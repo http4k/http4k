@@ -12,7 +12,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.RouterMatchResult.MatchingHandler
+import org.http4k.routing.RouterMatch.MatchingHandler
 import org.junit.jupiter.api.Test
 
 abstract class RoutingHttpHandlerContract {

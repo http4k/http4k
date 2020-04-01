@@ -14,15 +14,15 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import java.io.InputStream
 
-sealed class RouterMatchResult(private val priority: Int) : Comparable<RouterMatchResult> {
-    data class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatchResult(0), HttpHandler {
+sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
+    data class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatch(0), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
     }
 
-    object MethodNotMatched : RouterMatchResult(5)
-    object Unmatched : RouterMatchResult(10)
+    object MethodNotMatched : RouterMatch(1)
+    object Unmatched : RouterMatch(2)
 
-    override fun compareTo(other: RouterMatchResult): Int = priority.compareTo(other.priority)
+    override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
 }
 
 /**
@@ -32,7 +32,7 @@ interface Router {
     /**
      * Attempt to supply an HttpHandler which can service the passed request.
      */
-    fun match(request: Request): RouterMatchResult
+    fun match(request: Request): RouterMatch
 }
 
 /**
@@ -95,9 +95,9 @@ data class PathMethod(val path: String, val method: Method) {
         when (action) {
             is StaticRoutingHttpHandler -> action.withBasePath(path).let {
                 object : RoutingHttpHandler by it {
-                    override fun match(request: Request): RouterMatchResult = when (method) {
+                    override fun match(request: Request): RouterMatch = when (method) {
                         request.method -> it.match(request)
-                        else -> RouterMatchResult.MethodNotMatched
+                        else -> RouterMatch.MethodNotMatched
                     }
                 }
             }

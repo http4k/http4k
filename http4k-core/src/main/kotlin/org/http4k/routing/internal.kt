@@ -16,9 +16,9 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
-import org.http4k.routing.RouterMatchResult.MatchingHandler
-import org.http4k.routing.RouterMatchResult.MethodNotMatched
-import org.http4k.routing.RouterMatchResult.Unmatched
+import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MethodNotMatched
+import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsConsumer
 
@@ -59,7 +59,7 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
     private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
     private val handlerWithFilter = filter.then(handlerNoFilter)
 
-    override fun match(request: Request): RouterMatchResult = handlerNoFilter(request).let {
+    override fun match(request: Request): RouterMatch = handlerNoFilter(request).let {
         if (it.status != NOT_FOUND) MatchingHandler(filter.then { _: Request -> it }) else null
     } ?: Unmatched
 
@@ -79,7 +79,7 @@ internal data class AggregateRoutingHttpHandler(
         is Unmatched -> notFoundHandler(request)
     }
 
-    override fun match(request: Request): RouterMatchResult = list.asSequence()
+    override fun match(request: Request): RouterMatch = list.asSequence()
         .map { next -> next.match(request) }
         .sorted()
         .firstOrNull() ?: Unmatched
@@ -101,7 +101,7 @@ internal data class TemplateRoutingHttpHandler(
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
     private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
 
-    override fun match(request: Request): RouterMatchResult =
+    override fun match(request: Request): RouterMatch =
         if (template.matches(request.uri.path)) {
             when (method) {
                 null, request.method -> MatchingHandler { RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }

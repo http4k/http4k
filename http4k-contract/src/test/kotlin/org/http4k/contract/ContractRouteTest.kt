@@ -21,9 +21,9 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
-import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.MatchingHandler
-import org.http4k.routing.RouterMatchResult.Unmatched
+import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Test
 
 class ContractRouteTest {
@@ -79,9 +79,9 @@ class ContractRouteTest {
         val handler: (Request) -> Response = { Response(OK) }
         val route = "/" bindContract GET to handler
         val router = route.toRouter(Root)
-        assertThat(router.match(Request(GET, "/")), equalTo(MatchingHandler(handler) as RouterMatchResult))
-        assertThat(router.match(Request(POST, "/")), equalTo(Unmatched as RouterMatchResult))
-        assertThat(router.match(Request(GET, "/bob")), equalTo(Unmatched as RouterMatchResult))
+        assertThat(router.match(Request(GET, "/")), equalTo(MatchingHandler(handler) as RouterMatch))
+        assertThat(router.match(Request(POST, "/")), equalTo(Unmatched as RouterMatch))
+        assertThat(router.match(Request(GET, "/bob")), equalTo(Unmatched as RouterMatch))
     }
 
     @Test
@@ -250,17 +250,17 @@ class ContractRouteTest {
         assertThat(route(Request(DELETE, valid)), hasStatus(NOT_FOUND))
 
         val routerOnNoPrefix = route.toRouter(Root)
-        assertThat(routerOnNoPrefix.match(Request(GET, "")), equalTo(Unmatched as RouterMatchResult))
-        assertThat(routerOnNoPrefix.match(Request(POST, valid)), equalTo(Unmatched as RouterMatchResult))
+        assertThat(routerOnNoPrefix.match(Request(GET, "")), equalTo(Unmatched as RouterMatch))
+        assertThat(routerOnNoPrefix.match(Request(POST, valid)), equalTo(Unmatched as RouterMatch))
         assertThat(routerOnNoPrefix.match(Request(GET, valid)).matchOrNull()?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
 
         val routerOnPrefix = route.toRouter(Root / "somePrefix")
-        assertThat(routerOnPrefix.match(Request(GET, "/somePrefix")), equalTo(Unmatched as RouterMatchResult))
-        assertThat(routerOnPrefix.match(Request(POST, "/somePrefix/$valid")), equalTo(Unmatched as RouterMatchResult))
+        assertThat(routerOnPrefix.match(Request(GET, "/somePrefix")), equalTo(Unmatched as RouterMatch))
+        assertThat(routerOnPrefix.match(Request(POST, "/somePrefix/$valid")), equalTo(Unmatched as RouterMatch))
         assertThat(routerOnPrefix.match(Request(GET, "/somePrefix/$valid")).matchOrNull()?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
     }
 
-    private fun RouterMatchResult.matchOrNull(): HttpHandler? = when (this) {
+    private fun RouterMatch.matchOrNull(): HttpHandler? = when (this) {
         is MatchingHandler -> this
         else -> null
     }

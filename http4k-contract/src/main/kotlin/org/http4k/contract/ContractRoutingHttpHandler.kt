@@ -15,10 +15,10 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.Validator
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
-import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.MatchingHandler
-import org.http4k.routing.RouterMatchResult.MethodNotMatched
-import org.http4k.routing.RouterMatchResult.Unmatched
+import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MethodNotMatched
+import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.RoutingHttpHandler
 
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
@@ -75,8 +75,8 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 
-    override fun match(request: Request): RouterMatchResult {
-        val unmatched: RouterMatchResult = Unmatched
+    override fun match(request: Request): RouterMatch {
+        val unmatched: RouterMatch = Unmatched
 
         return if (request.isIn(contractRoot)) {
             routers.fold(unmatched) { memo, (routeFilter, router) ->
