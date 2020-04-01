@@ -43,7 +43,7 @@ changes with their rationale when appropriate:
 
 ### v3.232.0
 - [http4k-format-kotlinx-serialization] New JSON module! H/T @joscha-alisch for the PR. :)
-- [http4k-testing-servirtium] Work around Kotlin @JvmOverloads problem in ServitriumServer.
+- [http4k-testing-servirtium] Work around Kotlin @JvmOverloads problem in ServirtiumServer.
 - [all] Upgrade some dependency versions.
 
 ### v3.231.0
