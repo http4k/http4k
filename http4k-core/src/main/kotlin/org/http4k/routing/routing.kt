@@ -14,6 +14,16 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import java.io.InputStream
 
+/**
+ * Provides matching of a Request to an HttpHandler which can service it.
+ */
+interface Router {
+    /**
+     * Attempt to supply an HttpHandler which can service the passed request.
+     */
+    fun match(request: Request): RouterMatch
+}
+
 sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
     data class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatch(0), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
@@ -23,16 +33,6 @@ sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
     object Unmatched : RouterMatch(2)
 
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
-}
-
-/**
- * Provides matching of a Request to an HttpHandler which can service it.
- */
-interface Router {
-    /**
-     * Attempt to supply an HttpHandler which can service the passed request.
-     */
-    fun match(request: Request): RouterMatch
 }
 
 /**
