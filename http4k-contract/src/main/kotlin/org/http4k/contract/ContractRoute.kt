@@ -19,10 +19,10 @@ import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
-import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.MatchingHandler
-import org.http4k.routing.RouterMatchResult.MethodNotMatched
-import org.http4k.routing.RouterMatchResult.Unmatched
+import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MethodNotMatched
+import org.http4k.routing.RouterMatch.Unmatched
 
 class ContractRoute internal constructor(val method: Method,
                                          val spec: ContractRouteSpec,
@@ -37,7 +37,7 @@ class ContractRoute internal constructor(val method: Method,
     internal fun toRouter(contractRoot: PathSegments) = object : Router {
         override fun toString(): String = "${method.name}: ${spec.describe(contractRoot)}"
 
-        override fun match(request: Request): RouterMatchResult =
+        override fun match(request: Request): RouterMatch =
             if ((request.method == OPTIONS || request.method == method) && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
                 try {
                     request.without(spec.pathFn(contractRoot))

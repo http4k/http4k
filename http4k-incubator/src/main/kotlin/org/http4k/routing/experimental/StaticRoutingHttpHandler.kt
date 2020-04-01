@@ -11,10 +11,10 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
 import org.http4k.routing.Router
-import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.MatchingHandler
-import org.http4k.routing.RouterMatchResult.MethodNotMatched
-import org.http4k.routing.RouterMatchResult.Unmatched
+import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MethodNotMatched
+import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.RoutingHttpHandler
 
 fun static(resourceLoader: Router): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader)
@@ -32,7 +32,7 @@ internal data class StaticRoutingHttpHandler(
     private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader)
     private val handlerWithFilter = filter.then(handlerNoFilter)
 
-    override fun match(request: Request): RouterMatchResult = handlerNoFilter(request).let {
+    override fun match(request: Request): RouterMatch = handlerNoFilter(request).let {
         if (it.status != NOT_FOUND)
             MatchingHandler(filter.then { _: Request -> it })
         else

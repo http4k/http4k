@@ -14,9 +14,9 @@ import org.http4k.core.Uri.Companion.of
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.Router
-import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.MatchingHandler
-import org.http4k.routing.RouterMatchResult.Unmatched
+import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Test
 
 abstract class ResourceLoaderContract(private val loader: Router) {
@@ -51,7 +51,7 @@ abstract class ResourceLoaderContract(private val loader: Router) {
     protected fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
         val request = Request(GET, of(path))
         if (expected == null)
-            assertThat(loader.match(request), equalTo(Unmatched as RouterMatchResult))
+            assertThat(loader.match(request), equalTo(Unmatched as RouterMatch))
         else {
             val response = loader.match(request).matchOrExplode().invoke(request)
             assertThat(response, hasBody(expected))
@@ -60,7 +60,7 @@ abstract class ResourceLoaderContract(private val loader: Router) {
         }
     }
 
-    private fun RouterMatchResult.matchOrExplode(): HttpHandler = when (this) {
+    private fun RouterMatch.matchOrExplode(): HttpHandler = when (this) {
         is MatchingHandler -> this
         else -> error("Unmatched, got $this")
     }
