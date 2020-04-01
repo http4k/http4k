@@ -7,7 +7,6 @@ import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
 import org.http4k.contract.security.Security
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json

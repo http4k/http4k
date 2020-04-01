@@ -4,8 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.base64Encode
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate

@@ -23,13 +23,13 @@ import org.http4k.security.oauth.server.TokenRequest
 import java.time.Clock
 
 class AuthorizationCodeAccessTokenGenerator(
-        private val authorizationCodes: AuthorizationCodes,
-        private val accessTokens: AccessTokens,
-        private val clock: Clock,
-        private val idTokens: IdTokens
+    private val authorizationCodes: AuthorizationCodes,
+    private val accessTokens: AccessTokens,
+    private val clock: Clock,
+    private val idTokens: IdTokens
 ) : AccessTokenGenerator {
     override fun generate(request: Request, clientId: ClientId, tokenRequest: TokenRequest) =
-            extract(clientId, tokenRequest).flatMap { generate(it) }
+        extract(clientId, tokenRequest).flatMap { generate(it) }
 
     fun generate(request: AuthorizationCodeAccessTokenRequest): Result<AccessTokenDetails, AccessTokenError> {
         val code = request.authorizationCode
@@ -40,32 +40,32 @@ class AuthorizationCodeAccessTokenGenerator(
             codeDetails.clientId != request.clientId -> Failure(ClientIdMismatch)
             codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
             else -> accessTokens.create(codeDetails.clientId, request, code)
-                    .map { token ->
-                        when {
-                            codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(codeDetails, code, token))
-                            else -> AccessTokenDetails(token)
-                        }
+                .map { token ->
+                    when {
+                        codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(codeDetails, code, token))
+                        else -> AccessTokenDetails(token)
                     }
+                }
         }
     }
 
     companion object {
         fun extract(clientId: ClientId, tokenRequest: TokenRequest): Result<AuthorizationCodeAccessTokenRequest, AccessTokenError> {
             return Success(AuthorizationCodeAccessTokenRequest(
-                    clientId = clientId,
-                    clientSecret = tokenRequest.clientSecret ?: "",
-                    redirectUri = tokenRequest.redirectUri ?: return Failure(MissingRedirectUri),
-                    scopes = tokenRequest.scopes,
-                    authorizationCode = AuthorizationCode(tokenRequest.code ?: return Failure(MissingAuthorizationCode))
+                clientId = clientId,
+                clientSecret = tokenRequest.clientSecret ?: "",
+                redirectUri = tokenRequest.redirectUri ?: return Failure(MissingRedirectUri),
+                scopes = tokenRequest.scopes,
+                authorizationCode = AuthorizationCode(tokenRequest.code ?: return Failure(MissingAuthorizationCode))
             ))
         }
     }
 }
 
 data class AuthorizationCodeAccessTokenRequest(
-        val clientId: ClientId,
-        val clientSecret: String,
-        val redirectUri: Uri,
-        val scopes: List<String>,
-        val authorizationCode: AuthorizationCode
+    val clientId: ClientId,
+    val clientSecret: String,
+    val redirectUri: Uri,
+    val scopes: List<String>,
+    val authorizationCode: AuthorizationCode
 )

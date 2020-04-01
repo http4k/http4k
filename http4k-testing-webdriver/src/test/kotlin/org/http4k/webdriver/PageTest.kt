@@ -2,7 +2,6 @@ package org.http4k.webdriver
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By

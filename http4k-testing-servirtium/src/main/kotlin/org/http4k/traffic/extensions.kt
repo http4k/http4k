@@ -34,7 +34,7 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
                 if (expectedReq.toString() == actual) response
                 else renderMismatch(index, expectedReq.toString(), actual)
             }
-            else -> renderUnexpectedInteration(interactionCount, index+1)
+            else -> renderUnexpectedInteration(interactionCount, index + 1)
         }
     }
 }
@@ -45,7 +45,7 @@ private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Re
 
 /**
  * Interaction was called more times than there are interactions
-*/
+ */
 private fun renderUnexpectedInteration(interactions: Int, count: Int) = Response(NOT_IMPLEMENTED).body(
     "Have $interactions interaction(s) in the script but called $count times. Unexpected interaction"
 )

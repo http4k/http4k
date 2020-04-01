@@ -16,7 +16,7 @@ interface AuthoriseRequestValidator {
 class MustHaveRedirectUri(private val delegate: AuthoriseRequestValidator) : AuthoriseRequestValidator by delegate {
 
     override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
-        if(authorizationRequest.redirectUri == null) {
+        if (authorizationRequest.redirectUri == null) {
             return Failure(InvalidAuthorizationRequest("query 'redirect_uri' is required"))
         }
         return delegate.validate(request, authorizationRequest)

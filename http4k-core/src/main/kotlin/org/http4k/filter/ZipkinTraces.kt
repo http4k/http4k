@@ -26,7 +26,8 @@ data class SamplingDecision(val value: String) {
 
         private val VALID_VALUES = listOf("1", "0")
 
-        fun from(sampledHeaderValue: String?) = sampledHeaderValue?.takeIf { it in VALID_VALUES }?.let(::SamplingDecision) ?: SAMPLE
+        fun from(sampledHeaderValue: String?) = sampledHeaderValue?.takeIf { it in VALID_VALUES }?.let(::SamplingDecision)
+            ?: SAMPLE
     }
 }
 

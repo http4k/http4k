@@ -3,10 +3,16 @@ package org.http4k.filter
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.*
+import org.http4k.core.Body
+import org.http4k.core.ContentType
+import org.http4k.core.HttpTransaction
 import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP_LABEL
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.UriTemplate
+import org.http4k.core.then
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.hamkrest.hasBody

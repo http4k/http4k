@@ -22,8 +22,8 @@ class OAuthCallback(
                 ?.takeIf { it == oAuthPersistence.retrieveCsrf(request) }
                 ?.let {
                     val idToken = request.queryOrFragmentParameter("id_token")?.let { IdToken(it) }
-                    if(hasValidNonceInIdToken(request, idToken)) {
-                        idToken?.let {  idTokenConsumer.consumeFromAuthorizationResponse(it)}
+                    if (hasValidNonceInIdToken(request, idToken)) {
+                        idToken?.let { idTokenConsumer.consumeFromAuthorizationResponse(it) }
                         accessTokenFetcher.fetch(code)
                             ?.let { tokenDetails ->
                                 tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
@@ -39,7 +39,7 @@ class OAuthCallback(
         ?: oAuthPersistence.authFailureResponse()
 
     private fun hasValidNonceInIdToken(request: Request, idToken: IdToken?): Boolean {
-        return if(idToken != null) {
+        return if (idToken != null) {
             idTokenConsumer.nonceFromIdToken(idToken) == oAuthPersistence.retrieveNonce(request)
         } else true
     }

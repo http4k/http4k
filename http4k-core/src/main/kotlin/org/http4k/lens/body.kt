@@ -109,6 +109,7 @@ interface ContentNegotiation {
                 if (actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual)
             }
         }
+
         /**
          * The received Content-type header passed back MUST equal the expected Content-type, not including the directive
          */

@@ -245,7 +245,7 @@ object ServerFilters {
      */
     object GZip {
         operator fun invoke(compressionMode: GzipCompressionMode = Memory): Filter =
-                RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
+            RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
     }
 
     /**

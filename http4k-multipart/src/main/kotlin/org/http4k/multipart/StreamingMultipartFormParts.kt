@@ -23,6 +23,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
     private var boundary = prependBoundaryWithStreamTerminator(inBoundary)
     private var boundaryWithPrefix = addPrefixToBoundary(boundary)
     private var state: MultipartFormStreamState = FindBoundary
+
     // yes yes, I should use a stack or something for this
     private var mixedName: String? = null
     private var oldBoundary = inBoundary

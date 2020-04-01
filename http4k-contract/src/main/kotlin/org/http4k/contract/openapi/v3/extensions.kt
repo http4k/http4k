@@ -10,13 +10,14 @@ import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 
-val ParamMeta.value get() = when(this) {
-    ArrayParam -> "array"
-    StringParam -> "string"
-    ObjectParam -> "object"
-    BooleanParam -> "boolean"
-    IntegerParam -> "integer"
-    FileParam -> "string"
-    NumberParam -> "number"
-    NullParam -> "null"
-}
+val ParamMeta.value
+    get() = when (this) {
+        ArrayParam -> "array"
+        StringParam -> "string"
+        ObjectParam -> "object"
+        BooleanParam -> "boolean"
+        IntegerParam -> "integer"
+        FileParam -> "string"
+        NumberParam -> "number"
+        NullParam -> "null"
+    }

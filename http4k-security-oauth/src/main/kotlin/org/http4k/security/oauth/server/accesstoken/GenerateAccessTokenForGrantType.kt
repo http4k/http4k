@@ -16,7 +16,9 @@ import org.http4k.security.oauth.server.AccessTokens
 import org.http4k.security.oauth.server.AuthorizationCodes
 import org.http4k.security.oauth.server.IdTokens
 import org.http4k.security.oauth.server.UnsupportedGrantType
-import org.http4k.security.oauth.server.accesstoken.GrantType.*
+import org.http4k.security.oauth.server.accesstoken.GrantType.AuthorizationCode
+import org.http4k.security.oauth.server.accesstoken.GrantType.ClientCredentials
+import org.http4k.security.oauth.server.accesstoken.GrantType.RefreshToken
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokenAccessTokenGenerator
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.oauth.server.tokenRequest
@@ -39,9 +41,9 @@ class GenerateAccessTokenForGrantType(
         return resolveGrantTypeFromConfiguration(grantType)
             .flatMap { (generator, authenticator) ->
                 authenticator.validateCredentials(request, request.tokenRequest(grantType))
-                        .flatMap { (request, clientId, tokenRequest) ->
-                            generator.generate(request, clientId, tokenRequest)
-                        }
+                    .flatMap { (request, clientId, tokenRequest) ->
+                        generator.generate(request, clientId, tokenRequest)
+                    }
             }
     }
 

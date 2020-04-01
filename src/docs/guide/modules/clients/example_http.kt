@@ -6,8 +6,7 @@ import org.apache.http.impl.client.HttpClients
 import org.http4k.client.ApacheAsyncClient
 import org.http4k.client.ApacheClient
 import org.http4k.core.BodyMode
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import kotlin.concurrent.thread
 

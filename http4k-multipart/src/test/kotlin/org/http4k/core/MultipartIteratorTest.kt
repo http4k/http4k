@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.core.Method.*
+import org.http4k.core.Method.POST
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.MultipartFormFile
 import org.http4k.multipart.AlreadyClosedException

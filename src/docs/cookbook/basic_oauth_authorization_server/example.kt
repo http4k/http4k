@@ -34,7 +34,7 @@ import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
 import java.time.temporal.ChronoUnit.DAYS
-import java.util.*
+import java.util.UUID
 
 fun main() {
     fun authorizationServer(): RoutingHttpHandler {

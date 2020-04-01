@@ -6,8 +6,7 @@ import com.natpryce.hamkrest.or
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.hamkrest.hasBody

@@ -2,8 +2,7 @@ package cookbook.typesafe_http_requests_with_lenses
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.Body
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.format.Jackson.json
 import org.http4k.lens.LensExtractor
