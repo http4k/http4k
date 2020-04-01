@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.242.0 (uncut)
 - [all] Upgrade some dependency versions.
 - [http4k-testing-servirtium] Improve error diagnostics. H/T @vchekan for the PR.
+- [all] [Unlikely Break] Change `Router` to return `RouterMatch` instead of nullable `HttpHandler`. This allows us to support `METHOD_NOT_ALLOWED` (405) if we match a path but not a verb instead of just `NOT_FOUND` (404). This should break custom ro H/T @jshiell for the PR.
 
 ### v3.241.0
 - [http4k-security-oauth] [Breaking] `client_id` along with the corresponding `TokenRequest` is passed into access and refresh token generators so additional validation can take place H/T @tom
