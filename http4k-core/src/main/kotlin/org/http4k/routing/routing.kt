@@ -95,7 +95,7 @@ data class PathMethod(val path: String, val method: Method) {
         when (action) {
             is StaticRoutingHttpHandler -> action.withBasePath(path).let {
                 object : RoutingHttpHandler by it {
-                    override fun match(request: Request): RouterMatch = when (method) {
+                    override fun match(request: Request) = when (method) {
                         request.method -> it.match(request)
                         else -> RouterMatch.MethodNotMatched
                     }
