@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.242.0 (uncut)
+### v3.242.0
 - [all] Upgrade some dependency versions.
 - [http4k-testing-servirtium] Improve error diagnostics. H/T @vchekan for the PR.
 - [all] [Unlikely Break] Change `Router` to return `RouterMatch` instead of nullable `HttpHandler`. This allows us to support `METHOD_NOT_ALLOWED` (405) if we match a path but not a verb instead of just `NOT_FOUND` (404). This should break custom ro H/T @jshiell for the PR.
