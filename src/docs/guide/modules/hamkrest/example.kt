@@ -1,5 +1,6 @@
 package guide.modules.hamkrest
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
