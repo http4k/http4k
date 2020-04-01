@@ -10,6 +10,7 @@ import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
@@ -18,6 +19,8 @@ import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
+import org.http4k.routing.RouterMatchResult
+import org.http4k.routing.RouterMatchResult.*
 
 class ContractRoute internal constructor(val method: Method,
                                          val spec: ContractRouteSpec,
@@ -32,20 +35,20 @@ class ContractRoute internal constructor(val method: Method,
     internal fun toRouter(contractRoot: PathSegments) = object : Router {
         override fun toString(): String = "${method.name}: ${spec.describe(contractRoot)}"
 
-        override fun match(request: Request): HttpHandler? =
+        override fun match(request: Request): RouterMatchResult =
             if ((request.method == OPTIONS || request.method == method) && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
                 try {
                     request.without(spec.pathFn(contractRoot))
                         .extract(spec.pathLenses.toList())
                         ?.let {
                             if (request.method == OPTIONS) {
-                                { Response(OK) }
-                            } else toHandler(it)
-                        }
+                                MatchingHandler { Response(OK) }
+                            } else MatchingHandler(toHandler(it))
+                        } ?: Unmatched
                 } catch (e: LensFailure) {
-                    null
+                    Unmatched
                 }
-            } else null
+            } else Unmatched
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)
@@ -55,16 +58,18 @@ class ContractRoute internal constructor(val method: Method,
      * but this function exists to enable the testing of the ContractRoute logic outside of a wider contract context.
      * This means that certain behaviour is defaulted - chiefly the generation of NOT_FOUND and BAD_REQUEST responses.
      */
-    override fun invoke(p1: Request): Response {
-        val handler = toRouter(Root).match(p1)
-            ?.let {
-                (meta.security?.filter ?: Filter.NoOp)
-                    .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
-                    .then(PreFlightExtractionFilter(meta, Companion.All))
-                    .then(it)
+    override fun invoke(request: Request): Response {
+        return when (val matchResult = toRouter(Root).match(request)) {
+                is MatchingHandler -> {
+                    (meta.security?.filter ?: Filter.NoOp)
+                        .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
+                        .then(PreFlightExtractionFilter(meta, Companion.All))
+                        .then(matchResult)(request)
+                }
+                is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
+                is Unmatched -> Response(NOT_FOUND)
             }
-        return handler?.invoke(p1) ?: Response(NOT_FOUND)
-    }
+        }
 
     override fun toString() = "${method.name}: ${spec.describe(Root)}"
 }
