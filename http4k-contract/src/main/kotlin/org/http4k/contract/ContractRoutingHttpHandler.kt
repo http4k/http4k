@@ -1,16 +1,24 @@
 package org.http4k.contract
 
 import org.http4k.contract.security.Security
-import org.http4k.core.*
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.NoOp
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.UriTemplate
+import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Validator
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.*
+import org.http4k.routing.RouterMatchResult.MatchingHandler
+import org.http4k.routing.RouterMatchResult.MethodNotMatched
+import org.http4k.routing.RouterMatchResult.Unmatched
 import org.http4k.routing.RoutingHttpHandler
 
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,

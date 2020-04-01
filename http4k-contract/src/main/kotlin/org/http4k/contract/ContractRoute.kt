@@ -20,7 +20,9 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.*
+import org.http4k.routing.RouterMatchResult.MatchingHandler
+import org.http4k.routing.RouterMatchResult.MethodNotMatched
+import org.http4k.routing.RouterMatchResult.Unmatched
 
 class ContractRoute internal constructor(val method: Method,
                                          val spec: ContractRouteSpec,
@@ -60,16 +62,16 @@ class ContractRoute internal constructor(val method: Method,
      */
     override fun invoke(request: Request): Response {
         return when (val matchResult = toRouter(Root).match(request)) {
-                is MatchingHandler -> {
-                    (meta.security?.filter ?: Filter.NoOp)
-                        .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
-                        .then(PreFlightExtractionFilter(meta, Companion.All))
-                        .then(matchResult)(request)
-                }
-                is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
-                is Unmatched -> Response(NOT_FOUND)
+            is MatchingHandler -> {
+                (meta.security?.filter ?: Filter.NoOp)
+                    .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
+                    .then(PreFlightExtractionFilter(meta, Companion.All))
+                    .then(matchResult)(request)
             }
+            is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
+            is Unmatched -> Response(NOT_FOUND)
         }
+    }
 
     override fun toString() = "${method.name}: ${spec.describe(Root)}"
 }

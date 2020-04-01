@@ -1,7 +1,8 @@
 package org.http4k.contract
 
-import com.natpryce.hamkrest.*
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
@@ -21,7 +22,8 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.*
+import org.http4k.routing.RouterMatchResult.MatchingHandler
+import org.http4k.routing.RouterMatchResult.Unmatched
 import org.junit.jupiter.api.Test
 
 class ContractRouteTest {
@@ -258,7 +260,7 @@ class ContractRouteTest {
         assertThat(routerOnPrefix.match(Request(GET, "/somePrefix/$valid")).matchOrNull()?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
     }
 
-    private fun RouterMatchResult.matchOrNull() : HttpHandler? = when (this) {
+    private fun RouterMatchResult.matchOrNull(): HttpHandler? = when (this) {
         is MatchingHandler -> this
         else -> null
     }

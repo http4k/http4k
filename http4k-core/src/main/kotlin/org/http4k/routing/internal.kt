@@ -16,7 +16,9 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
-import org.http4k.routing.RouterMatchResult.*
+import org.http4k.routing.RouterMatchResult.MatchingHandler
+import org.http4k.routing.RouterMatchResult.MethodNotMatched
+import org.http4k.routing.RouterMatchResult.Unmatched
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsConsumer
 
@@ -136,7 +138,7 @@ internal data class SinglePageAppRoutingHandler(
 ) : RoutingHttpHandler {
 
     override fun invoke(request: Request): Response {
-        val matchOnStatic = when(val matchResult = staticHandler.match(request)) {
+        val matchOnStatic = when (val matchResult = staticHandler.match(request)) {
             is MatchingHandler -> matchResult(request)
             else -> null
         }

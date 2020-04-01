@@ -12,7 +12,9 @@ import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.*
+import org.http4k.routing.RouterMatchResult.MatchingHandler
+import org.http4k.routing.RouterMatchResult.MethodNotMatched
+import org.http4k.routing.RouterMatchResult.Unmatched
 import org.http4k.routing.RoutingHttpHandler
 
 fun static(resourceLoader: Router): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader)
