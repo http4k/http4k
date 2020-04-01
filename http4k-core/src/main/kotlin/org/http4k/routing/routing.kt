@@ -18,6 +18,7 @@ sealed class RouterMatchResult(private val priority: Int) : Comparable<RouterMat
     data class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatchResult(0), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
     }
+
     object MethodNotMatched : RouterMatchResult(5)
     object Unmatched : RouterMatchResult(10)
 

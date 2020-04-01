@@ -6,7 +6,8 @@ import org.http4k.core.MimeTypes
 import org.http4k.core.Request
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.*
+import org.http4k.routing.RouterMatchResult.MatchingHandler
+import org.http4k.routing.RouterMatchResult.Unmatched
 import java.net.URL
 import java.time.Instant
 import java.time.temporal.ChronoUnit.SECONDS

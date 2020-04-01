@@ -7,16 +7,16 @@ import com.natpryce.hamkrest.or
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
-import org.http4k.core.Method.GET
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatchResult
-import org.http4k.routing.RouterMatchResult.*
+import org.http4k.routing.RouterMatchResult.MatchingHandler
+import org.http4k.routing.RouterMatchResult.Unmatched
 import org.junit.jupiter.api.Test
 
 abstract class ResourceLoaderContract(private val loader: Router) {
@@ -60,7 +60,7 @@ abstract class ResourceLoaderContract(private val loader: Router) {
         }
     }
 
-    private fun RouterMatchResult.matchOrExplode() : HttpHandler = when (this) {
+    private fun RouterMatchResult.matchOrExplode(): HttpHandler = when (this) {
         is MatchingHandler -> this
         else -> error("Unmatched, got $this")
     }
