@@ -81,6 +81,7 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress?) : Serve
                     .setBacklogSize(1000)
                     .build())
                 .register("*", Http4kRequestHandler(httpHandler))
+                .setExceptionListener(STD_ERR)
 
             if (address != null)
                 bootstrap.setLocalAddress(address)
