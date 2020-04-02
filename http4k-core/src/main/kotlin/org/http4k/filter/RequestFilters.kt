@@ -39,8 +39,8 @@ object RequestFilters {
         operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
             { request ->
                 request.header("content-encoding")
-                        ?.let { if (it.contains("gzip")) it else null }
-                        ?.let { next(request.body(compressionMode.decompress(request.body))) } ?: next(request)
+                    ?.let { if (it.contains("gzip")) it else null }
+                    ?.let { next(request.body(compressionMode.decompress(request.body))) } ?: next(request)
             }
         }
     }

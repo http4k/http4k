@@ -112,6 +112,6 @@ class ServirtiumReplayIntegrationTest : TestContract {
         assertThat({
             handler(Request(POST, "/foobar").body("welcome"))
         }, throws(
-            has(AssertionFailedError::getLocalizedMessage, containsSubstring("Unexpected request received for Interaction 2"))))
+            has(AssertionFailedError::getLocalizedMessage, containsSubstring("Have 2 interaction(s) in the script but called 3 times. Unexpected interaction"))))
     }
 }

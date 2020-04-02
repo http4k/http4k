@@ -3,8 +3,18 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.240.0 (uncut)
+### v3.242.0
+- [all] Upgrade some dependency versions.
+- [http4k-testing-servirtium] Improve error diagnostics. H/T @vchekan for the PR.
+- [all] [Unlikely Break] Change `Router` to return `RouterMatch` instead of nullable `HttpHandler`. This allows us to support `METHOD_NOT_ALLOWED` (405) if we match a path but not a verb instead of just `NOT_FOUND` (404). This should break custom ro H/T @jshiell for the PR.
+
+### v3.241.0
+- [http4k-security-oauth] [Breaking] `client_id` along with the corresponding `TokenRequest` is passed into access and refresh token generators so additional validation can take place H/T @tom
+
+### v3.240.0
+- [all] Upgrade Kotlin to `1.3.71`.
 - [http4k-testing-servirtium] Switch OkHttp client for Apache.
+- [http4k-server-jetty] Made some classes non-internal so they can be easily reused for custom `ServerConfig` implementations.
 
 ### v3.239.0
 - [http4k-client-websocket] [Breaking] Added extra onError handler when creating a non-blocking websocket.

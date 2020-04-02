@@ -1,6 +1,11 @@
 package org.http4k.filter
 
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.HttpTransaction
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.filter.GzipCompressionMode.Memory
 import java.time.Clock
 import java.time.Duration
@@ -103,8 +108,8 @@ object ResponseFilters {
             { request ->
                 next(request.header("accept-encoding", "gzip")).let { response ->
                     response.header("content-encoding")
-                            ?.let { if (it.contains("gzip")) it else null }
-                            ?.let { response.body(compressionMode.decompress(response.body)) } ?: response
+                        ?.let { if (it.contains("gzip")) it else null }
+                        ?.let { response.body(compressionMode.decompress(response.body)) } ?: response
                 }
             }
         }

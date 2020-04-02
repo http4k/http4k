@@ -3,13 +3,7 @@ package org.http4k.security.oauth.server.accesstoken
 import com.natpryce.get
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.ContentType
-import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.core.body.form
-import org.http4k.core.with
-import org.http4k.lens.Header
 import org.http4k.security.oauth.server.AccessTokenError
 import org.http4k.security.oauth.server.AuthorizationCode
 import org.http4k.security.oauth.server.ClientId

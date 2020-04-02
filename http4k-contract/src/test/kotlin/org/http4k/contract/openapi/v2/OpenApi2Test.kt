@@ -9,12 +9,10 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
 import org.http4k.core.Filter
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.format.Argo

@@ -3,7 +3,11 @@ package org.http4k.filter
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.PushbackInputStream
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 import java.util.zip.Deflater

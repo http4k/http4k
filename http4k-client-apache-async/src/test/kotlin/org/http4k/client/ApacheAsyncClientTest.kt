@@ -9,8 +9,7 @@ import org.apache.http.impl.nio.reactor.IOReactorConfig
 import org.apache.http.nio.protocol.HttpAsyncRequestProducer
 import org.apache.http.nio.protocol.HttpAsyncResponseConsumer
 import org.apache.http.protocol.HttpContext
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.hamkrest.hasStatus

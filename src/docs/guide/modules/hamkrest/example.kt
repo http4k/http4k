@@ -3,11 +3,9 @@ package guide.modules.hamkrest
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK

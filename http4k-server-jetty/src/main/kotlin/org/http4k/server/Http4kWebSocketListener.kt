@@ -15,7 +15,7 @@ import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import java.nio.ByteBuffer
 
-internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: PushPullAdaptingWebSocket) {
+class Http4kWebSocketAdapter(private val innerSocket: PushPullAdaptingWebSocket) {
     fun onError(throwable: Throwable) = innerSocket.triggerError(throwable)
     fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(WsStatus(statusCode, reason
         ?: "<unknown>"))
@@ -23,13 +23,11 @@ internal class Http4kWebSocketAdapter internal constructor(private val innerSock
     fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
 }
 
-internal fun ServletUpgradeRequest.asHttp4kRequest(): Request =
-    Request(Method.valueOf(method), Uri.of(requestURI.toString()))
-        .headers(headerParameters())
+internal fun ServletUpgradeRequest.asHttp4kRequest() = Request(Method.valueOf(method), Uri.of(requestURI.toString())).headers(headerParameters())
 
 private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequence().fold(listOf()) { memo, next -> memo + next.value.map { next.key to it } }
 
-internal class Http4kWebSocketListener(private val wSocket: WsConsumer, private val upgradeRequest: Request) : WebSocketListener {
+class Http4kWebSocketListener(private val wSocket: WsConsumer, private val upgradeRequest: Request) : WebSocketListener {
     private var websocket: Http4kWebSocketAdapter? = null
 
     override fun onWebSocketClose(statusCode: Int, reason: String?) {

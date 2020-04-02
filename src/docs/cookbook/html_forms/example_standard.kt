@@ -1,7 +1,6 @@
 package cookbook.html_forms
 
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.body.form
 import org.http4k.core.getFirst

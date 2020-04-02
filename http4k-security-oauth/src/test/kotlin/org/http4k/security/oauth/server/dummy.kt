@@ -7,6 +7,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessToken
+import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 import org.http4k.security.oauth.server.refreshtoken.RefreshToken
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.openid.IdToken
@@ -14,7 +15,7 @@ import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.Nonce
 import java.time.Clock
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
     override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username
@@ -36,15 +37,15 @@ class DummyIdTokens(private val username: String? = null) : IdTokens {
 class DummyAccessTokens : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> = Success(AccessToken("dummy-access-token"))
 
-    override fun create(authorizationCode: AuthorizationCode) = Success(AccessToken("dummy-access-token"))
+    override fun create(clientId: ClientId, tokenRequest: AuthorizationCodeAccessTokenRequest, authorizationCode: AuthorizationCode) = Success(AccessToken("dummy-access-token"))
 }
 
 class DummyRefreshTokens : RefreshTokens {
-    override fun refreshAccessToken(refreshToken: RefreshToken): Result<AccessToken, AccessTokenError> {
-        if (refreshToken.value.startsWith("valid")) {
-            return Success(newAccessToken)
+    override fun refreshAccessToken(clientId: ClientId, tokenRequest: TokenRequest, refreshToken: RefreshToken): Result<AccessToken, AccessTokenError> {
+        return if (refreshToken.value.startsWith("valid")) {
+            Success(newAccessToken)
         } else {
-            return Failure(InvalidRequest("Invalid refresh token"))
+            Failure(InvalidRequest("Invalid refresh token"))
         }
     }
 
@@ -61,7 +62,7 @@ class DummyRefreshTokens : RefreshTokens {
 class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> = Failure(error)
 
-    override fun create(authorizationCode: AuthorizationCode) = Failure(error)
+    override fun create(clientId: ClientId, tokenRequest: AuthorizationCodeAccessTokenRequest, authorizationCode: AuthorizationCode) = Failure(error)
 }
 
 class DummyClientValidator : ClientValidator {

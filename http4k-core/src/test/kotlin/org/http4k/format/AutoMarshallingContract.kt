@@ -199,6 +199,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
     abstract fun customJson(): AutoMarshallingJson
 }
+
 fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
     .bigDecimal(::BigDecimalHolder, BigDecimalHolder::value)
     .bigInteger(::BigIntegerHolder, BigIntegerHolder::value)

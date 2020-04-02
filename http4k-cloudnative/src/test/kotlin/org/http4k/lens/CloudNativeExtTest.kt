@@ -8,8 +8,7 @@ import org.http4k.cloudnative.env.Host
 import org.http4k.cloudnative.env.Port
 import org.http4k.cloudnative.env.Secret
 import org.http4k.cloudnative.env.Timeout
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.BiDiLensContract.checkContract

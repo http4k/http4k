@@ -29,11 +29,12 @@ import org.http4k.security.oauth.server.InsecureCookieBasedAuthRequestTracking
 import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.security.oauth.server.TokenRequest
 import org.http4k.security.oauth.server.UnsupportedGrantType
+import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
 import java.time.temporal.ChronoUnit.DAYS
-import java.util.*
+import java.util.UUID
 
 fun main() {
     fun authorizationServer(): RoutingHttpHandler {
@@ -120,6 +121,6 @@ class InsecureAccessTokens : AccessTokens {
 
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date
-    override fun create(authorizationCode: AuthorizationCode) =
+    override fun create(clientId: ClientId, tokenRequest: AuthorizationCodeAccessTokenRequest, authorizationCode: AuthorizationCode) =
         Success(AccessToken(UUID.randomUUID().toString()))
 }

@@ -85,6 +85,7 @@ class OAuthServer(
         requestJWTValidator,
         errorRenderer,
         documentationUri)
+
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, refreshTokens, errorRenderer, grantTypes))
 

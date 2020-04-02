@@ -198,7 +198,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `as a router when does not fine file`() {
         val handler = "/svc" bind static()
 
-        assertThat(handler.match(Request(GET, of("/svc/../svc/Bob.xml"))), absent())
+        assertThat(handler.match(Request(GET, of("/svc/../svc/Bob.xml"))), equalTo(RouterMatch.Unmatched as RouterMatch))
     }
 
     @Test

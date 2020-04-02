@@ -15,6 +15,10 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.Validator
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
+import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MethodNotMatched
+import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.RoutingHttpHandler
 
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
@@ -42,7 +46,13 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val notFound = preSecurityFilter.then(security?.filter
         ?: Filter.NoOp).then(postSecurityFilter).then { renderer.notFound() }
 
-    private val handler: HttpHandler = { (match(it) ?: notFound).invoke(it) }
+    private val handler: HttpHandler = {
+        when (val matchResult = match(it)) {
+            is MatchingHandler -> matchResult(it)
+            is MethodNotMatched -> notFound(it)
+            is Unmatched -> notFound(it)
+        }
+    }
 
     override fun invoke(request: Request): Response = handler(request)
 
@@ -65,14 +75,20 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 
-    override fun match(request: Request): HttpHandler? {
-        val noMatch: HttpHandler? = null
+    override fun match(request: Request): RouterMatch {
+        val unmatched: RouterMatch = Unmatched
 
         return if (request.isIn(contractRoot)) {
-            routers.fold(noMatch) { memo, (routeFilter, router) ->
-                memo ?: router.match(request)?.let { routeFilter.then(it) }
+            routers.fold(unmatched) { memo, (routeFilter, router) ->
+                when (memo) {
+                    is MatchingHandler -> memo
+                    else -> when (val matchResult = router.match(request)) {
+                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult))
+                        else -> minOf(memo, matchResult)
+                    }
+                }
             }
-        } else null
+        } else unmatched
     }
 
     private fun identify(route: ContractRoute) =

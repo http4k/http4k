@@ -8,6 +8,6 @@ class HexTest {
 
     @Test
     fun `converts byte array to hex`() {
-        assertThat(Hex.hex(ByteArray(10)  { (it * 2).toByte() }), equalTo("00020406080a0c0e1012"))
+        assertThat(Hex.hex(ByteArray(10) { (it * 2).toByte() }), equalTo("00020406080a0c0e1012"))
     }
 }

@@ -160,7 +160,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
             redirectUri = requestObject.redirectUri,
             audience = audienceToJson(requestObject.audience),
             issuer = requestObject.issuer,
-            scope = if(requestObject.scope.isEmpty()) null else requestObject.scope.joinToString(" "),
+            scope = if (requestObject.scope.isEmpty()) null else requestObject.scope.joinToString(" "),
             responseMode = requestObject.responseMode,
             responseType = requestObject.responseType,
             state = requestObject.state,

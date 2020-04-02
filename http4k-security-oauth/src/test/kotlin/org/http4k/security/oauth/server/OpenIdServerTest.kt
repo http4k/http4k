@@ -34,7 +34,7 @@ class OpenIdServerTest {
 
     @Test
     fun `can follow authorization code id_token flow`() {
-        val clientOauthPersistence =  InsecureCookieBasedOAuthPersistence("oauthTest")
+        val clientOauthPersistence = InsecureCookieBasedOAuthPersistence("oauthTest")
         val authenticationServer = customOauthAuthorizationServer()
         val tokenConsumer = InMemoryIdTokenConsumer()
         val consumerApp = oauthClientApp(authenticationServer, debug, CodeIdToken, tokenConsumer, listOf("openid", "name", "age"), clientOauthPersistence)
@@ -50,7 +50,7 @@ class OpenIdServerTest {
         val authRequestUri = preAuthResponse.header("location")!!
 
         val suppliedNonce = Uri.of(authRequestUri).queries().findSingle("nonce")?.let { Nonce(it) }
-        val storedNonce = clientOauthPersistence.retrieveNonce(preAuthResponse.cookies().fold(Request(GET, "/"), {acc, c -> acc.cookie(c)}))
+        val storedNonce = clientOauthPersistence.retrieveNonce(preAuthResponse.cookies().fold(Request(GET, "/"), { acc, c -> acc.cookie(c) }))
         assertThat(storedNonce, present())
         assertThat(suppliedNonce, present())
         assertThat(suppliedNonce, equalTo(storedNonce))
@@ -68,7 +68,7 @@ class OpenIdServerTest {
 
     @Test
     fun `reject oidc flow if nonces do not match`() {
-        val clientOauthPersistence =  InsecureCookieBasedOAuthPersistence("oauthTest")
+        val clientOauthPersistence = InsecureCookieBasedOAuthPersistence("oauthTest")
         val authenticationServer = customOauthAuthorizationServer()
         val tokenConsumer = InMemoryIdTokenConsumer(expectedNonce = Nonce("some invalid nonce"))
         val consumerApp = oauthClientApp(authenticationServer, debug, CodeIdToken, tokenConsumer, listOf("openid", "name", "age"), clientOauthPersistence)

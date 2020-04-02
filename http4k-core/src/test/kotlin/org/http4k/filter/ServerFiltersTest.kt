@@ -268,7 +268,7 @@ class ServerFiltersTest {
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                    hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
         }
 
         @Test
@@ -300,7 +300,7 @@ class ServerFiltersTest {
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                    hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
         }
 
         @Test
@@ -311,7 +311,7 @@ class ServerFiltersTest {
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                    !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
+                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
         }
 
         @Test

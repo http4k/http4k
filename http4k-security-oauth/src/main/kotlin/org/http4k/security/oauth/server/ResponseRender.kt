@@ -1,7 +1,6 @@
 package org.http4k.security.oauth.server
 
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.query
