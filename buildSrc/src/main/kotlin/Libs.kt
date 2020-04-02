@@ -5,7 +5,6 @@
  *   `$ ./gradlew buildSrcVersions`
  */
 object Libs {
-
     /**
      * https://github.com/Kotlin/kotlinx.serialization
      */
@@ -283,7 +282,7 @@ object Libs {
     /**
      * http://hc.apache.org/httpcomponents-client
      */
-    const val httpclient: String = "org.apache.httpcomponents:httpclient:" + Versions.httpclient
+    const val httpclient5: String = "org.apache.httpcomponents.client5:httpclient5:" + Versions.httpclient5
 
     /**
      * https://github.com/javadev/underscore-java
@@ -318,7 +317,7 @@ object Libs {
     /**
      * http://hc.apache.org/httpcomponents-core-ga
      */
-    const val httpcore: String = "org.apache.httpcomponents:httpcore:" + Versions.httpcore
+    const val httpcore5: String = "org.apache.httpcomponents.core5:httpcore5:" + Versions.httpcore5
 
     /**
      * https://github.com/npryce/result4k

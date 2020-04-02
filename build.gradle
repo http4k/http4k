@@ -193,7 +193,6 @@ dependencies {
     compile project(":http4k-core")
     compile project(":http4k-aws")
     compile project(":http4k-client-apache")
-    provided project(":http4k-client-apache5")
     compile project(":http4k-client-apache-async")
     compile project(":http4k-client-jetty")
     compile project(":http4k-client-okhttp")

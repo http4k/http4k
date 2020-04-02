@@ -1,14 +1,16 @@
 package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
-import org.apache.http.HttpHost
-import org.apache.http.HttpRequest
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.config.SocketConfig
-import org.apache.http.conn.ConnectTimeoutException
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.protocol.HttpContext
+import org.apache.hc.client5.http.ConnectTimeoutException
+import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.core5.http.ClassicHttpRequest
+import org.apache.hc.core5.http.HttpHost
+import org.apache.hc.core5.http.protocol.HttpContext
+import org.apache.hc.core5.io.CloseMode
+import org.apache.hc.core5.util.Timeout
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -19,9 +21,9 @@ import org.junit.jupiter.api.Test
 
 class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
     ApacheClient(HttpClients.custom()
-        .setDefaultSocketConfig(
-            SocketConfig.custom()
-                .setSoTimeout(100)
+        .setDefaultRequestConfig(
+            RequestConfig.custom()
+                .setResponseTimeout(Timeout.ofMilliseconds(100))
                 .build()
         ).build()
         , responseBodyMode = Stream)) {
@@ -29,12 +31,11 @@ class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
     @Test
     fun `connect timeout is handled`() {
         assertThat(ApacheClient(object : CloseableHttpClient() {
-            override fun getParams() = TODO("not implemented")
+            override fun doExecute(target: HttpHost?, request: ClassicHttpRequest?, context: HttpContext?): CloseableHttpResponse {
+                throw ConnectTimeoutException("test timeout")
+            }
 
-            override fun getConnectionManager() = TODO("not implemented")
-
-            override fun doExecute(target: HttpHost?, request: HttpRequest?, context: HttpContext?): CloseableHttpResponse {
-                throw ConnectTimeoutException()
+            override fun close(closeMode: CloseMode?) {
             }
 
             override fun close() {
