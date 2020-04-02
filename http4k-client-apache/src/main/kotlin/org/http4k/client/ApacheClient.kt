@@ -1,31 +1,29 @@
 package org.http4k.client
 
-import org.apache.http.Header
-import org.apache.http.StatusLine
-import org.apache.http.client.config.CookieSpecs.IGNORE_COOKIES
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.client.methods.HttpDelete
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.methods.HttpHead
-import org.apache.http.client.methods.HttpOptions
-import org.apache.http.client.methods.HttpRequestBase
-import org.apache.http.client.methods.HttpTrace
-import org.apache.http.config.RegistryBuilder
-import org.apache.http.conn.ConnectTimeoutException
-import org.apache.http.conn.HttpHostConnectException
-import org.apache.http.conn.socket.ConnectionSocketFactory
-import org.apache.http.conn.socket.PlainConnectionSocketFactory
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory
-import org.apache.http.entity.ByteArrayEntity
-import org.apache.http.entity.InputStreamEntity
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
-import org.apache.http.ssl.SSLContextBuilder
-import org.http4k.client.PreCannedApacheHttpClients.defaultApacheHttpClient
+import org.apache.hc.client5.http.ConnectTimeoutException
+import org.apache.hc.client5.http.HttpHostConnectException
+import org.apache.hc.client5.http.classic.methods.HttpDelete
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.client5.http.classic.methods.HttpHead
+import org.apache.hc.client5.http.classic.methods.HttpOptions
+import org.apache.hc.client5.http.classic.methods.HttpTrace
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
+import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.cookie.StandardCookieSpec
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
+import org.apache.hc.core5.http.Header
+import org.apache.hc.core5.http.HttpResponse
+import org.apache.hc.core5.http.config.RegistryBuilder
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity
+import org.apache.hc.core5.http.io.entity.InputStreamEntity
+import org.apache.hc.core5.ssl.SSLContextBuilder
 import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
@@ -48,7 +46,7 @@ import java.net.UnknownHostException
 
 object ApacheClient {
     operator fun invoke(
-        client: CloseableHttpClient = defaultApacheHttpClient(),
+        client: CloseableHttpClient = PreCannedApacheHttpClients.defaultApacheHttpClient(),
         responseBodyMode: BodyMode = Memory,
         requestBodyMode: BodyMode = Memory
     ): HttpHandler = { request ->
@@ -65,7 +63,7 @@ object ApacheClient {
         }
     }
 
-    private fun Request.toApacheRequest(requestBodyMode: BodyMode): HttpRequestBase {
+    private fun Request.toApacheRequest(requestBodyMode: BodyMode): HttpUriRequestBase {
         val request = this@toApacheRequest
         val uri = URI(request.uri.toString())
 
@@ -81,21 +79,20 @@ object ApacheClient {
         return apacheRequest
     }
 
-    private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
+    private fun HttpResponse.toTargetStatus() = Status(code, reasonPhrase)
 
     private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
 
-    private fun CloseableHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
+    private fun CloseableHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(toTargetStatus()).headers(headers.toTarget())) {
         entity?.let { body(responseBodyMode(it.content)) } ?: this
     }
 }
 
-private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
+private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpUriRequestBase(request.method.toString(), URI(request.uri.toString())) {
     init {
-        uri = URI(request.uri.toString())
         entity = when (requestBodyMode) {
-            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
-            Memory -> ByteArrayEntity(request.body.payload.array())
+            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1, null)
+            Memory -> ByteArrayEntity(request.body.payload.array(), null)
         }
     }
 
@@ -107,20 +104,19 @@ object PreCannedApacheHttpClients {
     /**
      * Standard non-redirecting, no Cookies HTTP client
      */
-    fun defaultApacheHttpClient() = HttpClients.custom()
+    fun defaultApacheHttpClient(): CloseableHttpClient = HttpClients.custom()
         .setDefaultRequestConfig(RequestConfig.custom()
             .setRedirectsEnabled(false)
-            .setCookieSpec(IGNORE_COOKIES)
+            .setCookieSpec(StandardCookieSpec.IGNORE)
             .build()).build()
 
     /**
      * Do not use this in production! This is useful for testing locally and debugging HTTPS traffic
      */
-    fun insecureApacheHttpClient() = SSLContextBuilder()
+    fun insecureApacheHttpClient(): CloseableHttpClient = SSLContextBuilder()
         .loadTrustMaterial(null) { _, _ -> true }
         .build().run {
             HttpClientBuilder.create()
-                .setSSLContext(this)
                 .setConnectionManager(
                     PoolingHttpClientConnectionManager(
                         RegistryBuilder.create<ConnectionSocketFactory>()
