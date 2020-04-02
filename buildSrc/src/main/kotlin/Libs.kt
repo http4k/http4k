@@ -5,6 +5,7 @@
  *   `$ ./gradlew buildSrcVersions`
  */
 object Libs {
+
     /**
      * https://github.com/Kotlin/kotlinx.serialization
      */
