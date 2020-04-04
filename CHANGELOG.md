@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.243.0 (uncut)
+- [all] Upgrade some dependency versions.
+
 ### v3.242.0
 - [all] Upgrade some dependency versions.
 - [http4k-testing-servirtium] Improve error diagnostics. H/T @vchekan for the PR.
