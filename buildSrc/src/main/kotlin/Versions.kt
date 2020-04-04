@@ -12,6 +12,7 @@ import org.gradle.plugin.use.PluginDependencySpec
  */
 object Versions {
     const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.20.0"
+    // available: "0.20.0-1.4-M1-release-99"
 
     const val io_github_resilience4j: String = "1.3.1"
 
@@ -61,7 +62,7 @@ object Versions {
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val ktor_server_cio: String = "1.3.2"
+    const val ktor_server_cio: String = "1.1.1" // available: "1.3.2-1.4-M1-release-99"
 
     const val micrometer_core: String = "1.4.0"
 
@@ -79,7 +80,7 @@ object Versions {
 
     const val httpclient: String = "4.5.12"
 
-    const val underscore: String = "1.53"
+    const val underscore: String = "1.54"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
@@ -101,7 +102,7 @@ object Versions {
 
     const val jsoup: String = "1.13.1"
 
-    const val argo: String = "5.12"
+    const val argo: String = "5.13"
 
     const val gson: String = "2.8.6"
 
