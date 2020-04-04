@@ -55,11 +55,3 @@ inline fun <S, T : S, U : S, E> Result<E, T>.recover(errorToValue: (E) -> U): S 
     is Success<T> -> value
     is Failure<E> -> errorToValue(reason)
 }
-
-/**
- * Unwrap a Result, by returning the success value or calling _block_ on failure to abort from the current function.
- */
-inline fun <T, E> Result<E, T>.onFailure(block: (Failure<E>) -> Nothing): T = when (this) {
-    is Success<T> -> value
-    is Failure<E> -> block(this)
-}
