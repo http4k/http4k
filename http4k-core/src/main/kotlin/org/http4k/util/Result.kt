@@ -1,22 +1,24 @@
 package org.http4k.util
 
 /**
- * A result of a computation that can succeed or fail. Ported from Result4ks
+ * A result of a computation that can succeed or fail. Ported from Result4k
  */
-sealed class Result<out E, out T>
+sealed class Result<out E, out T> {
+    companion object {
+        /**
+         * Call a function and wrap the result in a Result, catching any Exception and returning it as Err value.
+         */
+        inline fun <T> from(block: () -> T): Result<Exception, T> =
+            try {
+                Success(block())
+            } catch (x: Exception) {
+                Failure(x)
+            }
+    }
+}
 
 data class Success<out T>(val value: T) : Result<Nothing, T>()
 data class Failure<out E>(val reason: E) : Result<E, Nothing>()
-
-/**
- * Call a function and wrap the result in a Result, catching any Exception and returning it as Err value.
- */
-inline fun <T> resultFrom(block: () -> T): Result<Exception, T> =
-    try {
-        Success(block())
-    } catch (x: Exception) {
-        Failure(x)
-    }
 
 /**
  * Map a function over the _value_ of a successful Result.
@@ -68,15 +70,3 @@ inline fun <E, T> Result<E, T>.onFailure(block: (Failure<E>) -> Nothing): T = wh
  */
 inline fun <S, T : S, U : S, E> Result<E, T>.recover(errorToValue: (E) -> U): S =
     mapFailure(errorToValue).get()
-
-/**
- * Perform a side effect with the success value.
- */
-inline fun <E, T> Result<E, T>.peek(f: (T) -> Unit) =
-    apply { if (this is Success<T>) f(value) }
-
-/**
- * Perform a side effect with the failure reason.
- */
-inline fun <E, T> Result<E, T>.peekFailure(f: (E) -> Unit) =
-    apply { if (this is Failure<E>) f(reason) }
