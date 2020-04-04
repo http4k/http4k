@@ -4,7 +4,8 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
     provided project(":http4k-format-jackson")
-    compile Libs.result4k
+
+    provided Libs.result4k
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

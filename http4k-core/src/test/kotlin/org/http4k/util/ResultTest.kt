@@ -44,4 +44,10 @@ class ResultTest {
         assertThat(success.flatMapFailure { Failure(anotherException) }, equalTo(success))
         assertThat(failure.flatMapFailure { Failure(anotherException) }, equalTo(Failure(anotherException) as Result<Exception, String>))
     }
+
+    @Test
+    fun `recover result`() {
+        assertThat(success.recover { value + value }, equalTo(value))
+        assertThat(failure.recover { value + value }, equalTo(value + value))
+    }
 }

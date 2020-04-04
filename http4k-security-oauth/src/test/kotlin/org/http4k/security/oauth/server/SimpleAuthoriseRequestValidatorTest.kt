@@ -1,8 +1,5 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
@@ -10,6 +7,9 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.security.ResponseType
 import org.http4k.security.State
+import org.http4k.util.Failure
+import org.http4k.util.Result
+import org.http4k.util.Success
 import org.junit.jupiter.api.Test
 
 class SimpleAuthoriseRequestValidatorTest {
@@ -74,7 +74,7 @@ class SimpleAuthoriseRequestValidatorTest {
         assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidScopes)))
     }
 
-    private fun success(request: Request): Result<Request, OAuthError> = Success(request)
+    private fun success(request: Request): Result<OAuthError, Request> = Success(request)
 
-    private fun failure(oAuthError: OAuthError): Result<Request, OAuthError> = Failure(oAuthError)
+    private fun failure(oAuthError: OAuthError): Result<OAuthError, Request> = Failure(oAuthError)
 }

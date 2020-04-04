@@ -1,8 +1,5 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -20,6 +17,8 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.openid.RequestJwtContainer
+import org.http4k.util.Failure
+import org.http4k.util.Success
 import org.junit.jupiter.api.Test
 
 internal class ClientValidationFilterTest {
@@ -36,13 +35,12 @@ internal class ClientValidationFilterTest {
 
         override fun isValidClientAndRedirectUriInCaseOfError(request: Request, clientId: ClientId, redirectUri: Uri): Boolean = clientId == validClientId
 
-        override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
-            return if (authorizationRequest.client == validClientId) {
+        override fun validate(request: Request, authorizationRequest: AuthRequest) =
+            if (authorizationRequest.client == validClientId) {
                 Success(request.header("Success", "true"))
             } else {
                 Failure(InvalidClientId)
             }
-        }
 
     }
 

@@ -47,3 +47,19 @@ inline fun <T, E, NEXT> Result<E, T>.flatMapFailure(f: (E) -> Result<NEXT, T>) =
  * Map a function over the _reason_ of an unsuccessful Result.
  */
 inline fun <T, E, NEXT> Result<E, T>.mapFailure(f: (E) -> NEXT) = flatMapFailure { reason -> Failure(f(reason)) }
+
+/**
+ * Unwrap a Result by returning the success value or calling _failureToValue_ to mapping the failure reason to a plain value.
+ */
+inline fun <S, T : S, U : S, E> Result<E, T>.recover(errorToValue: (E) -> U): S = when (this) {
+    is Success<T> -> value
+    is Failure<E> -> errorToValue(reason)
+}
+
+/**
+ * Unwrap a Result, by returning the success value or calling _block_ on failure to abort from the current function.
+ */
+inline fun <T, E> Result<E, T>.onFailure(block: (Failure<E>) -> Nothing): T = when (this) {
+    is Success<T> -> value
+    is Failure<E> -> block(this)
+}

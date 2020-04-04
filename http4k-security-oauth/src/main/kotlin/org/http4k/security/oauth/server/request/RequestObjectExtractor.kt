@@ -12,10 +12,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
-import com.natpryce.map
 import org.http4k.core.Uri
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
@@ -26,16 +22,20 @@ import org.http4k.security.State
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.InvalidRequestObject
 import org.http4k.security.openid.Nonce
+import org.http4k.util.Failure
+import org.http4k.util.Result
+import org.http4k.util.Success
+import org.http4k.util.map
 import java.util.Base64
 import kotlin.reflect.KClass
 
 object RequestObjectExtractor {
 
-    internal fun extractRequestJwtClaimsAsMap(value: String): Result<Map<*, *>, InvalidRequestObject> {
+    internal fun extractRequestJwtClaimsAsMap(value: String): Result<InvalidRequestObject, Map<*, *>> {
         return parseJsonFromJWT(value, Map::class)
     }
 
-    internal fun extractRequestObjectFromJwt(value: String): Result<RequestObject, InvalidRequestObject> {
+    internal fun extractRequestObjectFromJwt(value: String): Result<InvalidRequestObject, RequestObject> {
         return parseJsonFromJWT(value, RequestObjectJson::class)
             .map { jsonFromJWT ->
                 RequestObject(
@@ -63,7 +63,7 @@ object RequestObjectExtractor {
         }
     }
 
-    private fun <T : Any> parseJsonFromJWT(value: String, target: KClass<T>): Result<T, InvalidRequestObject> {
+    private fun <T : Any> parseJsonFromJWT(value: String, target: KClass<T>): Result<InvalidRequestObject, T> {
         try {
             val jwtParts = value.split(".")
             if (jwtParts.size != 3) {

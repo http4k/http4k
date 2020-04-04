@@ -1,10 +1,5 @@
 package org.http4k.security.oauth.server.accesstoken
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
-import com.natpryce.flatMap
-import com.natpryce.map
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.security.AccessTokenDetails
@@ -20,6 +15,11 @@ import org.http4k.security.oauth.server.MissingAuthorizationCode
 import org.http4k.security.oauth.server.MissingRedirectUri
 import org.http4k.security.oauth.server.RedirectUriMismatch
 import org.http4k.security.oauth.server.TokenRequest
+import org.http4k.util.Failure
+import org.http4k.util.Result
+import org.http4k.util.Success
+import org.http4k.util.flatMap
+import org.http4k.util.map
 import java.time.Clock
 
 class AuthorizationCodeAccessTokenGenerator(
@@ -31,7 +31,7 @@ class AuthorizationCodeAccessTokenGenerator(
     override fun generate(request: Request, clientId: ClientId, tokenRequest: TokenRequest) =
         extract(clientId, tokenRequest).flatMap { generate(it) }
 
-    fun generate(request: AuthorizationCodeAccessTokenRequest): Result<AccessTokenDetails, AccessTokenError> {
+    fun generate(request: AuthorizationCodeAccessTokenRequest): Result<AccessTokenError, AccessTokenDetails> {
         val code = request.authorizationCode
         val codeDetails = authorizationCodes.detailsFor(code)
 
@@ -50,7 +50,7 @@ class AuthorizationCodeAccessTokenGenerator(
     }
 
     companion object {
-        fun extract(clientId: ClientId, tokenRequest: TokenRequest): Result<AuthorizationCodeAccessTokenRequest, AccessTokenError> {
+        fun extract(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessTokenError, AuthorizationCodeAccessTokenRequest> {
             return Success(AuthorizationCodeAccessTokenRequest(
                 clientId = clientId,
                 clientSecret = tokenRequest.clientSecret ?: "",

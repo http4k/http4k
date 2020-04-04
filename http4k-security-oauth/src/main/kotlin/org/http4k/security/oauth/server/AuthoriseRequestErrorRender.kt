@@ -1,7 +1,5 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.get
-import com.natpryce.mapFailure
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -13,6 +11,7 @@ import org.http4k.security.State
 import org.http4k.security.oauth.server.ResponseRender.Companion.forAuthRequest
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.extractRequestJwtClaimsAsMap
+import org.http4k.util.recover
 
 class AuthoriseRequestErrorRender(private val authoriseRequestValidator: AuthoriseRequestValidator,
                                   private val requestJWTValidator: RequestJWTValidator,
@@ -28,7 +27,7 @@ class AuthoriseRequestErrorRender(private val authoriseRequestValidator: Authori
         val requestObjectMap = requestJwt
             ?.let { jwt ->
                 isRequestJwtValid?.let { isValidJwt ->
-                    if (isValidJwt) extractRequestJwtClaimsAsMap(jwt.value).mapFailure { mapOf<Any, Any>() }.get()
+                    if (isValidJwt) extractRequestJwtClaimsAsMap(jwt.value).recover { mapOf<Any, Any>() }
                     else null
                 }
             }

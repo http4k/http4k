@@ -1,8 +1,5 @@
 package org.http4k.security.oauth.server.request
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.apache.commons.codec.binary.Base64
@@ -15,6 +12,9 @@ import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.InvalidRequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.extractRequestJwtClaimsAsMap
 import org.http4k.security.openid.Nonce
+import org.http4k.util.Failure
+import org.http4k.util.Result
+import org.http4k.util.Success
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -138,7 +138,7 @@ internal class RequestObjectExtractorTest {
         assertThat(RequestObjectExtractor.extractRequestObjectFromJwt(requestJwt), equalTo(success(correspondingExpectedRequestObject)))
     }
 
-    private fun failure(): Result<Map<*, *>, InvalidRequestObject> = Failure(InvalidRequestObject)
-    private fun <T> success(data: T): Result<T, InvalidRequestObject> = Success(data)
+    private fun failure(): Result<InvalidRequestObject, Map<*, *>> = Failure(InvalidRequestObject)
+    private fun <T> success(data: T): Result<InvalidRequestObject, T> = Success(data)
 
 }

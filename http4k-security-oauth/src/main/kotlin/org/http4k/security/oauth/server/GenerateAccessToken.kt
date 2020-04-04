@@ -1,8 +1,5 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.get
-import com.natpryce.map
-import com.natpryce.mapFailure
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -13,6 +10,8 @@ import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.server.accesstoken.GenerateAccessTokenForGrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
+import org.http4k.util.map
+import org.http4k.util.recover
 import java.time.Clock
 
 class GenerateAccessToken(
@@ -36,5 +35,5 @@ class GenerateAccessToken(
                 token.idToken?.value,
                 token.accessToken.scope,
                 token.accessToken.refreshToken?.value))
-        }.mapFailure(errorRenderer::response).get()
+        }.recover(errorRenderer::response)
 }

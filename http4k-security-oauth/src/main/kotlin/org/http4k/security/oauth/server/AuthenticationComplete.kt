@@ -1,13 +1,12 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.get
-import com.natpryce.map
-import com.natpryce.mapFailure
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
+import org.http4k.util.map
+import org.http4k.util.recover
 
 class AuthenticationComplete(
     private val authorizationCodes: AuthorizationCodes,
@@ -26,7 +25,7 @@ class AuthenticationComplete(
 
     }
 
-    private fun ResponseRender.addResponseTypeValues(authorizationRequest: AuthRequest, request: Request, response: Response = this.complete()): ResponseRender =
+    private fun ResponseRender.addResponseTypeValues(authorizationRequest: AuthRequest, request: Request, response: Response = complete()): ResponseRender =
         with(authorizationCodes.create(request, authorizationRequest, response)) {
             map {
                 when (authorizationRequest.responseType) {
@@ -35,12 +34,11 @@ class AuthenticationComplete(
                         .addParameter("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, authorizationRequest.nonce, it).value)
                 }
             }
-                .mapFailure {
+                .recover {
                     val responseRender = addParameter("error", it.rfcError.rfcValue)
                         .addParameter("error_description", it.description)
                     documentationUri?.addTo(responseRender) ?: responseRender
                 }
-                .get()
         }
 
 

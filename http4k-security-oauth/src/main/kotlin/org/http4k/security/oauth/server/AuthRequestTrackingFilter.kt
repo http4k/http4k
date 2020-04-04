@@ -1,11 +1,10 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.get
-import com.natpryce.map
-import com.natpryce.mapFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
+import org.http4k.util.map
+import org.http4k.util.recover
 
 class AuthRequestTrackingFilter(
     private val tracking: AuthRequestTracking,
@@ -17,6 +16,6 @@ class AuthRequestTrackingFilter(
             .map {
                 val response = next(request)
                 tracking.trackAuthRequest(request, it, response)
-            }.mapFailure { authoriseRequestErrorRender.errorFor(request, it) }.get()
+            }.recover { authoriseRequestErrorRender.errorFor(request, it) }
     }
 }

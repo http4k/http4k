@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory.instance
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.apache.commons.codec.binary.Base64
@@ -21,6 +18,9 @@ import org.http4k.security.oauth.server.request.RequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.RequestObjectExtractorJson
 import org.http4k.security.openid.RequestJwtContainer
+import org.http4k.util.Failure
+import org.http4k.util.Result
+import org.http4k.util.Success
 import org.junit.jupiter.api.Test
 
 internal class AuthRequestWithRequestAuthRequestExtractorTest {
@@ -151,8 +151,8 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         ))))
     }
 
-    private fun success(authRequest: AuthRequest): Result<AuthRequest, InvalidAuthorizationRequest> = Success(authRequest)
-    private fun failure(error: InvalidAuthorizationRequest): Result<AuthRequest, InvalidAuthorizationRequest> = Failure(error)
+    private fun success(authRequest: AuthRequest): Result<InvalidAuthorizationRequest, AuthRequest> = Success(authRequest)
+    private fun failure(error: InvalidAuthorizationRequest): Result<InvalidAuthorizationRequest, AuthRequest> = Failure(error)
 
     private fun requestJwt(requestObject: RequestObject): String {
         val requestObjectJson = RequestObjectExtractor.RequestObjectJson(
@@ -172,17 +172,15 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         return "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asJsonString(requestObjectJson).toByteArray()).replace("=", "")}.someSignature"
     }
 
-    private fun audienceToJson(audience: List<String>): JsonNode {
-        return when {
-            audience.isEmpty() -> {
-                NullNode.instance
-            }
-            audience.size == 1 -> {
-                TextNode(audience[0])
-            }
-            else -> {
-                ArrayNode(instance, audience.map { TextNode(it) })
-            }
+    private fun audienceToJson(audience: List<String>): JsonNode = when {
+        audience.isEmpty() -> {
+            NullNode.instance
+        }
+        audience.size == 1 -> {
+            TextNode(audience[0])
+        }
+        else -> {
+            ArrayNode(instance, audience.map { TextNode(it) })
         }
     }
 

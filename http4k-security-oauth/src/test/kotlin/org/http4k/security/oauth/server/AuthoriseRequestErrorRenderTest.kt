@@ -1,6 +1,5 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Result
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -204,7 +203,7 @@ internal class AuthoriseRequestErrorRenderTest {
         override fun isValidClientAndRedirectUriInCaseOfError(request: Request, clientId: ClientId, redirectUri: Uri): Boolean =
             validClients[clientId] == redirectUri
 
-        override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> =
+        override fun validate(request: Request, authorizationRequest: AuthRequest) =
             throw UnsupportedOperationException("not needed for this test")
 
     }

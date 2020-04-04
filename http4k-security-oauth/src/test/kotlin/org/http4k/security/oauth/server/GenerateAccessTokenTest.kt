@@ -1,6 +1,5 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.get
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
@@ -27,6 +26,7 @@ import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenReque
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
 import org.http4k.util.FixedClock
+import org.http4k.util.recover
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Instant
@@ -41,7 +41,7 @@ class GenerateAccessTokenTest {
     private val codes = InMemoryAuthorizationCodes(FixedClock)
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), State("state"))
     private val request = Request(GET, "http://some-thing")
-    private val code = codes.create(request, authRequest, Response(OK)).get()
+    private val code = codes.create(request, authRequest, Response(OK)).recover { it }
     private val clientValidator = HardcodedClientValidator(authRequest.client, authRequest.redirectUri!!, "a-secret")
     private val handler = GenerateAccessToken(codes, DummyAccessTokens(), handlerClock, DummyIdTokens(), DummyRefreshTokens(), JsonResponseErrorRenderer(json), GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)))
 
@@ -61,7 +61,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `generates dummy access_token and id_token if an oidc request`() {
-        val codeForIdTokenRequest = codes.create(request, authRequest.copy(scopes = listOf("openid")), Response(OK)).get()
+        val codeForIdTokenRequest = codes.create(request, authRequest.copy(scopes = listOf("openid")), Response(OK)).recover { it }
 
         val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -132,7 +132,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `generates dummy access_token and id_token`() {
-        val codeForIdTokenRequest = codes.create(request, authRequest.copy(responseType = CodeIdToken, scopes = listOf("openid")), Response(OK)).get()
+        val codeForIdTokenRequest = codes.create(request, authRequest.copy(responseType = CodeIdToken, scopes = listOf("openid")), Response(OK)).recover { it }
 
         val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -192,7 +192,7 @@ class GenerateAccessTokenTest {
     fun `handles expired code`() {
         handlerClock.advance(1, SECONDS)
 
-        val expiredCode = codes.create(request, authRequest, Response(OK)).get()
+        val expiredCode = codes.create(request, authRequest, Response(OK)).recover { it }
 
         val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -208,7 +208,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles client id different from one in authorization code`() {
-        val storedCode = codes.create(request, authRequest.copy(client = ClientId("different client")), Response(OK)).get()
+        val storedCode = codes.create(request, authRequest.copy(client = ClientId("different client")), Response(OK)).recover { it }
 
         val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -224,7 +224,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles redirectUri different from one in authorization code`() {
-        val storedCode = codes.create(request, authRequest.copy(redirectUri = Uri.of("somethingelse")), Response(OK)).get()
+        val storedCode = codes.create(request, authRequest.copy(redirectUri = Uri.of("somethingelse")), Response(OK)).recover { it }
 
         val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)

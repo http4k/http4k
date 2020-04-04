@@ -1,5 +1,3 @@
-import com.natpryce.Failure
-import com.natpryce.Success
 import org.http4k.client.OkHttp
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
@@ -32,6 +30,8 @@ import org.http4k.security.oauth.server.UnsupportedGrantType
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
+import org.http4k.util.Failure
+import org.http4k.util.Success
 import java.time.Clock
 import java.time.temporal.ChronoUnit.DAYS
 import java.util.UUID

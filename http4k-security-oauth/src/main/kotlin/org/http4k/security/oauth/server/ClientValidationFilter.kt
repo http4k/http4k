@@ -1,13 +1,12 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Success
-import com.natpryce.get
-import com.natpryce.map
-import com.natpryce.mapFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.security.ResponseType
+import org.http4k.util.Failure
+import org.http4k.util.Success
+import org.http4k.util.map
+import org.http4k.util.recover
 
 class ClientValidationFilter(private val authoriseRequestValidator: AuthoriseRequestValidator,
                              private val errorRenderer: AuthoriseRequestErrorRender,
@@ -23,7 +22,7 @@ class ClientValidationFilter(private val authoriseRequestValidator: AuthoriseReq
                         is Success -> next(result.value)
                         is Failure -> errorRenderer.errorFor(it, result.reason)
                     }
-                }.mapFailure { error -> errorRenderer.errorFor(it, error) }.get()
+                }.recover { error -> errorRenderer.errorFor(it, error) }
             }
         }
 

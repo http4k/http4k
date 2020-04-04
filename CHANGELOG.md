@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.243.0 (uncut)
 - [all] Upgrade some dependency versions.
+- [http4k-security-oauth] [Breaking] Introduce custom `Result`, and replace usages of `Result4k` with it. To fix, add a dependency on Result4k in your project, then simply call `asResult4k`
 
 ### v3.242.0
 - [all] Upgrade some dependency versions.

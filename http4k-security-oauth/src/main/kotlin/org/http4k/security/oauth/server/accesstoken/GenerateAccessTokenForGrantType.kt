@@ -1,10 +1,5 @@
 package org.http4k.security.oauth.server.accesstoken
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
-import com.natpryce.flatMap
-import com.natpryce.onFailure
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.lens.FormField
@@ -22,6 +17,11 @@ import org.http4k.security.oauth.server.accesstoken.GrantType.RefreshToken
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokenAccessTokenGenerator
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.oauth.server.tokenRequest
+import org.http4k.util.Failure
+import org.http4k.util.Result
+import org.http4k.util.Success
+import org.http4k.util.flatMap
+import org.http4k.util.onFailure
 import java.time.Clock
 
 class GenerateAccessTokenForGrantType(
@@ -36,7 +36,7 @@ class GenerateAccessTokenForGrantType(
     private val clientCredentials = ClientCredentialsAccessTokenGenerator(accessTokens)
     private val refreshTokens = RefreshTokenAccessTokenGenerator(refreshTokens)
 
-    fun generate(request: Request): Result<AccessTokenDetails, AccessTokenError> {
+    fun generate(request: Request): Result<AccessTokenError, AccessTokenDetails> {
         val grantType = resolveGrantTypeFromRequest(request).onFailure { return it }
         return resolveGrantTypeFromConfiguration(grantType)
             .flatMap { (generator, authenticator) ->
@@ -51,7 +51,7 @@ class GenerateAccessTokenForGrantType(
         grantTypes.supportedGrantTypes[grantType]?.let { Success(grantType.generator() to it) }
             ?: Failure(UnsupportedGrantType(grantType.rfcValue))
 
-    private fun resolveGrantTypeFromRequest(request: Request): Result<GrantType, UnsupportedGrantType> {
+    private fun resolveGrantTypeFromRequest(request: Request): Result<UnsupportedGrantType, GrantType> {
         grantTypeForm(request).let { form ->
             return when (val grantType = grantType(form)) {
                 AuthorizationCode.rfcValue -> Success(AuthorizationCode)

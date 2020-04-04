@@ -1,6 +1,5 @@
 package org.http4k.security.oauth.server.accesstoken
 
-import com.natpryce.get
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Uri
@@ -10,6 +9,7 @@ import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.MissingAuthorizationCode
 import org.http4k.security.oauth.server.MissingRedirectUri
 import org.http4k.security.oauth.server.TokenRequest
+import org.http4k.util.recover
 import org.junit.jupiter.api.Test
 
 internal class AuthorizationCodeAccessTokenGeneratorTest {
@@ -27,7 +27,7 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 null,
                 null,
                 null
-            )).get()
+            )).recover { it }
             as? AuthorizationCodeAccessTokenRequest ?: org.junit.jupiter.api.fail("returned wrong type")
 
         assertThat(request, equalTo(AuthorizationCodeAccessTokenRequest(
@@ -53,7 +53,7 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 null,
                 null,
                 null
-            )).get()
+            )).recover { it }
             as? AccessTokenError ?: org.junit.jupiter.api.fail("returned wrong type")
 
         assertThat(error, equalTo(MissingRedirectUri as AccessTokenError))
@@ -73,7 +73,7 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 null,
                 null,
                 null
-            )).get()
+            )).recover { it }
             as? AccessTokenError ?: org.junit.jupiter.api.fail("returned wrong type")
 
         assertThat(error, equalTo(MissingAuthorizationCode as AccessTokenError))
