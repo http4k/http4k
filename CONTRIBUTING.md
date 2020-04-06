@@ -63,3 +63,22 @@ Thank you to all our sponsors! (please ask your company to also support this ope
 <a href="https://opencollective.com/http4k/sponsor/7/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/8/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/9/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/9/avatar.svg"></a>
+
+### Vendor support
+
+Many thanks to all of the software vendors who supply tools to help us deliver http4k to it's community:
+
+#### Kotlin IDE
+<img src="https://www.http4k.org/img/intellij.png"/></a>
+
+[Jetbrains](https://www.jetbrains.com) kindly supplies the project with an Open Source License for the amazing IntelliJ IDE.
+
+#### JVM Profiling tools
+
+<img src="https://www.yourkit.com/images/yklogo.png"/>
+
+YourKit supports open source projects with innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
+<a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>,
+and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
