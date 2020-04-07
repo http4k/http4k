@@ -69,7 +69,7 @@ Thank you to all our sponsors! (please ask your company to also support this ope
 Many thanks to all of the software vendors who supply tools to help us deliver http4k to it's community:
 
 #### Kotlin IDE
-<img src="https://www.http4k.org/img/intellij.png"/></a>
+<img src="https://www.http4k.org/img/intellij-100.png"/></a>
 
 [Jetbrains](https://www.jetbrains.com) kindly supplies the project with an Open Source License for the amazing IntelliJ IDE.
 
