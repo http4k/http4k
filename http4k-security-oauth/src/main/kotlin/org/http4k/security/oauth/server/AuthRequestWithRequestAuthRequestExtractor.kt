@@ -12,7 +12,8 @@ import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor
 
-class AuthRequestWithRequestAuthRequestExtractor(private val requestJWTValidator: RequestJWTValidator) : AuthRequestExtractor {
+class AuthRequestWithRequestAuthRequestExtractor(private val requestJWTValidator: RequestJWTValidator,
+                                                 private val combineAuthRequestRequestStrategy: CombineAuthRequestRequestStrategy) : AuthRequestExtractor {
 
     override fun extract(request: Request): Result<AuthRequest, InvalidAuthorizationRequest> {
 
@@ -55,7 +56,7 @@ class AuthRequestWithRequestAuthRequestExtractor(private val requestJWTValidator
         if (authRequestValue != null && requestObjectValue != null && authRequestValue != requestObjectValue) {
             return Failure(InvalidAuthorizationRequest("request object is invalid"))
         }
-        return Success(authRequestValue ?: requestObjectValue)
+        return Success(combineAuthRequestRequestStrategy.combine(authRequestValue, requestObjectValue))
     }
 
     private fun nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequestValue: List<String>,
@@ -63,7 +64,37 @@ class AuthRequestWithRequestAuthRequestExtractor(private val requestJWTValidator
         if (authRequestValue.isNotEmpty() && requestObjectValue.isNotEmpty() && authRequestValue.toSet() != requestObjectValue.toSet()) {
             return Failure(InvalidAuthorizationRequest("request object is invalid"))
         }
-        return Success(if (authRequestValue.isNotEmpty()) authRequestValue else requestObjectValue)
+        return Success(combineAuthRequestRequestStrategy.combine(authRequestValue, requestObjectValue))
+    }
+
+    sealed class CombineAuthRequestRequestStrategy {
+
+        object Combine : CombineAuthRequestRequestStrategy() {
+            override fun <T> combine(authRequestValue: T?, requestObjectValue: T?): T? =
+                authRequestValue ?: requestObjectValue
+
+            override fun <T> combine(authRequestValue: List<T>, requestObjectValue: List<T>): List<T> =
+                if (authRequestValue.isNotEmpty()) authRequestValue else requestObjectValue
+        }
+
+        object AuthRequestOnly : CombineAuthRequestRequestStrategy() {
+            override fun <T> combine(authRequestValue: T?, requestObjectValue: T?): T? =
+                authRequestValue
+
+            override fun <T> combine(authRequestValue: List<T>, requestObjectValue: List<T>): List<T> =
+                authRequestValue
+        }
+
+        object RequestObjectOnly : CombineAuthRequestRequestStrategy() {
+            override fun <T> combine(authRequestValue: T?, requestObjectValue: T?): T? =
+                requestObjectValue
+
+            override fun <T> combine(authRequestValue: List<T>, requestObjectValue: List<T>): List<T> =
+                requestObjectValue
+        }
+
+        abstract fun <T> combine(authRequestValue: T?, requestObjectValue: T?): T?
+        abstract fun <T> combine(authRequestValue: List<T>, requestObjectValue: List<T>): List<T>
     }
 
 }
