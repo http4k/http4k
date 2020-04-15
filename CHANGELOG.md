@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.243.0 (uncut)
-- [all] Upgrade some dependency versions.
+- [all] Upgrade some dependency versions, including Kotlin to `1.3.72`.
 
 ### v3.242.0
 - [all] Upgrade some dependency versions.
