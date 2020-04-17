@@ -9,3 +9,5 @@ object Query : BiDiLensSpec<Request, String>("query", StringParam,
     LensGet { name, target -> target.queries(name).map { it ?: "" } },
     LensSet { name, values, target -> values.fold(target.removeQuery(name)) { m, next -> m.query(name, next) } }
 )
+
+inline fun <reified T : Enum<T>> Query.enum() = map(StringBiDiMappings.enum<T>())

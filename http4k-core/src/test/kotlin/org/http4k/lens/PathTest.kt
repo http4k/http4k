@@ -4,6 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.base64Encode
+import org.http4k.core.Method
+import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -138,6 +140,9 @@ class PathTest {
 
     @Test
     fun `zoned datetime`() = checkContract(Path.zonedDateTime(), "1970-01-01T00:00:00Z[UTC]", ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))
+
+    @Test
+    fun `enum`() = checkContract(Path.enum<Method>(), "DELETE", DELETE)
 
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")

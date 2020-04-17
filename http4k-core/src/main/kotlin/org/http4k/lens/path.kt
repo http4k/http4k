@@ -115,7 +115,9 @@ fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map(Stri
 fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map(StringBiDiMappings.zonedDateTime(formatter))
 fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map(StringBiDiMappings.localDate(formatter))
 fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(StringBiDiMappings.localTime(formatter))
+inline fun <reified T: Enum<T>> Path.enum() = map(StringBiDiMappings.enum<T>())
 
+@PublishedApi
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
