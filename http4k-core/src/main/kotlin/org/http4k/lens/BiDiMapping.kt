@@ -83,7 +83,7 @@ object StringBiDiMappings {
     fun traceId() = BiDiMapping(::TraceId, TraceId::value)
     fun samplingDecision() = BiDiMapping(::SamplingDecision, SamplingDecision::value)
     fun throwable() = BiDiMapping<String, Throwable>({ throw Exception(it) }, Throwable::asString)
-    inline fun <reified T: Enum<T>>enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
+    inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
 }
 
 internal fun Throwable.asString() = StringWriter().use { output -> PrintWriter(output).use { printer -> printStackTrace(printer); output.toString() } }

@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.244.0 (uncut)
+- [http4k-core] - Add enum StringBiDiMapping #395 - H/T @goodhoko
+
 ### v3.243.0
 - [all] Upgrade some dependency versions, including Kotlin to `1.3.72`.
 - [http4k-security-oauth] A strategy can now be passed into `AuthRequestWithRequestAuthRequestExtractor` to determine how to combine `AuthRequest` and `RequestObject` H/T @tom
