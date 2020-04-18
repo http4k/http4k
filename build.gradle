@@ -265,7 +265,7 @@ dokka {
 
 
 buildSrcVersions {
-    indent = "     "
+    indent = "    "
 }
 
 // To update Gradle, run `$ ./gradlew :buildSrcVersions && ./gradlew wrapper`

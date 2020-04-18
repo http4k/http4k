@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.244.0 (uncut)
+- [all] Upgrade some dependency versions.
 - [http4k-core] - Add enum StringBiDiMapping #395 - H/T @goodhoko
 
 ### v3.243.0
