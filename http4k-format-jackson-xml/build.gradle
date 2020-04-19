@@ -1,7 +1,7 @@
 description = 'Http4k XML support using Jackson as an underlying engine'
 
 dependencies {
-    compileOnly project(":http4k-core")
+    compile project(":http4k-core")
 
     compile project(":http4k-format-jackson")
     compile Libs.jackson_dataformat_xml

@@ -1,11 +1,10 @@
 description = 'Http4k Handlebars templating support'
 
 dependencies {
-    compileOnly project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.handlebars
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
     testCompile Config.TestDependencies
 }
-

@@ -1,7 +1,7 @@
 description = 'Http4k support for chaos testing'
 
 dependencies {
-    compileOnly project(":http4k-core")
+    compile project(":http4k-core")
 
     compile project(":http4k-contract")
     compile project(":http4k-format-jackson")

@@ -1,7 +1,7 @@
 description = 'Http4k Dust templating support'
 
 dependencies {
-    compileOnly project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.commons_pool2
 

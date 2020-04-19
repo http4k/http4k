@@ -1,11 +1,10 @@
 description = 'Ultra-lightweight Selenium WebDriver implementation for http4k apps'
 
 dependencies {
-    compileOnly project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.selenium_api
     compile Libs.jsoup
 
     testCompile Config.TestDependencies
 }
-

@@ -1,12 +1,10 @@
 description = 'Http4k HTTP Server built on top of Netty'
 
 dependencies {
-    compileOnly project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.netty_codec_http2
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }
-
-

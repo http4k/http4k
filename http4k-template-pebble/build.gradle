@@ -1,7 +1,7 @@
 description = 'Http4k Pebble templating support'
 
 dependencies {
-    compileOnly project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.pebble
 

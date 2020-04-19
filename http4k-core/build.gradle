@@ -2,7 +2,7 @@ description = 'Dependency-lite Server as a Function in pure Kotlin'
 
 dependencies {
     compile Libs.kotlin_stdlib_jdk8
-     compileOnly Libs.javax_servlet_api
+    implementation Libs.javax_servlet_api
 
     testCompile Config.TestDependencies
     testCompile project(":http4k-client-apache")
@@ -11,4 +11,3 @@ dependencies {
     testCompile project(":http4k-testing-hamkrest")
     testCompile project(":http4k-server-jetty")
 }
-

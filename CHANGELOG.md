@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.244.0 (uncut)
 - [all] Upgrade some dependency versions.
-- [all] [Breaking (if you're not using it right!)] Fix #397 - Fixed up Maven dependencies so that they are not bringing in optional libraries. Any projects that were accidentally not including `http4k-core` will require it to be explicitly imported.
+- [all] [Breaking (if you're not using it right!)] Fix #397 - Fixed up Maven dependencies so that they are not bringing in runtime libraries.
 - [http4k-core] - Add enum StringBiDiMapping #395 - H/T @goodhoko
 
 ### v3.243.0
