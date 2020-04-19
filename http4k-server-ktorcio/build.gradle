@@ -1,13 +1,10 @@
 description = 'Http4k HTTP Server built on top of Ktor CIO engine'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile group: 'io.ktor', name: 'ktor-server-cio', version: '1.1.1'
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }
-
-

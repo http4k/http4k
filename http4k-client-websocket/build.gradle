@@ -1,8 +1,7 @@
 description = 'HTTP Websocket Client'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.java_websocket
 
@@ -10,4 +9,3 @@ dependencies {
     testCompile project(path: ":http4k-server-jetty")
     testCompile Config.TestDependencies
 }
-

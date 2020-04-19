@@ -1,8 +1,7 @@
 description = 'Http4k GSON JSON support'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.gson
 
@@ -10,6 +9,3 @@ dependencies {
     testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }
-
-
-

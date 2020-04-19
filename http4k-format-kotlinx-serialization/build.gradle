@@ -3,8 +3,7 @@ description = 'Http4k Kotlinx Serialization JSON support'
 apply plugin: 'kotlinx-serialization'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.kotlinx_serialization_runtime
 

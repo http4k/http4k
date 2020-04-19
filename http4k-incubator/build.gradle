@@ -1,8 +1,7 @@
 description = 'http4k incubator module'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     testCompile Config.TestDependencies
     testCompile project(":http4k-client-apache")

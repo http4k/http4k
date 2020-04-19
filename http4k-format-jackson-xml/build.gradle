@@ -1,8 +1,7 @@
 description = 'Http4k XML support using Jackson as an underlying engine'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile project(":http4k-format-jackson")
     compile Libs.jackson_dataformat_xml

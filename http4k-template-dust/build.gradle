@@ -1,8 +1,7 @@
 description = 'Http4k Dust templating support'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.commons_pool2
 

@@ -1,12 +1,10 @@
 description = 'Http4k Freemarker templating support'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.freemarker
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
     testCompile Config.TestDependencies
 }
-

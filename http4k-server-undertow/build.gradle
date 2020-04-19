@@ -1,8 +1,7 @@
 description = 'Http4k HTTP Server built on top of Undertow'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.undertow_core
     compile Libs.undertow_servlet
@@ -10,5 +9,3 @@ dependencies {
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }
-
-

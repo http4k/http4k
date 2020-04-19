@@ -3,10 +3,10 @@ description = 'http4k typesafe HTTP contracts and OpenApi support'
 apply plugin: 'org.openapi.generator'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
-    provided project(":http4k-format-jackson")
-    provided project(":http4k-security-oauth")
+    compile project(":http4k-core")
+    implementation project(":http4k-security-oauth")
+    implementation project(":http4k-format-jackson")
+
     compile Libs.kotlin_reflect
 
     testCompile project(":http4k-format-jackson")

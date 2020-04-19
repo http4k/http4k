@@ -10,7 +10,6 @@ buildscript {
         classpath Libs.coveralls_gradle_plugin
         classpath Libs.dokka_gradle_plugin
         classpath Libs.com_jfrog_bintray_gradle_plugin
-        classpath Libs.nebula_provided_base_gradle_plugin
         classpath Libs.openapi_generator_gradle_plugin
         classpath Libs.kotlin_serialization
     }
@@ -20,7 +19,6 @@ plugins {
     id 'com.github.kt3k.coveralls' version "2.9.0"
     id "com.jfrog.bintray" version "1.8.4"
     id 'de.fayard.buildSrcVersions' version "0.7.0"
-    id 'nebula.provided-base' version "3.0.3"
     id 'net.saliman.cobertura' version "3.0.0"
 }
 
@@ -38,7 +36,6 @@ allprojects {
     apply plugin: 'com.jfrog.bintray'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
-    apply plugin: 'nebula.provided-base'
     apply plugin: 'org.jetbrains.dokka'
 
     jacoco {
@@ -105,16 +102,16 @@ allprojects {
                         asNode().appendNode('description', description)
                         asNode().appendNode('url', 'https://http4k.org')
                         asNode().appendNode('developers')
-                                .appendNode('developer').appendNode('name', 'Ivan Sanchez').parent().appendNode('email', 'ivan@http4k.org')
-                                .parent().parent()
-                                .appendNode('developer').appendNode('name', 'David Denton').parent().appendNode('email', 'david@http4k.org')
+                            .appendNode('developer').appendNode('name', 'Ivan Sanchez').parent().appendNode('email', 'ivan@http4k.org')
+                            .parent().parent()
+                            .appendNode('developer').appendNode('name', 'David Denton').parent().appendNode('email', 'david@http4k.org')
                         asNode().appendNode('scm').
-                                appendNode('url', 'git@github.com:http4k/' + archivesBaseName + '.git').parent().
-                                appendNode('connection', 'scm:git:git@github.com:http4k/' + archivesBaseName + '.git').parent().
-                                appendNode('developerConnection', 'scm:git:git@github.com:http4k/' + archivesBaseName + '.git')
+                            appendNode('url', 'git@github.com:http4k/' + archivesBaseName + '.git').parent().
+                            appendNode('connection', 'scm:git:git@github.com:http4k/' + archivesBaseName + '.git').parent().
+                            appendNode('developerConnection', 'scm:git:git@github.com:http4k/' + archivesBaseName + '.git')
                         asNode().appendNode('licenses').appendNode('license').
-                                appendNode('name', 'Apache License, Version 2.0').parent().
-                                appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
+                            appendNode('name', 'Apache License, Version 2.0').parent().
+                            appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
                     }
                     from components.java
 
@@ -192,47 +189,45 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 }
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-
-    provided project(":http4k-core")
-    provided project(":http4k-aws")
-    provided project(":http4k-client-apache")
-    provided project(":http4k-client-apache-async")
-    provided project(":http4k-client-jetty")
-    provided project(":http4k-client-okhttp")
-    provided project(":http4k-client-websocket")
-    provided project(":http4k-cloudnative")
-    provided project(":http4k-contract")
-    provided project(":http4k-format-argo")
-    provided project(":http4k-format-gson")
-    provided project(":http4k-format-jackson")
-    provided project(":http4k-format-jackson-xml")
-    provided project(":http4k-format-moshi")
-    provided project(":http4k-format-xml")
-    provided project(":http4k-incubator")
-    provided project(":http4k-jsonrpc")
-    provided project(":http4k-metrics-micrometer")
-    provided project(":http4k-multipart")
-    provided project(":http4k-resilience4j")
-    provided project(":http4k-security-oauth")
-    provided project(":http4k-server-apache")
-    provided project(":http4k-server-jetty")
-    provided project(":http4k-server-ktorcio")
-    provided project(":http4k-server-netty")
-    provided project(":http4k-server-undertow")
-    provided project(":http4k-serverless-lambda")
-    provided project(":http4k-template-dust")
-    provided project(":http4k-template-freemarker")
-    provided project(":http4k-template-handlebars")
-    provided project(":http4k-template-pebble")
-    provided project(":http4k-template-thymeleaf")
-    provided project(":http4k-template-dust")
-    provided project(":http4k-template-jade4j")
-    provided project(":http4k-testing-approval")
-    provided project(":http4k-testing-chaos")
-    provided project(":http4k-testing-hamkrest")
-    provided project(":http4k-testing-servirtium")
-    provided project(":http4k-testing-webdriver")
+    compile project(":http4k-core")
+    compile project(":http4k-aws")
+    compile project(":http4k-client-apache")
+    compile project(":http4k-client-apache-async")
+    compile project(":http4k-client-jetty")
+    compile project(":http4k-client-okhttp")
+    compile project(":http4k-client-websocket")
+    compile project(":http4k-cloudnative")
+    compile project(":http4k-contract")
+    compile project(":http4k-format-argo")
+    compile project(":http4k-format-gson")
+    compile project(":http4k-format-jackson")
+    compile project(":http4k-format-jackson-xml")
+    compile project(":http4k-format-moshi")
+    compile project(":http4k-format-xml")
+    compile project(":http4k-incubator")
+    compile project(":http4k-jsonrpc")
+    compile project(":http4k-metrics-micrometer")
+    compile project(":http4k-multipart")
+    compile project(":http4k-resilience4j")
+    compile project(":http4k-security-oauth")
+    compile project(":http4k-server-apache")
+    compile project(":http4k-server-jetty")
+    compile project(":http4k-server-ktorcio")
+    compile project(":http4k-server-netty")
+    compile project(":http4k-server-undertow")
+    compile project(":http4k-serverless-lambda")
+    compile project(":http4k-template-dust")
+    compile project(":http4k-template-freemarker")
+    compile project(":http4k-template-handlebars")
+    compile project(":http4k-template-pebble")
+    compile project(":http4k-template-thymeleaf")
+    compile project(":http4k-template-dust")
+    compile project(":http4k-template-jade4j")
+    compile project(":http4k-testing-approval")
+    compile project(":http4k-testing-chaos")
+    compile project(":http4k-testing-hamkrest")
+    compile project(":http4k-testing-servirtium")
+    compile project(":http4k-testing-webdriver")
 
     testCompile Config.TestDependencies
     testCompile project(path: ":http4k-testing-servirtium", configuration: 'testArtifacts')
@@ -256,7 +251,7 @@ dokka {
 
     subProjects = subprojects.collect { i -> i.name }
 
-    configuration  {
+    configuration {
         includes = ['src/packages.md']
         moduleName = "$rootProject.name"
         jdkVersion = 9

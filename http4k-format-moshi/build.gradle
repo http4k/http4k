@@ -1,9 +1,7 @@
 description = 'Http4k Moshi JSON support'
 
-
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compile project(":http4k-core")
 
     compile Libs.moshi
     compile Libs.moshi_kotlin
@@ -11,6 +9,3 @@ dependencies {
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }
-
-
-
