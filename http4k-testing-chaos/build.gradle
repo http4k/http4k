@@ -1,8 +1,7 @@
 description = 'Http4k support for chaos testing'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compileOnly project(":http4k-core")
 
     compile project(":http4k-contract")
     compile project(":http4k-format-jackson")

@@ -1,13 +1,12 @@
 description = 'http4k incubator module'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
-    provided Libs.junit_jupiter_api
+    compileOnly project(":http4k-core")
+    compileOnly Libs.junit_jupiter_api
+
     compile project(":http4k-cloudnative")
     compile project(":http4k-format-jackson")
     compile project(":http4k-client-apache")
-    compile project(":http4k-testing-chaos")
 
     testCompile Config.TestDependencies
     testCompile project(":http4k-testing-approval")

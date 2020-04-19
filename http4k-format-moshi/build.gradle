@@ -2,8 +2,7 @@ description = 'Http4k Moshi JSON support'
 
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compileOnly project(":http4k-core")
 
     compile Libs.moshi
     compile Libs.moshi_kotlin

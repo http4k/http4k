@@ -1,8 +1,7 @@
 description = 'HTTP Client built on top of okhttp'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compileOnly project(":http4k-core")
 
     compile Libs.okhttp
 

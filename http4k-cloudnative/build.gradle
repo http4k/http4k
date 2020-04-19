@@ -1,8 +1,7 @@
 description = 'Machinery for running Http4k apps in cloud-native environments'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compileOnly project(":http4k-core")
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(":http4k-testing-hamkrest")

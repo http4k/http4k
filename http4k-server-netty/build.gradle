@@ -1,8 +1,7 @@
 description = 'Http4k HTTP Server built on top of Netty'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compileOnly project(":http4k-core")
 
     compile Libs.netty_codec_http2
 

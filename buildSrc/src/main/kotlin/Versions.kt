@@ -32,8 +32,6 @@ object Versions {
 
     const val net_saliman_cobertura_gradle_plugin: String = "3.0.0"
 
-    const val nebula_provided_base_gradle_plugin: String = "3.0.3" // available: "5.0.3"
-
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
 
     const val openapi_generator_gradle_plugin: String = "4.3.0"

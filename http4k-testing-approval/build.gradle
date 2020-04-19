@@ -1,10 +1,10 @@
-description = 'Http4k support for chaos testing'
+description = 'Http4k support for Approval Testing'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
-    provided Libs.junit_jupiter_api
-    provided Libs.hamkrest
+    compile project(":http4k-core")
+    compileOnly Libs.junit_jupiter_api
+    compileOnly Libs.hamkrest
+
     compile Libs.underscore
 
     testCompile project(":http4k-testing-hamkrest")

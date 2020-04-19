@@ -1,10 +1,9 @@
 description = 'Http4k Serverless support for AWS Lambda'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided Libs.kotlin_reflect
-    provided project(":http4k-core")
+    compileOnly project(":http4k-core")
 
+    compile Libs.kotlin_reflect
     compile Libs.aws_lambda_java_core
     compile Libs.aws_lambda_java_events
 

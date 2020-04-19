@@ -140,10 +140,6 @@ object Libs {
             "net.saliman.cobertura:net.saliman.cobertura.gradle.plugin:" +
             Versions.net_saliman_cobertura_gradle_plugin
 
-    const val nebula_provided_base_gradle_plugin: String =
-            "nebula.provided-base:nebula.provided-base.gradle.plugin:" +
-            Versions.nebula_provided_base_gradle_plugin
-
     const val com_jfrog_bintray_gradle_plugin: String =
             "com.jfrog.bintray:com.jfrog.bintray.gradle.plugin:" +
             Versions.com_jfrog_bintray_gradle_plugin
