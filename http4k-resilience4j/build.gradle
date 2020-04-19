@@ -8,6 +8,7 @@ dependencies {
     compile Libs.resilience4j_ratelimiter
     compile Libs.resilience4j_retry
 
+    testCompile project(":http4k-core")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }

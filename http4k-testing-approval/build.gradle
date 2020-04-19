@@ -1,12 +1,13 @@
 description = 'Http4k support for Approval Testing'
 
 dependencies {
-    compile project(":http4k-core")
+    compileOnly project(":http4k-core")
     compileOnly Libs.junit_jupiter_api
     compileOnly Libs.hamkrest
 
     compile Libs.underscore
 
+    testCompile project(":http4k-core")
     testCompile project(":http4k-testing-hamkrest")
     testCompile Config.TestDependencies
 }
