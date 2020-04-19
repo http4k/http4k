@@ -9,9 +9,9 @@ dependencies {
     compile Libs.javax_servlet_api
 
     // this list is for reference since http2 support is optional
-    compileOnly Libs.http2_server
-    compileOnly Libs.jetty_alpn_conscrypt_server
-    compileOnly Libs.alpn_boot
+     compileOnly Libs.http2_server
+     compileOnly Libs.jetty_alpn_conscrypt_server
+     compileOnly Libs.alpn_boot
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Libs.http2_server

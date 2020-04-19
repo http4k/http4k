@@ -4,8 +4,8 @@ apply plugin: 'org.openapi.generator'
 
 dependencies {
     compileOnly project(":http4k-core")
-    compileOnly project(":http4k-security-oauth")
-    compileOnly project(":http4k-format-jackson")
+     compileOnly project(":http4k-security-oauth")
+     compileOnly project(":http4k-format-jackson")
 
     compile Libs.kotlin_reflect
 
