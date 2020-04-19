@@ -14,8 +14,5 @@ dependencies {
     implementation Libs.alpn_boot
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile Libs.http2_server
-    testCompile Libs.jetty_alpn_conscrypt_server
-    testCompile Libs.alpn_boot
     testCompile Config.TestDependencies
 }
