@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.244.0 (uncut)
+### v3.244.0
 - [all] Upgrade some dependency versions.
 - [all] [Breaking (if you're not using it right!)] Fix #397 - Fixed up Maven dependencies so that they are not bringing in runtime libraries.
 - [http4k-core] - Add enum StringBiDiMapping #395 - H/T @goodhoko
