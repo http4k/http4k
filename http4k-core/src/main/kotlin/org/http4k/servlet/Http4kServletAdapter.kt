@@ -18,6 +18,7 @@ class Http4kServletAdapter(private val handler: HttpHandler) {
     fun handle(req: HttpServletRequest, resp: HttpServletResponse) = handler(req.asHttp4kRequest()).transferTo(resp)
 }
 
+@Suppress("DEPRECATION")
 private fun Response.transferTo(destination: HttpServletResponse) {
     destination.setStatus(status.code, status.description)
     headers.forEach { (key, value) -> destination.addHeader(key, value) }
