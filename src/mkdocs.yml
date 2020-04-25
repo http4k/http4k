@@ -16,6 +16,8 @@ google_analytics: ['UA-125143867-1', 'auto']
 markdown_extensions:
   - meta
   - codehilite
+extra_css:
+  - ./css/site.css
 extra:
   logo: img/logo_1100x200_white_on_blue_trans.png
 edit_uri: edit/master/src/docs/
