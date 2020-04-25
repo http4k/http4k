@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.throws
 import org.http4k.base64Encode
 import org.http4k.core.Method
 import org.http4k.core.Uri
-import org.http4k.core.with
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
@@ -137,6 +136,6 @@ class BiDiLensSpecTest {
         )
         val expected = CompositeObject(123, "123")
         assertThat(lens("123"), equalTo(expected))
-        assertThat("prefix".with(lens of expected), equalTo("prefix123123"))
+        assertThat(lens(expected, "prefix"), equalTo("prefix123123"))
     }
 }

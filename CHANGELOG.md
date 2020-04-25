@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.245.0 (uncut)
 - [http4k-core] Factored out `Http4kServletAdapter` to allow usage of the Servlet API outside of creating a Servlet instance.
+- [all] [Breaking (prevent API abuse)] Restricted generic `with()` method actual http4k types. Usage outside our API should not use this method.
 
 ### v3.244.0
 - [all] Upgrade some dependency versions.
