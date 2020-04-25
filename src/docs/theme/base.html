@@ -18,10 +18,6 @@
     {% endif %}
     {% endblock %}
     {% block styles %}
-    <link rel="stylesheet" href="{{ 'assets/stylesheets/application.451f80e5.css' | url }}">
-    {% if palette.primary or palette.accent %}
-    <link rel="stylesheet" href="{{ 'assets/stylesheets/application-palette.22915126.css' | url }}">
-    {% endif %}
     {% if palette.primary %}
     {% import "partials/palette.html" as map %}
     {% set primary = map.primary(
@@ -31,19 +27,14 @@
     {% endif %}
     {% endblock %}
     {% block libs %}
-    <script src="{{ 'assets/javascripts/modernizr.1aa3b519.js' | url }}"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
     {% endblock %}
     {% block fonts %}
     {% if font != false %}
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{
-              font.text | replace(' ', '+')  + ':300,400,400i,700|' +
-              font.code | replace(' ', '+')
-            }}">
-    <style>body,input{font-family:"{{ font.text }}","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"{{ font.code }}","Courier New",Courier,monospace}</style>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
     {% endif %}
     {% endblock %}
-    <link rel="stylesheet" href="{{ 'assets/fonts/material-icons.css' | url }}">
+    <link rel="stylesheet" href="/css/main.css"/>
     {% for path in config["extra_css"] %}
     <link rel="stylesheet" href="{{ path | url }}">
     {% endfor %}
@@ -62,64 +53,44 @@
 {% block header %}
 {% include "partials/header.html" %}
 {% endblock %}
-<div class="md-container">
-    {% block hero %}
-    {% if page and page.meta and page.meta.hero %}
-    {% include "partials/hero.html" with context %}
-    {% endif %}
-    {% endblock %}
-    {% if feature.tabs %}
-    {% include "partials/tabs.html" %}
-    {% endif %}
-    <main class="md-main">
-        <div class="md-main__inner md-grid" data-md-component="container">
-            {% block site_nav %}
-            {% if nav %}
-            <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-                <div class="md-sidebar__scrollwrap">
-                    <div class="md-sidebar__inner">
-                        {% include "partials/nav.html" %}
-                    </div>
+<div class="intro">
+    <div class="row no-gutters justify-content-center">
+        {% include "partials/nav.html" %}
+        <main class="col">
+            <div class="container">
+                <div class="content"><img class="mb-3 sideToggle" src="images/exchange-icon.svg" width="20" alt="" srcset=""/>
+                    <h3>Introduction</h3>
+                    <p><a href="#">http4k</a> is a lightweight but fully-featured HTTP toolkit written in pure <a href="#">Kotlin</a> that enables the serving and consuming of HTTP services in a functional and consistent way. <a href="#">http4k</a> applications are just Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:</p>
+                    <figure class="code">
+                        <div class="title">EXAMPLE
+                            <button class="getCode" data-toggle="tooltip" data-placement="top" title="Copy to clipboard"><img src="images/copy-icon.svg" alt=""/></button>
+                        </div>
+                        <pre><code><span class="keyword-color">val </span>app: HttpHandler = { request: Request -> Response(OK).body(request.body) }<br/><span class="keyword-color">val </span>server = app.asServer(SunHttp(<span class="number-color">8000</span>)).start()</code></pre>
+                    </figure>
+                    <p><a href="#">http4k</a> consists of a core library, http4k-core, providing a base HTTP implementation + a number of capability abstractions (such as servers, clients, templating, websockets etc). These capabilities are then implemented in add-on modules.</p>
+                    <h4>The principles of http4k are:</h4>
+                    <p><strong>Application as a Function:</strong> Based on the Twitter paper <a href="">"Your Server as a Function"</a>, all HTTP services can be composed of 2 types of simple function:</p>
+                    <ul>
+                        <li class="mb-4">HttpHandler: <span class="define-color">(Request) -> Response</span> - provides a remote call for processing a Request.</li>
+                        <li> Filter: <span class="define-color">(HttpHandler) -> HttpHandler</span>  - adds Request/Response pre/post processing. </li>
+                        <li>These filters are composed to make stacks of reusable behaviour that can then be applied to an HttpHandler.</li>
+                    </ul>
+                    <p><strong>Immutability:</strong> All entities in the library are immutable unless their function explicitly disallows this.</p>
+                    <p><strong>Symmetric:</strong> The HttpHandler interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together of services without HTTP container being required.</p>
+                    <p><strong>Dependency-lite:</strong> Apart the fr om Kotlin StdLib, http4k-core module has ZERO dependencies and weighs in at ~700kb. Add-on mo dules only have dependencies required for specific implementation.</p>
                 </div>
             </div>
-            {% endif %}
-            {% endblock %}
-            <div class="md-content">
-                <article class="md-content__inner md-typeset">
-                    {% block content %}
-                    {% if page.edit_url %}
-                    <a href="{{ page.edit_url }}" title="{{ lang.t('edit.link.title') }}" class="md-icon md-content__icon">&#xE3C9;</a>
-                    {% endif %}
-                    {% if not "\x3ch1" in page.content %}
-                    <h1>{{ page.title | default(config.site_name, true)}}</h1>
-                    {% endif %}
-                    {{ page.content }}
-                    {% block source %}
-                    {% if page and page.meta and page.meta.source %}
-                    <h2 id="__source">{{ lang.t("meta.source") }}</h2>
-                    {% set repo = config.repo_url %}
-                    {% if repo | last == "/" %}
-                    {% set repo = repo[:-1] %}
-                    {% endif %}
-                    {% set path = page.meta.path | default([""]) %}
-                    {% set file = page.meta.source %}
-                    <a href="{{ [repo, path, file] | join('/') }}" title="{{ file }}" class="md-source-file">
-                        {{ file }}
-                    </a>
-                    {% endif %}
-                    {% endblock %}
-                    {% endblock %}
-                    {% block disqus %}
-                    {% include "partials/integrations/disqus.html" %}
-                    {% endblock %}
-                </article>
-            </div>
-        </div>
-    </main>
-    {% block footer %}
-    {% include "partials/footer.html" %}
-    {% endblock %}
+        </main>
+    </div>
 </div>
+<!-- Spinner Loading-->
+<!-- Start Spinner Loading-->
+<div class="spinner-loading"><img src="images/spinner.svg" alt="loading"/></div>
+<!-- End Spinner Loading-->
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/index-min.js"></script>
+</body>
 {% block scripts %}
       <script src="{{ 'assets/javascripts/application.583bbe55.js' | url }}"></script>
 {% if lang.t("search.language") != "en" %}
@@ -142,7 +113,6 @@
 {% endif %}
 {% endif %}
 {% endif %}
-<script>app.initialize({version:"{{ mkdocs_version }}",url:{base:"{{ base_url }}"}})</script>
 {% for path in config["extra_javascript"] %}
 <script src="{{ path | url }}"></script>
 {% endfor %}
