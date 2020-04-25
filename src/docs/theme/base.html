@@ -58,26 +58,14 @@
         {% include "partials/nav.html" %}
         <main class="col">
             <div class="container">
-                <div class="content"><img class="mb-3 sideToggle" src="/img/exchange-icon.svg" width="20" alt="" srcset=""/>
-                    <h3>Introduction</h3>
-                    <p><a href="#">http4k</a> is a lightweight but fully-featured HTTP toolkit written in pure <a href="#">Kotlin</a> that enables the serving and consuming of HTTP services in a functional and consistent way. <a href="#">http4k</a> applications are just Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:</p>
-                    <figure class="code">
-                        <div class="title">EXAMPLE
-                            <button class="getCode" data-toggle="tooltip" data-placement="top" title="Copy to clipboard"><img src="images/copy-icon.svg" alt=""/></button>
-                        </div>
-                        <pre><code><span class="keyword-color">val </span>app: HttpHandler = { request: Request -> Response(OK).body(request.body) }<br/><span class="keyword-color">val </span>server = app.asServer(SunHttp(<span class="number-color">8000</span>)).start()</code></pre>
-                    </figure>
-                    <p><a href="#">http4k</a> consists of a core library, http4k-core, providing a base HTTP implementation + a number of capability abstractions (such as servers, clients, templating, websockets etc). These capabilities are then implemented in add-on modules.</p>
-                    <h4>The principles of http4k are:</h4>
-                    <p><strong>Application as a Function:</strong> Based on the Twitter paper <a href="">"Your Server as a Function"</a>, all HTTP services can be composed of 2 types of simple function:</p>
-                    <ul>
-                        <li class="mb-4">HttpHandler: <span class="define-color">(Request) -> Response</span> - provides a remote call for processing a Request.</li>
-                        <li> Filter: <span class="define-color">(HttpHandler) -> HttpHandler</span>  - adds Request/Response pre/post processing. </li>
-                        <li>These filters are composed to make stacks of reusable behaviour that can then be applied to an HttpHandler.</li>
-                    </ul>
-                    <p><strong>Immutability:</strong> All entities in the library are immutable unless their function explicitly disallows this.</p>
-                    <p><strong>Symmetric:</strong> The HttpHandler interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together of services without HTTP container being required.</p>
-                    <p><strong>Dependency-lite:</strong> Apart the fr om Kotlin StdLib, http4k-core module has ZERO dependencies and weighs in at ~700kb. Add-on mo dules only have dependencies required for specific implementation.</p>
+                <div class="content">
+                    <img class="mb-3 sideToggle" src="/img/exchange-icon.svg" width="20" alt="" srcset=""/>
+                    {% block content %}
+                    {% if not "\x3ch1" in page.content %}
+                    <h1>{{ page.title | default(config.site_name, true)}}</h1>
+                    {% endif %}
+                    {{ page.content }}
+                    {% endblock %}
                 </div>
             </div>
         </main>
