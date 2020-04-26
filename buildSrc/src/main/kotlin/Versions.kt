@@ -14,7 +14,7 @@ object Versions {
     const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.20.0"
              // available: "0.20.0-1.4-M1-release-99"
 
-    const val io_github_resilience4j: String = "1.3.1"
+    const val io_github_resilience4j: String = "1.4.0"
 
     const val org_jetbrains_kotlin: String = "1.3.72"
 
@@ -44,9 +44,9 @@ object Versions {
 
     const val aws_lambda_java_events: String = "2.2.7"
 
-    const val jackson_dataformat_xml: String = "2.10.3"
+    const val jackson_dataformat_xml: String = "2.11.0"
 
-    const val jackson_module_kotlin: String = "2.10.3"
+    const val jackson_module_kotlin: String = "2.11.0"
 
     const val aws_lambda_java_core: String = "1.2.0"
 
@@ -54,15 +54,15 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.48.Final"
+    const val netty_codec_http2: String = "4.1.49.Final"
 
-    const val jackson_databind: String = "2.10.3"
+    const val jackson_databind: String = "2.11.0"
 
     const val httpasyncclient: String = "4.1.4"
 
     const val ktor_server_cio: String = "1.1.1" // available: "1.3.2-1.4-M1-release-99"
 
-    const val micrometer_core: String = "1.4.1"
+    const val micrometer_core: String = "1.4.2"
 
     const val java_websocket: String = "1.4.1"
 
@@ -74,7 +74,7 @@ object Versions {
 
     const val freemarker: String = "2.3.30"
 
-    const val handlebars: String = "4.1.2"
+    const val handlebars: String = "4.2.0"
 
     const val httpclient: String = "4.5.12"
 
