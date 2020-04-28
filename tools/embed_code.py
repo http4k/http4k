@@ -16,7 +16,7 @@ def pull_content(uri):
     response = requests.get(uri)
     if response.status_code > 299:
         raise Exception('Server responded with ' + str(response.status_code))
-    return '```\nkotlin\n' + response.text + '```'
+    return '```kotlin\n' + response.text + '```'
 
 
 if __name__ == "__main__":
