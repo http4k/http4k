@@ -9,42 +9,8 @@ cache:
     - $HOME/.gradle/wrapper/
 matrix:
   include:
-    - stage: build
-      language: java
-      jdk: openjdk11
-      script:
-        - "./gradlew -i check jacocoRootReport"
-      after_success:
-        - bash <(curl -s https://codecov.io/bash)
-      cache:
-        directories:
-          - "$HOME/.m2"
-          - "$HOME/.gradle"
-    - stage: bintray
-      if: branch = master
-      language: java
-      jdk: openjdk11
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-ci.sh; fi'
-    - stage: docs
+   - stage: docs
       if: branch = master
       language: python
       script:
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-site.sh; fi'
-    - stage: api
-      if: branch = master
-      language: java
-      jdk: openjdk11
-      script:
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-api.sh; fi'
-    - stage: maven central 1
-      if: branch = master
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-1.sh; fi'
-    - stage: maven central 2
-      if: branch = master
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-2.sh; fi'
-    - stage: maven central 3
-      if: branch = master
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-3.sh; fi'
-    - stage: maven central 4
-      if: branch = master
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-4.sh; fi'
+        - './release-site.sh'
