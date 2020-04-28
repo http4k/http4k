@@ -16,7 +16,7 @@ def pull_content(uri):
     response = requests.get(uri)
     if response.status_code > 299:
         raise Exception('Server responded with ' + str(response.status_code))
-    return '```\n' + response.text + '```'
+    return '```\n' + response.text + '\n```'
 
 
 if __name__ == "__main__":
