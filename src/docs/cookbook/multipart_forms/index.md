@@ -13,13 +13,17 @@ Multipart form support is provided on 2 levels:
 ```
 
 ### Standard (non-typesafe) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_standard.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_standard.kt"></script>
 
 ### Lens (typesafe, validating) API - reads ALL contents onto disk/memory [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_lens.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_lens.kt"></script>
 
 ### Streaming - iterate over Multiparts [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_streaming.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_streaming.kt"></script>
 
 ### Processing Files with a Filter and convert to standard form [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_processing.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_processing.kt"></script>

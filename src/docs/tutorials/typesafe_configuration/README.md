@@ -93,6 +93,7 @@ convenient to source parameter values from a variety of contexts when running ap
 - Source code defined environmental configuration
 
 Implementing this kind of fallback logic manually, you'd end up with code like the below: 
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/typesafe_configuration/pre/overriding.kt"></script>
 
 ## The http4k approach...

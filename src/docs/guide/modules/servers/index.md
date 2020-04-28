@@ -19,6 +19,7 @@ Server-backend modules provide a consistent API to mount HttpHandlers into the s
 simply passing it to the relevant `ServerConfig` implementation (in this case `Jetty`):
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/servers/example_http.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/servers/example_http.kt"></script>
 
 ### Customisation

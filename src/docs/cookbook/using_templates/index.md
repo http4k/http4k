@@ -10,4 +10,5 @@ Example showing how to use the Templating modules - in this case Handlebars, bot
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_templates/example.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_templates/example.kt"></script>

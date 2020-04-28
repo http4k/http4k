@@ -10,4 +10,5 @@ description: Recipe for using http4k to create an authorization server that prov
 For this example, you need to configure `OAuthServer` instance with the correct implementations of your login pages, generation of authentication codes and access tokens.
 
 ### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/basic_oauth_authorization_server/example.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/basic_oauth_authorization_server/example.kt"></script>

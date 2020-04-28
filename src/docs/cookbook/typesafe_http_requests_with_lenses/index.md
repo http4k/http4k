@@ -22,5 +22,6 @@ Additionally, the lack of Higher Kinded Types in Kotlin means that we are unable
 Below is an example which uses a custom Result ADT - this will work for all extraction Lenses that you define:
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example_custom_result_adt.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example_custom_result_adt.kt"></script>
 

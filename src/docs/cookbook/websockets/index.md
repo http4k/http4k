@@ -23,10 +23,12 @@ The simplest possible Websocket can be mounted as a `WsConsumer` function onto a
 
 ### Mixing HTTP and Websocket services [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt)
 Both Websockets and Http handlers in **http4k** are routed using a similar path-based API. We combine them into a single `PolyHandler` which can handle both `http://` and `ws://`, and then convert to a Server as usual:
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt"></script>
 
 ### Automarshalling Websockets messages [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_automarshalling.kt)
 Using the standard Lens API, we can auto-convert Websocket messages on and off the wire. This example uses the Jackson for the marshalling:
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_automarshalling.kt"></script>
 
 ### Testing Websockets [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_testing.kt)

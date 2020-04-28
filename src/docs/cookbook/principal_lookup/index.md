@@ -12,4 +12,5 @@ When authorising requests, it is common to need to store some credentials or a u
 This can be easily achieved by combining the typesafe RequestContext functionality with one of the built-in authorisation Filters:
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/principal_lookup/example.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/principal_lookup/example.kt"></script>

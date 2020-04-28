@@ -12,6 +12,9 @@ documentation, and checking in a high-level way that the business endpoints are 
 - The service can be pinged over HTTP to prove that is still alive.
 
 ## Tests:
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/tdding_http4k/_1/tests.kt"></script>
+
 ## Production:
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/tdding_http4k/_1/project.kt"></script>

@@ -12,7 +12,9 @@ HTML form support is provided on 2 levels:
 ```
 
 ### Standard (non-typesafe) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_standard.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_standard.kt"></script>
 
 ### Lens (typesafe, validating) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_lens.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_lens.kt"></script>

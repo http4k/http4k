@@ -19,7 +19,9 @@ the shared bag of state for each request, and to remove the state after the requ
 ```
 
 #### String-based keys [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/string_key_example.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/string_key_example.kt"></script>
 
 #### Lens-based keys [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/lens_key_example.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/lens_key_example.kt"></script>

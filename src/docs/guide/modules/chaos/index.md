@@ -56,6 +56,7 @@ A **Stage** provides the lifecycle for applying a behaviour, and applies until a
 For use in automated test suites, it is simple to define the Chaos behaviour programmatically using the API and then use the `ChaosEngine` to add it onto an existing application.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos.kt"></script>
 
 ## Dynamic behaviour injection using Chaos Controls
@@ -106,9 +107,11 @@ Apart from being able to turn the Chaos on/off and check the status, the most po
 
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_openapi.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_openapi.kt"></script>
 
 ## Interacting with ChaosEngine using an HTTP client
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_client.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_client.kt"></script>

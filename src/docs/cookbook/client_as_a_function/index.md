@@ -9,4 +9,5 @@ This example demonstrates using http4k as a client, to consume HTTP services. A 
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/client_as_a_function/example.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/client_as_a_function/example.kt"></script>

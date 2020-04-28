@@ -32,5 +32,6 @@ In Kubernetes, this set of endpoints is generally hosted on a second port to avo
 easily start these services on a different port to the main application API via the `Http4kK8sServer` object.
  
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/cloud_native/example_k8s.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/cloud_native/example_k8s.kt"></script>
 

@@ -25,6 +25,6 @@ The examples below are for Handlebars, but the others have the same APIs:
 
 #### Code  [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/templating/example.kt)
 
- <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/templating/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/templating/example.kt"></script>
 
 [http4k]: https://http4k.org
