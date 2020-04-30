@@ -1,17 +1,19 @@
 package org.http4k.openapi
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = SchemaSpec.RefSpec::class)
+@JsonTypeInfo(use = NAME, property = "type", defaultImpl = SchemaSpec.RefSpec::class)
 @JsonSubTypes(
-    JsonSubTypes.Type(value = SchemaSpec.ObjectSpec::class, name = "object"),
-    JsonSubTypes.Type(value = SchemaSpec.ArraySpec::class, name = "array"),
-    JsonSubTypes.Type(value = SchemaSpec.ArraySpec::class, name = "array"),
-    JsonSubTypes.Type(value = SchemaSpec.StringSpec::class, name = "string"),
-    JsonSubTypes.Type(value = SchemaSpec.NumberSpec::class, name = "number"),
-    JsonSubTypes.Type(value = SchemaSpec.IntegerSpec::class, name = "integer"),
-    JsonSubTypes.Type(value = SchemaSpec.BooleanSpec::class, name = "boolean")
+    Type(value = SchemaSpec.ObjectSpec::class, name = "object"),
+    Type(value = SchemaSpec.ArraySpec::class, name = "array"),
+    Type(value = SchemaSpec.ArraySpec::class, name = "array"),
+    Type(value = SchemaSpec.StringSpec::class, name = "string"),
+    Type(value = SchemaSpec.NumberSpec::class, name = "number"),
+    Type(value = SchemaSpec.IntegerSpec::class, name = "integer"),
+    Type(value = SchemaSpec.BooleanSpec::class, name = "boolean")
 )
 sealed class SchemaSpec {
     data class ObjectSpec(val required: List<String> = emptyList(), val properties: Map<String, SchemaSpec> = emptyMap()) : SchemaSpec()
@@ -23,12 +25,12 @@ sealed class SchemaSpec {
     data class RefSpec(val `$ref`: String) : SchemaSpec()
 }
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "in")
+@JsonTypeInfo(use = NAME, property = "in")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = ParameterSpec.PathSpec::class, name = "path"),
-    JsonSubTypes.Type(value = ParameterSpec.HeaderSpec::class, name = "header"),
-    JsonSubTypes.Type(value = ParameterSpec.QuerySpec::class, name = "query"),
-    JsonSubTypes.Type(value = ParameterSpec.CookieSpec::class, name = "cookie")
+    Type(value = ParameterSpec.PathSpec::class, name = "path"),
+    Type(value = ParameterSpec.HeaderSpec::class, name = "header"),
+    Type(value = ParameterSpec.QuerySpec::class, name = "query"),
+    Type(value = ParameterSpec.CookieSpec::class, name = "cookie")
 )
 sealed class ParameterSpec(val name: String, val required: Boolean, val description: String?) {
     class PathSpec(name: String, required: Boolean, description: String?) : ParameterSpec(name, required, description)
@@ -47,4 +49,5 @@ data class PathSpec(
     val responses: Map<Int, ResponseSpec>? = emptyMap(),
     val parameters: List<ParameterSpec>? = emptyList()
 )
+
 data class OpenApi3Spec(val paths: Map<String, Map<String, PathSpec>>, val components: ComponentsSpec)
