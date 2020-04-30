@@ -50,4 +50,5 @@ data class PathSpec(
     val parameters: List<ParameterSpec>? = emptyList()
 )
 
-data class OpenApi3Spec(val paths: Map<String, Map<String, PathSpec>>, val components: ComponentsSpec)
+data class InfoSpec(val title: String)
+data class OpenApi3Spec(val info: InfoSpec, val paths: Map<String, Map<String, PathSpec>>, val components: ComponentsSpec)
