@@ -2,7 +2,6 @@ package org.http4k.openapi
 
 import org.http4k.openapi.client.ClientApiGenerator
 import org.http4k.openapi.models.ModelApiGenerator
-import org.http4k.openapi.server.GenerationOptions
 import org.http4k.openapi.server.ServerApiGenerator
 import java.io.File
 

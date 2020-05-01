@@ -7,9 +7,9 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.http4k.openapi.ApiGenerator
+import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.OpenApi3Spec
 import org.http4k.openapi.SchemaSpec
-import org.http4k.openapi.server.GenerationOptions
 
 object ModelApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
