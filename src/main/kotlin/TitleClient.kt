@@ -1,4 +1,8 @@
-class Title {
+import org.http4k.core.HttpHandler
+
+class TitleClient(
+  private val HttpHandler: HttpHandler
+) {
   fun echoMessage() {
   }
 

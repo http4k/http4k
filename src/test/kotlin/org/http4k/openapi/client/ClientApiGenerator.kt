@@ -2,30 +2,37 @@ package org.http4k.openapi.client
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.FunSpec.Companion.constructorBuilder
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.OpenApi3Spec
+import org.http4k.openapi.httpHandler
+import org.http4k.poet.Property.Companion.addParameter
+import org.http4k.poet.Property.Companion.addProperty
 
 object ClientApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec) =
         with(spec) {
-            val name = info.title.capitalize() + "Client"
+            val className = info.title.capitalize() + "Client"
 
-            val functions = paths.flatMap {
-                val path = it.key
-                it.value.entries.map {
-                    val functionName = it.value.operationId ?: it.key + path.replace('/', '_')
-                    FunSpec.builder(functionName).build()
-                }
-            }.sortedBy { it.name }
-
-            val classBuilder = TypeSpec.classBuilder(spec.info.title.capitalize())
-            val classWithFunctions = functions.fold(classBuilder, TypeSpec.Builder::addFunction)
+            val clientCode = buildFunctions().fold(classBuilder(className), TypeSpec.Builder::addFunction)
+                .addProperty(httpHandler)
+                .primaryConstructor(constructorBuilder().addParameter(httpHandler).build())
+                .build()
 
             listOf(
-                FileSpec.builder("", name)
-                    .addType(classWithFunctions.build())
+                FileSpec.builder("", className)
+                    .addType(clientCode)
                     .build()
             )
         }
+
+    private fun OpenApi3Spec.buildFunctions() = paths.flatMap {
+        val path = it.key
+        it.value.entries.map {
+            val functionName = it.value.operationId ?: it.key + path.replace('/', '_')
+            FunSpec.builder(functionName).build()
+        }
+    }.sortedBy { it.name }
 }
