@@ -8,11 +8,12 @@ import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.OpenApi3Spec
 import org.http4k.openapi.httpHandler
+import org.http4k.openapi.server.GenerationOptions
 import org.http4k.poet.Property.Companion.addParameter
 import org.http4k.poet.Property.Companion.addProperty
 
 object ClientApiGenerator : ApiGenerator {
-    override fun invoke(spec: OpenApi3Spec) =
+    override fun invoke(spec: OpenApi3Spec, options: GenerationOptions) =
         with(spec) {
             val className = info.title.capitalize() + "Client"
 
@@ -22,7 +23,7 @@ object ClientApiGenerator : ApiGenerator {
                 .build()
 
             listOf(
-                FileSpec.builder("", className)
+                FileSpec.builder(options.packageName("client"), className)
                     .addType(clientCode)
                     .build()
             )

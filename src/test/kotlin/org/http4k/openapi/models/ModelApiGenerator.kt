@@ -9,15 +9,16 @@ import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.OpenApi3Spec
 import org.http4k.openapi.SchemaSpec
+import org.http4k.openapi.server.GenerationOptions
 
 object ModelApiGenerator : ApiGenerator {
-    override fun invoke(spec: OpenApi3Spec): List<FileSpec> = with(spec) {
+    override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
 
         val schemas = components.schemas.entries.fold(emptyMap<String, TypeSpec>()) { acc, next ->
             acc + (next.key.capitalize() to acc.getOrDefault(next.key.capitalize(), buildClass(next)))
         }
 
-        val model = FileSpec.builder("", "model").apply {
+        val model = FileSpec.builder(options.packageName("model"), "model").apply {
             schemas.values.forEach { addType(it) }
         }.build()
 
