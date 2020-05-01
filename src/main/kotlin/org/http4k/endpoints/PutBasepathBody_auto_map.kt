@@ -1,7 +1,11 @@
 package org.http4k.endpoints
 
+import org.http4k.core.Method
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.bind
 
 fun PutBasepathBody_auto_map(): RoutingHttpHandler {
-  TODO()
+  return "/basepath/body_auto_map" bind Method.PUT to { Response(Status.OK) }
 }
