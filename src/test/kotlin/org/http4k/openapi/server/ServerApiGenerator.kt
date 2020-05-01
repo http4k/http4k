@@ -7,6 +7,8 @@ import com.squareup.kotlinpoet.KModifier.OPERATOR
 import com.squareup.kotlinpoet.TypeSpec.Companion.objectBuilder
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.OpenApi3Spec
+import org.http4k.poet.Property
+import org.http4k.routing.RoutingHttpHandler
 import java.io.File
 
 data class GenerationOptions(private val basePackage: String, val destinationFolder: File) {
@@ -19,24 +21,43 @@ object ServerApiGenerator : ApiGenerator {
 
         val endpoints = buildEndpoints()
         val server = objectBuilder(className.capitalize())
-            .addFunction(constructionMethod())
+            .addFunction(constructionMethod(endpoints))
             .build()
 
         endpoints.map { it.asFileSpec(options.packageName("endpoints")) } +
-            FileSpec.builder(options.packageName("server"), server.name!!)
+            endpoints
+                .fold(FileSpec.builder(options.packageName("server"), server.name!!)) { acc, next ->
+                    acc.addImport(options.packageName("endpoints"), next.name)
+                }
                 .addType(server)
                 .build()
     }
 
-    private fun OpenApi3Spec.constructionMethod() = FunSpec.builder("invoke")
+    private fun OpenApi3Spec.constructionMethod(endpoints: List<FunSpec>) = FunSpec.builder("invoke")
         .addModifiers(OPERATOR)
-        .addCode(buildApi())
+        .addCode(buildApi(endpoints))
         .build()
 
-    private fun OpenApi3Spec.buildApi() = CodeBlock.of("return org.http4k.routing.routes()")
-//
-//
-//
+    private fun OpenApi3Spec.buildApi(endpoints: List<FunSpec>): CodeBlock {
+        val code = endpoints.map { CodeBlock.builder().addStatement(it.name + "()").build() }.joinToString(", ")
+        return CodeBlock.builder().addStatement(
+            "return org.http4k.routing.routes(\n$code)"
+        ).build()
+    }
+
+    private fun OpenApi3Spec.buildEndpoints() = paths.flatMap { (path, value) ->
+        value.entries.map {
+            val functionName = it.value.operationId ?: it.key + path.replace('/', '_')
+            FunSpec.builder(functionName.capitalize())
+                .returns(Property<RoutingHttpHandler>().type)
+                .addCode("TODO()")
+                .build()
+        }
+    }.sortedBy { it.name }
+}
+
+private fun FunSpec.asFileSpec(packageName: String) = FileSpec.builder(packageName, name).addFunction(this).build()
+
 //        return buildEndpoints().fold(
 //            FunSpec.builder("invoke")
 //                .addModifiers(OVERRIDE, OPERATOR)
@@ -46,25 +67,3 @@ object ServerApiGenerator : ApiGenerator {
 //                .build()) { acc, next ->
 //            acc
 //        }
-
-//        return paths.flatMap {
-//            FileSpec.builder("", )
-//
-//            val path = it.key
-//            it.value.entries.map {
-//                val functionName = it.value.operationId ?: it.key + path.replace('/', '_')
-//                FunSpec.builder(functionName).build()
-//            }
-//        }.sortedBy { it.name }
-
-    private fun OpenApi3Spec.buildEndpoints() = paths.flatMap {
-        val path = it.key
-        it.value.entries.map {
-            val functionName = it.value.operationId ?: it.key + path.replace('/', '_')
-            FunSpec.builder(functionName.capitalize()).build()
-        }
-    }.sortedBy { it.name }
-
-}
-
-private fun FunSpec.asFileSpec(packageName: String) = FileSpec.builder(packageName, name).addFunction(this).build()
