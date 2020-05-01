@@ -45,9 +45,9 @@ data class PathSpec(
     val operationId: String?,
     val summary: String?,
     val description: String?,
-    val tags: List<String>? = emptyList(),
-    val responses: Map<Int, ResponseSpec>? = emptyMap(),
-    val parameters: List<ParameterSpec>? = emptyList()
+    val tags: List<String> = emptyList(),
+    val responses: Map<Int, ResponseSpec> = emptyMap(),
+    val parameters: List<ParameterSpec> = emptyList()
 )
 
 data class InfoSpec(val title: String)
