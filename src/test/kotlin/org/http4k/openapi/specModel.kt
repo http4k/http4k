@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
+import java.math.BigDecimal
 
 @JsonTypeInfo(use = NAME, property = "type", defaultImpl = SchemaSpec.RefSpec::class)
 @JsonSubTypes(
@@ -15,14 +16,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
     Type(value = SchemaSpec.IntegerSpec::class, name = "integer"),
     Type(value = SchemaSpec.BooleanSpec::class, name = "boolean")
 )
-sealed class SchemaSpec {
+sealed class SchemaSpec(val clazz: String? = null) {
     data class ObjectSpec(val required: List<String> = emptyList(), val properties: Map<String, SchemaSpec> = emptyMap()) : SchemaSpec()
     data class ArraySpec(val required: List<String> = emptyList(), val properties: Map<String, SchemaSpec> = emptyMap()) : SchemaSpec()
-    object IntegerSpec : SchemaSpec()
-    object NumberSpec : SchemaSpec()
-    object StringSpec : SchemaSpec()
-    object BooleanSpec : SchemaSpec()
-    data class RefSpec(val `$ref`: String) : SchemaSpec()
+    object IntegerSpec : SchemaSpec(Int::class.qualifiedName)
+    object NumberSpec : SchemaSpec(BigDecimal::class.qualifiedName)
+    object StringSpec : SchemaSpec(String::class.qualifiedName)
+    object BooleanSpec : SchemaSpec(Boolean::class.qualifiedName)
+    data class RefSpec(val `$ref`: String) : SchemaSpec(String::class.qualifiedName)
 }
 
 @JsonTypeInfo(use = NAME, property = "in")
@@ -32,11 +33,11 @@ sealed class SchemaSpec {
     Type(value = ParameterSpec.QuerySpec::class, name = "query"),
     Type(value = ParameterSpec.CookieSpec::class, name = "cookie")
 )
-sealed class ParameterSpec(val name: String, val required: Boolean, val description: String?) {
-    class PathSpec(name: String, required: Boolean, description: String?) : ParameterSpec(name, required, description)
-    class HeaderSpec(name: String, required: Boolean, description: String?) : ParameterSpec(name, required, description)
-    class QuerySpec(name: String, required: Boolean, description: String?) : ParameterSpec(name, required, description)
-    class CookieSpec(name: String, required: Boolean, description: String?) : ParameterSpec(name, required, description)
+sealed class ParameterSpec(val name: String, val required: Boolean, val description: String?, val schema: SchemaSpec) {
+    class PathSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
+    class HeaderSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
+    class QuerySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
+    class CookieSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
 }
 
 data class ResponseSpec(val schema: SchemaSpec?)

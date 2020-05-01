@@ -68,7 +68,7 @@ class TitleClient(
     return httpHandler(Request(Method.POST, "/basepath/body_string"))
   }
 
-  fun postBasepathCookies(): Response {
+  fun postBasepathCookies(b: String, s: String): Response {
     return httpHandler(Request(Method.POST, "/basepath/cookies"))
   }
 
@@ -76,7 +76,12 @@ class TitleClient(
     return httpHandler(Request(Method.GET, "/basepath/descriptions"))
   }
 
-  fun postBasepathHeaders(): Response {
+  fun postBasepathHeaders(
+    b: Boolean,
+    s: String,
+    i: Int,
+    j: String
+  ): Response {
     return httpHandler(Request(Method.POST, "/basepath/headers"))
   }
 
@@ -96,7 +101,7 @@ class TitleClient(
     return httpHandler(Request(Method.POST, "/basepath/or_auth"))
   }
 
-  fun postBasepathPaths_firstName_Bertrand_age(): Response {
+  fun postBasepathPaths_firstName_Bertrand_age(firstName: String, age: Boolean): Response {
     return httpHandler(Request(Method.POST, "/basepath/paths/{firstName}/bertrand/{age}"))
   }
 
@@ -104,7 +109,12 @@ class TitleClient(
     return httpHandler(Request(Method.GET, "/basepath/produces_and_consumes"))
   }
 
-  fun postBasepathQueries(): Response {
+  fun postBasepathQueries(
+    b: Boolean,
+    s: String,
+    i: Int,
+    j: String
+  ): Response {
     return httpHandler(Request(Method.POST, "/basepath/queries"))
   }
 
