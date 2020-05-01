@@ -10,7 +10,7 @@ import org.http4k.openapi.PathSpec
 import org.http4k.poet.Property
 import org.http4k.routing.RoutingHttpHandler
 
-fun OpenApi3Spec.buildEndpoint(method: Method, spec: PathSpec, path: String): FunSpec {
+fun OpenApi3Spec.buildEndpoint(path: String, method: Method, spec: PathSpec): FunSpec {
     val functionName = spec.operationId ?: method.toString().toLowerCase() + path.replace('/', '_')
 
     return FunSpec.builder(functionName.capitalize())

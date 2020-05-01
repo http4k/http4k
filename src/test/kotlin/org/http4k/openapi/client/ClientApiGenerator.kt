@@ -1,7 +1,6 @@
 package org.http4k.openapi.client
 
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.FunSpec.Companion.constructorBuilder
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
@@ -17,7 +16,7 @@ object ClientApiGenerator : ApiGenerator {
         with(spec) {
             val className = info.title.capitalize() + "Client"
 
-            val clientCode = buildFunctions().fold(classBuilder(className), TypeSpec.Builder::addFunction)
+            val clientCode = functions().fold(classBuilder(className), TypeSpec.Builder::addFunction)
                 .addProperty(httpHandler)
                 .primaryConstructor(constructorBuilder().addParameter(httpHandler).build())
                 .build()
@@ -29,11 +28,5 @@ object ClientApiGenerator : ApiGenerator {
             )
         }
 
-    private fun OpenApi3Spec.buildFunctions() = paths.flatMap {
-        val path = it.key
-        it.value.entries.map {
-            val functionName = it.value.operationId ?: it.key + path.replace('/', '_')
-            FunSpec.builder(functionName).build()
-        }
-    }.sortedBy { it.name }
 }
+
