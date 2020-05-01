@@ -26,9 +26,10 @@ import org.http4k.endpoints.PostBasepathReturning
 import org.http4k.endpoints.PutBasepathBody_auto_map
 import org.http4k.endpoints.PutBasepathBody_auto_schema
 import org.http4k.endpoints.PutBasepathMultipart_fields
+import org.http4k.routing.routes
 
 object TitleServer {
-  operator fun invoke() = org.http4k.routing.routes(
+  operator fun invoke() = routes(
   EchoMessage()
   , GetBasepathNometa()
   , GetBasepathProduces_and_consumes()
