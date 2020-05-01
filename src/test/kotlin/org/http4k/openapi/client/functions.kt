@@ -7,4 +7,4 @@ fun OpenApi3Spec.functions() = paths.flatMap { (path, specs) ->
     specs.entries.map { (method, spec) ->
         function(path, Method.valueOf(method.toUpperCase()), spec)
     }
-}.sortedBy { it.name }
+}

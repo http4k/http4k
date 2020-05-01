@@ -7,4 +7,4 @@ fun OpenApi3Spec.buildEndpoints() = paths.flatMap { (path, specs) ->
     specs.entries.map { (method, spec) ->
         buildEndpoint(path, Method.valueOf(method.toUpperCase()), spec)
     }
-}.sortedBy { it.name }
+}
