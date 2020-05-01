@@ -102,7 +102,7 @@ class TitleClient(
   }
 
   fun postBasepathPaths_firstName_Bertrand_age(firstName: String, age: Boolean): Response {
-    return httpHandler(Request(Method.POST, "/basepath/paths/{firstName}/bertrand/{age}"))
+    return httpHandler(Request(Method.POST, "/basepath/paths/${firstName}/bertrand/${age}"))
   }
 
   fun getBasepathProduces_and_consumes(): Response {
