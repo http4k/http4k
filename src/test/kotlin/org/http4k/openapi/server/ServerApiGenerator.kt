@@ -39,21 +39,24 @@ object ServerApiGenerator : ApiGenerator {
         .build()
 
     private fun OpenApi3Spec.buildApi(endpoints: List<FunSpec>): CodeBlock {
-        val code = endpoints.map { CodeBlock.builder().addStatement(it.name + "()").build() }.joinToString(", ")
+        val code = endpoints
+            .map { CodeBlock.builder().addStatement(it.name + "()").build() }
+            .joinToString(", ")
         return CodeBlock.builder().addStatement(
             "return org.http4k.routing.routes(\n$code)"
         ).build()
     }
 
-    private fun OpenApi3Spec.buildEndpoints() = paths.flatMap { (path, value) ->
-        value.entries.map {
-            val functionName = it.value.operationId ?: it.key + path.replace('/', '_')
-            FunSpec.builder(functionName.capitalize())
-                .returns(Property<RoutingHttpHandler>().type)
-                .addCode("TODO()")
-                .build()
-        }
-    }.sortedBy { it.name }
+    private fun OpenApi3Spec.buildEndpoints() = paths
+        .flatMap { (path, value) ->
+            value.entries.map {
+                val functionName = it.value.operationId ?: it.key + path.replace('/', '_')
+                FunSpec.builder(functionName.capitalize())
+                    .returns(Property<RoutingHttpHandler>().type)
+                    .addCode("TODO()")
+                    .build()
+            }
+        }.sortedBy { it.name }
 }
 
 private fun FunSpec.asFileSpec(packageName: String) = FileSpec.builder(packageName, name).addFunction(this).build()
