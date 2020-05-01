@@ -42,13 +42,13 @@ object Versions {
 
     const val gradle_cobertura_plugin: String = "3.0.0"
 
-    const val aws_lambda_java_events: String = "2.2.7"
+    const val aws_lambda_java_events: String = "2.2.8"
 
     const val jackson_dataformat_xml: String = "2.11.0"
 
     const val jackson_module_kotlin: String = "2.11.0"
 
-    const val aws_lambda_java_core: String = "1.2.0"
+    const val aws_lambda_java_core: String = "1.2.1"
 
     const val dokka_gradle_plugin: String = "0.10.1"
 
@@ -62,7 +62,7 @@ object Versions {
 
     const val ktor_server_cio: String = "1.1.1" // available: "1.3.2-1.4-M1-release-99"
 
-    const val micrometer_core: String = "1.4.2"
+    const val micrometer_core: String = "1.5.0"
 
     const val java_websocket: String = "1.4.1"
 
@@ -77,6 +77,8 @@ object Versions {
     const val handlebars: String = "4.2.0"
 
     const val httpclient: String = "4.5.12"
+
+    const val kotlinpoet: String = "1.5.0"
 
     const val underscore: String = "1.54"
 
@@ -94,7 +96,7 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val okhttp: String = "4.5.0"
+    const val okhttp: String = "4.6.0"
 
     const val pebble: String = "3.1.2"
 

@@ -268,6 +268,11 @@ object Libs {
     const val httpclient: String = "org.apache.httpcomponents:httpclient:" + Versions.httpclient
 
     /**
+     * https://github.com/square/kotlinpoet
+     */
+    const val kotlinpoet: String = "com.squareup:kotlinpoet:" + Versions.kotlinpoet
+
+    /**
      * https://github.com/javadev/underscore-java
      */
     const val underscore: String = "com.github.javadev:underscore:" + Versions.underscore
