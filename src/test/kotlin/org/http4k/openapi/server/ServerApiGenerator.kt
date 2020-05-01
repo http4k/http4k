@@ -24,13 +24,3 @@ object ServerApiGenerator : ApiGenerator {
 }
 
 private fun FunSpec.asFileSpec(packageName: String) = FileSpec.builder(packageName, name).addFunction(this).build()
-
-//        return buildEndpoints().fold(
-//            FunSpec.builder("invoke")
-//                .addModifiers(OVERRIDE, OPERATOR)
-//                .returns(Property<Response>().type)
-//                .addParameter(Property<Request>())
-//                .addCode("return Response(org.http4k.core.Status.OK)")
-//                .build()) { acc, next ->
-//            acc
-//        }
