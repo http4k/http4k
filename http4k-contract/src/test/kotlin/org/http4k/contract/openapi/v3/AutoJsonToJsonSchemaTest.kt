@@ -61,7 +61,7 @@ class AutoJsonToJsonSchemaTest {
     private val json = Jackson
 
     private val creator = AutoJsonToJsonSchema(json,
-        FieldRetrieval.compose(SimpleLookup, JacksonAnnotated),
+        FieldRetrieval.compose(SimpleLookup(), JacksonJsonPropertyAnnotated, JacksonJsonNamingAnnotated(Jackson)),
         SchemaModelNamer.Full,
         "customPrefix"
     )

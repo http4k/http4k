@@ -15,7 +15,7 @@ import org.http4k.util.JsonSchemaCreator
 
 class AutoJsonToJsonSchema<NODE : Any>(
     private val json: JsonLibAutoMarshallingJson<NODE>,
-    private val fieldRetrieval: FieldRetrieval = FieldRetrieval.compose(SimpleLookup),
+    private val fieldRetrieval: FieldRetrieval = FieldRetrieval.compose(SimpleLookup()),
     private val modelNamer: SchemaModelNamer = SchemaModelNamer.Simple,
     private val refPrefix: String = "components/schemas"
 ) : JsonSchemaCreator<Any, NODE> {
