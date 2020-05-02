@@ -60,7 +60,7 @@ object Versions {
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val ktor_server_cio: String = "1.1.1" // available: "1.3.2-1.4-M1-release-99"
+    const val ktor_server_cio: String = "1.3.2" // available: "1.3.2-1.4-M1-release-99"
 
     const val micrometer_core: String = "1.5.0"
 
@@ -98,7 +98,7 @@ object Versions {
 
     const val okhttp: String = "4.6.0"
 
-    const val pebble: String = "3.1.2"
+    const val pebble: String = "3.1.3"
 
     const val jsoup: String = "1.13.1"
 
