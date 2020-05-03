@@ -8,9 +8,12 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import org.http4k.lens.Cookies
 import org.http4k.lens.Header
+import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
 import org.http4k.lens.Query
+import org.http4k.openapi.OpenApi3Spec
 import org.http4k.openapi.ParameterSpec
+import org.http4k.openapi.PathSpec
 import kotlin.reflect.KClass
 
 fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
@@ -38,3 +41,17 @@ fun ParameterSpec.lensConstruct() =
         is ParameterSpec.PathSpec -> "of"
         else -> if (required) "required" else "optional"
     }
+
+fun OpenApi3Spec.lensDeclarations(pathSpec: PathSpec) = pathSpec.parameters.map {
+    when (it) {
+        is ParameterSpec.CookieSpec -> CodeBlock.of(
+            "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
+            it.lensSpecClazz.asClassName()
+        )
+        else -> CodeBlock.of(
+            "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
+            it.lensSpecClazz.asClassName(),
+            packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
+        )
+    }
+}

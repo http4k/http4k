@@ -3,21 +3,21 @@ package org.http4k.openapi.client
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.CodeBlock.Companion.of
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.asClassName
+import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.cookie.Cookie
-import org.http4k.lens.Cookies
-import org.http4k.lens.Header
-import org.http4k.lens.Query
 import org.http4k.openapi.OpenApi3Spec
 import org.http4k.openapi.ParameterSpec
 import org.http4k.openapi.PathSpec
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addReturnType
+import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
+import org.http4k.poet.lensDeclarations
+import org.http4k.poet.packageMember
 import org.http4k.poet.quotedName
 
 fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): FunSpec {
@@ -27,16 +27,16 @@ fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): Fun
         .fold(path) { acc, next -> acc.replace("/{", "/\${") }
 
     val map = pathSpec.parameters.mapNotNull {
-        val value = "${it.name}${ if(it.required) "" else "?" }.toString()"
-        val binding = "%T.%M().optional(${it.quotedName()}) of $value"
-        val with = MemberName("org.http4k.core", "with")
-        val string = MemberName("org.http4k.lens", "string")
+        val binding = "${it.name}Lens of ${it.name}"
+        val with = packageMember<Filter>("with")
 
         when (it) {
-            is ParameterSpec.CookieSpec ->
-                of("\n.%M(%T.optional(${it.quotedName()}) of %T(${it.quotedName()}, $value ?: \"\"))", with, Cookies::class.asClassName(), Cookie::class.asClassName())
-            is ParameterSpec.HeaderSpec -> of("\n.%M($binding)", with, Header::class.asClassName(), string)
-            is ParameterSpec.QuerySpec -> of("\n.%M($binding)", with, Query::class.asClassName(), string)
+            is ParameterSpec.CookieSpec -> {
+                val optionality = if(it.required) "" else " ?: \"\""
+                of("\n.%M(${it.name}Lens of %T(${it.quotedName()}, ${it.name}$optionality))", with, Cookie::class.asClassName())
+            }
+            is ParameterSpec.HeaderSpec -> of("\n.%M($binding)", with)
+            is ParameterSpec.QuerySpec -> of("\n.%M($binding)", with)
             else -> null
         }
     }
@@ -50,6 +50,7 @@ fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): Fun
             acc.addParameter(next.name, next.asTypeName()!!)
         }
         .addReturnType(Property<Response>())
+        .addCodeBlocks(lensDeclarations(pathSpec))
         .addCode(request)
         .addCode("\nreturn·httpHandler(request)")
         .build()
