@@ -24,6 +24,7 @@ object ClientApiGenerator : ApiGenerator {
             listOf(
                 FileSpec.builder(options.packageName("client"), className)
                     .addType(clientCode)
+                    .indent("\t")
                     .build()
             )
         }
