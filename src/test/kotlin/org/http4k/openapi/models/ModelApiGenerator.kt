@@ -1,11 +1,7 @@
 package org.http4k.openapi.models
 
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec.Companion.constructorBuilder
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.OpenApi3Spec
@@ -24,14 +20,4 @@ object ModelApiGenerator : ApiGenerator {
                 .buildFormatted()
         }
     }
-
-    private fun buildClass(name: String) = classBuilder(name.capitalize())
-        .addModifiers(KModifier.DATA)
-        .primaryConstructor(constructorBuilder()
-            .addParameter("name", String::class)
-            .build())
-        .addProperty(PropertySpec.builder("name", String::class)
-            .initializer("name")
-            .build())
-        .build()
 }
