@@ -24,7 +24,9 @@ sealed class SchemaSpec(val clazz: KClass<*>? = null) {
     object NumberSpec : SchemaSpec(BigDecimal::class)
     object StringSpec : SchemaSpec(String::class)
     object BooleanSpec : SchemaSpec(Boolean::class)
-    data class RefSpec(val `$ref`: String) : SchemaSpec(String::class)
+    data class RefSpec(val `$ref`: String) : SchemaSpec() {
+        val schemaName = `$ref`.removePrefix("#/components/schemas/")
+    }
 }
 
 @JsonTypeInfo(use = NAME, property = "in")

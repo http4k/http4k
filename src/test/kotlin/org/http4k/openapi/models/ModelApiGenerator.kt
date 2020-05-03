@@ -10,9 +10,9 @@ import org.http4k.poet.buildFormatted
 object ModelApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
 
-        val generated = emptyMap<String, TypeSpec>()
-        val schemas = components.schemas.entries.fold(generated) { acc, (name, schema) ->
-            acc + (name.capitalize() to acc.getOrDefault(name.capitalize(), schema.buildClass(name, generated)))
+        val schemas = components.schemas.entries.fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->
+            acc += (name.capitalize() to acc.getOrDefault(name.capitalize(), schema.buildModelClass(name, components.schemas, acc)))
+            acc
         }
 
         schemas.values.map {
