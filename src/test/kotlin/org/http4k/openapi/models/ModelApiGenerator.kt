@@ -9,6 +9,7 @@ import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.OpenApi3Spec
+import org.http4k.poet.buildFormatted
 
 object ModelApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
@@ -17,12 +18,11 @@ object ModelApiGenerator : ApiGenerator {
             acc + (next.key.capitalize() to acc.getOrDefault(next.key.capitalize(), buildClass(next.key)))
         }
 
-        val model = FileSpec.builder(options.packageName("model"), "model")
-            .apply { schemas.values.forEach { addType(it) } }
-            .indent("\t")
-            .build()
-
-        listOf(model)
+        schemas.values.map {
+            FileSpec.builder(options.packageName("model"), it.name!!)
+                .addType(it)
+                .buildFormatted()
+        }
     }
 
     private fun buildClass(name: String) = classBuilder(name.capitalize())

@@ -7,6 +7,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.OpenApi3Spec
+import org.http4k.poet.buildFormatted
 
 object ServerApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions) = with(spec) {
@@ -22,7 +23,7 @@ object ServerApiGenerator : ApiGenerator {
                 }
                 .addType(server)
                 .addFunction(server.buildMain())
-                .build()
+                .buildFormatted()
     }
 }
 
