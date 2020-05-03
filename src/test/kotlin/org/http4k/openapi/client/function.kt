@@ -18,6 +18,7 @@ import org.http4k.openapi.PathSpec
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addReturnType
 import org.http4k.poet.asTypeName
+import org.http4k.poet.quotedName
 
 fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): FunSpec {
     val functionName = pathSpec.operationId ?: method.name.toLowerCase() + path.replace('/', '_')
@@ -53,5 +54,3 @@ fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): Fun
         .addCode("\nreturn·httpHandler(request)")
         .build()
 }
-
-private fun ParameterSpec.quotedName() = "\"$name\""
