@@ -26,13 +26,13 @@ fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): Fun
     val reifiedPath = pathSpec.parameters.filterIsInstance<ParameterSpec.PathSpec>()
         .fold(path) { acc, next -> acc.replace("/{", "/\${") }
 
-    val map = pathSpec.parameters.mapNotNull {
+    val messageBindings = pathSpec.parameters.mapNotNull {
         val binding = "${it.name}Lens of ${it.name}"
         val with = packageMember<Filter>("with")
 
         when (it) {
             is ParameterSpec.CookieSpec -> {
-                val optionality = if(it.required) "" else " ?: \"\""
+                val optionality = if (it.required) "" else " ?: \"\""
                 of("\n.%M(${it.name}Lens of %T(${it.quotedName()}, ${it.name}$optionality))", with, Cookie::class.asClassName())
             }
             is ParameterSpec.HeaderSpec -> of("\n.%M($binding)", with)
@@ -41,9 +41,11 @@ fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): Fun
         }
     }
 
-    val request =  map.fold(CodeBlock.builder().add("val request = %T(%T.$method,·\"$reifiedPath\")", Property<Request>().type, Property<Method>().type)) {
-        acc, next -> acc.add(next)
-    }.build()
+    val request = messageBindings
+        .fold(CodeBlock.builder()
+            .add("val request = %T(%T.$method,·\"$reifiedPath\")", Property<Request>().type, Property<Method>().type)) { acc, next ->
+            acc.add(next)
+        }.build()
 
     return pathSpec.parameters
         .fold(FunSpec.builder(functionName)) { acc, next ->
