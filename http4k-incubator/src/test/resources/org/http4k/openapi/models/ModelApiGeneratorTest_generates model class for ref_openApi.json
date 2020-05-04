@@ -1,0 +1,31 @@
+{
+    "info": {
+        "title": ""
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Obj": {
+                "type": "object",
+                "required": [
+                    "ref"
+                ],
+                "properties": {
+                    "ref": {
+                        "$ref": "#/components/schemas/Ref"
+                    }
+                }
+            },
+            "Ref": {
+                "type": "object",
+                "required": [
+                ],
+                "properties": {
+                    "value": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}

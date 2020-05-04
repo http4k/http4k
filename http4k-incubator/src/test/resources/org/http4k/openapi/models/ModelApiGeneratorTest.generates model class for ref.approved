@@ -1,0 +1,7 @@
+package testPackage.model
+
+import Ref
+
+data class Obj(
+	private val ref: Ref
+)

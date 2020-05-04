@@ -1,5 +1,6 @@
 package org.http4k.openapi.models
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier.DATA
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -33,7 +34,10 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
         val type = when (spec) {
             is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
             is SchemaSpec.ArraySpec -> TODO()
-            is SchemaSpec.RefSpec -> TODO()
+            is SchemaSpec.RefSpec -> {
+                spec.buildModelClass(name, allSchemas, generated)
+                ClassName.bestGuess(spec.schemaName)
+            }
             else -> spec.clazz!!.asTypeName()
         }.copy(nullable = !required.contains(name))
 
