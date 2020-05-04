@@ -51,8 +51,8 @@ class NamedResourceApprover(private val name: String,
 
 class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResource) : RuntimeException("$prefix. To approve output:\nmv '$actual' '$expected'")
 
-fun Approver.assertApproved(response: Response, expectedStatus: Status) =
-    assertApproved(response.apply { assertEquals(expectedStatus, response.status) })
+fun Approver.assertApproved(response: Response, expectedStatus: Status) = assertApproved(response.apply { assertEquals(expectedStatus, response.status) })
+fun Approver.assertApproved(content: String) = assertApproved(Response(Status.OK).body(content))
 
 /**
  * Create a Hamkrest Matcher for this message that can be combined with other Matchers
