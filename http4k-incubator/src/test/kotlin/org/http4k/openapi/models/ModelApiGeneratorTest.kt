@@ -9,8 +9,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ApprovalTest::class, TestResources::class)
 class ModelApiGeneratorTest {
+
     @Test
     fun `generates model class for simple object`(approver: Approver, resourceLoader: ResourceLoader) {
+        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
+    }
+
+    @Test
+    fun `generates model class for nested object`(approver: Approver, resourceLoader: ResourceLoader) {
         approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
     }
 }
