@@ -8,6 +8,8 @@
             "Obj": {
                 "type": "object",
                 "required": [
+                    "anInteger",
+                    "aNumber"
                 ],
                 "properties": {
                     "anInteger": {
