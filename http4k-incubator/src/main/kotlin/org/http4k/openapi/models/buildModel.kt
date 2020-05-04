@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.KModifier.DATA
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import org.http4k.openapi.SchemaSpec
 import org.http4k.poet.Property
@@ -27,13 +28,16 @@ fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>
 }
 
 private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
-    val base = TypeSpec.classBuilder(name.capitalize())
+    val clazz = TypeSpec.classBuilder(name.capitalize())
     val primaryConstructor = FunSpec.constructorBuilder()
 
     val props = properties.map { (name, spec) ->
         val type = when (spec) {
             is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
-            is SchemaSpec.ArraySpec -> TODO()
+            is SchemaSpec.ArraySpec -> {
+                val typeArguments = listOf(ClassName.bestGuess("Any"))
+                List::class.asClassName().parameterizedBy(typeArguments)
+            }
             is SchemaSpec.RefSpec -> {
                 spec.buildModelClass(name, allSchemas, generated)
                 ClassName.bestGuess(spec.schemaName)
@@ -46,12 +50,12 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
 
     props.forEach {
         primaryConstructor.addParameter(it)
-        base.addProperty(it)
+        clazz.addProperty(it)
     }
 
-    base.addModifiers(DATA).primaryConstructor(primaryConstructor.build())
+    clazz.addModifiers(DATA).primaryConstructor(primaryConstructor.build())
 
-    return base.build()
+    return clazz.build()
 }
 
 private fun SchemaSpec.ArraySpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {

@@ -24,4 +24,9 @@ class ModelApiGeneratorTest {
     fun `generates model class for ref`(approver: Approver, resourceLoader: ResourceLoader) {
         approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
     }
+
+    @Test
+    fun `generates model class for array of primitives`(approver: Approver, resourceLoader: ResourceLoader) {
+        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
+    }
 }
