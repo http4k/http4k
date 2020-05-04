@@ -1,0 +1,10 @@
+package testPackage.model
+
+import kotlin.String
+
+data class Obj(
+	val anInteger: String,
+	val aNumber: String,
+	val aBoolean: String,
+	val aString: String
+)

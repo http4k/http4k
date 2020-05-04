@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(TestResources::class)
 class TestResourcesTest {
+
     @Test
     fun `can load resource that exists`(resourceLoader: ResourceLoader) {
         assertThat(resourceLoader.text("file.txt").trim(), equalTo("content"))

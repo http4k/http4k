@@ -22,7 +22,7 @@ class TestResources : ParameterResolver {
             override fun bytes(name: String): ByteArray = stream(name).readAllBytes()
 
             override fun stream(name: String): InputStream {
-                val resource = "/${extensionContext.testClass.get().packageName.replace('.', '/')}/${extensionContext.testMethod.get().name}_$name"
+                val resource = "/${extensionContext.testClass.get().packageName.replace('.', '/')}/${extensionContext.testClass.get().simpleName}_${extensionContext.testMethod.get().name}_$name"
                 return extensionContext.testClass.get().getResourceAsStream(resource)
                     ?: throw IllegalStateException("Cannot find resource `$resource`")
             }
