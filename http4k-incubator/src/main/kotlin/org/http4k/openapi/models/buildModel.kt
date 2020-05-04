@@ -34,8 +34,8 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
             is SchemaSpec.ArraySpec -> TODO()
             is SchemaSpec.RefSpec -> TODO()
             else -> spec.clazz!!.asTypeName()
-        }
-        spec.buildModelClass(name, allSchemas, generated)
+        }.copy(nullable = !required.contains(name))
+//        spec.buildModelClass(name, allSchemas, generated)
         Property(name, type)
     }
 
