@@ -4,12 +4,16 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier.DATA
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asTypeName
 import org.http4k.openapi.SchemaSpec
+import org.http4k.poet.Property
+import org.http4k.poet.Property.Companion.addParameter
+import org.http4k.poet.Property.Companion.addProperty
 
 fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
     return when (this) {
         is SchemaSpec.RefSpec -> generated[name]
-            ?: allSchemas[schemaName]!!.buildModelClass(schemaName, allSchemas, generated)
+            ?: allSchemas.getValue(schemaName).buildModelClass(schemaName, allSchemas, generated)
         is SchemaSpec.ObjectSpec -> {
             val typeSpec = buildModelClass(name, allSchemas, generated)
             generated[name] = typeSpec
@@ -21,26 +25,28 @@ fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>
 }
 
 private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
-    val props = properties.map { (name, spec) ->
-        name to spec.buildModelClass(name, allSchemas, generated)
-    }
-
+    val base = TypeSpec.classBuilder(name.capitalize())
     val primaryConstructor = FunSpec.constructorBuilder()
-    props.forEach {
-        primaryConstructor.addParameter(it.first, String::class)
+
+    val props = properties.map { (name, spec) ->
+        val type = when (spec) {
+            is SchemaSpec.ObjectSpec -> TODO()
+            is SchemaSpec.ArraySpec -> TODO()
+            is SchemaSpec.RefSpec -> TODO()
+            else -> spec.clazz!!.asTypeName()
+        }
+        spec.buildModelClass(name, allSchemas, generated)
+        Property(name, type)
     }
 
-    val addModifiers = TypeSpec.classBuilder(name.capitalize())
-        .addModifiers(DATA)
-        .primaryConstructor(primaryConstructor.build())
-
     props.forEach {
-        addModifiers.addProperty(PropertySpec.builder(it.first, String::class)
-            .initializer(it.first)
-            .build())
+        primaryConstructor.addParameter(it)
+        base.addProperty(it)
     }
 
-    return addModifiers.build()
+    base.addModifiers(DATA).primaryConstructor(primaryConstructor.build())
+
+    return base.build()
 }
 
 private fun SchemaSpec.ArraySpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
