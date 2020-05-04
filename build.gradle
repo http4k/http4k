@@ -228,7 +228,6 @@ dependencies {
     compile project(":http4k-testing-hamkrest")
     compile project(":http4k-testing-servirtium")
     compile project(":http4k-testing-webdriver")
-    compile Libs.kotlinpoet
 
     testCompile Config.TestDependencies
     testCompile project(path: ":http4k-testing-servirtium", configuration: 'testArtifacts')
