@@ -9,6 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.opentest4j.AssertionFailedError
+import java.io.InputStream
 
 /**
  * Coordinates the comparison of the content for a test.
@@ -53,6 +54,7 @@ class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResourc
 
 fun Approver.assertApproved(response: Response, expectedStatus: Status) = assertApproved(response.apply { assertEquals(expectedStatus, response.status) })
 fun Approver.assertApproved(content: String) = assertApproved(Response(Status.OK).body(content))
+fun Approver.assertApproved(content: InputStream) = assertApproved(Response(Status.OK).body(content))
 
 /**
  * Create a Hamkrest Matcher for this message that can be combined with other Matchers
