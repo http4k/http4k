@@ -67,4 +67,4 @@ data class PathSpec(
 )
 
 data class InfoSpec(val title: String)
-data class OpenApi3Spec(val info: InfoSpec, val paths: Map<String, Map<String, PathSpec>>, val components: ComponentsSpec)
+data class OpenApi3Spec(val info: InfoSpec, val paths: Map<String, Map<String, PathSpec>>, val components: ComponentsSpec = ComponentsSpec())

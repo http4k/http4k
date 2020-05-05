@@ -1,0 +1,26 @@
+package testPackage.client
+
+import kotlin.Boolean
+import kotlin.Int
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.with
+import org.http4k.lens.Header
+import org.http4k.lens.boolean
+import org.http4k.lens.int
+
+class TitleClient(
+	private val httpHandler: HttpHandler
+) {
+	fun post_header(required: Boolean, optional: Int?): Response {
+
+		val requiredLens = Header.boolean().required("required")
+		val optionalLens = Header.int().optional("optional")
+		val request = Request(Method.POST, "/header")
+		.with(requiredLens of required)
+		.with(optionalLens of optional)
+		return httpHandler(request)
+	}
+}

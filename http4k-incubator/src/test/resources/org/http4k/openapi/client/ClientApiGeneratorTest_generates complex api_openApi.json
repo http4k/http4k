@@ -1,0 +1,40 @@
+{
+    "info": {
+        "title": "title",
+        "version": "",
+        "description": ""
+    },
+    "paths": {
+        "/cookies": {
+            "post": {
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "cookie",
+                        "name": "b",
+                        "required": true,
+                        "description": "requiredCookie"
+                    },
+                    {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "cookie",
+                        "name": "s",
+                        "required": false,
+                        "description": "optionalCookie"
+                    }
+                ],
+                "responses": {
+                },
+                "deprecated": false
+            }
+        }
+    },
+    "openapi": "3.0.0",
+    "x-extension": [
+        "extensionField"
+    ]
+}
