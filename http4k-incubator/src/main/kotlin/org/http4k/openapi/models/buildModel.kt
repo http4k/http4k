@@ -31,25 +31,22 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
     val clazz = TypeSpec.classBuilder(name.capitalize())
     val primaryConstructor = FunSpec.constructorBuilder()
 
-    fun SchemaSpec.propertyType(): TypeName {
-        println(this)
-        return when (this) {
-            is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
-            is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
-            is SchemaSpec.RefSpec -> {
-                buildModelClass(name, allSchemas, generated)
-                ClassName.bestGuess(schemaName)
-            }
-            else -> this.clazz!!.asTypeName()
+    fun SchemaSpec.propertyType(): TypeName = when (this) {
+        is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
+        is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
+        is SchemaSpec.RefSpec -> {
+            buildModelClass(name, allSchemas, generated)
+            ClassName.bestGuess(schemaName)
         }
+        else -> this.clazz!!.asTypeName()
     }
 
-    val props = properties.map { (name, spec) -> Property(name, spec.propertyType().copy(nullable = !required.contains(name))) }
-
-    props.forEach {
-        primaryConstructor.addParameter(it)
-        clazz.addProperty(it)
-    }
+    properties
+        .map { (name, spec) -> Property(name, spec.propertyType().copy(nullable = !required.contains(name))) }
+        .forEach {
+            primaryConstructor.addParameter(it)
+            clazz.addProperty(it)
+        }
 
     clazz.addModifiers(DATA).primaryConstructor(primaryConstructor.build())
 
