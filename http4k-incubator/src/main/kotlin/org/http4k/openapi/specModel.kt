@@ -13,7 +13,6 @@ import kotlin.reflect.KClass
 @JsonSubTypes(
     Type(value = SchemaSpec.ObjectSpec::class, name = "object"),
     Type(value = SchemaSpec.ArraySpec::class, name = "array"),
-    Type(value = SchemaSpec.ArraySpec::class, name = "array"),
     Type(value = SchemaSpec.StringSpec::class, name = "string"),
     Type(value = SchemaSpec.NumberSpec::class, name = "number"),
     Type(value = SchemaSpec.IntegerSpec::class, name = "integer"),
@@ -25,7 +24,11 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
         fun itemsSpec(): SchemaSpec =  try {
             items.asA()
         } catch (e: Exception) {
-            ObjectSpec(clazz = Any::class)
+            try {
+                items.get("items").asA()
+            } catch (e: Exception) {
+                ObjectSpec(clazz = Any::class)
+            }
         }
     }
 

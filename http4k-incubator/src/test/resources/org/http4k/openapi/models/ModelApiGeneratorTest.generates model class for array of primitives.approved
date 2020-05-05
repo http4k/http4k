@@ -1,6 +1,6 @@
 package testPackage.model
 
-import Any
+import java.math.BigDecimal
 import kotlin.collections.List
 
 data class Obj(
