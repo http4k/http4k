@@ -1,0 +1,27 @@
+{
+    "info": {
+        "title": ""
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Obj": {
+                "type": "object",
+                "required": [
+                    "nested"
+                ],
+                "properties": {
+                    "nested": {
+                        "type": "object",
+                        "required": [],
+                        "properties": {
+                            "value": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "info": {
+        "title": ""
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Obj": {
+                "type": "object",
+                "required": [
+                    "mixed"
+                ],
+                "properties": {
+                    "mixed": {
+                        "type": "array",
+                        "items": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

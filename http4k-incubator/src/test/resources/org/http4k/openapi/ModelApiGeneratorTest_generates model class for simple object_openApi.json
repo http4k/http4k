@@ -1,0 +1,31 @@
+{
+    "info": {
+        "title": ""
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Obj": {
+                "type": "object",
+                "required": [
+                    "anInteger",
+                    "aNumber"
+                ],
+                "properties": {
+                    "anInteger": {
+                        "type": "integer"
+                    },
+                    "aNumber": {
+                        "type": "number"
+                    },
+                    "aBoolean": {
+                        "type": "boolean"
+                    },
+                    "aString": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

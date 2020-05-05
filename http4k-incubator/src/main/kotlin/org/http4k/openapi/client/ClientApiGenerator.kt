@@ -10,6 +10,7 @@ import org.http4k.openapi.OpenApi3Spec
 import org.http4k.openapi.httpHandler
 import org.http4k.poet.Property.Companion.addParameter
 import org.http4k.poet.Property.Companion.addProperty
+import org.http4k.poet.buildFormatted
 
 object ClientApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions) =
@@ -24,7 +25,7 @@ object ClientApiGenerator : ApiGenerator {
             listOf(
                 FileSpec.builder(options.packageName("client"), className)
                     .addType(clientCode)
-                    .build()
+                    .buildFormatted()
             )
         }
 

@@ -1,0 +1,27 @@
+{
+    "info": {
+        "title": ""
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Obj": {
+                "type": "object",
+                "required": [
+                    "numbers"
+                ],
+                "properties": {
+                    "numbers": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
