@@ -1,8 +1,5 @@
-package org.http4k.openapi.models
+package org.http4k.openapi
 
-import org.http4k.openapi.ApiGenerator
-import org.http4k.openapi.GenerationOptions
-import org.http4k.openapi.OpenApi3Spec
 import org.http4k.openapi.OpenApiJson.asA
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved

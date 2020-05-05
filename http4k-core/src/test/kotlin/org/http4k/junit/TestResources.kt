@@ -11,19 +11,20 @@ interface ResourceLoader {
     fun stream(name: String): InputStream
 }
 
-class TestResources : ParameterResolver {
-    override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext) =
-        parameterContext.parameter.type == ResourceLoader::class.java
+class TestResources(private val resourcePrefixer: (Class<*>) -> String = { "${it.simpleName}_" }) : ParameterResolver {
 
-    override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext) =
+    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.parameter.type == ResourceLoader::class.java
+
+    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) =
         object : ResourceLoader {
-            override fun text(name: String): String = stream(name).reader().readText().trim()
-
             override fun bytes(name: String): ByteArray = stream(name).readAllBytes()
 
+            override fun text(name: String): String = stream(name).reader().readText().trim()
+
             override fun stream(name: String): InputStream {
-                val resource = "/${extensionContext.testClass.get().packageName.replace('.', '/')}/${extensionContext.testClass.get().simpleName}_${extensionContext.testMethod.get().name}_$name"
-                return extensionContext.testClass.get().getResourceAsStream(resource)
+                val prefix = resourcePrefixer(ec.testClass.get())
+                val resource = "/${ec.testClass.get().packageName.replace('.', '/')}/$prefix${ec.testMethod.get().name}_$name"
+                return ec.testClass.get().getResourceAsStream(resource)
                     ?: throw IllegalStateException("Cannot find resource `$resource`")
             }
         }
