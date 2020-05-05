@@ -4,5 +4,5 @@ import Any
 import kotlin.collections.List
 
 data class Obj(
-	private val numbers: List<Any>
+	private val numbers: List<BigDecimal>
 )

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
+import com.fasterxml.jackson.databind.JsonNode
+import org.http4k.openapi.OpenApiJson.asA
 import java.math.BigDecimal
 import kotlin.reflect.KClass
 
@@ -17,9 +19,16 @@ import kotlin.reflect.KClass
     Type(value = SchemaSpec.IntegerSpec::class, name = "integer"),
     Type(value = SchemaSpec.BooleanSpec::class, name = "boolean")
 )
-sealed class SchemaSpec(val clazz: KClass<*>? = null) {
-    data class ObjectSpec(val required: List<String> = emptyList(), val properties: Map<String, SchemaSpec> = emptyMap()) : SchemaSpec()
-    data class ArraySpec(val required: List<String> = emptyList(), val properties: Map<String, SchemaSpec> = emptyMap()) : SchemaSpec()
+sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
+    data class ObjectSpec(val required: List<String> = emptyList(), val properties: Map<String, SchemaSpec> = emptyMap(), override val clazz: KClass<*>?) : SchemaSpec(clazz)
+    data class ArraySpec(private val items: JsonNode) : SchemaSpec() {
+        fun itemsSpec(): SchemaSpec =  try {
+            items.asA()
+        } catch (e: Exception) {
+            ObjectSpec(clazz = Any::class)
+        }
+    }
+
     object IntegerSpec : SchemaSpec(Int::class)
     object NumberSpec : SchemaSpec(BigDecimal::class)
     object StringSpec : SchemaSpec(String::class)
