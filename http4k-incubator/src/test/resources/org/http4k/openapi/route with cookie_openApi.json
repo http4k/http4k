@@ -26,8 +26,7 @@
                     }
                 ],
                 "responses": {
-                },
-                "deprecated": false
+                }
             }
         }
     },

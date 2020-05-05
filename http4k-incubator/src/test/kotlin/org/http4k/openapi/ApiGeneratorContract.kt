@@ -35,4 +35,9 @@ abstract class ApiGeneratorContract {
     fun `route with query`(approver: Approver, resourceLoader: ResourceLoader) {
         approver.assertGeneratedContent(ClientApiGenerator, resourceLoader.text("openApi.json"))
     }
+//
+//    @Test
+//    fun `route with form body`(approver: Approver, resourceLoader: ResourceLoader) {
+//        approver.assertGeneratedContent(ClientApiGenerator, resourceLoader.text("openApi.json"))
+//    }
 }
