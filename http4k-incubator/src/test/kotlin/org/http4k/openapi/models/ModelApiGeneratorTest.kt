@@ -31,7 +31,7 @@ class ModelApiGeneratorTest {
     }
 
     @Test
-    fun `generates`(approver: Approver, resourceLoader: ResourceLoader) {
+    fun `generates model class for mixed array`(approver: Approver, resourceLoader: ResourceLoader) {
         approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
     }
 
