@@ -8,14 +8,19 @@
             "Obj": {
                 "type": "object",
                 "required": [
-                    "numbers"
+                    "mixed"
                 ],
                 "properties": {
-                    "numbers": {
+                    "mixed": {
                         "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
+                        "items": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
                     }
                 }
             }

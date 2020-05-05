@@ -1,0 +1,10 @@
+package testPackage.model
+
+import kotlin.Any
+import kotlin.String
+import kotlin.collections.List
+import kotlin.collections.Map
+
+data class Obj(
+	private val mixed: List<Map<String, Any>>
+)
