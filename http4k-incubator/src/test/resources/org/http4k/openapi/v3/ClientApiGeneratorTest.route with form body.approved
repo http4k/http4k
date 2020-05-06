@@ -8,9 +8,9 @@ import org.http4k.core.Response
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun post_body_form(): Response {
+	fun endpoint(): Response {
 
-		val request = Request(Method.POST, "/body_form")
+		val request = Request(Method.POST, "/query")
 		return httpHandler(request)
 	}
 }
