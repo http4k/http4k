@@ -13,7 +13,7 @@ import org.http4k.lens.Cookies
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun post_cookie(required: Boolean, optional: Int?): Response {
+	fun endpoint(required: Boolean, optional: Int?): Response {
 
 		val requiredLens = Cookies.required("required")
 		val optionalLens = Cookies.optional("optional")

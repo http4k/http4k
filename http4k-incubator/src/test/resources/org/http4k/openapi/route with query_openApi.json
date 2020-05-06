@@ -25,6 +25,7 @@
                         "required": false
                     }
                 ],
+                "operationId": "endpoint",
                 "responses": {
                 }
             }

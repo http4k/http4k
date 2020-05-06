@@ -14,7 +14,7 @@ import org.http4k.lens.int
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun post_query(required: Boolean, optional: Int?): Response {
+	fun endpoint(required: Boolean, optional: Int?): Response {
 
 		val requiredLens = Query.boolean().required("required")
 		val optionalLens = Query.int().optional("optional")

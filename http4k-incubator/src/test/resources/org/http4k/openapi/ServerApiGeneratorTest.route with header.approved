@@ -2,11 +2,11 @@ package testPackage.server
 
 import org.http4k.routing.routes
 import org.http4k.server.asServer
-import testPackage.server.endpoints.Post_header
+import testPackage.server.endpoints.Endpoint
 
 object TitleServer {
 	operator fun invoke() = routes(
-	Post_header()
+	Endpoint()
 	)
 }
 

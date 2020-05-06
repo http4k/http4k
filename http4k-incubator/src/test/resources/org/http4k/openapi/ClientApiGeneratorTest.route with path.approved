@@ -13,7 +13,7 @@ import org.http4k.lens.int
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun `post_path_{required}_{optional}`(required: Boolean, optional: Int?): Response {
+	fun endpoint(required: Boolean, optional: Int?): Response {
 
 		val requiredLens = Path.boolean().of("required")
 		val optionalLens = Path.int().of("optional")
