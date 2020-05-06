@@ -5,7 +5,7 @@
         "description": ""
     },
     "paths": {
-        "/query": {
+        "/formbody": {
             "post": {
                 "parameters": [
                 ],

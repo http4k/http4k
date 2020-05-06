@@ -10,7 +10,7 @@ class TitleClient(
 ) {
 	fun endpoint(): Response {
 
-		val request = Request(Method.POST, "/query")
+		val request = Request(Method.POST, "/formbody")
 		return httpHandler(request)
 	}
 }
