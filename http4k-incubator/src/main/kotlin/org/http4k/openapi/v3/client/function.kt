@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.CodeBlock.Companion.of
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.asClassName
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -12,6 +13,7 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.PathSpec
+import org.http4k.openapi.v3.models.buildModelClass
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addReturnType
 import org.http4k.poet.addCodeBlocks
@@ -46,10 +48,16 @@ fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): Fun
             acc.add(next)
         }.build()
 
-    return pathSpec.parameters
-        .fold(FunSpec.builder(functionName)) { acc, next ->
-            acc.addParameter(next.name, next.asTypeName()!!)
-        }
+    val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
+    val formParams = pathSpec.requestBody
+        ?.contentFor(APPLICATION_FORM_URLENCODED)
+        ?.schema
+        ?.buildModelClass("form", emptyMap(), mutableMapOf())
+        ?.primaryConstructor?.parameters?.map { it.name to it.type } ?: emptyList()
+
+    val fn = (parameters + formParams).fold(FunSpec.builder(functionName)) { acc, next -> acc.addParameter(next.first, next.second) }
+
+    return fn
         .addReturnType(Property<Response>())
         .addCodeBlocks(lensDeclarations(pathSpec))
         .addCode(request)

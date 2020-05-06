@@ -1,5 +1,8 @@
 package testPackage.client
 
+import kotlin.Boolean
+import kotlin.Int
+import kotlin.String
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -8,7 +11,12 @@ import org.http4k.core.Response
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(): Response {
+	fun endpoint(
+		boolean: Boolean,
+		integer: Int?,
+		string: String?,
+		json: String
+	): Response {
 
 		val request = Request(Method.POST, "/formbody")
 		return httpHandler(request)

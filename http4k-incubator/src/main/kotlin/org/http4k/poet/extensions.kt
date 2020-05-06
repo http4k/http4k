@@ -42,18 +42,16 @@ fun ParameterSpec.lensConstruct() =
         else -> if (required) "required" else "optional"
     }
 
-fun OpenApi3Spec.lensDeclarations(pathSpec: PathSpec): List<CodeBlock> {
-    return pathSpec.parameters.map {
-        when (it) {
-            is ParameterSpec.CookieSpec -> CodeBlock.of(
-                "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
-                it.lensSpecClazz.asClassName()
-            )
-            else -> CodeBlock.of(
-                "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
-                it.lensSpecClazz.asClassName(),
-                packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
-            )
-        }
+fun OpenApi3Spec.lensDeclarations(pathSpec: PathSpec) = pathSpec.parameters.map {
+    when (it) {
+        is ParameterSpec.CookieSpec -> CodeBlock.of(
+            "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
+            it.lensSpecClazz.asClassName()
+        )
+        else -> CodeBlock.of(
+            "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
+            it.lensSpecClazz.asClassName(),
+            packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
+        )
     }
 }
