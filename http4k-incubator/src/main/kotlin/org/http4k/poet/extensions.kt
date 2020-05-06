@@ -11,9 +11,9 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.openapi.OpenApi3Spec
-import org.http4k.openapi.ParameterSpec
-import org.http4k.openapi.PathSpec
+import org.http4k.openapi.v3.OpenApi3Spec
+import org.http4k.openapi.v3.ParameterSpec
+import org.http4k.openapi.v3.PathSpec
 import kotlin.reflect.KClass
 
 fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
