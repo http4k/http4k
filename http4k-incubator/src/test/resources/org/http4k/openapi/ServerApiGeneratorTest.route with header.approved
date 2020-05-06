@@ -1,26 +1,15 @@
-package testPackage.client
+package testPackage.server
 
-import kotlin.Boolean
-import kotlin.Int
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.with
-import org.http4k.lens.Header
-import org.http4k.lens.boolean
-import org.http4k.lens.int
+import org.http4k.routing.routes
+import org.http4k.server.asServer
+import testPackage.server.endpoints.Post_header
 
-class TitleClient(
-	private val httpHandler: HttpHandler
-) {
-	fun post_header(required: Boolean, optional: Int?): Response {
+object TitleServer {
+	operator fun invoke() = routes(
+	Post_header()
+	)
+}
 
-		val requiredLens = Header.boolean().required("required")
-		val optionalLens = Header.int().optional("optional")
-		val request = Request(Method.POST, "/header")
-		.with(requiredLens of required)
-		.with(optionalLens of optional)
-		return httpHandler(request)
-	}
+fun main() {
+	TitleServer().asServer(SunHttp(8000)).start()
 }

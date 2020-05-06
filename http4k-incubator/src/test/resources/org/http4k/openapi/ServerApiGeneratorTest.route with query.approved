@@ -1,26 +1,15 @@
-package testPackage.client
+package testPackage.server
 
-import kotlin.Boolean
-import kotlin.Int
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.with
-import org.http4k.lens.Query
-import org.http4k.lens.boolean
-import org.http4k.lens.int
+import org.http4k.routing.routes
+import org.http4k.server.asServer
+import testPackage.server.endpoints.Post_query
 
-class TitleClient(
-	private val httpHandler: HttpHandler
-) {
-	fun post_query(required: Boolean, optional: Int?): Response {
+object TitleServer {
+	operator fun invoke() = routes(
+	Post_query()
+	)
+}
 
-		val requiredLens = Query.boolean().required("required")
-		val optionalLens = Query.int().optional("optional")
-		val request = Request(Method.POST, "/query")
-		.with(requiredLens of required)
-		.with(optionalLens of optional)
-		return httpHandler(request)
-	}
+fun main() {
+	TitleServer().asServer(SunHttp(8000)).start()
 }

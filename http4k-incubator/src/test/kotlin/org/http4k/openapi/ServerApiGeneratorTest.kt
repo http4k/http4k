@@ -1,3 +1,5 @@
 package org.http4k.openapi
 
-class ServerApiGeneratorTest : ApiGeneratorContract()
+import org.http4k.openapi.server.ServerApiGenerator
+
+class ServerApiGeneratorTest : ApiGeneratorContract(ServerApiGenerator)
