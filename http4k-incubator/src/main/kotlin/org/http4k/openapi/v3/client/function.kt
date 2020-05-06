@@ -48,19 +48,24 @@ fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): Fun
             acc.add(next)
         }.build()
 
+    return FunSpec.builder(functionName).addAllParametersFrom(pathSpec)
+        .addReturnType(Property<Response>())
+        .addCodeBlocks(lensDeclarations(pathSpec))
+        .addCode(request)
+        .addCode("\nreturn·httpHandler(request)")
+        .build()
+}
+
+private fun FunSpec.Builder.addAllParametersFrom(pathSpec: PathSpec): FunSpec.Builder {
     val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
+
     val formParams = pathSpec.requestBody
         ?.contentFor(APPLICATION_FORM_URLENCODED)
         ?.schema
         ?.buildModelClass("form", emptyMap(), mutableMapOf())
         ?.primaryConstructor?.parameters?.map { it.name to it.type } ?: emptyList()
 
-    val fn = (parameters + formParams).fold(FunSpec.builder(functionName)) { acc, next -> acc.addParameter(next.first, next.second) }
-
-    return fn
-        .addReturnType(Property<Response>())
-        .addCodeBlocks(lensDeclarations(pathSpec))
-        .addCode(request)
-        .addCode("\nreturn·httpHandler(request)")
-        .build()
+    return (parameters + formParams).fold(this) { acc, next ->
+        acc.addParameter(next.first, next.second)
+    }
 }
