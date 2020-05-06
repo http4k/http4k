@@ -1,11 +1,11 @@
-package org.http4k.openapi
+package org.http4k.openapi.v3
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.openapi.OpenApiJson.asA
+import org.http4k.openapi.v3.OpenApiJson.asA
 import java.math.BigDecimal
 import kotlin.reflect.KClass
 

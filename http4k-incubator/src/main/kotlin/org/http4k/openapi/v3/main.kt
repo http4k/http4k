@@ -1,9 +1,9 @@
-package org.http4k.openapi
+package org.http4k.openapi.v3
 
-import org.http4k.openapi.OpenApiJson.asA
-import org.http4k.openapi.client.ClientApiGenerator
-import org.http4k.openapi.models.ModelApiGenerator
-import org.http4k.openapi.server.ServerApiGenerator
+import org.http4k.openapi.v3.OpenApiJson.asA
+import org.http4k.openapi.v3.client.ClientApiGenerator
+import org.http4k.openapi.v3.models.ModelApiGenerator
+import org.http4k.openapi.v3.server.ServerApiGenerator
 import java.io.File
 
 fun main(args: Array<String>) {

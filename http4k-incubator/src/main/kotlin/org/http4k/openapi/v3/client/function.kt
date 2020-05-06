@@ -1,4 +1,4 @@
-package org.http4k.openapi.client
+package org.http4k.openapi.v3.client
 
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.CodeBlock.Companion.of
@@ -9,9 +9,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.cookie.Cookie
-import org.http4k.openapi.OpenApi3Spec
-import org.http4k.openapi.ParameterSpec
-import org.http4k.openapi.PathSpec
+import org.http4k.openapi.v3.OpenApi3Spec
+import org.http4k.openapi.v3.ParameterSpec
+import org.http4k.openapi.v3.PathSpec
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addReturnType
 import org.http4k.poet.addCodeBlocks

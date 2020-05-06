@@ -1,4 +1,4 @@
-package org.http4k.openapi.models
+package org.http4k.openapi.v3.models
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
@@ -8,7 +8,7 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
-import org.http4k.openapi.SchemaSpec
+import org.http4k.openapi.v3.SchemaSpec
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addParameter
 import org.http4k.poet.Property.Companion.addProperty

@@ -1,11 +1,11 @@
-package org.http4k.openapi.server
+package org.http4k.openapi.v3.server
 
 import com.squareup.kotlinpoet.FunSpec
 import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.openapi.OpenApi3Spec
-import org.http4k.openapi.PathSpec
+import org.http4k.openapi.v3.OpenApi3Spec
+import org.http4k.openapi.v3.PathSpec
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.lensDeclarations

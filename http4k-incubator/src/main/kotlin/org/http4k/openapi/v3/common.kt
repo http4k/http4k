@@ -1,4 +1,4 @@
-package org.http4k.openapi
+package org.http4k.openapi.v3
 
 import com.squareup.kotlinpoet.FileSpec
 import org.http4k.poet.Property

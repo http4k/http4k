@@ -1,8 +1,8 @@
-package org.http4k.openapi
+package org.http4k.openapi.v3
 
 import org.http4k.junit.ResourceLoader
 import org.http4k.junit.TestResources
-import org.http4k.openapi.models.ModelApiGenerator
+import org.http4k.openapi.v3.models.ModelApiGenerator
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-package org.http4k.openapi
+package org.http4k.openapi.v3
 
 import org.http4k.junit.ResourceLoader
 import org.http4k.junit.TestResources
@@ -37,6 +37,6 @@ abstract class ApiGeneratorContract(private val apiGenerator: ApiGenerator) {
 //
 //    @Test
 //    fun `route with form body`(approver: Approver, resourceLoader: ResourceLoader) {
-//        approver.assertGeneratedContent(ClientApiGenerator, resourceLoader.text("openApi.json"))
+//        approver.assertGeneratedContent(apiGenerator, resourceLoader.text("openApi.json"))
 //    }
 }

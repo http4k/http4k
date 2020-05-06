@@ -1,4 +1,4 @@
-package org.http4k.openapi
+package org.http4k.openapi.v3
 
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY

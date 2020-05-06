@@ -1,6 +1,6 @@
-package org.http4k.openapi
+package org.http4k.openapi.v3
 
-import org.http4k.openapi.OpenApiJson.asA
+import org.http4k.openapi.v3.OpenApiJson.asA
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
 import java.io.File
