@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.246.0 (uncut)
+- [http4k-server-ktorcio] Fix #410 - KtorCIO does not stop properly. 
+
 ### v3.245.0    
 - [all] Upgrade some dependency versions.
 - [http4k-core] Factored out `Http4kServletAdapter` to allow usage of the Servlet API outside of creating a Servlet instance.
