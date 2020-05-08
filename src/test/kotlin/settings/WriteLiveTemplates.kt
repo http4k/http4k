@@ -18,7 +18,7 @@ fun File.writeLiveTemplates() {
 
     val methods = Method.values().map {
         Template(it.name.toLowerCase(), "http4k ${it.name} Request",
-            """org.http4k.core.Request(org.http4k.core.Method.DELETE, &quot;${"$"}path${"$"}&quot;)""",
+            """org.http4k.core.Request(org.http4k.core.Method.${it.name}, &quot;${"$"}path${"$"}&quot;)""",
             listOf("path"))
     }
 
