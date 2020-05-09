@@ -12,32 +12,24 @@ import org.junit.jupiter.api.extension.ExtendWith
 class ModelApiGeneratorTest {
 
     @Test
-    fun `generates model class for simple object`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `generates model class for simple object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for nested object`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `generates model class for nested object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for ref`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `generates model class for ref`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for array of primitives`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `generates model class for array of primitives`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for mixed array`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `generates model class for mixed array`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for nested array of primitives`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
+    fun `generates model class for nested array of primitives`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+
+    private fun Approver.assertGeneratedContent(rl: ResourceLoader) {
+        assertGeneratedContent(ModelApiGenerator, rl.text("openApi.json"))
     }
 }
