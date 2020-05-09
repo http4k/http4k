@@ -16,27 +16,21 @@ abstract class ApiGeneratorContract(private val apiGenerator: ApiGenerator) {
     val resources = TestResources { "" }
 
     @Test
-    fun `route with cookie`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(apiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `route with cookie`(app: Approver, rl: ResourceLoader)  = app.assertGeneratedContent(rl)
 
     @Test
-    fun `route with path`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(apiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `route with path`(app: Approver, rl: ResourceLoader)  = app.assertGeneratedContent(rl)
 
     @Test
-    fun `route with header`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(apiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `route with header`(app: Approver, rl: ResourceLoader)  = app.assertGeneratedContent(rl)
 
     @Test
-    fun `route with query`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(apiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `route with query`(app: Approver, rl: ResourceLoader)  = app.assertGeneratedContent(rl)
 
     @Test
-    fun `route with form body`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(apiGenerator, resourceLoader.text("openApi.json"))
+    fun `route with form body`(app: Approver, rl: ResourceLoader)  = app.assertGeneratedContent(rl)
+
+    fun Approver.assertGeneratedContent(rl: ResourceLoader) {
+        assertGeneratedContent(apiGenerator, rl.text("openApi.json"))
     }
 }
