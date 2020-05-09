@@ -14,24 +14,14 @@
                         "application/x-www-form-urlencoded": {
                             "schema": {
                                 "type": "object",
-                                "properties": {
-                                    "boolean": {
-                                        "type": "boolean"
-                                    },
-                                    "integer": {
-                                        "type": "integer"
-                                    },
-                                    "string": {
-                                        "type": "string"
-                                    },
-                                    "json": {
-                                        "type": "string"
-                                    }
-                                },
                                 "required": [
-                                    "boolean",
-                                    "json"
-                                ]
+                                    "ref"
+                                ],
+                                "properties": {
+                                    "ref": {
+                                        "$ref": "#/components/schemas/Ref"
+                                    }
+                                }
                             }
                         }
                     },
@@ -40,6 +30,20 @@
                 "responses": {
                 },
                 "operationId": "endpoint"
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Ref": {
+                "type": "object",
+                "required": [
+                ],
+                "properties": {
+                    "value": {
+                        "type": "integer"
+                    }
+                }
             }
         }
     },

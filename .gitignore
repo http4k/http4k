@@ -9,4 +9,4 @@ classes/
 out/
 store/
 intellij-settings/
-/src/main/kotlin/org/http4k/
+**/*.actual
