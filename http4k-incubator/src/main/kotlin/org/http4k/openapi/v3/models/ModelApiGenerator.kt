@@ -3,6 +3,7 @@ package org.http4k.openapi.v3.models
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.openapi.v3.ApiGenerator
 import org.http4k.openapi.v3.GenerationOptions
 import org.http4k.openapi.v3.OpenApi3Spec
@@ -24,6 +25,15 @@ object ModelApiGenerator : ApiGenerator {
                     ?.also {
                         val functionName = pathSpec.operationId ?: method.toLowerCase() + path.replace('/', '_')
                         val name = functionName + "Form".capitalize()
+                        allSchemas += (name to allSchemas.getOrDefault(name, it.buildModelClass(name, components.schemas, allSchemas)))
+                    }
+
+                pathSpec.requestBody
+                    ?.contentFor(APPLICATION_JSON)
+                    ?.schema
+                    ?.also {
+                        val functionName = pathSpec.operationId ?: method.toLowerCase() + path.replace('/', '_')
+                        val name = functionName + "Json".capitalize()
                         allSchemas += (name to allSchemas.getOrDefault(name, it.buildModelClass(name, components.schemas, allSchemas)))
                     }
             }

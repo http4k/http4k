@@ -1,0 +1,14 @@
+>>>EndpointJson.kt
+
+package testPackage.model
+
+import kotlin.Boolean
+import kotlin.Int
+import kotlin.String
+
+data class EndpointJson(
+	private val boolean: Boolean,
+	private val integer: Int?,
+	private val string: String?,
+	private val json: String
+)
