@@ -6,6 +6,6 @@ import org.http4k.testing.assertApproved
 import java.io.File
 
 fun Approver.assertGeneratedContent(generator: ApiGenerator, content: String) {
-    val modelApiGenerator = generator(content.asA(OpenApi3Spec::class), GenerationOptions("testPackage", File(".")))
-    assertApproved(modelApiGenerator.toList().last().toString())
+    assertApproved(generator(content.asA(OpenApi3Spec::class), GenerationOptions("testPackage", File(".")))
+        .joinToString("\n") { ">>>${it.name}.kt\n\n$it" })
 }

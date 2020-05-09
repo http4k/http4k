@@ -1,3 +1,25 @@
+>>>Endpoint.kt
+
+package testPackage.server.endpoints
+
+import org.http4k.core.Method
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.lens.Query
+import org.http4k.lens.boolean
+import org.http4k.lens.int
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.bind
+
+fun Endpoint(): RoutingHttpHandler {
+
+	val requiredLens = Query.boolean().required("required")
+	val optionalLens = Query.int().optional("optional")
+	return "/query" bind Method.POST to { Response(Status.OK) }
+}
+
+>>>TitleServer.kt
+
 package testPackage.server
 
 import org.http4k.routing.routes
