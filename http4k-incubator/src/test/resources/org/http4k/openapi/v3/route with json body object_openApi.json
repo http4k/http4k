@@ -1,0 +1,50 @@
+{
+    "info": {
+        "title": "title",
+        "version": "",
+        "description": ""
+    },
+    "paths": {
+        "/jsonbody": {
+            "post": {
+                "parameters": [
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "boolean": {
+                                        "type": "boolean"
+                                    },
+                                    "integer": {
+                                        "type": "integer"
+                                    },
+                                    "string": {
+                                        "type": "string"
+                                    },
+                                    "json": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "boolean",
+                                    "json"
+                                ]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                },
+                "operationId": "endpoint"
+            }
+        }
+    },
+    "openapi": "3.0.0",
+    "x-extension": [
+        "extensionField"
+    ]
+}
