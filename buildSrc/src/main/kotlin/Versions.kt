@@ -34,7 +34,7 @@ object Versions {
 
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
 
-    const val openapi_generator_gradle_plugin: String = "4.3.0"
+    const val openapi_generator_gradle_plugin: String = "4.3.1"
 
     const val javax_websocket_server_impl: String = "9.4.28.v20200408"
 
@@ -62,9 +62,9 @@ object Versions {
 
     const val ktor_server_cio: String = "1.3.2" // available: "1.3.2-1.4-M1-release-99"
 
-    const val micrometer_core: String = "1.5.0"
+    const val micrometer_core: String = "1.5.1"
 
-    const val java_websocket: String = "1.4.1"
+    const val java_websocket: String = "1.5.0"
 
     const val commons_pool2: String = "2.8.0"
 
@@ -113,7 +113,7 @@ object Versions {
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */
-    const val gradleLatestVersion: String = "6.3"
+    const val gradleLatestVersion: String = "6.4"
 }
 
 /**

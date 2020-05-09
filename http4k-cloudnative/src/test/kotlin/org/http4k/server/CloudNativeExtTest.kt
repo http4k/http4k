@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class CloudNativeExtTest {
 
     @Test
-    fun `can HttpHandler to a server`() {
-        assertThat({ _: Request -> Response(OK) }.asServer(::SunHttp, Port(8000)).port(), equalTo(8000))
+    fun `can convert HttpHandler to a server with port`() {
+        assertThat({ _: Request -> Response(OK) }.asServer(::SunHttp, Port(65412)).port(), equalTo(65412))
     }
 }

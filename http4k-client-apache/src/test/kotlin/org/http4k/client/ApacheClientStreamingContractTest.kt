@@ -7,7 +7,7 @@ import org.http4k.server.SunHttp
 import org.http4k.streaming.StreamingContract
 
 class ApacheClientStreamingContractTest : StreamingContract() {
-    override fun serverConfig(): ServerConfig = SunHttp()
+    override fun serverConfig(): ServerConfig = SunHttp(0)
 
     override fun createClient(): HttpHandler = ApacheClient(requestBodyMode = BodyMode.Stream, responseBodyMode = BodyMode.Stream)
 }

@@ -144,9 +144,6 @@ object Libs {
             "com.jfrog.bintray:com.jfrog.bintray.gradle.plugin:" +
             Versions.com_jfrog_bintray_gradle_plugin
 
-    /**
-     * https://openapi-generator.tech
-     */
     const val openapi_generator_gradle_plugin: String =
             "org.openapitools:openapi-generator-gradle-plugin:" +
             Versions.openapi_generator_gradle_plugin
