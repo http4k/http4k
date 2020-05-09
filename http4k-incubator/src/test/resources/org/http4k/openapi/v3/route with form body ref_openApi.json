@@ -13,15 +13,7 @@
                     "content": {
                         "application/x-www-form-urlencoded": {
                             "schema": {
-                                "type": "object",
-                                "required": [
-                                    "ref"
-                                ],
-                                "properties": {
-                                    "ref": {
-                                        "$ref": "#/components/schemas/Ref"
-                                    }
-                                }
+                                "$ref": "#/components/schemas/Ref"
                             }
                         }
                     },
