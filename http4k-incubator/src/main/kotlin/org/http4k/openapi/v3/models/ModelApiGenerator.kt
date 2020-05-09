@@ -13,7 +13,8 @@ object ModelApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
 
         val allSchemas = components.schemas.entries.fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->
-            acc += (name.capitalize() to acc.getOrDefault(name.capitalize(), schema.buildModelClass(name, components.schemas, acc)))
+            val nameCapitalized = name.capitalize()
+            acc += (nameCapitalized to acc.getOrDefault(nameCapitalized, schema.buildModelClass(nameCapitalized, components.schemas, acc)))
             acc
         }
 
@@ -24,7 +25,7 @@ object ModelApiGenerator : ApiGenerator {
                     ?.schema
                     ?.also {
                         val functionName = pathSpec.operationId ?: method.toLowerCase() + path.replace('/', '_')
-                        val name = functionName + "Form".capitalize()
+                        val name = functionName.capitalize() + "Form"
                         allSchemas += (name to allSchemas.getOrDefault(name, it.buildModelClass(name, components.schemas, allSchemas)))
                     }
 
@@ -33,7 +34,7 @@ object ModelApiGenerator : ApiGenerator {
                     ?.schema
                     ?.also {
                         val functionName = pathSpec.operationId ?: method.toLowerCase() + path.replace('/', '_')
-                        val name = functionName + "Json".capitalize()
+                        val name = functionName.capitalize() + "Json"
                         allSchemas += (name to allSchemas.getOrDefault(name, it.buildModelClass(name, components.schemas, allSchemas)))
                     }
             }
