@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.246.0 (uncut)
 - [all] Upgrade some dependency versions.
+- [http4k-template-pebble] Fix #411 - Non-root pebble templates when using CachingClasspath from a compiled JAR. H/T @alyphen 
 
 ### v3.245.1
 - [http4k-server-ktorcio] Fix #410 - KtorCIO does not stop properly. 
