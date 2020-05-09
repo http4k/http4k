@@ -8,20 +8,20 @@ import org.junit.jupiter.api.Test
 class ModelApiGeneratorTest : ApiGeneratorContract(ModelApiGenerator) {
 
     @Test
-    fun `generates model class for simple object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+    fun `model simple object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for nested object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+    fun `model nested object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for ref`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+    fun `model ref`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for array of primitives`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+    fun `model array of primitives`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for mixed array`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+    fun `model mixed array`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for nested array of primitives`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+    fun `model nested array of primitives`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 }
