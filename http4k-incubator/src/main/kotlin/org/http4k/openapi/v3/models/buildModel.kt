@@ -13,8 +13,8 @@ import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addParameter
 import org.http4k.poet.Property.Companion.addProperty
 
-fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
-    return when (this) {
+fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec =
+    when (this) {
         is SchemaSpec.RefSpec -> generated[name]
             ?: allSchemas.getValue(schemaName).buildModelClass(schemaName, allSchemas, generated)
         is SchemaSpec.ObjectSpec -> {
@@ -25,7 +25,6 @@ fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>
         is SchemaSpec.ArraySpec -> buildModelClass(name, allSchemas, generated)
         else -> TypeSpec.classBuilder(name.capitalize()).build()
     }
-}
 
 private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
     val clazz = TypeSpec.classBuilder(name.capitalize())
