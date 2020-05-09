@@ -1,0 +1,35 @@
+{
+    "info": {
+        "title": "title",
+        "version": "",
+        "description": ""
+    },
+    "paths": {
+        "/jsonbody": {
+            "post": {
+                "parameters": [
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "endpoint"
+            }
+        }
+    },
+    "openapi": "3.0.0",
+    "x-extension": [
+        "extensionField"
+    ]
+}

@@ -1,0 +1,46 @@
+{
+    "info": {
+        "title": "title",
+        "version": "",
+        "description": ""
+    },
+    "paths": {
+        "/jsonbody": {
+            "post": {
+                "parameters": [
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Ref"
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "endpoint"
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Ref": {
+                "type": "object",
+                "required": [
+                ],
+                "properties": {
+                    "value": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    },
+    "openapi": "3.0.0",
+    "x-extension": [
+        "extensionField"
+    ]
+}
