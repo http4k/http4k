@@ -30,9 +30,7 @@ object ModelApiGenerator : ApiGenerator {
             acc
         }
 
-        println(allSchemas)
-
-        allSchemas.values.map {
+        allSchemas.values.distinct().map {
             FileSpec.builder(options.packageName("model"), it.name!!)
                 .addType(it)
                 .buildFormatted()
