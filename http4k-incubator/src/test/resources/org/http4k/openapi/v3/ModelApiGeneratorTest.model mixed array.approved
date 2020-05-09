@@ -8,5 +8,5 @@ import kotlin.collections.List
 import kotlin.collections.Map
 
 data class Obj(
-	private val mixed: List<Map<String, Any>>
+	val mixed: List<Map<String, Any>>
 )

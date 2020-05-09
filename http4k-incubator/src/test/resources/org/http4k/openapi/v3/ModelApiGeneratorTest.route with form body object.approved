@@ -7,8 +7,8 @@ import kotlin.Int
 import kotlin.String
 
 data class EndpointForm(
-	private val boolean: Boolean,
-	private val integer: Int?,
-	private val string: String?,
-	private val json: String
+	val boolean: Boolean,
+	val integer: Int?,
+	val string: String?,
+	val json: String
 )

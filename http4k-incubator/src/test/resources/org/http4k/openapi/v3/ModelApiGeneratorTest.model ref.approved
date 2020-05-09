@@ -5,7 +5,7 @@ package testPackage.model
 import kotlin.Int
 
 data class Ref(
-	private val value: Int?
+	val value: Int?
 )
 
 >>>Obj.kt
@@ -15,5 +15,5 @@ package testPackage.model
 import Ref
 
 data class Obj(
-	private val ref: Ref
+	val ref: Ref
 )

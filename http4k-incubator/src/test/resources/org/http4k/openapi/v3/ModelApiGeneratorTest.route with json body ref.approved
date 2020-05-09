@@ -5,5 +5,5 @@ package testPackage.model
 import kotlin.Int
 
 data class Ref(
-	private val value: Int?
+	val value: Int?
 )

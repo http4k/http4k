@@ -7,5 +7,5 @@ import kotlin.String
 import kotlin.collections.Map
 
 data class Obj(
-	private val nested: Map<String, Any>
+	val nested: Map<String, Any>
 )

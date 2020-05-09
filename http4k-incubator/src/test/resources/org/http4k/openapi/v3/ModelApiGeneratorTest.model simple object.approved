@@ -8,8 +8,8 @@ import kotlin.Int
 import kotlin.String
 
 data class Obj(
-	private val anInteger: Int,
-	private val aNumber: BigDecimal,
-	private val aBoolean: Boolean?,
-	private val aString: String?
+	val anInteger: Int,
+	val aNumber: BigDecimal,
+	val aBoolean: Boolean?,
+	val aString: String?
 )
