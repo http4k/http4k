@@ -86,6 +86,8 @@ object Versions {
 
     const val cobertura: String = "2.1.1"
 
+    const val slf4j_nop: String = "1.7.30"
+
     const val thymeleaf: String = "3.0.11.RELEASE"
 
     const val hamkrest: String = "1.7.0.3"

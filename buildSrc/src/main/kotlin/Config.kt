@@ -13,7 +13,6 @@ object Config {
 
     val io_undertow_major_minor = Versions.io_undertow.major_minor()
 
-
     private fun String.major(): String =
         this.substringBefore(".")
 

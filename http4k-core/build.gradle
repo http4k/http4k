@@ -10,4 +10,5 @@ dependencies {
     testCompile project(":http4k-testing-approval")
     testCompile project(":http4k-testing-hamkrest")
     testCompile project(":http4k-server-jetty")
+    testCompile Libs.slf4j_nop
 }

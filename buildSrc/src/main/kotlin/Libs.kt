@@ -290,6 +290,11 @@ object Libs {
     const val cobertura: String = "net.sourceforge.cobertura:cobertura:" + Versions.cobertura
 
     /**
+     * http://www.slf4j.org
+     */
+    const val slf4j_nop: String = "org.slf4j:slf4j-nop:" + Versions.slf4j_nop
+
+    /**
      * http://www.thymeleaf.org
      */
     const val thymeleaf: String = "org.thymeleaf:thymeleaf:" + Versions.thymeleaf
