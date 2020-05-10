@@ -16,7 +16,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.kt3k.coveralls' version "2.9.0"
+    id 'com.github.kt3k.coveralls' version "2.10.1"
     id "com.jfrog.bintray" version "1.8.4"
     id 'de.fayard.buildSrcVersions' version "0.7.0"
     id 'net.saliman.cobertura' version "3.0.0"
