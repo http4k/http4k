@@ -8,6 +8,8 @@ description: Feature overview of the http4k-server modules, covering Server back
 
 **Ktor CIO:** ```compile group: "org.http4k", name: "http4k-server-ktorcio", version: "3.246.0"```
 
+**Ktor Netty:** ```compile group: "org.http4k", name: "http4k-server-ktornetty", version: "3.246.0"```
+
 **Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "3.246.0"```
 
 **Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "3.246.0"```
