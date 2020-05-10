@@ -128,6 +128,16 @@ object Libs {
      */
     const val undertow_servlet: String = "io.undertow:undertow-servlet:" + Versions.io_undertow
 
+    /**
+     * https://github.com/ktorio/ktor
+     */
+    const val ktor_server_cio: String = "io.ktor:ktor-server-cio:" + Versions.io_ktor
+
+    /**
+     * https://github.com/ktorio/ktor
+     */
+    const val ktor_server_netty: String = "io.ktor:ktor-server-netty:" + Versions.io_ktor
+
     const val de_fayard_buildsrcversions_gradle_plugin: String =
             "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
             Versions.de_fayard_buildsrcversions_gradle_plugin
@@ -217,11 +227,6 @@ object Libs {
      */
     const val httpasyncclient: String = "org.apache.httpcomponents:httpasyncclient:" +
             Versions.httpasyncclient
-
-    /**
-     * https://github.com/ktorio/ktor
-     */
-    const val ktor_server_cio: String = "io.ktor:ktor-server-cio:" + Versions.ktor_server_cio
 
     /**
      * https://github.com/micrometer-metrics/micrometer

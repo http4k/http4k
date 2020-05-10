@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.247.0
+- [http4k-server-ktornetty] New backend module! H/T @albertlatacz for the PR adding this.
+
 ### v3.246.0
 - [all] Upgrade some dependency versions.
 - [http4k-template-pebble] Fix #411 - Non-root pebble templates when using CachingClasspath from a compiled JAR. H/T @alyphen 
