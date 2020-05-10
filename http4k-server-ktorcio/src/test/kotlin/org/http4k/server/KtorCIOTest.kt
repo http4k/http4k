@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.Random
 
-class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 10000) }, ApacheClient()) {
+class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, ApacheClient()) {
 
     @BeforeEach
     fun sleepForABitBecauseStartupIsCrushinglySlow() {
