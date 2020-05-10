@@ -18,16 +18,13 @@ import org.junit.jupiter.api.Test
 
 class OAuthServerTest {
 
-    private val debug = false
-
     @Test
     fun `can follow authorization code flow`() {
         val authenticationServer = customOauthAuthorizationServer()
-        val consumerApp = oauthClientApp(authenticationServer, debug)
+        val consumerApp = oauthClientApp(authenticationServer)
 
         val browser = Filter.NoOp
             .then(ClientFilters.Cookies())
-            .then(debugFilter(debug))
             .then(authenticationServer + consumerApp)
 
         val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)
@@ -45,11 +42,10 @@ class OAuthServerTest {
     @Test
     fun `authorization flow with oauth request persistence`() {
         val authenticationServer = customOauthAuthorizationServerWithPersistence()
-        val consumerApp = oauthClientApp(authenticationServer, debug)
+        val consumerApp = oauthClientApp(authenticationServer)
 
         val browser = Filter.NoOp
             .then(ClientFilters.Cookies())
-            .then(debugFilter(debug))
             .then(authenticationServer + consumerApp)
 
         val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)

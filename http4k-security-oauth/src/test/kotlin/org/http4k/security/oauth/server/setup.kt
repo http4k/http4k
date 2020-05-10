@@ -1,18 +1,15 @@
 package org.http4k.security.oauth.server
 
 import org.http4k.core.Credentials
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.filter.DebuggingFilters
 import org.http4k.format.Jackson
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
@@ -73,7 +70,6 @@ fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
 
 fun oauthClientApp(
     tokenClient: HttpHandler,
-    debug: Boolean,
     responseType: ResponseType = ResponseType.Code,
     idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
     scopes: List<String> = listOf("name", "age"),
@@ -85,7 +81,7 @@ fun oauthClientApp(
             "/my-login-page", "/oauth2/token",
             Credentials("my-app", "somepassword"),
             Uri.of("https://irrelevant")),
-        debugFilter(debug).then(tokenClient),
+        tokenClient,
         Uri.of("/my-callback"),
         scopes,
         persistence,
@@ -98,8 +94,5 @@ fun oauthClientApp(
         "/a-protected-resource" bind GET to oauthProvider.authFilter.then { Response(OK).body("user resource") }
     )
 }
-
-fun debugFilter(active: Boolean) = Filter.switchable(active, DebuggingFilters.PrintRequestAndResponse())
-private fun Filter.Companion.switchable(active: Boolean, next: Filter) = if (active) next else Filter.NoOp
 
 operator fun RoutingHttpHandler.plus(other: RoutingHttpHandler) = { request: Request -> routes(this, other)(request) }

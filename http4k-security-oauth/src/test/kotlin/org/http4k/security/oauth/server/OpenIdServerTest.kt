@@ -4,10 +4,8 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
@@ -30,19 +28,14 @@ import org.junit.jupiter.api.Test
 
 class OpenIdServerTest {
 
-    private val debug = true
-
     @Test
     fun `can follow authorization code id_token flow`() {
         val clientOauthPersistence = InsecureCookieBasedOAuthPersistence("oauthTest")
         val authenticationServer = customOauthAuthorizationServer()
         val tokenConsumer = InMemoryIdTokenConsumer()
-        val consumerApp = oauthClientApp(authenticationServer, debug, CodeIdToken, tokenConsumer, listOf("openid", "name", "age"), clientOauthPersistence)
+        val consumerApp = oauthClientApp(authenticationServer, CodeIdToken, tokenConsumer, listOf("openid", "name", "age"), clientOauthPersistence)
 
-        val browser = Filter.NoOp
-            .then(ClientFilters.Cookies())
-            .then(debugFilter(debug))
-            .then(authenticationServer + consumerApp)
+        val browser = ClientFilters.Cookies().then(authenticationServer + consumerApp)
 
         val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)
 
@@ -71,12 +64,9 @@ class OpenIdServerTest {
         val clientOauthPersistence = InsecureCookieBasedOAuthPersistence("oauthTest")
         val authenticationServer = customOauthAuthorizationServer()
         val tokenConsumer = InMemoryIdTokenConsumer(expectedNonce = Nonce("some invalid nonce"))
-        val consumerApp = oauthClientApp(authenticationServer, debug, CodeIdToken, tokenConsumer, listOf("openid", "name", "age"), clientOauthPersistence)
+        val consumerApp = oauthClientApp(authenticationServer, CodeIdToken, tokenConsumer, listOf("openid", "name", "age"), clientOauthPersistence)
 
-        val browser = Filter.NoOp
-            .then(ClientFilters.Cookies())
-            .then(debugFilter(debug))
-            .then(authenticationServer + consumerApp)
+        val browser = ClientFilters.Cookies().then(authenticationServer + consumerApp)
 
         val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)
 
@@ -89,5 +79,4 @@ class OpenIdServerTest {
         val postAuthResponse = browserWithRedirection(Request(POST, authRequestUri).form("some", "credentials"))
         assertThat(postAuthResponse, hasStatus(FORBIDDEN))
     }
-
 }
