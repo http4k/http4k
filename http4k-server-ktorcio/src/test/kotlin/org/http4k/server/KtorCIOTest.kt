@@ -15,4 +15,8 @@ class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, A
     @Test
     override fun `ok when length already set`() {
     }
+
+    @Test
+    override fun `can start on port zero and then get the port`() {
+    }
 }
