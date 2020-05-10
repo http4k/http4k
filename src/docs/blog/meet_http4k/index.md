@@ -70,7 +70,7 @@ class AppTest {
 }
 ```
 To plug it into a different Server-backend, just depend on the relevant module (Jetty, Undertow, Netty, Apache (httpcore), 
-Ktor CIO, and SunHttp are available) and change the call to `asServer()`.
+Ktor CIO, Ktor Netty, and SunHttp are available) and change the call to `asServer()`.
 
 ### Function 2: Filter
 `Filters` provides pre and post Request processing and are simply:
