@@ -12,9 +12,10 @@ import io.ktor.response.ApplicationResponse
 import io.ktor.response.header
 import io.ktor.response.respondOutputStream
 import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.stop
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
-import kotlinx.coroutines.io.jvm.javaio.toInputStream
+import io.ktor.utils.io.jvm.javaio.toInputStream
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -40,7 +41,7 @@ data class KtorNetty(val port: Int = 8000) : ServerConfig {
         }
 
         override fun stop() = apply {
-            engine.stop(1, 1, SECONDS)
+            engine.stop(0, 2, SECONDS)
         }
 
         override fun port() = engine.environment.connectors[0].port

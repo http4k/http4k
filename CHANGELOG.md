@@ -4,7 +4,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.247.0 (uncut)
-- [http4k-server-ktornetty] New backend module! H/T @albertlatacz for the PR adding this.
+- [http4k-server-ktornetty] New backend module! H/T @albertlatacz for the contribution!
+- [all] Upgrade some dependency versions.
 
 ### v3.246.0
 - [all] Upgrade some dependency versions.
