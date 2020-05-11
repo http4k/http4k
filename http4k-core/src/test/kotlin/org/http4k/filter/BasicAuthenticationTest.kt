@@ -24,6 +24,14 @@ class BasicAuthenticationTest {
     }
 
     @Test
+    fun invalid_base64() {
+        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
+        val response = handler(Request(GET, "/")
+            .header("Authorization", "Basic ababa"))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
+    }
+
+    @Test
     fun fails_to_authenticate() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
         val response = handler(Request(GET, "/"))

@@ -29,6 +29,7 @@ import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.lang.IllegalArgumentException
 
 data class CorsPolicy(val origins: List<String>,
                       val headers: List<String>,
@@ -137,7 +138,11 @@ object ServerFilters {
             ?.trim()
             ?.toCredentials()
 
-        private fun String.toCredentials(): Credentials? = base64Decoded().split(":").let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
+        private fun String.toCredentials(): Credentials? = try {
+            base64Decoded().split(":").let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
+        } catch (e: IllegalArgumentException) {
+            null
+        }
     }
 
     /**
