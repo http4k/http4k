@@ -6,6 +6,8 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
+import org.http4k.core.Body
+import org.http4k.format.Jackson
 import org.http4k.lens.Cookies
 import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
@@ -13,8 +15,9 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.ParameterSpec
-import org.http4k.openapi.v3.PathSpec
+import org.http4k.openapi.v3.SchemaSpec
 import kotlin.reflect.KClass
+import org.http4k.openapi.v3.Path as CPath
 
 fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
 
@@ -42,16 +45,49 @@ fun ParameterSpec.lensConstruct() =
         else -> if (required) "required" else "optional"
     }
 
-fun OpenApi3Spec.lensDeclarations(pathSpec: PathSpec) = pathSpec.parameters.map {
-    when (it) {
-        is ParameterSpec.CookieSpec -> CodeBlock.of(
-            "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
-            it.lensSpecClazz.asClassName()
-        )
-        else -> CodeBlock.of(
-            "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
-            it.lensSpecClazz.asClassName(),
-            packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
-        )
+fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
+    val bodies = path.pathSpec.requestBody?.content?.entries
+        ?.mapNotNull { it.value.schema }
+        ?.mapNotNull {
+            when (it) {
+                is SchemaSpec.ObjectSpec -> {
+                    CodeBlock.of(
+                        "val bodyLens = %T.%M<Any>().toLens()",
+                        Body::class.asTypeName(),
+                        member<Jackson>("auto")
+                    )
+                }
+                is SchemaSpec.ArraySpec -> {
+                    CodeBlock.of(
+                        "val bodyLens = %T.%M<List<Any>>().toLens()",
+                        Body::class.asTypeName(),
+                        member<Jackson>("auto")
+                    )
+                }
+                is SchemaSpec.RefSpec -> {
+                    CodeBlock.of(
+                        "val bodyLens = %T.%M<Any>().toLens()",
+                        Body::class.asTypeName(),
+                        member<Jackson>("auto")
+                    )
+                }
+                else -> null
+            }
+        } ?: emptyList()
+
+    val parameters = path.pathSpec.parameters.map {
+        when (it) {
+            is ParameterSpec.CookieSpec -> CodeBlock.of(
+                "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
+                it.lensSpecClazz.asClassName()
+            )
+            else -> CodeBlock.of(
+                "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
+                it.lensSpecClazz.asClassName(),
+                packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
+            )
+        }
     }
+
+    return bodies + parameters
 }

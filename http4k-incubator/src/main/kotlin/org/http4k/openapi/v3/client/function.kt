@@ -49,7 +49,7 @@ fun OpenApi3Spec.function(path: Path): FunSpec =
 
         FunSpec.builder(path.uniqueName.decapitalize()).addAllParametersFrom(this)
             .addReturnType(Property<Response>())
-            .addCodeBlocks(lensDeclarations(pathSpec))
+            .addCodeBlocks(lensDeclarations(this))
             .addCode(request)
             .addCode("\nreturn·httpHandler(request)")
             .build()

@@ -15,7 +15,7 @@ import org.http4k.routing.RoutingHttpHandler
 fun OpenApi3Spec.buildEndpoint(path: Path) = with(path) {
     FunSpec.builder(uniqueName)
         .returns(Property<RoutingHttpHandler>().type)
-        .addCodeBlocks(lensDeclarations(pathSpec))
+        .addCodeBlocks(lensDeclarations(this))
         .addStatement("return·\"${urlPathPattern}\"·%M·%T.$method·to·{ %T(%T.OK) }",
             packageMember<RoutingHttpHandler>("bind"),
             Property<Method>().type,
