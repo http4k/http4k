@@ -23,6 +23,7 @@ import org.http4k.routing.RoutingHttpHandler
 
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                                       private val security: Security?,
+                                      private val descriptionSecurity: Security?,
                                       private val descriptionPath: String,
                                       private val preFlightExtraction: PreFlightExtraction,
                                       private val routes: List<ContractRoute> = emptyList(),
@@ -70,8 +71,11 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                 .then(postSecurityFilter)
                 .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
-        } +
-        (identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+        } + (identify(descriptionRoute)
+            .then(preSecurityFilter)
+            .then(descriptionSecurity?.filter ?: Filter.NoOp)
+            .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 

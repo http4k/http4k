@@ -226,6 +226,28 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     }
 
     @Test
+    fun `applies description security to description route and responds with 401 to unauthorized access`() {
+        val handler = "/root" bind contract {
+            descriptionPath = "/docs/swagger.json"
+            descriptionSecurity = ApiKeySecurity(Query.required("key"), { false })
+        }
+        val response = handler(Request(GET, "/root/docs/swagger.json"))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
+    }
+
+    @Test
+    fun `applies description security and responds with a 200 to authorized requests`() {
+        val handler = "/root" bind contract {
+            renderer = SimpleJson(Jackson)
+            descriptionSecurity = ApiKeySecurity(Query.required("key"), { it == "valid" })
+        }
+
+        val response = handler(Request(GET, "/root?key=valid"))
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
+    }
+
+    @Test
     fun `only calls filters once`() {
         val filter = Filter { next ->
             {
