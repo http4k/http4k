@@ -46,9 +46,11 @@ fun ParameterSpec.lensConstruct() =
     }
 
 fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
-    val bodies = path.pathSpec.requestBody?.content?.entries
-        ?.mapNotNull { it.value.schema }
-        ?.mapNotNull {
+    val responseSchemas = path.pathSpec.responses.entries.mapNotNull { it.value.schema }
+    val bodySchemas = listOfNotNull(path.pathSpec.requestBody?.content?.entries?.mapNotNull { it.value.schema }).flatten()
+
+    val bodyTypes = (responseSchemas + bodySchemas)
+        .mapNotNull {
             when (it) {
                 is SchemaSpec.ObjectSpec -> {
                     CodeBlock.of(
@@ -73,9 +75,9 @@ fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
                 }
                 else -> null
             }
-        } ?: emptyList()
+        }
 
-    val parameters = path.pathSpec.parameters.map {
+    val parameterTypes = path.pathSpec.parameters.map {
         when (it) {
             is ParameterSpec.CookieSpec -> CodeBlock.of(
                 "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
@@ -89,5 +91,5 @@ fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
         }
     }
 
-    return bodies + parameters
+    return bodyTypes + parameterTypes
 }

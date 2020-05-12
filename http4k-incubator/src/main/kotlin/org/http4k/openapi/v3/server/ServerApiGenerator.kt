@@ -12,7 +12,7 @@ import org.http4k.poet.buildFormatted
 
 object ServerApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions) = with(spec) {
-        val endpoints = flattenedPaths().map { buildEndpoint(it) }
+        val endpoints = flattenedPaths().map(::buildEndpoint)
 
         val server = buildServer(endpoints)
 
