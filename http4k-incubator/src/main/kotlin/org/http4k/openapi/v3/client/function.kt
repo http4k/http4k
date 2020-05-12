@@ -12,7 +12,7 @@ import org.http4k.core.Response
 import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.ParameterSpec
-import org.http4k.openapi.v3.PathSpec
+import org.http4k.openapi.v3.Path
 import org.http4k.openapi.v3.models.buildModelClass
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addReturnType
@@ -22,50 +22,50 @@ import org.http4k.poet.lensDeclarations
 import org.http4k.poet.packageMember
 import org.http4k.poet.quotedName
 
-fun OpenApi3Spec.function(path: String, method: Method, pathSpec: PathSpec): FunSpec {
-    val functionName = pathSpec.operationId ?: method.name.toLowerCase() + path.replace('/', '_')
+fun OpenApi3Spec.function(path: Path): FunSpec =
+    with(path) {
+        val reifiedPath = path.urlPathPattern.replace("/{", "/\${")
 
-    val reifiedPath = path.replace("/{", "/\${")
+        val messageBindings = pathSpec.parameters.mapNotNull {
+            val binding = "${it.name}Lens of ${it.name}"
+            val with = packageMember<Filter>("with")
 
-    val messageBindings = pathSpec.parameters.mapNotNull {
-        val binding = "${it.name}Lens of ${it.name}"
-        val with = packageMember<Filter>("with")
-
-        when (it) {
-            is ParameterSpec.CookieSpec -> {
-                val optionality = if (it.required) "" else " ?: \"\""
-                of("\n.%M(${it.name}Lens of %T(${it.quotedName()}, ${it.name}$optionality))", with, Cookie::class.asClassName())
+            when (it) {
+                is ParameterSpec.CookieSpec -> {
+                    val optionality = if (it.required) "" else " ?: \"\""
+                    of("\n.%M(${it.name}Lens of %T(${it.quotedName()}, ${it.name}$optionality))", with, Cookie::class.asClassName())
+                }
+                is ParameterSpec.HeaderSpec -> of("\n.%M($binding)", with)
+                is ParameterSpec.QuerySpec -> of("\n.%M($binding)", with)
+                else -> null
             }
-            is ParameterSpec.HeaderSpec -> of("\n.%M($binding)", with)
-            is ParameterSpec.QuerySpec -> of("\n.%M($binding)", with)
-            else -> null
+        }
+
+        val request = messageBindings
+            .fold(CodeBlock.builder()
+                .add("val request = %T(%T.$method,·\"$reifiedPath\")", Property<Request>().type, Property<Method>().type)) { acc, next ->
+                acc.add(next)
+            }.build()
+
+        FunSpec.builder(path.uniqueName.decapitalize()).addAllParametersFrom(this)
+            .addReturnType(Property<Response>())
+            .addCodeBlocks(lensDeclarations(pathSpec))
+            .addCode(request)
+            .addCode("\nreturn·httpHandler(request)")
+            .build()
+    }
+
+private fun FunSpec.Builder.addAllParametersFrom(path: Path): FunSpec.Builder =
+    with(path) {
+        val parameters = path.pathSpec.parameters.map { it.name to it.asTypeName()!! }
+
+        val formParams = path.pathSpec.requestBody
+            ?.contentFor(APPLICATION_FORM_URLENCODED)
+            ?.schema
+            ?.buildModelClass("form", emptyMap(), mutableMapOf())
+            ?.primaryConstructor?.parameters?.map { it.name to it.type } ?: emptyList()
+
+        (parameters + formParams).fold(this@addAllParametersFrom) { acc, next ->
+            acc.addParameter(next.first, next.second)
         }
     }
-
-    val request = messageBindings
-        .fold(CodeBlock.builder()
-            .add("val request = %T(%T.$method,·\"$reifiedPath\")", Property<Request>().type, Property<Method>().type)) { acc, next ->
-            acc.add(next)
-        }.build()
-
-    return FunSpec.builder(functionName).addAllParametersFrom(pathSpec)
-        .addReturnType(Property<Response>())
-        .addCodeBlocks(lensDeclarations(pathSpec))
-        .addCode(request)
-        .addCode("\nreturn·httpHandler(request)")
-        .build()
-}
-
-private fun FunSpec.Builder.addAllParametersFrom(pathSpec: PathSpec): FunSpec.Builder {
-    val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
-
-    val formParams = pathSpec.requestBody
-        ?.contentFor(APPLICATION_FORM_URLENCODED)
-        ?.schema
-        ?.buildModelClass("form", emptyMap(), mutableMapOf())
-        ?.primaryConstructor?.parameters?.map { it.name to it.type } ?: emptyList()
-
-    return (parameters + formParams).fold(this) { acc, next ->
-        acc.addParameter(next.first, next.second)
-    }
-}

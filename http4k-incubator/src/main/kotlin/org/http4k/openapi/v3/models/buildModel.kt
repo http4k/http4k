@@ -15,13 +15,8 @@ import org.http4k.poet.Property.Companion.addProperty
 
 fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec =
     when (this) {
-        is SchemaSpec.RefSpec -> generated[name]
-            ?: allSchemas.getValue(schemaName).buildModelClass(schemaName, allSchemas, generated)
-        is SchemaSpec.ObjectSpec -> {
-            val typeSpec = buildModelClass(name, allSchemas, generated)
-            generated[name] = typeSpec
-            typeSpec
-        }
+        is SchemaSpec.ObjectSpec -> generated.getOrPut(name, { buildModelClass(name, allSchemas, generated) })
+        is SchemaSpec.RefSpec -> generated.getOrPut(schemaName, { allSchemas.getValue(schemaName).buildModelClass(schemaName, allSchemas, generated) })
         is SchemaSpec.ArraySpec -> buildModelClass(name, allSchemas, generated)
         else -> TypeSpec.classBuilder(name.capitalize()).build()
     }

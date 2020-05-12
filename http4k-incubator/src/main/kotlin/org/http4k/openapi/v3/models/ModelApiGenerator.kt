@@ -6,6 +6,7 @@ import org.http4k.core.ContentType
 import org.http4k.openapi.v3.ApiGenerator
 import org.http4k.openapi.v3.GenerationOptions
 import org.http4k.openapi.v3.OpenApi3Spec
+import org.http4k.openapi.v3.flattenedPaths
 import org.http4k.poet.buildFormatted
 
 object ModelApiGenerator : ApiGenerator {
@@ -17,19 +18,17 @@ object ModelApiGenerator : ApiGenerator {
             acc
         }
 
-        spec.paths.entries.fold(allSchemas) { acc, (path, verbToPathSpec) ->
-            verbToPathSpec.forEach { (method, pathSpec) ->
+        spec.flattenedPaths().forEach { path ->
+            with(path) {
                 pathSpec.requestBody
                     ?.content
                     ?.forEach { (type, spec) ->
                         spec.schema?.also {
-                            val functionName = pathSpec.operationId ?: method.toLowerCase() + path.replace('/', '_')
-                            val name = functionName.capitalize() + ContentType(type).value.substringAfter('/').capitalize()
-                            allSchemas += (name to allSchemas.getOrDefault(name, it.buildModelClass(name, components.schemas, allSchemas)))
+                            val name = uniqueName + ContentType(type).value.substringAfter('/').capitalize()
+                            allSchemas.getOrPut(name, { it.buildModelClass(name, components.schemas, allSchemas) })
                         }
                     }
             }
-            acc
         }
 
         allSchemas.values.distinct().map {

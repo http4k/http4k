@@ -7,5 +7,6 @@ import java.io.File
 
 fun Approver.assertGeneratedContent(generator: ApiGenerator, content: String) {
     assertApproved(generator(content.asA(OpenApi3Spec::class), GenerationOptions("testPackage", File(".")))
+        .sortedBy { it.name }
         .joinToString("\n") { ">>>${it.name}.kt\n\n$it" })
 }

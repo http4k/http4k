@@ -1,13 +1,3 @@
->>>Ref.kt
-
-package testPackage.model
-
-import kotlin.Int
-
-data class Ref(
-	val value: Int?
-)
-
 >>>Obj.kt
 
 package testPackage.model
@@ -16,4 +6,14 @@ import Ref
 
 data class Obj(
 	val ref: Ref
+)
+
+>>>Ref.kt
+
+package testPackage.model
+
+import kotlin.Int
+
+data class Ref(
+	val value: Int?
 )
