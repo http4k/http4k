@@ -2,8 +2,6 @@
 
 source ./release-functions.sh
 
-ensure_release_commit
-
 maven_publish "http4k-format-jackson-xml"
 maven_publish "http4k-format-xml"
 maven_publish "http4k-format-kotlinx-serialization"
