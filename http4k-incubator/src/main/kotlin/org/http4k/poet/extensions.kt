@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import org.http4k.core.Body
@@ -54,23 +55,27 @@ fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
             when (it) {
                 is SchemaSpec.ObjectSpec -> {
                     CodeBlock.of(
-                        "val bodyLens = %T.%M<Any>().toLens()",
+                        "val bodyLens = %T.%M<%T>().toLens()",
                         Body::class.asTypeName(),
-                        member<Jackson>("auto")
+                        member<Jackson>("auto"),
+                        Any::class.asTypeName()
                     )
                 }
                 is SchemaSpec.ArraySpec -> {
+                    println("FOO")
                     CodeBlock.of(
-                        "val bodyLens = %T.%M<List<Any>>().toLens()",
+                        "val bodyLens = %T.%M<%T<%T>>().toLens()",
                         Body::class.asTypeName(),
-                        member<Jackson>("auto")
+                        member<Jackson>("auto"),
+                        List::class.asClassName().parameterizedBy(Any::class.asTypeName())
                     )
                 }
                 is SchemaSpec.RefSpec -> {
                     CodeBlock.of(
-                        "val bodyLens = %T.%M<Any>().toLens()",
+                        "val bodyLens = %T.%M<%T>().toLens()",
                         Body::class.asTypeName(),
-                        member<Jackson>("auto")
+                        member<Jackson>("auto"),
+                        Any::class.asTypeName()
                     )
                 }
                 else -> null
