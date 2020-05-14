@@ -8,6 +8,7 @@ import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.http4k.openapi.v3.ApiGenerator
 import org.http4k.openapi.v3.GenerationOptions
 import org.http4k.openapi.v3.OpenApi3Spec
+import org.http4k.openapi.v3.Path
 import org.http4k.openapi.v3.apiName
 import org.http4k.openapi.v3.flattenedPaths
 import org.http4k.poet.Property
@@ -22,7 +23,7 @@ object ClientApiGenerator : ApiGenerator {
 
             val className = apiName() + "Client"
 
-            val clientCode = flattenedPaths().map(::function).fold(classBuilder(className), TypeSpec.Builder::addFunction)
+            val clientCode = flattenedPaths().map(Path::function).fold(classBuilder(className), TypeSpec.Builder::addFunction)
                 .addProperty(httpHandler)
                 .primaryConstructor(constructorBuilder().addParameter(httpHandler).build())
                 .build()
