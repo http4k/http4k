@@ -32,6 +32,8 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
         .mapNotNull { (code, messageSpec) ->
             messageSpec.schema?.let { NamedSchema(modelName("", "Response$code"), it) }
         }
+
+    fun allSchemas() = requestSchemas() + responseSchemas()
 }
 
 data class NamedSchema(val name: String, val schema: SchemaSpec)

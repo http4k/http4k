@@ -3,9 +3,6 @@
 package testPackage.client
 
 import `EndpointX-www-form-urlencodedRequest`
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -16,12 +13,7 @@ import org.http4k.format.Jackson.auto
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(
-		boolean: Boolean,
-		integer: Int?,
-		string: String?,
-		json: String
-	): Response {
+	fun endpoint(request: `EndpointX-www-form-urlencodedRequest`): Response {
 
 		val bodyLens = Body.auto<`EndpointX-www-form-urlencodedRequest`>().toLens()
 		val request = Request(Method.POST, "/formbody")

@@ -1,5 +1,6 @@
 package org.http4k.openapi.v3.client
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.CodeBlock.Companion.of
 import com.squareup.kotlinpoet.FunSpec
@@ -24,7 +25,7 @@ import org.http4k.poet.quotedName
 
 fun OpenApi3Spec.function(path: Path): FunSpec =
     with(path) {
-        val reifiedPath = path.urlPathPattern.replace("/{", "/\${")
+        val reifiedPath = urlPathPattern.replace("/{", "/\${")
 
         val messageBindings = pathSpec.parameters.mapNotNull {
             val binding = "${it.name}Lens of ${it.name}"
@@ -57,15 +58,15 @@ fun OpenApi3Spec.function(path: Path): FunSpec =
 
 private fun FunSpec.Builder.addAllParametersFrom(path: Path): FunSpec.Builder =
     with(path) {
-        val parameters = path.pathSpec.parameters.map { it.name to it.asTypeName()!! }
+        val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
 
-        val formParams = path.pathSpec.requestBody
-            ?.contentFor(APPLICATION_FORM_URLENCODED)
-            ?.schema
-            ?.buildModelClass("form", emptyMap(), mutableMapOf())
-            ?.primaryConstructor?.parameters?.map { it.name to it.type } ?: emptyList()
+        val bodyParams = requestSchemas().map {
+            "request" to ClassName("", it.name)
+        }
 
-        (parameters + formParams).fold(this@addAllParametersFrom) { acc, next ->
+        println(parameters)
+        println(bodyParams)
+        (parameters + bodyParams).fold(this@addAllParametersFrom) { acc, next ->
             acc.addParameter(next.first, next.second)
         }
     }
