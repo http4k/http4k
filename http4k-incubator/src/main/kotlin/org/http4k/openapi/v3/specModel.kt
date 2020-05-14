@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.core.ContentType
 import org.http4k.openapi.v3.OpenApiJson.asA
 import java.math.BigDecimal
 import kotlin.reflect.KClass
@@ -56,19 +55,51 @@ sealed class ParameterSpec(val name: String, val required: Boolean, val descript
     class QuerySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
 }
 
-data class RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap()) {
-    fun contentFor(type: ContentType) = content[type.value]
-}
+data class RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap())
 
 data class MessageBodySpec(val schema: SchemaSpec?)
 
 data class ComponentsSpec(val schemas: Map<String, SchemaSpec> = emptyMap())
+/*
+"responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "boolean": {
+                                            "type": "boolean"
+                                        },
+                                        "integer": {
+                                            "type": "integer"
+                                        },
+                                        "string": {
+                                            "type": "string"
+                                        },
+                                        "json": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "boolean",
+                                        "json"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+ */
+
+data class ResponseSpec(val content: Map<String, MessageBodySpec>)
+
 data class PathSpec(
     val operationId: String?,
     val summary: String?,
     val description: String?,
     val tags: List<String> = emptyList(),
-    val responses: Map<Int, MessageBodySpec> = emptyMap(),
+    val responses: Map<Int, ResponseSpec> = emptyMap(),
     val requestBody: RequestBodySpec?,
     val parameters: List<ParameterSpec> = emptyList()
 )

@@ -29,8 +29,10 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
         ).flatten()
 
     fun responseSchemas(): List<NamedSchema> = pathSpec.responses.entries
-        .mapNotNull { (code, messageSpec) ->
-            messageSpec.schema?.let { NamedSchema(modelName("", "Response$code"), it) }
+        .flatMap { (code, messageSpec) ->
+            messageSpec.content.entries.mapNotNull { (contentType, messageSpec) ->
+                messageSpec.schema?.let { NamedSchema(modelName(contentType, "Response$code"), it) }
+            }
         }
 
     fun allSchemas() = requestSchemas() + responseSchemas()
