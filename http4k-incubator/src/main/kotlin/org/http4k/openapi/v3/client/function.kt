@@ -64,8 +64,6 @@ private fun FunSpec.Builder.addAllParametersFrom(path: Path): FunSpec.Builder =
             "request" to ClassName("", it.name)
         }
 
-        println(parameters)
-        println(bodyParams)
         (parameters + bodyParams).fold(this@addAllParametersFrom) { acc, next ->
             acc.addParameter(next.first, next.second)
         }
