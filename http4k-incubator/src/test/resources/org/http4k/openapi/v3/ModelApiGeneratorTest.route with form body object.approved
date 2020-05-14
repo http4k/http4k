@@ -1,4 +1,4 @@
->>>EndpointX-www-form-urlencoded.kt
+>>>EndpointX-www-form-urlencodedRequest.kt
 
 package testPackage.model
 
@@ -6,7 +6,7 @@ import kotlin.Boolean
 import kotlin.Int
 import kotlin.String
 
-data class `EndpointX-www-form-urlencoded`(
+data class `EndpointX-www-form-urlencodedRequest`(
 	val boolean: Boolean,
 	val integer: Int?,
 	val string: String?,

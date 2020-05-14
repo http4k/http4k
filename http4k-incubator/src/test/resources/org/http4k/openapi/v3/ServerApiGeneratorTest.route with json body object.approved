@@ -2,7 +2,7 @@
 
 package testPackage.server.endpoints
 
-import kotlin.Any
+import EndpointJsonRequest
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Response
@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 
 fun Endpoint(): RoutingHttpHandler {
 
-	val bodyLens = Body.auto<Any>().toLens()
+	val bodyLens = Body.auto<EndpointJsonRequest>().toLens()
 	return "/jsonbody" bind Method.POST to { Response(Status.OK) }
 }
 

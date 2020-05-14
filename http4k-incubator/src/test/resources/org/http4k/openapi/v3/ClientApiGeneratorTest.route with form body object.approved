@@ -2,7 +2,7 @@
 
 package testPackage.client
 
-import kotlin.Any
+import `EndpointX-www-form-urlencodedRequest`
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.String
@@ -23,7 +23,7 @@ class TitleClient(
 		json: String
 	): Response {
 
-		val bodyLens = Body.auto<Any>().toLens()
+		val bodyLens = Body.auto<`EndpointX-www-form-urlencodedRequest`>().toLens()
 		val request = Request(Method.POST, "/formbody")
 		return httpHandler(request)
 	}

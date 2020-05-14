@@ -1,5 +1,6 @@
 package org.http4k.poet
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -47,27 +48,26 @@ fun ParameterSpec.lensConstruct() =
     }
 
 fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
-    val responseSchemas = path.pathSpec.responses.entries.mapNotNull { it.value.schema }
-    val bodySchemas = listOfNotNull(path.pathSpec.requestBody?.content?.entries?.mapNotNull { it.value.schema }).flatten()
+    val responseSchemas = path.responseSchemas()
+    val bodySchemas = path.requestSchemas()
 
     val bodyTypes = (responseSchemas + bodySchemas)
         .mapNotNull {
-            when (it) {
+            when (it.schema) {
                 is SchemaSpec.ObjectSpec -> {
                     CodeBlock.of(
                         "val bodyLens = %T.%M<%T>().toLens()",
                         Body::class.asTypeName(),
                         member<Jackson>("auto"),
-                        Any::class.asTypeName()
+                        ClassName("", it.name)
                     )
                 }
                 is SchemaSpec.ArraySpec -> {
-                    println("FOO")
                     CodeBlock.of(
                         "val bodyLens = %T.%M<%T<%T>>().toLens()",
                         Body::class.asTypeName(),
                         member<Jackson>("auto"),
-                        List::class.asClassName().parameterizedBy(Any::class.asTypeName())
+                        List::class.asClassName().parameterizedBy(ClassName("", it.name))
                     )
                 }
                 is SchemaSpec.RefSpec -> {
@@ -75,7 +75,7 @@ fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
                         "val bodyLens = %T.%M<%T>().toLens()",
                         Body::class.asTypeName(),
                         member<Jackson>("auto"),
-                        Any::class.asTypeName()
+                        ClassName("", it.name)
                     )
                 }
                 else -> null

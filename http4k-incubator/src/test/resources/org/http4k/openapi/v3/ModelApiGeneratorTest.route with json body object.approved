@@ -1,4 +1,4 @@
->>>EndpointJson.kt
+>>>EndpointJsonRequest.kt
 
 package testPackage.model
 
@@ -6,7 +6,7 @@ import kotlin.Boolean
 import kotlin.Int
 import kotlin.String
 
-data class EndpointJson(
+data class EndpointJsonRequest(
 	val boolean: Boolean,
 	val integer: Int?,
 	val string: String?,
