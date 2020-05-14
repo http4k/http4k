@@ -56,7 +56,7 @@ fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
             when (it.schema) {
                 is SchemaSpec.ObjectSpec -> {
                     CodeBlock.of(
-                        "val bodyLens = %T.%M<%T>().toLens()",
+                        "val ${it.name.decapitalize()} = %T.%M<%T>().toLens()",
                         Body::class.asTypeName(),
                         member<Jackson>("auto"),
                         ClassName("", it.name)
@@ -64,7 +64,7 @@ fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
                 }
                 is SchemaSpec.ArraySpec -> {
                     CodeBlock.of(
-                        "val bodyLens = %T.%M<%T<%T>>().toLens()",
+                        "val ${it.name.decapitalize()} = %T.%M<%T<%T>>().toLens()",
                         Body::class.asTypeName(),
                         member<Jackson>("auto"),
                         List::class.asClassName().parameterizedBy(ClassName("", it.name))
@@ -72,7 +72,7 @@ fun OpenApi3Spec.lensDeclarations(path: CPath): List<CodeBlock> {
                 }
                 is SchemaSpec.RefSpec -> {
                     CodeBlock.of(
-                        "val bodyLens = %T.%M<%T>().toLens()",
+                        "val ${it.name.decapitalize()} = %T.%M<%T>().toLens()",
                         Body::class.asTypeName(),
                         member<Jackson>("auto"),
                         ClassName("", it.name)

@@ -15,7 +15,7 @@ class TitleClient(
 ) {
 	fun endpoint(request: EndpointJsonRequest): Response {
 
-		val bodyLens = Body.auto<EndpointJsonRequest>().toLens()
+		val endpointJsonRequest = Body.auto<EndpointJsonRequest>().toLens()
 		val request = Request(Method.POST, "/jsonbody")
 		return httpHandler(request)
 	}

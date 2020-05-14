@@ -15,7 +15,8 @@ class TitleClient(
 ) {
 	fun endpoint(request: `EndpointX-www-form-urlencodedRequest`): Response {
 
-		val bodyLens = Body.auto<`EndpointX-www-form-urlencodedRequest`>().toLens()
+		val endpointX-www-form-urlencodedRequest =
+				Body.auto<`EndpointX-www-form-urlencodedRequest`>().toLens()
 		val request = Request(Method.POST, "/formbody")
 		return httpHandler(request)
 	}
