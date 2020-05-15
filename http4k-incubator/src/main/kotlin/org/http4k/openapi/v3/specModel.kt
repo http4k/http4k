@@ -60,37 +60,6 @@ data class RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap(
 data class MessageBodySpec(val schema: SchemaSpec?)
 
 data class ComponentsSpec(val schemas: Map<String, SchemaSpec> = emptyMap())
-/*
-"responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "boolean": {
-                                            "type": "boolean"
-                                        },
-                                        "integer": {
-                                            "type": "integer"
-                                        },
-                                        "string": {
-                                            "type": "string"
-                                        },
-                                        "json": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "boolean",
-                                        "json"
-                                    ]
-                                }
-                            }
-                        }
-                    }
- */
 
 data class ResponseSpec(val content: Map<String, MessageBodySpec>)
 
