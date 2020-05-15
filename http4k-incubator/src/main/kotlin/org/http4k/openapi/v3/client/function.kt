@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.Path
+import org.http4k.openapi.v3.models.buildModelClass
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
@@ -19,17 +20,22 @@ import org.http4k.poet.lensDeclarations
 import org.http4k.poet.packageMember
 import org.http4k.poet.quotedName
 
+private const val reqValName = "request"
+
 fun Path.function(): FunSpec =
     with(this) {
         val reifiedPath = urlPathPattern.replace("/{", "/\${")
 
         val with = packageMember<Filter>("with")
-//
-//        val bodyBindings = listOfNotNull(
-//            responseSchemas()
-//                .firstOrNull()
-//                ?.lensDeclaration()
-//        )
+
+        val bodyBindings = listOfNotNull(
+            requestSchemas()
+                .firstOrNull()
+                ?.let {
+                    val binding = "${it.name.decapitalize()} of request"
+                    of("\n.%M($binding)", with)
+                }
+        )
 
         val parameterBindings = pathSpec.parameters.mapNotNull {
             val binding = "${it.name}Lens of ${it.name}"
@@ -45,19 +51,19 @@ fun Path.function(): FunSpec =
             }
         }
 
-        val buildRequest = (parameterBindings)
+        val buildRequest = (bodyBindings + parameterBindings)
             .fold(CodeBlock.builder()
-                .add("val request = %T(%T.$method,·\"$reifiedPath\")", Property<Request>().type, Property<Method>().type)) { acc, next ->
+                .add("val $reqValName = %T(%T.$method,·\"$reifiedPath\")", Property<Request>().type, Property<Method>().type)) { acc, next ->
                 acc.add(next)
             }.build()
 
-        val responseType = responseSchemas().firstOrNull()?.let { ClassName("", it.name) } ?: Unit::class.asClassName()
-
         val response = responseSchemas().firstOrNull()?.let { schema ->
             schema.lensDeclaration()
-                ?.let { listOf(of("return " + schema.name.decapitalize() + "(httpHandler(request))")) }
+                ?.let { listOf(of("return " + schema.name.decapitalize() + "(httpHandler($reqValName))")) }
                 ?: emptyList()
-        } ?: listOf(of("\nhttpHandler(request)"))
+        } ?: listOf(of("\nhttpHandler($reqValName)"))
+
+        val responseType = responseSchemas().firstOrNull()?.let { ClassName("", it.name) } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this)

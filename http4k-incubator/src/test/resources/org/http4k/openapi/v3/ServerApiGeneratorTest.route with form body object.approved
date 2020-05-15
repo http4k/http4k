@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 
 fun Endpoint(): RoutingHttpHandler {
 
-	val endpointXwwwformurlencodedRequest = Body.auto<EndpointXwwwformurlencodedRequest>().toLens()
+	val endpointXwwwformurlencodedRequestLens = Body.auto<EndpointXwwwformurlencodedRequest>().toLens()
 	return "/formbody" bind Method.POST to { Response(Status.OK) }
 }
 

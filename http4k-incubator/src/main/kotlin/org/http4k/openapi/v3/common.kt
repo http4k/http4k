@@ -18,7 +18,7 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
     val uniqueName = (pathSpec.operationId
         ?: method.toString().toLowerCase() + urlPathPattern.replace('/', '_')).capitalize()
 
-    fun modelName(contentType: String, suffix: String) =
+    private fun modelName(contentType: String, suffix: String) =
         uniqueName + ContentType(contentType).value.substringAfter('/').capitalize().filter(Char::isLetterOrDigit) + suffix
 
     fun requestSchemas(): List<NamedSchema> =

@@ -69,7 +69,7 @@ fun org.http4k.openapi.v3.Path.lensDeclarations(): List<CodeBlock> {
 fun NamedSchema.lensDeclaration() = when (schema) {
     is SchemaSpec.ObjectSpec -> {
         CodeBlock.of(
-            "val ${name.decapitalize()} = %T.%M<%T>().toLens()",
+            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
             ClassName("", name)
@@ -77,7 +77,7 @@ fun NamedSchema.lensDeclaration() = when (schema) {
     }
     is SchemaSpec.ArraySpec -> {
         CodeBlock.of(
-            "val ${name.decapitalize()} = %T.%M<%T<%T>>().toLens()",
+            "val ${name.decapitalize()}Lens = %T.%M<%T<%T>>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
             List::class.asClassName().parameterizedBy(ClassName("", name))
@@ -85,7 +85,7 @@ fun NamedSchema.lensDeclaration() = when (schema) {
     }
     is SchemaSpec.RefSpec -> {
         CodeBlock.of(
-            "val ${name.decapitalize()} = %T.%M<%T>().toLens()",
+            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
             ClassName("", name)

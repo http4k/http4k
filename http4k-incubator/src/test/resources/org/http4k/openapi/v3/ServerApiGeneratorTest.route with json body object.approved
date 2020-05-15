@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 
 fun Endpoint(): RoutingHttpHandler {
 
-	val endpointJsonRequest = Body.auto<EndpointJsonRequest>().toLens()
+	val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
 	return "/jsonbody" bind Method.POST to { Response(Status.OK) }
 }
 
