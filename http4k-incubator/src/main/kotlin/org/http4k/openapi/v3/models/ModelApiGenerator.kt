@@ -17,15 +17,8 @@ object ModelApiGenerator : ApiGenerator {
         }
 
         spec.flattenedPaths().forEach { path ->
-            path.requestSchemas().forEach { (name, spec) ->
-                spec.also {
-                    allSchemas.getOrPut(name, { it.buildModelClass(name, components.schemas, allSchemas) })
-                }
-            }
-            path.responseSchemas().forEach { (name, spec) ->
-                spec.also {
-                    allSchemas.getOrPut(name, { it.buildModelClass(name, components.schemas, allSchemas) })
-                }
+            (path.requestSchemas() + path.responseSchemas()).forEach { (name, spec) ->
+                allSchemas.getOrPut(name, { spec.buildModelClass(name, components.schemas, allSchemas) })
             }
         }
 
