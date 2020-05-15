@@ -46,10 +46,7 @@ fun ParameterSpec.lensConstruct() =
     }
 
 fun org.http4k.openapi.v3.Path.lensDeclarations(): List<CodeBlock> {
-    val responseSchemas = responseSchemas()
-    val bodySchemas = requestSchemas()
-
-    val bodyTypes = (responseSchemas + bodySchemas)
+    val bodyTypes = allSchemas()
         .mapNotNull {
             when (it.schema) {
                 is SchemaSpec.ObjectSpec -> {

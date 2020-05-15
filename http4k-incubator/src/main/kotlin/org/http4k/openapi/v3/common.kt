@@ -37,6 +37,8 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
                 messageSpec.schema?.let { NamedSchema(modelName(contentType, "Response$code"), it) }
             }
         }
+
+    fun allSchemas() = requestSchemas() + responseSchemas()
 }
 
 data class NamedSchema(val name: String, val schema: SchemaSpec)
