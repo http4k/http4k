@@ -6,11 +6,14 @@ import org.http4k.openapi.v3.models.ModelApiGenerator
 import org.http4k.openapi.v3.server.ServerApiGenerator
 import java.io.File
 
-fun main(args: Array<String>) {
+fun main() {
     val generationOptions = GenerationOptions("org.http4k", File("src/main/kotlin"))
 
     val targetGeneratedDir = generationOptions.destinationFolder.apply { mkdirs() }
-    val spec = File(args[0]).readText().asA(OpenApi3Spec::class)
+    val spec =
+        File("http4k/src/test/resources/org/http4k/openapi/v3/apiSpec.json")
+            .apply { println(absolutePath) }
+            .readText().asA(OpenApi3Spec::class)
 
     listOf(ModelApiGenerator, ClientApiGenerator, ServerApiGenerator)
         .flatMap { it(spec, generationOptions) }
