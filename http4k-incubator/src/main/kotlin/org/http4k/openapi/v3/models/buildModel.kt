@@ -42,6 +42,10 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
             clazz.addProperty(it)
         }
 
+    if(additionalProperties != null) {
+        primaryConstructor.addParameter("additional", Map::class.parameterizedBy(String::class, Any::class))
+    }
+
     clazz.addModifiers(DATA).primaryConstructor(primaryConstructor.build())
 
     return clazz.build()

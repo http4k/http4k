@@ -2,4 +2,10 @@
 
 package testPackage.model
 
-data class EndpointJsonRequest
+import kotlin.Any
+import kotlin.String
+import kotlin.collections.Map
+
+data class EndpointJsonRequest(
+	additional: Map<String, Any>
+)

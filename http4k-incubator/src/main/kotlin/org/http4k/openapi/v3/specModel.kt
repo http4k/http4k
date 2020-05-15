@@ -19,9 +19,14 @@ import kotlin.reflect.KClass
     Type(value = SchemaSpec.BooleanSpec::class, name = "boolean")
 )
 sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
-    data class ObjectSpec(val required: List<String> = emptyList(), val properties: Map<String, SchemaSpec> = emptyMap(), override val clazz: KClass<*>?) : SchemaSpec(clazz)
+
+    data class ObjectSpec(val required: List<String> = emptyList(),
+                          val properties: Map<String, SchemaSpec> = emptyMap(),
+                          override val clazz: KClass<*>?,
+                          val additionalProperties: JsonNode? = null) : SchemaSpec(clazz)
+
     data class ArraySpec(private val items: JsonNode) : SchemaSpec() {
-        fun itemsSpec(): SchemaSpec =  try {
+        fun itemsSpec(): SchemaSpec = try {
             items.asA()
         } catch (e: Exception) {
             try {
