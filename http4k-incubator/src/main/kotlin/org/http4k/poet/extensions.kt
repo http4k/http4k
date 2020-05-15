@@ -77,7 +77,7 @@ fun NamedSchema.lensDeclaration() = when (schema) {
     }
     is SchemaSpec.ArraySpec -> {
         CodeBlock.of(
-            "val ${name.decapitalize()}Lens = %T.%M<%T<%T>>().toLens()",
+            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
             List::class.asClassName().parameterizedBy(ClassName("", name))
@@ -93,3 +93,4 @@ fun NamedSchema.lensDeclaration() = when (schema) {
     }
     else -> null
 }
+

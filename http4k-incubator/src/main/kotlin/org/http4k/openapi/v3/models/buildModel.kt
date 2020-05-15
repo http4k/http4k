@@ -17,7 +17,7 @@ fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>
     when (this) {
         is SchemaSpec.ObjectSpec -> generated.getOrPut(name, { buildModelClass(name, allSchemas, generated) })
         is SchemaSpec.RefSpec -> generated.getOrPut(schemaName, { allSchemas.getValue(schemaName).buildModelClass(schemaName, allSchemas, generated) })
-        is SchemaSpec.ArraySpec -> buildModelClass(name, allSchemas, generated)
+        is SchemaSpec.ArraySpec -> itemsSpec().buildModelClass(name, allSchemas, generated)
         else -> TypeSpec.classBuilder(name.capitalize()).build()
     }
 

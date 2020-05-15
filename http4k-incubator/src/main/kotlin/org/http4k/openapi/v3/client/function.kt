@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.CodeBlock.Companion.of
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -11,6 +12,7 @@ import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.Path
+import org.http4k.openapi.v3.SchemaSpec
 import org.http4k.openapi.v3.models.buildModelClass
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
@@ -78,7 +80,12 @@ private fun FunSpec.Builder.addAllParametersFrom(path: Path): FunSpec.Builder =
     with(path) {
         val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
 
-        val bodyParams = requestSchemas().map { "request" to ClassName("", it.name) }
+        val bodyParams = requestSchemas().map {
+            when (it.schema) {
+                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(ClassName("", it.name))
+                else -> "request" to ClassName("", it.name)
+            }
+        }
 
         (parameters + bodyParams).fold(this@addAllParametersFrom) { acc, next ->
             acc.addParameter(next.first, next.second)

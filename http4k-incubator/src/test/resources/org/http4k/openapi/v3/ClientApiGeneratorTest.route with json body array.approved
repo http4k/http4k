@@ -2,17 +2,24 @@
 
 package testPackage.client
 
+import EndpointJsonRequest
+import kotlin.collections.List
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.with
+import org.http4k.format.Jackson.auto
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(): Response {
+	fun endpoint(request: List<EndpointJsonRequest>) {
 
+		val endpointJsonRequestLens = Body.auto<List<EndpointJsonRequest>>().toLens()
 		val request = Request(Method.POST, "/jsonbody")
-		return httpHandler(request)
+			.with(endpointJsonRequest of request)
+
+		httpHandler(request)
 	}
 }
