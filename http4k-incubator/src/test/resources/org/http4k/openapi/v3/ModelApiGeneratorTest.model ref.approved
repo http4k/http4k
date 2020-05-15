@@ -1,3 +1,13 @@
+>>>DoubleRef.kt
+
+package testPackage.model
+
+import kotlin.Int
+
+data class DoubleRef(
+	val value: Int?
+)
+
 >>>Obj.kt
 
 package testPackage.model
@@ -12,8 +22,8 @@ data class Obj(
 
 package testPackage.model
 
-import kotlin.Int
+import DoubleRef
 
 data class Ref(
-	val value: Int?
+	val value: DoubleRef?
 )

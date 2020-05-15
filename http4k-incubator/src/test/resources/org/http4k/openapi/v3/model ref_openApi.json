@@ -22,6 +22,16 @@
                 ],
                 "properties": {
                     "value": {
+                        "$ref": "#/components/schemas/DoubleRef"
+                    }
+                }
+            },
+            "DoubleRef": {
+                "type": "object",
+                "required": [
+                ],
+                "properties": {
+                    "value": {
                         "type": "integer"
                     }
                 }
