@@ -20,8 +20,8 @@ class TitleClient(
 		val requiredLens = Header.boolean().required("required")
 		val optionalLens = Header.int().optional("optional")
 		val request = Request(Method.POST, "/header")
-		.with(requiredLens of required)
-		.with(optionalLens of optional)
+			.with(requiredLens of required)
+			.with(optionalLens of optional)
 
 		httpHandler(request)
 	}

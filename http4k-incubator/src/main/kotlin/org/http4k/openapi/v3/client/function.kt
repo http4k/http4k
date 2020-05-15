@@ -33,7 +33,7 @@ fun Path.function(): FunSpec =
                 .firstOrNull()
                 ?.let {
                     val binding = "${it.name.decapitalize()} of request"
-                    of("\n.%M($binding)", with)
+                    of("\n\t.%M($binding)", with)
                 }
         )
 
@@ -43,10 +43,10 @@ fun Path.function(): FunSpec =
             when (it) {
                 is ParameterSpec.CookieSpec -> {
                     val optionality = if (it.required) "" else " ?: \"\""
-                    of("\n.%M(${it.name}Lens of %T(${it.quotedName()}, ${it.name}$optionality))", with, Cookie::class.asClassName())
+                    of("\n\t.%M(${it.name}Lens of %T(${it.quotedName()}, ${it.name}$optionality))", with, Cookie::class.asClassName())
                 }
-                is ParameterSpec.HeaderSpec -> of("\n.%M($binding)", with)
-                is ParameterSpec.QuerySpec -> of("\n.%M($binding)", with)
+                is ParameterSpec.HeaderSpec -> of("\n\t.%M($binding)", with)
+                is ParameterSpec.QuerySpec -> of("\n\t.%M($binding)", with)
                 else -> null
             }
         }

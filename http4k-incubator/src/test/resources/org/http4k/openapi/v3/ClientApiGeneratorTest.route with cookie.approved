@@ -19,8 +19,8 @@ class TitleClient(
 		val requiredLens = Cookies.required("required")
 		val optionalLens = Cookies.optional("optional")
 		val request = Request(Method.POST, "/cookie")
-		.with(requiredLens of Cookie("required", required))
-		.with(optionalLens of Cookie("optional", optional ?: ""))
+			.with(requiredLens of Cookie("required", required))
+			.with(optionalLens of Cookie("optional", optional ?: ""))
 
 		httpHandler(request)
 	}
