@@ -7,5 +7,5 @@ import kotlin.String
 import kotlin.collections.Map
 
 data class EndpointJsonRequest(
-	additional: Map<String, Any>
+	val additional: Map<String, Any>
 )
