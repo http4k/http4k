@@ -45,7 +45,8 @@ fun Path.function(): FunSpec =
                 acc.add(next)
             }.build()
 
-        FunSpec.builder(this@function.uniqueName.decapitalize()).addAllParametersFrom(this)
+        FunSpec.builder(this@function.uniqueName.decapitalize())
+            .addAllParametersFrom(this)
             .addReturnType(Property<Response>())
             .addCodeBlocks(lensDeclarations())
             .addCode(request)
