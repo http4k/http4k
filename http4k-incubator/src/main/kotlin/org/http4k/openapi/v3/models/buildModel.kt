@@ -30,7 +30,7 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
         is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
         is SchemaSpec.RefSpec -> {
             buildModelClass(schemaName, allSchemas, generated)
-            ClassName.bestGuess(schemaName)
+            ClassName("", schemaName)
         }
         else -> this.clazz!!.asTypeName()
     }

@@ -264,37 +264,6 @@
         "deprecated": false
       }
     },
-    "/basepath/body_json_noschema": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": null,
-              "schema": {
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_json_noschema",
-        "deprecated": false
-      }
-    },
     "/basepath/body_json_response": {
       "post": {
         "summary": "<unknown>",
