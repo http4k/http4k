@@ -19,10 +19,10 @@ class TitleClient(
 
 		val requiredLens = Query.boolean().required("required")
 		val optionalLens = Query.int().optional("optional")
-		val req = Request(Method.POST, "/query")
+		val request = Request(Method.POST, "/query")
 		.with(requiredLens of required)
 		.with(optionalLens of optional)
 
-		httpHandler(req)
+		httpHandler(request)
 	}
 }
