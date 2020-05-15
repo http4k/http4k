@@ -42,7 +42,7 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
             clazz.addProperty(it)
         }
 
-    if(additionalProperties != null) {
+    if(additionalProperties != null || properties.isEmpty()) {
         val freeform = Property("additional", Map::class.parameterizedBy(String::class, Any::class))
         primaryConstructor.addParameter(freeform)
         clazz.addProperty(freeform)
