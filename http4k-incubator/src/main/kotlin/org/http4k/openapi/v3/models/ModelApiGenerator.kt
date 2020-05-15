@@ -17,29 +17,14 @@ object ModelApiGenerator : ApiGenerator {
         }
 
         spec.flattenedPaths().forEach { path ->
-            with(path) {
-                pathSpec.requestBody
-                    ?.content
-                    ?.forEach { (contentType, spec) ->
-                        spec.schema?.also {
-                            val name = modelName(contentType, "Request")
-                            allSchemas.getOrPut(name, { it.buildModelClass(name, components.schemas, allSchemas) })
-                        }
-                    }
+            path.requestSchemas().forEach { (name, spec) ->
+                spec.also {
+                    allSchemas.getOrPut(name, { it.buildModelClass(name, components.schemas, allSchemas) })
+                }
             }
-        }
-
-        spec.flattenedPaths().forEach { path ->
-            with(path) {
-                pathSpec.responses.forEach { (code, model) ->
-                    model
-                        .content
-                        .forEach { (contentType, spec) ->
-                            spec.schema?.also {
-                                val name = modelName(contentType, "Response$code")
-                                allSchemas.getOrPut(name, { it.buildModelClass(name, components.schemas, allSchemas) })
-                            }
-                        }
+            path.responseSchemas().forEach { (name, spec) ->
+                spec.also {
+                    allSchemas.getOrPut(name, { it.buildModelClass(name, components.schemas, allSchemas) })
                 }
             }
         }

@@ -24,7 +24,10 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
     fun requestSchemas(): List<NamedSchema> =
         listOfNotNull(pathSpec.requestBody?.content?.entries
             ?.mapNotNull { (contentType, messageSpec) ->
-                messageSpec.schema?.let { NamedSchema(modelName(contentType, "Request"), it) }
+                if (ContentType.APPLICATION_FORM_URLENCODED.value == contentType) {
+                    messageSpec.schema?.let { NamedSchema(modelName(contentType, "Request"), it) }
+                } else
+                    messageSpec.schema?.let { NamedSchema(modelName(contentType, "Request"), it) }
             }
         ).flatten()
 
