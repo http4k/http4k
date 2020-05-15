@@ -10,10 +10,7 @@ fun main() {
     val generationOptions = GenerationOptions("org.http4k", File("src/main/kotlin"))
 
     val targetGeneratedDir = generationOptions.destinationFolder.apply { mkdirs() }
-    val spec =
-        File("http4k/src/test/resources/org/http4k/openapi/v3/apiSpec.json")
-            .apply { println(absolutePath) }
-            .readText().asA(OpenApi3Spec::class)
+    val spec = File("http4k/src/test/resources/org/http4k/openapi/v3/apiSpec.json").readText().asA(OpenApi3Spec::class)
 
     listOf(ModelApiGenerator, ClientApiGenerator, ServerApiGenerator)
         .flatMap { it(spec, generationOptions) }
