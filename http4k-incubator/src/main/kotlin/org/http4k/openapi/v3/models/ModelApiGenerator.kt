@@ -13,7 +13,7 @@ object ModelApiGenerator : ApiGenerator {
         val componentSchemas = components.schemas.entries
             .fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->
                 val nameCapitalized = name.capitalize()
-                acc += (nameCapitalized to acc.getOrDefault(nameCapitalized, schema.buildModelClass(nameCapitalized, components.schemas, acc)))
+                acc.getOrPut(nameCapitalized, { schema.buildModelClass(nameCapitalized, components.schemas, acc) })
                 acc
             }
 
