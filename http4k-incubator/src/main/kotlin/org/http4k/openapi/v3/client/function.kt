@@ -49,11 +49,7 @@ fun Path.function(): FunSpec =
 
         val response = responseSchemas().firstOrNull()?.let { schema ->
             schema.lensDeclaration()
-                ?.let {
-                    listOf(
-                        of("return " + schema.name.decapitalize() + "(httpHandler(request))")
-                    )
-                }
+                ?.let { listOf(of("return " + schema.name.decapitalize() + "(httpHandler(request))")) }
                 ?: emptyList()
         } ?: listOf(of("\nhttpHandler(request)"))
 
