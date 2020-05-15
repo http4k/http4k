@@ -1,0 +1,5 @@
+>>>EndpointJsonRequest.kt
+
+package testPackage.model
+
+data class EndpointJsonRequest

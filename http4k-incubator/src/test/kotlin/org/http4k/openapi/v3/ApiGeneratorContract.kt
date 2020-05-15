@@ -49,6 +49,9 @@ abstract class ApiGeneratorContract(private val apiGenerator: ApiGenerator) {
     fun `route with json body object`(app: Approver, rl: ResourceLoader)  = app.assertGeneratedContent(rl)
 
     @Test
+    fun `route with json body object additional properties`(app: Approver, rl: ResourceLoader)  = app.assertGeneratedContent(rl)
+
+    @Test
     fun `route with json body ref`(app: Approver, rl: ResourceLoader)  = app.assertGeneratedContent(rl)
 
     fun Approver.assertGeneratedContent(rl: ResourceLoader) {
