@@ -2,7 +2,7 @@ package org.http4k.openapi.v3.client
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec.Companion.constructorBuilder
-import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.KModifier.PRIVATE
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.http4k.openapi.v3.ApiGenerator
@@ -19,11 +19,13 @@ import org.http4k.poet.buildFormatted
 object ClientApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions) =
         with(spec) {
-            val httpHandler = Property("org.http4k.core.HttpHandler", false, KModifier.PRIVATE)
+            val httpHandler = Property("org.http4k.core.HttpHandler", false, PRIVATE)
 
             val className = apiName() + "Client"
 
-            val clientCode = flattenedPaths().map(Path::function).fold(classBuilder(className), TypeSpec.Builder::addFunction)
+            val clientCode = flattenedPaths()
+                .map(Path::function)
+                .fold(classBuilder(className), TypeSpec.Builder::addFunction)
                 .addProperty(httpHandler)
                 .primaryConstructor(constructorBuilder().addParameter(httpHandler).build())
                 .build()
