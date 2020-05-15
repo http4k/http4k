@@ -27,7 +27,7 @@ import testPackage.server.endpoints.Endpoint
 
 object TitleServer {
 	operator fun invoke() = routes(
-	Endpoint()
+		Endpoint()
 	)
 }
 
