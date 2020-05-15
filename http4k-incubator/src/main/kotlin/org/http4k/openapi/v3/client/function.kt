@@ -8,14 +8,13 @@ import com.squareup.kotlinpoet.asClassName
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.Path
 import org.http4k.poet.Property
-import org.http4k.poet.Property.Companion.addReturnType
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
+import org.http4k.poet.lensDeclaration
 import org.http4k.poet.lensDeclarations
 import org.http4k.poet.packageMember
 import org.http4k.poet.quotedName
@@ -45,12 +44,25 @@ fun Path.function(): FunSpec =
                 acc.add(next)
             }.build()
 
-        FunSpec.builder(this@function.uniqueName.decapitalize())
+
+        val responseType = responseSchemas().firstOrNull()?.let { ClassName("", it.name) } ?: Unit::class.asClassName()
+
+        val response = responseSchemas().firstOrNull()?.let { schema ->
+            schema.lensDeclaration()
+                ?.let {
+                    listOf(
+                        of("return " + schema.name.decapitalize() + "(httpHandler(request))")
+                    )
+                }
+                ?: emptyList()
+        } ?: listOf(of("\nhttpHandler(request)"))
+
+        FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this)
-            .addReturnType(Property<Response>())
+            .returns(responseType)
             .addCodeBlocks(lensDeclarations())
             .addCode(request)
-            .addCode("\nreturn·httpHandler(request)")
+            .addCodeBlocks(response)
             .build()
     }
 

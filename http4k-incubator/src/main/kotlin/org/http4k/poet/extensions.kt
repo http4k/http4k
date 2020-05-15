@@ -15,6 +15,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
 import org.http4k.lens.Query
+import org.http4k.openapi.v3.NamedSchema
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.SchemaSpec
 import kotlin.reflect.KClass
@@ -46,36 +47,7 @@ fun ParameterSpec.lensConstruct() =
     }
 
 fun org.http4k.openapi.v3.Path.lensDeclarations(): List<CodeBlock> {
-    val bodyTypes = allSchemas()
-        .mapNotNull {
-            when (it.schema) {
-                is SchemaSpec.ObjectSpec -> {
-                    CodeBlock.of(
-                        "val ${it.name.decapitalize()} = %T.%M<%T>().toLens()",
-                        Body::class.asTypeName(),
-                        member<Jackson>("auto"),
-                        ClassName("", it.name)
-                    )
-                }
-                is SchemaSpec.ArraySpec -> {
-                    CodeBlock.of(
-                        "val ${it.name.decapitalize()} = %T.%M<%T<%T>>().toLens()",
-                        Body::class.asTypeName(),
-                        member<Jackson>("auto"),
-                        List::class.asClassName().parameterizedBy(ClassName("", it.name))
-                    )
-                }
-                is SchemaSpec.RefSpec -> {
-                    CodeBlock.of(
-                        "val ${it.name.decapitalize()} = %T.%M<%T>().toLens()",
-                        Body::class.asTypeName(),
-                        member<Jackson>("auto"),
-                        ClassName("", it.name)
-                    )
-                }
-                else -> null
-            }
-        }
+    val bodyTypes = allSchemas().mapNotNull(NamedSchema::lensDeclaration)
 
     val parameterTypes = pathSpec.parameters.map {
         when (it) {
@@ -92,4 +64,32 @@ fun org.http4k.openapi.v3.Path.lensDeclarations(): List<CodeBlock> {
     }
 
     return bodyTypes + parameterTypes
+}
+
+fun NamedSchema.lensDeclaration() = when (schema) {
+    is SchemaSpec.ObjectSpec -> {
+        CodeBlock.of(
+            "val ${name.decapitalize()} = %T.%M<%T>().toLens()",
+            Body::class.asTypeName(),
+            member<Jackson>("auto"),
+            ClassName("", name)
+        )
+    }
+    is SchemaSpec.ArraySpec -> {
+        CodeBlock.of(
+            "val ${name.decapitalize()} = %T.%M<%T<%T>>().toLens()",
+            Body::class.asTypeName(),
+            member<Jackson>("auto"),
+            List::class.asClassName().parameterizedBy(ClassName("", name))
+        )
+    }
+    is SchemaSpec.RefSpec -> {
+        CodeBlock.of(
+            "val ${name.decapitalize()} = %T.%M<%T>().toLens()",
+            Body::class.asTypeName(),
+            member<Jackson>("auto"),
+            ClassName("", name)
+        )
+    }
+    else -> null
 }

@@ -7,7 +7,6 @@ import kotlin.Int
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.with
 import org.http4k.lens.Query
 import org.http4k.lens.boolean
@@ -16,13 +15,14 @@ import org.http4k.lens.int
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(required: Boolean, optional: Int?): Response {
+	fun endpoint(required: Boolean, optional: Int?) {
 
 		val requiredLens = Query.boolean().required("required")
 		val optionalLens = Query.int().optional("optional")
 		val request = Request(Method.POST, "/query")
 		.with(requiredLens of required)
 		.with(optionalLens of optional)
-		return httpHandler(request)
+
+		httpHandler(request)
 	}
 }

@@ -7,7 +7,6 @@ import kotlin.Int
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.with
 import org.http4k.lens.Cookies
@@ -15,13 +14,14 @@ import org.http4k.lens.Cookies
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(required: Boolean, optional: Int?): Response {
+	fun endpoint(required: Boolean, optional: Int?) {
 
 		val requiredLens = Cookies.required("required")
 		val optionalLens = Cookies.optional("optional")
 		val request = Request(Method.POST, "/cookie")
 		.with(requiredLens of Cookie("required", required))
 		.with(optionalLens of Cookie("optional", optional ?: ""))
-		return httpHandler(request)
+
+		httpHandler(request)
 	}
 }
