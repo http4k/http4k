@@ -23,9 +23,16 @@ fun Path.function(): FunSpec =
     with(this) {
         val reifiedPath = urlPathPattern.replace("/{", "/\${")
 
-        val messageBindings = pathSpec.parameters.mapNotNull {
+        val with = packageMember<Filter>("with")
+//
+//        val bodyBindings = listOfNotNull(
+//            responseSchemas()
+//                .firstOrNull()
+//                ?.lensDeclaration()
+//        )
+
+        val parameterBindings = pathSpec.parameters.mapNotNull {
             val binding = "${it.name}Lens of ${it.name}"
-            val with = packageMember<Filter>("with")
 
             when (it) {
                 is ParameterSpec.CookieSpec -> {
@@ -38,12 +45,11 @@ fun Path.function(): FunSpec =
             }
         }
 
-        val request = messageBindings
+        val buildRequest = (parameterBindings)
             .fold(CodeBlock.builder()
                 .add("val request = %T(%T.$method,·\"$reifiedPath\")", Property<Request>().type, Property<Method>().type)) { acc, next ->
                 acc.add(next)
             }.build()
-
 
         val responseType = responseSchemas().firstOrNull()?.let { ClassName("", it.name) } ?: Unit::class.asClassName()
 
@@ -57,7 +63,7 @@ fun Path.function(): FunSpec =
             .addAllParametersFrom(this)
             .returns(responseType)
             .addCodeBlocks(lensDeclarations())
-            .addCode(request)
+            .addCode(buildRequest)
             .addCodeBlocks(response)
             .build()
     }
@@ -66,9 +72,7 @@ private fun FunSpec.Builder.addAllParametersFrom(path: Path): FunSpec.Builder =
     with(path) {
         val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
 
-        val bodyParams = requestSchemas().map {
-            "request" to ClassName("", it.name)
-        }
+        val bodyParams = requestSchemas().map { "request" to ClassName("", it.name) }
 
         (parameters + bodyParams).fold(this@addAllParametersFrom) { acc, next ->
             acc.addParameter(next.first, next.second)
