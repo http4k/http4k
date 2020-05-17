@@ -17,9 +17,9 @@ class TitleClient(
 	fun endpoint(request: List<BigDecimal>) {
 
 		val endpointJsonRequestLens = Body.auto<List<BigDecimal>>().toLens()
-		val request = Request(Method.POST, "/jsonbody")
+		val httpReq = Request(Method.POST, "/jsonbody")
 			.with(endpointJsonRequestLens of request)
 
-		httpHandler(request)
+		httpHandler(httpReq)
 	}
 }

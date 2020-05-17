@@ -16,9 +16,9 @@ class TitleClient(
 	fun endpoint(request: Ref) {
 
 		val refLens = Body.auto<Ref>().toLens()
-		val request = Request(Method.POST, "/formbody")
+		val httpReq = Request(Method.POST, "/formbody")
 			.with(refLens of request)
 
-		httpHandler(request)
+		httpHandler(httpReq)
 	}
 }

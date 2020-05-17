@@ -18,8 +18,8 @@ class TitleClient(
 
 		val requiredLens = Path.boolean().of("required")
 		val optionalLens = Path.int().of("optional")
-		val request = Request(Method.POST, "/path/${required}/${optional}")
+		val httpReq = Request(Method.POST, "/path/${required}/${optional}")
 
-		httpHandler(request)
+		httpHandler(httpReq)
 	}
 }

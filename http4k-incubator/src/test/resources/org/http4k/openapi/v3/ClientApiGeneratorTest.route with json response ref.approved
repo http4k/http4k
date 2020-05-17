@@ -15,7 +15,7 @@ class TitleClient(
 	fun endpoint(): Ref {
 
 		val refLens = Body.auto<Ref>().toLens()
-		val request = Request(Method.POST, "/jsonbody")
-		return refLens(httpHandler(request))
+		val httpReq = Request(Method.POST, "/jsonbody")
+		return refLens(httpHandler(httpReq))
 	}
 }

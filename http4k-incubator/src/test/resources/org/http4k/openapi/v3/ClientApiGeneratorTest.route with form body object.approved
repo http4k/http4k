@@ -17,9 +17,9 @@ class TitleClient(
 
 		val endpointXwwwformurlencodedRequestLens =
 				Body.auto<EndpointXwwwformurlencodedRequest>().toLens()
-		val request = Request(Method.POST, "/formbody")
+		val httpReq = Request(Method.POST, "/formbody")
 			.with(endpointXwwwformurlencodedRequestLens of request)
 
-		httpHandler(request)
+		httpHandler(httpReq)
 	}
 }

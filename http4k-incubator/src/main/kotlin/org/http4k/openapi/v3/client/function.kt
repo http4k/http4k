@@ -22,7 +22,7 @@ import org.http4k.poet.lensDeclarations
 import org.http4k.poet.packageMember
 import org.http4k.poet.quotedName
 
-private const val reqValName = "request"
+private const val reqValName = "httpReq"
 
 fun Path.function(modelPackageName: String): FunSpec =
     with(this) {
