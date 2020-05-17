@@ -1,5 +1,6 @@
 package org.http4k.poet
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -17,6 +18,7 @@ import org.http4k.lens.Query
 import org.http4k.openapi.v3.NamedSchema
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.SchemaSpec
+import org.http4k.openapi.v3.clean
 import kotlin.reflect.KClass
 
 fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
@@ -65,31 +67,38 @@ fun org.http4k.openapi.v3.Path.lensDeclarations(modelPackageName: String): List<
     return bodyTypes + parameterTypes
 }
 
-fun NamedSchema.lensDeclaration(modelPackageName: String) = when (schema) {
-    is SchemaSpec.ObjectSpec -> {
-        CodeBlock.of(
-            "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
-            Body::class.asTypeName(),
-            member<Jackson>("auto"),
-            classNameIn(modelPackageName)
-        )
+fun NamedSchema.lensDeclaration(modelPackageName: String): CodeBlock? {
+    val modelClassName = modelPackageName.childClassName(name)
+
+    return when (schema) {
+        is SchemaSpec.ObjectSpec -> {
+            CodeBlock.of(
+                "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
+                Body::class.asTypeName(),
+                member<Jackson>("auto"),
+                modelClassName
+            )
+        }
+        is SchemaSpec.ArraySpec -> {
+            CodeBlock.of(
+                "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
+                Body::class.asTypeName(),
+                member<Jackson>("auto"),
+                List::class.asClassName().parameterizedBy(modelClassName)
+            )
+        }
+        is SchemaSpec.RefSpec -> {
+            CodeBlock.of(
+                "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
+                Body::class.asTypeName(),
+                member<Jackson>("auto"),
+                modelClassName
+            )
+        }
+        else -> null
     }
-    is SchemaSpec.ArraySpec -> {
-        CodeBlock.of(
-            "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
-            Body::class.asTypeName(),
-            member<Jackson>("auto"),
-            List::class.asClassName().parameterizedBy(classNameIn(modelPackageName))
-        )
-    }
-    is SchemaSpec.RefSpec -> {
-        CodeBlock.of(
-            "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
-            Body::class.asTypeName(),
-            member<Jackson>("auto"),
-            classNameIn(modelPackageName)
-        )
-    }
-    else -> null
 }
 
+fun ClassName.sibling(siblingName: String): ClassName = ClassName(packageName, siblingName.clean().capitalize())
+
+fun String.childClassName(childName: String) = ClassName(this, childName.clean().capitalize())

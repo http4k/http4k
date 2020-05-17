@@ -13,12 +13,13 @@ import org.http4k.openapi.v3.clean
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addParameter
 import org.http4k.poet.Property.Companion.addProperty
+import org.http4k.poet.sibling
 
 fun SchemaSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec =
     when (this) {
-        is SchemaSpec.ObjectSpec -> generated.getOrPut(className.simpleName.clean(), { buildModelClass(className, allSchemas, generated) })
+        is SchemaSpec.ObjectSpec -> generated.getOrPut(className.simpleName, { buildModelClass(className, allSchemas, generated) })
         is SchemaSpec.RefSpec -> generated.getOrPut(schemaName.clean().capitalize(), { allSchemas.getValue(schemaName.capitalize()).buildModelClass(
-            ClassName(className.packageName, schemaName.clean().capitalize()), allSchemas, generated) })
+            className.sibling(schemaName), allSchemas, generated) })
         is SchemaSpec.ArraySpec -> itemsSpec().buildModelClass(className, allSchemas, generated)
         else -> TypeSpec.classBuilder(className).build()
     }
@@ -31,7 +32,7 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(className: ClassName, allSchem
         is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
         is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
         is SchemaSpec.RefSpec -> {
-            val refClassName = ClassName(className.packageName, schemaName.clean().capitalize())
+            val refClassName = className.sibling(schemaName)
             buildModelClass(refClassName, allSchemas, generated)
             refClassName
         }

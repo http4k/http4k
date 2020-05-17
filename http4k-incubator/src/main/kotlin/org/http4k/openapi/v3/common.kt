@@ -1,6 +1,5 @@
 package org.http4k.openapi.v3
 
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import org.http4k.core.ContentType
 import org.http4k.core.Method
@@ -43,10 +42,8 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
     fun allSchemas() = requestSchemas() + responseSchemas()
 }
 
-class NamedSchema(rawName: String, val schema: SchemaSpec) {
-    private val cleanName = rawName.clean()
-    fun classNameIn(packageName: String) = ClassName(packageName, cleanName.capitalize())
-    fun fieldName() = cleanName.decapitalize()
+data class NamedSchema(val name: String, val schema: SchemaSpec) {
+    fun fieldName() = name.clean().decapitalize()
 }
 
 fun String.clean() = filter { it.isLetterOrDigit() }

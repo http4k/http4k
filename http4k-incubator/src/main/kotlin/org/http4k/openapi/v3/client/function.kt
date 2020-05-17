@@ -15,6 +15,7 @@ import org.http4k.openapi.v3.SchemaSpec
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
+import org.http4k.poet.childClassName
 import org.http4k.poet.lensDeclaration
 import org.http4k.poet.lensDeclarations
 import org.http4k.poet.packageMember
@@ -63,7 +64,7 @@ fun Path.function(modelPackageName: String): FunSpec =
                 ?: emptyList()
         } ?: listOf(of("\nhttpHandler($reqValName)"))
 
-        val responseType = responseSchemas().firstOrNull()?.let { it.classNameIn(modelPackageName) } ?: Unit::class.asClassName()
+        val responseType = responseSchemas().firstOrNull()?.let { modelPackageName.childClassName(it.fieldName()) } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this, modelPackageName)
@@ -79,9 +80,10 @@ private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: S
         val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
 
         val bodyParams = requestSchemas().map {
+            val modelClassName = modelPackageName.childClassName(it.name)
             when (it.schema) {
-                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(it.classNameIn(modelPackageName))
-                else -> "request" to it.classNameIn(modelPackageName)
+                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(modelClassName)
+                else -> "request" to modelClassName
             }
         }
 
