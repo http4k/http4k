@@ -9,12 +9,11 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.format.Jackson.auto
-import testPackage.model.EndpointJsonResponse200
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(): EndpointJsonResponse200 {
+	fun endpoint(): List<BigDecimal> {
 
 		val endpointJsonResponse200Lens = Body.auto<List<BigDecimal>>().toLens()
 		val request = Request(Method.POST, "/jsonbody")

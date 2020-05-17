@@ -66,7 +66,11 @@ fun Path.function(modelPackageName: String): FunSpec =
         } ?: listOf(of("\nhttpHandler($reqValName)"))
 
         val responseType = responseSchemas().firstOrNull()?.let {
-            modelPackageName.childClassName(it.fieldName)
+            when(it) {
+                is NamedSchema.Generated -> modelPackageName.childClassName(it.fieldName)
+                is NamedSchema.Existing -> it.typeName
+            }
+
         } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
