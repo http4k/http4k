@@ -48,7 +48,11 @@ fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> ver
 
 fun OpenApi3Spec.apiName() = info.title.capitalize()
 
-private fun SchemaSpec.namedSchema(modelName: String) =
-    NamedSchema(if (this is SchemaSpec.RefSpec) schemaName else {
-        modelName
-    }, this)
+private fun SchemaSpec.namedSchema(modelName: String): NamedSchema {
+    fun SchemaSpec.name(): String = when (this) {
+        is SchemaSpec.RefSpec -> schemaName
+        is SchemaSpec.ArraySpec -> itemsSpec().name()
+        else -> clazz?.simpleName ?: modelName
+    }
+    return NamedSchema(name(), this)
+}

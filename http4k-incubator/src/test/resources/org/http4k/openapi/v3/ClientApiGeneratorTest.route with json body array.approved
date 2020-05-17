@@ -9,16 +9,16 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
-import testPackage.model.EndpointJsonRequest
+import testPackage.model.BigDecimal
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(request: List<EndpointJsonRequest>) {
+	fun endpoint(request: List<BigDecimal>) {
 
-		val endpointJsonRequestLens = Body.auto<List<EndpointJsonRequest>>().toLens()
+		val bigDecimalLens = Body.auto<List<BigDecimal>>().toLens()
 		val request = Request(Method.POST, "/jsonbody")
-			.with(endpointJsonRequestLens of request)
+			.with(bigDecimalLens of request)
 
 		httpHandler(request)
 	}
