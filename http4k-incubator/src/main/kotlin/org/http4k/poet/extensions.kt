@@ -1,6 +1,5 @@
 package org.http4k.poet
 
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -69,26 +68,26 @@ fun org.http4k.openapi.v3.Path.lensDeclarations(modelPackageName: String): List<
 fun NamedSchema.lensDeclaration(modelPackageName: String) = when (schema) {
     is SchemaSpec.ObjectSpec -> {
         CodeBlock.of(
-            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
+            "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
-            ClassName(modelPackageName, name)
+            classNameIn(modelPackageName)
         )
     }
     is SchemaSpec.ArraySpec -> {
         CodeBlock.of(
-            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
+            "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
-            List::class.asClassName().parameterizedBy(ClassName(modelPackageName, name))
+            List::class.asClassName().parameterizedBy(classNameIn(modelPackageName))
         )
     }
     is SchemaSpec.RefSpec -> {
         CodeBlock.of(
-            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
+            "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
-            ClassName(modelPackageName, name)
+            classNameIn(modelPackageName)
         )
     }
     else -> null

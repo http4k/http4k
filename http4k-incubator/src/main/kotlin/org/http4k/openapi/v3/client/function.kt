@@ -1,6 +1,5 @@
 package org.http4k.openapi.v3.client
 
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.CodeBlock.Companion.of
 import com.squareup.kotlinpoet.FunSpec
@@ -33,7 +32,7 @@ fun Path.function(modelPackageName: String): FunSpec =
             requestSchemas()
                 .firstOrNull()
                 ?.let {
-                    val binding = "${it.name.decapitalize()}Lens of request"
+                    val binding = "${it.fieldName()}Lens of request"
                     of("\n\t.%M($binding)", with)
                 }
         )
@@ -60,11 +59,11 @@ fun Path.function(modelPackageName: String): FunSpec =
 
         val response = responseSchemas().firstOrNull()?.let { schema ->
             schema.lensDeclaration(modelPackageName)
-                ?.let { listOf(of("return " + schema.name.decapitalize() + "Lens(httpHandler($reqValName))")) }
+                ?.let { listOf(of("return ${schema.fieldName()}Lens(httpHandler($reqValName))")) }
                 ?: emptyList()
         } ?: listOf(of("\nhttpHandler($reqValName)"))
 
-        val responseType = responseSchemas().firstOrNull()?.let { ClassName(modelPackageName, it.name) } ?: Unit::class.asClassName()
+        val responseType = responseSchemas().firstOrNull()?.let { it.classNameIn(modelPackageName) } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this, modelPackageName)
@@ -81,8 +80,8 @@ private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: S
 
         val bodyParams = requestSchemas().map {
             when (it.schema) {
-                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(ClassName(modelPackageName, it.name))
-                else -> "request" to ClassName(modelPackageName, it.name)
+                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(it.classNameIn(modelPackageName))
+                else -> "request" to it.classNameIn(modelPackageName)
             }
         }
 
