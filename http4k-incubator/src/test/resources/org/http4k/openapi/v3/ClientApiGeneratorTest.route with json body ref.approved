@@ -8,16 +8,16 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
-import testPackage.model.EndpointJsonRequest
+import testPackage.model.Ref
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(request: EndpointJsonRequest) {
+	fun endpoint(request: Ref) {
 
-		val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
+		val refLens = Body.auto<Ref>().toLens()
 		val request = Request(Method.POST, "/jsonbody")
-			.with(endpointJsonRequest of request)
+			.with(refLens of request)
 
 		httpHandler(request)
 	}

@@ -33,7 +33,7 @@ fun Path.function(modelPackageName: String): FunSpec =
             requestSchemas()
                 .firstOrNull()
                 ?.let {
-                    val binding = "${it.name.decapitalize()} of request"
+                    val binding = "${it.name.decapitalize()}Lens of request"
                     of("\n\t.%M($binding)", with)
                 }
         )
@@ -60,7 +60,7 @@ fun Path.function(modelPackageName: String): FunSpec =
 
         val response = responseSchemas().firstOrNull()?.let { schema ->
             schema.lensDeclaration(modelPackageName)
-                ?.let { listOf(of("return " + schema.name.decapitalize() + "(httpHandler($reqValName))")) }
+                ?.let { listOf(of("return " + schema.name.decapitalize() + "Lens(httpHandler($reqValName))")) }
                 ?: emptyList()
         } ?: listOf(of("\nhttpHandler($reqValName)"))
 

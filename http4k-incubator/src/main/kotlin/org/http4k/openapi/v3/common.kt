@@ -24,14 +24,18 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
     fun requestSchemas(): List<NamedSchema> =
         listOfNotNull(pathSpec.requestBody?.content?.entries
             ?.mapNotNull { (contentType, messageSpec) ->
-                messageSpec.schema?.let { NamedSchema(modelName(contentType, "Request"), it) }
+                messageSpec.schema?.let {
+                    NamedSchema(if (it is SchemaSpec.RefSpec) it.schemaName else modelName(contentType, "Request"), it)
+                }
             }
         ).flatten()
 
     fun responseSchemas(): List<NamedSchema> = pathSpec.responses.entries
         .flatMap { (code, messageSpec) ->
             messageSpec.content.entries.mapNotNull { (contentType, messageSpec) ->
-                messageSpec.schema?.let { NamedSchema(modelName(contentType, "Response$code"), it) }
+                messageSpec.schema?.let {
+                    NamedSchema(if (it is SchemaSpec.RefSpec) it.schemaName else modelName(contentType, "Response$code"), it)
+                }
             }
         }
 

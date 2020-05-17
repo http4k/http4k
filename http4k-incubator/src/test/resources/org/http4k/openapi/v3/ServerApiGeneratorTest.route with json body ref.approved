@@ -9,11 +9,11 @@ import org.http4k.core.Status
 import org.http4k.format.Jackson.auto
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
-import testPackage.model.EndpointJsonRequest
+import testPackage.model.Ref
 
 fun Endpoint(): RoutingHttpHandler {
 
-	val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
+	val refLens = Body.auto<Ref>().toLens()
 	return "/jsonbody" bind Method.POST to { Response(Status.OK) }
 }
 
