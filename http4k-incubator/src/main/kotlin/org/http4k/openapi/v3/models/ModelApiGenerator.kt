@@ -13,19 +13,18 @@ object ModelApiGenerator : ApiGenerator {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
         val componentSchemas = components.schemas.entries
             .fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->
-                val nameCapitalized = name.capitalize()
-                acc.getOrPut(nameCapitalized, { schema.buildModelClass(ClassName(options.packageName("model"), nameCapitalized), components.schemas, acc) })
+                schema.buildModelClass(ClassName(options.packageName("model"), name.capitalize()), components.schemas, acc)
                 acc
             }
 
         spec.flattenedPaths().forEach { path ->
             path.allSchemas().forEach { (name, spec) ->
-                spec.buildModelClass(ClassName(options.packageName("model"), name), components.schemas, componentSchemas)
+                spec.buildModelClass(ClassName(options.packageName("model"), name.capitalize()), components.schemas, componentSchemas)
             }
         }
 
         componentSchemas.values.distinct().map {
-            FileSpec.builder(options.packageName("model"), it.name!!)
+            FileSpec.builder(options.packageName("model"), it.name!!.capitalize())
                 .addType(it)
                 .buildFormatted()
         }
