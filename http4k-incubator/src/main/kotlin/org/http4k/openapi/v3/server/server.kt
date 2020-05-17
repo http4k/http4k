@@ -11,7 +11,7 @@ fun OpenApi3Spec.buildServer(endpoints: List<FunSpec>) =
         .addFunction(constructionMethod(endpoints))
         .build()
 
-private fun OpenApi3Spec.constructionMethod(endpoints: List<FunSpec>) = FunSpec.builder("invoke")
+private fun constructionMethod(endpoints: List<FunSpec>) = FunSpec.builder("invoke")
     .addModifiers(OPERATOR)
     .addCode(buildApi(endpoints))
     .build()

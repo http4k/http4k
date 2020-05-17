@@ -43,10 +43,13 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
     fun allSchemas() = requestSchemas() + responseSchemas()
 }
 
-data class NamedSchema(private val rawName: String, val schema: SchemaSpec) {
-    fun classNameIn(packageName: String) = ClassName(packageName, rawName.capitalize())
-    fun fieldName() = rawName.decapitalize()
+class NamedSchema(rawName: String, val schema: SchemaSpec) {
+    private val cleanName = rawName.clean()
+    fun classNameIn(packageName: String) = ClassName(packageName, cleanName.capitalize())
+    fun fieldName() = cleanName.decapitalize()
 }
+
+fun String.clean() = filter { it.isLetterOrDigit() }
 
 fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { Path(path, Method.valueOf(it.key.toUpperCase()), it.value) } }
 

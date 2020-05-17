@@ -9,14 +9,16 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import org.http4k.openapi.v3.SchemaSpec
+import org.http4k.openapi.v3.clean
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addParameter
 import org.http4k.poet.Property.Companion.addProperty
 
 fun SchemaSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec =
     when (this) {
-        is SchemaSpec.ObjectSpec -> generated.getOrPut(className.simpleName, { buildModelClass(className, allSchemas, generated) })
-        is SchemaSpec.RefSpec -> generated.getOrPut(schemaName.capitalize(), { allSchemas.getValue(schemaName.capitalize()).buildModelClass(ClassName(className.packageName, schemaName.capitalize()), allSchemas, generated) })
+        is SchemaSpec.ObjectSpec -> generated.getOrPut(className.simpleName.clean(), { buildModelClass(className, allSchemas, generated) })
+        is SchemaSpec.RefSpec -> generated.getOrPut(schemaName.clean().capitalize(), { allSchemas.getValue(schemaName.capitalize()).buildModelClass(
+            ClassName(className.packageName, schemaName.clean().capitalize()), allSchemas, generated) })
         is SchemaSpec.ArraySpec -> itemsSpec().buildModelClass(className, allSchemas, generated)
         else -> TypeSpec.classBuilder(className).build()
     }
@@ -29,7 +31,7 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(className: ClassName, allSchem
         is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
         is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
         is SchemaSpec.RefSpec -> {
-            val refClassName = ClassName(className.packageName, schemaName.capitalize())
+            val refClassName = ClassName(className.packageName, schemaName.clean().capitalize())
             buildModelClass(refClassName, allSchemas, generated)
             refClassName
         }
