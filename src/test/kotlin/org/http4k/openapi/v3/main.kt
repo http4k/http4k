@@ -12,10 +12,12 @@ fun main() {
     val targetGeneratedDir = generationOptions.destinationFolder.apply { mkdirs() }
     val spec = File("http4k/src/test/resources/org/http4k/openapi/v3/apiSpec.json").readText().asA(OpenApi3Spec::class)
 
+    println("Generating source to: " + targetGeneratedDir.absolutePath)
+
     listOf(ModelApiGenerator, ClientApiGenerator, ServerApiGenerator)
         .flatMap { it(spec, generationOptions) }
         .forEach {
-            println(targetGeneratedDir.absolutePath)
-            it.writeTo(targetGeneratedDir) }
+            it.writeTo(targetGeneratedDir)
+        }
 }
 
