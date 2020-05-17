@@ -2,21 +2,22 @@
 
 package testPackage.client
 
+import java.math.BigDecimal
 import kotlin.collections.List
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.format.Jackson.auto
-import testPackage.model.BigDecimal
+import testPackage.model.EndpointJsonResponse200
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(): BigDecimal {
+	fun endpoint(): EndpointJsonResponse200 {
 
-		val bigDecimalLens = Body.auto<List<BigDecimal>>().toLens()
+		val endpointJsonResponse200Lens = Body.auto<List<BigDecimal>>().toLens()
 		val request = Request(Method.POST, "/jsonbody")
-		return bigDecimalLens(httpHandler(request))
+		return endpointJsonResponse200Lens(httpHandler(request))
 	}
 }

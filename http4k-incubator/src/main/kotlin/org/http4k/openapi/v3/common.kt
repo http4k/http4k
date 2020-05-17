@@ -1,6 +1,10 @@
 package org.http4k.openapi.v3
 
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.asTypeName
 import org.http4k.core.ContentType
 import org.http4k.core.Method
 import java.io.File
@@ -38,8 +42,11 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
     fun allSchemas() = requestSchemas() + responseSchemas()
 }
 
-data class NamedSchema(val name: String, val schema: SchemaSpec) {
-    fun fieldName() = name.clean().decapitalize()
+sealed class NamedSchema(name: String) {
+    val fieldName = name.clean().decapitalize()
+
+    data class Existing(val name: String, val typeName: TypeName) : NamedSchema(name)
+    data class Generated(val name: String, val schema: SchemaSpec) : NamedSchema(name)
 }
 
 fun String.clean() = filter { it.isLetterOrDigit() }
@@ -48,11 +55,12 @@ fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> ver
 
 fun OpenApi3Spec.apiName() = info.title.capitalize()
 
-private fun SchemaSpec.namedSchema(modelName: String): NamedSchema {
-    fun SchemaSpec.name(): String = when (this) {
-        is SchemaSpec.RefSpec -> schemaName
-        is SchemaSpec.ArraySpec -> itemsSpec().name()
-        else -> clazz?.simpleName ?: modelName
+private fun SchemaSpec.namedSchema(modelName: String): NamedSchema = when (this) {
+    is SchemaSpec.RefSpec -> NamedSchema.Generated(schemaName, this)
+    is SchemaSpec.ArraySpec -> when (val itemSchema = itemsSpec().namedSchema(modelName)) {
+        is NamedSchema.Generated -> itemSchema
+        is NamedSchema.Existing -> NamedSchema.Existing(modelName, List::class.asTypeName().parameterizedBy(itemSchema.typeName))
     }
-    return NamedSchema(name(), this)
+    else -> clazz?.let { NamedSchema.Existing(modelName, it.asClassName()) }
+        ?: NamedSchema.Generated(modelName, this)
 }

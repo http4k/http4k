@@ -9,6 +9,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
+import org.http4k.openapi.v3.NamedSchema
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.Path
 import org.http4k.openapi.v3.SchemaSpec
@@ -33,7 +34,7 @@ fun Path.function(modelPackageName: String): FunSpec =
             requestSchemas()
                 .firstOrNull()
                 ?.let {
-                    val binding = "${it.fieldName()}Lens of request"
+                    val binding = "${it.fieldName}Lens of request"
                     of("\n\t.%M($binding)", with)
                 }
         )
@@ -60,11 +61,13 @@ fun Path.function(modelPackageName: String): FunSpec =
 
         val response = responseSchemas().firstOrNull()?.let { schema ->
             schema.lensDeclaration(modelPackageName)
-                ?.let { listOf(of("return ${schema.fieldName()}Lens(httpHandler($reqValName))")) }
+                ?.let { listOf(of("return ${schema.fieldName}Lens(httpHandler($reqValName))")) }
                 ?: emptyList()
         } ?: listOf(of("\nhttpHandler($reqValName)"))
 
-        val responseType = responseSchemas().firstOrNull()?.let { modelPackageName.childClassName(it.fieldName()) } ?: Unit::class.asClassName()
+        val responseType = responseSchemas().firstOrNull()?.let {
+            modelPackageName.childClassName(it.fieldName)
+        } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this, modelPackageName)
@@ -80,10 +83,15 @@ private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: S
         val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
 
         val bodyParams = requestSchemas().map {
-            val modelClassName = modelPackageName.childClassName(it.name)
-            when (it.schema) {
-                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(modelClassName)
-                else -> "request" to modelClassName
+            "request" to when (it) {
+                is NamedSchema.Generated -> {
+                    val modelClassName = modelPackageName.childClassName(it.name)
+                    when (it.schema) {
+                        is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(modelClassName)
+                        else -> modelClassName
+                    }
+                }
+                is NamedSchema.Existing -> it.typeName
             }
         }
 

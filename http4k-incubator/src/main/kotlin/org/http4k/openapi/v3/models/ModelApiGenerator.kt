@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import org.http4k.openapi.v3.ApiGenerator
 import org.http4k.openapi.v3.GenerationOptions
+import org.http4k.openapi.v3.NamedSchema
 import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.clean
 import org.http4k.openapi.v3.flattenedPaths
@@ -20,7 +21,7 @@ object ModelApiGenerator : ApiGenerator {
 
         spec.flattenedPaths().forEach { path ->
             path.allSchemas().forEach {
-                it.schema.buildModelClass(options.packageName("model").childClassName(it.name), components.schemas, componentSchemas)
+                if (it is NamedSchema.Generated) it.schema.buildModelClass(options.packageName("model").childClassName(it.name), components.schemas, componentSchemas)
             }
         }
 

@@ -2,6 +2,7 @@
 
 package testPackage.client
 
+import java.math.BigDecimal
 import kotlin.collections.List
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -9,16 +10,15 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
-import testPackage.model.BigDecimal
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
 	fun endpoint(request: List<BigDecimal>) {
 
-		val bigDecimalLens = Body.auto<List<BigDecimal>>().toLens()
+		val endpointJsonRequestLens = Body.auto<List<BigDecimal>>().toLens()
 		val request = Request(Method.POST, "/jsonbody")
-			.with(bigDecimalLens of request)
+			.with(endpointJsonRequestLens of request)
 
 		httpHandler(request)
 	}

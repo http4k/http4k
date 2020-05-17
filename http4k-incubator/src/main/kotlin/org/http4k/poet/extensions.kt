@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import org.http4k.core.Body
@@ -67,37 +68,25 @@ fun org.http4k.openapi.v3.Path.lensDeclarations(modelPackageName: String): List<
     return bodyTypes + parameterTypes
 }
 
-fun NamedSchema.lensDeclaration(modelPackageName: String): CodeBlock? {
-    val modelClassName = modelPackageName.childClassName(name)
-
-    return when (schema) {
-        is SchemaSpec.ObjectSpec -> {
-            CodeBlock.of(
-                "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
-                Body::class.asTypeName(),
-                member<Jackson>("auto"),
-                modelClassName
-            )
+fun NamedSchema.lensDeclaration(modelPackageName: String): CodeBlock? = when (this) {
+    is NamedSchema.Generated -> {
+        val modelClassName = modelPackageName.childClassName(name)
+        when (schema) {
+            is SchemaSpec.ObjectSpec -> lensBlock(modelClassName)
+            is SchemaSpec.ArraySpec -> lensBlock(List::class.asClassName().parameterizedBy(modelClassName))
+            is SchemaSpec.RefSpec -> lensBlock(modelClassName)
+            else -> null
         }
-        is SchemaSpec.ArraySpec -> {
-            CodeBlock.of(
-                "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
-                Body::class.asTypeName(),
-                member<Jackson>("auto"),
-                List::class.asClassName().parameterizedBy(modelClassName)
-            )
-        }
-        is SchemaSpec.RefSpec -> {
-            CodeBlock.of(
-                "val ${fieldName()}Lens = %T.%M<%T>().toLens()",
-                Body::class.asTypeName(),
-                member<Jackson>("auto"),
-                modelClassName
-            )
-        }
-        else -> null
     }
+    is NamedSchema.Existing -> lensBlock(typeName)
 }
+
+private fun NamedSchema.lensBlock(type: TypeName) = CodeBlock.of(
+    "val ${fieldName}Lens = %T.%M<%T>().toLens()",
+    Body::class.asTypeName(),
+    member<Jackson>("auto"),
+    type
+)
 
 fun ClassName.sibling(siblingName: String): ClassName = ClassName(packageName, siblingName.clean().capitalize())
 
