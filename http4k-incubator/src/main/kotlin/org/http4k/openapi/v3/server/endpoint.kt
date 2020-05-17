@@ -11,10 +11,10 @@ import org.http4k.poet.lensDeclarations
 import org.http4k.poet.packageMember
 import org.http4k.routing.RoutingHttpHandler
 
-fun Path.buildEndpoint() = with(this) {
+fun Path.buildEndpoint(modelPackageName: String) = with(this) {
     FunSpec.builder(uniqueName)
         .returns(Property<RoutingHttpHandler>().type)
-        .addCodeBlocks(lensDeclarations())
+        .addCodeBlocks(lensDeclarations(modelPackageName))
         .addStatement("return·\"$urlPathPattern\"·%M·%T.${method}·to·{ %T(%T.OK) }",
             packageMember<RoutingHttpHandler>("bind"),
             Property<Method>().type,

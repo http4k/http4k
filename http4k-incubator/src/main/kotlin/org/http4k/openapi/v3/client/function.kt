@@ -1,6 +1,5 @@
 package org.http4k.openapi.v3.client
 
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.CodeBlock.Companion.of
 import com.squareup.kotlinpoet.FunSpec
@@ -10,21 +9,22 @@ import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
+import org.http4k.openapi.v3.NamedSchema
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.Path
 import org.http4k.openapi.v3.SchemaSpec
-import org.http4k.openapi.v3.models.buildModelClass
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
+import org.http4k.poet.childClassName
 import org.http4k.poet.lensDeclaration
 import org.http4k.poet.lensDeclarations
 import org.http4k.poet.packageMember
 import org.http4k.poet.quotedName
 
-private const val reqValName = "request"
+private const val reqValName = "httpReq"
 
-fun Path.function(): FunSpec =
+fun Path.function(modelPackageName: String): FunSpec =
     with(this) {
         val reifiedPath = urlPathPattern.replace("/{", "/\${")
 
@@ -34,7 +34,7 @@ fun Path.function(): FunSpec =
             requestSchemas()
                 .firstOrNull()
                 ?.let {
-                    val binding = "${it.name.decapitalize()} of request"
+                    val binding = "${it.fieldName}Lens of request"
                     of("\n\t.%M($binding)", with)
                 }
         )
@@ -60,30 +60,42 @@ fun Path.function(): FunSpec =
             }.build()
 
         val response = responseSchemas().firstOrNull()?.let { schema ->
-            schema.lensDeclaration()
-                ?.let { listOf(of("return " + schema.name.decapitalize() + "(httpHandler($reqValName))")) }
+            schema.lensDeclaration(modelPackageName)
+                ?.let { listOf(of("return ${schema.fieldName}Lens(httpHandler($reqValName))")) }
                 ?: emptyList()
         } ?: listOf(of("\nhttpHandler($reqValName)"))
 
-        val responseType = responseSchemas().firstOrNull()?.let { ClassName("", it.name) } ?: Unit::class.asClassName()
+        val responseType = responseSchemas().firstOrNull()?.let {
+            when(it) {
+                is NamedSchema.Generated -> modelPackageName.childClassName(it.fieldName)
+                is NamedSchema.Existing -> it.typeName
+            }
+
+        } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
-            .addAllParametersFrom(this)
+            .addAllParametersFrom(this, modelPackageName)
             .returns(responseType)
-            .addCodeBlocks(lensDeclarations())
+            .addCodeBlocks(lensDeclarations(modelPackageName))
             .addCode(buildRequest)
             .addCodeBlocks(response)
             .build()
     }
 
-private fun FunSpec.Builder.addAllParametersFrom(path: Path): FunSpec.Builder =
+private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: String): FunSpec.Builder =
     with(path) {
         val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
 
         val bodyParams = requestSchemas().map {
-            when (it.schema) {
-                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(ClassName("", it.name))
-                else -> "request" to ClassName("", it.name)
+            "request" to when (it) {
+                is NamedSchema.Generated -> {
+                    val modelClassName = modelPackageName.childClassName(it.name)
+                    when (it.schema) {
+                        is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(modelClassName)
+                        else -> modelClassName
+                    }
+                }
+                is NamedSchema.Existing -> it.typeName
             }
         }
 

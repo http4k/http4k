@@ -2,7 +2,7 @@
 
 package testPackage.client
 
-import EndpointJsonRequest
+import java.math.BigDecimal
 import kotlin.collections.List
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -14,12 +14,12 @@ import org.http4k.format.Jackson.auto
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(request: List<EndpointJsonRequest>) {
+	fun endpoint(request: List<BigDecimal>) {
 
-		val endpointJsonRequestLens = Body.auto<List<EndpointJsonRequest>>().toLens()
-		val request = Request(Method.POST, "/jsonbody")
-			.with(endpointJsonRequest of request)
+		val endpointJsonRequestLens = Body.auto<List<BigDecimal>>().toLens()
+		val httpReq = Request(Method.POST, "/jsonbody")
+			.with(endpointJsonRequestLens of request)
 
-		httpHandler(request)
+		httpHandler(httpReq)
 	}
 }

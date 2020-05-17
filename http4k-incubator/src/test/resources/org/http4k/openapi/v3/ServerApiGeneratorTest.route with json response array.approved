@@ -2,14 +2,19 @@
 
 package testPackage.server.endpoints
 
+import java.math.BigDecimal
+import kotlin.collections.List
+import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.format.Jackson.auto
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 
 fun Endpoint(): RoutingHttpHandler {
 
+	val endpointJsonResponse200Lens = Body.auto<List<BigDecimal>>().toLens()
 	return "/jsonbody" bind Method.POST to { Response(Status.OK) }
 }
 
@@ -23,7 +28,7 @@ import testPackage.server.endpoints.Endpoint
 
 object TitleServer {
 	operator fun invoke() = routes(
-	Endpoint()
+		Endpoint()
 	)
 }
 

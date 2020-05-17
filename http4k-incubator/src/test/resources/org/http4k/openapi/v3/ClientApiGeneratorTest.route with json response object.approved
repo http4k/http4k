@@ -2,12 +2,12 @@
 
 package testPackage.client
 
-import EndpointJsonResponse200
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.format.Jackson.auto
+import testPackage.model.EndpointJsonResponse200
 
 class TitleClient(
 	private val httpHandler: HttpHandler
@@ -15,7 +15,7 @@ class TitleClient(
 	fun endpoint(): EndpointJsonResponse200 {
 
 		val endpointJsonResponse200Lens = Body.auto<EndpointJsonResponse200>().toLens()
-		val request = Request(Method.POST, "/jsonbody")
-		return endpointJsonResponse200(httpHandler(request))
+		val httpReq = Request(Method.POST, "/jsonbody")
+		return endpointJsonResponse200Lens(httpHandler(httpReq))
 	}
 }

@@ -2,13 +2,13 @@
 
 package testPackage.client
 
-import EndpointXwwwformurlencodedRequest
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
+import testPackage.model.EndpointXwwwformurlencodedRequest
 
 class TitleClient(
 	private val httpHandler: HttpHandler
@@ -17,9 +17,9 @@ class TitleClient(
 
 		val endpointXwwwformurlencodedRequestLens =
 				Body.auto<EndpointXwwwformurlencodedRequest>().toLens()
-		val request = Request(Method.POST, "/formbody")
-			.with(endpointXwwwformurlencodedRequest of request)
+		val httpReq = Request(Method.POST, "/formbody")
+			.with(endpointXwwwformurlencodedRequestLens of request)
 
-		httpHandler(request)
+		httpHandler(httpReq)
 	}
 }
