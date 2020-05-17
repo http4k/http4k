@@ -1,8 +1,10 @@
+>>>Obj.kt
+
 package testPackage.model
 
 import java.math.BigDecimal
 import kotlin.collections.List
 
 data class Obj(
-	private val numbers: List<BigDecimal>
+	val numbers: List<List<BigDecimal>>
 )

@@ -13,19 +13,13 @@ import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addParameter
 import org.http4k.poet.Property.Companion.addProperty
 
-fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
-    return when (this) {
-        is SchemaSpec.RefSpec -> generated[name]
-            ?: allSchemas.getValue(schemaName).buildModelClass(schemaName, allSchemas, generated)
-        is SchemaSpec.ObjectSpec -> {
-            val typeSpec = buildModelClass(name, allSchemas, generated)
-            generated[name] = typeSpec
-            typeSpec
-        }
-        is SchemaSpec.ArraySpec -> buildModelClass(name, allSchemas, generated)
+fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec =
+    when (this) {
+        is SchemaSpec.ObjectSpec -> generated.getOrPut(name, { buildModelClass(name, allSchemas, generated) })
+        is SchemaSpec.RefSpec -> generated.getOrPut(schemaName, { allSchemas.getValue(schemaName).buildModelClass(schemaName, allSchemas, generated) })
+        is SchemaSpec.ArraySpec -> itemsSpec().buildModelClass(name, allSchemas, generated)
         else -> TypeSpec.classBuilder(name.capitalize()).build()
     }
-}
 
 private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
     val clazz = TypeSpec.classBuilder(name.capitalize())
@@ -35,8 +29,8 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
         is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
         is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
         is SchemaSpec.RefSpec -> {
-            buildModelClass(name, allSchemas, generated)
-            ClassName.bestGuess(schemaName)
+            buildModelClass(schemaName, allSchemas, generated)
+            ClassName("", schemaName)
         }
         else -> this.clazz!!.asTypeName()
     }
@@ -47,6 +41,12 @@ private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<
             primaryConstructor.addParameter(it)
             clazz.addProperty(it)
         }
+
+    if(additionalProperties != null || properties.isEmpty()) {
+        val freeform = Property("additional", Map::class.parameterizedBy(String::class, Any::class))
+        primaryConstructor.addParameter(freeform)
+        clazz.addProperty(freeform)
+    }
 
     clazz.addModifiers(DATA).primaryConstructor(primaryConstructor.build())
 

@@ -1,43 +1,27 @@
 package org.http4k.openapi.v3
 
 import org.http4k.junit.ResourceLoader
-import org.http4k.junit.TestResources
 import org.http4k.openapi.v3.models.ModelApiGenerator
-import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(ApprovalTest::class, TestResources::class)
-class ModelApiGeneratorTest {
+class ModelApiGeneratorTest : ApiGeneratorContract(ModelApiGenerator) {
 
     @Test
-    fun `generates model class for simple object`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `model simple object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for nested object`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `model nested object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for ref`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `model ref`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for array of primitives`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `model array of primitives`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for mixed array`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `model mixed array`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    fun `generates model class for nested array of primitives`(approver: Approver, resourceLoader: ResourceLoader) {
-        approver.assertGeneratedContent(ModelApiGenerator, resourceLoader.text("openApi.json"))
-    }
+    fun `model nested array of primitives`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 }

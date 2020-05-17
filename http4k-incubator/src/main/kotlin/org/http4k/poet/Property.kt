@@ -3,7 +3,6 @@ package org.http4k.poet
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.KModifier.PRIVATE
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
@@ -18,6 +17,6 @@ class Property(val name: String, val type: TypeName, vararg val modifiers: KModi
 
         fun FunSpec.Builder.addParameter(property: Property) = addParameter(ParameterSpec.builder(property.name, property.type, *property.modifiers).build())
         fun FunSpec.Builder.addReturnType(property: Property) = returns(property.type)
-        fun TypeSpec.Builder.addProperty(property: Property) = addProperty(PropertySpec.builder(property.name, property.type, PRIVATE).initializer(property.name).build())
+        fun TypeSpec.Builder.addProperty(property: Property) = addProperty(PropertySpec.builder(property.name, property.type, *property.modifiers).initializer(property.name).build())
     }
 }

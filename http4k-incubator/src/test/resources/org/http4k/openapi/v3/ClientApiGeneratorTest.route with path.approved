@@ -1,3 +1,5 @@
+>>>TitleClient.kt
+
 package testPackage.client
 
 import kotlin.Boolean
@@ -5,7 +7,6 @@ import kotlin.Int
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.lens.Path
 import org.http4k.lens.boolean
 import org.http4k.lens.int
@@ -13,11 +14,12 @@ import org.http4k.lens.int
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(required: Boolean, optional: Int?): Response {
+	fun endpoint(required: Boolean, optional: Int?) {
 
 		val requiredLens = Path.boolean().of("required")
 		val optionalLens = Path.int().of("optional")
 		val request = Request(Method.POST, "/path/${required}/${optional}")
-		return httpHandler(request)
+
+		httpHandler(request)
 	}
 }

@@ -1,19 +1,23 @@
 package org.http4k.poet
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
+import org.http4k.core.Body
+import org.http4k.format.Jackson
 import org.http4k.lens.Cookies
 import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.openapi.v3.OpenApi3Spec
+import org.http4k.openapi.v3.NamedSchema
 import org.http4k.openapi.v3.ParameterSpec
-import org.http4k.openapi.v3.PathSpec
+import org.http4k.openapi.v3.SchemaSpec
 import kotlin.reflect.KClass
 
 fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
@@ -42,16 +46,51 @@ fun ParameterSpec.lensConstruct() =
         else -> if (required) "required" else "optional"
     }
 
-fun OpenApi3Spec.lensDeclarations(pathSpec: PathSpec) = pathSpec.parameters.map {
-    when (it) {
-        is ParameterSpec.CookieSpec -> CodeBlock.of(
-            "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
-            it.lensSpecClazz.asClassName()
-        )
-        else -> CodeBlock.of(
-            "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
-            it.lensSpecClazz.asClassName(),
-            packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
+fun org.http4k.openapi.v3.Path.lensDeclarations(): List<CodeBlock> {
+    val bodyTypes = allSchemas().mapNotNull(NamedSchema::lensDeclaration)
+
+    val parameterTypes = pathSpec.parameters.map {
+        when (it) {
+            is ParameterSpec.CookieSpec -> CodeBlock.of(
+                "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
+                it.lensSpecClazz.asClassName()
+            )
+            else -> CodeBlock.of(
+                "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
+                it.lensSpecClazz.asClassName(),
+                packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
+            )
+        }
+    }
+
+    return bodyTypes + parameterTypes
+}
+
+fun NamedSchema.lensDeclaration() = when (schema) {
+    is SchemaSpec.ObjectSpec -> {
+        CodeBlock.of(
+            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
+            Body::class.asTypeName(),
+            member<Jackson>("auto"),
+            ClassName("", name)
         )
     }
+    is SchemaSpec.ArraySpec -> {
+        CodeBlock.of(
+            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
+            Body::class.asTypeName(),
+            member<Jackson>("auto"),
+            List::class.asClassName().parameterizedBy(ClassName("", name))
+        )
+    }
+    is SchemaSpec.RefSpec -> {
+        CodeBlock.of(
+            "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
+            Body::class.asTypeName(),
+            member<Jackson>("auto"),
+            ClassName("", name)
+        )
+    }
+    else -> null
 }
+

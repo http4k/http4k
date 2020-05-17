@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.core.ContentType
 import org.http4k.openapi.v3.OpenApiJson.asA
 import java.math.BigDecimal
 import kotlin.reflect.KClass
@@ -20,9 +19,14 @@ import kotlin.reflect.KClass
     Type(value = SchemaSpec.BooleanSpec::class, name = "boolean")
 )
 sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
-    data class ObjectSpec(val required: List<String> = emptyList(), val properties: Map<String, SchemaSpec> = emptyMap(), override val clazz: KClass<*>?) : SchemaSpec(clazz)
+
+    data class ObjectSpec(val required: List<String> = emptyList(),
+                          val properties: Map<String, SchemaSpec> = emptyMap(),
+                          override val clazz: KClass<*>?,
+                          val additionalProperties: JsonNode? = null) : SchemaSpec(clazz)
+
     data class ArraySpec(private val items: JsonNode) : SchemaSpec() {
-        fun itemsSpec(): SchemaSpec =  try {
+        fun itemsSpec(): SchemaSpec = try {
             items.asA()
         } catch (e: Exception) {
             try {
@@ -56,19 +60,20 @@ sealed class ParameterSpec(val name: String, val required: Boolean, val descript
     class QuerySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
 }
 
-data class RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap()) {
-    fun contentFor(type: ContentType) = content[type.value]
-}
+data class RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap())
 
 data class MessageBodySpec(val schema: SchemaSpec?)
 
 data class ComponentsSpec(val schemas: Map<String, SchemaSpec> = emptyMap())
+
+data class ResponseSpec(val content: Map<String, MessageBodySpec>)
+
 data class PathSpec(
     val operationId: String?,
     val summary: String?,
     val description: String?,
     val tags: List<String> = emptyList(),
-    val responses: Map<Int, MessageBodySpec> = emptyMap(),
+    val responses: Map<Int, ResponseSpec> = emptyMap(),
     val requestBody: RequestBodySpec?,
     val parameters: List<ParameterSpec> = emptyList()
 )

@@ -1,0 +1,14 @@
+>>>EndpointJsonResponse200.kt
+
+package testPackage.model
+
+import kotlin.Boolean
+import kotlin.Int
+import kotlin.String
+
+data class EndpointJsonResponse200(
+	val boolean: Boolean,
+	val integer: Int?,
+	val string: String?,
+	val json: String
+)
