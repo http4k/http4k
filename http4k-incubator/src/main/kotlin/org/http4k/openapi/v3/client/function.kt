@@ -64,10 +64,10 @@ fun Path.function(modelPackageName: String): FunSpec =
                 ?: emptyList()
         } ?: listOf(of("\nhttpHandler($reqValName)"))
 
-        val responseType = responseSchemas().firstOrNull()?.let { ClassName("", it.name) } ?: Unit::class.asClassName()
+        val responseType = responseSchemas().firstOrNull()?.let { ClassName(modelPackageName, it.name) } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
-            .addAllParametersFrom(this)
+            .addAllParametersFrom(this, modelPackageName)
             .returns(responseType)
             .addCodeBlocks(lensDeclarations(modelPackageName))
             .addCode(buildRequest)
@@ -75,14 +75,14 @@ fun Path.function(modelPackageName: String): FunSpec =
             .build()
     }
 
-private fun FunSpec.Builder.addAllParametersFrom(path: Path): FunSpec.Builder =
+private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: String): FunSpec.Builder =
     with(path) {
         val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
 
         val bodyParams = requestSchemas().map {
             when (it.schema) {
-                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(ClassName("", it.name))
-                else -> "request" to ClassName("", it.name)
+                is SchemaSpec.ArraySpec -> "request" to List::class.asClassName().parameterizedBy(ClassName(modelPackageName, it.name))
+                else -> "request" to ClassName(modelPackageName, it.name)
             }
         }
 
