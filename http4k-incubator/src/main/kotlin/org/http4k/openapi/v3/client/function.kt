@@ -13,7 +13,6 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.openapi.v3.Path
 import org.http4k.openapi.v3.SchemaSpec
-import org.http4k.openapi.v3.models.buildModelClass
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
@@ -24,7 +23,7 @@ import org.http4k.poet.quotedName
 
 private const val reqValName = "request"
 
-fun Path.function(): FunSpec =
+fun Path.function(modelPackageName: String): FunSpec =
     with(this) {
         val reifiedPath = urlPathPattern.replace("/{", "/\${")
 
@@ -60,7 +59,7 @@ fun Path.function(): FunSpec =
             }.build()
 
         val response = responseSchemas().firstOrNull()?.let { schema ->
-            schema.lensDeclaration()
+            schema.lensDeclaration(modelPackageName)
                 ?.let { listOf(of("return " + schema.name.decapitalize() + "(httpHandler($reqValName))")) }
                 ?: emptyList()
         } ?: listOf(of("\nhttpHandler($reqValName)"))
@@ -70,7 +69,7 @@ fun Path.function(): FunSpec =
         FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this)
             .returns(responseType)
-            .addCodeBlocks(lensDeclarations())
+            .addCodeBlocks(lensDeclarations(modelPackageName))
             .addCode(buildRequest)
             .addCodeBlocks(response)
             .build()

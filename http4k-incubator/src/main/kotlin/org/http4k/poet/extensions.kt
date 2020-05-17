@@ -46,8 +46,8 @@ fun ParameterSpec.lensConstruct() =
         else -> if (required) "required" else "optional"
     }
 
-fun org.http4k.openapi.v3.Path.lensDeclarations(): List<CodeBlock> {
-    val bodyTypes = allSchemas().mapNotNull(NamedSchema::lensDeclaration)
+fun org.http4k.openapi.v3.Path.lensDeclarations(modelPackageName: String): List<CodeBlock> {
+    val bodyTypes = allSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
 
     val parameterTypes = pathSpec.parameters.map {
         when (it) {
@@ -66,13 +66,13 @@ fun org.http4k.openapi.v3.Path.lensDeclarations(): List<CodeBlock> {
     return bodyTypes + parameterTypes
 }
 
-fun NamedSchema.lensDeclaration() = when (schema) {
+fun NamedSchema.lensDeclaration(modelPackageName: String) = when (schema) {
     is SchemaSpec.ObjectSpec -> {
         CodeBlock.of(
             "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
-            ClassName("", name)
+            ClassName(modelPackageName, name)
         )
     }
     is SchemaSpec.ArraySpec -> {
@@ -80,7 +80,7 @@ fun NamedSchema.lensDeclaration() = when (schema) {
             "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
-            List::class.asClassName().parameterizedBy(ClassName("", name))
+            List::class.asClassName().parameterizedBy(ClassName(modelPackageName, name))
         )
     }
     is SchemaSpec.RefSpec -> {
@@ -88,7 +88,7 @@ fun NamedSchema.lensDeclaration() = when (schema) {
             "val ${name.decapitalize()}Lens = %T.%M<%T>().toLens()",
             Body::class.asTypeName(),
             member<Jackson>("auto"),
-            ClassName("", name)
+            ClassName(modelPackageName, name)
         )
     }
     else -> null

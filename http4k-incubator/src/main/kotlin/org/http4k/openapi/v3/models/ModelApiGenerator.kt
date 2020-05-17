@@ -1,5 +1,6 @@
 package org.http4k.openapi.v3.models
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import org.http4k.openapi.v3.ApiGenerator
@@ -13,13 +14,13 @@ object ModelApiGenerator : ApiGenerator {
         val componentSchemas = components.schemas.entries
             .fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->
                 val nameCapitalized = name.capitalize()
-                acc.getOrPut(nameCapitalized, { schema.buildModelClass(nameCapitalized, components.schemas, acc) })
+                acc.getOrPut(nameCapitalized, { schema.buildModelClass(ClassName(options.packageName("model"), nameCapitalized), components.schemas, acc) })
                 acc
             }
 
         spec.flattenedPaths().forEach { path ->
             path.allSchemas().forEach { (name, spec) ->
-                spec.buildModelClass(name, components.schemas, componentSchemas)
+                spec.buildModelClass(ClassName(options.packageName("model"), name), components.schemas, componentSchemas)
             }
         }
 

@@ -2,7 +2,6 @@
 
 package testPackage.server.endpoints
 
-import EndpointJsonRequest
 import kotlin.collections.List
 import org.http4k.core.Body
 import org.http4k.core.Method
@@ -11,6 +10,7 @@ import org.http4k.core.Status
 import org.http4k.format.Jackson.auto
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
+import testPackage.model.EndpointJsonRequest
 
 fun Endpoint(): RoutingHttpHandler {
 

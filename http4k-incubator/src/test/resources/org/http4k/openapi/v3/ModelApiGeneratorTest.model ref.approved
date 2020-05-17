@@ -12,8 +12,6 @@ data class DoubleRef(
 
 package testPackage.model
 
-import Ref
-
 data class Obj(
 	val ref: Ref
 )
@@ -21,8 +19,6 @@ data class Obj(
 >>>Ref.kt
 
 package testPackage.model
-
-import DoubleRef
 
 data class Ref(
 	val value: DoubleRef?

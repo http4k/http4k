@@ -14,7 +14,7 @@ class TitleClient(
 ) {
 	fun endpoint(): EndpointJsonResponse200 {
 
-		val endpointJsonResponse200Lens = Body.auto<EndpointJsonResponse200>().toLens()
+		val endpointJsonResponse200Lens = Body.auto<testPackage.model.EndpointJsonResponse200>().toLens()
 		val request = Request(Method.POST, "/jsonbody")
 		return endpointJsonResponse200(httpHandler(request))
 	}

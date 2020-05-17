@@ -13,24 +13,25 @@ import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addParameter
 import org.http4k.poet.Property.Companion.addProperty
 
-fun SchemaSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec =
+fun SchemaSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec =
     when (this) {
-        is SchemaSpec.ObjectSpec -> generated.getOrPut(name, { buildModelClass(name, allSchemas, generated) })
-        is SchemaSpec.RefSpec -> generated.getOrPut(schemaName, { allSchemas.getValue(schemaName).buildModelClass(schemaName, allSchemas, generated) })
-        is SchemaSpec.ArraySpec -> itemsSpec().buildModelClass(name, allSchemas, generated)
-        else -> TypeSpec.classBuilder(name.capitalize()).build()
+        is SchemaSpec.ObjectSpec -> generated.getOrPut(className.simpleName, { buildModelClass(className, allSchemas, generated) })
+        is SchemaSpec.RefSpec -> generated.getOrPut(schemaName, { allSchemas.getValue(schemaName).buildModelClass(ClassName(className.packageName, schemaName), allSchemas, generated) })
+        is SchemaSpec.ArraySpec -> itemsSpec().buildModelClass(className, allSchemas, generated)
+        else -> TypeSpec.classBuilder(className).build()
     }
 
-private fun SchemaSpec.ObjectSpec.buildModelClass(name: String, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
-    val clazz = TypeSpec.classBuilder(name.capitalize())
+private fun SchemaSpec.ObjectSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, TypeSpec>): TypeSpec {
+    val clazz = TypeSpec.classBuilder(className)
     val primaryConstructor = FunSpec.constructorBuilder()
 
     fun SchemaSpec.propertyType(): TypeName = when (this) {
         is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
         is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
         is SchemaSpec.RefSpec -> {
-            buildModelClass(schemaName, allSchemas, generated)
-            ClassName("", schemaName)
+            val refClassName = ClassName(className.packageName, schemaName)
+            buildModelClass(refClassName, allSchemas, generated)
+            refClassName
         }
         else -> this.clazz!!.asTypeName()
     }

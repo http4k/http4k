@@ -16,7 +16,7 @@ class TitleClient(
 	fun endpoint(request: EndpointXwwwformurlencodedRequest) {
 
 		val endpointXwwwformurlencodedRequestLens =
-				Body.auto<EndpointXwwwformurlencodedRequest>().toLens()
+				Body.auto<testPackage.model.EndpointXwwwformurlencodedRequest>().toLens()
 		val request = Request(Method.POST, "/formbody")
 			.with(endpointXwwwformurlencodedRequest of request)
 
