@@ -24,18 +24,14 @@ data class Path(val urlPathPattern: String, val method: Method, val pathSpec: Pa
     fun requestSchemas(): List<NamedSchema> =
         listOfNotNull(pathSpec.requestBody?.content?.entries
             ?.mapNotNull { (contentType, messageSpec) ->
-                messageSpec.schema?.let {
-                    NamedSchema(if (it is SchemaSpec.RefSpec) it.schemaName else modelName(contentType, "Request"), it)
-                }
+                messageSpec.schema?.namedSchema(modelName(contentType, "Request"))
             }
         ).flatten()
 
     fun responseSchemas(): List<NamedSchema> = pathSpec.responses.entries
         .flatMap { (code, messageSpec) ->
             messageSpec.content.entries.mapNotNull { (contentType, messageSpec) ->
-                messageSpec.schema?.let {
-                    NamedSchema(if (it is SchemaSpec.RefSpec) it.schemaName else modelName(contentType, "Response$code"), it)
-                }
+                messageSpec.schema?.namedSchema(modelName(contentType, "Response$code"))
             }
         }
 
@@ -51,3 +47,8 @@ fun String.clean() = filter { it.isLetterOrDigit() }
 fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { Path(path, Method.valueOf(it.key.toUpperCase()), it.value) } }
 
 fun OpenApi3Spec.apiName() = info.title.capitalize()
+
+private fun SchemaSpec.namedSchema(modelName: String) =
+    NamedSchema(if (this is SchemaSpec.RefSpec) schemaName else {
+        modelName
+    }, this)
