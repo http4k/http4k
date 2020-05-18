@@ -5,8 +5,8 @@ import com.squareup.kotlinpoet.FunSpec.Companion.constructorBuilder
 import com.squareup.kotlinpoet.KModifier.PRIVATE
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
-import org.http4k.openapi.v3.ApiGenerator
-import org.http4k.openapi.v3.GenerationOptions
+import org.http4k.openapi.ApiGenerator
+import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.apiName
 import org.http4k.openapi.v3.flattenedPaths

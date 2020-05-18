@@ -2,8 +2,8 @@ package org.http4k.openapi.v3.models
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
-import org.http4k.openapi.v3.ApiGenerator
-import org.http4k.openapi.v3.GenerationOptions
+import org.http4k.openapi.ApiGenerator
+import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.v3.NamedSchema
 import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.clean

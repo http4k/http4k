@@ -1,19 +1,11 @@
 package org.http4k.openapi.v3
 
-import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import org.http4k.core.ContentType
 import org.http4k.core.Method
-import java.io.File
-
-data class GenerationOptions(private val basePackage: String, val destinationFolder: File) {
-    fun packageName(name: String) = "$basePackage.$name"
-}
-
-interface ApiGenerator<T> : (T, GenerationOptions) -> List<FileSpec>
 
 /**
  * Convenience type for working with generated code
