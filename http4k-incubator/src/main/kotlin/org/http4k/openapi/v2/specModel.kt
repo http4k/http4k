@@ -8,8 +8,8 @@ data class PathV2Spec(
     val parameters: List<ParameterSpec> = emptyList()
 )
 
+data class ParameterSpec(val `in`: String, val name: String, val required: Boolean, val type: String)
+
 data class OpenApi2Spec(val info: InfoSpec, val paths: Map<String, Map<String, PathV2Spec>>, private val definitions: Map<String, SchemaSpec>?) {
     val components = definitions ?: emptyMap()
 }
-
-data class ParameterSpec(val `in`: String, val name: String, val required: Boolean, val type: String)

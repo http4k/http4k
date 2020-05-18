@@ -1,15 +1,15 @@
 package org.http4k.openapi.v2
 
-import org.http4k.core.Method
-import org.http4k.openapi.NamedSchema
+import org.http4k.openapi.v3.ComponentsV3Spec
+import org.http4k.openapi.v3.OpenApi3Spec
+import org.http4k.openapi.v3.PathV3Spec
 
-data class PathV2(val urlPathPattern: String, val method: Method, val pathV2Spec: PathV2Spec) {
+fun PathV2Spec.asV3(): PathV3Spec {
 
-    fun requestSchemas(): List<NamedSchema> = emptyList()
-
-    fun responseSchemas(): List<NamedSchema> = emptyList()
-
-    fun allSchemas() = requestSchemas() + responseSchemas()
+//    PathV3Spec(operationId)
+    return TODO()
 }
 
-fun OpenApi2Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { PathV2(path, Method.valueOf(it.key.toUpperCase()), it.value) } }
+fun OpenApi2Spec.asV3() = OpenApi3Spec(
+    info, paths.mapValues { it.value.mapValues { it.value.asV3() } }, ComponentsV3Spec(components)
+)

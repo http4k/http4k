@@ -15,9 +15,6 @@ data class ResponseV3Spec(val content: Map<String, MessageBodyV3Spec>)
 
 data class PathV3Spec(
     val operationId: String?,
-    val summary: String?,
-    val description: String?,
-    val tags: List<String> = emptyList(),
     val responses: Map<Int, ResponseV3Spec> = emptyMap(),
     val requestBody: RequestBodyV3Spec?,
     val parameters: List<ParameterSpec> = emptyList()
