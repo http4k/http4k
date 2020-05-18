@@ -12,6 +12,7 @@ import com.squareup.kotlinpoet.asTypeName
 import org.http4k.core.Body
 import org.http4k.format.Jackson
 import org.http4k.lens.Cookies
+import org.http4k.lens.FormField
 import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
@@ -34,6 +35,8 @@ val ParameterSpec.lensSpecClazz
         is ParameterSpec.HeaderSpec -> Header::class
         is ParameterSpec.QuerySpec -> Query::class
         is ParameterSpec.PathSpec -> Path::class
+        is ParameterSpec.FormSpec -> FormField::class
+        is ParameterSpec.BodySpec -> Body::class
     }
 
 inline fun <reified T : Any> member(name: String) = MemberName(T::class.asClassName(), name)

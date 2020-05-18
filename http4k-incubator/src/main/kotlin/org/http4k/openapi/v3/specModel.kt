@@ -51,6 +51,8 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
     Type(value = ParameterSpec.PathSpec::class, name = "path"),
     Type(value = ParameterSpec.HeaderSpec::class, name = "header"),
     Type(value = ParameterSpec.QuerySpec::class, name = "query"),
+    Type(value = ParameterSpec.FormSpec::class, name = "formData"),
+    Type(value = ParameterSpec.BodySpec::class, name = "body"),
     Type(value = ParameterSpec.CookieSpec::class, name = "cookie")
 )
 sealed class ParameterSpec(val name: String, val required: Boolean, val description: String?, val schema: SchemaSpec) {
@@ -58,6 +60,8 @@ sealed class ParameterSpec(val name: String, val required: Boolean, val descript
     class HeaderSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
     class PathSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
     class QuerySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
+    class FormSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
+    class BodySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
 }
 
 data class RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap())
