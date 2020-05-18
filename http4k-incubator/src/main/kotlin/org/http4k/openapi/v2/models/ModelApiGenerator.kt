@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.NamedSchema
+import org.http4k.openapi.buildModelClass
 import org.http4k.openapi.v2.OpenApi2Spec
 import org.http4k.openapi.clean
 import org.http4k.openapi.v2.flattenedPaths
@@ -13,15 +14,15 @@ import org.http4k.poet.childClassName
 
 object ModelApiGenerator : ApiGenerator<OpenApi2Spec> {
     override fun invoke(spec: OpenApi2Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
-        val componentSchemas = components.schemas.entries
+        val componentSchemas = components.entries
             .fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->
-                schema.buildModelClass(options.packageName("model").childClassName(name), components.schemas, acc)
+                schema.buildModelClass(options.packageName("model").childClassName(name), components, acc)
                 acc
             }
 
         spec.flattenedPaths().forEach { path ->
             path.allSchemas().forEach {
-                if (it is NamedSchema.Generated) it.schema.buildModelClass(options.packageName("model").childClassName(it.name), components.schemas, componentSchemas)
+                if (it is NamedSchema.Generated) it.schema.buildModelClass(options.packageName("model").childClassName(it.name), components, componentSchemas)
             }
         }
 

@@ -42,24 +42,6 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
     object StringSpec : SchemaSpec(String::class)
     object BooleanSpec : SchemaSpec(Boolean::class)
     data class RefSpec(val `$ref`: String) : SchemaSpec() {
-        val schemaName = `$ref`.removePrefix("#/components/schemas/")
+        val schemaName = `$ref`.removePrefix("#/components/schemas/").removePrefix("#/definitions/")
     }
-}
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "in")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = ParameterSpec.PathSpec::class, name = "path"),
-    JsonSubTypes.Type(value = ParameterSpec.HeaderSpec::class, name = "header"),
-    JsonSubTypes.Type(value = ParameterSpec.QuerySpec::class, name = "query"),
-    JsonSubTypes.Type(value = ParameterSpec.FormSpec::class, name = "formData"),
-    JsonSubTypes.Type(value = ParameterSpec.BodySpec::class, name = "body"),
-    JsonSubTypes.Type(value = ParameterSpec.CookieSpec::class, name = "cookie")
-)
-sealed class ParameterSpec(val name: String, val required: Boolean, val description: String?, val schema: SchemaSpec) {
-    class CookieSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class HeaderSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class PathSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class QuerySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class FormSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class BodySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
 }

@@ -10,9 +10,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.NamedSchema
-import org.http4k.openapi.ParameterSpec
 import org.http4k.openapi.v3.PathV3
 import org.http4k.openapi.SchemaSpec
+import org.http4k.openapi.v3.ParameterSpec
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName

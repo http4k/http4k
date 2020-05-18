@@ -1,4 +1,4 @@
-package org.http4k.openapi.v2.models
+package org.http4k.openapi
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec

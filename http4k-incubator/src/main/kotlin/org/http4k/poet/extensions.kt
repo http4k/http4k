@@ -12,15 +12,14 @@ import com.squareup.kotlinpoet.asTypeName
 import org.http4k.core.Body
 import org.http4k.format.Jackson
 import org.http4k.lens.Cookies
-import org.http4k.lens.FormField
 import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.openapi.NamedSchema
-import org.http4k.openapi.ParameterSpec
 import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.clean
+import org.http4k.openapi.v3.ParameterSpec
 import kotlin.reflect.KClass
 
 fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
@@ -35,8 +34,6 @@ val ParameterSpec.lensSpecClazz
         is ParameterSpec.HeaderSpec -> Header::class
         is ParameterSpec.QuerySpec -> Query::class
         is ParameterSpec.PathSpec -> Path::class
-        is ParameterSpec.FormSpec -> FormField::class
-        is ParameterSpec.BodySpec -> Body::class
     }
 
 inline fun <reified T : Any> member(name: String) = MemberName(T::class.asClassName(), name)
