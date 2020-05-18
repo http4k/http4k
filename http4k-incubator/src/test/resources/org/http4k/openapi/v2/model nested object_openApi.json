@@ -1,0 +1,25 @@
+{
+    "info": {
+        "title": ""
+    },
+    "paths": {},
+    "definitions": {
+        "Obj": {
+            "type": "object",
+            "required": [
+                "nested"
+            ],
+            "properties": {
+                "nested": {
+                    "type": "object",
+                    "required": [],
+                    "properties": {
+                        "value": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "info": {
+        "title": ""
+    },
+    "paths": {},
+    "definitions": {
+        "Obj": {
+            "type": "object",
+            "required": [
+                "ref"
+            ],
+            "properties": {
+                "ref": {
+                    "$ref": "#/components/schemas/Ref"
+                }
+            }
+        },
+        "Ref": {
+            "type": "object",
+            "required": [
+            ],
+            "properties": {
+                "value": {
+                    "$ref": "#/components/schemas/DoubleRef"
+                }
+            }
+        },
+        "DoubleRef": {
+            "type": "object",
+            "required": [
+            ],
+            "properties": {
+                "value": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

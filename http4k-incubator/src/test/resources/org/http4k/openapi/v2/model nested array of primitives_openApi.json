@@ -1,0 +1,25 @@
+{
+    "info": {
+        "title": ""
+    },
+    "paths": {},
+    "definitions": {
+        "Obj": {
+            "type": "object",
+            "required": [
+                "numbers"
+            ],
+            "properties": {
+                "numbers": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
