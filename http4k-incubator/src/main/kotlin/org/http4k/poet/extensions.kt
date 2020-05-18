@@ -51,7 +51,7 @@ fun ParameterSpec.lensConstruct() =
         else -> if (required) "required" else "optional"
     }
 
-fun org.http4k.openapi.v3.Path.lensDeclarations(modelPackageName: String): List<CodeBlock> {
+fun org.http4k.openapi.v3.PathV3.lensDeclarations(modelPackageName: String): List<CodeBlock> {
     val bodyTypes = allSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
 
     val parameterTypes = pathV3Spec.parameters.map {

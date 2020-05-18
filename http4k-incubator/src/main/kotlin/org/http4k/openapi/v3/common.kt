@@ -8,7 +8,7 @@ import org.http4k.openapi.namedSchema
 /**
  * Convenience type for working with generated code
  */
-data class Path(val urlPathPattern: String, val method: Method, val pathV3Spec: PathV3Spec) {
+data class PathV3(val urlPathPattern: String, val method: Method, val pathV3Spec: PathV3Spec) {
     val uniqueName = (pathV3Spec.operationId
         ?: method.toString().toLowerCase() + urlPathPattern.replace('/', '_')).capitalize()
 
@@ -32,6 +32,6 @@ data class Path(val urlPathPattern: String, val method: Method, val pathV3Spec: 
     fun allSchemas() = requestSchemas() + responseSchemas()
 }
 
-fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { Path(path, Method.valueOf(it.key.toUpperCase()), it.value) } }
+fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { PathV3(path, Method.valueOf(it.key.toUpperCase()), it.value) } }
 
 fun OpenApi3Spec.apiName() = info.title.capitalize()
