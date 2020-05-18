@@ -2,7 +2,6 @@ package org.http4k.openapi
 
 import org.http4k.junit.ResourceLoader
 import org.http4k.junit.TestResources
-import org.http4k.openapi.v3.OpenApiJson
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
