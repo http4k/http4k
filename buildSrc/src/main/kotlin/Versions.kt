@@ -1,3 +1,4 @@
+import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -24,7 +25,7 @@ object Versions {
 
     const val org_junit_jupiter: String = "5.6.2"
 
-    const val io_undertow: String = "2.1.0.Final"
+    const val io_undertow: String = "2.1.1.Final"
 
     const val io_ktor: String = "1.3.2" // available: "1.3.2-1.4-M1-release-99"
 
@@ -44,7 +45,7 @@ object Versions {
 
     const val gradle_cobertura_plugin: String = "3.0.0"
 
-    const val aws_lambda_java_events: String = "2.2.8"
+    const val aws_lambda_java_events: String = "3.0.0"
 
     const val jackson_dataformat_xml: String = "2.11.0"
 
@@ -56,7 +57,7 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.49.Final"
+    const val netty_codec_http2: String = "4.1.50.Final"
 
     const val jackson_databind: String = "2.11.0"
 
@@ -98,7 +99,7 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val okhttp: String = "4.6.0"
+    const val okhttp: String = "4.7.0"
 
     const val pebble: String = "3.1.3"
 
@@ -115,7 +116,7 @@ object Versions {
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */
-    const val gradleLatestVersion: String = "6.4"
+    const val gradleLatestVersion: String = "6.4.1"
 }
 
 /**
