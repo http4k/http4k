@@ -1,6 +1,8 @@
 {
+    "swagger": "2.0",
     "info": {
-        "title": ""
+        "title": "",
+        "version": ""
     },
     "paths": {},
     "definitions": {
@@ -11,24 +13,20 @@
             ],
             "properties": {
                 "ref": {
-                    "$ref": "#/components/schemas/Ref"
+                    "$ref": "#/definitions/Ref"
                 }
             }
         },
         "Ref": {
             "type": "object",
-            "required": [
-            ],
             "properties": {
                 "value": {
-                    "$ref": "#/components/schemas/DoubleRef"
+                    "$ref": "#/definitions/DoubleRef"
                 }
             }
         },
         "DoubleRef": {
             "type": "object",
-            "required": [
-            ],
             "properties": {
                 "value": {
                     "type": "integer"

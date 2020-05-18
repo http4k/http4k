@@ -1,6 +1,8 @@
 {
+    "swagger": "2.0",
     "info": {
-        "title": ""
+        "title": "",
+        "version": ""
     },
     "paths": {},
     "definitions": {
@@ -12,7 +14,6 @@
             "properties": {
                 "nested": {
                     "type": "object",
-                    "required": [],
                     "properties": {
                         "value": {
                             "type": "integer"
