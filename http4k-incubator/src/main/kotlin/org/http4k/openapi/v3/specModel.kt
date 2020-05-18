@@ -1,86 +1,25 @@
 package org.http4k.openapi.v3
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
-import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.openapi.OpenApiJson.asA
-import java.math.BigDecimal
-import kotlin.reflect.KClass
+import org.http4k.openapi.InfoSpec
+import org.http4k.openapi.ParameterSpec
+import org.http4k.openapi.SchemaSpec
 
-@JsonTypeInfo(use = NAME, property = "type", defaultImpl = SchemaSpec.RefSpec::class)
-@JsonSubTypes(
-    Type(value = SchemaSpec.ObjectSpec::class, name = "object"),
-    Type(value = SchemaSpec.ArraySpec::class, name = "array"),
-    Type(value = SchemaSpec.StringSpec::class, name = "string"),
-    Type(value = SchemaSpec.NumberSpec::class, name = "number"),
-    Type(value = SchemaSpec.IntegerSpec::class, name = "integer"),
-    Type(value = SchemaSpec.BooleanSpec::class, name = "boolean")
-)
-sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
+data class RequestBodyV3Spec(val content: Map<String, MessageBodyV3Spec> = emptyMap())
 
-    data class ObjectSpec(val required: List<String> = emptyList(),
-                          val properties: Map<String, SchemaSpec> = emptyMap(),
-                          override val clazz: KClass<*>?,
-                          val additionalProperties: JsonNode? = null) : SchemaSpec(clazz)
+data class MessageBodyV3Spec(val schema: SchemaSpec?)
 
-    data class ArraySpec(private val items: JsonNode) : SchemaSpec() {
-        fun itemsSpec(): SchemaSpec = try {
-            items.asA()
-        } catch (e: Exception) {
-            try {
-                items.get("items").asA()
-            } catch (e: Exception) {
-                ObjectSpec(clazz = Any::class)
-            }
-        }
-    }
+data class ComponentsV3Spec(val schemas: Map<String, SchemaSpec> = emptyMap())
 
-    object IntegerSpec : SchemaSpec(Int::class)
-    object NumberSpec : SchemaSpec(BigDecimal::class)
-    object StringSpec : SchemaSpec(String::class)
-    object BooleanSpec : SchemaSpec(Boolean::class)
-    data class RefSpec(val `$ref`: String) : SchemaSpec() {
-        val schemaName = `$ref`.removePrefix("#/components/schemas/")
-    }
-}
+data class ResponseV3Spec(val content: Map<String, MessageBodyV3Spec>)
 
-@JsonTypeInfo(use = NAME, property = "in")
-@JsonSubTypes(
-    Type(value = ParameterSpec.PathSpec::class, name = "path"),
-    Type(value = ParameterSpec.HeaderSpec::class, name = "header"),
-    Type(value = ParameterSpec.QuerySpec::class, name = "query"),
-    Type(value = ParameterSpec.FormSpec::class, name = "formData"),
-    Type(value = ParameterSpec.BodySpec::class, name = "body"),
-    Type(value = ParameterSpec.CookieSpec::class, name = "cookie")
-)
-sealed class ParameterSpec(val name: String, val required: Boolean, val description: String?, val schema: SchemaSpec) {
-    class CookieSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class HeaderSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class PathSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class QuerySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class FormSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class BodySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-}
-
-data class RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap())
-
-data class MessageBodySpec(val schema: SchemaSpec?)
-
-data class ComponentsSpec(val schemas: Map<String, SchemaSpec> = emptyMap())
-
-data class ResponseSpec(val content: Map<String, MessageBodySpec>)
-
-data class PathSpec(
+data class PathV3Spec(
     val operationId: String?,
     val summary: String?,
     val description: String?,
     val tags: List<String> = emptyList(),
-    val responses: Map<Int, ResponseSpec> = emptyMap(),
-    val requestBody: RequestBodySpec?,
+    val responses: Map<Int, ResponseV3Spec> = emptyMap(),
+    val requestBody: RequestBodyV3Spec?,
     val parameters: List<ParameterSpec> = emptyList()
 )
 
-data class InfoSpec(val title: String)
-data class OpenApi3Spec(val info: InfoSpec, val paths: Map<String, Map<String, PathSpec>>, val components: ComponentsSpec = ComponentsSpec())
+data class OpenApi3Spec(val info: InfoSpec, val paths: Map<String, Map<String, PathV3Spec>>, val components: ComponentsV3Spec = ComponentsV3Spec())

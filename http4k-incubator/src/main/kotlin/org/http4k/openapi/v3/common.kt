@@ -6,25 +6,26 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import org.http4k.core.ContentType
 import org.http4k.core.Method
+import org.http4k.openapi.SchemaSpec
 
 /**
  * Convenience type for working with generated code
  */
-data class Path(val urlPathPattern: String, val method: Method, val pathSpec: PathSpec) {
-    val uniqueName = (pathSpec.operationId
+data class Path(val urlPathPattern: String, val method: Method, val pathV3Spec: PathV3Spec) {
+    val uniqueName = (pathV3Spec.operationId
         ?: method.toString().toLowerCase() + urlPathPattern.replace('/', '_')).capitalize()
 
     private fun modelName(contentType: String, suffix: String) =
         uniqueName + ContentType(contentType).value.substringAfter('/').capitalize().filter(Char::isLetterOrDigit) + suffix
 
     fun requestSchemas(): List<NamedSchema> =
-        listOfNotNull(pathSpec.requestBody?.content?.entries
+        listOfNotNull(pathV3Spec.requestBody?.content?.entries
             ?.mapNotNull { (contentType, messageSpec) ->
                 messageSpec.schema?.namedSchema(modelName(contentType, "Request"))
             }
         ).flatten()
 
-    fun responseSchemas(): List<NamedSchema> = pathSpec.responses.entries
+    fun responseSchemas(): List<NamedSchema> = pathV3Spec.responses.entries
         .flatMap { (code, messageSpec) ->
             messageSpec.content.entries.mapNotNull { (contentType, messageSpec) ->
                 messageSpec.schema?.namedSchema(modelName(contentType, "Response$code"))

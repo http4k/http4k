@@ -8,7 +8,7 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
-import org.http4k.openapi.v3.SchemaSpec
+import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.v3.clean
 import org.http4k.poet.Property
 import org.http4k.poet.Property.Companion.addParameter

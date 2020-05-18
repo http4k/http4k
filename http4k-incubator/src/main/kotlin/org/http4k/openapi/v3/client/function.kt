@@ -10,9 +10,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.v3.NamedSchema
-import org.http4k.openapi.v3.ParameterSpec
+import org.http4k.openapi.ParameterSpec
 import org.http4k.openapi.v3.Path
-import org.http4k.openapi.v3.SchemaSpec
+import org.http4k.openapi.SchemaSpec
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
@@ -39,7 +39,7 @@ fun Path.function(modelPackageName: String): FunSpec =
                 }
         )
 
-        val parameterBindings = pathSpec.parameters.mapNotNull {
+        val parameterBindings = pathV3Spec.parameters.mapNotNull {
             val binding = "${it.name}Lens of ${it.name}"
 
             when (it) {
@@ -84,7 +84,7 @@ fun Path.function(modelPackageName: String): FunSpec =
 
 private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: String): FunSpec.Builder =
     with(path) {
-        val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
+        val parameters = pathV3Spec.parameters.map { it.name to it.asTypeName()!! }
 
         val bodyParams = requestSchemas().map {
             "request" to when (it) {

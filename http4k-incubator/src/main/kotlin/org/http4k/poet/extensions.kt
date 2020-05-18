@@ -18,8 +18,8 @@ import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.openapi.v3.NamedSchema
-import org.http4k.openapi.v3.ParameterSpec
-import org.http4k.openapi.v3.SchemaSpec
+import org.http4k.openapi.ParameterSpec
+import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.v3.clean
 import kotlin.reflect.KClass
 
@@ -54,7 +54,7 @@ fun ParameterSpec.lensConstruct() =
 fun org.http4k.openapi.v3.Path.lensDeclarations(modelPackageName: String): List<CodeBlock> {
     val bodyTypes = allSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
 
-    val parameterTypes = pathSpec.parameters.map {
+    val parameterTypes = pathV3Spec.parameters.map {
         when (it) {
             is ParameterSpec.CookieSpec -> CodeBlock.of(
                 "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
