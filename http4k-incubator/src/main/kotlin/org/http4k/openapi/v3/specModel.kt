@@ -29,9 +29,9 @@ data class OpenApi3Spec(val info: InfoSpec, val paths: Map<String, Map<String, P
     JsonSubTypes.Type(value = ParameterSpec.QuerySpec::class, name = "query"),
     JsonSubTypes.Type(value = ParameterSpec.CookieSpec::class, name = "cookie")
 )
-sealed class ParameterSpec(val name: String, val required: Boolean, val description: String?, val schema: SchemaSpec) {
-    class CookieSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class HeaderSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class PathSpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
-    class QuerySpec(name: String, required: Boolean, description: String?, schema: SchemaSpec) : ParameterSpec(name, required, description, schema)
+sealed class ParameterSpec(val name: String, val required: Boolean, val schema: SchemaSpec) {
+    class CookieSpec(name: String, required: Boolean, schema: SchemaSpec) : ParameterSpec(name, required, schema)
+    class HeaderSpec(name: String, required: Boolean, schema: SchemaSpec) : ParameterSpec(name, required, schema)
+    class PathSpec(name: String, required: Boolean, schema: SchemaSpec) : ParameterSpec(name, required, schema)
+    class QuerySpec(name: String, required: Boolean, schema: SchemaSpec) : ParameterSpec(name, required, schema)
 }
