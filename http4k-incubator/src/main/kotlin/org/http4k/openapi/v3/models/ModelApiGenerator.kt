@@ -2,16 +2,17 @@ package org.http4k.openapi.v3.models
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
-import org.http4k.openapi.v3.ApiGenerator
-import org.http4k.openapi.v3.GenerationOptions
-import org.http4k.openapi.v3.NamedSchema
+import org.http4k.openapi.ApiGenerator
+import org.http4k.openapi.GenerationOptions
+import org.http4k.openapi.NamedSchema
+import org.http4k.openapi.buildModelClass
+import org.http4k.openapi.clean
 import org.http4k.openapi.v3.OpenApi3Spec
-import org.http4k.openapi.v3.clean
 import org.http4k.openapi.v3.flattenedPaths
 import org.http4k.poet.buildFormatted
 import org.http4k.poet.childClassName
 
-object ModelApiGenerator : ApiGenerator {
+object ModelApiGenerator : ApiGenerator<OpenApi3Spec> {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
         val componentSchemas = components.schemas.entries
             .fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->

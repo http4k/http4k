@@ -9,10 +9,10 @@ import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
-import org.http4k.openapi.v3.NamedSchema
+import org.http4k.openapi.NamedSchema
+import org.http4k.openapi.v3.PathV3
+import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.v3.ParameterSpec
-import org.http4k.openapi.v3.Path
-import org.http4k.openapi.v3.SchemaSpec
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
@@ -24,7 +24,7 @@ import org.http4k.poet.quotedName
 
 private const val reqValName = "httpReq"
 
-fun Path.function(modelPackageName: String): FunSpec =
+fun PathV3.function(modelPackageName: String): FunSpec =
     with(this) {
         val reifiedPath = urlPathPattern.replace("/{", "/\${")
 
@@ -39,7 +39,7 @@ fun Path.function(modelPackageName: String): FunSpec =
                 }
         )
 
-        val parameterBindings = pathSpec.parameters.mapNotNull {
+        val parameterBindings = pathV3Spec.parameters.mapNotNull {
             val binding = "${it.name}Lens of ${it.name}"
 
             when (it) {
@@ -82,9 +82,9 @@ fun Path.function(modelPackageName: String): FunSpec =
             .build()
     }
 
-private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: String): FunSpec.Builder =
+private fun FunSpec.Builder.addAllParametersFrom(path: PathV3, modelPackageName: String): FunSpec.Builder =
     with(path) {
-        val parameters = pathSpec.parameters.map { it.name to it.asTypeName()!! }
+        val parameters = pathV3Spec.parameters.map { it.name to it.asTypeName()!! }
 
         val bodyParams = requestSchemas().map {
             "request" to when (it) {

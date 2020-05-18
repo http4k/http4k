@@ -16,10 +16,10 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.openapi.v3.NamedSchema
+import org.http4k.openapi.NamedSchema
+import org.http4k.openapi.SchemaSpec
+import org.http4k.openapi.clean
 import org.http4k.openapi.v3.ParameterSpec
-import org.http4k.openapi.v3.SchemaSpec
-import org.http4k.openapi.v3.clean
 import kotlin.reflect.KClass
 
 fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
@@ -48,10 +48,10 @@ fun ParameterSpec.lensConstruct() =
         else -> if (required) "required" else "optional"
     }
 
-fun org.http4k.openapi.v3.Path.lensDeclarations(modelPackageName: String): List<CodeBlock> {
+fun org.http4k.openapi.v3.PathV3.lensDeclarations(modelPackageName: String): List<CodeBlock> {
     val bodyTypes = allSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
 
-    val parameterTypes = pathSpec.parameters.map {
+    val parameterTypes = pathV3Spec.parameters.map {
         when (it) {
             is ParameterSpec.CookieSpec -> CodeBlock.of(
                 "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",

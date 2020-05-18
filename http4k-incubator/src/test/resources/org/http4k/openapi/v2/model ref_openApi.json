@@ -1,0 +1,37 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "",
+        "version": ""
+    },
+    "paths": {},
+    "definitions": {
+        "Obj": {
+            "type": "object",
+            "required": [
+                "ref"
+            ],
+            "properties": {
+                "ref": {
+                    "$ref": "#/definitions/Ref"
+                }
+            }
+        },
+        "Ref": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "$ref": "#/definitions/DoubleRef"
+                }
+            }
+        },
+        "DoubleRef": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

@@ -31,8 +31,5 @@
             }
         }
     },
-    "openapi": "3.0.0",
-    "x-extension": [
-        "extensionField"
-    ]
+    "openapi": "3.0.0"
 }

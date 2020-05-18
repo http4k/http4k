@@ -4,13 +4,13 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.TypeSpec
-import org.http4k.openapi.v3.ApiGenerator
-import org.http4k.openapi.v3.GenerationOptions
+import org.http4k.openapi.ApiGenerator
+import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.flattenedPaths
 import org.http4k.poet.buildFormatted
 
-object ServerApiGenerator : ApiGenerator {
+object ServerApiGenerator : ApiGenerator<OpenApi3Spec> {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions) = with(spec) {
         val endpoints = flattenedPaths().map { it.buildEndpoint(options.packageName("model")) }
 
