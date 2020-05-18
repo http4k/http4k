@@ -10,7 +10,7 @@ import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.flattenedPaths
 import org.http4k.poet.buildFormatted
 
-object ServerApiGenerator : ApiGenerator {
+object ServerApiGenerator : ApiGenerator<OpenApi3Spec> {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions) = with(spec) {
         val endpoints = flattenedPaths().map { it.buildEndpoint(options.packageName("model")) }
 

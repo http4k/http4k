@@ -11,7 +11,7 @@ import org.http4k.openapi.v3.flattenedPaths
 import org.http4k.poet.buildFormatted
 import org.http4k.poet.childClassName
 
-object ModelApiGenerator : ApiGenerator {
+object ModelApiGenerator : ApiGenerator<OpenApi3Spec> {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec) {
         val componentSchemas = components.schemas.entries
             .fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->

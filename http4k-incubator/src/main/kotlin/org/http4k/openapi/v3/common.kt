@@ -13,7 +13,7 @@ data class GenerationOptions(private val basePackage: String, val destinationFol
     fun packageName(name: String) = "$basePackage.$name"
 }
 
-interface ApiGenerator : (OpenApi3Spec, GenerationOptions) -> List<FileSpec>
+interface ApiGenerator<T> : (T, GenerationOptions) -> List<FileSpec>
 
 /**
  * Convenience type for working with generated code
