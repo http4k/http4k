@@ -4,5 +4,36 @@
         "title": "title",
         "version": "1.0"
     },
-    "paths": {}
+    "paths": {
+        "/jsonbody": {
+            "post": {
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "required",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Ref"
+                        }
+                    }
+                ],
+                "responses": {
+
+                },
+                "operationId": "endpoint"
+            }
+        }
+    },
+    "definitions": {
+        "Ref": {
+            "type": "object",
+            "required": [
+            ],
+            "properties": {
+                "value": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
 }
