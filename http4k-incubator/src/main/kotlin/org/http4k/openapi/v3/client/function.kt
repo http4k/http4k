@@ -10,9 +10,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.NamedSchema
-import org.http4k.openapi.v3.PathV3
 import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.v3.ParameterSpec
+import org.http4k.openapi.v3.PathV3
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
@@ -30,19 +30,9 @@ fun PathV3.function(modelPackageName: String): FunSpec =
     with(this) {
         val reifiedPath = urlPathPattern.replace("/{", "/\${")
 
-        val with = packageMember<Filter>("with")
-
-        val bodyBindings = listOfNotNull(
-            requestSchemas()
-                .firstOrNull()
-                ?.let {
-                    val binding = "${it.fieldName}Lens of request"
-                    of("\n\t.%M($binding)", with)
-                }
-        )
-
         val parameterBindings = pathV3Spec.parameters.mapNotNull {
             val binding = "${it.name}Lens of ${it.name}"
+            val with = packageMember<Filter>("with")
 
             when (it) {
                 is ParameterSpec.CookieSpec -> {
@@ -54,6 +44,8 @@ fun PathV3.function(modelPackageName: String): FunSpec =
                 else -> null
             }
         }
+
+        val bodyBindings = requestSchemas().bindFirstToHttpMessage("request")
 
         val buildRequest = (bodyBindings + parameterBindings)
             .fold(CodeBlock.builder()
@@ -68,7 +60,7 @@ fun PathV3.function(modelPackageName: String): FunSpec =
         } ?: listOf(of("\nhttpHandler($reqValName)"))
 
         val responseType = responseSchemas().firstOrNull()?.let {
-            when(it) {
+            when (it) {
                 is NamedSchema.Generated -> modelPackageName.childClassName(it.fieldName)
                 is NamedSchema.Existing -> it.typeName
             }
@@ -83,6 +75,14 @@ fun PathV3.function(modelPackageName: String): FunSpec =
             .addCodeBlocks(response)
             .build()
     }
+
+fun List<NamedSchema>.bindFirstToHttpMessage(input: String) = listOfNotNull(
+    firstOrNull()
+        ?.let {
+            val binding = "${it.fieldName}Lens of $input"
+            of("\n\t.%M($binding)", packageMember<Filter>("with"))
+        }
+)
 
 private fun FunSpec.Builder.addAllParametersFrom(path: PathV3, modelPackageName: String): FunSpec.Builder =
     with(path) {
