@@ -3,6 +3,7 @@
 package testPackage.server.endpoints
 
 import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.lens.Query
@@ -15,7 +16,9 @@ fun Endpoint(): RoutingHttpHandler {
 
 	val requiredLens = Query.boolean().required("required")
 	val optionalLens = Query.int().optional("optional")
-	return "/query" bind Method.POST to { Response(Status.OK) }
+	return "/query" bind Method.POST to { req: Request ->
+		Response(Status.OK)
+	}
 }
 
 >>>TitleServer.kt

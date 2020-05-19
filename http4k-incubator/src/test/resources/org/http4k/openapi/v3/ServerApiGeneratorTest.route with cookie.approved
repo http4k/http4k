@@ -3,6 +3,7 @@
 package testPackage.server.endpoints
 
 import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.lens.Cookies
@@ -13,7 +14,9 @@ fun Endpoint(): RoutingHttpHandler {
 
 	val requiredLens = Cookies.required("required")
 	val optionalLens = Cookies.optional("optional")
-	return "/cookie" bind Method.POST to { Response(Status.OK) }
+	return "/cookie" bind Method.POST to { req: Request ->
+		Response(Status.OK)
+	}
 }
 
 >>>TitleServer.kt

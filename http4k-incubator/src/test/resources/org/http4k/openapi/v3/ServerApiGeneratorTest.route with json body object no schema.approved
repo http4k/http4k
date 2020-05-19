@@ -4,6 +4,7 @@ package testPackage.server.endpoints
 
 import org.http4k.core.Body
 import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.format.Jackson.auto
@@ -14,7 +15,9 @@ import testPackage.model.EndpointJsonRequest
 fun Endpoint(): RoutingHttpHandler {
 
 	val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
-	return "/jsonbody" bind Method.POST to { Response(Status.OK) }
+	return "/jsonbody" bind Method.POST to { req: Request ->
+		Response(Status.OK)
+	}
 }
 
 >>>TitleServer.kt
