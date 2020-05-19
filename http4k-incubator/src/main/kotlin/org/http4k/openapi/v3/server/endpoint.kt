@@ -20,11 +20,8 @@ fun Path.buildEndpoint(modelPackageName: String) = with(this) {
 
     val body = CodeBlock.builder()
 
-    spec
-    requestSchemas()
-        .forEach {
-            body.addStatement("val ${it.fieldName} = ${it.fieldName}Lens(req)")
-        }
+    (spec.parameters.map { it.name } + requestSchemas().map { it.fieldName })
+        .forEach { body.addStatement("val $it = ${it}Lens(req)") }
 
     body.add("%T(%T.OK)", Property<Response>().type, Property<Status>().type)
     responseSchemas().bindFirstToHttpMessage("TODO()").firstOrNull()?.also { body.add(it) }

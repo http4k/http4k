@@ -18,6 +18,8 @@ fun Endpoint(): RoutingHttpHandler {
 	val optionalLens = Header.int().optional("optional")
 
 	return "/header" bind Method.POST to { req: Request ->
+		val required = requiredLens(req)
+		val optional = optionalLens(req)
 		Response(Status.OK)
 	}
 }
