@@ -1,12 +1,33 @@
+>>>Endpoint.kt
+
+package testPackage.server.endpoints
+
+import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.format.Jackson.auto
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.bind
+import testPackage.model.EndpointJsonRequest
+
+fun Endpoint(): RoutingHttpHandler {
+
+	val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
+	return "/jsonbody" bind Method.POST to { Response(Status.OK) }
+}
+
 >>>TitleServer.kt
 
 package testPackage.server
 
 import org.http4k.routing.routes
 import org.http4k.server.asServer
+import testPackage.server.endpoints.Endpoint
 
 object TitleServer {
 	operator fun invoke() = routes(
+		Endpoint()
 	)
 }
 
