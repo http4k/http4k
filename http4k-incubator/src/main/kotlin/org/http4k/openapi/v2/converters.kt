@@ -14,9 +14,9 @@ fun OpenApi2Spec.asV3() = OpenApi3Spec(
     info, paths.mapValues { it.value.mapValues { it.value.asV3() } }, OpenApi3ComponentsSpec(components)
 )
 
-private fun PathV2Spec.asV3(): OpenApi3PathSpec {
+private fun OpenApi2PathSpec.asV3(): OpenApi3PathSpec {
 
-    val requestBody = parameters.filterIsInstance<ParameterSpec.BodySpec>().firstOrNull()?.let {
+    val requestBody = parameters.filterIsInstance<OpenApi2ParameterSpec.BodySpec>().firstOrNull()?.let {
         OpenApi3RequestBodySpec(mapOf(
             (consumes.firstOrNull() ?: APPLICATION_JSON.value) to MessageBodySpec(it.schema)
         ))
@@ -29,16 +29,16 @@ private fun PathV2Spec.asV3(): OpenApi3PathSpec {
                 ResponseSpec(mapOf((produces.firstOrNull() ?: APPLICATION_JSON.value) to it.value))
         }.toMap(),
         requestBody,
-        parameters.filterNot { it is ParameterSpec.BodySpec }.mapNotNull { it.asV3() }
+        parameters.filterNot { it is OpenApi2ParameterSpec.BodySpec }.mapNotNull { it.asV3() }
     )
 }
 
-private fun ParameterSpec.asV3(): ParameterSpecV3? =
+private fun OpenApi2ParameterSpec.asV3(): ParameterSpecV3? =
     when (this) {
-        is ParameterSpec.CookieSpec -> ParameterSpecV3.CookieSpec(name, required, type.asSchema())
-        is ParameterSpec.HeaderSpec -> ParameterSpecV3.HeaderSpec(name, required, type.asSchema())
-        is ParameterSpec.PathSpec -> ParameterSpecV3.PathSpec(name, required, type.asSchema())
-        is ParameterSpec.QuerySpec -> ParameterSpecV3.QuerySpec(name, required, type.asSchema())
+        is OpenApi2ParameterSpec.CookieSpec -> ParameterSpecV3.CookieSpec(name, required, type.asSchema())
+        is OpenApi2ParameterSpec.HeaderSpec -> ParameterSpecV3.HeaderSpec(name, required, type.asSchema())
+        is OpenApi2ParameterSpec.PathSpec -> ParameterSpecV3.PathSpec(name, required, type.asSchema())
+        is OpenApi2ParameterSpec.QuerySpec -> ParameterSpecV3.QuerySpec(name, required, type.asSchema())
         else -> null
     }
 
