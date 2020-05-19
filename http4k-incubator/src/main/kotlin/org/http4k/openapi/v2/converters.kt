@@ -1,20 +1,30 @@
 package org.http4k.openapi.v2
 
-import com.squareup.kotlinpoet.FileSpec
-import org.http4k.openapi.ApiGenerator
-import org.http4k.openapi.GenerationOptions
-import org.http4k.openapi.v3.models.ModelApiGenerator
-import org.http4k.openapi.v3.client.ClientApiGenerator as ClientV3
-import org.http4k.openapi.v3.server.ServerApiGenerator as ServerV3
+import org.http4k.openapi.SchemaSpec
+import org.http4k.openapi.v3.ComponentsV3Spec
+import org.http4k.openapi.v3.OpenApi3Spec
+import org.http4k.openapi.v3.PathV3Spec
+import org.http4k.openapi.v3.ParameterSpec as ParameterSpecV3
 
-object ModelApiGenerator : ApiGenerator<OpenApi2Spec> {
-    override fun invoke(spec: OpenApi2Spec, options: GenerationOptions): List<FileSpec> = ModelApiGenerator(spec.asV3(), options)
-}
+fun OpenApi2Spec.asV3() = OpenApi3Spec(
+    info, paths.mapValues { it.value.mapValues { it.value.asV3() } }, ComponentsV3Spec(components)
+)
 
-object ClientApiGenerator : ApiGenerator<OpenApi2Spec> {
-    override fun invoke(spec: OpenApi2Spec, options: GenerationOptions): List<FileSpec> = ClientV3(spec.asV3(), options)
-}
+private fun PathV2Spec.asV3() = PathV3Spec(operationId, emptyMap(), null, parameters.filterNot { it is ParameterSpec.BodySpec }.mapNotNull { it.asV3() })
 
-object ServerApiGenerator : ApiGenerator<OpenApi2Spec> {
-    override fun invoke(spec: OpenApi2Spec, options: GenerationOptions): List<FileSpec> = ServerV3(spec.asV3(), options)
+private fun ParameterSpec.asV3(): ParameterSpecV3? =
+    when (this) {
+        is ParameterSpec.CookieSpec -> ParameterSpecV3.CookieSpec(name, required, type.asSchema())
+        is ParameterSpec.HeaderSpec -> ParameterSpecV3.HeaderSpec(name, required, type.asSchema())
+        is ParameterSpec.PathSpec -> ParameterSpecV3.PathSpec(name, required, type.asSchema())
+        is ParameterSpec.QuerySpec -> ParameterSpecV3.QuerySpec(name, required, type.asSchema())
+        else -> null
+    }
+
+private fun String.asSchema(): SchemaSpec = when (this) {
+    "string" -> SchemaSpec.StringSpec
+    "integer" -> SchemaSpec.IntegerSpec
+    "number" -> SchemaSpec.NumberSpec
+    "boolean" -> SchemaSpec.BooleanSpec
+    else -> throw UnsupportedOperationException("cannot support parameter type of $this")
 }
