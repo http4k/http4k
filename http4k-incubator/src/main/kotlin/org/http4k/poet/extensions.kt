@@ -20,6 +20,7 @@ import org.http4k.openapi.NamedSchema
 import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.clean
 import org.http4k.openapi.v3.ParameterSpec
+import org.http4k.openapi.v3.PathV3
 import kotlin.reflect.KClass
 
 fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
@@ -48,24 +49,24 @@ fun ParameterSpec.lensConstruct() =
         else -> if (required) "required" else "optional"
     }
 
-fun org.http4k.openapi.v3.PathV3.lensDeclarations(modelPackageName: String): List<CodeBlock> {
-    val bodyTypes = allSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
+fun PathV3.responseLensDeclarations(modelPackageName: String) =
+    responseSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
 
-    val parameterTypes = pathV3Spec.parameters.map {
-        when (it) {
-            is ParameterSpec.CookieSpec -> CodeBlock.of(
-                "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
-                it.lensSpecClazz.asClassName()
-            )
-            else -> CodeBlock.of(
-                "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
-                it.lensSpecClazz.asClassName(),
-                packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
-            )
-        }
+fun PathV3.requestLensDeclarations(modelPackageName: String) =
+    requestSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
+
+fun PathV3.parameterLensDeclarations() = pathV3Spec.parameters.map {
+    when (it) {
+        is ParameterSpec.CookieSpec -> CodeBlock.of(
+            "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
+            it.lensSpecClazz.asClassName()
+        )
+        else -> CodeBlock.of(
+            "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
+            it.lensSpecClazz.asClassName(),
+            packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
+        )
     }
-
-    return bodyTypes + parameterTypes
 }
 
 fun NamedSchema.lensDeclaration(modelPackageName: String): CodeBlock? = when (this) {

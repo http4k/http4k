@@ -26,7 +26,6 @@ data class PathV3(val urlPathPattern: String, val method: Method, val pathV3Spec
             }
         }
 
-    fun allSchemas() = requestSchemas() + responseSchemas()
 }
 
 fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { PathV3(path, Method.valueOf(it.key.toUpperCase()), it.value) } }

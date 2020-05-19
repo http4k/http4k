@@ -18,9 +18,11 @@ import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
 import org.http4k.poet.childClassName
 import org.http4k.poet.lensDeclaration
-import org.http4k.poet.lensDeclarations
 import org.http4k.poet.packageMember
+import org.http4k.poet.parameterLensDeclarations
 import org.http4k.poet.quotedName
+import org.http4k.poet.requestLensDeclarations
+import org.http4k.poet.responseLensDeclarations
 
 private const val reqValName = "httpReq"
 
@@ -76,7 +78,7 @@ fun PathV3.function(modelPackageName: String): FunSpec =
         FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this, modelPackageName)
             .returns(responseType)
-            .addCodeBlocks(lensDeclarations(modelPackageName))
+            .addCodeBlocks(requestLensDeclarations(modelPackageName) + responseLensDeclarations(modelPackageName) + parameterLensDeclarations())
             .addCode(buildRequest)
             .addCodeBlocks(response)
             .build()
