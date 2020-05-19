@@ -16,6 +16,7 @@ fun Endpoint(): RoutingHttpHandler {
 
 	val requiredLens = Path.boolean().of("required")
 	val optionalLens = Path.int().of("optional")
+
 	return "/path/{required}/{alsoRequired}" bind Method.POST to { req: Request ->
 		Response(Status.OK)
 	}

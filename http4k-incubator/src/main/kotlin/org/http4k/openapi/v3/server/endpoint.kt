@@ -17,7 +17,15 @@ import org.http4k.poet.responseLensDeclarations
 import org.http4k.routing.RoutingHttpHandler
 
 fun PathV3.buildEndpoint(modelPackageName: String) = with(this) {
-    val body = CodeBlock.builder().add("%T(%T.OK)", Property<Response>().type, Property<Status>().type)
+
+    val body = CodeBlock.builder()
+
+    requestSchemas()
+        .forEach {
+            body.addStatement("val ${it.fieldName} = ${it.fieldName}Lens(req)")
+        }
+
+    body.add("%T(%T.OK)", Property<Response>().type, Property<Status>().type)
     responseSchemas().bindFirstToHttpMessage("TODO()").firstOrNull()?.also { body.add(it) }
 
     val handler = CodeBlock.builder()
@@ -31,6 +39,7 @@ fun PathV3.buildEndpoint(modelPackageName: String) = with(this) {
     FunSpec.builder(uniqueName)
         .returns(Property<RoutingHttpHandler>().type)
         .addCodeBlocks(requestLensDeclarations(modelPackageName) + responseLensDeclarations(modelPackageName) + parameterLensDeclarations())
+        .addCode("\n")
         .addCode("return·\"$urlPathPattern\"·%M·%T.${method}·to·", packageMember<RoutingHttpHandler>("bind"), Property<Method>().type)
         .addCode(handler)
         .build()

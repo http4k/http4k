@@ -15,7 +15,9 @@ import testPackage.model.EndpointJsonRequest
 fun Endpoint(): RoutingHttpHandler {
 
 	val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
+
 	return "/jsonbody" bind Method.POST to { req: Request ->
+		val endpointJsonRequest = endpointJsonRequestLens(req)
 		Response(Status.OK)
 	}
 }

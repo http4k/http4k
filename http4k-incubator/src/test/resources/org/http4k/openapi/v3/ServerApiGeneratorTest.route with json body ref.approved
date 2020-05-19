@@ -15,7 +15,9 @@ import testPackage.model.Ref
 fun Endpoint(): RoutingHttpHandler {
 
 	val refLens = Body.auto<Ref>().toLens()
+
 	return "/jsonbody" bind Method.POST to { req: Request ->
+		val ref = refLens(req)
 		Response(Status.OK)
 	}
 }

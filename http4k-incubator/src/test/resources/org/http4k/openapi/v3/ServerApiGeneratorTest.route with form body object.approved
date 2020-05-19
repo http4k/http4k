@@ -15,7 +15,9 @@ import testPackage.model.EndpointXwwwformurlencodedRequest
 fun Endpoint(): RoutingHttpHandler {
 
 	val endpointXwwwformurlencodedRequestLens = Body.auto<EndpointXwwwformurlencodedRequest>().toLens()
+
 	return "/formbody" bind Method.POST to { req: Request ->
+		val endpointXwwwformurlencodedRequest = endpointXwwwformurlencodedRequestLens(req)
 		Response(Status.OK)
 	}
 }

@@ -14,6 +14,7 @@ fun Endpoint(): RoutingHttpHandler {
 
 	val requiredLens = Cookies.required("required")
 	val optionalLens = Cookies.optional("optional")
+
 	return "/cookie" bind Method.POST to { req: Request ->
 		Response(Status.OK)
 	}
