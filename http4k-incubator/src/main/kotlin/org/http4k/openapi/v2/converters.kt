@@ -22,6 +22,8 @@ private fun PathV2Spec.asV3(): PathV3Spec {
             (consumes.firstOrNull() ?: APPLICATION_JSON.value) to MessageBodyV3Spec(it.schema)
         ))
     }
+
+
     return PathV3Spec(
         operationId,
         responses,

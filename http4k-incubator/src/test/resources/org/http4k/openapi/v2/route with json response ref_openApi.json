@@ -4,5 +4,50 @@
         "title": "title",
         "version": "1.0"
     },
-    "paths": {}
+    "paths": {
+        "/jsonbody": {
+            "post": {
+                "parameters": [
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Ref"
+                        }
+                    }
+                },
+                "operationId": "endpoint"
+            }
+        }
+    },
+    "definitions": {
+        "Obj": {
+            "type": "object",
+            "required": [
+                "ref"
+            ],
+            "properties": {
+                "ref": {
+                    "$ref": "#/definitions/Ref"
+                }
+            }
+        },
+        "Ref": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "$ref": "#/definitions/DoubleRef"
+                }
+            }
+        },
+        "DoubleRef": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
 }
