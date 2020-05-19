@@ -45,3 +45,7 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
         val schemaName = `$ref`.removePrefix("#/components/schemas/").removePrefix("#/definitions/")
     }
 }
+
+data class ResponseSpec(val content: Map<String, MessageBodySpec>)
+
+data class MessageBodySpec(val schema: SchemaSpec?)

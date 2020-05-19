@@ -3,19 +3,17 @@ package org.http4k.openapi.v3
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.http4k.openapi.InfoSpec
+import org.http4k.openapi.MessageBodySpec
+import org.http4k.openapi.ResponseSpec
 import org.http4k.openapi.SchemaSpec
 
-data class RequestBodyV3Spec(val content: Map<String, MessageBodyV3Spec> = emptyMap())
-
-data class MessageBodyV3Spec(val schema: SchemaSpec?)
+data class RequestBodyV3Spec(val content: Map<String, MessageBodySpec> = emptyMap())
 
 data class ComponentsV3Spec(val schemas: Map<String, SchemaSpec> = emptyMap())
 
-data class ResponseV3Spec(val content: Map<String, MessageBodyV3Spec>)
-
 data class PathV3Spec(
     val operationId: String?,
-    val responses: Map<Int, ResponseV3Spec> = emptyMap(),
+    val responses: Map<Int, ResponseSpec> = emptyMap(),
     val requestBody: RequestBodyV3Spec?,
     val parameters: List<ParameterSpec> = emptyList()
 )

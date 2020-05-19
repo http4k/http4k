@@ -3,11 +3,14 @@ package org.http4k.openapi.v2
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.http4k.openapi.InfoSpec
+import org.http4k.openapi.MessageBodySpec
 import org.http4k.openapi.SchemaSpec
 
 data class PathV2Spec(
     val operationId: String?,
+    val produces: List<String> = emptyList(),
     val consumes: List<String> = emptyList(),
+    val responses: Map<String, MessageBodySpec> = emptyMap(),
     val parameters: List<ParameterSpec> = emptyList()
 )
 

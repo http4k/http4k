@@ -1,6 +1,5 @@
 package org.http4k.openapi.v2
 
-import com.squareup.kotlinpoet.FileSpec
 import org.http4k.openapi.ApiGenerator
 import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.v3.models.ModelApiGenerator
