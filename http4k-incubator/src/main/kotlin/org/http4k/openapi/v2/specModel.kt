@@ -7,6 +7,7 @@ import org.http4k.openapi.SchemaSpec
 
 data class PathV2Spec(
     val operationId: String?,
+    val consumes: List<String> = emptyList(),
     val parameters: List<ParameterSpec> = emptyList()
 )
 
