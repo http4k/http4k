@@ -4,25 +4,25 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.openapi.MessageBodySpec
 import org.http4k.openapi.ResponseSpec
 import org.http4k.openapi.SchemaSpec
-import org.http4k.openapi.v3.ComponentsV3Spec
+import org.http4k.openapi.v3.OpenApi3ComponentsSpec
 import org.http4k.openapi.v3.OpenApi3Spec
-import org.http4k.openapi.v3.PathV3Spec
-import org.http4k.openapi.v3.RequestBodyV3Spec
-import org.http4k.openapi.v3.ParameterSpec as ParameterSpecV3
+import org.http4k.openapi.v3.OpenApi3PathSpec
+import org.http4k.openapi.v3.OpenApi3RequestBodySpec
+import org.http4k.openapi.v3.OpenApi3ParameterSpec as ParameterSpecV3
 
 fun OpenApi2Spec.asV3() = OpenApi3Spec(
-    info, paths.mapValues { it.value.mapValues { it.value.asV3() } }, ComponentsV3Spec(components)
+    info, paths.mapValues { it.value.mapValues { it.value.asV3() } }, OpenApi3ComponentsSpec(components)
 )
 
-private fun PathV2Spec.asV3(): PathV3Spec {
+private fun PathV2Spec.asV3(): OpenApi3PathSpec {
 
     val requestBody = parameters.filterIsInstance<ParameterSpec.BodySpec>().firstOrNull()?.let {
-        RequestBodyV3Spec(mapOf(
+        OpenApi3RequestBodySpec(mapOf(
             (consumes.firstOrNull() ?: APPLICATION_JSON.value) to MessageBodySpec(it.schema)
         ))
     }
 
-    return PathV3Spec(
+    return OpenApi3PathSpec(
         operationId,
         responses.map {
             it.key.toInt() to

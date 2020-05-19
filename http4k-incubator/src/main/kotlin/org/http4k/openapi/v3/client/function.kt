@@ -11,8 +11,8 @@ import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
 import org.http4k.openapi.NamedSchema
 import org.http4k.openapi.SchemaSpec
-import org.http4k.openapi.v3.ParameterSpec
-import org.http4k.openapi.v3.PathV3
+import org.http4k.openapi.v3.OpenApi3ParameterSpec
+import org.http4k.openapi.v3.Path
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
@@ -26,21 +26,21 @@ import org.http4k.poet.responseLensDeclarations
 
 private const val reqValName = "httpReq"
 
-fun PathV3.function(modelPackageName: String): FunSpec =
+fun Path.function(modelPackageName: String): FunSpec =
     with(this) {
         val reifiedPath = urlPathPattern.replace("/{", "/\${")
 
-        val parameterBindings = pathV3Spec.parameters.mapNotNull {
+        val parameterBindings = spec.parameters.mapNotNull {
             val binding = "${it.name}Lens of ${it.name}"
             val with = packageMember<Filter>("with")
 
             when (it) {
-                is ParameterSpec.CookieSpec -> {
+                is OpenApi3ParameterSpec.CookieSpec -> {
                     val optionality = if (it.required) "" else " ?: \"\""
                     of("\n\t.%M(${it.name}Lens of %T(${it.quotedName()}, ${it.name}$optionality))", with, Cookie::class.asClassName())
                 }
-                is ParameterSpec.HeaderSpec -> of("\n\t.%M($binding)", with)
-                is ParameterSpec.QuerySpec -> of("\n\t.%M($binding)", with)
+                is OpenApi3ParameterSpec.HeaderSpec -> of("\n\t.%M($binding)", with)
+                is OpenApi3ParameterSpec.QuerySpec -> of("\n\t.%M($binding)", with)
                 else -> null
             }
         }
@@ -84,9 +84,9 @@ fun List<NamedSchema>.bindFirstToHttpMessage(input: String) = listOfNotNull(
         }
 )
 
-private fun FunSpec.Builder.addAllParametersFrom(path: PathV3, modelPackageName: String): FunSpec.Builder =
+private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: String): FunSpec.Builder =
     with(path) {
-        val parameters = pathV3Spec.parameters.map { it.name to it.asTypeName()!! }
+        val parameters = spec.parameters.map { it.name to it.asTypeName()!! }
 
         val bodyParams = requestSchemas().map {
             "request" to when (it) {

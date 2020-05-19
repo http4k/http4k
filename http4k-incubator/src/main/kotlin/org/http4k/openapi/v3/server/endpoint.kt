@@ -6,7 +6,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.openapi.v3.PathV3
+import org.http4k.openapi.v3.Path
 import org.http4k.openapi.v3.client.bindFirstToHttpMessage
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
@@ -16,10 +16,11 @@ import org.http4k.poet.requestLensDeclarations
 import org.http4k.poet.responseLensDeclarations
 import org.http4k.routing.RoutingHttpHandler
 
-fun PathV3.buildEndpoint(modelPackageName: String) = with(this) {
+fun Path.buildEndpoint(modelPackageName: String) = with(this) {
 
     val body = CodeBlock.builder()
 
+    spec
     requestSchemas()
         .forEach {
             body.addStatement("val ${it.fieldName} = ${it.fieldName}Lens(req)")
