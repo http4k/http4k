@@ -50,12 +50,9 @@ private fun String.asSchema(): SchemaSpec = when (this) {
     else -> throw UnsupportedOperationException("cannot support parameter type of $this")
 }
 
-fun OpenApi2Spec.flatten(): OpenApi2Spec {
-    return this
-//    return copy(paths = paths.mapValues {
-//        it.value.mapValues {
-//            val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi2ParameterSpec.RefSpec }
-//            it.value.copy(parameters = refs.filterIsInstance<OpenApi2ParameterSpec.RefSpec>().map { parameters[it.schemaName]!! } + nonrefs)
-//        }.toMap()
-//    })
-}
+fun OpenApi2Spec.flatten() = copy(paths = paths.mapValues {
+    it.value.mapValues {
+        val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi2ParameterSpec.RefSpec }
+        it.value.copy(parameters = refs.filterIsInstance<OpenApi2ParameterSpec.RefSpec>().map { parameters[it.schemaName]!! } + nonrefs)
+    }.toMap()
+})

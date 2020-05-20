@@ -13,7 +13,15 @@
         },
         "body": {
             "schema": {
-                "type": "object"
+                "type": "object",
+                "properties": {
+                    "boolean": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "boolean"
+                ]
             },
             "in": "body",
             "name": "required",
