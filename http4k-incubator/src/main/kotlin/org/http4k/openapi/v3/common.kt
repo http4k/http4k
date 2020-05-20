@@ -32,7 +32,10 @@ fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> ver
 
 fun OpenApi3Spec.apiName() = info.title.capitalize()
 
-fun OpenApi3Spec.flatten(): OpenApi3Spec {
-
-    return this
-}
+fun OpenApi3Spec.flatten() =
+    copy(paths = paths.mapValues { it: Map.Entry<String, Map<String, OpenApi3PathSpec>> ->
+        it.value.mapValues {
+            val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi3ParameterSpec.RefSpec }
+            it.value.copy(parameters = refs.filterIsInstance<OpenApi3ParameterSpec.RefSpec>().map { components.parameters[it.schemaName]!! } + nonrefs)
+        }.toMap()
+    })

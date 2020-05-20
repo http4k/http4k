@@ -23,3 +23,9 @@ fun SchemaSpec.namedSchema(modelName: String): NamedSchema = when (this) {
     else -> clazz?.let { NamedSchema.Existing(modelName, it.asClassName()) }
         ?: NamedSchema.Generated(modelName, this)
 }
+
+fun String.cleanSchemaName() = removePrefix("#/")
+    .removePrefix("components/")
+    .removePrefix("schemas/")
+    .removePrefix("definitions/")
+    .removePrefix("parameters/")

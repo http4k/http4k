@@ -1,0 +1,40 @@
+>>>Endpoint.kt
+
+package testPackage.server.endpoints
+
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.lens.Query
+import org.http4k.lens.boolean
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.bind
+
+fun Endpoint(): RoutingHttpHandler {
+
+	val requiredLens = Query.boolean().required("required")
+
+	return "/reusable" bind Method.POST to { req: Request ->
+		val required = requiredLens(req)
+		Response(Status.OK)
+	}
+}
+
+>>>TitleServer.kt
+
+package testPackage.server
+
+import org.http4k.routing.routes
+import org.http4k.server.asServer
+import testPackage.server.endpoints.Endpoint
+
+object TitleServer {
+	operator fun invoke() = routes(
+		Endpoint()
+	)
+}
+
+fun main() {
+	TitleServer().asServer(SunHttp(8000)).start()
+}

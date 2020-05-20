@@ -34,6 +34,7 @@ val OpenApi3ParameterSpec.lensSpecClazz
         is OpenApi3ParameterSpec.HeaderSpec -> Header::class
         is OpenApi3ParameterSpec.QuerySpec -> Query::class
         is OpenApi3ParameterSpec.PathSpec -> Path::class
+        is OpenApi3ParameterSpec.RefSpec -> throw IllegalStateException()
     }
 
 inline fun <reified T : Any> member(name: String) = MemberName(T::class.asClassName(), name)

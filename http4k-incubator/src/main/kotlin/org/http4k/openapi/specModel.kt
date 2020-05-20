@@ -42,7 +42,7 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
     object StringSpec : SchemaSpec(String::class)
     object BooleanSpec : SchemaSpec(Boolean::class)
     data class RefSpec(val `$ref`: String?) : SchemaSpec() {
-        val schemaName = `$ref`!!.removePrefix("#/components/schemas/").removePrefix("#/definitions/")
+        val schemaName = `$ref`!!.cleanSchemaName()
     }
 }
 
