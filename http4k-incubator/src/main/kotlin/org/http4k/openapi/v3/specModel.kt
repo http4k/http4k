@@ -9,7 +9,7 @@ import org.http4k.openapi.SchemaSpec
 
 data class OpenApi3RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap())
 
-data class OpenApi3ComponentsSpec(val schemas: Map<String, SchemaSpec> = emptyMap())
+data class OpenApi3ComponentsSpec(val schemas: Map<String, SchemaSpec> = emptyMap(), val parameters: Map<String, OpenApi3ParameterSpec> = emptyMap())
 
 data class OpenApi3PathSpec(
     val operationId: String?,

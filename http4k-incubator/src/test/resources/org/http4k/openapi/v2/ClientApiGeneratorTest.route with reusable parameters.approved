@@ -1,0 +1,18 @@
+>>>TitleClient.kt
+
+package testPackage.client
+
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+
+class TitleClient(
+	private val httpHandler: HttpHandler
+) {
+	fun endpoint() {
+
+		val httpReq = Request(Method.POST, "/reusable")
+
+		httpHandler(httpReq)
+	}
+}

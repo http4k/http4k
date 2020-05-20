@@ -1,0 +1,34 @@
+{
+    "info": {
+        "title": "title",
+        "version": "",
+        "description": ""
+    },
+    "paths": {
+        "/reusable": {
+            "post": {
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ref"
+                    }
+                ],
+                "operationId": "endpoint",
+                "responses": {
+                }
+            }
+        }
+    },
+    "components": {
+        "parameters": {
+            "Ref": {
+                "schema": {
+                    "type": "boolean"
+                },
+                "in": "query",
+                "name": "required",
+                "required": true
+            }
+        }
+    },
+    "openapi": "3.0.0"
+}

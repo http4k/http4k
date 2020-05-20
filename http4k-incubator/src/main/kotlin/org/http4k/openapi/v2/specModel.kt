@@ -14,7 +14,7 @@ data class OpenApi2PathSpec(
     val parameters: List<OpenApi2ParameterSpec> = emptyList()
 )
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "in", defaultImpl = SchemaSpec.RefSpec::class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "in", defaultImpl = OpenApi2ParameterSpec.RefSpec::class)
 @JsonSubTypes(
     JsonSubTypes.Type(value = OpenApi2ParameterSpec.CookieSpec::class, name = "cookie"),
     JsonSubTypes.Type(value = OpenApi2ParameterSpec.HeaderSpec::class, name = "header"),
@@ -30,6 +30,7 @@ sealed class OpenApi2ParameterSpec(val name: String, val required: Boolean) {
     class QuerySpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class FormSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class BodySpec(name: String, required: Boolean, val schema: SchemaSpec) : OpenApi2ParameterSpec(name, required)
+    class RefSpec(val `$ref`: String) : OpenApi2ParameterSpec(`$ref`, false)
 }
 
 data class OpenApi2Spec(val info: InfoSpec, val paths: Map<String, Map<String, OpenApi2PathSpec>>, private val definitions: Map<String, SchemaSpec>?) {

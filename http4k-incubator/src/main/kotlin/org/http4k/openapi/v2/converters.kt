@@ -49,3 +49,7 @@ private fun String.asSchema(): SchemaSpec = when (this) {
     "boolean" -> SchemaSpec.BooleanSpec
     else -> throw UnsupportedOperationException("cannot support parameter type of $this")
 }
+
+fun OpenApi2Spec.flatten(): OpenApi2Spec {
+    return this
+}

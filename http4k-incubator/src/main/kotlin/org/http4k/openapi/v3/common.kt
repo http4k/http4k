@@ -31,3 +31,8 @@ data class Path(val urlPathPattern: String, val method: Method, val spec: OpenAp
 fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { Path(path, Method.valueOf(it.key.toUpperCase()), it.value) } }
 
 fun OpenApi3Spec.apiName() = info.title.capitalize()
+
+fun OpenApi3Spec.flatten(): OpenApi3Spec {
+
+    return this
+}
