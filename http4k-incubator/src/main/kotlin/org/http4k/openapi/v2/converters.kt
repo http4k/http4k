@@ -5,13 +5,13 @@ import org.http4k.openapi.MessageBodySpec
 import org.http4k.openapi.ResponseSpec
 import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.v3.OpenApi3ComponentsSpec
-import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.OpenApi3PathSpec
 import org.http4k.openapi.v3.OpenApi3RequestBodySpec
+import org.http4k.openapi.v3.OpenApi3Spec
 import org.http4k.openapi.v3.OpenApi3ParameterSpec as ParameterSpecV3
 
 fun OpenApi2Spec.asV3() = OpenApi3Spec(
-    info, paths.mapValues { it.value.mapValues { it.value.asV3() } }, OpenApi3ComponentsSpec(components)
+    info, paths.mapValues { it.value.mapValues { it.value.asV3() } }, OpenApi3ComponentsSpec(definitions)
 )
 
 private fun OpenApi2PathSpec.asV3(): OpenApi3PathSpec {
@@ -52,4 +52,10 @@ private fun String.asSchema(): SchemaSpec = when (this) {
 
 fun OpenApi2Spec.flatten(): OpenApi2Spec {
     return this
+//    return copy(paths = paths.mapValues {
+//        it.value.mapValues {
+//            val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi2ParameterSpec.RefSpec }
+//            it.value.copy(parameters = refs.filterIsInstance<OpenApi2ParameterSpec.RefSpec>().map { parameters[it.schemaName]!! } + nonrefs)
+//        }.toMap()
+//    })
 }

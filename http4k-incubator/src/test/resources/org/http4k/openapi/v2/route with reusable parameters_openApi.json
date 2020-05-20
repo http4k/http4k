@@ -6,9 +6,7 @@
     },
     "parameters": {
         "required": {
-            "schema": {
-                "type": "boolean"
-            },
+            "type": "boolean",
             "in": "header",
             "name": "required",
             "required": true

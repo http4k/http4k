@@ -25,7 +25,6 @@ data class Path(val urlPathPattern: String, val method: Method, val spec: OpenAp
                 messageSpec.schema?.namedSchema(modelName(contentType, "Response$code"))
             }
         }
-
 }
 
 fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { Path(path, Method.valueOf(it.key.toUpperCase()), it.value) } }
@@ -33,7 +32,7 @@ fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> ver
 fun OpenApi3Spec.apiName() = info.title.capitalize()
 
 fun OpenApi3Spec.flatten() =
-    copy(paths = paths.mapValues { it: Map.Entry<String, Map<String, OpenApi3PathSpec>> ->
+    copy(paths = paths.mapValues {
         it.value.mapValues {
             val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi3ParameterSpec.RefSpec }
             it.value.copy(parameters = refs.filterIsInstance<OpenApi3ParameterSpec.RefSpec>().map { components.parameters[it.schemaName]!! } + nonrefs)

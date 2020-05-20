@@ -33,7 +33,7 @@ sealed class OpenApi3ParameterSpec(val name: String, val required: Boolean, val 
     class HeaderSpec(name: String, required: Boolean, schema: SchemaSpec) : OpenApi3ParameterSpec(name, required, schema)
     class PathSpec(name: String, required: Boolean, schema: SchemaSpec) : OpenApi3ParameterSpec(name, required, schema)
     class QuerySpec(name: String, required: Boolean, schema: SchemaSpec) : OpenApi3ParameterSpec(name, required, schema)
-    data class RefSpec(val `$ref`: String) : OpenApi3ParameterSpec("", false, SchemaSpec.RefSpec(`$ref`)) {
+    class RefSpec(val `$ref`: String) : OpenApi3ParameterSpec(`$ref`, false, SchemaSpec.RefSpec(`$ref`)) {
         val schemaName = `$ref`.cleanSchemaName()
     }
 }

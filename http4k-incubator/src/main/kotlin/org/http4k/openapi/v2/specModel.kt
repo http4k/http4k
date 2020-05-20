@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.http4k.openapi.InfoSpec
 import org.http4k.openapi.MessageBodySpec
 import org.http4k.openapi.SchemaSpec
+import org.http4k.openapi.cleanSchemaName
 
 data class OpenApi2PathSpec(
     val operationId: String?,
@@ -30,9 +31,12 @@ sealed class OpenApi2ParameterSpec(val name: String, val required: Boolean) {
     class QuerySpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class FormSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class BodySpec(name: String, required: Boolean, val schema: SchemaSpec) : OpenApi2ParameterSpec(name, required)
-    class RefSpec(val `$ref`: String) : OpenApi2ParameterSpec(`$ref`, false)
+    data class RefSpec(val `$ref`: String) : OpenApi2ParameterSpec(`$ref`, false) {
+        val schemaName = `$ref`.cleanSchemaName()
+    }
 }
 
-data class OpenApi2Spec(val info: InfoSpec, val paths: Map<String, Map<String, OpenApi2PathSpec>>, private val definitions: Map<String, SchemaSpec>?) {
-    val components = definitions ?: emptyMap()
-}
+data class OpenApi2Spec(val info: InfoSpec,
+                        val paths: Map<String, Map<String, OpenApi2PathSpec>>,
+                        val definitions: Map<String, SchemaSpec> = emptyMap(),
+                        val parameters: Map<String, OpenApi2ParameterSpec> = emptyMap())
