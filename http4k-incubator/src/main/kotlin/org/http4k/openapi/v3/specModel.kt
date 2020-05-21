@@ -7,6 +7,8 @@ import org.http4k.openapi.MessageBodySpec
 import org.http4k.openapi.ResponseSpec
 import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.cleanSchemaName
+import org.http4k.openapi.cleanValueName
+import java.util.Objects
 
 data class OpenApi3RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap())
 
@@ -28,12 +30,16 @@ data class OpenApi3Spec(val info: InfoSpec, val paths: Map<String, Map<String, O
     JsonSubTypes.Type(value = OpenApi3ParameterSpec.QuerySpec::class, name = "query"),
     JsonSubTypes.Type(value = OpenApi3ParameterSpec.CookieSpec::class, name = "cookie")
 )
-sealed class OpenApi3ParameterSpec(val name: String, val required: Boolean, val schema: SchemaSpec) {
+sealed class OpenApi3ParameterSpec(name: String, val required: Boolean, val schema: SchemaSpec) {
+    override fun toString(): String = name + required + schema
+
+    val name = name.cleanValueName()
+
     class CookieSpec(name: String, required: Boolean, schema: SchemaSpec) : OpenApi3ParameterSpec(name, required, schema)
     class HeaderSpec(name: String, required: Boolean, schema: SchemaSpec) : OpenApi3ParameterSpec(name, required, schema)
     class PathSpec(name: String, required: Boolean, schema: SchemaSpec) : OpenApi3ParameterSpec(name, required, schema)
     class QuerySpec(name: String, required: Boolean, schema: SchemaSpec) : OpenApi3ParameterSpec(name, required, schema)
     class RefSpec(val `$ref`: String) : OpenApi3ParameterSpec(`$ref`, false, SchemaSpec.RefSpec(`$ref`)) {
-        val schemaName = `$ref`.cleanSchemaName()
+        val schemaName = `$ref`.cleanSchemaName().cleanValueName()
     }
 }

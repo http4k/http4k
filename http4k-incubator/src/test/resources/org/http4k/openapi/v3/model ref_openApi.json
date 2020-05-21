@@ -29,14 +29,7 @@
                 }
             },
             "DoubleRef": {
-                "type": "object",
-                "required": [
-                ],
-                "properties": {
-                    "value": {
-                        "type": "integer"
-                    }
-                }
+                "type": "integer"
             }
         }
     }

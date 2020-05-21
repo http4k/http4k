@@ -2,6 +2,8 @@ package org.http4k.openapi.v2
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
 import org.http4k.openapi.InfoSpec
 import org.http4k.openapi.MessageBodySpec
 import org.http4k.openapi.SchemaSpec
@@ -24,16 +26,20 @@ data class OpenApi2PathSpec(
     JsonSubTypes.Type(value = OpenApi2ParameterSpec.FormSpec::class, name = "formData"),
     JsonSubTypes.Type(value = OpenApi2ParameterSpec.BodySpec::class, name = "body")
 )
-sealed class OpenApi2ParameterSpec(val name: String, val required: Boolean) {
+sealed class OpenApi2ParameterSpec(val name: String, val required: Boolean, val items: JsonNode = NullNode.instance) {
+    fun itemsSpec(): SchemaSpec = SchemaSpec.ArraySpec(items).itemsSpec()
+
     class CookieSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class HeaderSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class PathSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class QuerySpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class FormSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class BodySpec(name: String, required: Boolean, val schema: SchemaSpec) : OpenApi2ParameterSpec(name, required)
+
     data class RefSpec(val `$ref`: String) : OpenApi2ParameterSpec(`$ref`, false) {
         val schemaName = `$ref`.cleanSchemaName()
     }
+
 }
 
 data class OpenApi2Spec(val info: InfoSpec,

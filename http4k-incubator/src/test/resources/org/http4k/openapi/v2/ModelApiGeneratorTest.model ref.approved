@@ -4,9 +4,7 @@ package testPackage.model
 
 import kotlin.Int
 
-data class DoubleRef(
-	val value: Int?
-)
+typealias DoubleRef = Int
 
 >>>Obj.kt
 

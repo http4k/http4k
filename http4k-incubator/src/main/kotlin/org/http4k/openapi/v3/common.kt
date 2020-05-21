@@ -3,11 +3,12 @@ package org.http4k.openapi.v3
 import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.openapi.NamedSchema
+import org.http4k.openapi.cleanValueName
 import org.http4k.openapi.namedSchema
 
 data class Path(val urlPathPattern: String, val method: Method, val spec: OpenApi3PathSpec) {
     val uniqueName = (spec.operationId
-        ?: method.toString().toLowerCase() + urlPathPattern.replace('/', '_')).capitalize()
+        ?: method.toString().toLowerCase() + urlPathPattern.cleanValueName()).capitalize()
 
     private fun modelName(contentType: String, suffix: String) =
         uniqueName + ContentType(contentType).value.substringAfter('/').capitalize().filter(Char::isLetterOrDigit) + suffix

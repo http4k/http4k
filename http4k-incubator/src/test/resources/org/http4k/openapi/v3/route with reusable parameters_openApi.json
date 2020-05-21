@@ -9,6 +9,9 @@
             "post": {
                 "parameters": [
                     {
+                        "$ref": "#/components/parameters/Array"
+                    },
+                    {
                         "$ref": "#/components/parameters/Ref"
                     }
                 ],
@@ -26,6 +29,17 @@
                 },
                 "in": "query",
                 "name": "required",
+                "required": true
+            },
+            "Array": {
+                "schema": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "in": "query",
+                "name": "array",
                 "required": true
             }
         }

@@ -2,21 +2,26 @@
 
 package testPackage.client
 
+import java.math.BigDecimal
 import kotlin.Boolean
+import kotlin.collections.List
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Query
+import org.http4k.lens.bigDecimal
 import org.http4k.lens.boolean
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(required: Boolean) {
+	fun endpoint(array: List<BigDecimal>, required: Boolean) {
 
+		val arrayLens = Query.bigDecimal().multi.required("array")
 		val requiredLens = Query.boolean().required("required")
 		val httpReq = Request(Method.POST, "/reusable")
+			.with(arrayLens of array)
 			.with(requiredLens of required)
 
 		httpHandler(httpReq)

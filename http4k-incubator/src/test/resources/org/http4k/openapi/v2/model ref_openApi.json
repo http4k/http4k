@@ -26,12 +26,7 @@
             }
         },
         "DoubleRef": {
-            "type": "object",
-            "properties": {
-                "value": {
-                    "type": "integer"
-                }
-            }
+            "type": "integer"
         }
     }
 }

@@ -1,8 +1,8 @@
 package org.http4k.openapi.v3.models
 
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.TypeSpec
 import org.http4k.openapi.ApiGenerator
+import org.http4k.openapi.GeneratedType
 import org.http4k.openapi.GenerationOptions
 import org.http4k.openapi.NamedSchema
 import org.http4k.openapi.buildModelClass
@@ -16,7 +16,7 @@ import org.http4k.poet.childClassName
 object ModelApiGenerator : ApiGenerator<OpenApi3Spec> {
     override fun invoke(spec: OpenApi3Spec, options: GenerationOptions): List<FileSpec> = with(spec.flatten()) {
         val componentSchemas = components.schemas.entries
-            .fold(mutableMapOf<String, TypeSpec>()) { acc, (name, schema) ->
+            .fold(mutableMapOf<String, GeneratedType>()) { acc, (name, schema) ->
                 schema.buildModelClass(options.packageName("model").childClassName(name), components.schemas, acc)
                 acc
             }
@@ -28,9 +28,12 @@ object ModelApiGenerator : ApiGenerator<OpenApi3Spec> {
         }
 
         componentSchemas.values.distinct().map {
-            FileSpec.builder(options.packageName("model"), it.name!!.clean().capitalize())
-                .addType(it)
-                .buildFormatted()
+            FileSpec.builder(options.packageName("model"), it.name.clean().capitalize()).apply {
+                when (it) {
+                    is GeneratedType.GeneratedClass -> addType(it.spec)
+                    is GeneratedType.GeneratedTypeAlias -> addTypeAlias(it.spec)
+                }
+            }.buildFormatted()
         }
     }
 }

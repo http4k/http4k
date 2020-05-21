@@ -70,7 +70,7 @@ fun Path.function(modelPackageName: String): FunSpec =
         FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this, modelPackageName)
             .returns(responseType)
-            .addCodeBlocks(requestLensDeclarations(modelPackageName) + responseLensDeclarations(modelPackageName) + parameterLensDeclarations())
+            .addCodeBlocks((requestLensDeclarations(modelPackageName) + responseLensDeclarations(modelPackageName) + parameterLensDeclarations()).distinct())
             .addCode(buildRequest)
             .addCodeBlocks(response)
             .build()
@@ -86,7 +86,7 @@ fun List<NamedSchema>.bindFirstToHttpMessage(input: String) = listOfNotNull(
 
 private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: String): FunSpec.Builder =
     with(path) {
-        val parameters = spec.parameters.map { it.name to it.asTypeName()!! }
+        val parameters = spec.parameters.map { it.name to it.asTypeName() }
 
         val bodyParams = requestSchemas().map {
             "request" to when (it) {

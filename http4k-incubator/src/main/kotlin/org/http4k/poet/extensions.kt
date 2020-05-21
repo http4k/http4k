@@ -18,11 +18,15 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.openapi.NamedSchema
 import org.http4k.openapi.SchemaSpec
-import org.http4k.openapi.clean
+import org.http4k.openapi.cleanValueName
 import org.http4k.openapi.v3.OpenApi3ParameterSpec
 import kotlin.reflect.KClass
 
-fun OpenApi3ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
+
+fun OpenApi3ParameterSpec.asTypeName() = when (schema) {
+    is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(schema.itemsSpec().clazz!!.asClassName())
+    else -> schema.clazz!!.asClassName().copy(nullable = !required)
+}
 
 fun FileSpec.Builder.buildFormatted() = this.indent("\t").build()
 
@@ -61,11 +65,18 @@ fun org.http4k.openapi.v3.Path.parameterLensDeclarations() = spec.parameters.map
             "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
             it.lensSpecClazz.asClassName()
         )
-        else -> CodeBlock.of(
-            "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
-            it.lensSpecClazz.asClassName(),
-            packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
-        )
+        else -> when (it.schema) {
+            is SchemaSpec.ArraySpec -> CodeBlock.of(
+                "val ${it.name}Lens = %T.%M().multi.${it.lensConstruct()}(${it.quotedName()})",
+                it.lensSpecClazz.asClassName(),
+                packageMember<LensSpec<*, *>>(it.schema.itemsSpec().clazz!!.simpleName!!.decapitalize())
+            )
+            else -> CodeBlock.of(
+                "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
+                it.lensSpecClazz.asClassName(),
+                packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.decapitalize())
+            )
+        }
     }
 }
 
@@ -89,6 +100,6 @@ private fun NamedSchema.lensBlock(type: TypeName) = CodeBlock.of(
     type
 )
 
-fun ClassName.sibling(siblingName: String): ClassName = ClassName(packageName, siblingName.clean().capitalize())
+fun ClassName.sibling(siblingName: String): ClassName = ClassName(packageName, siblingName.cleanValueName().capitalize())
 
-fun String.childClassName(childName: String) = ClassName(this, childName.clean().capitalize())
+fun String.childClassName(childName: String) = ClassName(this, childName.cleanValueName().capitalize())

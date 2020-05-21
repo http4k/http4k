@@ -36,7 +36,7 @@ fun Path.buildEndpoint(modelPackageName: String) = with(this) {
 
     FunSpec.builder(uniqueName)
         .returns(Property<RoutingHttpHandler>().type)
-        .addCodeBlocks(requestLensDeclarations(modelPackageName) + responseLensDeclarations(modelPackageName) + parameterLensDeclarations())
+        .addCodeBlocks((requestLensDeclarations(modelPackageName) + responseLensDeclarations(modelPackageName) + parameterLensDeclarations()).distinct())
         .addCode("\n")
         .addCode("return·\"$urlPathPattern\"·%M·%T.${method}·to·", packageMember<RoutingHttpHandler>("bind"), Property<Method>().type)
         .addCode(handler)

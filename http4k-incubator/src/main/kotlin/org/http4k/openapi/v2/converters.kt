@@ -1,6 +1,7 @@
 package org.http4k.openapi.v2
 
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Status
 import org.http4k.openapi.MessageBodySpec
 import org.http4k.openapi.ResponseSpec
 import org.http4k.openapi.SchemaSpec
@@ -25,7 +26,7 @@ private fun OpenApi2PathSpec.asV3(): OpenApi3PathSpec {
     return OpenApi3PathSpec(
         operationId,
         responses.map {
-            it.key.toInt() to
+            (it.key.toIntOrNull() ?: Status.OK.code) to
                 ResponseSpec(mapOf((produces.firstOrNull() ?: APPLICATION_JSON.value) to it.value))
         }.toMap(),
         requestBody,
@@ -33,20 +34,20 @@ private fun OpenApi2PathSpec.asV3(): OpenApi3PathSpec {
     )
 }
 
-private fun OpenApi2ParameterSpec.asV3(): ParameterSpecV3? =
-    when (this) {
-        is OpenApi2ParameterSpec.CookieSpec -> ParameterSpecV3.CookieSpec(name, required, type.asSchema())
-        is OpenApi2ParameterSpec.HeaderSpec -> ParameterSpecV3.HeaderSpec(name, required, type.asSchema())
-        is OpenApi2ParameterSpec.PathSpec -> ParameterSpecV3.PathSpec(name, required, type.asSchema())
-        is OpenApi2ParameterSpec.QuerySpec -> ParameterSpecV3.QuerySpec(name, required, type.asSchema())
-        else -> null
-    }
+private fun OpenApi2ParameterSpec.asV3() = when (this) {
+    is OpenApi2ParameterSpec.CookieSpec -> ParameterSpecV3.CookieSpec(name, required, type.asSchema(this))
+    is OpenApi2ParameterSpec.HeaderSpec -> ParameterSpecV3.HeaderSpec(name, required, type.asSchema(this))
+    is OpenApi2ParameterSpec.PathSpec -> ParameterSpecV3.PathSpec(name, required, type.asSchema(this))
+    is OpenApi2ParameterSpec.QuerySpec -> ParameterSpecV3.QuerySpec(name, required, type.asSchema(this))
+    else -> null
+}
 
-private fun String.asSchema(): SchemaSpec = when (this) {
+private fun String.asSchema(parameterSpec: OpenApi2ParameterSpec) = when (this) {
     "string" -> SchemaSpec.StringSpec
     "integer" -> SchemaSpec.IntegerSpec
     "number" -> SchemaSpec.NumberSpec
     "boolean" -> SchemaSpec.BooleanSpec
+    "array" -> parameterSpec.itemsSpec()
     else -> throw UnsupportedOperationException("cannot support parameter type of $this")
 }
 
