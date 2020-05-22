@@ -12,9 +12,11 @@ import org.http4k.server.asServer
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus.Companion.NORMAL
+import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.concurrent.LinkedBlockingQueue
 
 class WebsocketClientTest {
@@ -33,6 +35,15 @@ class WebsocketClientTest {
                     ws.send(it)
                     ws.close(NORMAL)
                 }
+            },
+
+            "/long-living/{name}" bind { ws: Websocket ->
+                val name = ws.upgradeRequest.path("name")!!
+                ws.send(WsMessage(name))
+                ws.onMessage {
+                    ws.send(it)
+                    // not sending close
+                }
             }
         )
         server = ws.asServer(Jetty(0)).start()
@@ -44,10 +55,49 @@ class WebsocketClientTest {
     }
 
     @Test
-    fun `blocking`() {
+    fun `blocking happy path`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bob"))
         client.send(WsMessage("hello"))
         assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
+    }
+
+    @Test
+    fun `blocking gets exception on sending after the connection is closed`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bob"))
+        client.send(WsMessage("hello"))
+        assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
+        assertThrows<WebsocketNotConnectedException> {
+            client.send(WsMessage("hi"))
+        }
+    }
+
+    @Test
+    fun `blocking with auto-reconnection (closed by server)`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bob"), autoReconnection = true)
+        client.send(WsMessage("hello"))
+
+        assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
+        
+        client.send(WsMessage("hi"))
+        assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hi"))))
+    }
+
+    @Test
+    fun `blocking with auto-reconnection (closed by client)`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/long-living/bob"), autoReconnection = true)
+
+        client.send(WsMessage("hello"))
+        Thread.sleep(100) // wait until the message comes back
+
+        client.close()
+
+        assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
+
+        client.send(WsMessage("hi"))
+        Thread.sleep(100)
+        client.close()
+
+        assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hi"))))
     }
 
     @Test
