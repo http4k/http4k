@@ -39,6 +39,7 @@ private fun OpenApi2ParameterSpec.asV3() = when (this) {
     is OpenApi2ParameterSpec.HeaderSpec -> ParameterSpecV3.HeaderSpec(name, required, type.asSchema(this))
     is OpenApi2ParameterSpec.PathSpec -> ParameterSpecV3.PathSpec(name, required, type.asSchema(this))
     is OpenApi2ParameterSpec.QuerySpec -> ParameterSpecV3.QuerySpec(name, required, type.asSchema(this))
+    is OpenApi2ParameterSpec.FormSpec -> ParameterSpecV3.FormFieldSpec(name, required, type.asSchema(this))
     else -> null
 }
 
@@ -51,20 +52,14 @@ private fun String.asSchema(parameterSpec: OpenApi2ParameterSpec) = when (this) 
     else -> throw UnsupportedOperationException("cannot support parameter type of $this")
 }
 
-fun OpenApi2Spec.flatten() = replaceFormsWithParameters().flattenParameterRefsIntoPaths()
-
-/**
- * Forms will render as objects instead of a set of parameters. Replace them upfront.
- */
-private fun OpenApi2Spec.replaceFormsWithParameters(): OpenApi2Spec = this
-
 /**
  * For all parameters which are common (and represented in the paths as Refs), inline the content into the path so
  * we can tell the type without looking up from the "global" list
  */
-private fun OpenApi2Spec.flattenParameterRefsIntoPaths() = copy(paths = paths.mapValues {
-    it.value.mapValues {
-        val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi2ParameterSpec.RefSpec }
-        it.value.copy(parameters = refs.filterIsInstance<OpenApi2ParameterSpec.RefSpec>().map { parameters[it.schemaName]!! } + nonrefs)
-    }.toMap()
-})
+fun OpenApi2Spec.flatten() = copy(paths = paths.mapValues {
+        it.value.mapValues {
+            val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi2ParameterSpec.RefSpec }
+            it.value.copy(parameters = refs.filterIsInstance<OpenApi2ParameterSpec.RefSpec>().map { parameters[it.schemaName]!! } + nonrefs)
+        }.toMap()
+    })
+

@@ -4,5 +4,26 @@
         "title": "title",
         "version": "1.0"
     },
-    "paths": {}
+    "parameters": {
+        "required": {
+            "type": "boolean",
+            "in": "formData",
+            "name": "required",
+            "required": true
+        }
+    },
+    "paths": {
+        "/formreusable": {
+            "post": {
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/required"
+                    }
+                ],
+                "operationId": "endpoint",
+                "responses": {
+                }
+            }
+        }
+    }
 }
