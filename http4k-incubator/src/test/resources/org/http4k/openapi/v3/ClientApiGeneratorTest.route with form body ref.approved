@@ -2,22 +2,20 @@
 
 package testPackage.client
 
-import org.http4k.core.Body
+import kotlin.Int
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.with
-import org.http4k.format.Jackson.auto
-import testPackage.model.Ref
+import org.http4k.lens.FormField
+import org.http4k.lens.int
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(request: Ref) {
+	fun endpoint(value: Int?) {
 
-		val refLens = Body.auto<Ref>().toLens()
+		val valueLens = FormField.int().optional("value")
 		val httpReq = Request(Method.POST, "/formbody")
-			.with(refLens of request)
 
 		httpHandler(httpReq)
 	}
