@@ -12,6 +12,7 @@ import com.squareup.kotlinpoet.asTypeName
 import org.http4k.core.Body
 import org.http4k.format.Jackson
 import org.http4k.lens.Cookies
+import org.http4k.lens.FormField
 import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
@@ -38,6 +39,7 @@ val OpenApi3ParameterSpec.lensSpecClazz
         is OpenApi3ParameterSpec.HeaderSpec -> Header::class
         is OpenApi3ParameterSpec.QuerySpec -> Query::class
         is OpenApi3ParameterSpec.PathSpec -> Path::class
+        is OpenApi3ParameterSpec.FormFieldSpec -> FormField::class
         is OpenApi3ParameterSpec.RefSpec -> throw IllegalStateException()
     }
 

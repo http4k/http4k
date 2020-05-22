@@ -29,7 +29,7 @@ private fun OpenApi2PathSpec.asV3(): OpenApi3PathSpec {
             (it.key.toIntOrNull() ?: Status.OK.code) to
                 ResponseSpec(mapOf((produces.firstOrNull() ?: APPLICATION_JSON.value) to it.value))
         }.toMap(),
-        requestBody,
+        requestBody ?: OpenApi3RequestBodySpec(),
         parameters.filterNot { it is OpenApi2ParameterSpec.BodySpec }.mapNotNull { it.asV3() }
     )
 }

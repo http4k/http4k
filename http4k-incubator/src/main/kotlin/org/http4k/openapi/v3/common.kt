@@ -1,6 +1,7 @@
 package org.http4k.openapi.v3
 
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method
 import org.http4k.openapi.NamedSchema
 import org.http4k.openapi.cleanValueName
@@ -37,7 +38,17 @@ fun OpenApi3Spec.flatten() = replaceFormsWithParameters().flattenParameterRefsIn
 /**
  * Forms will render as objects instead of a set of parameters. Replace them upfront.
  */
-private fun OpenApi3Spec.replaceFormsWithParameters(): OpenApi3Spec = this
+private fun OpenApi3Spec.replaceFormsWithParameters(): OpenApi3Spec = copy(
+    paths = paths.mapValues {
+        it.value.mapValues { (_, path) ->
+            val requestBody = path.requestBody
+            val formContent = requestBody.content[APPLICATION_FORM_URLENCODED.value]
+            if (formContent != null) {
+                path.copy(requestBody = requestBody.copy(content = requestBody.content + (APPLICATION_FORM_URLENCODED.value to formContent)))
+            } else path
+        }
+    }
+)
 
 /**
  * For all parameters which are common (and represented in the paths as Refs), inline the content into the path so

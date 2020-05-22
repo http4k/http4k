@@ -16,7 +16,7 @@ data class OpenApi3ComponentsSpec(val schemas: Map<String, SchemaSpec> = emptyMa
 data class OpenApi3PathSpec(
     val operationId: String?,
     val responses: Map<Int, ResponseSpec> = emptyMap(),
-    val requestBody: OpenApi3RequestBodySpec?,
+    val requestBody: OpenApi3RequestBodySpec = OpenApi3RequestBodySpec(),
     val parameters: List<OpenApi3ParameterSpec> = emptyList()
 )
 
