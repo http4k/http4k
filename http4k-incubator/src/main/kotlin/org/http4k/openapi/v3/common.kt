@@ -3,7 +3,9 @@ package org.http4k.openapi.v3
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method
+import org.http4k.openapi.MessageBodySpec
 import org.http4k.openapi.NamedSchema
+import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.cleanValueName
 import org.http4k.openapi.namedSchema
 
@@ -41,14 +43,41 @@ fun OpenApi3Spec.flatten() = replaceFormsWithParameters().flattenParameterRefsIn
 private fun OpenApi3Spec.replaceFormsWithParameters(): OpenApi3Spec = copy(
     paths = paths.mapValues {
         it.value.mapValues { (_, path) ->
-            path.requestBody.content[APPLICATION_FORM_URLENCODED.value]
-                ?.let {
-                    path.copy(requestBody = path.requestBody.copy(content = path.requestBody.content + (APPLICATION_FORM_URLENCODED.value to it)))
+            path.contentFor(APPLICATION_FORM_URLENCODED)
+                ?.let { formContent ->
+                    when (formContent.schema) {
+                        is SchemaSpec.RefSpec -> {
+                            when (val newFormSchema = components.schemas[formContent.schema.`$ref`]!!) {
+                                is SchemaSpec.ObjectSpec -> path.copy(
+                                    parameters = path.parameters + newFormSchema.convertToParameters(),
+                                    requestBody = path.remove(APPLICATION_FORM_URLENCODED)
+                                )
+                                else -> path.add(APPLICATION_FORM_URLENCODED, formContent)
+                            }
+                        }
+                        is SchemaSpec.ObjectSpec -> path.copy(
+                            parameters = path.parameters + formContent.schema.convertToParameters(),
+                            requestBody = path.remove(APPLICATION_FORM_URLENCODED)
+                        )
+                        else -> null
+                    }
                 }
                 ?: path
         }
     }
 )
+
+private fun OpenApi3PathSpec.contentFor(contentType: ContentType) = requestBody.content[contentType.value]
+
+private fun OpenApi3PathSpec.add(contentType: ContentType, it: MessageBodySpec): OpenApi3PathSpec =
+    copy(requestBody = requestBody.copy(content = requestBody.content + (contentType.value to it)))
+
+private fun OpenApi3PathSpec.remove(contentType: ContentType): OpenApi3RequestBodySpec =
+    requestBody.copy(content = requestBody.content.minus(contentType.value))
+
+private fun SchemaSpec.ObjectSpec.convertToParameters() = properties.map {
+    OpenApi3ParameterSpec.FormFieldSpec(it.key, required.contains(it.key), it.value)
+}
 
 /**
  * For all parameters which are common (and represented in the paths as Refs), inline the content into the path so

@@ -2,23 +2,32 @@
 
 package testPackage.client
 
-import org.http4k.core.Body
+import kotlin.Boolean
+import kotlin.Int
+import kotlin.String
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.with
-import org.http4k.format.Jackson.auto
-import testPackage.model.EndpointXwwwformurlencodedRequest
+import org.http4k.lens.FormField
+import org.http4k.lens.boolean
+import org.http4k.lens.int
+import org.http4k.lens.string
 
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
-	fun endpoint(request: EndpointXwwwformurlencodedRequest) {
+	fun endpoint(
+		boolean: Boolean,
+		integer: Int?,
+		string: String?,
+		json: String
+	) {
 
-		val endpointXwwwformurlencodedRequestLens =
-				Body.auto<EndpointXwwwformurlencodedRequest>().toLens()
+		val booleanLens = FormField.boolean().required("boolean")
+		val integerLens = FormField.int().optional("integer")
+		val stringLens = FormField.string().optional("string")
+		val jsonLens = FormField.string().required("json")
 		val httpReq = Request(Method.POST, "/formbody")
-			.with(endpointXwwwformurlencodedRequestLens of request)
 
 		httpHandler(httpReq)
 	}
