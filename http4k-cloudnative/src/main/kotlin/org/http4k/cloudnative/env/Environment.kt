@@ -35,7 +35,7 @@ interface Environment {
      * Used to chain: eg. Local File -> System Properties -> Env Properties -> Defaults
      */
     infix fun overrides(that: Environment): Environment = MapEnvironment.from(
-        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties()
+        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties(), separator = separator
     )
 
     companion object {
