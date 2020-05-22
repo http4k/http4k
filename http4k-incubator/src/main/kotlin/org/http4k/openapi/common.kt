@@ -6,13 +6,11 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 
 sealed class NamedSchema(name: String) {
-    val fieldName = name.clean().decapitalize()
+    val fieldName = name.cleanValueName().decapitalize()
 
     data class Existing(val name: String, val typeName: TypeName) : NamedSchema(name)
     data class Generated(val name: String, val schema: SchemaSpec) : NamedSchema(name)
 }
-
-fun String.clean() = filter { it.isLetterOrDigit() }
 
 fun SchemaSpec.namedSchema(modelName: String): NamedSchema = when (this) {
     is SchemaSpec.RefSpec -> NamedSchema.Generated(schemaName, this)
@@ -23,3 +21,13 @@ fun SchemaSpec.namedSchema(modelName: String): NamedSchema = when (this) {
     else -> clazz?.let { NamedSchema.Existing(modelName, it.asClassName()) }
         ?: NamedSchema.Generated(modelName, this)
 }
+
+fun String.cleanSchemaName() = removePrefix("#/")
+    .removePrefix("components/")
+    .removePrefix("schemas/")
+    .removePrefix("definitions/")
+    .removePrefix("parameters/")
+
+fun String.clean() = filter { it.isLetterOrDigit()  || it == '_' }
+
+fun String.cleanValueName() = replace('/', '_').clean()

@@ -49,6 +49,9 @@ abstract class ApiGeneratorContract<T : Any>(private val clazz: KClass<T>, priva
     open fun `route with json body array`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
+    open fun `route with json body ref`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+
+    @Test
     open fun `route with json body object`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
@@ -58,7 +61,7 @@ abstract class ApiGeneratorContract<T : Any>(private val clazz: KClass<T>, priva
     open fun `route with json body object no schema`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
-    open fun `route with json body ref`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+    open fun `route with reusable parameters`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     fun Approver.assertGeneratedContent(rl: ResourceLoader) {
         assertApproved(apiGenerator(OpenApiJson.asA(rl.text("openApi.json"), clazz), GenerationOptions("testPackage", File(".")))

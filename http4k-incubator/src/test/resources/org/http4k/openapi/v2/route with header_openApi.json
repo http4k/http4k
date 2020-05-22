@@ -4,5 +4,25 @@
         "title": "title",
         "version": "1.0"
     },
-    "paths": {}
+    "paths": {
+        "/header": {
+            "post": {
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "required",
+                        "required": true,
+                        "type": "boolean"
+                    },
+                    {
+                        "in": "header",
+                        "name": "optional",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "operationId": "endpoint"
+            }
+        }
+    }
 }

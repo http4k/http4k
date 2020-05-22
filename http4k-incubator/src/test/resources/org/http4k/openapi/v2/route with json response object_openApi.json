@@ -4,5 +4,39 @@
         "title": "title",
         "version": "1.0"
     },
-    "paths": {}
+    "paths": {
+        "/jsonbody": {
+            "post": {
+                "parameters": [
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "boolean": {
+                                    "type": "boolean"
+                                },
+                                "integer": {
+                                    "type": "integer"
+                                },
+                                "string": {
+                                    "type": "string"
+                                },
+                                "json": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "boolean",
+                                "json"
+                            ]
+                        }
+                    }
+                },
+                "operationId": "endpoint"
+            }
+        }
+    }
 }

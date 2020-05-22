@@ -16,7 +16,6 @@ class Property(val name: String, val type: TypeName, vararg val modifiers: KModi
             with(T::class) { Property(simpleName!!, ClassName.bestGuess(qualifiedName!!).copy(nullable = isNullable), *modifiers) }
 
         fun FunSpec.Builder.addParameter(property: Property) = addParameter(ParameterSpec.builder(property.name, property.type, *property.modifiers).build())
-        fun FunSpec.Builder.addReturnType(property: Property) = returns(property.type)
         fun TypeSpec.Builder.addProperty(property: Property) = addProperty(PropertySpec.builder(property.name, property.type, *property.modifiers).initializer(property.name).build())
     }
 }

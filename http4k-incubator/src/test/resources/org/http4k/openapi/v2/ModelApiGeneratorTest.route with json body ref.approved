@@ -1,0 +1,9 @@
+>>>Ref.kt
+
+package testPackage.model
+
+import kotlin.Int
+
+data class Ref(
+	val value: Int?
+)

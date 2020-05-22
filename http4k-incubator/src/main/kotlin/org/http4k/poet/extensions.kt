@@ -18,22 +18,27 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.openapi.NamedSchema
 import org.http4k.openapi.SchemaSpec
-import org.http4k.openapi.clean
-import org.http4k.openapi.v3.ParameterSpec
+import org.http4k.openapi.cleanValueName
+import org.http4k.openapi.v3.OpenApi3ParameterSpec
 import kotlin.reflect.KClass
 
-fun ParameterSpec.asTypeName() = schema.clazz?.asTypeName()?.copy(nullable = !required)
+
+fun OpenApi3ParameterSpec.asTypeName() = when (schema) {
+    is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(schema.itemsSpec().clazz!!.asClassName())
+    else -> schema.clazz!!.asClassName().copy(nullable = !required)
+}
 
 fun FileSpec.Builder.buildFormatted() = this.indent("\t").build()
 
-fun ParameterSpec.quotedName() = "\"$name\""
+fun OpenApi3ParameterSpec.quotedName() = "\"$name\""
 
-val ParameterSpec.lensSpecClazz
+val OpenApi3ParameterSpec.lensSpecClazz
     get() = when (this) {
-        is ParameterSpec.CookieSpec -> Cookies::class
-        is ParameterSpec.HeaderSpec -> Header::class
-        is ParameterSpec.QuerySpec -> Query::class
-        is ParameterSpec.PathSpec -> Path::class
+        is OpenApi3ParameterSpec.CookieSpec -> Cookies::class
+        is OpenApi3ParameterSpec.HeaderSpec -> Header::class
+        is OpenApi3ParameterSpec.QuerySpec -> Query::class
+        is OpenApi3ParameterSpec.PathSpec -> Path::class
+        is OpenApi3ParameterSpec.RefSpec -> throw IllegalStateException()
     }
 
 inline fun <reified T : Any> member(name: String) = MemberName(T::class.asClassName(), name)
@@ -42,30 +47,37 @@ fun KClass<*>.packageMember(name: String) = MemberName(qualifiedName!!.split("."
 
 fun FunSpec.Builder.addCodeBlocks(blocks: List<CodeBlock>) = blocks.fold(this) { acc, next -> acc.addCode("\n").addCode(next) }.addCode("\n")
 
-fun ParameterSpec.lensConstruct() =
+fun OpenApi3ParameterSpec.lensConstruct() =
     when (this) {
-        is ParameterSpec.PathSpec -> "of"
+        is OpenApi3ParameterSpec.PathSpec -> "of"
         else -> if (required) "required" else "optional"
     }
 
-fun org.http4k.openapi.v3.PathV3.lensDeclarations(modelPackageName: String): List<CodeBlock> {
-    val bodyTypes = allSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
+fun org.http4k.openapi.v3.Path.responseLensDeclarations(modelPackageName: String) =
+    responseSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
 
-    val parameterTypes = pathV3Spec.parameters.map {
-        when (it) {
-            is ParameterSpec.CookieSpec -> CodeBlock.of(
-                "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
-                it.lensSpecClazz.asClassName()
+fun org.http4k.openapi.v3.Path.requestLensDeclarations(modelPackageName: String) =
+    requestSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
+
+fun org.http4k.openapi.v3.Path.parameterLensDeclarations() = spec.parameters.map {
+    when (it) {
+        is OpenApi3ParameterSpec.CookieSpec -> CodeBlock.of(
+            "val ${it.name}Lens = %T.${it.lensConstruct()}(${it.quotedName()})",
+            it.lensSpecClazz.asClassName()
+        )
+        else -> when (it.schema) {
+            is SchemaSpec.ArraySpec -> CodeBlock.of(
+                "val ${it.name}Lens = %T.%M().multi.${it.lensConstruct()}(${it.quotedName()})",
+                it.lensSpecClazz.asClassName(),
+                packageMember<LensSpec<*, *>>(it.schema.itemsSpec().clazz!!.simpleName!!.decapitalize())
             )
             else -> CodeBlock.of(
                 "val ${it.name}Lens = %T.%M().${it.lensConstruct()}(${it.quotedName()})",
                 it.lensSpecClazz.asClassName(),
-                packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.toLowerCase())
+                packageMember<LensSpec<*, *>>(it.schema.clazz!!.simpleName!!.decapitalize())
             )
         }
     }
-
-    return bodyTypes + parameterTypes
 }
 
 fun NamedSchema.lensDeclaration(modelPackageName: String): CodeBlock? = when (this) {
@@ -88,6 +100,6 @@ private fun NamedSchema.lensBlock(type: TypeName) = CodeBlock.of(
     type
 )
 
-fun ClassName.sibling(siblingName: String): ClassName = ClassName(packageName, siblingName.clean().capitalize())
+fun ClassName.sibling(siblingName: String): ClassName = ClassName(packageName, siblingName.cleanValueName().capitalize())
 
-fun String.childClassName(childName: String) = ClassName(this, childName.clean().capitalize())
+fun String.childClassName(childName: String) = ClassName(this, childName.cleanValueName().capitalize())

@@ -1,0 +1,29 @@
+>>>TitleClient.kt
+
+package testPackage.client
+
+import kotlin.Boolean
+import org.http4k.core.Body
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.with
+import org.http4k.format.Jackson.auto
+import org.http4k.lens.Header
+import org.http4k.lens.boolean
+import testPackage.model.EndpointJsonRequest
+
+class TitleClient(
+	private val httpHandler: HttpHandler
+) {
+	fun endpoint(required: Boolean, request: EndpointJsonRequest) {
+
+		val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
+		val requiredLens = Header.boolean().required("required")
+		val httpReq = Request(Method.POST, "/reusable")
+			.with(endpointJsonRequestLens of request)
+			.with(requiredLens of required)
+
+		httpHandler(httpReq)
+	}
+}

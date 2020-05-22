@@ -6,6 +6,7 @@ import java.math.BigDecimal
 import kotlin.collections.List
 import org.http4k.core.Body
 import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.format.Jackson.auto
@@ -15,7 +16,11 @@ import org.http4k.routing.bind
 fun Endpoint(): RoutingHttpHandler {
 
 	val endpointJsonRequestLens = Body.auto<List<BigDecimal>>().toLens()
-	return "/jsonbody" bind Method.POST to { Response(Status.OK) }
+
+	return "/jsonbody" bind Method.POST to { req: Request ->
+		val endpointJsonRequest = endpointJsonRequestLens(req)
+		Response(Status.OK)
+	}
 }
 
 >>>TitleServer.kt

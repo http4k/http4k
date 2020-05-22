@@ -1,0 +1,21 @@
+>>>TitleClient.kt
+
+package testPackage.client
+
+import org.http4k.core.Body
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.format.Jackson.auto
+import testPackage.model.Ref
+
+class TitleClient(
+	private val httpHandler: HttpHandler
+) {
+	fun endpoint(): Ref {
+
+		val refLens = Body.auto<Ref>().toLens()
+		val httpReq = Request(Method.POST, "/jsonbody")
+		return refLens(httpHandler(httpReq))
+	}
+}

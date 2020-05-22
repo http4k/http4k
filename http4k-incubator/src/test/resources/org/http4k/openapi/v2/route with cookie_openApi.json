@@ -4,5 +4,25 @@
         "title": "title",
         "version": "1.0"
     },
-    "paths": {}
+    "paths": {
+        "/cookie": {
+            "post": {
+                "parameters": [
+                    {
+                        "in": "cookie",
+                        "name": "required",
+                        "required": true,
+                        "type": "boolean"
+                    },
+                    {
+                        "in": "cookie",
+                        "name": "optional",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "operationId": "endpoint"
+            }
+        }
+    }
 }

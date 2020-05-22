@@ -4,5 +4,41 @@
         "title": "title",
         "version": "1.0"
     },
-    "paths": {}
+    "paths": {
+        "/jsonbody": {
+            "post": {
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "required",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "boolean": {
+                                    "type": "boolean"
+                                },
+                                "integer": {
+                                    "type": "integer"
+                                },
+                                "string": {
+                                    "type": "string"
+                                },
+                                "json": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "boolean",
+                                "json"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                },
+                "operationId": "endpoint"
+            }
+        }
+    }
 }
