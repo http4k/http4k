@@ -41,11 +41,11 @@ fun OpenApi3Spec.flatten() = replaceFormsWithParameters().flattenParameterRefsIn
 private fun OpenApi3Spec.replaceFormsWithParameters(): OpenApi3Spec = copy(
     paths = paths.mapValues {
         it.value.mapValues { (_, path) ->
-            val requestBody = path.requestBody
-            val formContent = requestBody.content[APPLICATION_FORM_URLENCODED.value]
-            if (formContent != null) {
-                path.copy(requestBody = requestBody.copy(content = requestBody.content + (APPLICATION_FORM_URLENCODED.value to formContent)))
-            } else path
+            path.requestBody.content[APPLICATION_FORM_URLENCODED.value]
+                ?.let {
+                    path.copy(requestBody = path.requestBody.copy(content = path.requestBody.content + (APPLICATION_FORM_URLENCODED.value to it)))
+                }
+                ?: path
         }
     }
 )
