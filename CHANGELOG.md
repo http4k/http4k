@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.248.0 (uncut)
 - [all] Upgrade some dependency versions.
 - [http4k-cloudnative] - Fix #418 - Fix separator propagation when adding values to an existing MapEnvironment. H/T @jshiell
+- [http4k-contract] - Add support for securing the API description endpoint. H/T @goodhoko for the PR.
 
 ### v3.247.0
 - [http4k-server-ktornetty] New backend module! H/T @albertlatacz for the contribution!
