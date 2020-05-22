@@ -74,7 +74,7 @@ interface Environment {
 class MapEnvironment private constructor(private val contents: Map<String, String>, override val separator: String = ",") : Environment {
     override operator fun <T> get(key: Lens<Environment, T>) = key(this)
     override operator fun get(key: String): String? = contents[key.convertFromKey()]
-    override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value))
+    override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value), separator)
     override fun minus(key: String): Environment = MapEnvironment(contents - key.convertFromKey(), separator)
     override fun keys() = contents.keys
 
