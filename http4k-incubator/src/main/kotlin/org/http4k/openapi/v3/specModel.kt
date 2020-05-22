@@ -31,8 +31,6 @@ data class OpenApi3Spec(val info: InfoSpec, val paths: Map<String, Map<String, O
     JsonSubTypes.Type(value = OpenApi3ParameterSpec.CookieSpec::class, name = "cookie")
 )
 sealed class OpenApi3ParameterSpec(name: String, val required: Boolean, val schema: SchemaSpec) {
-    override fun toString(): String = name + required + schema
-
     val name = name.cleanValueName()
 
     class CookieSpec(name: String, required: Boolean, schema: SchemaSpec) : OpenApi3ParameterSpec(name, required, schema)
