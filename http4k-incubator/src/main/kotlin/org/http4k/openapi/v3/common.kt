@@ -32,10 +32,20 @@ fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> ver
 
 fun OpenApi3Spec.apiName() = info.title.capitalize()
 
-fun OpenApi3Spec.flatten() =
-    copy(paths = paths.mapValues {
-        it.value.mapValues {
-            val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi3ParameterSpec.RefSpec }
-            it.value.copy(parameters = refs.filterIsInstance<OpenApi3ParameterSpec.RefSpec>().map { components.parameters[it.schemaName]!! } + nonrefs)
-        }.toMap()
-    })
+fun OpenApi3Spec.flatten() = replaceFormsWithParameters().flattenParameterRefsIntoPaths()
+
+/**
+ * Forms will render as objects instead of a set of parameters. Replace them upfront.
+ */
+private fun OpenApi3Spec.replaceFormsWithParameters(): OpenApi3Spec = this
+
+/**
+ * For all parameters which are common (and represented in the paths as Refs), inline the content into the path so
+ * we can tell the type without looking up from the "global" list
+ */
+private fun OpenApi3Spec.flattenParameterRefsIntoPaths(): OpenApi3Spec = copy(paths = paths.mapValues {
+    it.value.mapValues {
+        val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi3ParameterSpec.RefSpec }
+        it.value.copy(parameters = refs.filterIsInstance<OpenApi3ParameterSpec.RefSpec>().map { components.parameters[it.schemaName]!! } + nonrefs)
+    }.toMap()
+})
