@@ -43,18 +43,20 @@ fun OpenApi3Spec.flatten() = replaceFormsWithParameters().flattenParameterRefsIn
 private fun OpenApi3Spec.replaceFormsWithParameters(): OpenApi3Spec = copy(
     paths = paths.mapValues {
         it.value.mapValues { (_, path) ->
-            path.contentFor(APPLICATION_FORM_URLENCODED)
-                ?.let { formContent ->
-                    when (formContent.schema) {
-                        is SchemaSpec.RefSpec -> inlineReference(path, formContent, formContent.schema.schemaName)
-                        is SchemaSpec.ObjectSpec -> path.convertFormToParameters(formContent.schema)
-                        else -> null
-                    }
+            if (path.supports(APPLICATION_FORM_URLENCODED)) {
+                val formContent = path.get(APPLICATION_FORM_URLENCODED)
+                when (formContent.schema) {
+                    is SchemaSpec.RefSpec -> inlineReference(path, formContent, formContent.schema.schemaName)
+                    is SchemaSpec.ObjectSpec -> path.convertFormToParameters(formContent.schema)
+                    else -> path
                 }
-                ?: path
+            } else path
         }
     }
 )
+
+private fun OpenApi3PathSpec.get(contentType: ContentType) = contentFor(contentType)!!
+private fun OpenApi3PathSpec.supports(contentType: ContentType) = contentFor(contentType) != null
 
 private fun OpenApi3Spec.inlineReference(path: OpenApi3PathSpec, formContent: MessageBodySpec, ref: String?) =
     when (val newFormSchema = components.schemas[ref]!!) {
