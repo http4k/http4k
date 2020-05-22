@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.248.0 (uncut)
+- [all] Upgrade some dependency versions.
+- [http4k-cloudnative] - Fix #418 - Fix separator propagation when adding values to an existing MapEnvironment. H/T @jshiell
+
 ### v3.247.0
 - [http4k-server-ktornetty] New backend module! H/T @albertlatacz for the contribution!
 - [all] Upgrade some dependency versions.

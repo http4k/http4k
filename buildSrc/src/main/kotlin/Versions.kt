@@ -1,4 +1,3 @@
-import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -21,7 +20,7 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.9.2"
 
-    const val org_eclipse_jetty: String = "9.4.28.v20200408"
+    const val org_eclipse_jetty: String = "9.4.29.v20200521"
 
     const val org_junit_jupiter: String = "5.6.2"
 
@@ -39,13 +38,13 @@ object Versions {
 
     const val openapi_generator_gradle_plugin: String = "4.3.1"
 
-    const val javax_websocket_server_impl: String = "9.4.28.v20200408"
+    const val javax_websocket_server_impl: String = "9.4.29.v20200521"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
     const val gradle_cobertura_plugin: String = "3.0.0"
 
-    const val aws_lambda_java_events: String = "3.0.0"
+    const val aws_lambda_java_events: String = "3.1.0"
 
     const val jackson_dataformat_xml: String = "2.11.0"
 
@@ -69,7 +68,7 @@ object Versions {
 
     const val commons_pool2: String = "2.8.0"
 
-    const val http2_server: String = "9.4.28.v20200408"
+    const val http2_server: String = "9.4.29.v20200521"
 
     const val selenium_api: String = "3.141.59"
 
@@ -99,7 +98,7 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val okhttp: String = "4.7.0"
+    const val okhttp: String = "4.7.2"
 
     const val pebble: String = "3.1.3"
 
