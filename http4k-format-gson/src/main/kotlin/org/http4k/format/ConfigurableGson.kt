@@ -14,6 +14,7 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
 import org.http4k.core.Body
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -95,7 +96,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
     inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        jsonHttpBodyLens(description, contentNegotiation).map(mapper.read<T>(), { mapper.toJson(it) })
+        httpBodyLens(description, contentNegotiation, APPLICATION_JSON).map(mapper.read<T>(), { mapper.toJson(it) })
 }
 
 inline fun <reified T : Any> Gson.read(): (String) -> T =

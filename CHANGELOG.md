@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.248.0 (uncut)
+- [http4k-format-jackson-yaml] New module!
 - [all] Upgrade some dependency versions.
 - [http4k-cloudnative] - Fix #418 - Fix separator propagation when adding values to an existing MapEnvironment. H/T @jshiell
 - [http4k-contract] - Add support for securing the API description endpoint. H/T @goodhoko for the PR.

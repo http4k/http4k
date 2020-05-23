@@ -1,5 +1,5 @@
 title: http4k JSON Message Format Modules
-description: Feature overview of the JSON http4k-format modules, several of which support automarshalling into data classes.
+description: Feature overview of the JSON http4k-format modules, several of which support auto-marshalling into data classes.
 
 ### Installation (Gradle)
 **Argo:**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "3.247.0"```

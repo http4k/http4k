@@ -1,8 +1,5 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonView
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
@@ -18,33 +15,6 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
 
-open class Public
-class Private : Public()
-
-data class ArbObjectWithView(@JsonView(Private::class) @JvmField val priv: Int, @JsonView(Public::class) @JvmField val pub: Int)
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@class")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = FirstChild::class, name = "first"),
-    JsonSubTypes.Type(value = SecondChild::class, name = "second")
-)
-sealed class PolymorphicParent
-
-data class FirstChild(val something: String) : PolymorphicParent()
-data class SecondChild(val somethingElse: String) : PolymorphicParent()
-
-abstract class NotSealedParent
-data class NonSealedChild(val something: String) : NotSealedParent()
-
-interface Interface {
-    val value: String
-}
-
-class InterfaceImpl : Interface {
-    override val value = "hello"
-    val subValue = "123"
-}
-
 class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
     @Test
@@ -55,19 +25,45 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
     }
 
     @Test
+    fun `roundtrip list of arbitary objects to and from node`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(Jackson.asJsonObject(listOf(obj)).asA(), equalTo(listOf(obj)))
+    }
+
+    @Test
+    fun `roundtrip body using view`() {
+        val arbObjectWithView = ArbObjectWithView(3, 5)
+        val publicLens = Body.autoView<ArbObjectWithView, Public>().toLens()
+        val privateLens = Body.autoView<ArbObjectWithView, Private>().toLens()
+
+        assertThat(Response(OK).with(publicLens of arbObjectWithView), hasBody(equalTo("""{"pub":5}""")))
+        assertThat(Response(OK).with(privateLens of arbObjectWithView), hasBody(equalTo("""{"priv":3,"pub":5}""")))
+
+        assertThat(publicLens(Response(OK).with(privateLens of arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
+    }
+
+    @Test
+    fun `roundtrip WsMessage using view`() {
+        val arbObjectWithView = ArbObjectWithView(3, 5)
+        val publicLens = WsMessage.autoView<ArbObjectWithView, Public>().toLens()
+        val privateLens = WsMessage.autoView<ArbObjectWithView, Private>().toLens()
+
+        assertThat(publicLens(arbObjectWithView).bodyString(), equalTo("""{"pub":5}"""))
+        assertThat(privateLens(arbObjectWithView).bodyString(), equalTo("""{"priv":3,"pub":5}"""))
+
+        assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
+    }
+
+    override fun customMarshaller() = object : ConfigurableJackson(KotlinModule().asConfigurable().customise()) {}
+
+    @Test
     fun `roundtrip list of arbitary objects to and from body`() {
         val body = Body.auto<List<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(body(Response(OK).with(body of listOf(obj))), equalTo(listOf(obj)))
-    }
-
-    @Test
-    fun `roundtrip list of arbitary objects to and from node`() {
-        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
-
-        assertThat(Jackson.asJsonObject(listOf(obj)).asA(), equalTo(listOf(obj)))
     }
 
     @Test
@@ -118,32 +114,6 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
         assertThat(body(Response(OK).with(body of list)), equalTo(list))
     }
-
-    @Test
-    fun `roundtrip body using view`() {
-        val arbObjectWithView = ArbObjectWithView(3, 5)
-        val publicLens = Body.autoView<ArbObjectWithView, Public>().toLens()
-        val privateLens = Body.autoView<ArbObjectWithView, Private>().toLens()
-
-        assertThat(Response(OK).with(publicLens of arbObjectWithView), hasBody(equalTo("""{"pub":5}""")))
-        assertThat(Response(OK).with(privateLens of arbObjectWithView), hasBody(equalTo("""{"priv":3,"pub":5}""")))
-
-        assertThat(publicLens(Response(OK).with(privateLens of arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
-    }
-
-    @Test
-    fun `roundtrip WsMessage using view`() {
-        val arbObjectWithView = ArbObjectWithView(3, 5)
-        val publicLens = WsMessage.autoView<ArbObjectWithView, Public>().toLens()
-        val privateLens = WsMessage.autoView<ArbObjectWithView, Private>().toLens()
-
-        assertThat(publicLens(arbObjectWithView).bodyString(), equalTo("""{"pub":5}"""))
-        assertThat(privateLens(arbObjectWithView).bodyString(), equalTo("""{"priv":3,"pub":5}"""))
-
-        assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
-    }
-
-    override fun customMarshaller() = object : ConfigurableJackson(KotlinModule().asConfigurable().customise()) {}
 }
 
 class JacksonTest : JsonContract<JsonNode>(Jackson) {
