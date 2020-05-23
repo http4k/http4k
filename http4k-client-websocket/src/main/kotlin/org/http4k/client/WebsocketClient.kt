@@ -96,7 +96,8 @@ private class BlockingWsClient(private val queue: LinkedBlockingQueue<() -> WsMe
     override fun close(status: WsStatus) = client.close(status.code, status.description)
 
     override fun send(message: WsMessage): Unit {
-        if (autoReconnection && client.socket.isClosed) {
+        if (autoReconnection && (client.isClosing || client.isClosed)) {
+            client.closeBlocking() // ensure it's closed
             client.reconnectBlocking()
         }
 
