@@ -2,22 +2,29 @@
 
 package testPackage.server.endpoints
 
-import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.format.Jackson.auto
+import org.http4k.lens.FormField
+import org.http4k.lens.boolean
+import org.http4k.lens.int
+import org.http4k.lens.string
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
-import testPackage.model.EndpointXwwwformurlencodedRequest
 
 fun Endpoint(): RoutingHttpHandler {
 
-	val endpointXwwwformurlencodedRequestLens = Body.auto<EndpointXwwwformurlencodedRequest>().toLens()
+	val booleanLens = FormField.boolean().required("boolean")
+	val integerLens = FormField.int().optional("integer")
+	val stringLens = FormField.string().optional("string")
+	val jsonLens = FormField.string().required("json")
 
 	return "/formbody" bind Method.POST to { req: Request ->
-		val endpointXwwwformurlencodedRequest = endpointXwwwformurlencodedRequestLens(req)
+		val boolean = booleanLens(req)
+		val integer = integerLens(req)
+		val string = stringLens(req)
+		val json = jsonLens(req)
 		Response(Status.OK)
 	}
 }

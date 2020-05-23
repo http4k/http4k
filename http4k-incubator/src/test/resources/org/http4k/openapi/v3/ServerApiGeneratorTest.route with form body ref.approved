@@ -2,22 +2,21 @@
 
 package testPackage.server.endpoints
 
-import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.format.Jackson.auto
+import org.http4k.lens.FormField
+import org.http4k.lens.int
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
-import testPackage.model.Ref
 
 fun Endpoint(): RoutingHttpHandler {
 
-	val refLens = Body.auto<Ref>().toLens()
+	val valueLens = FormField.int().optional("value")
 
 	return "/formbody" bind Method.POST to { req: Request ->
-		val ref = refLens(req)
+		val value = valueLens(req)
 		Response(Status.OK)
 	}
 }

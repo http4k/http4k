@@ -4,5 +4,25 @@
         "title": "title",
         "version": "1.0"
     },
-    "paths": {}
+    "paths": {
+        "/formbody": {
+            "post": {
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "required",
+                        "required": true,
+                        "type": "boolean"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "optional",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "operationId": "endpoint"
+            }
+        }
+    }
 }
