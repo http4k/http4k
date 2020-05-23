@@ -95,6 +95,8 @@ plugging together of services without HTTP container being required.
         * **[XML](https://www.http4k.org/guide/modules/xml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
             * **Xml** - includes support for **one way automatic marshalling of Data classes**
+        * **[YAML](https://www.http4k.org/guide/modules/yaml/)** - includes support for:
+            * **Jackson** - includes support for **fully automatic marshalling of Data classes**
 * [Resilience:](https://http4k.org/guide/modules/resilience) 
     * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration.
 * [Metrics:](https://http4k.org/guide/modules/metrics) 

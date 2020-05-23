@@ -62,13 +62,11 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val expectedAutoMarshallingResult: String
     protected abstract val expectedAutoMarshallingResultPrimitives: String
     protected abstract val expectedWrappedMap: String
-    protected abstract val expectedCustomWrappedNumber: String
     protected abstract val expectedConvertToInputStream: String
     protected abstract val expectedThrowable: String
     protected abstract val inputUnknownValue: String
     protected abstract val inputEmptyObject: String
     protected abstract val expectedRegexSpecial: String
-    protected abstract val expectedInOutOnly: String
 
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
@@ -128,15 +126,6 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    fun `roundtrip custom mapped number`() {
-        val marshaller = customMarshaller()
-
-        val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
-        assertThat(marshaller.asString(wrapper), equalTo(expectedCustomWrappedNumber))
-        assertThat(marshaller.asA(expectedCustomWrappedNumber, HolderHolder::class), equalTo(wrapper))
-    }
-
-    @Test
     fun `roundtrip custom decimal`() {
         val marshaller = customMarshaller()
 
@@ -165,14 +154,6 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    fun `prohibit strings`() {
-        val marshaller = customMarshaller()
-
-        assertThat(marshaller.asString(StringHolder("hello")), equalTo(expectedConvertToInputStream))
-        assertThat({ marshaller.asA(expectedConvertToInputStream, StringHolder::class) }, throws<Exception>())
-    }
-
-    @Test
     open fun `fails decoding when a required value is null`() {
         assertThat({ marshaller.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
     }
@@ -180,25 +161,6 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     @Test
     open fun `does not fail decoding when unknown value is encountered`() {
         assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
-    }
-
-    @Test
-    fun `out only string`() {
-        val marshaller = customMarshaller()
-
-        val wrapper = OutOnlyHolder(OutOnly("foobar"))
-        val actual = marshaller.asString(wrapper)
-        assertThat(actual, equalTo(expectedInOutOnly))
-        assertThat({ marshaller.asA(actual, OutOnlyHolder::class) }, throws<Exception>())
-    }
-
-    @Test
-    fun `in only string`() {
-        val marshaller = customMarshaller()
-
-        val wrapper = InOnlyHolder(InOnly("foobar"))
-        assertThat({ marshaller.asString(wrapper) }, throws<IllegalArgumentException>())
-        assertThat(marshaller.asA(expectedInOutOnly, InOnlyHolder::class), equalTo(wrapper))
     }
 
     abstract fun customMarshaller(): AutoMarshalling

@@ -12,7 +12,6 @@ import org.http4k.lens.BiDiMapping
 import java.math.BigDecimal
 import java.math.BigInteger
 
-
 fun <T : ObjectMapper> KotlinModule.asConfigurable(mapper: T): AutoMappingConfiguration<T> = object : AutoMappingConfiguration<T> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getIntValue)
     override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getLongValue)
