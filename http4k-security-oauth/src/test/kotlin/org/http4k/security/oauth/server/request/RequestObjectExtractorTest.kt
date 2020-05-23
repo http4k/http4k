@@ -99,7 +99,7 @@ internal class RequestObjectExtractorTest {
             )
         )
 
-        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asJsonString(rawData).toByteArray()).replace("=", "")}.someSignature"
+        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asString(rawData).toByteArray()).replace("=", "")}.someSignature"
 
         assertThat(RequestObjectExtractor.extractRequestObjectFromJwt(requestJwt), equalTo(success(correspondingExpectedRequestObject)))
     }
@@ -117,7 +117,7 @@ internal class RequestObjectExtractorTest {
             claims = Claims()
         )
 
-        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asJsonString(rawData).toByteArray()).replace("=", "")}.someSignature"
+        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asString(rawData).toByteArray()).replace("=", "")}.someSignature"
 
         assertThat(RequestObjectExtractor.extractRequestObjectFromJwt(requestJwt), equalTo(success(correspondingExpectedRequestObject)))
     }
@@ -133,7 +133,7 @@ internal class RequestObjectExtractorTest {
             scope = emptyList()
         )
 
-        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asJsonString(rawData).toByteArray()).replace("=", "")}.someSignature"
+        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asString(rawData).toByteArray()).replace("=", "")}.someSignature"
 
         assertThat(RequestObjectExtractor.extractRequestObjectFromJwt(requestJwt), equalTo(success(correspondingExpectedRequestObject)))
     }

@@ -45,7 +45,7 @@ class InterfaceImpl : Interface {
     val subValue = "123"
 }
 
-class JacksonAutoTest : AutoMarshallingContract(Jackson) {
+class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
     @Test
     fun `roundtrip arbitary object to and from JSON element`() {
@@ -143,7 +143,7 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }
 
-    override fun customJson() = object : ConfigurableJackson(KotlinModule().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableJackson(KotlinModule().asConfigurable().customise()) {}
 }
 
 class JacksonTest : JsonContract<JsonNode>(Jackson) {

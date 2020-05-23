@@ -11,7 +11,7 @@ import org.http4k.format.Moshi.auto
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class MoshiAutoTest : AutoMarshallingContract(Moshi) {
+class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
 
     override val expectedAutoMarshallingResult = """{"string":"hello","child":{"string":"world","numbers":[1],"bool":true},"numbers":[],"bool":false}"""
 
@@ -28,7 +28,7 @@ class MoshiAutoTest : AutoMarshallingContract(Moshi) {
     @Test
     fun `roundtrip array of arbitary objects to and from JSON`() {
         val expected = arrayOf(obj)
-        val asJsonString = Moshi.asJsonString(expected)
+        val asJsonString = Moshi.asString(expected)
         val actual: Array<ArbObject> = Moshi.asA(asJsonString)
         assertThat(actual.toList(), equalTo(expected.toList()))
     }
@@ -41,5 +41,5 @@ class MoshiAutoTest : AutoMarshallingContract(Moshi) {
         assertThat(actual.toList().toString(), actual.toList(), equalTo(expected.toList()))
     }
 
-    override fun customJson() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
 }

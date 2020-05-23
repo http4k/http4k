@@ -11,23 +11,17 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
-import kotlin.reflect.KClass
 
-abstract class AutoMarshallingXml {
+abstract class AutoMarshallingXml : AutoMarshalling() {
 
     inline fun <reified T : Any> String.asA(): T = asA(this)
 
-    @JvmName("stringAsA")
-    fun <T : Any> String.asA(target: KClass<T>): T = asA(this, target)
-
-    @JvmName("stringAsA")
-    inline fun <reified T : Any> asA(input: String): T = asA(input, T::class)
-
-    abstract fun <T : Any> asA(input: String, target: KClass<T>): T
-
     abstract fun Any.asXmlString(): String
 
+    override fun asString(input: Any): String = input.asXmlString()
+
     @JvmName("anyAsXmlString")
+    @Deprecated("Use asString instead", ReplaceWith("asString(input"))
     fun asXmlString(input: Any): String = input.asXmlString()
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> =

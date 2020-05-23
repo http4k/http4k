@@ -22,7 +22,6 @@ import java.math.BigInteger
 interface Json<NODE> {
     // Contract methods to be implemented
     fun NODE.asPrettyJsonString(): String
-
     fun NODE.asCompactJsonString(): String
     fun String.asJsonObject(): NODE
     fun String?.asJsonValue(): NODE

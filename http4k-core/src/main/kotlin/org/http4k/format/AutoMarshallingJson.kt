@@ -11,19 +11,27 @@ import org.http4k.lens.httpBodyRoot
 import java.io.InputStream
 import kotlin.reflect.KClass
 
-abstract class AutoMarshallingJson {
-    abstract fun asJsonString(input: Any): String
-
+abstract class AutoMarshalling {
     abstract fun <T : Any> asA(input: String, target: KClass<T>): T
+
+    @JvmName("stringAsA")
+    inline fun <reified T : Any> asA(input: String): T = asA(input, T::class)
 
     @JvmName("stringAsA")
     fun <T : Any> String.asA(target: KClass<T>): T = asA(this, target)
 
-    fun asInputStream(input: Any): InputStream = asJsonString(input).byteInputStream()
+    abstract fun asString(input: Any): String
+
+    fun asInputStream(input: Any): InputStream = asString(input).byteInputStream()
+}
+
+abstract class AutoMarshallingJson : AutoMarshalling() {
+    @Deprecated("Use asString instead", ReplaceWith("asString(input"))
+    fun asJsonString(input: Any): String = asString(input)
 }
 
 abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), Json<NODE> {
-    override fun asJsonString(input: Any): String = compact(asJsonObject(input))
+    override fun asString(input: Any): String = compact(asJsonObject(input))
 
     abstract fun asJsonObject(input: Any): NODE
 

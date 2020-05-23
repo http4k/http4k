@@ -13,7 +13,7 @@ import org.http4k.format.Gson.auto
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class GsonAutoTest : AutoMarshallingContract(Gson) {
+class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
 
     @Test
     fun ` roundtrip arbitary object to and from JSON element`() {
@@ -52,7 +52,7 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
     override fun `fails decoding when a required value is null`() {
     }
 
-    override fun customJson() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
 }
 
 class GsonTest : JsonContract<JsonElement>(Gson) {

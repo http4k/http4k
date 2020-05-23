@@ -16,7 +16,7 @@ import org.http4k.hamkrest.hasContentType
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
 
-class JacksonXmlTest : AutoXmlContract(JacksonXml) {
+class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
 
     @JsonPropertyOrder("first", "second")
     data class OrderedContainer(val second: List<String>, val first: String)

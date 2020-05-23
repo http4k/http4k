@@ -14,6 +14,8 @@ object Versions {
     const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.20.0"
              // available: "0.20.0-1.4-M1-release-99"
 
+    const val com_fasterxml_jackson_dataformat: String = "2.11.0"
+
     const val io_github_resilience4j: String = "1.4.0"
 
     const val org_jetbrains_kotlin: String = "1.3.72"
@@ -45,8 +47,6 @@ object Versions {
     const val gradle_cobertura_plugin: String = "3.0.0"
 
     const val aws_lambda_java_events: String = "3.1.0"
-
-    const val jackson_dataformat_xml: String = "2.11.0"
 
     const val jackson_module_kotlin: String = "2.11.0"
 
@@ -108,7 +108,7 @@ object Versions {
 
     const val gson: String = "2.8.6"
 
-    const val json: String = "20190722"
+    const val json: String = "20200518"
 
     /**
      * Current version: "6.1.1"

@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Test
@@ -56,31 +55,28 @@ data class OutOnly(val value: String)
 data class InOnlyHolder(val value: InOnly)
 data class InOnly(val value: String)
 data class ExceptionHolder(val value: Throwable)
-
 class CustomException(m: String) : RuntimeException(m)
 
-abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
+abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) {
 
-    protected open val expectedAutoMarshallingResult = """{"string":"hello","child":{"string":"world","child":null,"numbers":[1],"bool":true},"numbers":[],"bool":false}"""
-    protected open val expectedAutoMarshallingResultPrimitives = """{"duration":"PT1S","localDate":"2000-01-01","localTime":"01:01:01","localDateTime":"2000-01-01T01:01:01","zonedDateTime":"2000-01-01T01:01:01Z[UTC]","offsetTime":"01:01:01Z","offsetDateTime":"2000-01-01T01:01:01Z","instant":"1970-01-01T00:00:00Z","uuid":"1a448854-1687-4f90-9562-7d527d64383c","uri":"http://uri:8000","url":"http://url:9000","status":200}"""
+    protected abstract val expectedAutoMarshallingResult: String
+    protected abstract val expectedAutoMarshallingResultPrimitives: String
+    protected abstract val expectedWrappedMap: String
+    protected abstract val expectedCustomWrappedNumber: String
+    protected abstract val expectedConvertToInputStream: String
+    protected abstract val expectedThrowable: String
+    protected abstract val inputUnknownValue: String
+    protected abstract val inputEmptyObject: String
+    protected abstract val expectedRegexSpecial: String
+    protected abstract val expectedInOutOnly: String
 
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
     @Test
-    fun `roundtrip arbitary object to and from JSON string`() {
-        val out = j.asJsonString(obj)
+    fun `roundtrip arbitary object to and from string`() {
+        val out = marshaller.asString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResult))
-        assertThat(j.asA(out, ArbObject::class), equalTo(obj))
-    }
-
-    @Test
-    open fun `fails decoding when a required value is null`() {
-        assertThat({ j.asA("{}", ArbObject::class) }, throws<Exception>())
-    }
-
-    @Test
-    open fun `does not fail decoding when unknown value is encountered`() {
-        assertThat(j.asA("""{"value":"value","unknown":"ohno!"}""", StringHolder::class), equalTo(StringHolder("value")))
+        assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
     }
 
     @Test
@@ -100,104 +96,112 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
             UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
             Uri.of("http://uri:8000"),
             URL("http://url:9000"),
-            OK
+            Status.OK
         )
-        val out = j.asJsonString(obj)
+        val out = marshaller.asString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResultPrimitives))
-        assertThat(j.asA(out, CommonJdkPrimitives::class), equalTo(obj))
+        assertThat(marshaller.asA(out, CommonJdkPrimitives::class), equalTo(obj))
     }
 
     @Test
     fun `roundtrip regex special as equals isn't comparable`() {
         val obj = RegexHolder(".*".toRegex())
-        val out = j.asJsonString(obj)
-        assertThat(out, equalTo("""{"regex":".*"}"""))
-        assertThat(j.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
+        val out = marshaller.asString(obj)
+        assertThat(out, equalTo(expectedRegexSpecial))
+        assertThat(marshaller.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
     }
 
     @Test
     fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
-        assertThat(j.asJsonString(wrapper), equalTo("""{"value":{"key":"value","key2":"123"}}"""))
-        assertThat(j.asA(j.asJsonString(wrapper), MapHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asString(wrapper), equalTo(expectedWrappedMap))
+        assertThat(marshaller.asA(marshaller.asString(wrapper), MapHolder::class), equalTo(wrapper))
     }
 
     @Test
     fun `roundtrip custom number`() {
-        val json = customJson()
+        val marshaller = customMarshaller()
 
         val wrapper = BigIntegerHolder(1.toBigInteger())
-        assertThat(json.asJsonString(wrapper), equalTo("1"))
-        assertThat(json.asA("1", BigIntegerHolder::class), equalTo(wrapper))
-    }
-
-    @Test
-    fun `out only string`() {
-        val json = customJson()
-
-        val wrapper = OutOnlyHolder(OutOnly("foobar"))
-        val actual = json.asJsonString(wrapper)
-        assertThat(actual, equalTo("""{"value":"foobar"}"""))
-        assertThat({ json.asA(actual, OutOnlyHolder::class) }, throws<Exception>())
-    }
-
-    @Test
-    fun `in only string`() {
-        val json = customJson()
-
-        val wrapper = InOnlyHolder(InOnly("foobar"))
-        val expected = """{"value":"foobar"}"""
-        assertThat({ json.asJsonString(wrapper) }, throws<IllegalArgumentException>())
-        assertThat(json.asA(expected, InOnlyHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asString(wrapper), equalTo("1"))
+        assertThat(marshaller.asA("1", BigIntegerHolder::class), equalTo(wrapper))
     }
 
     @Test
     fun `roundtrip custom mapped number`() {
-        val json = customJson()
+        val marshaller = customMarshaller()
 
         val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
-        assertThat(json.asJsonString(wrapper), equalTo("""{"value":"1.01"}"""))
-        assertThat(json.asA("""{"value":"1.01"}""", HolderHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asString(wrapper), equalTo(expectedCustomWrappedNumber))
+        assertThat(marshaller.asA(expectedCustomWrappedNumber, HolderHolder::class), equalTo(wrapper))
     }
 
     @Test
     fun `roundtrip custom decimal`() {
-        val json = customJson()
+        val marshaller = customMarshaller()
 
         val wrapper = BigDecimalHolder(1.01.toBigDecimal())
-        assertThat(json.asJsonString(wrapper), equalTo("1.01"))
-        assertThat(json.asA("1.01", BigDecimalHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asString(wrapper), equalTo("1.01"))
+        assertThat(marshaller.asA("1.01", BigDecimalHolder::class), equalTo(wrapper))
     }
 
     @Test
     fun `roundtrip custom boolean`() {
-        val json = customJson()
+        val marshaller = customMarshaller()
 
         val wrapper = BooleanHolder(true)
-        assertThat(json.asJsonString(wrapper), equalTo("true"))
-        assertThat(json.asA("true", BooleanHolder::class), equalTo(wrapper))
-    }
-
-    @Test
-    fun `prohibit strings`() {
-        val json = customJson()
-
-        assertThat(json.asJsonString(StringHolder("hello")), equalTo("""{"value":"hello"}"""))
-
-        assertThat({ json.asA("""{"value":"hello"}""", StringHolder::class) }, throws<Exception>())
+        assertThat(marshaller.asString(wrapper), equalTo("true"))
+        assertThat(marshaller.asA("true", BooleanHolder::class), equalTo(wrapper))
     }
 
     @Test
     fun `convert to inputstream`() {
-        assertThat(j.asInputStream(StringHolder("hello")).reader().use { it.readText() }, equalTo("""{"value":"hello"}"""))
+        assertThat(marshaller.asInputStream(StringHolder("hello")).reader().use { it.readText() }, equalTo(expectedConvertToInputStream))
     }
 
     @Test
     fun `throwable is marshalled`() {
-        assertThat(j.asJsonString(ExceptionHolder(CustomException("foobar"))), startsWith("""{"value":"org.http4k.format.CustomException: foobar"""))
+        assertThat(marshaller.asString(ExceptionHolder(CustomException("foobar"))), startsWith(expectedThrowable))
     }
 
-    abstract fun customJson(): AutoMarshallingJson
+    @Test
+    fun `prohibit strings`() {
+        val marshaller = customMarshaller()
+
+        assertThat(marshaller.asString(StringHolder("hello")), equalTo(expectedConvertToInputStream))
+        assertThat({ marshaller.asA(expectedConvertToInputStream, StringHolder::class) }, throws<Exception>())
+    }
+
+    @Test
+    open fun `fails decoding when a required value is null`() {
+        assertThat({ marshaller.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
+    }
+
+    @Test
+    open fun `does not fail decoding when unknown value is encountered`() {
+        assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
+    }
+
+    @Test
+    fun `out only string`() {
+        val marshaller = customMarshaller()
+
+        val wrapper = OutOnlyHolder(OutOnly("foobar"))
+        val actual = marshaller.asString(wrapper)
+        assertThat(actual, equalTo(expectedInOutOnly))
+        assertThat({ marshaller.asA(actual, OutOnlyHolder::class) }, throws<Exception>())
+    }
+
+    @Test
+    fun `in only string`() {
+        val marshaller = customMarshaller()
+
+        val wrapper = InOnlyHolder(InOnly("foobar"))
+        assertThat({ marshaller.asString(wrapper) }, throws<IllegalArgumentException>())
+        assertThat(marshaller.asA(expectedInOutOnly, InOnlyHolder::class), equalTo(wrapper))
+    }
+
+    abstract fun customMarshaller(): AutoMarshalling
 }
 
 fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
@@ -219,4 +223,3 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
     .zonedDateTime({ it }, { it })
     .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
     .done()
-
