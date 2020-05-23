@@ -1,5 +1,6 @@
 package org.http4k.openapi
 
+import org.http4k.format.Jackson
 import org.http4k.junit.ResourceLoader
 import org.http4k.junit.TestResources
 import org.http4k.testing.ApprovalTest
@@ -64,7 +65,7 @@ abstract class ApiGeneratorContract<T : Any>(private val clazz: KClass<T>, priva
     open fun `route with reusable parameters`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     fun Approver.assertGeneratedContent(rl: ResourceLoader) {
-        assertApproved(apiGenerator(OpenApiJson.asA(rl.text("openApi.json"), clazz), GenerationOptions("testPackage", File(".")))
+        assertApproved(apiGenerator(Jackson.asA(rl.text("openApi.json"), clazz), GenerationOptions("testPackage", File(".")))
             .sortedBy { it.name }
             .joinToString("\n") { ">>>${it.name}.kt\n\n$it" })
     }
