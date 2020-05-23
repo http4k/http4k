@@ -52,7 +52,7 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     override fun `fails decoding when a required value is null`() {
     }
 
-    override fun customMarshaler() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
 }
 
 class GsonTest : JsonContract<JsonElement>(Gson) {

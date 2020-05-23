@@ -143,7 +143,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }
 
-    override fun customMarshaler() = object : ConfigurableJackson(KotlinModule().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableJackson(KotlinModule().asConfigurable().customise()) {}
 }
 
 class JacksonTest : JsonContract<JsonNode>(Jackson) {

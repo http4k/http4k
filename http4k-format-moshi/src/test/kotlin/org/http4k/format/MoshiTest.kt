@@ -41,5 +41,5 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
         assertThat(actual.toList().toString(), actual.toList(), equalTo(expected.toList()))
     }
 
-    override fun customMarshaler() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
 }
