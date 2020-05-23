@@ -3,9 +3,9 @@ package org.http4k.openapi
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.JsonNode
+import org.http4k.format.Jackson.asA
 import java.math.BigDecimal
 import kotlin.reflect.KClass
-import org.http4k.openapi.OpenApiJson.asA
 
 data class InfoSpec(val title: String)
 
