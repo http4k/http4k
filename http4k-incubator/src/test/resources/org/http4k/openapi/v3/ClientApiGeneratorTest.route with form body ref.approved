@@ -6,6 +6,7 @@ import kotlin.Int
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.with
 import org.http4k.lens.FormField
 import org.http4k.lens.int
 
@@ -16,6 +17,7 @@ class TitleClient(
 
 		val valueLens = FormField.int().optional("value")
 		val httpReq = Request(Method.POST, "/formbody")
+			.with(formLens of request)
 
 		httpHandler(httpReq)
 	}

@@ -8,6 +8,7 @@ import kotlin.String
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.with
 import org.http4k.lens.FormField
 import org.http4k.lens.boolean
 import org.http4k.lens.int
@@ -28,6 +29,7 @@ class TitleClient(
 		val stringLens = FormField.string().optional("string")
 		val jsonLens = FormField.string().required("json")
 		val httpReq = Request(Method.POST, "/formbody")
+			.with(formLens of request)
 
 		httpHandler(httpReq)
 	}

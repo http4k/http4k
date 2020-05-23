@@ -9,6 +9,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
+import org.http4k.lens.WebForm
 import org.http4k.openapi.NamedSchema
 import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.v3.OpenApi3ParameterSpec
@@ -45,7 +46,12 @@ fun Path.function(modelPackageName: String): FunSpec =
             }
         }
 
-        val bodyBindings = requestSchemas().bindFirstToHttpMessage("request")
+        val requestSchemas = when {
+            spec.parameters.none { it is OpenApi3ParameterSpec.FormFieldSpec } -> requestSchemas()
+            else -> requestSchemas() + NamedSchema.Existing("form", WebForm::class.asClassName())
+        }
+
+        val bodyBindings = requestSchemas.bindFirstToHttpMessage("request")
 
         val buildRequest = (bodyBindings + parameterBindings)
             .fold(CodeBlock.builder()

@@ -16,12 +16,11 @@ data class Path(val urlPathPattern: String, val method: Method, val spec: OpenAp
     private fun modelName(contentType: String, suffix: String) =
         uniqueName + ContentType(contentType).value.substringAfter('/').capitalize().filter(Char::isLetterOrDigit) + suffix
 
-    fun requestSchemas(): List<NamedSchema> =
-        listOfNotNull(spec.requestBody.content.entries
-            .mapNotNull { (contentType, messageSpec) ->
-                messageSpec.schema?.namedSchema(modelName(contentType, "Request"))
-            }
-        ).flatten()
+    fun requestSchemas() = listOfNotNull(spec.requestBody.content.entries
+        .mapNotNull { (contentType, messageSpec) ->
+            messageSpec.schema?.namedSchema(modelName(contentType, "Request"))
+        }
+    ).flatten()
 
     fun responseSchemas(): List<NamedSchema> = spec.responses.entries
         .flatMap { (code, messageSpec) ->
@@ -75,7 +74,7 @@ private fun OpenApi3PathSpec.add(contentType: ContentType, it: MessageBodySpec):
     copy(requestBody = requestBody.copy(content = requestBody.content + (contentType.value to it)))
 
 private fun OpenApi3PathSpec.remove(contentType: ContentType): OpenApi3RequestBodySpec =
-    requestBody.copy(content = requestBody.content.minus(contentType.value))
+    requestBody.copy(content = requestBody.content - contentType.value)
 
 private fun SchemaSpec.ObjectSpec.convertToFormParameters() = properties.map {
     OpenApi3ParameterSpec.FormFieldSpec(it.key, required.contains(it.key), it.value)
