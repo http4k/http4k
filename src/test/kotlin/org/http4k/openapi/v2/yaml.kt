@@ -1,7 +1,7 @@
 package org.http4k.openapi.v2
 
+import org.http4k.format.JacksonYaml.asA
 import org.http4k.openapi.GenerationOptions
-import org.http4k.openapi.OpenApiYaml.asA
 import java.io.File
 
 fun main() {
