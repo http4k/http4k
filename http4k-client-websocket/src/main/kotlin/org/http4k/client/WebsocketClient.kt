@@ -41,10 +41,10 @@ object WebsocketClient {
      * messages will block on iteration until all messages are received (or the socket it closed). This call will also
      * block while connection happens.
      */
-    fun blocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO): WsClient {
+    fun blocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO, autoReconnection: Boolean = false): WsClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val client = BlockingQueueClient(uri, headers, timeout, queue).apply { connectBlocking() }
-        return BlockingWsClient(queue, client)
+        return BlockingWsClient(queue, client, autoReconnection)
     }
 }
 
@@ -90,14 +90,20 @@ private class NonBlockingClient(uri: Uri, headers: Headers, timeout: Duration, p
     override fun onError(e: Exception) = socket.get().triggerError(e)
 }
 
-private class BlockingWsClient(private val queue: LinkedBlockingQueue<() -> WsMessage?>, private val client: BlockingQueueClient) : WsClient {
+private class BlockingWsClient(private val queue: LinkedBlockingQueue<() -> WsMessage?>, private val client: BlockingQueueClient, private val autoReconnection: Boolean) : WsClient {
     override fun received() = generateSequence { queue.take()() }
 
     override fun close(status: WsStatus) = client.close(status.code, status.description)
 
-    override fun send(message: WsMessage): Unit =
-        when (message.body) {
+    override fun send(message: WsMessage): Unit {
+        if (autoReconnection && (client.isClosing || client.isClosed)) {
+            client.closeBlocking() // ensure it's closed
+            client.reconnectBlocking()
+        }
+
+        return when (message.body) {
             is StreamBody -> client.send(message.body.payload)
             else -> client.send(message.bodyString())
         }
+    }
 }
