@@ -12,7 +12,7 @@ data class UriContainer(val field: Uri)
 data class ListContainer(val children: List<String>)
 data class NullableListContainer(val children: List<String>?)
 
-abstract class AutoXmlContract(private val x: AutoMarshallingXml) {
+abstract class AutoMarshalingXmlContract(private val x: AutoMarshallingXml) {
 
     @Test
     fun `deserialise simple container with attribute`() {
