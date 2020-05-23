@@ -28,8 +28,6 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = moshi.adapter(target.java).fromJson(input)!!
 
-    inline fun <reified T : Any> asA(s: String): T = asA(s, T::class)
-
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> =
         Body.string(APPLICATION_JSON, description, contentNegotiation).map({ asA(it, T::class) }, { asJsonString(it) })
 
