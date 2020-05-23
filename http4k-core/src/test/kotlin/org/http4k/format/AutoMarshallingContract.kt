@@ -59,7 +59,7 @@ data class ExceptionHolder(val value: Throwable)
 
 class CustomException(m: String) : RuntimeException(m)
 
-abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
+abstract class AutoMarshallingContract(private val j: AutoMarshalling) {
 
     protected open val expectedAutoMarshallingResult = """{"string":"hello","child":{"string":"world","child":null,"numbers":[1],"bool":true},"numbers":[],"bool":false}"""
     protected open val expectedAutoMarshallingResultPrimitives = """{"duration":"PT1S","localDate":"2000-01-01","localTime":"01:01:01","localDateTime":"2000-01-01T01:01:01","zonedDateTime":"2000-01-01T01:01:01Z[UTC]","offsetTime":"01:01:01Z","offsetDateTime":"2000-01-01T01:01:01Z","instant":"1970-01-01T00:00:00Z","uuid":"1a448854-1687-4f90-9562-7d527d64383c","uri":"http://uri:8000","url":"http://url:9000","status":200}"""
@@ -68,7 +68,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
     @Test
     fun `roundtrip arbitary object to and from JSON string`() {
-        val out = j.asJsonString(obj)
+        val out = j.asString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResult))
         assertThat(j.asA(out, ArbObject::class), equalTo(obj))
     }
@@ -102,7 +102,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
             URL("http://url:9000"),
             OK
         )
-        val out = j.asJsonString(obj)
+        val out = j.asString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResultPrimitives))
         assertThat(j.asA(out, CommonJdkPrimitives::class), equalTo(obj))
     }
@@ -110,7 +110,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
     @Test
     fun `roundtrip regex special as equals isn't comparable`() {
         val obj = RegexHolder(".*".toRegex())
-        val out = j.asJsonString(obj)
+        val out = j.asString(obj)
         assertThat(out, equalTo("""{"regex":".*"}"""))
         assertThat(j.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
     }
@@ -118,8 +118,8 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
     @Test
     fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
-        assertThat(j.asJsonString(wrapper), equalTo("""{"value":{"key":"value","key2":"123"}}"""))
-        assertThat(j.asA(j.asJsonString(wrapper), MapHolder::class), equalTo(wrapper))
+        assertThat(j.asString(wrapper), equalTo("""{"value":{"key":"value","key2":"123"}}"""))
+        assertThat(j.asA(j.asString(wrapper), MapHolder::class), equalTo(wrapper))
     }
 
     @Test
@@ -127,7 +127,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val json = customJson()
 
         val wrapper = BigIntegerHolder(1.toBigInteger())
-        assertThat(json.asJsonString(wrapper), equalTo("1"))
+        assertThat(json.asString(wrapper), equalTo("1"))
         assertThat(json.asA("1", BigIntegerHolder::class), equalTo(wrapper))
     }
 
@@ -136,7 +136,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val json = customJson()
 
         val wrapper = OutOnlyHolder(OutOnly("foobar"))
-        val actual = json.asJsonString(wrapper)
+        val actual = json.asString(wrapper)
         assertThat(actual, equalTo("""{"value":"foobar"}"""))
         assertThat({ json.asA(actual, OutOnlyHolder::class) }, throws<Exception>())
     }
@@ -147,7 +147,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
         val wrapper = InOnlyHolder(InOnly("foobar"))
         val expected = """{"value":"foobar"}"""
-        assertThat({ json.asJsonString(wrapper) }, throws<IllegalArgumentException>())
+        assertThat({ json.asString(wrapper) }, throws<IllegalArgumentException>())
         assertThat(json.asA(expected, InOnlyHolder::class), equalTo(wrapper))
     }
 
@@ -156,7 +156,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val json = customJson()
 
         val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
-        assertThat(json.asJsonString(wrapper), equalTo("""{"value":"1.01"}"""))
+        assertThat(json.asString(wrapper), equalTo("""{"value":"1.01"}"""))
         assertThat(json.asA("""{"value":"1.01"}""", HolderHolder::class), equalTo(wrapper))
     }
 
@@ -165,7 +165,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val json = customJson()
 
         val wrapper = BigDecimalHolder(1.01.toBigDecimal())
-        assertThat(json.asJsonString(wrapper), equalTo("1.01"))
+        assertThat(json.asString(wrapper), equalTo("1.01"))
         assertThat(json.asA("1.01", BigDecimalHolder::class), equalTo(wrapper))
     }
 
@@ -174,7 +174,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val json = customJson()
 
         val wrapper = BooleanHolder(true)
-        assertThat(json.asJsonString(wrapper), equalTo("true"))
+        assertThat(json.asString(wrapper), equalTo("true"))
         assertThat(json.asA("true", BooleanHolder::class), equalTo(wrapper))
     }
 
@@ -182,7 +182,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
     fun `prohibit strings`() {
         val json = customJson()
 
-        assertThat(json.asJsonString(StringHolder("hello")), equalTo("""{"value":"hello"}"""))
+        assertThat(json.asString(StringHolder("hello")), equalTo("""{"value":"hello"}"""))
 
         assertThat({ json.asA("""{"value":"hello"}""", StringHolder::class) }, throws<Exception>())
     }
@@ -194,7 +194,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
     @Test
     fun `throwable is marshalled`() {
-        assertThat(j.asJsonString(ExceptionHolder(CustomException("foobar"))), startsWith("""{"value":"org.http4k.format.CustomException: foobar"""))
+        assertThat(j.asString(ExceptionHolder(CustomException("foobar"))), startsWith("""{"value":"org.http4k.format.CustomException: foobar"""))
     }
 
     abstract fun customJson(): AutoMarshallingJson

@@ -16,7 +16,9 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.State
-import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.*
+import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.AuthRequestOnly
+import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.Combine
+import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.RequestObjectOnly
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor
@@ -337,7 +339,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
             expiry = requestObject.expiry,
             claims = requestObject.claims
         )
-        return "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asJsonString(requestObjectJson).toByteArray()).replace("=", "")}.someSignature"
+        return "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asString(requestObjectJson).toByteArray()).replace("=", "")}.someSignature"
     }
 
     private fun audienceToJson(audience: List<String>): JsonNode {

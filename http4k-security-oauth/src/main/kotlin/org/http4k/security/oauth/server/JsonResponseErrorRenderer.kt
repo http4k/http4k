@@ -21,7 +21,7 @@ class JsonResponseErrorRenderer(
 
     private fun createResponse(error: OAuthError, response: Response) =
         response.with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(json.asJsonString(ErrorResponse(
+            .body(json.asString(ErrorResponse(
                 error.rfcError.rfcValue,
                 error.description,
                 documentationUri

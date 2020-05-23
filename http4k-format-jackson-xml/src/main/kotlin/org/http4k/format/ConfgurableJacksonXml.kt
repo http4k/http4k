@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import kotlin.reflect.KClass
 
 open class ConfigurableJacksonXml(private val mapper: XmlMapper) : AutoMarshallingXml() {
-    override fun Any.asXmlString() = mapper.writeValueAsString(this)
+    override fun Any.asXmlString(): String = mapper.writeValueAsString(this)
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
 }

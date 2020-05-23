@@ -22,16 +22,16 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 
     private val moshi: Moshi = builder.build()
 
-    override fun asJsonString(input: Any): String = moshi.adapter(input.javaClass).toJson(input)
+    override fun asString(input: Any): String = moshi.adapter(input.javaClass).toJson(input)
 
     fun <T : Any> asJsonString(t: T, c: KClass<T>): String = moshi.adapter(c.java).toJson(t)
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = moshi.adapter(target.java).fromJson(input)!!
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> =
-        Body.string(APPLICATION_JSON, description, contentNegotiation).map({ asA(it, T::class) }, { asJsonString(it) })
+        Body.string(APPLICATION_JSON, description, contentNegotiation).map({ asA(it, T::class) }, { asString(it) })
 
-    inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asJsonString(it) })
+    inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asString(it) })
 }
 
 fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Builder> {
