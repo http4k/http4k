@@ -13,7 +13,6 @@
                         "name": "required",
                         "required": true,
                         "schema": {
-                            "type": "object"
                         }
                     }
                 ],

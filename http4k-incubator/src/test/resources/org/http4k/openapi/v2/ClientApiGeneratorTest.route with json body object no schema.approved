@@ -2,13 +2,15 @@
 
 package testPackage.client
 
+import kotlin.Any
+import kotlin.String
+import kotlin.collections.Map
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
-import testPackage.model.EndpointJsonRequest
 
 class TitleClient(
 	private val httpHandler: HttpHandler
@@ -17,11 +19,11 @@ class TitleClient(
 	 * Request:
 	 * 	application/json 
 	 */
-	fun endpoint(request: EndpointJsonRequest) {
+	fun endpoint(request: Map<String, Any>) {
 
-		val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
+		val Lens = Body.auto<Map<String, Any>>().toLens()
 		val httpReq = Request(Method.POST, "/jsonbody")
-			.with(endpointJsonRequestLens of request)
+			.with(Lens of request)
 
 		httpHandler(httpReq)
 	}
