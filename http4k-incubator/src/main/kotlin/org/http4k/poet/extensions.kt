@@ -70,27 +70,35 @@ fun org.http4k.openapi.v3.Path.responseLensDeclarations(modelPackageName: String
 fun org.http4k.openapi.v3.Path.requestLensDeclarations(modelPackageName: String) =
     requestSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
 
-fun org.http4k.openapi.v3.Path.formLensDeclarations() = if (supportsFormContent()) {
-    val with = packageMember<Filter>("with")
-    val buildForm = CodeBlock.builder().addStatement("val request = %T()", WebForm::class.asClassName()).indent()
-    formFields().forEach { buildForm.addStatement(".%M(${it.name}Lens of ${it.name})", with) }
-    listOfNotNull(webFormLensDeclaration(), buildForm.unindent().build())
-} else emptyList()
+fun org.http4k.openapi.v3.Path.buildWebForm() = when {
+    supportsFormContent() -> {
+        val with = packageMember<Filter>("with")
+        val buildForm = CodeBlock.builder().addStatement("val request = %T()", WebForm::class.asClassName()).indent()
+        formFields().forEach { buildForm.addStatement(".%M(${it.name}Lens of ${it.name})", with) }
+
+        listOfNotNull(buildForm.unindent().build())
+    }
+    else -> emptyList()
+}
+
 
 private fun org.http4k.openapi.v3.Path.supportsFormContent() = formFields().isNotEmpty()
 
 private fun org.http4k.openapi.v3.Path.formFields() = spec.parameters.filterIsInstance<FormFieldSpec>()
 
-private fun org.http4k.openapi.v3.Path.webFormLensDeclaration(): CodeBlock? =
-    takeIf { supportsFormContent() }
-        ?.let {
-            CodeBlock.of(
-                "val formLens = %T.%M(%M, ${formFields().joinToString(", ") { it.name + "Lens" }}).toLens()",
-                Body::class.asTypeName(),
-                member<Body>("webForm"),
-                member<Validator>("Strict")
+fun org.http4k.openapi.v3.Path.webFormLensDeclarations(): List<CodeBlock> =
+    when {
+        supportsFormContent() ->
+            listOf(
+                CodeBlock.of(
+                    "val formLens = %T.%M(%M, ${formFields().joinToString(", ") { it.name + "Lens" }}).toLens()",
+                    Body::class.asTypeName(),
+                    member<Body>("webForm"),
+                    member<Validator>("Strict")
+                )
             )
-        }
+        else -> emptyList()
+    }
 
 fun org.http4k.openapi.v3.Path.parameterLensDeclarations() = spec.parameters
     .map {
