@@ -3,6 +3,7 @@
 package testPackage.server.endpoints
 
 import org.http4k.core.Body
+import org.http4k.core.Body.webForm
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -10,18 +11,17 @@ import org.http4k.core.Status
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator.Strict
 import org.http4k.lens.int
-import org.http4k.lens.webForm
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 
 fun Endpoint(): RoutingHttpHandler {
 
 	val valueLens = FormField.int().optional("value")
-	val formLens = Body.webForm(Strict, valueLens).toLens()
 
 	return "/formbody" bind Method.POST to { req: Request ->
-		val form = formLens(req)
-		val value = valueLens(form)
+		val value = valueLens(req)
+		val formLens = Body.webForm(Strict, valueLens).toLens()
+
 		Response(Status.OK)
 
 	}

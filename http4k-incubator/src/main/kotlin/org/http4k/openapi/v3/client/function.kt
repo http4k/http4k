@@ -17,15 +17,14 @@ import org.http4k.openapi.v3.Path
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
-import org.http4k.poet.buildWebForm
 import org.http4k.poet.childClassName
+import org.http4k.poet.formLensDeclarations
 import org.http4k.poet.lensDeclaration
 import org.http4k.poet.packageMember
 import org.http4k.poet.parameterLensDeclarations
 import org.http4k.poet.quotedName
 import org.http4k.poet.requestLensDeclarations
 import org.http4k.poet.responseLensDeclarations
-import org.http4k.poet.webFormLensDeclaration
 
 private const val reqValName = "httpReq"
 
@@ -76,15 +75,13 @@ fun Path.function(modelPackageName: String): FunSpec =
         } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
-            .addKdoc(buildKDoc())
             .addAllParametersFrom(this, modelPackageName)
             .returns(responseType)
             .addCodeBlocks((
-                requestLensDeclarations(modelPackageName) +
-                    responseLensDeclarations(modelPackageName) +
-                    parameterLensDeclarations() +
-                    webFormLensDeclaration() +
-                    buildWebForm()
+                requestLensDeclarations(modelPackageName)
+                    + responseLensDeclarations(modelPackageName)
+                    + parameterLensDeclarations()
+                    + formLensDeclarations()
                 )
                 .distinct())
             .addCode(buildRequest)

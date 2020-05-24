@@ -3,6 +3,7 @@
 package testPackage.server.endpoints
 
 import org.http4k.core.Body
+import org.http4k.core.Body.webForm
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,7 +13,6 @@ import org.http4k.lens.Validator.Strict
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.string
-import org.http4k.lens.webForm
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 
@@ -22,14 +22,14 @@ fun Endpoint(): RoutingHttpHandler {
 	val integerLens = FormField.int().optional("integer")
 	val stringLens = FormField.string().optional("string")
 	val jsonLens = FormField.string().required("json")
-	val formLens = Body.webForm(Strict, booleanLens, integerLens, stringLens, jsonLens).toLens()
 
 	return "/formbody" bind Method.POST to { req: Request ->
-		val form = formLens(req)
-		val boolean = booleanLens(form)
-		val integer = integerLens(form)
-		val string = stringLens(form)
-		val json = jsonLens(form)
+		val boolean = booleanLens(req)
+		val integer = integerLens(req)
+		val string = stringLens(req)
+		val json = jsonLens(req)
+		val formLens = Body.webForm(Strict, booleanLens, integerLens, stringLens, jsonLens).toLens()
+
 		Response(Status.OK)
 
 	}
