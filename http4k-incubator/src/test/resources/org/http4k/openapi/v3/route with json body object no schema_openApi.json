@@ -16,7 +16,6 @@
                                 "foo": 123
                             },
                             "schema": {
-                                "type": "object"
                             }
                         }
                     },
