@@ -22,8 +22,8 @@ fun Endpoint(): RoutingHttpHandler {
 	val formLens = Body.webForm(Strict, requiredLens, optionalLens).toLens()
 
 	return "/formbody" bind Method.POST to { req: Request ->
-		val required = requiredLens(req)
-		val optional = optionalLens(req)
+		val required = requiredLens(form)
+		val optional = optionalLens(form)
 		Response(Status.OK)
 
 	}
