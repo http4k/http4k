@@ -12,6 +12,12 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import testPackage.model.Ref
 
+/**
+ * some route summary
+ * some route description
+ * Request
+ * 	application/json 
+ */
 fun Endpoint(): RoutingHttpHandler {
 
 	val refLens = Body.auto<Ref>().toLens()
@@ -19,6 +25,7 @@ fun Endpoint(): RoutingHttpHandler {
 	return "/jsonbody" bind Method.POST to { req: Request ->
 		val ref = refLens(req)
 		Response(Status.OK)
+
 	}
 }
 

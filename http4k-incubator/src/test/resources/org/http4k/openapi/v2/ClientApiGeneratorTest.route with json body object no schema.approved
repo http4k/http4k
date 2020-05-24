@@ -13,6 +13,10 @@ import testPackage.model.EndpointJsonRequest
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
+	/**
+	 * Request
+	 * 	application/json 
+	 */
 	fun endpoint(request: EndpointJsonRequest) {
 
 		val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()

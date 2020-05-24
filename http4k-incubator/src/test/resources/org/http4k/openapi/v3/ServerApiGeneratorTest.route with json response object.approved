@@ -13,12 +13,17 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import testPackage.model.EndpointJsonResponse200
 
+/**
+ * Returns
+ * 	200 OK
+ */
 fun Endpoint(): RoutingHttpHandler {
 
 	val endpointJsonResponse200Lens = Body.auto<EndpointJsonResponse200>().toLens()
 
 	return "/jsonbody" bind Method.POST to { req: Request ->
 		Response(Status.OK)
+
 			.with(endpointJsonResponse200Lens of TODO())
 	}
 }

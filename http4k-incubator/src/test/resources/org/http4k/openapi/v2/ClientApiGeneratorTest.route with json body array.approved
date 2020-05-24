@@ -14,6 +14,10 @@ import org.http4k.format.Jackson.auto
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
+	/**
+	 * Request
+	 * 	application/json 
+	 */
 	fun endpoint(request: List<Any>) {
 
 		val endpointJsonRequestLens = Body.auto<List<Any>>().toLens()

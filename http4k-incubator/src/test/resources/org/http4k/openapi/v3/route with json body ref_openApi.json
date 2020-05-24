@@ -7,9 +7,12 @@
     "paths": {
         "/jsonbody": {
             "post": {
+                "summary": "some route summary",
+                "description": "some route description",
                 "parameters": [
                 ],
                 "requestBody": {
+                    "description": "some body description",
                     "content": {
                         "application/json": {
                             "schema": {

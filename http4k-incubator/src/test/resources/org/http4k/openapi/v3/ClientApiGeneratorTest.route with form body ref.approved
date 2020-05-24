@@ -3,11 +3,16 @@
 package testPackage.client
 
 import kotlin.Int
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.with
 import org.http4k.lens.FormField
+import org.http4k.lens.Validator.Strict
+import org.http4k.lens.WebForm
 import org.http4k.lens.int
+import org.http4k.lens.webForm
 
 class TitleClient(
 	private val httpHandler: HttpHandler
@@ -15,7 +20,12 @@ class TitleClient(
 	fun endpoint(value: Int?) {
 
 		val valueLens = FormField.int().optional("value")
+		val formLens = Body.webForm(Strict, valueLens).toLens()
+		val request = WebForm()
+			.with(valueLens of value)
+
 		val httpReq = Request(Method.POST, "/formbody")
+			.with(formLens of request)
 
 		httpHandler(httpReq)
 	}

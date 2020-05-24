@@ -3,11 +3,16 @@
 package testPackage.client
 
 import kotlin.Boolean
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.with
 import org.http4k.lens.FormField
+import org.http4k.lens.Validator.Strict
+import org.http4k.lens.WebForm
 import org.http4k.lens.boolean
+import org.http4k.lens.webForm
 
 class TitleClient(
 	private val httpHandler: HttpHandler
@@ -15,7 +20,12 @@ class TitleClient(
 	fun endpoint(required: Boolean) {
 
 		val requiredLens = FormField.boolean().required("required")
+		val formLens = Body.webForm(Strict, requiredLens).toLens()
+		val request = WebForm()
+			.with(requiredLens of required)
+
 		val httpReq = Request(Method.POST, "/formreusable")
+			.with(formLens of request)
 
 		httpHandler(httpReq)
 	}

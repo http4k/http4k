@@ -16,20 +16,21 @@ fun OpenApi2Spec.asV3() = OpenApi3Spec(
 )
 
 private fun OpenApi2PathSpec.asV3(): OpenApi3PathSpec {
-
     val requestBody = parameters.filterIsInstance<OpenApi2ParameterSpec.BodySpec>().firstOrNull()?.let {
-        OpenApi3RequestBodySpec(mapOf(
-            (consumes.firstOrNull() ?: APPLICATION_JSON.value) to MessageBodySpec(it.schema)
+        OpenApi3RequestBodySpec(it.description, mapOf(
+            (consumes.firstOrNull() ?: APPLICATION_JSON.value) to MessageBodySpec(null, it.schema)
         ))
     }
 
     return OpenApi3PathSpec(
+        summary,
+        description,
         operationId,
         responses.map {
             (it.key.toIntOrNull() ?: Status.OK.code) to
-                ResponseSpec(mapOf((produces.firstOrNull() ?: APPLICATION_JSON.value) to it.value))
+                ResponseSpec(it.value.description, mapOf((produces.firstOrNull() ?: APPLICATION_JSON.value) to it.value))
         }.toMap(),
-        requestBody ?: OpenApi3RequestBodySpec(),
+        requestBody ?: OpenApi3RequestBodySpec(null),
         parameters.filterNot { it is OpenApi2ParameterSpec.BodySpec }.mapNotNull { it.asV3() }
     )
 }
@@ -44,10 +45,10 @@ private fun OpenApi2ParameterSpec.asV3() = when (this) {
 }
 
 private fun String.asSchema(parameterSpec: OpenApi2ParameterSpec) = when (this) {
-    "string" -> SchemaSpec.StringSpec
-    "integer" -> SchemaSpec.IntegerSpec
-    "number" -> SchemaSpec.NumberSpec
-    "boolean" -> SchemaSpec.BooleanSpec
+    "string" -> SchemaSpec.StringSpec()
+    "integer" -> SchemaSpec.IntegerSpec()
+    "number" -> SchemaSpec.NumberSpec()
+    "boolean" -> SchemaSpec.BooleanSpec()
     "array" -> parameterSpec.itemsSpec()
     else -> throw UnsupportedOperationException("cannot support parameter type of $this")
 }

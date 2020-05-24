@@ -7,8 +7,11 @@
     "paths": {
         "/jsonbody": {
             "post": {
+                "summary": "some route summary",
+                "description": "some route description",
                 "parameters": [
                     {
+                        "description": "a json object",
                         "in": "body",
                         "name": "required",
                         "required": true,

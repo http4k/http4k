@@ -16,12 +16,11 @@ data class Path(val urlPathPattern: String, val method: Method, val spec: OpenAp
     private fun modelName(contentType: String, suffix: String) =
         uniqueName + ContentType(contentType).value.substringAfter('/').capitalize().filter(Char::isLetterOrDigit) + suffix
 
-    fun requestSchemas(): List<NamedSchema> =
-        listOfNotNull(spec.requestBody.content.entries
-            .mapNotNull { (contentType, messageSpec) ->
-                messageSpec.schema?.namedSchema(modelName(contentType, "Request"))
-            }
-        ).flatten()
+    fun requestSchemas() = listOfNotNull(spec.requestBody.content.entries
+        .mapNotNull { (contentType, messageSpec) ->
+            messageSpec.schema?.namedSchema(modelName(contentType, "Request"))
+        }
+    ).flatten()
 
     fun responseSchemas(): List<NamedSchema> = spec.responses.entries
         .flatMap { (code, messageSpec) ->
@@ -29,6 +28,21 @@ data class Path(val urlPathPattern: String, val method: Method, val spec: OpenAp
                 messageSpec.schema?.namedSchema(modelName(contentType, "Response$code"))
             }
         }
+
+    fun buildKDoc(): String {
+        val summary = listOfNotNull(spec.summary, spec.description)
+        val requests = spec.requestBody.takeIf { it.content.isNotEmpty() }?.let {
+            listOf("Request").plus(
+                it.content.map { "\t" + it.key + " " + (it.value.description ?: "") }
+            )
+        } ?: emptyList()
+        val responses = spec.responses.takeIf { it.isNotEmpty() }?.let {
+            listOf("Returns").plus(
+                spec.responses.map { "\t" + it.key.toString() + " " + (it.value.description ?: "") }
+            )
+        } ?: emptyList()
+        return (summary + requests + responses).joinToString("\n")
+    }
 }
 
 fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { Path(path, Method.valueOf(it.key.toUpperCase()), it.value) } }
@@ -43,7 +57,7 @@ fun OpenApi3Spec.flatten() = replaceFormsWithParameters().flattenParameterRefsIn
 private fun OpenApi3Spec.replaceFormsWithParameters(): OpenApi3Spec = copy(
     paths = paths.mapValues {
         it.value.mapValues { (_, path) ->
-            if(path.supports(APPLICATION_FORM_URLENCODED)) {
+            if (path.supports(APPLICATION_FORM_URLENCODED)) {
                 val formContent = path.get(APPLICATION_FORM_URLENCODED)
                 when (formContent.schema) {
                     is SchemaSpec.RefSpec -> inlineReference(path, formContent, formContent.schema.schemaName)
@@ -75,7 +89,7 @@ private fun OpenApi3PathSpec.add(contentType: ContentType, it: MessageBodySpec):
     copy(requestBody = requestBody.copy(content = requestBody.content + (contentType.value to it)))
 
 private fun OpenApi3PathSpec.remove(contentType: ContentType): OpenApi3RequestBodySpec =
-    requestBody.copy(content = requestBody.content.minus(contentType.value))
+    requestBody.copy(content = requestBody.content - contentType.value)
 
 private fun SchemaSpec.ObjectSpec.convertToFormParameters() = properties.map {
     OpenApi3ParameterSpec.FormFieldSpec(it.key, required.contains(it.key), it.value)

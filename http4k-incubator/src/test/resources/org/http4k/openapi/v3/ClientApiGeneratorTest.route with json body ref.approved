@@ -13,6 +13,12 @@ import testPackage.model.Ref
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
+	/**
+	 * some route summary
+	 * some route description
+	 * Request
+	 * 	application/json 
+	 */
 	fun endpoint(request: Ref) {
 
 		val refLens = Body.auto<Ref>().toLens()

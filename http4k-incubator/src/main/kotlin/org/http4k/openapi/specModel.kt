@@ -22,10 +22,10 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
 
     data class ObjectSpec(val required: List<String> = emptyList(),
                           val properties: Map<String, SchemaSpec> = emptyMap(),
-                          override val clazz: KClass<*>?,
+                          override val clazz: KClass<*>? = null,
                           val additionalProperties: JsonNode? = null) : SchemaSpec(clazz)
 
-    data class ArraySpec(private val items: JsonNode) : SchemaSpec() {
+    data class ArraySpec(private val items: JsonNode, val minItems: Int? = null, val maxItems: Int? = null, val uniqueItems: Boolean = false, val nullable: Boolean? = null) : SchemaSpec() {
         fun itemsSpec(): SchemaSpec = try {
             items.asA()
         } catch (e: Exception) {
@@ -37,15 +37,29 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
         }
     }
 
-    object IntegerSpec : SchemaSpec(Int::class)
-    object NumberSpec : SchemaSpec(BigDecimal::class)
-    object StringSpec : SchemaSpec(String::class)
-    object BooleanSpec : SchemaSpec(Boolean::class)
+    data class IntegerSpec(val minimum: Number? = null,
+                      val maximum: Number? = null,
+                      val format: String? = null,
+                      val exclusiveMinimum: Number? = null,
+                      val exclusiveMaximum: Number? = null,
+                      val multipleOf: Number? = null,
+                      val nullable: Boolean? = null) : SchemaSpec(Int::class)
+
+    data class NumberSpec(val minimum: Number? = null,
+                     val maximum: Number? = null,
+                     val format: String? = null,
+                     val exclusiveMinimum: Number? = null,
+                     val exclusiveMaximum: Number? = null,
+                     val multipleOf: Number? = null,
+                     val nullable: Boolean? = null) : SchemaSpec(BigDecimal::class)
+
+    data class StringSpec(val minLength: Int? = null, val maxLength: Int? = null, val format: String? = null, val nullable: Boolean? = null) : SchemaSpec(String::class)
+    data class BooleanSpec(val nullable: Boolean? = null) : SchemaSpec(Boolean::class)
     data class RefSpec(val `$ref`: String?) : SchemaSpec() {
         val schemaName = `$ref`!!.cleanSchemaName()
     }
 }
 
-data class ResponseSpec(val content: Map<String, MessageBodySpec>)
+data class ResponseSpec(val description: String?, val content: Map<String, MessageBodySpec>)
 
-data class MessageBodySpec(val schema: SchemaSpec?)
+data class MessageBodySpec(val description: String?, val schema: SchemaSpec?)

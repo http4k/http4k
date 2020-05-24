@@ -10,6 +10,8 @@ import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.cleanSchemaName
 
 data class OpenApi2PathSpec(
+    val summary: String?,
+    val description: String?,
     val operationId: String?,
     val produces: List<String> = emptyList(),
     val consumes: List<String> = emptyList(),
@@ -27,19 +29,18 @@ data class OpenApi2PathSpec(
     JsonSubTypes.Type(value = OpenApi2ParameterSpec.BodySpec::class, name = "body")
 )
 sealed class OpenApi2ParameterSpec(val name: String, val required: Boolean, val items: JsonNode = NullNode.instance) {
-    fun itemsSpec(): SchemaSpec = SchemaSpec.ArraySpec(items).itemsSpec()
+    fun itemsSpec(): SchemaSpec = SchemaSpec.ArraySpec(items, nullable = !required).itemsSpec()
 
     class CookieSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class HeaderSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class PathSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class QuerySpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class FormSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
-    class BodySpec(name: String, required: Boolean, val schema: SchemaSpec) : OpenApi2ParameterSpec(name, required)
+    class BodySpec(val description: String?, name: String, required: Boolean, val schema: SchemaSpec) : OpenApi2ParameterSpec(name, required)
 
     data class RefSpec(val `$ref`: String) : OpenApi2ParameterSpec(`$ref`, false) {
         val schemaName = `$ref`.cleanSchemaName()
     }
-
 }
 
 data class OpenApi2Spec(val info: InfoSpec,

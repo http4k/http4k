@@ -12,6 +12,11 @@ import testPackage.model.Ref
 class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
+	/**
+	 * Returns
+	 * 	200 OK
+	 * 	404 Not OK
+	 */
 	fun endpoint(): Ref {
 
 		val refLens = Body.auto<Ref>().toLens()
