@@ -6,6 +6,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.openapi.v3.OpenApi3ParameterSpec
 import org.http4k.openapi.v3.Path
 import org.http4k.openapi.v3.client.bindFirstToHttpMessage
 import org.http4k.poet.Property
@@ -21,8 +22,10 @@ fun Path.buildEndpoint(modelPackageName: String) = with(this) {
 
     val body = CodeBlock.builder()
 
-    (spec.parameters.map { it.name } + requestSchemas().map { it.fieldName })
-        .forEach { body.addStatement("val $it = ${it}Lens(req)") }
+    (spec.parameters.map { it.name to if (it is OpenApi3ParameterSpec.FormFieldSpec) "form" else "req" } +
+        requestSchemas().map { it.fieldName to "req" }
+        )
+        .forEach { (it, target) -> body.addStatement("val $it = ${it}Lens($target)") }
 
     body.addStatement("%T(%T.OK)", Property<Response>().type, Property<Status>().type)
     responseSchemas().bindFirstToHttpMessage("TODO()").firstOrNull()?.also { body.add(it) }

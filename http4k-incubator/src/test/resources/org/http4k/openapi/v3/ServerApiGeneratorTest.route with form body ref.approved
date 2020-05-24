@@ -20,7 +20,7 @@ fun Endpoint(): RoutingHttpHandler {
 	val formLens = Body.webForm(Strict, valueLens).toLens()
 
 	return "/formbody" bind Method.POST to { req: Request ->
-		val value = valueLens(req)
+		val value = valueLens(form)
 		Response(Status.OK)
 
 	}
