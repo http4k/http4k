@@ -92,7 +92,7 @@ fun org.http4k.openapi.v3.Path.webFormLensDeclaration(): List<CodeBlock> =
                 CodeBlock.of(
                     "val formLens = %T.%M(%M, ${formFields().joinToString(", ") { it.name + "Lens" }}).toLens()",
                     Body::class.asTypeName(),
-                    member<Body>("webForm"),
+                    packageMember<LensSpec<*, *>>("webForm"),
                     member<Validator>("Strict")
                 )
             )
