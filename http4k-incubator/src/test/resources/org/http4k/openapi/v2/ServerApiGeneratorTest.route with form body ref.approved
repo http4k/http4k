@@ -20,9 +20,9 @@ fun Endpoint(): RoutingHttpHandler {
 	val formLens = Body.webForm(Strict, requiredLens).toLens()
 
 	return "/formreusable" bind Method.POST to { req: Request ->
+		val form = formLens(req)
 		val required = requiredLens(form)
 		Response(Status.OK)
-
 	}
 }
 

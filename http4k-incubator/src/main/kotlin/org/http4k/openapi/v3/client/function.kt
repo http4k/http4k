@@ -25,7 +25,7 @@ import org.http4k.poet.parameterLensDeclarations
 import org.http4k.poet.quotedName
 import org.http4k.poet.requestLensDeclarations
 import org.http4k.poet.responseLensDeclarations
-import org.http4k.poet.webFormLensDeclarations
+import org.http4k.poet.webFormLensDeclaration
 
 private const val reqValName = "httpReq"
 
@@ -82,7 +82,7 @@ fun Path.function(modelPackageName: String): FunSpec =
                 requestLensDeclarations(modelPackageName) +
                     responseLensDeclarations(modelPackageName) +
                     parameterLensDeclarations() +
-                    webFormLensDeclarations() +
+                    webFormLensDeclaration() +
                     buildWebForm()
                 )
                 .distinct())
