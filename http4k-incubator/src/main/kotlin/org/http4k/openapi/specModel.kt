@@ -22,8 +22,7 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
 
     data class ObjectSpec(val required: List<String> = emptyList(),
                           val properties: Map<String, SchemaSpec> = emptyMap(),
-                          override val clazz: KClass<*>? = null,
-                          val additionalProperties: JsonNode? = null) : SchemaSpec(clazz)
+                          override val clazz: KClass<*>? = null) : SchemaSpec(clazz)
 
     data class ArraySpec(private val items: JsonNode, val minItems: Int? = null, val maxItems: Int? = null, val uniqueItems: Boolean = false, val nullable: Boolean? = null) : SchemaSpec() {
         fun itemsSpec(): SchemaSpec = try {

@@ -39,35 +39,31 @@ fun SchemaSpec.buildModelClass(className: ClassName, allSchemas: Map<String, Sch
     }
 }
 
-private fun SchemaSpec.ObjectSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, GeneratedType>): GeneratedType {
-    val clazz = TypeSpec.classBuilder(className)
-    val primaryConstructor = FunSpec.constructorBuilder()
+private fun SchemaSpec.ObjectSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, GeneratedType>) =
+    if (properties.isEmpty()) GeneratedType.GeneratedTypeAlias(TypeAliasSpec.builder(className.simpleName, Map::class.parameterizedBy(String::class, Any::class)).build())
+    else {
+        val clazz = TypeSpec.classBuilder(className)
+        val primaryConstructor = FunSpec.constructorBuilder()
 
-    fun SchemaSpec.propertyType(): TypeName = when (this) {
-        is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
-        is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
-        is SchemaSpec.RefSpec -> {
-            val refClassName = className.sibling(schemaName)
-            buildModelClass(refClassName, allSchemas, generated)
-            refClassName
-        }
-        else -> this.clazz!!.asTypeName()
-    }
-
-    properties
-        .map { (name, spec) -> Property(name, spec.propertyType().copy(nullable = !required.contains(name))) }
-        .forEach {
-            primaryConstructor.addParameter(it)
-            clazz.addProperty(it)
+        fun SchemaSpec.propertyType(): TypeName = when (this) {
+            is SchemaSpec.ObjectSpec -> Map::class.parameterizedBy(String::class, Any::class)
+            is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(listOf(itemsSpec().propertyType()))
+            is SchemaSpec.RefSpec -> {
+                val refClassName = className.sibling(schemaName)
+                buildModelClass(refClassName, allSchemas, generated)
+                refClassName
+            }
+            else -> this.clazz!!.asTypeName()
         }
 
-    if (additionalProperties != null || properties.isEmpty()) {
-        val freeform = Property("additional", Map::class.parameterizedBy(String::class, Any::class))
-        primaryConstructor.addParameter(freeform)
-        clazz.addProperty(freeform)
+        properties
+            .map { (name, spec) -> Property(name, spec.propertyType().copy(nullable = !required.contains(name))) }
+            .forEach {
+                primaryConstructor.addParameter(it)
+                clazz.addProperty(it)
+            }
+
+        clazz.addModifiers(DATA).primaryConstructor(primaryConstructor.build())
+
+        GeneratedType.GeneratedClass(clazz.build())
     }
-
-    clazz.addModifiers(DATA).primaryConstructor(primaryConstructor.build())
-
-    return GeneratedType.GeneratedClass(clazz.build())
-}

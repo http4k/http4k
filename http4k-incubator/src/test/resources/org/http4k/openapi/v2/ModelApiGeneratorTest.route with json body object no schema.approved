@@ -6,6 +6,4 @@ import kotlin.Any
 import kotlin.String
 import kotlin.collections.Map
 
-data class EndpointJsonRequest(
-	val additional: Map<String, Any>
-)
+typealias EndpointJsonRequest = Map<String, Any>
