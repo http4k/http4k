@@ -17,11 +17,10 @@ import org.http4k.routing.bind
 fun Endpoint(): RoutingHttpHandler {
 
 	val requiredLens = FormField.boolean().required("required")
+	val formLens = Body.webForm(Strict, requiredLens).toLens()
 
 	return "/formreusable" bind Method.POST to { req: Request ->
 		val required = requiredLens(req)
-		val formLens = Body.webForm(Strict, requiredLens).toLens()
-
 		Response(Status.OK)
 
 	}

@@ -22,14 +22,13 @@ fun Endpoint(): RoutingHttpHandler {
 	val integerLens = FormField.int().optional("integer")
 	val stringLens = FormField.string().optional("string")
 	val jsonLens = FormField.string().required("json")
+	val formLens = Body.webForm(Strict, booleanLens, integerLens, stringLens, jsonLens).toLens()
 
 	return "/formbody" bind Method.POST to { req: Request ->
 		val boolean = booleanLens(req)
 		val integer = integerLens(req)
 		val string = stringLens(req)
 		val json = jsonLens(req)
-		val formLens = Body.webForm(Strict, booleanLens, integerLens, stringLens, jsonLens).toLens()
-
 		Response(Status.OK)
 
 	}

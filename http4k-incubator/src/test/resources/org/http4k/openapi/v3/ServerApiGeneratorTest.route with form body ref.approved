@@ -17,11 +17,10 @@ import org.http4k.routing.bind
 fun Endpoint(): RoutingHttpHandler {
 
 	val valueLens = FormField.int().optional("value")
+	val formLens = Body.webForm(Strict, valueLens).toLens()
 
 	return "/formbody" bind Method.POST to { req: Request ->
 		val value = valueLens(req)
-		val formLens = Body.webForm(Strict, valueLens).toLens()
-
 		Response(Status.OK)
 
 	}
