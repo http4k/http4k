@@ -53,7 +53,7 @@ private fun Path.buildHandlerCode(): CodeBlock {
         .indent()
         .add(body.build())
         .unindent()
-        .addStatement("}")
+        .add("\n}")
         .build()
     return handler
 }
