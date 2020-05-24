@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator.Strict
+import org.http4k.lens.WebForm
 import org.http4k.lens.int
 
 class TitleClient(
@@ -20,6 +21,9 @@ class TitleClient(
 
 		val valueLens = FormField.int().optional("value")
 		val formLens = Body.webForm(Strict, valueLens).toLens()
+		val request = WebForm()
+			.with(valueLens of value)
+
 		val httpReq = Request(Method.POST, "/formbody")
 			.with(formLens of request)
 
