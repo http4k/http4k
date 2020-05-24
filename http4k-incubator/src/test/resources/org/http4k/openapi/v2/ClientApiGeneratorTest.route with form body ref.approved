@@ -4,7 +4,6 @@ package testPackage.client
 
 import kotlin.Boolean
 import org.http4k.core.Body
-import org.http4k.core.Body.webForm
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -13,6 +12,7 @@ import org.http4k.lens.FormField
 import org.http4k.lens.Validator.Strict
 import org.http4k.lens.WebForm
 import org.http4k.lens.boolean
+import org.http4k.lens.webForm
 
 class TitleClient(
 	private val httpHandler: HttpHandler
