@@ -13,6 +13,7 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator.Strict
+import org.http4k.lens.WebForm
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.string
@@ -32,6 +33,12 @@ class TitleClient(
 		val stringLens = FormField.string().optional("string")
 		val jsonLens = FormField.string().required("json")
 		val formLens = Body.webForm(Strict, booleanLens, integerLens, stringLens, jsonLens).toLens()
+		val request = WebForm()
+			.with(booleanLens of boolean)
+			.with(integerLens of integer)
+			.with(stringLens of string)
+			.with(jsonLens of json)
+
 		val httpReq = Request(Method.POST, "/formbody")
 			.with(formLens of request)
 

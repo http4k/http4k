@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator.Strict
+import org.http4k.lens.WebForm
 import org.http4k.lens.boolean
 
 class TitleClient(
@@ -20,6 +21,9 @@ class TitleClient(
 
 		val requiredLens = FormField.boolean().required("required")
 		val formLens = Body.webForm(Strict, requiredLens).toLens()
+		val request = WebForm()
+			.with(requiredLens of required)
+
 		val httpReq = Request(Method.POST, "/formreusable")
 			.with(formLens of request)
 
