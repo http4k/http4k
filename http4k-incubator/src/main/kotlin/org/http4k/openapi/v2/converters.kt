@@ -16,21 +16,20 @@ fun OpenApi2Spec.asV3() = OpenApi3Spec(
 )
 
 private fun OpenApi2PathSpec.asV3(): OpenApi3PathSpec {
+
     val requestBody = parameters.filterIsInstance<OpenApi2ParameterSpec.BodySpec>().firstOrNull()?.let {
-        OpenApi3RequestBodySpec(it.description, mapOf(
+        OpenApi3RequestBodySpec(mapOf(
             (consumes.firstOrNull() ?: APPLICATION_JSON.value) to MessageBodySpec(null, it.schema)
         ))
     }
 
     return OpenApi3PathSpec(
-        summary,
-        description,
         operationId,
         responses.map {
             (it.key.toIntOrNull() ?: Status.OK.code) to
                 ResponseSpec(it.value.description, mapOf((produces.firstOrNull() ?: APPLICATION_JSON.value) to it.value))
         }.toMap(),
-        requestBody ?: OpenApi3RequestBodySpec(null),
+        requestBody ?: OpenApi3RequestBodySpec(),
         parameters.filterNot { it is OpenApi2ParameterSpec.BodySpec }.mapNotNull { it.asV3() }
     )
 }
