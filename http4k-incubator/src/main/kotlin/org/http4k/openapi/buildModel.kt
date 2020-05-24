@@ -27,8 +27,8 @@ sealed class GeneratedType(val name: String) {
     }
 }
 
-fun SchemaSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, GeneratedType>): GeneratedType {
-    return when (this) {
+fun SchemaSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, GeneratedType>): GeneratedType =
+    when (this) {
         is SchemaSpec.ObjectSpec -> generated.getOrPut(className.simpleName, { buildModelClass(className, allSchemas, generated) })
         is SchemaSpec.RefSpec -> generated.getOrPut(schemaName.cleanValueName().capitalize(), {
             allSchemas.getValue(schemaName.capitalize()).buildModelClass(
@@ -37,7 +37,6 @@ fun SchemaSpec.buildModelClass(className: ClassName, allSchemas: Map<String, Sch
         is SchemaSpec.ArraySpec -> itemsSpec().buildModelClass(className, allSchemas, generated)
         else -> GeneratedType.GeneratedTypeAlias(TypeAliasSpec.builder(className.simpleName, clazz!!).build())
     }
-}
 
 private fun SchemaSpec.ObjectSpec.buildModelClass(className: ClassName, allSchemas: Map<String, SchemaSpec>, generated: MutableMap<String, GeneratedType>) =
     if (properties.isEmpty()) GeneratedType.GeneratedTypeAlias(TypeAliasSpec.builder(className.simpleName, Map::class.parameterizedBy(String::class, Any::class)).build())
