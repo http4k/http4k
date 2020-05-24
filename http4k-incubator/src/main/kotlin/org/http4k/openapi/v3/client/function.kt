@@ -76,6 +76,7 @@ fun Path.function(modelPackageName: String): FunSpec =
         } ?: Unit::class.asClassName()
 
         FunSpec.builder(uniqueName.decapitalize())
+            .addKdoc(buildKDoc())
             .addAllParametersFrom(this, modelPackageName)
             .returns(responseType)
             .addCodeBlocks((
