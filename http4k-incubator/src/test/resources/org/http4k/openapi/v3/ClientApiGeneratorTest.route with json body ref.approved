@@ -16,7 +16,7 @@ class TitleClient(
 	/**
 	 * some route summary
 	 * some route description
-	 * Request
+	 * Request:
 	 * 	application/json 
 	 */
 	fun endpoint(request: Ref) {

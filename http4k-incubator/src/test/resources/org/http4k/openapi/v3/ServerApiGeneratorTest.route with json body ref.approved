@@ -15,7 +15,7 @@ import testPackage.model.Ref
 /**
  * some route summary
  * some route description
- * Request
+ * Request:
  * 	application/json 
  */
 fun Endpoint(): RoutingHttpHandler {

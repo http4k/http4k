@@ -17,7 +17,7 @@ class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
 	/**
-	 * Request
+	 * Request:
 	 * 	application/json 
 	 */
 	fun endpoint(required: Boolean, request: EndpointJsonRequest) {

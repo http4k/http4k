@@ -13,7 +13,7 @@ class TitleClient(
 	private val httpHandler: HttpHandler
 ) {
 	/**
-	 * Returns
+	 * Response:
 	 * 	200 OK
 	 */
 	fun endpoint(): EndpointJsonResponse200 {
