@@ -52,7 +52,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             "/length" bind { req: Request ->
                 when (req.body) {
                     is StreamBody -> Response(OK).body(req.body.length.toString())
-                    else -> Response(INTERNAL_SERVER_ERROR)
+                    else -> Response(INTERNAL_SERVER_ERROR).body("Expected stream body")
                 }
             },
             "/uri" bind GET to { Response(OK).body(it.uri.toString()) },

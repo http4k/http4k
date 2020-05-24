@@ -133,6 +133,11 @@ object Libs {
             Versions.org_junit_jupiter
 
     /**
+     * https://ratpack.io/
+     */
+    const val ratpack_core: String = "io.ratpack:ratpack-core:" + Versions.io_ratpack
+
+    /**
      * http://www.jboss.org
      */
     const val undertow_core: String = "io.undertow:undertow-core:" + Versions.io_undertow
