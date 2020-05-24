@@ -44,10 +44,10 @@ private fun OpenApi2ParameterSpec.asV3() = when (this) {
 }
 
 private fun String.asSchema(parameterSpec: OpenApi2ParameterSpec) = when (this) {
-    "string" -> SchemaSpec.StringSpec
-    "integer" -> SchemaSpec.IntegerSpec
-    "number" -> SchemaSpec.NumberSpec
-    "boolean" -> SchemaSpec.BooleanSpec
+    "string" -> SchemaSpec.StringSpec()
+    "integer" -> SchemaSpec.IntegerSpec()
+    "number" -> SchemaSpec.NumberSpec()
+    "boolean" -> SchemaSpec.BooleanSpec()
     "array" -> parameterSpec.itemsSpec()
     else -> throw UnsupportedOperationException("cannot support parameter type of $this")
 }

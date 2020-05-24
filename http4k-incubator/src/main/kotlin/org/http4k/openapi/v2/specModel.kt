@@ -27,7 +27,7 @@ data class OpenApi2PathSpec(
     JsonSubTypes.Type(value = OpenApi2ParameterSpec.BodySpec::class, name = "body")
 )
 sealed class OpenApi2ParameterSpec(val name: String, val required: Boolean, val items: JsonNode = NullNode.instance) {
-    fun itemsSpec(): SchemaSpec = SchemaSpec.ArraySpec(items).itemsSpec()
+    fun itemsSpec(): SchemaSpec = SchemaSpec.ArraySpec(items, nullable = !required).itemsSpec()
 
     class CookieSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
     class HeaderSpec(name: String, required: Boolean, val type: String) : OpenApi2ParameterSpec(name, required)
