@@ -10,6 +10,7 @@ import org.http4k.openapi.v3.Path
 import org.http4k.openapi.v3.client.bindFirstToHttpMessage
 import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
+import org.http4k.poet.formLensDeclarations
 import org.http4k.poet.packageMember
 import org.http4k.poet.parameterLensDeclarations
 import org.http4k.poet.requestLensDeclarations
@@ -23,7 +24,12 @@ fun Path.buildEndpoint(modelPackageName: String) = with(this) {
     (spec.parameters.map { it.name } + requestSchemas().map { it.fieldName })
         .forEach { body.addStatement("val $it = ${it}Lens(req)") }
 
-    body.add("%T(%T.OK)", Property<Response>().type, Property<Status>().type)
+    formLensDeclarations().forEach {
+        body.add(it)
+        body.addStatement("\n")
+    }
+
+    body.addStatement("%T(%T.OK)", Property<Response>().type, Property<Status>().type)
     responseSchemas().bindFirstToHttpMessage("TODO()").firstOrNull()?.also { body.add(it) }
 
     val handler = CodeBlock.builder()

@@ -42,7 +42,7 @@ fun OpenApi3Spec.flatten() = replaceFormsWithParameters().flattenParameterRefsIn
 private fun OpenApi3Spec.replaceFormsWithParameters(): OpenApi3Spec = copy(
     paths = paths.mapValues {
         it.value.mapValues { (_, path) ->
-            if(path.supports(APPLICATION_FORM_URLENCODED)) {
+            if (path.supports(APPLICATION_FORM_URLENCODED)) {
                 val formContent = path.get(APPLICATION_FORM_URLENCODED)
                 when (formContent.schema) {
                     is SchemaSpec.RefSpec -> inlineReference(path, formContent, formContent.schema.schemaName)

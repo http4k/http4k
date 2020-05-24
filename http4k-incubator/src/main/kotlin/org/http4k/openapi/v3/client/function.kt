@@ -18,6 +18,7 @@ import org.http4k.poet.Property
 import org.http4k.poet.addCodeBlocks
 import org.http4k.poet.asTypeName
 import org.http4k.poet.childClassName
+import org.http4k.poet.formLensDeclarations
 import org.http4k.poet.lensDeclaration
 import org.http4k.poet.packageMember
 import org.http4k.poet.parameterLensDeclarations
@@ -76,7 +77,13 @@ fun Path.function(modelPackageName: String): FunSpec =
         FunSpec.builder(uniqueName.decapitalize())
             .addAllParametersFrom(this, modelPackageName)
             .returns(responseType)
-            .addCodeBlocks((requestLensDeclarations(modelPackageName) + responseLensDeclarations(modelPackageName) + parameterLensDeclarations()).distinct())
+            .addCodeBlocks((
+                requestLensDeclarations(modelPackageName)
+                    + responseLensDeclarations(modelPackageName)
+                    + parameterLensDeclarations()
+                    + formLensDeclarations()
+                )
+                .distinct())
             .addCode(buildRequest)
             .addCodeBlocks(response)
             .build()

@@ -17,6 +17,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensSpec
 import org.http4k.lens.Path
 import org.http4k.lens.Query
+import org.http4k.lens.Validator
 import org.http4k.openapi.NamedSchema
 import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.cleanValueName
@@ -61,6 +62,21 @@ fun org.http4k.openapi.v3.Path.responseLensDeclarations(modelPackageName: String
 fun org.http4k.openapi.v3.Path.requestLensDeclarations(modelPackageName: String) =
     requestSchemas().mapNotNull { it.lensDeclaration(modelPackageName) }
 
+fun org.http4k.openapi.v3.Path.formLensDeclarations(): List<CodeBlock> {
+    val formFields = spec.parameters.filterIsInstance<OpenApi3ParameterSpec.FormFieldSpec>()
+    return when {
+        formFields.isEmpty() -> emptyList()
+        else -> {
+            listOf(CodeBlock.of(
+                "val formLens = %T.%M(%M, ${formFields.joinToString(", ") { it.name + "Lens" }}).toLens()",
+                Body::class.asTypeName(),
+                member<Body>("webForm"),
+                member<Validator>("Strict")
+            ))
+        }
+    }
+}
+
 fun org.http4k.openapi.v3.Path.parameterLensDeclarations() = spec.parameters.map {
     when (it) {
         is OpenApi3ParameterSpec.CookieSpec -> CodeBlock.of(
@@ -86,16 +102,16 @@ fun NamedSchema.lensDeclaration(modelPackageName: String): CodeBlock? = when (th
     is NamedSchema.Generated -> {
         val modelClassName = modelPackageName.childClassName(name)
         when (schema) {
-            is SchemaSpec.ObjectSpec -> lensBlock(modelClassName)
-            is SchemaSpec.ArraySpec -> lensBlock(List::class.asClassName().parameterizedBy(modelClassName))
-            is SchemaSpec.RefSpec -> lensBlock(modelClassName)
+            is SchemaSpec.ObjectSpec -> autoLensBlock(modelClassName)
+            is SchemaSpec.ArraySpec -> autoLensBlock(List::class.asClassName().parameterizedBy(modelClassName))
+            is SchemaSpec.RefSpec -> autoLensBlock(modelClassName)
             else -> null
         }
     }
-    is NamedSchema.Existing -> lensBlock(typeName)
+    is NamedSchema.Existing -> autoLensBlock(typeName)
 }
 
-private fun NamedSchema.lensBlock(type: TypeName) = CodeBlock.of(
+private fun NamedSchema.autoLensBlock(type: TypeName) = CodeBlock.of(
     "val ${fieldName}Lens = %T.%M<%T>().toLens()",
     Body::class.asTypeName(),
     member<Jackson>("auto"),

@@ -20,6 +20,7 @@ fun Endpoint(): RoutingHttpHandler {
 
 	return "/jsonbody" bind Method.POST to { req: Request ->
 		Response(Status.OK)
+
 			.with(endpointJsonResponse200Lens of TODO())
 	}
 }
