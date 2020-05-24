@@ -20,8 +20,8 @@ import org.http4k.poet.webFormLensDeclaration
 import org.http4k.routing.RoutingHttpHandler
 
 fun Path.buildEndpoint(modelPackageName: String) = with(this) {
-
     FunSpec.builder(uniqueName)
+        .addKdoc(buildKDoc())
         .returns(Property<RoutingHttpHandler>().type)
         .addCodeBlocks((
             requestLensDeclarations(modelPackageName) +

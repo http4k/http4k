@@ -28,6 +28,13 @@ data class Path(val urlPathPattern: String, val method: Method, val spec: OpenAp
                 messageSpec.schema?.namedSchema(modelName(contentType, "Response$code"))
             }
         }
+
+    fun buildKDoc(): String {
+        val responses = listOf("Returns").plus(
+            spec.responses.map { "\t" + it.key.toString() + " " + (it.value.description ?: "") }
+        )
+        return responses.joinToString("\n")
+    }
 }
 
 fun OpenApi3Spec.flattenedPaths() = paths.entries.flatMap { (path, verbs) -> verbs.map { Path(path, Method.valueOf(it.key.toUpperCase()), it.value) } }

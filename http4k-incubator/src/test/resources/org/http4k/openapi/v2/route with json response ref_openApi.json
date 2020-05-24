@@ -15,6 +15,12 @@
                         "schema": {
                             "$ref": "#/definitions/Ref"
                         }
+                    },
+                    "404": {
+                        "description": "Not OK",
+                        "schema": {
+                            "$ref": "#/definitions/Ref"
+                        }
                     }
                 },
                 "operationId": "endpoint"
