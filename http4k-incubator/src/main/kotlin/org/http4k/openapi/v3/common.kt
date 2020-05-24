@@ -32,13 +32,13 @@ data class Path(val urlPathPattern: String, val method: Method, val spec: OpenAp
     fun buildKDoc(): String {
         val summary = listOfNotNull(spec.summary, spec.description)
         val requests = spec.requestBody.takeIf { it.content.isNotEmpty() }?.let {
-            listOf("Request").plus(
-                it.content.map { "\t" + it.key + " " + (it.value.description ?: "") }
+            listOf("Request:").plus(
+                it.content.map { "\t${it.key} ${it.value.description ?: ""}" }
             )
         } ?: emptyList()
         val responses = spec.responses.takeIf { it.isNotEmpty() }?.let {
-            listOf("Returns").plus(
-                spec.responses.map { "\t" + it.key.toString() + " " + (it.value.description ?: "") }
+            listOf("Response:").plus(
+                spec.responses.map { "\t${it.key} ${it.value.description ?: ""}" }
             )
         } ?: emptyList()
         return (summary + requests + responses).joinToString("\n")
