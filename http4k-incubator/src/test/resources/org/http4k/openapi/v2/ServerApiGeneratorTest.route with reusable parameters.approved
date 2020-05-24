@@ -14,6 +14,10 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import testPackage.model.EndpointJsonRequest
 
+/**
+ * Request
+ * 	application/json 
+ */
 fun Endpoint(): RoutingHttpHandler {
 
 	val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()

@@ -13,6 +13,10 @@ import org.http4k.format.Jackson.auto
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 
+/**
+ * Request
+ * 	application/json 
+ */
 fun Endpoint(): RoutingHttpHandler {
 
 	val endpointJsonRequestLens = Body.auto<List<BigDecimal>>().toLens()

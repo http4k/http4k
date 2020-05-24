@@ -13,6 +13,11 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import testPackage.model.Ref
 
+/**
+ * Returns
+ * 	200 OK
+ * 	404 Not OK
+ */
 fun Endpoint(): RoutingHttpHandler {
 
 	val refLens = Body.auto<Ref>().toLens()

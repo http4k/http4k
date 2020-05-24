@@ -14,6 +14,10 @@ import org.http4k.format.Jackson.auto
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 
+/**
+ * Returns
+ * 	200 OK
+ */
 fun Endpoint(): RoutingHttpHandler {
 
 	val endpointJsonResponse200Lens = Body.auto<List<BigDecimal>>().toLens()

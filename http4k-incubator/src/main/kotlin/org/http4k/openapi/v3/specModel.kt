@@ -9,11 +9,16 @@ import org.http4k.openapi.SchemaSpec
 import org.http4k.openapi.cleanSchemaName
 import org.http4k.openapi.cleanValueName
 
-data class OpenApi3RequestBodySpec(val content: Map<String, MessageBodySpec> = emptyMap())
+data class OpenApi3RequestBodySpec(
+    val description: String? = null,
+    val content: Map<String, MessageBodySpec> = emptyMap()
+)
 
 data class OpenApi3ComponentsSpec(val schemas: Map<String, SchemaSpec> = emptyMap(), val parameters: Map<String, OpenApi3ParameterSpec> = emptyMap())
 
 data class OpenApi3PathSpec(
+    val summary: String?,
+    val description: String?,
     val operationId: String?,
     val responses: Map<Int, ResponseSpec> = emptyMap(),
     val requestBody: OpenApi3RequestBodySpec = OpenApi3RequestBodySpec(),
