@@ -62,6 +62,9 @@ abstract class ApiGeneratorContract<T : Any>(private val clazz: KClass<T>, priva
      fun `route with json body object no schema`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     @Test
+     fun `route with json body object no schema type`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
+
+    @Test
      fun `route with reusable parameters`(app: Approver, rl: ResourceLoader) = app.assertGeneratedContent(rl)
 
     fun Approver.assertGeneratedContent(rl: ResourceLoader) {
