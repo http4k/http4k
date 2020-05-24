@@ -81,12 +81,11 @@ fun org.http4k.openapi.v3.Path.buildWebForm() = when {
     else -> emptyList()
 }
 
-
-private fun org.http4k.openapi.v3.Path.supportsFormContent() = formFields().isNotEmpty()
+fun org.http4k.openapi.v3.Path.supportsFormContent() = formFields().isNotEmpty()
 
 private fun org.http4k.openapi.v3.Path.formFields() = spec.parameters.filterIsInstance<FormFieldSpec>()
 
-fun org.http4k.openapi.v3.Path.webFormLensDeclarations(): List<CodeBlock> =
+fun org.http4k.openapi.v3.Path.webFormLensDeclaration(): List<CodeBlock> =
     when {
         supportsFormContent() ->
             listOf(

@@ -21,7 +21,6 @@ fun Endpoint(): RoutingHttpHandler {
 		val array = arrayLens(req)
 		val required = requiredLens(req)
 		Response(Status.OK)
-
 	}
 }
 

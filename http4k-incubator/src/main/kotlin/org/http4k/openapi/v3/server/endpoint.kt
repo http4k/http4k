@@ -15,12 +15,30 @@ import org.http4k.poet.packageMember
 import org.http4k.poet.parameterLensDeclarations
 import org.http4k.poet.requestLensDeclarations
 import org.http4k.poet.responseLensDeclarations
-import org.http4k.poet.webFormLensDeclarations
+import org.http4k.poet.supportsFormContent
+import org.http4k.poet.webFormLensDeclaration
 import org.http4k.routing.RoutingHttpHandler
 
 fun Path.buildEndpoint(modelPackageName: String) = with(this) {
 
+    FunSpec.builder(uniqueName)
+        .returns(Property<RoutingHttpHandler>().type)
+        .addCodeBlocks((
+            requestLensDeclarations(modelPackageName) +
+                responseLensDeclarations(modelPackageName) +
+                parameterLensDeclarations() +
+                webFormLensDeclaration()
+            ).distinct())
+        .addCode("\n")
+        .addCode("return·\"$urlPathPattern\"·%M·%T.${method}·to·", packageMember<RoutingHttpHandler>("bind"), Property<Method>().type)
+        .addCode(buildHandlerCode())
+        .build()
+}
+
+private fun Path.buildHandlerCode(): CodeBlock {
     val body = CodeBlock.builder()
+
+    if (supportsFormContent()) body.addStatement("val form = formLens(req)")
 
     (spec.parameters.map { it.name to if (it is OpenApi3ParameterSpec.FormFieldSpec) "form" else "req" } +
         requestSchemas().map { it.fieldName to "req" }
@@ -35,19 +53,7 @@ fun Path.buildEndpoint(modelPackageName: String) = with(this) {
         .indent()
         .add(body.build())
         .unindent()
-        .add("\n}")
+        .addStatement("}")
         .build()
-
-    FunSpec.builder(uniqueName)
-        .returns(Property<RoutingHttpHandler>().type)
-        .addCodeBlocks((
-            requestLensDeclarations(modelPackageName) +
-                responseLensDeclarations(modelPackageName) +
-                parameterLensDeclarations() +
-                webFormLensDeclarations()
-            ).distinct())
-        .addCode("\n")
-        .addCode("return·\"$urlPathPattern\"·%M·%T.${method}·to·", packageMember<RoutingHttpHandler>("bind"), Property<Method>().type)
-        .addCode(handler)
-        .build()
+    return handler
 }
