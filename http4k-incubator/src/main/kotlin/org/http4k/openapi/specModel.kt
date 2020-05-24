@@ -60,6 +60,6 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
     }
 }
 
-data class ResponseSpec(val content: Map<String, MessageBodySpec>)
+data class ResponseSpec(val description: String?, val content: Map<String, MessageBodySpec>)
 
-data class MessageBodySpec(val schema: SchemaSpec?)
+data class MessageBodySpec(val description: String?, val schema: SchemaSpec?)
