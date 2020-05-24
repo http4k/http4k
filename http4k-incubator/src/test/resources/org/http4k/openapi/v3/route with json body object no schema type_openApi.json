@@ -1,0 +1,31 @@
+{
+    "info": {
+        "title": "title",
+        "version": "",
+        "description": ""
+    },
+    "paths": {
+        "/jsonbody": {
+            "post": {
+                "parameters": [
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "foo": 123
+                            },
+                            "schema": {
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                },
+                "operationId": "endpoint"
+            }
+        }
+    },
+    "openapi": "3.0.0"
+}

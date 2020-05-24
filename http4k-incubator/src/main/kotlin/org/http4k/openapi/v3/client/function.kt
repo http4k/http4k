@@ -106,12 +106,10 @@ private fun FunSpec.Builder.addAllParametersFrom(path: Path, modelPackageName: S
 
         val bodyParams = requestSchemas().map {
             "request" to when (it) {
-                is NamedSchema.Generated -> {
-                    val modelClassName = modelPackageName.childClassName(it.name)
-                    when (it.schema) {
-                        is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(modelClassName)
-                        else -> modelClassName
-                    }
+                is NamedSchema.Generated -> when (it.schema) {
+                    is SchemaSpec.ArraySpec -> List::class.asClassName().parameterizedBy(modelPackageName.childClassName(it.name))
+                    is SchemaSpec.RefSpec -> it.schemaClassNameIn(modelPackageName)
+                    else -> modelPackageName.childClassName(it.name)
                 }
                 is NamedSchema.Existing -> it.typeName
             }

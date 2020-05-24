@@ -4,12 +4,17 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
+import org.http4k.poet.childClassName
 
 sealed class NamedSchema(name: String) {
     val fieldName = name.cleanValueName().decapitalize()
 
     data class Existing(val name: String, val typeName: TypeName) : NamedSchema(name)
-    data class Generated(val name: String, val schema: SchemaSpec) : NamedSchema(name)
+    data class Generated(val name: String, val schema: SchemaSpec) : NamedSchema(name) {
+        fun schemaClassNameIn(packageName: String) =
+            if (name == "") Map::class.asClassName().parameterizedBy(String::class.asClassName(), Any::class.asClassName())
+            else packageName.childClassName(name)
+    }
 }
 
 fun SchemaSpec.namedSchema(modelName: String): NamedSchema = when (this) {
@@ -28,6 +33,6 @@ fun String.cleanSchemaName() = removePrefix("#/")
     .removePrefix("definitions/")
     .removePrefix("parameters/")
 
-fun String.clean() = filter { it.isLetterOrDigit()  || it == '_' }
+fun String.clean() = filter { it.isLetterOrDigit() || it == '_' }
 
 fun String.cleanValueName() = replace('/', '_').clean()

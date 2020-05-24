@@ -29,7 +29,7 @@ import org.http4k.openapi.v3.OpenApi3ParameterSpec.FormFieldSpec
 import org.http4k.openapi.v3.OpenApi3ParameterSpec.HeaderSpec
 import org.http4k.openapi.v3.OpenApi3ParameterSpec.PathSpec
 import org.http4k.openapi.v3.OpenApi3ParameterSpec.QuerySpec
-import org.http4k.openapi.v3.OpenApi3ParameterSpec.RefSpec
+import org.http4k.openapi.v3.OpenApi3ParameterSpec.RefOrNoSchemaSpec
 import kotlin.reflect.KClass
 
 
@@ -49,7 +49,7 @@ val OpenApi3ParameterSpec.lensSpecClazz
         is QuerySpec -> Query::class
         is PathSpec -> Path::class
         is FormFieldSpec -> FormField::class
-        is RefSpec -> throw IllegalStateException()
+        is RefOrNoSchemaSpec -> throw IllegalStateException()
     }
 
 inline fun <reified T : Any> member(name: String) = MemberName(T::class.asClassName(), name)
@@ -123,11 +123,10 @@ fun org.http4k.openapi.v3.Path.parameterLensDeclarations() = spec.parameters
 
 fun NamedSchema.lensDeclaration(modelPackageName: String): CodeBlock? = when (this) {
     is NamedSchema.Generated -> {
-        val modelClassName = modelPackageName.childClassName(name)
         when (schema) {
-            is SchemaSpec.ObjectSpec -> autoLensBlock(modelClassName)
-            is SchemaSpec.ArraySpec -> autoLensBlock(List::class.asClassName().parameterizedBy(modelClassName))
-            is SchemaSpec.RefSpec -> autoLensBlock(modelClassName)
+            is SchemaSpec.ObjectSpec -> autoLensBlock(modelPackageName.childClassName(name))
+            is SchemaSpec.ArraySpec -> autoLensBlock(List::class.asClassName().parameterizedBy(modelPackageName.childClassName(name)))
+            is SchemaSpec.RefSpec -> autoLensBlock(schemaClassNameIn(modelPackageName))
             else -> null
         }
     }

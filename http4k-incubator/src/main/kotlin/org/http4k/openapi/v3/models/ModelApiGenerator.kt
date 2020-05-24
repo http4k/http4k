@@ -23,7 +23,7 @@ object ModelApiGenerator : ApiGenerator<OpenApi3Spec> {
 
         flattenedPaths().forEach { path ->
             (path.requestSchemas() + path.responseSchemas()).forEach {
-                if (it is NamedSchema.Generated) it.schema.buildModelClass(options.packageName("model").childClassName(it.name), components.schemas, componentSchemas)
+                if (it is NamedSchema.Generated && it.name.isNotEmpty()) it.schema.buildModelClass(options.packageName("model").childClassName(it.name), components.schemas, componentSchemas)
             }
         }
 

@@ -101,7 +101,7 @@ private fun SchemaSpec.ObjectSpec.convertToFormParameters() = properties.map {
  */
 private fun OpenApi3Spec.flattenParameterRefsIntoPaths(): OpenApi3Spec = copy(paths = paths.mapValues {
     it.value.mapValues {
-        val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi3ParameterSpec.RefSpec }
-        it.value.copy(parameters = refs.filterIsInstance<OpenApi3ParameterSpec.RefSpec>().map { components.parameters[it.schemaName]!! } + nonrefs)
+        val (refs, nonrefs) = it.value.parameters.partition { it is OpenApi3ParameterSpec.RefOrNoSchemaSpec }
+        it.value.copy(parameters = refs.filterIsInstance<OpenApi3ParameterSpec.RefOrNoSchemaSpec>().map { components.parameters[it.schemaName]!! } + nonrefs)
     }.toMap()
 })

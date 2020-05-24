@@ -2,6 +2,9 @@
 
 package testPackage.server.endpoints
 
+import kotlin.Any
+import kotlin.String
+import kotlin.collections.Map
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -10,7 +13,6 @@ import org.http4k.core.Status
 import org.http4k.format.Jackson.auto
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
-import testPackage.model.EndpointJsonRequest
 
 /**
  * Request:
@@ -18,10 +20,10 @@ import testPackage.model.EndpointJsonRequest
  */
 fun Endpoint(): RoutingHttpHandler {
 
-	val endpointJsonRequestLens = Body.auto<EndpointJsonRequest>().toLens()
+	val Lens = Body.auto<Map<String, Any>>().toLens()
 
 	return "/jsonbody" bind Method.POST to { req: Request ->
-		val endpointJsonRequest = endpointJsonRequestLens(req)
+		val  = Lens(req)
 		Response(Status.OK)
 
 	}

@@ -22,8 +22,7 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
 
     data class ObjectSpec(val required: List<String> = emptyList(),
                           val properties: Map<String, SchemaSpec> = emptyMap(),
-                          override val clazz: KClass<*>? = null,
-                          val additionalProperties: JsonNode? = null) : SchemaSpec(clazz)
+                          override val clazz: KClass<*>? = null) : SchemaSpec(clazz)
 
     data class ArraySpec(private val items: JsonNode, val minItems: Int? = null, val maxItems: Int? = null, val uniqueItems: Boolean = false, val nullable: Boolean? = null) : SchemaSpec() {
         fun itemsSpec(): SchemaSpec = try {
@@ -56,8 +55,9 @@ sealed class SchemaSpec(open val clazz: KClass<*>? = null) {
     data class StringSpec(val minLength: Int? = null, val maxLength: Int? = null, val format: String? = null, val nullable: Boolean? = null) : SchemaSpec(String::class)
     data class BooleanSpec(val nullable: Boolean? = null) : SchemaSpec(Boolean::class)
     data class RefSpec(val `$ref`: String?) : SchemaSpec() {
-        val schemaName = `$ref`!!.cleanSchemaName()
+        val schemaName = `$ref`?.cleanSchemaName() ?: ""
     }
+    object NoSchema : SchemaSpec(Map::class)
 }
 
 data class ResponseSpec(val description: String?, val content: Map<String, MessageBodySpec>)
