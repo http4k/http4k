@@ -2,7 +2,7 @@ title: http4k Servirtium Testing Module
 description: Feature overview of the http4k-testing-servirtium module, used for Service Virtualisation
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-servirtium", version: "3.247.0"```
+```compile group: "org.http4k", name: "http4k-testing-servirtium", version: "3.248.0"```
 
 ### About
 Service Virtualisation testing technology provides a way of declaring contracts which can record HTTP conversations to a custom Markdown format and then replaying them later offline. [http4k] provides a fully featured implementation of the [Servirtium] solution to implement this concept.

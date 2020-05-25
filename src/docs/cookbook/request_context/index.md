@@ -15,7 +15,7 @@ the shared bag of state for each request, and to remove the state after the requ
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.247.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.248.0"
 ```
 
 #### String-based keys [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/string_key_example.kt)
