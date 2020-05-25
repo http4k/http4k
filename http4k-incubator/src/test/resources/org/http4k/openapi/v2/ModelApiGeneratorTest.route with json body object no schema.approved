@@ -1,9 +1,0 @@
->>>EndpointJsonRequest.kt
-
-package testPackage.model
-
-import kotlin.Any
-import kotlin.String
-import kotlin.collections.Map
-
-typealias EndpointJsonRequest = Map<String, Any>

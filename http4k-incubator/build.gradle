@@ -6,7 +6,6 @@ dependencies {
     compile project(":http4k-format-jackson-yaml")
     compile Libs.kotlinpoet
 
-    testCompile project(":http4k-contract")
     testCompile Config.TestDependencies
     testCompile project(":http4k-client-apache")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')

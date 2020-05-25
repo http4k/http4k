@@ -1,9 +1,0 @@
->>>TitleClient.kt
-
-package testPackage.client
-
-import org.http4k.core.HttpHandler
-
-class TitleClient(
-	private val httpHandler: HttpHandler
-)
