@@ -1,12 +1,4 @@
 <div class="aside col-auto"><img class="mb-3 sideToggle d-inline-block d-md-none" src="/img/exchange-icon.svg" width="20" alt="" srcset=""/>
-<!--    <div class="logo"><img src="images/logo-intro.svg" alt="logo" srcset=""/></div>-->
-<!--    <form>-->
-        <div class="form-group"><img src="/img/search-icon.svg" alt="" srcset=""/>
-            <form name="search">
-            <input name="query" class="form-control" type="text" placeholder="Search..." aria-label="Search"/>
-            </form>
-        </div>
-<!--    </form>-->
     <ul class="nav flex-column">
         {% for nav_item in nav %}
         {% set path = "nav-" + loop.index | string %}
