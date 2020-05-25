@@ -18,10 +18,10 @@ abstract class AutoMarshallingXml : AutoMarshalling() {
 
     abstract fun Any.asXmlString(): String
 
-    override fun asString(input: Any): String = input.asXmlString()
+    override fun asFormatString(input: Any): String = input.asXmlString()
 
     @JvmName("anyAsXmlString")
-    @Deprecated("Use asString instead", ReplaceWith("asString(input"))
+    @Deprecated("Use asFormatString instead", ReplaceWith("asFormatString(input"))
     fun asXmlString(input: Any): String = input.asXmlString()
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> =

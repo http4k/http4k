@@ -23,7 +23,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
         val marshaller = customMarshaller()
 
         val wrapper = OutOnlyHolder(OutOnly("foobar"))
-        val actual = marshaller.asString(wrapper)
+        val actual = marshaller.asFormatString(wrapper)
         assertThat(actual, equalTo(expectedInOutOnly))
         assertThat({ marshaller.asA(actual, OutOnlyHolder::class) }, throws<Exception>())
     }
@@ -33,7 +33,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
         val marshaller = customMarshaller()
 
         val wrapper = InOnlyHolder(InOnly("foobar"))
-        assertThat({ marshaller.asString(wrapper) }, throws<Exception>())
+        assertThat({ marshaller.asFormatString(wrapper) }, throws<Exception>())
         assertThat(marshaller.asA(expectedInOutOnly, InOnlyHolder::class), equalTo(wrapper))
     }
 
@@ -41,7 +41,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     fun `prohibit strings`() {
         val marshaller = customMarshaller()
 
-        assertThat(marshaller.asString(StringHolder("hello")), equalTo(expectedConvertToInputStream))
+        assertThat(marshaller.asFormatString(StringHolder("hello")), equalTo(expectedConvertToInputStream))
         assertThat({ marshaller.asA(expectedConvertToInputStream, StringHolder::class) }, throws<Exception>())
     }
 
@@ -50,7 +50,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
         val marshaller = customMarshaller()
 
         val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
-        assertThat(marshaller.asString(wrapper), equalTo(expectedCustomWrappedNumber))
+        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedCustomWrappedNumber))
         assertThat(marshaller.asA(expectedCustomWrappedNumber, HolderHolder::class), equalTo(wrapper))
     }
 }

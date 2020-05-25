@@ -28,7 +28,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
     @Test
     fun `roundtrip array of arbitary objects to and from JSON`() {
         val expected = arrayOf(obj)
-        val asJsonString = Moshi.asString(expected)
+        val asJsonString = Moshi.asFormatString(expected)
         val actual: Array<ArbObject> = Moshi.asA(asJsonString)
         assertThat(actual.toList(), equalTo(expected.toList()))
     }

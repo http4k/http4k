@@ -72,7 +72,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     fun `roundtrip arbitary object to and from string`() {
-        val out = marshaller.asString(obj)
+        val out = marshaller.asFormatString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResult))
         assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
     }
@@ -96,7 +96,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
             URL("http://url:9000"),
             Status.OK
         )
-        val out = marshaller.asString(obj)
+        val out = marshaller.asFormatString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResultPrimitives))
         assertThat(marshaller.asA(out, CommonJdkPrimitives::class), equalTo(obj))
     }
@@ -104,7 +104,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     @Test
     fun `roundtrip regex special as equals isn't comparable`() {
         val obj = RegexHolder(".*".toRegex())
-        val out = marshaller.asString(obj)
+        val out = marshaller.asFormatString(obj)
         assertThat(out, equalTo(expectedRegexSpecial))
         assertThat(marshaller.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
     }
@@ -112,8 +112,8 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     @Test
     fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
-        assertThat(marshaller.asString(wrapper), equalTo(expectedWrappedMap))
-        assertThat(marshaller.asA(marshaller.asString(wrapper), MapHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedWrappedMap))
+        assertThat(marshaller.asA(marshaller.asFormatString(wrapper), MapHolder::class), equalTo(wrapper))
     }
 
     @Test
@@ -121,7 +121,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val marshaller = customMarshaller()
 
         val wrapper = BigIntegerHolder(1.toBigInteger())
-        assertThat(marshaller.asString(wrapper), equalTo("1"))
+        assertThat(marshaller.asFormatString(wrapper), equalTo("1"))
         assertThat(marshaller.asA("1", BigIntegerHolder::class), equalTo(wrapper))
     }
 
@@ -130,7 +130,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val marshaller = customMarshaller()
 
         val wrapper = BigDecimalHolder(1.01.toBigDecimal())
-        assertThat(marshaller.asString(wrapper), equalTo("1.01"))
+        assertThat(marshaller.asFormatString(wrapper), equalTo("1.01"))
         assertThat(marshaller.asA("1.01", BigDecimalHolder::class), equalTo(wrapper))
     }
 
@@ -139,7 +139,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val marshaller = customMarshaller()
 
         val wrapper = BooleanHolder(true)
-        assertThat(marshaller.asString(wrapper), equalTo("true"))
+        assertThat(marshaller.asFormatString(wrapper), equalTo("true"))
         assertThat(marshaller.asA("true", BooleanHolder::class), equalTo(wrapper))
     }
 
@@ -150,7 +150,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     fun `throwable is marshalled`() {
-        assertThat(marshaller.asString(ExceptionHolder(CustomException("foobar"))), startsWith(expectedThrowable))
+        assertThat(marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))), startsWith(expectedThrowable))
     }
 
     @Test

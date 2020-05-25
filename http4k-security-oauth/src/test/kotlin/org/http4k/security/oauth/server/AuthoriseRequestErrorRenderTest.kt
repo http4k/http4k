@@ -247,6 +247,6 @@ internal class AuthoriseRequestErrorRenderTest {
         if (clientId != null) {
             data["client_id"] = clientId
         }
-        return "someSuperValidHeader.${Base64.getUrlEncoder().encodeToString(Jackson.asString(data).toByteArray()).replace("=", "")}.someSuperValidSignature"
+        return "someSuperValidHeader.${Base64.getUrlEncoder().encodeToString(Jackson.asFormatString(data).toByteArray()).replace("=", "")}.someSuperValidSignature"
     }
 }

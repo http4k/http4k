@@ -15,7 +15,7 @@ abstract class AutoMarshalling {
     @JvmName("stringAsA")
     fun <T : Any> String.asA(target: KClass<T>): T = asA(this, target)
 
-    abstract fun asString(input: Any): String
+    abstract fun asFormatString(input: Any): String
 
-    fun asInputStream(input: Any): InputStream = asString(input).byteInputStream()
+    fun asInputStream(input: Any): InputStream = asFormatString(input).byteInputStream()
 }

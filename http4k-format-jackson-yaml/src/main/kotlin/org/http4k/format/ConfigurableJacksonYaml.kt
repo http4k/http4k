@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
 open class ConfigurableJacksonYaml(val mapper: ObjectMapper) : AutoMarshalling() {
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
 
-    override fun asString(input: Any): String = mapper.writeValueAsString(input)
+    override fun asFormatString(input: Any): String = mapper.writeValueAsString(input)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 

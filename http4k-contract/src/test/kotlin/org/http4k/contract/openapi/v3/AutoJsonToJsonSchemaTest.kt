@@ -175,14 +175,14 @@ class AutoJsonToJsonSchemaTest {
 
         approver.assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
-            .body(Jackson.asString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder()))))
+            .body(Jackson.asFormatString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder()))))
     }
 
 
     private fun Approver.assertApproved(obj: Any, name: String? = null) {
         assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
-            .body(Jackson.asString(creator.toSchema(obj, name))))
+            .body(Jackson.asFormatString(creator.toSchema(obj, name))))
     }
 }
 

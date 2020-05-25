@@ -339,7 +339,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
             expiry = requestObject.expiry,
             claims = requestObject.claims
         )
-        return "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asString(requestObjectJson).toByteArray()).replace("=", "")}.someSignature"
+        return "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asFormatString(requestObjectJson).toByteArray()).replace("=", "")}.someSignature"
     }
 
     private fun audienceToJson(audience: List<String>): JsonNode {
