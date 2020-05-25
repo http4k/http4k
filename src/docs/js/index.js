@@ -1,11 +1,3 @@
-// spinner loading
-$(window).on("load", function() {
-  // Spinner Loading
-  $(".spinner-loading").fadeOut(function() {
-    $(this).remove();
-  });
-});
-
 // jquery ready start
 $(document).ready(function() {
   // back to prev page
