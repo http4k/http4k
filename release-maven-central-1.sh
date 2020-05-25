@@ -14,4 +14,5 @@ maven_publish "http4k-server-apache"
 maven_publish "http4k-server-ktorcio"
 maven_publish "http4k-server-ktornetty"
 maven_publish "http4k-server-netty"
+maven_publish "http4k-server-ratpack"
 

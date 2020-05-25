@@ -12,6 +12,8 @@ description: Feature overview of the http4k-server modules, covering Server back
 
 **Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "3.247.0"```
 
+**Ratpack:** ```compile group: "org.http4k", name: "http4k-server-ratpack", version: "3.247.0"```
+
 **Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "3.247.0"```
 
 **SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.247.0"```
