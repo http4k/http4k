@@ -302,9 +302,6 @@ header {
   position: relative;
 }
 
-.mb-4{
-  padding-top: 80px;
-}
 header .overlay {
   position: absolute;
   top: 0;
@@ -722,6 +719,7 @@ header p {
 
 .intro .aside .nav .nav-item a {
   color: #5c5c5c;
+  white-space: normal;
 }
 
 .intro .aside .nav .nav-item a:hover, .intro .aside .nav .nav-item a:focus, .intro .aside .nav .nav-item a:active {
@@ -792,10 +790,6 @@ header p {
 .intro main .content p {
   margin-top: 32px;
   margin-bottom: 32px;
-}
-
-.intro main .content ul {
-  list-style: none;
 }
 
 .intro .sideToggle {
