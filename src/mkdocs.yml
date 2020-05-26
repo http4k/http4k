@@ -8,6 +8,8 @@ repo_url: https://github.com/http4k/http4k/
 theme:
   name: 'material'
   custom_dir: ./docs/theme
+  static_templates:
+      - ./landing.html
   palette:
     primary: 'indigo'
     accent: 'blue'
