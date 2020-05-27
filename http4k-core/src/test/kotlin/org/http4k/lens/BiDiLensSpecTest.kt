@@ -114,7 +114,6 @@ class BiDiLensSpecTest {
 
     @Test
     fun enum() {
-        fun BiDiLensSpec<String, String>.enum() = map(StringBiDiMappings.enum<Method>())
         checkContract(spec.enum(), Method.DELETE, "DELETE", "", "invalid", "o", "oDELETE", "oDELETEDELETE")
     }
 
