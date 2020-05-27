@@ -118,7 +118,6 @@ class BiDiLensSpecTest {
         checkContract(spec.enum(), Method.DELETE, "DELETE", "", "invalid", "o", "oDELETE", "oDELETEDELETE")
     }
 
-
     @Test
     fun bytes() {
         val requiredLens = spec.bytes().required("hello")
