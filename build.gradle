@@ -215,6 +215,7 @@ dependencies {
     compile project(":http4k-server-ktorcio")
     compile project(":http4k-server-netty")
     compile project(":http4k-server-undertow")
+    compile project(":http4k-serverless-gcp")
     compile project(":http4k-serverless-lambda")
     compile project(":http4k-template-dust")
     compile project(":http4k-template-freemarker")
