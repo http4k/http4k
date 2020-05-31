@@ -11,21 +11,15 @@ import org.http4k.serverless.gcf.GoogleCloudFunction
 import org.junit.jupiter.api.Test
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
-import java.io.Reader
 import java.io.StringReader
 
 class GoogleCloudFunctionTest {
 
     class MockHttpRequest : HttpRequest {
-        override fun getReader(): BufferedReader {
-            val reader: Reader = StringReader("gcf test")
-            return BufferedReader(reader)
-        }
-
+        override fun getReader() = BufferedReader(StringReader("gcf test"))
         override fun getMethod() = "GET"
         override fun getHeaders() = mapOf<String, MutableList<String>>()
         override fun getUri() = "/"
-
         override fun getCharacterEncoding() = TODO()
         override fun getQuery() = TODO()
         override fun getContentLength() = TODO()
@@ -40,7 +34,6 @@ class GoogleCloudFunctionTest {
         private val outStream = ByteArrayOutputStream()
         override fun getOutputStream() = outStream
         override fun setStatusCode(code: Int, message: String?) {}
-
         override fun getHeaders() = TODO()
         override fun setContentType(contentType: String?) = TODO()
         override fun appendHeader(header: String?, value: String?) = TODO()
@@ -57,7 +50,7 @@ class GoogleCloudFunctionTest {
 
         GoogleCloudFunction(app).service(request, response)
 
-        assertThat((String((response.outputStream as ByteArrayOutputStream).toByteArray())), equalTo("hello gcf"))
+        assertThat((String(response.outputStream.toByteArray())), equalTo("hello gcf"))
     }
 
 }
