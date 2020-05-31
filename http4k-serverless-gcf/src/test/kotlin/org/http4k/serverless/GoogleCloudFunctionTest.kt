@@ -9,16 +9,14 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.gcf.GoogleCloudFunction
 import org.junit.jupiter.api.Test
-import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
-import java.io.StringReader
 
 class GoogleCloudFunctionTest {
 
     class MockHttpRequest : HttpRequest {
-        override fun getReader() = BufferedReader(StringReader("gcf test"))
+        override fun getReader() = TODO()
         override fun getMethod() = "GET"
-        override fun getHeaders() = mapOf<String, MutableList<String>>()
+        override fun getHeaders() = mapOf<String, List<String>>()
         override fun getUri() = "/"
         override fun getCharacterEncoding() = TODO()
         override fun getQuery() = TODO()
@@ -27,7 +25,7 @@ class GoogleCloudFunctionTest {
         override fun getPath() = TODO()
         override fun getParts() = TODO()
         override fun getQueryParameters() = TODO()
-        override fun getInputStream() = TODO()
+        override fun getInputStream() = "gcf test".byteInputStream()
     }
 
     class MockHttpResponse : HttpResponse {

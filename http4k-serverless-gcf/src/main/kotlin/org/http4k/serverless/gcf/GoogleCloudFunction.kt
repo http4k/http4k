@@ -8,15 +8,13 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import java.util.stream.Collectors
 
 open class GoogleCloudFunction(private val handler: HttpHandler) : HttpFunction {
 
     override fun service(request: HttpRequest, response: HttpResponse) = handler(request.asHttp4kRequest()).into(response)
 
     private fun HttpRequest.asHttp4kRequest(): Request =
-        Request(Method.valueOf(method), uri)
-            .headers(toHttp4kHeaders(headers)).body(reader.lines().collect(Collectors.joining()))
+        Request(Method.valueOf(method), uri).headers(toHttp4kHeaders(headers)).body(inputStream)
 
     private fun Response.into(response: HttpResponse) {
         response.setStatusCode(status.code, status.description)
