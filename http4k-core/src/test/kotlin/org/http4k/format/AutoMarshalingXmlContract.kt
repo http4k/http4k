@@ -26,7 +26,7 @@ abstract class AutoMarshalingXmlContract(private val x: AutoMarshallingXml) {
 
     @Test
     fun `serialise simple container defaults to using child element`() {
-        assertThat(x.asXmlString(Container("value")), equalTo("""<Container><field>value</field></Container>"""))
+        assertThat(x.asFormatString(Container("value")), equalTo("""<Container><field>value</field></Container>"""))
     }
 
     @Test
@@ -34,18 +34,18 @@ abstract class AutoMarshalingXmlContract(private val x: AutoMarshallingXml) {
         val xml = """<UriContainer><field>foo.com</field></UriContainer>"""
         val expected = UriContainer(Uri.of("foo.com"))
         assertThat(x.asA(xml, UriContainer::class), equalTo(expected))
-        assertThat(x.asXmlString(expected), equalTo(xml))
+        assertThat(x.asFormatString(expected), equalTo(xml))
     }
 
     @Test
     fun `serialize lists with items`() {
-        assertThat(x.asXmlString(ListContainer(listOf("boo", "asdas"))),
+        assertThat(x.asFormatString(ListContainer(listOf("boo", "asdas"))),
             equalTo("<ListContainer><children>boo</children><children>asdas</children></ListContainer>"))
     }
 
     @Test
     fun `serialize lists with no items`() {
-        assertThat(x.asXmlString(ListContainer(emptyList())), equalTo("<ListContainer/>"))
+        assertThat(x.asFormatString(ListContainer(emptyList())), equalTo("<ListContainer/>"))
     }
 
     @Test
