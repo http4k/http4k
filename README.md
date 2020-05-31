@@ -69,7 +69,8 @@ plugging together of services without HTTP container being required.
         * **SunHttp** (bundled with `http4k-core`)
     * API design allows for plugging into configurable instances of each
 * [Serverless:](https://http4k.org/guide/modules/serverless)
-    * Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway. 
+    * AWS: Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway. 
+    * Google Cloud Functions: Extend an adaptor, then upload your [http4k] applications to Google Cloud Functions with `gcloud`. 
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching

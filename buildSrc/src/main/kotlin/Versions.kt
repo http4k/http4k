@@ -112,6 +112,8 @@ object Versions {
 
     const val json: String = "20200518"
 
+    const val gcf: String = "1.0.1"
+
     /**
      * Current version: "6.1.1"
      * See issue 19: How to update Gradle itself?

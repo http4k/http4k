@@ -2,10 +2,12 @@ title: http4k Serverless Modules
 description: Feature overview of the http4k-serverless modules, covering Serverless backends
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.248.0"```
+AWS Lambda: ```compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.248.0"```
+
+GCP Cloud Functions: ```compile group: "org.http4k", name: "http4k-serverless-gcp", version: "3.248.0"```
 
 ### About
-These modules provide integration with Serverless deployment environments, such as AWS Lambda. 
+These modules provide integration with Serverless deployment environments, such as AWS Lambda or Google Cloud Functions. 
 
 #### AWS Lambda integration
 Since [http4k] is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
@@ -32,3 +34,49 @@ We hope to soon provide some tools to automate at least some of the above proces
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/example_lambda.kt"></script>
 
 [http4k]: https://http4k.org
+
+#### Google Cloud Functions integration
+
+Google Cloud Functions are triggered in the cloud by calling an entry point class which implements their `HttpFunction` interface.
+We have provided an adapter `Http4kGCFAdapter` which adapts their interface to Http4k handler.
+
+You can compose filters and handlers as usual and pass them to the constructor of the `Http4kGCFAdapter` and make your entry point class extend from it.
+Here is an example:
+
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/example_gcf.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/example_gcf.kt"></script>
+
+If you are using gradle, gcloud can't deploy the function directly from the project, you must build the fat jar first.
+Applying this plugin [shadow jar](https://imperceptiblethoughts.com/shadow/) will provide you with appropriate gradle task to build the fat jar.
+
+After building, and having your jar as the only file in the `libs/` folder you can deploy the function from the parent folder with : 
+
+```gcloud functions deploy example-function --runtime=java11 --entry-point=guide.modules.serverless.FunctionsExampleEntryClass --trigger-http --source=libs/```
+
+If you wan't to invoke functions locally you can do it with this gradle setup and passing a `-PrunFunction.target` parameter to the build task : 
+```groovy
+configurations {
+    invoker
+}
+
+dependencies {
+    invoker 'com.google.cloud.functions.invoker:java-function-invoker:1.0.0-alpha-2-rc5'
+}
+
+tasks.register("runFunction", JavaExec) {
+    main = 'com.google.cloud.functions.invoker.runner.Invoker'
+    classpath(configurations.invoker)
+    inputs.files(configurations.runtimeClasspath, sourceSets.main.output)
+    args(
+            '--target', project.findProperty('runFunction.target'),
+            '--port', project.findProperty('runFunction.port') ?: 8080
+    )
+    doFirst {
+        args('--classpath', files(configurations.runtimeClasspath, sourceSets.main.output).asPath)
+    }
+}
+```
+
+If you are using Maven, you do not have to build the fat JAR and can deploy the function from the project folder.
+Simple example on how to setup `pom.xml` to run functions locally and deploy Maven project to the cloud is shown [here](https://cloud.google.com/functions/docs/first-java)
