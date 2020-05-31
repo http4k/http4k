@@ -68,7 +68,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     }
 
     @Test
-    fun `can stream request`() {
+    open fun `can stream request`() {
         createClient()(Request(POST, "$baseUrl/stream-request").body(beeper("client")))
 
         waitForCompletion()
