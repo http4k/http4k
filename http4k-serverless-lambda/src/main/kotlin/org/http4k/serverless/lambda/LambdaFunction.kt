@@ -13,7 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.toUrlFormEncoded
-import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import org.http4k.serverless.BootstrapAppLoader
 
 const val LAMBDA_CONTEXT_KEY = "HTTP4K_LAMBDA_CONTEXT"
@@ -26,10 +26,9 @@ const val LAMBDA_REQUEST_KEY = "HTTP4K_LAMBDA_REQUEST"
 class LambdaFunction(env: Map<String, String> = System.getenv()) {
     private val contexts = RequestContexts()
     private val app = BootstrapAppLoader(env, contexts)
-    private val initializeRequestContext = ServerFilters.InitialiseRequestContext(contexts)
 
     fun handle(request: APIGatewayProxyRequestEvent, lambdaContext: Context? = null) =
-        initializeRequestContext
+        InitialiseRequestContext(contexts)
             .then(AddLambdaContextAndRequest(lambdaContext, request, contexts))
             .then(app)(request.asHttp4k())
             .asApiGateway()
