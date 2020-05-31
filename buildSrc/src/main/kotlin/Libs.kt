@@ -133,11 +133,6 @@ object Libs {
             Versions.org_junit_jupiter
 
     /**
-     * https://ratpack.io/
-     */
-    const val ratpack_core: String = "io.ratpack:ratpack-core:" + Versions.io_ratpack
-
-    /**
      * http://www.jboss.org
      */
     const val undertow_core: String = "io.undertow:undertow-core:" + Versions.io_undertow
@@ -181,20 +176,23 @@ object Libs {
      * http://www.eclipse.org/jetty
      */
     const val javax_websocket_server_impl: String =
-            "org.eclipse.jetty.websocket:javax-websocket-server-impl:" +
+        "org.eclipse.jetty.websocket:javax-websocket-server-impl:" +
             Versions.javax_websocket_server_impl
 
     /**
      * http://github.com/kt3k/coveralls-gradle-plugin/
      */
     const val coveralls_gradle_plugin: String = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:" +
-            Versions.coveralls_gradle_plugin
+        Versions.coveralls_gradle_plugin
+
+    const val functions_framework_api: String =
+        "com.google.cloud.functions:functions-framework-api:" + Versions.functions_framework_api
 
     /**
      * https://github.com/stevesaliman/gradle-cobertura-plugin
      */
     const val gradle_cobertura_plugin: String = "net.saliman:gradle-cobertura-plugin:" +
-            Versions.gradle_cobertura_plugin
+        Versions.gradle_cobertura_plugin
 
     /**
      * https://aws.amazon.com/lambda/
@@ -262,6 +260,11 @@ object Libs {
     const val http2_server: String = "org.eclipse.jetty.http2:http2-server:" + Versions.http2_server
 
     /**
+     * http://www.ratpack.io
+     */
+    const val ratpack_core: String = "io.ratpack:ratpack-core:" + Versions.ratpack_core
+
+    /**
      * http://www.seleniumhq.org/
      */
     const val selenium_api: String = "org.seleniumhq.selenium:selenium-api:" + Versions.selenium_api
@@ -280,11 +283,6 @@ object Libs {
      * http://hc.apache.org/httpcomponents-client
      */
     const val httpclient: String = "org.apache.httpcomponents:httpclient:" + Versions.httpclient
-
-    /**
-     * https://github.com/square/kotlinpoet
-     */
-    const val kotlinpoet: String = "com.squareup:kotlinpoet:" + Versions.kotlinpoet
 
     /**
      * https://github.com/javadev/underscore-java
@@ -360,6 +358,4 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
-
-    const val gcf: String = "com.google.cloud.functions:functions-framework-api:" + Versions.gcf
 }

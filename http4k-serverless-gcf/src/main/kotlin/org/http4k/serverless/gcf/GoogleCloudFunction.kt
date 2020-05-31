@@ -1,12 +1,18 @@
-package org.http4k.serverless.gcp
+package org.http4k.serverless.gcf
 
 import com.google.cloud.functions.HttpFunction
 import com.google.cloud.functions.HttpRequest
 import com.google.cloud.functions.HttpResponse
-import org.http4k.core.*
+import org.http4k.core.Headers
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
 import java.util.stream.Collectors
 
-open class Http4kGCFAdapter(private val handler: HttpHandler) : HttpFunction {
+open class GoogleCloudFunction(private val handler: HttpHandler) : HttpFunction {
+
+    override fun service(request: HttpRequest, response: HttpResponse) = handler(request.asHttp4kRequest()).into(response)
 
     private fun HttpRequest.asHttp4kRequest(): Request =
         Request(Method.valueOf(method), uri)
@@ -18,11 +24,7 @@ open class Http4kGCFAdapter(private val handler: HttpHandler) : HttpFunction {
         body.stream.use { input -> response.outputStream.use { output -> input.copyTo(output) } }
     }
 
-    private fun toHttp4kHeaders(gcpHeaders: Map<String, List<String>>): Headers = gcpHeaders.entries.map { gcpHeader ->
-        gcpHeader.value.map { Pair(gcpHeader.key, it) }
+    private fun toHttp4kHeaders(gcfHeaders: Map<String, List<String>>): Headers = gcfHeaders.entries.map { gcfHeader ->
+        gcfHeader.value.map { Pair(gcfHeader.key, it) }
     }.flatten()
-
-    override fun service(request: HttpRequest, response: HttpResponse) {
-        handler(request.asHttp4kRequest()).into(response)
-    }
 }

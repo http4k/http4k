@@ -30,8 +30,6 @@ object Versions {
 
     const val io_ktor: String = "1.3.2" // available: "1.3.2-1.4-M1-release-99"
 
-    const val io_ratpack:String = "1.8.0"
-
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1"
@@ -45,6 +43,8 @@ object Versions {
     const val javax_websocket_server_impl: String = "9.4.29.v20200521"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
+
+    const val functions_framework_api: String = "1.0.1"
 
     const val gradle_cobertura_plugin: String = "3.0.0"
 
@@ -72,6 +72,8 @@ object Versions {
 
     const val http2_server: String = "9.4.29.v20200521"
 
+    const val ratpack_core: String = "1.8.0"
+
     const val selenium_api: String = "3.141.59"
 
     const val freemarker: String = "2.3.30"
@@ -79,8 +81,6 @@ object Versions {
     const val handlebars: String = "4.2.0"
 
     const val httpclient: String = "4.5.12"
-
-    const val kotlinpoet: String = "1.5.0"
 
     const val underscore: String = "1.54"
 
@@ -102,7 +102,7 @@ object Versions {
 
     const val okhttp: String = "4.7.2"
 
-    const val pebble: String = "3.1.3"
+    const val pebble: String = "3.1.4"
 
     const val jsoup: String = "1.13.1"
 
@@ -111,8 +111,6 @@ object Versions {
     const val gson: String = "2.8.6"
 
     const val json: String = "20200518"
-
-    const val gcf: String = "1.0.1"
 
     /**
      * Current version: "6.1.1"

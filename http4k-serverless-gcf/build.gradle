@@ -1,9 +1,9 @@
-description = 'Http4k Adapter for GCF'
+description = 'Http4k Serverless support for Google Cloud Functions'
 
 dependencies {
     compile project(":http4k-core")
 
-    compile Libs.gcf
+    compile Libs.functions_framework_api
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
