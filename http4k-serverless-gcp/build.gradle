@@ -3,7 +3,7 @@ description = 'Http4k Adapter for GCF'
 dependencies {
     compile project(":http4k-core")
 
-    implementation 'com.google.cloud.functions:functions-framework-api:1.0.1'
+    compile Libs.gcf
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

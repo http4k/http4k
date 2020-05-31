@@ -360,4 +360,6 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
+
+    const val gcf: String = "com.google.cloud.functions:functions-framework-api:" + Versions.gcf
 }
