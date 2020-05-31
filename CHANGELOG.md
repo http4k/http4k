@@ -3,9 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.249.0 (uncut)
+### v3.249.0
 - [all] Upgrade some dependency versions.
-- [http4k-server-netty] Add support for response streaming.  H/T @carbotaniuman for the PR.
+- [http4k-server-netty] Add support for response streaming. H/T @carbotaniuman for the PR.
 - [http4k-serverless-gcf] New serverless module! H/T @ssijak for the PR.
 
 ### v3.248.0
