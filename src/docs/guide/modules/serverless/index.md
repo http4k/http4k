@@ -2,9 +2,9 @@ title: http4k Serverless Modules
 description: Feature overview of the http4k-serverless modules, covering Serverless backends
 
 ### Installation (Gradle)
-AWS Lambda: ```compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.248.0"```
+AWS Lambda: ```compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.249.0"```
 
-Google Cloud Functions: ```compile group: "org.http4k", name: "http4k-serverless-gcf", version: "3.248.0"```
+Google Cloud Functions: ```compile group: "org.http4k", name: "http4k-serverless-gcf", version: "3.249.0"```
 
 ### About
 These modules provide integration with Serverless deployment environments, such as AWS Lambda or Google Cloud Functions by implementing a single interface. 

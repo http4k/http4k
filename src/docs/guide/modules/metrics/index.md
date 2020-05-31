@@ -2,7 +2,7 @@ title: http4k Metrics Modules
 description: Feature overview of the http4k-metrics modules
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-metrics-micrometer", version: "3.248.0"```
+```compile group: "org.http4k", name: "http4k-metrics-micrometer", version: "3.249.0"```
 
 ### About
 

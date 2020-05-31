@@ -3,8 +3,8 @@ description: Recipes for using JSON in http4k applications with a variety of pop
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.248.0"
-    compile group: "org.http4k", name: "http4k-format-jackson", version: "3.248.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.249.0"
+    compile group: "org.http4k", name: "http4k-format-jackson", version: "3.249.0"
 ```
 
 ## Custom auto-mapping JSON configurations
