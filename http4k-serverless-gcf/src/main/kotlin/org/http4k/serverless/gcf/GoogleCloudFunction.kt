@@ -3,26 +3,49 @@ package org.http4k.serverless.gcf
 import com.google.cloud.functions.HttpFunction
 import com.google.cloud.functions.HttpRequest
 import com.google.cloud.functions.HttpResponse
-import org.http4k.core.Headers
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Filter
+import org.http4k.core.Method.valueOf
 import org.http4k.core.Request
+import org.http4k.core.RequestContexts
 import org.http4k.core.Response
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.InitialiseRequestContext
+import org.http4k.serverless.AppLoader
+import org.http4k.serverless.AppLoaderWithContexts
 
-open class GoogleCloudFunction(private val handler: HttpHandler) : HttpFunction {
+const val GCF_REQUEST_KEY = "HTTP4K_GCF_REQUEST"
 
-    override fun service(request: HttpRequest, response: HttpResponse) = handler(request.asHttp4kRequest()).into(response)
+open class GoogleCloudFunction(appLoader: AppLoaderWithContexts) : HttpFunction {
+    constructor(input: AppLoader) : this(object : AppLoaderWithContexts {
+        override fun invoke(env: Map<String, String>, contexts: RequestContexts) = input(env)
+    })
 
-    private fun HttpRequest.asHttp4kRequest(): Request =
-        Request(Method.valueOf(method), uri).headers(toHttp4kHeaders(headers)).body(inputStream)
+    private val contexts = RequestContexts()
+    private val app = appLoader(System.getenv(), contexts)
 
-    private fun Response.into(response: HttpResponse) {
-        response.setStatusCode(status.code, status.description)
-        headers.forEach { (key, value) -> response.appendHeader(key, value) }
-        body.stream.use { input -> response.outputStream.use { output -> input.copyTo(output) } }
-    }
+    override fun service(request: HttpRequest, response: HttpResponse) =
+        InitialiseRequestContext(contexts)
+            .then(AddGCPRequest(request, contexts))
+            .then(app)(request.asHttp4kRequest().also { println(it) })
+            .into(response)
+}
 
-    private fun toHttp4kHeaders(gcfHeaders: Map<String, List<String>>): Headers = gcfHeaders.entries.map { gcfHeader ->
+private fun HttpRequest.asHttp4kRequest() = Request(valueOf(method), uri).headers(toHttp4kHeaders(headers)).body(inputStream)
+
+private fun Response.into(response: HttpResponse) {
+    response.setStatusCode(status.code, status.description)
+    headers.forEach { (key, value) -> response.appendHeader(key, value) }
+    body.stream.use { input -> response.outputStream.use { output -> input.copyTo(output) } }
+}
+
+private fun toHttp4kHeaders(gcfHeaders: Map<String, List<String>>) = gcfHeaders.entries
+    .map { gcfHeader ->
         gcfHeader.value.map { Pair(gcfHeader.key, it) }
     }.flatten()
+
+private fun AddGCPRequest(request: HttpRequest, contexts: RequestContexts) = Filter { next ->
+    {
+        contexts[it][GCF_REQUEST_KEY] = request
+        next(it)
+    }
 }

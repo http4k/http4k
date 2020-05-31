@@ -1,4 +1,4 @@
-package guide.modules.serverless
+package guide.modules.serverless.lambda
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import org.http4k.client.ApacheClient
@@ -50,5 +50,4 @@ fun main() {
 
     runLambdaLocally()
     runLambdaAsAwsWould()
-
 }

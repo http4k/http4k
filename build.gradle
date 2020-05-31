@@ -232,6 +232,7 @@ dependencies {
 
     testCompile Config.TestDependencies
     testCompile project(path: ":http4k-testing-servirtium", configuration: 'testArtifacts')
+    testCompile project(path: ":http4k-serverless-gcf", configuration: 'testArtifacts')
 }
 
 sourceSets {
