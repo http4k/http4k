@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.249.0 (uncut)
+- [http4k-server-netty] Add support for response streaming.  H/T @carbotaniuman for the PR.
+
 ### v3.248.0
 - [http4k-server-ratpack] New backend module!
 - [http4k-format-jackson-yaml] New module!
