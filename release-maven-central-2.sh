@@ -8,6 +8,7 @@ maven_publish "http4k-client-jetty"
 maven_publish "http4k-client-okhttp"
 maven_publish "http4k-client-websocket"
 
+maven_publish "http4k-serverless-gcf"
 maven_publish "http4k-serverless-lambda"
 maven_publish "http4k-jsonrpc"
 maven_publish "http4k-multipart"
