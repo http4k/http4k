@@ -1,13 +1,11 @@
 package org.http4k.server
 
 import io.ktor.application.ApplicationCallPipeline.ApplicationPhase.Call
+import io.ktor.features.origin
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.request.ApplicationRequest
-import io.ktor.request.header
-import io.ktor.request.httpMethod
-import io.ktor.request.uri
+import io.ktor.request.*
 import io.ktor.response.ApplicationResponse
 import io.ktor.response.header
 import io.ktor.response.respondOutputStream
@@ -51,6 +49,8 @@ data class KtorNetty(val port: Int = 8000) : ServerConfig {
 fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
     .headers(headers.toHttp4kHeaders())
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
+    .sourceAddress(origin.remoteHost)
+    // origin.remotePort does not exist for Ktor
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))

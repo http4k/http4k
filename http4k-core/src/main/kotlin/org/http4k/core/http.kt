@@ -7,6 +7,7 @@ import org.http4k.lens.WebForm
 import org.http4k.routing.RoutedRequest
 import java.io.Closeable
 import java.io.InputStream
+import java.net.InetAddress
 import java.nio.ByteBuffer
 
 typealias Headers = Parameters
@@ -160,6 +161,8 @@ interface HttpMessage : Closeable {
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD }
 
 interface Request : HttpMessage {
+    val sourceAddress: String?
+    val sourcePort: Int?
     val method: Method
     val uri: Uri
 
@@ -193,6 +196,16 @@ interface Request : HttpMessage {
      */
     fun removeQuery(name: String): Request
 
+    /**
+     * (Copy &) sets source address.
+     */
+    fun sourceAddress(address: String): Request
+
+    /**
+     * (Copy &) sets source port.
+     */
+    fun sourcePort(port: Int): Request
+
     override fun header(name: String, value: String?): Request
 
     override fun headers(headers: Headers): Request
@@ -219,7 +232,15 @@ interface Request : HttpMessage {
 }
 
 @Suppress("EqualsOrHashCode")
-data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY, override val version: String = HTTP_1_1) : Request {
+data class MemoryRequest(
+    override val method: Method,
+    override val uri: Uri,
+    override val headers: Headers = listOf(),
+    override val body: Body = EMPTY,
+    override val version: String = HTTP_1_1,
+    override val sourceAddress: String? = null,
+    override val sourcePort: Int? = null
+) : Request {
     override fun method(method: Method): Request = copy(method = method)
 
     override fun uri(uri: Uri) = copy(uri = uri)
@@ -237,6 +258,10 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
     override fun headers(headers: Headers) = copy(headers = this.headers + headers)
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
+
+    override fun sourceAddress(address: String) = copy(sourceAddress = address)
+
+    override fun sourcePort(port: Int) = copy(sourcePort = port)
 
     override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
 
