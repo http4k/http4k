@@ -7,7 +7,6 @@ import org.http4k.lens.WebForm
 import org.http4k.routing.RoutedRequest
 import java.io.Closeable
 import java.io.InputStream
-import java.net.InetAddress
 import java.nio.ByteBuffer
 
 typealias Headers = Parameters
@@ -161,10 +160,9 @@ interface HttpMessage : Closeable {
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD }
 
 interface Request : HttpMessage {
-    val sourceAddress: String?
-    val sourcePort: Int?
     val method: Method
     val uri: Uri
+    val source: RequestSource?
 
     /**
      * (Copy &) sets the method.
@@ -197,14 +195,9 @@ interface Request : HttpMessage {
     fun removeQuery(name: String): Request
 
     /**
-     * (Copy &) sets source address.
+     * (Copy &) sets request source.
      */
-    fun sourceAddress(address: String): Request
-
-    /**
-     * (Copy &) sets source port.
-     */
-    fun sourcePort(port: Int): Request
+    fun source(source: RequestSource): Request
 
     override fun header(name: String, value: String?): Request
 
@@ -238,8 +231,7 @@ data class MemoryRequest(
     override val headers: Headers = listOf(),
     override val body: Body = EMPTY,
     override val version: String = HTTP_1_1,
-    override val sourceAddress: String? = null,
-    override val sourcePort: Int? = null
+    override val source: RequestSource? = null
 ) : Request {
     override fun method(method: Method): Request = copy(method = method)
 
@@ -259,9 +251,7 @@ data class MemoryRequest(
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
-    override fun sourceAddress(address: String) = copy(sourceAddress = address)
-
-    override fun sourcePort(port: Int) = copy(sourcePort = port)
+    override fun source(source: RequestSource) = copy(source = source)
 
     override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
 
@@ -339,5 +329,10 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
         && body == other.body)
 }
 
+data class RequestSource(val address: ClientAddress, val port: Int? = 0)
+
+data class ClientAddress(val value: String)
+
 fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this) { memo, next -> next(memo) }
+
 fun WebForm.with(vararg modifiers: (WebForm) -> WebForm) = modifiers.fold(this) { memo, next -> next(memo) }

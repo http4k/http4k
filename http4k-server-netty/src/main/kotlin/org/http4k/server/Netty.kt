@@ -25,9 +25,11 @@ import io.netty.handler.codec.http.LastHttpContent
 import io.netty.handler.stream.ChunkedStream
 import io.netty.handler.stream.ChunkedWriteHandler
 import org.http4k.core.Body
+import org.http4k.core.ClientAddress
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.valueOf
 import org.http4k.core.Request
+import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.CONTINUE
 import org.http4k.core.Uri
@@ -36,7 +38,6 @@ import org.http4k.core.then
 import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
 import java.net.InetSocketAddress
-import java.net.SocketAddress
 
 
 /**
@@ -73,8 +74,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
         Request(valueOf(method().name()), Uri.of(uri()))
             .headers(headers().map { it.key to it.value })
             .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
-            .sourceAddress(address.address.hostAddress)
-            .sourcePort(address.port)
+            .source(RequestSource(ClientAddress(address.address.hostAddress), address.port))
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {
