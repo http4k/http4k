@@ -1,8 +1,10 @@
 package org.http4k.server
 
+import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import org.http4k.asByteBuffer
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -11,6 +13,7 @@ import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
@@ -19,6 +22,7 @@ import org.http4k.core.StreamBody
 import org.http4k.core.with
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasPort
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.binary
 import org.http4k.routing.bind
@@ -26,6 +30,7 @@ import org.http4k.routing.routes
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.net.InetAddress
 
 abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
                               private val requiredMethods: Array<Method> = Method.values()) {
@@ -57,7 +62,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             },
             "/uri" bind GET to { Response(OK).body(it.uri.toString()) },
             "/multiple-headers" bind GET to { Response(OK).header("foo", "value1").header("foo", "value2") },
-            "/boom" bind GET to { throw IllegalArgumentException("BOOM!") }
+            "/boom" bind GET to { throw IllegalArgumentException("BOOM!") },
+            "/request-source" bind GET to { request ->
+                Response(OK)
+                    .header("x-address", request.source?.address?.value ?: "")
+                    .header("x-port", (request.source?.port ?: 0).toString())
+            }
         )
 
     @BeforeEach
@@ -174,6 +184,17 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             assertThat(client(Request(GET, "http://localhost:${it.port()}/uri")).status, equalTo(OK))
         }
     }
+
+    @Test
+    fun `can resolve request source`() {
+        assertThat(client(Request(GET, "$baseUrl/request-source")),
+            allOf(hasStatus(OK),
+                hasHeader("x-address", clientAddress() ?: ""),
+                hasHeader("x-port", present())
+            ))
+    }
+
+    open fun clientAddress(): String? = InetAddress.getLocalHost().hostAddress
 
     @AfterEach
     fun after() {
