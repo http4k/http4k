@@ -36,7 +36,6 @@ import org.http4k.core.then
 import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
 import java.net.InetSocketAddress
-import java.net.SocketAddress
 
 
 /**
@@ -55,8 +54,8 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
                 addListener(CLOSE)
             }
         }
-        val address = ctx.channel().remoteAddress() as InetSocketAddress
-        val (response, stream) = safeHandler(request.asRequest(address)).asNettyResponse()
+
+        val (response, stream) = safeHandler(request.asRequest()).asNettyResponse()
         ctx.write(response)
         ctx.write(stream)
         ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).apply {
@@ -69,12 +68,10 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
             headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
         } to ChunkedStream(body.stream)
 
-    private fun FullHttpRequest.asRequest(address: InetSocketAddress) =
+    private fun FullHttpRequest.asRequest() =
         Request(valueOf(method().name()), Uri.of(uri()))
             .headers(headers().map { it.key to it.value })
             .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
-            .sourceAddress(address.address.hostAddress)
-            .sourcePort(address.port)
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {

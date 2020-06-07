@@ -23,10 +23,7 @@ class Http4kWebSocketAdapter(private val innerSocket: PushPullAdaptingWebSocket)
     fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
 }
 
-internal fun ServletUpgradeRequest.asHttp4kRequest() =
-    Request(Method.valueOf(method), Uri.of(requestURI.toString())).headers(headerParameters())
-        .sourceAddress(remoteAddress)
-        .sourcePort(remotePort)
+internal fun ServletUpgradeRequest.asHttp4kRequest() = Request(Method.valueOf(method), Uri.of(requestURI.toString())).headers(headerParameters())
 
 private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequence().fold(listOf()) { memo, next -> memo + next.value.map { next.key to it } }
 
