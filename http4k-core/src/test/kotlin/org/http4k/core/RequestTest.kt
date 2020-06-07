@@ -47,22 +47,6 @@ class RequestTest {
     }
 
     private fun requestWithQuery(query: String) = Request(GET, Uri.of("http://ignore/?$query"))
-
-    @Test
-    fun `request has default src ip and port`() {
-        val request = Request(GET, "http://ignore")
-        assert(request.sourceAddress == null)
-        assert(request.sourcePort == null)
-    }
-
-    @Test
-    fun `request has modifiable src ip and port`() {
-        val request = Request(GET, "http://ignore")
-            .sourceAddress("192.168.0.1")
-            .sourcePort(32768)
-        assertThat(request.sourceAddress, equalTo("192.168.0.1"))
-        assertThat(request.sourcePort, equalTo(32768))
-    }
 }
 
 

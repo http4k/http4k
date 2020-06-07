@@ -2,14 +2,12 @@ package org.http4k.server
 
 import org.apache.http.Header
 import org.apache.http.HttpEntityEnclosingRequest
-import org.apache.http.HttpInetConnection
 import org.apache.http.config.SocketConfig
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.bootstrap.HttpServer
 import org.apache.http.impl.bootstrap.ServerBootstrap
 import org.apache.http.impl.io.EmptyInputStream
 import org.apache.http.protocol.HttpContext
-import org.apache.http.protocol.HttpCoreContext
 import org.apache.http.protocol.HttpRequestHandler
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
@@ -32,21 +30,17 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
     override fun handle(request: ApacheRequest, response: ApacheResponse, context: HttpContext) {
-        safeHandler(request.asHttp4kRequest(context)).into(response)
+        safeHandler(request.asHttp4kRequest()).into(response)
     }
 
-    private fun ApacheRequest.asHttp4kRequest(context: HttpContext): Request {
-        val connection = context.getAttribute(HttpCoreContext.HTTP_CONNECTION) as HttpInetConnection
-        return Request(Method.valueOf(requestLine.method), requestLine.uri)
+    private fun ApacheRequest.asHttp4kRequest(): Request =
+        Request(Method.valueOf(requestLine.method), requestLine.uri)
             .headers(allHeaders.toHttp4kHeaders()).let {
                 when (this) {
                     is HttpEntityEnclosingRequest -> it.body(entity.content, getFirstHeader("Content-Length")?.value.safeLong())
                     else -> it.body(EmptyInputStream.INSTANCE, 0)
                 }
             }
-            .sourceAddress(connection.remoteAddress.hostAddress)
-            .sourcePort(connection.remotePort)
-    }
 
     private val headersThatApacheInterceptorSets = setOf("Transfer-Encoding", "Content-Length")
 

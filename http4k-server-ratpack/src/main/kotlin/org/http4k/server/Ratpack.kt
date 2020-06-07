@@ -49,8 +49,6 @@ class RatpackHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
             })
         }
         .body(data.inputStream, request.headers.get("content-length")?.toLongOrNull())
-        .sourceAddress(request.remoteAddress.host)
-        .sourcePort(request.remoteAddress.port)
 
     private fun Response.pushTo(context: Context) {
         headers.groupBy { it.first }
