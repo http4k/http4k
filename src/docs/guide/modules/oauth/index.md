@@ -22,7 +22,7 @@ There is a single user-defined interface, `OAuthPersistence`, required to implem
 
 To enable OAuth integration, construct a configured instance of `OAuthProvider`. This provides 3 things:
 1. A filter to protect application resources
-1. A callback HttpHandler for the OAuth provider to redirect the authticated user to
+1. A callback HttpHandler for the OAuth provider to redirect the authenticated user to
 1. A fully configured API client (which populated the Host on the URI) - this allows different
 implementations of the provider to be used across environments.
 
