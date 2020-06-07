@@ -116,8 +116,9 @@ object Versions {
      * Current version: "6.1.1"
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
+     * Why 6.1.1? See https://github.com/stevesaliman/gradle-cobertura-plugin/issues/168 for details.
      */
-    const val gradleLatestVersion: String = "6.4.1"
+    const val gradleLatestVersion: String = "6.1.1"
 }
 
 /**
