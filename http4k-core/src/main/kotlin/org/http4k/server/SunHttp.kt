@@ -2,9 +2,11 @@ package org.http4k.server
 
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
+import org.http4k.core.ClientAddress
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
@@ -48,3 +50,4 @@ private fun HttpExchange.toRequest(): Request =
             ?: Uri.of(requestURI.rawPath))
         .body(requestBody, requestHeaders.getFirst("Content-Length").safeLong())
         .headers(requestHeaders.toList().flatMap { (key, values) -> values.map { key to it } })
+        .source(RequestSource(ClientAddress(localAddress.address.hostAddress), localAddress.port))
