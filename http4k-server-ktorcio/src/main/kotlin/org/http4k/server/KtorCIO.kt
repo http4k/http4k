@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import io.ktor.application.ApplicationCallPipeline.ApplicationPhase.Call
+import io.ktor.features.origin
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -51,6 +52,8 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
 fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
     .headers(headers.toHttp4kHeaders())
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
+    .sourceAddress(origin.remoteHost)
+    // origin.remotePort does not exist for Ktor
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))
