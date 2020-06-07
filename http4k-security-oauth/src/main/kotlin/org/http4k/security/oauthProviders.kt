@@ -31,6 +31,15 @@ fun OAuthProvider.Companion.dropbox(client: HttpHandler, credentials: Credential
         listOf(""),
         oAuthPersistence)
 
+fun OAuthProvider.Companion.facebook(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("email")): OAuthProvider =
+    OAuthProvider(
+        OAuthProviderConfig(Uri.of("https://www.facebook.com"), "/dialog/oauth", "/oauth/access_token", credentials, Uri.of("https://graph.facebook.com")),
+        client,
+        callbackUri,
+        scopes,
+        oAuthPersistence
+    )
+
 fun OAuthProvider.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("openid")): OAuthProvider =
     OAuthProvider(
         OAuthProviderConfig(Uri.of("https://accounts.google.com"), "/o/oauth2/v2/auth", "/oauth2/v4/token", credentials, Uri.of("https://www.googleapis.com")),
