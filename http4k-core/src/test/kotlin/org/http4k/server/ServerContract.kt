@@ -13,7 +13,6 @@ import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
@@ -22,7 +21,6 @@ import org.http4k.core.StreamBody
 import org.http4k.core.with
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
-import org.http4k.hamkrest.hasPort
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.binary
 import org.http4k.routing.bind
@@ -189,12 +187,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     fun `can resolve request source`() {
         assertThat(client(Request(GET, "$baseUrl/request-source")),
             allOf(hasStatus(OK),
-                hasHeader("x-address", clientAddress() ?: ""),
+                hasHeader("x-address", clientAddress()),
                 hasHeader("x-port", present())
             ))
     }
 
-    open fun clientAddress(): String? = InetAddress.getLocalHost().hostAddress
+    open fun clientAddress() = equalTo(InetAddress.getLocalHost().hostAddress)
 
     @AfterEach
     fun after() {
