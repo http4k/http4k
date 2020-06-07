@@ -11,10 +11,12 @@ import org.apache.http.impl.io.EmptyInputStream
 import org.apache.http.protocol.HttpContext
 import org.apache.http.protocol.HttpCoreContext
 import org.apache.http.protocol.HttpRequestHandler
+import org.http4k.core.ClientAddress
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.safeLong
 import org.http4k.core.then
@@ -44,8 +46,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
                     else -> it.body(EmptyInputStream.INSTANCE, 0)
                 }
             }
-            .sourceAddress(connection.remoteAddress.hostAddress)
-            .sourcePort(connection.remotePort)
+            .source(RequestSource(ClientAddress(connection.remoteAddress.hostAddress), connection.remotePort))
     }
 
     private val headersThatApacheInterceptorSets = setOf("Transfer-Encoding", "Content-Length")

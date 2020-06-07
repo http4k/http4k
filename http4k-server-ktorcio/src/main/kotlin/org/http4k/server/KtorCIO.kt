@@ -17,10 +17,12 @@ import io.ktor.server.cio.CIOApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.stop
 import io.ktor.utils.io.jvm.javaio.toInputStream
+import org.http4k.core.ClientAddress
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.lens.Header
 import java.util.concurrent.TimeUnit.SECONDS
@@ -52,8 +54,7 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
 fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
     .headers(headers.toHttp4kHeaders())
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
-    .sourceAddress(origin.remoteHost)
-    // origin.remotePort does not exist for Ktor
+    .source(RequestSource(ClientAddress(origin.remoteHost))) // origin.remotePort does not exist for Ktor
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))

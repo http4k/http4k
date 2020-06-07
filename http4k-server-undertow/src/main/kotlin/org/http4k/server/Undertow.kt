@@ -5,9 +5,11 @@ import io.undertow.UndertowOptions.ENABLE_HTTP2
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.BlockingHandler
 import io.undertow.util.HttpString
+import org.http4k.core.ClientAddress
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
@@ -35,8 +37,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
             .headers(requestHeaders
                 .flatMap { header -> header.map { header.headerName.toString() to it } })
             .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
-            .sourceAddress(sourceAddress.hostString)
-            .sourcePort(sourceAddress.port)
+            .source(RequestSource(ClientAddress(sourceAddress.hostString), sourceAddress.port))
 
     override fun handleRequest(exchange: HttpServerExchange) = safeHandler(exchange.asRequest()).into(exchange)
 }
