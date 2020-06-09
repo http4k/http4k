@@ -1,6 +1,5 @@
 package org.http4k.server
 
-import org.http4k.core.ClientAddress
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -51,7 +50,7 @@ class RatpackHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
             })
         }
         .body(data.inputStream, request.headers.get("content-length")?.toLongOrNull())
-        .source(RequestSource(ClientAddress(request.remoteAddress.host), request.remoteAddress.port) )
+        .source(RequestSource(request.remoteAddress.host, request.remoteAddress.port) )
 
     private fun Response.pushTo(context: Context) {
         headers.groupBy { it.first }

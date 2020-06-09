@@ -1,6 +1,5 @@
 package org.http4k.servlet
 
-import org.http4k.core.ClientAddress
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Parameters
@@ -30,7 +29,7 @@ private fun Response.transferTo(destination: HttpServletResponse) {
 private fun HttpServletRequest.asHttp4kRequest() =
     Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
         .body(inputStream, getHeader("Content-Length").safeLong()).headers(headerParameters())
-        .source(RequestSource(ClientAddress(remoteAddr), remotePort))
+        .source(RequestSource(remoteAddr, remotePort))
 
 private fun HttpServletRequest.headerParameters() =
     headerNames.asSequence().fold(listOf()) { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) }

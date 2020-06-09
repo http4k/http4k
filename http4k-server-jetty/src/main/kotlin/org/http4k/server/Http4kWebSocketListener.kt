@@ -4,7 +4,6 @@ import org.eclipse.jetty.websocket.api.Session
 import org.eclipse.jetty.websocket.api.WebSocketListener
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest
 import org.http4k.core.Body
-import org.http4k.core.ClientAddress
 import org.http4k.core.Headers
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -27,7 +26,7 @@ class Http4kWebSocketAdapter(private val innerSocket: PushPullAdaptingWebSocket)
 
 internal fun ServletUpgradeRequest.asHttp4kRequest() =
     Request(Method.valueOf(method), Uri.of(requestURI.toString())).headers(headerParameters())
-        .source(RequestSource(ClientAddress(remoteAddress), remotePort))
+        .source(RequestSource(remoteAddress, remotePort))
 
 private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequence().fold(listOf()) { memo, next -> memo + next.value.map { next.key to it } }
 
