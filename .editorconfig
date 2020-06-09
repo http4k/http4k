@@ -7,5 +7,8 @@ indent_style=space
 indent_size = 4
 insert_final_newline = true
 
-[*.kt]
+[{*.kt,*.kts}]
 continuation_indent_size = 4
+ij_continuation_indent_size = 4
+ij_kotlin_name_count_to_use_star_import = 99
+ij_kotlin_name_count_to_use_star_import_for_members = 99
