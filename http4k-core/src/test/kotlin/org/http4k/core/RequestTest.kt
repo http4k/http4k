@@ -57,8 +57,8 @@ class RequestTest {
     @Test
     fun `request has modifiable src ip and port`() {
         val request = Request(GET, "http://ignore")
-            .source(RequestSource(ClientAddress("192.168.0.1"), 32768))
-        assertThat(request.source, equalTo(RequestSource(ClientAddress("192.168.0.1"), 32768)))
+            .source(RequestSource("192.168.0.1", 32768))
+        assertThat(request.source, equalTo(RequestSource("192.168.0.1", 32768)))
     }
 }
 

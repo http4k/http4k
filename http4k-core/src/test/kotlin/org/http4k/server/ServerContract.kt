@@ -63,7 +63,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             "/boom" bind GET to { throw IllegalArgumentException("BOOM!") },
             "/request-source" bind GET to { request ->
                 Response(OK)
-                    .header("x-address", request.source?.address?.value ?: "")
+                    .header("x-address", request.source?.address ?: "")
                     .header("x-port", (request.source?.port ?: 0).toString())
             }
         )

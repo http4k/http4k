@@ -14,7 +14,6 @@ import io.ktor.server.engine.stop
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.utils.io.jvm.javaio.toInputStream
-import org.http4k.core.ClientAddress
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -51,7 +50,7 @@ data class KtorNetty(val port: Int = 8000) : ServerConfig {
 fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
     .headers(headers.toHttp4kHeaders())
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
-    .source(RequestSource(ClientAddress(origin.remoteHost))) // origin.remotePort does not exist for Ktor
+    .source(RequestSource(origin.remoteHost)) // origin.remotePort does not exist for Ktor
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))
