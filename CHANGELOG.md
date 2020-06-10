@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.250.0 (uncut)
 - [http4k-security-oauth] Add OAuth provider configuration for Facebook. H/T @knyttl for the PR.
+- [http4k-server-netty] Implement KeepAlive. H/T @carbotaniuman for the PR.
 
 ### v3.249.0
 - [all] Upgrade some dependency versions.
