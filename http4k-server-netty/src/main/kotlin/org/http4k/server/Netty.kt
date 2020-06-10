@@ -5,7 +5,6 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBufInputStream
 import io.netty.channel.ChannelFactory
 import io.netty.channel.ChannelFuture
-import io.netty.channel.ChannelFutureListener.CLOSE
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
@@ -16,9 +15,12 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.DefaultHttpResponse
 import io.netty.handler.codec.http.FullHttpRequest
+import io.netty.handler.codec.http.HttpHeaderNames
+import io.netty.handler.codec.http.HttpHeaderValues
 import io.netty.handler.codec.http.HttpObjectAggregator
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.netty.handler.codec.http.HttpServerCodec
+import io.netty.handler.codec.http.HttpServerKeepAliveHandler
 import io.netty.handler.codec.http.HttpUtil
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
 import io.netty.handler.codec.http.LastHttpContent
@@ -30,7 +32,6 @@ import org.http4k.core.Method.valueOf
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.CONTINUE
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
@@ -47,21 +48,13 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
     override fun channelRead0(ctx: ChannelHandlerContext, request: FullHttpRequest) {
-        if (HttpUtil.is100ContinueExpected(request)) {
-            val (response, stream) = Response(CONTINUE).asNettyResponse()
-            ctx.write(response)
-            ctx.write(stream)
-            ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).apply {
-                addListener(CLOSE)
-            }
-        }
         val address = ctx.channel().remoteAddress() as InetSocketAddress
         val (response, stream) = safeHandler(request.asRequest(address)).asNettyResponse()
+        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
+
         ctx.write(response)
         ctx.write(stream)
-        ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT).apply {
-            addListener(CLOSE)
-        }
+        ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT)
     }
 
     private fun Response.asNettyResponse(): Pair<DefaultHttpResponse, ChunkedStream> =
@@ -90,6 +83,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                 .childHandler(object : ChannelInitializer<SocketChannel>() {
                     public override fun initChannel(ch: SocketChannel) {
                         ch.pipeline().addLast("codec", HttpServerCodec())
+                        ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
                         ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
