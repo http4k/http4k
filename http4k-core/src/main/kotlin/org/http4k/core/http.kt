@@ -329,7 +329,7 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
         && body == other.body)
 }
 
-data class RequestSource(val address: String, val port: Int? = 0)
+data class RequestSource(val address: String, val port: Int? = 0, val scheme: String? = null)
 
 fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this) { memo, next -> next(memo) }
 

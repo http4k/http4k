@@ -29,7 +29,7 @@ private fun Response.transferTo(destination: HttpServletResponse) {
 private fun HttpServletRequest.asHttp4kRequest() =
     Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
         .body(inputStream, getHeader("Content-Length").safeLong()).headers(headerParameters())
-        .source(RequestSource(remoteAddr, remotePort))
+        .source(RequestSource(remoteAddr, remotePort, scheme))
 
 private fun HttpServletRequest.headerParameters() =
     headerNames.asSequence().fold(listOf()) { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) }
