@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.250.0 (uncut)
+- [http4k-core] Add `Request.source` to provide extra information about the request origin (address/port/scheme). H/T @kam1sh and @jshiell for the contributions.
 - [http4k-security-oauth] Add OAuth provider configuration for Facebook. H/T @knyttl for the PR.
 - [http4k-server-netty] Implement KeepAlive. H/T @carbotaniuman for the PR.
 
