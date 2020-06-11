@@ -3,6 +3,7 @@ package org.http4k.websocket
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.throws
 import org.http4k.client.WebsocketClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -19,6 +20,7 @@ import org.http4k.routing.websockets
 import org.http4k.server.Http4kServer
 import org.http4k.server.WsServerConfig
 import org.http4k.server.asServer
+import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -170,5 +172,13 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         }
 
         latch.await()
+    }
+
+    @Test
+    fun `should fail on invalid url`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/aaa"))
+        assertThat({
+            client.send(WsMessage("hello"))
+        }, throws<WebsocketNotConnectedException>())
     }
 }
