@@ -58,11 +58,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 
     private fun Response.asNettyResponse(): Pair<DefaultHttpResponse, ChunkedStream> =
         DefaultHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
-            this@asNettyResponse.headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
-            when (body.length) {
-                null -> headers().set("Transfer-Encoding", "chunked")
-                else -> headers().set("Content-Length", body.length.toString())
-            }
+            headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
         } to ChunkedStream(body.stream)
 
     private fun FullHttpRequest.asRequest(address: InetSocketAddress) =
@@ -89,9 +85,12 @@ data class Netty(val port: Int = 8000)   : WsServerConfig  {
                         ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
 
+
+                        ch.pipeline().addLast("websocket", WebSocketServerHandler())
                         if(wsHandler != null) {
-                            ch.pipeline().addLast("websocket", WebSocketServerHandler(wsHandler))
+                            ch.pipeline().addLast("wsHandler", Http4kWsHandshakeListener(wsHandler))
                         }
+
 
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
                         if(httpHandler != null) {
