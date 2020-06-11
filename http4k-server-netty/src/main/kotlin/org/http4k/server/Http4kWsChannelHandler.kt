@@ -22,7 +22,6 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
-import java.lang.Exception
 import java.net.InetSocketAddress
 
 class Http4kWsHandshakeListener(private val wsHandler: WsHandler) : ChannelInboundHandlerAdapter() {
@@ -46,18 +45,17 @@ class Http4kWsHandshakeListener(private val wsHandler: WsHandler) : ChannelInbou
 
 class Http4kWebSocketAdapter(private val innerSocket: PushPullAdaptingWebSocket) {
     fun onError(throwable: Throwable) = innerSocket.triggerError(throwable)
-    fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(
-        WsStatus(statusCode, reason
-            ?: "<unknown>")
-    )
+    fun onClose(status: WsStatus) = innerSocket.triggerClose(status)
 
     fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
 }
 
 class Http4kWsChannelHandler(private val wSocket: WsConsumer, private val upgradeRequest: Request): SimpleChannelInboundHandler<WebSocketFrame>() {
     private var websocket: Http4kWebSocketAdapter? = null
+    private var normalClose = false;
 
     override fun handlerAdded(ctx: ChannelHandlerContext) {
+        println("A")
         websocket = Http4kWebSocketAdapter(object : PushPullAdaptingWebSocket(upgradeRequest) {
             override fun send(message: WsMessage) {
                 when (message.body) {
@@ -67,20 +65,38 @@ class Http4kWsChannelHandler(private val wSocket: WsConsumer, private val upgrad
             }
 
             override fun close(status: WsStatus) {
-                ctx.writeAndFlush(CloseWebSocketFrame()).addListener(ChannelFutureListener.CLOSE)
+                ctx.writeAndFlush(CloseWebSocketFrame(status.code, status.description)).addListeners(ChannelFutureListener {
+                    normalClose = true;
+                    websocket?.onClose(status)
+                }, ChannelFutureListener.CLOSE)
             }
         }.apply(wSocket))
     }
 
-    override fun handlerRemoved(ctx: ChannelHandlerContext?) {
+    override fun handlerRemoved(ctx: ChannelHandlerContext) {
+        if(ctx.channel().isActive) {
+            ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListeners(ChannelFutureListener {
+                normalClose = true;
+                websocket?.onClose(WsStatus.NOCODE)
+            }, ChannelFutureListener.CLOSE)
+        }
         websocket = null
     }
 
     override fun channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) {
-        if(msg is TextWebSocketFrame) {
-            websocket?.onMessage(Body(msg.text()))
-        } else if (msg is BinaryWebSocketFrame) {
-            websocket?.onMessage(Body(ByteBufInputStream(msg.content())))
+        when (msg) {
+            is TextWebSocketFrame -> {
+                websocket?.onMessage(Body(msg.text()))
+            }
+            is BinaryWebSocketFrame -> {
+                websocket?.onMessage(Body(ByteBufInputStream(msg.content())))
+            }
+            is CloseWebSocketFrame -> {
+                msg.retain()
+                ctx.writeAndFlush(msg).addListeners(ChannelFutureListener {
+                    websocket?.onClose(WsStatus(msg.statusCode(), msg.reasonText()))
+                }, ChannelFutureListener.CLOSE)
+            }
         }
     }
 
