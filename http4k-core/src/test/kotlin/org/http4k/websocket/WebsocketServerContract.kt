@@ -2,6 +2,7 @@ package org.http4k.websocket
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import org.http4k.client.WebsocketClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -85,6 +86,72 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/errors"))
         client.send(WsMessage("hello"))
         assertThat(client.received().take(1).toList(), equalTo(listOf(WsMessage("websocket 'message' must be object"))))
+    }
+
+    @Test
+    fun `should propagate close on client close`() {
+        val latch = CountDownLatch(1)
+        var closeStatus: WsStatus? = null
+
+        val server = websockets(
+            "/closes" bind { ws: Websocket ->
+                ws.onClose {
+                    closeStatus = it
+                    latch.countDown()
+                }
+            }).asServer(serverConfig(0)).start()
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+        client.close()
+
+        latch.await()
+        assertThat(closeStatus, present())
+        server.close()
+    }
+
+    @Test
+    fun `should propagate close on server close`() {
+        val latch = CountDownLatch(1)
+        var closeStatus: WsStatus? = null
+
+        val server = websockets(
+            "/closes" bind { ws: Websocket ->
+                ws.onMessage {
+                    ws.close()
+                }
+                ws.onClose {
+                    closeStatus = it
+                    latch.countDown()
+                }
+            }).asServer(serverConfig(0)).start()
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+        client.send(WsMessage("message"))
+
+        latch.await()
+        assertThat(closeStatus, present())
+        client.close()
+        server.close()
+    }
+
+    @Test
+    fun `should propagate close on server stop`() {
+        val latch = CountDownLatch(1)
+        var closeStatus: WsStatus? = null
+
+        val server = websockets(
+            "/closes" bind { ws: Websocket ->
+                ws.onClose {
+                    closeStatus = it
+                    latch.countDown()
+                }
+            }).asServer(serverConfig(0)).start()
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+        client.send(WsMessage("message"))
+        server.close()
+
+        latch.await()
+        println(closeStatus)
+        assertThat(closeStatus, present())
+        client.close()
     }
 
     @Test
