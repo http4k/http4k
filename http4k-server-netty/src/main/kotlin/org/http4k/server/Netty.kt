@@ -89,12 +89,9 @@ data class Netty(val port: Int = 8000)   : WsServerConfig  {
                         ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
 
-
-                        ch.pipeline().addLast("websocket", WebSocketServerHandler())
                         if(wsHandler != null) {
-                            ch.pipeline().addLast("wsHandler", Http4kWsHandshakeListener(wsHandler))
+                            ch.pipeline().addLast("websocket", WebSocketServerHandler(wsHandler))
                         }
-
 
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
                         if(httpHandler != null) {
