@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import com.natpryce.hamkrest.Matcher
+import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.client.ApacheClient
 import org.junit.jupiter.api.BeforeEach
@@ -23,4 +24,6 @@ class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, A
     }
 
     override fun clientAddress(): Matcher<String?> = present()
+
+    override fun requestScheme(): Matcher<String?> = equalTo("http")
 }
