@@ -65,6 +65,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                 Response(OK)
                     .header("x-address", request.source?.address ?: "")
                     .header("x-port", (request.source?.port ?: 0).toString())
+                    .header("x-scheme", (request.source?.scheme ?: "unsupported").toString())
             }
         )
 
@@ -188,11 +189,14 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         assertThat(client(Request(GET, "$baseUrl/request-source")),
             allOf(hasStatus(OK),
                 hasHeader("x-address", clientAddress()),
-                hasHeader("x-port", present())
+                hasHeader("x-port", present()),
+                hasHeader("x-scheme", requestScheme())
             ))
     }
 
     open fun clientAddress() = equalTo(InetAddress.getLocalHost().hostAddress)
+
+    open fun requestScheme() = equalTo("unsupported")
 
     @AfterEach
     fun after() {
