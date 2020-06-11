@@ -53,7 +53,7 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
 fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
     .headers(headers.toHttp4kHeaders())
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
-    .source(RequestSource(origin.remoteHost)) // origin.remotePort does not exist for Ktor
+    .source(RequestSource(origin.remoteHost, scheme = origin.scheme)) // origin.remotePort does not exist for Ktor
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))

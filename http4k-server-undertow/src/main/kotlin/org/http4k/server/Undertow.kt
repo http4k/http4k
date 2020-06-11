@@ -36,7 +36,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
             .headers(requestHeaders
                 .flatMap { header -> header.map { header.headerName.toString() to it } })
             .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
-            .source(RequestSource(sourceAddress.hostString, sourceAddress.port))
+            .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
 
     override fun handleRequest(exchange: HttpServerExchange) = safeHandler(exchange.asRequest()).into(exchange)
 }
