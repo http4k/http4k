@@ -77,7 +77,9 @@ class WebsocketClientTest {
         client.send(WsMessage("hello"))
 
         assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
-        
+
+        Thread.sleep(100)
+
         client.send(WsMessage("hi"))
         assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hi"))))
     }
