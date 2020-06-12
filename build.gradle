@@ -178,7 +178,7 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
     dependsOn = subprojects.test
     getSourceDirectories().from(subprojects.sourceSets.main.allSource.srcDirs)
     getClassDirectories().from(subprojects.sourceSets.main.output)
-    getExecutionData().from(subprojects.jacocoTestReport.executionData)
+    getExecutionData().from(subprojects.findAll { it.name != 'http4k-bom' }.jacocoTestReport.executionData)
 
     reports {
         html.enabled = true
