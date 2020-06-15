@@ -26,7 +26,7 @@ fun Request.cookie(new: Cookie): Request = replaceHeader("Cookie", cookies().plu
 internal fun String.toCookieList(): List<Cookie> = split(";").map { it.trim() }.filter { it.isNotBlank() }.map { it.split("=", limit = 2).let { Cookie(it.elementAt(0), it.elementAtOrElse(1) { "\"\"" }.unquoted()) } }
 
 fun Request.cookies(): List<Cookie> = headers
-    .filter { it.first.toLowerCase() == "cookie" }
+    .filter { it.first.equals("cookie", true) }
     .mapNotNull { it.second?.toCookieList() }
     .fold(listOf()) { acc, current -> acc.plus(current) }
 
