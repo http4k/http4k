@@ -71,6 +71,18 @@ class CookieTest {
     }
 
     @Test
+    fun `cookies can be extracted from a http2 request with multiple cookie headers`() {
+        assertThat(Request(GET, "/")
+            .header("cookie","foo=bar; voo=tar")
+            .header("cookie", "roo=gar")
+            .cookies(),
+            equalTo(listOf(
+                Cookie("foo", "bar"),
+                Cookie("voo", "tar"),
+                Cookie("roo", "gar"))))
+    }
+
+    @Test
     fun `cookies with ending semicolon can be extracted from request`() {
         assertThat(Request(GET, "/").header("cookie", "foo=\"bar\";").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
