@@ -13,3 +13,5 @@ maven_publish "http4k-template-thymeleaf"
 maven_publish "http4k-template-freemarker"
 maven_publish "http4k-template-jade4j"
 maven_publish "http4k-template-dust"
+
+maven_publish "http4k-bom"
