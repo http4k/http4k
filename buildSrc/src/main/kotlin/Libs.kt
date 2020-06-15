@@ -27,25 +27,25 @@ object Libs {
             Versions.com_fasterxml_jackson_dataformat
 
     /**
-     * https://github.com/resilience4j/resilience4j
+     * https://resilience4j.readme.io
      */
     const val resilience4j_bulkhead: String = "io.github.resilience4j:resilience4j-bulkhead:" +
             Versions.io_github_resilience4j
 
     /**
-     * https://github.com/resilience4j/resilience4j
+     * https://resilience4j.readme.io
      */
     const val resilience4j_circuitbreaker: String =
             "io.github.resilience4j:resilience4j-circuitbreaker:" + Versions.io_github_resilience4j
 
     /**
-     * https://github.com/resilience4j/resilience4j
+     * https://resilience4j.readme.io
      */
     const val resilience4j_ratelimiter: String =
             "io.github.resilience4j:resilience4j-ratelimiter:" + Versions.io_github_resilience4j
 
     /**
-     * https://github.com/resilience4j/resilience4j
+     * https://resilience4j.readme.io
      */
     const val resilience4j_retry: String = "io.github.resilience4j:resilience4j-retry:" +
             Versions.io_github_resilience4j
@@ -176,23 +176,23 @@ object Libs {
      * http://www.eclipse.org/jetty
      */
     const val javax_websocket_server_impl: String =
-        "org.eclipse.jetty.websocket:javax-websocket-server-impl:" +
+            "org.eclipse.jetty.websocket:javax-websocket-server-impl:" +
             Versions.javax_websocket_server_impl
 
     /**
      * http://github.com/kt3k/coveralls-gradle-plugin/
      */
     const val coveralls_gradle_plugin: String = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:" +
-        Versions.coveralls_gradle_plugin
+            Versions.coveralls_gradle_plugin
 
     const val functions_framework_api: String =
-        "com.google.cloud.functions:functions-framework-api:" + Versions.functions_framework_api
+            "com.google.cloud.functions:functions-framework-api:" + Versions.functions_framework_api
 
     /**
      * https://github.com/stevesaliman/gradle-cobertura-plugin
      */
     const val gradle_cobertura_plugin: String = "net.saliman:gradle-cobertura-plugin:" +
-        Versions.gradle_cobertura_plugin
+            Versions.gradle_cobertura_plugin
 
     /**
      * https://aws.amazon.com/lambda/

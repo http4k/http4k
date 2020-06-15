@@ -16,17 +16,17 @@ object Versions {
 
     const val com_fasterxml_jackson_dataformat: String = "2.11.0"
 
-    const val io_github_resilience4j: String = "1.4.0"
+    const val io_github_resilience4j: String = "1.5.0"
 
     const val org_jetbrains_kotlin: String = "1.3.72"
 
-    const val com_squareup_moshi: String = "1.9.2"
+    const val com_squareup_moshi: String = "1.9.3"
 
-    const val org_eclipse_jetty: String = "9.4.29.v20200521"
+    const val org_eclipse_jetty: String = "9.4.30.v20200611"
 
     const val org_junit_jupiter: String = "5.6.2"
 
-    const val io_undertow: String = "2.1.1.Final"
+    const val io_undertow: String = "2.1.3.Final"
 
     const val io_ktor: String = "1.3.2" // available: "1.3.2-1.4-M1-release-99"
 
@@ -40,7 +40,7 @@ object Versions {
 
     const val openapi_generator_gradle_plugin: String = "4.3.1"
 
-    const val javax_websocket_server_impl: String = "9.4.29.v20200521"
+    const val javax_websocket_server_impl: String = "9.4.30.v20200611"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
@@ -70,7 +70,7 @@ object Versions {
 
     const val commons_pool2: String = "2.8.0"
 
-    const val http2_server: String = "9.4.29.v20200521"
+    const val http2_server: String = "9.4.30.v20200611"
 
     const val ratpack_core: String = "1.8.0"
 
@@ -82,7 +82,7 @@ object Versions {
 
     const val httpclient: String = "4.5.12"
 
-    const val underscore: String = "1.54"
+    const val underscore: String = "1.55"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
@@ -118,7 +118,7 @@ object Versions {
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      * Why 6.1.1? See https://github.com/stevesaliman/gradle-cobertura-plugin/issues/168 for details.
      */
-    const val gradleLatestVersion: String = "6.1.1"
+    const val gradleLatestVersion: String = "6.5"
 }
 
 /**
