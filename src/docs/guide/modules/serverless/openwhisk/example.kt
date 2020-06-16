@@ -1,5 +1,6 @@
-package guide.modules.serverless.gcf
+package guide.modules.serverless.openwhisk
 
+import com.google.gson.JsonObject
 import org.http4k.client.ApacheClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -8,16 +9,16 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.format.Gson
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
-import org.http4k.serverless.FakeGCFRequest
-import org.http4k.serverless.FakeGCFResponse
-import org.http4k.serverless.GoogleCloudFunction
+import org.http4k.serverless.FakeOpenWhiskRequest
+import org.http4k.serverless.openwhisk.OpenWhiskFunction
 
-// This AppLoader is responsible for building our HttpHandler which is supplied to GCF
+// This AppLoader is responsible for building our HttpHandler which is supplied to OpenWhisk
 // Along with the extension class below, is the only actual piece of code that needs to be written.
 object TweetEchoLambda : AppLoader {
     private val timer = Filter { next: HttpHandler ->
@@ -40,12 +41,12 @@ object TweetEchoLambda : AppLoader {
 }
 
 // This class is the entry-point for the function call - configure it when deploying
-class FunctionsExampleEntryClass : GoogleCloudFunction(TweetEchoLambda)
+class FunctionsExampleEntryClass : OpenWhiskFunction(TweetEchoLambda)
 
 fun main() {
 
     // Launching your Function locally - by simply providing the operating ENVIRONMENT map as would
-    // be configured in GCP.
+    // be configured in OpenWhisk.
     fun runFunctionLocally() {
         println("RUNNING LOCALLY:")
 
@@ -56,18 +57,20 @@ fun main() {
         localLambda.stop()
     }
 
-    // the following code is purely here for demonstration purposes, to explain exactly what is happening at GCP.
-    fun runFunctionAsGCFWould() {
-        println("RUNNING AS GCF:")
+    // the following code is purely here for demonstration purposes, to explain exactly what is happening in OpenWhisk.
+    fun runFunctionAsOpenWhiskWould() {
+        println("RUNNING AS OpenWhisk:")
 
-        val response = FakeGCFResponse()
-        FunctionsExampleEntryClass().service(FakeGCFRequest
-        (Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")), response)
-        println(response.status)
-        println(response.headers)
-        println(response.body)
+        val fakeOpenWhiskRequest = FakeOpenWhiskRequest(
+            "POST", "/echo", emptyMap(), emptyMap(),
+            "hello hello hello, i suppose this isn't 140 characters anymore.."
+        )
+
+        val response = FunctionsExampleEntryClass().main(Gson.asJsonObject(fakeOpenWhiskRequest) as JsonObject)
+
+        println(response)
     }
 
     runFunctionLocally()
-    runFunctionAsGCFWould()
+    runFunctionAsOpenWhiskWould()
 }
