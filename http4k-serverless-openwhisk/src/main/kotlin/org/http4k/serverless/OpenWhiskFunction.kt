@@ -25,8 +25,7 @@ open class OpenWhiskFunction(appLoader: AppLoaderWithContexts) {
     fun main(request: JsonObject) =
         ServerFilters.InitialiseRequestContext(contexts)
             .then(AddOpenWhiskRequest(request, contexts))
-            .then(app)
-            .invoke(request.asHttp4k()).toGson()
+            .then(app)(request.asHttp4k()).toGson()
 }
 
 private fun AddOpenWhiskRequest(request: JsonElement, contexts: RequestContexts) = Filter { next ->
@@ -50,6 +49,7 @@ private fun JsonObject.asHttp4k(): Request {
     val raw = Request(
         Method.valueOf(getAsJsonPrimitive("__ow_method").asString.toUpperCase()),
         getAsJsonPrimitive("__ow_path").asString)
+        .body(getAsJsonPrimitive("__ow_body").asString)
     val withQueries = getAsJsonObject("__ow_query").entrySet().fold(raw) { acc, next ->
         acc.query(next.key, next.value.asJsonPrimitive.asString)
     }

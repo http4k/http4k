@@ -19,6 +19,7 @@ class OpenWhiskFunctionTest {
                 req.uri.toString() + req.bodyString()
             ).headers(req.headers)
         }
+
         val request = FakeOpenWhiskRequest("GET", "/bob",
             mapOf("query" to "qvalue"),
             mapOf("header" to "hvalue"),
@@ -36,6 +37,6 @@ class OpenWhiskFunctionTest {
             equalTo(FakeOpenWhiskResponse(200, mapOf(
                 "x-http4k-context" to actual.headers["x-http4k-context"]!!,
                 "header" to "hvalue"),
-                "/bob?query=qvalue")))
+                "/bob?query=qvaluebob")))
     }
 }

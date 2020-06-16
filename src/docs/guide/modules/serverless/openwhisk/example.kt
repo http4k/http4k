@@ -67,7 +67,6 @@ fun main() {
         )
 
         val response = FunctionsExampleEntryClass().main(Gson.asJsonObject(fakeOpenWhiskRequest) as JsonObject)
-
         println(response)
     }
 
