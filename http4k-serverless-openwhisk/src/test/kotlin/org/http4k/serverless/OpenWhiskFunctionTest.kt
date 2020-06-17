@@ -7,7 +7,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Gson
-import org.http4k.serverless.openwhisk.OpenWhiskFunction
 import org.junit.jupiter.api.Test
 
 class OpenWhiskFunctionTest {

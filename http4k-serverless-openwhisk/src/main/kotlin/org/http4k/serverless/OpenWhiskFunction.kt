@@ -1,4 +1,4 @@
-package org.http4k.serverless.openwhisk
+package org.http4k.serverless
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -9,8 +9,6 @@ import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
-import org.http4k.serverless.AppLoader
-import org.http4k.serverless.AppLoaderWithContexts
 
 const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 

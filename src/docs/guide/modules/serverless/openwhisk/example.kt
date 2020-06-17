@@ -16,7 +16,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
 import org.http4k.serverless.FakeOpenWhiskRequest
-import org.http4k.serverless.openwhisk.OpenWhiskFunction
+import org.http4k.serverless.OpenWhiskFunction
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to OpenWhisk
 // Along with the extension class below, is the only actual piece of code that needs to be written.
