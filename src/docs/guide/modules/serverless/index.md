@@ -6,7 +6,7 @@ AWS Lambda: ```compile group: "org.http4k", name: "http4k-serverless-lambda", ve
 
 Google Cloud Functions: ```compile group: "org.http4k", name: "http4k-serverless-gcf", version: "3.250.0"```
 
-OpenWhisk: ```compile group: "org.http4k", name: "http4k-serverless-openwhisk", version: "3.250.0"```
+Apache OpenWhisk: ```compile group: "org.http4k", name: "http4k-serverless-openwhisk", version: "3.250.0"```
 
 ### About
 These modules provide integration with Serverless deployment environments, such as AWS Lambda or Google Cloud Functions by implementing a single interface. 
@@ -36,7 +36,6 @@ We hope to soon provide some tools to automate at least some of the above proces
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/lambda/example.kt"></script>
 
 #### Google Cloud Functions integration
-
 Google Cloud Functions are triggered in the cloud by calling an entry point class which implements their `HttpFunction` interface.
 
 In order to achieve this in [http4k], only a single interface `AppLoader` needs to be implemented, and then a simple extension class needs to be written which accepts this interface.
@@ -81,5 +80,25 @@ tasks.register("runFunction", JavaExec) {
 
 If you are using Maven, you do not have to build the fat JAR and can deploy the function from the project folder.
 Simple example on how to setup `pom.xml` to run functions locally and deploy Maven project to the cloud is shown [here](https://cloud.google.com/functions/docs/first-java)
+
+#### Apache OpenWhisk integration
+OpenWhisk has a Java runtime which is triggered by calling an entry point class which contains a static `main()` function receiving a GSON `JsonObject`.
+
+In order to achieve this in [http4k], only a single interface `AppLoader` needs to be implemented, and then a simple class needs to be written which uses the `OpenWhiskFunction` wrapper.
+
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/openwhisk/example.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/openwhisk/example.kt"></script>
+
+Packaging of the app should be done using [ShadowJar]  and then an action created with the `wsk` CLI:
+
+```
+wsk -i action create myFunctionName myApp.jar --main org.http4k.example.MyFunctionClass --web true
+```
+
+Locally, you can then just call the function with `curl`:
+```
+curl -k https://localhost:31001/api/v1/web/guest/default/myFunctionName
+```
 
 [http4k]: https://http4k.org
