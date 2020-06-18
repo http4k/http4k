@@ -98,7 +98,7 @@ wsk -i action create myFunctionName myApp.jar --main org.http4k.example.MyFuncti
 
 Locally, you can then just call the function with `curl`:
 ```
-curl -k https://localhost:31001/api/v1/web/guest/default/myFunctionName
+curl -k `wsk -i action get test --url | tail -1`
 ```
 
 [http4k]: https://http4k.org
