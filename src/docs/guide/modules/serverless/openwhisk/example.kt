@@ -43,7 +43,7 @@ object TweetEchoLambda : AppLoader {
 // This class is the entry-point for the function call - configure it when deploying
 object FunctionsExampleEntryClass {
     @JvmStatic
-    fun main(request: JsonObject)  = OpenWhiskFunction(TweetEchoLambda)(request)
+    fun main(request: JsonObject) = OpenWhiskFunction(TweetEchoLambda)(request)
 }
 
 fun main() {
