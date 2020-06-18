@@ -2,6 +2,7 @@ package org.http4k.serverless
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -47,12 +48,18 @@ private fun Response.toGson() = JsonObject().apply {
 private fun JsonObject.asHttp4k(): Request {
     val raw = Request(
         Method.valueOf(getAsJsonPrimitive("__ow_method").asString.toUpperCase()),
-        getAsJsonPrimitive("__ow_path").asString)
-        .body(getAsJsonPrimitive("__ow_body").asString)
-    val withQueries = getAsJsonObject("__ow_query").entrySet().fold(raw) { acc, next ->
+        stringOrEmpty("__ow_path"))
+        .body(Body(stringOrEmpty("__ow_body")))
+
+    val withQueries = mapFrom("__ow_query").fold(raw) { acc, next ->
         acc.query(next.key, next.value.asJsonPrimitive.asString)
     }
-    return getAsJsonObject("__ow_headers").entrySet().fold(withQueries) { acc, next ->
+    return mapFrom("__ow_headers").fold(withQueries) { acc, next ->
         acc.header(next.key, next.value.asJsonPrimitive.asString)
     }
 }
+
+private fun JsonObject.mapFrom(key: String) =
+    get(key)?.takeIf { get(key).isJsonObject }?.asJsonObject?.entrySet() ?: emptySet()
+
+private fun JsonObject.stringOrEmpty(key: String) = get(key)?.takeIf { get(key).isJsonPrimitive }?.asString ?: ""

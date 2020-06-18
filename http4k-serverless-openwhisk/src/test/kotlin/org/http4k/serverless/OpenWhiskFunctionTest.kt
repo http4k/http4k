@@ -12,18 +12,29 @@ import org.junit.jupiter.api.Test
 class OpenWhiskFunctionTest {
 
     @Test
-    fun `calls the handler and returns proper body`() {
+    fun `full request - calls the handler and returns proper body`() {
+        assertExpectedResponseIs(
+            FakeOpenWhiskRequest("post", "/bob", mapOf("query" to "qvalue"), mapOf("header" to "hvalue"), "bob"),
+            FakeOpenWhiskResponse(200, mapOf(
+                "header" to "hvalue"),
+                "/bob?query=qvaluebob")
+        )
+    }
+
+    @Test
+    fun `minimal request - calls the handler and returns proper body`() {
+        assertExpectedResponseIs(
+            FakeOpenWhiskRequest("get", null, null, null, null),
+            FakeOpenWhiskResponse(200, emptyMap(), "")
+        )
+    }
+
+    private fun assertExpectedResponseIs(request: FakeOpenWhiskRequest, expected: FakeOpenWhiskResponse) {
         val app = { req: Request ->
             Response(OK).body(
                 req.uri.toString() + req.bodyString()
             ).headers(req.headers)
         }
-
-        val request = FakeOpenWhiskRequest("GET", "/bob",
-            mapOf("query" to "qvalue"),
-            mapOf("header" to "hvalue"),
-            "bob"
-        )
 
         val function = OpenWhiskFunction(object : AppLoader {
             override fun invoke(p1: Map<String, String>) = app
@@ -32,10 +43,7 @@ class OpenWhiskFunctionTest {
         val response = function(Gson.asJsonObject(request) as JsonObject)
 
         val actual = Gson.asA(response, FakeOpenWhiskResponse::class)
-        assertThat(actual,
-            equalTo(FakeOpenWhiskResponse(200, mapOf(
-                "x-http4k-context" to actual.headers["x-http4k-context"]!!,
-                "header" to "hvalue"),
-                "/bob?query=qvaluebob")))
+
+        assertThat(actual.copy(headers = actual.headers.minus("x-http4k-context")), equalTo(expected))
     }
 }
