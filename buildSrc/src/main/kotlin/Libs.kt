@@ -76,6 +76,12 @@ object Libs {
             Versions.org_jetbrains_kotlin
 
     /**
+     * https://github.com/johnrengelman/shadow
+     */
+    const val shadow_plugin: String = "com.github.jengelman.gradle.plugins:shadow:" +
+        Versions.org_github_jengelman_gradle_plugins_shadow
+
+    /**
      * https://kotlinlang.org/
      */
     const val kotlin_serialization_unshaded: String =

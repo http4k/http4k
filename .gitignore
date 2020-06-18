@@ -10,3 +10,4 @@ out/
 store/
 intellij-settings/
 **/*.actual
+local.properties

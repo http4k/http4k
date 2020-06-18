@@ -30,6 +30,8 @@ object Versions {
 
     const val io_ktor: String = "1.3.2" // available: "1.3.2-1.4-M1-release-99"
 
+    const val org_github_jengelman_gradle_plugins_shadow: String = "6.0.0"
+
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1"
