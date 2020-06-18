@@ -53,10 +53,10 @@ object DeployServerAsLambdaForClientContract {
 
         val lambdaClient = LambdaHttpClient(functionName, region).then(client)
 
-        val functionResponse = lambdaClient(Request(Method.GET, "/"))
+        val functionResponse = lambdaClient(Request(Method.POST, "/echo").body("Hello, http4k"))
 
         assertThat(functionResponse.status, equalTo(Status.OK))
-        assertThat(functionResponse.bodyString(), containsSubstring("Hello World"))
+        assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
     }
 
     object Config {

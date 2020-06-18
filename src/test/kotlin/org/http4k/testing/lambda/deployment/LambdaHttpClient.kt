@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
+import org.http4k.core.toParameters
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 
@@ -21,7 +22,11 @@ object LambdaHttpClient {
                 val lambdaResponse = next(Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
                     .header("X-Amz-Invocation-Type", "RequestResponse")
                     .header("X-Amz-Log-Type", "Tail")
-                    .with(lambdaRequest of APIGatewayProxyRequestEvent().withHttpMethod("GET")))
+                    .with(lambdaRequest of APIGatewayProxyRequestEvent()
+                        .withHttpMethod(it.method.name)
+                        .withPath(it.uri.path)
+                        .withQueryStringParameters(it.uri.query.toParameters().toMap())
+                        .withBody(it.bodyString())))
 
                 Response(Status.OK).body(lambdaResponse.body)
             }
