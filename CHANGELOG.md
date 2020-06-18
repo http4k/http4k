@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 ### v3.251.0 (uncut)
 - [http4k-core] Added support for multiple "cookie" headers. H/T @jshiell 
+- [http4k-serverless-openwhisk] New serverless module!
+- [http4k-serverless-*] [Breaking] - Repackage functions to `org.http4k.serverless` package.
 
 ### v3.250.0
 - [http4k-core] Add `Request.source` to provide extra information about the request origin (address/port/scheme). H/T @kam1sh and @jshiell for the contributions.

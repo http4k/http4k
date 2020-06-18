@@ -6,7 +6,6 @@ import org.http4k.core.Request
 import java.io.ByteArrayOutputStream
 import java.util.Optional
 
-
 class FakeGCFRequest(private val http4k: Request) : HttpRequest {
     override fun getReader() = TODO()
     override fun getMethod() = http4k.method.name
@@ -26,7 +25,7 @@ class FakeGCFRequest(private val http4k: Request) : HttpRequest {
     override fun getInputStream() = http4k.body.stream
 }
 
-class FakeHGCFResponse : HttpResponse {
+class FakeGCFResponse : HttpResponse {
     var status: Int? = null
     private var _contentType: Optional<String> = Optional.empty()
     private val headers = mutableMapOf<String, MutableList<String>>()

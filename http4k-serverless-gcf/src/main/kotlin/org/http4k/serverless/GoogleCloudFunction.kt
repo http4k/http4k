@@ -1,4 +1,4 @@
-package org.http4k.serverless.gcf
+package org.http4k.serverless
 
 import com.google.cloud.functions.HttpFunction
 import com.google.cloud.functions.HttpRequest
@@ -10,8 +10,6 @@ import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
-import org.http4k.serverless.AppLoader
-import org.http4k.serverless.AppLoaderWithContexts
 
 const val GCF_REQUEST_KEY = "HTTP4K_GCF_REQUEST"
 

@@ -11,7 +11,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
 import org.http4k.serverless.BootstrapAppLoader
-import org.http4k.serverless.lambda.LambdaFunction
+import org.http4k.serverless.LambdaFunction
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
 // It is the only actual piece of code that needs to be written.
@@ -22,7 +22,6 @@ object TweetEchoLambda : AppLoader {
 }
 
 fun main() {
-
     // Launching your Lambda Function locally - by simply providing the operating ENVIRONMENT map as would
     // be configured on AWS.
     fun runLambdaLocally() {
