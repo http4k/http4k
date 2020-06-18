@@ -8,22 +8,23 @@ import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
-import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.InitialiseRequestContext
 
 const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 
-open class OpenWhiskFunction(appLoader: AppLoaderWithContexts) {
+class OpenWhiskFunction(appLoader: AppLoaderWithContexts, env: Map<String, String> = System.getenv()) : (JsonObject) -> JsonObject {
     constructor(input: AppLoader) : this(object : AppLoaderWithContexts {
         override fun invoke(env: Map<String, String>, contexts: RequestContexts) = input(env)
     })
 
     private val contexts = RequestContexts()
-    private val app = appLoader(System.getenv(), contexts)
+    private val app = appLoader(env, contexts)
 
-    fun main(request: JsonObject) =
-        ServerFilters.InitialiseRequestContext(contexts)
+    override fun invoke(request: JsonObject) =
+        InitialiseRequestContext(contexts)
             .then(AddOpenWhiskRequest(request, contexts))
-            .then(app)(request.asHttp4k()).toGson()
+            .then(app)
+            .invoke(request.asHttp4k()).toGson()
 }
 
 private fun AddOpenWhiskRequest(request: JsonElement, contexts: RequestContexts) = Filter { next ->

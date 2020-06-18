@@ -41,7 +41,10 @@ object TweetEchoLambda : AppLoader {
 }
 
 // This class is the entry-point for the function call - configure it when deploying
-class FunctionsExampleEntryClass : OpenWhiskFunction(TweetEchoLambda)
+object FunctionsExampleEntryClass {
+    @JvmStatic
+    fun main(request: JsonObject)  = OpenWhiskFunction(TweetEchoLambda)(request)
+}
 
 fun main() {
 
@@ -66,7 +69,7 @@ fun main() {
             "hello hello hello, i suppose this isn't 140 characters anymore.."
         )
 
-        val response = FunctionsExampleEntryClass().main(Gson.asJsonObject(fakeOpenWhiskRequest) as JsonObject)
+        val response = FunctionsExampleEntryClass.main(Gson.asJsonObject(fakeOpenWhiskRequest) as JsonObject)
         println(response)
     }
 

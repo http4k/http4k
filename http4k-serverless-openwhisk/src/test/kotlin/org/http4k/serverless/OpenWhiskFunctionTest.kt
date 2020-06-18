@@ -29,7 +29,7 @@ class OpenWhiskFunctionTest {
             override fun invoke(p1: Map<String, String>) = app
         })
 
-        val response = function.main(Gson.asJsonObject(request) as JsonObject)
+        val response = function(Gson.asJsonObject(request) as JsonObject)
 
         val actual = Gson.asA(response, FakeOpenWhiskResponse::class)
         assertThat(actual,
