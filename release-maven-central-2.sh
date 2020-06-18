@@ -10,6 +10,7 @@ maven_publish "http4k-client-websocket"
 
 maven_publish "http4k-serverless-gcf"
 maven_publish "http4k-serverless-lambda"
+#maven_publish "http4k-serverless-openwhisk"
 maven_publish "http4k-jsonrpc"
 maven_publish "http4k-multipart"
 maven_publish "http4k-aws"
