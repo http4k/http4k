@@ -12,7 +12,7 @@ buildscript {
         classpath Libs.com_jfrog_bintray_gradle_plugin
         classpath Libs.openapi_generator_gradle_plugin
         classpath Libs.kotlin_serialization
-        classpath Libs.shadow_plugin
+        classpath Libs.shadow
     }
 }
 

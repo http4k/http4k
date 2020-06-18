@@ -30,8 +30,6 @@ object Versions {
 
     const val io_ktor: String = "1.3.2" // available: "1.3.2-1.4-M1-release-99"
 
-    const val org_github_jengelman_gradle_plugins_shadow: String = "6.0.0"
-
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1"
@@ -106,6 +104,8 @@ object Versions {
 
     const val pebble: String = "3.1.4"
 
+    const val shadow: String = "6.0.0"
+
     const val jsoup: String = "1.13.1"
 
     const val argo: String = "5.13"
@@ -118,7 +118,6 @@ object Versions {
      * Current version: "6.1.1"
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
-     * Why 6.1.1? See https://github.com/stevesaliman/gradle-cobertura-plugin/issues/168 for details.
      */
     const val gradleLatestVersion: String = "6.5"
 }

@@ -90,7 +90,7 @@ In order to achieve this in [http4k], only a single interface `AppLoader` needs 
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/openwhisk/example.kt"></script>
 
-Packaging of the app should be done using [ShadowJar]  and then an action created with the `wsk` CLI:
+Packaging of the app should be done using [ShadowJar](https://imperceptiblethoughts.com/shadow/) and then an action created with the `wsk` CLI:
 
 ```
 wsk -i action create myFunctionName myApp.jar --main org.http4k.example.MyFunctionClass --web true
