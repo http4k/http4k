@@ -29,4 +29,4 @@ simply passing it to the relevant `ServerConfig` implementation (in this case `J
 ### Customisation
 Each of the server backends implement an interface `ServerConfig`, which is written with sensible defaults for the server in questions, 
 but is also designed to be used as a starting point for tweaking to API user needs. To customize, simply use the relevant `ServerConfig` 
-class as a starting point and reimplement as required.
+class as a starting point and reimplement as required. See the Cookbook for an example of this in use.
