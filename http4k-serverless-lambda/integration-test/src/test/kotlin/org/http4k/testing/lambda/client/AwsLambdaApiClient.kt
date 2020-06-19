@@ -1,4 +1,4 @@
-package org.http4k.testing.lambda.deployment
+package org.http4k.testing.lambda.client
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.core.Body
@@ -78,7 +78,11 @@ data class FunctionPackage(
 
 data class FunctionName(val value: String)
 
-data class FunctionHandler(val value: String)
+data class FunctionHandler(val value: String){
+    companion object{
+        val http4kFunctionHandler = FunctionHandler("org.http4k.serverless.lambda.LambdaFunction::handle")
+    }
+}
 
 data class FunctionDetails(val arn: String, val name: String)
 

@@ -1,4 +1,4 @@
-package org.http4k.testing.lambda.deployment
+package org.http4k.testing.lambda.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import org.http4k.core.Body

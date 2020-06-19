@@ -1,0 +1,21 @@
+//import proguard.gradle.ProGuardTask
+
+description = 'Functions to be used for testing of AWS Lambdas'
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+dependencies {
+    compile project(":http4k-core")
+    compile project(":http4k-cloudnative")
+    compile project(":http4k-serverless-lambda")
+    compile project(":http4k-aws")
+    compile project(":http4k-format-jackson")
+
+    compile Libs.kotlin_reflect
+    compile Libs.aws_lambda_java_core
+    compile Libs.aws_lambda_java_events
+    compile project(path: ":http4k-core", configuration: 'testArtifacts')
+
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile Config.TestDependencies
+}
