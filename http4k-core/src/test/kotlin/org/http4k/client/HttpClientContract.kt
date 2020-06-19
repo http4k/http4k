@@ -145,7 +145,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    fun `send binary data`() {
+    open fun `send binary data`() {
         val response = client(Request(POST, "http://localhost:$port/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
         assertThat(response.status, equalTo(OK))
     }

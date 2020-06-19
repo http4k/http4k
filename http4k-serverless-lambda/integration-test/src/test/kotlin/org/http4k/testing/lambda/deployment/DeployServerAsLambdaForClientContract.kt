@@ -4,11 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.aws.AwsCredentialScope
-import org.http4k.aws.AwsCredentials
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
@@ -17,12 +14,11 @@ import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.testing.lambda.client.AwsLambdaApiClient
+import org.http4k.testing.lambda.client.Config
 import org.http4k.testing.lambda.client.FunctionHandler
 import org.http4k.testing.lambda.client.FunctionName
 import org.http4k.testing.lambda.client.FunctionPackage
 import org.http4k.testing.lambda.client.LambdaHttpClient
-import org.http4k.testing.lambda.client.Region
-import org.http4k.testing.lambda.client.Role
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.nio.ByteBuffer
@@ -64,15 +60,6 @@ object DeployServerAsLambdaForClientContract {
 
         assertThat(functionResponse.status, equalTo(Status.OK))
         assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
-    }
-
-    object Config {
-        val scope = EnvironmentKey.map { AwsCredentialScope(it, "lambda") }.required("region")
-        val region = EnvironmentKey.map(::Region).required("region")
-        val role = EnvironmentKey.map(::Role).required("lambdaRuntimeRole")
-
-        fun credentials(config: Environment) =
-            AwsCredentials(EnvironmentKey.required("accessKey")(config), EnvironmentKey.required("secretKey")(config))
     }
 }
 
