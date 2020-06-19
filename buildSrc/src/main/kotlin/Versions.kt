@@ -80,7 +80,7 @@ object Versions {
 
     const val handlebars: String = "4.2.0"
 
-    const val httpclient5: String = "5.0"
+    const val httpclient5: String = "5.0.1"
 
     const val underscore: String = "1.55"
 
@@ -94,7 +94,7 @@ object Versions {
 
     const val hamkrest: String = "1.7.0.3"
 
-    const val httpcore5: String = "5.0"
+    const val httpcore5: String = "5.0.1"
 
     const val result4k: String = "2.0.0"
 
