@@ -2,9 +2,11 @@ title: http4k Serverless Modules
 description: Feature overview of the http4k-serverless modules, covering Serverless backends
 
 ### Installation (Gradle)
-AWS Lambda: ```compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.250.0"```
+AWS Lambda: ```compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.251.0"```
 
-Google Cloud Functions: ```compile group: "org.http4k", name: "http4k-serverless-gcf", version: "3.250.0"```
+Google Cloud Functions: ```compile group: "org.http4k", name: "http4k-serverless-gcf", version: "3.251.0"```
+
+Apache OpenWhisk: ```compile group: "org.http4k", name: "http4k-serverless-openwhisk", version: "3.251.0"```
 
 ### About
 These modules provide integration with Serverless deployment environments, such as AWS Lambda or Google Cloud Functions by implementing a single interface. 
@@ -24,7 +26,7 @@ This is far from a complete guide, but configuring AWS Lambda and the API Gatewa
 1. Create and configure the Lambda function, and at the same time:
 
     1. Upload the standard Zip file to S3.
-    1. Set the function execution to call the main http4k entry point: `org.http4k.serverless.lambda.LambdaFunction::handle`
+    1. Set the function execution to call the main http4k entry point: `org.http4k.serverless.LambdaFunction::handle`
     1. Set an environment variable for the Lambda `HTTP4K_BOOTSTRAP_CLASS` to the class of your `AppLoader` class.
 
 We hope to soon provide some tools to automate at least some of the above process, or at least document it somewhat. However, AWS is a complicated beast and many people have a preferred way to set it up: CloudFormation templates, Serverless framework, Terraform, etc. In the meantime, here is an example of how the `AppLoader` is created and a sneak peak at launching the app locally:
@@ -34,7 +36,6 @@ We hope to soon provide some tools to automate at least some of the above proces
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/lambda/example.kt"></script>
 
 #### Google Cloud Functions integration
-
 Google Cloud Functions are triggered in the cloud by calling an entry point class which implements their `HttpFunction` interface.
 
 In order to achieve this in [http4k], only a single interface `AppLoader` needs to be implemented, and then a simple extension class needs to be written which accepts this interface.
@@ -79,5 +80,25 @@ tasks.register("runFunction", JavaExec) {
 
 If you are using Maven, you do not have to build the fat JAR and can deploy the function from the project folder.
 Simple example on how to setup `pom.xml` to run functions locally and deploy Maven project to the cloud is shown [here](https://cloud.google.com/functions/docs/first-java)
+
+#### Apache OpenWhisk integration
+OpenWhisk has a Java runtime which is triggered by calling an entry point class which contains a static `main()` function receiving a GSON `JsonObject`.
+
+In order to achieve this in [http4k], only a single interface `AppLoader` needs to be implemented, and then a simple class needs to be written which uses the `OpenWhiskFunction` wrapper.
+
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/openwhisk/example.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/openwhisk/example.kt"></script>
+
+Packaging of the app should be done using [ShadowJar](https://imperceptiblethoughts.com/shadow/) and then an action created with the `wsk` CLI:
+
+```
+wsk -i action create myFunctionName myApp.jar --main org.http4k.example.MyFunctionClass --web true
+```
+
+Locally, you can then just call the function with `curl`:
+```
+curl -k `wsk -i action get test --url | tail -1`
+```
 
 [http4k]: https://http4k.org

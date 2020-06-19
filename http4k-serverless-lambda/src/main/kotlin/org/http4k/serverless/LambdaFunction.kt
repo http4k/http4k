@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda
+package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
@@ -14,7 +14,6 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.toUrlFormEncoded
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
-import org.http4k.serverless.BootstrapAppLoader
 
 const val LAMBDA_CONTEXT_KEY = "HTTP4K_LAMBDA_CONTEXT"
 const val LAMBDA_REQUEST_KEY = "HTTP4K_LAMBDA_REQUEST"

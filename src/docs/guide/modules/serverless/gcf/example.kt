@@ -14,8 +14,8 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
 import org.http4k.serverless.FakeGCFRequest
-import org.http4k.serverless.FakeHGCFResponse
-import org.http4k.serverless.gcf.GoogleCloudFunction
+import org.http4k.serverless.FakeGCFResponse
+import org.http4k.serverless.GoogleCloudFunction
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to GCF
 // Along with the extension class below, is the only actual piece of code that needs to be written.
@@ -39,7 +39,7 @@ object TweetEchoLambda : AppLoader {
             )
 }
 
-// This class is required to ensure that your
+// This class is the entry-point for the function call - configure it when deploying
 class FunctionsExampleEntryClass : GoogleCloudFunction(TweetEchoLambda)
 
 fun main() {
@@ -60,7 +60,7 @@ fun main() {
     fun runFunctionAsGCFWould() {
         println("RUNNING AS GCF:")
 
-        val response = FakeHGCFResponse()
+        val response = FakeGCFResponse()
         FunctionsExampleEntryClass().service(FakeGCFRequest
         (Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")), response)
         println(response.status)

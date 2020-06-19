@@ -59,6 +59,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-server-undertow:bintrayUpload \
     :http4k-serverless-gcf:bintrayUpload \
     :http4k-serverless-lambda:bintrayUpload \
+    :http4k-serverless-openwhisk:bintrayUpload \
     :http4k-template-dust:bintrayUpload \
     :http4k-template-freemarker:bintrayUpload \
     :http4k-template-jade4j:bintrayUpload \

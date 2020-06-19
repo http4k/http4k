@@ -224,7 +224,7 @@ In order to achieve this, only a single interface `AppLoader` needs to be implem
 the `HttpHandler` which is adapted to the API of the `ApiGatewayProxyRequest/ApiGatewayProxyResponse` used by AWS. As this 
 is AWS, there is a fair amount of configuration required to make this possible, but the only [http4k] specific config is to:
 
-1. Set the function execution to call `org.http4k.serverless.lambda.LambdaFunction::handle`
+1. Set the function execution to call `org.http4k.serverless.LambdaFunction::handle`
 2. Set an environment variable for the Lambda `HTTP4K_BOOTSTRAP_CLASS` to the class of your `AppLoader` class.
 
 Here's a simple example:

@@ -71,6 +71,7 @@ plugging together of services without HTTP container being required.
 * [Serverless:](https://http4k.org/guide/modules/serverless)
     * AWS: Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway. 
     * Google Cloud Functions: Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
+    * Apache OpenWhisk: Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
@@ -133,9 +134,9 @@ This quick example is designed to convey the simplicity & features of [http4k] .
 To install, add these dependencies to your **Gradle** file:
 ```groovy
 dependencies {
-    compile group: "org.http4k", name: "http4k-core", version: "3.250.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.250.0"
-    compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.250.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.251.0"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.251.0"
+    compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.251.0"
 }
 ```
 
