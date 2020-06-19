@@ -12,12 +12,20 @@ import org.apache.http.client.methods.HttpHead
 import org.apache.http.client.methods.HttpOptions
 import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.client.methods.HttpTrace
+import org.apache.http.config.RegistryBuilder
 import org.apache.http.conn.ConnectTimeoutException
 import org.apache.http.conn.HttpHostConnectException
+import org.apache.http.conn.socket.ConnectionSocketFactory
+import org.apache.http.conn.socket.PlainConnectionSocketFactory
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
+import org.apache.http.ssl.SSLContextBuilder
+import org.http4k.client.PreCannedApacheHttpClients.defaultApacheHttpClient
 import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
@@ -80,13 +88,6 @@ object ApacheClient {
     private fun CloseableHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
         entity?.let { body(responseBodyMode(it.content)) } ?: this
     }
-
-    private fun defaultApacheHttpClient() = HttpClients.custom()
-        .setDefaultRequestConfig(RequestConfig.custom()
-            .setRedirectsEnabled(false)
-            .setCookieSpec(IGNORE_COOKIES)
-            .build()).build()
-
 }
 
 private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
@@ -99,4 +100,34 @@ private class ApacheRequest(requestBodyMode: BodyMode, private val request: Requ
     }
 
     override fun getMethod() = request.method.name
+}
+
+object PreCannedApacheHttpClients {
+
+    /**
+     * Standard non-redirecting, no Cookies HTTP client
+     */
+    fun defaultApacheHttpClient() = HttpClients.custom()
+        .setDefaultRequestConfig(RequestConfig.custom()
+            .setRedirectsEnabled(false)
+            .setCookieSpec(IGNORE_COOKIES)
+            .build()).build()
+
+    /**
+     * Do not use this in production! This is useful for testing locally and debugging HTTPS traffic
+     */
+    fun insecureApacheHttpClient() = SSLContextBuilder()
+        .loadTrustMaterial(null) { _, _ -> true }
+        .build().run {
+            HttpClientBuilder.create()
+                .setSSLContext(this)
+                .setConnectionManager(
+                    PoolingHttpClientConnectionManager(
+                        RegistryBuilder.create<ConnectionSocketFactory>()
+                            .register("http", PlainConnectionSocketFactory.INSTANCE)
+                            .register("https", SSLConnectionSocketFactory(this) { _, _ -> true })
+                            .build()
+                    ))
+                .build()
+        }
 }
