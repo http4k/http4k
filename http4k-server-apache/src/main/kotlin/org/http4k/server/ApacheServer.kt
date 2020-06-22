@@ -47,7 +47,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
                     else -> it.body(EmptyInputStream.INSTANCE, 0)
                 }
             }
-            .source((connection.remoteAddress as InetSocketAddress).let { RequestSource(it.hostString, it.port) })
+            .source((connection.remoteAddress as InetSocketAddress).let { RequestSource(it.hostString, it.port, uri.scheme) })
     }
 
     private fun URI.httpUri(): String = path + if (query.isNullOrBlank()) "" else "?$query"
