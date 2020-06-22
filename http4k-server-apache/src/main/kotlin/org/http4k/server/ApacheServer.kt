@@ -11,7 +11,6 @@ import org.apache.hc.core5.http.io.SocketConfig
 import org.apache.hc.core5.http.io.entity.InputStreamEntity
 import org.apache.hc.core5.http.protocol.HttpContext
 import org.apache.hc.core5.http.protocol.HttpCoreContext
-import org.apache.hc.core5.net.InetAddressUtils
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -24,6 +23,7 @@ import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header.CONTENT_TYPE
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.URI
 import org.apache.hc.core5.http.HttpRequest as ApacheRequest
 import org.apache.hc.core5.http.HttpResponse as ApacheResponse
 
@@ -40,7 +40,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
 
     private fun ApacheRequest.asHttp4kRequest(context: HttpContext): Request {
         val connection = context.getAttribute(HttpCoreContext.CONNECTION_ENDPOINT) as EndpointDetails
-        return Request(Method.valueOf(method), uri.toString())
+        return Request(Method.valueOf(method), uri.httpUri())
             .headers(headers.toHttp4kHeaders()).let {
                 when (this) {
                     is HttpEntityContainer -> entity?. let { httpEntity -> it.body(httpEntity.content, getFirstHeader("Content-Length")?.value.safeLong()) } ?: it
@@ -49,6 +49,8 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
             }
             .source((connection.remoteAddress as InetSocketAddress).let { RequestSource(it.hostString, it.port) })
     }
+
+    private fun URI.httpUri(): String = path + if (query.isNullOrBlank()) "" else "?$query"
 
     private val headersThatApacheInterceptorSets = setOf("Transfer-Encoding", "Content-Length")
 
