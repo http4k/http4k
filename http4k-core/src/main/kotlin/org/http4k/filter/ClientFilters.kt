@@ -18,6 +18,7 @@ import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
+import org.http4k.lens.BiDiLens
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -66,6 +67,12 @@ object ClientFilters {
         operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
             { request -> next(request.uri(uri.extend(request.uri))) }
         })
+    }
+
+    object ApiKeyAuth {
+        operator fun invoke(set: (Request) -> Request): Filter = Filter { next ->
+            { next(set(it)) }
+        }
     }
 
     object BasicAuth {
