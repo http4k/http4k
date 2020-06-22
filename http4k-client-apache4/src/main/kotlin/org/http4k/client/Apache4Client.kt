@@ -25,7 +25,7 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.ssl.SSLContextBuilder
-import org.http4k.client.PreCannedApacheHttpClients.defaultApacheHttpClient
+import org.http4k.client.PreCannedApache4HttpClients.defaultApacheHttpClient
 import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
@@ -46,7 +46,7 @@ import java.net.SocketTimeoutException
 import java.net.URI
 import java.net.UnknownHostException
 
-object ApacheClient {
+object Apache4Client {
     operator fun invoke(
         client: CloseableHttpClient = defaultApacheHttpClient(),
         responseBodyMode: BodyMode = Memory,
@@ -75,7 +75,7 @@ object ApacheClient {
             OPTIONS -> HttpOptions(uri)
             TRACE -> HttpTrace(uri)
             DELETE -> HttpDelete(uri)
-            else -> ApacheRequest(requestBodyMode, request)
+            else -> Apache4Request(requestBodyMode, request)
         }
         request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
         return apacheRequest
@@ -90,7 +90,7 @@ object ApacheClient {
     }
 }
 
-private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
+private class Apache4Request(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
     init {
         uri = URI(request.uri.toString())
         entity = when (requestBodyMode) {
@@ -102,7 +102,7 @@ private class ApacheRequest(requestBodyMode: BodyMode, private val request: Requ
     override fun getMethod() = request.method.name
 }
 
-object PreCannedApacheHttpClients {
+object PreCannedApache4HttpClients {
 
     /**
      * Standard non-redirecting, no Cookies HTTP client

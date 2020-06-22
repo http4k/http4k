@@ -19,8 +19,8 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Future
 
-class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsyncClient(),
-    ApacheAsyncClient(HttpAsyncClients.custom()
+class Apache4AsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, Apache4AsyncClient(),
+    Apache4AsyncClient(HttpAsyncClients.custom()
         .setDefaultIOReactorConfig(IOReactorConfig.custom()
             .setSoTimeout(100)
             .build()).build().apply { start() })) {
@@ -28,7 +28,7 @@ class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsy
     fun `connect timeout is handled`() {
 
         val latch = CountDownLatch(1)
-        ApacheAsyncClient(object : CloseableHttpAsyncClient() {
+        Apache4AsyncClient(object : CloseableHttpAsyncClient() {
             override fun isRunning(): Boolean = false
             override fun start() {}
 

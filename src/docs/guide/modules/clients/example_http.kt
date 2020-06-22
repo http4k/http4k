@@ -1,8 +1,8 @@
 package guide.modules.clients
 
 import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.cookie.StandardCookieSpec
 import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.apache.http.client.config.CookieSpecs
 import org.http4k.client.ApacheAsyncClient
 import org.http4k.client.ApacheClient
 import org.http4k.core.BodyMode
@@ -44,7 +44,7 @@ fun main() {
     val customClient = ApacheClient(
         client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
             .setRedirectsEnabled(false)
-            .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
+            .setCookieSpec(StandardCookieSpec.IGNORE)
             .build())
             .build()
     )

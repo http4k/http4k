@@ -28,7 +28,7 @@ import org.apache.http.HttpResponse as ApacheResponse
 /**
  * Exposed to allow for insertion into a customised Apache WebServer instance
  */
-class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
+class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
 
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
@@ -62,7 +62,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun Array<Header>.toHttp4kHeaders(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
 }
 
-data class ApacheServer(val port: Int = 8000, val address: InetAddress?) : ServerConfig {
+data class Apache4Server(val port: Int = 8000, val address: InetAddress?) : ServerConfig {
     constructor(port: Int = 8000) : this(port, null)
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
@@ -77,7 +77,7 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress?) : Serve
                     .setSoReuseAddress(true)
                     .setBacklogSize(1000)
                     .build())
-                .registerHandler("*", Http4kRequestHandler(httpHandler))
+                .registerHandler("*", Http4kApache4RequestHandler(httpHandler))
 
             if (address != null)
                 bootstrap.setLocalAddress(address)

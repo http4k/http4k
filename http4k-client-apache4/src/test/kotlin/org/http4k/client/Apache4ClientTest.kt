@@ -17,18 +17,18 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.server.Jetty
 import org.junit.jupiter.api.Test
 
-class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
-    ApacheClient(HttpClients.custom()
+class Apache4ClientTest : HttpClientContract({ Jetty(it) }, Apache4Client(),
+    Apache4Client(HttpClients.custom()
         .setDefaultSocketConfig(
             SocketConfig.custom()
                 .setSoTimeout(100)
                 .build()
         ).build()
         , responseBodyMode = Stream)) {
-
+    
     @Test
     fun `connect timeout is handled`() {
-        assertThat(ApacheClient(object : CloseableHttpClient() {
+        assertThat(Apache4Client(object : CloseableHttpClient() {
             override fun getParams() = TODO("not implemented")
 
             override fun getConnectionManager() = TODO("not implemented")
