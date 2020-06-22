@@ -25,7 +25,7 @@ import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import java.net.SocketTimeoutException
 import java.net.URI
 
-object ApacheAsyncClient {
+object Apache4AsyncClient {
     operator fun invoke(
         client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient(),
         responseBodyMode: BodyMode = Memory,

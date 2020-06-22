@@ -5,9 +5,9 @@ import org.apache.http.impl.nio.reactor.IOReactorConfig
 import org.http4k.core.BodyMode
 import org.http4k.server.SunHttp
 
-class ApacheAsyncClientStreamingTest : AsyncHttpClientContract({ SunHttp(it) },
-    ApacheAsyncClient(responseBodyMode = BodyMode.Stream),
-    ApacheAsyncClient(HttpAsyncClients.custom()
+class Apache4AsyncClientStreamingTest : AsyncHttpClientContract({ SunHttp(it) },
+    Apache4AsyncClient(responseBodyMode = BodyMode.Stream),
+    Apache4AsyncClient(HttpAsyncClients.custom()
         .setDefaultIOReactorConfig(IOReactorConfig.custom()
             .setConnectTimeout(100)
             .setSoTimeout(100)
