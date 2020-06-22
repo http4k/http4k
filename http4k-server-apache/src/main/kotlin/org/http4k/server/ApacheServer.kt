@@ -11,6 +11,7 @@ import org.apache.hc.core5.http.io.SocketConfig
 import org.apache.hc.core5.http.io.entity.InputStreamEntity
 import org.apache.hc.core5.http.protocol.HttpContext
 import org.apache.hc.core5.http.protocol.HttpCoreContext
+import org.apache.hc.core5.net.InetAddressUtils
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -65,7 +66,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun Array<Header>.toHttp4kHeaders(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
 }
 
-data class ApacheServer(val port: Int = 8000, val address: InetAddress?) : ServerConfig {
+data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, private val canonicalHostname: String? = null) : ServerConfig {
     constructor(port: Int = 8000) : this(port, null)
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
@@ -82,6 +83,9 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress?) : Serve
                     .build())
                 .register("*", Http4kRequestHandler(httpHandler))
                 .setExceptionListener(STD_ERR)
+
+            if (canonicalHostname != null)
+                bootstrap.setCanonicalHostName(canonicalHostname)
 
             if (address != null)
                 bootstrap.setLocalAddress(address)
