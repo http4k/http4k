@@ -194,7 +194,7 @@ dependencies {
     compile project(":http4k-aws")
     compile project(":http4k-client-apache")
     compile project(":http4k-client-apache4")
-    compile project(":http4k-client-apache-async")
+    compile project(":http4k-client-apache4-async")
     compile project(":http4k-client-jetty")
     compile project(":http4k-client-okhttp")
     compile project(":http4k-client-websocket")
