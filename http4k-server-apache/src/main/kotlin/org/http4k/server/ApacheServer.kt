@@ -2,7 +2,6 @@ package org.http4k.server
 
 import org.apache.hc.core5.http.*
 import org.apache.hc.core5.http.ContentType
-import org.apache.hc.core5.http.ExceptionListener.STD_ERR
 import org.apache.hc.core5.http.impl.bootstrap.HttpServer
 import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap
 import org.apache.hc.core5.http.impl.io.EmptyInputStream
@@ -69,7 +68,6 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
 }
 
 data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, private val canonicalHostname: String? = null) : ServerConfig {
-    constructor(port: Int = 8000) : this(port, null)
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer
@@ -84,7 +82,6 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, 
                     .setBacklogSize(1000)
                     .build())
                 .register("*", Http4kRequestHandler(httpHandler))
-                .setExceptionListener(STD_ERR)
 
             if (canonicalHostname != null)
                 bootstrap.setCanonicalHostName(canonicalHostname)
