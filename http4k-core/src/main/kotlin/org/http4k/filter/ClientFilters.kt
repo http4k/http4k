@@ -18,7 +18,6 @@ import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
-import org.http4k.lens.BiDiLens
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneOffset
