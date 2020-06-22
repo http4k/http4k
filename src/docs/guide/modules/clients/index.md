@@ -8,6 +8,8 @@ description: Feature overview of the http4k-client modules
 
 **Apache v4 (Sync):** ```compile group: "org.http4k", name: "http4k-client-apache4", version: "3.251.0"```
 
+**Apache v5 (Async):** ```compile group: "org.http4k", name: "http4k-client-apache-async", version: "3.251.0"```
+
 **Apache v4 (Async):** ```compile group: "org.http4k", name: "http4k-client-apache4-async", version: "3.251.0"```
 
 **Jetty (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-jetty", version: "3.251.0"```

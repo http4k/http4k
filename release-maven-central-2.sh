@@ -4,6 +4,7 @@ source ./release-functions.sh
 
 maven_publish "http4k-client-apache"
 maven_publish "http4k-client-apache4"
+maven_publish "http4k-client-apache-async"
 maven_publish "http4k-client-apache4-async"
 maven_publish "http4k-client-jetty"
 maven_publish "http4k-client-okhttp"
