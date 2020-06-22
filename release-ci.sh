@@ -32,7 +32,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-cloudnative:bintrayUpload \
     :http4k-client-apache:bintrayUpload \
     :http4k-client-apache4:bintrayUpload \
-    :http4k-client-apache-async:bintrayUpload \
+    :http4k-client-apache4-async:bintrayUpload \
     :http4k-client-okhttp:bintrayUpload \
     :http4k-client-jetty:bintrayUpload \
     :http4k-client-websocket:bintrayUpload \

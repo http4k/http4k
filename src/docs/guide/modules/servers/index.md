@@ -2,7 +2,9 @@ title: http4k Server Modules
 description: Feature overview of the http4k-server modules, covering Server backends
 
 ### Installation (Gradle)
-**Apache:** ```compile group: "org.http4k", name: "http4k-server-apache", version: "3.251.0"```
+**Apache v5:** ```compile group: "org.http4k", name: "http4k-server-apache", version: "3.251.0"```
+
+**Apache v4:** ```compile group: "org.http4k", name: "http4k-server-apache4", version: "3.251.0"```
 
 **Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "3.251.0"```
 
