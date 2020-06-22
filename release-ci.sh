@@ -31,6 +31,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-bom:bintrayUpload \
     :http4k-cloudnative:bintrayUpload \
     :http4k-client-apache:bintrayUpload \
+    :http4k-client-apache4:bintrayUpload \
     :http4k-client-apache-async:bintrayUpload \
     :http4k-client-okhttp:bintrayUpload \
     :http4k-client-jetty:bintrayUpload \
@@ -51,6 +52,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-resilience4j:bintrayUpload \
     :http4k-security-oauth:bintrayUpload \
     :http4k-server-apache:bintrayUpload \
+    :http4k-server-apache4:bintrayUpload \
     :http4k-server-jetty:bintrayUpload \
     :http4k-server-ktorcio:bintrayUpload \
     :http4k-server-ktornetty:bintrayUpload \

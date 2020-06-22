@@ -280,7 +280,12 @@ object Libs {
     const val handlebars: String = "com.github.jknack:handlebars:" + Versions.handlebars
 
     /**
-     * http://hc.apache.org/httpcomponents-client
+     * https://hc.apache.org/httpcomponents-client-4.5.x/
+     */
+    const val httpclient4: String = "org.apache.httpcomponents:httpclient:" + Versions.httpclient4
+
+    /**
+     * https://hc.apache.org/httpcomponents-client-5.0.x/
      */
     const val httpclient5: String = "org.apache.httpcomponents.client5:httpclient5:" + Versions.httpclient5
 
@@ -315,7 +320,12 @@ object Libs {
     const val hamkrest: String = "com.natpryce:hamkrest:" + Versions.hamkrest
 
     /**
-     * http://hc.apache.org/httpcomponents-core-ga
+     * https://hc.apache.org/httpcomponents-core-4.4.x/
+     */
+    const val httpcore4: String = "org.apache.httpcomponents:httpcore:" + Versions.httpcore4
+
+    /**
+     * https://hc.apache.org/httpcomponents-core-5.0.x/
      */
     const val httpcore5: String = "org.apache.httpcomponents.core5:httpcore5:" + Versions.httpcore5
 
