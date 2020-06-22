@@ -8,7 +8,7 @@ import org.http4k.server.ServerConfig
 import org.http4k.streaming.StreamingContract
 
 class ApacheServerStreamingTest : StreamingContract() {
-    override fun serverConfig(): ServerConfig = ApacheServer(0)
+    override fun serverConfig(): ServerConfig = ApacheServer(0, canonicalHostname = "0.0.0.0")
 
     override fun createClient(): HttpHandler =
         ApacheClient(requestBodyMode = Stream, responseBodyMode = Stream)
