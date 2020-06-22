@@ -3,6 +3,11 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.252.0 (uncut)
+
+- [http4k-client-apache, http4k-client-apache-async] [Breaking] Updated to apache client v5. H/T to @jshiell
+- [http4k-client-apache4, http4k-client-apache4-async] New modules to maintain previous integration with apache client (v4). Intended to reduce the impact on projects that are not ready to move to v5 yet.
+ 
 ### v3.251.0
 - [http4k-core] Added support for multiple "cookie" headers. H/T @jshiell 
 - [http4k-serverless-openwhisk] New serverless module!
