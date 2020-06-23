@@ -19,7 +19,10 @@ class BootstrapAppLoaderTest {
     @Test
     fun `loads the expected app if it implements the AppLoader interface`() {
         val app = BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to TestApp::class.java.name), RequestContexts())
-        assertThat(app(Request(GET, "/")), hasStatus(CREATED).and(hasHeader(HTTP4K_BOOTSTRAP_CLASS, TestApp::class.java.name)))
+        assertThat(
+            app(Request(GET, "/")),
+            hasStatus(CREATED).and(hasHeader(HTTP4K_BOOTSTRAP_CLASS, TestApp::class.java.name))
+        )
     }
 
     @Test
@@ -28,7 +31,10 @@ class BootstrapAppLoaderTest {
         val app = BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to TestAppWithContexts::class.java.name), contexts)
         val appWithContext = ServerFilters.InitialiseRequestContext(contexts).then(app)
 
-        assertThat(appWithContext(Request(GET, "/")), hasStatus(CREATED).and(hasHeader(HTTP4K_BOOTSTRAP_CLASS, TestAppWithContexts::class.java.name)))
+        assertThat(
+            appWithContext(Request(GET, "/")),
+            hasStatus(CREATED).and(hasHeader(HTTP4K_BOOTSTRAP_CLASS, TestAppWithContexts::class.java.name))
+        )
     }
 
     @Test
