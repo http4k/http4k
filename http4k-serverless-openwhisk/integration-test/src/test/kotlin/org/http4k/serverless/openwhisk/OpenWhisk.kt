@@ -1,14 +1,14 @@
 package org.http4k.serverless.openwhisk
 
 import org.http4k.client.ApacheClient
-import org.http4k.cloudnative.env.Host
+import org.http4k.cloudnative.env.Authority
 import org.http4k.core.Body
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.core.host
+import org.http4k.core.authority
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
@@ -19,13 +19,14 @@ import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.string
 
+data class OpenWhiskConfig(val credentials: Credentials, val authority: Authority)
+
 class OpenWhisk(
-    host: Host,
-    credentials: Credentials,
+    config: OpenWhiskConfig,
     rawHttp: HttpHandler = ApacheClient()
 ) {
-    private val http = ClientFilters.SetBaseUriFrom(Uri.of("https://host/api/v1").host(host))
-        .then(ClientFilters.BasicAuth(credentials))
+    private val http = ClientFilters.SetBaseUriFrom(Uri.of("https://host/api/v1").authority(config.authority))
+        .then(ClientFilters.BasicAuth(config.credentials))
         .then(rawHttp)
 
     /**
