@@ -4,9 +4,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.252.0 (uncut)
-
-- [http4k-client-apache, http4k-client-apache-async] [Breaking] Updated to apache client v5. H/T to @jshiell
-- [http4k-client-apache4, http4k-client-apache4-async] New modules to maintain previous integration with apache client (v4). Intended to reduce the impact on projects that are not ready to move to v5 yet.
+- [http4k-client-apache, http4k-client-apache-async] [Breaking] Updated to Apache HTTP Client 5.X.X. H/T to @jshiell. Note that the underlying Apache API has changed in the v5 release. This should only break if you have customised the underlying `CloseableHttpClient` that is passed to the constructor of the http4k client. If you have, we have you covered with....
+- [http4k-client-apache4, http4k-client-apache4-async] New modules to maintain previous integration with Apache HTTP Client 4.X.X. Intended to reduce the impact on projects that are not ready to move to v5 yet. In these compatibility modules, renamed `ApacheClient` -> `ApacheClientV4` - which is the only change that will be required in end user code.
  
 ### v3.251.0
 - [http4k-core] Added support for multiple "cookie" headers. H/T @jshiell 
