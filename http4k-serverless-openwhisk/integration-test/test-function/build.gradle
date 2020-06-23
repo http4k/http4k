@@ -1,10 +1,8 @@
-description = 'Testing against a functions deployed to AWS'
+description = 'Testing against a functions deployed to Apache OpenWhisk'
 
 dependencies {
     compile project(":http4k-core")
-    compile project(":http4k-serverless-lambda")
-
-    compile Libs.kotlin_reflect
+    compile project(":http4k-serverless-openwhisk")
     compile project(path: ":http4k-core", configuration: 'testArtifacts')
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')

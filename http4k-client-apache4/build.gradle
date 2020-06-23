@@ -3,7 +3,7 @@ description = 'Http4k HTTP Client built on top of apache-httpclient'
 dependencies {
     compile project(":http4k-core")
 
-    compile Libs.httpclient4 // apache
+    compile Libs.httpclient // apache
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
     testCompile Config.TestDependencies
