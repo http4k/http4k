@@ -7,7 +7,7 @@ import org.http4k.util.CliFlags
 class OpenWhiskCliFlags(args: Array<String>) : CliFlags(args) {
     val main by required()
     val version by defaulted("0.0.0")
-    val jar by required()
+    val jarFile by required()
     val namespace by required()
     val actionName by required()
     val packageName by required()
