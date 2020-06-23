@@ -17,3 +17,5 @@ class CLIFlag private constructor(private val default: String? = null) : ReadOnl
         fun defaulted(default: String?) = CLIFlag(default)
     }
 }
+
+fun <T : CliFlags> T.use(fn: T.() -> Unit): Unit = fn(this)

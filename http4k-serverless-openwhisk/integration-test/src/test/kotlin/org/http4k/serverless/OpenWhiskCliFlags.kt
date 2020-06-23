@@ -11,6 +11,4 @@ class OpenWhiskCliFlags(args: Array<String>) : CliFlags(args) {
     val namespace by required()
     val actionName by required()
     val packageName by required()
-
-    fun use(fn: OpenWhiskCliFlags.() -> Unit): Unit = fn(this)
 }
