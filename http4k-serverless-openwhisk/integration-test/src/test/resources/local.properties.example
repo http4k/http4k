@@ -1,6 +1,5 @@
-accessKey=
-secretKey=
-region=us-east-1
-
-#see https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html
-lambdaRuntimeRole=
+ow_action_name=<function_name>
+ow_namespace=<namespace>
+ow_package_name=<package_name>
+ow_region=<region_name>
+ow_apikey=<api_key>

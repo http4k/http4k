@@ -11,6 +11,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.then
+import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
@@ -55,5 +58,6 @@ class SecureJetty(
 }
 
 fun main() {
-    { req: Request -> Response(Status.OK) }.asServer(SecureJetty(9000, "keystore.jks", "password", "password"))
+    PrintRequestAndResponse().then { Response(Status.OK).body("hello from secure jetty!") }
+        .asServer(SecureJetty(9000, "keystore.jks", "password", "password")).start()
 }
