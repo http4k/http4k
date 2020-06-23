@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.http4k.serverless.openwhisk
 
 import org.http4k.client.ServerForClientContract
