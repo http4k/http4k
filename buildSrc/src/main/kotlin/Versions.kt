@@ -1,4 +1,3 @@
-import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -15,7 +14,7 @@ object Versions {
     const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.20.0"
              // available: "0.20.0-1.4-M1-release-99"
 
-    const val com_fasterxml_jackson_dataformat: String = "2.11.0"
+    const val com_fasterxml_jackson_dataformat: String = "2.11.1"
 
     const val io_github_resilience4j: String = "1.5.0"
 
@@ -51,7 +50,7 @@ object Versions {
 
     const val aws_lambda_java_events: String = "3.1.0"
 
-    const val jackson_module_kotlin: String = "2.11.0"
+    const val jackson_module_kotlin: String = "2.11.1"
 
     const val aws_lambda_java_core: String = "1.2.1"
 
@@ -61,11 +60,11 @@ object Versions {
 
     const val netty_codec_http2: String = "4.1.50.Final"
 
-    const val jackson_databind: String = "2.11.0"
+    const val jackson_databind: String = "2.11.1"
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val micrometer_core: String = "1.5.1"
+    const val micrometer_core: String = "1.5.2"
 
     const val java_websocket: String = "1.5.1"
 
@@ -88,6 +87,8 @@ object Versions {
     const val underscore: String = "1.55"
 
     const val alpn_boot: String = "8.1.13.v20181017"
+
+    const val bunting4k: String = "0.0.0.0"
 
     const val cobertura: String = "2.1.1"
 
