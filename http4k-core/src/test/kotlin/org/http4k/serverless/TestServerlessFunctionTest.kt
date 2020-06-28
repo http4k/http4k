@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda
+package org.http4k.serverless
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
