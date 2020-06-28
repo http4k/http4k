@@ -720,8 +720,8 @@ class OpenWhisk(
         public: Boolean? = null,
         limit: Int? = null,
         skip: Int? = null
-    ): Package {
-        val packageLens = Body.auto<Package>().toLens()
+    ): List<Package> {
+        val packageLens = Body.auto<List<Package>>().toLens()
         val namespaceLens = Path.string().of("namespace")
         val publicLens = Query.boolean().optional("public")
         val limitLens = Query.int().optional("limit")
