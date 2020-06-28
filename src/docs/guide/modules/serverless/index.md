@@ -84,7 +84,7 @@ Simple example on how to setup `pom.xml` to run functions locally and deploy Mav
 #### Apache OpenWhisk integration
 OpenWhisk has a Java runtime which is triggered by calling an entry point class which contains a static `main()` function receiving a GSON `JsonObject`.
 
-In order to achieve this in [http4k], only a single interface `AppLoader` needs to be implemented, and then a simple class needs to be written which uses the `OpenWhiskFunction` wrapper.
+In order to achieve this in [http4k], only a single interface `AppLoader` needs to be implemented, and then a simple class needs to be written which uses the `OpenWhiskFunction` wrapper. Because of the OpenWhisk runtime usage of the library, a `compileOnly` dependency also needs to be added on [GSON](https://mvnrepository.com/artifact/com.google.code.gson/gson) to ensure that your function can build correctly.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/openwhisk/example.kt)
 

@@ -2,7 +2,7 @@ description = 'Http4k Serverless support for Apache OpenWhisk'
 
 dependencies {
     compile project(":http4k-core")
-    compileOnly Libs.gson
+    implementation Libs.gson
 
     testCompile project(":http4k-format-gson")
     testCompile Config.TestDependencies
