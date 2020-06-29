@@ -1,7 +1,6 @@
 package org.http4k.serverless
 
 import dev.forkhandles.bunting.use
-import org.http4k.cloudnative.env.Environment
 import org.http4k.serverless.openwhisk.ActionExec
 import org.http4k.serverless.openwhisk.ActionPut
 import org.http4k.serverless.openwhisk.KeyValue
@@ -12,7 +11,7 @@ object DeployFunction {
     @JvmStatic
     fun main(args: Array<String>) =
         OpenWhiskCliFlags(args).use {
-            Environment.openWhiskClient(secureMode).updateActionInPackage(namespace, packageName, actionName, "true",
+            openWhiskClient().updateActionInPackage(namespace, packageName, actionName, "true",
                 ActionPut(namespace, actionName, version, true, ActionExec("java:default",
                     String(Base64.getEncoder().encode(File(jarFile).readBytes())),
                     main = main), listOf(

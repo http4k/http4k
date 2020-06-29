@@ -6,15 +6,20 @@ import org.http4k.client.PreCannedApacheHttpClients.insecureApacheHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.Credentials
+import org.http4k.core.Filter
+import org.http4k.core.NoOp
+import org.http4k.core.then
+import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.lens.authority
 import org.http4k.lens.composite
 import org.http4k.serverless.openwhisk.OpenWhisk
 import org.http4k.serverless.openwhisk.OpenWhiskConfig
 import java.io.File
 
-fun Environment.Companion.openWhiskClient(secureMode: Boolean = true): OpenWhisk = OpenWhisk(
+fun OpenWhiskCliFlags.openWhiskClient() = OpenWhisk(
     EnvironmentKey.openWhiskConfig(Environment.OpenWhiskConfig()),
-    ApacheClient(if (secureMode) defaultApacheHttpClient() else insecureApacheHttpClient())
+    (if (verbose) PrintRequestAndResponse() else Filter.NoOp)
+        .then(ApacheClient(if (insecure) insecureApacheHttpClient() else defaultApacheHttpClient()))
 )
 
 fun Environment.Companion.OpenWhiskConfig(configFile: File = File("${System.getenv("HOME")}/.wskprops")): Environment = from(configFile)

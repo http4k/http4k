@@ -7,7 +7,8 @@ fun main() {
         "--main", "org.http4k.serverless.openwhisk.TestAction",
         "--namespace", "guest",
         "--packageName", "foo",
-        "--secureMode", "false",
-        "--version", "0.0.1"
+        "--version", "0.0.1",
+        "--verbose",
+        "--insecure"
     ))
 }

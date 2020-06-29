@@ -1,13 +1,12 @@
 package org.http4k.serverless
 
 import dev.forkhandles.bunting.use
-import org.http4k.cloudnative.env.Environment
 
 object ListAllActions {
     @JvmStatic
     fun main(args: Array<String>) =
         OpenWhiskCliFlags(args).use {
-            val ow = Environment.openWhiskClient(secureMode)
+            val ow = openWhiskClient()
 
             ow.getAllNamespaces().forEach {
                 println("Namespace: $it")
