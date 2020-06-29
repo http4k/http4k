@@ -13,12 +13,12 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.HandleRemoteRequestFailed
-import org.http4k.format.Jackson.auto
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.string
+import org.http4k.serverless.openwhisk.OpenWhiskJson.auto
 
 data class OpenWhiskConfig(val credentials: Credentials, val authority: Authority)
 
