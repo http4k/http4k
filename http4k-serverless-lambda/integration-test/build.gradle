@@ -8,6 +8,7 @@ dependencies {
     compile project(":http4k-core")
     compile project(":http4k-cloudnative")
     compile project(":http4k-serverless-lambda")
+    compile project("test-function")
     compile project(":http4k-aws")
     compile project(":http4k-format-jackson")
 

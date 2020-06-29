@@ -1,4 +1,4 @@
-package org.http4k.serverless.openwhisk.client
+package org.http4k.serverless.lambda.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
@@ -21,25 +21,27 @@ object LambdaHttpClient {
     operator fun invoke(functionName: FunctionName, region: Region): Filter =
         callFunction(functionName).then(LambdaApi(region))
 
-    private fun callFunction(functionName: FunctionName): Filter {
-        return Filter { next ->
-            {
-                val lambdaResponse = next(Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
+    private fun callFunction(functionName: FunctionName) = Filter { next ->
+        {
+            val lambdaResponse = next(
+                Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
                     .header("X-Amz-Invocation-Type", "RequestResponse")
                     .header("X-Amz-Log-Type", "Tail")
-                    .with(lambdaRequest of APIGatewayProxyRequestEvent()
-                        .withHttpMethod(it.method.name)
-                        .withHeaders(it.headers.toMap())
-                        .withPath(it.uri.path)
-                        .withQueryStringParameters(it.uri.query.toParameters().toMap())
-                        .withBody(it.bodyString())))
+                    .with(
+                        lambdaRequest of APIGatewayProxyRequestEvent()
+                            .withHttpMethod(it.method.name)
+                            .withHeaders(it.headers.toMap())
+                            .withPath(it.uri.path)
+                            .withQueryStringParameters(it.uri.query.toParameters().toMap())
+                            .withBody(it.bodyString())
+                    )
+            )
 
-                val response = lambdaResponse(lambdaResponse)
+            val response = lambdaResponse(lambdaResponse)
 
-                Response(Status(response.statusCode,""))
-                    .headers(response.headers.map { kv -> kv.toPair() })
-                    .body(response.body)
-            }
+            Response(Status(response.statusCode, ""))
+                .headers(response.headers.map { kv -> kv.toPair() })
+                .body(response.body)
         }
     }
 

@@ -1,4 +1,4 @@
-package org.http4k.serverless.openwhisk.client
+package org.http4k.serverless.lambda.client
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.core.Body
@@ -13,7 +13,6 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import java.nio.ByteBuffer
 import java.util.Base64
-
 
 class AwsLambdaApiClient(client: HttpHandler, region: Region) {
     private val client = LambdaApi(region).then(client)
