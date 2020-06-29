@@ -1,5 +1,7 @@
 package org.http4k.serverless.openwhisk
 
+import java.math.BigInteger
+
 data class Action(
     val namespace: String,
     val name: String,
@@ -9,5 +11,5 @@ data class Action(
     val annotations: List<KeyValue>?,
     val parameters: List<KeyValue>?,
     val limits: ActionLimits,
-    val updated: Int?
+    val updated: BigInteger?
 )

@@ -12,6 +12,7 @@ import org.http4k.core.authority
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.HandleRemoteRequestFailed
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.Path
 import org.http4k.lens.Query
@@ -27,6 +28,7 @@ class OpenWhisk(
 ) {
     private val http = ClientFilters.SetBaseUriFrom(Uri.of("https://host/api/v1").authority(config.authority))
         .then(ClientFilters.BasicAuth(config.credentials))
+        .then(ClientFilters.HandleRemoteRequestFailed())
         .then(rawHttp)
 
     /**
@@ -56,8 +58,8 @@ class OpenWhisk(
         namespace: String,
         limit: Int? = null,
         skip: Int? = null
-    ): Action {
-        val actionLens = Body.auto<Action>().toLens()
+    ): List<Action> {
+        val actionLens = Body.auto<List<Action>>().toLens()
         val namespaceLens = Path.string().of("namespace")
         val limitLens = Query.int().optional("limit")
         val skipLens = Query.int().optional("skip")

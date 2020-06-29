@@ -1,5 +1,7 @@
 package org.http4k.serverless.openwhisk
 
+import java.math.BigInteger
+
 data class Rule(
     val namespace: String,
     val name: String,
@@ -7,7 +9,7 @@ data class Rule(
     val publish: Boolean,
     val annotations: List<KeyValue>?,
     val status: String?,
-    val updated: Int?,
+    val updated: BigInteger?,
     val trigger: PathName,
     val action: PathName
 )

@@ -1,5 +1,7 @@
 package org.http4k.serverless.openwhisk
 
+import java.math.BigInteger
+
 data class Trigger(
     val namespace: String,
     val name: String,
@@ -9,5 +11,5 @@ data class Trigger(
     val parameters: List<KeyValue>?,
     val limits: TriggerLimits?,
     val rules: Map<String, Any>?,
-    val updated: Int?
+    val updated: BigInteger?
 )

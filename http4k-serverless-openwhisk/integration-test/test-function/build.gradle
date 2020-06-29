@@ -1,5 +1,7 @@
 description = 'Testing against a functions deployed to Apache OpenWhisk'
 
+apply plugin: 'com.github.johnrengelman.shadow'
+
 dependencies {
     compile project(":http4k-core")
     compile project(":http4k-serverless-openwhisk")
