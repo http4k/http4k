@@ -12,8 +12,8 @@ object ListAllActions {
                 println("Namespace: $it")
                 ow.getAllPackages(it).forEach {
                     println("\tPackage: ${it.name}")
-                    (it.actions ?: emptyList()).forEach {
-                        println("\t\t${it.name}")
+                    (ow.getPackageByName(it.namespace, it.name).actions ?: emptyList()).forEach {
+                        println("\t\tAction: ${it.name}")
                     }
                 }
                 println("--")
