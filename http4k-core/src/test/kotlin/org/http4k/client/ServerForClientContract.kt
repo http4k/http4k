@@ -1,6 +1,7 @@
 package org.http4k.client
 
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -9,11 +10,14 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.CREATED
 import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
+import org.http4k.core.with
+import org.http4k.lens.binary
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -60,7 +64,9 @@ object ServerForClientContract : HttpHandler {
             if (Arrays.equals(testImageBytes(), request.body.payload.array()))
                 Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
         },
-        "/image" bind POST to { _: Request -> Response(OK).body(Body(ByteBuffer.wrap(testImageBytes()))) },
+        "/image" bind GET to { _: Request ->
+            Response(CREATED).with(Body.binary(ContentType("image/png")).toLens() of Body(ByteBuffer.wrap(testImageBytes())))
+        },
         "/status/{status}" bind GET to { r: Request ->
             val code = r.path("status")!!.toInt()
             val status = Status(code, "Description for $code")

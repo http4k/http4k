@@ -151,6 +151,12 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
+    open fun `download binary data`() {
+        val response = client(Request(GET, "http://localhost:$port/image"))
+        assertThat(response.bodyString(), equalTo(String(testImageBytes())))
+    }
+
+    @Test
     @Disabled
     open fun `socket timeouts are converted into 504`() {
         val response = timeoutClient(Request(GET, "http://localhost:$port/delay/150"))
