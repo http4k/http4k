@@ -2,7 +2,6 @@ package org.http4k.serverless
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -10,8 +9,6 @@ import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
-import java.nio.ByteBuffer
-import java.util.Base64
 
 const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 
@@ -52,7 +49,7 @@ private fun JsonObject.asHttp4k(): Request {
         Method.valueOf(getAsJsonPrimitive("__ow_method").asString.toUpperCase()),
         stringOrEmpty("__ow_path") + if (has("__ow_query")) "?" + get("__ow_query").asJsonPrimitive.asString else ""
     )
-        .body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(stringOrEmpty("__ow_body")))))
+        .body(stringOrEmpty("__ow_body"))
 
     val withQueries = getQueries().fold(raw) { acc, next ->
         acc.query(next.key, next.value.takeIf { it.isJsonPrimitive }?.asJsonPrimitive?.asString ?: "")

@@ -3,7 +3,6 @@ package org.http4k.serverless
 import com.google.gson.JsonObject
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.base64Encode
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -15,7 +14,7 @@ class OpenWhiskFunctionTest {
     @Test
     fun `full request (raw) - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
-            FakeOpenWhiskRawRequest("post", "/bob", "query=qvalue", mapOf("header" to "hvalue"), "myBody".base64Encode()),
+            FakeOpenWhiskRawRequest("post", "/bob", "query=qvalue", mapOf("header" to "hvalue"), "myBody"),
             FakeOpenWhiskResponse(200, mapOf(
                 "header" to "hvalue"),
                 "/bob?query=qvaluemyBody")
@@ -25,7 +24,7 @@ class OpenWhiskFunctionTest {
     @Test
     fun `full request (with queries at top level) - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
-            FakeOpenWhiskRequestWithTopLevelQueries("post", "/bob", mapOf("header" to "hvalue"), "myBody".base64Encode(), "qvalue"),
+            FakeOpenWhiskRequestWithTopLevelQueries("post", "/bob", mapOf("header" to "hvalue"), "myBody", "qvalue"),
             FakeOpenWhiskResponse(200, mapOf(
                 "header" to "hvalue"),
                 "/bob?query=qvaluemyBody")
