@@ -15,7 +15,7 @@ import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
-import org.http4k.serverless.FakeOpenWhiskRequest
+import org.http4k.serverless.FakeOpenWhiskRawRequest
 import org.http4k.serverless.OpenWhiskFunction
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to OpenWhisk
@@ -64,8 +64,8 @@ fun main() {
     fun runFunctionAsOpenWhiskWould() {
         println("RUNNING AS OpenWhisk:")
 
-        val fakeOpenWhiskRequest = FakeOpenWhiskRequest(
-            "POST", "/echo", emptyMap(), emptyMap(),
+        val fakeOpenWhiskRequest = FakeOpenWhiskRawRequest(
+            "POST", "/echo", "", emptyMap(),
             "hello hello hello, i suppose this isn't 140 characters anymore.."
         )
 

@@ -10,6 +10,8 @@ import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
+import java.nio.ByteBuffer
+import java.util.Base64
 
 const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 
@@ -36,7 +38,7 @@ private fun AddOpenWhiskRequest(request: JsonElement, contexts: RequestContexts)
 }
 
 private fun Response.toGson() = JsonObject().apply {
-    addProperty("code", status.code)
+    addProperty("statusCode", status.code)
     addProperty("body", bodyString())
     add("headers", JsonObject().apply {
         headers.forEach {
@@ -48,9 +50,9 @@ private fun Response.toGson() = JsonObject().apply {
 private fun JsonObject.asHttp4k(): Request {
     val raw = Request(
         Method.valueOf(getAsJsonPrimitive("__ow_method").asString.toUpperCase()),
-        stringOrEmpty("__ow_path")
+        stringOrEmpty("__ow_path") + if (has("__ow_query")) "?" + get("__ow_query").asJsonPrimitive.asString else ""
     )
-        .body(Body(stringOrEmpty("__ow_body")))
+        .body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(stringOrEmpty("__ow_body")))))
 
     val withQueries = getQueries().fold(raw) { acc, next ->
         acc.query(next.key, next.value.takeIf { it.isJsonPrimitive }?.asJsonPrimitive?.asString ?: "")
@@ -60,8 +62,7 @@ private fun JsonObject.asHttp4k(): Request {
     }
 }
 
-private fun JsonObject.getQueries() =
-    if (has("__ow_query")) mapFrom("__ow_query") else entrySet().filterNot { it.key.startsWith("__ow_") }
+private fun JsonObject.getQueries() = entrySet().filterNot { it.key.startsWith("__ow_") }
 
 private fun JsonObject.mapFrom(key: String) =
     get(key)?.takeIf { get(key).isJsonObject }?.asJsonObject?.entrySet() ?: emptySet()

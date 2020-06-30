@@ -1,7 +1,9 @@
 import okhttp3.OkHttpClient
 import org.http4k.client.OkHttp
-import org.http4k.core.Method
+import org.http4k.core.Body
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.time.Duration
@@ -14,9 +16,9 @@ fun main() {
     println(
         OkHttp(client())(
             Request(
-                Method.GET,
-                "https://localhost:31001/api/v1/web/guest/foo/testFunction/status/418?foo=bar"
-            )
+                POST,
+                "https://localhost:31001/api/v1/web/guest/foo/testFunction/check-image"
+            ).body(Body(ByteBuffer.wrap(Request.javaClass.getResourceAsStream("/test.png").readBytes())))
         )
     )
 }

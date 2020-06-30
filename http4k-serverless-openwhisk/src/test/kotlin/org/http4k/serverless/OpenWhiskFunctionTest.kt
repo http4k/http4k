@@ -3,6 +3,7 @@ package org.http4k.serverless
 import com.google.gson.JsonObject
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -12,31 +13,30 @@ import org.junit.jupiter.api.Test
 class OpenWhiskFunctionTest {
 
     @Test
-    fun `full request - calls the handler and returns proper body`() {
+    fun `full request (raw) - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
-            FakeOpenWhiskRequest("post", "/bob", mapOf("query" to "qvalue"), mapOf("header" to "hvalue"), "bob"),
+            FakeOpenWhiskRawRequest("post", "/bob", "query=qvalue", mapOf("header" to "hvalue"), "myBody".base64Encode()),
             FakeOpenWhiskResponse(200, mapOf(
                 "header" to "hvalue"),
-                "/bob?query=qvaluebob")
+                "/bob?query=qvaluemyBody")
         )
     }
 
     @Test
-    // see https://github.com/apache/openwhisk-runtime-java/issues/111
-    fun `full request (with queries bug) - calls the handler and returns proper body`() {
+    fun `full request (with queries at top level) - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
-            FakeOpenWhiskRequestWithIncorrectQueries("post", "/bob", mapOf("header" to "hvalue"), "bob", "qvalue"),
+            FakeOpenWhiskRequestWithTopLevelQueries("post", "/bob", mapOf("header" to "hvalue"), "myBody".base64Encode(), "qvalue"),
             FakeOpenWhiskResponse(200, mapOf(
                 "header" to "hvalue"),
-                "/bob?query=qvaluebob")
+                "/bob?query=qvaluemyBody")
         )
     }
 
     @Test
     fun `minimal request - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
-            FakeOpenWhiskRequest("get", null, null, null, null),
-            FakeOpenWhiskResponse(200, emptyMap(), "")
+            FakeOpenWhiskRequestWithTopLevelQueries("get", null, null, null, null),
+            FakeOpenWhiskResponse(200, emptyMap(), "?query=")
         )
     }
 

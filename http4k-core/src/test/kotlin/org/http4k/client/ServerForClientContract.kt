@@ -1,5 +1,6 @@
 package org.http4k.client
 
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -16,7 +17,8 @@ import org.http4k.core.cookie.cookies
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import java.util.*
+import java.nio.ByteBuffer
+import java.util.Arrays
 
 object ServerForClientContract : HttpHandler {
     override fun invoke(request: Request) = app(request)
@@ -58,6 +60,7 @@ object ServerForClientContract : HttpHandler {
             if (Arrays.equals(testImageBytes(), request.body.payload.array()))
                 Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
         },
+        "/image" bind POST to { _: Request -> Response(OK).body(Body(ByteBuffer.wrap(testImageBytes()))) },
         "/status/{status}" bind GET to { r: Request ->
             val code = r.path("status")!!.toInt()
             val status = Status(code, "Description for $code")
