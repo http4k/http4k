@@ -22,6 +22,17 @@ class OpenWhiskFunctionTest {
     }
 
     @Test
+    // see https://github.com/apache/openwhisk-runtime-java/issues/111
+    fun `full request (with queries bug) - calls the handler and returns proper body`() {
+        assertExpectedResponseIs(
+            FakeOpenWhiskRequestWithIncorrectQueries("post", "/bob", mapOf("header" to "hvalue"), "bob", "qvalue"),
+            FakeOpenWhiskResponse(200, mapOf(
+                "header" to "hvalue"),
+                "/bob?query=qvaluebob")
+        )
+    }
+
+    @Test
     fun `minimal request - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
             FakeOpenWhiskRequest("get", null, null, null, null),
@@ -29,7 +40,7 @@ class OpenWhiskFunctionTest {
         )
     }
 
-    private fun assertExpectedResponseIs(request: FakeOpenWhiskRequest, expected: FakeOpenWhiskResponse) {
+    private fun assertExpectedResponseIs(request: Any, expected: FakeOpenWhiskResponse) {
         val app = { req: Request ->
             Response(OK).body(
                 req.uri.toString() + req.bodyString()

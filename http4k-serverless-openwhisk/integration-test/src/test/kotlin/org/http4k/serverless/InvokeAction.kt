@@ -2,7 +2,7 @@ package org.http4k.serverless
 
 import dev.forkhandles.bunting.use
 
-object InvokeFunction {
+object InvokeAction {
     @JvmStatic
     fun main(args: Array<String>) =
         OpenWhiskCliFlags(args).use {

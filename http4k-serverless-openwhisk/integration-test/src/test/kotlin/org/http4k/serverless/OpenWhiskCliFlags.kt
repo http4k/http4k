@@ -1,11 +1,13 @@
 package org.http4k.serverless
 
 import dev.forkhandles.bunting.Bunting
+import java.io.File
 
 /**
  * Represents all Command Line flags used by the OpenWhisk CLI tools
  */
 class OpenWhiskCliFlags(args: Array<String>) : Bunting(args) {
+    val credentialsFile by defaultedFlag("${System.getenv("HOME")}/.wskprops", "Path to OW credentials file").map { File(it) }
     val insecure by noValueFlag("Disable cert checking (use for local OW deployments)")
     val main by requiredFlag("Class containing the main action to invoke")
     val version by defaultedFlag("0.0.1", "The version")
