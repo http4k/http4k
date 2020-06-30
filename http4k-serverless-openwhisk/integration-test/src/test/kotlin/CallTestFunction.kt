@@ -15,7 +15,7 @@ fun main() {
         OkHttp(client())(
             Request(
                 Method.GET,
-                "https://localhost:31001/api/v1/web/guest/foo/testFunction/status/418?foo"
+                "https://localhost:31001/api/v1/web/guest/foo/testFunction/status/418?foo=bar"
             )
         )
     )
