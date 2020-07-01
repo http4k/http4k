@@ -120,7 +120,7 @@ p {
 }
 
 nav a {
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   line-height: 1.17;
 }
 
@@ -129,7 +129,7 @@ footer a {
 }
 
 .btn {
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   line-height: 1.17;
 }
 
@@ -349,6 +349,10 @@ header p {
 .landing .overlay {
   background-image: linear-gradient(73.88deg, #59aff5 32.66%, #60c0ff 91.08%);
   opacity: 0.1;
+}
+
+.landing .header {
+  padding-top: 1em;
 }
 
 @media (min-width: 768px) {
