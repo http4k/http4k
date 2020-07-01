@@ -2,7 +2,6 @@ package org.http4k.serverless
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import org.http4k.base64Decoded
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -12,15 +11,26 @@ import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import java.nio.ByteBuffer
-import java.util.Base64
+import java.util.Base64.getDecoder
+import java.util.Base64.getEncoder
 
 const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 
-class OpenWhiskFunction(appLoader: AppLoaderWithContexts, env: Map<String, String> = System.getenv()) :
-        (JsonObject) -> JsonObject {
-    constructor(input: AppLoader) : this(object : AppLoaderWithContexts {
+class OpenWhiskFunction(
+    appLoader: AppLoaderWithContexts,
+    env: Map<String, String> = System.getenv(),
+    private val isRequestBinary: (Request) -> Boolean = { false },
+    private val isResponseBinary: (Response) -> Boolean = { false }
+) : (JsonObject) -> JsonObject {
+
+    constructor(
+        input: AppLoader,
+        env: Map<String, String> = System.getenv(),
+        isRequestBinary: (Request) -> Boolean = { false },
+        isResponseBinary: (Response) -> Boolean = { false }
+    ) : this(object : AppLoaderWithContexts {
         override fun invoke(env: Map<String, String>, contexts: RequestContexts) = input(env)
-    })
+    }, env, isRequestBinary, isResponseBinary)
 
     private val contexts = RequestContexts()
     private val app = appLoader(env, contexts)
@@ -29,37 +39,47 @@ class OpenWhiskFunction(appLoader: AppLoaderWithContexts, env: Map<String, Strin
         .then(AddOpenWhiskRequest(request, contexts))
         .then(app)
         .invoke(request.asHttp4k()).toGson()
+
+    private fun Response.toGson() = JsonObject().apply {
+        addProperty("statusCode", status.code)
+        addProperty(
+            "body",
+            if (isResponseBinary(this@toGson)) getEncoder().encodeToString(body.payload.array()) else bodyString()
+        )
+        add("headers", JsonObject().apply {
+            headers.forEach {
+                addProperty(it.first, it.second)
+            }
+        })
+    }
+
+    private fun JsonObject.asHttp4k(): Request {
+        val baseRequest = Request(
+            Method.valueOf(getAsJsonPrimitive("__ow_method").asString.toUpperCase()),
+            stringOrEmpty("__ow_path") + if (has("__ow_query")) "?" + get("__ow_query").asJsonPrimitive.asString else ""
+        ).body(stringOrEmpty("__ow_body"))
+
+        val withQueries = getQueries().fold(baseRequest) { acc, next ->
+            acc.query(next.key, next.value.takeIf { it.isJsonPrimitive }?.asJsonPrimitive?.asString ?: "")
+        }
+
+        val fullRequest = mapFrom("__ow_headers").fold(withQueries) { acc, next ->
+            acc.header(next.key, next.value.asJsonPrimitive.asString)
+        }
+
+        return when {
+            isRequestBinary(fullRequest) -> fullRequest.body(
+                Body(ByteBuffer.wrap(getDecoder().decode(fullRequest.body.payload.array())))
+            )
+            else -> fullRequest
+        }
+    }
 }
 
 private fun AddOpenWhiskRequest(request: JsonElement, contexts: RequestContexts) = Filter { next ->
     {
         contexts[it][OW_REQUEST_KEY] = request
         next(it)
-    }
-}
-
-private fun Response.toGson() = JsonObject().apply {
-    addProperty("statusCode", status.code)
-    addProperty("body", Base64.getEncoder().encodeToString(body.payload.array()))
-    add("headers", JsonObject().apply {
-        headers.forEach {
-            addProperty(it.first, it.second)
-        }
-    })
-}
-
-private fun JsonObject.asHttp4k(): Request {
-    val raw = Request(
-        Method.valueOf(getAsJsonPrimitive("__ow_method").asString.toUpperCase()),
-        stringOrEmpty("__ow_path") + if (has("__ow_query")) "?" + get("__ow_query").asJsonPrimitive.asString else ""
-    )
-        .body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(stringOrEmpty("__ow_body")))))
-
-    val withQueries = getQueries().fold(raw) { acc, next ->
-        acc.query(next.key, next.value.takeIf { it.isJsonPrimitive }?.asJsonPrimitive?.asString ?: "")
-    }
-    return mapFrom("__ow_headers").fold(withQueries) { acc, next ->
-        acc.header(next.key, next.value.asJsonPrimitive.asString)
     }
 }
 

@@ -12,6 +12,7 @@ import org.http4k.core.authority
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.ClientFilters.BasicAuth
 import org.http4k.filter.HandleRemoteRequestFailed
 import org.http4k.lens.Path
 import org.http4k.lens.Query
@@ -26,10 +27,11 @@ class OpenWhisk(
     config: OpenWhiskConfig,
     rawHttp: HttpHandler = ApacheClient()
 ) {
-    private val http = ClientFilters.SetBaseUriFrom(Uri.of("https://host/api/v1").authority(config.authority))
-        .then(ClientFilters.BasicAuth(config.credentials))
+    private val insecureHttp = ClientFilters.SetBaseUriFrom(Uri.of("https://host/api/v1").authority(config.authority))
         .then(ClientFilters.HandleRemoteRequestFailed())
         .then(rawHttp)
+
+    private val secureHttp = BasicAuth(config.credentials).then(insecureHttp)
 
     /**
      * Get all namespaces for authenticated user
@@ -42,7 +44,7 @@ class OpenWhisk(
     fun getAllNamespaces(): List<String> {
         val getAllNamespacesJsonResponse200Lens = Body.auto<List<String>>().toLens()
         val httpReq = Request(Method.GET, "/namespaces")
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return getAllNamespacesJsonResponse200Lens(response)
     }
 
@@ -67,7 +69,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(limitLens of limit)
             .with(skipLens of skip)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return actionLens(response)
     }
 
@@ -95,7 +97,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(actionNameLens of actionName)
             .with(codeLens of code)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return actionLens(response)
     }
 
@@ -129,7 +131,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(actionNameLens of actionName)
             .with(overwriteLens of overwrite)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return actionLens(response)
     }
 
@@ -170,10 +172,16 @@ class OpenWhisk(
             .with(blockingLens of blocking)
             .with(resultLens of result)
             .with(timeoutLens of timeout)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
 
         response
     }
+
+    /**
+     * Invoke a web action and return the raw Response
+     */
+    fun invokeWebActionInPackage(namespace: String, packageName: String, actionName: String, request: Request) =
+        insecureHttp(request.run { uri(uri.path("/web/$namespace/$packageName/$actionName" + uri.path)) })
 
     /**
      * Delete an action
@@ -193,7 +201,7 @@ class OpenWhisk(
         val httpReq = Request(Method.DELETE, "/namespaces/{namespace}/actions/{actionName}")
             .with(namespaceLens of namespace)
             .with(actionNameLens of actionName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
 
         response
     }
@@ -225,7 +233,7 @@ class OpenWhisk(
             .with(packageNameLens of packageName)
             .with(actionNameLens of actionName)
             .with(codeLens of code)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return actionLens(response)
     }
 
@@ -262,7 +270,7 @@ class OpenWhisk(
             .with(packageNameLens of packageName)
             .with(actionNameLens of actionName)
             .with(overwriteLens of overwrite)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return actionLens(response)
     }
 
@@ -306,7 +314,7 @@ class OpenWhisk(
             .with(blockingLens of blocking)
             .with(resultLens of result)
             .with(timeoutLens of timeout)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
 
         response
     }
@@ -335,7 +343,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(packageNameLens of packageName)
             .with(actionNameLens of actionName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
 
         response
     }
@@ -362,7 +370,7 @@ class OpenWhisk(
             .with(packageNameLens of packageName)
             .with(actionNameLens of actionName)
             .with(extensionLens of extension)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return get_web_namespace_packageName_actionNameextensionJsonResponse200Lens(response)
     }
 
@@ -388,7 +396,7 @@ class OpenWhisk(
             .with(packageNameLens of packageName)
             .with(actionNameLens of actionName)
             .with(extensionLens of extension)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return put_web_namespace_packageName_actionNameextensionJsonResponse200Lens(response)
     }
 
@@ -420,7 +428,7 @@ class OpenWhisk(
             .with(packageNameLens of packageName)
             .with(actionNameLens of actionName)
             .with(extensionLens of extension)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return post_web_namespace_packageName_actionNameextensionJsonResponse200Lens(response)
     }
 
@@ -446,7 +454,7 @@ class OpenWhisk(
             .with(packageNameLens of packageName)
             .with(actionNameLens of actionName)
             .with(extensionLens of extension)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return delete_web_namespace_packageName_actionNameextensionJsonResponse200Lens(response)
     }
 
@@ -471,7 +479,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(limitLens of limit)
             .with(skipLens of skip)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return ruleLens(response)
     }
 
@@ -491,7 +499,7 @@ class OpenWhisk(
         val httpReq = Request(Method.GET, "/namespaces/{namespace}/rules/{ruleName}")
             .with(namespaceLens of namespace)
             .with(ruleNameLens of ruleName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return ruleLens(response)
     }
 
@@ -525,7 +533,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(ruleNameLens of ruleName)
             .with(overwriteLens of overwrite)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return ruleLens(response)
     }
 
@@ -554,7 +562,7 @@ class OpenWhisk(
             .with(setStateJsonRequestLens of request)
             .with(namespaceLens of namespace)
             .with(ruleNameLens of ruleName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
 
         response
     }
@@ -574,7 +582,7 @@ class OpenWhisk(
         val httpReq = Request(Method.DELETE, "/namespaces/{namespace}/rules/{ruleName}")
             .with(namespaceLens of namespace)
             .with(ruleNameLens of ruleName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
 
         response
     }
@@ -600,7 +608,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(limitLens of limit)
             .with(skipLens of skip)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return triggerLens(response)
     }
 
@@ -620,7 +628,7 @@ class OpenWhisk(
         val httpReq = Request(Method.GET, "/namespaces/{namespace}/triggers/{triggerName}")
             .with(namespaceLens of namespace)
             .with(triggerNameLens of triggerName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return triggerLens(response)
     }
 
@@ -653,7 +661,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(triggerNameLens of triggerName)
             .with(overwriteLens of overwrite)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return triggerLens(response)
     }
 
@@ -684,7 +692,7 @@ class OpenWhisk(
             .with(fireTriggerJsonRequestLens of request)
             .with(namespaceLens of namespace)
             .with(triggerNameLens of triggerName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return activationIdLens(response)
     }
 
@@ -703,7 +711,7 @@ class OpenWhisk(
         val httpReq = Request(Method.DELETE, "/namespaces/{namespace}/triggers/{triggerName}")
             .with(namespaceLens of namespace)
             .with(triggerNameLens of triggerName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
 
         response
     }
@@ -733,7 +741,7 @@ class OpenWhisk(
             .with(publicLens of public)
             .with(limitLens of limit)
             .with(skipLens of skip)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return packageLens(response)
     }
 
@@ -756,7 +764,7 @@ class OpenWhisk(
         val httpReq = Request(Method.GET, "/namespaces/{namespace}/packages/{packageName}")
             .with(namespaceLens of namespace)
             .with(packageNameLens of packageName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return packageLens(response)
     }
 
@@ -790,7 +798,7 @@ class OpenWhisk(
             .with(namespaceLens of namespace)
             .with(packageNameLens of packageName)
             .with(overwriteLens of overwrite)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return packageLens(response)
     }
 
@@ -810,7 +818,7 @@ class OpenWhisk(
         val httpReq = Request(Method.DELETE, "/namespaces/{namespace}/packages/{packageName}")
             .with(namespaceLens of namespace)
             .with(packageNameLens of packageName)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
 
         response
     }
@@ -849,7 +857,7 @@ class OpenWhisk(
             .with(sinceLens of since)
             .with(uptoLens of upto)
             .with(docsLens of docs)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return activationBriefLens(response)
     }
 
@@ -870,7 +878,7 @@ class OpenWhisk(
         val httpReq = Request(Method.GET, "/namespaces/{namespace}/activations/{activationid}")
             .with(namespaceLens of namespace)
             .with(activationidLens of activationid)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return activationLens(response)
     }
 
@@ -891,7 +899,7 @@ class OpenWhisk(
         val httpReq = Request(Method.GET, "/namespaces/{namespace}/activations/{activationid}/logs")
             .with(namespaceLens of namespace)
             .with(activationidLens of activationid)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return activationLogsLens(response)
     }
 
@@ -912,7 +920,7 @@ class OpenWhisk(
         val httpReq = Request(Method.GET, "/namespaces/{namespace}/activations/{activationid}/result")
             .with(namespaceLens of namespace)
             .with(activationidLens of activationid)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return activationResultLens(response)
     }
 
@@ -930,7 +938,7 @@ class OpenWhisk(
         val namespaceLens = Path.string().of("namespace")
         val httpReq = Request(Method.GET, "/namespaces/{namespace}/limits")
             .with(namespaceLens of namespace)
-        val response = http(httpReq)
+        val response = secureHttp(httpReq)
         return userLimitsLens(response)
     }
 }

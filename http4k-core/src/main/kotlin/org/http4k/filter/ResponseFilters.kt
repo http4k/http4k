@@ -11,6 +11,7 @@ import org.http4k.filter.GzipCompressionMode.Memory
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
+import java.util.Base64
 
 object ResponseFilters {
 
@@ -129,7 +130,7 @@ object ResponseFilters {
      * Some platforms deliver bodies as Base64 encoded strings.
      */
     fun Base64EncodeBody() = Filter { next ->
-        { next(it).run { body(bodyString().base64Encode()) } }
+        { next(it).run { body(Base64.getEncoder().encodeToString(body.payload.array())) } }
     }
 }
 

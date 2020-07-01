@@ -15,20 +15,63 @@ class OpenWhiskFunctionTest {
     @Test
     fun `full request (raw) - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
-            FakeOpenWhiskRawRequest("post", "/bob", "query=qvalue", mapOf("header" to "hvalue"), "myBody".base64Encode()),
-            FakeOpenWhiskResponse(200, mapOf(
-                "header" to "hvalue"),
-                "L2JvYj9xdWVyeT1xdmFsdWVteUJvZHk=")
+            FakeOpenWhiskRawRequest(
+                "post",
+                "/bob",
+                "query=qvalue",
+                mapOf("header" to "hvalue"),
+                "myBody"
+            ),
+            FakeOpenWhiskResponse(
+                200, mapOf(
+                    "header" to "hvalue"
+                ),
+                "/bob?query=qvaluemyBody"
+            ),
+            { false },
+            { false }
         )
     }
 
     @Test
-    fun `full request (with queries at top level) - calls the handler and returns proper body`() {
+    fun `full request (with queries at top level) - binary - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
-            FakeOpenWhiskRequestWithTopLevelQueries("post", "/bob", mapOf("header" to "hvalue"), "myBody".base64Encode(), "qvalue"),
-            FakeOpenWhiskResponse(200, mapOf(
-                "header" to "hvalue"),
-                "L2JvYj9xdWVyeT1xdmFsdWVteUJvZHk=")
+            FakeOpenWhiskRequestWithTopLevelQueries(
+                "post",
+                "/bob",
+                mapOf("header" to "hvalue"),
+                "myBody".base64Encode(),
+                "qvalue"
+            ),
+            FakeOpenWhiskResponse(
+                200, mapOf(
+                    "header" to "hvalue"
+                ),
+                "L2JvYj9xdWVyeT1xdmFsdWVteUJvZHk="
+            ),
+            { true },
+            { true }
+        )
+    }
+
+    @Test
+    fun `full request (with queries at top level) - non-binary - calls the handler and returns proper body`() {
+        assertExpectedResponseIs(
+            FakeOpenWhiskRequestWithTopLevelQueries(
+                "post",
+                "/bob",
+                mapOf("header" to "hvalue"),
+                "myBody",
+                "qvalue"
+            ),
+            FakeOpenWhiskResponse(
+                200, mapOf(
+                    "header" to "hvalue"
+                ),
+                "/bob?query=qvaluemyBody"
+            ),
+            { false },
+            { false }
         )
     }
 
@@ -36,16 +79,23 @@ class OpenWhiskFunctionTest {
     fun `minimal request - calls the handler and returns proper body`() {
         assertExpectedResponseIs(
             FakeOpenWhiskRequestWithTopLevelQueries("get", null, null, null, null),
-            FakeOpenWhiskResponse(200, emptyMap(), "P3F1ZXJ5PQ==")
+            FakeOpenWhiskResponse(200, emptyMap(), "P3F1ZXJ5PQ=="),
+            { true },
+            { true }
         )
     }
 
-    private fun assertExpectedResponseIs(request: Any, expected: FakeOpenWhiskResponse) {
+    private fun assertExpectedResponseIs(
+        request: Any,
+        expected: FakeOpenWhiskResponse,
+        isRequestBinary: (Request) -> Boolean,
+        isResponseBinary: (Response) -> Boolean
+    ) {
         val function = OpenWhiskFunction(object : AppLoader {
             override fun invoke(p1: Map<String, String>) = { req: Request ->
                 Response(OK).body(req.uri.toString() + req.bodyString()).headers(req.headers)
             }
-        })
+        }, isRequestBinary = isRequestBinary, isResponseBinary = isResponseBinary)
 
         val response = function(Gson.asJsonObject(request) as JsonObject)
 
