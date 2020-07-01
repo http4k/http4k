@@ -28,4 +28,7 @@ fun main() {
 
     println(">List actions")
     ListAllActions.main(standardArgs)
+
+    println(">Call action")
+    CallTestAction.main(arrayOf())
 }

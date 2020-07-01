@@ -1,5 +1,7 @@
 package org.http4k.client
 
+import org.http4k.base64Decoded
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
@@ -23,6 +25,7 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import java.nio.ByteBuffer
 import java.util.Arrays
+import java.util.Base64
 
 object ServerForClientContract : HttpHandler {
     override fun invoke(request: Request) = app(request)
@@ -78,5 +81,6 @@ object ServerForClientContract : HttpHandler {
             Response(status)
         })
 
-    private fun testImageBytes() = this::class.java.getResourceAsStream("/test.png").readBytes()
 }
+
+fun testImageBytes() = ServerForClientContract::class.java.getResourceAsStream("/test.png").readBytes()

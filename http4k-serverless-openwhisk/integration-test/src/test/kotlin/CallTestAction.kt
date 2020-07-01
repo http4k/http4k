@@ -2,7 +2,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import okhttp3.OkHttpClient
 import org.http4k.client.OkHttp
-import org.http4k.core.Method.GET
+import org.http4k.client.testImageBytes
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters
@@ -14,12 +15,15 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-fun main() {
-    val request = Request(GET, "https://localhost:31001/api/v1/web/guest/foo/testFunction/image")
-    val payload = DebuggingFilters.PrintResponse().then(OkHttp(client()))(request).body.payload
-    assertThat(
-        payload.array().size, equalTo(Request.javaClass.getResourceAsStream("/test.png").readBytes().size)
-    )
+object CallTestAction {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val app = DebuggingFilters.PrintResponse().then(OkHttp(client()))
+//    app(Request(POST, "https://localhost:31001/api/v1/web/guest/foo/testFunction/echo").body("helloworld"))
+//        app(Request(POST, "https://localhost:31001/api/v1/web/guest/foo/testFunction/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
+        assertThat(app(Request(Method.GET, "https://localhost:31001/api/v1/web/guest/foo/testFunction/image")).body.payload.array().size, equalTo(
+            testImageBytes().size))
+    }
 }
 
 private fun client(): OkHttpClient {
