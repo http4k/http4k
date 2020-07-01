@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import org.http4k.base64Encode
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -33,7 +34,11 @@ object ResponseFilters {
      * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportHttpTransaction {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), transactionLabeller: HttpTransactionLabeller = { it }, recordFn: (HttpTransaction) -> Unit): Filter = Filter { next ->
+        operator fun invoke(
+            clock: Clock = Clock.systemUTC(),
+            transactionLabeller: HttpTransactionLabeller = { it },
+            recordFn: (HttpTransaction) -> Unit
+        ): Filter = Filter { next ->
             {
                 clock.instant().let { start ->
                     next(it).apply {
@@ -51,16 +56,21 @@ object ResponseFilters {
     object ReportRouteLatency {
         operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit): Filter =
             ReportHttpTransaction(clock) { tx ->
-                recordFn("${tx.request.method}.${tx.routingGroup.replace('.', '_').replace(':', '.').replace('/', '_')}" +
-                    ".${tx.response.status.code / 100}xx" +
-                    ".${tx.response.status.code}", tx.duration)
+                recordFn(
+                    "${tx.request.method}.${tx.routingGroup.replace('.', '_').replace(':', '.').replace('/', '_')}" +
+                        ".${tx.response.status.code / 100}xx" +
+                        ".${tx.response.status.code}", tx.duration
+                )
             }
     }
 
     /**
      * GZipping of the response where the content-type (sans-charset) matches an allowed list of compressible types.
      */
-    class GZipContentTypes(compressibleContentTypes: Set<ContentType>, private val compressionMode: GzipCompressionMode = Memory) : Filter {
+    class GZipContentTypes(
+        compressibleContentTypes: Set<ContentType>,
+        private val compressionMode: GzipCompressionMode = Memory
+    ) : Filter {
         private val compressibleMimeTypes = compressibleContentTypes
             .map { it.value }
             .map { it.split(";").first() }
@@ -115,6 +125,12 @@ object ResponseFilters {
         }
     }
 
+    /**
+     * Some platforms deliver bodies as Base64 encoded strings
+     */
+    fun Base64EncodeBody() = Filter { next ->
+        { next(it).body(it.bodyString().base64Encode()) }
+    }
 }
 
 typealias HttpTransactionLabeller = (HttpTransaction) -> HttpTransaction

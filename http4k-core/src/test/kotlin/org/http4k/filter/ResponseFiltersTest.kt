@@ -3,6 +3,7 @@ package org.http4k.filter
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpTransaction
@@ -278,5 +279,12 @@ class ResponseFiltersTest {
 
         assertThat(transaction, equalTo(HttpTransaction(request,
             Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}"))))
+    }
+
+    @Test
+    fun `base 64 decode body`() {
+        val handler = ResponseFilters.Base64EncodeBody().then { Response(OK).body("hello") }
+
+        assertThat(handler(Request(GET, "")), hasBody("hello"))
     }
 }

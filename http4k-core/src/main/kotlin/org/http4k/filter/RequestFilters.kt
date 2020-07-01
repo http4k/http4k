@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import org.http4k.base64Decoded
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -69,6 +70,13 @@ object RequestFilters {
                     ?: Response(BAD_REQUEST.description("Cannot proxy without host header"))
             }
         }
+    }
+
+    /**
+     * Some platforms deliver bodies as Base64 encoded strings
+     */
+    fun Base64DecodeBody() = Filter { next ->
+        { next(it.body(it.bodyString().base64Decoded())) }
     }
 }
 
