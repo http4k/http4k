@@ -17,21 +17,31 @@ import org.http4k.lens.string
 fun main() {
 
     data class Child(val name: String)
+    data class Pageable(val sortAscending: Boolean, val page: Int, val maxResults: Int)
 
     val nameHeader = Header.required("name")
     val ageQuery = Query.int().optional("age")
     val childrenBody = Body.string(TEXT_PLAIN).map({ it.split(",").map(::Child) }, { it.map { it.name }.joinToString() }).toLens()
+    val pageable = Query.composite {
+        Pageable(
+                boolean().defaulted("sortAscending", true)(it),
+                int().defaulted("page", 1)(it),
+                int().defaulted("maxResults", 20)(it)
+        )
+    }
 
     val endpoint = { request: Request ->
 
         val name: String = nameHeader(request)
         val age: Int? = ageQuery(request)
         val children: List<Child> = childrenBody(request)
+        val pagination = pageable(request)
 
         val msg = "$name is ${age ?: "unknown"} years old and has " +
-            "${children.size} children (${children.map { it.name }.joinToString()})"
+                "${children.size} children (${children.map { it.name }.joinToString()})" +
+                "pagination: $pagination"
         Response(OK).with(
-            Body.string(TEXT_PLAIN).toLens() of msg
+                Body.string(TEXT_PLAIN).toLens() of msg
         )
     }
 
