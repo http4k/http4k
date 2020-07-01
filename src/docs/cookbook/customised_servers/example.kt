@@ -8,11 +8,9 @@ import org.eclipse.jetty.server.ServerConnector
 import org.eclipse.jetty.server.SslConnectionFactory
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
-import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig

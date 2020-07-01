@@ -282,9 +282,9 @@ class ResponseFiltersTest {
     }
 
     @Test
-    fun `base 64 decode body`() {
+    fun `base 64 encode body`() {
         val handler = ResponseFilters.Base64EncodeBody().then { Response(OK).body("hello") }
 
-        assertThat(handler(Request(GET, "")), hasBody("hello"))
+        assertThat(handler(Request(GET, "")), hasBody("hello".base64Encode()))
     }
 }

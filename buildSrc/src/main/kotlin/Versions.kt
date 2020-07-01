@@ -1,3 +1,4 @@
+import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -34,8 +35,6 @@ object Versions {
 
     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1"
 
-    const val net_saliman_cobertura_gradle_plugin: String = "3.0.0"
-
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
 
     const val openapi_generator_gradle_plugin: String = "4.3.1"
@@ -45,8 +44,6 @@ object Versions {
     const val coveralls_gradle_plugin: String = "2.8.3"
 
     const val functions_framework_api: String = "1.0.1"
-
-    const val gradle_cobertura_plugin: String = "3.0.0"
 
     const val aws_lambda_java_events: String = "3.1.0"
 
@@ -90,8 +87,6 @@ object Versions {
 
     const val bunting4k: String = "0.0.0.1"
 
-    const val cobertura: String = "2.1.1"
-
     const val httpcore5: String = "5.0.1"
 
     const val slf4j_nop: String = "1.7.30"
@@ -125,7 +120,7 @@ object Versions {
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */
-    const val gradleLatestVersion: String = "6.5"
+    const val gradleLatestVersion: String = "6.5.1"
 }
 
 /**

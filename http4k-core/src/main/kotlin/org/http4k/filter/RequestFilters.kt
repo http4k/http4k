@@ -73,7 +73,7 @@ object RequestFilters {
     }
 
     /**
-     * Some platforms deliver bodies as Base64 encoded strings
+     * Some platforms deliver bodies as Base64 encoded strings.
      */
     fun Base64DecodeBody() = Filter { next ->
         { next(it.body(it.bodyString().base64Decoded())) }

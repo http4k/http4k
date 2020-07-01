@@ -15,7 +15,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ChunkKeyContentsIfRequired
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.Payload
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -27,7 +26,6 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
         val requestBodyMode = BodyMode.Memory
         bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
             .then(awsClientFilter(Payload.Mode.Signed))
-            .then(DebuggingFilters.PrintResponse())
             .then(ApacheClient(requestBodyMode = requestBodyMode)))
     }
 
@@ -37,7 +35,6 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
         val requestBodyMode = BodyMode.Stream
         bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
             .then(awsClientFilter(Payload.Mode.Unsigned))
-            .then(DebuggingFilters.PrintResponse())
             .then(ApacheClient(requestBodyMode = requestBodyMode)))
     }
 

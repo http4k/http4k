@@ -30,6 +30,8 @@ If you're running [http4k] in production and would like to be listed on the site
 - `org.http4k.filter.CachingFilters.Request` & `org.http4k.filter.CachingFilters.Response` 
 - `org.http4k.filter.ClientFilters`
 - `org.http4k.filter.DebuggingFilters`
+- `org.http4k.filter.RequestFilters`
+- `org.http4k.filter.ResponseFilters`
 - `org.http4k.filter.ServerFilters` 
 - `org.http4k.filter.TrafficFilters`
 

@@ -126,10 +126,10 @@ object ResponseFilters {
     }
 
     /**
-     * Some platforms deliver bodies as Base64 encoded strings
+     * Some platforms deliver bodies as Base64 encoded strings.
      */
     fun Base64EncodeBody() = Filter { next ->
-        { next(it).body(it.bodyString().base64Encode()) }
+        { next(it).run { body(bodyString().base64Encode()) } }
     }
 }
 

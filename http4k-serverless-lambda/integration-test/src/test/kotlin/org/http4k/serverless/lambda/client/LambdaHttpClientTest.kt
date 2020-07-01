@@ -3,12 +3,13 @@ package org.http4k.serverless.lambda.client
 import org.http4k.client.HttpClientContract
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.junit.jupiter.api.Assumptions.assumeTrue
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 private val lazyClient by lazy {
         val config = Environment.ENV overrides Environment.fromResource("/local.properties")
         val region = Config.region(config)
-        val client = DebuggingFilters.PrintRequestAndResponse()
+        val client = Filter.NoOp
             .then(ClientFilters.AwsAuth(Config.scope(config), Config.credentials(config)))
             .then(JavaHttpClient())
 
