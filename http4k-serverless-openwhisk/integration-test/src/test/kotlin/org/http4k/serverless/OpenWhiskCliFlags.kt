@@ -7,13 +7,15 @@ import java.io.File
  * Represents all Command Line flags used by the OpenWhisk CLI tools
  */
 class OpenWhiskCliFlags(args: Array<String>) : Bunting(args) {
-    val credentialsFile by defaultedFlag("${System.getenv("HOME")}/.wskprops", "Path to OW credentials file").map { File(it) }
-    val insecure by noValueFlag("Disable cert checking (use for local OW deployments)")
-    val main by requiredFlag("Class containing the main action to invoke")
-    val version by defaultedFlag("0.0.1", "The version")
-    val jarFile by requiredFlag("Path to the JAR file containing Action code")
-    val namespace by requiredFlag("OpenWhisk Namespace")
-    val actionName by requiredFlag("OpenWhisk Action name")
-    val packageName by requiredFlag("OpenWhisk Package name")
-    val verbose by noValueFlag("Print all HTTP traffic")
+    val credentialsFile by option("Path to OW credentials file")
+        .defaultsTo("${System.getenv("HOME")}/.wskprops")
+        .map(::File)
+    val insecure by switch("Disable cert checking (use for local OW deployments)")
+    val main by option("Class containing the main action to invoke")
+    val version by option("The version").defaultsTo("0.0.1")
+    val jarFile by option("Path to the JAR file containing Action code")
+    val namespace by option("OpenWhisk Namespace")
+    val actionName by option("OpenWhisk Action name")
+    val packageName by option("OpenWhisk Package name")
+    val verbose by switch("Print all HTTP traffic")
 }

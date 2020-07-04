@@ -1,4 +1,3 @@
-import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -81,11 +80,11 @@ object Versions {
 
     const val httpclient: String = "4.5.12"
 
-    const val underscore: String = "1.55"
+    const val underscore: String = "1.56"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val bunting4k: String = "0.0.0.1"
+    const val bunting4k: String = "0.1.0.0"
 
     const val httpcore5: String = "5.0.1"
 
@@ -116,7 +115,7 @@ object Versions {
     const val json: String = "20200518"
 
     /**
-     * Current version: "6.1.1"
+     * Current version: "6.5.1"
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */
