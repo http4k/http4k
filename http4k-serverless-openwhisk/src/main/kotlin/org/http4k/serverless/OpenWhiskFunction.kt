@@ -10,6 +10,7 @@ import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
+import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import java.nio.ByteBuffer
 import java.util.Base64.getDecoder
 import java.util.Base64.getEncoder
@@ -19,18 +20,16 @@ const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 class OpenWhiskFunction(
     appLoader: AppLoaderWithContexts,
     env: Map<String, String> = System.getenv(),
-    private val isRequestBinary: (Request) -> Boolean = { false },
-    private val isResponseBinary: (Response) -> Boolean = { false }
+    private val detectBinaryBody: DetectBinaryBody = NonBinary
 ) : (JsonObject) -> JsonObject {
 
     constructor(
         input: AppLoader,
         env: Map<String, String> = System.getenv(),
-        isRequestBinary: (Request) -> Boolean = { false },
-        isResponseBinary: (Response) -> Boolean = { false }
+        detectBinaryBody: DetectBinaryBody = NonBinary
     ) : this(object : AppLoaderWithContexts {
         override fun invoke(env: Map<String, String>, contexts: RequestContexts) = input(env)
-    }, env, isRequestBinary, isResponseBinary)
+    }, env, detectBinaryBody)
 
     private val contexts = RequestContexts()
     private val app = appLoader(env, contexts)
@@ -44,7 +43,7 @@ class OpenWhiskFunction(
         addProperty("statusCode", status.code)
         addProperty(
             "body",
-            if (isResponseBinary(this@toGson)) getEncoder().encodeToString(body.payload.array()) else bodyString()
+            if (detectBinaryBody.isBinary(this@toGson)) getEncoder().encodeToString(body.payload.array()) else bodyString()
         )
         add("headers", JsonObject().apply {
             headers.forEach {
@@ -67,12 +66,10 @@ class OpenWhiskFunction(
             acc.header(next.key, next.value.asJsonPrimitive.asString)
         }
 
-        return when {
-            isRequestBinary(fullRequest) -> fullRequest.body(
-                Body(ByteBuffer.wrap(getDecoder().decode(fullRequest.body.payload.array())))
-            )
-            else -> fullRequest
-        }
+        return if (detectBinaryBody.isBinary(fullRequest)) fullRequest.body(
+            Body(ByteBuffer.wrap(getDecoder().decode(fullRequest.body.payload.array())))
+        )
+        else fullRequest
     }
 }
 

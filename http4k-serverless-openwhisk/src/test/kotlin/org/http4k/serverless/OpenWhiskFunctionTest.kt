@@ -8,6 +8,10 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Gson
+import org.http4k.serverless.DetectBinaryBody.Companion.Binary
+import org.http4k.serverless.DetectBinaryBody.Companion.BinaryRequestOnly
+import org.http4k.serverless.DetectBinaryBody.Companion.BinaryResponseOnly
+import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import org.junit.jupiter.api.Test
 
 class OpenWhiskFunctionTest {
@@ -24,12 +28,11 @@ class OpenWhiskFunctionTest {
             ),
             FakeOpenWhiskResponse(
                 200, mapOf(
-                    "header" to "hvalue"
-                ),
+                "header" to "hvalue"
+            ),
                 "/bob?query=qvaluemyBody"
             ),
-            { false },
-            { false }
+            NonBinary
         )
     }
 
@@ -45,12 +48,11 @@ class OpenWhiskFunctionTest {
             ),
             FakeOpenWhiskResponse(
                 200, mapOf(
-                    "header" to "hvalue"
-                ),
+                "header" to "hvalue"
+            ),
                 "L2JvYj9xdWVyeT1xdmFsdWVteUJvZHk="
             ),
-            { true },
-            { true }
+            Binary
         )
     }
 
@@ -66,12 +68,11 @@ class OpenWhiskFunctionTest {
             ),
             FakeOpenWhiskResponse(
                 200, mapOf(
-                    "header" to "hvalue"
-                ),
-                "/bob?query=qvaluemyBody"
+                "header" to "hvalue"
             ),
-            { false },
-            { false }
+                "/bob?query=qvalue� hw"
+            ),
+            BinaryRequestOnly
         )
     }
 
@@ -80,22 +81,20 @@ class OpenWhiskFunctionTest {
         assertExpectedResponseIs(
             FakeOpenWhiskRequestWithTopLevelQueries("get", null, null, null, null),
             FakeOpenWhiskResponse(200, emptyMap(), "P3F1ZXJ5PQ=="),
-            { true },
-            { true }
+            BinaryResponseOnly
         )
     }
 
     private fun assertExpectedResponseIs(
         request: Any,
         expected: FakeOpenWhiskResponse,
-        isRequestBinary: (Request) -> Boolean,
-        isResponseBinary: (Response) -> Boolean
+        detectBinaryBody: DetectBinaryBody
     ) {
         val function = OpenWhiskFunction(object : AppLoader {
             override fun invoke(p1: Map<String, String>) = { req: Request ->
                 Response(OK).body(req.uri.toString() + req.bodyString()).headers(req.headers)
             }
-        }, isRequestBinary = isRequestBinary, isResponseBinary = isResponseBinary)
+        }, detectBinaryBody = detectBinaryBody)
 
         val response = function(Gson.asJsonObject(request) as JsonObject)
 
