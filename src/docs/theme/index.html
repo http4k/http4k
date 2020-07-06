@@ -22,6 +22,7 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto align-items-center">
               <li class="nav-item active"><a class="nav-link" href="/documentation/">Documentation</a></li>
+              <li class="nav-item"><a class="nav-link" href="/changelog">Changelog</a></li>
                 <li class="nav-item"><a class="nav-link" href="/support">Support</a></li>
                 <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
               <li class="nav-item"><a class="nav-link btn btn-outline-light" href="https://github.com/http4k/http4k">Source</a></li>
@@ -42,20 +43,20 @@
     <!-- features-->
     <div class="developers-custom">
         <div class="container-fluid">
-            <h2>HTTP made simple</h2>
+            <h2>HTTP as a Function</h2>
             <div class="row">
                 <div class="col-md-6 text-center">
-                    <img class="img-fluid" src="/images/client.png" alt="Creating a client with http4k"/>
-                    <p>A client is a function (same as the server) that you invoke with a Request and receives a Response.
-                       </br></br>
-                       You can pick your underlying client implementation among Java (built-in), Apache, and OkHttp.
+                    <img class="img-fluid" src="/images/server.png" alt="Creating a server with http4k"/>
+                    <p>An http4k server is just a regular function that gets invoked with a Request and returns a Response.
+                        </br></br>
+                        In a single line of code you can switch your server between Java (built-in), Apache, Jetty, Netty, Undertow, Ktor, or Ratpack.
                     </p>
                 </div>
                 <div class="col-md-6 text-center">
-                    <img class="img-fluid" src="/images/server.png" alt="Creating a server with http4k"/>
-                    <p>A server is a function (same as the client) that gets invoked with a Request and returns a Response.
+                    <img class="img-fluid" src="/images/client.png" alt="Creating a client with http4k"/>
+                    <p>An http4k client is just a regular function that you invoke with a Request and receives a Response.
                         </br></br>
-                        You can pick your underlying server implementation among Sun (built-in), Jetty, Netty, Undertow, Ktor, and Ratpack.
+                        In a single line of code you can switch your client implementation between Java (built-in), Apache, Jetty, and OkHttp.
                     </p>
                 </div>
             </div>
@@ -68,9 +69,11 @@
         <div class="row">
           <div class="col-md-6 col-lg-3">
             <div class="card-custom"><img src="/images/footprint.svg" alt="footprint"/>
-              <h4>Small <br/> footprint</h4>
+              <h4>Tiny <br/> footprint</h4>
               <div class="dash blue-color"> </div>
-              <p>The core library has no other dependencies and it’s enough to get started.</p>
+              <p>The core library has no dependencies and it’s all you need to create fully-functional applications. </br></br>
+                  http4k APIs take advantage of Kotlin features and are powered by Functional Programming techniques.
+              </p>
             </div>
           </div>
           <div class="col-md-6 col-lg-3">
@@ -78,8 +81,8 @@
               <h4>Highly <br/> extendable</h4>
               <div class="dash purple-color"></div>
               <p>
-                Template engines, rendering formats, operability and resilience features, testing tools… </br></br>
-                  http4k provides 30+ integrations for developers to choose from
+                Supports many Server, Serverless and HTTP Client technologies behind simple, consistent interfaces. </br></br>
+                http4k provides 30+ pre-built integrations for developers to choose from including Operability, JSON, and OpenAPI support.
               </p>
             </div>
           </div>
@@ -88,33 +91,32 @@
               <h4>First class<br/> testability</h4>
               <div class="dash secondary-color"> </div>
               <p>
-                Testing can be done in-memory without actual running servers or network communication. </br></br>
-                Various approaches such as Approval and Chaos Testing are also supported.</p>
+                Create lightning fast, rock solid test suites for individual endpoints, applications or multi-service systems, all running fully in-memory. </br></br>
+                  http4k embraces advanced testing approaches such as Approval, Chaos and Service Virtualization.</p>
             </div>
           </div>
           <div class="col-md-6 col-lg-3">
             <div class="card-custom"><img src="/images/supportive.svg" alt="supportive"/>
-              <h4>Supportive <br/> community</h4>
+              <h4>Battle-tested <br/> in the wild</h4>
               <div class="dash green-color"> </div>
-              <p>The core library has no other dependencies and it’s enough to get started.</p>
+              <p>http4k takes advantage of technologies that have millions of hours of production runtime. </br></br>
+                  The toolkit has been used to build high volume applications in Banking, Publishing & Government projects.</p>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- our-document-->
     <div class="our-document">
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-md-8 col-lg-6 text-center">
-            <h2>See our documentation</h2>
-            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor erat est neque lorem nunc. </p>
-            <button class="btn btn-primary">Quick Start</button>
+            <h2>Learn by example</h2>
+            <p class="lead">The docs are based on real, runnable examples that you can just use to get started.</p>
+            <a class="btn btn-primary" href="/cookbook">See cookbook</a>
           </div>
         </div>
       </div>
     </div>
-    <!-- api -->
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-10">
@@ -122,8 +124,8 @@
             <div class="row align-items-center">
               <div class="col-lg-5 col-xl-4">
                 <h2>More than 30 integrations</h2>
-                <p>Our API integrates with the most popular tools, check it out</p>
-                <button class="btn btn-primary">Quick Start</button>
+                <p>http4k integrates with many tools and libraries for building Cloud-Native applications.</p>
+                <a class="btn btn-primary" href="/modules">Check it out</a>
               </div>
               <div class="col-lg-7 offset-xl-1 col-lg-7 offset-xl-1">
                 <div class="row justify-content-center align-items-center">
@@ -156,13 +158,14 @@
         <div class="row justify-content-between">
           <div class="col-md-6 col-lg-5">
             <h2>We love <br/> our community</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor erat est neque lorem nunc. Ultrices purus ipsum sit pulvinar arcu augue quis elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor erat est neque lorem nunc. Ultrices purus ipsum sit pulvinar arcu augue quis elit. </p>
-            <button class="btn btn-primary">Contribute</button>
+            <p>Many of the features of http4k have been added by its amazing contributors. New versions for features and fixes are released quickly and without fuss. </br></br>
+                http4k had been designed to make it easy to contribute or get help when you need it.</p>
+              <a class="btn btn-primary" href="/contributing">Contribute</a>
           </div>
           <div class="col-md-6 col-lg-5 p-md-0">
             <!-- Our Contribuitors-->
             <div class="contribuitors">
-              <h4>Our Contribuitors</h4>
+              <h4>Our Contributors</h4>
               <div class="row justify-content-between align-content-center no-gutters">
                 <div class="col-auto"><img src="/images/c1.jpg" alt="Contribuitor"/></div>
                 <div class="col-auto"><img src="/images/c2.jpg" alt="Contribuitor"/></div>
@@ -203,9 +206,9 @@
               <div class="row">
                 <div class="col-auto"><img src="/images/support.svg" alt="support"/></div>
                 <div class="col p-0">
-                  <h3>Support Us</h3>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor erat est neque lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor erat est neque lorem</p>
-                  <div class="see-more"><a href="#">See more ››</a></div>
+                  <h3>Getting Support</h3>
+                  <p>Sometimes everybody needs a little help. http4k provides several way to seek assistance, both through the community Slack channels and through bespoke support services.</p>
+                  <div class="see-more"><a href="/support">See more ››</a></div>
                 </div>
               </div>
             </div>
@@ -215,7 +218,7 @@
               <div class="row">
                 <div class="col-auto"><img src="/images/faq.svg" alt="faq"/></div>
                 <div class="col p-0">
-                  <h3> F.A.Q</h3>
+                  <h3> In the wild</h3>
                   <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor erat est neque lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor erat est neque lorem</p>
                   <div class="see-more"><a href="#">See more ››</a></div>
                 </div>
