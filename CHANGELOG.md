@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.253.0 (uncut)
+- [http4k-core] Replaced implementation of `JavaHttpClient` with one from Java standard library. Should you not yet have access to the Java 11 SDK, we renamed the old implementation to `Java8HttpClient`.
 - [http4k-client-websocket] [Unlikely break] Allow API users to pass in their own `Draft` object for custom protocols. If broken, simple fix is to just use named arguments in the construction call to the client.
 
 ### v3.252.0
