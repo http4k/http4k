@@ -88,6 +88,7 @@ nav:
     - Typesafe Websockets: blog/typesafe_websockets/index.md
   - Getting Support: support/index.md
   - Contribute/Support http4k: contributing/index.md
+  - Code of Conduct: code-of-conduct/index.md
   - API docs: api/index.md
   - Changelog: changelog/index.md
   - FAQ: faq/index.md
