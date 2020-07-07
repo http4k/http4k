@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.253.0 (uncut)
+- [http4k-client-websocket] [Unlikely break] Allow API users to pass in their own `Draft` object for custom protocols. If broken, simple fix is to just use named arguments in the construction call to the client.
+
 ### v3.252.0
 - [http4k-server-apache, http4k-client-apache, http4k-client-apache-async] [Breaking] Updated to Apache HTTP 5.X.X. H/T to @jshiell. Note that the underlying Apache APIs have changed in the v5 release. For the clients, this should only break if you have customised the underlying HTTP `CloseableHttpClient` that is passed to the constructor of the http4k client. If you have, we have you covered with....
 - [http4k-server-apache4, http4k-client-apache4, http4k-client-apache4-async] New modules to maintain previous integration with Apache HTTP 4.X.X. Intended to reduce the impact on projects that are not ready to move to v5 yet. In these compatibility modules, renamed `ApacheClient` -> `Apache4Client` and `ApacheAsyncClient` to `Apache4AsyncClient` - which is the only change that should be required in end user code.
