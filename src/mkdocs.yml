@@ -45,6 +45,7 @@ nav:
       - Cloud native Configuration: guide/modules/cloud_native/index.md
       - JSON RPC: guide/modules/jsonrpc/index.md
       - XML handling: guide/modules/xml/index.md
+      - YAML handling: guide/modules/yaml/index.md
       - Hamkrest: guide/modules/hamkrest/index.md
       - Approval Testing: guide/modules/approvaltests/index.md
       - WebDriver: guide/modules/webdriver/index.md
