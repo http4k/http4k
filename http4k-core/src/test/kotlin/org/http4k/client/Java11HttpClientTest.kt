@@ -5,6 +5,8 @@ import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.util.Timeout
 import org.http4k.core.Body
 import org.http4k.core.BodyMode
+import org.http4k.core.BodyMode.Memory
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -22,6 +24,7 @@ import java.net.http.HttpClient.Version.HTTP_1_1
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
+import java.nio.ByteBuffer
 
 
 class Java11HttpClientTest : HttpClientContract({ Jetty(it) }, Java11HttpClient(),
@@ -31,7 +34,7 @@ class Java11HttpClientTest : HttpClientContract({ Jetty(it) }, Java11HttpClient(
                 .setResponseTimeout(Timeout.ofMilliseconds(100))
                 .build()
         ).build()
-        , responseBodyMode = BodyMode.Stream)) {
+        , responseBodyMode = Stream)) {
 
     @Disabled("unsupported by the underlying java client")
     override fun `handles response with custom status message`() {
@@ -40,14 +43,17 @@ class Java11HttpClientTest : HttpClientContract({ Jetty(it) }, Java11HttpClient(
 }
 
 class Java11HttpClient(private val httpClient: HttpClient = defaultClient(),
-                       private val requestBodyMode: BodyMode = BodyMode.Memory,
-                       private val responseBodyMode: BodyMode = BodyMode.Memory
+                       private val requestBodyMode: BodyMode = Memory,
+                       private val responseBodyMode: BodyMode = Memory
 ) : HttpHandler {
     override fun invoke(request: Request): Response = try {
-        val bodyHandler: HttpResponse.BodyHandler<out Any> = responseBodyMode.toBodyHandler()
-        val javaRequest: HttpRequest = request.toJavaHttpRequest(requestBodyMode)
-        val send: HttpResponse<out Any> = httpClient.send(javaRequest, bodyHandler)
-        send.toResponse()
+        val javaRequest = request.toJavaHttpRequest(requestBodyMode)
+        when (responseBodyMode) {
+            is Memory -> httpClient.send(javaRequest, BodyHandlers.ofByteArray())
+                .run { coreResponse().body(Body(ByteBuffer.wrap(body()))) }
+            is Stream -> httpClient.send(javaRequest, BodyHandlers.ofInputStream())
+                .run { coreResponse().body(body()) }
+        }
     } catch (e: UnknownHostException) {
         Response(UNKNOWN_HOST.toClientStatus(e))
     } catch (e: ConnectException) {
@@ -69,19 +75,15 @@ private fun Request.toJavaHttpRequest(bodyMode: BodyMode) =
             headers.fold(this) { acc, next -> acc.header(next.first, next.second) }
         }.method(method.name, body.toRequestPublisher(bodyMode)).build()
 
-private fun <T> HttpResponse<T>.toResponse(): Response {
-    val headers = headers().map()
-        .map { headerNameToValues -> headerNameToValues.value.map { headerNameToValues.key to it } }
-        .flatten()
-    return Response(Status(statusCode(), "")).headers(headers).body(body().toString())
-}
+private fun <T> HttpResponse<T>.coreResponse() =
+    Response(Status(statusCode(), "")).headers(headers().map()
+        .map { headerNameToValues ->
+            headerNameToValues.value
+                .map { headerNameToValues.key to it }
+        }
+        .flatten())
 
 private fun Body.toRequestPublisher(bodyMode: BodyMode) = when (bodyMode) {
-    BodyMode.Memory -> HttpRequest.BodyPublishers.ofByteArray(payload.array())
-    BodyMode.Stream -> HttpRequest.BodyPublishers.ofInputStream { stream }
-}
-
-private fun BodyMode.toBodyHandler(): HttpResponse.BodyHandler<out Any> = when (this) {
-    BodyMode.Memory -> BodyHandlers.ofByteArray()
-    BodyMode.Stream -> BodyHandlers.ofInputStream()
+    Memory -> HttpRequest.BodyPublishers.ofByteArray(payload.array())
+    Stream -> HttpRequest.BodyPublishers.ofInputStream { stream }
 }
