@@ -1,34 +1,44 @@
-{% if nav_item.children %}
-<li class="nav-item dropdown {%if nav_item == page %}active{% endif %}">
-    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ nav_item.title }}</a>
-    <div class="dropdown-menu">
-        {% set base = path %}
-        {% for nav_item in nav_item.children %}
-        {% set path = base + "-" + loop.index | string %}
-        {% set level = level + 1 %}
-        {% if level == 2 %}
-        <a class="dropdown-item {%if nav_item == page %}active{% endif %}" href="{{ nav_item.url | url }}"
-           title="{{ nav_item.title | striptags }}">
-            {{ nav_item.title }}
-        </a>
-        {# include "partials/nav-item.html" #}
-        {% endif %}
-        {% endfor %}
-    </div>
-</li>
-{% else %}
+<!--level={{level}}, hasChildren={%if nav_item.children %}true{% else %}false{% endif %}-->
 {% if level == 1 %}
-<li class="nav-item {%if nav_item == page %}active{% endif %}">
-    <a class="nav-link" href="{{ nav_item.url | url }}"
-       title="{{ nav_item.title | striptags }}">
-        {{ nav_item.title }}
-    </a>
-</li>
+    {% if nav_item.children %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               data-toggle="dropdown"
+               href="#"
+               role="button"
+               aria-haspopup="true"
+               aria-expanded="false">{{ nav_item.title }}</a>
+            <div class="dropdown-menu">
+            {% for nav_item in nav_item.children %}
+            {% set level = level + 1 %}
+            {% include "partials/nav-item.html" %}
+            {% endfor %}
+            </div>
+        </li>
+    {% else %}
+        <li class="nav-item">
+            <a class="nav-link {%if nav_item == page %}active{% endif %}"
+               href="{{ nav_item.url | url }}"
+               title="{{ nav_item.title | striptags }}">{{ nav_item.title }}</a>
+        </li>
+    {% endif %}
 {% else %}
-<a class="dropdown-item" href="{{ nav_item.url | url }}"
-   title="{{ nav_item.title | striptags }}">
-    {{ nav_item.title }}
-</a>
+    {% if nav_item.children %}
+        <a class="dropdown-item nav-link dropdown-toggle"
+            data-toggle="dropdown"
+            href="#"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"> {{ nav_item.title }}</a>
+        <div class="dropdown-menu">
+            {% for nav_item in nav_item.children %}
+            {% set level = level + 1 %}
+            {% include "partials/nav-item.html" %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <a class="dropdown-item"
+           href="{{ nav_item.url | url }}"
+           title="{{ nav_item.title | striptags }}">{{ nav_item.title }}</a>
+    {% endif %}
 {% endif %}
-{% endif %}
-
