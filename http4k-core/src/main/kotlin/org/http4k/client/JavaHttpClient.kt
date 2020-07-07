@@ -58,7 +58,9 @@ private fun Request.toJavaHttpRequest(bodyMode: BodyMode) =
     HttpRequest.newBuilder()
         .uri(URI.create(uri.toString()))
         .apply {
-            headers.fold(this) { acc, next -> acc.header(next.first, next.second) }
+            headers
+                .filterNot { disallowedHeaders.contains(it.first.toLowerCase()) }
+                .fold(this) { acc, next -> acc.header(next.first, next.second) }
         }.method(method.name, body.toRequestPublisher(bodyMode)).build()
 
 private fun <T> HttpResponse<T>.coreResponse() =
@@ -73,3 +75,7 @@ private fun Body.toRequestPublisher(bodyMode: BodyMode) = when (bodyMode) {
     Memory -> HttpRequest.BodyPublishers.ofByteArray(payload.array())
     Stream -> HttpRequest.BodyPublishers.ofInputStream { stream }
 }
+
+// list copied from internal JDK Utils.ALLOWED_HEADERS
+private val disallowedHeaders = setOf("connection", "content-length",
+    "date", "expect", "from", "host", "upgrade", "via", "warning")
