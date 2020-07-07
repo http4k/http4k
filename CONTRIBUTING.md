@@ -73,6 +73,11 @@ Many thanks to all of the software vendors who supply tools to help us deliver h
 
 [Jetbrains](https://www.jetbrains.com) kindly supplies the project with an Open Source License for the amazing IntelliJ IDE.
 
+#### Pairing tools
+<img src="https://www.http4k.org/img/tuple.png"/></a>
+
+[Tuple](https://tuple.app/) supplies the http4k team with their amazing Pair-Programming tool Tuple allowing us to collaborate to build the library. Pairing is ace - everyone should do it!
+
 #### JVM Profiling tools
 
 <img src="https://www.yourkit.com/images/yklogo.png"/>

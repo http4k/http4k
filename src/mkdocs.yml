@@ -29,6 +29,7 @@ nav:
   - Getting started: quickstart/index.md
   - Developer Guide:
     - Modules:
+      - Overview: guide/modules/index.md
       - AWS: guide/modules/aws/index.md
       - Core: guide/modules/core/index.md
       - JSON handling: guide/modules/json/index.md
@@ -54,6 +55,7 @@ nav:
     - TDDing http4k: tutorials/tdding_http4k/index.md
     - Documenting http4k apps with OpenApi3: tutorials/documenting_apis_with_openapi/index.md
   - Cookbook:
+    - How to use this guide: cookbook/index.md
     - Server as a function: cookbook/server_as_a_function/index.md
     - Client as a function: cookbook/client_as_a_function/index.md
     - Container integration: cookbook/container_integration/index.md
@@ -72,6 +74,7 @@ nav:
     - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
     - Basic OAuth Server configuration: cookbook/basic_oauth_authorization_server/index.md
     - Custom OAuth Provider configuration: cookbook/custom_oauth_provider/index.md
+    - Custom Server (SSL): cookbook/customised_servers/index.md
     - Principal lookup: cookbook/principal_lookup/index.md
     - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
