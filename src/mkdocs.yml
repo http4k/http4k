@@ -21,7 +21,7 @@ extra_css:
 extra:
   logo: img/logo_1100x200_white_on_blue_trans.png
 edit_uri: edit/master/src/docs/
-strict: true
+strict: false
 nav:
   - Introduction: index.md
   - Rationale & Concepts: rationale/index.md
