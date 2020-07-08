@@ -325,7 +325,7 @@ header p {
   min-height: 672px;
   -webkit-clip-path: polygon(0 0, 100% 0, 100% 100%, 0 85%);
           clip-path: polygon(0 0, 100% 0, 100% 100%, 0 85%);
-  background: url("../images/pipes-hero.svg");
+  background: url("../img/pipes-hero.svg");
   background-color: #59aff5;
   background-size: cover;
   background-repeat: no-repeat;
@@ -416,7 +416,7 @@ header p {
 }
 
 .logo-repeater {
-  background: url("../images/logo-repeater.svg");
+  background: url("../img/logo-repeater.svg");
   height: 56px;
   background-repeat: space;
 }
