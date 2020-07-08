@@ -5,8 +5,6 @@
 ### Request headers recorded for playback:
 
 ```
-Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
-Connection: keep-alive
 Content-type: application/x-www-form-urlencoded
 Content-length: 7
 ```
@@ -36,8 +34,6 @@ hello
 ### Request headers recorded for playback:
 
 ```
-Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
-Connection: keep-alive
 Content-type: application/x-www-form-urlencoded
 Content-length: 7
 ```

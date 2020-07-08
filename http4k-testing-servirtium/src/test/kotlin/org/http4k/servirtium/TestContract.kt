@@ -24,11 +24,13 @@ interface TestContract {
 
         control.addNote("this is a note")
 
-        assertThat(handler(Request(POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
+        val request = Request(POST, "/foobar").header("content-type", "application/x-www-form-urlencoded").body("welcome")
+
+        assertThat(handler(request).bodyString(), equalTo("hello"))
 
         control.addNote("this is another note")
 
-        assertThat(handler(Request(POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
+        assertThat(handler(request).bodyString(), equalTo("hello"))
 
         control.addNote("this is yet another note")
     }
