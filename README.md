@@ -132,6 +132,7 @@ plugging together of services without HTTP container being required.
 This quick example is designed to convey the simplicity & features of [http4k] . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point and demonstrates how to serve and consume HTTP services with dynamic routing.
 
 To install, add these dependencies to your **Gradle** file:
+
 ```groovy
 dependencies {
     compile group: "org.http4k", name: "http4k-core", version: "3.252.0"

@@ -6,6 +6,7 @@ description: Easy ways to get started using http4k
 This simple example demonstates how to serve and consume HTTP services using **http4k**. 
 
 To install, add these dependencies to your **Gradle** file:
+
 ```groovy
 dependencies {
     compile group: "org.http4k", name: "http4k-core", version: "3.252.0"

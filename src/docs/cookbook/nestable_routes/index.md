@@ -13,8 +13,9 @@ This is a fairly comprehensive example of the core-routing logic available:
 - Support for Single Page Applications using a `singlePageApp()` block - resources loaded from here are loaded from the underlying `ResourceLoader` or fallback to `/` (and passed to the SPA code)
 
 ### Gradle setup
-```
-    compile group: "org.http4k", name: "http4k-core", version: "3.252.0"
+
+```groovy
+compile group: "org.http4k", name: "http4k-core", version: "3.252.0"
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/nestable_routes/example.kt)

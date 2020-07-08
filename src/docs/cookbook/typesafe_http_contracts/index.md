@@ -9,10 +9,11 @@ This contract example shows:
 - OpenApi v3 documentation - Run this example and point a browser [here](https://http4k.org/openapi3?url=http://localhost:8000/context/swagger.json)
 
 ### Gradle setup
-```
-    compile group: "org.http4k", name: "http4k-core", version: "3.252.0"
-    compile group: "org.http4k", name: "http4k-contract", version: "3.252.0"
-    compile group: "org.http4k", name: "http4k-format-argo", version: "3.252.0"
+
+```groovy
+compile group: "org.http4k", name: "http4k-core", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-contract", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-format-argo", version: "3.252.0"
 ```
 
 Note: although we use Argo here as our JSON API, you could also switch in any of the `http4k-format-xxx` JSON modules. 
