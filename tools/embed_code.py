@@ -28,6 +28,7 @@ if __name__ == "__main__":
     os.makedirs(working_dir, exist_ok=True)
     shutil.copytree(project_root + '/src/docs', working_dir + '/docs')
     shutil.copy(project_root + '/CONTRIBUTING.md', working_dir + '/docs/contributing/index.md')
+    shutil.copy(project_root + '/CODE_OF_CONDUCT.md', working_dir + '/docs/code-of-conduct/index.md')
     shutil.copy(project_root + '/CHANGELOG.md', working_dir + '/docs/changelog/index.md')
     shutil.copy(project_root + '/README.md', working_dir + '/docs/index.md')
 
