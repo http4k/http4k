@@ -22,6 +22,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         val APPLICATION_JSON = Text("application/json")
         val APPLICATION_FORM_URLENCODED = Text("application/x-www-form-urlencoded")
         val MULTIPART_FORM_DATA = Text("multipart/form-data")
+        val MULTIPART_MIXED = Text("multipart/mixed")
         val APPLICATION_XML = Text("application/xml")
         val APPLICATION_PDF = Text("application/pdf")
         val TEXT_HTML = Text("text/html")
