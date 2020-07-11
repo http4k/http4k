@@ -1,7 +1,5 @@
 package org.http4k.client
 
-import org.http4k.base64Decoded
-import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
@@ -23,9 +21,7 @@ import org.http4k.lens.binary
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import java.nio.ByteBuffer
 import java.util.Arrays
-import java.util.Base64
 
 object ServerForClientContract : HttpHandler {
     override fun invoke(request: Request) = app(request)
@@ -68,7 +64,7 @@ object ServerForClientContract : HttpHandler {
                 Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
         },
         "/image" bind GET to { _: Request ->
-            Response(CREATED).with(Body.binary(ContentType("image/png")).toLens() of Body(ByteBuffer.wrap(testImageBytes())))
+            Response(CREATED).with(Body.binary(ContentType("image/png")).toLens() of testImageBytes().inputStream())
         },
         "/status/{status}" bind GET to { r: Request ->
             val code = r.path("status")!!.toInt()

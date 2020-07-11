@@ -143,6 +143,7 @@ fun Body.Companion.string(contentType: ContentType, description: String? = null,
 fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = string(contentType, description, contentNegotiation).map(StringBiDiMappings.nonEmpty())
 
 fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = httpBodyRoot(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
+    .map({ it.stream }, { Body(it) })
 
 fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = None) =
     StringBiDiMappings.regex(pattern, group).let { string(contentType, description, contentNegotiation).map(it) }

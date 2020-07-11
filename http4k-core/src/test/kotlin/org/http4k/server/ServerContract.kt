@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.asByteBuffer
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
@@ -48,7 +47,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             },
             "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
-            "/stream" bind GET to { Response(OK).with(Body.binary(TEXT_PLAIN).toLens() of Body("hello".asByteBuffer())) },
+            "/stream" bind GET to { Response(OK).with(Body.binary(TEXT_PLAIN).toLens() of "hello".byteInputStream()) },
             "/presetlength" bind GET to { Response(OK).header("Content-Length", "0") },
             "/echo" bind POST to { Response(OK).body(it.bodyString()) },
             "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
