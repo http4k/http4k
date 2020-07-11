@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - [http4k-core] Replaced implementation of `JavaHttpClient` with one from Java standard library. Should you not yet have access to the Java 11 SDK, we renamed the old implementation to `Java8HttpClient`. Note that some headers that are added by default by the old Java8 implementation will no longer be added.
 - [http4k-core] [Breaking] Change `Body.binary()` lens to use an InputStream instead of a raw `Body`. To fix, just provide the InputStream by calling `Body.stream()` or similar.
 - [http4k-client-websocket] [Unlikely break] Allow API users to pass in their own `Draft` object for custom protocols. If broken, simple fix is to just use named arguments in the construction call to the client.
+- [all] Upgrade some dependency versions.
 
 ### v3.252.0
 - [http4k-server-apache, http4k-client-apache, http4k-client-apache-async] [Breaking] Updated to Apache HTTP 5.X.X. H/T to @jshiell. Note that the underlying Apache APIs have changed in the v5 release. For the clients, this should only break if you have customised the underlying HTTP `CloseableHttpClient` that is passed to the constructor of the http4k client. If you have, we have you covered with....

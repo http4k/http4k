@@ -54,7 +54,7 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.50.Final"
+    const val netty_codec_http2: String = "4.1.51.Final"
 
     const val jackson_databind: String = "2.11.1"
 
@@ -84,7 +84,7 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val bunting4k: String = "0.1.0.0"
+    const val bunting4k: String = "0.2.0.0"
 
     const val httpcore5: String = "5.0.1"
 
