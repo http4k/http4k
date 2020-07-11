@@ -4,7 +4,7 @@ description: Feature overview of the http4k-testing-servirtium module, used for 
 ### Installation (Gradle)
 
 ```groovy
-compile group: "org.http4k", name: "http4k-testing-servirtium", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-testing-servirtium", version: "3.253.0"
 ```
 
 ### About

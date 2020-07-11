@@ -6,7 +6,7 @@ This example shows how to use the simple routing functionality to bind several r
 ### Gradle setup
 
 ```groovy
-compile group: "org.http4k", name: "http4k-core", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-core", version: "3.253.0"
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/simple_routing/example.kt)

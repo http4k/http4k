@@ -5,19 +5,19 @@ description: Feature overview of the JSON http4k-format modules, several of whic
 
 ```groovy
 // Argo:  
-compile group: "org.http4k", name: "http4k-format-argo", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-format-argo", version: "3.253.0"
 
 // Gson:  
-compile group: "org.http4k", name: "http4k-format-gson", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-format-gson", version: "3.253.0"
 
 // Jackson: 
-compile group: "org.http4k", name: "http4k-format-jackson", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-format-jackson", version: "3.253.0"
 
 // Moshi: 
-compile group: "org.http4k", name: "http4k-format-moshi", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-format-moshi", version: "3.253.0"
 
 // KotlinX Serialization: 
-compile group: "org.http4k", name: "http4k-format-kotlinx-serialization", version: "3.252.0"
+compile group: "org.http4k", name: "http4k-format-kotlinx-serialization", version: "3.253.0"
 ```
 
 ### About
