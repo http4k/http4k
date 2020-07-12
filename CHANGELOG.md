@@ -29,6 +29,8 @@ changes with their rationale when appropriate:
 ### v3.254.0
 - [all] Upgrade some dependency versions.
 - [http4k-core] Added `hostDemux()` routing for when you want to select an `HttpHandler` based on the Host header.
+- [http4k-security-oauth] [Breaking] Make the state on oauth requests just be the csrf token and store the originating uri in the oauth persistence layter instead. This will break any inflight oauth requests H/T @tom for the PR.
+
 
 ### v3.253.0
 - [http4k-core] Replaced implementation of `JavaHttpClient` with one from Java standard library. Should you not yet have access to the Java 11 SDK, we renamed the old implementation to `Java8HttpClient`. Note that some headers that are added by default by the old Java8 implementation will no longer be added.

@@ -57,13 +57,13 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - when no accessToken value present, request is redirected to expected location`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&response_mode=form_post"""
+        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&response_mode=form_post"""
         assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
     @Test
     fun `filter - accepts custom request JWT container`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&request=myCustomJwt&response_mode=form_post"""
+        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&request=myCustomJwt&response_mode=form_post"""
 
         val jwts = object : RequestJwts {
             override fun create(authRequest: AuthRequest, state: State, nonce: Nonce?) = RequestJwtContainer("myCustomJwt")
@@ -82,7 +82,7 @@ class OAuthProviderTest {
     private val withCookie = Request(GET, "/").cookie("serviceCsrf", "randomCsrf")
     private val withCode = withCookie.query("code", "value")
     private val withCodeAndInvalidState = withCode.query("state", listOf("csrf" to "notreal").toUrlFormEncoded())
-    private val withCodeAndValidStateButNoUrl = withCode.query("state", listOf("csrf" to "randomCsrf").toUrlFormEncoded())
+    private val withCodeAndValidStateButNoUrl = withCode.query("state", "randomCsrf")
 
     @Test
     fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {

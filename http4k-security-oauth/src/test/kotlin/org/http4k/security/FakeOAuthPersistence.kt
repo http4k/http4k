@@ -2,6 +2,7 @@ package org.http4k.security
 
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Uri
 import org.http4k.security.openid.Nonce
 
 class FakeOAuthPersistence : OAuthPersistence {
@@ -9,6 +10,7 @@ class FakeOAuthPersistence : OAuthPersistence {
     var csrf: CrossSiteRequestForgeryToken? = null
     var nonce: Nonce? = null
     var accessToken: AccessToken? = null
+    var originalUri: Uri? = null
 
     override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
 
@@ -23,6 +25,13 @@ class FakeOAuthPersistence : OAuthPersistence {
     }
 
     override fun retrieveNonce(request: Request): Nonce? = nonce
+
+    override fun assignOriginalUri(redirect: Response, originalUri: Uri): Response {
+        this.originalUri = originalUri
+        return redirect.header("action", "assignOriginalUri")
+    }
+
+    override fun retrieveOriginalUri(request: Request): Uri? = originalUri
 
     override fun retrieveToken(request: Request): AccessToken? = accessToken
 

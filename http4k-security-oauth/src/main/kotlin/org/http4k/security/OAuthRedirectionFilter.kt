@@ -5,7 +5,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
-import org.http4k.core.toUrlFormEncoded
 import org.http4k.core.with
 import org.http4k.lens.Header.LOCATION
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
@@ -30,7 +29,7 @@ class OAuthRedirectionFilter(
     override fun invoke(next: HttpHandler): HttpHandler = {
         if (oAuthPersistence.retrieveToken(it) != null) next(it) else {
             val csrf = generateCrsf()
-            val state = State(listOf("csrf" to csrf.value, "uri" to it.uri.toString()).toUrlFormEncoded())
+            val state = State(csrf.value)
             val nonce = generateNonceIfRequired()
 
             val authRequest = AuthRequest(
@@ -44,7 +43,7 @@ class OAuthRedirectionFilter(
 
             val redirect = Response(TEMPORARY_REDIRECT)
                 .with(LOCATION of modifyState(redirectionBuilder(providerConfig.authUri, authRequest, state, nonce)))
-            assignNonceIfRequired(oAuthPersistence.assignCsrf(redirect, csrf), nonce)
+            assignNonceIfRequired(oAuthPersistence.assignOriginalUri(oAuthPersistence.assignCsrf(redirect, csrf), it.uri), nonce)
         }
     }
 

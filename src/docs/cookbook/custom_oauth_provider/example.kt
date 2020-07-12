@@ -1,22 +1,13 @@
 package cookbook.custom_oauth_provider
 
 import org.http4k.client.ApacheClient
-import org.http4k.core.Credentials
-import org.http4k.core.HttpHandler
+import org.http4k.core.*
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.AccessToken
-import org.http4k.security.CrossSiteRequestForgeryToken
-import org.http4k.security.OAuthPersistence
-import org.http4k.security.OAuthProvider
-import org.http4k.security.OAuthProviderConfig
+import org.http4k.security.*
 import org.http4k.security.openid.Nonce
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -56,6 +47,7 @@ fun main() {
 class CustomOAuthPersistence : OAuthPersistence {
     var nonce: Nonce? = null
     var csrf: CrossSiteRequestForgeryToken? = null
+    var originalUri: Uri? = null
     var accessToken: AccessToken? = null
 
     override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
@@ -71,6 +63,13 @@ class CustomOAuthPersistence : OAuthPersistence {
     }
 
     override fun retrieveNonce(request: Request): Nonce? = nonce
+
+    override fun assignOriginalUri(redirect: Response, originalUri: Uri): Response {
+        this.originalUri = originalUri
+        return redirect.header("action", "assignOriginalUri")
+    }
+
+    override fun retrieveOriginalUri(request: Request): Uri? = originalUri
 
     override fun retrieveToken(request: Request): AccessToken? = accessToken
 
