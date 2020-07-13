@@ -74,6 +74,11 @@ fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg e
 fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/public"), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler =
     SinglePageAppRoutingHandler("", StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
 
+/**
+ * Matches the Host header to a matching Handler.
+ */
+fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>): RoutingHttpHandler = HostDemuxRoutingHttpHandler(mapOf(*hosts))
+
 interface RoutingWsHandler : WsHandler {
     fun withBasePath(new: String): RoutingWsHandler
 }

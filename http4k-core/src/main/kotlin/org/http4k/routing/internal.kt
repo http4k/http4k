@@ -158,3 +158,19 @@ internal data class SinglePageAppRoutingHandler(
 
     override fun withBasePath(new: String) = SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
 }
+
+internal class HostDemuxRoutingHttpHandler(private val hosts: Map<String, RoutingHttpHandler>) : RoutingHttpHandler {
+    override fun invoke(p1: Request) = when (val result = match(p1)) {
+        is MatchingHandler -> result(p1)
+        is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
+        is Unmatched -> Response(NOT_FOUND)
+    }
+
+    override fun match(request: Request) = request.header("host")
+        ?.let { hosts[it]?.let(RouterMatch::MatchingHandler) }
+        ?: Unmatched
+
+    override fun withBasePath(new: String) = HostDemuxRoutingHttpHandler(hosts.mapValues { it.value.withBasePath(new) })
+
+    override fun withFilter(new: Filter) = HostDemuxRoutingHttpHandler(hosts.mapValues { it.value.withFilter(new) })
+}
