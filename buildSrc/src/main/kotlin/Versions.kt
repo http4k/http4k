@@ -84,7 +84,7 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val bunting4k: String = "0.2.0.0"
+    const val bunting4k: String = "0.4.0.0"
 
     const val httpcore5: String = "5.0.1"
 
