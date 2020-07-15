@@ -17,8 +17,8 @@ import java.time.ZoneId
  * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
 class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
-                                          private val cookieValidity: Duration = Duration.ofHours(1),
-                                          private val clock: Clock = Clock.systemUTC()) : OAuthPersistence {
+                                          private val cookieValidity: Duration = Duration.ofHours(3),
+                                          private val clock: Clock = Clock.systemDefaultZone()) : OAuthPersistence {
 
     private val csrfName = "${cookieNamePrefix}Csrf"
 
@@ -45,5 +45,5 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
         .invalidateCookie(accessTokenCookieName)
         .invalidateCookie(nonceName)
 
-    private fun expiring(name: String, value: String) = Cookie(name, value, expires = LocalDateTime.ofInstant(clock.instant().plus(cookieValidity), ZoneId.of("GMT")))
+    private fun expiring(name: String, value: String) = Cookie(name, value, expires = LocalDateTime.ofInstant(clock.instant().plus(cookieValidity), clock.zone), path = "/")
 }

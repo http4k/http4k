@@ -5,6 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
+import org.http4k.routing.bind
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.Nonce.Companion.SECURE_NONCE
@@ -25,14 +26,13 @@ class OAuthProvider(
     private val nonceGenerator: NonceGenerator = SECURE_NONCE,
     private val responseType: ResponseType = ResponseType.Code,
     idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
-    private val accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(providerConfig)
+    accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(providerConfig)
 ) {
-
     // pre-configured API client for this provider
     val api = ClientFilters.SetHostFrom(providerConfig.apiBase).then(client)
 
     // use this filter to protect endpoints
-    val authFilter: Filter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType)
+    val authFilter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType)
 
     // protect endpoint and provide custom request JWT creation mechanism
     fun authFilter(requestJwts: RequestJwts): Filter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType, uriBuilderWithRequestJwt(requestJwts))
@@ -40,7 +40,10 @@ class OAuthProvider(
     private val accessTokenFetcher = AccessTokenFetcher(api, callbackUri, providerConfig, accessTokenFetcherAuthenticator)
 
     // this HttpHandler should exist at the callback URI registered with the OAuth Provider
-    val callback: HttpHandler = OAuthCallback(oAuthPersistence, idTokenConsumer, accessTokenFetcher)
+    val callback = OAuthCallback(oAuthPersistence, idTokenConsumer, accessTokenFetcher)
+
+    // convenient binding of callback path to handler
+    val callbackEndpoint = callbackUri.path bind callback
 
     companion object
 }
