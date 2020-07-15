@@ -17,15 +17,14 @@ import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 class InsecureCookieBasedOAuthPersistenceTest {
 
-    private val cookieValidity = Duration.ofHours(2)
+    private val cookieValidity = Duration.ofHours(1)
 
     private val clock: Clock = FixedClock
     private val persistence = InsecureCookieBasedOAuthPersistence("prefix", cookieValidity, clock)
-    private val expectedCookieExpiry = LocalDateTime.ofInstant(clock.instant().plus(cookieValidity), ZoneId.of("GMT"))
+    private val expectedCookieExpiry = LocalDateTime.ofInstant(clock.instant().plus(cookieValidity), clock.zone)
 
     @Test
     fun `failed response has correct cookies`() {
@@ -55,13 +54,13 @@ class InsecureCookieBasedOAuthPersistenceTest {
     @Test
     fun `adds csrf as a cookie to the auth redirect`() {
         assertThat(persistence.assignCsrf(Response(TEMPORARY_REDIRECT), CrossSiteRequestForgeryToken("csrfValue")),
-            equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixCsrf", "csrfValue", expires = expectedCookieExpiry))))
+            equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixCsrf", "csrfValue", expires = expectedCookieExpiry, path = "/"))))
     }
 
     @Test
     fun `adds csrf as a cookie to the token redirect`() {
         assertThat(persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessToken("tokenValue")),
-            equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue", expires = expectedCookieExpiry))
+            equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue", expires = expectedCookieExpiry, path = "/"))
                 .invalidateCookie("prefixCsrf").invalidateCookie("prefixNonce")
             ))
     }
@@ -70,7 +69,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
     fun `adds nonce as a cookie to the auth redirect`() {
         assertThat(persistence.assignNonce(Response(TEMPORARY_REDIRECT), Nonce("nonceValue")), equalTo(
             Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixNonce", "nonceValue",
-                expires = expectedCookieExpiry))
+                expires = expectedCookieExpiry, path = "/"))
         ))
     }
 }
