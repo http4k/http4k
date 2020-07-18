@@ -141,7 +141,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 security = AuthCodeOAuthSecurity(OAuthProvider.gitHub({ Response(OK) },
                     credentials,
                     Uri.of("http://localhost/callback"),
-                    FakeOAuthPersistence()))
+                    FakeOAuthPersistence(), listOf("user")))
             } bindContract POST to { Response(OK) }
             routes += "/body_form" meta {
                 receiving(Body.webForm(Strict,
