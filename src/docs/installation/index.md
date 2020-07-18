@@ -4,7 +4,7 @@ description: How to get the http4k library
 All **http4k** libraries are available on Maven Central and JCenter and are released under a single version. For the core module, add the following to your Gradle file:
 
 ```groovy
-compile group: "org.http4k", name: "http4k-core", version: "3.253.0"
+compile group: "org.http4k", name: "http4k-core", version: "3.254.0"
 ```
 
 <ul class="statusLink">

@@ -11,9 +11,9 @@ This contract example shows:
 ### Gradle setup
 
 ```groovy
-compile group: "org.http4k", name: "http4k-core", version: "3.253.0"
-compile group: "org.http4k", name: "http4k-contract", version: "3.253.0"
-compile group: "org.http4k", name: "http4k-format-argo", version: "3.253.0"
+compile group: "org.http4k", name: "http4k-core", version: "3.254.0"
+compile group: "org.http4k", name: "http4k-contract", version: "3.254.0"
+compile group: "org.http4k", name: "http4k-format-argo", version: "3.254.0"
 ```
 
 Note: although we use Argo here as our JSON API, you could also switch in any of the `http4k-format-xxx` JSON modules. 

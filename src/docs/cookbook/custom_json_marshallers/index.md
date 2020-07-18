@@ -4,8 +4,8 @@ description: Recipes for using JSON in http4k applications with a variety of pop
 ### Gradle setup
 
 ```groovy
-compile group: "org.http4k", name: "http4k-core", version: "3.253.0"
-compile group: "org.http4k", name: "http4k-format-jackson", version: "3.253.0"
+compile group: "org.http4k", name: "http4k-core", version: "3.254.0"
+compile group: "org.http4k", name: "http4k-format-jackson", version: "3.254.0"
 ```
 
 ## Custom auto-mapping JSON configurations

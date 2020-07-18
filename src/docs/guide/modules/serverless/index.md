@@ -5,13 +5,13 @@ description: Feature overview of the http4k-serverless modules, covering Serverl
 
 ```groovy
 // AWS Lambda: 
-compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.253.0"
+compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.254.0"
 
 // Google Cloud Functions: 
-compile group: "org.http4k", name: "http4k-serverless-gcf", version: "3.253.0"
+compile group: "org.http4k", name: "http4k-serverless-gcf", version: "3.254.0"
 
 // Apache OpenWhisk: 
-compile group: "org.http4k", name: "http4k-serverless-openwhisk", version: "3.253.0"
+compile group: "org.http4k", name: "http4k-serverless-openwhisk", version: "3.254.0"
 ```
 
 ### About

@@ -4,7 +4,7 @@ description: Feature overview of the http4k-jsonrpc module
 ### Installation (Gradle)
 
 ```groovy
-compile group: "org.http4k", name: "http4k-jsonrpc", version: "3.253.0"
+compile group: "org.http4k", name: "http4k-jsonrpc", version: "3.254.0"
 ```
 
 ### About
