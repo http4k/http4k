@@ -1,4 +1,4 @@
-package org.http4k.backend
+package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Filter
@@ -9,9 +9,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.bind
-import org.http4k.routing.hostDemux
-import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
 class HostDemuxRoutingHttpHandlerTest {
