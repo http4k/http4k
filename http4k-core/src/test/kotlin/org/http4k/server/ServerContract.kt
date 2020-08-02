@@ -1,10 +1,13 @@
 package org.http4k.server
 
+import com.natpryce.hamkrest.allElements
 import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
+import org.http4k.client.Java8HttpClient
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
@@ -14,8 +17,10 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.StreamBody
 import org.http4k.core.with
 import org.http4k.hamkrest.hasBody
@@ -27,7 +32,15 @@ import org.http4k.routing.routes
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
+import java.io.ByteArrayInputStream
+import java.lang.System.currentTimeMillis
 import java.net.InetAddress
+import java.net.SocketException
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.concurrent.thread
 
 abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
                               private val requiredMethods: Array<Method> = Method.values()) {
@@ -42,6 +55,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         requiredMethods.map { m ->
             "/" + m.name bind m to { Response(OK).body(m.name) }
         } + listOf(
+            "/health" bind GET to { Response(OK).body("UP") },
             "/headers" bind GET to {
                 Response(ACCEPTED).header("content-type", "text/plain")
             },
@@ -65,12 +79,19 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                     .header("x-address", request.source?.address ?: "")
                     .header("x-port", (request.source?.port ?: 0).toString())
                     .header("x-scheme", (request.source?.scheme ?: "unsupported").toString())
+            },
+            "/slow-echo" bind POST to {
+                Thread.sleep(500)
+                Response(OK).with(Body.binary(TEXT_PLAIN).toLens() of SlowBodyProducer(it.bodyString()))
             }
         )
 
     @BeforeEach
     fun before() {
         server = routes(*routes.toTypedArray()).asServer(serverConfig(0)).start()
+        retry(seconds=3) {
+            assertThat(client(Request(GET, "$baseUrl/health")), hasStatus(OK).and(hasBody("UP")))
+        }
     }
 
     @Test
@@ -193,6 +214,69 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             ))
     }
 
+    @Test
+    fun `rejects connections after server has been stopped`() {
+        server.stop()
+
+        val response = client(Request(GET, "$baseUrl/health"))
+
+        assertThat(response, hasStatus(CONNECTION_REFUSED))
+    }
+
+    @Test
+    @Timeout(5, unit = SECONDS)
+    fun `does not cancel inflight requests during shutdown`() {
+        val responses = ConcurrentLinkedQueue<Response>()
+        val numberOfInflightRequests = 5
+        val countDownInflightRequestsStarted = CountDownLatch(numberOfInflightRequests)
+        val inflightRequestThreads = (1..numberOfInflightRequests).map {
+            thread {
+                countDownInflightRequestsStarted.countDown()
+                try {
+                    responses.add(client(Request(POST, "$baseUrl/slow-echo").body("Hello")))
+                } catch (e: SocketException) { }
+            }
+        }
+        countDownInflightRequestsStarted.await(1, SECONDS)
+        Thread.sleep(100)
+
+        assertThat(responses.size, equalTo(0))
+        server.stop()
+        inflightRequestThreads.forEach { it.join() }
+
+        assertThat(responses, hasSize(equalTo(numberOfInflightRequests)))
+        assertThat(responses, allElements(hasStatus(OK).and(hasBody("Hello"))))
+    }
+
+    @Test
+    @Timeout(5, unit = SECONDS)
+    fun `responds with 503 service unavailable during graceful shutdown`() {
+        val inflightRequestOnTheWay = CountDownLatch(1)
+        val stopHasBeenCalled = CountDownLatch(1)
+        var responseFromInflightRequest: Response? = null
+        val requestToBlockShutdownThread = thread {
+            inflightRequestOnTheWay.countDown()
+            responseFromInflightRequest = client(Request(POST, "$baseUrl/slow-echo").body("Hello"))
+        }
+        val requestAfterStopThread = thread {
+            inflightRequestOnTheWay.await(1, SECONDS)
+            Thread.sleep(200)
+            stopHasBeenCalled.countDown()
+            server.stop()
+        }
+        stopHasBeenCalled.await(1, SECONDS)
+        Thread.sleep(100)
+
+        // The default ApacheClient will retry on 503 but the Java8HttpClient won't
+        val nonRetryClient = Java8HttpClient()
+        val responseFromRequestDuringShutdown = nonRetryClient(Request(GET, "$baseUrl/health"))
+
+        requestToBlockShutdownThread.join()
+        requestAfterStopThread.join()
+        assertThat(responseFromInflightRequest!!, hasStatus(OK).and(hasBody("Hello")))
+        assertThat(responseFromRequestDuringShutdown, hasStatus(SERVICE_UNAVAILABLE))
+    }
+
     open fun clientAddress() = equalTo(InetAddress.getLocalHost().hostAddress)
 
     open fun requestScheme() = equalTo("unsupported")
@@ -201,4 +285,34 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     fun after() {
         server.stop()
     }
+}
+
+private class SlowBodyProducer(message: String) : ByteArrayInputStream(message.toByteArray()) {
+    var firstRead = true
+
+    fun <T> wait(then: () -> T): T = then().also {
+        if (firstRead) {
+            Thread.sleep(500)
+            firstRead = false
+        }
+    }
+
+    override fun read(): Int = wait { super.read() }
+    override fun read(b: ByteArray): Int = wait { super.read(b) }
+    override fun read(b: ByteArray, off: Int, len: Int): Int = wait { super.read(b, off, len) }
+}
+
+private fun retry(seconds: Int, fn: () -> Unit) {
+    val until = currentTimeMillis() + seconds * 1000
+    var lastException: Throwable? = null
+    while(until >= currentTimeMillis()) {
+        try {
+            fn()
+            return
+        } catch (e: Throwable) {
+            lastException = e
+            Thread.sleep(20)
+        }
+    }
+    lastException?.let { throw it }
 }

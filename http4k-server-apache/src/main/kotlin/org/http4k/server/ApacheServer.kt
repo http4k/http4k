@@ -19,10 +19,12 @@ import org.http4k.core.Response
 import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.GracefulShutdown
 import org.http4k.lens.Header.CONTENT_TYPE
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.URI
+import java.time.Duration
 import org.apache.hc.core5.http.HttpRequest as ApacheRequest
 import org.apache.hc.core5.http.HttpResponse as ApacheResponse
 
@@ -71,8 +73,10 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, 
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer
+        private val shutdownFilter = GracefulShutdown()
 
         init {
+            val handlerWithShutdownFilter = shutdownFilter.then(httpHandler)
             val bootstrap = ServerBootstrap.bootstrap()
                 .setListenerPort(port)
                 .setSocketConfig(SocketConfig.custom()
@@ -81,7 +85,7 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, 
                     .setSoReuseAddress(true)
                     .setBacklogSize(1000)
                     .build())
-                .register("*", Http4kRequestHandler(httpHandler))
+                .register("*", Http4kRequestHandler(handlerWithShutdownFilter))
 
             if (canonicalHostname != null)
                 bootstrap.setCanonicalHostName(canonicalHostname)
@@ -94,7 +98,10 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, 
 
         override fun start() = apply { server.start() }
 
-        override fun stop() = apply { server.stop() }
+        override fun stop() = apply {
+            shutdownFilter.shutdown(Duration.ofSeconds(10))
+            server.stop()
+        }
 
         override fun port(): Int = if (port != 0) port else server.localPort
     }

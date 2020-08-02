@@ -10,9 +10,14 @@ import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
-import java.lang.Runtime.getRuntime
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.GracefulShutdown
+import java.lang.System.currentTimeMillis
 import java.net.InetSocketAddress
+import java.time.Duration
 import java.util.concurrent.Executors.newWorkStealingPool
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import kotlin.math.max
 
 class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
@@ -50,13 +55,30 @@ data class SunHttp(val port: Int = 8000) : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
         override fun port(): Int = if (port > 0) port else server.address.port
 
+        private val shutdownFilter = GracefulShutdown()
+        private val executor = newWorkStealingPool()
+
         private val server = HttpServer.create(InetSocketAddress(port), 1000)
-        override fun start(): Http4kServer = apply {
-            server.createContext("/", HttpExchangeHandler(httpHandler))
-            server.executor = newWorkStealingPool()
-            server.start()
+        override fun start(): Http4kServer {
+            val handlerWithGracefulShutdown = shutdownFilter.then(httpHandler)
+            return apply {
+                server.createContext("/", HttpExchangeHandler(handlerWithGracefulShutdown))
+                server.executor = executor
+                server.start()
+            }
         }
 
-        override fun stop() = apply { server.stop(0) }
+        override fun stop() = apply {
+            val gracefulShutdownTimeout = Duration.ofSeconds(10)
+            val shutdownDeadline = currentTimeMillis() + gracefulShutdownTimeout.toMillis()
+
+            shutdownFilter.shutdown(gracefulShutdownTimeout)
+
+            executor.shutdown()
+            val remainingShutdownTimeInMillis = max(0L, shutdownDeadline - currentTimeMillis())
+            executor.awaitTermination(remainingShutdownTimeInMillis, MILLISECONDS)
+
+            server.stop(0)
+        }
     }
 }

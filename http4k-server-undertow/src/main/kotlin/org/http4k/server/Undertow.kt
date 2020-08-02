@@ -15,7 +15,9 @@ import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.GracefulShutdown
 import java.net.InetSocketAddress
+import java.time.Duration
 
 /**
  * Exposed to allow for insertion into a customised Undertow server instance
@@ -46,14 +48,19 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : ServerConf
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer =
         object : Http4kServer {
+            val shutdownFilter = GracefulShutdown()
+
             val server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, enableHttp2)
-                .setHandler(BlockingHandler(HttpUndertowHandler(httpHandler))).build()
+                .setHandler((BlockingHandler(HttpUndertowHandler(shutdownFilter.then(httpHandler))))).build()
 
             override fun start() = apply { server.start() }
 
-            override fun stop() = apply { server.stop() }
+            override fun stop() = apply {
+                shutdownFilter.shutdown(Duration.ofSeconds(10))
+                server.stop()
+            }
 
             override fun port(): Int = if (port > 0) port else (server.listenerInfo[0].address as InetSocketAddress).port
         }

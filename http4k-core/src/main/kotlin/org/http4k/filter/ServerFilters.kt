@@ -14,6 +14,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.Store
@@ -30,6 +31,12 @@ import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.lang.System.currentTimeMillis
+import java.time.Duration
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 data class CorsPolicy(val origins: List<String>,
                       val headers: List<String>,
@@ -337,6 +344,96 @@ object ServerFilters {
                         response.body(loader.load(it)?.readText() ?: "")
                     } ?: response
             }
+        }
+    }
+
+    /**
+     * When shutdown mode is active this filter will return 503 Service Unavailable for all incoming requests.
+     *
+     * Call [#shutdown] to initiate and wait for shutdown to complete
+     */
+    class GracefulShutdown : Filter {
+
+        private val lock = ReentrantLock()
+        private val shutdownComplete = lock.newCondition()
+        private val shutdownState = AtomicLong(0L)
+
+        override fun invoke(next: HttpHandler): HttpHandler {
+            return { request ->
+                if (!increaseRequestCount())
+                    Response(SERVICE_UNAVAILABLE).body(SERVICE_UNAVAILABLE.toString())
+                else {
+                    try {
+                        next(request)
+                    } finally {
+                        decreaseRequestCount()
+                    }
+                }
+            }
+        }
+
+        /**
+         * @return true when the shutdown was successful within the given timeout
+         *         false if timeout was reached or an interrupt was received
+         */
+        fun shutdown(timeout: Duration): Boolean {
+            return try {
+                shutdownState.startShutdown {
+                    lock.withLock {
+                        val deadline = currentTimeMillis() + timeout.toMillis()
+                        while (!shutdownState.get().shutdownCompleted()) {
+                            val millisTillDeadline = deadline - currentTimeMillis()
+                            if (millisTillDeadline <= 0) return@withLock false
+                            shutdownComplete.await(millisTillDeadline, MILLISECONDS)
+                        }
+                        true
+                    }
+                }
+            } catch (e: InterruptedException) {
+                false
+            }
+        }
+
+        private fun increaseRequestCount(): Boolean = shutdownState.incrementActive { newState: Long ->
+            if (newState.isShuttingDown()) {
+                decreaseRequestCount()
+                false
+            } else {
+                true
+            }
+        }
+
+        private fun decreaseRequestCount(): Unit = shutdownState.decrementActive { newState: Long ->
+            check(newState.activeRequests() >= 0)
+            if (newState.shutdownCompleted()) signalShutdownCompleted()
+        }
+
+        private fun signalShutdownCompleted() = lock.withLock { shutdownComplete.signalAll() }
+
+        companion object {
+            private const val SHUTDOWN_MASK = 1L shl 63
+            private const val ACTIVE_COUNT_MASK: Long = SHUTDOWN_MASK.inv()
+
+            private fun <T> AtomicLong.incrementActive(withNewState: (Long) -> T): T =
+                withNewState(updateAndGet { state ->
+                    val incrementedActiveCount = state.activeRequests() + 1
+                    incrementedActiveCount or (state and SHUTDOWN_MASK)
+                })
+
+            private fun <T> AtomicLong.decrementActive(withNewState: (Long) -> T): T =
+                withNewState(updateAndGet { state ->
+                    val decrementedActiveCount = state.activeRequests() - 1
+                    decrementedActiveCount or (state and SHUTDOWN_MASK)
+                })
+
+            private fun <T> AtomicLong.startShutdown(then: () -> T): T {
+                updateAndGet { state: Long -> state or SHUTDOWN_MASK }
+                return then()
+            }
+
+            private fun Long.isShuttingDown(): Boolean = this and SHUTDOWN_MASK != 0L
+            private fun Long.shutdownCompleted(): Boolean = this == SHUTDOWN_MASK
+            private fun Long.activeRequests(): Long = this and ACTIVE_COUNT_MASK
         }
     }
 }

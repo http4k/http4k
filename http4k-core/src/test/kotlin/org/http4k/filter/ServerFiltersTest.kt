@@ -26,6 +26,7 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
@@ -46,6 +47,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.time.Duration
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.concurrent.thread
 
 class ServerFiltersTest {
 
@@ -399,6 +404,48 @@ class ServerFiltersTest {
         val handler = ServerFilters.SetContentType(OCTET_STREAM).then { Response(OK) }
 
         assertThat(handler(Request(GET, "/")), hasContentType(OCTET_STREAM))
+    }
+
+    @Nested
+    inner class GracefulShutdown {
+
+        @Test
+        fun `requests go through`() {
+            val shutdownFilter = ServerFilters.GracefulShutdown().then { Response(OK) }
+            assertThat(shutdownFilter(Request(GET, "/")), hasStatus(OK))
+        }
+
+        @Test
+        fun `inflight requests are not terminated`() {
+            val shutdownFilter = ServerFilters.GracefulShutdown()
+            val requestHasBeenReceived = CountDownLatch(1)
+            val shutdownHasBeenInvoked = CountDownLatch(1)
+            val handler = shutdownFilter.then {
+                requestHasBeenReceived.countDown()
+                shutdownHasBeenInvoked.await(1, SECONDS);
+                Thread.sleep(100);
+                Response(OK)
+            }
+            thread {
+                requestHasBeenReceived.await(1, SECONDS)
+                shutdownHasBeenInvoked.countDown()
+                shutdownFilter.shutdown(Duration.ofMillis(200))
+            }
+
+            val requestBeforeShutdown = handler(Request(GET, "/"))
+
+            assertThat(requestBeforeShutdown, hasStatus(OK))
+        }
+
+        @Test
+        fun `requests are blocked`() {
+            val shutdownFilter = ServerFilters.GracefulShutdown()
+            val handler = shutdownFilter.then { Response(OK) }
+
+            shutdownFilter.shutdown(Duration.ofSeconds(1))
+
+            assertThat(handler(Request(GET, "/")), hasStatus(SERVICE_UNAVAILABLE))
+        }
     }
 
 }

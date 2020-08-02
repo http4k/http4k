@@ -15,8 +15,11 @@ import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.websocket.server.WebSocketHandler
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory
 import org.http4k.core.HttpHandler
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.GracefulShutdown
 import org.http4k.servlet.asServlet
 import org.http4k.websocket.WsHandler
+import java.time.Duration
 
 class Jetty(private val port: Int, private val server: Server) : WsServerConfig {
     constructor(port: Int = 8000) : this(port, http(port))
@@ -25,7 +28,9 @@ class Jetty(private val port: Int, private val server: Server) : WsServerConfig 
     })
 
     override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?): Http4kServer {
-        httpHandler?.let { server.insertHandler(httpHandler.toJettyHandler()) }
+        val shutdownFilter = GracefulShutdown()
+
+        httpHandler?.let { server.insertHandler(shutdownFilter.then(httpHandler).toJettyHandler()) }
         wsHandler?.let { server.insertHandler(it.toJettyHandler()) }
 
         return object : Http4kServer {
@@ -33,7 +38,10 @@ class Jetty(private val port: Int, private val server: Server) : WsServerConfig 
                 server.start()
             }
 
-            override fun stop(): Http4kServer = apply { server.stop() }
+            override fun stop(): Http4kServer = apply {
+                shutdownFilter.shutdown(Duration.ofSeconds(10))
+                server.stop()
+            }
 
             override fun port(): Int = if (port > 0) port else server.uri.port
         }

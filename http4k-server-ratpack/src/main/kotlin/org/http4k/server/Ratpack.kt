@@ -5,26 +5,36 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.GracefulShutdown
 import ratpack.handling.Context
 import ratpack.handling.Handler
 import ratpack.http.TypedData
 import ratpack.server.RatpackServer
 import ratpack.server.RatpackServerSpec
+import java.time.Duration
 import ratpack.server.ServerConfig as RatpackServerConfig
 
 class Ratpack(port: Int = 8000) : ServerConfig {
     private val serverConfig = RatpackServerConfig.embedded().port(port)
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer {
+
+        val shutdownFilter = GracefulShutdown()
+
         val server = RatpackServer.of { server: RatpackServerSpec ->
+            val handlerWithShutdownFilter = shutdownFilter.then(httpHandler)
             server.serverConfig(serverConfig)
-                .handler { RatpackHttp4kHandler(httpHandler) }
+                .handler { RatpackHttp4kHandler(handlerWithShutdownFilter) }
         }
 
         return object : Http4kServer {
             override fun start(): Http4kServer = apply { server.start() }
 
-            override fun stop(): Http4kServer = apply { server.stop() }
+            override fun stop(): Http4kServer = apply {
+                shutdownFilter.shutdown(Duration.ofSeconds(10))
+                server.stop()
+            }
 
             override fun port(): Int = server.bindPort
         }

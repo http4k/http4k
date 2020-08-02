@@ -20,17 +20,25 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.GracefulShutdown
 import org.http4k.lens.Header
-import java.util.concurrent.TimeUnit.SECONDS
+import java.lang.System.currentTimeMillis
+import java.time.Duration
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import kotlin.math.max
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 data class KtorNetty(val port: Int = 8000) : ServerConfig {
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+        private val shutdownFilter = GracefulShutdown()
+        private val handlerWithShutdownFilter = shutdownFilter.then(httpHandler)
+
         private val engine: NettyApplicationEngine = embeddedServer(Netty, port) {
             intercept(Call) {
-                with(context) { response.fromHttp4K(httpHandler(request.asHttp4k())) }
+                with(context) { response.fromHttp4K(handlerWithShutdownFilter(request.asHttp4k())) }
                 return@intercept finish()
             }
         }
@@ -40,7 +48,11 @@ data class KtorNetty(val port: Int = 8000) : ServerConfig {
         }
 
         override fun stop() = apply {
-            engine.stop(0, 2, SECONDS)
+            val shutdownTimeout = Duration.ofSeconds(10)
+            val deadline = currentTimeMillis() + shutdownTimeout.toMillis()
+            shutdownFilter.shutdown(shutdownTimeout)
+            val remainingMillis = max(0, deadline - currentTimeMillis())
+            engine.stop(0, remainingMillis, MILLISECONDS)
         }
 
         override fun port() = engine.environment.connectors[0].port

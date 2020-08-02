@@ -37,7 +37,9 @@ import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.GracefulShutdown
 import java.net.InetSocketAddress
+import java.time.Duration
 
 
 /**
@@ -71,6 +73,8 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 
 data class Netty(val port: Int = 8000) : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+        private val shutdownFilter = GracefulShutdown()
+
         private val masterGroup = NioEventLoopGroup()
         private val workerGroup = NioEventLoopGroup()
         private var closeFuture: ChannelFuture? = null
@@ -86,7 +90,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                         ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
-                        ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
+                        ch.pipeline().addLast("handler", Http4kChannelHandler(shutdownFilter.then(httpHandler)))
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 1000)
@@ -98,6 +102,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
         }
 
         override fun stop() = apply {
+            shutdownFilter.shutdown(Duration.ofSeconds(10))
             closeFuture?.cancel(false)
             workerGroup.shutdownGracefully()
             masterGroup.shutdownGracefully()
