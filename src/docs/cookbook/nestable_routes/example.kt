@@ -29,6 +29,7 @@ fun main() {
     val app = routes(
         "/bob" bind routesWithFilter,
         "/static" bind staticWithFilter,
+        "/pattern/{rest:.*}" bind { req: Request -> Response(OK).body(req.path("rest") ?: "") },
         "/rita" bind routes(
             "/delete/{name}" bind DELETE to { _: Request -> Response(OK) },
             "/post/{name}" bind POST to { _: Request -> Response(OK) }
@@ -38,5 +39,6 @@ fun main() {
 
     println(app(Request(GET, "/bob/get/value")))
     println(app(Request(GET, "/static/someStaticFile.txt")))
+    println(app(Request(GET, "/pattern/some/entire/pattern/we/want/to/capture")))
     println(app(Request(GET, "/someSpaResource")))
 }
