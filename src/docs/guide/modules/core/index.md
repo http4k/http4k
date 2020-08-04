@@ -61,7 +61,7 @@ val myFilter = Filter {
             response
     }
 }
-val latencyAndBasicAuth: HttpHandler = ServerFilters.BasicAuth("my realm", "user", "password").then(myFilter)
+val latencyAndBasicAuth: Filter = ServerFilters.BasicAuth("my realm", "user", "password").then(myFilter)
 val app: HttpHandler = latencyAndBasicAuth.then(handler)
 ```
 
