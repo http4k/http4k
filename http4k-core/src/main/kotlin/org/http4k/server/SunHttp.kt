@@ -10,7 +10,9 @@ import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
+import java.lang.Runtime.getRuntime
 import java.net.InetSocketAddress
+import java.util.concurrent.Executors.newWorkStealingPool
 
 class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
@@ -51,6 +53,7 @@ data class SunHttp(val port: Int = 8000) : ServerConfig {
         private val server = HttpServer.create(InetSocketAddress(port), 0)
         override fun start(): Http4kServer = apply {
             server.createContext("/", HttpExchangeHandler(httpHandler))
+            server.executor = newWorkStealingPool()
             server.start()
         }
 
