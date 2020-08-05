@@ -37,8 +37,9 @@ class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
                 populate(handler(toRequest()))
             } catch (e: Exception) {
                 sendResponseHeaders(500, 0)
+            } finally {
+                close()
             }
-            close()
         }
     }
 }
