@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.255.0 (uncut)
 - [all] [Breaking (if you're not using it right!)] - Fixed up Maven dependencies so that they are not exporting compileOnly libraries into POMs.
 - [http4k-security-oauth] Remove "user" from default list of GitHub scopes as it gives you write access to the profile. New default is empty (just public data).
+- [http4k-core] Improve defaults of SunHttp server. H/T @nlochschmidt for the PR.
 
 ### v3.254.0
 - [all] Upgrade some dependency versions.
