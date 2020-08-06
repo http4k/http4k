@@ -11,7 +11,7 @@ class FieldRetrievalTest {
         override fun invoke(p1: Any, p2: String) = throw NoFieldFound(p2, p1)
     }
 
-    private val result = Field("hello", true)
+    private val result = Field("hello", true, FieldMetadata.empty)
 
     private val findIt = object : FieldRetrieval {
         override fun invoke(p1: Any, p2: String): Field = result
@@ -26,6 +26,6 @@ class FieldRetrievalTest {
 
     @Test
     fun `field retrieval falls back if none found`() {
-        assertThat(FieldRetrieval.compose(blowUp, findIt)(Beany(), "foo"), equalTo(Field("hello", true)))
+        assertThat(FieldRetrieval.compose(blowUp, findIt)(Beany(), "foo"), equalTo(Field("hello", true, FieldMetadata.empty)))
     }
 }

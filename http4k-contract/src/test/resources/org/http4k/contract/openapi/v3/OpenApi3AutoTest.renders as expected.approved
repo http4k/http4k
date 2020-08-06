@@ -100,17 +100,20 @@
                   "properties": {
                     "foo": {
                       "example": 123,
+                      "description": null,
                       "type": "number"
                     }
                   },
                   "example": {
                     "foo": 123
                   },
+                  "description": null,
                   "type": "object",
                   "required": [
                     "foo"
                   ]
                 },
+                "description": null,
                 "example": null,
                 "type": "object"
               }
@@ -154,6 +157,7 @@
               },
               "schema": {
                 "$ref": "#/components/schemas/someOtherId",
+                "description": null,
                 "example": null
               }
             }
@@ -190,6 +194,7 @@
               },
               "schema": {
                 "$ref": "#/components/schemas/ArbObject3",
+                "description": null,
                 "example": null
               }
             }
@@ -219,6 +224,7 @@
                       "anotherString": "bing"
                     }
                   ],
+                  "description": null,
                   "type": "array"
                 }
               }
@@ -251,10 +257,12 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/ArbObject1",
+                    "description": null,
                     "example": null
                   },
                   {
                     "$ref": "#/components/schemas/ArbObject3",
+                    "description": null,
                     "example": null
                   }
                 ]
@@ -294,6 +302,7 @@
                 },
                 "schema": {
                   "$ref": "#/components/schemas/ArbObject1",
+                  "description": null,
                   "example": null
                 }
               }
@@ -307,10 +316,12 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/ArbObject1",
+                      "description": null,
                       "example": null
                     },
                     {
                       "$ref": "#/components/schemas/ArbObject3",
+                      "description": null,
                       "example": null
                     }
                   ]
@@ -347,10 +358,12 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/impl1",
+                      "description": null,
                       "example": null
                     },
                     {
                       "$ref": "#/components/schemas/impl2",
+                      "description": null,
                       "example": null
                     }
                   ]
@@ -1015,10 +1028,12 @@
         "properties": {
           "string": {
             "example": "s",
+            "description": null,
             "type": "string"
           },
           "child": {
             "$ref": "#/components/schemas/ArbObject1",
+            "description": null,
             "example": null
           },
           "numbers": {
@@ -1032,10 +1047,12 @@
             "example": [
               1
             ],
+            "description": null,
             "type": "array"
           },
           "bool": {
             "example": true,
+            "description": null,
             "type": "boolean"
           }
         },
@@ -1049,6 +1066,7 @@
           ],
           "bool": true
         },
+        "description": null,
         "type": "object",
         "required": [
           "bool",
@@ -1060,12 +1078,14 @@
         "properties": {
           "anotherString": {
             "$ref": "#/components/schemas/Foo",
+            "description": null,
             "example": null
           }
         },
         "example": {
           "anotherString": "bing"
         },
+        "description": null,
         "type": "object",
         "required": [
           "anotherString"
@@ -1077,12 +1097,14 @@
           "bar",
           "bing"
         ],
+        "description": null,
         "type": "string"
       },
       "ArbObject3": {
         "properties": {
           "uri": {
             "example": "http://foowang",
+            "description": null,
             "type": "string"
           },
           "additional": {
@@ -1090,17 +1112,20 @@
               "properties": {
                 "foo": {
                   "example": 123,
+                  "description": null,
                   "type": "number"
                 }
               },
               "example": {
                 "foo": 123
               },
+              "description": null,
               "type": "object",
               "required": [
                 "foo"
               ]
             },
+            "description": null,
             "example": null,
             "type": "object"
           }
@@ -1111,6 +1136,7 @@
             "foo": 123
           }
         },
+        "description": null,
         "type": "object",
         "required": [
           "additional",
@@ -1121,6 +1147,7 @@
         "properties": {
           "obj": {
             "$ref": "#/components/schemas/Impl1",
+            "description": null,
             "example": null
           }
         },
@@ -1129,6 +1156,7 @@
             "value": "bob"
           }
         },
+        "description": null,
         "type": "object",
         "required": [
           "obj"
@@ -1138,12 +1166,14 @@
         "properties": {
           "value": {
             "example": "bob",
+            "description": null,
             "type": "string"
           }
         },
         "example": {
           "value": "bob"
         },
+        "description": null,
         "type": "object",
         "required": [
           "value"
@@ -1153,6 +1183,7 @@
         "properties": {
           "obj": {
             "$ref": "#/components/schemas/Impl2",
+            "description": null,
             "example": null
           }
         },
@@ -1161,6 +1192,7 @@
             "value": 123
           }
         },
+        "description": null,
         "type": "object",
         "required": [
           "obj"
@@ -1170,12 +1202,14 @@
         "properties": {
           "value": {
             "example": 123,
+            "description": null,
             "type": "number"
           }
         },
         "example": {
           "value": 123
         },
+        "description": null,
         "type": "object",
         "required": [
           "value"

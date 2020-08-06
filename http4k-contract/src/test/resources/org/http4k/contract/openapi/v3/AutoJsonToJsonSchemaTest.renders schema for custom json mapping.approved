@@ -1,6 +1,7 @@
 {
   "node": {
     "$ref": "#/components/schemas/ArbObjectHolder",
+    "description": null,
     "example": null
   },
   "definitions": [
@@ -19,6 +20,7 @@
             "example": [
               "foobar"
             ],
+            "description": null,
             "type": "array"
           }
         },
@@ -27,6 +29,7 @@
             "foobar"
           ]
         },
+        "description": null,
         "type": "object",
         "required": [
           "inner"
