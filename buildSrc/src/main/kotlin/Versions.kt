@@ -14,7 +14,7 @@ object Versions {
     const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.20.0"
              // available: "0.20.0-1.4-M1-release-99"
 
-    const val com_fasterxml_jackson_dataformat: String = "2.11.1"
+    const val com_fasterxml_jackson_dataformat: String = "2.11.2"
 
     const val io_github_resilience4j: String = "1.5.0"
 
@@ -22,7 +22,7 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.9.3"
 
-    const val org_eclipse_jetty: String = "9.4.30.v20200611"
+    const val org_eclipse_jetty: String = "9.4.30.v20200611" // available: "9.4.31.v20200723"
 
     const val org_junit_jupiter: String = "5.6.2"
 
@@ -39,14 +39,15 @@ object Versions {
     const val openapi_generator_gradle_plugin: String = "4.3.1"
 
     const val javax_websocket_server_impl: String = "9.4.30.v20200611"
+             // available: "9.4.31.v20200723"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
     const val functions_framework_api: String = "1.0.1"
 
-    const val aws_lambda_java_events: String = "3.1.0"
+    const val aws_lambda_java_events: String = "3.1.1"
 
-    const val jackson_module_kotlin: String = "2.11.1"
+    const val jackson_module_kotlin: String = "2.11.2"
 
     const val aws_lambda_java_core: String = "1.2.1"
 
@@ -56,17 +57,17 @@ object Versions {
 
     const val netty_codec_http2: String = "4.1.51.Final"
 
-    const val jackson_databind: String = "2.11.1"
+    const val jackson_databind: String = "2.11.2"
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val micrometer_core: String = "1.5.2"
+    const val micrometer_core: String = "1.5.3"
 
     const val java_websocket: String = "1.5.1"
 
-    const val commons_pool2: String = "2.8.0"
+    const val commons_pool2: String = "2.8.1"
 
-    const val http2_server: String = "9.4.30.v20200611"
+    const val http2_server: String = "9.4.31.v20200723"
 
     const val ratpack_core: String = "1.8.0"
 
@@ -80,11 +81,11 @@ object Versions {
 
     const val httpclient: String = "4.5.12"
 
-    const val underscore: String = "1.56"
+    const val underscore: String = "1.57"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val bunting4k: String = "0.10.0.0"
+    const val bunting4k: String = "0.14.0.0"
 
     const val httpcore5: String = "5.0.1"
 
@@ -100,7 +101,7 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val okhttp: String = "4.8.0"
+    const val okhttp: String = "4.8.1"
 
     const val pebble: String = "3.1.4"
 
