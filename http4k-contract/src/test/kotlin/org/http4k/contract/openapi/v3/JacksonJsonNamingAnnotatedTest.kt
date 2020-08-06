@@ -23,9 +23,9 @@ internal class JacksonJsonNamingAnnotatedTest {
 
     @Test
     fun `finds value from object`() {
-        assertThat("nonNullable", standard(Renamed(), "RenamedValue"), equalTo(Field("bob", false)))
-        assertThat("nonNullableNoRename", standard(Snake(), "renamedValue"), equalTo(Field("bob", false)))
-        assertThat("nullable", standard(Renamed(), "Nullable"), equalTo(Field("nullable", true)))
+        assertThat("nonNullable", standard(Renamed(), "RenamedValue"), equalTo(Field("bob", false, FieldMetadata.empty)))
+        assertThat("nonNullableNoRename", standard(Snake(), "renamedValue"), equalTo(Field("bob", false, FieldMetadata.empty)))
+        assertThat("nullable", standard(Renamed(), "Nullable"), equalTo(Field("nullable", true, FieldMetadata.empty)))
     }
 
     @Test
@@ -41,6 +41,6 @@ internal class JacksonJsonNamingAnnotatedTest {
 
     @Test
     fun `use custom Jackson naming strategy`() {
-        assertThat(JacksonJsonNamingAnnotated(CustomJackson)(Snake(), "renamed_value"), equalTo(Field("bob", false)))
+        assertThat(JacksonJsonNamingAnnotated(CustomJackson)(Snake(), "renamed_value"), equalTo(Field("bob", false, FieldMetadata.empty)))
     }
 }

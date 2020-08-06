@@ -1,6 +1,7 @@
 {
   "node": {
     "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.MapHolder",
+    "description": null,
     "example": null
   },
   "definitions": [
@@ -13,10 +14,12 @@
               "properties": {
                 "key": {
                   "example": "value",
+                  "description": null,
                   "type": "string"
                 },
                 "key2": {
                   "example": 123,
+                  "description": null,
                   "type": "number"
                 },
                 "key3": {
@@ -24,6 +27,7 @@
                     "properties": {
                       "inner": {
                         "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+                        "description": null,
                         "example": null
                       }
                     },
@@ -32,16 +36,19 @@
                         "uri": "foobar"
                       }
                     },
+                    "description": null,
                     "type": "object",
                     "required": [
                       "inner"
                     ]
                   },
+                  "description": null,
                   "example": null,
                   "type": "object"
                 },
                 "key4": {
                   "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+                  "description": null,
                   "example": null
                 }
               },
@@ -57,6 +64,7 @@
                   "uri": "foobar"
                 }
               },
+              "description": null,
               "type": "object",
               "required": [
                 "key",
@@ -65,6 +73,7 @@
                 "key4"
               ]
             },
+            "description": null,
             "example": null,
             "type": "object"
           }
@@ -83,6 +92,7 @@
             }
           }
         },
+        "description": null,
         "type": "object",
         "required": [
           "value"
@@ -95,12 +105,14 @@
         "properties": {
           "uri": {
             "example": "foobar",
+            "description": null,
             "type": "string"
           }
         },
         "example": {
           "uri": "foobar"
         },
+        "description": null,
         "type": "object",
         "required": [
           "uri"

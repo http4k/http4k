@@ -19,7 +19,10 @@ interface FieldRetrieval : (Any, String) -> Field {
     }
 }
 
-class SimpleLookup(private val renamingStrategy: (String) -> String = { it }) : FieldRetrieval {
+class SimpleLookup(
+    private val renamingStrategy: (String) -> String = { it },
+    private val metadataRetrievalStrategy: FieldMetadataRetrievalStrategy = NoOpFieldMetadataRetrievalStrategy()
+) : FieldRetrieval {
     override fun invoke(target: Any, name: String): Field {
         val fields = try {
             target::class.memberProperties.map { renamingStrategy(it.name) to it }.toMap()
@@ -33,10 +36,23 @@ class SimpleLookup(private val renamingStrategy: (String) -> String = { it }) : 
                     ?.let { it(target) }
                     ?.let { it to field.returnType.isMarkedNullable }
             }
-            ?.let { Field(it.first, it.second) } ?: throw NoFieldFound(name, target)
+            ?.let { Field(it.first, it.second, metadataRetrievalStrategy(target, name)) } ?: throw NoFieldFound(name, target)
     }
+}
+
+data class FieldMetadata(val description: String?) {
+    companion object {
+        val empty: FieldMetadata = FieldMetadata(description = null)
+    }
+}
+
+interface FieldMetadataRetrievalStrategy : (Any, String) -> FieldMetadata
+
+class NoOpFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
+    override fun invoke(target: Any, fieldName: String): FieldMetadata =
+        FieldMetadata.empty
 }
 
 class NoFieldFound(name: String, target: Any, cause: Throwable? = null) : RuntimeException("Could not find $name in $target", cause)
 
-data class Field(val value: Any, val isNullable: Boolean)
+data class Field(val value: Any, val isNullable: Boolean, val metadata: FieldMetadata)

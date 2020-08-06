@@ -1,6 +1,7 @@
 package org.http4k.contract.openapi.v3
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonPropertyDescription
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
@@ -56,12 +57,24 @@ enum class Foo {
 data class GenericListHolder(val value: List<Generic>)
 data class MapHolder(val value: Map<Any, Any>)
 
+data class JacksonFieldAnnotated(@JsonProperty("OTHERNAME") val uri: Uri = Uri.of("foobar"))
+
+data class JacksonFieldWithMetadata(
+    @JsonPropertyDescription("Field 1 description")
+    val field1: String = "field1",
+    val field2: String = "field2"
+)
+
 @ExtendWith(JsonApprovalTest::class)
 class AutoJsonToJsonSchemaTest {
     private val json = Jackson
 
     private val creator = AutoJsonToJsonSchema(json,
-        FieldRetrieval.compose(SimpleLookup(), JacksonJsonPropertyAnnotated, JacksonJsonNamingAnnotated(Jackson)),
+        FieldRetrieval.compose(
+            SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy),
+            JacksonJsonPropertyAnnotated,
+            JacksonJsonNamingAnnotated(Jackson)
+        ),
         SchemaModelNamer.Full,
         "customPrefix"
     )
@@ -178,6 +191,10 @@ class AutoJsonToJsonSchemaTest {
             .body(Jackson.asFormatString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder()))))
     }
 
+    @Test
+    fun `renders schema for field with description`(approver: Approver) {
+        approver.assertApproved(JacksonFieldWithMetadata())
+    }
 
     private fun Approver.assertApproved(obj: Any, name: String? = null) {
         assertApproved(Response(OK)
@@ -185,7 +202,5 @@ class AutoJsonToJsonSchemaTest {
             .body(Jackson.asFormatString(creator.toSchema(obj, name))))
     }
 }
-
-data class JacksonFieldAnnotated(@JsonProperty("OTHERNAME") val uri: Uri = Uri.of("foobar"))
 
 
