@@ -6,7 +6,7 @@ A set of classes to provide simple recording/replaying of HTTP traffic. This is 
 ### Gradle setup
 
 ```groovy
-compile group: "org.http4k", name: "http4k-core", version: "3.254.0"
+compile group: "org.http4k", name: "http4k-core", version: "3.255.0"
 ```
 
 ### Caching HTTP Traffic 
