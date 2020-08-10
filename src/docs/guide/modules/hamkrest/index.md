@@ -4,7 +4,7 @@ description: Feature overview of the http4k-testing-hamkrest module
 ### Installation (Gradle)
 
 ```groovy
-compile group: "org.http4k", name: "http4k-testing-hamkrest", version: "3.255.0"
+compile group: "org.http4k", name: "http4k-testing-hamkrest", version: "3.256.0"
 ```
 
 ### About
