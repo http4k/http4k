@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.256.0
-- [http4k-security-oauth] Add ability to handle form encoded responses
+- [http4k-security-oauth] Add ability to handle form encoded responses in OAuth responses.
 
 ### v3.255.0
 - [all] Upgrade some dependency versions.
