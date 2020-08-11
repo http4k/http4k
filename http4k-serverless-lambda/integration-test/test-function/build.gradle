@@ -1,4 +1,4 @@
-description = 'Testing against a functions deployed to AWS'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile project(":http4k-core")
@@ -9,4 +9,8 @@ dependencies {
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
+}
+
+shadowJar {
+    configurations = [project.configurations.runtime]
 }

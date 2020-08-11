@@ -13,12 +13,7 @@ import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
-import org.http4k.serverless.lambda.client.AwsLambdaApiClient
-import org.http4k.serverless.lambda.client.Config
-import org.http4k.serverless.lambda.client.FunctionHandler
-import org.http4k.serverless.lambda.client.FunctionName
-import org.http4k.serverless.lambda.client.FunctionPackage
-import org.http4k.serverless.lambda.client.LambdaHttpClient
+import org.http4k.serverless.lambda.client.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.nio.ByteBuffer
@@ -35,7 +30,7 @@ object DeployServerAsLambdaForClientContract {
 
     fun deploy() {
         val lambdaBinary =
-            File("http4k-serverless-lambda/integration-test/test-function/build/libs/test-function-LOCAL-all.jar")
+            File("test-function/build/libs/test-function-LOCAL-all.jar")
 
         assumeTrue(lambdaBinary.exists(), "lambda binary to deploy needs to be available")
 
@@ -45,10 +40,9 @@ object DeployServerAsLambdaForClientContract {
 
         val functionPackage = FunctionPackage(
             functionName,
-            FunctionHandler.http4kFunctionHandler,
+            FunctionHandler("org.http4k.serverless.lambda.TestFunction::handle"),
             ByteBuffer.wrap(lambdaBinary.readBytes()),
-            Config.role(config),
-            mapOf("HTTP4K_BOOTSTRAP_CLASS" to "org.http4k.serverless.TestApp")
+            Config.role(config)
         )
 
         deployment.create(functionPackage)
