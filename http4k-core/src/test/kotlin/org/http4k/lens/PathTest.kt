@@ -76,8 +76,8 @@ class PathTest {
     @Test
     fun `sets value on request uri with proper encoding`() {
         val pathParam = Path.string().of("bob")
-        val updated = Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of "123 45/6")
-        assertThat(pathParam("123%2045%2F6"), equalTo("123 45/6"))
+        val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of "123 45/6"), UriTemplate.from("/first/{bob}/second") )
+        assertThat(pathParam(updated), equalTo("123 45/6"))
         assertThat(updated, equalTo(Request(GET, "http://bob.com/first/123%2045%2F6/second")))
     }
 

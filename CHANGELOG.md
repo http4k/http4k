@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.256.1
+- [http4k-core] Fix #470. Path.of cannot decode path parameter values containing %/
+
 ### v3.256.0
 - [http4k-security-oauth] Add ability to handle form encoded responses in OAuth responses.
 
