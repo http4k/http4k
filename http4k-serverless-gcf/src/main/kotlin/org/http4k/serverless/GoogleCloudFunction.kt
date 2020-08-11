@@ -24,7 +24,7 @@ open class GoogleCloudFunction(appLoader: AppLoaderWithContexts) : HttpFunction 
     override fun service(request: HttpRequest, response: HttpResponse) =
         InitialiseRequestContext(contexts)
             .then(AddGCPRequest(request, contexts))
-            .then(app)(request.asHttp4kRequest().also { println(it) })
+            .then(app)(request.asHttp4kRequest())
             .into(response)
 }
 
