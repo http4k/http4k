@@ -5,31 +5,31 @@ description: Feature overview of the http4k-server modules, covering Server back
 
 ```groovy
 // Apache v5: 
-compile group: "org.http4k", name: "http4k-server-apache", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-server-apache", version: "3.256.1"
 
 // Apache v4: 
-compile group: "org.http4k", name: "http4k-server-apache4", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-server-apache4", version: "3.256.1"
 
 // Jetty: 
-compile group: "org.http4k", name: "http4k-server-jetty", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-server-jetty", version: "3.256.1"
 
 // Ktor CIO: 
-compile group: "org.http4k", name: "http4k-server-ktorcio", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-server-ktorcio", version: "3.256.1"
 
 // Ktor Netty: 
-compile group: "org.http4k", name: "http4k-server-ktornetty", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-server-ktornetty", version: "3.256.1"
 
 // Netty: 
-compile group: "org.http4k", name: "http4k-server-netty", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-server-netty", version: "3.256.1"
 
 // Ratpack: 
-compile group: "org.http4k", name: "http4k-server-ratpack", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-server-ratpack", version: "3.256.1"
 
 // Undertow: 
-compile group: "org.http4k", name: "http4k-server-undertow", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-server-undertow", version: "3.256.1"
 
 // SunHttp (for development only): 
-compile group: "org.http4k", name: "http4k-core", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-core", version: "3.256.1"
 ```
 
 ### About

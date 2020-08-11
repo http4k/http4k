@@ -4,7 +4,7 @@ description: Feature overview of the http4k-cloudnative module
 ### Installation (Gradle)
 
 ```groovy
-compile group: "org.http4k", name: "http4k-cloudnative", version: "3.256.0"
+compile group: "org.http4k", name: "http4k-cloudnative", version: "3.256.1"
 ```
 
 http4k applications are naturally at home operating in distributed, Cloud Native environments. Whilst simple to create, this module 
