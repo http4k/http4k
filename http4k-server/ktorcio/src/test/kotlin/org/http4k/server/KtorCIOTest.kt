@@ -27,3 +27,12 @@ class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, A
 
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 }
+
+class KtorCIOStopTest : ServerStopContract(
+    { stopMode -> KtorCIO(Random().nextInt(1000) + 8745, stopMode) },
+    ApacheClient(),
+    {
+        enableImmediateStop()
+        enableGracefulStop()
+        enableDelayedStop()
+    })

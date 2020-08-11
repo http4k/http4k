@@ -11,3 +11,12 @@ class ApacheServerTest : ServerContract({ port -> ApacheServer(port, canonicalHo
 
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 }
+
+class ApacheServerStopTest : ServerStopContract(
+    { stopMode -> ApacheServer(0, canonicalHostname = "0.0.0.0", stopMode=stopMode) },
+    ApacheClient(),
+    {
+        enableImmediateStop()
+        enableGracefulStop()
+    }
+)

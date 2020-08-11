@@ -11,6 +11,14 @@ class UndertowTest : ServerContract({ Undertow(it) }, ApacheClient()) {
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 }
 
+class UndertowStopTest : ServerStopContract(
+    { stopMode -> Undertow(0, false, stopMode) },
+    ApacheClient(),
+    {
+        enableImmediateStop()
+        enableGracefulStop()
+    })
+
 class UndertowWebsocketTest : WebsocketServerContract(::Undertow, JavaHttpClient())
 
 class UndertowSseTest : SseServerContract(::Undertow, JavaHttpClient())

@@ -13,6 +13,15 @@ class JettyTest : ServerContract(::Jetty, ApacheClient()) {
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 }
 
+class JettyStopTest : ServerStopContract(
+    { stopMode -> Jetty(0, stopMode) },
+    ApacheClient(),
+    {
+        enableImmediateStop()
+        enableGracefulStop()
+    }
+)
+
 class JettyHttp2Test {
 
     @Test

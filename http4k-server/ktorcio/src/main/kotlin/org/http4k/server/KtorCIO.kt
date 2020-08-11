@@ -25,11 +25,14 @@ import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.lens.Header
-import java.util.concurrent.TimeUnit.SECONDS
+import org.http4k.server.ServerConfig.StopMode
+import java.time.Duration
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class KtorCIO(val port: Int = 8000) : ServerConfig {
+class KtorCIO(val port: Int = 8000, override val stopMode: StopMode) : ServerConfig {
+    constructor(port: Int = 8000) : this(8000, StopMode.Delayed(Duration.ofSeconds(2)))
 
     @OptIn(EngineAPI::class)
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
@@ -45,7 +48,12 @@ class KtorCIO(val port: Int = 8000) : ServerConfig {
         }
 
         override fun stop() = apply {
-            engine.stop(0, 2, SECONDS)
+            val (gracePeriodMillis, timeoutMillis) = when(stopMode) {
+                is StopMode.Graceful -> 1000L to stopMode.timeout.toMillis()
+                is StopMode.Immediate -> 0L to 0L
+                is StopMode.Delayed -> stopMode.timeout.toMillis() to stopMode.timeout.toMillis()
+            }
+            engine.stop(gracePeriodMillis, timeoutMillis, MILLISECONDS)
         }
 
         override fun port() = engine.environment.connectors[0].port

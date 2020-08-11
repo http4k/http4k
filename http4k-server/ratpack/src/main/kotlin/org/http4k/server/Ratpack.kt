@@ -5,14 +5,25 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
+import org.http4k.server.ServerConfig.StopMode
 import ratpack.handling.Context
 import ratpack.handling.Handler
 import ratpack.http.TypedData
 import ratpack.server.RatpackServer
 import ratpack.server.RatpackServerSpec
 import ratpack.server.ServerConfig.builder
+import java.time.Duration.ofSeconds
 
-class Ratpack(port: Int = 8000) : ServerConfig {
+class Ratpack(port: Int = 8000, stopMode: StopMode) : ServerConfig {
+    constructor(port: Int = 8000) : this(port, StopMode.Graceful(ofSeconds(5)))
+
+    init {
+        when (stopMode) {
+            is StopMode.Delayed, is StopMode.Immediate -> throw ServerConfig.UnsupportedStopMode(stopMode)
+            else -> {}
+        }
+    }
+
     private val serverConfig = builder().connectQueueSize(1000).port(port)
 
     override fun toServer(http: HttpHandler): Http4kServer {

@@ -7,3 +7,5 @@ class RatpackTest : ServerContract({ Ratpack(it) }, ApacheClient()) {
     override fun `ok when length already set`() {
     }
 }
+
+class RatpackStopTest : ServerStopContract({ Ratpack(0, it) }, ApacheClient(), { enableGracefulStop() })
