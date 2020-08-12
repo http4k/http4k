@@ -42,9 +42,9 @@ To install the latest http4k Toolbox binary:
 ```
 sdk install http4k
 ```
-... then test it with:
+... then test it to show the help with:
 ```
-http4k --version
+http4k --help
 ```
 
 ### Install with <a href="https://brew.sh/">Brew</a>
@@ -61,5 +61,5 @@ brew tap http4k/tap && brew install http4k
 ```
 ... then test it with:
 ```
-http4k --version
+http4k --help
 ```
