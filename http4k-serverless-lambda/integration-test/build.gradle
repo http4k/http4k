@@ -19,4 +19,4 @@ task deployTestFunction(type: JavaExec) {
     mainClass = 'org.http4k.serverless.lambda.DeployServerAsLambdaForClientContractKt'
 }
 
-deployTestFunction.dependsOn("test-function:shadowJar")
+deployTestFunction.dependsOn("test-function:buildZip")

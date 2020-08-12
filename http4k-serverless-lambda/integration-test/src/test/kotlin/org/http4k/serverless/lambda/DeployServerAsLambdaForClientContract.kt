@@ -35,12 +35,13 @@ object DeployServerAsLambdaForClientContract {
 
     fun deploy() {
         val lambdaBinary =
-            File("test-function/build/libs/test-function-LOCAL-all.jar")
+            File("test-function/build/distributions/test-function-LOCAL.zip")
 
         assumeTrue(lambdaBinary.exists(), "lambda binary to deploy needs to be available")
 
         val functionName = FunctionName("test-function")
 
+        println("Deleting existing function (if exists)...")
         deployment.delete(functionName)
 
         val functionPackage = FunctionPackage(
@@ -50,12 +51,14 @@ object DeployServerAsLambdaForClientContract {
             Config.role(config)
         )
 
+        println("Deploying function...")
         deployment.create(functionPackage)
 
         assertThat(deployment.list().find { it.name == functionName.value }, present())
 
         val lambdaClient = LambdaHttpClient(functionName, region).then(client)
 
+        println("Performing a test request...")
         val functionResponse = lambdaClient(Request(Method.POST, "/echo").body("Hello, http4k"))
 
         assertThat(functionResponse.status, equalTo(Status.OK))

@@ -1,16 +1,26 @@
-apply plugin: 'com.github.johnrengelman.shadow'
-
+configurations{
+    runtimeClasspath.transitive = false
+}
 dependencies {
     compile project(":http4k-core")
     compile project(":http4k-serverless-lambda")
-
-    compile Libs.kotlin_reflect
     compile project(path: ":http4k-core", configuration: 'testArtifacts')
+
+    compile Libs.kotlin_stdlib_jdk8
+    compile "org.jetbrains.kotlin:kotlin-stdlib-common:" + Versions.org_jetbrains_kotlin
+    compile "org.jetbrains.kotlin:kotlin-stdlib:" + Versions.org_jetbrains_kotlin
+    compile Libs.aws_lambda_java_core
+    compile Libs.aws_lambda_java_events
+    compile "joda-time:joda-time:2.6"
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }
 
-shadowJar {
-    configurations = [project.configurations.runtime]
+task buildZip(type: Zip) {
+    from compileKotlin
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
 }
