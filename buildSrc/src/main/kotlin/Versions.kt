@@ -115,6 +115,8 @@ object Versions {
 
     const val json: String = "20200518"
 
+    const val kotest: String = "4.1.3"
+
     /**
      * Current version: "6.5.1"
      * See issue 19: How to update Gradle itself?

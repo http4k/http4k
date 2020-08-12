@@ -363,4 +363,9 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
+
+    /**
+     * https://github.com/kotest/kotest
+     */
+    const val kotest: String = "io.kotest:kotest-assertions-core-jvm:" + Versions.kotest
 }
