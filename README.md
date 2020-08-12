@@ -1,4 +1,4 @@
-<span class="github">
+<div class="github">
 <hr/>
 
 <a href="https://http4k.org"><img src="https://www.http4k.org/img/logo-readme.png"/></a>
@@ -14,9 +14,10 @@
 <a href="https://kotlin.link"><img alt="Awesome Kotlin Badge" src="https://kotlin.link/awesome-kotlin.svg"></a>
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/backers/badge.svg"></a>
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
-</span>
 
 <hr/>
+
+</div>
 
  [http4k] is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [http4k] applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:
  
