@@ -1,6 +1,8 @@
 <span class="github">
 <a href="https://http4k.org"><img src="https://www.http4k.org/img/logo-readme.png"/></a>
 
+<hr/>
+
 <a href="https://bintray.com/http4k/maven/http4k-core/_latestVersion"><img alt="Download" src="https://api.bintray.com/packages/http4k/maven/http4k-core/images/download.svg"></a>
 <a href="https://travis-ci.org/http4k/http4k"><img alt="build status" src="https://travis-ci.org/http4k/http4k.svg?branch=master"/></a>
 <a href="https://coveralls.io/github/http4k/http4k?branch=master"><img alt="coverage" src="https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master"></a>
@@ -8,10 +10,11 @@
 <a href="http://kotlinlang.org"><img alt="kotlin" src="https://img.shields.io/badge/kotlin-1.3-blue.svg"></a>
 <a href="https://codebeat.co/projects/github-com-http4k-http4k-master"><img alt="codebeat badge" src="https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e"></a>
 <a href="https://kotlin.link"><img alt="Awesome Kotlin Badge" src="https://kotlin.link/awesome-kotlin.svg"></a>
-<br/>
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/backers/badge.svg"></a>
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
 </span>
+
+<hr/>
 
  [http4k] is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [http4k] applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:
  
@@ -135,9 +138,9 @@ To install, add these dependencies to your **Gradle** file:
 
 ```groovy
 dependencies {
-    compile group: "org.http4k", name: "http4k-core", version: "3.256.1"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.256.1"
-    compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.256.1"
+    implementation group: "org.http4k", name: "http4k-core", version: "3.256.1"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.256.1"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "3.256.1"
 }
 ```
 
