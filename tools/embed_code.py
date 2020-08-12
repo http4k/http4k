@@ -30,7 +30,7 @@ if __name__ == "__main__":
     shutil.copy(project_root + '/CONTRIBUTING.md', working_dir + '/docs/contributing/index.md')
     shutil.copy(project_root + '/CODE_OF_CONDUCT.md', working_dir + '/docs/code-of-conduct/index.md')
     shutil.copy(project_root + '/CHANGELOG.md', working_dir + '/docs/changelog/index.md')
-    shutil.copy(project_root + '/README.md', working_dir + '/docs/index.md')
+    shutil.copy(project_root + '/README.md', working_dir + '/docs/documentation/index.md')
 
     pages = [f for f in glob.glob(working_dir + "/**/*.md", recursive=True)]
     for page in pages:

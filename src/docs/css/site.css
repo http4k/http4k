@@ -1,3 +1,7 @@
+.codehilite code {
+    padding-left: 0;
+}
+
 .gist-meta {
     display: none;
 }

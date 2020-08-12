@@ -8,6 +8,8 @@ repo_url: https://github.com/http4k/http4k/
 theme:
   name: 'material'
   custom_dir: ./docs/theme
+  static_templates:
+      - ./index.html
   palette:
     primary: 'indigo'
     accent: 'blue'
@@ -23,7 +25,7 @@ extra:
 edit_uri: edit/master/src/docs/
 strict: false
 nav:
-  - Introduction: index.md
+  - Introduction: documentation/index.md
   - Rationale & Concepts: rationale/index.md
   - Installation:  installation/index.md
   - Getting started: quickstart/index.md
