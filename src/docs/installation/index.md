@@ -48,7 +48,7 @@ http4k --version
 ```
 
 ### Install with <a href="https://brew.sh/">Brew</a>
-Brew is the "missing package manager for MacOS.
+Brew is the "missing package manager for MacOS".
 
 To install <a href="https://brew.sh/">Brew</a>, just paste the following into your terminal:
 ```
