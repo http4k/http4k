@@ -1,4 +1,6 @@
 <span class="github">
+<hr/>
+
 <a href="https://http4k.org"><img src="https://www.http4k.org/img/logo-readme.png"/></a>
 
 <hr/>
