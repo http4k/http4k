@@ -10,10 +10,7 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
 import kotlin.reflect.KClass
 
-abstract class AutoMarshallingJson : AutoMarshalling() {
-    @Deprecated("Use asFormatString instead", ReplaceWith("asFormatString(input"))
-    fun asJsonString(input: Any): String = asFormatString(input)
-}
+typealias AutoMarshallingJson = AutoMarshalling
 
 abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), Json<NODE> {
     override fun asFormatString(input: Any): String = compact(asJsonObject(input))
