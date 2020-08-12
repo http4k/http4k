@@ -1,8 +1,15 @@
 package org.http4k.serverless.lambda.client
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.http4k.core.*
-import org.http4k.core.Method.*
+import org.http4k.core.Body
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import java.nio.ByteBuffer
 import java.util.*

@@ -13,7 +13,12 @@ import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
-import org.http4k.serverless.lambda.client.*
+import org.http4k.serverless.lambda.client.AwsLambdaApiClient
+import org.http4k.serverless.lambda.client.Config
+import org.http4k.serverless.lambda.client.FunctionHandler
+import org.http4k.serverless.lambda.client.FunctionName
+import org.http4k.serverless.lambda.client.FunctionPackage
+import org.http4k.serverless.lambda.client.LambdaHttpClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.nio.ByteBuffer
