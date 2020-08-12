@@ -1,7 +1,7 @@
 package org.http4k.jsonrpc
 
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
-import org.http4k.format.JsonLibAutoMarshallingJson
 
 interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
     fun method(name: String, handler: JsonRpcHandler<NODE, NODE>)
@@ -33,7 +33,7 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
                 NoParamsJsonRequestHandler(block, resultLens)
         }
 
-        class Auto<NODE : Any>(val json: JsonLibAutoMarshallingJson<NODE>) :
+        class Auto<NODE : Any>(val json: AutoMarshallingJson<NODE>) :
             Manual<NODE>(json) {
 
             inline fun <reified IN : Any, OUT : Any> handler(paramsFieldNames: Set<String>,
