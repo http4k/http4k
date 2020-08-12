@@ -52,8 +52,7 @@ Brew is the "missing package manager for MacOS.
 
 To install <a href="https://brew.sh/">Brew</a>, just paste the following into your terminal:
 ```
-/bin/bash -c "$(curl -fsSL
-    https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 ```
 
 To install the latest http4k Toolbox binary:
