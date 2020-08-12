@@ -3,15 +3,16 @@ description: Easy ways to get started using http4k
 
 # Quickstart
 
-This simple example demonstates how to serve and consume HTTP services using **http4k**. 
+This simple example demonstrates how to serve and consume HTTP services using **http4k**. 
 
 To install, add these dependencies to your **Gradle** file:
 
 ```groovy
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "3.256.1"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.256.1"
-    implementation group: "org.http4k", name: "http4k-client-apache", version: "3.256.1"
+    implementation platform("org.http4k:http4k-bom:3.256.1")
+    implementation "org.http4k:http4k-core"
+    implementation "org.http4k:http4k-server=jetty"
+    implementation "org.http4k:client-server=apache"
 }
 ```
 
