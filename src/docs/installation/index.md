@@ -29,21 +29,25 @@ fully working starter code, build tooling, extra modules and packaging options.
 SDKMan! provides package management for Unix-based systems.
 
 To install <a href="https://sdkman.io/">SDKman!</a>, just paste the following into your terminal:
-```
+
+```bash
 curl -s https://get.sdkman.io | bash
 ```
 
 After installation, bootstrap SDKMan! by opening a new terminal:
-```
+
+```bash
 source "$HOME/.sdkman/bin/sdkman-init.sh"
 ```
 
 To install the latest http4k Toolbox binary:
-```
+
+```bash
 sdk install http4k
 ```
 ... then test it to show the help with:
-```
+
+```bash
 http4k --help
 ```
 
@@ -51,15 +55,19 @@ http4k --help
 Brew is the "missing package manager for MacOS".
 
 To install <a href="https://brew.sh/">Brew</a>, just paste the following into your terminal:
-```
+
+```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 ```
 
 To install the latest http4k Toolbox binary:
-```
+
+```bash
 brew tap http4k/tap && brew install http4k
 ```
+
 ... then test it with:
-```
+
+```bash
 http4k --help
 ```

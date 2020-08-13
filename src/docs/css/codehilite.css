@@ -6,7 +6,6 @@
 /* source: http://smasue.github.io/pygments-darcula */
 .codehilite {
     margin-bottom: 1.5em;
-    color: #A9B7C6;
     background-color: #2B2B2B;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -14,6 +13,7 @@
 }
 
 .codehilite pre {
+    color: #A9B7C6;
     position: relative;
     margin: 0;
     padding: 1em;
