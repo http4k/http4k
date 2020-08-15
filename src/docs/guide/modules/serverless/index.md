@@ -32,10 +32,9 @@ This is far from a complete guide, but configuring AWS Lambda and the API Gatewa
 1. Create and configure the Lambda function, and at the same time:
 
     1. Upload the standard Zip file to S3.
-    1. Set the function execution to call the main http4k entry point: `org.http4k.serverless.LambdaFunction::handle`
-    1. Set an environment variable for the Lambda `HTTP4K_BOOTSTRAP_CLASS` to the class of your `AppLoader` class.
+    1. Set the function execution to call the main http4k entry point: `guide.modules.serverless.lambda.FunctionsExampleEntryClass::handle`
 
-We hope to soon provide some tools to automate at least some of the above process, or at least document it somewhat. However, AWS is a complicated beast and many people have a preferred way to set it up: CloudFormation templates, Serverless framework, Terraform, etc. In the meantime, here is an example of how the `AppLoader` is created and a sneak peak at launching the app locally:
+We hope to soon provide some tools to automate at least some of the above process, or at least document it somewhat. However, AWS is a complicated beast and many people have a preferred way to set it up: CloudFormation templates, Serverless framework, Terraform, etc. In the meantime, here is an example of how the `AppLoader` is created and how to launch the app locally:
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/lambda/example.kt)
 
