@@ -32,7 +32,7 @@ open class LambdaFunction(appLoader: AppLoaderWithContexts) {
         override fun invoke(env: Map<String, String>): HttpHandler = input
     })
 
-    @Deprecated("This reflection based implementation will be removed in future versions")
+    @Deprecated("This reflection based implementation will be removed in future version. Use class based extension approach instead.")
     constructor(env: Map<String, String> = System.getenv()) : this(object : AppLoaderWithContexts {
         override fun invoke(otherEnv: Map<String, String>, contexts: RequestContexts) = BootstrapAppLoader(env, contexts)
     })

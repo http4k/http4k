@@ -3,6 +3,7 @@ package org.http4k.serverless
 import org.http4k.core.HttpHandler
 import org.http4k.core.RequestContexts
 
+@Deprecated("Extend LambdaFunction instead of this reflection-based approach.")
 object BootstrapAppLoader : AppLoaderWithContexts {
     const val HTTP4K_BOOTSTRAP_CLASS = "HTTP4K_BOOTSTRAP_CLASS"
 

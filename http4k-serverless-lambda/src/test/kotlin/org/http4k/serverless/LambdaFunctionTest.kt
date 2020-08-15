@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
@@ -9,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.serverless.BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS
 import org.junit.jupiter.api.Test
 
+@Suppress("DEPRECATION")
 class LambdaFunctionTest {
     class LambdaContextMock(private val functionName: String = "LambdaContextMock") : Context {
         override fun getFunctionName() = functionName
@@ -37,6 +40,29 @@ class LambdaFunctionTest {
             HTTP4K_BOOTSTRAP_CLASS to TestApp::class.java.name,
             "a" to "b")
         val response = LambdaFunction(env).handle(request, LambdaContextMock())
+
+        assertThat(response.statusCode, equalTo(201))
+        assertThat(response.headers, equalTo(env))
+        assertThat(response.body, equalTo(Request(GET, "/path")
+            .header("c", "d")
+            .body("input body")
+            .query("query", "value").toString()))
+    }
+
+    @Test
+    fun `loads function from the environment and adapts API Gateway request and response`() {
+        val env = mapOf("a" to "b")
+
+        class MyFunction : LambdaFunction(TestApp(env))
+
+        val request = APIGatewayProxyRequestEvent()
+        request.httpMethod = "GET"
+        request.body = "input body"
+        request.headers = mapOf("c" to "d")
+        request.path = "/path"
+        request.queryStringParameters = mapOf("query" to "value")
+
+        val response = MyFunction().handle(request, LambdaContextMock())
 
         assertThat(response.statusCode, equalTo(201))
         assertThat(response.headers, equalTo(env))
