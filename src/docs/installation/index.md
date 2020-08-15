@@ -10,7 +10,7 @@ All **http4k** libraries are available on Maven Central and JCenter and are rele
 To do this for the simplest project using only the **core** module, just add the following to your Gradle file dependencies block:
 
 ```groovy
-implementation platform("org.http4k:http4k-bom:3.256.1")
+implementation platform("org.http4k:http4k-bom:3.257.0")
 implementation "org.http4k:http4k-core"
 ```
 
