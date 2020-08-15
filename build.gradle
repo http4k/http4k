@@ -232,6 +232,7 @@ dependencies {
     compile project(":http4k-testing-approval")
     compile project(":http4k-testing-chaos")
     compile project(":http4k-testing-hamkrest")
+    compile project(":http4k-testing-kotest")
     compile project(":http4k-testing-servirtium")
     compile project(":http4k-testing-webdriver")
 
