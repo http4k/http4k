@@ -54,6 +54,7 @@ description: Details about the various http4k integration libraries
 ### Testing
 <a href="https://http4k.org/guide/modules/webdriver"><span class="pill">WebDriver</span></a>
 <a href="https://http4k.org/guide/modules/hamkrest"><span class="pill">Hamkrest</span></a>
+<a href="https://http4k.org/guide/modules/kotest"><span class="pill">Kotest</span></a>
 <a href="https://http4k.org/guide/modules/approvaltests"><span class="pill">Approval Testing</span></a>
 <a href="https://http4k.org/guide/modules/chaos"><span class="pill">Chaos Monkey</span></a>
 <a href="https://http4k.org/guide/modules/servicevirtualisation"><span class="pill">Servirtium</span></a>

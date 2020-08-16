@@ -126,6 +126,8 @@ plugging together of services without HTTP container being required.
     * Ultra-lightweight Selenium WebDriver implementation for [http4k] application.
 * [Hamkrest:](https://http4k.org/guide/modules/hamkrest) 
     * A set of Hamkrest matchers for testing [http4k] Request and Response messages.
+* [Kotest:](https://http4k.org/guide/modules/kotest) 
+    * A set of Kotest matchers for testing [http4k] Request and Response messages.
 * [Approval Testing:](https://http4k.org/guide/modules/approvaltests) 
     * JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of [http4k] Request and Response messages.
 * [Chaos:](https://http4k.org/guide/modules/chaos) 
