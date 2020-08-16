@@ -22,7 +22,7 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.9.3"
 
-    const val org_eclipse_jetty: String = "9.4.30.v20200611" // available: "9.4.31.v20200723"
+    const val org_eclipse_jetty: String = "9.4.31.v20200723"
 
     const val org_junit_jupiter: String = "5.6.2"
 
@@ -32,20 +32,19 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1"
+    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.2"
 
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
 
     const val openapi_generator_gradle_plugin: String = "4.3.1"
 
-    const val javax_websocket_server_impl: String = "9.4.30.v20200611"
-             // available: "9.4.31.v20200723"
+    const val javax_websocket_server_impl: String = "9.4.31.v20200723"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
     const val functions_framework_api: String = "1.0.1"
 
-    const val aws_lambda_java_events: String = "3.1.1"
+    const val aws_lambda_java_events: String = "3.2.0"
 
     const val jackson_module_kotlin: String = "2.11.2"
 
@@ -61,7 +60,7 @@ object Versions {
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val micrometer_core: String = "1.5.3"
+    const val micrometer_core: String = "1.5.4"
 
     const val java_websocket: String = "1.5.1"
 
@@ -88,6 +87,8 @@ object Versions {
     const val bunting4k: String = "0.14.0.0"
 
     const val httpcore5: String = "5.0.1"
+
+    const val joda_time: String = "2.10.6"
 
     const val slf4j_nop: String = "1.7.30"
 
@@ -118,11 +119,11 @@ object Versions {
     const val kotest: String = "4.1.3"
 
     /**
-     * Current version: "6.5.1"
+     * Current version: "6.6"
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */
-    const val gradleLatestVersion: String = "6.5.1"
+    const val gradleLatestVersion: String = "6.6"
 }
 
 /**

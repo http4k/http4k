@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.258.0 (uncut)
+- [http4k-testing-kotest] New module! A set of matchers for use with the `kotest library`. H/T @nlochschmidt for the PR.
+- [all] Upgrade some dependency versions.
+
 ### v3.257.0
 - [http4k-serverless-*] Making the Serverless APIs consistent between flavours by ensuring that all Serverless functions act by class extension and not reflection based approach. Deprecated old approach. Hopefully this is simpler.. :) 
 
