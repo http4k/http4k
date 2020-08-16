@@ -3,7 +3,7 @@ description = 'A set of kotest matchers for common http4k types'
 dependencies {
     compile project(":http4k-core")
 
-    compile Libs.kotest
+    compile Libs.kotest_assertions_core_jvm
 
     testCompile project(":http4k-format-jackson")
     testCompile Config.TestDependencies - Libs.hamkrest

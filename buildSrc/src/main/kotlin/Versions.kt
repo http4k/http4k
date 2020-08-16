@@ -18,7 +18,7 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.5.0"
 
-    const val org_jetbrains_kotlin: String = "1.3.72"
+    const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.0"
 
     const val com_squareup_moshi: String = "1.9.3"
 
@@ -39,6 +39,8 @@ object Versions {
     const val openapi_generator_gradle_plugin: String = "4.3.1"
 
     const val javax_websocket_server_impl: String = "9.4.31.v20200723"
+
+    const val kotest_assertions_core_jvm: String = "4.1.3"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
@@ -88,7 +90,7 @@ object Versions {
 
     const val httpcore5: String = "5.0.1"
 
-    const val joda_time: String = "2.10.6"
+    const val joda_time: String = "2.6" // available: "2.10.6"
 
     const val slf4j_nop: String = "1.7.30"
 
@@ -115,8 +117,6 @@ object Versions {
     const val gson: String = "2.8.6"
 
     const val json: String = "20200518"
-
-    const val kotest: String = "4.1.3"
 
     /**
      * Current version: "6.6"

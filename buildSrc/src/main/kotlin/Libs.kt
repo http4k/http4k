@@ -188,6 +188,12 @@ object Libs {
             Versions.javax_websocket_server_impl
 
     /**
+     * http://www.github.com/kotest/kotest
+     */
+    const val kotest_assertions_core_jvm: String = "io.kotest:kotest-assertions-core-jvm:" +
+            Versions.kotest_assertions_core_jvm
+
+    /**
      * http://github.com/kt3k/coveralls-gradle-plugin/
      */
     const val coveralls_gradle_plugin: String = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:" +
@@ -378,9 +384,4 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
-
-    /**
-     * https://github.com/kotest/kotest
-     */
-    const val kotest: String = "io.kotest:kotest-assertions-core-jvm:" + Versions.kotest
 }
