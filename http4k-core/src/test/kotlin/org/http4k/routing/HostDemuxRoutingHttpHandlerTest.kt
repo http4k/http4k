@@ -11,19 +11,21 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class HostDemuxRoutingHttpHandlerTest {
-    private val handler = hostDemux(hostFor("host1"), hostFor("host2"))
+class HostDemuxRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
+    override val handler = hostDemux("host" to routes(validPath bind GET to { Response(OK) }))
+
+    private val otherHandler = hostDemux(hostFor("host1"), hostFor("host2"))
 
     @Test
     fun `matching handler`() {
-        assertThat(handler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
-        assertThat(handler(requestWithHost("host2", "/foo")), hasBody("host2host2"))
-        assertThat(handler(Request(GET, "")), hasStatus(NOT_FOUND))
+        assertThat(otherHandler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
+        assertThat(otherHandler(requestWithHost("host2", "/foo")), hasBody("host2host2"))
+        assertThat(otherHandler(Request(GET, "")), hasStatus(NOT_FOUND))
     }
 
     @Test
     fun `with base path`() {
-        val handler2 = handler.withBasePath("/bar")
+        val handler2 = otherHandler.withBasePath("/bar")
         assertThat(handler2(requestWithHost("host1", "/bar/foo")), hasBody("host1host1"))
         assertThat(handler2(requestWithHost("host2", "/bar/foo")), hasBody("host2host2"))
         assertThat(handler2(requestWithHost("host1", "/foo")), hasStatus(NOT_FOUND))
@@ -32,7 +34,7 @@ class HostDemuxRoutingHttpHandlerTest {
 
     @Test
     fun `with filter`() {
-        val handler2 = handler.withFilter(Filter { next ->
+        val handler2 = otherHandler.withFilter(Filter { next ->
             {
                 next(it.replaceHeader("host", "foobar"))
             }

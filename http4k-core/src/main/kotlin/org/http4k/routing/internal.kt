@@ -159,18 +159,29 @@ internal data class SinglePageAppRoutingHandler(
     override fun withBasePath(new: String) = SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
 }
 
-internal class HostDemuxRoutingHttpHandler(private val hosts: Map<String, RoutingHttpHandler>) : RoutingHttpHandler {
+internal class HostDemuxRoutingHttpHandler(
+    private val hosts: Map<String, RoutingHttpHandler>,
+    private val notFoundHandler: HttpHandler = routeNotFoundHandler,
+    private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler
+) : RoutingHttpHandler {
     override fun invoke(p1: Request) = when (val result = match(p1)) {
         is MatchingHandler -> result(p1)
-        is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
-        is Unmatched -> Response(NOT_FOUND)
+        is MethodNotMatched -> methodNotAllowedHandler(p1)
+        is Unmatched -> notFoundHandler(p1)
     }
 
     override fun match(request: Request) = request.header("host")
-        ?.let { hosts[it]?.let(RouterMatch::MatchingHandler) }
+        ?.let { hosts[it]?.match(request) }
         ?: Unmatched
 
-    override fun withBasePath(new: String) = HostDemuxRoutingHttpHandler(hosts.mapValues { it.value.withBasePath(new) })
+    override fun withBasePath(new: String) = HostDemuxRoutingHttpHandler(
+        hosts.mapValues { it.value.withBasePath(new) },
+        notFoundHandler, methodNotAllowedHandler
+    )
 
-    override fun withFilter(new: Filter) = HostDemuxRoutingHttpHandler(hosts.mapValues { it.value.withFilter(new) })
+    override fun withFilter(new: Filter) = HostDemuxRoutingHttpHandler(
+        hosts.mapValues { it.value.withFilter(new) },
+        new.then(notFoundHandler),
+        new.then(methodNotAllowedHandler)
+        )
 }
