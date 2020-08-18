@@ -42,5 +42,5 @@ fun main() {
     request shouldHaveBody "http4k is cool"
 
     // composite
-    request should (haveQuery("a", "b") and haveBody(be("http4k is cool")))
+    request should (haveQuery("a", "b") and haveBody("http4k is cool"))
 }

@@ -18,7 +18,7 @@ class CookieMatchersTest {
 
     @Test
     fun `value with matcher`() {
-        assertMatchAndNonMatch(Cookie("name", "bob"), haveValue(be("bob")), haveValue(contain("bill")))
+        assertMatchAndNonMatch(Cookie("name", "bob"), haveValue(be<String>("bob")), haveValue(contain("bill")))
     }
 
     @Test
