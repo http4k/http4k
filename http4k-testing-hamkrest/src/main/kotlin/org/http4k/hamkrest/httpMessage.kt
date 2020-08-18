@@ -52,7 +52,7 @@ fun hasBody(expected: Matcher<String?>): Matcher<HttpMessage> = httpMessageHas("
 @JvmName("hasBodyString")
 fun hasBody(expected: Matcher<String>): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> m.bodyString() }, expected)
 
-fun hasBody(expected: CharSequence): Matcher<HttpMessage> = hasBody(equalTo(expected))
+fun hasBody(expected: CharSequence): Matcher<HttpMessage> = hasBody(equalTo<CharSequence>(expected))
 
 fun hasBody(expected: Regex): Matcher<HttpMessage> = hasBody(present(matches(expected)))
 
