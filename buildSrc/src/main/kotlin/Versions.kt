@@ -11,8 +11,7 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.20.0"
-             // available: "0.20.0-1.4-M1-release-99"
+    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0-M1-1.4.0-rc"
 
     const val com_fasterxml_jackson_dataformat: String = "2.11.2"
 
@@ -20,7 +19,7 @@ object Versions {
 
     const val software_amazon_awssdk: String = "2.14.26"
 
-    const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.10"
+    const val org_jetbrains_kotlin: String = "1.4.10"
 
     const val com_squareup_moshi: String = "1.9.3" // available: "1.10.0"
 
