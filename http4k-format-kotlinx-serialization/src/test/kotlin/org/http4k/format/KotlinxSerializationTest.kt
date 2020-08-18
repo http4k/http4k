@@ -18,7 +18,7 @@ import java.math.BigInteger
 
 class KotlinxSerializationTest : JsonContract<JsonElement>(KotlinxSerialization) {
     override val prettyString = """{
-	"hello": "world"
+    "hello": "world"
 }"""
 
     /**

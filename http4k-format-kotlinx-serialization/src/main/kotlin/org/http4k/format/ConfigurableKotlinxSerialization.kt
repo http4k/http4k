@@ -27,19 +27,18 @@ open class ConfigurableKotlinxSerialization(
             prettyPrint = true
         }
 
-    override fun typeOf(value: JsonElement): JsonType =
-        when (value) {
-            is JsonPrimitive -> when {
-                value.isString -> JsonType.String
-                value.booleanOrNull != null -> JsonType.Boolean
-                value.doubleOrNull != null -> JsonType.Number
-                else -> throw RuntimeException()
-            }
-            is JsonArray -> JsonType.Array
-            is JsonObject -> JsonType.Object
-            is JsonNull -> JsonType.Null
-            else -> throw IllegalArgumentException("Don't know how to translate $value")
+    override fun typeOf(value: JsonElement) = when (value) {
+        is JsonNull -> JsonType.Null
+        is JsonPrimitive -> when {
+            value.isString -> JsonType.String
+            value.booleanOrNull != null -> JsonType.Boolean
+            value.doubleOrNull != null -> JsonType.Number
+            else -> throw RuntimeException()
         }
+        is JsonArray -> JsonType.Array
+        is JsonObject -> JsonType.Object
+        else -> throw IllegalArgumentException("Don't know how to translate $value")
+    }
 
     override fun JsonElement.asPrettyJsonString() = prettyJson.encodeToString(JsonElement.serializer(), this)
 
