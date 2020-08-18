@@ -29,10 +29,9 @@ fun main() {
     assertThat(request, hasHeader("my header", "a value"))
 
     // body
-    assertThat(request, hasBody(equalTo("http4k is cool")))
     assertThat(request, hasBody("http4k is cool"))
     assertThat(request, hasBody(Body.string(ContentType.TEXT_HTML).toLens(), equalTo("http4k is cool")))
 
     // composite
-    assertThat(request, hasBody(equalTo("http4k is cool")).and(hasQuery("a", "b")))
+    assertThat(request, hasBody("http4k is cool").and(hasQuery("a", "b")))
 }
