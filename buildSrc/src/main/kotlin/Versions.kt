@@ -11,14 +11,13 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.20.0"
-             // available: "0.20.0-1.4-M1-release-99"
+    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0-M1-1.4.0-rc"
 
     const val com_fasterxml_jackson_dataformat: String = "2.11.2"
 
     const val io_github_resilience4j: String = "1.5.0"
 
-    const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.10"
+    const val org_jetbrains_kotlin: String = "1.4.10"
 
     const val com_squareup_moshi: String = "1.9.3" // available: "1.10.0"
 
@@ -40,7 +39,7 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.31.v20200723"
 
-    const val kotest_assertions_core_jvm: String = "4.1.3" // available: "4.2.3"
+    const val kotest_assertions_core_jvm: String = "4.2.3"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
@@ -52,7 +51,7 @@ object Versions {
 
     const val aws_lambda_java_core: String = "1.2.1"
 
-    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.0"
+    const val dokka_gradle_plugin: String = "1.4.0"
 
     const val javax_servlet_api: String = "4.0.1"
 
