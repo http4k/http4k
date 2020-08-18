@@ -29,7 +29,7 @@ fun haveHeader(name: String, matcher: Matcher<String>): Matcher<HttpMessage> = h
 
 fun HttpMessage.shouldHaveHeader(name: String, expected: CharSequence) = this should haveHeader(name, expected)
 fun HttpMessage.shouldNotHaveHeader(name: String, expected: CharSequence) = this shouldNot haveHeader(name, expected)
-fun haveHeader(name: String, expected: CharSequence): Matcher<HttpMessage> = haveHeader(name, be(expected.toString()))
+fun haveHeader(name: String, expected: CharSequence): Matcher<HttpMessage> = haveHeader(name, be<String>(expected.toString()))
 
 fun HttpMessage.shouldHaveHeader(name: String, expected: Regex) = this should haveHeader(name, expected)
 fun HttpMessage.shouldNotHaveHeader(name: String, expected: Regex) = this shouldNot haveHeader(name, expected)
@@ -67,7 +67,7 @@ inline fun <reified T : HttpMessage> haveBody(expected: Matcher<String>): Matche
 
 infix fun HttpMessage.shouldHaveBody(expected: CharSequence) = this should haveBody(expected)
 infix fun HttpMessage.shouldNotHaveBody(expected: CharSequence) = this shouldNot haveBody(expected)
-inline fun <reified T : HttpMessage> haveBody(expected: CharSequence): Matcher<T> = haveBody(be(expected.toString()))
+inline fun <reified T : HttpMessage> haveBody(expected: CharSequence): Matcher<T> = haveBody(be<String>(expected.toString()))
 
 infix fun HttpMessage.shouldHaveBody(expected: Regex) = this should haveBody(expected)
 infix fun HttpMessage.shouldNotHaveBody(expected: Regex) = this shouldNot haveBody(expected)

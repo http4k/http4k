@@ -21,7 +21,7 @@ fun haveName(expected: String): Matcher<Cookie> = object : Matcher<Cookie> {
 
 infix fun Cookie.shouldHaveValue(expected: String) = this should haveValue(expected)
 infix fun Cookie.shouldNotHaveValue(expected: String) = this shouldNot haveValue(expected)
-fun haveValue(expected: String): Matcher<Cookie> = haveValue(be(expected))
+fun haveValue(expected: String): Matcher<Cookie> = haveValue(be<String>(expected))
 
 @JvmName("haveCookieValueNullableString")
 fun haveValue(matcher: Matcher<String?>): Matcher<Cookie> = object : Matcher<Cookie> {

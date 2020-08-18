@@ -196,23 +196,23 @@ class ServerFiltersTest {
         @Test
         fun `gunzip request and gzip response`() {
             val handler = ServerFilters.GZip().then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzipped().body))))
         }
 
         @Test
         fun `handle empty messages with incorrect content-encoding`() {
             val handler = ServerFilters.GZip().then {
-                assertThat(it, hasBody(equalTo(Body.EMPTY)))
+                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)))
                 Response(OK).body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body.EMPTY)),
-                hasBody(equalTo(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
         }
 
         @Test
@@ -228,23 +228,23 @@ class ServerFiltersTest {
         @Test
         fun `gunzip request and gzip response with matching content type`() {
             val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN)).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzipped().body))))
         }
 
         @Test
         fun `gunzip request and do not gzip response with unmatched content type`() {
             val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
+                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello")))))
         }
 
         @Test
@@ -263,23 +263,23 @@ class ServerFiltersTest {
         @Test
         fun `gunzip request and gzip response`() {
             val handler = ServerFilters.GZip(Streaming).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).body(Body("hello"))
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body))))
         }
 
         @Test
         fun `handle empty messages with incorrect content-encoding`() {
             val handler = ServerFilters.GZip(Streaming).then {
-                assertThat(it, hasBody(equalTo(Body.EMPTY)))
+                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)))
                 Response(OK).body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body.EMPTY)),
-                hasBody(equalTo(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
         }
 
         @Test
@@ -295,23 +295,23 @@ class ServerFiltersTest {
         @Test
         fun `gunzip request and gzip response with matching content type`() {
             val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN), Streaming).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(Body("hello"))
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body))))
         }
 
         @Test
         fun `gunzip request and do not gzip response with unmatched content type`() {
             val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), Streaming).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
+                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello")))))
         }
 
         @Test

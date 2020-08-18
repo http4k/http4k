@@ -187,7 +187,7 @@ class ClientFiltersTest {
         @Test
         fun `gzip request and gunzip in-memory response`() {
             val handler = ClientFilters.GZip().then {
-                assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped().body))))
+                assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzipped().body))))
                 Response(OK).header("content-encoding", "gzip").body(it.body)
             }
 
@@ -197,7 +197,7 @@ class ClientFiltersTest {
         @Test
         fun `in-memory empty bodies are not encoded`() {
             val handler = ClientFilters.GZip().then {
-                assertThat(it, hasBody(equalTo(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
                 Response(OK).body(Body.EMPTY)
             }
 
@@ -216,7 +216,7 @@ class ClientFiltersTest {
         @Test
         fun `gzip request and gunzip streamed response`() {
             val handler = ClientFilters.GZip(Streaming).then {
-                assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
+                assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body))))
                 Response(OK).header("content-encoding", "gzip").body(Body("hello").gzippedStream().body)
             }
 
@@ -226,7 +226,7 @@ class ClientFiltersTest {
         @Test
         fun `streaming empty bodies are not encoded`() {
             val handler = ClientFilters.GZip(Streaming).then {
-                assertThat(it, hasBody(equalTo(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
                 Response(OK).body(Body.EMPTY)
             }
 
@@ -257,7 +257,7 @@ class ClientFiltersTest {
         @Test
         fun `request bodies are not encoded`() {
             val handler = ClientFilters.AcceptGZip().then {
-                assertThat(it, hasBody(equalTo("a value"))
+                assertThat(it, hasBody(equalTo<String>("a value"))
                     .and(!hasHeader("content-encoding", "gzip")))
                 Response(OK)
             }
