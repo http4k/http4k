@@ -29,7 +29,7 @@ class HttpMessageMatchersTest {
     fun `header no value`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header"), haveHeader("header").invert())
 
     @Test
-    fun `header - non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", contain("bob")), haveHeader("header", be("bill")))
+    fun `header - non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", contain("bob")), haveHeader("header", be<String>("bill")))
 
     @Test
     fun `header lens`() =
@@ -53,7 +53,7 @@ class HttpMessageMatchersTest {
     fun `body non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(contain("bo")), haveBody(contain("foo")))
 
     @Test
-    fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be("bob")), haveBody(be("bill")))
+    fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be<String>("bob")), haveBody(be<String>("bill")))
 
     @Test
     fun `json body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.haveBody("""{"hello":"world"}"""), Jackson.haveBody("""{"hello":"w2orld"}"""))

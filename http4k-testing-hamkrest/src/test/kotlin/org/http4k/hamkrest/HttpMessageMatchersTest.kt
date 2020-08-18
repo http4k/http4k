@@ -47,16 +47,16 @@ class HttpMessageMatchersTest {
     fun `body regex`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(Regex(".*bob")), hasBody(Regex(".*bill")))
 
     @Test
-    fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo(Body("bob"))), hasBody(equalTo(Body("bill"))))
+    fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo<Body>(Body("bob"))), hasBody(equalTo<Body>(Body("bill"))))
 
     @Test
     fun `body non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(containsSubstring("bo")), hasBody(containsSubstring("foo")))
 
     @Test
-    fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob")), hasBody(equalTo("bill")))
+    fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody("bob"), hasBody("bill"))
 
     @Test
-    fun `json body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.hasBody("""{"hello":"world"}"""), hasBody(equalTo("""{"hello":"w2orld"}""")))
+    fun `json body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.hasBody("""{"hello":"world"}"""), hasBody("""{"hello":"w2orld"}"""))
 
     @Test
     fun `json node body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.hasBody(equalTo(Jackson.obj("hello" to Jackson.string("world")))), Jackson.hasBody(equalTo(Jackson.obj("hello" to Jackson.string("wo2rld")))))
