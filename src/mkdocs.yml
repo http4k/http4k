@@ -49,6 +49,7 @@ nav:
       - XML handling: guide/modules/xml/index.md
       - YAML handling: guide/modules/yaml/index.md
       - Hamkrest: guide/modules/hamkrest/index.md
+      - Kotest: guide/modules/kotest/index.md
       - Approval Testing: guide/modules/approvaltests/index.md
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
