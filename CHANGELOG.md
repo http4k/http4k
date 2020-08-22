@@ -31,7 +31,6 @@ changes with their rationale when appropriate:
 - [all] Upgrade some dependency versions.
 - [http4k-core] Added `hostDemux()` routing for when you want to select an `HttpHandler` based on the Host header.
 
-
 ### v3.253.0
 - [http4k-core] Replaced implementation of `JavaHttpClient` with one from Java standard library. Should you not yet have access to the Java 11 SDK, we renamed the old implementation to `Java8HttpClient`. Note that some headers that are added by default by the old Java8 implementation will no longer be added.
 - [http4k-core] [Breaking] Change `Body.binary()` lens to use an InputStream instead of a raw `Body`. To fix, just provide the InputStream by calling `Body.stream()` or similar.
