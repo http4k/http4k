@@ -59,7 +59,7 @@ class RatpackHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
                 context.response.headers.set(name, values.mapNotNull { it.second })
             }
         context.response.status(status.code)
-        context.response.send(bodyString())
+        context.response.send(body.payload.array())
     }
 }
 
