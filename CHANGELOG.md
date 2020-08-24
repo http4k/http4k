@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.259.0 (uncut)
 - [all] Upgrade some dependency versions.
+- [http4k-server-ratpack] Tweak to SO_BACKLOG size (1000)
 
 ### v3.258.0
 - [http4k-testing-kotest] New module! A set of matchers for use with the `kotest` library. H/T @nlochschmidt for the PR.
