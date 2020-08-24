@@ -27,7 +27,7 @@ object Versions {
 
     const val io_undertow: String = "2.1.3.Final"
 
-    const val io_ktor: String = "1.3.2" // available: "1.4.0"
+    const val io_ktor: String = "1.4.0"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
