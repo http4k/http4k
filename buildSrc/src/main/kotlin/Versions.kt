@@ -27,7 +27,7 @@ object Versions {
 
     const val io_undertow: String = "2.1.3.Final"
 
-    const val io_ktor: String = "1.3.2-1.4.0-rc"
+    const val io_ktor: String = "1.4.0"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
@@ -39,11 +39,11 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.31.v20200723"
 
-    const val kotest_assertions_core_jvm: String = "4.1.3"
+    const val kotest_assertions_core_jvm: String = "4.2.0"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
-    const val functions_framework_api: String = "1.0.1"
+    const val functions_framework_api: String = "1.0.2"
 
     const val aws_lambda_java_events: String = "3.2.0"
 
