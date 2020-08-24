@@ -31,7 +31,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     private lateinit var server: Http4kServer
 
-    protected val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
+    private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val sharedList = CopyOnWriteArrayList<Char>()
 
