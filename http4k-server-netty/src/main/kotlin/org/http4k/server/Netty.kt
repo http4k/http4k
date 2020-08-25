@@ -21,7 +21,6 @@ import io.netty.handler.codec.http.HttpObjectAggregator
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.netty.handler.codec.http.HttpServerCodec
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler
-import io.netty.handler.codec.http.HttpUtil
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
 import io.netty.handler.codec.http.LastHttpContent
 import io.netty.handler.stream.ChunkedStream
@@ -59,7 +58,11 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 
     private fun Response.asNettyResponse(): Pair<DefaultHttpResponse, ChunkedStream> =
         DefaultHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
-            headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
+            this@asNettyResponse.headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
+            when (body.length) {
+                null -> headers().set("Transfer-Encoding", "chunked")
+                else -> headers().set("Content-Length", body.length.toString())
+            }
         } to ChunkedStream(body.stream)
 
     private fun FullHttpRequest.asRequest(address: InetSocketAddress) =
