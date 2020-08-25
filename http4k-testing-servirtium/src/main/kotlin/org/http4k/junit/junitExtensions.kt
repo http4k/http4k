@@ -25,12 +25,13 @@ import org.opentest4j.AssertionFailedError
 /**
  * JUnit 5 extension for recording HTTP traffic to disk in Servirtium format.
  */
-class ServirtiumRecording(
-    private val baseName: String,
-    private val httpHandler: HttpHandler,
-    private val storageProvider: StorageProvider,
-    private val options: InteractionOptions = Defaults)
-    : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+class ServirtiumRecording
+    @JvmOverloads constructor(
+        private val baseName: String,
+        private val httpHandler: HttpHandler,
+        private val storageProvider: StorageProvider,
+        private val options: InteractionOptions = Defaults
+    ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isInteractionControl()
 
     private var inTest = false
@@ -60,7 +61,7 @@ class ServirtiumRecording(
 /**
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
-class ServirtiumReplay(private val baseName: String,
+class ServirtiumReplay @JvmOverloads constructor(private val baseName: String,
                        private val storageProvider: StorageProvider,
                        private val options: InteractionOptions = Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isInteractionControl()

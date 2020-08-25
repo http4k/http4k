@@ -25,6 +25,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          * Incoming requests can be manipulated to ensure that it matches the expected request.
          */
         @JvmStatic
+        @JvmOverloads
         fun Replay(
             name: String,
             storageProvider: StorageProvider,
@@ -46,6 +47,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          * Manipulations can be made to the requests and responses before they are stored.
          */
         @JvmStatic
+        @JvmOverloads
         fun Recording(
             name: String,
             target: Uri,

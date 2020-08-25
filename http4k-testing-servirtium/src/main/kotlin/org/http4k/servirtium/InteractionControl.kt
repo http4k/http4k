@@ -7,6 +7,7 @@ interface InteractionControl {
     fun addNote(note: String)
 
     companion object {
+        @JvmStatic
         fun StorageBased(storage: InteractionStorage) = object : InteractionControl {
             override fun addNote(note: String) = storage.accept("## $note\n\n".toByteArray())
         }
