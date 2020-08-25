@@ -3,9 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.259.0 (uncut)
+### v3.259.0
 - [all] Upgrade some dependency versions.
-- [http4k-server-ratpack] Tweak to SO_BACKLOG size (1000)
+- [http4k-server-netty] Fix #141 Http4k-netty performs really badly on all benchmarks. Massive H/T adam-arold!
+- [http4k-server-ratpack] Tweak to SO_BACKLOG size (1000).
 
 ### v3.258.0
 - [http4k-testing-kotest] New module! A set of matchers for use with the `kotest` library. H/T @nlochschmidt for the PR.
