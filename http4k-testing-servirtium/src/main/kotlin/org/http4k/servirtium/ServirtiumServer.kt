@@ -25,7 +25,6 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          * Incoming requests can be manipulated to ensure that it matches the expected request.
          */
         @JvmStatic
-        @JvmOverloads
         fun Replay(
             name: String,
             storageProvider: StorageProvider,
@@ -35,10 +34,17 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
         ): ServirtiumServer = object : ServirtiumServer,
             Http4kServer by
             options.trafficPrinter()
-                .then(Replay.Servirtium(storageProvider(name))
-                    .replayingMatchingContent(options::modify))
+                .then(
+                    Replay.Servirtium(storageProvider(name))
+                        .replayingMatchingContent(options::modify)
+                )
                 .asServer(serverFn(port)),
             InteractionControl by InteractionControl.Companion.NoOp {}
+
+        @JvmStatic
+        // here until KT-35716 is fixed
+        fun Replay(name: String, storageProvider: StorageProvider) =
+            Replay(name, storageProvider, Defaults)
 
         /**
          * MiTM proxy server which sits in between the client and the target and stores traffic in the
@@ -47,7 +53,6 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          * Manipulations can be made to the requests and responses before they are stored.
          */
         @JvmStatic
-        @JvmOverloads
         fun Recording(
             name: String,
             target: Uri,
@@ -61,7 +66,8 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             return object : ServirtiumServer,
                 Http4kServer by
                 TrafficFilters.RecordTo(
-                    Sink.Servirtium(storage, options))
+                    Sink.Servirtium(storage, options)
+                )
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(options.trafficPrinter())
                     .then(proxyClient)
@@ -69,5 +75,13 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
                 InteractionControl by StorageBased(storage) {
             }
         }
+
+        @JvmStatic
+        // here until KT-35716 is fixed
+        fun Recording(
+            name: String,
+            target: Uri,
+            storageProvider: StorageProvider
+        ) = Recording(name, target, storageProvider, Defaults)
     }
 }

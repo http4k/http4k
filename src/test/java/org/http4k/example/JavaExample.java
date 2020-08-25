@@ -3,11 +3,7 @@ package org.http4k.example;
 import okhttp3.OkHttpClient;
 import org.http4k.client.DualSyncAsyncHttpHandler;
 import org.http4k.client.OkHttp;
-import org.http4k.core.BodyMode;
-import org.http4k.core.Filter;
-import org.http4k.core.Request;
-import org.http4k.core.Response;
-import org.http4k.core.Status;
+import org.http4k.core.*;
 import org.http4k.routing.RoutingHttpHandler;
 import org.http4k.server.Http4kServer;
 import org.http4k.server.SunHttp;
@@ -23,7 +19,7 @@ public class JavaExample {
     public static void main(String[] args) {
         Filter f = next -> req -> next.invoke(req.body(req.bodyString().substring(0, 5)));
 
-        RoutingHttpHandler routing = routes(bind("/path", POST).to(req -> Response.Companion.invoke(Status.Companion.getACCEPTED(), Request.HTTP_1_1)));
+        RoutingHttpHandler routing = routes(bind("/path", POST).to(req -> Response.Companion.create(Status.ACCEPTED)));
 
         RoutingHttpHandler app = then(f, routing);
 
@@ -31,9 +27,9 @@ public class JavaExample {
 
         http4kServer.start();
 
-        DualSyncAsyncHttpHandler client = OkHttp.INSTANCE.invoke(new OkHttpClient.Builder().build(), BodyMode.Memory.INSTANCE);
+        DualSyncAsyncHttpHandler client = OkHttp.create(new OkHttpClient.Builder().build(), BodyMode.Memory.INSTANCE);
 
-        System.out.println(client.invoke(Request.Companion.invoke(POST, "http://localhost:8000/path", Request.HTTP_1_1).body("1234567890")));
+        System.out.println(client.invoke(Request.Companion.create(POST, "http://localhost:8000/path").body("1234567890")));
 
         http4kServer.stop();
     }

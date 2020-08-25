@@ -47,6 +47,9 @@ import java.net.URI
 import java.net.UnknownHostException
 
 object Apache4Client {
+    @JvmStatic
+    @JvmOverloads
+    @JvmName("create")
     operator fun invoke(
         client: CloseableHttpClient = defaultApacheHttpClient(),
         responseBodyMode: BodyMode = Memory,

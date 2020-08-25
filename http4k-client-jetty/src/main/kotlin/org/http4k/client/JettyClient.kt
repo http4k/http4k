@@ -25,6 +25,9 @@ import org.eclipse.jetty.client.api.Request as JettyRequest
 import org.eclipse.jetty.client.api.Response as JettyResponse
 
 object JettyClient {
+    @JvmStatic
+    @JvmOverloads
+    @JvmName("create")
     operator fun invoke(client: HttpClient = defaultHttpClient(),
                         bodyMode: BodyMode = BodyMode.Memory,
                         requestModifier: (JettyRequest) -> JettyRequest = { it }): DualSyncAsyncHttpHandler {

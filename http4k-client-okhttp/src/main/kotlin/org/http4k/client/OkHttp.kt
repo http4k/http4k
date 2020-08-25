@@ -26,6 +26,9 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 object OkHttp {
+    @JvmStatic
+    @JvmOverloads
+    @JvmName("create")
     operator fun invoke(
         client: OkHttpClient = defaultOkHttpClient(),
         bodyMode: BodyMode = BodyMode.Memory

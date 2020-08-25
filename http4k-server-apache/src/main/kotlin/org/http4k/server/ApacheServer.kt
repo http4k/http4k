@@ -1,7 +1,11 @@
 package org.http4k.server
 
-import org.apache.hc.core5.http.*
+import org.apache.hc.core5.http.ClassicHttpRequest
+import org.apache.hc.core5.http.ClassicHttpResponse
 import org.apache.hc.core5.http.ContentType
+import org.apache.hc.core5.http.EndpointDetails
+import org.apache.hc.core5.http.Header
+import org.apache.hc.core5.http.HttpEntityContainer
 import org.apache.hc.core5.http.impl.bootstrap.HttpServer
 import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap
 import org.apache.hc.core5.http.impl.io.EmptyInputStream
@@ -68,6 +72,8 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
 }
 
 data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, private val canonicalHostname: String? = null) : ServerConfig {
+
+    constructor(port: Int = 8000) : this(port, null, null)
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer

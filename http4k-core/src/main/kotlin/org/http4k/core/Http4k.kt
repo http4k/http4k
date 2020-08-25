@@ -6,6 +6,8 @@ typealias HttpHandler = (Request) -> Response
 
 interface Filter : (HttpHandler) -> HttpHandler {
     companion object {
+        @JvmStatic
+        @JvmName("create")
         operator fun invoke(fn: (HttpHandler) -> HttpHandler): Filter = object : Filter {
             override operator fun invoke(next: HttpHandler): HttpHandler = fn(next)
         }
