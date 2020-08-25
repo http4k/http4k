@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.260.0 (uncut)
+- [all] [Unlikely break] Added some nicer naming and examples for when people are calling http4k via Java code.
+
 ### v3.259.0
 - [all] Upgrade some dependency versions.
 - [http4k-server-netty] Fix #141 Http4k-netty performs really badly on all benchmarks. Massive H/T adam-arold!
