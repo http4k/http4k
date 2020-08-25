@@ -41,11 +41,6 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
                 .asServer(serverFn(port)),
             InteractionControl by InteractionControl.Companion.NoOp {}
 
-        @JvmStatic
-        // here until KT-35716 is fixed
-        fun Replay(name: String, storageProvider: StorageProvider) =
-            Replay(name, storageProvider, Defaults)
-
         /**
          * MiTM proxy server which sits in between the client and the target and stores traffic in the
          * named Servirtium Markdown file.
@@ -75,13 +70,5 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
                 InteractionControl by StorageBased(storage) {
             }
         }
-
-        @JvmStatic
-        // here until KT-35716 is fixed
-        fun Recording(
-            name: String,
-            target: Uri,
-            storageProvider: StorageProvider
-        ) = Recording(name, target, storageProvider, Defaults)
     }
 }

@@ -42,7 +42,8 @@ interface InteractionOptions {
          * not be used very often as dynamic headers such as "Date" and "User-Agent" will almost always be present and
          * need to be stripped out.
          */
-        object Defaults : InteractionOptions
+        @JvmField
+        val Defaults = object : InteractionOptions {}
     }
 }
 
