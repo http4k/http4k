@@ -103,7 +103,7 @@ object Versions {
 
     const val httpcore: String = "4.4.13"
 
-    const val result4k: String = "0.17.0.0"
+    const val result4k: String = "0.18.0.0"
 
     const val jade4j: String = "1.3.2"
 
