@@ -1,8 +1,8 @@
 package org.http4k.security.oauth.server.refreshtoken
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.map
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.map
 import org.http4k.core.Request
 import org.http4k.security.AccessTokenDetails
 import org.http4k.security.oauth.server.AccessTokenError

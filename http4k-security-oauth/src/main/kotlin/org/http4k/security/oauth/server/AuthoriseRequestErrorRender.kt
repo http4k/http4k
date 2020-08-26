@@ -1,7 +1,7 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.get
-import com.natpryce.mapFailure
+import dev.forkhandles.result4k.get
+import dev.forkhandles.result4k.mapFailure
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri

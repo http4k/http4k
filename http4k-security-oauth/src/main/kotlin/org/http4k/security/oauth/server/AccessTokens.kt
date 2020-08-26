@@ -1,6 +1,6 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Result
+import dev.forkhandles.result4k.Result
 import org.http4k.security.AccessToken
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 
