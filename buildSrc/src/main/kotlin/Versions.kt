@@ -103,7 +103,7 @@ object Versions {
 
     const val httpcore: String = "4.4.13"
 
-    const val result4k: String = "0.18.0.0"
+    const val result4k: String = "1.2.0.0"
 
     const val jade4j: String = "1.3.2"
 
@@ -135,4 +135,4 @@ object Versions {
  */
 val PluginDependenciesSpec.buildSrcVersions: PluginDependencySpec
     inline get() =
-            id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
+        id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
