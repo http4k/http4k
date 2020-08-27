@@ -19,7 +19,7 @@ class TestResources(private val resourcePrefixer: (Class<*>) -> String = { "${it
         object : ResourceLoader {
             override fun bytes(name: String): ByteArray = stream(name).readAllBytes()
 
-            override fun text(name: String): String = stream(name).reader().readText().trim()
+            override fun text(name: String): String = stream(name).reader().use { it.readText().trim() }
 
             override fun stream(name: String): InputStream {
                 val prefix = resourcePrefixer(ec.testClass.get())
