@@ -11,7 +11,7 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0-M1-1.4.0-rc"
+    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.0-RC"
 
     const val com_fasterxml_jackson_dataformat: String = "2.11.2"
 

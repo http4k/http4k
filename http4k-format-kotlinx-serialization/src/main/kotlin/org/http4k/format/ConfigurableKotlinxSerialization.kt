@@ -5,7 +5,6 @@ import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonObjectSerializer
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.booleanOrNull
@@ -44,7 +43,7 @@ open class ConfigurableKotlinxSerialization(
 
     override fun JsonElement.asCompactJsonString() = json.encodeToString(JsonElement.serializer(), this)
 
-    override fun String.asJsonObject() = json.decodeFromString(JsonObjectSerializer, this)
+    override fun String.asJsonObject() = json.decodeFromString(JsonObject.serializer(), this)
 
     override fun String?.asJsonValue() = JsonPrimitive(this)
 
