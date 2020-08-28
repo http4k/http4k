@@ -20,7 +20,7 @@ object Versions {
 
     const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.0"
 
-    const val com_squareup_moshi: String = "1.9.3"
+    const val com_squareup_moshi: String = "1.10.0"
 
     const val org_eclipse_jetty: String = "9.4.31.v20200723"
 
@@ -28,7 +28,7 @@ object Versions {
 
     const val io_undertow: String = "2.1.3.Final"
 
-    const val io_ktor: String = "1.3.2" // available: "1.3.2-1.4-M1-release-99"
+    const val io_ktor: String = "1.3.2" // available: "1.4.0"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
@@ -44,7 +44,7 @@ object Versions {
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
-    const val functions_framework_api: String = "1.0.1"
+    const val functions_framework_api: String = "1.0.2"
 
     const val aws_lambda_java_events: String = "3.2.0"
 
@@ -86,7 +86,7 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val bunting4k: String = "0.14.0.0"
+    const val bunting4k: String = "0.18.0.0"
 
     const val httpcore5: String = "5.0.1"
 
@@ -123,7 +123,7 @@ object Versions {
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */
-    const val gradleLatestVersion: String = "6.6"
+    const val gradleLatestVersion: String = "6.6.1"
 }
 
 /**

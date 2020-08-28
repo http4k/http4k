@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.260.0 (uncut)
+- [all] Upgrade some dependency versions.
 - [all] [Unlikely break] Added some nicer naming and examples for when people are calling http4k via Java code.
 
 ### v3.259.0
