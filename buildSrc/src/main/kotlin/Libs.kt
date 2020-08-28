@@ -9,7 +9,7 @@ object Libs {
      * https://github.com/Kotlin/kotlinx.serialization
      */
     const val kotlinx_serialization_runtime: String =
-            "org.jetbrains.kotlinx:kotlinx-serialization-runtime:" +
+            "org.jetbrains.kotlinx:kotlinx-serialization-core:" +
             Versions.org_jetbrains_kotlinx_kotlinx_serialization
 
     /**
