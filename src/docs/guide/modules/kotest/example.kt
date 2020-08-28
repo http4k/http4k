@@ -1,5 +1,6 @@
 package guide.modules.kotest
 
+import io.kotest.matchers.and
 import io.kotest.matchers.be
 import io.kotest.matchers.should
 import io.kotest.matchers.string.startWith

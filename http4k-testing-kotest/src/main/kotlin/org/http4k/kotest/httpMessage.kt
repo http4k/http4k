@@ -2,6 +2,7 @@ package org.http4k.kotest
 
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
+import io.kotest.matchers.and
 import io.kotest.matchers.be
 import io.kotest.matchers.neverNullMatcher
 import io.kotest.matchers.nulls.beNull
