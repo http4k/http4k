@@ -19,7 +19,7 @@ object Versions {
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
-    const val com_squareup_moshi: String = "1.9.3" // available: "1.10.0"
+    const val com_squareup_moshi: String = "1.10.0"
 
     const val org_eclipse_jetty: String = "9.4.31.v20200723"
 
