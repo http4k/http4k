@@ -39,8 +39,8 @@ class MetricFiltersClientTest {
         }
 
         assert(registry,
-            hasRequestTimer(1, 1, tags = *arrayOf("host" to "test_server_com", "method" to "GET", "status" to "200")),
-            hasRequestTimer(2, 2, tags = *arrayOf("host" to "another_server_com", "method" to "POST", "status" to "404"))
+            hasRequestTimer(1, 1, tags = arrayOf("host" to "test_server_com", "method" to "GET", "status" to "200")),
+            hasRequestTimer(2, 2, tags = arrayOf("host" to "another_server_com", "method" to "POST", "status" to "404"))
         )
     }
 
@@ -52,8 +52,8 @@ class MetricFiltersClientTest {
         }
 
         assert(registry,
-            hasRequestCounter(1, tags = *arrayOf("host" to "test_server_com", "method" to "GET", "status" to "200")),
-            hasRequestCounter(2, tags = *arrayOf("host" to "another_server_com", "method" to "POST", "status" to "404"))
+            hasRequestCounter(1, tags = arrayOf("host" to "test_server_com", "method" to "GET", "status" to "200")),
+            hasRequestCounter(2, tags = arrayOf("host" to "another_server_com", "method" to "POST", "status" to "404"))
         )
     }
 
@@ -65,7 +65,7 @@ class MetricFiltersClientTest {
         assertThat(timedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
 
         assert(registry,
-            hasRequestTimer(1, 1, "custom.requests", "custom.description", tags = *arrayOf("foo" to "bar"))
+            hasRequestTimer(1, 1, "custom.requests", "custom.description", tags = arrayOf("foo" to "bar"))
         )
     }
 
