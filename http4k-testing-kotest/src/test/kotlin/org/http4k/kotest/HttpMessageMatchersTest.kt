@@ -1,5 +1,6 @@
 package org.http4k.kotest
 
+import io.kotest.matchers.Matcher
 import io.kotest.matchers.be
 import io.kotest.matchers.string.contain
 import org.http4k.core.Body
@@ -47,7 +48,11 @@ class HttpMessageMatchersTest {
     fun `body regex`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(Regex(".*bob")), haveBody(Regex(".*bill")))
 
     @Test
-    fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be(Body("bob"))), haveBody(be(Body("bill"))))
+    fun `body string matcher`() {
+        val be: Matcher<Body> = be(Body("bob"))
+        val be1 = be(Body("bill"))
+        assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be), haveBody(be1))
+    }
 
     @Test
     fun `body non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(contain("bo")), haveBody(contain("foo")))
