@@ -49,33 +49,33 @@ fun haveContentType(expected: ContentType): Matcher<HttpMessage> = httpMessageHa
 
 infix fun HttpMessage.shouldHaveBody(expected: Matcher<Body>) = this should haveBody(expected)
 infix fun HttpMessage.shouldNotHaveBody(expected: Matcher<Body>) = this shouldNot haveBody(expected)
-inline fun <reified T : HttpMessage> haveBody(expected: Matcher<Body>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.body }, expected)
+fun <T : HttpMessage> haveBody(expected: Matcher<Body>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.body }, expected)
 
 @JvmName("shouldHaveBodyNullableStringMatcher")
 infix fun HttpMessage.shouldHaveBody(expected: Matcher<String?>) = this should haveBody(expected)
 @JvmName("shouldNotHaveBodyNullableStringMatcher")
 infix fun HttpMessage.shouldNotHaveBody(expected: Matcher<String?>) = this shouldNot haveBody(expected)
 @JvmName("haveBodyNullableStringMatcher")
-inline fun <reified T : HttpMessage> haveBody(expected: Matcher<String?>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.bodyString() }, expected)
+fun <T : HttpMessage> haveBody(expected: Matcher<String?>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.bodyString() }, expected)
 
 @JvmName("shouldHaveBodyStringMatcher")
 infix fun HttpMessage.shouldHaveBody(expected: Matcher<String>) = this should haveBody(expected)
 @JvmName("shouldNotHaveBodyStringMatcher")
 infix fun HttpMessage.shouldNotHaveBody(expected: Matcher<String>) = this shouldNot haveBody(expected)
 @JvmName("haveBodyStringMatcher")
-inline fun <reified T : HttpMessage> haveBody(expected: Matcher<String>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.bodyString() }, expected)
+fun <T : HttpMessage> haveBody(expected: Matcher<String>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.bodyString() }, expected)
 
 infix fun HttpMessage.shouldHaveBody(expected: CharSequence) = this should haveBody(expected)
 infix fun HttpMessage.shouldNotHaveBody(expected: CharSequence) = this shouldNot haveBody(expected)
-inline fun <reified T : HttpMessage> haveBody(expected: CharSequence): Matcher<T> = haveBody(be(expected.toString()))
+fun <T : HttpMessage> haveBody(expected: CharSequence): Matcher<T> = haveBody(be(expected.toString()))
 
 infix fun HttpMessage.shouldHaveBody(expected: Regex) = this should haveBody(expected)
 infix fun HttpMessage.shouldNotHaveBody(expected: Regex) = this shouldNot haveBody(expected)
-inline fun <reified T : HttpMessage> haveBody(expected: Regex): Matcher<T> = haveBody(contain(expected))
+fun <T : HttpMessage> haveBody(expected: Regex): Matcher<T> = haveBody(contain(expected))
 
 fun <T> HttpMessage.shouldHaveBody(lens: BodyLens<T>, matcher: Matcher<T>) = this should haveBody(lens, matcher)
 fun <T> HttpMessage.shouldNotHaveBody(lens: BodyLens<T>, matcher: Matcher<T>) = this shouldNot haveBody(lens, matcher)
-inline fun <reified T : HttpMessage, B> haveBody(lens: BodyLens<B>, matcher: Matcher<B>): Matcher<T> = LensMatcher(httpMessageHas("Body", { m: T -> lens(m) }, matcher))
+fun <T : HttpMessage, B> haveBody(lens: BodyLens<B>, matcher: Matcher<B>): Matcher<T> = LensMatcher(httpMessageHas("Body", { m: T -> lens(m) }, matcher))
 
 fun <NODE> Json<NODE>.haveBody(expected: NODE): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, be(expected))
 
@@ -83,7 +83,7 @@ fun <NODE> Json<NODE>.haveBody(expected: Matcher<NODE>): Matcher<HttpMessage> = 
 
 fun <NODE> Json<NODE>.haveBody(expected: String): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compactify(m.bodyString()) }, be(compactify(expected)))
 
-inline fun <reified T : HttpMessage, R> httpMessageHas(name: String, crossinline extractValue: (T) -> R, match: Matcher<R>): Matcher<T> = object : Matcher<T> {
+fun <T : HttpMessage, R> httpMessageHas(name: String, extractValue: (T) -> R, match: Matcher<R>): Matcher<T> = object : Matcher<T> {
     override fun test(value: T): MatcherResult {
         val testResult = match.test(extractValue(value))
         return MatcherResult(
