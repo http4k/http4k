@@ -11,8 +11,8 @@ To install, add these dependencies to your **Gradle** file:
 dependencies {
     implementation platform("org.http4k:http4k-bom:3.259.0")
     implementation "org.http4k:http4k-core"
-    implementation "org.http4k:http4k-server=jetty"
-    implementation "org.http4k:client-server=apache"
+    implementation "org.http4k:http4k-server-jetty"
+    implementation "org.http4k:client-server-apache"
 }
 ```
 
