@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.260.0 (uncut)
+### v3.260.0
 - [all] Upgrade some dependency versions.
 - [all] [Unlikely break] Added some nicer naming and examples for when people are calling http4k via Java code.
 - [http4k-core] Fixed SunHttp server backend not setting content length, and hence responses are always chunked.
