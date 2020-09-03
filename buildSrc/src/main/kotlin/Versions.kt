@@ -20,7 +20,7 @@ object Versions {
 
     const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.0"
 
-    const val com_squareup_moshi: String = "1.9.3"
+    const val com_squareup_moshi: String = "1.9.3" // available: "1.10.0"
 
     const val org_eclipse_jetty: String = "9.4.31.v20200723"
 
@@ -40,7 +40,7 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.31.v20200723"
 
-    const val kotest_assertions_core_jvm: String = "4.1.3"
+    const val kotest_assertions_core_jvm: String = "4.1.3" // available: "4.2.3"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
@@ -52,7 +52,7 @@ object Versions {
 
     const val aws_lambda_java_core: String = "1.2.1"
 
-    const val dokka_gradle_plugin: String = "0.10.1"
+    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.0"
 
     const val javax_servlet_api: String = "4.0.1"
 

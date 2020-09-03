@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.260.0 (uncut)
 - [all] Upgrade some dependency versions.
 - [all] [Unlikely break] Added some nicer naming and examples for when people are calling http4k via Java code.
+- [http4k-core] Fixed SunHttp server backend not setting content length, and hence responses are always chunked.
 
 ### v3.259.0
 - [all] Upgrade some dependency versions.

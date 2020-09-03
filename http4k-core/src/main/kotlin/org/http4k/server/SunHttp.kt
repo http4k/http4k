@@ -1,7 +1,6 @@
 package org.http4k.server
 
 import com.sun.net.httpserver.HttpExchange
-import com.sun.net.httpserver.HttpHandler as SunHttpHandler
 import com.sun.net.httpserver.HttpServer
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -10,9 +9,9 @@ import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
-import java.lang.Runtime.getRuntime
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors.newWorkStealingPool
+import com.sun.net.httpserver.HttpHandler as SunHttpHandler
 
 class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
@@ -20,7 +19,7 @@ class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
         if (requestMethod == "HEAD") {
             sendResponseHeaders(httpResponse.status.code, -1)
         } else {
-            sendResponseHeaders(httpResponse.status.code, 0)
+            sendResponseHeaders(httpResponse.status.code, httpResponse.body.length ?: 0)
             httpResponse.body.stream.use { input -> responseBody.use { input.copyTo(it) } }
         }
     }
@@ -38,7 +37,7 @@ class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
             try {
                 populate(handler(toRequest()))
             } catch (e: Exception) {
-                sendResponseHeaders(500, 0)
+                sendResponseHeaders(500, -1)
             } finally {
                 close()
             }
