@@ -101,7 +101,7 @@ Yep - the reusing of the existing [http4k] lens system to cover configuring your
 It's no secret that the [http4k] team love testing - it's part of our core DNA and the simplicity of core design would be worthless unless we could test apps built with the library simply and effectively. To that end, some of the most exciting additions that we've added to the library have been in the arena of testing:
 
 * [Approval Testing] is a technique for simplifying complex assertions that might otherwise be more effectively checked by eye. `http4k-testing-approval` provides the primitives and tooling for supporting this style of testing,
-* [Chaos Testing] was made famous by Netflix for proving out how systems react when everything heads south. `http4k-testing-chaos` adds transparent, programmable failure-generation to any [httpt4k] app using only a simple `Filter`.
+* [Chaos Testing] was made famous by Netflix for proving out how systems react when everything heads south. `http4k-testing-chaos` adds transparent, programmable failure-generation to any [http4k] app using only a simple `Filter`.
 * [Service Virtualization] enables API test contracts to be encoded and then shipped, simplifying the process of proving that apps retain compatibility, `http4k-testing-servirtium` provides the basis for recording and replaying contracts from disk or from other sources such as GitHub.
 
 <img src="./testing.jpg" alt="testing"/>
@@ -127,7 +127,7 @@ So - we did what any good dev team would do and replaced the magic function load
 
 One other piece of interesting research which came out and somewhat vindicated the dependency-lite approach of [http4k] was [Cold Start War], which performed a lot of experiments and concluded that:
 
-> **"As expected, the dependencies slow the loading down. You should keep your Funxctions lean, otherwise, you will pay in seconds for every cold start." - Mikhail Shilkov**
+> **"As expected, the dependencies slow the loading down. You should keep your Functions lean, otherwise, you will pay in seconds for every cold start." - Mikhail Shilkov**
 
 For production deployments, we continue to recommend the use of a tool such as Proguard or R8 to massively reduce the size of packaged Serverless Function JAR file. The [http4k] serverless modules also ship with zero or minimal dependencies to avoid any transitive bloat that might occur.
 
