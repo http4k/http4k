@@ -1,14 +1,15 @@
-name: Send a Tweet
-on: [push]
+on:
+  push:
+    tags:
+      - '*'
 jobs:
   tweet:
     runs-on: ubuntu-latest
     steps:
       - uses: ethomson/send-tweet-action@v1
         with:
-          status: "Hi, this is a test!"
+          status: 'New version ${GITHUB_REF/refs\/tags\//} 🎉. Changelog available at: https://github.com/http4k/http4k/blob/master/CHANGELOG.md'
           consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
           consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
           access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
           access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-

@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Create release note
-        run: ./build_release_note.sh 'refs/tags/3.260.0' > NOTE.md
+        run: ./build_release_note.sh ${{ github.ref }} > NOTE.md
       - name: Create release
         uses: actions/create-release@v1
         env:
