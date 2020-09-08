@@ -6,7 +6,7 @@ jobs:
   release:
   runs-on: ubuntu-latest
   steps:
-  - name: Checkout
-    uses: actions/checkout@v2
-  - name: Create release
-    run: echo ${{ github.ref }}
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Create release
+      run: echo ${{ github.ref }}

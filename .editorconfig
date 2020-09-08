@@ -7,6 +7,13 @@ indent_style=space
 indent_size = 4
 insert_final_newline = true
 
+[{*.yml,*.yaml}]
+charset=utf-8
+end_of_line=lf
+indent_style=space
+indent_size = 2
+insert_final_newline = true
+
 [{*.kt,*.kts}]
 continuation_indent_size = 4
 ij_continuation_indent_size = 4
