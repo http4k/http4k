@@ -133,11 +133,21 @@ For production deployments, we continue to recommend the use of a tool such as P
 
 <hr/>
 
+#### Going native
+
+Apart from Serverless, one of the most exciting things happening in JVM-land right now is the advent of native technologies such as Quarkus and GraalVM, giving the possibility of compiling apps direct to binaries - which give a massive performance boost. It's a young technology and often involves various amounts of trickery to get around limitations of the native system regarding areas such as reflection. Luckily for us (and you!), [http4k] operates on an anti-magic principle (see the 5th commandment above) and it was a nice surprise when it occurred that, with the correct server engine (Apache for the curious), [http4k] applications can be packaged out-of-the-box to this format with absolutely no modifications of aforementioned trickery. 
+
+<img src="./smug-mode.jpg" alt="smug-mode"/>
+
+We look forward to further supporting these technologies as they develop, and will endeavour to provide custom modules to suppport teams who want to take advantage of them.
+
+<hr/>
+
 #### Future echoes...
 
 > **“And the open road rolled out in front of us.” - Alexandra Bracken, In The Afterlight**
 
->So what's next? Well, we've got a load of good stuff coming up for post version 4 of [http4k], the rest of 2020 and beyond. As well as the website improvements, we've got a bunch of tools in the works to make the library more quick-start friendly, both from the command-line and from the browser. We're also looking at improvements in the versioning scheme to better communicate breaking changes, and rolling out modules to enable better Serverless platform support. 
+So what's next? Well, we've got a load of good stuff coming up for post version 4 of [http4k], the rest of 2020 and beyond. As well as the website improvements, we've got a bunch of tools in the works to make the library more quick-start friendly, including the ability to autogenerate advanced [http4k] Clients and Server stubs from OpenApi specifications - both from the command-line and from the browser. We're also looking at improvements in the versioning scheme to better communicate breaking changes, and rolling out modules to enable better Serverless platform support. 
 
 Whatever happens though, the focus of [http4k] will always be on providing a best-in-class Developer and Testing experience. We'd love to hear how we're doing, so please drop into the comm channels to get in touch. Here's to the future. Stay safe out there and we'll see you in it.
 
