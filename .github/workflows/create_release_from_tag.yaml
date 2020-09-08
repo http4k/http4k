@@ -12,11 +12,11 @@ jobs:
         run: ./build_release_note.sh 'refs/tags/3.260.0' > NOTE.md
       - name: Create release
         uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: ${{ github.ref }}
-            release_name: Release ${{ github.ref }}
-            body_path: NOTE.md
-            draft: false
-            prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: NOTE.md
+          draft: false
+          prerelease: false
