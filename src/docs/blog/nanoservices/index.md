@@ -16,12 +16,16 @@ This simple proxy converts HTTP requests to HTTPS. Because of the symmetrical se
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt"></script>
 
+<hr/>
+
 ### Latency Reporting Proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/latency_reporting_proxy.kt)
 Requires: `http4k-core`
 
 Building on the Simple Proxy example, we can simply layer on extra filters to add features to the proxy, in this case reporting the latency of each call.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/latency_reporting_proxy.kt"></script>
+
+<hr/>
 
 ### Wire-sniffing Proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/wire_sniffing_proxy.kt)
 Requires: `http4k-core`
@@ -30,12 +34,16 @@ Applying a `DebuggingFilter` to the HTTP calls in a proxy dumps the entire conte
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/wire_sniffing_proxy.kt"></script>
 
+<hr/>
+
 ### Traffic Recording Proxy & Replayer [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/record_and_replay_http_traffic_proxy.kt)
 Requires: `http4k-core`
 
 This example contains two apps. The first is a proxy which captures streams of traffic and records it to a directory on disk. The second app is configured to replay the requests from that disk store at the original server. This kind of traffic capture/replay is very useful for load testing or for tracking down hard-to-diagnose bugs - and it's easy to write other other stores such as an S3 bucket etc.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/record_and_replay_http_traffic_proxy.kt"></script>
+
+<hr/>
 
 ### Static file Server [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt)
 Requires: `http4k-core`
@@ -44,12 +52,16 @@ Longer than the Python `SimpleHttpServer`, but still pretty small!
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt"></script>
 
+<hr/>
+
 ### Websocket Clock [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/websocket_clock.kt)
 Requires: `http4k-core`, `http4k-server-jetty`
 
 Like Http handlers, Websockets in http4k can be modelled as simple functions that can be mounted onto a Server, or combined with path patterns if required.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/websocket_clock.kt"></script>
+
+<hr/>
 
 ### Chaos Proxy (random latency edition) [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt)
 Requires: `http4k-core`, `http4k-testing-chaos`
