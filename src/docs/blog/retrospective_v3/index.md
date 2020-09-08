@@ -42,7 +42,7 @@ One of the most important things to us when we were developing was to create a l
 
 This post made us very happy and all of our efforts feel completely worthwhile. We hope you all feel the same. 😊
 
-As for community reach, we've been in touch with [http4k] user from all corners of the planet from all kinds of different projects and industries - from COVID tracking apps (relevant!) to Academic Publishers (that one was us) to Investment and Challenger Banks (also us), to No-code platforms. If Twitter is to be believed, the library seems pretty popular in Japan, but no-one on the core team speaks Japanese so we don't actually know why!
+As for community reach, we've been in touch with [http4k] users from all corners of the planet from all kinds of different projects and industries - from COVID tracking apps (relevant!) to Academic Publishers (that one was us) to Investment and Challenger Banks (also us), to No-code platforms. If Twitter is to be believed, the library seems pretty popular in Japan, but no-one on the core team speaks Japanese so we don't actually know why!
 
 <hr/>
 #### Globe-trotting
