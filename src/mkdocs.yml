@@ -83,7 +83,6 @@ nav:
     - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md
-    - Nanoservices: cookbook/nanoservices/index.md
   - Performance: performance/index.md
   - In action: in_action/index.md
   - Blog:
