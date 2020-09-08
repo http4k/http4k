@@ -1,7 +1,7 @@
 on:
   push:
-  tags:
-  - '*'
+    tags:
+      - '*'
 jobs:
   release:
   runs-on: ubuntu-latest
