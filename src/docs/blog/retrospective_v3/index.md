@@ -1,5 +1,5 @@
 title: http4k blog: A retrospective on http4k v3
-description: An overview of the Kotlin "Server as a Function" library, http4k
+description: In preparation for the upcoming release of v4, the http4k team thought we'd do a bit of a retrospective about all the things that have gone in the >260 releases of v3
 
 #  A retrospective on http4k v3.
 
