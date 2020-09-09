@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: http4k/toolbox
-          token: c01d921ab3d68528ddc0f75ad83cde8b6013c891
+          token: ${{ secrets.TOOLBOX_TOKEN }}
       - name: Create branch
         uses: peterjgrainger/action-create-branch@v1.0.0
         env:
