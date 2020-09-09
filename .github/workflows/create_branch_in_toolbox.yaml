@@ -8,14 +8,15 @@ jobs:
     steps:
       - uses: olegtarasov/get-tag@v2
         id: tagName
+      - run: echo ${{ steps.tagName.outputs.tag }}
       - name: Checkout tools repo
         uses: actions/checkout@v2
         with:
           repository: http4k/toolbox
           token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
-      - name: Create branch
-        uses: peterjgrainger/action-create-branch@v1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          branch: ${{ steps.tagName.outputs.tag }}
+      - run: echo ${{ steps.tagName.outputs.tag }}
+      - run: git checkout -b ${{ steps.tagName.outputs.tag }}
+      - run: TOKEN="const val org_http4k" && ORIGINAL=`grep $TOKEN buildSrc/src/main/kotlin/Versions.kt` && sed s/$ORIGINAL/"    $TOKEN = \"${{ steps.tagName.outputs.tag }}\""/ buildSrc/src/main/kotlin/Versions.kt
+      - run: git add ."
+      - run: git commit -am "Upgrade to ${{ steps.tagName.outputs.tag }}"
+      - run: git push
