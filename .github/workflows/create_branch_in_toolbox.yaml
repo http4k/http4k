@@ -3,20 +3,16 @@ on:
     tags:
       - 'test*'
 jobs:
-  create-branch:
+  create-toolbox-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: olegtarasov/get-tag@v2
+      - name: Grab tag name
+        uses: olegtarasov/get-tag@v2
         id: tagName
-      - run: echo ${{ steps.tagName.outputs.tag }}
-      - name: Checkout tools repo
-        uses: actions/checkout@v2
+      - name: Trigger toolbox
+        uses: peter-evans/repository-dispatch@v1.1.1
         with:
-          repository: http4k/toolbox
           token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
-      - run: echo ${{ steps.tagName.outputs.tag }}
-      - run: git checkout -b ${{ steps.tagName.outputs.tag }}
-      - run: TOKEN="const val org_http4k" && ORIGINAL=`grep $TOKEN buildSrc/src/main/kotlin/Versions.kt` && sed s/$ORIGINAL/"    $TOKEN = \"${{ steps.tagName.outputs.tag }}\""/ buildSrc/src/main/kotlin/Versions.kt
-      - run: git add ."
-      - run: git commit -am "Upgrade to ${{ steps.tagName.outputs.tag }}"
-      - run: git push
+          repository: http4k/toolbox
+          event-type: http4k-release
+          client-payload: '{"version": "${{ steps.tagName.outputs.tag }}"}'
