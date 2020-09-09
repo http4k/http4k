@@ -4,471 +4,471 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.260.0
-- **[all]** Upgrade some dependency versions.
-- [all] [Unlikely break] Added some nicer naming and examples for when people are calling http4k via Java code.
-- [http4k-core] Fixed SunHttp server backend not setting content length, and hence responses are always chunked.
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*, Unlikely break** : Added some nicer naming and examples for when people are calling http4k via Java code.
+- **http4k-core** : Fixed SunHttp server backend not setting content length, and hence responses are always chunked.
 
 ### v3.259.0
-- [all] Upgrade some dependency versions.
-- [http4k-server-netty] Fix #141 Http4k-netty performs really badly on all benchmarks. Massive H/T adam-arold!
-- [http4k-server-ratpack] Tweak to SO_BACKLOG size (1000).
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-netty** : Fix #141 Http4k-netty performs really badly on all benchmarks. Massive H/T adam-arold!
+- **http4k-server-ratpack** : Tweak to SO_BACKLOG size (1000).
 
 ### v3.258.0
-- [http4k-testing-kotest] New module! A set of matchers for use with the `kotest` library. H/T @nlochschmidt for the PR.
-- [all] Upgrade some dependency versions.
+- **http4k-testing-kotest** : New module! A set of matchers for use with the `kotest` library. H/T @nlochschmidt for the PR.
+- **http4k-*** : Upgrade some dependency versions.
 
 ### v3.257.0
-- [http4k-serverless-*] Making the Serverless APIs consistent between flavours by ensuring that all Serverless functions act by class extension and not reflection based approach. Deprecated old approach. Hopefully this is simpler.. :) 
+- **http4k-serverless-\*** : Making the Serverless APIs consistent between flavours by ensuring that all Serverless functions act by class extension and not reflection based approach. Deprecated old approach. Hopefully this is simpler.. :) 
 
 ### v3.256.1
-- [http4k-core] Fix #470. Path.of cannot decode path parameter values containing %/
+- **http4k-core** : Fix #470. Path.of cannot decode path parameter values containing %/
 
 ### v3.256.0
-- [http4k-security-oauth] Add ability to handle form encoded responses in OAuth responses.
+- **http4k-security-oauth** : Add ability to handle form encoded responses in OAuth responses.
 
 ### v3.255.0
-- [all] Upgrade some dependency versions.
-- [all] [Breaking (if you're not using it right!)] - Fixed up Maven dependencies so that they are not exporting compileOnly libraries into POMs.
-- [http4k-security-oauth] Remove "user" from default list of GitHub scopes as it gives you write access to the profile. New default is empty (just public data).
-- [http4k-core] Improve defaults of SunHttp server. H/T @nlochschmidt for the PR.
-- [http4k-contract] Add description to OpenApi schema fields using Jackson annotations. H/T @env0der for the PR.
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*, Breaking (if you're not using it right!)** : - Fixed up Maven dependencies so that they are not exporting compileOnly libraries into POMs.
+- **http4k-security-oauth** : Remove "user" from default list of GitHub scopes as it gives you write access to the profile. New default is empty (just public data).
+- **http4k-core** : Improve defaults of SunHttp server. H/T @nlochschmidt for the PR.
+- **http4k-contract** : Add description to OpenApi schema fields using Jackson annotations. H/T @env0der for the PR.
 
 ### v3.254.0
-- [all] Upgrade some dependency versions.
-- [http4k-core] Added `hostDemux()` routing for when you want to select an `HttpHandler` based on the Host header.
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Added `hostDemux()` routing for when you want to select an `HttpHandler` based on the Host header.
 
 ### v3.253.0
-- [http4k-core] Replaced implementation of `JavaHttpClient` with one from Java standard library. Should you not yet have access to the Java 11 SDK, we renamed the old implementation to `Java8HttpClient`. Note that some headers that are added by default by the old Java8 implementation will no longer be added.
-- [http4k-core] [Breaking] Change `Body.binary()` lens to use an InputStream instead of a raw `Body`. To fix, just provide the InputStream by calling `Body.stream()` or similar.
-- [http4k-client-websocket] [Unlikely break] Allow API users to pass in their own `Draft` object for custom protocols. If broken, simple fix is to just use named arguments in the construction call to the client.
-- [all] Upgrade some dependency versions.
+- **http4k-core** : Replaced implementation of `JavaHttpClient` with one from Java standard library. Should you not yet have access to the Java 11 SDK, we renamed the old implementation to `Java8HttpClient`. Note that some headers that are added by default by the old Java8 implementation will no longer be added.
+- **http4k-core, Breaking** : Change `Body.binary()` lens to use an InputStream instead of a raw `Body`. To fix, just provide the InputStream by calling `Body.stream()` or similar.
+- **http4k-client-websocket, Unlikely break** : Allow API users to pass in their own `Draft` object for custom protocols. If broken, simple fix is to just use named arguments in the construction call to the client.
+- **http4k-*** : Upgrade some dependency versions.
 
 ### v3.252.0
-- [http4k-server-apache, http4k-client-apache, http4k-client-apache-async] [Breaking] Updated to Apache HTTP 5.X.X. H/T to @jshiell. Note that the underlying Apache APIs have changed in the v5 release. For the clients, this should only break if you have customised the underlying HTTP `CloseableHttpClient` that is passed to the constructor of the http4k client. If you have, we have you covered with....
-- [http4k-server-apache4, http4k-client-apache4, http4k-client-apache4-async] New modules to maintain previous integration with Apache HTTP 4.X.X. Intended to reduce the impact on projects that are not ready to move to v5 yet. In these compatibility modules, renamed `ApacheClient` -> `Apache4Client` and `ApacheAsyncClient` to `Apache4AsyncClient` - which is the only change that should be required in end user code.
-- [http4k-serverless-openwhisk] Fixes to support binary content types and overcome issues with the request/response format of the OW Java runtime.
-- [http4k-core] Added some Filters for base64 encoding and decoding responses.
-- [all] Upgrade some dependency versions.
+- **http4k-server-apache, http4k-client-apache, http4k-client-apache-async, Breaking** : Updated to Apache HTTP 5.X.X. H/T to @jshiell. Note that the underlying Apache APIs have changed in the v5 release. For the clients, this should only break if you have customised the underlying HTTP `CloseableHttpClient` that is passed to the constructor of the http4k client. If you have, we have you covered with....
+- **http4k-server-apache4, http4k-client-apache4, http4k-client-apache4-async** : New modules to maintain previous integration with Apache HTTP 4.X.X. Intended to reduce the impact on projects that are not ready to move to v5 yet. In these compatibility modules, renamed `ApacheClient` -> `Apache4Client` and `ApacheAsyncClient` to `Apache4AsyncClient` - which is the only change that should be required in end user code.
+- **http4k-serverless-openwhisk** : Fixes to support binary content types and overcome issues with the request/response format of the OW Java runtime.
+- **http4k-core** : Added some Filters for base64 encoding and decoding responses.
+- **http4k-*** : Upgrade some dependency versions.
  
 ### v3.251.0
-- [http4k-core] Added support for multiple "cookie" headers. H/T @jshiell 
-- [http4k-serverless-openwhisk] New serverless module!
-- [http4k-serverless-*] [Breaking] - Repackage some functions to `org.http4k.serverless` package. Just change the package names to fix.
+- **http4k-core** : Added support for multiple "cookie" headers. H/T @jshiell 
+- **http4k-serverless-openwhisk** : New serverless module!
+- **http4k-serverless-*, Breaking** : - Repackage some functions to `org.http4k.serverless` package. Just change the package names to fix.
 
 ### v3.250.0
-- [http4k-core] Add `Request.source` to provide extra information about the request origin (address/port/scheme). H/T @kam1sh and @jshiell for the contributions.
-- [http4k-security-oauth] Add OAuth provider configuration for Facebook. H/T @knyttl for the PR.
-- [http4k-server-netty] Implement KeepAlive. H/T @carbotaniuman for the PR.
-- [http4k-bom] New Bill-Of-Materials module! 
-- [all] Upgrade some dependency versions.
+- **http4k-core** : Add `Request.source` to provide extra information about the request origin (address/port/scheme). H/T @kam1sh and @jshiell for the contributions.
+- **http4k-security-oauth** : Add OAuth provider configuration for Facebook. H/T @knyttl for the PR.
+- **http4k-server-netty** : Implement KeepAlive. H/T @carbotaniuman for the PR.
+- **http4k-bom** : New Bill-Of-Materials module! 
+- **http4k-*** : Upgrade some dependency versions.
 
 ### v3.249.0
-- [all] Upgrade some dependency versions.
-- [http4k-server-netty] Add support for response streaming. H/T @carbotaniuman for the PR.
-- [http4k-serverless-gcf] New serverless module! H/T @ssijak for the PR.
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-netty** : Add support for response streaming. H/T @carbotaniuman for the PR.
+- **http4k-serverless-gcf** : New serverless module! H/T @ssijak for the PR.
 
 ### v3.248.0
-- [http4k-server-ratpack] New backend module!
-- [http4k-format-jackson-yaml] New module!
-- [all] Upgrade some dependency versions.
-- [http4k-cloudnative] - Fix #418 - Fix separator propagation when adding values to an existing MapEnvironment. H/T @jshiell
-- [http4k-contract] - Add support for securing the API description endpoint. H/T @goodhoko for the PR.
-- [http4k-client-websocket] Added auto-reconnection support on blocking WsClient. H/T @alphaho for the PR.
-- [http4k-format-*] Rename/deprecate `asXYZString(Any)` -> `asFormatString(Any)` in all modules
+- **http4k-server-ratpack** : New backend module!
+- **http4k-format-jackson-yaml** : New module!
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-cloudnative** : - Fix #418 - Fix separator propagation when adding values to an existing MapEnvironment. H/T @jshiell
+- **http4k-contract** : - Add support for securing the API description endpoint. H/T @goodhoko for the PR.
+- **http4k-client-websocket** : Added auto-reconnection support on blocking WsClient. H/T @alphaho for the PR.
+- **http4k-format-\*** : Rename/deprecate `asXYZString(Any)` -> `asFormatString(Any)` in all modules
 
 ### v3.247.0
-- [http4k-server-ktornetty] New backend module! H/T @albertlatacz for the contribution!
-- [all] Upgrade some dependency versions.
-- [http4k-security-oauth] Fix #414 BasicAuth server filter to not throw an exception on invalid base64 input. H/T @Sebruck for the fix.
+- **http4k-server-ktornetty** : New backend module! H/T @albertlatacz for the contribution!
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** : Fix #414 BasicAuth server filter to not throw an exception on invalid base64 input. H/T @Sebruck for the fix.
 
 ### v3.246.0
-- [all] Upgrade some dependency versions.
-- [http4k-template-pebble] Fix #411 - Non-root pebble templates when using CachingClasspath from a compiled JAR. H/T @alyphen 
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-template-pebble** : Fix #411 - Non-root pebble templates when using CachingClasspath from a compiled JAR. H/T @alyphen 
 
 ### v3.245.1
-- [http4k-server-ktorcio] Fix #410 - KtorCIO does not stop properly. 
+- **http4k-server-ktorcio** : Fix #410 - KtorCIO does not stop properly. 
 
 ### v3.245.0    
-- [all] Upgrade some dependency versions.
-- [http4k-core] Factored out `Http4kServletAdapter` to allow usage of the Servlet API outside of creating a Servlet instance.
-- [all] [Breaking (prevent API abuse)] Restricted generic `with()` method actual http4k types. Usage outside our API should not use this method.
-- [http4k-contract] Fix #404 - Rework of some `FieldRetrieval` classes to remove duplication and to support PropertyNamingStrategies set at the global level
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Factored out `Http4kServletAdapter` to allow usage of the Servlet API outside of creating a Servlet instance.
+- **http4k-*, Breaking (prevent API abuse)** : Restricted generic `with()` method actual http4k types. Usage outside our API should not use this method.
+- **http4k-contract** : Fix #404 - Rework of some `FieldRetrieval` classes to remove duplication and to support PropertyNamingStrategies set at the global level
 
 ### v3.244.0
-- [all] Upgrade some dependency versions.
-- [all] [Breaking (if you're not using it right!)] Fix #397 - Fixed up Maven dependencies so that they are not bringing in runtime libraries.
-- [http4k-core] - Add enum StringBiDiMapping #395 - H/T @goodhoko
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*, Breaking (if you're not using it right!)** : Fix #397 - Fixed up Maven dependencies so that they are not bringing in runtime libraries.
+- **http4k-core** : - Add enum StringBiDiMapping #395 - H/T @goodhoko
 
 ### v3.243.0
-- [all] Upgrade some dependency versions, including Kotlin to `1.3.72`.
-- [http4k-security-oauth] A strategy can now be passed into `AuthRequestWithRequestAuthRequestExtractor` to determine how to combine `AuthRequest` and `RequestObject` H/T @tom
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to `1.3.72`.
+- **http4k-security-oauth** : A strategy can now be passed into `AuthRequestWithRequestAuthRequestExtractor` to determine how to combine `AuthRequest` and `RequestObject` H/T @tom
 
 ### v3.242.0
-- [all] Upgrade some dependency versions.
-- [http4k-testing-servirtium] Improve error diagnostics. H/T @vchekan for the PR.
-- [all] [Unlikely Break] Change `Router` to return `RouterMatch` instead of nullable `HttpHandler`. This allows us to support `METHOD_NOT_ALLOWED` (405) if we match a path but not a verb instead of just `NOT_FOUND` (404). This should break custom ro H/T @jshiell for the PR.
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-servirtium** : Improve error diagnostics. H/T @vchekan for the PR.
+- **http4k-*, Unlikely Break** : Change `Router` to return `RouterMatch` instead of nullable `HttpHandler`. This allows us to support `METHOD_NOT_ALLOWED` (405) if we match a path but not a verb instead of just `NOT_FOUND` (404). This should break custom ro H/T @jshiell for the PR.
 
 ### v3.241.0
-- [http4k-security-oauth] [Breaking] `client_id` along with the corresponding `TokenRequest` is passed into access and refresh token generators so additional validation can take place H/T @tom
+- **http4k-security-oauth, Breaking** : `client_id` along with the corresponding `TokenRequest` is passed into access and refresh token generators so additional validation can take place H/T @tom
 
 ### v3.240.0
-- [all] Upgrade Kotlin to `1.3.71`.
-- [http4k-testing-servirtium] Switch OkHttp client for Apache.
-- [http4k-server-jetty] Made some classes non-internal so they can be easily reused for custom `ServerConfig` implementations.
+- **http4k-*** : Upgrade Kotlin to `1.3.71`.
+- **http4k-testing-servirtium** : Switch OkHttp client for Apache.
+- **http4k-server-jetty** : Made some classes non-internal so they can be easily reused for custom `ServerConfig` implementations.
 
 ### v3.239.0
-- [http4k-client-websocket] [Breaking] Added extra onError handler when creating a non-blocking websocket.
-- [all] Upgrade some dependency versions, including Kotlin to 1.3.70.
+- **http4k-client-websocket, Breaking** : Added extra onError handler when creating a non-blocking websocket.
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.3.70.
 
 ### v3.238.0
-- [http4k-security-oauth] Early work on supporting refresh tokens. H/T @tom
+- **http4k-security-oauth** : Early work on supporting refresh tokens. H/T @tom
 
 ### v3.237.0
-- [http4k-core] Fix #377. `Added replaceHeaders()` method. Thanks to @bastman for the idea.
-- [http4k-contract] Fix nullability of references in OpenApi3
+- **http4k-core** : Fix #377. `Added replaceHeaders()` method. Thanks to @bastman for the idea.
+- **http4k-contract** : Fix nullability of references in OpenApi3
 
 ### v3.236.0
-- [http4k-testing-servirtium] Don't pass recording handler into non-test methods as a resolved parameter.
+- **http4k-testing-servirtium** : Don't pass recording handler into non-test methods as a resolved parameter.
 
 ### v3.235.0
-- [http4k-testing-chaos] [Break/Rename] ChaosEngine is now exposed when configuring API. Renamed `withChaosEngine()` to `withChaosApi()`, replaced `toggle()` and `update()` with `enable()/disable()`
+- **http4k-testing-chaos, Break/Rename** : ChaosEngine is now exposed when configuring API. Renamed `withChaosEngine()` to `withChaosApi()`, replaced `toggle()` and `update()` with `enable()/disable()`
 
 ### v3.234.0
-- [http4k-testing-chaos] [Break] Tweaked API make it simpler to use the `ChaosEngine` via programmatically (as opposed to REST).
-- [http4k-testing-servirtium] [Tiny break] Tweaks to `InteractionOptions` to make working with Servirtium tests a bit nicer.
+- **http4k-testing-chaos, Break** : Tweaked API make it simpler to use the `ChaosEngine` via programmatically (as opposed to REST).
+- **http4k-testing-servirtium, Tiny break** : Tweaks to `InteractionOptions` to make working with Servirtium tests a bit nicer.
 
 ### v3.233.0
-- [http4k-testing-servirtium] Upgrade ServirtiumServer to use OkHttp instead of JavaHttpClient (due to streaming restrictions on MiTM).
-- [http4k-testing-servirtium] [Break] Rename `Github` to `GitHub`.
+- **http4k-testing-servirtium** : Upgrade ServirtiumServer to use OkHttp instead of JavaHttpClient (due to streaming restrictions on MiTM).
+- **http4k-testing-servirtium, Break** : Rename `Github` to `GitHub`.
 
 ### v3.232.0
-- [http4k-format-kotlinx-serialization] New JSON module! H/T @joscha-alisch for the PR. :)
-- [http4k-testing-servirtium] Work around Kotlin @JvmOverloads problem in ServirtiumServer.
-- [all] Upgrade some dependency versions.
+- **http4k-format-kotlinx-serialization** : New JSON module! H/T @joscha-alisch for the PR. :)
+- **http4k-testing-servirtium** : Work around Kotlin @JvmOverloads problem in ServirtiumServer.
+- **http4k-*** : Upgrade some dependency versions.
 
 ### v3.231.0
-- [http4k-testing-servirtium] Making API a bit more Java-compatible friendly. Ability to vary the Server implementation.
-- [http4k-server-jetty] Fix #362 - Websocket disconnect early causes lateinit reference race condition. H/T @fintara for the report/fix.
+- **http4k-testing-servirtium** : Making API a bit more Java-compatible friendly. Ability to vary the Server implementation.
+- **http4k-server-jetty** : Fix #362 - Websocket disconnect early causes lateinit reference race condition. H/T @fintara for the report/fix.
 
 ### v3.230.0
-- [http4k-aws] Improved efficiency of building AWS credentials (replace String.format).
-- [http4k-testing-servirtium] Making API a bit more Java-compatible friendly.
-- [all] Upgrade some dependency versions.
+- **http4k-aws** : Improved efficiency of building AWS credentials (replace String.format).
+- **http4k-testing-servirtium** : Making API a bit more Java-compatible friendly.
+- **http4k-*** : Upgrade some dependency versions.
 
 ### v3.229.0
-- [http4k-security-oauth] Allowing for custom authenticate methods when fetching access tokens H/T @tom
+- **http4k-security-oauth** : Allowing for custom authenticate methods when fetching access tokens H/T @tom
 
 ### v3.228.0
-- [http4k-testing-servirtium] [Breaking] API is still in beta, so moving to a more composed approach which will increase reuse and allow for running Servirtium infra without a dependency on http4k or Junit. Added loading from GitHub. :)
-- [http4k-security-oauth] [Breaking] Audience on request object is now a list to support multiple audiences. H/T @tom
-- [http4k-security-oauth] Nonce is now also passed through on RequestJwts, so it can be added to request jwts. H/T @tom
+- **http4k-testing-servirtium, Breaking** : API is still in beta, so moving to a more composed approach which will increase reuse and allow for running Servirtium infra without a dependency on http4k or Junit. Added loading from GitHub. :)
+- **http4k-security-oauth, Breaking** : Audience on request object is now a list to support multiple audiences. H/T @tom
+- **http4k-security-oauth** : Nonce is now also passed through on RequestJwts, so it can be added to request jwts. H/T @tom
 
 ### v3.227.0
-- [http4k-core] Implmement #340. Support SameSite cookies. H/T @danielwellman for the contribution.
-- [http4k-format-jackson] Made `JacksonJsonPropertyAnnotated` Kotlin 1.4 safe (call to superclass might return null). H/T @pyos for spotting this.
+- **http4k-core** : Implmement #340. Support SameSite cookies. H/T @danielwellman for the contribution.
+- **http4k-format-jackson** : Made `JacksonJsonPropertyAnnotated` Kotlin 1.4 safe (call to superclass might return null). H/T @pyos for spotting this.
 
 ### v3.226.0
-- [http4k-testing-servirtium] Moved Servirtium code to new module - was previously [http4k-incubator].
+- **http4k-testing-servirtium** : Moved Servirtium code to new module - was previously [http4k-incubator].
 
 ### v3.225.0
-- [http4k-incubator] Rewrote Servirtium code to support manipulations.
+- **http4k-incubator** : Rewrote Servirtium code to support manipulations.
 
 ### v3.224.0
-- [http4k-security-oauth] Fix issue where `AuthRequestWithRequestAuthRequestExtractor` doesn't take into account scopes not being nullable correctly. H/T @tom
+- **http4k-security-oauth** : Fix issue where `AuthRequestWithRequestAuthRequestExtractor` doesn't take into account scopes not being nullable correctly. H/T @tom
 
 ### v3.223.0
-- [http4k-security-oauth] Adding `expiry` to `RequestObject`. H/T @tom
-- [http4k-security-oauth] Fixing issue where unknown fields cause extracting `RequestObject` from a jwt, fails due to unknown fields. H/T @tom
+- **http4k-security-oauth** : Adding `expiry` to `RequestObject`. H/T @tom
+- **http4k-security-oauth** : Fixing issue where unknown fields cause extracting `RequestObject` from a jwt, fails due to unknown fields. H/T @tom
 
 ### v3.222.0
-- [http4k-security-oauth] [Breaking] Error responses in the authorise endpoint now take into account values from the `request` parameter, this will require a validator for that jwt be implemented. H/T @tom
-- [http4k-security-oauth] [Breaking] State is now its own type, and not just a string, so it can be validated. H/T @tom
-- [http4k-security-oauth] [Breaking] `redirectUri` on `AuthRequest` is now nullable as it might come on a request jwt, this is validated to be always be present downstream. H/T @tom
-- [http4k-security-oauth] Allow parsing of request jwt. H/T @tom
-- [http4k-security-oauth] Adding `RequestObject` to `AuthRequest`. H/T @tom
-- [http4k-security-oauth] Adding `AuthRequestWithRequestAuthRequestExtractor` that will extract the request from the jwt, assuming the validator is implemented which can be used instead of just using `AuthRequestFromQueryParameters` if support for parsing a request jwt is required. H/T @tom
+- **http4k-security-oauth, Breaking** : Error responses in the authorise endpoint now take into account values from the `request` parameter, this will require a validator for that jwt be implemented. H/T @tom
+- **http4k-security-oauth, Breaking** : State is now its own type, and not just a string, so it can be validated. H/T @tom
+- **http4k-security-oauth, Breaking** : `redirectUri` on `AuthRequest` is now nullable as it might come on a request jwt, this is validated to be always be present downstream. H/T @tom
+- **http4k-security-oauth** : Allow parsing of request jwt. H/T @tom
+- **http4k-security-oauth** : Adding `RequestObject` to `AuthRequest`. H/T @tom
+- **http4k-security-oauth** : Adding `AuthRequestWithRequestAuthRequestExtractor` that will extract the request from the jwt, assuming the validator is implemented which can be used instead of just using `AuthRequestFromQueryParameters` if support for parsing a request jwt is required. H/T @tom
 
 ### v3.221.0 
-- [all] [Unlikely break from Java only] Make all custom http4k exceptions extend RuntimeException. This helps with Java compatibility so things like LensFailure inside Java Lambdas don't require catching (as they are caught/dealt with by other bits of http4k automatically)
+- **http4k-*, Unlikely break from Java only** : Make all custom http4k exceptions extend RuntimeException. This helps with Java compatibility so things like LensFailure inside Java Lambdas don't require catching (as they are caught/dealt with by other bits of http4k automatically)
 
 ### v3.220.0
-- [http4k-moshi] [Behaviour break] Fix #353 Don't fail by default on unknown properties. This is the expected default behaviour for all JSON implementations. H/T cnusp for the report.
+- **http4k-moshi, Behaviour break** : Fix #353 Don't fail by default on unknown properties. This is the expected default behaviour for all JSON implementations. H/T cnusp for the report.
 
 ### v3.219.0
-- [http4k-incubator] Next iteration of Servirtium JUnit extensions. Improved API to support multiple storage engines.
+- **http4k-incubator** : Next iteration of Servirtium JUnit extensions. Improved API to support multiple storage engines.
 
 ### v3.218.0
-- [http4k-incubator] Next iteration of Servirtium JUnit extensions. Correct indexing of interactions.
-- [http4k-security-oauth] Authorisation rendering will now taking into account 'response_mode' of either query or fragment in responses and no longer just use the default fo the 'response_type'. H/T @tom
-- [http4k-security-oauth] [Breaking] Error responses in the authorise endpoint will actually redirect back to 'redirect_uri' assuming the validator correctly validates both the 'client_id' and 'redirect_uri' to be valid. H/T @tom
+- **http4k-incubator** : Next iteration of Servirtium JUnit extensions. Correct indexing of interactions.
+- **http4k-security-oauth** : Authorisation rendering will now taking into account 'response_mode' of either query or fragment in responses and no longer just use the default fo the 'response_type'. H/T @tom
+- **http4k-security-oauth, Breaking** : Error responses in the authorise endpoint will actually redirect back to 'redirect_uri' assuming the validator correctly validates both the 'client_id' and 'redirect_uri' to be valid. H/T @tom
 
 ### v3.217.0
-- [all] Upgrade some dependency versions.
-- [http4k-incubator] Next iteration of Servirtium JUnit extensions. Only check content which is in the contract when replaying.
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-incubator** : Next iteration of Servirtium JUnit extensions. Only check content which is in the contract when replaying.
 
 ### v3.216.0
-- [http4k-core] [Breaking] Removed clashing Events `then()` from deprecated (meaning it cannot be used as there is also another `then()` in that package). Use the one in `org.http4k.events` instead.
-- [http4k-security-oauth] Adding nonce to AuthorizationCodeDetails H/T @tom
+- **http4k-core, Breaking** : Removed clashing Events `then()` from deprecated (meaning it cannot be used as there is also another `then()` in that package). Use the one in `org.http4k.events` instead.
+- **http4k-security-oauth** : Adding nonce to AuthorizationCodeDetails H/T @tom
 
 ### v3.215.0
-- [http4k-core] GZip client filters now send correct accept-encoding header. @jshiell
-- [http4k-core] New AcceptGZip client filter allows handling of remote GZip without compressing client requests. @jshiell
+- **http4k-core** : GZip client filters now send correct accept-encoding header. @jshiell
+- **http4k-core** : New AcceptGZip client filter allows handling of remote GZip without compressing client requests. @jshiell
 
 ### v3.214.0
-- [http4k-core] Fix #344 H/T Streaming GZip encoder loses data. @jshiell
+- **http4k-core** : Fix #344 H/T Streaming GZip encoder loses data. @jshiell
 
 ### v3.213.0
-- [http4k-security-oauth] Fixing wrong AuthRequestExtractor passed to AuthRequestTrackingFilter. H/T @tom
+- **http4k-security-oauth** : Fixing wrong AuthRequestExtractor passed to AuthRequestTrackingFilter. H/T @tom
 
 ### v3.212.0
-- [http4k-security-oauth] allowing additional properties to be stored on auth request, if using additional extractors H/T @tom
+- **http4k-security-oauth** : allowing additional properties to be stored on auth request, if using additional extractors H/T @tom
 
 ### v3.211.0
-- [http4k-core] Fixes for #338 - Gzip filters send content-encoding of gzip even when body is empty. H/T @jshiell
-- [http4k-security-oauth] [Break] OIDC callback urls using the ResponseType 'code id_token' will now have the parameters returned as a fragment not a query as per 3.3.2.5 of the OpenID Connect Core 1.0 spec H/T @tom
-- [http4k-security-oauth] [Break] Initial support of nonce in OIDC requests H/T @tom
+- **http4k-core** : Fixes for #338 - Gzip filters send content-encoding of gzip even when body is empty. H/T @jshiell
+- **http4k-security-oauth, Break** : OIDC callback urls using the ResponseType 'code id_token' will now have the parameters returned as a fragment not a query as per 3.3.2.5 of the OpenID Connect Core 1.0 spec H/T @tom
+- **http4k-security-oauth, Break** : Initial support of nonce in OIDC requests H/T @tom
 
 ### v3.210.0
-- [http4k-core] Support for GZipping response streams. H/T @jshiell
-- [http4k-security-oauth] Adding expires_in to token endpoint response. H/T @tom
+- **http4k-core** : Support for GZipping response streams. H/T @jshiell
+- **http4k-security-oauth** : Adding expires_in to token endpoint response. H/T @tom
 
 ### v3.209.0
-- [all] Added `Status` to auto-marshalling JSON mappings.
-- [http4k-security-oauth] Adding token_type to token endpoint response, and strip out nulls in response. H/T @tom
+- **http4k-*** : Added `Status` to auto-marshalling JSON mappings.
+- **http4k-security-oauth** : Adding token_type to token endpoint response, and strip out nulls in response. H/T @tom
 
 ### v3.208.0
-- [all] Upgrade some dependency versions.
-- [http4k-core] PR #333. Copy zipkin traces across threads. H/T @jshiell for the PR.
-- [http4k-testing-approval] Close Readers when reading from them.
-- [http4k-incubator] Next iteration of Servirtium JUnit extensions for recording and replaying.
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : PR #333. Copy zipkin traces across threads. H/T @jshiell for the PR.
+- **http4k-testing-approval** : Close Readers when reading from them.
+- **http4k-incubator** : Next iteration of Servirtium JUnit extensions for recording and replaying.
 
 ### v3.207.0
-- [all] Upgrade some dependency versions
-- [http4k-incubator] Added first cut of Servirtium classes for recording and replaying traffic. Needs validating in the wild
-- [http4k-format-jackson] Fix #320. http4k-format-jackson incompatible with jackson-module-kotlin 2.10.1
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-incubator** : Added first cut of Servirtium classes for recording and replaying traffic. Needs validating in the wild
+- **http4k-format-jackson** : Fix #320. http4k-format-jackson incompatible with jackson-module-kotlin 2.10.1
 
 ### v3.206.0
-- [all] Upgrade some dependency versions.
-- [http4k-contract] Fix #323. Doc generation does not work with multipart lenses.
-- [http4k-format-jackson] Fix #313. Jackson serialization is not working properly with polymorphic types stored in a collection. H/T @alphaho for the PR :)
-- [http4k-core] [Break] Renamed `value` on `ParamMeta` to `description`.
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Fix #323. Doc generation does not work with multipart lenses.
+- **http4k-format-jackson** : Fix #313. Jackson serialization is not working properly with polymorphic types stored in a collection. H/T @alphaho for the PR :)
+- **http4k-core, Break** : Renamed `value` on `ParamMeta` to `description`.
 
 ### v3.205.0
-- [all] Upgrade some dependency versions, including Kotlin to 1.3.61
-- [http4k-security-oauth] allowing setting scopes on AccessToken creation so they are set on the response. H/T @tom
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.3.61
+- **http4k-security-oauth** : allowing setting scopes on AccessToken creation so they are set on the response. H/T @tom
 
 ### v3.204.0
-- [http4k-core, http4k-aws] - increase efficiency of Hex implementation for trace ids and HMAC. H/T @time4tea
-- [http4k-cloudnative] Reimplemented Environment to be more efficient. H/T @time4tea for noticing this.
+- **http4k-core, http4k-aws** : - increase efficiency of Hex implementation for trace ids and HMAC. H/T @time4tea
+- **http4k-cloudnative** : Reimplemented Environment to be more efficient. H/T @time4tea for noticing this.
 
 ### v3.203.0
-- [http4k-security-oauth] On generating tokens allowing for the client id to be based on the result of validation rather than just the form parameters of the request. To support client assertions. H/T @tom
+- **http4k-security-oauth** : On generating tokens allowing for the client id to be based on the result of validation rather than just the form parameters of the request. To support client assertions. H/T @tom
 
 ### v3.202.0
-- [http4k-security-oauth] Adding new errors to support issues with client assertions. H/T @tom
+- **http4k-security-oauth** : Adding new errors to support issues with client assertions. H/T @tom
 
 ### v3.201.0
-- [http4k-security-oauth] Allowing a scope to be set on AccessToken. Allowing for more low level validation of Authorise and Token Requests, by implementing `org.http4k.security.oauth.server.AuthoriseRequestValidator` and `org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication` respectively. H/T @tom
+- **http4k-security-oauth** : Allowing a scope to be set on AccessToken. Allowing for more low level validation of Authorise and Token Requests, by implementing `org.http4k.security.oauth.server.AuthoriseRequestValidator` and `org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication` respectively. H/T @tom
 
 ### v3.200.0
-- [http4k-contract] Support multiple request bodies in OpenApi v3
+- **http4k-contract** : Support multiple request bodies in OpenApi v3
 
 ### v3.199.1
-- [http4k-format-jackson] Fix #313 Part 2 - Revert default behaviour for collections of polymorphic types, but is now overridable by using `autoBody()` instead of `auto()`. Reopened #313.
+- **http4k-format-jackson** : Fix #313 Part 2 - Revert default behaviour for collections of polymorphic types, but is now overridable by using `autoBody()` instead of `auto()`. Reopened #313.
 
 ### v3.199.0
-- [http4k-format-jackson] [Breaking] Fix #313 - ConfigurableJackson.autoBody implementation would not work with collections of polymorphic types. This fix has the effect of blowing up auto-json behaviour when classes are defined inside functions (causing nasty `java.lang.reflect.GenericSignatureFormatError: Signature Parse error` exceptions). To remedy, just move inlined classes outside of the functions that they are defined in. H/T @alphaho for the PR.
-- [all] Update some dependency versions
+- **http4k-format-jackson, Breaking** : Fix #313 - ConfigurableJackson.autoBody implementation would not work with collections of polymorphic types. This fix has the effect of blowing up auto-json behaviour when classes are defined inside functions (causing nasty `java.lang.reflect.GenericSignatureFormatError: Signature Parse error` exceptions). To remedy, just move inlined classes outside of the functions that they are defined in. H/T @alphaho for the PR.
+- **http4k-*** : Update some dependency versions
 
 ### v3.198.0
-- [http4k-core] [Breaking] Reworking of ContentType to support multiple directives. `directive` field is now `directives`, so just add the extra 's' to fix :)
-- [http4k-security-oauth] Moar options on `OAuthProviderConfig`. H/T @tom
+- **http4k-core, Breaking** : Reworking of ContentType to support multiple directives. `directive` field is now `directives`, so just add the extra 's' to fix :)
+- **http4k-security-oauth** : Moar options on `OAuthProviderConfig`. H/T @tom
 
 ### v3.197.0
-- [all] Update some dependency versions, including Kotlin to `1.3.60`.
-- [http4k-core] Make Query value optional when setting on a `Request`.
-- [http4k-core] [Breaking] Fix #316. Optional Query lens handling is more accurate. See issue for details of change in behaviour.
+- **http4k-*** : Update some dependency versions, including Kotlin to `1.3.60`.
+- **http4k-core** : Make Query value optional when setting on a `Request`.
+- **http4k-core, Breaking** : Fix #316. Optional Query lens handling is more accurate. See issue for details of change in behaviour.
 
 ### v3.196.0
-- [all] Update some dependency versions.
-- [http4k-format-jackson, http4k-format-gson] Add support for auto marshalling `Throwable` in a sensible way.
-- [http4k-cloudnative] Renamed badly named `UpstreamRequestFailed` to `RemoteRequestFailed`. Improved error handling.
+- **http4k-*** : Update some dependency versions.
+- **http4k-format-jackson, http4k-format-gson** : Add support for auto marshalling `Throwable` in a sensible way.
+- **http4k-cloudnative** : Renamed badly named `UpstreamRequestFailed` to `RemoteRequestFailed`. Improved error handling.
 
 ### v3.195.1
-- [http4k-cloudnative] Fix adding value to overridden environment when using `set()`.  H/T @jippeholwerda for the PR
+- **http4k-cloudnative** : Fix adding value to overridden environment when using `set()`.  H/T @jippeholwerda for the PR
 
 ### v3.195.0
-- [http4k-security-oauth] Tweak to handle Content-Type comparisons (with and without directive). H/T @jippeholwerda for the PR
-- [http4k-multipart] - [Breaking] Added support for setting custom headers in Multipart form fields and files. This has removed the `String` as the default field type (it is now `MultipartFormField`. Calls to create lenses using `MultipartFormField` will now require `MultipartFormField.string()` instead.
+- **http4k-security-oauth** : Tweak to handle Content-Type comparisons (with and without directive). H/T @jippeholwerda for the PR
+- **http4k-multipart] - [Breaking** : Added support for setting custom headers in Multipart form fields and files. This has removed the `String` as the default field type (it is now `MultipartFormField`. Calls to create lenses using `MultipartFormField` will now require `MultipartFormField.string()` instead.
 
 ### v3.194.0
-- [http4k-contract] Useful tweaks to the contracts API
+- **http4k-contract** : Useful tweaks to the contracts API
 
 ### v3.193.1
 [http4k-cloudnative] Fix #304 - map `get()` does not respect fallback values in overridden environment.
 
 ### v3.193.0
-- [http4k-contract] Marking endpoints as deprecated in OpenApi3
+- **http4k-contract** : Marking endpoints as deprecated in OpenApi3
 
 ### v3.192.0
-- [http4k-template-jade4j] New module! H/T @RichyHBM for the contribution! :)
+- **http4k-template-jade4j** : New module! H/T @RichyHBM for the contribution! :)
 
 ### v3.191.0
-- [http4k-contract] Better support for overriding of raw map definition id in JSON schema generation
+- **http4k-contract** : Better support for overriding of raw map definition id in JSON schema generation
 
 ### v3.190.0
-- [http4k-core] Added method to (immutably) modify status on `Response`. H/T @brandon-atkinson for the suggestion
-- [http4k-core] Added composite object support to lens system, allowing creation of simple lenses which draw from several different values (of the same location only - e.g Query/EnvironmentKey)
-- [http4k-contract] Support for overriding the entity definition id in JSON schema generation
-- [all] Update some dependency versions.
+- **http4k-core** : Added method to (immutably) modify status on `Response`. H/T @brandon-atkinson for the suggestion
+- **http4k-core** : Added composite object support to lens system, allowing creation of simple lenses which draw from several different values (of the same location only - e.g Query/EnvironmentKey)
+- **http4k-contract** : Support for overriding the entity definition id in JSON schema generation
+- **http4k-*** : Update some dependency versions.
 
 ### v3.189.0
-- [http4k-server-netty] Fix reported port in `Netty`. H/T @fantayeneh for the PR :)
-- [http4k-security-oauth] Add `validateScopes()` to `ClientValidator`. H/T  @tom
+- **http4k-server-netty** : Fix reported port in `Netty`. H/T @fantayeneh for the PR :)
+- **http4k-security-oauth** : Add `validateScopes()` to `ClientValidator`. H/T  @tom
 
 ### v3.188.0
-- [http4k-contract] Support multiple-response models in OpenApi2 and 3. Note that this currently is unsupported in the OpenApi UI due to a bug (which doesn't display the schema for the response correctly). However, the JSON schema is generated correctly in these cases.
-- [all] Update some dependency versions.
+- **http4k-contract** : Support multiple-response models in OpenApi2 and 3. Note that this currently is unsupported in the OpenApi UI due to a bug (which doesn't display the schema for the response correctly). However, the JSON schema is generated correctly in these cases.
+- **http4k-*** : Update some dependency versions.
 
 ### v3.187.0
-- [all] Update some dependency versions, and changes to various APIs involved (Jackson and Resilience4J)
-- [http4k-core] - Add YearMonth support to standard JSON mappings
-- [http4k-format-jackson, http4k-format-gson] [Possible break] - Moved reified `NODE.asA()` method from `JsonLibAutoMarshallingJson` down onto the instances of the `Json` (`ConfigurableJackson`/`ConfigurableGson`). This is so that we can handle generified classes such as lists and maps correctly. (As per the problems fixed in 3.181.0)
+- **http4k-*** : Update some dependency versions, and changes to various APIs involved (Jackson and Resilience4J)
+- **http4k-core** : - Add YearMonth support to standard JSON mappings
+- **http4k-format-jackson, http4k-format-gson, Possible break** : - Moved reified `NODE.asA()` method from `JsonLibAutoMarshallingJson` down onto the instances of the `Json` (`ConfigurableJackson`/`ConfigurableGson`). This is so that we can handle generified classes such as lists and maps correctly. (As per the problems fixed in 3.181.0)
     
 ### v3.186.0
-- [http4k-core] - Rollback a couple of places which were using Java9+ APIs (for no good reason).
+- **http4k-core** : - Rollback a couple of places which were using Java9+ APIs (for no good reason).
 
 ### v3.185.0
-- [http4k-contract] Improvements to rendering enums as their own objects in JSON Schema.
+- **http4k-contract** : Improvements to rendering enums as their own objects in JSON Schema.
 
 ### v3.184.0
-- [http4k-contract] Add `Cookies` options to contract DSL
+- **http4k-contract** : Add `Cookies` options to contract DSL
 
 ### v3.183.0
-- [http4k-serverless-lambda] Add ability to access Lambda context. H/T @ivoanjo for the PR.
-- [http4k-contract] Fix rendering of OrSecurity when there are more than 2 parts.
+- **http4k-serverless-lambda** : Add ability to access Lambda context. H/T @ivoanjo for the PR.
+- **http4k-contract** : Fix rendering of OrSecurity when there are more than 2 parts.
 
 ### v3.182.0
-- [http4k-core] Rename `EventsFilter` to `EventFilter` because sanity.
-- [http4k-format-jackson, http4k-format-gson] Reintroduce `autoBody()` method
+- **http4k-core** : Rename `EventsFilter` to `EventFilter` because sanity.
+- **http4k-format-jackson, http4k-format-gson** : Reintroduce `autoBody()` method
 
 ### v3.181.0
-- [http4k-core] Added base events implementations for StructuredLogging.
-- [http4k-core] [Repackage] Events classes are now in `org.http4k.events`.
-- [http4k-core] [Breaking] `EventCategory` is no longer a field of `Event`. To fix, just remove `override` from your `Event` classes.
-- [http4k-format-jackson, http4k-format-gson] Fixed problem when attempting to deserialise generic Lists.
+- **http4k-core** : Added base events implementations for StructuredLogging.
+- **http4k-core, Repackage** : Events classes are now in `org.http4k.events`.
+- **http4k-core, Breaking** : `EventCategory` is no longer a field of `Event`. To fix, just remove `override` from your `Event` classes.
+- **http4k-format-jackson, http4k-format-gson** : Fixed problem when attempting to deserialise generic Lists.
 
 ### v3.180.0
-- [all] Update various dependencies.
-- [http4k-testing-hamcrest] Improve messages of Hamkrest matchers. H/T @albertlatacz
-- [http4k-cloudnative] Fix #291 - Readiness check result when there are > 2 checks may not report the correct result. H/T @alfi
-- [http4k-security-oauth] [Possibly breaking] Making client_secret optional in AuthorizationCodeAccessTokenRequest to support non client_secret flows. H/T @tom
+- **http4k-*** : Update various dependencies.
+- **http4k-testing-hamcrest** : Improve messages of Hamkrest matchers. H/T @albertlatacz
+- **http4k-cloudnative** : Fix #291 - Readiness check result when there are > 2 checks may not report the correct result. H/T @alfi
+- **http4k-security-oauth, Possibly breaking** : Making client_secret optional in AuthorizationCodeAccessTokenRequest to support non client_secret flows. H/T @tom
 
 ### v3.179.1
-- [http4k-client-okhttp] Include status description in Response object.
+- **http4k-client-okhttp** : Include status description in Response object.
 
 ### v3.179.0
-- [http4k-contract] Added `OpenApiExtension` interface, which allows the definition of extensions that will modify the OpenApi specification JSON. H/T @rgladwell for the inspiration.
-- [http4k-contract] Support composite security models using `or()` and `and()`. Once again, H/T @rgladwell :)
+- **http4k-contract** : Added `OpenApiExtension` interface, which allows the definition of extensions that will modify the OpenApi specification JSON. H/T @rgladwell for the inspiration.
+- **http4k-contract** : Support composite security models using `or()` and `and()`. Once again, H/T @rgladwell :)
 
 ### v3.178.0
-- [http4k-security-oauth] [Possibly breaking] Request is passed as a parameter to the ClientValidator. Just pass it in! :)  H/T @tom
-- [http4k-contract] [Behaviour change] When specified, individual route security now replaces global security (this is as the security model in the OpenApi spec is specified) as opposed to both being applied. 
+- **http4k-security-oauth, Possibly breaking** : Request is passed as a parameter to the ClientValidator. Just pass it in! :)  H/T @tom
+- **http4k-contract, Behaviour change** : When specified, individual route security now replaces global security (this is as the security model in the OpenApi spec is specified) as opposed to both being applied. 
  
 ### v3.177.0
-- [http4k-security-oauth] [Possibly breaking] More support for OIDC, adding state to AuthorizationCodeDetails, and passing it into createForAccessToken on IdTokens. H/T @tom
+- **http4k-security-oauth, Possibly breaking** : More support for OIDC, adding state to AuthorizationCodeDetails, and passing it into createForAccessToken on IdTokens. H/T @tom
 
 ### v3.176.0
-- [http4k-security-oauth] More support for OIDC. H/T @tom
+- **http4k-security-oauth** : More support for OIDC. H/T @tom
 
 ### v3.175.0
-- [all] Update various dependencies, including Kotlin to 1.3.50.
-- [http4k-security-oauth] Some support for OIDC. H/T @tom
+- **http4k-*** : Update various dependencies, including Kotlin to 1.3.50.
+- **http4k-security-oauth** : Some support for OIDC. H/T @tom
 
 ### v3.174.0
-- [all] Update various dependencies, including Jackson for a CVE.
+- **http4k-*** : Update various dependencies, including Jackson for a CVE.
 
 ### v3.173.0
-- [http4k-core] Fix #273 - parentSpanId trace incorrectly populated when no previous traces
-- [http4k-contract] [Unlikely Break] Remodelled how Security is rendered, so it's possible that this may break slightly for customer implementations
-- [http4k-contract] Added support for Implicit OAuth flow, with suport for custom `googleCloudEndpoints` Security. H/T @rgladwell
+- **http4k-core** : Fix #273 - parentSpanId trace incorrectly populated when no previous traces
+- **http4k-contract, Unlikely Break** : Remodelled how Security is rendered, so it's possible that this may break slightly for customer implementations
+- **http4k-contract** : Added support for Implicit OAuth flow, with suport for custom `googleCloudEndpoints` Security. H/T @rgladwell
 
 ### v3.172.0
-- [http4k-core] Added uni-directional serialization/deserialization options to JSON lib auto-conversion configuration. 
+- **http4k-core** : Added uni-directional serialization/deserialization options to JSON lib auto-conversion configuration. 
 
 ### v3.171.0
-- [http4k-core] [Break (mitigation)] Replaced default resource loader location for `singlePageApp()` to `/public` instead of root - this is for safety of NOT serving the root of the classpath by default.
+- **http4k-core, Break (mitigation)** : Replaced default resource loader location for `singlePageApp()` to `/public` instead of root - this is for safety of NOT serving the root of the classpath by default.
 
 ### v3.170.0
-- [http4k-core] Add a warning when `static()` is used with no package path, thus exposing the contents of the classpath remotely.
+- **http4k-core** : Add a warning when `static()` is used with no package path, thus exposing the contents of the classpath remotely.
 
 ### v3.169.0
-- [all] Update various dependencies.
+- **http4k-*** : Update various dependencies.
 
 ### v3.168.0
-- [http4k-contract] Collect LensFailure causes into a single place when validating.
+- **http4k-contract** : Collect LensFailure causes into a single place when validating.
 
 ### v3.167.0
-- [http4k-contract] [Possibly Break] Open out `ErrorResponseRenderer` interface to take LensFailure instead of the individual failures when rendering `badResponse()`. To fix, simply wrap the list of failures into a LensFailure.
+- **http4k-contract, Possibly Break** : Open out `ErrorResponseRenderer` interface to take LensFailure instead of the individual failures when rendering `badResponse()`. To fix, simply wrap the list of failures into a LensFailure.
 
 ### v3.166.1
-- [http4k-core] Tweak `singlePageApp()` routing handler, to correctly apply filters when fallback page is used.
+- **http4k-core** : Tweak `singlePageApp()` routing handler, to correctly apply filters when fallback page is used.
 
 ### v3.166.0
-- [http4k-core] Added `singlePageApp()` routing handler, which matches both static content or falls back to the root path index file
+- **http4k-core** : Added `singlePageApp()` routing handler, which matches both static content or falls back to the root path index file
 
 ### v3.165.0
-- [http4k-contract] Fix invalid OpenApi2 when root and base path match. H/T @rgladwell
-- [http4k-contract] `ContractRoute` is now an `HttpHandler`, so no need to wrap contract routes in a `contract {}` to test them. H/T @rgladwell for the inspiration.
-- [http4k-contract] Support Host/baseUri values in OpenApi2. H/T @rgladwell
-- [http4k-contract] Optionally add description route to route list H/T @rgladwell
+- **http4k-contract** : Fix invalid OpenApi2 when root and base path match. H/T @rgladwell
+- **http4k-contract** : `ContractRoute` is now an `HttpHandler`, so no need to wrap contract routes in a `contract {}` to test them. H/T @rgladwell for the inspiration.
+- **http4k-contract** : Support Host/baseUri values in OpenApi2. H/T @rgladwell
+- **http4k-contract** : Optionally add description route to route list H/T @rgladwell
 
 ### v3.164.0
-- [all] Update various dependencies, including Kotlin to 1.3.41.
-- [http4k-testing-approval] Upgrade of HTML library from above may have an effect on output of HTML approval tests.
-- [http4k-contract] Support for more Jackson annotations in JSON Schema rendering. H/T @tom for the PR contributing this.
+- **http4k-*** : Update various dependencies, including Kotlin to 1.3.41.
+- **http4k-testing-approval** : Upgrade of HTML library from above may have an effect on output of HTML approval tests.
+- **http4k-contract** : Support for more Jackson annotations in JSON Schema rendering. H/T @tom for the PR contributing this.
 
 ### v3.163.0
-- [http4k-testing-chaos] Add detail to Chaos OpenApi interface.
+- **http4k-testing-chaos** : Add detail to Chaos OpenApi interface.
 
 ### v3.162.0
-- [http4k-testing-chaos] Add detail to Chaos OpenApi interface.
+- **http4k-testing-chaos** : Add detail to Chaos OpenApi interface.
 
 ### v3.161.0
-- [http4k-cloudnative] Added Forbidden request exception to HandleUpstreamRequestFailed.
+- **http4k-cloudnative** : Added Forbidden request exception to HandleUpstreamRequestFailed.
 
 ### v3.160.1
-- [http4k-testing-chaos] Countdown chaos trigger fixed.
+- **http4k-testing-chaos** : Countdown chaos trigger fixed.
 
 ### v3.160.0
-- [http4k-testing-chaos] Slight fix to avoid consuming stream body when setting chaos.
+- **http4k-testing-chaos** : Slight fix to avoid consuming stream body when setting chaos.
 
 ### v3.159.0
-- [all] Update various dependencies.
-- [http4k-client-okhttp] Updated `OkHttp` to v4.0.0 (Kotlin edition).
-- [http4k-contract] Tweak to JSON Schema rendering to handle recursive objects better.
+- **http4k-*** : Update various dependencies.
+- **http4k-client-okhttp** : Updated `OkHttp` to v4.0.0 (Kotlin edition).
+- **http4k-contract** : Tweak to JSON Schema rendering to handle recursive objects better.
 
 ### v3.158.1
-- [http4k-server-netty] Fix #260 - cannot set multiple response headers with same name
-- [http4k-server-undertow] Fix #260 - cannot set multiple response headers with same name
+- **http4k-server-netty** : Fix #260 - cannot set multiple response headers with same name
+- **http4k-server-undertow** : Fix #260 - cannot set multiple response headers with same name
 
 ### v3.158.0
-- [http4k-contract] POSSIBLE BEHAVIOUR CHANGE DUE TO BUG: Fix #259 - Contract blocks do not produce 400s if an external CatchAll is provided. This may have an effect on how errors are generated (a 400 is produced instead of the previous 500 from the CatchAll).
+- **http4k-contract** : POSSIBLE BEHAVIOUR CHANGE DUE TO BUG: Fix #259 - Contract blocks do not produce 400s if an external CatchAll is provided. This may have an effect on how errors are generated (a 400 is produced instead of the previous 500 from the CatchAll).
 
 ### v3.157.1
-- [http4k-security-oauth] Fix broken deprecation annotation.
+- **http4k-security-oauth** : Fix broken deprecation annotation.
 
 ### v3.157.0
-- [http4k-security-oauth] Default to JSON format response in Access Token response
-- [http4k-security-oauth] Renamed a couple of classes (AccessTokenContainer -> AccessToken), and removed `isValid` method from `AuthorizationCodes` because it doesn't make sense for this to be on the OAuthServer.
+- **http4k-security-oauth** : Default to JSON format response in Access Token response
+- **http4k-security-oauth** : Renamed a couple of classes (AccessTokenContainer -> AccessToken), and removed `isValid` method from `AuthorizationCodes` because it doesn't make sense for this to be on the OAuthServer.
 
 ### v3.156.0
-- [all] Update Kotlin to 1.3.40
-- [http4k-contract] Support OAuthSecurity renderer.
+- **http4k-*** : Update Kotlin to 1.3.40
+- **http4k-contract** : Support OAuthSecurity renderer.
 
 ### v3.155.2
-- [all] Update various dependencies.
-- [all] Dokka improvements. Does not mitigate #196 as we run the main build on OpenJdk11. H/T @ivoanjo
+- **http4k-*** : Update various dependencies.
+- **http4k-*** : Dokka improvements. Does not mitigate #196 as we run the main build on OpenJdk11. H/T @ivoanjo
 
 ### v3.155.1
 - DO NOT USE - broken
@@ -477,138 +477,138 @@ changes with their rationale when appropriate:
 - DO NOT USE - broken
 
 ### v3.154.1
-- [http4k-multipart] Made the multipart header parser case-insensitive. H/T @tenniscp25
+- **http4k-multipart** : Made the multipart header parser case-insensitive. H/T @tenniscp25
 
 ### v3.154.0
-- [http4k-contract] Add `SchemaModelNamer` to allow for custom JSON Schema model names.
+- **http4k-contract** : Add `SchemaModelNamer` to allow for custom JSON Schema model names.
 
 ### v3.153.0
-- [http4k-contract] OperationIds are generated without illegal characters `{}`.
+- **http4k-contract** : OperationIds are generated without illegal characters `{}`.
 
 ### v3.152.0
-- [http4k-contract] Support non-string keys for "text convertible" values in maps for Auto-schema generation.
+- **http4k-contract** : Support non-string keys for "text convertible" values in maps for Auto-schema generation.
 
 ### v3.151.0
-- [http4k-contract] Fixed Auto-schema generation to detect and remove duplicate items from list schemas.
+- **http4k-contract** : Fixed Auto-schema generation to detect and remove duplicate items from list schemas.
 
 ### v3.150.0
-- [http4k-security-oauth] Make authentication mechanism for grant types configurable.
+- **http4k-security-oauth** : Make authentication mechanism for grant types configurable.
 
 ### v3.149.0
-- [http4k-security-oauth] Initial support for `client_credentials` grant type.
+- **http4k-security-oauth** : Initial support for `client_credentials` grant type.
 
 ### v3.148.0
-- [http4k-contract] Jackson property searching in OpenApi3 now searches superclasses.
+- **http4k-contract** : Jackson property searching in OpenApi3 now searches superclasses.
 
 ### v3.147.0
-- [http4k-contract] Support custom `JsonProperty` annotation for OpenAPi3 generation
-- [http4k-cloudnative] New exception type for unuathorised. H/T @tom
+- **http4k-contract** : Support custom `JsonProperty` annotation for OpenAPi3 generation
+- **http4k-cloudnative** : New exception type for unuathorised. H/T @tom
 
 ### v3.146.0
-- [http4k-contract] Fix #228 - Support Map-based fields in OpenApi 3 Auto-schema generation as `additionalProperties`. H/T @noahbetzen-wk for the idea.
+- **http4k-contract** : Fix #228 - Support Map-based fields in OpenApi 3 Auto-schema generation as `additionalProperties`. H/T @noahbetzen-wk for the idea.
 
 ### v3.145.0
-- [http4k-contract] Reimplement Auto-schema generation using reflection. Added test cases to use 
+- **http4k-contract** : Reimplement Auto-schema generation using reflection. Added test cases to use 
 the OpenApi generator to create valid code-based OpenApi clients using the OpenApi generator.
-- [http4k-format-jackson] Removed reflective JSON schema creator, since it was not actually OA3 compliant.
+- **http4k-format-jackson** : Removed reflective JSON schema creator, since it was not actually OA3 compliant.
 
 ### v3.144.0
-- [all] Update various dependencies.
-- [http4k-contract] Improvements to better adhere to OA3 spec.
-- [http4k-security-oauth] Allow injecting OpenID's `request` parameter into the authorization request.
-- [http4k-security-oauth] Expose request to AuthRequestTracking. 
+- **http4k-*** : Update various dependencies.
+- **http4k-contract** : Improvements to better adhere to OA3 spec.
+- **http4k-security-oauth** : Allow injecting OpenID's `request` parameter into the authorization request.
+- **http4k-security-oauth** : Expose request to AuthRequestTracking. 
 
 ### v3.143.1
-- [http4k-core] Replace RequestContexts with reference to Store<RequestContext>. H/T @amcghie
-- [http4k-contract] Added some missing deprecations.
-- [http4k-contract] Fix #243 - Nulls not allowed in OpenApi V3 JSON models.
+- **http4k-core** : Replace RequestContexts with reference to Store<RequestContext>. H/T @amcghie
+- **http4k-contract** : Added some missing deprecations.
+- **http4k-contract** : Fix #243 - Nulls not allowed in OpenApi V3 JSON models.
 
 ### v3.143.0
-- [http4k-contract] Fix #239 - OpenApi v3 schemas for raw lists blow up when rendering.
-- [all] Update various dependencies.
+- **http4k-contract** : Fix #239 - OpenApi v3 schemas for raw lists blow up when rendering.
+- **http4k-*** : Update various dependencies.
 
 ### v3.142.0
-- [http4k-contract] Both OpenApi v2 and v3 are now supported, including automatic schema generation. Some classes for 
+- **http4k-contract** : Both OpenApi v2 and v3 are now supported, including automatic schema generation. Some classes for 
 OpenApi2 have moved to a new package - Deprecations should provide most alternatives. See module docs for details. For OpenApi v3, optionally include `http4k-format-jackson` to get JSON schema models based on JVM objects.
-- [http4k-format-jackson] Added reflective JSON schema creator, to be used for generating named models from JVM objects.  
+- **http4k-format-jackson** : Added reflective JSON schema creator, to be used for generating named models from JVM objects.  
 
 ### v3.141.0
-- [http4k-core] - Fix #233 - MemoryBody blows up with "java.nio.ReadOnlyBufferException"
-- [http4k-core] - Tighten up security on  Basic and Bearer auth server filters.  H/T @andymoody
-- [http4k-security-oauth] - Add filter to check bearer token is valid access token. H/T @andymoody
+- **http4k-core** : - Fix #233 - MemoryBody blows up with "java.nio.ReadOnlyBufferException"
+- **http4k-core** : - Tighten up security on  Basic and Bearer auth server filters.  H/T @andymoody
+- **http4k-security-oauth** : - Add filter to check bearer token is valid access token. H/T @andymoody
 
 ### v3.140.0
-- [all] Update dependencies (including Kotlin bump to 1.3.31)
-- [http4k-security-oauth] Handle user rejecting/failing authentication. H/T @andymoody 
+- **http4k-*** : Update dependencies (including Kotlin bump to 1.3.31)
+- **http4k-security-oauth** : Handle user rejecting/failing authentication. H/T @andymoody 
 
 ### v3.139.0
-- [http4k-security-oauth] Allow access token generation to explicitly reject an authorization code already used. H/T @andymoody 
+- **http4k-security-oauth** : Allow access token generation to explicitly reject an authorization code already used. H/T @andymoody 
 
 ### v3.138.1
-- [http4k-security-oauth] Amend error responses from access token generation. H/T @andymoody
+- **http4k-security-oauth** : Amend error responses from access token generation. H/T @andymoody
 
 ### v3.138.0
-- [http4k-contracts] Tweaks to Security model for `http4k-contracts`. (Renamed) `ApiKeySecurity` is now a proper class, and added `BasicAuthSecurity`. You can now also override the security model on a per-route basis.
-- [http4k-contract] Added ability to set the `Security` on each individual contract route. This overrides any `Security` 
+- **http4k-contracts** : Tweaks to Security model for `http4k-contracts`. (Renamed) `ApiKeySecurity` is now a proper class, and added `BasicAuthSecurity`. You can now also override the security model on a per-route basis.
+- **http4k-contract** : Added ability to set the `Security` on each individual contract route. This overrides any `Security` 
 set on a contract-level basis.
 
 ### v3.137.1
-- [http4k-serverless] Allow invocation of serverless functions locally. H/T @Charlyzzz
-- [http4k-core] Fix #226 - ResourceLoadingHandler not close stream
+- **http4k-serverless** : Allow invocation of serverless functions locally. H/T @Charlyzzz
+- **http4k-core** : Fix #226 - ResourceLoadingHandler not close stream
 
 ### v3.137.0
-- [http4k-security-oauth] Rename AuthRequestPersistence to AuthRequestTracking
+- **http4k-security-oauth** : Rename AuthRequestPersistence to AuthRequestTracking
 
 ### v3.136.0
-- [http4k-security-oauth] Allow the http request to be referenced when generating OAuth authorization codes. H/T @andymoody
+- **http4k-security-oauth** : Allow the http request to be referenced when generating OAuth authorization codes. H/T @andymoody
 
 ### v3.135.0
-- [http4k-core] Change `mime.types` location so it doesn't conflic with other libraries. H/T @benusher and @dgliosca
-- [http4k-testing-chaos] Added `SnipRequestBody` behaviour.
-- [http4k-core] (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This will require reimporting the new location into your source if you were using the imports.
+- **http4k-core** : Change `mime.types` location so it doesn't conflic with other libraries. H/T @benusher and @dgliosca
+- **http4k-testing-chaos** : Added `SnipRequestBody` behaviour.
+- **http4k-core** : (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This will require reimporting the new location into your source if you were using the imports.
 
 ### v3.134.0
-- [http4k-testing-approval] Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests, as 
+- **http4k-testing-approval** : Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests, as 
 it is more important that the content is correct than the content-type (and often errors don't have content type set so you 
 get an erroneous error message which masks the fact that the content was wrong).
 
 ### v3.133.0
-- [http4k-cloudnative] `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This allows for more fine grained custom control of which Responses are acceptable.
-- [all] Upgrade deps, including Kotlin to `1.3.30`.
-- [http4k-contract] Fix #221 - Contract path fixed segments cannot contain slash characters.
+- **http4k-cloudnative** : `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This allows for more fine grained custom control of which Responses are acceptable.
+- **http4k-*** : Upgrade deps, including Kotlin to `1.3.30`.
+- **http4k-contract** : Fix #221 - Contract path fixed segments cannot contain slash characters.
 
 ### v3.132.0
-- [http4k-format-jackson] Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
+- **http4k-format-jackson** : Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
 
 ### v3.131.0
-- [http4k-core] (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 
+- **http4k-core** : (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 
 appending. This leads to a more consistent behaviour. In order to be able to set multiple values on an object 
 using a lense, use the `multi` form instead - eg. `Header.required("foo")` -> `Header.multi.required("foo")`. We 
 envisage the impact of this change is limited as it's only Queries that generally can have multiple possible 
 values, and in the vast majority of cases a replace rather than append is expected.
 
 ### v3.130.0
-- [http4k-contract] Generify contract handling code to allow for custom `HttpMessageMeta<XYZ>` 
+- **http4k-contract** : Generify contract handling code to allow for custom `HttpMessageMeta<XYZ>` 
 
 ### v3.129.0
 - (Slight) Break: Collapsed `UpstreamRequestFailed` exceptions to contain the status, and thus removing non-special 
 cases like `BadRequest` and `BadGateway`. This makes them much easier to use in practice as users have access 
 to the the status. To migrate, simply replace previous classes with `UpstreamRequestFailed(Status.XYZ, message)`. 
-- [http4k-contract] Open up `ContractRoute` API to facilitate extension when defining a custom `ContractRenderer`.
-- [all] Upgrade deps.
+- **http4k-contract** : Open up `ContractRoute` API to facilitate extension when defining a custom `ContractRenderer`.
+- **http4k-*** : Upgrade deps.
 
 ### v3.128.0
-- [http4k-core] Added base64 to the supported mappings for Query/Headers etc...
-- [http4k-testing-approval] Approver does not write actual output if there is none to write and there is no approved content
+- **http4k-core** : Added base64 to the supported mappings for Query/Headers etc...
+- **http4k-testing-approval** : Approver does not write actual output if there is none to write and there is no approved content
 
 ### v3.127.0
-- [http4k-testing-approval] Improved `Approver` interface to more closely match the traditional 
+- **http4k-testing-approval** : Improved `Approver` interface to more closely match the traditional 
 `assert<XYZ>` approach - this results in a more discoverable/obvious API.
-- [http4k-testing-hamkrest] Added ability to create a Hamkrest matcher directly from the `Approver` instance to be combined 
+- **http4k-testing-hamkrest** : Added ability to create a Hamkrest matcher directly from the `Approver` instance to be combined 
 with other relevant matchers.
 
 ### v3.126.0
-- [http4k-testing-approval] Add support for XML and HTML approval tests.
+- **http4k-testing-approval** : Add support for XML and HTML approval tests.
 
 ### v3.125.0
 - Added `http4k-testing-approval` module, which is compatible with JUnit5 tests and integrates with 
@@ -616,10 +616,10 @@ the [OkeyDoke](https://github.com/dmcg/okey-doke) approval testing files and Int
 @jshiell for the inspiration Gist containing the base Junit5 Extension.
 
 ### v3.124.0
-- [http4k-security-oauth] Make authentication response available when creating AuthorizationCode.
+- **http4k-security-oauth** : Make authentication response available when creating AuthorizationCode.
 
 ### v3.123.0
-- [http4k-security-oauth] Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers.
+- **http4k-security-oauth** : Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers.
 
 ### v3.122.0
 - Generified `GenerateXmlDataClasses` filter, and added default implementations for 
