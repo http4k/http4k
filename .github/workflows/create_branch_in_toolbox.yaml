@@ -1,0 +1,21 @@
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: olegtarasov/get-tag@v2
+        id: tagName
+      - name: Checkout tools repo
+        uses: actions/checkout@v2
+        with:
+          repository: http4k/toolbox
+          token: c01d921ab3d68528ddc0f75ad83cde8b6013c891
+      - name: Create branch
+        uses: peterjgrainger/action-create-branch@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: ${{ steps.tagName.outputs.tag }}
