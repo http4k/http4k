@@ -28,6 +28,11 @@ function maven_publish {
     fi
 }
 
+function create_tag {
+    git tag -a "$LOCAL_VERSION" -m "http4k version $LOCAL_VERSION"
+    git push origin "$LOCAL_VERSION"
+}
+
 function ensure_release_commit {
     local CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD)
 

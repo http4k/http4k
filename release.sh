@@ -18,8 +18,6 @@ sed -i '' s/"$BINTRAY_VERSION"/"$NEW_VERSION"/g version.json
 
 git commit -am"Release $NEW_VERSION"
 
-./create_and_push_tag.sh "$NEW_VERSION"
-
 git push
 
 git stash apply

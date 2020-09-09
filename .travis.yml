@@ -48,3 +48,7 @@ matrix:
     - stage: maven central 4
       if: branch = master AND type != "pull_request"
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-4.sh; fi'
+    - stage: tag
+      if: branch = master AND type != "pull_request"
+      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-tag.sh; fi'
+
