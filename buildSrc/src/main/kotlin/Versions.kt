@@ -18,7 +18,7 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.5.0"
 
-    const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.0"
+    const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.10"
 
     const val com_squareup_moshi: String = "1.9.3" // available: "1.10.0"
 
@@ -56,7 +56,7 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.51.Final"
+    const val netty_codec_http2: String = "4.1.52.Final"
 
     const val jackson_databind: String = "2.11.2"
 
@@ -82,7 +82,7 @@ object Versions {
 
     const val httpclient: String = "4.5.12"
 
-    const val underscore: String = "1.57"
+    const val underscore: String = "1.58"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 

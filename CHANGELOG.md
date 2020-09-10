@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.261.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v3.260.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-*, Unlikely break** : Added some nicer naming and examples for when people are calling http4k via Java code.
