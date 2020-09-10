@@ -17,7 +17,7 @@ set -o nounset
 #    exit 0
 #fi
 
-./gradlew dokka
+./gradlew dokkaHtmlMultiModule
 rm -rf /tmp/http4k-api/
 git clone https://"${GH_TOKEN}"@github.com/http4k/api.git /tmp/http4k-api/
 rm -rf /tmp/http4k-api/*
