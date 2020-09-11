@@ -11,3 +11,4 @@ jobs:
         with:
           java-version: 11
       - run: ./gradlew -i check jacocoRootReport
+      - run: bash <(curl -s https://codecov.io/bash)
