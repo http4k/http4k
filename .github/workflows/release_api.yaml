@@ -1,7 +1,7 @@
 on:
   push:
-    branches:
-      - 'master'
+    tags:
+      - '*'
 jobs:
   release-api:
     runs-on: ubuntu-latest
