@@ -11,5 +11,13 @@ jobs:
         with:
           python-version: '3.6.7'
           architecture: 'x64'
-      - name: Build Site
-        run: echo '::set-env name=GH_TOKEN::${{ secrets.GITHUB_TOKEN }}' && ./release-site.sh
+      - run: pip install -r requirements.txt
+      - run: ./tools/embed_code.py
+      - uses: actions/checkout@v2
+        repository: http4k/http4k.github.io
+        path: tmp
+      - run: cp -R build/docs-website/docs tmp/
+      - run: cp -R src/mkdocs.yml tmp/
+      - run: cd tmp/
+      - run: mkdocs gh-deploy
+      -
