@@ -27,6 +27,9 @@ Matchers for use with the kotest matching library.
 # Package org.http4k.lens
 Code relevant to extracting and injecting typesafe values into HTTP messages.
 
+# Package org.http4k.contract.openapi
+Rendering for OpenAPI specifications
+
 # Package org.http4k.routing
 Code for routing HTTP messages inside server implementations.
 
