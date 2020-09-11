@@ -16,8 +16,9 @@ jobs:
           repository: http4k/api
           path: tmp
           token: ${{ secrets.AUTHOR_TOKEN }}
-      - run: rm -rf tmp/*
-      - run: cp -R build/ddoc/http4k/* tmp/
+      - run: touch tmp/bob
+#      - run: rm -rf tmp/*
+#      - run: cp -R build/ddoc/http4k/* tmp/
       - uses: EndBug/add-and-commit@v4
         with:
           cwd: 'tmp'
