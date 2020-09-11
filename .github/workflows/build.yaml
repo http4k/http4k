@@ -10,5 +10,4 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 11
-      - run: ./gradlew -i check jacocoRootReport
-      - run: bash <(curl -s https://codecov.io/bash)
+      - run: ./build-ci.sh
