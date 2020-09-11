@@ -12,4 +12,4 @@ jobs:
           python-version: '3.6.7'
           architecture: 'x64'
       - name: Build Site
-        run: release-site.sh
+        run: ./release-site.sh
