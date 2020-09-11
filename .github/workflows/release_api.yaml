@@ -30,3 +30,4 @@ jobs:
         with:
           github_token: asdasd
           directory: tmp
+          repository: http4k/api
