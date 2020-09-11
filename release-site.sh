@@ -9,7 +9,7 @@ pip install -r requirements.txt
 
 ./tools/embed_code.py
 
-export TOKEN_TO_USE=${GH_TOKEN:$1}
+export TOKEN_TO_USE=$1
 
 TMP=/tmp/http4k.github.io/
 rm -rf ${TMP}
