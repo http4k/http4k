@@ -25,12 +25,6 @@ matrix:
       language: java
       jdk: openjdk11
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-ci.sh; fi'
-    - stage: api
-      if: branch = master AND type != "pull_request"
-      language: java
-      jdk: openjdk11
-      script:
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-api.sh; fi'
     - stage: maven central 1
       if: branch = master AND type != "pull_request"
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-1.sh; fi'
