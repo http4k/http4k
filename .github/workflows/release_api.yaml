@@ -7,18 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-#      - uses: actions/setup-java@v1
-#        with:
-#          java-version: 11
-      #      - run: ./gradlew --no-daemon -i dokka
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+            - run: ./gradlew --no-daemon -i dokka
       - uses: actions/checkout@v2
         with:
           repository: http4k/api
           path: tmp
           token: ${{ secrets.AUTHOR_TOKEN }}
-      - run: touch tmp/bob
-#      - run: rm -rf tmp/*
-#      - run: cp -R build/ddoc/http4k/* tmp/
       - uses: EndBug/add-and-commit@v4
         with:
           cwd: 'tmp'
@@ -28,6 +25,6 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: asdasd
+          github_token: ${{ secrets.AUTHOR_TOKEN }}
           directory: tmp
           repository: http4k/api
