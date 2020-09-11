@@ -18,4 +18,15 @@ jobs:
       - run: ./gradlew --no-daemon -i dokka
       - run: rm -rf tmp/*
       - run: cp -R build/ddoc/http4k/* tmp/
-      - run: pushd tmp && git add . && git commit -am "release API docs" && git push --force && popd
+      - uses: EndBug/add-and-commit@v4
+        with:
+          cwd: 'tmp'
+          message: 'release API docs'
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTHOR_TOKEN }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.AUTHOR_TOKEN }}
+          force: true
+          directory: tmp
