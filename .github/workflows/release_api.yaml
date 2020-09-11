@@ -15,7 +15,7 @@ jobs:
           repository: http4k/api
           path: tmp
           token: ${{ secrets.AUTHOR_TOKEN }}
-      - run: ./gradlew -i dokka
+      - run: ./gradlew --no-daemon -i dokka
       - run: rm -rf tmp/*
       - run: cp -R build/ddoc/http4k/* tmp/
       - run: pushd tmp && git add . && git commit -am "release API docs" && git push --force && popd
