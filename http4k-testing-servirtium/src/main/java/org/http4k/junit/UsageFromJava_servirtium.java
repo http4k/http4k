@@ -29,7 +29,7 @@ public interface UsageFromJava_servirtium {
         "name of interaction",
         InteractionStorage.InMemory(),
         InteractionOptions.Defaults,
-        0,
+        9000,
         SunHttp::new
     );
 }
