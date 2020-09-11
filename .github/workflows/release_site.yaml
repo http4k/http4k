@@ -14,8 +14,9 @@ jobs:
       - run: pip install -r requirements.txt
       - run: ./tools/embed_code.py
       - uses: actions/checkout@v2
-        repository: http4k/http4k.github.io
-        path: tmp
+        with:
+          repository: http4k/http4k.github.io
+          path: tmp
       - run: cp -R build/docs-website/docs tmp/
       - run: cp -R src/mkdocs.yml tmp/
       - run: cd tmp/
