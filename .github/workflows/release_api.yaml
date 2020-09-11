@@ -1,0 +1,21 @@
+on:
+  push:
+    branches:
+      - 'master'
+jobs:
+  release-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+          with:
+            java-version: 11
+      - uses: actions/checkout@v2
+        with:
+          repository: http4k/api
+          path: tmp
+          token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
+      - run: ./gradlew -i dokka
+      - run: rm -rf tmp/*
+      - run: cp -R build/ddoc/http4k/* tmp/
+      - run: pushd tmp && git add . && git commit -am "release API docs" && git push --force && popd
