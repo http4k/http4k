@@ -40,7 +40,7 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.31.v20200723"
 
-    const val kotest_assertions_core_jvm: String = "4.1.3" // available: "4.2.3"
+    const val kotest_assertions_core_jvm: String = "4.1.3" // available: "4.2.4"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
