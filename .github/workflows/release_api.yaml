@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 11
-            - run: ./gradlew --no-daemon -i dokka
+      - run: ./gradlew --no-daemon -i dokka
       - uses: actions/checkout@v2
         with:
           repository: http4k/api
