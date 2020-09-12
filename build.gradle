@@ -2,6 +2,7 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        gradlePluginPortal()
     }
 
     dependencies {
@@ -18,7 +19,7 @@ buildscript {
 plugins {
     id 'com.github.kt3k.coveralls' version "2.10.1"
     id "com.jfrog.bintray" version "1.8.4"
-    id 'de.fayard.buildSrcVersions' version "0.7.0"
+    //id 'de.fayard.buildSrcVersions' version "0.7.0"
 }
 
 allprojects {
@@ -257,6 +258,7 @@ sourceSets {
     }
 }
 
+
 dokka {
     outputFormat = "gfm"
     outputDirectory = "$buildDir/ddoc"
@@ -270,9 +272,11 @@ dokka {
     }
 }
 
+/**
 buildSrcVersions {
     indent = "    "
 }
+ **/
 
 // To update Gradle, run `$ ./gradlew :buildSrcVersions && ./gradlew wrapper`
 wrapper {

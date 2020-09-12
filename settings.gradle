@@ -1,3 +1,27 @@
+import de.fayard.refreshVersions.RefreshVersionsSetup
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+buildscript {
+    repositories {
+        mavenLocal() // Only necessary for testing
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath("de.fayard.refreshVersions:refreshVersions:0.9.6-SNAPSHOT")
+    }
+}
+
+
+
+RefreshVersionsSetup.bootstrap(settings)
+
+
+
 rootProject.name = 'http4k'
 include 'http4k-core'
 include 'http4k-aws'
