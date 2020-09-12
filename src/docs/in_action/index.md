@@ -13,6 +13,10 @@ description: Example applications and usages of http4k, including TDD approach
 Also, check out the [YouTube Playlist](https://bit.ly/http4k-talks) for the lastest collection of talks featuring http4k.
 
 # See http4k in action in these example projects and repos:
+
+There is a repository of helpful examples at [http4k/examples](https://github.com/http4k/examples), covering how to build [http4k] applications using various features.
+
+#### Standalone projects...
 Each project is tagged with the http4k features it demonstrates:
 
 ### ["Hello World"](https://start.http4k.org)

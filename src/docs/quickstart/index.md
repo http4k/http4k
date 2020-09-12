@@ -1,7 +1,11 @@
 title: http4k Quickstart
 description: Easy ways to get started using http4k
 
-# Quickstart
+# Quickstart 
+
+For the impatient, there is a repository of examples at [http4k/examples](https://github.com/http4k/examples).
+
+... alternatively, for a step-by-step guide, keep reading...
 
 This simple example demonstrates how to serve and consume HTTP services using **http4k**. 
 
