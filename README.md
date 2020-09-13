@@ -43,7 +43,7 @@ of 2 types of simple function:
 * **Immutability:** All entities in the library are immutable unless their function explicitly disallows this.
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as 
 plugging together of services without HTTP container being required.
-* **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has ZERO dependencies and weighs in at ~700kb. Add-on modules only have dependencies required for specific implementation.
+* **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has **ZERO** dependencies and weighs in at ~1mb. Add-on modules only have dependencies required for specific implementation.
 * **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
     * individual endpoints
     * applications
@@ -51,7 +51,7 @@ plugging together of services without HTTP container being required.
     * full suites of microservices
     
 ## Quick-start:
-Bored with reading already and just want to get coding? For the impatient, visit the [quickstart](https://www.http4k.org/quickstart/), which showcases a variety of [http4k] usecases and features.
+Bored with reading already and just want to get coding? For the impatient, visit the [quickstart](https://www.http4k.org/quickstart/) or the [examples repo](https://github.com/http4k/examples), which showcases a variety of [http4k] use-cases and features.
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
@@ -69,19 +69,20 @@ Bored with reading already and just want to get coding? For the impatient, visit
 * [Client:](https://http4k.org/guide/modules/clients) 
     * **1LOC** client adapters 
         * **Apache** sync + async HTTP
+        * **Java** (bundled with `http4k-core`)
         * **Jetty** HTTP (supports sync and async HTTP)
         * **OkHttp** HTTP (supports sync and async HTTP)
-        * **Java** (bundled with `http4k-core`)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
 * [Server:](https://http4k.org/guide/modules/servers)
-    * **1LOC** server backend spinup for:
+    * **1LOC** server backend spin-up for:
+        * **Apache v4 & v5** (from httpcore)
         * **Jetty** (including websocket support)
-        * **Undertow**
-        * **Apache** (from httpcore)
+        * **Ktor CIO & Netty**
         * **Netty**
-        * **Ktor CIO**
         * **SunHttp** (bundled with `http4k-core`)
-    * API design allows for plugging into configurable instances of each
+        * **Undertow**
+    * API design allows for simple customization of underying backend.
+    * **Native Friendly** Several of these backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/modules/serverless)
     * AWS: Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway. 
     * Google Cloud Functions: Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
