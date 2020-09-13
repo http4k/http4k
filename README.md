@@ -50,7 +50,7 @@ plugging together of services without HTTP container being required.
     * websockets
     * full suites of microservices
     
-## Quick-start:
+## Quickstart
 Bored with reading already and just want to get coding? For the impatient, visit the [quickstart](https://www.http4k.org/quickstart/) or the [examples repo](https://github.com/http4k/examples), which showcases a variety of [http4k] use-cases and features.
 
 ## Module feature overview
