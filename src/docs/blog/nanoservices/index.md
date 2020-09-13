@@ -1,9 +1,9 @@
 title: http4k blog: http4k Nanoservices
 description: You thought that microservices were a thing? Pah! The powerful abstractions in the http4k toolkit allow you to write entire useful apps which fit in a Tweet. And that's original style btw... none of this 280 character verbosity!
 
-#  http4k Nanoservices
+# http4k Nanoservices
 
-##### [@daviddenton][github]
+##### september 2020 / [@daviddenton][github]
 
 http4k is a small library with minimal dependencies, but what you can accomplish with just a single line of code is quite remarkable due to a combination of the available modules and the `Server as a Function` concept.
 

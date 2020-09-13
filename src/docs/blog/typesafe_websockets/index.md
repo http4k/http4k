@@ -3,7 +3,7 @@ description: An overview of Websocket support in http4k
 
 # Websockets. But typesafe. And testable. Without the Server.
 
-##### [@daviddenton][github]
+##### december 2017 / [@daviddenton][github]
 
 Reaction to the last post introducing [http4k] was pretty good, and one of the most popular questions was: **"But what about Websockets"**?
 
