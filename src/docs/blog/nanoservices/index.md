@@ -11,7 +11,7 @@ Skeptical? We would be disappointed if you weren't! Hence, we decided to prove t
 
 For each of the examples below, there is a fully formed [http4k] applications declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()`. Even better, all of the main app code (excluding import statements 🙂) can fit in a single Tweet.
 
-### 1. Build a transparent Proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt)
+### 1. Build a simple proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt)
 Requires: `http4k-core`
 
 This simple proxy converts HTTP requests to HTTPS. Because of the symmetrical server/client `HttpHandler` signature, we can simply pipe an HTTP Client onto a Server, then add a `ProxyHost` filter to do the protocol conversion.
@@ -20,7 +20,7 @@ This simple proxy converts HTTP requests to HTTPS. Because of the symmetrical se
 
 <hr/>
 
-### 2. Report latency through a Proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/latency_reporting_proxy.kt)
+### 2. Report latency through a proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/latency_reporting_proxy.kt)
 Requires: `http4k-core`
 
 Building on the Simple Proxy example, we can simply layer on extra filters to add features to the proxy, in this case reporting the latency of each call.
