@@ -1,0 +1,8 @@
+description = 'Http4k Google integrations'
+
+dependencies {
+    compile project(":http4k-core")
+
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile Config.TestDependencies
+}
