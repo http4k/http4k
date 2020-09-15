@@ -15,7 +15,7 @@ object GoogleAnalytics {
 
         override fun invoke(handler: HttpHandler): HttpHandler = { request ->
             handler(request).also {
-                if (it.status.successful)
+                if (it.status.successful || it.status.informational || it.status.redirection)
                     analyticsHandler(request.asPageView())
             }
         }
