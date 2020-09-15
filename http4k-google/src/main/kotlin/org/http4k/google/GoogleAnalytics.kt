@@ -8,34 +8,43 @@ import org.http4k.core.body.form
 import org.http4k.routing.RoutedRequest
 import java.util.UUID
 
-class GoogleAnalytics(private val clientHandler: HttpHandler,
-                      private val trackingId: String,
-                      private val clientId: (Request) -> String = { UUID.randomUUID().toString() }) : Filter {
+object GoogleAnalytics {
+    operator fun invoke(clientHandler: HttpHandler,
+                        trackingId: String,
+                        clientId: (Request) -> String = { UUID.randomUUID().toString() }): Filter = object : Filter {
 
-    override fun invoke(handler: HttpHandler): HttpHandler = { request ->
-        handler(request).let {
-            val response = clientHandler(request.asPageView())
-            when {
-                response.status.successful -> it
-                else -> response
+        override fun invoke(handler: HttpHandler): HttpHandler = { request ->
+            handler(request).let {
+                val response = clientHandler(request.asPageView())
+                when {
+                    response.status.successful -> it
+                    else -> response
+                }
             }
         }
-    }
 
-    private fun Request.asPageView(): Request {
-        val host = header("host") ?: ""
+        private fun Request.asPageView(): Request {
+            val host = header("host") ?: uri.host
 
-        val path = when (this) {
-            is RoutedRequest -> xUriTemplate.toString()
-            else -> uri.path
+            val path = when (this) {
+                is RoutedRequest -> xUriTemplate.toString()
+                else -> uri.path
+            }
+
+            return Request(POST, "/collect")
+                .form(VERSION, "1")
+                .form(MEASUREMENT_ID, trackingId)
+                .form(CLIENT_ID, clientId(this))
+                .form(DOCUMENT_TITLE, path)
+                .form(DOCUMENT_PATH, path)
+                .form(DOCUMENT_HOST, host)
         }
-
-        return Request(POST, "/collect")
-            .form("v", "1")
-            .form("tid", trackingId)
-            .form("cid", clientId(this))
-            .form("dt", path)
-            .form("dp", path)
-            .form("dh", host)
     }
+
+    const val VERSION = "v"
+    const val MEASUREMENT_ID = "tid"
+    const val CLIENT_ID = "cid"
+    const val DOCUMENT_TITLE = "dt"
+    const val DOCUMENT_PATH = "dp"
+    const val DOCUMENT_HOST = "dh"
 }
