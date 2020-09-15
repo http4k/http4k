@@ -65,7 +65,7 @@ class GoogleAnalyticsTest {
     }
 
     @Test
-    fun `do not logs page view on unsuccessful response`() {
+    fun `don't log page view on unsuccessful response`() {
         val response = analytics(Request(GET, "/fail"))
 
         assertThat(response, hasStatus(BAD_REQUEST))
