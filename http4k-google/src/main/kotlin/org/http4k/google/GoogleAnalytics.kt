@@ -9,17 +9,14 @@ import org.http4k.routing.RoutedRequest
 import java.util.UUID
 
 object GoogleAnalytics {
-    operator fun invoke(clientHandler: HttpHandler,
+    operator fun invoke(analyticsHandler: HttpHandler,
                         trackingId: String,
                         clientId: (Request) -> String = { UUID.randomUUID().toString() }): Filter = object : Filter {
 
         override fun invoke(handler: HttpHandler): HttpHandler = { request ->
-            handler(request).let {
-                val response = clientHandler(request.asPageView())
-                when {
-                    response.status.successful -> it
-                    else -> response
-                }
+            handler(request).also {
+                if (it.status.successful)
+                    analyticsHandler(request.asPageView())
             }
         }
 
