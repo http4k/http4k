@@ -24,9 +24,9 @@ object Versions {
 
     const val org_eclipse_jetty: String = "9.4.31.v20200723"
 
-    const val org_junit_jupiter: String = "5.6.2"
+    const val org_junit_jupiter: String = "5.7.0"
 
-    const val io_undertow: String = "2.1.3.Final"
+    const val io_undertow: String = "2.2.0.Final"
 
     const val io_ktor: String = "1.3.2" // available: "1.4.0"
 
@@ -40,13 +40,13 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.31.v20200723"
 
-    const val kotest_assertions_core_jvm: String = "4.1.3" // available: "4.2.4"
+    const val kotest_assertions_core_jvm: String = "4.1.3" // available: "4.2.5"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
     const val functions_framework_api: String = "1.0.2"
 
-    const val aws_lambda_java_events: String = "3.2.0"
+    const val aws_lambda_java_events: String = "3.3.0"
 
     const val jackson_module_kotlin: String = "2.11.2"
 
@@ -59,6 +59,8 @@ object Versions {
     const val netty_codec_http2: String = "4.1.52.Final"
 
     const val jackson_databind: String = "2.11.2"
+
+    const val http_client_spi: String = "2.14.19"
 
     const val httpasyncclient: String = "4.1.4"
 
@@ -104,7 +106,7 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val okhttp: String = "4.8.1"
+    const val okhttp: String = "4.8.1" // available: "4.9.0" - 1.4.10
 
     const val pebble: String = "3.1.4"
 
@@ -117,6 +119,8 @@ object Versions {
     const val gson: String = "2.8.6"
 
     const val json: String = "20200518"
+
+    const val s3: String = "2.14.19"
 
     /**
      * Current version: "6.6"

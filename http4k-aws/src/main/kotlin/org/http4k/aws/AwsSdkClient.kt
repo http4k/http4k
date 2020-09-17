@@ -26,15 +26,12 @@ class AwsSdkClient(private val http: HttpHandler) : SdkHttpClient {
 }
 
 private fun HttpExecuteRequest.fromAws() = with(httpRequest()) {
-    println(uri.query)
-    uri.query
-    println(uri.toString())
     val init = Request(Method.valueOf(method().name), Uri.of(uri.toString()))
         .headers(headers().entries.flatMap { (name, values) -> values.map { name to it } })
 
-    when (init) {
+    when (this) {
         is SdkHttpFullRequest ->
-            init.body(init.contentStreamProvider().map { Body(it.newStream()) }.orElse(EMPTY))
+            init.body(contentStreamProvider().map { Body(it.newStream()) }.orElse(EMPTY))
         else -> init
     }
 }
@@ -42,6 +39,7 @@ private fun HttpExecuteRequest.fromAws() = with(httpRequest()) {
 private fun Response.asAws() = HttpExecuteResponse.builder()
     .response(builder()
         .statusCode(status.code)
+        .statusText(status.description)
         .headers(headers.groupBy { it.first }.mapValues { it.value.map { it.second } })
         .content(create(body.stream))
         .build())

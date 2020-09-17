@@ -241,6 +241,12 @@ object Libs {
             Versions.jackson_databind
 
     /**
+     * https://aws.amazon.com/sdkforjava
+     */
+    const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:" +
+            Versions.http_client_spi
+
+    /**
      * http://hc.apache.org/httpcomponents-asyncclient
      */
     const val httpasyncclient: String = "org.apache.httpcomponents:httpasyncclient:" +
@@ -314,7 +320,7 @@ object Libs {
     const val bunting4k: String = "dev.forkhandles:bunting4k:" + Versions.bunting4k
 
     /**
-     * http://hc.apache.org/httpcomponents-core-ga
+     * https://hc.apache.org/httpcomponents-core-5.0.x/
      */
     const val httpcore5: String = "org.apache.httpcomponents.core5:httpcore5:" + Versions.httpcore5
 
@@ -384,4 +390,9 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
+
+    /**
+     * https://aws.amazon.com/sdkforjava
+     */
+    const val s3: String = "software.amazon.awssdk:s3:" + Versions.s3
 }
