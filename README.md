@@ -121,6 +121,7 @@ Bored with reading already and just want to get coding? For the impatient, visit
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 
+    * Plug a standard `HttpHandler` into the AWS v2 SDKs. This massively simplifies testing and allows for sniffing of the exact traffic going to AWS - brilliant for debugging and building fakes.
     * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [OAuth Security](https://http4k.org/guide/modules/oauth) 
     * Implement OAuth Authorisation Code Grant flow with a single Interface
