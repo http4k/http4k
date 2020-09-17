@@ -14,15 +14,12 @@ Errors in extracting Lenses are propagated as exceptions which are caught and ha
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example.kt"></script>
 
-### Using custom "Result" ADTs
-An alternative approach to using Exceptions to automatically produce `BadRequests` is to use an Either-type structure, and this would be easy to implement - but the lack of an in-built Result/Either type in the standard Kotlin library means that we 
-don't have a single representation to use without shackling ourselves to another Either-containing library such as Arrow or Result4k.
+### Using "Result" ADT
+An alternative approach to using Exceptions to automatically produce `BadRequests` is to use an Either-type structure, and this would be easy to implement - but the lack of an usable Result/Either type in the standard Kotlin library means that we have chosen to use `Result4k` as an optional dependency. If it is on the classpath you will gain support for it.
 
-Additionally, the lack of Higher Kinded Types in Kotlin means that we are unable to provide a generic method for converting standard lenses. However, it is easy to implement an extension method to use in specific use cases.
+Additionally, the lack of Higher Kinded Types in Kotlin means that we are unable to provide a generic method for converting standard lenses. However, it is easy to implement an extension method to use in specific use cases - you can follow the example in the http4k source to implement your own version of the one we supply for Result4k. Below is an example which uses that Result4k ADT:
 
-Below is an example which uses a custom Result ADT - this will work for all extraction Lenses that you define:
+### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example_result4k.kt)
 
-### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example_custom_result_adt.kt)
-
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example_custom_result_adt.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example_result4k.kt"></script>
 
