@@ -2,6 +2,7 @@ description = 'Http4k AWS integration and request signing'
 
 dependencies {
     compile project(":http4k-core")
+    implementation group: 'software.amazon.awssdk', name: 'http-client-spi', version: '2.14.18'
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(":http4k-client-apache")
