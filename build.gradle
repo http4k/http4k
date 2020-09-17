@@ -239,6 +239,7 @@ dependencies {
     compile project(":http4k-testing-servirtium")
     compile project(":http4k-testing-webdriver")
 
+    testCompile Libs.s3
     testCompile Config.TestDependencies
     testCompile project(path: ":http4k-testing-servirtium", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-serverless-gcf", configuration: 'testArtifacts')
