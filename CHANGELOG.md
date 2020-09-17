@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.261.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-*** : Remove some example code which was mistakenly added to some main src dirs. No impact on anything other than JAR size.
+- **http4k-aws*** : Add pluggable Amazon SDK client, allowing you to plug an HttpHandler into the Amazon SDK.
 
 ### v3.260.0
 - **http4k-*** : Upgrade some dependency versions.
