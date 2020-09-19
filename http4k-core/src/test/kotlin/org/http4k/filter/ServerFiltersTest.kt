@@ -136,6 +136,30 @@ class ServerFiltersTest {
     }
 
     @Test
+    fun `OPTIONS - requests are returned with expected headers when cors policy has origin pattern`() {
+        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST), false, Regex(".*.company.com"))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "abc.company.com"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "abc.company.com"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when cors policy has origin pattern not matched by origin`() {
+        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST), false, Regex(".*.company.com"))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "abc.organisation.com"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "null"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
     fun `OPTIONS - requests are returned with expected headers when origin does not match`() {
         val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "baz"))

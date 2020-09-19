@@ -34,7 +34,8 @@ import java.io.StringWriter
 data class CorsPolicy(val origins: List<String>,
                       val headers: List<String>,
                       val methods: List<Method>,
-                      val credentials: Boolean = false) {
+                      val credentials: Boolean = false,
+                      val originRegex: Regex = Regex("")) {
     companion object {
         val UnsafeGlobalPermissive = CorsPolicy(listOf("*"), listOf("content-type"), Method.values().toList(), true)
     }
@@ -55,7 +56,7 @@ object ServerFilters {
                 val origin = it.header("Origin")
                 val allowedOrigin = when {
                     "*" in policy.origins -> "*"
-                    origin != null && origin in policy.origins -> origin
+                    origin != null && (policy.originRegex.matches(origin) || origin in policy.origins) -> origin
                     else -> "null"
                 }
 
