@@ -18,6 +18,8 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.5.0"
 
+    const val software_amazon_awssdk: String = "2.14.26"
+
     const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.10"
 
     const val com_squareup_moshi: String = "1.9.3" // available: "1.10.0"
@@ -28,7 +30,7 @@ object Versions {
 
     const val io_undertow: String = "2.2.0.Final"
 
-    const val io_ktor: String = "1.3.2" // available: "1.4.0"
+    const val io_ktor: String = "1.3.2" // available: "1.4.1"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
@@ -46,13 +48,13 @@ object Versions {
 
     const val functions_framework_api: String = "1.0.2"
 
-    const val aws_lambda_java_events: String = "3.3.0"
+    const val aws_lambda_java_events: String = "3.3.1"
 
     const val jackson_module_kotlin: String = "2.11.2"
 
     const val aws_lambda_java_core: String = "1.2.1"
 
-    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.0"
+    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.10"
 
     const val javax_servlet_api: String = "4.0.1"
 
@@ -60,11 +62,9 @@ object Versions {
 
     const val jackson_databind: String = "2.11.2"
 
-    const val http_client_spi: String = "2.14.19"
-
     const val httpasyncclient: String = "4.1.4"
 
-    const val micrometer_core: String = "1.5.4"
+    const val micrometer_core: String = "1.5.5"
 
     const val java_websocket: String = "1.5.1"
 
@@ -76,7 +76,7 @@ object Versions {
 
     const val selenium_api: String = "3.141.59"
 
-    const val httpclient5: String = "5.0.1"
+    const val httpclient5: String = "5.0.2"
 
     const val freemarker: String = "2.3.30"
 
@@ -90,7 +90,7 @@ object Versions {
 
     const val bunting4k: String = "0.18.0.0"
 
-    const val httpcore5: String = "5.0.1"
+    const val httpcore5: String = "5.0.2"
 
     const val joda_time: String = "2.10.6"
 
@@ -98,7 +98,7 @@ object Versions {
 
     const val thymeleaf: String = "3.0.11.RELEASE"
 
-    const val hamkrest: String = "1.7.0.3"
+    const val hamkrest: String = "1.7.0.3" // available: "1.8.0.1"
 
     const val httpcore: String = "4.4.13"
 
@@ -106,7 +106,7 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val okhttp: String = "4.8.1" // available: "4.9.0" - 1.4.10
+    const val okhttp: String = "4.8.1" // available: "4.9.0"
 
     const val pebble: String = "3.1.4"
 
@@ -119,8 +119,6 @@ object Versions {
     const val gson: String = "2.8.6"
 
     const val json: String = "20200518"
-
-    const val s3: String = "2.14.19"
 
     /**
      * Current version: "6.6"

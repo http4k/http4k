@@ -51,6 +51,17 @@ object Libs {
             Versions.io_github_resilience4j
 
     /**
+     * https://aws.amazon.com/sdkforjava
+     */
+    const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:" +
+            Versions.software_amazon_awssdk
+
+    /**
+     * https://aws.amazon.com/sdkforjava
+     */
+    const val s3: String = "software.amazon.awssdk:s3:" + Versions.software_amazon_awssdk
+
+    /**
      * https://kotlinlang.org/
      */
     const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:" +
@@ -241,12 +252,6 @@ object Libs {
             Versions.jackson_databind
 
     /**
-     * https://aws.amazon.com/sdkforjava
-     */
-    const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:" +
-            Versions.http_client_spi
-
-    /**
      * http://hc.apache.org/httpcomponents-asyncclient
      */
     const val httpasyncclient: String = "org.apache.httpcomponents:httpasyncclient:" +
@@ -284,7 +289,7 @@ object Libs {
     const val selenium_api: String = "org.seleniumhq.selenium:selenium-api:" + Versions.selenium_api
 
     /**
-     * http://hc.apache.org/httpcomponents-client
+     * https://hc.apache.org/httpcomponents-client-5.0.x/
      */
     const val httpclient5: String = "org.apache.httpcomponents.client5:httpclient5:" +
             Versions.httpclient5
@@ -390,9 +395,4 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
-
-    /**
-     * https://aws.amazon.com/sdkforjava
-     */
-    const val s3: String = "software.amazon.awssdk:s3:" + Versions.s3
 }
