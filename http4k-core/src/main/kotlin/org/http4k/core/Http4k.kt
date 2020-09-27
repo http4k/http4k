@@ -4,15 +4,11 @@ import org.http4k.routing.RoutingHttpHandler
 
 typealias HttpHandler = (Request) -> Response
 
-interface Filter : (HttpHandler) -> HttpHandler {
-    companion object {
-        @JvmStatic
-        @JvmName("create")
-        operator fun invoke(fn: (HttpHandler) -> HttpHandler): Filter = object : Filter {
-            override operator fun invoke(next: HttpHandler): HttpHandler = fn(next)
-        }
-    }
+fun interface Filter : (HttpHandler) -> HttpHandler {
+    companion object
 }
+
+fun Filter.Companion.create(fn: (HttpHandler) -> HttpHandler): Filter = Filter { next -> fn(next) }
 
 val Filter.Companion.NoOp: Filter get() = Filter { next -> { next(it) } }
 
