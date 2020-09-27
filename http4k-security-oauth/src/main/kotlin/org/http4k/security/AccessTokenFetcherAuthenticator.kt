@@ -3,7 +3,7 @@ package org.http4k.security
 import org.http4k.core.Request
 import org.http4k.core.body.form
 
-interface AccessTokenFetcherAuthenticator {
+fun interface AccessTokenFetcherAuthenticator {
     fun authenticate(request: Request): Request
 }
 

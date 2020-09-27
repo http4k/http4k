@@ -6,7 +6,7 @@ import com.natpryce.Success
 import org.http4k.core.Request
 import org.http4k.lens.LensFailure
 
-interface AuthRequestExtractor {
+fun interface AuthRequestExtractor {
     fun extract(request: Request): Result<AuthRequest, InvalidAuthorizationRequest>
 }
 

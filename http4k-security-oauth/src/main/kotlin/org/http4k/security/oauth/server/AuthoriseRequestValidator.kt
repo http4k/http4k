@@ -10,7 +10,6 @@ interface AuthoriseRequestValidator {
     fun isValidClientAndRedirectUriInCaseOfError(request: Request, clientId: ClientId, redirectUri: Uri): Boolean
 
     fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError>
-
 }
 
 class MustHaveRedirectUri(private val delegate: AuthoriseRequestValidator) : AuthoriseRequestValidator by delegate {

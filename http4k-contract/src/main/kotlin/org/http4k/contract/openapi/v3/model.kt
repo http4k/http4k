@@ -61,7 +61,7 @@ sealed class ApiPath<NODE>(
     }
 }
 
-interface HasSchema<NODE> {
+fun interface HasSchema<NODE> {
     fun definitions(): Iterable<Pair<String, NODE>>
 }
 

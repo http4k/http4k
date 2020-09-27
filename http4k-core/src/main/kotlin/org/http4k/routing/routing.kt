@@ -17,7 +17,7 @@ import java.io.InputStream
 /**
  * Provides matching of a Request to an HttpHandler which can service it.
  */
-interface Router {
+fun interface Router {
     /**
      * Attempt to supply an HttpHandler which can service the passed request.
      */
