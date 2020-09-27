@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 ### v3.262.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-kotest - Possible Break (on Jackosn)**: Remove a `haveBody` matcher which uses `Matcher<JsonNode>` directly, because of a bug in Kotest:
+https://github.com/kotest/kotest/issues/1727
 
 ### v3.261.0
 - **http4k-*** : Upgrade some dependency versions.

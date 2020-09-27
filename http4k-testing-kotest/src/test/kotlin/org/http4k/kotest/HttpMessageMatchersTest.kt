@@ -13,7 +13,6 @@ import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.lens.Header
 import org.http4k.lens.string
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class HttpMessageMatchersTest {
@@ -31,7 +30,7 @@ class HttpMessageMatchersTest {
     fun `header no value`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header"), haveHeader("header").invert())
 
     @Test
-    fun `header - non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", contain("bob")), haveHeader("header", be<String>("bill")))
+    fun `header - non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", contain("bob")), haveHeader("header", be("bill")))
 
     @Test
     fun `header lens`() =
@@ -64,9 +63,9 @@ class HttpMessageMatchersTest {
     @Test
     fun `json body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.haveBody("""{"hello":"world"}"""), Jackson.haveBody("""{"hello":"w2orld"}"""))
 
-    @Test
-    @Disabled("some problem with jackson")
-    fun `json node body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.haveBody(be(Jackson.obj("hello" to Jackson.string("world")))), Jackson.haveBody(be(Jackson.obj("hello" to Jackson.string("wo2rld")))))
+//    @Test
+//    @Disabled("https://github.com/kotest/kotest/issues/1727")
+//    fun `json node body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.haveBody(be(Jackson.obj("hello" to Jackson.string("world")))), Jackson.haveBody(be(Jackson.obj("hello" to Jackson.string("wo2rld")))))
 
     @Test
     fun `json node body equal matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.haveBody(Jackson.obj("hello" to Jackson.string("world"))), Jackson.haveBody(Jackson.obj("hello" to Jackson.string("wo2rld"))))
