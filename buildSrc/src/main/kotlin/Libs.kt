@@ -5,8 +5,8 @@
  *   `$ ./gradlew buildSrcVersions`
  */
 object Libs {
-    const val kotlinx_serialization_core: String =
-            "org.jetbrains.kotlinx:kotlinx-serialization-core:" +
+    const val kotlinx_serialization_json: String =
+            "org.jetbrains.kotlinx:kotlinx-serialization-json:" +
             Versions.org_jetbrains_kotlinx_kotlinx_serialization
 
     /**

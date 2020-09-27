@@ -11,7 +11,7 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.0-RC"
+    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.0-RC2"
 
     const val com_fasterxml_jackson_dataformat: String = "2.11.2"
 
@@ -21,7 +21,7 @@ object Versions {
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
-    const val com_squareup_moshi: String = "1.9.3" // available: "1.10.0"
+    const val com_squareup_moshi: String = "1.10.0"
 
     const val org_eclipse_jetty: String = "9.4.31.v20200723"
 
@@ -29,7 +29,7 @@ object Versions {
 
     const val io_undertow: String = "2.2.0.Final"
 
-    const val io_ktor: String = "1.4.10"
+    const val io_ktor: String = "1.4.1"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
@@ -97,7 +97,7 @@ object Versions {
 
     const val thymeleaf: String = "3.0.11.RELEASE"
 
-    const val hamkrest: String = "1.7.0.3" // available: "1.8.0.1"
+    const val hamkrest: String = "1.8.0.1"
 
     const val httpcore: String = "4.4.13"
 
@@ -105,7 +105,7 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val okhttp: String = "4.8.1" // available: "4.9.0"
+    const val okhttp: String = "4.9.0"
 
     const val pebble: String = "3.1.4"
 
