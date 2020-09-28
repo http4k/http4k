@@ -4,7 +4,7 @@ description: Feature overview of the http4k-resilience4j module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-resilience4j", version: "3.261.0"
+implementation group: "org.http4k", name: "http4k-resilience4j", version: "3.262.0"
 ```
 
 ### About
