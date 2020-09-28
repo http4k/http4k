@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.262.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.10
-- **http4k-*** : Take advantage of Kotlin Functional Interfaces, including for Filter. Slight change to creation of Filters from Java code as they can just be lambdas eg. `Filter filter = next -> req -> next.invoke(request.header("foo", "bar"));` 
+- **http4k-*** : Take advantage of Kotlin Functional Interfaces, including for Filter. Breaking change to creation of Filters **from Java code only** as they can just be lambdas eg. `Filter filter = next -> req -> next.invoke(request.header("foo", "bar"));` 
 - **http4k-testing-kotest - Possible Break**: DUE TO KOTLIN 1.4.10. Remove a `haveBody` matcher which uses `Matcher<JsonNode>` directly, because of a bug in Kotest:
 https://github.com/kotest/kotest/issues/1727
 - **http4k-format-jackson - Possible Break**: DUE TO KOTLIN 1.4.10. Inline classes do not deserialise properly. See: https://github.com/FasterXML/jackson-module-kotlin/issues/356
