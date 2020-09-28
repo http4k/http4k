@@ -4,7 +4,7 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
-interface ReadResource {
+fun interface ReadResource {
     fun input(): InputStream?
 }
 

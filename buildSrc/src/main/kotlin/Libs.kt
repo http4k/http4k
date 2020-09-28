@@ -5,8 +5,8 @@
  *   `$ ./gradlew buildSrcVersions`
  */
 object Libs {
-    const val kotlinx_serialization_core: String =
-            "org.jetbrains.kotlinx:kotlinx-serialization-core:" +
+    const val kotlinx_serialization_json: String =
+            "org.jetbrains.kotlinx:kotlinx-serialization-json:" +
             Versions.org_jetbrains_kotlinx_kotlinx_serialization
 
     /**
@@ -46,6 +46,17 @@ object Libs {
      */
     const val resilience4j_retry: String = "io.github.resilience4j:resilience4j-retry:" +
             Versions.io_github_resilience4j
+
+    /**
+     * https://aws.amazon.com/sdkforjava
+     */
+    const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:" +
+            Versions.software_amazon_awssdk
+
+    /**
+     * https://aws.amazon.com/sdkforjava
+     */
+    const val s3: String = "software.amazon.awssdk:s3:" + Versions.software_amazon_awssdk
 
     /**
      * https://kotlinlang.org/
@@ -275,7 +286,7 @@ object Libs {
     const val selenium_api: String = "org.seleniumhq.selenium:selenium-api:" + Versions.selenium_api
 
     /**
-     * http://hc.apache.org/httpcomponents-client
+     * https://hc.apache.org/httpcomponents-client-5.0.x/
      */
     const val httpclient5: String = "org.apache.httpcomponents.client5:httpclient5:" +
             Versions.httpclient5
@@ -311,7 +322,7 @@ object Libs {
     const val bunting4k: String = "dev.forkhandles:bunting4k:" + Versions.bunting4k
 
     /**
-     * http://hc.apache.org/httpcomponents-core-ga
+     * https://hc.apache.org/httpcomponents-core-5.0.x/
      */
     const val httpcore5: String = "org.apache.httpcomponents.core5:httpcore5:" + Versions.httpcore5
 

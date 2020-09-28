@@ -113,14 +113,10 @@ class AutoJsonToJsonSchema<NODE : Any>(
     }
 }
 
-interface SchemaModelNamer : (Any) -> String {
+fun interface SchemaModelNamer : (Any) -> String {
     companion object {
-        val Simple: SchemaModelNamer = object : SchemaModelNamer {
-            override fun invoke(p1: Any) = p1.javaClass.simpleName
-        }
-        val Full: SchemaModelNamer = object : SchemaModelNamer {
-            override fun invoke(p1: Any) = p1.javaClass.name
-        }
+        val Simple: SchemaModelNamer = SchemaModelNamer { it.javaClass.simpleName }
+        val Full: SchemaModelNamer = SchemaModelNamer { it.javaClass.name }
     }
 }
 

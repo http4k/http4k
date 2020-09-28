@@ -1,10 +1,19 @@
 <h2 class="github">Changelog</h2>
 
-This list is not currently intended to be all-encompassing - it will document major and breaking API 
+This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.261.0 (uncut)
+### v3.262.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.10
+- **http4k-*** : Take advantage of Kotlin Functional Interfaces, including for Filter.
+- **http4k-testing-kotest - Possible Break**: DUE TO KOTLIN 1.4.10. Remove a `haveBody` matcher which uses `Matcher<JsonNode>` directly, because of a bug in Kotest:
+https://github.com/kotest/kotest/issues/1727
+- **http4k-format-jackson - Possible Break**: DUE TO KOTLIN 1.4.10. Inline classes do not deserialise properly. See: https://github.com/FasterXML/jackson-module-kotlin/issues/356
+
+### v3.261.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Remove some example code which was mistakenly added to some main src dirs. No impact on anything other than JAR size.
+- **http4k-aws*** : Add pluggable Amazon SDK client, allowing you to plug an HttpHandler into the Amazon SDK.
 
 ### v3.260.0
 - **http4k-*** : Upgrade some dependency versions.

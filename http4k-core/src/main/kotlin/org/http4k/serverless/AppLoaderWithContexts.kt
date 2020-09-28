@@ -8,8 +8,6 @@ import org.http4k.core.then
 /**
  * Http4k app loader - instantiate the application from the environment config and RequestContexts
  */
-interface AppLoaderWithContexts : (Map<String, String>, RequestContexts) -> HttpHandler
+fun interface AppLoaderWithContexts : (Map<String, String>, RequestContexts) -> HttpHandler
 
-fun Filter.then(appLoader: AppLoaderWithContexts) = object : AppLoaderWithContexts {
-    override fun invoke(p1: Map<String, String>, contexts: RequestContexts) = then(appLoader(p1, contexts))
-}
+fun Filter.then(appLoader: AppLoaderWithContexts) = AppLoaderWithContexts { p1, contexts -> then(appLoader(p1, contexts)) }

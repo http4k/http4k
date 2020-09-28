@@ -141,7 +141,7 @@ object RemoteChaosApi {
                 .then(ServerFilters.CatchAll())
                 .then(
                     contract {
-                        renderer = OpenApi3(ApiInfo("http4k Chaos Engine", "1.0", apiDescription), Jackson)
+                        renderer = OpenApi3(ApiInfo("http4k Chaos Engine", "1.0", apiDescription))
                         descriptionPath = openApiPath
                         security = chaosSecurity
                         routes += "/status" meta {
