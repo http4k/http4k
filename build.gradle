@@ -258,20 +258,18 @@ sourceSets {
     }
 }
 
-tasks.dokkaGfmMultiModule.configure {
-}
+dokka {
+    outputFormat = "gfm"
+    outputDirectory = "$buildDir/ddoc"
 
-//dokkaGfm {
-//    outputDirectory.set(buildDir.resolve("ddoc"))
-//
-//    subProjects = subprojects.collect { i -> i.name }
-//
-//    configuration {
-//        includes = ['src/packages.md']
-//        moduleName = "$rootProject.name"
-//        jdkVersion = 9
-//    }
-//}
+    subProjects = subprojects.collect { i -> i.name }
+
+    configuration {
+        includes = ['src/packages.md']
+        moduleName = "$rootProject.name"
+        jdkVersion = 9
+    }
+}
 
 buildSrcVersions {
     indent = "    "
