@@ -34,7 +34,7 @@ class SecretTest {
     @Test
     fun `using the value twice throws up`() {
         aSecret.use { it }
-        assertThat({ aSecret.use { it } }, throws<IllegalStateException>())
+        assertThat({ aSecret.use { it.also {} } }, throws<IllegalStateException>())
     }
 
     @Test

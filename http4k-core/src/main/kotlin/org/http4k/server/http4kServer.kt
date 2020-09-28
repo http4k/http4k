@@ -20,7 +20,7 @@ interface Http4kServer : AutoCloseable {
 /**
  * Standard interface for creating a configured WebServer
  */
-interface ServerConfig {
+fun interface ServerConfig {
     fun toServer(httpHandler: HttpHandler): Http4kServer
 }
 

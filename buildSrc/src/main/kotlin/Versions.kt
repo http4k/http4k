@@ -11,8 +11,7 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.20.0"
-             // available: "0.20.0-1.4-M1-release-99"
+    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.0-RC2"
 
     const val com_fasterxml_jackson_dataformat: String = "2.11.2"
 
@@ -20,9 +19,9 @@ object Versions {
 
     const val software_amazon_awssdk: String = "2.14.26"
 
-    const val org_jetbrains_kotlin: String = "1.3.72" // available: "1.4.10"
+    const val org_jetbrains_kotlin: String = "1.4.10"
 
-    const val com_squareup_moshi: String = "1.9.3" // available: "1.10.0"
+    const val com_squareup_moshi: String = "1.10.0"
 
     const val org_eclipse_jetty: String = "9.4.31.v20200723"
 
@@ -30,7 +29,7 @@ object Versions {
 
     const val io_undertow: String = "2.2.0.Final"
 
-    const val io_ktor: String = "1.3.2" // available: "1.4.1"
+    const val io_ktor: String = "1.4.1"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
@@ -42,7 +41,7 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.31.v20200723"
 
-    const val kotest_assertions_core_jvm: String = "4.1.3" // available: "4.2.5"
+    const val kotest_assertions_core_jvm: String = "4.2.5"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
@@ -88,7 +87,7 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val bunting4k: String = "0.18.0.0"
+    const val bunting4k: String = "1.0.0.0"
 
     const val httpcore5: String = "5.0.2"
 
@@ -98,7 +97,7 @@ object Versions {
 
     const val thymeleaf: String = "3.0.11.RELEASE"
 
-    const val hamkrest: String = "1.7.0.3" // available: "1.8.0.1"
+    const val hamkrest: String = "1.8.0.1"
 
     const val httpcore: String = "4.4.13"
 
@@ -106,7 +105,7 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val okhttp: String = "4.8.1" // available: "4.9.0"
+    const val okhttp: String = "4.9.0"
 
     const val pebble: String = "3.1.4"
 

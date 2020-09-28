@@ -54,9 +54,9 @@ class MetricFiltersServerTest {
         }
 
         assert(registry,
-            hasRequestTimer(1, 1, tags = *arrayOf(
+            hasRequestTimer(1, 1, tags = arrayOf(
                 "path" to "timed_one", "method" to "GET", "status" to "200")),
-            hasRequestTimer(2, 2, tags = *arrayOf(
+            hasRequestTimer(2, 2, tags = arrayOf(
                 "path" to "timed_two_name", "method" to "POST", "status" to "200"))
         )
     }
@@ -69,8 +69,8 @@ class MetricFiltersServerTest {
         }
 
         assert(registry,
-            hasRequestCounter(1, tags = *arrayOf("path" to "counted_one", "method" to "GET", "status" to "200")),
-            hasRequestCounter(2, tags = *arrayOf("path" to "counted_two_name", "method" to "POST", "status" to "200"))
+            hasRequestCounter(1, tags = arrayOf("path" to "counted_one", "method" to "GET", "status" to "200")),
+            hasRequestCounter(2, tags = arrayOf("path" to "counted_two_name", "method" to "POST", "status" to "200"))
         )
     }
 
@@ -115,13 +115,13 @@ class MetricFiltersServerTest {
     fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() {
         assertThat(server(Request(GET, "/otherTimed/test.json")), hasStatus(OK))
 
-        assert(registry, hasRequestTimer(1, 1, tags = *arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
+        assert(registry, hasRequestTimer(1, 1, tags = arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
     }
 
     @Test
     fun `counted routes without uri template generate request count metrics tagged with unmapped path value`() {
         assertThat(server(Request(GET, "/otherCounted/test.json")), hasStatus(OK))
-        assert(registry, hasRequestCounter(1, tags = *arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
+        assert(registry, hasRequestCounter(1, tags = arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
     }
 
 

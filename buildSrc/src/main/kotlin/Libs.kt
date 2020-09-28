@@ -5,11 +5,8 @@
  *   `$ ./gradlew buildSrcVersions`
  */
 object Libs {
-    /**
-     * https://github.com/Kotlin/kotlinx.serialization
-     */
-    const val kotlinx_serialization_runtime: String =
-            "org.jetbrains.kotlinx:kotlinx-serialization-runtime:" +
+    const val kotlinx_serialization_json: String =
+            "org.jetbrains.kotlinx:kotlinx-serialization-json:" +
             Versions.org_jetbrains_kotlinx_kotlinx_serialization
 
     /**

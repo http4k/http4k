@@ -33,7 +33,7 @@ fun haveQuery(name: String, matcher: Matcher<String>): Matcher<Request> = httpMe
 
 fun Request.shouldHaveQuery(name: String, expected: CharSequence) = this should haveQuery(name, expected)
 fun Request.shouldNotHaveQuery(name: String, expected: CharSequence) = this shouldNot haveQuery(name, expected)
-fun haveQuery(name: String, expected: CharSequence): Matcher<Request> = haveQuery(name, be(expected.toString()))
+fun haveQuery(name: String, expected: CharSequence): Matcher<Request> = haveQuery(name, be<String>(expected.toString()))
 
 fun Request.shouldHaveQuery(name: String, expected: Regex) = this should haveQuery(name, expected)
 fun Request.shouldNotHaveQuery(name: String, expected: Regex) = this shouldNot haveQuery(name, expected)
@@ -62,7 +62,7 @@ fun haveForm(name: String, expected: Regex): Matcher<Request> = haveForm(name, c
 
 fun Request.shouldHaveForm(name: String, expected: CharSequence) = this should haveForm(name, expected)
 fun Request.shouldNotHaveForm(name: String, expected: CharSequence) = this shouldNot haveForm(name, expected)
-fun haveForm(name: String, expected: CharSequence): Matcher<Request> = haveForm(name, be(expected.toString()))
+fun haveForm(name: String, expected: CharSequence): Matcher<Request> = haveForm(name, be<String>(expected.toString()))
 
 infix fun Request.shouldHaveMethod(expected: Method) = this should haveMethod(expected)
 infix fun Request.shouldNotHaveMethod(expected: Method) = this shouldNot haveMethod(expected)

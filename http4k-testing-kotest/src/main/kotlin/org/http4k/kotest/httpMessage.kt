@@ -2,6 +2,7 @@ package org.http4k.kotest
 
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
+import io.kotest.matchers.and
 import io.kotest.matchers.be
 import io.kotest.matchers.neverNullMatcher
 import io.kotest.matchers.nulls.beNull
@@ -27,9 +28,9 @@ fun HttpMessage.shouldHaveHeader(name: String, matcher: Matcher<String>) = this 
 fun HttpMessage.shouldNotHaveHeader(name: String, matcher: Matcher<String>) = this shouldNot haveHeader(name, matcher)
 fun haveHeader(name: String, matcher: Matcher<String>): Matcher<HttpMessage> = httpMessageHas("Header \"$name\"", { m: HttpMessage -> m.header(name) }, neverNullMatcher { matcher.test(it) })
 
-fun HttpMessage.shouldHaveHeader(name: String, expected: CharSequence) = this should haveHeader(name, expected)
-fun HttpMessage.shouldNotHaveHeader(name: String, expected: CharSequence) = this shouldNot haveHeader(name, expected)
-fun haveHeader(name: String, expected: CharSequence): Matcher<HttpMessage> = haveHeader(name, be(expected.toString()))
+fun HttpMessage.shouldHaveHeader(name: String, expected: String) = this should haveHeader(name, expected)
+fun HttpMessage.shouldNotHaveHeader(name: String, expected: String) = this shouldNot haveHeader(name, expected)
+fun haveHeader(name: String, expected: String): Matcher<HttpMessage> = haveHeader(name, be(expected.toString()))
 
 fun HttpMessage.shouldHaveHeader(name: String, expected: Regex) = this should haveHeader(name, expected)
 fun HttpMessage.shouldNotHaveHeader(name: String, expected: Regex) = this shouldNot haveHeader(name, expected)
@@ -65,9 +66,12 @@ infix fun HttpMessage.shouldNotHaveBody(expected: Matcher<String>) = this should
 @JvmName("haveBodyStringMatcher")
 fun <T : HttpMessage> haveBody(expected: Matcher<String>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.bodyString() }, expected)
 
-infix fun HttpMessage.shouldHaveBody(expected: CharSequence) = this should haveBody(expected)
-infix fun HttpMessage.shouldNotHaveBody(expected: CharSequence) = this shouldNot haveBody(expected)
-fun <T : HttpMessage> haveBody(expected: CharSequence): Matcher<T> = haveBody(be(expected.toString()))
+infix fun HttpMessage.shouldHaveBody(expected: String) = this should haveBody(expected)
+infix fun HttpMessage.shouldNotHaveBody(expected: String) = this shouldNot haveBody(expected)
+fun <T : HttpMessage> haveBody(expected: String): Matcher<T> {
+    val be: Matcher<String> = be(expected)
+    return haveBody(be)
+}
 
 infix fun HttpMessage.shouldHaveBody(expected: Regex) = this should haveBody(expected)
 infix fun HttpMessage.shouldNotHaveBody(expected: Regex) = this shouldNot haveBody(expected)
@@ -77,9 +81,10 @@ fun <T> HttpMessage.shouldHaveBody(lens: BodyLens<T>, matcher: Matcher<T>) = thi
 fun <T> HttpMessage.shouldNotHaveBody(lens: BodyLens<T>, matcher: Matcher<T>) = this shouldNot haveBody(lens, matcher)
 fun <T : HttpMessage, B> haveBody(lens: BodyLens<B>, matcher: Matcher<B>): Matcher<T> = LensMatcher(httpMessageHas("Body", { m: T -> lens(m) }, matcher))
 
-fun <NODE> Json<NODE>.haveBody(expected: NODE): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, be(expected))
+fun <NODE> Json<NODE>.haveBody(expected: NODE): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compact(parse(m.bodyString())) }, be(compact(expected)))
 
-fun <NODE> Json<NODE>.haveBody(expected: Matcher<NODE>): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
+// Removed because of : https://github.com/kotest/kotest/issues/1727
+//fun <NODE> Json<NODE>.haveBody(expected: Matcher<NODE>): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
 
 fun <NODE> Json<NODE>.haveBody(expected: String): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compactify(m.bodyString()) }, be(compactify(expected)))
 

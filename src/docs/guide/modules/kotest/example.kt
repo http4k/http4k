@@ -1,5 +1,6 @@
 package guide.modules.kotest
 
+import io.kotest.matchers.and
 import io.kotest.matchers.be
 import io.kotest.matchers.should
 import io.kotest.matchers.string.startWith
@@ -42,5 +43,5 @@ fun main() {
     request shouldHaveBody "http4k is cool"
 
     // composite
-    request should (haveQuery("a", "b") and haveBody(be("http4k is cool")))
+    request should (haveQuery("a", "b") and haveBody("http4k is cool"))
 }
