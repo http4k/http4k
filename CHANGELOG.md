@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.262.0 (uncut)
+### v3.262.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.10
 - **http4k-*** : Take advantage of Kotlin Functional Interfaces, including for Filter. Breaking change to creation of Filters **from Java code only** as they can just be lambdas eg. `Filter filter = next -> req -> next.invoke(request.header("foo", "bar"));` 
 - **http4k-testing-kotest - Possible Break**: DUE TO KOTLIN 1.4.10. Remove a `haveBody` matcher which uses `Matcher<JsonNode>` directly, because of a bug in Kotest:
