@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.263.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-cloudnative** : Add support for loading config files and YAML files into Environments.
+
 ### v3.262.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.10
 - **http4k-*** : Take advantage of Kotlin Functional Interfaces, including for Filter. Breaking change to creation of Filters **from Java code only** as they can just be lambdas eg. `Filter filter = next -> req -> next.invoke(request.header("foo", "bar"));` 
