@@ -24,18 +24,12 @@ const val LAMBDA_REQUEST_KEY = "HTTP4K_LAMBDA_REQUEST"
  * to instantiate the Http4k handler which can be used for further invocations.
  */
 open class LambdaFunction(appLoader: AppLoaderWithContexts) {
-    constructor(input: AppLoader) : this(object : AppLoaderWithContexts {
-        override fun invoke(env: Map<String, String>, contexts: RequestContexts) = input(env)
-    })
+    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
 
-    constructor(input: HttpHandler) : this(object : AppLoader {
-        override fun invoke(env: Map<String, String>): HttpHandler = input
-    })
+    constructor(input: HttpHandler) : this(AppLoader { input })
 
     @Deprecated("This reflection based implementation will be removed in future version. Use class based extension approach instead.")
-    constructor(env: Map<String, String> = System.getenv()) : this(object : AppLoaderWithContexts {
-        override fun invoke(otherEnv: Map<String, String>, contexts: RequestContexts) = BootstrapAppLoader(env, contexts)
-    })
+    constructor(env: Map<String, String> = System.getenv()) : this(AppLoaderWithContexts { _, contexts -> BootstrapAppLoader(env, contexts) })
 
     private val contexts = RequestContexts()
     private val app = appLoader(System.getenv(), contexts)

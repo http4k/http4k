@@ -27,9 +27,7 @@ class OpenWhiskFunction(
         input: AppLoader,
         env: Map<String, String> = System.getenv(),
         detectBinaryBody: DetectBinaryBody = NonBinary
-    ) : this(object : AppLoaderWithContexts {
-        override fun invoke(env: Map<String, String>, contexts: RequestContexts) = input(env)
-    }, env, detectBinaryBody)
+    ) : this(AppLoaderWithContexts { env, _ -> input(env) }, env, detectBinaryBody)
 
     private val contexts = RequestContexts()
     private val app = appLoader(env, contexts)

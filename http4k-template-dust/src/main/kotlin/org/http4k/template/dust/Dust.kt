@@ -118,7 +118,7 @@ class Dust(
             "TEMPLATE_NOT_FOUND" to TEMPLATE_NOT_FOUND))
     }
 
-    private val pool = GenericObjectPool<SingleThreadedDust>(
+    private val pool = GenericObjectPool(
         object : BasePooledObjectFactory<SingleThreadedDust>() {
             override fun create(): SingleThreadedDust = SingleThreadedDust(
                 js = scriptEngineManager.getEngineByName("nashorn"),
