@@ -10,7 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.toUrlFormEncoded
 
-object LoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
+object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
     override fun invoke(req: ApplicationLoadBalancerRequestEvent) = (req.headers ?: emptyMap()).toList().fold(
         Request(Method.valueOf(req.httpMethod), req.uri())
             .body(req.body?.let(::MemoryBody) ?: Body.EMPTY)) { memo, (first, second) ->

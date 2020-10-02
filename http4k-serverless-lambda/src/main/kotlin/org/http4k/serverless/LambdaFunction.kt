@@ -30,7 +30,7 @@ open class LambdaFunction(appLoader: AppLoaderWithContexts) {
 
     fun handle(request: APIGatewayProxyRequestEvent, lambdaContext: Context? = null) = handle(ApiGatewayV1AwsHttpAdapter, lambdaContext, request)
     fun handle(request: APIGatewayV2HTTPEvent, lambdaContext: Context? = null) = handle(ApiGatewayV2AwsHttpAdapter, lambdaContext, request)
-    fun handle(request: ApplicationLoadBalancerRequestEvent, lambdaContext: Context? = null) = handle(LoadBalancerAwsHttpAdapter, lambdaContext, request)
+    fun handle(request: ApplicationLoadBalancerRequestEvent, lambdaContext: Context? = null) = handle(ApplicationLoadBalancerAwsHttpAdapter, lambdaContext, request)
 
     private fun <Req : Any, Resp> handle(awsHttpAdapter: AwsHttpAdapter<Req, Resp>, lambdaContext: Context?, request: Req): Resp =
         awsHttpAdapter(InitialiseRequestContext(contexts).then(AddLambdaContextAndRequest(lambdaContext, request, contexts)).then(app)(awsHttpAdapter(request)))
