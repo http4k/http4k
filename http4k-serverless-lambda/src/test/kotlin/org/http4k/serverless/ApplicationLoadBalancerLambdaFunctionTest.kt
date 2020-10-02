@@ -2,8 +2,8 @@
 
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
+import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
+import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
@@ -18,17 +18,14 @@ class ApplicationLoadBalancerLambdaFunctionTest {
     fun `adapts API Gateway request and response and receives context`() {
         val lambdaContext = LambdaContextMock()
 
-        val request = APIGatewayV2HTTPEvent.builder()
-            .withRawPath("/path")
-            .withQueryStringParameters(mapOf("query" to "value"))
-            .withBody("input body")
-            .withHeaders(mapOf("c" to "d"))
-            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-                .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
-                ).build()
-            )
-            .build()
+        val request = ApplicationLoadBalancerRequestEvent().apply {
+            httpMethod = "GET"
+            body = "input body"
+            headers = mapOf("c" to "d")
+            path = "/path"
+            queryStringParameters = mapOf("query" to "value")
+            requestContext = ApplicationLoadBalancerRequestEvent.RequestContext()
+        }
 
         val lambda = object : LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
@@ -36,23 +33,20 @@ class ApplicationLoadBalancerLambdaFunctionTest {
                 assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
                 assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
-                    .query("query", "value")
                     .header("c", "d")
                     .body("input body")
-                ))
+                    .query("query", "value")))
                 Response(Status.OK).header("a", "b").body("hello there")
             }
         }) {}
 
         assertThat(lambda.handle(request, lambdaContext),
             equalTo(
-                APIGatewayV2HTTPResponse.builder()
-                    .withStatusCode(200)
-                    .withBody("hello there")
-                    .withMultiValueHeaders(mapOf("a" to listOf("b")))
-                    .build()
-            )
+                ApplicationLoadBalancerResponseEvent().apply {
+                    statusCode = 200
+                    body = "hello there"
+                    headers = mapOf("a" to "b")
+                })
         )
     }
-
 }
