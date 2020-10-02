@@ -19,7 +19,7 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<APIGatewayV2HTTPEvent, APIGat
 
     override fun invoke(req: Response) = APIGatewayV2HTTPResponse().also {
         it.statusCode = req.status.code
-        it.headers = req.headers.toMap()
+        it.multiValueHeaders = req.headers.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap()
         it.body = req.bodyString()
     }
 
