@@ -33,18 +33,16 @@ class ApiGatewayV1AwsHttpAdapterTest {
 
     @Test
     fun `converts from http4k response`() {
-        val response = APIGatewayProxyResponseEvent().apply {
-            statusCode = 418
-            body = "output body"
-            headers = mapOf("c" to "d")
-        }
-
         assertThat(
             ApiGatewayV1AwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
                 .header("c", "d")
                 .body("output body")
             ),
-            equalTo(response)
+            equalTo(APIGatewayProxyResponseEvent().apply {
+                statusCode = 418
+                body = "output body"
+                headers = mapOf("c" to "d")
+            })
         )
     }
 }
