@@ -2,88 +2,57 @@
 
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.serverless.BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 
 class ApplicationLoadBalancerLambdaFunctionTest {
 
     @Test
-    fun `loads app from the environment and adapts API Gateway request and response`() {
-        val request = ApplicationLoadBalancerRequestEvent()
-        request.httpMethod = "GET"
-        request.body = "input body"
-        request.headers = mapOf("c" to "d")
-        request.path = "/path"
-        request.queryStringParameters = mapOf("query" to "value")
+    fun `adapts API Gateway request and response and receives context`() {
+        val lambdaContext = LambdaContextMock()
 
-        val env = mapOf(
-            HTTP4K_BOOTSTRAP_CLASS to TestApp::class.java.name,
-            "a" to "b")
+        val request = APIGatewayV2HTTPEvent.builder()
+            .withRawPath("/path")
+            .withQueryStringParameters(mapOf("query" to "value"))
+            .withBody("input body")
+            .withHeaders(mapOf("c" to "d"))
+            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
+                .withHttp(
+                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
+                ).build()
+            )
+            .build()
 
-        val l = object : LambdaFunction(AppLoaderWithContexts { _, contexts ->
-            LamdbdaTestAppWithContext<ApplicationLoadBalancerRequestEvent>(env, contexts) { it.requestContext.elb.targetGroupArn }
+        val lambda = object : LambdaFunction(AppLoaderWithContexts { env, contexts ->
+            {
+                assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
+                assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
+                assertThat(env, equalTo(System.getenv()))
+                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
+                    .query("query", "value")
+                    .header("c", "d")
+                    .body("input body")
+                ))
+                Response(Status.OK).header("a", "b").body("hello there")
+            }
         }) {}
-        val response = l.handle(request, LambdaContextMock())
 
-        assertThat(response.statusCode, equalTo(201))
-        assertThat(response.headers, equalTo(env))
-        assertThat(response.body, equalTo(Request(GET, "/path")
-            .header("c", "d")
-            .body("input body")
-            .query("query", "value").toString()))
+        assertThat(lambda.handle(request, lambdaContext),
+            equalTo(
+                APIGatewayV2HTTPResponse.builder()
+                    .withStatusCode(200)
+                    .withBody("hello there")
+                    .withMultiValueHeaders(mapOf("a" to listOf("b")))
+                    .build()
+            )
+        )
     }
 
-    @Test
-    fun `loads function from the environment and adapts API Gateway request and response`() {
-        val env = mapOf("a" to "b")
-
-        class MyFunction : LambdaFunction(TestApp(env))
-
-        val request = ApplicationLoadBalancerRequestEvent()
-        request.httpMethod = "GET"
-        request.body = "input body"
-        request.headers = mapOf("c" to "d")
-        request.path = "/path"
-        request.queryStringParameters = mapOf("query" to "value")
-
-        val response = MyFunction().handle(request, LambdaContextMock())
-
-        assertThat(response.statusCode, equalTo(201))
-        assertThat(response.headers, equalTo(env))
-        assertThat(response.body, equalTo(Request(GET, "/path")
-            .header("c", "d")
-            .body("input body")
-            .query("query", "value").toString()))
-    }
-
-    @Test
-    fun `loads app from the environment and adapts API Gateway request and response, as well as include the lambda context in the request context`() {
-        val request = ApplicationLoadBalancerRequestEvent()
-        request.httpMethod = "GET"
-        request.body = "input body"
-        request.headers = mapOf("c" to "d")
-        request.path = "/path"
-        request.queryStringParameters = mapOf("query" to "value")
-        request.requestContext = ApplicationLoadBalancerRequestEvent.RequestContext()
-
-        val env = mapOf(
-            HTTP4K_BOOTSTRAP_CLASS to TestAppWithContexts::class.java.name,
-            "a" to "b")
-        val l = object : LambdaFunction(AppLoaderWithContexts { _, contexts -> LamdbdaTestAppWithContext<ApplicationLoadBalancerRequestEvent>(env, contexts) { it.requestContext.elb.targetGroupArn } }) {}
-        val response = l.handle(request, LambdaContextMock(functionName = "TestFunction1"))
-
-        assertThat(response.statusCode, equalTo(201))
-        assertThat(response.headers, equalTo(env))
-        assertThat(response.body, equalTo(Request(GET, "/path")
-            .header("c", "d")
-            .header("LAMBDA_CONTEXT_FUNCTION_NAME", "TestFunction1")
-            .header("LAMBDA_REQUEST_VALUE", "123456789012")
-            .body("input body")
-            .query("query", "value").toString()))
-    }
 }
