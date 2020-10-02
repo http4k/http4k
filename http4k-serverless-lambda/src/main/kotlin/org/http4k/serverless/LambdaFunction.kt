@@ -2,18 +2,12 @@ package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import org.http4k.core.Body
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
+import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.MemoryBody
-import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.core.RequestContexts
-import org.http4k.core.Response
-import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.core.toUrlFormEncoded
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 
 const val LAMBDA_CONTEXT_KEY = "HTTP4K_LAMBDA_CONTEXT"
@@ -34,28 +28,13 @@ open class LambdaFunction(appLoader: AppLoaderWithContexts) {
     private val contexts = RequestContexts()
     private val app = appLoader(System.getenv(), contexts)
 
-    fun handle(request: APIGatewayProxyRequestEvent, lambdaContext: Context? = null) =
-        InitialiseRequestContext(contexts)
-            .then(AddLambdaContextAndRequest(lambdaContext, request, contexts))
-            .then(app)(request.asHttp4k())
-            .asApiGateway()
+    fun handle(request: APIGatewayProxyRequestEvent, lambdaContext: Context? = null) = handle(ApiGatewayV1AwsHttpAdapter, lambdaContext, request)
+    fun handle(request: APIGatewayV2HTTPEvent, lambdaContext: Context? = null) = handle(ApiGatewayV2AwsHttpAdapter, lambdaContext, request)
+    fun handle(request: ApplicationLoadBalancerRequestEvent, lambdaContext: Context? = null) = handle(LoadBalancerAwsHttpAdapter, lambdaContext, request)
+
+    private fun <Req : Any, Resp> handle(awsHttpAdapter: AwsHttpAdapter<Req, Resp>, lambdaContext: Context?, request: Req): Resp =
+        awsHttpAdapter(InitialiseRequestContext(contexts).then(AddLambdaContextAndRequest(lambdaContext, request, contexts)).then(app)(awsHttpAdapter(request)))
 }
-
-internal fun Response.asApiGateway() = APIGatewayProxyResponseEvent().also {
-    it.statusCode = status.code
-    it.headers = headers.toMap()
-    it.body = bodyString()
-}
-
-internal fun APIGatewayProxyRequestEvent.asHttp4k() = (headers ?: emptyMap()).toList().fold(
-    Request(Method.valueOf(httpMethod), uri())
-        .body(body?.let(::MemoryBody) ?: Body.EMPTY)) { memo, (first, second) ->
-    memo.header(first, second)
-}
-
-internal fun APIGatewayProxyRequestEvent.uri() = Uri.of(path ?: "").query((queryStringParameters
-    ?: emptyMap()).toList().toUrlFormEncoded())
-
 
 internal fun AddLambdaContextAndRequest(lambdaContext: Context?, request: Any, contexts: RequestContexts) = Filter { next ->
     {
