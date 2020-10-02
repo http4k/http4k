@@ -7,19 +7,17 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.CREATED
 
 class TestAppWithContexts<Req>(private val getAccountId: (Req) -> String) : AppLoaderWithContexts {
-    override fun invoke(env: Map<String, String>, contexts: RequestContexts): HttpHandler = LamdbdaTestAppWithContext(env, contexts, getAccountId)
-}
+    override fun invoke(env: Map<String, String>, contexts: RequestContexts): HttpHandler = { request ->
+        val lambdaContext: Context? = contexts[request][LAMBDA_CONTEXT_KEY]
+        val lambdaRequest: Req = contexts[request][LAMBDA_REQUEST_KEY]!!
 
-fun <Req> LamdbdaTestAppWithContext(env: Map<String, String>, contexts: RequestContexts, getAccountId: (Req) -> String): HttpHandler = { request ->
-    val lambdaContext: Context? = contexts[request][LAMBDA_CONTEXT_KEY]
-    val lambdaRequest: Req = contexts[request][LAMBDA_REQUEST_KEY]!!
-
-    env.toList().fold(Response(CREATED)) { memo, (key, value) ->
-        memo.header(key, value)
-    }.body(
-        request
-            .header("LAMBDA_CONTEXT_FUNCTION_NAME", lambdaContext?.functionName)
-            .header("LAMBDA_REQUEST_VALUE", getAccountId(lambdaRequest))
-            .removeHeader("x-http4k-context").toString()
-    )
+        env.toList().fold(Response(CREATED)) { memo, (key, value) ->
+            memo.header(key, value)
+        }.body(
+            request
+                .header("LAMBDA_CONTEXT_FUNCTION_NAME", lambdaContext?.functionName)
+                .header("LAMBDA_REQUEST_VALUE", getAccountId(lambdaRequest))
+                .removeHeader("x-http4k-context").toString()
+        )
+    }
 }
