@@ -56,7 +56,8 @@ internal fun APIGatewayProxyRequestEvent.asHttp4k() = (headers ?: emptyMap()).to
 internal fun APIGatewayProxyRequestEvent.uri() = Uri.of(path ?: "").query((queryStringParameters
     ?: emptyMap()).toList().toUrlFormEncoded())
 
-internal fun AddLambdaContextAndRequest(lambdaContext: Context?, request: APIGatewayProxyRequestEvent, contexts: RequestContexts) = Filter { next ->
+
+internal fun AddLambdaContextAndRequest(lambdaContext: Context?, request: Any, contexts: RequestContexts) = Filter { next ->
     {
         lambdaContext?.apply { contexts[it][LAMBDA_CONTEXT_KEY] = lambdaContext }
         contexts[it][LAMBDA_REQUEST_KEY] = request
