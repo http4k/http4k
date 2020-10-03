@@ -28,7 +28,7 @@ class ApiGatewayV2LambdaFunctionTest {
             )
             .build()
 
-        val lambda = object : LambdaFunction(AppLoaderWithContexts { env, contexts ->
+        val lambda = object : ApiGatewayV2LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
                 assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))

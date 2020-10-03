@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
@@ -27,7 +25,7 @@ class ApplicationLoadBalancerLambdaFunctionTest {
             requestContext = ApplicationLoadBalancerRequestEvent.RequestContext()
         }
 
-        val lambda = object : LambdaFunction(AppLoaderWithContexts { env, contexts ->
+        val lambda = object : ApplicationLoadBalancerLambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
                 assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
