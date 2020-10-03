@@ -125,17 +125,17 @@ object Libs {
             "org.eclipse.jetty:jetty-alpn-conscrypt-server:" + Versions.org_eclipse_jetty
 
     /**
-     * http://www.eclipse.org/jetty
+     * https://eclipse.org/jetty
      */
     const val jetty_client: String = "org.eclipse.jetty:jetty-client:" + Versions.org_eclipse_jetty
 
     /**
-     * http://www.eclipse.org/jetty
+     * https://eclipse.org/jetty
      */
     const val jetty_server: String = "org.eclipse.jetty:jetty-server:" + Versions.org_eclipse_jetty
 
     /**
-     * http://www.eclipse.org/jetty
+     * https://eclipse.org/jetty
      */
     const val jetty_servlet: String = "org.eclipse.jetty:jetty-servlet:" +
             Versions.org_eclipse_jetty
@@ -189,7 +189,7 @@ object Libs {
             Versions.openapi_generator_gradle_plugin
 
     /**
-     * http://www.eclipse.org/jetty
+     * https://eclipse.org/jetty
      */
     const val javax_websocket_server_impl: String =
             "org.eclipse.jetty.websocket:javax-websocket-server-impl:" +

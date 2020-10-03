@@ -13,17 +13,17 @@ import org.gradle.plugin.use.PluginDependencySpec
 object Versions {
     const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.0-RC2"
 
-    const val com_fasterxml_jackson_dataformat: String = "2.11.2"
+    const val com_fasterxml_jackson_dataformat: String = "2.11.3"
 
     const val io_github_resilience4j: String = "1.5.0"
 
-    const val software_amazon_awssdk: String = "2.14.28"
+    const val software_amazon_awssdk: String = "2.15.2"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
     const val com_squareup_moshi: String = "1.10.0"
 
-    const val org_eclipse_jetty: String = "9.4.31.v20200723"
+    const val org_eclipse_jetty: String = "9.4.32.v20200930"
 
     const val org_junit_jupiter: String = "5.7.0"
 
@@ -39,7 +39,7 @@ object Versions {
 
     const val openapi_generator_gradle_plugin: String = "4.3.1"
 
-    const val javax_websocket_server_impl: String = "9.4.31.v20200723"
+    const val javax_websocket_server_impl: String = "9.4.32.v20200930"
 
     const val kotest_assertions_core_jvm: String = "4.2.5"
 
@@ -49,7 +49,7 @@ object Versions {
 
     const val aws_lambda_java_events: String = "3.3.1"
 
-    const val jackson_module_kotlin: String = "2.11.2"
+    const val jackson_module_kotlin: String = "2.11.3"
 
     const val aws_lambda_java_core: String = "1.2.1"
 
@@ -59,7 +59,7 @@ object Versions {
 
     const val netty_codec_http2: String = "4.1.52.Final"
 
-    const val jackson_databind: String = "2.11.2"
+    const val jackson_databind: String = "2.11.3"
 
     const val httpasyncclient: String = "4.1.4"
 
@@ -69,7 +69,7 @@ object Versions {
 
     const val commons_pool2: String = "2.9.0"
 
-    const val http2_server: String = "9.4.31.v20200723"
+    const val http2_server: String = "9.4.32.v20200930"
 
     const val ratpack_core: String = "1.8.0"
 
@@ -83,7 +83,7 @@ object Versions {
 
     const val httpclient: String = "4.5.12"
 
-    const val underscore: String = "1.58"
+    const val underscore: String = "1.59"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
