@@ -33,7 +33,7 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.2"
+    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1" // available: "2.10.2"
 
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
 
@@ -52,6 +52,8 @@ object Versions {
     const val jackson_module_kotlin: String = "2.11.3"
 
     const val aws_lambda_java_core: String = "1.2.1"
+
+    const val aws_java_sdk_bundle: String = "1.11.875"
 
     const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.10"
 
@@ -91,7 +93,7 @@ object Versions {
 
     const val httpcore5: String = "5.0.2"
 
-    const val joda_time: String = "2.10.6"
+    const val joda_time: String = "2.6" // available: "2.10.6"
 
     const val slf4j_nop: String = "1.7.30"
 

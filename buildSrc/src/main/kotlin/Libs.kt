@@ -228,6 +228,12 @@ object Libs {
     const val aws_lambda_java_core: String = "com.amazonaws:aws-lambda-java-core:" +
             Versions.aws_lambda_java_core
 
+    /**
+     * https://aws.amazon.com/sdkforjava
+     */
+    const val aws_java_sdk_bundle: String = "com.amazonaws:aws-java-sdk-bundle:" +
+            Versions.aws_java_sdk_bundle
+
     const val dokka_gradle_plugin: String = "org.jetbrains.dokka:dokka-gradle-plugin:" +
             Versions.dokka_gradle_plugin
 
