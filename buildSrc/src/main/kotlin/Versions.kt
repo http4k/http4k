@@ -93,7 +93,7 @@ object Versions {
 
     const val httpcore5: String = "5.0.2"
 
-    const val joda_time: String = "2.6" // available: "2.10.6"
+    const val joda_time: String = "2.10.6"
 
     const val slf4j_nop: String = "1.7.30"
 
