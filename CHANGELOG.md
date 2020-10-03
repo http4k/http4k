@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.264.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-serverless-lambda** : Support for ApiGateway V1 & v2 and AppLoadBalancer requests. Just extend the correct class. Converted functions to use the official AWS `RequestHandler` interfaces (which means that you can refer to just the name of the class when deploying lambda instead of `handle()`)
 
 ### v3.263.0
 - **http4k-*** : Upgrade some dependency versions.
