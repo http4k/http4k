@@ -3,7 +3,21 @@ package org.http4k.serverless
 import org.http4k.core.HttpHandler
 import org.http4k.core.RequestContexts
 
-@Deprecated("Extend LambdaFunction instead of this reflection-based approach.")
+/**
+ * This is the main entry point for lambda invocations using the V1 payload format.
+ * It uses the local environment to instantiate the HttpHandler which can be used
+ * for further invocations.
+ */
+@Deprecated("Extend one of the specific AwsLambdaFunction subclasses instead.")
+open class LambdaFunction(appLoader: AppLoaderWithContexts) : ApiGatewayV1LambdaFunction(appLoader) {
+    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+    constructor(input: HttpHandler) : this(AppLoader { input })
+
+    @Deprecated("This reflection based implementation will be removed in future version. Use class based extension approach instead.")
+    constructor(env: Map<String, String> = System.getenv()) : this(AppLoaderWithContexts { _, contexts -> BootstrapAppLoader(env, contexts) })
+}
+
+@Deprecated("Extend one of the AwsLambdaFunction subclasses instead of this reflection-based approach.")
 object BootstrapAppLoader : AppLoaderWithContexts {
     const val HTTP4K_BOOTSTRAP_CLASS = "HTTP4K_BOOTSTRAP_CLASS"
 
