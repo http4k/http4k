@@ -4,20 +4,24 @@ import org.http4k.aws.AwsCredentialScope
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
-import org.http4k.core.Method.POST
-import org.http4k.core.Request
 import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.serverless.lambda.client.ApiName
 import org.http4k.serverless.lambda.client.AwsApiGatewayApiClient
 import org.http4k.serverless.lambda.client.Config
-import org.http4k.serverless.lambda.client.Route
 import org.http4k.serverless.lambda.client.Stage
 
 class DeployApiGateway {
+    private val config = Environment.ENV overrides Environment.fromResource("/local.properties")
+    private val region = Config.region(config)
+
+    private val client = DebuggingFilters.PrintRequestAndResponse()
+        .then(AwsApiGatewayApiClient.ApiGatewayApi(region)) //TODO delete once all calls are moved into client
+        .then(ClientFilters.AwsAuth(scope(config), Config.credentials(config)))
+        .then(JavaHttpClient())
+
     fun deploy() {
         val apiGateway = AwsApiGatewayApiClient(client, region)
 
@@ -31,28 +35,17 @@ class DeployApiGateway {
             apiGateway.delete(it.apiId)
         }
 
-        println(apiGateway.listApis())
-
         val api = apiGateway.createApi(apiName)
         apiGateway.createStage(api.apiId, Stage.default)
 
-        val integrationInfo = apiGateway.createLambdaIntegration(api.apiId, functionArn)
-        println(integrationInfo)
+        val integrationId = apiGateway.createLambdaIntegration(api.apiId, functionArn)
 
-        client(Request(POST, "/v2/apis/${api.apiId.value}/routes").with(Route.lens of Route("integrations/${integrationInfo.value}")))
+        apiGateway.createDefaultRoute(api.apiId, integrationId)
 
         //TODO add a call (with retries + timeout) to the deployed api
         // println(JavaHttpClient()(Request(Method.GET, api.apiEndpoint.path("/empty"))))
         println("Created API: $api")
     }
-
-    private val config = Environment.ENV overrides Environment.fromResource("/local.properties")
-    private val region = Config.region(config)
-
-    private val client = DebuggingFilters.PrintRequestAndResponse()
-        .then(AwsApiGatewayApiClient.ApiGatewayApi(region)) //TODO delete once all calls are moved into client
-        .then(ClientFilters.AwsAuth(scope(config), Config.credentials(config)))
-        .then(JavaHttpClient())
 
     companion object {
         val scope = EnvironmentKey.map { AwsCredentialScope(it, "apigateway") }.required("region")

@@ -36,6 +36,10 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
         integrationInfo(client(Request(Method.POST, "/v2/apis/${apiId.value}/integrations")
             .with(createIntegrationLens of Integration(integrationUri = functionArn)))).integrationId
 
+    fun createDefaultRoute(apiId: ApiId, integrationId: IntegrationId) =
+        client(Request(Method.POST, "/v2/apis/${apiId.value}/routes")
+            .with(createRouteLens of Route("integrations/${integrationId.value}")))
+
     companion object {
         private val createApiLens = Body.auto<Api>().toLens()
         private val apiDetailsLens = Body.auto<ApiDetails>().toLens()
@@ -43,11 +47,13 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
         private val createStageLens = Body.auto<Stage>().toLens()
         private val createIntegrationLens = Body.auto<Integration>().toLens()
         private val integrationInfo = Body.auto<IntegrationInfo>().toLens()
+        private val createRouteLens = Body.auto<Route>().toLens()
     }
 
     private data class Api(val name: String, val protocolType: String = "HTTP")
     private data class IntegrationInfo(val integrationId: IntegrationId)
     private data class ListApiResponse(val items: List<ApiDetails>)
+    private data class Route(val target: String, val routeKey: String = "\$default")
 
     object ApiGatewayApi {
         operator fun invoke(region: Region): Filter = Filter { next ->
@@ -79,11 +85,6 @@ data class Integration(
 
 data class IntegrationId(val value: String)
 
-data class Route(val target: String, val routeKey: String = "\$default") {
-    companion object {
-        val lens = Body.auto<Route>().toLens()
-    }
-}
 
 object ApiGatewayJackson : ConfigurableJackson(KotlinModule()
     .asConfigurable()
