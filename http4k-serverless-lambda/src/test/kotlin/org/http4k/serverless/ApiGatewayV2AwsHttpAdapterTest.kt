@@ -5,11 +5,14 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
+import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.Test
+import java.nio.ByteBuffer
+import java.util.Base64
 
 class ApiGatewayV2AwsHttpAdapterTest {
 
@@ -32,6 +35,27 @@ class ApiGatewayV2AwsHttpAdapterTest {
                 .query("query", "value")
                 .header("c", "d")
                 .body("input body")
+            ))
+    }
+
+    @Test
+    fun `handles binary data`() {
+        val imageBytes = this::class.java.getResourceAsStream("/test.png").readBytes()
+
+        val request = APIGatewayV2HTTPEvent.builder()
+            .withRawPath("/")
+            .withBody(String(Base64.getEncoder().encode(imageBytes)))
+            .withIsBase64Encoded(true)
+            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
+                .withHttp(
+                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
+                ).build())
+            .build()
+
+        assertThat(
+            ApiGatewayV2AwsHttpAdapter(request),
+            equalTo(Request(GET, "/")
+                .body(Body(ByteBuffer.wrap(imageBytes)))
             ))
     }
 
