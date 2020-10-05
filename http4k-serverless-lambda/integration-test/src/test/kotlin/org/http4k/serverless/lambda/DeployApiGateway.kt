@@ -4,111 +4,91 @@ import org.http4k.aws.AwsCredentialScope
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
-import org.http4k.core.Body
+import org.http4k.cloudnative.env.Timeout
 import org.http4k.core.Filter
-import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
-import org.http4k.core.Method.POST
+import org.http4k.core.NoOp
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
-import org.http4k.format.Jackson.auto
+import org.http4k.serverless.lambda.client.ApiName
+import org.http4k.serverless.lambda.client.AwsApiGatewayApiClient
 import org.http4k.serverless.lambda.client.Config
-import org.http4k.serverless.lambda.client.Region
+import org.http4k.serverless.lambda.client.Stage
+import org.junit.jupiter.api.fail
+import java.lang.management.ManagementFactory
+import java.time.Duration
+import java.time.Instant
 
 class DeployApiGateway {
-    fun deploy() {
-
-        val functionArn = "arn:aws:lambda:us-east-1:145304051762:function:test-function"
-
-        val apis = ListApiResponse.lens(client(Request(GET, "/v2/apis")))
-        println(apis)
-        apis.items.filter { it.name == "http4k-test-function" }.forEach {
-            println("Deleting ${it.apiId}")
-            client(Request(DELETE, "/v2/apis/${it.apiId}"))
-        }
-
-        ListApiResponse.lens(client(Request(GET, "/v2/apis")))
-        val api = ApiInfo.lens(client(Request(POST, "/v2/apis").with(Api.lens of Api("http4k-test-function"))))
-        println(api)
-        client(Request(POST, "/v2/apis/${api.apiId}/stages").with(Stage.lens of Stage("\$default")))
-
-        val integrationInfo = IntegrationInfo.lens(client(Request(POST, "/v2/apis/${api.apiId}/integrations").with(Integration.lens of Integration(integrationUri = functionArn))))
-        println(integrationInfo)
-
-        client(Request(POST, "/v2/apis/${api.apiId}/routes").with(Route.lens of Route("integrations/${integrationInfo.integrationId}")))
-    }
-
     private val config = Environment.ENV overrides Environment.fromResource("/local.properties")
     private val region = Config.region(config)
 
-    private val client = DebuggingFilters.PrintRequestAndResponse()
-        .then(ApiGatewayApi(region))
-        .then(ClientFilters.AwsAuth(scope(config), Config.credentials(config)))
-        .then(JavaHttpClient())
+    private val client =
+        inIntelliJOnly(DebuggingFilters.PrintRequestAndResponse())
+            .then(AwsApiGatewayApiClient.ApiGatewayApi(region)) //TODO delete once all calls are moved into client
+            .then(ClientFilters.AwsAuth(scope(config), Config.credentials(config)))
+            .then(JavaHttpClient())
+
+    fun deploy() {
+        val apiGateway = AwsApiGatewayApiClient(client, region)
+
+        val functionArn = "arn:aws:lambda:us-east-1:145304051762:function:test-function"
+        val apiName = ApiName("http4k-test-function")
+
+        val apis = apiGateway.listApis()
+
+        apis.filter { it.name == apiName }.forEach {
+            println("Deleting ${it.apiId.value}")
+            apiGateway.delete(it.apiId)
+        }
+
+        val api = apiGateway.createApi(apiName)
+        apiGateway.createStage(api.apiId, Stage.default)
+
+        val integrationId = apiGateway.createLambdaIntegration(api.apiId, functionArn)
+
+        apiGateway.createDefaultRoute(api.apiId, integrationId)
+
+        waitUntil(OK) {
+            JavaHttpClient()(Request(GET, api.apiEndpoint.path("/empty"))).also { println(it.status) }
+        }
+    }
 
     companion object {
         val scope = EnvironmentKey.map { AwsCredentialScope(it, "apigateway") }.required("region")
-    }
-
-}
-
-data class Api(val name: String, val protocolType: String = "HTTP") {
-    companion object {
-        val lens = Body.auto<Api>().toLens()
-    }
-}
-
-data class Stage(val stageName: String, val autoDeploy: Boolean = true) {
-    companion object {
-        val lens = Body.auto<Stage>().toLens()
-    }
-}
-
-data class ApiInfo(val name: String, val apiId: String, val apiEndpoint: String) {
-    companion object {
-        val lens = Body.auto<ApiInfo>().toLens()
-    }
-}
-
-data class ListApiResponse(val items: List<ApiInfo>) {
-    companion object {
-        val lens = Body.auto<ListApiResponse>().toLens()
-    }
-}
-
-data class Integration(
-    val integrationType: String = "AWS_PROXY",
-    val integrationUri: String,
-    val timeoutInMillis: Long = 30000,
-    val payloadFormatVersion: String = "1.0"
-) {
-    companion object {
-        val lens = Body.auto<Integration>().toLens()
-    }
-}
-
-data class IntegrationInfo(val integrationId: String) {
-    companion object {
-        val lens = Body.auto<IntegrationInfo>().toLens()
-    }
-}
-
-data class Route(val target: String, val routeKey: String = "\$default") {
-    companion object {
-        val lens = Body.auto<Route>().toLens()
-    }
-}
-
-object ApiGatewayApi {
-    operator fun invoke(region: Region): Filter = Filter { next ->
-        { request -> next(request.uri(request.uri.host("apigateway.${region.name}.amazonaws.com").scheme("https"))) }
     }
 }
 
 fun main() {
     DeployApiGateway().deploy()
 }
+
+fun waitUntil(
+    status: Status,
+    timeout: Timeout = Timeout(Duration.ofSeconds(5)),
+    retryEvery: Duration = Duration.ofMillis(500),
+    action: () -> Response
+) {
+    val start = Instant.now()
+    var success: Boolean
+    do {
+        success = action().status == status
+        if (!success) {
+            if (Duration.ofMillis(Instant.now().toEpochMilli() - start.toEpochMilli()) > timeout.value) {
+                fail("Timed out after ${timeout.value}")
+            }
+            Thread.sleep(retryEvery.toMillis())
+        }
+    } while (!success)
+}
+
+private fun inIntelliJOnly(filter: Filter) =
+    if (ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea", true) } != null)
+        filter
+    else Filter.NoOp
