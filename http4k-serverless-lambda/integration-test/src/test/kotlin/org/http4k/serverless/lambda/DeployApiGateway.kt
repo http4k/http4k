@@ -5,7 +5,9 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.cloudnative.env.Timeout
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -13,7 +15,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
 import org.http4k.serverless.lambda.client.ApiName
 import org.http4k.serverless.lambda.client.AwsApiGatewayApiClient
 import org.http4k.serverless.lambda.client.Config
@@ -26,10 +27,12 @@ class DeployApiGateway {
     private val config = Environment.ENV overrides Environment.fromResource("/local.properties")
     private val region = Config.region(config)
 
-    private val client = DebuggingFilters.PrintRequestAndResponse()
-        .then(AwsApiGatewayApiClient.ApiGatewayApi(region)) //TODO delete once all calls are moved into client
-        .then(ClientFilters.AwsAuth(scope(config), Config.credentials(config)))
-        .then(JavaHttpClient())
+    private val client =
+        Filter.NoOp
+//            .then(DebuggingFilters.PrintRequestAndResponse())
+            .then(AwsApiGatewayApiClient.ApiGatewayApi(region)) //TODO delete once all calls are moved into client
+            .then(ClientFilters.AwsAuth(scope(config), Config.credentials(config)))
+            .then(JavaHttpClient())
 
     fun deploy() {
         val apiGateway = AwsApiGatewayApiClient(client, region)
@@ -52,7 +55,7 @@ class DeployApiGateway {
         apiGateway.createDefaultRoute(api.apiId, integrationId)
 
         waitUntil(OK) {
-            JavaHttpClient()(Request(GET, api.apiEndpoint.path("/empty"))).also { println(it) }
+            JavaHttpClient()(Request(GET, api.apiEndpoint.path("/empty"))).also { println(it.status) }
         }
     }
 
