@@ -17,6 +17,10 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
 
     fun listApis(): List<ApiDetails> = listApiLens(client(Request(Method.GET, "/v2/apis"))).items
 
+    fun delete(apiId: String) {
+        client(Request(Method.DELETE, "/v2/apis/$apiId"))
+    }
+
     companion object {
         private val createApiLens = Body.auto<Api>().toLens()
         private val listApiLens = Body.auto<ListApiResponse>().toLens()

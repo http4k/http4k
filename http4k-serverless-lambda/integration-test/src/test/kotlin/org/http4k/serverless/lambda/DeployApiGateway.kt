@@ -4,7 +4,6 @@ import org.http4k.aws.AwsCredentialScope
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
-import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
@@ -30,7 +29,7 @@ class DeployApiGateway {
         println(apis)
         apis.filter { it.name == "http4k-test-function" }.forEach {
             println("Deleting ${it.apiId}")
-            client(Request(DELETE, "/v2/apis/${it.apiId}"))
+            apiGateway.delete(it.apiId)
         }
 
         println(apiGateway.listApis())
