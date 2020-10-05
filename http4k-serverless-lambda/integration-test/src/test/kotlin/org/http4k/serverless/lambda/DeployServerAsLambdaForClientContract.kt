@@ -52,7 +52,9 @@ object DeployServerAsLambdaForClientContract {
         )
 
         println("Deploying function...")
-        deployment.create(functionPackage)
+        val details = deployment.create(functionPackage)
+
+        println("Created function with arn ${details.arn}")
 
         assertThat(deployment.list().find { it.name == functionName.value }, present())
 

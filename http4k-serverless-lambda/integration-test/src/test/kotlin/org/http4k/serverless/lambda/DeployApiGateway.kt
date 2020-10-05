@@ -21,16 +21,25 @@ import org.http4k.serverless.lambda.client.Region
 
 class DeployApiGateway {
     fun deploy() {
+
+        val functionArn = "arn:aws:lambda:us-east-1:145304051762:function:test-function"
+
         val apis = ListApiResponse.lens(client(Request(GET, "/v2/apis")))
         println(apis)
-        apis.items.filter { it.name == "http4k-test-function"}.forEach {
+        apis.items.filter { it.name == "http4k-test-function" }.forEach {
             println("Deleting ${it.apiId}")
             client(Request(DELETE, "/v2/apis/${it.apiId}"))
         }
-        println(ListApiResponse.lens(client(Request(GET, "/v2/apis"))))
+
+        ListApiResponse.lens(client(Request(GET, "/v2/apis")))
         val api = ApiInfo.lens(client(Request(POST, "/v2/apis").with(Api.lens of Api("http4k-test-function"))))
         println(api)
-        println(client(Request(POST, "/v2/apis/${api.apiId}/stages").with(Stage.lens of Stage("\$default"))))
+        client(Request(POST, "/v2/apis/${api.apiId}/stages").with(Stage.lens of Stage("\$default")))
+
+        val integrationInfo = IntegrationInfo.lens(client(Request(POST, "/v2/apis/${api.apiId}/integrations").with(Integration.lens of Integration(integrationUri = functionArn))))
+        println(integrationInfo)
+
+        client(Request(POST, "/v2/apis/${api.apiId}/routes").with(Route.lens of Route("integrations/${integrationInfo.integrationId}")))
     }
 
     private val config = Environment.ENV overrides Environment.fromResource("/local.properties")
@@ -53,13 +62,13 @@ data class Api(val name: String, val protocolType: String = "HTTP") {
     }
 }
 
-data class Stage(val stageName:String, val autoDeploy:Boolean = true){
+data class Stage(val stageName: String, val autoDeploy: Boolean = true) {
     companion object {
         val lens = Body.auto<Stage>().toLens()
     }
 }
 
-data class ApiInfo(val name: String, val apiId: String, val apiEndpoint: String){
+data class ApiInfo(val name: String, val apiId: String, val apiEndpoint: String) {
     companion object {
         val lens = Body.auto<ApiInfo>().toLens()
     }
@@ -68,6 +77,29 @@ data class ApiInfo(val name: String, val apiId: String, val apiEndpoint: String)
 data class ListApiResponse(val items: List<ApiInfo>) {
     companion object {
         val lens = Body.auto<ListApiResponse>().toLens()
+    }
+}
+
+data class Integration(
+    val integrationType: String = "AWS_PROXY",
+    val integrationUri: String,
+    val timeoutInMillis: Long = 30000,
+    val payloadFormatVersion: String = "1.0"
+) {
+    companion object {
+        val lens = Body.auto<Integration>().toLens()
+    }
+}
+
+data class IntegrationInfo(val integrationId: String) {
+    companion object {
+        val lens = Body.auto<IntegrationInfo>().toLens()
+    }
+}
+
+data class Route(val target: String, val routeKey: String = "\$default") {
+    companion object {
+        val lens = Body.auto<Route>().toLens()
     }
 }
 
@@ -80,28 +112,3 @@ object ApiGatewayApi {
 fun main() {
     DeployApiGateway().deploy()
 }
-
-/**
-API_ID="$(aws apigatewayv2 create-api --name 'http4k-demo'  --protocol-type HTTP | jq -r '.ApiId')"
-
-aws apigatewayv2 create-stage \
---api-id "${API_ID}" \
---stage-name \$default \
---auto-deploy 1>/dev/null
-
-INTEGRATION_ID="$(aws apigatewayv2 create-integration \
---api-id "${API_ID}"  \
---integration-type AWS_PROXY \
---integration-uri ${FUNCTION} \
---timeout-in-millis 30000 \
---payload-format-version 2.0 | jq -r .IntegrationId)" 1>/dev/null
-
-aws apigatewayv2 create-route \
---api-id "${API_ID}" \
---route-key '$default' \
---target "integrations/${INTEGRATION_ID}" 1>/dev/null
-
-ENDPOINT="$( aws apigatewayv2 get-apis |  jq -r ' .Items | .[] | select(.Name == "http4k-demo") | .ApiEndpoint')"
-
-echo "Access the API in: $ENDPOINT"
- **/
