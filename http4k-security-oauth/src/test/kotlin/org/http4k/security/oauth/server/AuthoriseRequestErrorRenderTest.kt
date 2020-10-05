@@ -208,10 +208,8 @@ internal class AuthoriseRequestErrorRenderTest {
 
     }
 
-    private val requestValidator = RequestJWTValidator { clientId, requestJwtContainer ->
-        if (requestJwtContainer.value == "inValidRequest") {
-            InvalidAuthorizationRequest("request not correctly signed")
-        } else null
+    private val requestValidator = RequestJWTValidator { _, requestJwtContainer ->
+        if (requestJwtContainer.value == "inValidRequest") InvalidAuthorizationRequest("request not correctly signed") else null
     }
 
     private val documentationUri = "https://someDocumentationUri"
