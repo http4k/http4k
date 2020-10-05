@@ -27,7 +27,7 @@ private val lazyClient by lazy {
 
 private val client = { request: Request -> lazyClient(request) }
 
-class LambdaHttpClientTest : HttpClientContract({ NoOpServerConfig }, client, client) {
+class LambdaHttpClientTest : HttpClientContract({ NoOpServerConfig }, apiClient, apiClient) {
 
     @BeforeEach
     fun ensureLocalPropertiesExist(){
@@ -47,6 +47,6 @@ private object NoOpHttp4kServer : Http4kServer {
     override fun port(): Int = 0
 }
 
-private object NoOpServerConfig : ServerConfig {
+internal object NoOpServerConfig : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = NoOpHttp4kServer
 }
