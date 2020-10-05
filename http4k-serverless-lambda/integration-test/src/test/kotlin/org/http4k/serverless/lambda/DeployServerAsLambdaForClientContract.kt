@@ -26,7 +26,7 @@ object DeployServerAsLambdaForClientContract {
 
         assumeTrue(lambdaBinary.exists(), "lambda binary to deploy (${lambdaBinary.absolutePath}) needs to be available")
 
-        val functionName = FunctionName("test-function")
+
 
         println("Deleting existing function (if exists)...")
         lambdaApiClient.delete(functionName)
@@ -51,6 +51,8 @@ object DeployServerAsLambdaForClientContract {
         assertThat(functionResponse.status, equalTo(Status.OK))
         assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
     }
+
+    val functionName = FunctionName("test-function")
 }
 
 fun main() {

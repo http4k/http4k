@@ -11,7 +11,9 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.aws.ApiName
 import org.http4k.aws.Stage
+import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
 import org.http4k.serverless.lambda.client.apiGatewayClient
+import org.http4k.serverless.lambda.client.lambdaApiClient
 import org.junit.jupiter.api.fail
 import java.lang.management.ManagementFactory
 import java.time.Duration
@@ -20,7 +22,7 @@ import java.time.Instant
 class DeployApiGateway {
 
     fun deploy() {
-        val functionArn = "arn:aws:lambda:us-east-1:145304051762:function:test-function"
+        val functionArn = lambdaApiClient.list().find { it.name == functionName.value }?.arn ?: error("Lambda ${functionName.value} does not exist.")
 
         val apis = apiGatewayClient.listApis()
 
