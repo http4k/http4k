@@ -49,12 +49,10 @@ object ClientFilters {
      * Sets the host on an outbound request. This is useful to separate configuration of remote endpoints
      * from the logic required to construct the rest of the request.
      */
-    object SetHostFrom {
-        operator fun invoke(uri: Uri): Filter = Filter { next ->
-            {
-                next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))
-                    .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}"))
-            }
+    fun SetHostFrom(uri: Uri): Filter = Filter { next ->
+        {
+            next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))
+                .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}"))
         }
     }
 
@@ -63,9 +61,15 @@ object ClientFilters {
      * from the logic required to construct the rest of the request.
      */
     object SetBaseUriFrom {
-        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
-            { request -> next(request.uri(uri.extend(request.uri))) }
-        })
+        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(SetBaseUriOnlyFrom(uri))
+    }
+
+    /**
+     * Sets the base uri only (base path) on an outbound request. This is useful to override the destination server of a request
+     * without affecting the rest of the request.
+     */
+    object SetBaseUriOnlyFrom {
+        operator fun invoke(uri: Uri): Filter = Filter { next -> { request -> next(request.uri(uri.extend(request.uri))) } }
     }
 
     object ApiKeyAuth {
