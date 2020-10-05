@@ -11,7 +11,6 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
-import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
@@ -61,15 +60,16 @@ object ClientFilters {
      * from the logic required to construct the rest of the request.
      */
     object SetBaseUriFrom {
-        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(SetBaseUriOnlyFrom(uri))
+        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(SetAuthorityFrom(uri))
     }
 
     /**
      * Sets the base uri only (base path) on an outbound request. This is useful to override the destination server of a request
      * without affecting the rest of the request.
      */
-    object SetBaseUriOnlyFrom {
-        operator fun invoke(uri: Uri): Filter = Filter { next -> { request -> next(request.uri(uri.extend(request.uri))) } }
+    object SetAuthorityFrom {
+        operator fun invoke(uri: Uri): Filter = Filter { next -> { request ->
+            next(request.uri(request.uri.authority(uri.authority).scheme(uri.scheme))) } }
     }
 
     object ApiKeyAuth {

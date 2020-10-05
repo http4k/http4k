@@ -157,9 +157,9 @@ class ClientFiltersTest {
     }
 
     @Test
-    fun `set base uri only appends path`() {
-        val handler = ClientFilters.SetBaseUriOnlyFrom(Uri.of("http://localhost/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
-        assertThat(handler(Request(GET, "/loop").header("Host", "firstHost")), hasBody("http://localhost/a-path/loop").and(hasHeader("Host", "firstHost")))
+    fun `SetAuthorityFrom does not set path`() {
+        val handler = ClientFilters.SetAuthorityFrom(Uri.of("http://localhost:8080/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
+        assertThat(handler(Request(GET, "/loop").header("Host", "firstHost")), hasBody("http://localhost:8080/loop").and(hasHeader("Host", "firstHost")))
     }
 
     @Test
