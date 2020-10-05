@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -48,13 +49,13 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .withIsBase64Encoded(true)
             .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
                 .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
+                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("POST").build()
                 ).build())
             .build()
 
         assertThat(
             ApiGatewayV2AwsHttpAdapter(request),
-            equalTo(Request(GET, "/")
+            equalTo(Request(POST, "/")
                 .body(Body(ByteBuffer.wrap(imageBytes)))
             ))
     }
