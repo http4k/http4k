@@ -24,7 +24,7 @@ class HttpMessageMatchersTest {
     fun `header regex`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob"), haveHeader("header", Regex(".*bob")), haveHeader("header", Regex(".*bill")))
 
     @Test
-    fun `headers`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", listOf("bob", "bob2")), haveHeader("header", listOf("bill")))
+    fun headers() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", listOf("bob", "bob2")), haveHeader("header", listOf("bill")))
 
     @Test
     fun `header no value`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header"), haveHeader("header").invert())
@@ -64,7 +64,7 @@ class HttpMessageMatchersTest {
     fun `json body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.haveBody("""{"hello":"world"}"""), Jackson.haveBody("""{"hello":"w2orld"}"""))
 
 //    @Test
-//    @Disabled("https://github.com/kotest/kotest/issues/1727")
+//    @Disabled("https://github.com/kotest/kotest/issues/1751")
 //    fun `json node body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.haveBody(be(Jackson.obj("hello" to Jackson.string("world")))), Jackson.haveBody(be(Jackson.obj("hello" to Jackson.string("wo2rld")))))
 
     @Test

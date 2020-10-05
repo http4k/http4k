@@ -21,11 +21,13 @@ object Versions {
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
-    const val com_squareup_moshi: String = "1.10.0"
+    const val com_squareup_moshi: String = "1.11.0"
 
     const val org_eclipse_jetty: String = "9.4.32.v20200930"
 
     const val org_junit_jupiter: String = "5.7.0"
+
+    const val dev_forkhandles: String = "1.2.0.0"
 
     const val io_undertow: String = "2.2.0.Final"
 
@@ -41,7 +43,7 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.32.v20200930"
 
-    const val kotest_assertions_core_jvm: String = "4.2.5"
+    const val kotest_assertions_core_jvm: String = "4.2.6"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
@@ -52,8 +54,6 @@ object Versions {
     const val jackson_module_kotlin: String = "2.11.3"
 
     const val aws_lambda_java_core: String = "1.2.1"
-
-    const val aws_java_sdk_bundle: String = "1.11.875"
 
     const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.10"
 
@@ -89,8 +89,6 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val bunting4k: String = "1.2.0.0"
-
     const val httpcore5: String = "5.0.2"
 
     const val joda_time: String = "2.10.6"
@@ -102,8 +100,6 @@ object Versions {
     const val hamkrest: String = "1.8.0.1"
 
     const val httpcore: String = "4.4.13"
-
-    const val result4k: String = "1.2.0.0"
 
     const val jade4j: String = "1.3.2"
 
@@ -135,4 +131,4 @@ object Versions {
  */
 val PluginDependenciesSpec.buildSrcVersions: PluginDependencySpec
     inline get() =
-        id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
+            id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)

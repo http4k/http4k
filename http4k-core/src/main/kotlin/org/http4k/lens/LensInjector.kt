@@ -20,4 +20,9 @@ interface LensInjector<in IN, in OUT> {
      * Bind this Lens to a value, so we can set it into a target
      */
     infix fun <R : OUT> of(value: IN): (R) -> R = { invoke(value, it) }
+
+    /**
+     * Restrict the type that this Lens can inject into
+     */
+    fun <NEXT : OUT> restrictInto(): LensInjector<IN, NEXT> = this
 }

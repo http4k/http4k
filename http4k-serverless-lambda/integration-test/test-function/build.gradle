@@ -11,7 +11,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:" + Versions.org_jetbrains_kotlin
     compile Libs.aws_lambda_java_core
     compile Libs.aws_lambda_java_events
-    compile "joda-time:joda-time:2.6"
+    compile Libs.joda_time
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

@@ -108,12 +108,12 @@ object Libs {
             Versions.org_jetbrains_kotlin
 
     /**
-     * https://github.com/square/moshi
+     * https://github.com/square/moshi/
      */
     const val moshi: String = "com.squareup.moshi:moshi:" + Versions.com_squareup_moshi
 
     /**
-     * https://github.com/square/moshi
+     * https://github.com/square/moshi/
      */
     const val moshi_kotlin: String = "com.squareup.moshi:moshi-kotlin:" +
             Versions.com_squareup_moshi
@@ -151,6 +151,16 @@ object Libs {
      */
     const val junit_jupiter_engine: String = "org.junit.jupiter:junit-jupiter-engine:" +
             Versions.org_junit_jupiter
+
+    /**
+     * https://forkhandles.dev
+     */
+    const val bunting4k: String = "dev.forkhandles:bunting4k:" + Versions.dev_forkhandles
+
+    /**
+     * https://forkhandles.dev
+     */
+    const val result4k: String = "dev.forkhandles:result4k:" + Versions.dev_forkhandles
 
     /**
      * http://www.jboss.org
@@ -227,12 +237,6 @@ object Libs {
      */
     const val aws_lambda_java_core: String = "com.amazonaws:aws-lambda-java-core:" +
             Versions.aws_lambda_java_core
-
-    /**
-     * https://aws.amazon.com/sdkforjava
-     */
-    const val aws_java_sdk_bundle: String = "com.amazonaws:aws-java-sdk-bundle:" +
-            Versions.aws_java_sdk_bundle
 
     const val dokka_gradle_plugin: String = "org.jetbrains.dokka:dokka-gradle-plugin:" +
             Versions.dokka_gradle_plugin
@@ -323,11 +327,6 @@ object Libs {
     const val alpn_boot: String = "org.mortbay.jetty.alpn:alpn-boot:" + Versions.alpn_boot
 
     /**
-     * https://forkhandles.dev
-     */
-    const val bunting4k: String = "dev.forkhandles:bunting4k:" + Versions.bunting4k
-
-    /**
      * https://hc.apache.org/httpcomponents-core-5.0.x/
      */
     const val httpcore5: String = "org.apache.httpcomponents.core5:httpcore5:" + Versions.httpcore5
@@ -356,11 +355,6 @@ object Libs {
      * http://hc.apache.org/httpcomponents-core-ga
      */
     const val httpcore: String = "org.apache.httpcomponents:httpcore:" + Versions.httpcore
-
-    /**
-     * https://github.com/npryce/result4k
-     */
-    const val result4k: String = "dev.forkhandles:result4k:" + Versions.result4k
 
     /**
      * https://github.com/neuland/jade4j

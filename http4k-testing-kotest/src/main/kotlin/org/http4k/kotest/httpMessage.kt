@@ -83,7 +83,7 @@ fun <T : HttpMessage, B> haveBody(lens: BodyLens<B>, matcher: Matcher<B>): Match
 
 fun <NODE> Json<NODE>.haveBody(expected: NODE): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compact(parse(m.bodyString())) }, be(compact(expected)))
 
-// Removed because of : https://github.com/kotest/kotest/issues/1727
+// Removed because of : https://github.com/kotest/kotest/issues/1751
 //fun <NODE> Json<NODE>.haveBody(expected: Matcher<NODE>): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
 
 fun <NODE> Json<NODE>.haveBody(expected: String): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compactify(m.bodyString()) }, be(compactify(expected)))
