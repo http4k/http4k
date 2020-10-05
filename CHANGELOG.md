@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v3.265.0
-- [http4k-security-oauth] [Break] - Result4k changed published package structure. Changes made to accommodate new package `dev.forkhandles.result4k` instead of `com.natpryce`. To fix, simply find/replace the package names - everything else is identical.
+- [http4k-security-oauth] [Break (via repackaging of dependent JAR)] - Result4k changed published package structure. Changes made to accommodate new package `dev.forkhandles.result4k` instead of `com.natpryce`. To fix, simply find/replace the package names - everything else is identical.
 
 ### v3.264.0
 - **http4k-*** : Upgrade some dependency versions.
