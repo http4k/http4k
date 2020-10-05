@@ -27,7 +27,7 @@ private val lazyClient by lazy {
 
 private val client = { request: Request -> lazyClient(request) }
 
-class LambdaHttpClientTest : HttpClientContract({ NoOpServerConfig }, apiClient, apiClient) {
+class LambdaHttpClientTest : HttpClientContract({ NoOpServerConfig }, client, client) {
 
     @BeforeEach
     fun ensureLocalPropertiesExist(){

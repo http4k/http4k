@@ -10,12 +10,16 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.DebuggingFilters
 import org.http4k.format.Jackson.auto
+import org.http4k.serverless.lambda.inIntelliJOnly
 import java.nio.ByteBuffer
 import java.util.*
 
 class AwsLambdaApiClient(client: HttpHandler, region: Region) {
-    private val client = LambdaApi(region).then(client)
+    private val client = LambdaApi(region)
+        .then(inIntelliJOnly(DebuggingFilters.PrintRequestAndResponse()))
+        .then(client)
 
     fun create(functionPackage: FunctionPackage): FunctionDetails {
         val code = String(Base64.getEncoder().encode(functionPackage.jar.array()))
