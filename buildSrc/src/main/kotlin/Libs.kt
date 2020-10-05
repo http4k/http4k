@@ -360,7 +360,7 @@ object Libs {
     /**
      * https://github.com/npryce/result4k
      */
-    const val result4k: String = "com.natpryce:result4k:" + Versions.result4k
+    const val result4k: String = "dev.forkhandles:result4k:" + Versions.result4k
 
     /**
      * https://github.com/neuland/jade4j

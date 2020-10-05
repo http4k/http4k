@@ -1,5 +1,5 @@
-import com.natpryce.Failure
-import com.natpryce.Success
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.http4k.client.OkHttp
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler

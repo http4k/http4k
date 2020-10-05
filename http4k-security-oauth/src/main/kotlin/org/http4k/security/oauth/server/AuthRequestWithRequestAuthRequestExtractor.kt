@@ -1,11 +1,11 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
-import com.natpryce.flatMap
-import com.natpryce.mapFailure
-import com.natpryce.onFailure
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.mapFailure
+import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Request
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.oauth.server.request.RequestJWTValidator

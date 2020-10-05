@@ -1,10 +1,10 @@
 package org.http4k.security.oauth.server.request
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.apache.commons.codec.binary.Base64
 import org.http4k.core.Uri
 import org.http4k.format.Jackson

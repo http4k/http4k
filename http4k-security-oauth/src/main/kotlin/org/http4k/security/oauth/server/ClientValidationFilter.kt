@@ -1,10 +1,10 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Success
-import com.natpryce.get
-import com.natpryce.map
-import com.natpryce.mapFailure
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.get
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.mapFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.security.ResponseType

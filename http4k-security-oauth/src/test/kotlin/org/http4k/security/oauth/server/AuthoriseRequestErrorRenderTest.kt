@@ -1,8 +1,8 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Result
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Result
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -17,7 +17,6 @@ import org.http4k.security.ResponseMode.Query
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.oauth.server.request.RequestJWTValidator
-import org.http4k.security.openid.RequestJwtContainer
 import org.junit.jupiter.api.Test
 import java.util.Base64
 
@@ -209,13 +208,8 @@ internal class AuthoriseRequestErrorRenderTest {
 
     }
 
-    private val requestValidator = object : RequestJWTValidator {
-        override fun validate(clientId: ClientId, requestJwtContainer: RequestJwtContainer): InvalidAuthorizationRequest? {
-            return if (requestJwtContainer.value == "inValidRequest") {
-                InvalidAuthorizationRequest("request not correctly signed")
-            } else null
-        }
-
+    private val requestValidator = RequestJWTValidator { _, requestJwtContainer ->
+        if (requestJwtContainer.value == "inValidRequest") InvalidAuthorizationRequest("request not correctly signed") else null
     }
 
     private val documentationUri = "https://someDocumentationUri"

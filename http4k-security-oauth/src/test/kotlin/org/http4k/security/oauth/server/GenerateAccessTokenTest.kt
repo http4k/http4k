@@ -1,10 +1,10 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.get
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.get
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
