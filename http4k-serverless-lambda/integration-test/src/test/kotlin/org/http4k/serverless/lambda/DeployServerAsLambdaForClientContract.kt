@@ -35,9 +35,9 @@ object DeployServerAsLambdaForClientContract {
 
     fun deploy() {
         val lambdaBinary =
-            File("test-function/build/distributions/test-function-LOCAL.zip")
+            File("http4k-serverless-lambda/integration-test/test-function/build/distributions/test-function-LOCAL.zip")
 
-        assumeTrue(lambdaBinary.exists(), "lambda binary to deploy needs to be available")
+        assumeTrue(lambdaBinary.exists(), "lambda binary to deploy (${lambdaBinary.absolutePath}) needs to be available")
 
         val functionName = FunctionName("test-function")
 
@@ -46,7 +46,7 @@ object DeployServerAsLambdaForClientContract {
 
         val functionPackage = FunctionPackage(
             functionName,
-            FunctionHandler("org.http4k.serverless.lambda.TestFunction::handle"),
+            FunctionHandler("org.http4k.serverless.lambda.TestFunction"),
             ByteBuffer.wrap(lambdaBinary.readBytes()),
             Config.role(config)
         )
