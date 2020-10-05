@@ -1,11 +1,11 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response

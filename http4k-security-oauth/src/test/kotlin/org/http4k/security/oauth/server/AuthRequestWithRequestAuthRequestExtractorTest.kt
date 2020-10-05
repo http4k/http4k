@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory.instance
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.apache.commons.codec.binary.Base64
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -32,14 +32,8 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
     private val invalidJwt = RequestJwtContainer("invalidJwt")
 
-    private val requestJWTValidator = object : RequestJWTValidator {
-        override fun validate(clientId: ClientId, requestJwtContainer: RequestJwtContainer): InvalidAuthorizationRequest? {
-            return if (requestJwtContainer == invalidJwt) {
-                InvalidAuthorizationRequest("Query 'request' is invalid")
-            } else {
-                null
-            }
-        }
+    private val requestJWTValidator = RequestJWTValidator { _, requestJwtContainer ->
+        if (requestJwtContainer == invalidJwt) InvalidAuthorizationRequest("Query 'request' is invalid") else null
     }
 
     @Test

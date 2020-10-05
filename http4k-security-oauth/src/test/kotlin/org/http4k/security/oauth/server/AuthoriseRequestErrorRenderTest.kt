@@ -1,8 +1,8 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Result
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Result
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
