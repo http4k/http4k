@@ -24,19 +24,18 @@ class DeployApiGateway {
         val apiGateway = AwsApiGatewayApiClient(client, region)
 
         val functionArn = "arn:aws:lambda:us-east-1:145304051762:function:test-function"
+        val apiName = ApiName("http4k-test-function")
 
         val apis = apiGateway.listApis()
 
-        apis.filter { it.name == ApiName("http4k-test-function") }.forEach {
+        apis.filter { it.name == apiName }.forEach {
             println("Deleting ${it.apiId.value}")
             apiGateway.delete(it.apiId)
         }
 
         println(apiGateway.listApis())
 
-        val api = apiGateway.createApi(ApiName("http4k-test-function"))
-        println(api)
-
+        val api = apiGateway.createApi(apiName)
         apiGateway.createStage(api.apiId, Stage.default)
 
         val integrationInfo = IntegrationInfo.lens(client(Request(POST, "/v2/apis/${api.apiId.value}/integrations").with(Integration.lens of Integration(integrationUri = functionArn))))
@@ -46,6 +45,7 @@ class DeployApiGateway {
 
         //TODO add a call (with retries + timeout) to the deployed api
         // println(JavaHttpClient()(Request(Method.GET, api.apiEndpoint.path("/empty"))))
+        println("Created API: $api")
     }
 
     private val config = Environment.ENV overrides Environment.fromResource("/local.properties")
