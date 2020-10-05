@@ -43,19 +43,6 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    fun `supports gzipped content`() {
-        val asServer = ServerFilters.GZip().then { Response(OK).body("hello") }.asServer(SunHttp(0))
-        asServer.start()
-        val client = JavaHttpClient()
-
-        val request = Request(GET, "http://localhost:${asServer.port()}").header("accept-encoding", "gzip")
-        client(request)
-        client(request)
-        client(request)
-        asServer.stop()
-    }
-
-    @Test
     fun `can make call`() {
         val response = client(Request(POST, "http://localhost:$port/someUri")
             .query("query", "123")
