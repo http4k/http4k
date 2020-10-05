@@ -21,7 +21,6 @@ class DeployApiGateway {
 
     fun deploy() {
         val functionArn = "arn:aws:lambda:us-east-1:145304051762:function:test-function"
-        val apiName = ApiName("http4k-test-function")
 
         val apis = apiGatewayClient.listApis()
 
@@ -40,6 +39,10 @@ class DeployApiGateway {
         waitUntil(OK) {
             JavaHttpClient()(Request(GET, api.apiEndpoint.path("/empty"))).also { println(it.status) }
         }
+    }
+
+    companion object{
+        val apiName = ApiName("http4k-test-function")
     }
 }
 

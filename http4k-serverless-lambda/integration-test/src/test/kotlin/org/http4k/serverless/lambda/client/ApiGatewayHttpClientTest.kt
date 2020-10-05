@@ -2,18 +2,27 @@ package org.http4k.serverless.lambda.client
 
 import org.http4k.client.HttpClientContract
 import org.http4k.client.OkHttp
+import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
+import org.http4k.serverless.lambda.DeployApiGateway.Companion.apiName
 import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
+import org.opentest4j.TestAbortedException
 
-private val apiClient = ClientFilters.SetBaseUriFrom(Uri.of("https://<apiId>.execute-api.us-east-1.amazonaws.com/")).then(OkHttp())
+private val apiClient by lazy {
+    val api = apiGatewayClient.listApis().find { it.name == apiName }
+        ?: throw TestAbortedException("API hasn't been deployed")
+    ClientFilters.SetBaseUriFrom(api.apiEndpoint).then(OkHttp())
+}
 
-@Disabled
-class ApiGatewayHttpClientTest : HttpClientContract({ NoOpServerConfig }, apiClient, apiClient) {
-    override fun `connection refused are converted into 503`() = Assumptions.assumeTrue(false, "Unsupported client feature")
-    override fun `handles response with custom status message`() = Assumptions.assumeTrue(false, "Unsupported client feature")
-    override fun `unknown host are converted into 503`()  = Assumptions.assumeTrue(false, "Unsupported client feature")
+private val client = { request: Request -> apiClient(request) }
+
+class ApiGatewayHttpClientTest : HttpClientContract({ NoOpServerConfig }, client, client) {
+    override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
+    override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
+    override fun `unknown host are converted into 503`()  = assumeTrue(false, "Unsupported client feature")
 }
 
