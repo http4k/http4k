@@ -28,10 +28,15 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
         client(Request(Method.DELETE, "/v2/apis/${apiId.value}"))
     }
 
+    fun createStage(apiId: ApiId, stage: Stage) {
+        client(Request(Method.POST, "/v2/apis/${apiId.value}/stages").with(createStageLens of stage))
+    }
+
     companion object {
         private val createApiLens = Body.auto<Api>().toLens()
         private val apiDetailsLens = Body.auto<ApiDetails>().toLens()
         private val listApiLens = Body.auto<ListApiResponse>().toLens()
+        val createStageLens = Body.auto<Stage>().toLens()
     }
 
     private data class Api(val name: String, val protocolType: String = "HTTP")
@@ -45,12 +50,15 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     }
 }
 
-data class ApiName(val value:String)
-data class ApiId(val value:String)
 
-data class Stage(val stageName: String, val autoDeploy: Boolean = true) {
+data class ApiName(val value: String)
+data class ApiId(val value: String)
+
+data class StageName(val value: String)
+
+data class Stage(val stageName: StageName, val autoDeploy: Boolean) {
     companion object {
-        val lens = Body.auto<Stage>().toLens()
+        val default = Stage(StageName("\$default"), true)
     }
 }
 
@@ -85,6 +93,7 @@ object ApiGatewayJackson : ConfigurableJackson(KotlinModule()
     .withStandardMappings()
     .text(BiDiMapping(::ApiName, ApiName::value))
     .text(BiDiMapping(::ApiId, ApiId::value))
+    .text(BiDiMapping(::StageName, StageName::value))
     .done()
     .deactivateDefaultTyping()
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

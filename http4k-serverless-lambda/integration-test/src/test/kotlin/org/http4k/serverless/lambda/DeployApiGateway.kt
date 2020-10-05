@@ -37,7 +37,7 @@ class DeployApiGateway {
         val api = apiGateway.createApi(ApiName("http4k-test-function"))
         println(api)
 
-        client(Request(POST, "/v2/apis/${api.apiId.value}/stages").with(Stage.lens of Stage("\$default")))
+        apiGateway.createStage(api.apiId, Stage.default)
 
         val integrationInfo = IntegrationInfo.lens(client(Request(POST, "/v2/apis/${api.apiId.value}/integrations").with(Integration.lens of Integration(integrationUri = functionArn))))
         println(integrationInfo)
@@ -59,7 +59,6 @@ class DeployApiGateway {
     companion object {
         val scope = EnvironmentKey.map { AwsCredentialScope(it, "apigateway") }.required("region")
     }
-
 }
 
 fun main() {
