@@ -88,7 +88,7 @@ fun waitUntil(
     } while (!success)
 }
 
-private fun inIntelliJOnly(filter: Filter) =
+fun inIntelliJOnly(filter: Filter) =
     if (ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea", true) } != null)
         filter
     else Filter.NoOp
