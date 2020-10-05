@@ -11,6 +11,7 @@ import org.http4k.core.with
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
+import org.http4k.serverless.lambda.client.ApiName
 import org.http4k.serverless.lambda.client.AwsApiGatewayApiClient
 import org.http4k.serverless.lambda.client.Config
 import org.http4k.serverless.lambda.client.Integration
@@ -26,22 +27,25 @@ class DeployApiGateway {
 
         val apis = apiGateway.listApis()
 
-        println(apis)
-        apis.filter { it.name == "http4k-test-function" }.forEach {
-            println("Deleting ${it.apiId}")
+        apis.filter { it.name == ApiName("http4k-test-function") }.forEach {
+            println("Deleting ${it.apiId.value}")
             apiGateway.delete(it.apiId)
         }
 
         println(apiGateway.listApis())
 
-        val api = apiGateway.create("http4k-test-function")
+        val api = apiGateway.create(ApiName("http4k-test-function"))
         println(api)
-        client(Request(POST, "/v2/apis/${api.apiId}/stages").with(Stage.lens of Stage("\$default")))
 
-        val integrationInfo = IntegrationInfo.lens(client(Request(POST, "/v2/apis/${api.apiId}/integrations").with(Integration.lens of Integration(integrationUri = functionArn))))
+        client(Request(POST, "/v2/apis/${api.apiId.value}/stages").with(Stage.lens of Stage("\$default")))
+
+        val integrationInfo = IntegrationInfo.lens(client(Request(POST, "/v2/apis/${api.apiId.value}/integrations").with(Integration.lens of Integration(integrationUri = functionArn))))
         println(integrationInfo)
 
-        client(Request(POST, "/v2/apis/${api.apiId}/routes").with(Route.lens of Route("integrations/${integrationInfo.integrationId}")))
+        client(Request(POST, "/v2/apis/${api.apiId.value}/routes").with(Route.lens of Route("integrations/${integrationInfo.integrationId}")))
+
+        //TODO add a call (with retries + timeout) to the deployed api
+        // println(JavaHttpClient()(Request(Method.GET, api.apiEndpoint.path("/empty"))))
     }
 
     private val config = Environment.ENV overrides Environment.fromResource("/local.properties")
