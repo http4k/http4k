@@ -1,5 +1,6 @@
 package org.http4k.serverless.lambda
 
+import org.http4k.aws.ApiIntegrationVersion
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Timeout
 import org.http4k.core.Filter
@@ -19,10 +20,14 @@ import java.lang.management.ManagementFactory
 import java.time.Duration
 import java.time.Instant
 
-class DeployApiGateway {
+object DeployApiGateway {
 
-    fun deploy() {
-        val functionArn = lambdaApiClient.list().find { it.name == functionName.value }?.arn ?: error("Lambda ${functionName.value} does not exist.")
+    fun deploy(version: ApiIntegrationVersion) {
+        val functionName = functionName(version)
+        val apiName = apiName(version)
+
+        val functionArn = lambdaApiClient.list().find { it.name == functionName.value }?.arn
+            ?: error("Lambda ${functionName.value} does not exist.")
 
         val apis = apiGatewayClient.listApis()
 
@@ -34,7 +39,7 @@ class DeployApiGateway {
         val api = apiGatewayClient.createApi(apiName)
         apiGatewayClient.createStage(api.apiId, Stage.default)
 
-        val integrationId = apiGatewayClient.createLambdaIntegration(api.apiId, functionArn)
+        val integrationId = apiGatewayClient.createLambdaIntegration(api.apiId, functionArn, version)
 
         apiGatewayClient.createDefaultRoute(api.apiId, integrationId)
 
@@ -43,13 +48,11 @@ class DeployApiGateway {
         }
     }
 
-    companion object{
-        val apiName = ApiName("http4k-test-function")
-    }
+    fun apiName(version: ApiIntegrationVersion) = ApiName("http4k-test-function-${version.name}")
 }
 
 fun main() {
-    DeployApiGateway().deploy()
+    DeployApiGateway.deploy(ApiIntegrationVersion.v1)
 }
 
 fun waitUntil(

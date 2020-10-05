@@ -15,6 +15,7 @@ import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
 import org.http4k.aws.ApiGatewayJackson.auto
+import org.http4k.aws.ApiIntegrationVersion.*
 
 class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     private val client = ApiGatewayApi(region).then(rawClient)
@@ -32,9 +33,15 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
         client(Request(Method.POST, "/v2/apis/${apiId.value}/stages").with(createStageLens of stage))
     }
 
-    fun createLambdaIntegration(apiId: ApiId, functionArn: String): IntegrationId =
+    fun createLambdaIntegration(apiId: ApiId, functionArn: String, version: ApiIntegrationVersion): IntegrationId =
         integrationInfo(client(Request(Method.POST, "/v2/apis/${apiId.value}/integrations")
-            .with(createIntegrationLens of Integration(integrationUri = functionArn)))).integrationId
+            .with(createIntegrationLens of Integration(
+                integrationUri = functionArn,
+                payloadFormatVersion = when (version) {
+                    v1 -> "1.0"
+                    v2 -> "2.0"
+                }
+            )))).integrationId
 
     fun createDefaultRoute(apiId: ApiId, integrationId: IntegrationId) =
         client(Request(Method.POST, "/v2/apis/${apiId.value}/routes")
@@ -85,6 +92,7 @@ data class Integration(
 
 data class IntegrationId(val value: String)
 
+enum class ApiIntegrationVersion { v1, v2 }
 
 object ApiGatewayJackson : ConfigurableJackson(KotlinModule()
     .asConfigurable()
