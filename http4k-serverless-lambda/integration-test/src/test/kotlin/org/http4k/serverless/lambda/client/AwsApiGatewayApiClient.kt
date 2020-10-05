@@ -13,13 +13,18 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     private val client = ApiGatewayApi(region).then(rawClient)
 
     fun create(name: String): ApiDetails =
-        ApiDetails.lens(client(Request(Method.POST, "/v2/apis").with(Api.lens of Api(name))))
+        ApiDetails.lens(client(Request(Method.POST, "/v2/apis").with(createApiLens of Api(name))))
 
-    private data class Api(val name: String, val protocolType: String = "HTTP") {
-        companion object {
-            val lens = Body.auto<Api>().toLens()
-        }
+    fun listApis(): List<ApiDetails> = listApiLens(client(Request(Method.GET, "/v2/apis"))).items
+
+    companion object {
+        private val createApiLens = Body.auto<Api>().toLens()
+        private val listApiLens = Body.auto<ListApiResponse>().toLens()
     }
+
+    private data class Api(val name: String, val protocolType: String = "HTTP")
+
+    private data class ListApiResponse(val items: List<ApiDetails>)
 
     object ApiGatewayApi {
         operator fun invoke(region: Region): Filter = Filter { next ->
@@ -41,11 +46,6 @@ data class ApiDetails(val name: String, val apiId: String, val apiEndpoint: Stri
     }
 }
 
-data class ListApiResponse(val items: List<ApiDetails>) {
-    companion object {
-        val lens = Body.auto<ListApiResponse>().toLens()
-    }
-}
 
 data class Integration(
     val integrationType: String = "AWS_PROXY",
