@@ -30,8 +30,3 @@ val lambdaClient by lazy {
     val region = Config.region(awsConfig)
     LambdaHttpClient(FunctionName("test-function"), region).then(awsClient)
 }
-
-private val awsNotSetup: HttpHandler = {
-    assumeTrue(false, "local.properties not defined")
-    Response(Status.I_M_A_TEAPOT)
-}
