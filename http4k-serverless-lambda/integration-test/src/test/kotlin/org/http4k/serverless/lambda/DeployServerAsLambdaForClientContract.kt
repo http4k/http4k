@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.aws.AwsLambdaApiClient
 import org.http4k.aws.FunctionHandler
 import org.http4k.aws.FunctionName
 import org.http4k.aws.FunctionPackage
@@ -20,7 +19,6 @@ import java.io.File
 import java.nio.ByteBuffer
 
 object DeployServerAsLambdaForClientContract {
-    private val deployment = AwsLambdaApiClient(lambdaApiClient, Config.region(awsConfig))
 
     fun deploy() {
         val lambdaBinary =
@@ -31,7 +29,7 @@ object DeployServerAsLambdaForClientContract {
         val functionName = FunctionName("test-function")
 
         println("Deleting existing function (if exists)...")
-        deployment.delete(functionName)
+        lambdaApiClient.delete(functionName)
 
         val functionPackage = FunctionPackage(
             functionName,
@@ -41,11 +39,11 @@ object DeployServerAsLambdaForClientContract {
         )
 
         println("Deploying function...")
-        val details = deployment.create(functionPackage)
+        val details = lambdaApiClient.create(functionPackage)
 
         println("Created function with arn ${details.arn}")
 
-        assertThat(deployment.list().find { it.name == functionName.value }, present())
+        assertThat(lambdaApiClient.list().find { it.name == functionName.value }, present())
 
         println("Performing a test request...")
         val functionResponse = testFunctionClient(Request(Method.POST, "/echo").body("Hello, http4k"))

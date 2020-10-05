@@ -1,5 +1,6 @@
 package org.http4k.serverless.lambda.client
 
+import org.http4k.aws.AwsApiGatewayApiClient
 import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
 import org.http4k.aws.AwsLambdaApiClient
@@ -17,11 +18,12 @@ import org.http4k.filter.ClientFilters
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
 val testFunctionClient by lazy {
-    LambdaHttpClient(FunctionName("test-function"), Config.region(awsConfig)).then(lambdaApiClient)
+    LambdaHttpClient(FunctionName("test-function"), Config.region(awsConfig)).then(awsClient("lambda"))
 }
 
-val lambdaApiClient by lazy { awsClient("lambda") }
-val apiGatewayClient by lazy { awsClient("apigateway") }
+val lambdaApiClient by lazy { AwsLambdaApiClient(awsClient("lambda"), Config.region(awsConfig)) }
+
+val apiGatewayClient by lazy { AwsApiGatewayApiClient( awsClient("apigateway"), Config.region(awsConfig)) }
 
 private fun awsClient(service: String) = Filter.NoOp
     .then(ClientFilters.AwsAuth(Config.scope(awsConfig, service), Config.credentials(awsConfig)))
