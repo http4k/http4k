@@ -15,11 +15,13 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.DebuggingFilters
 import org.http4k.serverless.lambda.client.ApiName
 import org.http4k.serverless.lambda.client.AwsApiGatewayApiClient
 import org.http4k.serverless.lambda.client.Config
 import org.http4k.serverless.lambda.client.Stage
 import org.junit.jupiter.api.fail
+import java.lang.management.ManagementFactory
 import java.time.Duration
 import java.time.Instant
 
@@ -28,8 +30,7 @@ class DeployApiGateway {
     private val region = Config.region(config)
 
     private val client =
-        Filter.NoOp
-//            .then(DebuggingFilters.PrintRequestAndResponse())
+        inIntelliJOnly(DebuggingFilters.PrintRequestAndResponse())
             .then(AwsApiGatewayApiClient.ApiGatewayApi(region)) //TODO delete once all calls are moved into client
             .then(ClientFilters.AwsAuth(scope(config), Config.credentials(config)))
             .then(JavaHttpClient())
@@ -86,3 +87,8 @@ fun waitUntil(
         }
     } while (!success)
 }
+
+private fun inIntelliJOnly(filter: Filter) =
+    if (ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea", true) } != null)
+        filter
+    else Filter.NoOp
