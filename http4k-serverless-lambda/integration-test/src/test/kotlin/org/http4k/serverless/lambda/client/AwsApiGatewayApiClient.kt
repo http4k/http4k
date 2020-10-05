@@ -19,7 +19,7 @@ import org.http4k.serverless.lambda.client.ApiGatewayJackson.auto
 class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     private val client = ApiGatewayApi(region).then(rawClient)
 
-    fun create(name: ApiName) =
+    fun createApi(name: ApiName) =
         apiDetailsLens(client(Request(Method.POST, "/v2/apis").with(createApiLens of Api(name.value))))
 
     fun listApis(): List<ApiDetails> = listApiLens(client(Request(Method.GET, "/v2/apis"))).items

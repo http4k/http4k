@@ -34,7 +34,7 @@ class DeployApiGateway {
 
         println(apiGateway.listApis())
 
-        val api = apiGateway.create(ApiName("http4k-test-function"))
+        val api = apiGateway.createApi(ApiName("http4k-test-function"))
         println(api)
 
         client(Request(POST, "/v2/apis/${api.apiId.value}/stages").with(Stage.lens of Stage("\$default")))
