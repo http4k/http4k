@@ -21,6 +21,7 @@ val testFunctionClient by lazy {
 }
 
 val lambdaApiClient by lazy { awsClient("lambda") }
+val apiGatewayClient by lazy { awsClient("apigateway") }
 
 private fun awsClient(service: String) = Filter.NoOp
     .then(ClientFilters.AwsAuth(Config.scope(awsConfig, service), Config.credentials(awsConfig)))
