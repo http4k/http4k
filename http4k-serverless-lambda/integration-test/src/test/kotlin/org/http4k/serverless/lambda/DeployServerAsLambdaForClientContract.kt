@@ -59,7 +59,7 @@ object DeployServerAsLambdaForClientContract {
 
     fun functionName(version: ApiIntegrationVersion) = FunctionName("test-function-${version.name}")
 
-    private fun functionMainClass(version: ApiIntegrationVersion):String = when (version) {
+    private fun functionMainClass(version: ApiIntegrationVersion): String = when (version) {
         v1 -> "org.http4k.serverless.lambda.TestFunctionV1"
         v2 -> "org.http4k.serverless.lambda.TestFunctionV2"
     }
@@ -67,5 +67,6 @@ object DeployServerAsLambdaForClientContract {
 
 fun main() {
     DeployServerAsLambdaForClientContract.deploy(v1)
+    DeployServerAsLambdaForClientContract.deploy(v2)
 }
 

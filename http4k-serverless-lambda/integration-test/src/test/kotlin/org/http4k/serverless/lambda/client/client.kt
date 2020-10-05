@@ -1,5 +1,7 @@
 package org.http4k.serverless.lambda.client
 
+import org.http4k.aws.ApiIntegrationVersion
+import org.http4k.aws.ApiIntegrationVersion.v1
 import org.http4k.aws.AwsApiGatewayApiClient
 import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
@@ -15,10 +17,11 @@ import org.http4k.core.NoOp
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
+import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
 val testFunctionClient by lazy {
-    LambdaHttpClient(FunctionName("test-function"), Config.region(awsConfig)).then(awsClient("lambda"))
+    LambdaHttpClient(DeployServerAsLambdaForClientContract.functionName(v1), Config.region(awsConfig)).then(awsClient("lambda"))
 }
 
 val lambdaApiClient by lazy { AwsLambdaApiClient(awsClient("lambda"), Config.region(awsConfig)) }

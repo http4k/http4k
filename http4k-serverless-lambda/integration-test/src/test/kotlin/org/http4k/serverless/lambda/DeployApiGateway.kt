@@ -53,6 +53,7 @@ object DeployApiGateway {
 
 fun main() {
     DeployApiGateway.deploy(ApiIntegrationVersion.v1)
+    DeployApiGateway.deploy(ApiIntegrationVersion.v2)
 }
 
 fun waitUntil(

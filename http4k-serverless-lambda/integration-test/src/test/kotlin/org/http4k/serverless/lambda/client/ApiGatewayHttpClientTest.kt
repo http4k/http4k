@@ -1,5 +1,6 @@
 package org.http4k.serverless.lambda.client
 
+import org.http4k.aws.ApiIntegrationVersion
 import org.http4k.aws.ApiIntegrationVersion.v1
 import org.http4k.client.HttpClientContract
 import org.http4k.client.OkHttp
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 
 private val apiClient by lazy {
-    val api = apiGatewayClient.listApis().find { it.name == apiName(v1) }
+    val api = apiGatewayClient.listApis().find { it.name == apiName(ApiIntegrationVersion.v2) }
         ?: throw TestAbortedException("API hasn't been deployed")
     ClientFilters.SetBaseUriFrom(api.apiEndpoint).then(OkHttp())
 }
