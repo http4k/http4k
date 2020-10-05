@@ -32,15 +32,21 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
         client(Request(Method.POST, "/v2/apis/${apiId.value}/stages").with(createStageLens of stage))
     }
 
+    fun createLambdaIntegration(apiId: ApiId, functionArn: String): IntegrationId =
+        integrationInfo(client(Request(Method.POST, "/v2/apis/${apiId.value}/integrations")
+            .with(createIntegrationLens of Integration(integrationUri = functionArn)))).integrationId
+
     companion object {
         private val createApiLens = Body.auto<Api>().toLens()
         private val apiDetailsLens = Body.auto<ApiDetails>().toLens()
         private val listApiLens = Body.auto<ListApiResponse>().toLens()
-        val createStageLens = Body.auto<Stage>().toLens()
+        private val createStageLens = Body.auto<Stage>().toLens()
+        private val createIntegrationLens = Body.auto<Integration>().toLens()
+        private val integrationInfo = Body.auto<IntegrationInfo>().toLens()
     }
 
     private data class Api(val name: String, val protocolType: String = "HTTP")
-
+    private data class IntegrationInfo(val integrationId: IntegrationId)
     private data class ListApiResponse(val items: List<ApiDetails>)
 
     object ApiGatewayApi {
@@ -64,23 +70,14 @@ data class Stage(val stageName: StageName, val autoDeploy: Boolean) {
 
 data class ApiDetails(val name: ApiName, val apiId: ApiId, val apiEndpoint: Uri)
 
-
 data class Integration(
     val integrationType: String = "AWS_PROXY",
     val integrationUri: String,
     val timeoutInMillis: Long = 30000,
     val payloadFormatVersion: String = "1.0"
-) {
-    companion object {
-        val lens = Body.auto<Integration>().toLens()
-    }
-}
+)
 
-data class IntegrationInfo(val integrationId: String) {
-    companion object {
-        val lens = Body.auto<IntegrationInfo>().toLens()
-    }
-}
+data class IntegrationId(val value: String)
 
 data class Route(val target: String, val routeKey: String = "\$default") {
     companion object {
@@ -94,6 +91,7 @@ object ApiGatewayJackson : ConfigurableJackson(KotlinModule()
     .text(BiDiMapping(::ApiName, ApiName::value))
     .text(BiDiMapping(::ApiId, ApiId::value))
     .text(BiDiMapping(::StageName, StageName::value))
+    .text(BiDiMapping(::IntegrationId, IntegrationId::value))
     .done()
     .deactivateDefaultTyping()
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

@@ -14,8 +14,6 @@ import org.http4k.filter.DebuggingFilters
 import org.http4k.serverless.lambda.client.ApiName
 import org.http4k.serverless.lambda.client.AwsApiGatewayApiClient
 import org.http4k.serverless.lambda.client.Config
-import org.http4k.serverless.lambda.client.Integration
-import org.http4k.serverless.lambda.client.IntegrationInfo
 import org.http4k.serverless.lambda.client.Route
 import org.http4k.serverless.lambda.client.Stage
 
@@ -38,10 +36,10 @@ class DeployApiGateway {
         val api = apiGateway.createApi(apiName)
         apiGateway.createStage(api.apiId, Stage.default)
 
-        val integrationInfo = IntegrationInfo.lens(client(Request(POST, "/v2/apis/${api.apiId.value}/integrations").with(Integration.lens of Integration(integrationUri = functionArn))))
+        val integrationInfo = apiGateway.createLambdaIntegration(api.apiId, functionArn)
         println(integrationInfo)
 
-        client(Request(POST, "/v2/apis/${api.apiId.value}/routes").with(Route.lens of Route("integrations/${integrationInfo.integrationId}")))
+        client(Request(POST, "/v2/apis/${api.apiId.value}/routes").with(Route.lens of Route("integrations/${integrationInfo.value}")))
 
         //TODO add a call (with retries + timeout) to the deployed api
         // println(JavaHttpClient()(Request(Method.GET, api.apiEndpoint.path("/empty"))))
