@@ -29,7 +29,7 @@ abstract class ApiGatewayV1LambdaFunction(appLoader: AppLoaderWithContexts)
 internal object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     override fun invoke(req: APIGatewayProxyRequestEvent) = (req.headers ?: emptyMap()).toList().fold(
         Request(Method.valueOf(req.httpMethod), req.uri())
-            .body(req.body?.let { MemoryBody(if (req.isBase64Encoded) it.base64Decoded() else it) } ?: Body.EMPTY)) { memo, (first, second) ->
+            .body(req.body?.let { MemoryBody(if (req.isBase64Encoded == true) it.base64Decoded() else it) } ?: Body.EMPTY)) { memo, (first, second) ->
         memo.header(first, second)
     }
 
