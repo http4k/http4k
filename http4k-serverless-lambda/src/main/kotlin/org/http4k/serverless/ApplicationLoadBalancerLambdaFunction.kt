@@ -5,8 +5,6 @@ import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerReque
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
-import org.http4k.core.Uri
-import org.http4k.core.toUrlFormEncoded
 
 /**
  * This is the main entry point for lambda invocations coming from an Application LoadBalancer.
@@ -23,14 +21,11 @@ abstract class ApplicationLoadBalancerLambdaFunction(appLoader: AppLoaderWithCon
 
 internal object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
     override fun invoke(req: ApplicationLoadBalancerRequestEvent) =
-        RequestContent(req.uri(), req.body, req.isBase64Encoded, req.httpMethod, req.headers).asHttp4k()
+        RequestContent(req.path, req.queryStringParameters, req.body, req.isBase64Encoded, req.httpMethod, req.headers).asHttp4k()
 
     override fun invoke(req: Response) = ApplicationLoadBalancerResponseEvent().also {
         it.statusCode = req.status.code
         it.headers = req.headers.toMap()
         it.body = req.bodyString()
     }
-
-    private fun ApplicationLoadBalancerRequestEvent.uri() = Uri.of(path ?: "").query((queryStringParameters
-        ?: emptyMap()).toList().toUrlFormEncoded())
 }

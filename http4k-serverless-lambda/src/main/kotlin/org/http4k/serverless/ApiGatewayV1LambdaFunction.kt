@@ -5,8 +5,6 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
-import org.http4k.core.Uri
-import org.http4k.core.toUrlFormEncoded
 
 /**
  * This is the main entry point for lambda invocations using the V1 payload format.
@@ -23,15 +21,12 @@ abstract class ApiGatewayV1LambdaFunction(appLoader: AppLoaderWithContexts)
 
 internal object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     override fun invoke(req: APIGatewayProxyRequestEvent) =
-        RequestContent(req.uri(), req.body, req.isBase64Encoded, req.httpMethod, req.headers).asHttp4k()
+        RequestContent(req.path, req.queryStringParameters, req.body, req.isBase64Encoded, req.httpMethod, req.headers).asHttp4k()
 
     override fun invoke(req: Response) = APIGatewayProxyResponseEvent().also {
         it.statusCode = req.status.code
         it.headers = req.headers.toMap()
         it.body = req.bodyString()
     }
-
-    private fun APIGatewayProxyRequestEvent.uri() = Uri.of(path ?: "")
-        .query((queryStringParameters ?: emptyMap()).toList().toUrlFormEncoded())
 }
 

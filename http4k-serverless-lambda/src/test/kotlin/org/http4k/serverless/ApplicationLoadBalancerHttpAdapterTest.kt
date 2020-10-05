@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -43,15 +44,12 @@ class ApplicationLoadBalancerHttpAdapterTest {
             httpMethod = "POST"
             body = String(Base64.getEncoder().encode(imageBytes))
             path = "/"
-            queryStringParameters = mapOf("query" to "value")
             isBase64Encoded = true
         }
 
         assertThat(
             ApplicationLoadBalancerAwsHttpAdapter(request),
-            equalTo(Request(GET, "/path")
-                .query("query", "value")
-                .header("c", "d")
+            equalTo(Request(POST, "/")
                 .body(Body(ByteBuffer.wrap(imageBytes)))
             ))
     }
