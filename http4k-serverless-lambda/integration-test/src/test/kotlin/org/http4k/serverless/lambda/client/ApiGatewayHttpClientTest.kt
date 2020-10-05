@@ -16,3 +16,4 @@ class ApiGatewayHttpClientTest : HttpClientContract({ NoOpServerConfig }, apiCli
     override fun `handles response with custom status message`() = Assumptions.assumeTrue(false, "Unsupported client feature")
     override fun `unknown host are converted into 503`()  = Assumptions.assumeTrue(false, "Unsupported client feature")
 }
+
