@@ -1,5 +1,6 @@
 package org.http4k.serverless.lambda.client
 
+import org.http4k.aws.FunctionName
 import org.http4k.client.HttpClientContract
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment

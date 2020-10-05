@@ -16,10 +16,10 @@ import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
-import org.http4k.serverless.lambda.client.ApiName
-import org.http4k.serverless.lambda.client.AwsApiGatewayApiClient
+import org.http4k.aws.ApiName
+import org.http4k.aws.AwsApiGatewayApiClient
 import org.http4k.serverless.lambda.client.Config
-import org.http4k.serverless.lambda.client.Stage
+import org.http4k.aws.Stage
 import org.junit.jupiter.api.fail
 import java.lang.management.ManagementFactory
 import java.time.Duration

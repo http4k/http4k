@@ -4,6 +4,9 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
+import org.http4k.aws.FunctionName
+import org.http4k.aws.Region
+import org.http4k.aws.Role
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.Body

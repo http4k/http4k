@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.client
+package org.http4k.aws
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -14,7 +14,7 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
-import org.http4k.serverless.lambda.client.ApiGatewayJackson.auto
+import org.http4k.aws.ApiGatewayJackson.auto
 
 class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     private val client = ApiGatewayApi(region).then(rawClient)
