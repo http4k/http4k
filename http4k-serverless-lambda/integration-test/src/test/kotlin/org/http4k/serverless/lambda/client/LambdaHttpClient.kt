@@ -58,11 +58,3 @@ object LambdaApi {
     }
 }
 
-object Config {
-    val scope = EnvironmentKey.map { AwsCredentialScope(it, "lambda") }.required("region")
-    val region = EnvironmentKey.map(::Region).required("region")
-    val role = EnvironmentKey.map(::Role).required("lambdaRuntimeRole")
-
-    fun credentials(config: Environment) =
-        AwsCredentials(EnvironmentKey.required("accessKey")(config), EnvironmentKey.required("secretKey")(config))
-}
