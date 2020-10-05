@@ -26,8 +26,6 @@ object DeployServerAsLambdaForClientContract {
 
         assumeTrue(lambdaBinary.exists(), "lambda binary to deploy (${lambdaBinary.absolutePath}) needs to be available")
 
-
-
         println("Deleting existing function (if exists)...")
         lambdaApiClient.delete(functionName)
 
