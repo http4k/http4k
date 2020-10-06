@@ -14,6 +14,7 @@ import org.http4k.core.then
 import org.http4k.core.toParameters
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
+import org.http4k.lens.BiDiBodyLens
 
 object LambdaHttpClient {
     operator fun invoke(functionName: FunctionName, region: Region): Filter =
@@ -26,17 +27,14 @@ object LambdaHttpClient {
                 Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
                     .header("X-Amz-Invocation-Type", "RequestResponse")
                     .header("X-Amz-Log-Type", "Tail")
-                    .with(lambdaRequest of adapter(it))
+                    .with(adapter.requestLens of adapter(it))
             )
 
-            val response = lambdaResponse(lambdaResponse)
+            val response = adapter.responseLens(lambdaResponse)
 
             adapter(response)
         }
     }
-
-    private val lambdaRequest = Body.auto<APIGatewayProxyRequestEvent>().toLens()
-    private val lambdaResponse = Body.auto<APIGatewayProxyResponseEvent>().toLens()
 }
 
 object LambdaApi {
@@ -48,6 +46,9 @@ object LambdaApi {
 internal interface AwsClientHttpAdapter<Req, Resp> {
     operator fun invoke(response: Resp): Response
     operator fun invoke(request: Request): Req
+
+    val requestLens: BiDiBodyLens<Req>
+    val responseLens: BiDiBodyLens<Resp>
 }
 
 class AwsClientV1HttpAdapter :
@@ -63,4 +64,7 @@ class AwsClientV1HttpAdapter :
         .withPath(request.uri.path)
         .withQueryStringParameters(request.uri.query.toParameters().toMap())
         .withBody(request.bodyString())
+
+    override val requestLens = Body.auto<APIGatewayProxyRequestEvent>().toLens()
+    override val responseLens = Body.auto<APIGatewayProxyResponseEvent>().toLens()
 }
