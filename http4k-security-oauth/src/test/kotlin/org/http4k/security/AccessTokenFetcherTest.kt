@@ -30,7 +30,7 @@ internal class AccessTokenFetcherTest {
 
     @Test
     fun `can get access token from json body`() {
-        //see https://tools.ietf.org/html/rfc6749#section-4.1.4
+        // see https://tools.ietf.org/html/rfc6749#section-4.1.4
         val api = { _: Request -> Response(OK).with(accessTokenResponseBody of AccessTokenResponse("some-access-token")) }
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)

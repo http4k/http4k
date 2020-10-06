@@ -19,7 +19,7 @@ object BiDiLensContract {
         LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
 
     inline fun <reified IN : Any, T> checkContract(spec: BiDiLensSpec<IN, T>, tValue: T, validValue: IN, nullValue: IN, invalidValue: IN?, unmodifiedValue: IN, modifiedValue: IN, listModifiedValue: IN) {
-        //synonym methods
+        // synonym methods
         assertThat(spec.required("hello").inject(tValue, unmodifiedValue), equalTo(modifiedValue))
         assertThat(spec.required("hello").extract(validValue), equalTo(tValue))
         assertThat(spec.required("hello")[validValue], equalTo(tValue))

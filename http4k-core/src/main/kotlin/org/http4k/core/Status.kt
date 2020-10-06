@@ -48,7 +48,7 @@ class Status internal constructor(val code: Int, val description: String, privat
         @JvmField val UNSUPPORTED_MEDIA_TYPE = Status(415, "Unsupported Media Type")
         @JvmField val REQUESTED_RANGE_NOT_SATISFIABLE = Status(416, "Requested Range Not Satisfiable")
         @JvmField val EXPECTATION_FAILED = Status(417, "Expectation Failed")
-        @JvmField val I_M_A_TEAPOT = Status(418, "I'm a teapot") //RFC2324
+        @JvmField val I_M_A_TEAPOT = Status(418, "I'm a teapot") // RFC2324
         @JvmField val UNPROCESSABLE_ENTITY = Status(422, "Unprocessable Entity")
         @JvmField val UPGRADE_REQUIRED = Status(426, "Upgrade Required")
         @JvmField val TOO_MANY_REQUESTS = Status(429, "Too many requests")

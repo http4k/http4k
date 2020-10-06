@@ -20,7 +20,7 @@ fun main() {
     println(extractedList)
     println(extractedList == nativeList)
 
-    //solution:
+    // solution:
     val anArrayLens = Body.auto<Array<MyIntWrapper>>().toLens()
 
     println(anArrayLens(req).contentEquals(arrayOf(MyIntWrapper(1), MyIntWrapper(2))))
