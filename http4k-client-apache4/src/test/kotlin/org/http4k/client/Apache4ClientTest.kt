@@ -23,8 +23,7 @@ class Apache4ClientTest : HttpClientContract({ Jetty(it) }, Apache4Client(),
             SocketConfig.custom()
                 .setSoTimeout(100)
                 .build()
-        ).build()
-        , responseBodyMode = Stream)) {
+        ).build(), responseBodyMode = Stream)) {
     
     @Test
     fun `connect timeout is handled`() {

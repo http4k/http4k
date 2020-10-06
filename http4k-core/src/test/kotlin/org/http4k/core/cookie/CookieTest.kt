@@ -73,7 +73,7 @@ class CookieTest {
     @Test
     fun `cookies can be extracted from a http2 request with multiple cookie headers`() {
         assertThat(Request(GET, "/")
-            .header("cookie","foo=bar; voo=tar")
+            .header("cookie", "foo=bar; voo=tar")
             .header("cookie", "roo=gar")
             .cookies(),
             equalTo(listOf(

@@ -22,8 +22,7 @@ class JavaHttpClientTest : HttpClientContract({ Jetty(it) }, JavaHttpClient(),
             RequestConfig.custom()
                 .setResponseTimeout(Timeout.ofMilliseconds(100))
                 .build()
-        ).build()
-        , responseBodyMode = Stream)) {
+        ).build(), responseBodyMode = Stream)) {
 
     @Disabled("unsupported by the underlying java client")
     override fun `handles response with custom status message`() {

@@ -25,8 +25,7 @@ class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
             RequestConfig.custom()
                 .setResponseTimeout(Timeout.ofMilliseconds(100))
                 .build()
-        ).build()
-        , responseBodyMode = Stream)) {
+        ).build(), responseBodyMode = Stream)) {
 
     @Test
     fun `connect timeout is handled`() {

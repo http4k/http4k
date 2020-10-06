@@ -8,5 +8,4 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class Java8HttpClientTest : HttpClientContract({ Jetty(it) }, Java8HttpClient(),
     ApacheClient(HttpClients.custom()
-        .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(100, MILLISECONDS).build()).build()
-        , responseBodyMode = BodyMode.Stream))
+        .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(100, MILLISECONDS).build()).build(), responseBodyMode = BodyMode.Stream))

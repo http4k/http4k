@@ -88,7 +88,6 @@ class WsClientTest {
         assertThat(
             object : WsHandler {
                 override fun invoke(request: Request): WsConsumer? = null
-            }.testWsClient(Request(GET, "/"))
-            , absent())
+            }.testWsClient(Request(GET, "/")), absent())
     }
 }
