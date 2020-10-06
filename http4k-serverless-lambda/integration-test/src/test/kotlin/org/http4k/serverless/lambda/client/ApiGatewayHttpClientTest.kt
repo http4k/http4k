@@ -33,5 +33,4 @@ abstract class ApiGatewayHttpClientTest(version: ApiIntegrationVersion) :
 
 class ApiGatewayV1ClientTest:ApiGatewayHttpClientTest(v1)
 
-//@Disabled("v2 is not supported by the client yet")
 class ApiGatewayV2ClientTest:ApiGatewayHttpClientTest(v2)

@@ -13,7 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
-import java.util.Base64
+import java.util.*
 
 class ApiGatewayV2AwsHttpAdapterTest {
 
@@ -89,6 +89,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .withStatusCode(418)
             .withBody("output body")
             .withMultiValueHeaders(mapOf("c" to listOf("d")))
+            .withHeaders(mapOf("c" to "d"))
             .build()
 
         assertThat(

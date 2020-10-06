@@ -24,5 +24,4 @@ abstract class LambdaHttpClientTest(version: ApiIntegrationVersion) :
 
 class LambdaV1HttpClientTest : LambdaHttpClientTest(v1)
 
-//@Disabled("v2 is not supported by the client yet")
 class LambdaV2HttpClientTest : LambdaHttpClientTest(v2)

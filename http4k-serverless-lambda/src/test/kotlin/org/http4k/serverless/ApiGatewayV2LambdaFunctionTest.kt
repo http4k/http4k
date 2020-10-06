@@ -47,6 +47,7 @@ class ApiGatewayV2LambdaFunctionTest {
                 APIGatewayV2HTTPResponse.builder()
                     .withStatusCode(200)
                     .withBody("hello there")
+                    .withHeaders(mapOf("a" to "b"))
                     .withMultiValueHeaders(mapOf("a" to listOf("b")))
                     .build()
             )

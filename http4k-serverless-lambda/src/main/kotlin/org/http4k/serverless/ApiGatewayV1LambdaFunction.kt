@@ -21,7 +21,7 @@ abstract class ApiGatewayV1LambdaFunction(appLoader: AppLoaderWithContexts)
 
 internal object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     override fun invoke(req: APIGatewayProxyRequestEvent) =
-        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, req.headers).asHttp4k()
+        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, req.headers, emptyList<String>()).asHttp4k()
 
     override fun invoke(req: Response) = APIGatewayProxyResponseEvent().also {
         it.statusCode = req.status.code
