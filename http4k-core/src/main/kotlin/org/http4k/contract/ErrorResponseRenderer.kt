@@ -21,20 +21,30 @@ class JsonErrorResponseRenderer<NODE>(private val json: Json<NODE>) : ErrorRespo
             .body(
                 json {
                     compact(
-                        obj("message" to string("Missing/invalid parameters"),
-                            "params" to array(lensFailure.failures.map {
-                                obj(
-                                    "name" to string(it.meta.name),
-                                    "type" to string(it.meta.location),
-                                    "datatype" to string(it.meta.paramMeta.description),
-                                    "required" to boolean(it.meta.required),
-                                    "reason" to string(it.javaClass.simpleName))
-                            })))
-                })
+                        obj(
+                            "message" to string("Missing/invalid parameters"),
+                            "params" to array(
+                                lensFailure.failures.map {
+                                    obj(
+                                        "name" to string(it.meta.name),
+                                        "type" to string(it.meta.location),
+                                        "datatype" to string(it.meta.paramMeta.description),
+                                        "required" to boolean(it.meta.required),
+                                        "reason" to string(it.javaClass.simpleName)
+                                    )
+                                }
+                            )
+                        )
+                    )
+                }
+            )
 
     override fun notFound(): Response = Response(NOT_FOUND)
-        .body(json {
-            compact(
-                obj("message" to string("No route found on this path. Have you used the correct HTTP verb?")))
-        })
+        .body(
+            json {
+                compact(
+                    obj("message" to string("No route found on this path. Have you used the correct HTTP verb?"))
+                )
+            }
+        )
 }

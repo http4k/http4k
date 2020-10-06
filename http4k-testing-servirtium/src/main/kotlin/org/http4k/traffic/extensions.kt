@@ -41,7 +41,8 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
 
 private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Response(NOT_IMPLEMENTED).body(
     "Unexpected request received for Interaction $index ==> " +
-        "expected:<$expectedReq> but was:<$actual>")
+        "expected:<$expectedReq> but was:<$actual>"
+)
 
 /**
  * Interaction was called more times than there are interactions
@@ -70,18 +71,23 @@ fun Sink.Companion.Servirtium(
         )
     }
 
-    private fun Response.middle() = ("\n```\n\n" +
-        headerLine<Response>() + ":\n" +
-        headerBlock() + "\n" +
-        bodyLine<Response>() + " (${status.code}: ${(CONTENT_TYPE(this)?.toHeaderValue()
-        ?: "")}):\n\n```\n"
+    private fun Response.middle() = (
+        "\n```\n\n" +
+            headerLine<Response>() + ":\n" +
+            headerBlock() + "\n" +
+            bodyLine<Response>() + " (${status.code}: ${(
+            CONTENT_TYPE(this)?.toHeaderValue()
+                ?: ""
+            )}):\n\n```\n"
         ).toByteArray()
 
-    private fun Request.header() = ("## Interaction ${count.getAndIncrement()}: ${method.name} $uri\n\n" +
-        headerLine<Request>() + ":\n" +
-        headerBlock() + "\n" +
-        bodyLine<Request>() + " (${CONTENT_TYPE(this)?.toHeaderValue() ?: ""}):\n" +
-        "\n```\n").toByteArray()
+    private fun Request.header() = (
+        "## Interaction ${count.getAndIncrement()}: ${method.name} $uri\n\n" +
+            headerLine<Request>() + ":\n" +
+            headerBlock() + "\n" +
+            bodyLine<Request>() + " (${CONTENT_TYPE(this)?.toHeaderValue() ?: ""}):\n" +
+            "\n```\n"
+        ).toByteArray()
 
     private fun footer() = "\n```\n\n".toByteArray()
 
@@ -124,18 +130,21 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
             .map {
                 val sections = it.split("```").map { it.byteInputStream().reader().readLines() }
 
-                val req = Request.parse(listOf(
-                    listOf(sections[0][0] + " " + HTTP_1_1),
-                    sections[1].dropWhile(String::isBlank) + "\r\n",
-                    sections[3].dropWhile(String::isBlank)
-                ).flatten().joinToString("\r\n"))
+                val req = Request.parse(
+                    listOf(
+                        listOf(sections[0][0] + " " + HTTP_1_1),
+                        sections[1].dropWhile(String::isBlank) + "\r\n",
+                        sections[3].dropWhile(String::isBlank)
+                    ).flatten().joinToString("\r\n")
+                )
 
                 val resp = Response.parse(
                     listOf(
-                        listOf(HTTP_1_1 +
-                            " " +
-                            sections[6].first { it.startsWith(bodyLine<Response>()) }.split('(', ':')[1] +
-                            " "
+                        listOf(
+                            HTTP_1_1 +
+                                " " +
+                                sections[6].first { it.startsWith(bodyLine<Response>()) }.split('(', ':')[1] +
+                                " "
                         ),
                         sections[5].dropWhile(String::isBlank) + "\r\n",
                         sections[7].dropWhile(String::isBlank)

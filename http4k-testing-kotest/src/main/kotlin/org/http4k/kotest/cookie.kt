@@ -16,7 +16,8 @@ fun haveName(expected: String): Matcher<Cookie> = object : Matcher<Cookie> {
     override fun test(value: Cookie): MatcherResult = MatcherResult(
         value.name == expected,
         "Cookie should have name $expected but was ${value.name}",
-        "Cookie should not have name $expected")
+        "Cookie should not have name $expected"
+    )
 }
 
 infix fun Cookie.shouldHaveValue(expected: String) = this should haveValue(expected)
@@ -30,7 +31,8 @@ fun haveValue(matcher: Matcher<String?>): Matcher<Cookie> = object : Matcher<Coo
         return MatcherResult(
             testResult.passed(),
             "Cookie value mismatch: ${testResult.failureMessage()}",
-            "Cookie value mismatch: ${testResult.negatedFailureMessage()}")
+            "Cookie value mismatch: ${testResult.negatedFailureMessage()}"
+        )
     }
 }
 
@@ -42,7 +44,8 @@ fun haveDomain(expected: String): Matcher<Cookie> = object : Matcher<Cookie> {
     override fun test(value: Cookie): MatcherResult = MatcherResult(
         value.domain == expected,
         "Cookie domain should be $expected but was ${value.domain}",
-        "Cookie domain should not be $expected")
+        "Cookie domain should not be $expected"
+    )
 }
 
 infix fun Cookie.shouldHavePath(expected: String) = this should haveCookiePath(expected)
@@ -51,7 +54,8 @@ fun haveCookiePath(expected: String): Matcher<Cookie> = object : Matcher<Cookie>
     override fun test(value: Cookie): MatcherResult = MatcherResult(
         value.path == expected,
         "Cookie path should be $expected but was ${value.path}",
-        "Cookie path should not be $expected")
+        "Cookie path should not be $expected"
+    )
 }
 
 fun Cookie.shouldBeSecure() = this should beSecure()
@@ -60,7 +64,8 @@ fun beSecure(): Matcher<Cookie> = object : Matcher<Cookie> {
     override fun test(value: Cookie): MatcherResult = MatcherResult(
         value.secure,
         "Cookie should be secure",
-        "Cookie should not be secure")
+        "Cookie should not be secure"
+    )
 }
 
 fun Cookie.shouldBeHttpOnly() = this should beHttpOnly()
@@ -69,7 +74,8 @@ fun beHttpOnly(): Matcher<Cookie> = object : Matcher<Cookie> {
     override fun test(value: Cookie): MatcherResult = MatcherResult(
         value.httpOnly,
         "Cookie should be httpOnly",
-        "Cookie should not be httpOnly")
+        "Cookie should not be httpOnly"
+    )
 }
 
 infix fun Cookie.shouldHaveExpiry(expected: LocalDateTime) = this should expireOn(expected)
@@ -81,7 +87,8 @@ fun expireOn(matcher: Matcher<LocalDateTime?>): Matcher<Cookie> = object : Match
         return MatcherResult(
             testResult.passed(),
             "Cookie expiration mismatch: ${testResult.failureMessage()}",
-            "Cookie expiration mismatch: ${testResult.negatedFailureMessage()}")
+            "Cookie expiration mismatch: ${testResult.negatedFailureMessage()}"
+        )
     }
 }
 
@@ -90,7 +97,8 @@ fun neverExpire(): Matcher<Cookie> = object : Matcher<Cookie> {
     override fun test(value: Cookie): MatcherResult = MatcherResult(
         value.expires == null,
         "Cookie should never expire (expires on ${value.expires})",
-        "Cookie should expire")
+        "Cookie should expire"
+    )
 }
 
 infix fun Cookie.shouldHaveSameSite(expected: SameSite) = this should haveSameSite(expected)
@@ -99,5 +107,6 @@ fun haveSameSite(expected: SameSite): Matcher<Cookie> = object : Matcher<Cookie>
     override fun test(value: Cookie): MatcherResult = MatcherResult(
         value.sameSite == expected,
         "Cookie should have same-site: expected:<$expected> but was:<${value.sameSite}>",
-        "Cookie should not have same-site $expected")
+        "Cookie should not have same-site $expected"
+    )
 }

@@ -110,8 +110,10 @@ class GzipBodyTest {
 
         @Test
         fun `a round-trip of a streaming body works`() {
-            assertThat(Body("foo".byteInputStream(Charsets.UTF_8)).gzippedStream().body.gunzippedStream().payload,
-                equalTo(Body("foo").payload))
+            assertThat(
+                Body("foo".byteInputStream(Charsets.UTF_8)).gzippedStream().body.gunzippedStream().payload,
+                equalTo(Body("foo").payload)
+            )
         }
 
         @Test

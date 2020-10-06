@@ -38,10 +38,12 @@ class KotlinxSerializationTest : JsonContract<JsonElement>(KotlinxSerialization)
                 "null" to nullNode(),
                 "int" to number(2),
                 "empty" to obj(),
-                "array" to array(listOf(
-                    string(""),
-                    number(123)
-                )),
+                "array" to array(
+                    listOf(
+                        string(""),
+                        number(123)
+                    )
+                ),
                 "singletonArray" to array(obj("number" to number(123)))
             )
             val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":"1.1999999999999999555910790149937383830547332763671875","bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
@@ -72,19 +74,23 @@ class KotlinxSerializationGenerateDataClassesTest : GenerateDataClassesContract<
                     "double" to number(1.0),
                     "long" to number(10L)
                 ),
-                "array" to array(listOf(
-                    string(""),
-                    number(123),
-                    obj(
-                        "nullNode" to nullNode(),
-                        "long" to number(10L)
+                "array" to array(
+                    listOf(
+                        string(""),
+                        number(123),
+                        obj(
+                            "nullNode" to nullNode(),
+                            "long" to number(10L)
+                        )
                     )
-                )),
+                ),
                 "singleTypeArray" to array(
-                    listOf(obj(
-                        "string" to string("someString"),
-                        "list" to array(listOf(obj("id" to string("someValue"))))
-                    ))
+                    listOf(
+                        obj(
+                            "string" to string("someString"),
+                            "list" to array(listOf(obj("id" to string("someValue"))))
+                        )
+                    )
                 )
             )
         }
@@ -94,7 +100,10 @@ class KotlinxSerializationGenerateDataClassesTest : GenerateDataClassesContract<
 
         handler(Request(GET, "/bob"))
         val actual = String(os.toByteArray())
-        assertThat(actual, equalTo("""// result generated from /bob
+        assertThat(
+            actual,
+            equalTo(
+                """// result generated from /bob
 
 data class Array1(val nullNode: Any?, val long: Number?)
 
@@ -107,6 +116,8 @@ data class List1(val id: String?)
 data class NonEmpty(val double: Number?, val long: Number?)
 
 data class SingleTypeArray1(val string: String?, val list: List<List1>?)
-"""))
+"""
+            )
+        )
     }
 }

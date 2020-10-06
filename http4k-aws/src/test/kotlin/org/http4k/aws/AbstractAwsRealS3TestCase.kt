@@ -35,7 +35,8 @@ abstract class AbstractAwsRealS3TestCase {
         assertThat(
             "Developer should understand what this test does- set signMyLifeAway property to the expected value.",
             properties.getProperty("signMyLifeAway"),
-            equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
+            equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials")
+        )
 
         scope = AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service"))
         credentials = AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey"))

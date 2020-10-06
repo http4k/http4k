@@ -29,11 +29,13 @@ class ApiGatewayV1AwsHttpAdapterTest {
 
         assertThat(
             ApiGatewayV1AwsHttpAdapter(request),
-            equalTo(Request(GET, "/path")
-                .query("query", "value")
-                .header("c", "d")
-                .body("input body")
-            ))
+            equalTo(
+                Request(GET, "/path")
+                    .query("query", "value")
+                    .header("c", "d")
+                    .body("input body")
+            )
+        )
     }
 
     @Test
@@ -49,11 +51,13 @@ class ApiGatewayV1AwsHttpAdapterTest {
 
         assertThat(
             ApiGatewayV1AwsHttpAdapter(request),
-            equalTo(Request(GET, "/path")
-                .query("query", "value")
-                .header("c", "d")
-                .body("input body")
-            ))
+            equalTo(
+                Request(GET, "/path")
+                    .query("query", "value")
+                    .header("c", "d")
+                    .body("input body")
+            )
+        )
     }
 
     @Test
@@ -69,23 +73,28 @@ class ApiGatewayV1AwsHttpAdapterTest {
 
         assertThat(
             ApiGatewayV1AwsHttpAdapter(request),
-            equalTo(Request(POST, "/path")
-                .body(Body(ByteBuffer.wrap(imageBytes)))
-            ))
+            equalTo(
+                Request(POST, "/path")
+                    .body(Body(ByteBuffer.wrap(imageBytes)))
+            )
+        )
     }
 
     @Test
     fun `converts from http4k response`() {
         assertThat(
-            ApiGatewayV1AwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
-                .header("c", "d")
-                .body("output body")
+            ApiGatewayV1AwsHttpAdapter(
+                Response(Status.I_M_A_TEAPOT)
+                    .header("c", "d")
+                    .body("output body")
             ),
-            equalTo(APIGatewayProxyResponseEvent().apply {
-                statusCode = 418
-                body = "output body"
-                headers = mapOf("c" to "d")
-            })
+            equalTo(
+                APIGatewayProxyResponseEvent().apply {
+                    statusCode = 418
+                    body = "output body"
+                    headers = mapOf("c" to "d")
+                }
+            )
         )
     }
 }

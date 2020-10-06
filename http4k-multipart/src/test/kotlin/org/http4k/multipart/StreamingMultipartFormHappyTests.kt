@@ -22,8 +22,11 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun uploadEmptyFile() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "", "doesnt/matter", "".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", "", "doesnt/matter", "".byteInputStream(), emptyList()).stream()
+        )
 
         assertFilePart(form, "aFile", "", "doesnt/matter", "")
 
@@ -33,9 +36,12 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun hasNextIsIdempotent() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "", "application/octet-stream", "".byteInputStream(), emptyList())
-            .file("anotherFile", "", "application/octet-stream", "".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", "", "application/octet-stream", "".byteInputStream(), emptyList())
+                .file("anotherFile", "", "application/octet-stream", "".byteInputStream(), emptyList()).stream()
+        )
 
         assertThereAreMoreParts(form)
         assertThereAreMoreParts(form)
@@ -54,8 +60,11 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun uploadEmptyField() {
         val boundary = "-----3456"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .field("aField", "", emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .field("aField", "", emptyList()).stream()
+        )
 
         assertFieldPart(form, "aField", "")
 
@@ -65,8 +74,11 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun uploadSmallFile() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream()
+        )
 
         assertFilePart(form, "aFile", "file.name", "application/octet-stream", "File contents here")
 
@@ -76,13 +88,18 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun uploadFileWithLowercaseContentDisposition() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .part("File contents here".byteInputStream(),
-                listOf(
-                    "content-disposition" to "form-data; name=\"aFile\"; filename=\"file.name\"",
-                    "Content-Type" to "application/octet-stream")
-            )
-            .stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .part(
+                    "File contents here".byteInputStream(),
+                    listOf(
+                        "content-disposition" to "form-data; name=\"aFile\"; filename=\"file.name\"",
+                        "Content-Type" to "application/octet-stream"
+                    )
+                )
+                .stream()
+        )
 
         assertFilePart(form, "aFile", "file.name", "application/octet-stream", "File contents here")
 
@@ -92,14 +109,17 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun uploadSmallFileAsAttachment() {
         val boundary = "-----4567"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("beforeFile", "before.txt", "application/json", "[]".byteInputStream(), emptyList())
-            .startMultipart("multipartFieldName", "7890")
-            .attachment("during.txt", "plain/text", "Attachment contents here", emptyList())
-            .attachment("during2.txt", "plain/text", "More text here", emptyList())
-            .endMultipart()
-            .file("afterFile", "after.txt", "application/json", "[]".byteInputStream(), emptyList())
-            .stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("beforeFile", "before.txt", "application/json", "[]".byteInputStream(), emptyList())
+                .startMultipart("multipartFieldName", "7890")
+                .attachment("during.txt", "plain/text", "Attachment contents here", emptyList())
+                .attachment("during2.txt", "plain/text", "More text here", emptyList())
+                .endMultipart()
+                .file("afterFile", "after.txt", "application/json", "[]".byteInputStream(), emptyList())
+                .stream()
+        )
 
         assertFilePart(form, "beforeFile", "before.txt", "application/json", "[]")
         assertFilePart(form, "multipartFieldName", "during.txt", "plain/text", "Attachment contents here")
@@ -112,8 +132,11 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun uploadSmallField() {
         val boundary = "-----3456"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .field("aField", "Here is the value of the field\n", emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .field("aField", "Here is the value of the field\n", emptyList()).stream()
+        )
 
         assertFieldPart(form, "aField", "Here is the value of the field\n")
 
@@ -123,14 +146,16 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun uploadMultipleFilesAndFields() {
         val boundary = "-----1234"
-        val form = getMultipartFormParts(boundary,
+        val form = getMultipartFormParts(
+            boundary,
             MultipartFormBuilder(boundary)
                 .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream(), emptyList())
                 .field("field", "fieldValue" + CR_LF + "with cr lf", emptyList())
                 .field("multi", "value1", emptyList())
                 .file("anotherFile", "BAR.tab", "text/something", "This is another file\n".byteInputStream(), emptyList())
                 .field("multi", "value2", emptyList())
-                .stream())
+                .stream()
+        )
 
         assertFilePart(form, "file", "foo.tab", "text/whatever", "This is the content of the file\n")
         assertFieldPart(form, "field", "fieldValue" + CR_LF + "with cr lf")
@@ -144,18 +169,26 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun uploadFieldsWithMultilineHeaders() {
         val boundary = "-----1234"
-        val form = getMultipartFormParts(boundary,
+        val form = getMultipartFormParts(
+            boundary,
             MultipartFormBuilder(boundary)
-                .part("Content-Disposition: form-data; \r\n" +
-                    "\tname=\"field\"\r\n" +
-                    "\r\n" +
-                    "fieldValue", emptyList())
-                .part("Content-Disposition: form-data;\r\n" +
-                    "     name=\"multi\"\r\n" +
-                    "\r\n" +
-                    "value1", emptyList())
+                .part(
+                    "Content-Disposition: form-data; \r\n" +
+                        "\tname=\"field\"\r\n" +
+                        "\r\n" +
+                        "fieldValue",
+                    emptyList()
+                )
+                .part(
+                    "Content-Disposition: form-data;\r\n" +
+                        "     name=\"multi\"\r\n" +
+                        "\r\n" +
+                        "value1",
+                    emptyList()
+                )
                 .field("multi", "value2", emptyList())
-                .stream())
+                .stream()
+        )
 
         assertFieldPart(form, "field", "fieldValue")
         assertFieldPart(form, "multi", "value1")
@@ -167,16 +200,26 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun partsCanHaveLotsOfHeaders() {
         val boundary = "-----1234"
-        val form = getMultipartFormParts(boundary,
+        val form = getMultipartFormParts(
+            boundary,
             MultipartFormBuilder(boundary)
-                .part("This is the content of the file\n",
-                    listOf("Content-Disposition" to "form-data; name=\"fileFieldName\"; filename=\"filename.txt\"",
+                .part(
+                    "This is the content of the file\n",
+                    listOf(
+                        "Content-Disposition" to "form-data; name=\"fileFieldName\"; filename=\"filename.txt\"",
                         "Content-Type" to "plain/text",
-                        "Some-header" to "some value"))
-                .part("This is the content of the field\n",
-                    listOf("Content-Disposition" to "form-data; name=\"fieldFieldName\"",
-                        "Another-header" to "some-key=\"some-value\""))
-                .stream())
+                        "Some-header" to "some value"
+                    )
+                )
+                .part(
+                    "This is the content of the field\n",
+                    listOf(
+                        "Content-Disposition" to "form-data; name=\"fieldFieldName\"",
+                        "Another-header" to "some-key=\"some-value\""
+                    )
+                )
+                .stream()
+        )
 
         val file = assertFilePart(form, "fileFieldName", "filename.txt", "plain/text", "This is the content of the file\n")
 
@@ -199,8 +242,11 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun closedPartsCannotBeReadFrom() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream()
+        )
 
         val file = form.next()
 
@@ -222,8 +268,11 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun readingPartsContentsAsStringClosesStream() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream()
+        )
 
         val file = form.next()
         file.contentsAsString
@@ -241,9 +290,12 @@ class StreamingMultipartFormHappyTests {
     @Test
     fun gettingNextPartClosesOldPart() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
+                .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream(), emptyList()).stream()
+        )
 
         val file1 = form.next()
 

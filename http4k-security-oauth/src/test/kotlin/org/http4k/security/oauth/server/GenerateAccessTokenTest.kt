@@ -47,13 +47,14 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `generates a dummy token`() {
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "authorization_code")
-            .form("code", code.value)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret")
-            .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", code.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))))
@@ -63,13 +64,14 @@ class GenerateAccessTokenTest {
     fun `generates dummy access_token and id_token if an oidc request`() {
         val codeForIdTokenRequest = codes.create(request, authRequest.copy(scopes = listOf("openid")), Response(OK)).get()
 
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "authorization_code")
-            .form("code", codeForIdTokenRequest.value)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret")
-            .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", codeForIdTokenRequest.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(OK))
@@ -79,53 +81,69 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `allowing refreshing a token`() {
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "refresh_token")
-            .form("refresh_token", "valid-refresh-token")
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret"))
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "refresh_token")
+                .form("refresh_token", "valid-refresh-token")
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+        )
 
-        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse(
-            accessToken = DummyRefreshTokens.newAccessToken.value,
-            tokenType = DummyRefreshTokens.newAccessToken.type,
-            scope = DummyRefreshTokens.newAccessToken.scope,
-            expiresIn = DummyRefreshTokens.newAccessToken.expiresIn,
-            refreshToken = DummyRefreshTokens.newAccessToken.refreshToken?.value
-        ))))
+        assertThat(
+            response,
+            hasStatus(OK) and hasBody(
+                accessTokenResponseBody,
+                equalTo(
+                    AccessTokenResponse(
+                        accessToken = DummyRefreshTokens.newAccessToken.value,
+                        tokenType = DummyRefreshTokens.newAccessToken.type,
+                        scope = DummyRefreshTokens.newAccessToken.scope,
+                        expiresIn = DummyRefreshTokens.newAccessToken.expiresIn,
+                        refreshToken = DummyRefreshTokens.newAccessToken.refreshToken?.value
+                    )
+                )
+            )
+        )
     }
 
     @Test
     fun `bad request for missing refresh_token parameter`() {
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "refresh_token")
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret"))
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "refresh_token")
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+        )
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_request")))
     }
 
     @Test
     fun `validates credentials for refresh tokens`() {
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "refresh_token")
-            .form("refresh_token", "invalid-refresh-token")
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "not a valid secret"))
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "refresh_token")
+                .form("refresh_token", "invalid-refresh-token")
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "not a valid secret")
+        )
 
         assertThat(response, hasStatus(UNAUTHORIZED) and hasBody(withErrorType("invalid_client")))
     }
 
     @Test
     fun `copes with error from actual refresh tokens`() {
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "refresh_token")
-            .form("refresh_token", "invalid-refresh-token")
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret"))
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "refresh_token")
+                .form("refresh_token", "invalid-refresh-token")
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+        )
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_request")))
     }
@@ -134,13 +152,14 @@ class GenerateAccessTokenTest {
     fun `generates dummy access_token and id_token`() {
         val codeForIdTokenRequest = codes.create(request, authRequest.copy(responseType = CodeIdToken, scopes = listOf("openid")), Response(OK)).get()
 
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "authorization_code")
-            .form("code", codeForIdTokenRequest.value)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret")
-            .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", codeForIdTokenRequest.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(OK))
@@ -150,11 +169,12 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `generates dummy token for client credentials grant type`() {
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "client_credentials")
-            .form("client_secret", "a-secret")
-            .form("client_id", authRequest.client.value)
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "client_credentials")
+                .form("client_secret", "a-secret")
+                .form("client_id", authRequest.client.value)
         )
 
         assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))))
@@ -162,13 +182,14 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles invalid grant_type`() {
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "something_else")
-            .form("code", code.value)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret")
-            .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "something_else")
+                .form("code", code.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("unsupported_grant_type")))
@@ -176,13 +197,14 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles invalid client credentials`() {
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "authorization_code")
-            .form("code", code.value)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "wrong-secret")
-            .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", code.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "wrong-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(UNAUTHORIZED) and hasBody(withErrorType("invalid_client")))
@@ -194,13 +216,14 @@ class GenerateAccessTokenTest {
 
         val expiredCode = codes.create(request, authRequest, Response(OK)).get()
 
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "authorization_code")
-            .form("code", expiredCode.value)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret")
-            .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", expiredCode.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
@@ -210,13 +233,14 @@ class GenerateAccessTokenTest {
     fun `handles client id different from one in authorization code`() {
         val storedCode = codes.create(request, authRequest.copy(client = ClientId("different client")), Response(OK)).get()
 
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "authorization_code")
-            .form("code", storedCode.value)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret")
-            .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", storedCode.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
@@ -226,13 +250,14 @@ class GenerateAccessTokenTest {
     fun `handles redirectUri different from one in authorization code`() {
         val storedCode = codes.create(request, authRequest.copy(redirectUri = Uri.of("somethingelse")), Response(OK)).get()
 
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", "authorization_code")
-            .form("code", storedCode.value)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret")
-            .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", storedCode.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
@@ -273,11 +298,12 @@ class GenerateAccessTokenTest {
     fun `handles grant type not in configuration`() {
         val handler = GenerateAccessToken(codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdTokens(), DummyRefreshTokens(), JsonResponseErrorRenderer(json), GrantTypesConfiguration(emptyMap()))
 
-        val response = handler(Request(POST, "/token")
-            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-            .form("grant_type", GrantType.ClientCredentials.rfcValue)
-            .form("client_id", authRequest.client.value)
-            .form("client_secret", "a-secret")
+        val response = handler(
+            Request(POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", GrantType.ClientCredentials.rfcValue)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
         )
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("unsupported_grant_type")))

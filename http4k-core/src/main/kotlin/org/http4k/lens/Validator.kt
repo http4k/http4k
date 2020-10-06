@@ -10,11 +10,13 @@ enum class Validator(private val actOn: (LensFailure) -> List<Failure>) {
 
     operator fun <T : Any> invoke(entity: T, vararg lenses: LensExtractor<T, *>): List<Failure> =
         collectErrors(lenses, entity).run {
-            actOn(when (size) {
-                0 -> LensFailure()
-                1 -> first()
-                else -> LensFailure(flatMap { it.failures }, LensFailures(this), entity)
-            })
+            actOn(
+                when (size) {
+                    0 -> LensFailure()
+                    1 -> first()
+                    else -> LensFailure(flatMap { it.failures }, LensFailures(this), entity)
+                }
+            )
         }
 
     private fun <T : Any> collectErrors(lenses: Array<out LensExtractor<T, *>>, entity: T): List<LensFailure> =

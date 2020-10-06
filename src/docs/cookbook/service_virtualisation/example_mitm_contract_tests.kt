@@ -34,11 +34,13 @@ import java.nio.file.Paths
  * This is our producing app
  */
 fun WordCounterApp(port: Int): Http4kServer {
-    val app = routes("/count" bind POST to { req: Request ->
-        Response(OK).body(
-            req.bodyString().run { if (isBlank()) 0 else split(" ").size }.toString()
-        )
-    })
+    val app = routes(
+        "/count" bind POST to { req: Request ->
+            Response(OK).body(
+                req.bodyString().run { if (isBlank()) 0 else split(" ").size }.toString()
+            )
+        }
+    )
     return app.asServer(SunHttp(port))
 }
 
@@ -125,7 +127,8 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"),
+        servirtium = ServirtiumServer.Replay(
+            info.displayName.removeSuffix("()"),
             Disk(File(".")),
             object : InteractionOptions {
                 override fun modify(request: Request) = request.header("Date", "some overridden date")
@@ -152,8 +155,10 @@ class GitHubReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        servirtium = ServirtiumServer.Replay("WordCounter." + info.displayName.removeSuffix("()"),
-            GitHub("http4k", "http4k",
+        servirtium = ServirtiumServer.Replay(
+            "WordCounter." + info.displayName.removeSuffix("()"),
+            GitHub(
+                "http4k", "http4k",
                 Credentials("<github user>", "<personal access token>"),
                 Paths.get("src/test/resources/cookbook/service_virtualisation")
             ),

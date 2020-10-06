@@ -99,12 +99,15 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
                 contentType,
                 filenameFromMap(contentDisposition),
                 BoundedInputStream(),
-                headers)
+                headers
+            )
         }
     }
 
-    private fun filenameFromMap(contentDisposition: Map<String, String>): String? = if (contentDisposition.containsKey("filename")) trim(contentDisposition["filename"]
-        ?: "") else null
+    private fun filenameFromMap(contentDisposition: Map<String, String>): String? = if (contentDisposition.containsKey("filename")) trim(
+        contentDisposition["filename"]
+            ?: ""
+    ) else null
 
     private fun trim(string: String?): String? = string?.trim { it <= ' ' }
 

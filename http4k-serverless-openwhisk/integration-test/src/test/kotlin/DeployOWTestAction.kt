@@ -43,8 +43,10 @@ object DeployOWTestAction {
         ListAllActions.main(standardArgs)
 
         OpenWhiskCliFlags(standardArgs + arrayOf("--packageName", packageName, "--actionName", actionName, "--verbose")).use {
-            openWhiskClient().invokeWebActionInPackage(if (local) "guest" else "david%40http4k.org_dev", packageName,
-                actionName, Request(POST, "/echo").body("helloworld"))
+            openWhiskClient().invokeWebActionInPackage(
+                if (local) "guest" else "david%40http4k.org_dev", packageName,
+                actionName, Request(POST, "/echo").body("helloworld")
+            )
         }
     }
 }

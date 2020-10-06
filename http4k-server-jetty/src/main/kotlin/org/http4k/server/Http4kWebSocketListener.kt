@@ -18,8 +18,13 @@ import java.nio.ByteBuffer
 
 class Http4kWebSocketAdapter(private val innerSocket: PushPullAdaptingWebSocket) {
     fun onError(throwable: Throwable) = innerSocket.triggerError(throwable)
-    fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(WsStatus(statusCode, reason
-        ?: "<unknown>"))
+    fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(
+        WsStatus(
+            statusCode,
+            reason
+                ?: "<unknown>"
+        )
+    )
 
     fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
 }
@@ -38,18 +43,20 @@ class Http4kWebSocketListener(private val wSocket: WsConsumer, private val upgra
     }
 
     override fun onWebSocketConnect(session: Session) {
-        websocket = Http4kWebSocketAdapter(object : PushPullAdaptingWebSocket(upgradeRequest) {
-            override fun send(message: WsMessage) {
-                when (message.body) {
-                    is StreamBody -> session.remote.sendBytesByFuture(message.body.payload).get()
-                    else -> session.remote.sendStringByFuture(message.bodyString()).get()
+        websocket = Http4kWebSocketAdapter(
+            object : PushPullAdaptingWebSocket(upgradeRequest) {
+                override fun send(message: WsMessage) {
+                    when (message.body) {
+                        is StreamBody -> session.remote.sendBytesByFuture(message.body.payload).get()
+                        else -> session.remote.sendStringByFuture(message.bodyString()).get()
+                    }
                 }
-            }
 
-            override fun close(status: WsStatus) {
-                session.close(status.code, status.description)
-            }
-        }.apply(wSocket))
+                override fun close(status: WsStatus) {
+                    session.close(status.code, status.description)
+                }
+            }.apply(wSocket)
+        )
     }
 
     override fun onWebSocketText(message: String) {

@@ -88,8 +88,10 @@ class QuotedPrintableDecoderTestCase {
     @Test
     @Throws(Exception::class)
     fun softLineBreakDecode() {
-        assertEncoded("If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.",
-            "If you believe that truth=3Dbeauty, then surely=20=\r\nmathematics is the most beautiful branch of philosophy.")
+        assertEncoded(
+            "If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.",
+            "If you believe that truth=3Dbeauty, then surely=20=\r\nmathematics is the most beautiful branch of philosophy."
+        )
     }
 
     @Test

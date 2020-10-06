@@ -55,9 +55,10 @@ class ServirtiumReplayServerTest : TestContract {
     fun `too many requests`(approver: Approver) {
         super.scenario()
         val httpMessage = createHandler()(Request(GET, "/foo")).run {
-            body(bodyString()
-                .replace(Regex("Host.*"), "Host: localhost")
-                .replace(Regex("User-agent.*"), "User-agent: bob")
+            body(
+                bodyString()
+                    .replace(Regex("Host.*"), "Host: localhost")
+                    .replace(Regex("User-agent.*"), "User-agent: bob")
             )
         }
 

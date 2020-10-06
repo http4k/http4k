@@ -46,18 +46,22 @@ fun Body.Companion.multipartForm(
     diskThreshold: Int = DEFAULT_DISK_THRESHOLD,
     contentTypeFn: (String) -> ContentType = ::MultipartFormWithBoundary
 ): BiDiBodyLensSpec<MultipartForm> =
-    BiDiBodyLensSpec(parts.map { it.meta }, MULTIPART_FORM_DATA,
+    BiDiBodyLensSpec(
+        parts.map { it.meta }, MULTIPART_FORM_DATA,
         LensGet { _, target ->
-            listOf(MultipartFormBody.from(target, diskThreshold).apply {
-                Strict(contentTypeFn(boundary), CONTENT_TYPE(target))
-            })
+            listOf(
+                MultipartFormBody.from(target, diskThreshold).apply {
+                    Strict(contentTypeFn(boundary), CONTENT_TYPE(target))
+                }
+            )
         },
         LensSet { _: String, values: List<Body>, target: HttpMessage ->
             values.fold(target) { a, b ->
                 a.body(b)
                     .with(CONTENT_TYPE of contentTypeFn(defaultBoundary))
             }
-        })
+        }
+    )
         .map({ it.toMultipartForm() }, { it.toMultipartFormBody(defaultBoundary) })
         .map({ it.copy(errors = validator(it, *parts)) }, { it.copy(errors = validator(it, *parts)) })
 

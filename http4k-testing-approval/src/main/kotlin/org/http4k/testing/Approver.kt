@@ -41,12 +41,13 @@ class NamedResourceApprover(
                         throw ApprovalFailed("No approved content found", actual, approved)
                     }
                 }
-                else -> try {
-                    assertEquals(approvalContent(this).reader().use { it.readText() }, approvalContent(httpMessage).reader().readText())
-                } catch (e: AssertionError) {
-                    approvalContent(httpMessage).copyTo(actual.output())
-                    throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)
-                }
+                else ->
+                    try {
+                        assertEquals(approvalContent(this).reader().use { it.readText() }, approvalContent(httpMessage).reader().readText())
+                    } catch (e: AssertionError) {
+                        approvalContent(httpMessage).copyTo(actual.output())
+                        throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)
+                    }
             }
         }
     }

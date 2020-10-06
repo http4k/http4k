@@ -78,8 +78,11 @@ class MapEnvironment private constructor(private val contents: Map<String, Strin
     override fun keys() = contents.keys
 
     companion object {
-        fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(properties.entries
-            .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator)
+        fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(
+            properties.entries
+                .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) },
+            separator
+        )
 
         fun from(reader: Reader, separator: String = ","): Environment = from(Properties().apply { load(reader) }, separator)
     }
@@ -90,7 +93,8 @@ class MapEnvironment private constructor(private val contents: Map<String, Strin
  * values contain commas, either use a EnvironmentKey.(mapping).multi.required()/optional()/defaulted() to retrieve the
  * entire list, or override the comma separator in your initial Environment.
  */
-object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
+object EnvironmentKey : BiDiLensSpec<Environment, String>(
+    "env", ParamMeta.StringParam,
     LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim) ?: emptyList() },
     LensSet { name, values, target ->
         values.fold(target - name) { acc, next ->

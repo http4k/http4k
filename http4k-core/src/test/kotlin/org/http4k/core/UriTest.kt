@@ -77,11 +77,14 @@ class UriTest {
 
     @Test
     fun can_remove_parameter() {
-        assertThat(Uri.of(value = "http://ignore")
-            .query("a", "b")
-            .query("c", "d")
-            .query("a", "c")
-            .removeQuery("a").toString(), equalTo("http://ignore?c=d"))
+        assertThat(
+            Uri.of(value = "http://ignore")
+                .query("a", "b")
+                .query("c", "d")
+                .query("a", "c")
+                .removeQuery("a").toString(),
+            equalTo("http://ignore?c=d")
+        )
     }
 
     @Test

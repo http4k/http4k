@@ -28,16 +28,22 @@ class ReplayExtensionTests {
 
     @Test
     fun `replayingMatchingContent blows up with non-matching request`() {
-        assertThat(http(Request(GET, "/foobar")),
+        assertThat(
+            http(Request(GET, "/foobar")),
             hasStatus(NOT_IMPLEMENTED).and(
-                hasBody(containsSubstring("Unexpected request received for Interaction 0 ==>"))))
+                hasBody(containsSubstring("Unexpected request received for Interaction 0 ==>"))
+            )
+        )
     }
 
     @Test
     fun `replayingMatchingContent blows up when more requests than interactions`() {
         assertThat(http(request), equalTo(response))
-        assertThat(http(request),
+        assertThat(
+            http(request),
             hasStatus(NOT_IMPLEMENTED).and(
-                hasBody(containsSubstring("Have 1 interaction(s) in the script but called 2 times. Unexpected interaction"))))
+                hasBody(containsSubstring("Have 1 interaction(s) in the script but called 2 times. Unexpected interaction"))
+            )
+        )
     }
 }

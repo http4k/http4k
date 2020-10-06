@@ -34,18 +34,26 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     }
 
     fun createLambdaIntegration(apiId: ApiId, functionArn: String, version: ApiIntegrationVersion): IntegrationId =
-        integrationInfo(client(Request(Method.POST, "/v2/apis/${apiId.value}/integrations")
-            .with(createIntegrationLens of Integration(
-                integrationUri = functionArn,
-                payloadFormatVersion = when (version) {
-                    v1 -> "1.0"
-                    v2 -> "2.0"
-                }
-            )))).integrationId
+        integrationInfo(
+            client(
+                Request(Method.POST, "/v2/apis/${apiId.value}/integrations")
+                    .with(
+                        createIntegrationLens of Integration(
+                            integrationUri = functionArn,
+                            payloadFormatVersion = when (version) {
+                                v1 -> "1.0"
+                                v2 -> "2.0"
+                            }
+                        )
+                    )
+            )
+        ).integrationId
 
     fun createDefaultRoute(apiId: ApiId, integrationId: IntegrationId) =
-        client(Request(Method.POST, "/v2/apis/${apiId.value}/routes")
-            .with(createRouteLens of Route("integrations/${integrationId.value}")))
+        client(
+            Request(Method.POST, "/v2/apis/${apiId.value}/routes")
+                .with(createRouteLens of Route("integrations/${integrationId.value}"))
+        )
 
     companion object {
         private val createApiLens = Body.auto<Api>().toLens()
@@ -93,17 +101,18 @@ data class IntegrationId(val value: String)
 
 enum class ApiIntegrationVersion { v1, v2 }
 
-object ApiGatewayJackson : ConfigurableJackson(KotlinModule()
-    .asConfigurable()
-    .withStandardMappings()
-    .text(BiDiMapping(::ApiName, ApiName::value))
-    .text(BiDiMapping(::ApiId, ApiId::value))
-    .text(BiDiMapping(::StageName, StageName::value))
-    .text(BiDiMapping(::IntegrationId, IntegrationId::value))
-    .done()
-    .deactivateDefaultTyping()
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
-    .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
-    .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
+object ApiGatewayJackson : ConfigurableJackson(
+    KotlinModule()
+        .asConfigurable()
+        .withStandardMappings()
+        .text(BiDiMapping(::ApiName, ApiName::value))
+        .text(BiDiMapping(::ApiId, ApiId::value))
+        .text(BiDiMapping(::StageName, StageName::value))
+        .text(BiDiMapping(::IntegrationId, IntegrationId::value))
+        .done()
+        .deactivateDefaultTyping()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+        .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
+        .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
 )

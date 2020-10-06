@@ -34,11 +34,13 @@ class HostDemuxRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
 
     @Test
     fun `with filter`() {
-        val handler2 = otherHandler.withFilter(Filter { next ->
-            {
-                next(it.replaceHeader("host", "foobar"))
+        val handler2 = otherHandler.withFilter(
+            Filter { next ->
+                {
+                    next(it.replaceHeader("host", "foobar"))
+                }
             }
-        })
+        )
         assertThat(handler2(requestWithHost("host1", "/foo")), hasBody("host1foobar"))
         assertThat(handler2(requestWithHost("host2", "/foo")), hasBody("host2foobar"))
         assertThat(handler2(Request(GET, "")), hasStatus(NOT_FOUND))

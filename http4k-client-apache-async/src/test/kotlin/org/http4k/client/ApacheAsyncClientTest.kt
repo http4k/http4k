@@ -27,11 +27,17 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
-class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsyncClient(),
-    ApacheAsyncClient(HttpAsyncClients.custom()
-        .setIOReactorConfig(IOReactorConfig.custom()
-            .setSoTimeout(100, TimeUnit.MILLISECONDS)
-            .build()).build().apply { start() })) {
+class ApacheAsyncClientTest : AsyncHttpClientContract(
+    { SunHttp(it) }, ApacheAsyncClient(),
+    ApacheAsyncClient(
+        HttpAsyncClients.custom()
+            .setIOReactorConfig(
+                IOReactorConfig.custom()
+                    .setSoTimeout(100, TimeUnit.MILLISECONDS)
+                    .build()
+            ).build().apply { start() }
+    )
+) {
     @Test
     fun `connect timeout is handled`() {
 

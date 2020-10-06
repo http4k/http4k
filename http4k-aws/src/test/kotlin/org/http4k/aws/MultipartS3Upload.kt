@@ -31,9 +31,12 @@ object MultipartS3Upload {
 
     private fun Request.initialiseMultipart() = Request(POST, uri.query("uploads", ""))
 
-    private fun Request.uploadPart(index: Int, uploadId: UploadId, body: Body): Request = Request(PUT, uri
-        .query("partNumber", (index + 1).toString())
-        .query("uploadId", uploadId.value))
+    private fun Request.uploadPart(index: Int, uploadId: UploadId, body: Body): Request = Request(
+        PUT,
+        uri
+            .query("partNumber", (index + 1).toString())
+            .query("uploadId", uploadId.value)
+    )
         .body(body)
 
     private fun Request.completeMultipart(uploadId: UploadId, partEtags: Sequence<String>) = Request(POST, uri.query("uploadId", uploadId.value))

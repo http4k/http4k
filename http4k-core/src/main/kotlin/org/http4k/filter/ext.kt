@@ -26,15 +26,19 @@ data class CompressionResult(
     val contentEncoding: String?
 ) {
     fun apply(request: Request): Request =
-        (contentEncoding?.let {
-            request.header("content-encoding", it)
-        } ?: request)
+        (
+            contentEncoding?.let {
+                request.header("content-encoding", it)
+            } ?: request
+            )
             .body(body)
 
     fun apply(response: Response): Response =
-        (contentEncoding?.let {
-            response.header("content-encoding", it)
-        } ?: response)
+        (
+            contentEncoding?.let {
+                response.header("content-encoding", it)
+            } ?: response
+            )
             .body(body)
 }
 
@@ -52,16 +56,20 @@ else ByteArrayOutputStream().use {
 }
 
 fun Body.gzippedStream(): CompressionResult =
-    sampleStream(stream,
+    sampleStream(
+        stream,
         { CompressionResult(Body.EMPTY, null) },
-        { compressedStream -> CompressionResult(Body(GZippingInputStream(compressedStream)), "gzip") })
+        { compressedStream -> CompressionResult(Body(GZippingInputStream(compressedStream)), "gzip") }
+    )
 
 fun Body.gunzippedStream(): Body = if (length != null && length == 0L) {
     Body.EMPTY
 } else {
-    sampleStream(stream,
+    sampleStream(
+        stream,
         { Body.EMPTY },
-        { compressedStream -> Body(GZIPInputStream(compressedStream)) })
+        { compressedStream -> Body(GZIPInputStream(compressedStream)) }
+    )
 }
 
 private fun <T> sampleStream(sourceStream: InputStream, actionIfEmpty: () -> T, actionIfHasContent: (InputStream) -> T): T {
@@ -84,7 +92,8 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
             GZIP_MAGIC.toByte(),
             (GZIP_MAGIC shr 8).toByte(),
             Deflater.DEFLATED.toByte(),
-            0, 0, 0, 0, 0, 0, 0)
+            0, 0, 0, 0, 0, 0, 0
+        )
         private const val INITIAL_BUFFER_SIZE = 8192
     }
 
@@ -142,15 +151,16 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
                 }
             }
         }
-        State.FINALISE -> if (deflater.finished()) {
-            stage = State.TRAILER
-            val crcValue = crc.value.toInt()
-            val totalIn = deflater.totalIn
-            trailer = createTrailer(crcValue, totalIn)
-            0
-        } else {
-            deflater.deflate(readBuffer, readOffset, readLength, Deflater.FULL_FLUSH)
-        }
+        State.FINALISE ->
+            if (deflater.finished()) {
+                stage = State.TRAILER
+                val crcValue = crc.value.toInt()
+                val totalIn = deflater.totalIn
+                trailer = createTrailer(crcValue, totalIn)
+                0
+            } else {
+                deflater.deflate(readBuffer, readOffset, readLength, Deflater.FULL_FLUSH)
+            }
         State.TRAILER -> {
             val trailerStream = trailer ?: error("Trailer stream is null in trailer stage")
             val bytesRead = trailerStream.read(readBuffer, readOffset, readLength)
@@ -171,15 +181,18 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
     }
 
     private fun createTrailer(crcValue: Int, totalIn: Int) =
-        ByteArrayInputStream(byteArrayOf(
-            (crcValue shr 0).toByte(),
-            (crcValue shr 8).toByte(),
-            (crcValue shr 16).toByte(),
-            (crcValue shr 24).toByte(),
-            (totalIn shr 0).toByte(),
-            (totalIn shr 8).toByte(),
-            (totalIn shr 16).toByte(),
-            (totalIn shr 24).toByte()))
+        ByteArrayInputStream(
+            byteArrayOf(
+                (crcValue shr 0).toByte(),
+                (crcValue shr 8).toByte(),
+                (crcValue shr 16).toByte(),
+                (crcValue shr 24).toByte(),
+                (totalIn shr 0).toByte(),
+                (totalIn shr 8).toByte(),
+                (totalIn shr 16).toByte(),
+                (totalIn shr 24).toByte()
+            )
+        )
 
     override fun available(): Int {
         if (stage == State.DONE) {

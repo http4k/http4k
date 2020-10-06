@@ -43,11 +43,14 @@ class OpenWhiskFunction(
             "body",
             if (detectBinaryBody.isBinary(this@toGson)) getEncoder().encodeToString(body.payload.array()) else bodyString()
         )
-        add("headers", JsonObject().apply {
-            headers.forEach {
-                addProperty(it.first, it.second)
+        add(
+            "headers",
+            JsonObject().apply {
+                headers.forEach {
+                    addProperty(it.first, it.second)
+                }
             }
-        })
+        )
     }
 
     private fun JsonObject.asHttp4k(): Request {

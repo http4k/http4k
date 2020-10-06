@@ -46,8 +46,10 @@ class QueryTest {
         assertThat(single("value2", single("value1", request)), equalTo(request.query("world", "value2")))
 
         val multi = Query.multi.required("world")
-        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
-            equalTo(request.query("world", "value3").query("world", "value4")))
+        assertThat(
+            multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
+            equalTo(request.query("world", "value3").query("world", "value4"))
+        )
     }
 
     @Test

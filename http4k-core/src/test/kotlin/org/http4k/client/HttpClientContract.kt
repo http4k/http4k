@@ -42,9 +42,11 @@ abstract class HttpClientContract(
 
     @Test
     fun `can make call`() {
-        val response = client(Request(POST, "http://localhost:$port/someUri")
-            .query("query", "123")
-            .header("header", "value").body("body"))
+        val response = client(
+            Request(POST, "http://localhost:$port/someUri")
+                .query("query", "123")
+                .header("header", "value").body("body")
+        )
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("uri"), equalTo("/someUri?query=123"))

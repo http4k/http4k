@@ -93,7 +93,8 @@ object JettyClient {
             }
 
             private fun HttpClient.newRequest(request: Request): JettyRequest = request.headers.fold(
-                newRequest(request.uri.toString()).method(request.method.name)) { memo, (key, value) ->
+                newRequest(request.uri.toString()).method(request.method.name)
+            ) { memo, (key, value) ->
                 memo.header(key, value)
             }.content(InputStreamContentProvider(request.body.stream)).let(requestModifier)
 
@@ -104,10 +105,12 @@ object JettyClient {
 
             private fun HttpFields.toHttp4kHeaders(): Headers = flatMap { it.values.map { hValue -> it.name to hValue } }
 
-            private fun Throwable.asHttp4kResponse(): Response = Response(when (this) {
-                is TimeoutException -> CLIENT_TIMEOUT
-                else -> SERVICE_UNAVAILABLE
-            }.description("Client Error: caused by $localizedMessage"))
+            private fun Throwable.asHttp4kResponse(): Response = Response(
+                when (this) {
+                    is TimeoutException -> CLIENT_TIMEOUT
+                    else -> SERVICE_UNAVAILABLE
+                }.description("Client Error: caused by $localizedMessage")
+            )
         }
     }
 

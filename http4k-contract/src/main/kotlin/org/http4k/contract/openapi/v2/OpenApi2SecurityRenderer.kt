@@ -17,11 +17,13 @@ val ApiKeySecurity.Companion.renderer
     get() = rendererFor<ApiKeySecurity<*>> {
         object : RenderModes {
             override fun <NODE> full(): Render<NODE> = {
-                obj(it.name to obj(
-                    "type" to string("apiKey"),
-                    "in" to string(it.param.meta.location),
-                    "name" to string(it.param.meta.name)
-                ))
+                obj(
+                    it.name to obj(
+                        "type" to string("apiKey"),
+                        "in" to string(it.param.meta.location),
+                        "name" to string(it.param.meta.name)
+                    )
+                )
             }
 
             override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
@@ -32,9 +34,11 @@ val BasicAuthSecurity.Companion.renderer
     get() = rendererFor<BasicAuthSecurity> {
         object : RenderModes {
             override fun <NODE> full(): Render<NODE> = {
-                obj(it.name to obj(
-                    "type" to string("basic")
-                ))
+                obj(
+                    it.name to obj(
+                        "type" to string("basic")
+                    )
+                )
             }
 
             override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
@@ -45,14 +49,15 @@ val ImplicitOAuthSecurity.Companion.renderer
     get() = rendererFor<ImplicitOAuthSecurity> {
         object : RenderModes {
             override fun <NODE> full(): Render<NODE> = {
-                obj(it.name to
-                    obj(
-                        listOfNotNull(
-                            "type" to string("oauth2"),
-                            "flow" to string("implicit"),
-                            "authorizationUrl" to string(it.authorizationUrl.toString())
-                        ) + it.extraFields.map { it.key to string(it.value) }
-                    )
+                obj(
+                    it.name to
+                        obj(
+                            listOfNotNull(
+                                "type" to string("oauth2"),
+                                "flow" to string("implicit"),
+                                "authorizationUrl" to string(it.authorizationUrl.toString())
+                            ) + it.extraFields.map { it.key to string(it.value) }
+                        )
                 )
             }
 

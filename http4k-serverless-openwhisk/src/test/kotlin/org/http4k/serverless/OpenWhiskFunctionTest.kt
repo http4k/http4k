@@ -27,9 +27,10 @@ class OpenWhiskFunctionTest {
                 "myBody"
             ),
             FakeOpenWhiskResponse(
-                200, mapOf(
-                "header" to "hvalue"
-            ),
+                200,
+                mapOf(
+                    "header" to "hvalue"
+                ),
                 "/bob?query=qvaluemyBody"
             ),
             NonBinary
@@ -47,9 +48,10 @@ class OpenWhiskFunctionTest {
                 "qvalue"
             ),
             FakeOpenWhiskResponse(
-                200, mapOf(
-                "header" to "hvalue"
-            ),
+                200,
+                mapOf(
+                    "header" to "hvalue"
+                ),
                 "L2JvYj9xdWVyeT1xdmFsdWVteUJvZHk="
             ),
             Binary
@@ -67,9 +69,10 @@ class OpenWhiskFunctionTest {
                 "qvalue"
             ),
             FakeOpenWhiskResponse(
-                200, mapOf(
-                "header" to "hvalue"
-            ),
+                200,
+                mapOf(
+                    "header" to "hvalue"
+                ),
                 "/bob?query=qvalue� hw"
             ),
             BinaryRequestOnly
@@ -90,11 +93,14 @@ class OpenWhiskFunctionTest {
         expected: FakeOpenWhiskResponse,
         detectBinaryBody: DetectBinaryBody
     ) {
-        val function = OpenWhiskFunction(object : AppLoader {
-            override fun invoke(p1: Map<String, String>) = { req: Request ->
-                Response(OK).body(req.uri.toString() + req.bodyString()).headers(req.headers)
-            }
-        }, detectBinaryBody = detectBinaryBody)
+        val function = OpenWhiskFunction(
+            object : AppLoader {
+                override fun invoke(p1: Map<String, String>) = { req: Request ->
+                    Response(OK).body(req.uri.toString() + req.bodyString()).headers(req.headers)
+                }
+            },
+            detectBinaryBody = detectBinaryBody
+        )
 
         val response = function(Gson.asJsonObject(request) as JsonObject)
 

@@ -44,13 +44,16 @@ class StreamingMultipartFormEncodingTests {
     private fun constructForm(encoding: Charset): Iterator<StreamingPart> {
         val boundary = "-----\u00E91234\uD83D\uDCA9"
         val boundaryBytes = boundary.toByteArray(encoding)
-        return getMultipartFormParts(boundaryBytes,
+        return getMultipartFormParts(
+            boundaryBytes,
             MultipartFormBuilder(boundaryBytes, encoding)
                 .file("file", "foo.tab\uD83D\uDCA9", "text/whatever\u00E9\uD83D\uDCA9", "This is the content of the file\u00E9\uD83D\uDCA9".byteInputStream(encoding), emptyList())
                 .field("field\uD83D\uDCA9", "fieldValue\u00E9\uD83D\uDCA9", emptyList())
                 .field("multi", "value1\u00E9", emptyList())
                 .file("anotherFile", "BAR.tab", "text/something\u00E9", "This is another file\u00E9".byteInputStream(encoding), emptyList())
                 .field("multi", "value2\u00E9", emptyList())
-                .stream(), encoding)
+                .stream(),
+            encoding
+        )
     }
 }

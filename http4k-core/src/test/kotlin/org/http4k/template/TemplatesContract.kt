@@ -9,7 +9,8 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
 
     private val items = listOf(
         Item("item1", "£1", listOf(Feature("pretty"))),
-        Item("item2", "£3", listOf(Feature("nasty"))))
+        Item("item2", "£3", listOf(Feature("nasty")))
+    )
 
     @Test
     fun `caching classpath`() {
@@ -47,8 +48,13 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     }
 
     private fun checkAtRoot(renderer: TemplateRenderer) {
-        assertThat(renderer(AtRoot(items)), equalTo("<ul><li>AtRootName:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>AtRootName:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty" +
-            "</span></li></ul></li></ul>"))
+        assertThat(
+            renderer(AtRoot(items)),
+            equalTo(
+                "<ul><li>AtRootName:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>AtRootName:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty" +
+                    "</span></li></ul></li></ul>"
+            )
+        )
     }
 
     private fun checkNonExistent(renderer: TemplateRenderer) {

@@ -38,25 +38,36 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
     @Test
     fun `if no request jwt then do nothing, just treat it as a normal request`() {
-        assertThat(underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost")), equalTo(success(AuthRequest(
-            client = ClientId("12345"),
-            responseType = Code,
-            redirectUri = Uri.of("https://somehost"),
-            scopes = emptyList(),
-            state = null
-        ))))
+        assertThat(
+            underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost")),
+            equalTo(
+                success(
+                    AuthRequest(
+                        client = ClientId("12345"),
+                        responseType = Code,
+                        redirectUri = Uri.of("https://somehost"),
+                        scopes = emptyList(),
+                        state = null
+                    )
+                )
+            )
+        )
     }
 
     @Test
     fun `if has request jwt but not valid then error`() {
-        assertThat(underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=invalidJwt")),
-            equalTo(failure(InvalidAuthorizationRequest("Query 'request' is invalid"))))
+        assertThat(
+            underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=invalidJwt")),
+            equalTo(failure(InvalidAuthorizationRequest("Query 'request' is invalid")))
+        )
     }
 
     @Test
     fun `if has 'valid' request jwt but fails parsing then error`() {
-        assertThat(underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=someInvalidButCorrectlySigned")),
-            equalTo(failure(InvalidAuthorizationRequest("Query 'request' is invalid"))))
+        assertThat(
+            underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=someInvalidButCorrectlySigned")),
+            equalTo(failure(InvalidAuthorizationRequest("Query 'request' is invalid")))
+        )
     }
 
     @Test
@@ -81,75 +92,110 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         fun `if client_id on request uri and has same one in request jwt then success`() {
             val requestObject = RequestObject(client = ClientId("12345"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = emptyList(),
-                state = null,
-                request = RequestJwtContainer(requestObjectJwt),
-                requestObject = requestObject
-            ))))
+            assertThat(
+                underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = emptyList(),
+                            state = null,
+                            request = RequestJwtContainer(requestObjectJwt),
+                            requestObject = requestObject
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if redirect_uri is null on request but available on request object user that one`() {
             val requestObject = RequestObject(redirectUri = Uri.of("https://somehost"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest().extract(Request(GET, "/?client_id=12345&response_type=code&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = emptyList(),
-                state = null,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest().extract(Request(GET, "/?client_id=12345&response_type=code&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = emptyList(),
+                            state = null,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `scopes are the same on request and request object but in different order than it is correct`() {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest().extract(Request(GET, "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = listOf("openid", "email", "address"),
-                state = null,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest().extract(Request(GET, "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = listOf("openid", "email", "address"),
+                            state = null,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if scopes on the request are missing but available on the request jwt`() {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest().extract(Request(GET, "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = listOf("email", "openid", "address"),
-                state = null,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest().extract(Request(GET, "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = listOf("email", "openid", "address"),
+                            state = null,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if scopes on the request are missing but missing on the request jwt`() {
             val requestObject = RequestObject(state = State("some state"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest().extract(Request(GET, "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = listOf("openid", "email", "address"),
-                state = State("some state"),
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest().extract(Request(GET, "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = listOf("openid", "email", "address"),
+                            state = State("some state"),
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
     }
 
@@ -161,75 +207,110 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         fun `if client_id on request uri and has same one in request jwt then success`() {
             val requestObject = RequestObject(client = ClientId("12345"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = emptyList(),
-                state = null,
-                request = RequestJwtContainer(requestObjectJwt),
-                requestObject = requestObject
-            ))))
+            assertThat(
+                underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = emptyList(),
+                            state = null,
+                            request = RequestJwtContainer(requestObjectJwt),
+                            requestObject = requestObject
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if redirect_uri is null on request but available on request object user that one`() {
             val requestObject = RequestObject(redirectUri = Uri.of("https://somehost"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345&response_type=code&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = null,
-                scopes = emptyList(),
-                state = null,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345&response_type=code&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = null,
+                            scopes = emptyList(),
+                            state = null,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `scopes are the same on request and request object but in different order than it is correct`() {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = listOf("openid", "email", "address"),
-                state = null,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = listOf("openid", "email", "address"),
+                            state = null,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if scopes on the request are missing but available on the request jwt, only use the auth request one`() {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = emptyList(),
-                state = null,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = emptyList(),
+                            state = null,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if scopes on the request are missing but missing on the request jwt, only use the auth request one`() {
             val requestObject = RequestObject(state = State("some state"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = Uri.of("https://somehost"),
-                scopes = listOf("openid", "email", "address"),
-                state = null,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest(AuthRequestOnly).extract(Request(GET, "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = Uri.of("https://somehost"),
+                            scopes = listOf("openid", "email", "address"),
+                            state = null,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
     }
 
@@ -241,75 +322,110 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         fun `if client_id on request uri and has same one in request jwt then success`() {
             val requestObject = RequestObject(client = ClientId("12345"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = requestObject.redirectUri,
-                scopes = requestObject.scope,
-                state = requestObject.state,
-                request = RequestJwtContainer(requestObjectJwt),
-                requestObject = requestObject
-            ))))
+            assertThat(
+                underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = requestObject.redirectUri,
+                            scopes = requestObject.scope,
+                            state = requestObject.state,
+                            request = RequestJwtContainer(requestObjectJwt),
+                            requestObject = requestObject
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if redirect_uri is null on request but available on request object user that one`() {
             val requestObject = RequestObject(redirectUri = Uri.of("https://somehost"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345&response_type=code&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = requestObject.redirectUri,
-                scopes = requestObject.scope,
-                state = requestObject.state,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345&response_type=code&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = requestObject.redirectUri,
+                            scopes = requestObject.scope,
+                            state = requestObject.state,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `scopes are the same on request and request object but in different order than it is correct`() {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = requestObject.redirectUri,
-                scopes = requestObject.scope,
-                state = requestObject.state,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = requestObject.redirectUri,
+                            scopes = requestObject.scope,
+                            state = requestObject.state,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if scopes on the request are missing but available on the request jwt, only use the request object one`() {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = requestObject.redirectUri,
-                scopes = requestObject.scope,
-                state = requestObject.state,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = requestObject.redirectUri,
+                            scopes = requestObject.scope,
+                            state = requestObject.state,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
 
         @Test
         fun `if scopes on the request are missing but missing on the request jwt, only use the request object one`() {
             val requestObject = RequestObject(state = State("some state"))
             val requestObjectJwt = requestJwt(requestObject)
-            assertThat(underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
-                client = ClientId("12345"),
-                responseType = Code,
-                redirectUri = requestObject.redirectUri,
-                scopes = requestObject.scope,
-                state = requestObject.state,
-                requestObject = requestObject,
-                request = RequestJwtContainer(requestObjectJwt)
-            ))))
+            assertThat(
+                underTest(RequestObjectOnly).extract(Request(GET, "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt")),
+                equalTo(
+                    success(
+                        AuthRequest(
+                            client = ClientId("12345"),
+                            responseType = Code,
+                            redirectUri = requestObject.redirectUri,
+                            scopes = requestObject.scope,
+                            state = requestObject.state,
+                            requestObject = requestObject,
+                            request = RequestJwtContainer(requestObjectJwt)
+                        )
+                    )
+                )
+            )
         }
     }
 

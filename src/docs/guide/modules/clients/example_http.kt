@@ -42,10 +42,12 @@ fun main() {
 
     // custom configured client
     val customClient = ApacheClient(
-        client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
-            .setRedirectsEnabled(false)
-            .setCookieSpec(StandardCookieSpec.IGNORE)
-            .build())
+        client = HttpClients.custom().setDefaultRequestConfig(
+            RequestConfig.custom()
+                .setRedirectsEnabled(false)
+                .setCookieSpec(StandardCookieSpec.IGNORE)
+                .build()
+        )
             .build()
     )
 }

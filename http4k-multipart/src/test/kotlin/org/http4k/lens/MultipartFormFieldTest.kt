@@ -38,8 +38,10 @@ class MultipartFormFieldTest {
         assertThat(single("value2", single("value1", form)), equalTo(form + ("world" to "value2")))
 
         val multi = MultipartFormField.string().multi.required("world")
-        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), form)),
-            equalTo(form + ("world" to "value3") + ("world" to "value4")))
+        assertThat(
+            multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), form)),
+            equalTo(form + ("world" to "value3") + ("world" to "value4"))
+        )
     }
 
     @Test

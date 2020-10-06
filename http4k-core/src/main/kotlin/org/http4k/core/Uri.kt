@@ -53,11 +53,13 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
     override fun toString() = StringBuilder()
         .appendIfNotBlank(scheme, scheme, ":")
         .appendIfNotBlank(authority, "//", authority)
-        .append(when {
-            authority.isBlank() -> path
-            path.isBlank() || path.startsWith("/") -> path
-            else -> "/$path"
-        })
+        .append(
+            when {
+                authority.isBlank() -> path
+                path.isBlank() || path.startsWith("/") -> path
+                else -> "/$path"
+            }
+        )
         .appendIfNotBlank(query, "?", query)
         .appendIfNotBlank(fragment, "#", fragment).toString()
 }

@@ -24,7 +24,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val schema = json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true)
         return JsonSchema(
             json.asJsonObject(schema),
-            schema.definitions().map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet())
+            schema.definitions().map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()
+        )
     }
 
     private fun NODE.toSchema(value: Any, objName: String?, topLevel: Boolean) =
@@ -58,8 +59,10 @@ class AutoJsonToJsonSchema<NODE : Any>(
         isNullable: Boolean,
         metadata: FieldMetadata?
     ): SchemaNode =
-        SchemaNode.Reference(fieldName, "#/$refPrefix/${modelNamer(obj)}",
-            SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { it.toString() }, null), metadata)
+        SchemaNode.Reference(
+            fieldName, "#/$refPrefix/${modelNamer(obj)}",
+            SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { it.toString() }, null), metadata
+        )
 
     private fun NODE.toObjectOrMapSchema(objName: String?, obj: Any, isNullable: Boolean, topLevel: Boolean, metadata: FieldMetadata?) =
         if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable, topLevel, metadata) else toObjectSchema(objName, obj, isNullable, topLevel, metadata)
@@ -82,9 +85,12 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
         val nameToUseForRef = if (topLevel) objName ?: modelNamer(obj) else modelNamer(obj)
 
-        return SchemaNode.Reference(objName
-            ?: modelNamer(obj), "#/$refPrefix/$nameToUseForRef",
-            SchemaNode.Object(nameToUseForRef, isNullable, properties, this, null), metadata)
+        return SchemaNode.Reference(
+            objName
+                ?: modelNamer(obj),
+            "#/$refPrefix/$nameToUseForRef",
+            SchemaNode.Object(nameToUseForRef, isNullable, properties, this, null), metadata
+        )
     }
 
     private fun NODE.toMapSchema(objName: String?, obj: Map<*, *>, isNullable: Boolean, topLevel: Boolean, metadata: FieldMetadata?): SchemaNode {
@@ -105,11 +111,15 @@ class AutoJsonToJsonSchema<NODE : Any>(
             .map { it.name() to it }.toMap()
 
         return if (topLevel && objName != null) {
-            SchemaNode.Reference(objName, "#/$refPrefix/$objName",
-                SchemaNode.Object(objName, isNullable, properties, this, null), metadata)
+            SchemaNode.Reference(
+                objName, "#/$refPrefix/$objName",
+                SchemaNode.Object(objName, isNullable, properties, this, null), metadata
+            )
         } else
-            SchemaNode.MapType(objName ?: modelNamer(obj), isNullable,
-                SchemaNode.Object(modelNamer(obj), isNullable, properties, this, null), metadata)
+            SchemaNode.MapType(
+                objName ?: modelNamer(obj), isNullable,
+                SchemaNode.Object(modelNamer(obj), isNullable, properties, this, null), metadata
+            )
     }
 
     private fun toJsonKey(it: Any): String {

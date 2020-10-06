@@ -101,37 +101,47 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
 
     @Test
     fun `matches path`() {
-        assertMatchNoMatch(MatchRequest(path = Regex(".*bob")),
+        assertMatchNoMatch(
+            MatchRequest(path = Regex(".*bob")),
             Request(GET, "/abob"),
-            Request(GET, "/bill"))
+            Request(GET, "/bill")
+        )
     }
 
     @Test
     fun `matches header`() {
-        assertMatchNoMatch(MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
+        assertMatchNoMatch(
+            MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
             request.header("header", "abob"),
-            request.header("header", "bill"))
+            request.header("header", "bill")
+        )
     }
 
     @Test
     fun `matches query`() {
-        assertMatchNoMatch(MatchRequest(queries = mapOf("query" to Regex(".*bob"))),
+        assertMatchNoMatch(
+            MatchRequest(queries = mapOf("query" to Regex(".*bob"))),
             request.query("query", "abob"),
-            request.query("query", "bill"))
+            request.query("query", "bill")
+        )
     }
 
     @Test
     fun `matches body`() {
-        assertMatchNoMatch(MatchRequest(body = Regex(".*bob")),
+        assertMatchNoMatch(
+            MatchRequest(body = Regex(".*bob")),
             request.body("abob"),
-            request.body("bill"))
+            request.body("bill")
+        )
     }
 
     @Test
     fun `matches method`() {
-        assertMatchNoMatch(MatchRequest(method = "put"),
+        assertMatchNoMatch(
+            MatchRequest(method = "put"),
             Request(PUT, "/abob"),
-            Request(GET, "/abob"))
+            Request(GET, "/abob")
+        )
     }
 }
 

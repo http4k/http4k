@@ -8,7 +8,8 @@ import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.ParamMeta.StringParam
 import java.net.URLDecoder.decode
 
-object FormField : BiDiLensSpec<WebForm, String>("formData",
+object FormField : BiDiLensSpec<WebForm, String>(
+    "formData",
     StringParam,
     LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
     LensSet { name, values, target -> values.fold(target - name) { m, next -> m + (name to next) } }
@@ -26,7 +27,8 @@ fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm
         .map({ it.payload.asString() }, { Body(it) })
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
-            { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlFormEncoded() })
+            { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlFormEncoded() }
+        )
         .map({ it.copy(errors = validator(it, *formFields)) }, { it.copy(errors = validator(it, *formFields)) })
 
 private fun formParametersFrom(target: String): Map<String, List<String>> = target

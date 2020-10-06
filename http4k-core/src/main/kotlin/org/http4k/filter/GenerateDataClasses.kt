@@ -25,12 +25,14 @@ class GenerateDataClasses<out NODE>(
     override fun invoke(next: HttpHandler): HttpHandler = { req ->
         val response = next(req)
         out.println("// result generated from ${req.uri}\n")
-        out.println(flatten(setOf(process("Base", json.body().toLens()(response))))
-            .toSet()
-            .groupBy { it.asClassName() }
-            .mapNotNull { (_, gens) -> gens.mapNotNull(Gen::asDefinitionString).sortedByDescending { it.length }.firstOrNull() }
-            .sorted()
-            .joinToString("\n\n"))
+        out.println(
+            flatten(setOf(process("Base", json.body().toLens()(response))))
+                .toSet()
+                .groupBy { it.asClassName() }
+                .mapNotNull { (_, gens) -> gens.mapNotNull(Gen::asDefinitionString).sortedByDescending { it.length }.firstOrNull() }
+                .sorted()
+                .joinToString("\n\n")
+        )
         response
     }
 

@@ -33,10 +33,11 @@ internal class JacksonJsonNamingAnnotatedTest {
         assertThat("non existent", { JacksonJsonNamingAnnotated(Jackson)(Renamed(), "non existent") }, throws<NoFieldFound>())
     }
 
-    object CustomJackson : ConfigurableJackson(KotlinModule()
-        .asConfigurable()
-        .withStandardMappings()
-        .done().setPropertyNamingStrategy(SNAKE_CASE)
+    object CustomJackson : ConfigurableJackson(
+        KotlinModule()
+            .asConfigurable()
+            .withStandardMappings()
+            .done().setPropertyNamingStrategy(SNAKE_CASE)
     )
 
     @Test

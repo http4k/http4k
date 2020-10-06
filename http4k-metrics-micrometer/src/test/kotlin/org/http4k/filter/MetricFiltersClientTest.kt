@@ -38,7 +38,8 @@ class MetricFiltersClientTest {
             assertThat(timedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
         }
 
-        assert(registry,
+        assert(
+            registry,
             hasRequestTimer(1, 1, tags = arrayOf("host" to "test_server_com", "method" to "GET", "status" to "200")),
             hasRequestTimer(2, 2, tags = arrayOf("host" to "another_server_com", "method" to "POST", "status" to "404"))
         )
@@ -51,7 +52,8 @@ class MetricFiltersClientTest {
             assertThat(countedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
         }
 
-        assert(registry,
+        assert(
+            registry,
             hasRequestCounter(1, tags = arrayOf("host" to "test_server_com", "method" to "GET", "status" to "200")),
             hasRequestCounter(2, tags = arrayOf("host" to "another_server_com", "method" to "POST", "status" to "404"))
         )
@@ -59,25 +61,32 @@ class MetricFiltersClientTest {
 
     @Test
     fun `request timer meter names and transaction labelling can be configured`() {
-        requestTimer = MetricFilters.Client.RequestTimer(registry, "custom.requests", "custom.description",
-            { it.label("foo", "bar") }, clock)
+        requestTimer = MetricFilters.Client.RequestTimer(
+            registry, "custom.requests", "custom.description",
+            { it.label("foo", "bar") }, clock
+        )
 
         assertThat(timedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
 
-        assert(registry,
+        assert(
+            registry,
             hasRequestTimer(1, 1, "custom.requests", "custom.description", tags = arrayOf("foo" to "bar"))
         )
     }
 
     @Test
     fun `request counter meter names and transaction labelling can be configured`() {
-        requestCounter = MetricFilters.Client.RequestCounter(registry, "custom.requests", "custom.description",
-            { it.label("foo", "bar") })
+        requestCounter = MetricFilters.Client.RequestCounter(
+            registry, "custom.requests", "custom.description",
+            { it.label("foo", "bar") }
+        )
 
         assertThat(countedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
 
-        assert(registry,
-            hasRequestCounter(1, "custom.requests", "custom.description",
+        assert(
+            registry,
+            hasRequestCounter(
+                1, "custom.requests", "custom.description",
                 "foo" to "bar"
             )
         )
@@ -88,7 +97,8 @@ class MetricFiltersClientTest {
         name: String = "http.client.request.count",
         description: String = "Total number of client requests",
         vararg tags: Pair<String, String>
-    ) = hasCounter(name,
+    ) = hasCounter(
+        name,
         tags.asList()
             .map { Tag.of(it.first, it.second) },
         description(description) and counterCount(count)
@@ -100,7 +110,8 @@ class MetricFiltersClientTest {
         name: String = "http.client.request.latency",
         description: String = "Timing of client requests",
         vararg tags: Pair<String, String>
-    ) = hasTimer(name,
+    ) = hasTimer(
+        name,
         tags.asList()
             .map { Tag.of(it.first, it.second) },
         description(description) and timerCount(count) and timerTotalTime(totalTimeSec * 1000)

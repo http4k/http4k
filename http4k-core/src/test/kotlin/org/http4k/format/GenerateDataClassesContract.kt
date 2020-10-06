@@ -32,19 +32,23 @@ abstract class GenerateDataClassesContract<NODE : Any>(val j: Json<NODE>) {
                     "double" to number(1.0),
                     "long" to number(10L)
                 ),
-                "array" to array(listOf(
-                    string(""),
-                    number(123),
-                    obj(
-                        "nullNode" to nullNode(),
-                        "long" to number(10L)
+                "array" to array(
+                    listOf(
+                        string(""),
+                        number(123),
+                        obj(
+                            "nullNode" to nullNode(),
+                            "long" to number(10L)
+                        )
                     )
-                )),
+                ),
                 "singleTypeArray" to array(
-                    listOf(obj(
-                        "string" to string("someString"),
-                        "list" to array(listOf(obj("id" to string("someValue"))))
-                    ))
+                    listOf(
+                        obj(
+                            "string" to string("someString"),
+                            "list" to array(listOf(obj("id" to string("someValue"))))
+                        )
+                    )
                 )
             )
         }
@@ -54,7 +58,10 @@ abstract class GenerateDataClassesContract<NODE : Any>(val j: Json<NODE>) {
 
         handler(Request(GET, "/bob"))
         val actual = String(os.toByteArray())
-        assertThat(actual, equalTo("""// result generated from /bob
+        assertThat(
+            actual,
+            equalTo(
+                """// result generated from /bob
 
 data class Array1(val nullNode: Any?, val long: Number?)
 
@@ -67,6 +74,8 @@ data class List1(val id: String?)
 data class NonEmpty(val double: Number?, val long: Number?)
 
 data class SingleTypeArray1(val string: String?, val list: List<List1>?)
-"""))
+"""
+            )
+        )
     }
 }

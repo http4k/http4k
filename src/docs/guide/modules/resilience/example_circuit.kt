@@ -23,7 +23,8 @@ fun main() {
     responses.add(Response(OK))
 
     // configure the circuit breaker filter here
-    val circuitBreaker = CircuitBreaker.of("circuit",
+    val circuitBreaker = CircuitBreaker.of(
+        "circuit",
         CircuitBreakerConfig.custom()
             .slidingWindow(2, 2, COUNT_BASED)
             .permittedNumberOfCallsInHalfOpenState(2)
@@ -31,7 +32,8 @@ fun main() {
             .build()
     )
 
-    val circuited = ResilienceFilters.CircuitBreak(circuitBreaker,
+    val circuited = ResilienceFilters.CircuitBreak(
+        circuitBreaker,
         isError = { r: Response -> !r.status.successful } // this defaults to >= 500
     ).then { responses.removeFirst() }
 

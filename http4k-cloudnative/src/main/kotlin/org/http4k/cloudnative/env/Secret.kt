@@ -20,8 +20,10 @@ class Secret(input: ByteArray) : Closeable {
 
     private val initialHashcode = input.contentHashCode()
 
-    override fun equals(other: Any?): Boolean = (value.get()
-        ?: ByteArray(0)).contentEquals((other as Secret).value.get())
+    override fun equals(other: Any?): Boolean = (
+        value.get()
+            ?: ByteArray(0)
+        ).contentEquals((other as Secret).value.get())
 
     override fun hashCode(): Int = initialHashcode
 

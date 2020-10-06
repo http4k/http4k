@@ -23,7 +23,8 @@ class WsRoutingTest {
                 "/{name}" bind { ws: Websocket ->
                     request.set(ws.upgradeRequest)
                 }
-            ))
+            )
+        )
 
         val sentRequestWithNoUriTemplateHeader = Request(GET, "/path1/correct")
         val a = ws(sentRequestWithNoUriTemplateHeader)

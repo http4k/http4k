@@ -33,35 +33,45 @@ class HealthTest {
 
     @Test
     fun `readiness with extra checks`() {
-        assertThat(Health(checks = listOf(check(true, "first"), check(false, "second")))(Request(GET, "/readiness")),
-            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nfirst=true\nsecond=false [foobar]")))
+        assertThat(
+            Health(checks = listOf(check(true, "first"), check(false, "second")))(Request(GET, "/readiness")),
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nfirst=true\nsecond=false [foobar]"))
+        )
     }
 
     @Test
     fun `readiness continues to run when check fails`() {
-        assertThat(Health(checks = listOf(throws("boom"), check(true, "second")))(Request(GET, "/readiness")),
-            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nboom=false [foobar]\nsecond=true")))
+        assertThat(
+            Health(checks = listOf(throws("boom"), check(true, "second")))(Request(GET, "/readiness")),
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nboom=false [foobar]\nsecond=true"))
+        )
     }
 
     @Test
     fun `readiness with three checks`() {
         val checks = listOf(check(true, "first"), check(true, "second"), check(false, "third"))
-        assertThat(Health(checks = checks)(Request(GET, "/readiness")),
-            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nfirst=true\nsecond=true\nthird=false [foobar]")))
+        assertThat(
+            Health(checks = checks)(Request(GET, "/readiness")),
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nfirst=true\nsecond=true\nthird=false [foobar]"))
+        )
     }
 
     @Test
     fun `readiness with four checks`() {
         val checks = listOf(check(true, "first"), check(true, "second"), check(true, "third"), check(false, "fourth"))
-        assertThat(Health(checks = checks)(Request(GET, "/readiness")),
-            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nfirst=true\nsecond=true\nthird=true\nfourth=false [foobar]")))
+        assertThat(
+            Health(checks = checks)(Request(GET, "/readiness")),
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nfirst=true\nsecond=true\nthird=true\nfourth=false [foobar]"))
+        )
     }
 
     @Test
     fun `readiness with three passing checks`() {
         val checks = listOf(check(true, "first"), check(true, "second"), check(true, "third"))
-        assertThat(Health(checks = checks)(Request(GET, "/readiness")),
-            hasStatus(OK).and(hasBody("overall=true\nfirst=true\nsecond=true\nthird=true")))
+        assertThat(
+            Health(checks = checks)(Request(GET, "/readiness")),
+            hasStatus(OK).and(hasBody("overall=true\nfirst=true\nsecond=true\nthird=true"))
+        )
     }
 
     private fun check(result: Boolean, name: String): ReadinessCheck = object : ReadinessCheck {

@@ -82,7 +82,8 @@ class BiDiWsMessageLens<FINAL>(
 private val wsRoot =
     BiDiWsMessageLensSpec<Body>(
         LensGet { _, target -> listOf(target.body) },
-        LensSet { _, values, target -> values.fold(target) { m, next -> m.body(next) } })
+        LensSet { _, values, target -> values.fold(target) { m, next -> m.body(next) } }
+    )
 
 fun WsMessage.Companion.binary() = wsRoot.map(Body::payload) { Body(it) }
 fun WsMessage.Companion.string() = wsRoot.map({ it.payload.asString() }, { it: String -> Body(it) })

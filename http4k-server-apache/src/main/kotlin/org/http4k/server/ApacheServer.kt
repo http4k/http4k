@@ -81,12 +81,14 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, 
         init {
             val bootstrap = ServerBootstrap.bootstrap()
                 .setListenerPort(port)
-                .setSocketConfig(SocketConfig.custom()
-                    .setTcpNoDelay(true)
-                    .setSoKeepAlive(true)
-                    .setSoReuseAddress(true)
-                    .setBacklogSize(1000)
-                    .build())
+                .setSocketConfig(
+                    SocketConfig.custom()
+                        .setTcpNoDelay(true)
+                        .setSoKeepAlive(true)
+                        .setSoReuseAddress(true)
+                        .setBacklogSize(1000)
+                        .build()
+                )
                 .register("*", Http4kRequestHandler(httpHandler))
 
             if (canonicalHostname != null)

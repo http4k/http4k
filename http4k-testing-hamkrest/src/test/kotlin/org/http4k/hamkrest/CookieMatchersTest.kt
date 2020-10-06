@@ -36,8 +36,10 @@ class CookieMatchersTest {
     @Test
     fun expiry() {
         val expires = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0))
-        assertMatchAndNonMatch(Cookie("name", "value", expires = expires),
-            hasCookieExpiry(expires), hasCookieExpiry(expires.plusDays(1)))
+        assertMatchAndNonMatch(
+            Cookie("name", "value", expires = expires),
+            hasCookieExpiry(expires), hasCookieExpiry(expires.plusDays(1))
+        )
     }
 
     @Test

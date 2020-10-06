@@ -59,7 +59,8 @@ private class SingleThreadedDust(
                     callback(null, template);
                 }
             }
-            """)
+            """
+        )
 
         js["dust"] as? JSObject ?: throw IllegalStateException("could not initialise Dust")
     }
@@ -76,13 +77,15 @@ private class SingleThreadedDust(
         val writer = StringWriter()
         var error: Any? = null
 
-        val bindings = SimpleBindings(mapOf(
-            "dust" to dust,
-            "templateName" to templateName,
-            "templateParams" to params,
-            "writer" to writer,
-            "reportError" to { e: Any -> error = e }
-        ))
+        val bindings = SimpleBindings(
+            mapOf(
+                "dust" to dust,
+                "templateName" to templateName,
+                "templateParams" to params,
+                "writer" to writer,
+                "reportError" to { e: Any -> error = e }
+            )
+        )
 
         js.eval(
             //language=JavaScript
@@ -94,7 +97,9 @@ private class SingleThreadedDust(
                     writer.write(result, 0, result.length);
                 }
             });
-            """, bindings)
+            """,
+            bindings
+        )
 
         return when (error) {
             null -> writer.toString()
@@ -111,9 +116,12 @@ class Dust(
     loader: TemplateLoader
 ) {
     private val scriptEngineManager = ScriptEngineManager().apply {
-        bindings = SimpleBindings(mapOf(
-            "loader" to loader,
-            "TEMPLATE_NOT_FOUND" to TEMPLATE_NOT_FOUND))
+        bindings = SimpleBindings(
+            mapOf(
+                "loader" to loader,
+                "TEMPLATE_NOT_FOUND" to TEMPLATE_NOT_FOUND
+            )
+        )
     }
 
     private val pool = GenericObjectPool(
@@ -122,13 +130,15 @@ class Dust(
                 js = scriptEngineManager.getEngineByName("nashorn"),
                 cacheTemplates = cacheTemplates,
                 dustPluginScripts = dustPluginScripts,
-                notifyOnClosed = { returnDustEngine(it) })
+                notifyOnClosed = { returnDustEngine(it) }
+            )
 
             override fun wrap(obj: SingleThreadedDust) = DefaultPooledObject(obj)
         },
         GenericObjectPoolConfig<SingleThreadedDust>().apply {
             minIdle = precachePoolSize
-        })
+        }
+    )
 
     private fun returnDustEngine(dustEngine: SingleThreadedDust) {
         pool.returnObject(dustEngine)

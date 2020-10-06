@@ -54,7 +54,8 @@ Pagination: $pagination
     val goodRequest = Request(GET, "http://localhost:9000").with(
         nameHeader of "Jane Doe",
         ageQuery of 25,
-        childrenBody of listOf(Child("Rita"), Child("Sue")))
+        childrenBody of listOf(Child("Rita"), Child("Sue"))
+    )
 
     println(listOf("", "Request:", goodRequest, app(goodRequest)).joinToString("\n"))
 

@@ -30,10 +30,12 @@ fun main() {
 
     // custom OAuth2 provider configuration
     val oauthProvider = OAuthProvider(
-        OAuthProviderConfig(Uri.of("https://auth.chatroulette.com"),
+        OAuthProviderConfig(
+            Uri.of("https://auth.chatroulette.com"),
             "/oauth2/auth", "/oauth2/token",
             Credentials("username", "somepassword"),
-            Uri.of("https://api.chatroulette.com")),
+            Uri.of("https://api.chatroulette.com")
+        ),
         ApacheClient(),
         callbackUri,
         listOf("emailScope", "nameScope", "familyScope"),

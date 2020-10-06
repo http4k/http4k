@@ -71,12 +71,14 @@ data class Apache4Server(val port: Int = 8000, val address: InetAddress?) : Serv
         init {
             val bootstrap = ServerBootstrap.bootstrap()
                 .setListenerPort(port)
-                .setSocketConfig(SocketConfig.custom()
-                    .setTcpNoDelay(true)
-                    .setSoKeepAlive(true)
-                    .setSoReuseAddress(true)
-                    .setBacklogSize(1000)
-                    .build())
+                .setSocketConfig(
+                    SocketConfig.custom()
+                        .setTcpNoDelay(true)
+                        .setSoKeepAlive(true)
+                        .setSoReuseAddress(true)
+                        .setBacklogSize(1000)
+                        .build()
+                )
                 .registerHandler("*", Http4kApache4RequestHandler(httpHandler))
 
             if (address != null)

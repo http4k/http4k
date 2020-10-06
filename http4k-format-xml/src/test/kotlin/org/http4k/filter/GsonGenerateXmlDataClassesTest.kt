@@ -26,7 +26,10 @@ class GsonGenerateXmlDataClassesTest {
         handler(Request(GET, "/bob"))
         val actual = String(os.toByteArray())
 
-        assertThat(actual, equalTo("""// result generated from /bob
+        assertThat(
+            actual,
+            equalTo(
+                """// result generated from /bob
 
 data class Base(val Xml: Xml?)
 
@@ -35,6 +38,8 @@ data class SubWithAttr(val attr: String?)
 data class SubWithText1(val attr: String?, val content: String?)
 
 data class Xml(val SubWithText: List<SubWithText1>?, val subWithAttr: SubWithAttr?, val content: String?)
-"""))
+"""
+            )
+        )
     }
 }

@@ -39,8 +39,10 @@ abstract class AutoMarshalingXmlContract(private val x: AutoMarshallingXml) {
 
     @Test
     fun `serialize lists with items`() {
-        assertThat(x.asFormatString(ListContainer(listOf("boo", "asdas"))),
-            equalTo("<ListContainer><children>boo</children><children>asdas</children></ListContainer>"))
+        assertThat(
+            x.asFormatString(ListContainer(listOf("boo", "asdas"))),
+            equalTo("<ListContainer><children>boo</children><children>asdas</children></ListContainer>")
+        )
     }
 
     @Test

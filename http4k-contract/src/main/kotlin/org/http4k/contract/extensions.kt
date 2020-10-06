@@ -10,10 +10,12 @@ import org.http4k.lens.PathLens
 import org.http4k.util.Appendable
 
 fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
-    ContractRoutingHttpHandler(renderer, security, descriptionSecurity, descriptionPath, preFlightExtraction, routes.all,
+    ContractRoutingHttpHandler(
+        renderer, security, descriptionSecurity, descriptionPath, preFlightExtraction, routes.all,
         preSecurityFilter = preSecurityFilter,
         postSecurityFilter = postSecurityFilter,
-        includeDescriptionRoute = includeDescriptionRoute)
+        includeDescriptionRoute = includeDescriptionRoute
+    )
 }
 
 class ContractBuilder internal constructor() {

@@ -65,14 +65,18 @@ class HttpMessageMatchersTest {
     fun `json node body equal matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.hasBody(Jackson.obj("hello" to Jackson.string("world"))), Jackson.hasBody(Jackson.obj("hello" to Jackson.string("wo2rld"))))
 
     @Test
-    fun `json node body equal matcher - with numbers`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":2}"""),
+    fun `json node body equal matcher - with numbers`() = assertMatchAndNonMatch(
+        Request(GET, "/").body("""{"hello":2}"""),
         Jackson.hasBody(Jackson.obj("hello" to Jackson.number(2))),
-        Jackson.hasBody(Jackson.obj("hello" to Jackson.number(42))))
+        Jackson.hasBody(Jackson.obj("hello" to Jackson.number(42)))
+    )
 
     @Test
-    fun `json node body equal matcher - with longs`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":2}"""),
+    fun `json node body equal matcher - with longs`() = assertMatchAndNonMatch(
+        Request(GET, "/").body("""{"hello":2}"""),
         Jackson.hasBody(Jackson.obj("hello" to Jackson.number(2L))),
-        Jackson.hasBody(Jackson.obj("hello" to Jackson.number(42L))))
+        Jackson.hasBody(Jackson.obj("hello" to Jackson.number(42L)))
+    )
 
     @Test
     fun `body lens`() =

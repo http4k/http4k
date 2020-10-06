@@ -39,13 +39,16 @@ fun main() {
 
     // the following code is purely here for demonstration purposes, to explain exactly what is happening at AWS.
     fun runLambdaAsAwsWould() {
-        val response = FunctionsExampleEntryClass().handleRequest(APIGatewayProxyRequestEvent().apply {
-            path = "/"
-            body = "hello hello hello, i suppose this isn't 140 characters anymore.."
-            httpMethod = "GET"
-            headers = mapOf()
-            queryStringParameters = mapOf()
-        }, proxy<Context>())
+        val response = FunctionsExampleEntryClass().handleRequest(
+            APIGatewayProxyRequestEvent().apply {
+                path = "/"
+                body = "hello hello hello, i suppose this isn't 140 characters anymore.."
+                httpMethod = "GET"
+                headers = mapOf()
+                queryStringParameters = mapOf()
+            },
+            proxy<Context>()
+        )
         println(response)
     }
 

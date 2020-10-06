@@ -18,8 +18,14 @@ import java.time.Instant
 import java.util.UUID
 
 class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
-    override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username
-        ?: "unknown")))
+    override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(
+        AuthorizationCode(
+            "dummy-token-for-" + (
+                username
+                    ?: "unknown"
+                )
+        )
+    )
 
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri!!, Instant.EPOCH, request.state, request.isOIDC(), request.responseType, request.nonce)
 }
@@ -53,7 +59,8 @@ class DummyRefreshTokens : RefreshTokens {
             "new-valid-access-token",
             expiresIn = 100,
             scope = "openid",
-            refreshToken = RefreshToken("new-valid-refresh-token"))
+            refreshToken = RefreshToken("new-valid-refresh-token")
+        )
     }
 }
 
@@ -99,9 +106,11 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
     override fun detailsFor(code: AuthorizationCode) = codes[code] ?: error("code not stored")
 
     override fun create(request: Request, authRequest: AuthRequest, response: Response) =
-        Success(AuthorizationCode(UUID.randomUUID().toString()).also {
-            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri!!, clock.instant(), authRequest.state, authRequest.isOIDC(), authRequest.responseType, authRequest.nonce)
-        })
+        Success(
+            AuthorizationCode(UUID.randomUUID().toString()).also {
+                codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri!!, clock.instant(), authRequest.state, authRequest.isOIDC(), authRequest.responseType, authRequest.nonce)
+            }
+        )
 }
 
 class InMemoryIdTokenConsumer(var expectedNonce: Nonce? = null) : IdTokenConsumer {

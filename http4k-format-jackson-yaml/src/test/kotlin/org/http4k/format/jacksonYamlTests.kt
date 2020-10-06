@@ -43,27 +43,42 @@ class JacksonYamlBodyTest {
 
     @Test
     fun `write interface implementation to body`() {
-        assertThat(Response(Status.OK).with(
-            Body.auto<Interface>().toLens() of InterfaceImpl()
-        ).bodyString(), equalTo("""value: "hello"
+        assertThat(
+            Response(Status.OK).with(
+                Body.auto<Interface>().toLens() of InterfaceImpl()
+            ).bodyString(),
+            equalTo(
+                """value: "hello"
 subValue: "123"
-"""))
+"""
+            )
+        )
     }
 
     @Test
     fun `write list of interface implementation to body`() {
-        assertThat(Response(Status.OK).with(
-            Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
-        ).bodyString(), equalTo("""- value: "hello"
+        assertThat(
+            Response(Status.OK).with(
+                Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
+            ).bodyString(),
+            equalTo(
+                """- value: "hello"
   subValue: "123"
-"""))
+"""
+            )
+        )
     }
 
     @Test
     fun `writes using non-sealed parent type`() {
         val nonSealedChild = NonSealedChild("hello")
-        assertThat(Response(Status.OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""something: "hello"
-"""))
+        assertThat(
+            Response(Status.OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(),
+            equalTo(
+                """something: "hello"
+"""
+            )
+        )
     }
 
     @Test

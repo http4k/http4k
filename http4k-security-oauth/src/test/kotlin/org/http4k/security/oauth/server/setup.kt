@@ -77,10 +77,12 @@ fun oauthClientApp(
 ): RoutingHttpHandler {
 
     val oauthProvider = OAuthProvider(
-        OAuthProviderConfig(Uri.of("http://irrelevant"),
+        OAuthProviderConfig(
+            Uri.of("http://irrelevant"),
             "/my-login-page", "/oauth2/token",
             Credentials("my-app", "somepassword"),
-            Uri.of("https://irrelevant")),
+            Uri.of("https://irrelevant")
+        ),
         tokenClient,
         Uri.of("/my-callback"),
         scopes,

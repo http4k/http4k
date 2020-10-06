@@ -49,7 +49,8 @@ class JsonToJsonSchema<NODE>(
             }
 
         val newDefinition = json {
-            obj("type" to string("object"),
+            obj(
+                "type" to string("object"),
                 "required" to array(emptyList()),
                 "properties" to obj(fields)
             )

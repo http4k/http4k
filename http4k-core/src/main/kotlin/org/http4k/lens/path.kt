@@ -13,9 +13,12 @@ import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
-open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(meta, {
-    it.path(meta.name)?.let(get) ?: throw LensFailure(Missing(meta), target = it)
-}) {
+open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(
+    meta,
+    {
+        it.path(meta.name)?.let(get) ?: throw LensFailure(Missing(meta), target = it)
+    }
+) {
 
     operator fun invoke(target: String) = try {
         get(target)
@@ -71,22 +74,28 @@ open class BiDiPathLensSpec<OUT>(
         val setLens = set(name)
 
         val meta = Meta(true, "path", paramMeta, name, description)
-        return BiDiPathLens(meta,
+        return BiDiPathLens(
+            meta,
             { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
-            { it: OUT, target: Request -> setLens(listOf(it), target) })
+            { it: OUT, target: Request -> setLens(listOf(it), target) }
+        )
     }
 }
 
-object Path : BiDiPathLensSpec<String>(StringParam,
+object Path : BiDiPathLensSpec<String>(
+    StringParam,
     LensGet { _, target -> listOf(target) },
-    LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().toPathEncoded()))) }) {
+    LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().toPathEncoded()))) }
+) {
 
     fun fixed(name: String): PathLens<String> {
         if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
         val getLens = get(name)
         val meta = Meta(true, "path", StringParam, name)
-        return object : PathLens<String>(meta,
-            { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta), target = it) }) {
+        return object : PathLens<String>(
+            meta,
+            { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta), target = it) }
+        ) {
             override fun toString(): String = name
 
             override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()
@@ -121,4 +130,5 @@ inline fun <reified T : Enum<T>> Path.enum() = map(StringBiDiMappings.enum<T>())
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
-    mapping::invoke, mapping::invoke, paramMeta)
+    mapping::invoke, mapping::invoke, paramMeta
+)

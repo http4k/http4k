@@ -79,9 +79,11 @@ class LatencyBehaviourTest : ChaosBehaviourContract() {
 
     @Test
     override fun `deserialises from JSON`() {
-        assertBehaviour("""{"type":"latency","min":"PT0.1S","max":"PT0.3S"}""",
+        assertBehaviour(
+            """{"type":"latency","min":"PT0.1S","max":"PT0.3S"}""",
             description,
-            hasStatus(OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
+            hasStatus(OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*")))
+        )
     }
 
     @Test
@@ -113,9 +115,11 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
 
     @Test
     override fun `deserialises from JSON`() {
-        assertBehaviour("""{"type":"status","status":404}""",
+        assertBehaviour(
+            """{"type":"status","status":404}""",
             description,
-            hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
+            hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404")))
+        )
     }
 }
 
@@ -132,9 +136,11 @@ class NoBodyBehaviourTest : ChaosBehaviourContract() {
 
     @Test
     override fun `deserialises from JSON`() {
-        assertBehaviour("""{"type":"body"}""",
+        assertBehaviour(
+            """{"type":"body"}""",
             description,
-            hasStatus(OK).and(hasHeader("x-http4k-chaos", "Snip body (0b)")))
+            hasStatus(OK).and(hasHeader("x-http4k-chaos", "Snip body (0b)"))
+        )
     }
 }
 
@@ -151,9 +157,11 @@ class SnipBodyBehaviourTest : ChaosBehaviourContract() {
 
     @Test
     override fun `deserialises from JSON`() {
-        assertBehaviour("""{"type":"snip"}""",
+        assertBehaviour(
+            """{"type":"snip"}""",
             description,
-            hasStatus(OK).and(hasHeader("x-http4k-chaos", matches("""Snip body \(\db\)""".toRegex()))))
+            hasStatus(OK).and(hasHeader("x-http4k-chaos", matches("""Snip body \(\db\)""".toRegex())))
+        )
     }
 }
 
@@ -165,17 +173,22 @@ class SnipRequestBodyBehaviourTest : ChaosBehaviourContract() {
         val snipBody = ChaosBehaviours.SnipRequestBody(Random(1)) { 3 }
         assertThat(snipBody.toString(), equalTo(description))
 
-        assertThat(snipBody.then {
-            assertThat(it, hasBody("h"))
-            response
-        }(request), equalTo(response))
+        assertThat(
+            snipBody.then {
+                assertThat(it, hasBody("h"))
+                response
+            }(request),
+            equalTo(response)
+        )
     }
 
     @Test
     override fun `deserialises from JSON`() {
-        assertBehaviour("""{"type":"sniprequest"}""",
+        assertBehaviour(
+            """{"type":"sniprequest"}""",
             description,
-            hasMethod(GET).and(hasHeader("x-http4k-chaos", matches("""Snip request body \(\db\)""".toRegex()))))
+            hasMethod(GET).and(hasHeader("x-http4k-chaos", matches("""Snip request body \(\db\)""".toRegex())))
+        )
     }
 }
 

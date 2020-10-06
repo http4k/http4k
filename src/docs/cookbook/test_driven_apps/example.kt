@@ -51,9 +51,11 @@ class EndpointUnitTest {
 }
 
 fun MyMathsApp(recorderHttp: HttpHandler) =
-    ServerFilters.CatchAll().then(routes(
-        "/add" bind GET to myMathsEndpoint({ first, second -> first + second }, AnswerRecorder(recorderHttp))
-    ))
+    ServerFilters.CatchAll().then(
+        routes(
+            "/add" bind GET to myMathsEndpoint({ first, second -> first + second }, AnswerRecorder(recorderHttp))
+        )
+    )
 
 class FakeRecorderHttp : HttpHandler {
     val calls = mutableListOf<Int>()

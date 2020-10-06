@@ -231,8 +231,8 @@ object ServerFilters {
      */
     fun CatchLensFailure(
         failResponseFn: (LensFailure) -> Response = {
-Response(BAD_REQUEST.description(it.failures.joinToString("; ")))
-}
+            Response(BAD_REQUEST.description(it.failures.joinToString("; ")))
+        }
     ) = Filter { next ->
         {
             try {

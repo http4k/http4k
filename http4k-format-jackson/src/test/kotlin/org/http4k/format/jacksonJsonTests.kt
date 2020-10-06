@@ -87,16 +87,22 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
     @Test
     fun `write interface implementation to body`() {
-        assertThat(Response(OK).with(
-            Body.auto<Interface>().toLens() of InterfaceImpl()
-        ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}"""))
+        assertThat(
+            Response(OK).with(
+                Body.auto<Interface>().toLens() of InterfaceImpl()
+            ).bodyString(),
+            equalTo("""{"value":"hello","subValue":"123"}""")
+        )
     }
 
     @Test
     fun `write list of interface implementation to body`() {
-        assertThat(Response(OK).with(
-            Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
-        ).bodyString(), equalTo("""[{"value":"hello","subValue":"123"}]"""))
+        assertThat(
+            Response(OK).with(
+                Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
+            ).bodyString(),
+            equalTo("""[{"value":"hello","subValue":"123"}]""")
+        )
     }
 
     @Test

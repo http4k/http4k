@@ -51,9 +51,11 @@ data class Cookie(
                     val attributes = valueAndAttributes.drop(1)
                         .map { it.trimStart() }
                         .map { attrString -> attrString.split("=").let { it[0] to it.getOrNull(1) } }
-                    Cookie(pair[0], valueAndAttributes[0].unquoted(),
+                    Cookie(
+                        pair[0], valueAndAttributes[0].unquoted(),
                         attributes.maxAge(), attributes.expires(), attributes.domain(),
-                        attributes.path(), attributes.secure(), attributes.httpOnly(), attributes.sameSite())
+                        attributes.path(), attributes.secure(), attributes.httpOnly(), attributes.sameSite()
+                    )
                 }
             }
         }
@@ -101,7 +103,8 @@ enum class SameSite {
 
 private val RFC822 = ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz", US)
 
-private val supportedFormats = listOf(RFC822,
+private val supportedFormats = listOf(
+    RFC822,
     ofPattern("EEE, dd-MMM-yyyy HH:mm:ss zzz"),
     ofPattern("EEE, dd-MMM-yy HH:mm:ss zzz"),
     ofPattern("EEE, dd MMM yy HH:mm:ss zzz"),

@@ -20,7 +20,7 @@ fun main() {
     val client = ApacheClient()
 
     val request = Request(GET, "http://localhost:9000")
-                    .query("name", "John Doe")
+        .query("name", "John Doe")
 
     val response: Response = client(request)
 

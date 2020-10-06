@@ -8,9 +8,12 @@ class DefaultReadinessCheckResultRendererTest {
 
     @Test
     fun `calls toString() on result`() {
-        assertThat(DefaultReadinessCheckResultRenderer(
-            Failed("first", "failed") +
-                Completed("second")
-        ), equalTo("overall=false\nfirst=false [failed]\nsecond=true"))
+        assertThat(
+            DefaultReadinessCheckResultRenderer(
+                Failed("first", "failed") +
+                    Completed("second")
+            ),
+            equalTo("overall=false\nfirst=false [failed]\nsecond=true")
+        )
     }
 }

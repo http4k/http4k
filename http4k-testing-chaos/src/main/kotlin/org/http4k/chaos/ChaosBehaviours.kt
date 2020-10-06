@@ -66,8 +66,10 @@ object ChaosBehaviours {
             defaultMax: Duration = ofMillis(500),
             minName: String = "CHAOS_LATENCY_MS_MIN",
             maxName: String = "CHAOS_LATENCY_MS_MAX"
-        ) = Latency(env(minName)?.let { ofMillis(it.toLong()) } ?: defaultMin,
-            env(maxName)?.let { ofMillis(it.toLong()) } ?: defaultMax)
+        ) = Latency(
+            env(minName)?.let { ofMillis(it.toLong()) } ?: defaultMin,
+            env(maxName)?.let { ofMillis(it.toLong()) } ?: defaultMax
+        )
     }
 
     /**
@@ -123,11 +125,13 @@ object ChaosBehaviours {
     object SnipRequestBody {
         operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour {
             override fun invoke(next: HttpHandler): HttpHandler = {
-                next(with(it) {
-                    val max = limitFn(body.length ?: 0)
-                    val limit = if (max == 0L) 0L else random.nextLong(max)
-                    body(body.snipTo(limit)).with(Header.CHAOS of "Snip request body (${limit}b)")
-                })
+                next(
+                    with(it) {
+                        val max = limitFn(body.length ?: 0)
+                        val limit = if (max == 0L) 0L else random.nextLong(max)
+                        body(body.snipTo(limit)).with(Header.CHAOS of "Snip request body (${limit}b)")
+                    }
+                )
             }
 
             override fun toString() = "SnipRequestBody"
@@ -230,7 +234,10 @@ internal fun JsonNode.asBehaviour() = when (nonNullable<String>("type")) {
 private fun Body.snipTo(limit: Long): Body {
     var left = limit
     val original = stream
-    return Body(object : InputStream() {
-        override fun read() = if (left-- > 0) original.read() else -1
-    }, limit)
+    return Body(
+        object : InputStream() {
+            override fun read() = if (left-- > 0) original.read() else -1
+        },
+        limit
+    )
 }

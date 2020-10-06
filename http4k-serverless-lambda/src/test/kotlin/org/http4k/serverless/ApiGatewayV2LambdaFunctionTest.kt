@@ -21,28 +21,36 @@ class ApiGatewayV2LambdaFunctionTest {
             .withQueryStringParameters(mapOf("query" to "value"))
             .withBody("input body")
             .withHeaders(mapOf("c" to "d"))
-            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-                .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
-                ).build()
+            .withRequestContext(
+                APIGatewayV2HTTPEvent.RequestContext.builder()
+                    .withHttp(
+                        APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
+                    ).build()
             )
             .build()
 
-        val lambda = object : ApiGatewayV2LambdaFunction(AppLoaderWithContexts { env, contexts ->
-            {
-                assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
-                assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
-                assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
-                    .query("query", "value")
-                    .header("c", "d")
-                    .body("input body")
-                ))
-                Response(Status.OK).header("a", "b").body("hello there")
+        val lambda = object : ApiGatewayV2LambdaFunction(
+            AppLoaderWithContexts { env, contexts ->
+                {
+                    assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
+                    assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
+                    assertThat(env, equalTo(System.getenv()))
+                    assertThat(
+                        it.removeHeader("x-http4k-context"),
+                        equalTo(
+                            Request(GET, "/path")
+                                .query("query", "value")
+                                .header("c", "d")
+                                .body("input body")
+                        )
+                    )
+                    Response(Status.OK).header("a", "b").body("hello there")
+                }
             }
-        }) {}
+        ) {}
 
-        assertThat(lambda.handle(request, lambdaContext),
+        assertThat(
+            lambda.handle(request, lambdaContext),
             equalTo(
                 APIGatewayV2HTTPResponse.builder()
                     .withStatusCode(200)

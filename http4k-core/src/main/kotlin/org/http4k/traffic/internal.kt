@@ -16,8 +16,10 @@ internal fun HttpMessage.writeTo(folder: File) {
 
 internal fun String.toBaseFolder(): File = File(if (isEmpty()) "." else this)
 
-internal fun Request.toFolder(baseDir: File) = File(File(baseDir, uri.path),
+internal fun Request.toFolder(baseDir: File) = File(
+    File(baseDir, uri.path),
     String(Base64.getEncoder().encode(MessageDigest.getInstance("SHA1").digest(toString().toByteArray())))
-        .replace(File.separatorChar, '_'))
+        .replace(File.separatorChar, '_')
+)
 
 internal fun HttpMessage.toFile(folder: File): File = File(folder, if (this is Request) "request.txt" else "response.txt")

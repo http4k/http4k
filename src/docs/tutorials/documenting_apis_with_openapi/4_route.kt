@@ -18,10 +18,13 @@ data class Person(val name: String, val age: Age, val children: List<Person> = e
 
 fun Family(): ContractRoute {
 
-    val familyData = Person("Bob", Age(85), listOf(
-        Person("Anita", Age(55)),
-        Person("Donald", Age(52), listOf(Person("Don Jr", Age(21))))
-    ))
+    val familyData = Person(
+        "Bob", Age(85),
+        listOf(
+            Person("Anita", Age(55)),
+            Person("Donald", Age(52), listOf(Person("Don Jr", Age(21))))
+        )
+    )
 
     val responseLens = Body.auto<Person>("The matched family tree").toLens()
 

@@ -6,8 +6,11 @@ import org.http4k.contract.openapi.AddSimpleFieldToRootNode
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.format.Argo
 
-class OpenApi3Test : ContractRendererContract<JsonNode>(Argo, OpenApi3(
-    ApiInfo("title", "1.2", "module description"),
+class OpenApi3Test : ContractRendererContract<JsonNode>(
     Argo,
-    listOf(AddSimpleFieldToRootNode)
-))
+    OpenApi3(
+        ApiInfo("title", "1.2", "module description"),
+        Argo,
+        listOf(AddSimpleFieldToRootNode)
+    )
+)

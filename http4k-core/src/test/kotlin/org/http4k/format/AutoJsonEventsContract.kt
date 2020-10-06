@@ -27,11 +27,13 @@ abstract class AutoJsonEventsContract(private val j: AutoMarshallingJson) {
         val final = MyEvent() + ("first" to "1") + ("second" to 2)
         val w = StringWriter()
 
-        ZipkinTraces.THREAD_LOCAL.set(ZipkinTraces(
-            TraceId("61a2ebc48552f603"),
-            TraceId("f494afd6389ff8f0"),
-            TraceId("b429b2d2803523b9")
-        ))
+        ZipkinTraces.THREAD_LOCAL.set(
+            ZipkinTraces(
+                TraceId("61a2ebc48552f603"),
+                TraceId("f494afd6389ff8f0"),
+                TraceId("b429b2d2803523b9")
+            )
+        )
 
         val pipeline = EventFilters.AddZipkinTraces()
             .then(EventFilters.AddTimestamp(FixedClock))

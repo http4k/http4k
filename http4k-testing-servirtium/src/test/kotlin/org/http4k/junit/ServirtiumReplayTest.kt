@@ -33,10 +33,12 @@ class ServirtiumReplayTest {
             .header("header3", "value3")
             .body("body1")
 
-        val servirtiumReplay = ServirtiumReplay("name", storage,
+        val servirtiumReplay = ServirtiumReplay(
+            "name", storage,
             object : InteractionOptions {
                 override fun modify(request: Request): Request = request.header("toBeAdded", "value")
-            })
+            }
+        )
 
         @Suppress("UNCHECKED_CAST")
         val actualResponse = (servirtiumReplay.resolveParameter(stub, stub) as HttpHandler)(originalRequest)

@@ -36,9 +36,11 @@ private enum class Cacheability {
     operator fun invoke(currentValue: String?): String =
         currentValue?.let {
             val split = currentValue.split(",")
-            (listOf(name) + split
-                .map(String::trim)
-                .filterNot { values().map { it.name }.contains(it) }).joinToString(", ")
+            (
+                listOf(name) + split
+                    .map(String::trim)
+                    .filterNot { values().map { it.name }.contains(it) }
+                ).joinToString(", ")
         } ?: name
 }
 

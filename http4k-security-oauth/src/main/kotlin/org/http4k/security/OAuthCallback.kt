@@ -28,8 +28,12 @@ class OAuthCallback(
                             ?.let { tokenDetails ->
                                 tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
                                 val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                                oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT)
-                                    .header("Location", originalUri), tokenDetails.accessToken)
+                                oAuthPersistence.assignToken(
+                                    request,
+                                    Response(TEMPORARY_REDIRECT)
+                                        .header("Location", originalUri),
+                                    tokenDetails.accessToken
+                                )
                             }
                     } else {
                         null

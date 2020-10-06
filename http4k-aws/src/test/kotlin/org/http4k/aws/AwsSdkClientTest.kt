@@ -42,30 +42,43 @@ class AwsSdkClientTest {
             builder().request(
                 SdkHttpFullRequest.builder()
                     .method(SdkHttpMethod.POST)
-                    .headers(headers.groupBy { it.first }
-                        .mapValues { it.value.map { it.second } })
+                    .headers(
+                        headers.groupBy { it.first }
+                            .mapValues { it.value.map { it.second } }
+                    )
                     .uri(URL(request.uri.toString()).toURI())
                     .putRawQueryParameter("foo", listOf("bar1", "bar2"))
                     .contentStreamProvider { request.body.stream }.build()
             ).build()
         ).call()
 
-        assertThat(out.httpResponse() as SdkHttpFullResponse,
+        assertThat(
+            out.httpResponse() as SdkHttpFullResponse,
             has(SdkHttpResponse::statusCode, equalTo(I_M_A_TEAPOT.code))
                 .and(
-                    has(SdkHttpFullResponse::headers, equalTo(mapOf(
-                        "bar" to listOf(null),
-                        "foo" to listOf("bar1")
-                    )))
+                    has(
+                        SdkHttpFullResponse::headers,
+                        equalTo(
+                            mapOf(
+                                "bar" to listOf(null),
+                                "foo" to listOf("bar1")
+                            )
+                        )
+                    )
                 )
-                .and(has(SdkHttpFullResponse::content, object : Matcher<Optional<AbortableInputStream>> {
-                    override val description = "same content"
+                .and(
+                    has(
+                        SdkHttpFullResponse::content,
+                        object : Matcher<Optional<AbortableInputStream>> {
+                            override val description = "same content"
 
-                    override fun invoke(actual: Optional<AbortableInputStream>): MatchResult {
-                        val content = actual.get().reader().readText()
-                        return if (content == response.bodyString()) MatchResult.Match else MatchResult.Mismatch(content)
-                    }
-                }))
+                            override fun invoke(actual: Optional<AbortableInputStream>): MatchResult {
+                                val content = actual.get().reader().readText()
+                                return if (content == response.bodyString()) MatchResult.Match else MatchResult.Mismatch(content)
+                            }
+                        }
+                    )
+                )
         )
     }
 }

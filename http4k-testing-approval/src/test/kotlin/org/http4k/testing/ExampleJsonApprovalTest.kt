@@ -34,9 +34,12 @@ class ExampleJsonApprovalTest {
 
     @Test
     fun `check response content with badly-formatted JSON`(approver: Approver) {
-        assertThat({
-            approver.assertApproved(Response(OK).with(CONTENT_TYPE of APPLICATION_JSON).body("foobar"))
-        }, throws<AssertionError>())
+        assertThat(
+            {
+                approver.assertApproved(Response(OK).with(CONTENT_TYPE of APPLICATION_JSON).body("foobar"))
+            },
+            throws<AssertionError>()
+        )
     }
 
     @Test

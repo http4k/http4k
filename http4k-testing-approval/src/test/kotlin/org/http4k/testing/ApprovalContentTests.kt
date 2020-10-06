@@ -26,9 +26,16 @@ class ApprovalContentTests {
 
     @Test
     fun `entire message`() {
-        assertThat(EntireHttpMessage()(input).reader().use { it.readText() }, equalTo(("HTTP/1.1 200 OK\r\n" +
-            "some-header: some header value\r\n" +
-            "\r\n" +
-            "hello")))
+        assertThat(
+            EntireHttpMessage()(input).reader().use { it.readText() },
+            equalTo(
+                (
+                    "HTTP/1.1 200 OK\r\n" +
+                        "some-header: some header value\r\n" +
+                        "\r\n" +
+                        "hello"
+                    )
+            )
+        )
     }
 }

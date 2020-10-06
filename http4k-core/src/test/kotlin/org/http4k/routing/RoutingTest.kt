@@ -217,9 +217,11 @@ class RoutingTest {
 
     @Test
     fun `group router shortcuts if parent prefix does not match`() {
-        val app = routes("/prefix" bind routes(
-            "/{.*}" bind GET to { Response(OK).body("matched") }
-        ))
+        val app = routes(
+            "/prefix" bind routes(
+                "/{.*}" bind GET to { Response(OK).body("matched") }
+            )
+        )
 
         assertThat(app(Request(GET, "/prefix/foo")).status, equalTo(OK))
         assertThat(app(Request(GET, "/prefix/foo/something")).status, equalTo(NOT_FOUND))
@@ -274,9 +276,11 @@ class RoutingTest {
     fun `RoutingHttpHandler with filters also applies when route is not found`() {
         val filter = Filter { next -> { next(it).body("value") } }
 
-        val routingHttpHandler = filter.then(routes(
-            "/a/thing" bind GET to { Response(OK) }
-        ))
+        val routingHttpHandler = filter.then(
+            routes(
+                "/a/thing" bind GET to { Response(OK) }
+            )
+        )
 
         assertThat(routingHttpHandler(Request(GET, "/not-found")).bodyString(), equalTo("value"))
     }
@@ -284,9 +288,11 @@ class RoutingTest {
     @Test
     fun `can apply a filter to a Router`() {
         val routes = Filter { next -> { next(it.header("name", "value")) } }
-            .then(routes(
-                "/a/thing" bind GET to { Response(OK).body(it.header("name")!!) }
-            ))
+            .then(
+                routes(
+                    "/a/thing" bind GET to { Response(OK).body(it.header("name")!!) }
+                )
+            )
 
         assertThat(routes(Request(GET, "/a/thing")).bodyString(), equalTo("value"))
     }

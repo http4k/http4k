@@ -28,9 +28,12 @@ class InsecureCookieBasedOAuthPersistenceTest {
 
     @Test
     fun `failed response has correct cookies`() {
-        assertThat(persistence.authFailureResponse(), equalTo(
-            Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken").invalidateCookie("prefixNonce")
-        ))
+        assertThat(
+            persistence.authFailureResponse(),
+            equalTo(
+                Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken").invalidateCookie("prefixNonce")
+            )
+        )
     }
 
     @Test
@@ -53,23 +56,35 @@ class InsecureCookieBasedOAuthPersistenceTest {
 
     @Test
     fun `adds csrf as a cookie to the auth redirect`() {
-        assertThat(persistence.assignCsrf(Response(TEMPORARY_REDIRECT), CrossSiteRequestForgeryToken("csrfValue")),
-            equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixCsrf", "csrfValue", expires = expectedCookieExpiry, path = "/"))))
+        assertThat(
+            persistence.assignCsrf(Response(TEMPORARY_REDIRECT), CrossSiteRequestForgeryToken("csrfValue")),
+            equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixCsrf", "csrfValue", expires = expectedCookieExpiry, path = "/")))
+        )
     }
 
     @Test
     fun `adds csrf as a cookie to the token redirect`() {
-        assertThat(persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessToken("tokenValue")),
-            equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue", expires = expectedCookieExpiry, path = "/"))
-                .invalidateCookie("prefixCsrf").invalidateCookie("prefixNonce")
-            ))
+        assertThat(
+            persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessToken("tokenValue")),
+            equalTo(
+                Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue", expires = expectedCookieExpiry, path = "/"))
+                    .invalidateCookie("prefixCsrf").invalidateCookie("prefixNonce")
+            )
+        )
     }
 
     @Test
     fun `adds nonce as a cookie to the auth redirect`() {
-        assertThat(persistence.assignNonce(Response(TEMPORARY_REDIRECT), Nonce("nonceValue")), equalTo(
-            Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixNonce", "nonceValue",
-                expires = expectedCookieExpiry, path = "/"))
-        ))
+        assertThat(
+            persistence.assignNonce(Response(TEMPORARY_REDIRECT), Nonce("nonceValue")),
+            equalTo(
+                Response(TEMPORARY_REDIRECT).cookie(
+                    Cookie(
+                        "prefixNonce", "nonceValue",
+                        expires = expectedCookieExpiry, path = "/"
+                    )
+                )
+            )
+        )
     }
 }

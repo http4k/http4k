@@ -86,7 +86,8 @@ class OAuthServer(
         authoriseRequestValidator,
         requestJWTValidator,
         errorRenderer,
-        documentationUri)
+        documentationUri
+    )
 
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, refreshTokens, errorRenderer, grantTypes))
@@ -125,7 +126,8 @@ class OAuthServer(
             scopesForm,
             clientAssertionType,
             clientAssertion,
-            refreshToken).toLens()
+            refreshToken
+        ).toLens()
     }
 }
 
@@ -156,5 +158,6 @@ internal fun Request.tokenRequest(grantType: GrantType): TokenRequest {
         OAuthServer.scopesForm(tokenRequestWebForm) ?: listOf(),
         OAuthServer.clientAssertionType(tokenRequestWebForm),
         OAuthServer.clientAssertion(tokenRequestWebForm),
-        OAuthServer.refreshToken(tokenRequestWebForm)?.let { RefreshToken(it) })
+        OAuthServer.refreshToken(tokenRequestWebForm)?.let { RefreshToken(it) }
+    )
 }

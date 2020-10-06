@@ -45,8 +45,10 @@ data class ContractRoutingHttpHandler(
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    private val notFound = preSecurityFilter.then(security?.filter
-        ?: Filter.NoOp).then(postSecurityFilter).then { renderer.notFound() }
+    private val notFound = preSecurityFilter.then(
+        security?.filter
+            ?: Filter.NoOp
+    ).then(postSecurityFilter).then { renderer.notFound() }
 
     private val handler: HttpHandler = {
         when (val matchResult = match(it)) {
@@ -72,10 +74,12 @@ data class ContractRoutingHttpHandler(
                 .then(postSecurityFilter)
                 .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
-        } + (identify(descriptionRoute)
+        } + (
+        identify(descriptionRoute)
             .then(preSecurityFilter)
             .then(descriptionSecurity?.filter ?: Filter.NoOp)
-            .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+            .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot)
+        )
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 

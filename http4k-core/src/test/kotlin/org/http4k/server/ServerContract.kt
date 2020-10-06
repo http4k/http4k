@@ -130,8 +130,10 @@ abstract class ServerContract(
 
     @Test
     fun `length is set on body if it is sent`() {
-        val response = client(Request(POST, "$baseUrl/length")
-            .body("12345").header("Content-Length", "5"))
+        val response = client(
+            Request(POST, "$baseUrl/length")
+                .body("12345").header("Content-Length", "5")
+        )
         assertThat(response, hasStatus(OK).and(hasBody("5")))
     }
 
@@ -188,12 +190,15 @@ abstract class ServerContract(
 
     @Test
     fun `can resolve request source`() {
-        assertThat(client(Request(GET, "$baseUrl/request-source")),
-            allOf(hasStatus(OK),
+        assertThat(
+            client(Request(GET, "$baseUrl/request-source")),
+            allOf(
+                hasStatus(OK),
                 hasHeader("x-address", clientAddress()),
                 hasHeader("x-port", present()),
                 hasHeader("x-scheme", requestScheme())
-            ))
+            )
+        )
     }
 
     open fun clientAddress() = equalTo(InetAddress.getLocalHost().hostAddress)

@@ -35,14 +35,16 @@ class CachingFiltersTest {
     fun `Adds If-Modified-Since to Request`() {
         val maxAge = Duration.ofSeconds(1)
         val response = AddIfModifiedSince(clock, maxAge).then { Response(OK).header("If-modified-since", it.header("If-modified-since")) }(
-            request)
+            request
+        )
         assertThat(response, hasHeader("If-modified-since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
     }
 
     @Test
     fun `Add eTag`() {
         val response = AddETag { true }.then { Response(OK).body("bob") }(
-            request)
+            request
+        )
         assertThat(response, hasHeader("etag", "9f9d51bc70ef21ca5c14f307980a29d8"))
     }
 

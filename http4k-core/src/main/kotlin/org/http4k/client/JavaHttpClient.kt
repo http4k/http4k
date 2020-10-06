@@ -33,10 +33,12 @@ class JavaHttpClient(
     override fun invoke(request: Request): Response = try {
         val javaRequest = request.toJavaHttpRequest(requestBodyMode)
         when (responseBodyMode) {
-            is Memory -> httpClient.send(javaRequest, BodyHandlers.ofByteArray())
-                .run { coreResponse().body(Body(ByteBuffer.wrap(body()))) }
-            is Stream -> httpClient.send(javaRequest, BodyHandlers.ofInputStream())
-                .run { coreResponse().body(body()) }
+            is Memory ->
+                httpClient.send(javaRequest, BodyHandlers.ofByteArray())
+                    .run { coreResponse().body(Body(ByteBuffer.wrap(body()))) }
+            is Stream ->
+                httpClient.send(javaRequest, BodyHandlers.ofInputStream())
+                    .run { coreResponse().body(body()) }
         }
     } catch (e: UnknownHostException) {
         Response(UNKNOWN_HOST.toClientStatus(e))
@@ -65,12 +67,14 @@ private fun Request.toJavaHttpRequest(bodyMode: BodyMode) =
         }.method(method.name, body.toRequestPublisher(bodyMode)).build()
 
 private fun <T> HttpResponse<T>.coreResponse() =
-    Response(Status(statusCode(), "")).headers(headers().map()
-        .map { headerNameToValues ->
-            headerNameToValues.value
-                .map { headerNameToValues.key to it }
-        }
-        .flatten())
+    Response(Status(statusCode(), "")).headers(
+        headers().map()
+            .map { headerNameToValues ->
+                headerNameToValues.value
+                    .map { headerNameToValues.key to it }
+            }
+            .flatten()
+    )
 
 private fun Body.toRequestPublisher(bodyMode: BodyMode) = when (bodyMode) {
     Memory -> HttpRequest.BodyPublishers.ofByteArray(payload.array())
@@ -78,5 +82,7 @@ private fun Body.toRequestPublisher(bodyMode: BodyMode) = when (bodyMode) {
 }
 
 // list copied from internal JDK Utils.ALLOWED_HEADERS
-private val disallowedHeaders = setOf("connection", "content-length",
-    "date", "expect", "from", "host", "upgrade", "via", "warning")
+private val disallowedHeaders = setOf(
+    "connection", "content-length",
+    "date", "expect", "from", "host", "upgrade", "via", "warning"
+)

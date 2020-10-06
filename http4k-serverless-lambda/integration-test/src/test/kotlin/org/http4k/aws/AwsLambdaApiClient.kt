@@ -25,12 +25,16 @@ class AwsLambdaApiClient(client: HttpHandler, region: Region) {
     fun create(functionPackage: FunctionPackage): FunctionDetails {
         val code = String(Base64.getEncoder().encode(functionPackage.jar.array()))
         val request = Request(POST, Uri.of("/2015-03-31/functions/"))
-            .with(createFunctionRequestBody of CreateFunction(Code(code),
-                functionPackage.name.value,
-                functionPackage.handler.value,
-                functionPackage.role.name,
-                Environment(functionPackage.environmentProperties),
-                functionPackage.timeoutInSeconds))
+            .with(
+                createFunctionRequestBody of CreateFunction(
+                    Code(code),
+                    functionPackage.name.value,
+                    functionPackage.handler.value,
+                    functionPackage.role.name,
+                    Environment(functionPackage.environmentProperties),
+                    functionPackage.timeoutInSeconds
+                )
+            )
         val response = client(request)
         if (!response.status.successful) {
             throw RuntimeException("Could not create function (error ${response.status.code}): ${response.bodyString()}")

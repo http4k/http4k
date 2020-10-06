@@ -28,5 +28,6 @@ internal class AuthRequestTest {
         redirectUri = Uri.of("http://someredirecturi"),
         responseType = ResponseType.Code,
         state = State("some state"),
-        scopes = emptyList())
+        scopes = emptyList()
+    )
 }

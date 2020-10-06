@@ -14,17 +14,21 @@ import java.util.ArrayDeque
 fun main() {
 
     // configure the retry filter here, with max attempts and backoff
-    val retry = Retry.of("retrying", RetryConfig.custom<RetryConfig>()
-        .maxAttempts(3)
-        .intervalFunction { attempt: Int -> (attempt * 2).toLong() }
-        .build())
+    val retry = Retry.of(
+        "retrying",
+        RetryConfig.custom<RetryConfig>()
+            .maxAttempts(3)
+            .intervalFunction { attempt: Int -> (attempt * 2).toLong() }
+            .build()
+    )
 
     // queued up responses
     val responses = ArrayDeque<Response>()
     responses.add(Response(INTERNAL_SERVER_ERROR))
     responses.add(Response(OK))
 
-    val retrying = ResilienceFilters.RetryFailures(retry,
+    val retrying = ResilienceFilters.RetryFailures(
+        retry,
         isError = { r: Response -> !r.status.successful }
     ).then {
         val response = responses.removeFirst()

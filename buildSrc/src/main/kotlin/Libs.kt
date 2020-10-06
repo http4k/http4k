@@ -6,52 +6,52 @@
  */
 object Libs {
     const val kotlinx_serialization_json: String =
-            "org.jetbrains.kotlinx:kotlinx-serialization-json:" +
+        "org.jetbrains.kotlinx:kotlinx-serialization-json:" +
             Versions.org_jetbrains_kotlinx_kotlinx_serialization
 
     /**
      * https://github.com/FasterXML/jackson-dataformat-xml
      */
     const val jackson_dataformat_xml: String =
-            "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:" +
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:" +
             Versions.com_fasterxml_jackson_dataformat
 
     /**
      * https://github.com/FasterXML/jackson-dataformats-text
      */
     const val jackson_dataformat_yaml: String =
-            "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:" +
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:" +
             Versions.com_fasterxml_jackson_dataformat
 
     /**
      * https://resilience4j.readme.io
      */
     const val resilience4j_bulkhead: String = "io.github.resilience4j:resilience4j-bulkhead:" +
-            Versions.io_github_resilience4j
+        Versions.io_github_resilience4j
 
     /**
      * https://resilience4j.readme.io
      */
     const val resilience4j_circuitbreaker: String =
-            "io.github.resilience4j:resilience4j-circuitbreaker:" + Versions.io_github_resilience4j
+        "io.github.resilience4j:resilience4j-circuitbreaker:" + Versions.io_github_resilience4j
 
     /**
      * https://resilience4j.readme.io
      */
     const val resilience4j_ratelimiter: String =
-            "io.github.resilience4j:resilience4j-ratelimiter:" + Versions.io_github_resilience4j
+        "io.github.resilience4j:resilience4j-ratelimiter:" + Versions.io_github_resilience4j
 
     /**
      * https://resilience4j.readme.io
      */
     const val resilience4j_retry: String = "io.github.resilience4j:resilience4j-retry:" +
-            Versions.io_github_resilience4j
+        Versions.io_github_resilience4j
 
     /**
      * https://aws.amazon.com/sdkforjava
      */
     const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:" +
-            Versions.software_amazon_awssdk
+        Versions.software_amazon_awssdk
 
     /**
      * https://aws.amazon.com/sdkforjava
@@ -62,50 +62,50 @@ object Libs {
      * https://kotlinlang.org/
      */
     const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:" +
-            Versions.org_jetbrains_kotlin
+        Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/
      */
     const val kotlin_reflect: String = "org.jetbrains.kotlin:kotlin-reflect:" +
-            Versions.org_jetbrains_kotlin
+        Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/
      */
     const val kotlin_scripting_compiler_embeddable: String =
-            "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:" +
+        "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:" +
             Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/
      */
     const val kotlin_serialization: String = "org.jetbrains.kotlin:kotlin-serialization:" +
-            Versions.org_jetbrains_kotlin
+        Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/
      */
     const val kotlin_serialization_unshaded: String =
-            "org.jetbrains.kotlin:kotlin-serialization-unshaded:" + Versions.org_jetbrains_kotlin
+        "org.jetbrains.kotlin:kotlin-serialization-unshaded:" + Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/
      */
     const val kotlin_stdlib: String = "org.jetbrains.kotlin:kotlin-stdlib:" +
-            Versions.org_jetbrains_kotlin
+        Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/
      */
     const val kotlin_stdlib_common: String = "org.jetbrains.kotlin:kotlin-stdlib-common:" +
-            Versions.org_jetbrains_kotlin
+        Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/
      */
     const val kotlin_stdlib_jdk8: String = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" +
-            Versions.org_jetbrains_kotlin
+        Versions.org_jetbrains_kotlin
 
     /**
      * https://github.com/square/moshi/
@@ -116,13 +116,13 @@ object Libs {
      * https://github.com/square/moshi/
      */
     const val moshi_kotlin: String = "com.squareup.moshi:moshi-kotlin:" +
-            Versions.com_squareup_moshi
+        Versions.com_squareup_moshi
 
     /**
      * https://eclipse.org/jetty
      */
     const val jetty_alpn_conscrypt_server: String =
-            "org.eclipse.jetty:jetty-alpn-conscrypt-server:" + Versions.org_eclipse_jetty
+        "org.eclipse.jetty:jetty-alpn-conscrypt-server:" + Versions.org_eclipse_jetty
 
     /**
      * https://eclipse.org/jetty
@@ -138,19 +138,19 @@ object Libs {
      * https://eclipse.org/jetty
      */
     const val jetty_servlet: String = "org.eclipse.jetty:jetty-servlet:" +
-            Versions.org_eclipse_jetty
+        Versions.org_eclipse_jetty
 
     /**
      * https://junit.org/junit5/
      */
     const val junit_jupiter_api: String = "org.junit.jupiter:junit-jupiter-api:" +
-            Versions.org_junit_jupiter
+        Versions.org_junit_jupiter
 
     /**
      * https://junit.org/junit5/
      */
     const val junit_jupiter_engine: String = "org.junit.jupiter:junit-jupiter-engine:" +
-            Versions.org_junit_jupiter
+        Versions.org_junit_jupiter
 
     /**
      * https://forkhandles.dev
@@ -183,69 +183,69 @@ object Libs {
     const val ktor_server_netty: String = "io.ktor:ktor-server-netty:" + Versions.io_ktor
 
     const val de_fayard_buildsrcversions_gradle_plugin: String =
-            "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
+        "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
             Versions.de_fayard_buildsrcversions_gradle_plugin
 
     const val com_github_kt3k_coveralls_gradle_plugin: String =
-            "com.github.kt3k.coveralls:com.github.kt3k.coveralls.gradle.plugin:" +
+        "com.github.kt3k.coveralls:com.github.kt3k.coveralls.gradle.plugin:" +
             Versions.com_github_kt3k_coveralls_gradle_plugin
 
     const val com_jfrog_bintray_gradle_plugin: String =
-            "com.jfrog.bintray:com.jfrog.bintray.gradle.plugin:" +
+        "com.jfrog.bintray:com.jfrog.bintray.gradle.plugin:" +
             Versions.com_jfrog_bintray_gradle_plugin
 
     const val openapi_generator_gradle_plugin: String =
-            "org.openapitools:openapi-generator-gradle-plugin:" +
+        "org.openapitools:openapi-generator-gradle-plugin:" +
             Versions.openapi_generator_gradle_plugin
 
     /**
      * https://eclipse.org/jetty
      */
     const val javax_websocket_server_impl: String =
-            "org.eclipse.jetty.websocket:javax-websocket-server-impl:" +
+        "org.eclipse.jetty.websocket:javax-websocket-server-impl:" +
             Versions.javax_websocket_server_impl
 
     /**
      * http://www.github.com/kotest/kotest
      */
     const val kotest_assertions_core_jvm: String = "io.kotest:kotest-assertions-core-jvm:" +
-            Versions.kotest_assertions_core_jvm
+        Versions.kotest_assertions_core_jvm
 
     /**
      * http://github.com/kt3k/coveralls-gradle-plugin/
      */
     const val coveralls_gradle_plugin: String = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:" +
-            Versions.coveralls_gradle_plugin
+        Versions.coveralls_gradle_plugin
 
     const val functions_framework_api: String =
-            "com.google.cloud.functions:functions-framework-api:" + Versions.functions_framework_api
+        "com.google.cloud.functions:functions-framework-api:" + Versions.functions_framework_api
 
     /**
      * https://aws.amazon.com/lambda/
      */
     const val aws_lambda_java_events: String = "com.amazonaws:aws-lambda-java-events:" +
-            Versions.aws_lambda_java_events
+        Versions.aws_lambda_java_events
 
     /**
      * https://github.com/FasterXML/jackson-module-kotlin
      */
     const val jackson_module_kotlin: String =
-            "com.fasterxml.jackson.module:jackson-module-kotlin:" + Versions.jackson_module_kotlin
+        "com.fasterxml.jackson.module:jackson-module-kotlin:" + Versions.jackson_module_kotlin
 
     /**
      * https://aws.amazon.com/lambda/
      */
     const val aws_lambda_java_core: String = "com.amazonaws:aws-lambda-java-core:" +
-            Versions.aws_lambda_java_core
+        Versions.aws_lambda_java_core
 
     const val dokka_gradle_plugin: String = "org.jetbrains.dokka:dokka-gradle-plugin:" +
-            Versions.dokka_gradle_plugin
+        Versions.dokka_gradle_plugin
 
     /**
      * https://javaee.github.io/servlet-spec/
      */
     const val javax_servlet_api: String = "javax.servlet:javax.servlet-api:" +
-            Versions.javax_servlet_api
+        Versions.javax_servlet_api
 
     /**
      * https://netty.io/
@@ -256,13 +256,13 @@ object Libs {
      * http://github.com/FasterXML/jackson
      */
     const val jackson_databind: String = "com.fasterxml.jackson.core:jackson-databind:" +
-            Versions.jackson_databind
+        Versions.jackson_databind
 
     /**
      * http://hc.apache.org/httpcomponents-asyncclient
      */
     const val httpasyncclient: String = "org.apache.httpcomponents:httpasyncclient:" +
-            Versions.httpasyncclient
+        Versions.httpasyncclient
 
     /**
      * https://github.com/micrometer-metrics/micrometer
@@ -273,7 +273,7 @@ object Libs {
      * https://github.com/TooTallNate/Java-WebSocket
      */
     const val java_websocket: String = "org.java-websocket:Java-WebSocket:" +
-            Versions.java_websocket
+        Versions.java_websocket
 
     /**
      * https://commons.apache.org/proper/commons-pool/
@@ -299,7 +299,7 @@ object Libs {
      * https://hc.apache.org/httpcomponents-client-5.0.x/
      */
     const val httpclient5: String = "org.apache.httpcomponents.client5:httpclient5:" +
-            Versions.httpclient5
+        Versions.httpclient5
 
     /**
      * https://freemarker.apache.org/

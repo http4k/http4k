@@ -25,26 +25,35 @@ class ApplicationLoadBalancerLambdaFunctionTest {
             requestContext = ApplicationLoadBalancerRequestEvent.RequestContext()
         }
 
-        val lambda = object : ApplicationLoadBalancerLambdaFunction(AppLoaderWithContexts { env, contexts ->
-            {
-                assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
-                assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
-                assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
-                    .header("c", "d")
-                    .body("input body")
-                    .query("query", "value")))
-                Response(Status.OK).header("a", "b").body("hello there")
+        val lambda = object : ApplicationLoadBalancerLambdaFunction(
+            AppLoaderWithContexts { env, contexts ->
+                {
+                    assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
+                    assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
+                    assertThat(env, equalTo(System.getenv()))
+                    assertThat(
+                        it.removeHeader("x-http4k-context"),
+                        equalTo(
+                            Request(GET, "/path")
+                                .header("c", "d")
+                                .body("input body")
+                                .query("query", "value")
+                        )
+                    )
+                    Response(Status.OK).header("a", "b").body("hello there")
+                }
             }
-        }) {}
+        ) {}
 
-        assertThat(lambda.handle(request, lambdaContext),
+        assertThat(
+            lambda.handle(request, lambdaContext),
             equalTo(
                 ApplicationLoadBalancerResponseEvent().apply {
                     statusCode = 200
                     body = "hello there"
                     headers = mapOf("a" to "b")
-                })
+                }
+            )
         )
     }
 }

@@ -36,8 +36,10 @@ class HeaderTest {
         assertThat(single("value2", single("value1", request)), equalTo(request.header("world", "value2")))
 
         val multi = Header.multi.required("world")
-        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
-            equalTo(request.header("world", "value3").header("world", "value4")))
+        assertThat(
+            multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
+            equalTo(request.header("world", "value3").header("world", "value4"))
+        )
     }
 
     @Test
@@ -109,8 +111,15 @@ class HeaderTest {
     fun `content type serialises and deserialises correctly to message - with illegal directive is ignored`() {
         val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").header("Content-Type", "bob; charset=UTF-8 ;boundary=asd; foomanchu; media-type=a/b")
-        assertThat(lens(reqWithHeader), equalTo(ContentType("bob",
-            listOf("charset" to "UTF-8", "boundary" to "asd", "media-type" to "a/b"))))
+        assertThat(
+            lens(reqWithHeader),
+            equalTo(
+                ContentType(
+                    "bob",
+                    listOf("charset" to "UTF-8", "boundary" to "asd", "media-type" to "a/b")
+                )
+            )
+        )
     }
 
     @Test
@@ -126,8 +135,12 @@ class HeaderTest {
         assertThat(Header.parseValueAndDirectives("some value"), equalTo("some value" to emptyList()))
         assertThat(Header.parseValueAndDirectives("some value ;"), equalTo("some value" to emptyList()))
         assertThat(Header.parseValueAndDirectives("some value; bob"), equalTo("some value" to listOf<Parameter>("bob" to null)))
-        assertThat(Header.parseValueAndDirectives("some value; bob   ;bob2=anotherValue   "),
-            equalTo("some value" to
-                listOf("bob" to null, "bob2" to "anotherValue")))
+        assertThat(
+            Header.parseValueAndDirectives("some value; bob   ;bob2=anotherValue   "),
+            equalTo(
+                "some value" to
+                    listOf("bob" to null, "bob2" to "anotherValue")
+            )
+        )
     }
 }

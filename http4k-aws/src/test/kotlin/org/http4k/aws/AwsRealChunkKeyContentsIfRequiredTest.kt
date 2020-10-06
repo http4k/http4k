@@ -24,18 +24,22 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
     @Test
     fun `default usage`() {
         val requestBodyMode = BodyMode.Memory
-        bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
-            .then(awsClientFilter(Payload.Mode.Signed))
-            .then(ApacheClient(requestBodyMode = requestBodyMode)))
+        bucketLifecycle(
+            ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
+                .then(awsClientFilter(Payload.Mode.Signed))
+                .then(ApacheClient(requestBodyMode = requestBodyMode))
+        )
     }
 
     @Test
     @Disabled
     fun `streaming usage`() {
         val requestBodyMode = BodyMode.Stream
-        bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
-            .then(awsClientFilter(Payload.Mode.Unsigned))
-            .then(ApacheClient(requestBodyMode = requestBodyMode)))
+        bucketLifecycle(
+            ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
+                .then(awsClientFilter(Payload.Mode.Unsigned))
+                .then(ApacheClient(requestBodyMode = requestBodyMode))
+        )
     }
 
     private fun bucketLifecycle(client: HttpHandler) {
@@ -46,46 +50,58 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
         assertThat(
             "Bucket should not exist in root listing",
             aClient(Request(GET, s3Root)).bodyString(),
-            !containsSubstring(bucketName))
+            !containsSubstring(bucketName)
+        )
         assertThat(
             "Put of bucket should succeed",
             aClient(Request(PUT, bucketUrl)).status,
-            equalTo(OK))
+            equalTo(OK)
+        )
         assertThat(
             "Bucket should exist in root listing",
             aClient(Request(GET, s3Root)).bodyString(),
-            containsSubstring(bucketName))
+            containsSubstring(bucketName)
+        )
         assertThat(
             "Key should not exist in bucket listing",
             aClient(Request(GET, bucketUrl)).bodyString(),
-            !containsSubstring(key))
+            !containsSubstring(key)
+        )
 
-        client(Request(PUT, keyUrl)
-            .body(contentOriginal.byteInputStream(), contentOriginal.length.toLong()))
+        client(
+            Request(PUT, keyUrl)
+                .body(contentOriginal.byteInputStream(), contentOriginal.length.toLong())
+        )
 
         assertThat(
             "Key should appear in bucket listing",
             aClient(Request(GET, bucketUrl)).bodyString(),
-            containsSubstring(key))
+            containsSubstring(key)
+        )
         assertThat(
             "Key contents should be as expected",
             aClient(Request(GET, keyUrl)).bodyString().length,
-            equalTo(contentOriginal.length))
+            equalTo(contentOriginal.length)
+        )
         assertThat(
             "Delete of key should succeed",
             aClient(Request(DELETE, keyUrl)).status,
-            equalTo(NO_CONTENT))
+            equalTo(NO_CONTENT)
+        )
         assertThat(
             "Key should no longer appear in bucket listing",
             aClient(Request(GET, bucketUrl)).bodyString(),
-            !containsSubstring(key))
+            !containsSubstring(key)
+        )
         assertThat(
             "Delete of bucket should succeed",
             aClient(Request(DELETE, bucketUrl)).status,
-            equalTo(NO_CONTENT))
+            equalTo(NO_CONTENT)
+        )
         assertThat(
             "Bucket should no longer exist in root listing",
             aClient(Request(GET, s3Root)).bodyString(),
-            !containsSubstring(bucketName))
+            !containsSubstring(bucketName)
+        )
     }
 }

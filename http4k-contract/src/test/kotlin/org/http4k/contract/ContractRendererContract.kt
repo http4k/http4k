@@ -59,18 +59,27 @@ import org.junit.jupiter.api.extension.ExtendWith
 abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, protected val rendererToUse: ContractRenderer) {
     @Test
     fun `can build 400`() {
-        val response = rendererToUse.badRequest(LensFailure(listOf(
-            Missing(Meta(true, "location1", StringParam, "name1")),
-            Invalid(Meta(false, "location2", NumberParam, "name2")))))
-        assertThat(response.bodyString(),
-            equalTo("""{"message":"Missing/invalid parameters","params":[{"name":"name1","type":"location1","datatype":"string","required":true,"reason":"Missing"},{"name":"name2","type":"location2","datatype":"number","required":false,"reason":"Invalid"}]}"""))
+        val response = rendererToUse.badRequest(
+            LensFailure(
+                listOf(
+                    Missing(Meta(true, "location1", StringParam, "name1")),
+                    Invalid(Meta(false, "location2", NumberParam, "name2"))
+                )
+            )
+        )
+        assertThat(
+            response.bodyString(),
+            equalTo("""{"message":"Missing/invalid parameters","params":[{"name":"name1","type":"location1","datatype":"string","required":true,"reason":"Missing"},{"name":"name2","type":"location2","datatype":"number","required":false,"reason":"Invalid"}]}""")
+        )
     }
 
     @Test
     fun `can build 404`() {
         val response = rendererToUse.notFound()
-        assertThat(response.bodyString(),
-            equalTo("""{"message":"No route found on this path. Have you used the correct HTTP verb?"}"""))
+        assertThat(
+            response.bodyString(),
+            equalTo("""{"message":"No route found on this path. Have you used the correct HTTP verb?"}""")
+        )
     }
 
     @Test
@@ -113,20 +122,27 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 receiving(json.body("json").toLens())
             } bindContract POST to { Response(OK) }
             routes += "/body_json_response" meta {
-                returning("normal" to json {
-                    val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
-                    Response(OK).with(body("json").toLens() of obj)
-                })
+                returning(
+                    "normal" to json {
+                        val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
+                        Response(OK).with(body("json").toLens() of obj)
+                    }
+                )
             } bindContract POST to { Response(OK) }
             routes += "/body_json_schema" meta {
-                receiving(json.body("json").toLens() to json {
-                    obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
-                }, "someDefinitionId")
+                receiving(
+                    json.body("json").toLens() to json {
+                        obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
+                    },
+                    "someDefinitionId"
+                )
             } bindContract POST to { Response(OK) }
             routes += "/body_json_list_schema" meta {
-                receiving(json.body("json").toLens() to json {
-                    array(obj("aNumberField" to number(123)))
-                })
+                receiving(
+                    json.body("json").toLens() to json {
+                        array(obj("aNumberField" to number(123)))
+                    }
+                )
             } bindContract POST to { Response(OK) }
             routes += "/basic_auth" meta {
                 security = BasicAuthSecurity("realm", credentials)
@@ -138,18 +154,25 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 security = BasicAuthSecurity("foo", credentials, "or1").or(BasicAuthSecurity("foo", credentials, "or2"))
             } bindContract POST to { Response(OK) }
             routes += "/oauth2_auth" meta {
-                security = AuthCodeOAuthSecurity(OAuthProvider.gitHub({ Response(OK) },
-                    credentials,
-                    Uri.of("http://localhost/callback"),
-                    FakeOAuthPersistence(), listOf("user")))
+                security = AuthCodeOAuthSecurity(
+                    OAuthProvider.gitHub(
+                        { Response(OK) },
+                        credentials,
+                        Uri.of("http://localhost/callback"),
+                        FakeOAuthPersistence(), listOf("user")
+                    )
+                )
             } bindContract POST to { Response(OK) }
             routes += "/body_form" meta {
-                receiving(Body.webForm(Strict,
-                    FormField.boolean().required("b", "booleanField"),
-                    FormField.int().optional("i", "intField"),
-                    FormField.string().optional("s", "stringField"),
-                    json.lens(FormField).required("j", "jsonField")
-                ).toLens())
+                receiving(
+                    Body.webForm(
+                        Strict,
+                        FormField.boolean().required("b", "booleanField"),
+                        FormField.int().optional("i", "intField"),
+                        FormField.string().optional("s", "stringField"),
+                        json.lens(FormField).required("j", "jsonField")
+                    ).toLens()
+                )
             } bindContract POST to { Response(OK) }
             routes += "/produces_and_consumes" meta {
                 produces += APPLICATION_JSON
@@ -161,12 +184,15 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of json { obj("aString" to string("a message of some kind")) }))
             } bindContract POST to { Response(OK) }
             routes += "/body_auto_schema" meta {
-                receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(
-                    "s",
-                    ArbObject1(Foo.bar),
-                    listOf(1),
-                    true
-                ), "someOtherId")
+                receiving(
+                    Body.auto<ArbObject2>().toLens() to ArbObject2(
+                        "s",
+                        ArbObject1(Foo.bar),
+                        listOf(1),
+                        true
+                    ),
+                    "someOtherId"
+                )
             } bindContract POST to { Response(OK) }
             routes += "/body_auto_schema" meta {
                 receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))

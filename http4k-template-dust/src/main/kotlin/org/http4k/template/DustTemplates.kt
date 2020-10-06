@@ -26,12 +26,15 @@ class DustTemplates(
             cacheTemplates = cacheTemplates,
             precachePoolSize = precachePoolSize,
             dustPluginScripts = dustPluginScripts,
-            loader = loader)
+            loader = loader
+        )
 
         return fun(viewModel: ViewModel) =
             dust.withTemplates {
-                it.expandTemplate(viewModel.template(), viewModel,
-                    onMissingTemplate = { throw ViewNotFound(viewModel) })
+                it.expandTemplate(
+                    viewModel.template(), viewModel,
+                    onMissingTemplate = { throw ViewNotFound(viewModel) }
+                )
             }
     }
 }

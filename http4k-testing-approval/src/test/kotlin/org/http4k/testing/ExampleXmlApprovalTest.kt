@@ -29,18 +29,24 @@ class ExampleXmlApprovalTest {
 
     @Test
     fun `check response content with mismatching content type`(approver: Approver) {
-        assertThat({
-            approver.assertApproved(Response(OK))
-        }, throws<AssertionError>())
+        assertThat(
+            {
+                approver.assertApproved(Response(OK))
+            },
+            throws<AssertionError>()
+        )
     }
 
     @Test
     fun `check response content with badly-formatted XML`(approver: Approver) {
-        assertThat({
-            approver.assertApproved(
-                Response(OK).with(CONTENT_TYPE of APPLICATION_XML).body("""<this is not really XML""")
-            )
-        }, throws<AssertionError>())
+        assertThat(
+            {
+                approver.assertApproved(
+                    Response(OK).with(CONTENT_TYPE of APPLICATION_XML).body("""<this is not really XML""")
+                )
+            },
+            throws<AssertionError>()
+        )
     }
 
     @Test

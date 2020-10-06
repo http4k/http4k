@@ -108,10 +108,12 @@ object PreCannedApacheHttpClients {
      * Standard non-redirecting, no Cookies HTTP client
      */
     fun defaultApacheHttpClient(): CloseableHttpClient = HttpClients.custom()
-        .setDefaultRequestConfig(RequestConfig.custom()
-            .setRedirectsEnabled(false)
-            .setCookieSpec(StandardCookieSpec.IGNORE)
-            .build()).build()
+        .setDefaultRequestConfig(
+            RequestConfig.custom()
+                .setRedirectsEnabled(false)
+                .setCookieSpec(StandardCookieSpec.IGNORE)
+                .build()
+        ).build()
 
     /**
      * Do not use this in production! This is useful for testing locally and debugging HTTPS traffic
@@ -126,7 +128,8 @@ object PreCannedApacheHttpClients {
                             .register("http", PlainConnectionSocketFactory.INSTANCE)
                             .register("https", SSLConnectionSocketFactory(this) { _, _ -> true })
                             .build()
-                    ))
+                    )
+                )
                 .build()
         }
 }

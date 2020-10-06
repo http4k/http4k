@@ -263,8 +263,11 @@ class ClientFiltersTest {
         @Test
         fun `request bodies are not encoded`() {
             val handler = ClientFilters.AcceptGZip().then {
-                assertThat(it, hasBody(equalTo<String>("a value"))
-                    .and(!hasHeader("content-encoding", "gzip")))
+                assertThat(
+                    it,
+                    hasBody(equalTo<String>("a value"))
+                        .and(!hasHeader("content-encoding", "gzip"))
+                )
                 Response(OK)
             }
 

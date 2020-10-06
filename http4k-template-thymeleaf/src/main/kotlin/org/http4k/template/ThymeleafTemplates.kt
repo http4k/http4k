@@ -14,34 +14,55 @@ class ThymeleafTemplates(
     private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()
 ) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer =
-        ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
-            setTemplateResolver(ClassLoaderTemplateResolver(classLoader).apply {
-                prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', '/') + "/"
-            })
-        }))
+        ThymeleafTemplateRenderer(
+            configure(
+                TemplateEngine().apply {
+                    setTemplateResolver(
+                        ClassLoaderTemplateResolver(classLoader).apply {
+                            prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', '/') + "/"
+                        }
+                    )
+                }
+            )
+        )
 
     override fun Caching(baseTemplateDir: String): TemplateRenderer =
-        ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
-            setTemplateResolver(FileTemplateResolver().apply {
-                prefix = "$baseTemplateDir/"
-            })
-        }))
+        ThymeleafTemplateRenderer(
+            configure(
+                TemplateEngine().apply {
+                    setTemplateResolver(
+                        FileTemplateResolver().apply {
+                            prefix = "$baseTemplateDir/"
+                        }
+                    )
+                }
+            )
+        )
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer =
-        ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
-            cacheManager = StandardCacheManager().apply {
-                templateCacheMaxSize = 0
-            }
-            setTemplateResolver(FileTemplateResolver().apply {
-                prefix = "$baseTemplateDir/"
-            })
-        }))
+        ThymeleafTemplateRenderer(
+            configure(
+                TemplateEngine().apply {
+                    cacheManager = StandardCacheManager().apply {
+                        templateCacheMaxSize = 0
+                    }
+                    setTemplateResolver(
+                        FileTemplateResolver().apply {
+                            prefix = "$baseTemplateDir/"
+                        }
+                    )
+                }
+            )
+        )
 
     private class ThymeleafTemplateRenderer(private val engine: ITemplateEngine) : TemplateRenderer {
         override fun invoke(viewModel: ViewModel): String = try {
-            engine.process(viewModel.template(), Context().apply {
-                setVariable("model", viewModel)
-            })
+            engine.process(
+                viewModel.template(),
+                Context().apply {
+                    setVariable("model", viewModel)
+                }
+            )
         } catch (e: TemplateInputException) {
             when (e.cause) {
                 is FileNotFoundException -> throw ViewNotFound(viewModel)

@@ -25,9 +25,11 @@ class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     }
 
     private fun HttpExchange.toRequest(): Request =
-        Request(Method.valueOf(requestMethod),
+        Request(
+            Method.valueOf(requestMethod),
             requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) }
-                ?: Uri.of(requestURI.rawPath))
+                ?: Uri.of(requestURI.rawPath)
+        )
             .body(requestBody, requestHeaders.getFirst("Content-Length").safeLong())
             .headers(requestHeaders.toList().flatMap { (key, values) -> values.map { key to it } })
             .source(RequestSource(localAddress.address.hostAddress, localAddress.port))

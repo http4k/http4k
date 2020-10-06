@@ -61,8 +61,11 @@ fun main() {
         println("RUNNING AS GCF:")
 
         val response = FakeGCFResponse()
-        FunctionsExampleEntryClass().service(FakeGCFRequest
-        (Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")), response)
+        FunctionsExampleEntryClass().service(
+            FakeGCFRequest
+            (Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")),
+            response
+        )
         println(response.status)
         println(response.headers)
         println(response.body)

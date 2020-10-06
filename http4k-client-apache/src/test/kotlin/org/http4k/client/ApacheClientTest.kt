@@ -19,26 +19,34 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.server.Jetty
 import org.junit.jupiter.api.Test
 
-class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
-    ApacheClient(HttpClients.custom()
-        .setDefaultRequestConfig(
-            RequestConfig.custom()
-                .setResponseTimeout(Timeout.ofMilliseconds(100))
-                .build()
-        ).build(), responseBodyMode = Stream)) {
+class ApacheClientTest : HttpClientContract(
+    { Jetty(it) }, ApacheClient(),
+    ApacheClient(
+        HttpClients.custom()
+            .setDefaultRequestConfig(
+                RequestConfig.custom()
+                    .setResponseTimeout(Timeout.ofMilliseconds(100))
+                    .build()
+            ).build(),
+        responseBodyMode = Stream
+    )
+) {
 
     @Test
     fun `connect timeout is handled`() {
-        assertThat(ApacheClient(object : CloseableHttpClient() {
-            override fun doExecute(target: HttpHost?, request: ClassicHttpRequest?, context: HttpContext?): CloseableHttpResponse {
-                throw ConnectTimeoutException("test timeout")
-            }
+        assertThat(
+            ApacheClient(object : CloseableHttpClient() {
+                override fun doExecute(target: HttpHost?, request: ClassicHttpRequest?, context: HttpContext?): CloseableHttpResponse {
+                    throw ConnectTimeoutException("test timeout")
+                }
 
-            override fun close(closeMode: CloseMode?) {
-            }
+                override fun close(closeMode: CloseMode?) {
+                }
 
-            override fun close() {
-            }
-        })(Request(GET, "http://localhost:8000")), hasStatus(CLIENT_TIMEOUT))
+                override fun close() {
+                }
+            })(Request(GET, "http://localhost:8000")),
+            hasStatus(CLIENT_TIMEOUT)
+        )
     }
 }

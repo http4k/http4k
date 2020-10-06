@@ -37,9 +37,11 @@ class SecureJetty(
             }
 
             connectors = arrayOf(
-                ServerConnector(server,
+                ServerConnector(
+                    server,
                     SslConnectionFactory(sslContextFactory, "http/1.1"),
-                    HttpConnectionFactory(https)).apply { port = sslPort }
+                    HttpConnectionFactory(https)
+                ).apply { port = sslPort }
             )
 
             insertHandler(httpHandler.toJettyHandler())

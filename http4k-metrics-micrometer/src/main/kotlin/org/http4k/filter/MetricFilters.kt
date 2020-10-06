@@ -45,11 +45,13 @@ object MetricFilters {
         "http.server.request.latency" to "Timing of server requests",
         "http.server.request.count" to "Total number of server requests",
         {
-            it.copy(labels = mapOf(
-                "method" to it.request.method.toString(),
-                "status" to it.response.status.code.toString(),
-                "path" to it.routingGroup.replace('/', '_').replace(notAlphaNumUnderscore, "")
-            ))
+            it.copy(
+                labels = mapOf(
+                    "method" to it.request.method.toString(),
+                    "status" to it.response.status.code.toString(),
+                    "path" to it.routingGroup.replace('/', '_').replace(notAlphaNumUnderscore, "")
+                )
+            )
         }
     )
 
@@ -57,11 +59,13 @@ object MetricFilters {
         "http.client.request.latency" to "Timing of client requests",
         "http.client.request.count" to "Total number of client requests",
         {
-            it.copy(labels = mapOf(
-                "method" to it.request.method.toString(),
-                "status" to it.response.status.code.toString(),
-                "host" to it.request.uri.host.replace('.', '_')
-            ))
+            it.copy(
+                labels = mapOf(
+                    "method" to it.request.method.toString(),
+                    "status" to it.response.status.code.toString(),
+                    "host" to it.request.uri.host.replace('.', '_')
+                )
+            )
         }
     )
 }

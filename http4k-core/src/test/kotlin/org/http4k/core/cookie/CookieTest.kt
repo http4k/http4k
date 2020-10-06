@@ -27,8 +27,10 @@ class CookieTest {
             .httpOnly()
             .sameSite(Lax)
 
-        assertThat(cookie.toString(),
-            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=Sat, 11 Mar 2017 12:15:21 GMT; Domain=google.com; Path=/; secure; HttpOnly; SameSite=Lax"""))
+        assertThat(
+            cookie.toString(),
+            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=Sat, 11 Mar 2017 12:15:21 GMT; Domain=google.com; Path=/; secure; HttpOnly; SameSite=Lax""")
+        )
     }
 
     @Test
@@ -72,14 +74,19 @@ class CookieTest {
 
     @Test
     fun `cookies can be extracted from a http2 request with multiple cookie headers`() {
-        assertThat(Request(GET, "/")
-            .header("cookie", "foo=bar; voo=tar")
-            .header("cookie", "roo=gar")
-            .cookies(),
-            equalTo(listOf(
-                Cookie("foo", "bar"),
-                Cookie("voo", "tar"),
-                Cookie("roo", "gar"))))
+        assertThat(
+            Request(GET, "/")
+                .header("cookie", "foo=bar; voo=tar")
+                .header("cookie", "roo=gar")
+                .cookies(),
+            equalTo(
+                listOf(
+                    Cookie("foo", "bar"),
+                    Cookie("voo", "tar"),
+                    Cookie("roo", "gar")
+                )
+            )
+        )
     }
 
     @Test
@@ -89,8 +96,10 @@ class CookieTest {
 
     @Test
     fun `cookie values are quoted`() {
-        assertThat(Cookie("my-cookie", "my \"quoted\" value").toString(),
-            equalTo("""my-cookie="my \"quoted\" value"; """))
+        assertThat(
+            Cookie("my-cookie", "my \"quoted\" value").toString(),
+            equalTo("""my-cookie="my \"quoted\" value"; """)
+        )
     }
 
     @Test
@@ -117,10 +126,15 @@ class CookieTest {
             .header("Other-Header", "other-value")
             .removeCookie("a-cookie")
 
-        assertThat(response.headers, equalTo(listOf(
-            "Other-Header" to "other-value",
-            "Set-Cookie" to "other-cookie=\"other-value\""
-        ) as Parameters))
+        assertThat(
+            response.headers,
+            equalTo(
+                listOf(
+                    "Other-Header" to "other-value",
+                    "Set-Cookie" to "other-cookie=\"other-value\""
+                ) as Parameters
+            )
+        )
     }
 
     @Test
@@ -131,10 +145,15 @@ class CookieTest {
             .header("Other-Header", "other-value")
             .removeCookie("a-cookie")
 
-        assertThat(request.headers, equalTo(listOf(
-            "Other-Header" to "other-value",
-            "Cookie" to "other-cookie=\"other-value\""
-        ) as Parameters))
+        assertThat(
+            request.headers,
+            equalTo(
+                listOf(
+                    "Other-Header" to "other-value",
+                    "Cookie" to "other-cookie=\"other-value\""
+                ) as Parameters
+            )
+        )
     }
 
     @Test
@@ -191,20 +210,26 @@ class CookieTest {
 
     @Test
     fun `cookie can be invalidated`() {
-        assertThat(Cookie("foo", "bar").invalidate(),
-            equalTo(Cookie("foo", "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC))))
+        assertThat(
+            Cookie("foo", "bar").invalidate(),
+            equalTo(Cookie("foo", "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC)))
+        )
     }
 
     @Test
     fun `cookie can be invalidated at response level`() {
-        assertThat(Response(OK).cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
-            equalTo(Cookie("foo", "").invalidate()))
+        assertThat(
+            Response(OK).cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
+            equalTo(Cookie("foo", "").invalidate())
+        )
     }
 
     @Test
     fun `cookie with domain can be invalidated at response level`() {
-        assertThat(Response(OK).cookie(Cookie("foo", "bar", domain = "foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
-            equalTo(Cookie("foo", "", domain = "foo.com").invalidate()))
+        assertThat(
+            Response(OK).cookie(Cookie("foo", "bar", domain = "foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
+            equalTo(Cookie("foo", "", domain = "foo.com").invalidate())
+        )
     }
 
     @Test

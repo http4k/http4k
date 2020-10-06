@@ -64,8 +64,10 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
         }
     }
 
-    private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
-        expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
+    private fun HCookie.toWebDriver(): Cookie = Cookie(
+        name, value, domain, path,
+        expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly
+    )
 
     private fun LocalCookie.toWebDriver(): StoredCookie = StoredCookie(cookie.toWebDriver(), this)
 
@@ -112,7 +114,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
         override fun alert(): Alert = throw FeatureNotImplementedYet
 
         override fun activeElement(): WebElement = activeElement ?: current?.firstElement()
-        ?: throw NoSuchElementException("no page loaded!")
+            ?: throw NoSuchElementException("no page loaded!")
 
         override fun window(nameOrHandle: String?): WebDriver = if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle$nameOrHandle") else this@Http4kWebDriver
 

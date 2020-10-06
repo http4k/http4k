@@ -40,17 +40,19 @@ class AuthRequestWithRequestAuthRequestExtractor(
         if (requestObject.client != null && authRequest.client != requestObject.client) {
             return Failure(InvalidAuthorizationRequest("'client_id' is invalid"))
         }
-        return Success(authRequest.copy(
-            requestObject = requestObject,
-            redirectUri = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.redirectUri, requestObject.redirectUri).onFailure { return it },
-            state = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.state, requestObject.state).onFailure { return it },
-            nonce = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.nonce, requestObject.nonce).onFailure { return it },
-            responseType = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseType, requestObject.responseType).onFailure { return it }
-                ?: Code,
-            responseMode = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseMode, requestObject.responseMode).onFailure { return it },
-            scopes = nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequest.scopes, requestObject.scope)
-                .onFailure { return it }
-        ))
+        return Success(
+            authRequest.copy(
+                requestObject = requestObject,
+                redirectUri = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.redirectUri, requestObject.redirectUri).onFailure { return it },
+                state = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.state, requestObject.state).onFailure { return it },
+                nonce = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.nonce, requestObject.nonce).onFailure { return it },
+                responseType = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseType, requestObject.responseType).onFailure { return it }
+                    ?: Code,
+                responseMode = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseMode, requestObject.responseMode).onFailure { return it },
+                scopes = nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequest.scopes, requestObject.scope)
+                    .onFailure { return it }
+            )
+        )
     }
 
     private fun <T> nonNullValueIfExistsOrErrorIfNotEqual(

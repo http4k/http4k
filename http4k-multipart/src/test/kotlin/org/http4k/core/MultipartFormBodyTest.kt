@@ -42,10 +42,13 @@ class MultipartFormBodyTest {
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
-        assertThat(MultipartFormBody.from(req), equalTo(
-            MultipartFormBody("bob") + ("field" to formFieldValue) +
-                ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
-        ))
+        assertThat(
+            MultipartFormBody.from(req),
+            equalTo(
+                MultipartFormBody("bob") + ("field" to formFieldValue) +
+                    ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            )
+        )
     }
 
     @Test
@@ -59,10 +62,13 @@ class MultipartFormBodyTest {
 
         req.bodyString()
 
-        assertThat(MultipartFormBody.from(req), equalTo(
-            MultipartFormBody("bob") + ("field" to formFieldValue) +
-                ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
-        ))
+        assertThat(
+            MultipartFormBody.from(req),
+            equalTo(
+                MultipartFormBody("bob") + ("field" to formFieldValue) +
+                    ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            )
+        )
     }
 
     @Test
@@ -97,9 +103,11 @@ class MultipartFormBodyTest {
 
         val original = streams.toMultipartForm()
 
-        MultipartFormBody.from(Request(POST, "/")
-            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(original.boundary))
-            .body(original))
+        MultipartFormBody.from(
+            Request(POST, "/")
+                .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(original.boundary))
+                .body(original)
+        )
 
         assertThat(streams, closed)
         // original stream are automatically closed during parsing

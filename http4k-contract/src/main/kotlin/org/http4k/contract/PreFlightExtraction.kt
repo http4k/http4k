@@ -22,8 +22,10 @@ fun interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *
          * HttpHandler.
          */
         val All = PreFlightExtraction {
-            it.requestParams + (it.body?.let { listOf(it) }
-                ?: emptyList<BodyLens<*>>())
+            it.requestParams + (
+                it.body?.let { listOf(it) }
+                    ?: emptyList<BodyLens<*>>()
+                )
         }
 
         /**

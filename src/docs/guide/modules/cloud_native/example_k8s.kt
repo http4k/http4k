@@ -42,9 +42,13 @@ object App {
         // define the health app API
         val healthApp = Health(
             "/config" bind GET to { Response(OK).body(env.toString()) },
-            checks = listOf(DatabaseCheck(
-                RandomlyFailingDatabase(dbRole(env), dbPassword(env)
-                )))
+            checks = listOf(
+                DatabaseCheck(
+                    RandomlyFailingDatabase(
+                        dbRole(env), dbPassword(env)
+                    )
+                )
+            )
         )
         return mainApp.asK8sServer(::SunHttp, env, healthApp)
     }

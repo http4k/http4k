@@ -43,8 +43,10 @@ class MultipartFormFileTest {
         assertThat(single(file2(), single(file1(), MultipartForm())), equalTo(MultipartForm() + ("world" to file2())))
 
         val multi = MultipartFormFile.multi.required("world")
-        assertThat(multi(listOf(file2(), file2()), multi(listOf(file1(), file1()), MultipartForm())),
-            equalTo(MultipartForm() + ("world" to file2()) + ("world" to file2())))
+        assertThat(
+            multi(listOf(file2(), file2()), multi(listOf(file1(), file1()), MultipartForm())),
+            equalTo(MultipartForm() + ("world" to file2()) + ("world" to file2()))
+        )
     }
 
     @Test

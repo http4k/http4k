@@ -68,8 +68,10 @@ class EnvironmentKeyTest {
         assertThat(single(single(2, single(1, original))), equalTo(2))
 
         val multi = EnvironmentKey.int().multi.required("value")
-        assertThat(multi(multi(listOf(3, 4), multi(listOf(1, 2), original))),
-            equalTo(listOf(3, 4)))
+        assertThat(
+            multi(multi(listOf(3, 4), multi(listOf(1, 2), original))),
+            equalTo(listOf(3, 4))
+        )
     }
 
     @Test
@@ -81,25 +83,40 @@ class EnvironmentKeyTest {
 
     @Test
     fun `get uri for a service`() {
-        assertThat(serviceUriFor("myservice")(
-            from("MYSERVICE_SERVICE_PORT" to "8000")),
-            equalTo(Uri.of("http://myservice:8000/")))
+        assertThat(
+            serviceUriFor("myservice")(
+                from("MYSERVICE_SERVICE_PORT" to "8000")
+            ),
+            equalTo(Uri.of("http://myservice:8000/"))
+        )
 
-        assertThat(serviceUriFor("myservice")(
-            from("MYSERVICE_SERVICE_PORT" to "80")),
-            equalTo(Uri.of("http://myservice/")))
+        assertThat(
+            serviceUriFor("myservice")(
+                from("MYSERVICE_SERVICE_PORT" to "80")
+            ),
+            equalTo(Uri.of("http://myservice/"))
+        )
 
-        assertThat(serviceUriFor("myservice", true)(
-            from("MYSERVICE_SERVICE_PORT" to "80")),
-            equalTo(Uri.of("https://myservice/")))
+        assertThat(
+            serviceUriFor("myservice", true)(
+                from("MYSERVICE_SERVICE_PORT" to "80")
+            ),
+            equalTo(Uri.of("https://myservice/"))
+        )
 
-        assertThat(serviceUriFor("myservice")(
-            from("MYSERVICE_SERVICE_PORT" to "443")),
-            equalTo(Uri.of("http://myservice/")))
+        assertThat(
+            serviceUriFor("myservice")(
+                from("MYSERVICE_SERVICE_PORT" to "443")
+            ),
+            equalTo(Uri.of("http://myservice/"))
+        )
 
-        assertThat(serviceUriFor("myservice", true)(
-            from("MYSERVICE_SERVICE_PORT" to "443")),
-            equalTo(Uri.of("https://myservice/")))
+        assertThat(
+            serviceUriFor("myservice", true)(
+                from("MYSERVICE_SERVICE_PORT" to "443")
+            ),
+            equalTo(Uri.of("https://myservice/"))
+        )
     }
 
     @Test

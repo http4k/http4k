@@ -129,9 +129,11 @@ object RemoteChaosApi {
 
         val currentChaosDescription = Repeat {
             Wait.until(Delay(ofMinutes(1), clock))
-                .then(ReturnStatus(I_M_A_TEAPOT)
-                    .appliedWhen(Always())
-                    .until(Deadline(ofEpochSecond(1735689600))))
+                .then(
+                    ReturnStatus(I_M_A_TEAPOT)
+                        .appliedWhen(Always())
+                        .until(Deadline(ofEpochSecond(1735689600)))
+                )
         }.toString()
 
         fun RouteMetaDsl.returningExampleChaosDescription() =
@@ -180,22 +182,29 @@ object RemoteChaosApi {
 private fun chaosStatus(value: String) = obj("chaos" to string(value))
 
 private val exampleChaos = Jackson {
-    array(listOf(
-        obj("type" to string("repeat"),
-            "stages" to array(
-                listOf(
-                    obj("type" to string("wait"),
-                        "until" to obj("type" to string("delay"), "period" to string("PT30S"))
-                    ),
-                    obj("type" to string("trigger"),
-                        "behaviour" to obj("type" to string("status"), "status" to number(418)),
-                        "trigger" to obj("type" to string("always")),
-                        "until" to obj("type" to string("countdown"), "count" to number(10))
+    array(
+        listOf(
+            obj(
+                "type" to string("repeat"),
+                "stages" to array(
+                    listOf(
+                        obj(
+                            "type" to string("wait"),
+                            "until" to obj("type" to string("delay"), "period" to string("PT30S"))
+                        ),
+                        obj(
+                            "type" to string("trigger"),
+                            "behaviour" to obj("type" to string("status"), "status" to number(418)),
+                            "trigger" to obj("type" to string("always")),
+                            "until" to obj("type" to string("countdown"), "count" to number(10))
+                        )
                     )
+                ),
+                "until" to obj(
+                    "type" to string("deadline"),
+                    "endTime" to string("2030-01-01T00:00:00Z")
                 )
-            ),
-            "until" to obj("type" to string("deadline"),
-                "endTime" to string("2030-01-01T00:00:00Z"))
+            )
         )
-    ))
+    )
 }

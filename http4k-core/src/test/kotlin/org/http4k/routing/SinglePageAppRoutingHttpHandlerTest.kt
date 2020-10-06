@@ -16,7 +16,8 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
 class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
-    override val handler: RoutingHttpHandler = SinglePageAppRoutingHandler(validPath,
+    override val handler: RoutingHttpHandler = SinglePageAppRoutingHandler(
+        validPath,
         StaticRoutingHttpHandler(
             pathSegments = validPath,
             resourceLoader = ResourceLoader.Classpath(),

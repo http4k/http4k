@@ -39,25 +39,28 @@ class AuthorizationCodeAccessTokenGenerator(
             codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
             codeDetails.clientId != request.clientId -> Failure(ClientIdMismatch)
             codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
-            else -> accessTokens.create(codeDetails.clientId, request, code)
-                .map { token ->
-                    when {
-                        codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(codeDetails, code, token))
-                        else -> AccessTokenDetails(token)
+            else ->
+                accessTokens.create(codeDetails.clientId, request, code)
+                    .map { token ->
+                        when {
+                            codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(codeDetails, code, token))
+                            else -> AccessTokenDetails(token)
+                        }
                     }
-                }
         }
     }
 
     companion object {
         fun extract(clientId: ClientId, tokenRequest: TokenRequest): Result<AuthorizationCodeAccessTokenRequest, AccessTokenError> {
-            return Success(AuthorizationCodeAccessTokenRequest(
-                clientId = clientId,
-                clientSecret = tokenRequest.clientSecret ?: "",
-                redirectUri = tokenRequest.redirectUri ?: return Failure(MissingRedirectUri),
-                scopes = tokenRequest.scopes,
-                authorizationCode = AuthorizationCode(tokenRequest.code ?: return Failure(MissingAuthorizationCode))
-            ))
+            return Success(
+                AuthorizationCodeAccessTokenRequest(
+                    clientId = clientId,
+                    clientSecret = tokenRequest.clientSecret ?: "",
+                    redirectUri = tokenRequest.redirectUri ?: return Failure(MissingRedirectUri),
+                    scopes = tokenRequest.scopes,
+                    authorizationCode = AuthorizationCode(tokenRequest.code ?: return Failure(MissingAuthorizationCode))
+                )
+            )
         }
     }
 }

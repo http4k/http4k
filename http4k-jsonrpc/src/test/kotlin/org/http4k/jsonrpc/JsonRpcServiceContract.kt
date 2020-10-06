@@ -252,14 +252,16 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     @Test
     fun `rpc batch call with mixed invalid and valid normal and notifications returns result`() {
         assertThat(
-            rpcRequestWithBody(listOf(
-                rpcJson("increment", """{"value": 5}""", "1"),
-                rpcJson("increment", "[3]", "2"),
-                rpcJson("increment", "3", "[1]"),
-                rpcJson("increment", """{"value": 2}"""),
-                rpcJson("increment", "[2]"),
-                "1"
-            ).joinToString(",", "[", "]")),
+            rpcRequestWithBody(
+                listOf(
+                    rpcJson("increment", """{"value": 5}""", "1"),
+                    rpcJson("increment", "[3]", "2"),
+                    rpcJson("increment", "3", "[1]"),
+                    rpcJson("increment", """{"value": 2}"""),
+                    rpcJson("increment", "[2]"),
+                    "1"
+                ).joinToString(",", "[", "]")
+            ),
             hasBatchResponse(
                 Success("5", "1"),
                 Success("8", "2"),
@@ -272,10 +274,12 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     @Test
     fun `rpc batch call with only notifications returns no content`() {
         assertThat(
-            rpcRequestWithBody(listOf(
-                rpcJson("increment", """{"value": 5}"""),
-                rpcJson("increment", "[3]")
-            ).joinToString(",", "[", "]")),
+            rpcRequestWithBody(
+                listOf(
+                    rpcJson("increment", """{"value": 5}"""),
+                    rpcJson("increment", "[3]")
+                ).joinToString(",", "[", "]")
+            ),
             hasNoContentResponse()
         )
     }
@@ -284,8 +288,10 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     fun `rpc call that throws user exception returns failure`() {
         assertThat(
             rpcRequest("increment", """{"value": -1}""", "1"),
-            hasErrorResponse(1, "Increment by negative",
-                """"cannot increment counter by negative"""", "1")
+            hasErrorResponse(
+                1, "Increment by negative",
+                """"cannot increment counter by negative"""", "1"
+            )
         )
     }
 
@@ -299,8 +305,10 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
             "}"
 
     private fun rpcRequestWithBody(body: String): Response =
-        rpc(Request(POST, "/rpc")
-            .with(Body.string(APPLICATION_JSON).toLens() of body))
+        rpc(
+            Request(POST, "/rpc")
+                .with(Body.string(APPLICATION_JSON).toLens() of body)
+        )
 
     protected fun hasSuccessResponse(result: String, id: String): Matcher<Response> =
         hasResponse(Success(result, id))

@@ -32,9 +32,12 @@ class StreamingMultipartFormSadTests {
     @Test
     fun failsWhenGettingNextPastEndOfParts() {
         val boundary = "-----1234"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
+                .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream(), emptyList()).stream()
+        )
 
         form.next() // aFile
         form.next() // anotherFile
@@ -49,9 +52,12 @@ class StreamingMultipartFormSadTests {
     @Test
     fun failsWhenGettingNextPastEndOfPartsAfterHasNext() {
         val boundary = "-----1234"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
+                .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream(), emptyList()).stream()
+        )
 
         form.next() // aFile
         form.next() // anotherFile
@@ -68,11 +74,14 @@ class StreamingMultipartFormSadTests {
     @Disabled("this is not a valid test case according to the RFC - we should blow up..")
     fun partHasNoHeaders() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .field("multi", "value0", emptyList())
-            .part("" + CR_LF + "value with no headers", emptyList())
-            .field("multi", "value2", emptyList())
-            .stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .field("multi", "value0", emptyList())
+                .part("" + CR_LF + "value with no headers", emptyList())
+                .field("multi", "value2", emptyList())
+                .stream()
+        )
 
         form.next()
         val StreamingPart = form.next()
@@ -87,28 +96,42 @@ class StreamingMultipartFormSadTests {
     @Test
     fun overwritesPartHeaderIfHeaderIsRepeated() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .part("contents of StreamingPart",
-                listOf("Content-Disposition" to "form-data; bit=\"first\"; name=\"first-name\"",
-                    "Content-Disposition" to "form-data; bot=\"second\"; name=\"second-name\""))
-            .stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .part(
+                    "contents of StreamingPart",
+                    listOf(
+                        "Content-Disposition" to "form-data; bit=\"first\"; name=\"first-name\"",
+                        "Content-Disposition" to "form-data; bot=\"second\"; name=\"second-name\""
+                    )
+                )
+                .stream()
+        )
 
         val StreamingPart = form.next()
         assertThat(StreamingPart.fieldName, equalTo("second-name"))
-        assertThat(StreamingPart.headers["Content-Disposition"],
-            equalTo("form-data; bot=\"second\"; name=\"second-name\""))
+        assertThat(
+            StreamingPart.headers["Content-Disposition"],
+            equalTo("form-data; bot=\"second\"; name=\"second-name\"")
+        )
     }
 
     @Test
     fun failsIfFoundBoundaryButNoFieldSeparator() {
         val boundary = "---2345"
 
-        val form = getMultipartFormParts(boundary, ("-----2345" + // no CR_LF
+        val form = getMultipartFormParts(
+            boundary,
+            (
+                "-----2345" + // no CR_LF
 
-            "Content-Disposition: form-data; name=\"name\"" + CR_LF +
-            "" + CR_LF +
-            "value" + CR_LF +
-            "-----2345--" + CR_LF).byteInputStream())
+                    "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                    "" + CR_LF +
+                    "value" + CR_LF +
+                    "-----2345--" + CR_LF
+                ).byteInputStream()
+        )
 
         assertParseErrorWrapsTokenNotFound(form, "Boundary must be followed by field separator, but didn't find it")
     }
@@ -117,30 +140,51 @@ class StreamingMultipartFormSadTests {
     fun failsIfHeaderMissingFieldSeparator() {
         val boundary = "---2345"
 
-        assertParseError(getMultipartFormParts(boundary, ("-----2345" + CR_LF +
-            "Content-Disposition: form-data; name=\"name\"" + // no CR_LF
+        assertParseError(
+            getMultipartFormParts(
+                boundary,
+                (
+                    "-----2345" + CR_LF +
+                        "Content-Disposition: form-data; name=\"name\"" + // no CR_LF
 
-            "" + CR_LF +
-            "value" + CR_LF +
-            "-----2345--" + CR_LF).byteInputStream()), "Header didn't include a colon <<value>>")
+                        "" + CR_LF +
+                        "value" + CR_LF +
+                        "-----2345--" + CR_LF
+                    ).byteInputStream()
+            ),
+            "Header didn't include a colon <<value>>"
+        )
 
-        assertParseError(getMultipartFormParts(boundary, ("-----2345" + CR_LF +
-            "Content-Disposition: form-data; name=\"name\"" + CR_LF +
-            // no CR_LF
-            "value" + CR_LF +
-            "-----2345--" + CR_LF).byteInputStream()), "Header didn't include a colon <<value>>")
+        assertParseError(
+            getMultipartFormParts(
+                boundary,
+                (
+                    "-----2345" + CR_LF +
+                        "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                        // no CR_LF
+                        "value" + CR_LF +
+                        "-----2345--" + CR_LF
+                    ).byteInputStream()
+            ),
+            "Header didn't include a colon <<value>>"
+        )
     }
 
     @Test
     fun failsIfContentsMissingFieldSeparator() {
         val boundary = "---2345"
 
-        val form = getMultipartFormParts(boundary, ("-----2345" + CR_LF +
-            "Content-Disposition: form-data; name=\"name\"" + CR_LF +
-            "" + CR_LF +
-            "value" + // no CR_LF
+        val form = getMultipartFormParts(
+            boundary,
+            (
+                "-----2345" + CR_LF +
+                    "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                    "" + CR_LF +
+                    "value" + // no CR_LF
 
-            "-----2345--" + CR_LF).byteInputStream())
+                    "-----2345--" + CR_LF
+                ).byteInputStream()
+        )
 
         form.next()
         // StreamingPart's content stream hasn't been closed
@@ -151,12 +195,17 @@ class StreamingMultipartFormSadTests {
     fun failsIfContentsMissingFieldSeparatorAndHasReadToEndOfContent() {
         val boundary = "---2345"
 
-        val form = getMultipartFormParts(boundary, ("-----2345" + CR_LF +
-            "Content-Disposition: form-data; name=\"name\"" + CR_LF +
-            "" + CR_LF +
-            "value" + // no CR_LF
+        val form = getMultipartFormParts(
+            boundary,
+            (
+                "-----2345" + CR_LF +
+                    "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                    "" + CR_LF +
+                    "value" + // no CR_LF
 
-            "-----2345--" + CR_LF).byteInputStream())
+                    "-----2345--" + CR_LF
+                ).byteInputStream()
+        )
 
         val StreamingPart = form.next()
         StreamingPart.contentsAsString
@@ -167,11 +216,16 @@ class StreamingMultipartFormSadTests {
     fun failsIfClosingBoundaryIsMissingFieldSeparator() {
         val boundary = "---2345"
 
-        val form = getMultipartFormParts(boundary, ("-----2345" + CR_LF +
-            "Content-Disposition: form-data; name=\"name\"" + CR_LF +
-            "" + CR_LF +
-            "value" + CR_LF +
-            "-----2345--").byteInputStream()) // no CR_LF
+        val form = getMultipartFormParts(
+            boundary,
+            (
+                "-----2345" + CR_LF +
+                    "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                    "" + CR_LF +
+                    "value" + CR_LF +
+                    "-----2345--"
+                ).byteInputStream()
+        ) // no CR_LF
 
         form.next()
         assertParseErrorWrapsTokenNotFound(form, "Stream terminator must be followed by field separator, but didn't find it")
@@ -181,11 +235,16 @@ class StreamingMultipartFormSadTests {
     fun failsIfClosingBoundaryIsMissing() {
         val boundary = "---2345"
 
-        val form = getMultipartFormParts(boundary, ("-----2345" + CR_LF +
-            "Content-Disposition: form-data; name=\"name\"" + CR_LF +
-            "" + CR_LF +
-            "value" + CR_LF +
-            "-----2345" + CR_LF).byteInputStream())
+        val form = getMultipartFormParts(
+            boundary,
+            (
+                "-----2345" + CR_LF +
+                    "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                    "" + CR_LF +
+                    "value" + CR_LF +
+                    "-----2345" + CR_LF
+                ).byteInputStream()
+        )
 
         form.next()
         assertParseErrorWrapsTokenNotFound(form, "Reached end of stream before finding Token <<\r\n>>. Last 2 bytes read were <<>>")
@@ -197,8 +256,11 @@ class StreamingMultipartFormSadTests {
 
         val chars = CharArray(StreamingMultipartFormParts.HEADER_SIZE_MAX)
         chars.fill('x')
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", String(chars), "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .file("aFile", String(chars), "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream()
+        )
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Token <<\r\n>> within 10240 bytes")
     }
@@ -209,21 +271,27 @@ class StreamingMultipartFormSadTests {
 
         val chars = CharArray(1024)
         chars.fill('x')
-        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .part("some contents",
-                listOf("Content-Disposition" to "form-data; name=\"fieldName\"; filename=\"filename\"",
-                    "Content-Type" to "text/plain",
-                    "extra-1" to String(chars),
-                    "extra-2" to String(chars),
-                    "extra-3" to String(chars),
-                    "extra-4" to String(chars),
-                    "extra-5" to String(chars),
-                    "extra-6" to String(chars),
-                    "extra-7" to String(chars),
-                    "extra-8" to String(chars),
-                    "extra-9" to String(chars),
-                    "extra-10" to String(chars, 0, 816)) // header section exactly 10240 bytes big!
-            ).stream())
+        val form = getMultipartFormParts(
+            boundary,
+            MultipartFormBuilder(boundary)
+                .part(
+                    "some contents",
+                    listOf(
+                        "Content-Disposition" to "form-data; name=\"fieldName\"; filename=\"filename\"",
+                        "Content-Type" to "text/plain",
+                        "extra-1" to String(chars),
+                        "extra-2" to String(chars),
+                        "extra-3" to String(chars),
+                        "extra-4" to String(chars),
+                        "extra-5" to String(chars),
+                        "extra-6" to String(chars),
+                        "extra-7" to String(chars),
+                        "extra-8" to String(chars),
+                        "extra-9" to String(chars),
+                        "extra-10" to String(chars, 0, 816)
+                    ) // header section exactly 10240 bytes big!
+                ).stream()
+        )
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Header section within 10240 bytes")
     }

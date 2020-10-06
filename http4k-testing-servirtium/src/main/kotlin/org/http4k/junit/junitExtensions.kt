@@ -26,12 +26,12 @@ import org.opentest4j.AssertionFailedError
  * JUnit 5 extension for recording HTTP traffic to disk in Servirtium format.
  */
 class ServirtiumRecording
-    @JvmOverloads constructor(
-        private val baseName: String,
-        private val httpHandler: HttpHandler,
-        private val storageProvider: StorageProvider,
-        private val options: InteractionOptions = Defaults
-    ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+@JvmOverloads constructor(
+    private val baseName: String,
+    private val httpHandler: HttpHandler,
+    private val storageProvider: StorageProvider,
+    private val options: InteractionOptions = Defaults
+) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isInteractionControl()
 
     private var inTest = false
@@ -41,9 +41,10 @@ class ServirtiumRecording
         val storage = storageProvider(testName).apply { clean() }
         if (pc.isHttpHandler()) {
             when {
-                inTest -> RecordTo(Sink.Servirtium(storage, options))
-                    .then(options.trafficPrinter())
-                    .then(httpHandler)
+                inTest ->
+                    RecordTo(Sink.Servirtium(storage, options))
+                        .then(options.trafficPrinter())
+                        .then(httpHandler)
                 else -> httpHandler
             }
         } else InteractionControl.StorageBased(storage)
@@ -71,8 +72,9 @@ class ServirtiumReplay @JvmOverloads constructor(
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         if (pc.isHttpHandler()) {
             ConvertBadResponseToAssertionFailed()
-                .then(Replay.Servirtium(storageProvider("$baseName.${ec.requiredTestMethod.name}"), options)
-                    .replayingMatchingContent(options::modify)
+                .then(
+                    Replay.Servirtium(storageProvider("$baseName.${ec.requiredTestMethod.name}"), options)
+                        .replayingMatchingContent(options::modify)
                 )
         } else NoOp
 }

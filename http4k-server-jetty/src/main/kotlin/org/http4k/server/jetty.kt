@@ -20,9 +20,12 @@ import org.http4k.websocket.WsHandler
 
 class Jetty(private val port: Int, private val server: Server) : WsServerConfig {
     constructor(port: Int = 8000) : this(port, http(port))
-    constructor(port: Int, vararg inConnectors: ConnectorBuilder) : this(port, Server().apply {
-        inConnectors.forEach { addConnector(it(this)) }
-    })
+    constructor(port: Int, vararg inConnectors: ConnectorBuilder) : this(
+        port,
+        Server().apply {
+            inConnectors.forEach { addConnector(it(this)) }
+        }
+    )
 
     override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?): Http4kServer {
         httpHandler?.let { server.insertHandler(httpHandler.toJettyHandler()) }
@@ -59,7 +62,8 @@ fun http(httpPort: Int): ConnectorBuilder = { server: Server -> ServerConnector(
 
 fun http2(http2Port: Int, keystorePath: String, keystorePassword: String): ConnectorBuilder =
     { server: Server ->
-        ServerConnector(server,
+        ServerConnector(
+            server,
             SslConnectionFactory(
                 SslContextFactory.Server().apply {
                     keyStorePath = keystorePath
@@ -67,14 +71,18 @@ fun http2(http2Port: Int, keystorePath: String, keystorePassword: String): Conne
                     cipherComparator = COMPARATOR
                     provider = "Conscrypt"
                 },
-                "alpn"),
+                "alpn"
+            ),
             ALPNServerConnectionFactory().apply {
                 defaultProtocol = "h2"
             },
-            HTTP2ServerConnectionFactory(HttpConfiguration().apply {
-                sendServerVersion = false
-                secureScheme = "https"
-                securePort = http2Port
-                addCustomizer(SecureRequestCustomizer())
-            })).apply { port = http2Port }
+            HTTP2ServerConnectionFactory(
+                HttpConfiguration().apply {
+                    sendServerVersion = false
+                    secureScheme = "https"
+                    securePort = http2Port
+                    addCustomizer(SecureRequestCustomizer())
+                }
+            )
+        ).apply { port = http2Port }
     }

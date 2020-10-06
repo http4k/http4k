@@ -90,16 +90,23 @@ class ETagValidationRequestParserTest {
 
     @Test
     fun `a mix of well formed weak and strong etags`() {
-        val fieldValue = parse("""
+        val fieldValue = parse(
+            """
             W/"hello", "hey", "this", W/"is", "cool"
-        """.trimIndent())
+            """.trimIndent()
+        )
 
-        assertThat(fieldValue, equalTo<FieldValue>(ETags(
-            ETag("hello", weak = true),
-            ETag("hey"),
-            ETag("this"),
-            ETag("is", weak = true),
-            ETag("cool")
-        )))
+        assertThat(
+            fieldValue,
+            equalTo<FieldValue>(
+                ETags(
+                    ETag("hello", weak = true),
+                    ETag("hey"),
+                    ETag("this"),
+                    ETag("is", weak = true),
+                    ETag("cool")
+                )
+            )
+        )
     }
 }

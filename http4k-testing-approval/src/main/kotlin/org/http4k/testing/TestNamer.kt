@@ -10,9 +10,11 @@ fun interface TestNamer {
 
     companion object {
         val ClassAndMethod = TestNamer { testClass, testMethod ->
-            testClass.`package`.name.replace('.', '/') + '/' + testClass.simpleName + "." + testMethod.name }
+            testClass.`package`.name.replace('.', '/') + '/' + testClass.simpleName + "." + testMethod.name
+        }
 
         val MethodOnly = TestNamer { testClass, testMethod ->
-            testClass.`package`.name.replace('.', '/') + '/' + testMethod.name }
+            testClass.`package`.name.replace('.', '/') + '/' + testMethod.name
+        }
     }
 }

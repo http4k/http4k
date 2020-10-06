@@ -18,16 +18,20 @@ class BasicAuthenticationTest {
     @Test
     fun wrong_token_type() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
-        val response = handler(Request(GET, "/")
-            .header("Authorization", "Bearer: foobar"))
+        val response = handler(
+            Request(GET, "/")
+                .header("Authorization", "Bearer: foobar")
+        )
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
     @Test
     fun invalid_base64() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
-        val response = handler(Request(GET, "/")
-            .header("Authorization", "Basic ababa"))
+        val response = handler(
+            Request(GET, "/")
+                .header("Authorization", "Basic ababa")
+        )
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 

@@ -37,17 +37,24 @@ object Apache4AsyncClient {
             override fun close() = client.close()
 
             override fun invoke(request: Request, fn: (Response) -> Unit) {
-                client.execute(request.toApacheRequest(), object : FutureCallback<HttpResponse> {
-                    override fun cancelled() {}
+                client.execute(
+                    request.toApacheRequest(),
+                    object : FutureCallback<HttpResponse> {
+                        override fun cancelled() {}
 
-                    override fun completed(result: HttpResponse) = fn(result.toHttp4kResponse())
+                        override fun completed(result: HttpResponse) = fn(result.toHttp4kResponse())
 
-                    override fun failed(e: Exception) = fn(Response(when (e) {
-                        is ConnectTimeoutException -> CLIENT_TIMEOUT
-                        is SocketTimeoutException -> CLIENT_TIMEOUT
-                        else -> SERVICE_UNAVAILABLE
-                    }.toClientStatus(e)))
-                })
+                        override fun failed(e: Exception) = fn(
+                            Response(
+                                when (e) {
+                                    is ConnectTimeoutException -> CLIENT_TIMEOUT
+                                    is SocketTimeoutException -> CLIENT_TIMEOUT
+                                    else -> SERVICE_UNAVAILABLE
+                                }.toClientStatus(e)
+                            )
+                        )
+                    }
+                )
             }
 
             private fun HttpResponse.toHttp4kResponse(): Response =
@@ -60,8 +67,12 @@ object Apache4AsyncClient {
                     val request = this@toApacheRequest
                     uri = URI(request.uri.toString())
                     entity = when (requestBodyMode) {
-                        Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong()
-                            ?: -1)
+                        Stream ->
+                            InputStreamEntity(
+                                request.body.stream,
+                                request.header("content-length")?.toLong()
+                                    ?: -1
+                            )
                         Memory -> ByteArrayEntity(request.body.payload.array())
                     }
                     request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
@@ -77,8 +88,10 @@ object Apache4AsyncClient {
     }
 
     private fun defaultApacheAsyncHttpClient() = HttpAsyncClients.custom()
-        .setDefaultRequestConfig(RequestConfig.custom()
-            .setRedirectsEnabled(false)
-            .setCookieSpec(IGNORE_COOKIES)
-            .build()).build().apply { start() }
+        .setDefaultRequestConfig(
+            RequestConfig.custom()
+                .setRedirectsEnabled(false)
+                .setCookieSpec(IGNORE_COOKIES)
+                .build()
+        ).build().apply { start() }
 }

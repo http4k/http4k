@@ -14,19 +14,22 @@ object RequestContextKey {
         val get: (Request) -> T = { target ->
             store[target].let {
                 val value: T? = it[name]
-                value ?: throw LensFailure(Missing(meta), target = it) }
+                value ?: throw LensFailure(Missing(meta), target = it)
+            }
         }
         val setter = { value: T, target: Request -> store[target][name] = value; target }
         return BiDiLens(meta, get, setter)
     }
 
     fun <T : Any?> optional(store: Store<RequestContext>, name: String = UUID.randomUUID().toString()) =
-        BiDiLens(Meta(false, "context", ObjectParam, name), { target -> store[target][name] },
+        BiDiLens(
+            Meta(false, "context", ObjectParam, name), { target -> store[target][name] },
             { value: T?, target: Request -> store[target][name] = value; target }
         )
 
     fun <T : Any?> defaulted(store: Store<RequestContext>, default: T, name: String = UUID.randomUUID().toString()) =
-        BiDiLens(Meta(false, "context", ObjectParam, name), { target -> store[target][name] ?: default },
+        BiDiLens(
+            Meta(false, "context", ObjectParam, name), { target -> store[target][name] ?: default },
             { value: T, target: Request -> store[target][name] = value; target }
         )
 }

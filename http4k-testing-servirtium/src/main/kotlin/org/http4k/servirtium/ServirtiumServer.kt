@@ -31,7 +31,8 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             options: InteractionOptions = Defaults,
             port: Int = 0,
             serverFn: (Int) -> ServerConfig = ::SunHttp
-        ): ServirtiumServer = object : ServirtiumServer,
+        ): ServirtiumServer = object :
+            ServirtiumServer,
             Http4kServer by
             options.trafficPrinter()
                 .then(
@@ -58,7 +59,8 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             proxyClient: HttpHandler = ApacheClient()
         ): ServirtiumServer {
             val storage = storageProvider(name).apply { clean() }
-            return object : ServirtiumServer,
+            return object :
+                ServirtiumServer,
                 Http4kServer by
                 TrafficFilters.RecordTo(
                     Sink.Servirtium(storage, options)

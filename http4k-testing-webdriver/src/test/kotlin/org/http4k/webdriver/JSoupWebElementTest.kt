@@ -22,25 +22,39 @@ class JSoupWebElementTest {
     private fun input(type: String): WebElement = JSoupWebElement(navigate, getURL, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
 
     private fun select(multiple: Boolean): WebElement =
-        JSoupWebElement(navigate, getURL, Jsoup.parse("""<select name="bob" ${if (multiple) "multiple" else ""}>
+        JSoupWebElement(
+            navigate, getURL,
+            Jsoup.parse(
+                """<select name="bob" ${if (multiple) "multiple" else ""}>
             <option>foo1</option>
             <option>foo2</option>
             </select>"""
-        )).findElement(By.tagName("select"))!!
+            )
+        ).findElement(By.tagName("select"))!!
 
     private fun element(tag: String = "a"): WebElement =
-        JSoupWebElement(navigate, getURL, Jsoup.parse("""<$tag id="bob" href="/link">
+        JSoupWebElement(
+            navigate, getURL,
+            Jsoup.parse(
+                """<$tag id="bob" href="/link">
         |<span>hello</span>
         |<disabled disabled>disabled</disabled>
-        |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
+        |</$tag>""".trimMargin()
+            )
+        ).findElement(By.tagName(tag))!!
 
-    private fun form(method: Method = POST) = JSoupWebElement(navigate, getURL, Jsoup.parse("""
+    private fun form(method: Method = POST) = JSoupWebElement(
+        navigate, getURL,
+        Jsoup.parse(
+            """
         <form method="${method.name}" action="/posted">
             <input id="text" type="text"/>
             <textarea id="textarea"/>
             <p>inner</p>
         </form>
-        """)).findElement(By.tagName("form"))!!
+        """
+        )
+    ).findElement(By.tagName("form"))!!
 
     @Test
     fun `find sub elements`() = assertThat(element().findElements(By.tagName("span"))[0].text, equalTo("hello"))

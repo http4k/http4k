@@ -25,17 +25,24 @@ object ApacheAsyncClient {
             override fun close() = client.close()
 
             override fun invoke(request: Request, fn: (Response) -> Unit) {
-                client.execute(request.toApacheRequest(), object : FutureCallback<SimpleHttpResponse> {
-                    override fun cancelled() {}
+                client.execute(
+                    request.toApacheRequest(),
+                    object : FutureCallback<SimpleHttpResponse> {
+                        override fun cancelled() {}
 
-                    override fun completed(result: SimpleHttpResponse) = fn(result.toHttp4kResponse())
+                        override fun completed(result: SimpleHttpResponse) = fn(result.toHttp4kResponse())
 
-                    override fun failed(e: Exception) = fn(Response(when (e) {
-                        is ConnectTimeoutException -> CLIENT_TIMEOUT
-                        is SocketTimeoutException -> CLIENT_TIMEOUT
-                        else -> SERVICE_UNAVAILABLE
-                    }.toClientStatus(e)))
-                })
+                        override fun failed(e: Exception) = fn(
+                            Response(
+                                when (e) {
+                                    is ConnectTimeoutException -> CLIENT_TIMEOUT
+                                    is SocketTimeoutException -> CLIENT_TIMEOUT
+                                    else -> SERVICE_UNAVAILABLE
+                                }.toClientStatus(e)
+                            )
+                        )
+                    }
+                )
             }
 
             private fun SimpleHttpResponse.toHttp4kResponse(): Response =
@@ -65,8 +72,10 @@ object ApacheAsyncClient {
     }
 
     private fun defaultApacheAsyncHttpClient() = HttpAsyncClients.custom()
-        .setDefaultRequestConfig(RequestConfig.custom()
-            .setRedirectsEnabled(false)
-            .setCookieSpec(StandardCookieSpec.IGNORE)
-            .build()).build().apply { start() }
+        .setDefaultRequestConfig(
+            RequestConfig.custom()
+                .setRedirectsEnabled(false)
+                .setCookieSpec(StandardCookieSpec.IGNORE)
+                .build()
+        ).build().apply { start() }
 }

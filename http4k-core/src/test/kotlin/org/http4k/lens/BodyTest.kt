@@ -96,8 +96,13 @@ class BodyTest {
     @Test
     fun `can create a one way custom Body type`() {
         val customBody = Body.string(TEXT_PLAIN).map(::MyCustomType).toLens()
-        assertThat(customBody(emptyRequest
-            .header("Content-type", TEXT_PLAIN.toHeaderValue())
-            .body("hello world!")), equalTo(MyCustomType("hello world!")))
+        assertThat(
+            customBody(
+                emptyRequest
+                    .header("Content-type", TEXT_PLAIN.toHeaderValue())
+                    .body("hello world!")
+            ),
+            equalTo(MyCustomType("hello world!"))
+        )
     }
 }

@@ -41,7 +41,7 @@ fun main() {
             "type": "always"
           }
         }]
-        """.trimIndent()
+    """.trimIndent()
     println(appWithChaos(Request(POST, "/chaos/activate/new").body(alwaysReturn418)).bodyString())
     println(appWithChaos(Request(GET, "/")).status)
 }

@@ -29,11 +29,13 @@ class ApplicationLoadBalancerHttpAdapterTest {
 
         assertThat(
             ApplicationLoadBalancerAwsHttpAdapter(request),
-            equalTo(Request(GET, "/path")
-                .query("query", "value")
-                .header("c", "d")
-                .body("input body")
-            ))
+            equalTo(
+                Request(GET, "/path")
+                    .query("query", "value")
+                    .header("c", "d")
+                    .body("input body")
+            )
+        )
     }
 
     @Test
@@ -49,9 +51,11 @@ class ApplicationLoadBalancerHttpAdapterTest {
 
         assertThat(
             ApplicationLoadBalancerAwsHttpAdapter(request),
-            equalTo(Request(POST, "/")
-                .body(Body(ByteBuffer.wrap(imageBytes)))
-            ))
+            equalTo(
+                Request(POST, "/")
+                    .body(Body(ByteBuffer.wrap(imageBytes)))
+            )
+        )
     }
 
     @Test
@@ -67,11 +71,13 @@ class ApplicationLoadBalancerHttpAdapterTest {
 
         assertThat(
             ApplicationLoadBalancerAwsHttpAdapter(request),
-            equalTo(Request(GET, "/path")
-                .query("query", "value")
-                .header("c", "d")
-                .body("input body")
-            ))
+            equalTo(
+                Request(GET, "/path")
+                    .query("query", "value")
+                    .header("c", "d")
+                    .body("input body")
+            )
+        )
     }
 
     @Test
@@ -83,9 +89,10 @@ class ApplicationLoadBalancerHttpAdapterTest {
         }
 
         assertThat(
-            ApplicationLoadBalancerAwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
-                .header("c", "d")
-                .body("output body")
+            ApplicationLoadBalancerAwsHttpAdapter(
+                Response(Status.I_M_A_TEAPOT)
+                    .header("c", "d")
+                    .body("output body")
             ),
             equalTo(response)
         )

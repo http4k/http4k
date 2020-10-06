@@ -19,10 +19,13 @@ class SimpleAuthoriseRequestValidatorTest {
 
     private val aRequest = Request(GET, "/some/path")
 
-    private val authoriseRequestValidator = SimpleAuthoriseRequestValidator(HardcodedClientValidator(
-        validClientId,
-        validRedirectUri,
-        expectedScopes = validScopes))
+    private val authoriseRequestValidator = SimpleAuthoriseRequestValidator(
+        HardcodedClientValidator(
+            validClientId,
+            validRedirectUri,
+            expectedScopes = validScopes
+        )
+    )
 
     @Test
     fun `return auth request when client is valid`() {
@@ -33,8 +36,10 @@ class SimpleAuthoriseRequestValidatorTest {
             scopes = validScopes,
             state = State("")
         )
-        assertThat(authoriseRequestValidator.validate(aRequest, validAuthRequest),
-            equalTo(success(aRequest)))
+        assertThat(
+            authoriseRequestValidator.validate(aRequest, validAuthRequest),
+            equalTo(success(aRequest))
+        )
     }
 
     @Test

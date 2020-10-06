@@ -25,7 +25,8 @@ class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(ResourceLoader
         <li><a href="/dir/subdir">subdir</a></li>
         </ol>
         </body>
-        </html>""".trimIndent()
+        </html>
+        """.trimIndent()
         checkContents("/dir/", expected, ContentType.TEXT_HTML)
 
         @Language("HTML") val expected2 = """
@@ -36,7 +37,8 @@ class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(ResourceLoader
         <li><a href="/dir/subdir/file.html">file.html</a></li>
         </ol>
         </body>
-        </html>""".trimIndent()
+        </html>
+        """.trimIndent()
         checkContents("/dir/subdir/", expected2, ContentType.TEXT_HTML)
     }
 }

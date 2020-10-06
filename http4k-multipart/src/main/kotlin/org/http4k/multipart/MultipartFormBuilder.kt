@@ -72,10 +72,12 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
         contents: String,
         headers: Parameters
     ) =
-        part(contents,
+        part(
+            contents,
             listOf(
                 "Content-Disposition" to """attachment; filename="$fileName"""",
-                "Content-Type" to contentType) + headers
+                "Content-Type" to contentType
+            ) + headers
         )
 
     fun file(
@@ -85,10 +87,12 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
         contents: InputStream,
         headers: Parameters
     ) =
-        part(contents,
+        part(
+            contents,
             listOf(
                 "Content-Disposition" to """form-data; name="$fieldName"; filename="$filename"""",
-                "Content-Type" to contentType) + headers
+                "Content-Type" to contentType
+            ) + headers
         )
 
     fun endMultipart(): MultipartFormBuilder = apply {

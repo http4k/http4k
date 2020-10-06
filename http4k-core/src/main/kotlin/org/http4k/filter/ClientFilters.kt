@@ -52,8 +52,10 @@ object ClientFilters {
      */
     fun SetHostFrom(uri: Uri): Filter = Filter { next ->
         {
-            next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))
-                .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}"))
+            next(
+                it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))
+                    .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}")
+            )
         }
     }
 
@@ -62,9 +64,11 @@ object ClientFilters {
      * from the logic required to construct the rest of the request.
      */
     object SetBaseUriFrom {
-        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
-            { request -> next(request.uri(uri.extend(request.uri))) }
-        })
+        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(
+            Filter { next ->
+                { request -> next(request.uri(uri.extend(request.uri))) }
+            }
+        )
     }
 
     /**
@@ -72,8 +76,11 @@ object ClientFilters {
      * without affecting the rest of the request.
      */
     object SetAuthorityFrom {
-        operator fun invoke(uri: Uri): Filter = Filter { next -> { request ->
-            next(request.uri(request.uri.authority(uri.authority).scheme(uri.scheme))) } }
+        operator fun invoke(uri: Uri): Filter = Filter { next ->
+            { request ->
+                next(request.uri(request.uri.authority(uri.authority).scheme(uri.scheme)))
+            }
+        }
     }
 
     object ApiKeyAuth {

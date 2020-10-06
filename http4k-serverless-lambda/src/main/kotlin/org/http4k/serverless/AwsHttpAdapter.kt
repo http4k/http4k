@@ -29,7 +29,8 @@ class RequestContent(
     fun asHttp4k(): Request {
         val body = reqBody?.let { MemoryBody(if (reqBase64 == true) Base64.getDecoder().decode(it.toByteArray()) else it.toByteArray()) } ?: Body.EMPTY
         return (reqHeaders ?: emptyMap()).toList().fold(
-            Request(Method.valueOf(reqMethod), uri()).body(body)) { memo, (fst, snd) ->
+            Request(Method.valueOf(reqMethod), uri()).body(body)
+        ) { memo, (fst, snd) ->
             memo.header(fst, snd)
         }.headers(cookies.map { "Cookie" to it })
     }

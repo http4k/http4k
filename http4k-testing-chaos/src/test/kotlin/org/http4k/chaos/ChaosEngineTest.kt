@@ -76,7 +76,10 @@ class ChaosEngineTest {
         assertThat(appWithChaos(Request(POST, "/chaos/deactivate")), hasStatus(OK).and(hasBody(noChaos)))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
-        assertThat(appWithChaos(Request(POST, "/chaos/activate/new").body("""
+        assertThat(
+            appWithChaos(
+                Request(POST, "/chaos/activate/new").body(
+                    """
                    [{
                        "type":"trigger",
                        "trigger": {
@@ -86,7 +89,12 @@ class ChaosEngineTest {
                            "type":"status",
                            "status":418
                        }
-                   }]""".trimIndent())), hasStatus(OK).and(hasBody(customChaos)))
+                   }]
+                    """.trimIndent()
+                )
+            ),
+            hasStatus(OK).and(hasBody(customChaos))
+        )
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(customChaos))
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(I_M_A_TEAPOT))
         assertThat(appWithChaos(Request(POST, "/chaos/deactivate")), hasStatus(OK).and(hasBody(noChaos)))

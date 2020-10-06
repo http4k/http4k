@@ -23,11 +23,13 @@ class Library(private val rawHttp: HttpHandler) {
 fun Server(http: HttpHandler): RoutingHttpHandler {
     val library = Library(http)
 
-    return routes("/api/books" bind GET to {
-        try {
-            Response(OK).body(library.titles().joinToString(","))
-        } catch (e: Exception) {
-            Response(SERVICE_UNAVAILABLE)
+    return routes(
+        "/api/books" bind GET to {
+            try {
+                Response(OK).body(library.titles().joinToString(","))
+            } catch (e: Exception) {
+                Response(SERVICE_UNAVAILABLE)
+            }
         }
-    })
+    )
 }

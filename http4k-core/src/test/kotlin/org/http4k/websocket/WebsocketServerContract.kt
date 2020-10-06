@@ -57,7 +57,8 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
                     ws.send(WsMessage(ws.upgradeRequest.query("query") ?: "not set"))
                 }
                 ws.onError { ws.send(WsMessage(it.localizedMessage)) }
-            })
+            }
+        )
 
         server = PolyHandler(routes, ws).asServer(serverConfig(0)).start()
     }

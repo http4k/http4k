@@ -58,6 +58,7 @@ private fun buildValidMultipartRequest(): Request {
 
     val multipartform = MultipartForm().with(
         nameField of AName("rita"),
-        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
+        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream())
+    )
     return Request(POST, "http://localhost:8000").with(strictFormBody of multipartform)
 }

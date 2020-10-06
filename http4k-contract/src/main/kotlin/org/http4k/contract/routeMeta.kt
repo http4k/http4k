@@ -81,8 +81,13 @@ class RouteMetaDsl internal constructor() {
      */
     @JvmName("returningStatus")
     fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>, description: String? = null, definitionId: String? = null) {
-        returning(ResponseMeta(description
-            ?: status.description, Response(status).with(body.first of body.second), definitionId, body.second))
+        returning(
+            ResponseMeta(
+                description
+                    ?: status.description,
+                Response(status).with(body.first of body.second), definitionId, body.second
+            )
+        )
     }
 
     /**

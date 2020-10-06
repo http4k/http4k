@@ -34,14 +34,18 @@ internal class RequestObjectExtractorTest {
 
     @Test
     fun `if middle part is correctly base64 encoded but not json then error`() {
-        assertThat(extractRequestJwtClaimsAsMap("kasdjfl.${Base64.encodeBase64String("something not json".toByteArray())}.faksjdf"),
-            equalTo(failure()))
+        assertThat(
+            extractRequestJwtClaimsAsMap("kasdjfl.${Base64.encodeBase64String("something not json".toByteArray())}.faksjdf"),
+            equalTo(failure())
+        )
     }
 
     @Test
     fun `if middle part is correctly base64 encoded json then success`() {
-        assertThat(extractRequestJwtClaimsAsMap("kasdjfl.${Base64.encodeBase64String("{\"foo\":\"bar\"}".toByteArray())}.faksjdf"),
-            equalTo(success(mapOf("foo" to "bar") as Map<*, *>)))
+        assertThat(
+            extractRequestJwtClaimsAsMap("kasdjfl.${Base64.encodeBase64String("{\"foo\":\"bar\"}".toByteArray())}.faksjdf"),
+            equalTo(success(mapOf("foo" to "bar") as Map<*, *>))
+        )
     }
 
     @Test
@@ -108,7 +112,8 @@ internal class RequestObjectExtractorTest {
     fun `if has unknown fields ignore them, and parse known ones`() {
         val rawData = mapOf(
             "iss" to "s6BhdRkqt3",
-            "foo" to "bar")
+            "foo" to "bar"
+        )
 
         val correspondingExpectedRequestObject = RequestObject(
             issuer = "s6BhdRkqt3",

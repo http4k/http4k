@@ -190,5 +190,5 @@ internal class HostDemuxRoutingHttpHandler(
         hosts.mapValues { it.value.withFilter(new) },
         new.then(notFoundHandler),
         new.then(methodNotAllowedHandler)
-        )
+    )
 }

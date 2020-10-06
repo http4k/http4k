@@ -73,8 +73,11 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - request redirecttion may use other response_type`() {
-        assertThat(oAuth(oAuthPersistence, OK, ResponseType.CodeIdToken)
-            .authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", ".*response_type=code\\+id_token.*".toRegex())))
+        assertThat(
+            oAuth(oAuthPersistence, OK, ResponseType.CodeIdToken)
+                .authFilter.then { Response(OK) }(Request(GET, "/")),
+            hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", ".*response_type=code\\+id_token.*".toRegex()))
+        )
     }
 
     private val base = Request(GET, "/")

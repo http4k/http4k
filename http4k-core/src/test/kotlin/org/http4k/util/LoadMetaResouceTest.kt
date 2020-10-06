@@ -19,8 +19,15 @@ class LoadMetaResouceTest {
     fun `throws on missing`() {
         assertThat(
             { loadMetaResource<MimeTypes>("myfile.txt") },
-            throws(has(java.lang.IllegalStateException::message, equalTo("" +
-                "Could not find 'myfile.txt' inside META-INF. If using Shadow JAR, add mergeServiceFiles() to the configuration")))
+            throws(
+                has(
+                    java.lang.IllegalStateException::message,
+                    equalTo(
+                        "" +
+                            "Could not find 'myfile.txt' inside META-INF. If using Shadow JAR, add mergeServiceFiles() to the configuration"
+                    )
+                )
+            )
         )
     }
 }

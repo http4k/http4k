@@ -15,7 +15,8 @@ internal fun <R> uriHas(name: String, extractValue: (Uri) -> R, match: Matcher<R
         return MatcherResult(
             testResult.passed(),
             "Invalid Uri $name: ${testResult.failureMessage()}",
-            "Invalid Uri $name: ${testResult.negatedFailureMessage()}")
+            "Invalid Uri $name: ${testResult.negatedFailureMessage()}"
+        )
     }
 }
 

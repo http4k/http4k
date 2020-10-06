@@ -35,7 +35,8 @@ class OAuthProvidersTest {
 
     private fun assertProvider(provider: OAuthProvider, expectedRedirectPrefix: String) {
         assertThat(provider.api(Request(GET, "/")), hasStatus(OK))
-        assertThat(provider.authFilter.then { Response(OK) }(Request(GET, "/")),
+        assertThat(
+            provider.authFilter.then { Response(OK) }(Request(GET, "/")),
             hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", startsWith(expectedRedirectPrefix)))
         )
     }

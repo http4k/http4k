@@ -24,19 +24,23 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .withQueryStringParameters(mapOf("query" to "value"))
             .withBody("input body")
             .withHeaders(mapOf("c" to "d"))
-            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-                .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
-                ).build())
+            .withRequestContext(
+                APIGatewayV2HTTPEvent.RequestContext.builder()
+                    .withHttp(
+                        APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
+                    ).build()
+            )
             .build()
 
         assertThat(
             ApiGatewayV2AwsHttpAdapter(request),
-            equalTo(Request(GET, "/path")
-                .query("query", "value")
-                .header("c", "d")
-                .body("input body")
-            ))
+            equalTo(
+                Request(GET, "/path")
+                    .query("query", "value")
+                    .header("c", "d")
+                    .body("input body")
+            )
+        )
     }
 
     @Test
@@ -47,17 +51,21 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .withRawPath("/")
             .withBody(String(Base64.getEncoder().encode(imageBytes)))
             .withIsBase64Encoded(true)
-            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-                .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("POST").build()
-                ).build())
+            .withRequestContext(
+                APIGatewayV2HTTPEvent.RequestContext.builder()
+                    .withHttp(
+                        APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("POST").build()
+                    ).build()
+            )
             .build()
 
         assertThat(
             ApiGatewayV2AwsHttpAdapter(request),
-            equalTo(Request(POST, "/")
-                .body(Body(ByteBuffer.wrap(imageBytes)))
-            ))
+            equalTo(
+                Request(POST, "/")
+                    .body(Body(ByteBuffer.wrap(imageBytes)))
+            )
+        )
     }
 
     @Test
@@ -68,19 +76,23 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .withBody("input body".base64Encode())
             .withHeaders(mapOf("c" to "d"))
             .withIsBase64Encoded(true)
-            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-                .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
-                ).build())
+            .withRequestContext(
+                APIGatewayV2HTTPEvent.RequestContext.builder()
+                    .withHttp(
+                        APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
+                    ).build()
+            )
             .build()
 
         assertThat(
             ApiGatewayV2AwsHttpAdapter(request),
-            equalTo(Request(GET, "/path")
-                .query("query", "value")
-                .header("c", "d")
-                .body("input body")
-            ))
+            equalTo(
+                Request(GET, "/path")
+                    .query("query", "value")
+                    .header("c", "d")
+                    .body("input body")
+            )
+        )
     }
 
     @Test
@@ -93,9 +105,10 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .build()
 
         assertThat(
-            ApiGatewayV2AwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
-                .header("c", "d")
-                .body("output body")
+            ApiGatewayV2AwsHttpAdapter(
+                Response(Status.I_M_A_TEAPOT)
+                    .header("c", "d")
+                    .body("output body")
             ),
             equalTo(response)
         )

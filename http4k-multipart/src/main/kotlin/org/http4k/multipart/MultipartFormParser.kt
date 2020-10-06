@@ -56,7 +56,8 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
                 part.inputStream.use {
                     return InMemory(
                         part,
-                        storeInMemory(bytes, length), encoding)
+                        storeInMemory(bytes, length), encoding
+                    )
                 }
             }
             length += count
@@ -64,7 +65,8 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
                 part.inputStream.use {
                     return DiskBacked(
                         part,
-                        writeToDisk(part, bytes, length))
+                        writeToDisk(part, bytes, length)
+                    )
                 }
             }
         }
@@ -73,8 +75,11 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
     private fun storeInMemory(bytes: ByteArray, length: Int) = ByteArray(length).apply { System.arraycopy(bytes, 0, this, 0, length) }
 
     private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int) =
-        File.createTempFile(part.fileName ?: UUID.randomUUID().toString() +
-        "-", ".tmp", temporaryFileDirectory).apply {
+        File.createTempFile(
+            part.fileName ?: UUID.randomUUID().toString() +
+                "-",
+            ".tmp", temporaryFileDirectory
+        ).apply {
             deleteOnExit()
             FileOutputStream(this).apply {
                 write(bytes, 0, length)

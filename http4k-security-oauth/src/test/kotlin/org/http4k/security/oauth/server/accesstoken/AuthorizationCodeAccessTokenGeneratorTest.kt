@@ -27,16 +27,22 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 null,
                 null,
                 null
-            )).get()
+            )
+        ).get()
             as? AuthorizationCodeAccessTokenRequest ?: org.junit.jupiter.api.fail("returned wrong type")
 
-        assertThat(request, equalTo(AuthorizationCodeAccessTokenRequest(
-            ClientId("a-client-id"),
-            "a-client-secret",
-            Uri.of("http://some-uri"),
-            emptyList(),
-            AuthorizationCode("some-code")
-        )))
+        assertThat(
+            request,
+            equalTo(
+                AuthorizationCodeAccessTokenRequest(
+                    ClientId("a-client-id"),
+                    "a-client-secret",
+                    Uri.of("http://some-uri"),
+                    emptyList(),
+                    AuthorizationCode("some-code")
+                )
+            )
+        )
     }
 
     @Test
@@ -53,7 +59,8 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 null,
                 null,
                 null
-            )).get()
+            )
+        ).get()
             as? AccessTokenError ?: org.junit.jupiter.api.fail("returned wrong type")
 
         assertThat(error, equalTo(MissingRedirectUri as AccessTokenError))
@@ -73,7 +80,8 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 null,
                 null,
                 null
-            )).get()
+            )
+        ).get()
             as? AccessTokenError ?: org.junit.jupiter.api.fail("returned wrong type")
 
         assertThat(error, equalTo(MissingAuthorizationCode as AccessTokenError))

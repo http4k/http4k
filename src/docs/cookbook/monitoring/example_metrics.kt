@@ -28,7 +28,8 @@ fun main() {
     val addCustomLabels: HttpTransactionLabeller = { tx: HttpTransaction -> tx.label("status", tx.response.status.code.toString()) }
 
     val withCustomLabels = ResponseFilters.ReportHttpTransaction(
-        transactionLabeller = addCustomLabels) { tx: HttpTransaction ->
+        transactionLabeller = addCustomLabels
+    ) { tx: HttpTransaction ->
         // send metrics to some custom system here...
         println("custom txLabels are: ${tx.labels} ${tx.duration}")
     }

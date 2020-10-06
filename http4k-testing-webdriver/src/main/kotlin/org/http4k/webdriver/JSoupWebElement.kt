@@ -63,12 +63,16 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val buttons = it.findElements(By.tagName("button"))
                 .filter { it.getAttribute("name") != "" && it == this }
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
-            val form = WebForm(inputs.plus(textareas).plus(selects).plus(buttons)
-                .groupBy { it.first }
-                .mapValues { it.value.map { it.second }.flatMap { it } })
+            val form = WebForm(
+                inputs.plus(textareas).plus(selects).plus(buttons)
+                    .groupBy { it.first }
+                    .mapValues { it.value.map { it.second }.flatMap { it } }
+            )
 
-            val body = Body.webForm(Validator.Strict,
-                *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
+            val body = Body.webForm(
+                Validator.Strict,
+                *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())
+            ).toLens()
 
             val formtarget = Uri.of(it.element.attr("action") ?: "")
             val current = getURL()

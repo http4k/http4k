@@ -25,7 +25,8 @@ class TrafficExtensionTests {
     @Test
     fun `sink stores traffic in servirtium markdown format, applying manipulations to recording only`(approver: Approver) {
         val received = AtomicReference<ByteArray>()
-        val sink = Sink.Servirtium(Consumer(received::set),
+        val sink = Sink.Servirtium(
+            Consumer(received::set),
             object : InteractionOptions {
                 override fun modify(request: Request) =
                     request.removeHeader("toBeRemoved").body(request.bodyString() + request.bodyString())
@@ -53,7 +54,8 @@ class TrafficExtensionTests {
     @Test
     fun `sink stores binary artifacts as base64 encoded`(approver: Approver) {
         val received = AtomicReference<ByteArray>()
-        val sink = Sink.Servirtium(Consumer(received::set),
+        val sink = Sink.Servirtium(
+            Consumer(received::set),
             object : InteractionOptions {
                 override fun isBinary(contentType: ContentType?) = true
             }
@@ -66,9 +68,11 @@ class TrafficExtensionTests {
 
     @Test
     fun `replay replays traffic from servirtium markdown format`() {
-        val replay = Replay.Servirtium(Supplier {
-            javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readBytes()
-        })
+        val replay = Replay.Servirtium(
+            Supplier {
+                javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readBytes()
+            }
+        )
 
         val request1 = Request(GET, "/hello?query=123")
             .header("header1", "value1")
@@ -84,9 +88,10 @@ class TrafficExtensionTests {
 
     @Test
     fun `replay replays binary traffic from servirtium markdown format`() {
-        val replay = Replay.Servirtium(Supplier {
-            javaClass.getResourceAsStream("/org/http4k/traffic/storedBinaryTraffic.txt").readBytes()
-        },
+        val replay = Replay.Servirtium(
+            Supplier {
+                javaClass.getResourceAsStream("/org/http4k/traffic/storedBinaryTraffic.txt").readBytes()
+            },
             object : InteractionOptions {
                 override fun isBinary(contentType: ContentType?) = true
             }

@@ -7,7 +7,8 @@ import org.http4k.core.cookie.cookies
 import org.http4k.core.cookie.removeCookie
 import org.http4k.lens.ParamMeta.StringParam
 
-object Cookies : BiDiLensSpec<Request, Cookie>("cookie", StringParam,
+object Cookies : BiDiLensSpec<Request, Cookie>(
+    "cookie", StringParam,
     LensGet { name, target -> target.cookies().filter { it.name == name } },
     LensSet { name, values, target -> values.fold(target.removeCookie(name)) { m, (name, value) -> m.cookie(name, value) } }
 )

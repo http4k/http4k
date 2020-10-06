@@ -19,8 +19,10 @@ class ExampleHtmlApprovalTest {
     private val app: HttpHandler = {
         Response(OK)
             .with(CONTENT_TYPE of TEXT_HTML)
-            .body("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><div><p>text1</p></div><div><p>text1</p></div></html>""")
+            .body(
+                """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><div><p>text1</p></div><div><p>text1</p></div></html>"""
+            )
     }
 
     @Test
@@ -35,8 +37,11 @@ class ExampleHtmlApprovalTest {
 
     @Test
     fun `check response content with badly-formatted HTML`(approver: Approver) {
-        assertThat({
-            approver.assertApproved(Response(OK).with(CONTENT_TYPE of TEXT_HTML).body("""<this is not really HTML"""))
-        }, throws<AssertionError>())
+        assertThat(
+            {
+                approver.assertApproved(Response(OK).with(CONTENT_TYPE of TEXT_HTML).body("""<this is not really HTML"""))
+            },
+            throws<AssertionError>()
+        )
     }
 }

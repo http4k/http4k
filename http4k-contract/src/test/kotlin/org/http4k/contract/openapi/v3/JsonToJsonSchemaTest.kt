@@ -22,37 +22,48 @@ class JsonToJsonSchemaTest {
     @Test
     fun `renders object contents of different types of json value as expected`(approver: Approver) {
 
-        approver.assertApproved(json {
-            obj(
-                "aString" to string("aStringValue"),
-                "aNumber" to number(BigDecimal("1.9")),
-                "aDouble" to number(1.01),
-                "aBooleanTrue" to boolean(true),
-                "aBooleanFalse" to boolean(false),
-                "anArray" to array(listOf(obj("anotherString" to string("yetAnotherString")))),
-                "anObject" to obj("anInteger" to number(1)),
-                "anotherObject" to obj("anInteger" to number(1))
-            )
-        }, "bob")
+        approver.assertApproved(
+            json {
+                obj(
+                    "aString" to string("aStringValue"),
+                    "aNumber" to number(BigDecimal("1.9")),
+                    "aDouble" to number(1.01),
+                    "aBooleanTrue" to boolean(true),
+                    "aBooleanFalse" to boolean(false),
+                    "anArray" to array(listOf(obj("anotherString" to string("yetAnotherString")))),
+                    "anObject" to obj("anInteger" to number(1)),
+                    "anotherObject" to obj("anInteger" to number(1))
+                )
+            },
+            "bob"
+        )
     }
 
     @Test
     fun `renders array contents of different types of json value as expected`(approver: Approver) {
-        approver.assertApproved(json {
-            array(listOf(obj("anotherString" to string("yetAnotherString"))))
-        }, "bob")
+        approver.assertApproved(
+            json {
+                array(listOf(obj("anotherString" to string("yetAnotherString"))))
+            },
+            "bob"
+        )
     }
 
     @Test
     fun `renders nested array contents of different types of json value as expected`(approver: Approver) {
-        approver.assertApproved(json {
-            array(listOf(array(listOf(obj("anotherString" to string("yetAnotherString"))))))
-        }, "bob")
+        approver.assertApproved(
+            json {
+                array(listOf(array(listOf(obj("anotherString" to string("yetAnotherString"))))))
+            },
+            "bob"
+        )
     }
 
     private fun Approver.assertApproved(obj: JsonNode, name: String) {
-        assertApproved(Response(OK)
-            .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(Jackson.asFormatString(creator.toSchema(obj, name))))
+        assertApproved(
+            Response(OK)
+                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
+                .body(Jackson.asFormatString(creator.toSchema(obj, name)))
+        )
     }
 }

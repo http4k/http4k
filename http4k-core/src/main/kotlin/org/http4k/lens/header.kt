@@ -9,19 +9,23 @@ import org.http4k.lens.ParamMeta.StringParam
 
 typealias HeaderLens<T> = Lens<HttpMessage, T>
 
-object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
+object Header : BiDiLensSpec<HttpMessage, String>(
+    "header", StringParam,
     LensGet { name, target -> target.headerValues(name).map { it ?: "" } },
     LensSet { name, values, target -> values.fold(target.removeHeader(name)) { m, next -> m.header(name, next) } }
 ) {
     val CONTENT_TYPE = map(
         {
             parseValueAndDirectives(it).let {
-                ContentType(it.first, it.second
-                    .filter { it.first.toLowerCase() in setOf("boundary", "charset", "media-type") }
+                ContentType(
+                    it.first,
+                    it.second
+                        .filter { it.first.toLowerCase() in setOf("boundary", "charset", "media-type") }
                 )
             }
         },
-        ContentType::toHeaderValue).optional("content-type")
+        ContentType::toHeaderValue
+    ).optional("content-type")
 
     val LOCATION = map({ of(it) }, Uri::toString).required("location")
 

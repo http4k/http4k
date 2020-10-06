@@ -47,8 +47,10 @@ class CookiesTest {
         assertThat(actual, equalTo(request.cookie(Cookie("world", "value2"))))
 
         val multi = Cookies.multi.required("world")
-        assertThat(multi(listOf(Cookie("world", "value3"), Cookie("world", "value4")), multi(listOf(Cookie("world", "value1"), Cookie("world", "value2")), request)),
-            equalTo(request.cookie(Cookie("world", "value3")).cookie(Cookie("world", "value4"))))
+        assertThat(
+            multi(listOf(Cookie("world", "value3"), Cookie("world", "value4")), multi(listOf(Cookie("world", "value1"), Cookie("world", "value2")), request)),
+            equalTo(request.cookie(Cookie("world", "value3")).cookie(Cookie("world", "value4")))
+        )
     }
 
     @Test

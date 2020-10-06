@@ -118,8 +118,11 @@ class OpenApi3<NODE : Any>(
         .groupBy { it.message.status.code.toString() }
         .map {
             it.key to
-                ResponseContents<NODE>(it.value
-                    .map { it.description }.toSortedSet().joinToString(","), it.value.collectSchemas())
+                ResponseContents<NODE>(
+                    it.value
+                        .map { it.description }.toSortedSet().joinToString(","),
+                    it.value.collectSchemas()
+                )
         }.toMap()
 
     private fun List<HttpMessageMeta<Response>>.collectSchemas() = groupBy { CONTENT_TYPE(it.message) }
@@ -136,12 +139,18 @@ class OpenApi3<NODE : Any>(
     private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
         when (it.paramMeta) {
             ObjectParam -> SchemaParameter(it, "{}".toSchema())
-            FileParam -> PrimitiveParameter(it, json {
-                obj("type" to string(FileParam.value), "format" to string("binary"))
-            })
-            else -> PrimitiveParameter(it, json {
-                obj("type" to string(it.paramMeta.value))
-            })
+            FileParam -> PrimitiveParameter(
+                it,
+                json {
+                    obj("type" to string(FileParam.value), "format" to string("binary"))
+                }
+            )
+            else -> PrimitiveParameter(
+                it,
+                json {
+                    obj("type" to string(it.paramMeta.value))
+                }
+            )
         }
     }
 
@@ -152,8 +161,9 @@ class OpenApi3<NODE : Any>(
             with(CONTENT_TYPE(it.message)) {
                 when (this) {
                     APPLICATION_JSON -> APPLICATION_JSON.value to it.toSchemaContent()
-                    APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
-                        (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
+                    APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA ->
+                        value to
+                            (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
                     else -> null
                 }
             }
@@ -176,7 +186,8 @@ class OpenApi3<NODE : Any>(
     private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): BodyContent {
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
             if (example is Array<*> ||
-                example is Iterable<*>) !json.fields(schema.node).toMap().containsKey("\$ref")
+                example is Iterable<*>
+            ) !json.fields(schema.node).toMap().containsKey("\$ref")
             else apiRenderer.toSchema(object {}) != schema
 
         val jsonSchema = example
@@ -196,9 +207,11 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun List<Security>.combineRef(): Render<NODE> = {
-        array(mapNotNull { securityRenderer.ref<NODE>(it) }.flatMap {
-            this(it).let { if (typeOf(it) == JsonType.Array) elements(it) else listOf(it) }
-        })
+        array(
+            mapNotNull { securityRenderer.ref<NODE>(it) }.flatMap {
+                this(it).let { if (typeOf(it) == JsonType.Array) elements(it) else listOf(it) }
+            }
+        )
     }
 
     private fun String.safeParse(): NODE? = try {

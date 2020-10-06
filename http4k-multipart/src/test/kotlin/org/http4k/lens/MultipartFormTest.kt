@@ -38,7 +38,8 @@ class MultipartFormTest {
                 stringRequiredField of "world",
                 intRequiredField of 123,
                 requiredFile of validFile(),
-                fieldWithHeaders of MultipartFormField("someValue",
+                fieldWithHeaders of MultipartFormField(
+                    "someValue",
                     listOf("MyHeader" to "myHeaderValue")
                 )
             )
@@ -54,11 +55,15 @@ class MultipartFormTest {
                 stringRequiredField of "world",
                 intRequiredField of 123,
                 requiredFile of validFile()
-            )).replaceHeader("Content-Type", "unknown; boundary=hello")
+            )
+        ).replaceHeader("Content-Type", "unknown; boundary=hello")
 
-        assertThat({
-            multipartFormLens(Strict)(request)
-        }, throws(lensFailureWith<Any?>(Unsupported(Header.CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        assertThat(
+            {
+                multipartFormLens(Strict)(request)
+            },
+            throws(lensFailureWith<Any?>(Unsupported(Header.CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported))
+        )
     }
 
     @Test
@@ -72,9 +77,12 @@ class MultipartFormTest {
         )
 
         val expected = MultipartForm(
-            mapOf("hello" to listOf(MultipartFormField("world")),
-                "another" to listOf(MultipartFormField("123"))),
-            mapOf("file" to listOf(validFile())))
+            mapOf(
+                "hello" to listOf(MultipartFormField("world")),
+                "another" to listOf(MultipartFormField("123"))
+            ),
+            mapOf("file" to listOf(validFile()))
+        )
         assertThat(multipartFormLens(Strict)(request), equalTo(expected))
     }
 
@@ -89,10 +97,16 @@ class MultipartFormTest {
         )
 
         val requiredString = MultipartFormField.string().required("hello")
-        assertThat(multipartFormLens(Feedback)(request), equalTo(MultipartForm(
-            mapOf("another" to listOf(MultipartFormField("123"))),
-            mapOf("file" to listOf(validFile())),
-            listOf(Missing(requiredString.meta)))))
+        assertThat(
+            multipartFormLens(Feedback)(request),
+            equalTo(
+                MultipartForm(
+                    mapOf("another" to listOf(MultipartFormField("123"))),
+                    mapOf("file" to listOf(validFile())),
+                    listOf(Missing(requiredString.meta))
+                )
+            )
+        )
     }
 
     @Test
@@ -126,8 +140,10 @@ class MultipartFormTest {
         val intField = MultipartFormField.string().int().required("another")
 
         val populated = MultipartForm()
-            .with(stringField of "world",
-                intField of 123)
+            .with(
+                stringField of "world",
+                intField of 123
+            )
 
         assertThat(stringField(populated), equalTo("world"))
         assertThat(intField(populated), equalTo(123))

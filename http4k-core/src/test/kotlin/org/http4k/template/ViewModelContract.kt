@@ -13,7 +13,8 @@ abstract class ViewModelContract(private val templates: Templates) {
 
     private val items = listOf(
         Item("item1", "£1", listOf(Feature("pretty"))),
-        Item("item2", "£3", listOf(Feature("nasty"))))
+        Item("item2", "£3", listOf(Feature("nasty")))
+    )
 
     @Test
     fun `renders from Body`() {

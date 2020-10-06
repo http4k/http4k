@@ -49,21 +49,25 @@ open class OpenApi2<out NODE>(
         with(renderPaths(routes, contractRoot, security)) {
             Response(OK)
                 .with(Header.CONTENT_TYPE of APPLICATION_JSON)
-                .body(json {
-                    val unextended = obj(listOfNotNull(
-                        "swagger" to string("2.0"),
-                        "info" to apiInfo.asJson(),
-                        "basePath" to string("/"),
-                        "tags" to array(routes.renderTags()),
-                        "paths" to obj(fields.sortedBy { it.first }),
-                        "securityDefinitions" to (listOfNotNull(security) + routes.mapNotNull { it.meta.security }).combine(),
-                        "definitions" to obj(definitions),
-                        baseUri?.let { "host" to string(it.authority) },
-                        baseUri?.let { "schemes" to array(string(it.scheme)) }
-                    ))
+                .body(
+                    json {
+                        val unextended = obj(
+                            listOfNotNull(
+                                "swagger" to string("2.0"),
+                                "info" to apiInfo.asJson(),
+                                "basePath" to string("/"),
+                                "tags" to array(routes.renderTags()),
+                                "paths" to obj(fields.sortedBy { it.first }),
+                                "securityDefinitions" to (listOfNotNull(security) + routes.mapNotNull { it.meta.security }).combine(),
+                                "definitions" to obj(definitions),
+                                baseUri?.let { "host" to string(it.authority) },
+                                baseUri?.let { "schemes" to array(string(it.scheme)) }
+                            )
+                        )
 
-                    pretty(extensions.fold(unextended) { acc, next -> json(next(acc)) })
-                })
+                        pretty(extensions.fold(unextended) { acc, next -> json(next(acc)) })
+                    }
+                )
         }
 
     private fun List<Security>.combine() =
@@ -112,44 +116,48 @@ open class OpenApi2<out NODE>(
     private fun render(pathSegments: PathSegments, contractSecurity: Security?, route: ContractRoute):
         FieldAndDefinitions<NODE> {
 
-        val (responses, responseDefinitions) = route.meta.responses.render()
+            val (responses, responseDefinitions) = route.meta.responses.render()
 
-        val schema = route.meta.requests.find {
-            Header.CONTENT_TYPE(it.message)?.equalsIgnoringDirectives(APPLICATION_JSON) ?: false
-        }?.asSchema()
+            val schema = route.meta.requests.find {
+                Header.CONTENT_TYPE(it.message)?.equalsIgnoringDirectives(APPLICATION_JSON) ?: false
+            }?.asSchema()
 
-        val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
+            val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
 
-        val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { it.renderMeta() }
+            val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { it.renderMeta() }
 
-        val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagNames()
-        val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
-            ?: emptyList())
+            val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagNames()
+            val consumes = route.meta.consumes + (
+                route.spec.routeMeta.body?.let { listOf(it.contentType) }
+                    ?: emptyList()
+                )
 
-        return json {
-            val security = listOfNotNull(route.meta.security ?: contractSecurity)
-                .mapNotNull { securityRenderer.ref<NODE>(it) }.flatMap {
-                    this(it).let { if (typeOf(it) == JsonType.Array) elements(it) else listOf(it) }
-                }
+            return json {
+                val security = listOfNotNull(route.meta.security ?: contractSecurity)
+                    .mapNotNull { securityRenderer.ref<NODE>(it) }.flatMap {
+                        this(it).let { if (typeOf(it) == JsonType.Array) elements(it) else listOf(it) }
+                    }
 
-            val fields =
-                listOfNotNull(
-                    "tags" to array(routeTags),
-                    "summary" to string(route.meta.summary),
-                    "operationId" to string(route.operationId(pathSegments)),
-                    "produces" to array(route.meta.produces.map { string(it.value) }),
-                    "consumes" to array(consumes.map { string(it.value) }),
-                    "parameters" to array(nonBodyParamNodes + bodyParamNodes),
-                    "responses" to obj(responses),
-                    "security" to array(
-                        security)
-                ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
+                val fields =
+                    listOfNotNull(
+                        "tags" to array(routeTags),
+                        "summary" to string(route.meta.summary),
+                        "operationId" to string(route.operationId(pathSegments)),
+                        "produces" to array(route.meta.produces.map { string(it.value) }),
+                        "consumes" to array(consumes.map { string(it.value) }),
+                        "parameters" to array(nonBodyParamNodes + bodyParamNodes),
+                        "responses" to obj(responses),
+                        "security" to array(
+                            security
+                        )
+                    ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
-            FieldAndDefinitions(
-                route.method.toString().toLowerCase() to obj(fields),
-                ((route.meta.requests.flatMap { it.asSchema().definitions }) + responseDefinitions).toSet())
+                FieldAndDefinitions(
+                    route.method.toString().toLowerCase() to obj(fields),
+                    ((route.meta.requests.flatMap { it.asSchema().definitions }) + responseDefinitions).toSet()
+                )
+            }
         }
-    }
 
     private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
         schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId)
@@ -182,8 +190,10 @@ open class OpenApi2<out NODE>(
             memo + FieldAndDefinitions(
                 status.code.toString() to obj(
                     listOf("description" to string(description)) +
-                        if (schema.node == nullNode()) emptyList() else listOf("schema" to schema.node)),
-                schema.definitions)
+                        if (schema.node == nullNode()) emptyList() else listOf("schema" to schema.node)
+                ),
+                schema.definitions
+            )
         }
     }
 
@@ -203,8 +213,10 @@ open class OpenApi2<out NODE>(
 }
 
 private data class FieldsAndDefinitions<NODE>(val fields: List<Pair<String, NODE>> = emptyList(), val definitions: Set<Pair<String, NODE>> = emptySet()) {
-    operator fun plus(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(fields + fieldAndDefinitions.field,
-        fieldAndDefinitions.definitions + definitions)
+    operator fun plus(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(
+        fields + fieldAndDefinitions.field,
+        fieldAndDefinitions.definitions + definitions
+    )
 }
 
 private data class FieldAndDefinitions<out NODE>(val field: Pair<String, NODE>, val definitions: Set<Pair<String, NODE>>)

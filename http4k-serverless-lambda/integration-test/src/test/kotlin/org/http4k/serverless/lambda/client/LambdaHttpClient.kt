@@ -85,11 +85,20 @@ class AwsClientV1HttpAdapter :
 internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
     override fun invoke(response: APIGatewayV2HTTPResponse) =
         Response(Status(response.statusCode, ""))
-            .headers((response.headers
-                ?: emptyMap()).entries.fold(listOf(), { acc, next -> acc + (next.key to next.value) }))
-            .headers((response.multiValueHeaders ?: emptyMap()).entries.fold(listOf(), { acc, next ->
-                next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
-            }))
+            .headers(
+                (
+                    response.headers
+                        ?: emptyMap()
+                    ).entries.fold(listOf(), { acc, next -> acc + (next.key to next.value) })
+            )
+            .headers(
+                (response.multiValueHeaders ?: emptyMap()).entries.fold(
+                    listOf(),
+                    { acc, next ->
+                        next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
+                    }
+                )
+            )
             .body(response.body.orEmpty())
 
     override fun invoke(request: Request) = APIGatewayV2HTTPEvent.builder()
@@ -98,10 +107,11 @@ internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEve
         .withQueryStringParameters(request.uri.queries().toMap())
         .withBody(request.bodyString())
         .withHeaders(request.headers.toMap())
-        .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-            .withHttp(
-                APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod(request.method.name).build()
-            ).build()
+        .withRequestContext(
+            APIGatewayV2HTTPEvent.RequestContext.builder()
+                .withHttp(
+                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod(request.method.name).build()
+                ).build()
         )
         .build()
 

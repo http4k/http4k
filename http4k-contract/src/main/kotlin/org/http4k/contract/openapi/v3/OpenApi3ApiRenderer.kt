@@ -119,27 +119,31 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     }
 
     private fun FormContent.toJson(): NODE = json {
-        obj("schema" to
-            obj(
-                "type" to string("object"),
-                "properties" to obj(
-                    schema.properties.map {
-                        it.key to obj(it.value.map { it.key to it.value.asJson() })
-                    }
-                ),
-                "required" to array(schema.required.map { it.asJson() })
-            )
+        obj(
+            "schema" to
+                obj(
+                    "type" to string("object"),
+                    "properties" to obj(
+                        schema.properties.map {
+                            it.key to obj(it.value.map { it.key to it.value.asJson() })
+                        }
+                    ),
+                    "required" to array(schema.required.map { it.asJson() })
+                )
         )
     }
 
     @JvmName("responseAsJson")
     private fun Map<String, ResponseContents<NODE>>.asJson(): NODE = json {
-        obj(map {
-            it.key to
-                obj(
-                    "description" to it.value.description.asJson(),
-                    "content" to it.value.content.asJson())
-        })
+        obj(
+            map {
+                it.key to
+                    obj(
+                        "description" to it.value.description.asJson(),
+                        "content" to it.value.content.asJson()
+                    )
+            }
+        )
     }
 
     private fun List<RequestParameter<NODE>>.asJson(): NODE = json {

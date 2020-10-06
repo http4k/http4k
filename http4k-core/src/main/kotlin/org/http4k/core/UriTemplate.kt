@@ -12,9 +12,11 @@ data class UriTemplate private constructor(private val template: String) {
     init {
         matches = URI_TEMPLATE_FORMAT.findAll(template)
         parameterNames = matches.map { it.groupValues[1] }.toList()
-        templateRegex = template.replace(URI_TEMPLATE_FORMAT,
+        templateRegex = template.replace(
+            URI_TEMPLATE_FORMAT,
             { notMatched -> Pattern.quote(notMatched) },
-            { matched -> if (matched.groupValues[2].isBlank()) "([^/]+)" else "(${matched.groupValues[2]})" }).toRegex()
+            { matched -> if (matched.groupValues[2].isBlank()) "([^/]+)" else "(${matched.groupValues[2]})" }
+        ).toRegex()
     }
 
     companion object {

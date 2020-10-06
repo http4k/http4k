@@ -67,9 +67,11 @@ class ServirtiumRecordingIntegrationTest : TestContract {
         approver: Approver
     ) {
         super.scenario(handler, control)
-        approver.assertApproved(Response(OK).body(
-            String(storage("contractName.check contents are recorded as per manipulations").get())
-        ))
+        approver.assertApproved(
+            Response(OK).body(
+                String(storage("contractName.check contents are recorded as per manipulations").get())
+            )
+        )
     }
 
     @AfterEach
@@ -92,26 +94,36 @@ class ServirtiumReplayIntegrationTest : TestContract {
 
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay("contractName", storage,
+    val replay = ServirtiumReplay(
+        "contractName", storage,
         object : InteractionOptions {
             override fun modify(request: Request) = request.body(request.bodyString().replace("2", ""))
-        })
+        }
+    )
 
     @Test
     fun `unexpected content`(handler: HttpHandler) {
-        assertThat({
-            handler(Request(GET, "/foobar").body("welcome"))
-        }, throws(
-            has(AssertionFailedError::getLocalizedMessage, containsSubstring("Unexpected request received for Interaction 0"))))
+        assertThat(
+            {
+                handler(Request(GET, "/foobar").body("welcome"))
+            },
+            throws(
+                has(AssertionFailedError::getLocalizedMessage, containsSubstring("Unexpected request received for Interaction 0"))
+            )
+        )
     }
 
     @Test
     fun `too many requests`(handler: HttpHandler) {
         handler(Request(POST, "/foobar").body("welcome"))
         handler(Request(POST, "/foobar").body("welcome"))
-        assertThat({
-            handler(Request(POST, "/foobar").body("welcome"))
-        }, throws(
-            has(AssertionFailedError::getLocalizedMessage, containsSubstring("Have 2 interaction(s) in the script but called 3 times. Unexpected interaction"))))
+        assertThat(
+            {
+                handler(Request(POST, "/foobar").body("welcome"))
+            },
+            throws(
+                has(AssertionFailedError::getLocalizedMessage, containsSubstring("Have 2 interaction(s) in the script but called 3 times. Unexpected interaction"))
+            )
+        )
     }
 }

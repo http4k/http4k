@@ -35,7 +35,8 @@ class ServirtiumRecordingServerTest : TestContract {
             object : InteractionOptions {
                 override fun modify(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
                 override fun modify(response: Response) = response.removeHeader("Date")
-            })
+            }
+        )
 
         control.start()
     }

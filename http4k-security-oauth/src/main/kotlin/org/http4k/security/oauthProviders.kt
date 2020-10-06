@@ -32,7 +32,8 @@ fun OAuthProvider.Companion.dropbox(client: HttpHandler, credentials: Credential
         client,
         callbackUri,
         listOf(""),
-        oAuthPersistence)
+        oAuthPersistence
+    )
 
 fun OAuthProvider.Companion.facebook(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("email")): OAuthProvider =
     OAuthProvider(

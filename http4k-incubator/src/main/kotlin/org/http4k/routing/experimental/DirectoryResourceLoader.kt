@@ -25,5 +25,6 @@ internal data class DirectoryResourceLoader(
         ResourceListingHandler(
             ResourceSummary(dir.name, Instant.ofEpochMilli(dir.lastModified())),
             dir.listFiles().sortedBy { it.name }.map { ResourceSummary(it.name, Instant.ofEpochMilli(it.lastModified())) },
-            renderer)
+            renderer
+        )
 }

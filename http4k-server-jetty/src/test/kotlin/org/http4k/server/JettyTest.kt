@@ -17,10 +17,16 @@ class JettyHttp2Test {
 
     @Test
     fun `can configure http2`() {
-        val server = { _: Request -> Response(OK) }.asServer(Jetty(0,
-            http2(0,
-                File("src/test/resources/keystore.jks").absolutePath,
-                "password")))
+        val server = { _: Request -> Response(OK) }.asServer(
+            Jetty(
+                0,
+                http2(
+                    0,
+                    File("src/test/resources/keystore.jks").absolutePath,
+                    "password"
+                )
+            )
+        )
         server.start().stop()
     }
 }

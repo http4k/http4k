@@ -135,8 +135,10 @@ class ReplayFromDiskTest : WordCounterContract {
 class ReplayFromGitHubTest : WordCounterContract {
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay("WordCounter",
-        GitHub("http4k", "http4k",
+    val replay = ServirtiumReplay(
+        "WordCounter",
+        GitHub(
+            "http4k", "http4k",
             Credentials("<github user>", "<personal access token>"),
             Paths.get("src/test/resources/cookbook/service_virtualisation")
         )

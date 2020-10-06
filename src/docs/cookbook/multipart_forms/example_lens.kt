@@ -44,7 +44,8 @@ fun main() {
     // taken care of automatically
     val multipartform = MultipartForm().with(
         nameField of Name("rita"),
-        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
+        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream())
+    )
     val validRequest = Request(POST, "http://localhost:8000").with(strictFormBody of multipartform)
 
     println(ApacheClient()(validRequest))

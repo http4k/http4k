@@ -23,13 +23,14 @@ import org.http4k.core.cookie.Cookie as HCookie
 class Http4kWebDriverTest {
     private val driver = Http4kWebDriver { req ->
         val body = File("src/test/resources/test.html").readText()
-        Response(OK).body(body
-            .replace("FORMMETHOD", Method.POST.name)
-            .replace("THEMETHOD", req.method.name)
-            .replace("THEBODY", req.bodyString())
-            .replace("THEURL", req.uri.toString())
-            .replace("THETIME", System.currentTimeMillis().toString())
-            .replace("ACTION", "action=\"/form\"")
+        Response(OK).body(
+            body
+                .replace("FORMMETHOD", Method.POST.name)
+                .replace("THEMETHOD", req.method.name)
+                .replace("THEBODY", req.bodyString())
+                .replace("THEURL", req.uri.toString())
+                .replace("THETIME", System.currentTimeMillis().toString())
+                .replace("ACTION", "action=\"/form\"")
         )
     }
 
@@ -67,13 +68,14 @@ class Http4kWebDriverTest {
         val driver = Http4kWebDriver { req ->
             loadCount++
             val body = File("src/test/resources/test.html").readText()
-            Response(OK).body(body
-                .replace("FORMMETHOD", Method.POST.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action")
+            Response(OK).body(
+                body
+                    .replace("FORMMETHOD", Method.POST.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action")
             )
         }
         val n0 = loadCount
@@ -91,13 +93,14 @@ class Http4kWebDriverTest {
         val driver = Http4kWebDriver { req ->
             loadCount++
             val body = File("src/test/resources/test.html").readText()
-            Response(OK).body(body
-                .replace("FORMMETHOD", Method.POST.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action=\"\"")
+            Response(OK).body(
+                body
+                    .replace("FORMMETHOD", Method.POST.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action=\"\"")
             )
         }
         val n0 = loadCount
@@ -113,13 +116,14 @@ class Http4kWebDriverTest {
     fun `GET form`() {
         val driver = Http4kWebDriver { req ->
             val body = File("src/test/resources/test.html").readText()
-            Response(OK).body(body
-                .replace("FORMMETHOD", Method.GET.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action=\"/form\"")
+            Response(OK).body(
+                body
+                    .replace("FORMMETHOD", Method.GET.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action=\"/form\"")
             )
         }
 

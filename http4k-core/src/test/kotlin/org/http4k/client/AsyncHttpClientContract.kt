@@ -30,9 +30,11 @@ abstract class AsyncHttpClientContract(
     @Test
     fun `can make call`() {
         val latch = CountDownLatch(1)
-        client(Request(POST, "http://localhost:$port/someUri")
-            .query("query", "123")
-            .header("header", "value").body("body")) { response ->
+        client(
+            Request(POST, "http://localhost:$port/someUri")
+                .query("query", "123")
+                .header("header", "value").body("body")
+        ) { response ->
             assertThat(response.status, equalTo(OK))
             assertThat(response.header("uri"), equalTo("/someUri?query=123"))
             assertThat(response.header("query"), equalTo("123"))

@@ -16,13 +16,18 @@ import org.http4k.server.asServer
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class JavaHttpClientTest : HttpClientContract({ Jetty(it) }, JavaHttpClient(),
-    ApacheClient(HttpClients.custom()
-        .setDefaultRequestConfig(
-            RequestConfig.custom()
-                .setResponseTimeout(Timeout.ofMilliseconds(100))
-                .build()
-        ).build(), responseBodyMode = Stream)) {
+class JavaHttpClientTest : HttpClientContract(
+    { Jetty(it) }, JavaHttpClient(),
+    ApacheClient(
+        HttpClients.custom()
+            .setDefaultRequestConfig(
+                RequestConfig.custom()
+                    .setResponseTimeout(Timeout.ofMilliseconds(100))
+                    .build()
+            ).build(),
+        responseBodyMode = Stream
+    )
+) {
 
     @Disabled("unsupported by the underlying java client")
     override fun `handles response with custom status message`() {

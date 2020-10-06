@@ -34,7 +34,8 @@ object ServerForClientContract : HttpHandler {
             .body(request.body)
     }
 
-    private val app = routes("/someUri" bind POST to defaultHandler,
+    private val app = routes(
+        "/someUri" bind POST to defaultHandler,
         "/cookies/set" bind GET to { req: Request ->
             Response(FOUND).header("Location", "/cookies").cookie(Cookie(req.query("name")!!, req.query("value")!!))
         },
@@ -75,7 +76,8 @@ object ServerForClientContract : HttpHandler {
             val code = r.path("status")!!.toInt()
             val status = Status(code, "Description for $code")
             Response(status)
-        })
+        }
+    )
 }
 
 fun testImageBytes() = ServerForClientContract::class.java.getResourceAsStream("/test.png").readBytes()

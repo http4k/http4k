@@ -23,12 +23,18 @@ fun <T : ObjectMapper> KotlinModule.asConfigurable(mapper: T): AutoMappingConfig
 
     private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, write: JsonGenerator.(IN) -> Unit, read: JsonParser.() -> IN) =
         apply {
-            addDeserializer(mapping.clazz, object : JsonDeserializer<OUT>() {
-                override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.invoke(p.read())
-            })
-            addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-                override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.write(mapping(value))
-            })
+            addDeserializer(
+                mapping.clazz,
+                object : JsonDeserializer<OUT>() {
+                    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.invoke(p.read())
+                }
+            )
+            addSerializer(
+                mapping.clazz,
+                object : JsonSerializer<OUT>() {
+                    override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.write(mapping(value))
+                }
+            )
         }
 
     override fun done(): T = mapper.apply { registerModule(this@asConfigurable) }

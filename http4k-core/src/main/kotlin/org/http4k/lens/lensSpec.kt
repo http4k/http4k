@@ -159,7 +159,8 @@ open class BiDiLensSpec<IN : Any, OUT>(
     override fun defaulted(name: String, default: Lens<IN, OUT>, description: String?): BiDiLens<IN, OUT> {
         val getLens = get(name)
         val setLens = set(name)
-        return BiDiLens(Meta(false, location, paramMeta, name, description),
+        return BiDiLens(
+            Meta(false, location, paramMeta, name, description),
             { getLens(it).run { if (isEmpty()) default(it) else first() } },
             { out: OUT, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
@@ -168,7 +169,8 @@ open class BiDiLensSpec<IN : Any, OUT>(
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT?> {
         val getLens = get(name)
         val setLens = set(name)
-        return BiDiLens(Meta(false, location, paramMeta, name, description),
+        return BiDiLens(
+            Meta(false, location, paramMeta, name, description),
             { getLens(it).run { if (isEmpty()) null else first() } },
             { out: OUT?, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
@@ -177,12 +179,14 @@ open class BiDiLensSpec<IN : Any, OUT>(
     override fun required(name: String, description: String?): BiDiLens<IN, OUT> {
         val getLens = get(name)
         val setLens = set(name)
-        return BiDiLens(Meta(true, location, paramMeta, name, description),
+        return BiDiLens(
+            Meta(true, location, paramMeta, name, description),
             {
                 getLens(it).firstOrNull()
                     ?: throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)), target = it)
             },
-            { out: OUT, target: IN -> setLens(listOf(out), target) })
+            { out: OUT, target: IN -> setLens(listOf(out), target) }
+        )
     }
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
@@ -192,7 +196,8 @@ open class BiDiLensSpec<IN : Any, OUT>(
         override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
-            return BiDiLens(Meta(false, location, paramMeta, name, description),
+            return BiDiLens(
+                Meta(false, location, paramMeta, name, description),
                 { getLens(it).run { if (isEmpty()) default(it) else this } },
                 { out: List<OUT>, target: IN -> setLens(out, target) }
             )
@@ -201,7 +206,8 @@ open class BiDiLensSpec<IN : Any, OUT>(
         override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?> {
             val getLens = get(name)
             val setLens = set(name)
-            return BiDiLens(Meta(false, location, paramMeta, name, description),
+            return BiDiLens(
+                Meta(false, location, paramMeta, name, description),
                 { getLens(it).run { if (isEmpty()) null else this } },
                 { out: List<OUT>?, target: IN -> setLens(out ?: emptyList(), target) }
             )
@@ -210,9 +216,11 @@ open class BiDiLensSpec<IN : Any, OUT>(
         override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
-            return BiDiLens(Meta(true, location, paramMeta, name, description),
+            return BiDiLens(
+                Meta(true, location, paramMeta, name, description),
                 { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)), target = it) else this } },
-                { out: List<OUT>, target: IN -> setLens(out, target) })
+                { out: List<OUT>, target: IN -> setLens(out, target) }
+            )
         }
     }
 }
@@ -244,7 +252,8 @@ fun <IN : Any> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormat
 inline fun <IN : Any, reified T : Enum<T>> BiDiLensSpec<IN, String>.enum() = map(StringBiDiMappings.enum<T>())
 
 internal fun <NEXT, IN : Any, OUT> BiDiLensSpec<IN, OUT>.mapWithNewMeta(mapping: BiDiMapping<OUT, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
-    mapping::invoke, mapping::invoke, paramMeta)
+    mapping::invoke, mapping::invoke, paramMeta
+)
 
 fun <NEXT, IN : Any, OUT> BiDiLensSpec<IN, OUT>.map(mapping: BiDiMapping<OUT, NEXT>) = map(mapping::invoke, mapping::invoke)
 
@@ -252,7 +261,8 @@ fun <NEXT, IN : Any, OUT> BiDiLensSpec<IN, OUT>.map(mapping: BiDiMapping<OUT, NE
  * This allows creation of a composite object from several values from the same source.
  */
 inline fun <TARGET : Any, reified T> BiDiLensSpec<TARGET, String>.composite(crossinline fn: BiDiLensSpec<TARGET, String>.(TARGET) -> T) = LensSpec<TARGET, T>(
-    T::class.java.name, ParamMeta.ObjectParam, LensGet { _, target -> listOf(fn(target)) }).required(T::class.java.name)
+    T::class.java.name, ParamMeta.ObjectParam, LensGet { _, target -> listOf(fn(target)) }
+).required(T::class.java.name)
 
 inline fun <TARGET : Any, reified T> BiDiLensSpec<TARGET, String>.composite(
     crossinline getFn: BiDiLensSpec<TARGET, String>.(TARGET) -> T,
@@ -260,5 +270,6 @@ inline fun <TARGET : Any, reified T> BiDiLensSpec<TARGET, String>.composite(
 ) = BiDiLensSpec(
     T::class.java.name, ParamMeta.ObjectParam,
     LensGet { _, target -> listOf(getFn(target)) },
-    LensSet<TARGET, T> { _, values, target -> values.fold(target) { msg, next: T -> next.setFn(msg) } })
+    LensSet<TARGET, T> { _, values, target -> values.fold(target) { msg, next: T -> next.setFn(msg) } }
+)
     .required(T::class.java.name)

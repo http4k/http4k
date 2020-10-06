@@ -23,8 +23,10 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
 
     @Test
     override fun `can set field order`() {
-        assertThat(JacksonXml.asFormatString(OrderedContainer(listOf("2.1", "2.2"), "1.0")),
-            equalTo("<OrderedContainer><first>1.0</first><second>2.1</second><second>2.2</second></OrderedContainer>"))
+        assertThat(
+            JacksonXml.asFormatString(OrderedContainer(listOf("2.1", "2.2"), "1.0")),
+            equalTo("<OrderedContainer><first>1.0</first><second>2.1</second><second>2.2</second></OrderedContainer>")
+        )
     }
 
     @Test

@@ -16,7 +16,8 @@ internal fun assert(registry: MeterRegistry, vararg matcher: Matcher<MeterRegist
     matcher.forEach { assertThat(registry, it) }
 
 internal fun hasCounter(name: String, tags: List<Tag>, matcher: Matcher<Counter>? = null): Matcher<MeterRegistry> =
-    has("a counter named $name with tags ${tags.map { "${it.key}=${it.value}" }}",
+    has(
+        "a counter named $name with tags ${tags.map { "${it.key}=${it.value}" }}",
         {
             it.find(name).tags(tags).counter()
         },
@@ -24,7 +25,8 @@ internal fun hasCounter(name: String, tags: List<Tag>, matcher: Matcher<Counter>
     )
 
 internal fun hasTimer(name: String, tags: List<Tag>, matcher: Matcher<Timer>? = null): Matcher<MeterRegistry> =
-    has("a timer named $name with tags ${tags.map { "${it.key}=${it.value}" }}",
+    has(
+        "a timer named $name with tags ${tags.map { "${it.key}=${it.value}" }}",
         { it.find(name).tags(tags).timer() },
         present(matcher)
     )
@@ -34,6 +36,10 @@ internal fun timerCount(value: Long) = has<Timer, Long>("count", { it.count() },
 internal fun timerTotalTime(millis: Long) =
     has<Timer, Long>("total time", { it.totalTime(TimeUnit.MILLISECONDS).toLong() }, equalTo(millis))
 
-internal fun description(value: String) = has<Meter, String>("description", {
-    it.id.description ?: "unknown"
-}, equalTo(value))
+internal fun description(value: String) = has<Meter, String>(
+    "description",
+    {
+        it.id.description ?: "unknown"
+    },
+    equalTo(value)
+)

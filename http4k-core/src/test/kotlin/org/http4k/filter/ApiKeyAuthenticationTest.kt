@@ -39,12 +39,22 @@ class ApiKeyAuthenticationTest {
         val apiKey = "hello"
         val lens = Query.required("foo")
 
-        assertThat((ClientFilters.ApiKeyAuth(lens of apiKey)
-            .then(ServerFilters.ApiKeyAuth(lens) { it == apiKey })
-            .then { Response(OK) })(Request(GET, "/")), hasStatus(OK))
+        assertThat(
+            (
+                ClientFilters.ApiKeyAuth(lens of apiKey)
+                    .then(ServerFilters.ApiKeyAuth(lens) { it == apiKey })
+                    .then { Response(OK) }
+                )(Request(GET, "/")),
+            hasStatus(OK)
+        )
 
-        assertThat((ClientFilters.ApiKeyAuth(lens of "not hello")
-            .then(ServerFilters.ApiKeyAuth(lens) { it == apiKey })
-            .then { Response(OK) })(Request(GET, "/")), hasStatus(UNAUTHORIZED))
+        assertThat(
+            (
+                ClientFilters.ApiKeyAuth(lens of "not hello")
+                    .then(ServerFilters.ApiKeyAuth(lens) { it == apiKey })
+                    .then { Response(OK) }
+                )(Request(GET, "/")),
+            hasStatus(UNAUTHORIZED)
+        )
     }
 }

@@ -42,12 +42,18 @@ class RatpackHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
 
     private fun Context.toHttp4kRequest(data: TypedData) = Request(Method.valueOf(request.method.name), request.rawUri)
         .let {
-            request.headers.names.fold(it, { acc, nextHeaderName ->
-                request.headers.getAll(nextHeaderName)
-                    .fold(acc, { vAcc, nextHeaderValue ->
-                        vAcc.header(nextHeaderName, nextHeaderValue)
-                    })
-            })
+            request.headers.names.fold(
+                it,
+                { acc, nextHeaderName ->
+                    request.headers.getAll(nextHeaderName)
+                        .fold(
+                            acc,
+                            { vAcc, nextHeaderValue ->
+                                vAcc.header(nextHeaderName, nextHeaderValue)
+                            }
+                        )
+                }
+            )
         }
         .body(data.inputStream, request.headers.get("content-length")?.toLongOrNull())
         .source(RequestSource(request.remoteAddress.host, request.remoteAddress.port))

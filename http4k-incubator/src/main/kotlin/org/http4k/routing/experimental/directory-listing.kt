@@ -14,7 +14,8 @@ fun simpleDirectoryRenderer(uri: Uri, dir: ResourceSummary, resources: Iterable<
 ${listOfFiles(uri, resources)}
 </ol>
 </body>
-</html>""".trimIndent()
+</html>
+""".trimIndent()
 
 private fun listOfFiles(base: Uri, resources: Iterable<ResourceSummary>): String =
     resources.joinToString(separator = "\n") { resourceInfo ->

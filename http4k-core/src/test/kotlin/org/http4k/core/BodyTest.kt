@@ -14,14 +14,18 @@ class BodyTest {
 
     @Test
     fun `body bytebuffer`() {
-        assertThat(Response(OK).body(Body(ByteBuffer.wrap("abc".toByteArray()))).bodyString(),
-            equalTo("abc"))
+        assertThat(
+            Response(OK).body(Body(ByteBuffer.wrap("abc".toByteArray()))).bodyString(),
+            equalTo("abc")
+        )
     }
 
     @Test
     fun `body stream`() {
-        assertThat(String(Response(OK).body(Body("abc".byteInputStream())).body.stream.readBytes()),
-            equalTo("abc"))
+        assertThat(
+            String(Response(OK).body(Body("abc".byteInputStream())).body.stream.readBytes()),
+            equalTo("abc")
+        )
     }
 
     @Test

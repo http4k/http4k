@@ -13,11 +13,13 @@ class UriTemplateTest {
 
         assertThat(
             template.generate(pathParameters(pair("name", "a name with spaces"))),
-            equalTo("properties/a+name+with+spaces"))
+            equalTo("properties/a+name+with+spaces")
+        )
 
         assertThat(
             template.generate(pathParameters(pair("name", "a/name/with/slashes"))),
-            equalTo("properties/a/name/with/slashes"))
+            equalTo("properties/a/name/with/slashes")
+        )
     }
 
     @Test

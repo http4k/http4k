@@ -44,16 +44,22 @@ class BootstrapAppLoaderTest {
 
     @Test
     fun `complains if the configured class is not found`() {
-        assertThat({
-            BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to "java.lang.NotAnApp"), RequestContexts())
-        }, throws(isA<CouldNotFindAppLoaderException>()))
+        assertThat(
+            {
+                BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to "java.lang.NotAnApp"), RequestContexts())
+            },
+            throws(isA<CouldNotFindAppLoaderException>())
+        )
     }
 
     @Test
     fun `complains if the configured class is not an AppLoader`() {
-        assertThat({
-            BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to "java.lang.String"), RequestContexts())
-        }, throws(isA<InvalidAppLoaderException>()))
+        assertThat(
+            {
+                BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to "java.lang.String"), RequestContexts())
+            },
+            throws(isA<InvalidAppLoaderException>())
+        )
     }
 }
 

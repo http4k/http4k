@@ -74,17 +74,19 @@ class AccessTokenFetcher(
 
             val responseForm =
                 Body.webForm(Validator.Strict, accessToken, tokenType, expiresIn, idToken, scope, refreshToken)
-                    .map({
-                        AccessTokenDetails(
-                            AccessToken(
-                                accessToken(it),
-                                tokenType(it),
-                                expiresIn(it),
-                                scope(it),
-                                refreshToken(it)
-                            ), idToken(it)
-                        )
-                    },
+                    .map(
+                        {
+                            AccessTokenDetails(
+                                AccessToken(
+                                    accessToken(it),
+                                    tokenType(it),
+                                    expiresIn(it),
+                                    scope(it),
+                                    refreshToken(it)
+                                ),
+                                idToken(it)
+                            )
+                        },
                         {
                             WebForm().with(
                                 accessToken of it.accessToken.value,

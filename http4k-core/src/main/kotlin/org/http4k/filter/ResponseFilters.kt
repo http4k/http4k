@@ -59,7 +59,8 @@ object ResponseFilters {
                 recordFn(
                     "${tx.request.method}.${tx.routingGroup.replace('.', '_').replace(':', '.').replace('/', '_')}" +
                         ".${tx.response.status.code / 100}xx" +
-                        ".${tx.response.status.code}", tx.duration
+                        ".${tx.response.status.code}",
+                    tx.duration
                 )
             }
     }

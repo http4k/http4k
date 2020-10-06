@@ -38,8 +38,10 @@ private fun awsClient(service: String) = Filter.NoOp
     .then(JavaHttpClient())
 
 val awsConfig by lazy {
-    assumeTrue(AwsLambdaApiClient::class.java.getResourceAsStream("/local.properties") != null,
-        "local.properties must exist for this test to run")
+    assumeTrue(
+        AwsLambdaApiClient::class.java.getResourceAsStream("/local.properties") != null,
+        "local.properties must exist for this test to run"
+    )
     Environment.ENV overrides Environment.fromResource("/local.properties")
 }
 

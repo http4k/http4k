@@ -24,13 +24,18 @@ class JacksonXmlGenerateXmlDataClassesTest {
 
         app(Request(GET, "/bob"))
 
-        assertThat(String(os.toByteArray()), equalTo("""// result generated from /bob
+        assertThat(
+            String(os.toByteArray()),
+            equalTo(
+                """// result generated from /bob
 
 data class Base(val : String?, val SubWithText: SubWithText?, val subWithAttr: SubWithAttr?)
 
 data class SubWithAttr(val attr: String?)
 
 data class SubWithText(val attr: String?, val : String?)
-"""))
+"""
+            )
+        )
     }
 }

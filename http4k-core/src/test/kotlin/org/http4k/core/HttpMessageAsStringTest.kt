@@ -14,53 +14,77 @@ class HttpMessageAsStringTest {
     fun `represents request as string`() {
         val request = Request(GET, Uri.of("http://www.somewhere.com/path"))
             .header("foo", "one").header("bar", "two").body(Body("body"))
-        assertThat(request.toString(), equalTo("""
+        assertThat(
+            request.toString(),
+            equalTo(
+                """
             GET http://www.somewhere.com/path HTTP/1.1
             foo: one
             bar: two
 
-            body""".toPayload()))
+            body""".toPayload()
+            )
+        )
     }
 
     @Test
     fun `represents response as string`() {
         val request = Response(OK)
             .header("foo", "one").header("bar", "two").body("body")
-        assertThat(request.toString(), equalTo("""
+        assertThat(
+            request.toString(),
+            equalTo(
+                """
             HTTP/1.1 200 OK
             foo: one
             bar: two
 
-            body""".toPayload()))
+            body""".toPayload()
+            )
+        )
     }
 
     @Test
     fun `parses request string`() {
-        assertThat(Request.parse("""GET http://www.somewhere.com/path HTTP/1.1
+        assertThat(
+            Request.parse(
+                """GET http://www.somewhere.com/path HTTP/1.1
 foo: one
 bar: two
 
-body""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
-            .header("foo", "one").header("bar", "two").body(Body("body"))
-        ))
+body""".toPayload()
+            ),
+            equalTo(
+                Request(GET, Uri.of("http://www.somewhere.com/path"))
+                    .header("foo", "one").header("bar", "two").body(Body("body"))
+            )
+        )
     }
 
     @Test
     fun `parses response string`() {
-        assertThat(Response.parse("""
+        assertThat(
+            Response.parse(
+                """
 HTTP/1.1 200 OK
 foo: one
 bar: two
 
-body""".toPayload()), equalTo(Response(OK)
-            .header("foo", "one").header("bar", "two").body("body")
-        ))
+body""".toPayload()
+            ),
+            equalTo(
+                Response(OK)
+                    .header("foo", "one").header("bar", "two").body("body")
+            )
+        )
     }
 
     @Test
     fun `parse response with other status`() {
-        assertThat(Response.parse(Response(NOT_FOUND).body("hi").toString()),
-            equalTo(Response(NOT_FOUND).body("hi")))
+        assertThat(
+            Response.parse(Response(NOT_FOUND).body("hi").toString()),
+            equalTo(Response(NOT_FOUND).body("hi"))
+        )
     }
 
     @Test

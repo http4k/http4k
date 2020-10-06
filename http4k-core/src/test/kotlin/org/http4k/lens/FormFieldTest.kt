@@ -38,8 +38,10 @@ class FormFieldTest {
         assertThat(single("value2", single("value1", form)), equalTo(form + ("world" to "value2")))
 
         val multi = FormField.multi.required("world")
-        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), form)),
-            equalTo(form + ("world" to "value3") + ("world" to "value4")))
+        assertThat(
+            multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), form)),
+            equalTo(form + ("world" to "value3") + ("world" to "value4"))
+        )
     }
 
     @Test

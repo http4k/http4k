@@ -51,9 +51,12 @@ class HandleRemoteRequestFailedTest {
 
     @Test
     fun `client throws when filter fails`() {
-        assertThat({
-            ClientFilters.HandleRemoteRequestFailed({ false }).then { Response(NOT_FOUND) }(Request(GET, ""))
-        }, throws(has(RemoteRequestFailed::status, equalTo(NOT_FOUND))))
+        assertThat(
+            {
+                ClientFilters.HandleRemoteRequestFailed({ false }).then { Response(NOT_FOUND) }(Request(GET, ""))
+            },
+            throws(has(RemoteRequestFailed::status, equalTo(NOT_FOUND)))
+        )
     }
 
     @Test
@@ -64,11 +67,13 @@ class HandleRemoteRequestFailedTest {
     @Test
     fun `multi stack errors looks sane`(approver: Approver) {
         fun stack(clientUri: String) = ServerFilters.HandleRemoteRequestFailed()
-            .then(Filter { next ->
-                {
-                    next(it.uri(Uri.of(clientUri)))
+            .then(
+                Filter { next ->
+                    {
+                        next(it.uri(Uri.of(clientUri)))
+                    }
                 }
-            })
+            )
             .then(ClientFilters.HandleRemoteRequestFailed())
 
         val multiStack = stack("http://parent")

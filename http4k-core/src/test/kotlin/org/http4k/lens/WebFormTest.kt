@@ -37,12 +37,16 @@ class WebFormTest {
     fun `web form blows up if not URL content type`() {
         val request = emptyRequest.header("Content-Type", "unknown").body(Body("hello=world&another=123"))
 
-        assertThat({
-            Body.webForm(Strict,
-                FormField.required("hello"),
-                FormField.int().required("another")
-            ).toLens()(request)
-        }, throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        assertThat(
+            {
+                Body.webForm(
+                    Strict,
+                    FormField.required("hello"),
+                    FormField.int().required("another")
+                ).toLens()(request)
+            },
+            throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported))
+        )
     }
 
     @Test
@@ -51,10 +55,14 @@ class WebFormTest {
 
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
 
-        assertThat(Body.webForm(Strict,
-            FormField.required("hello"),
-            FormField.int().required("another")
-        ).toLens()(request), equalTo(WebForm(expected, emptyList())))
+        assertThat(
+            Body.webForm(
+                Strict,
+                FormField.required("hello"),
+                FormField.int().required("another")
+            ).toLens()(request),
+            equalTo(WebForm(expected, emptyList()))
+        )
     }
 
     @Test
@@ -62,10 +70,14 @@ class WebFormTest {
         val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body(Body("another=123"))
 
         val requiredString = FormField.required("hello")
-        assertThat(Body.webForm(Feedback,
-            requiredString,
-            FormField.int().required("another")
-        ).toLens()(request), equalTo(WebForm(mapOf("another" to listOf("123")), listOf(Missing(requiredString.meta)))))
+        assertThat(
+            Body.webForm(
+                Feedback,
+                requiredString,
+                FormField.int().required("another")
+            ).toLens()(request),
+            equalTo(WebForm(mapOf("another" to listOf("123")), listOf(Missing(requiredString.meta))))
+        )
     }
 
     @Test
@@ -86,8 +98,10 @@ class WebFormTest {
         val intField = FormField.int().required("another")
 
         val populated = WebForm()
-            .with(stringField of "world",
-                intField of 123)
+            .with(
+                stringField of "world",
+                intField of 123
+            )
 
         assertThat(stringField(populated), equalTo("world"))
         assertThat(intField(populated), equalTo(123))
