@@ -26,6 +26,7 @@ internal object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<APIGatewayV2HTTPEven
     override fun invoke(req: Response) = APIGatewayV2HTTPResponse().also {
         it.statusCode = req.status.code
         it.multiValueHeaders = req.headers.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap()
+        it.headers = req.headers.toMap()
         it.body = req.bodyString()
     }
 }
