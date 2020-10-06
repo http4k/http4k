@@ -6,6 +6,7 @@ import org.http4k.aws.FunctionName
 import org.http4k.aws.Region
 import org.http4k.core.Body
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -16,10 +17,7 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
 
-object LambdaHttpClient {
-    operator fun invoke(functionName: FunctionName, region: Region): Filter =
-        callFunction(functionName).then(LambdaApi(region))
-
+class LambdaHttpClient(functionName: FunctionName, region: Region):Filter {
     private fun callFunction(functionName: FunctionName) = Filter { next ->
         {
             val adapter = AwsClientV1HttpAdapter()
@@ -35,6 +33,10 @@ object LambdaHttpClient {
             adapter(response)
         }
     }
+
+    private val filter = callFunction(functionName).then(LambdaApi(region))
+
+    override fun invoke(handler: HttpHandler): HttpHandler = filter(handler)
 }
 
 object LambdaApi {
