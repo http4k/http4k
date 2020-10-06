@@ -1,6 +1,8 @@
 package org.http4k.serverless.lambda
 
 import org.http4k.aws.ApiIntegrationVersion
+import org.http4k.aws.ApiName
+import org.http4k.aws.Stage
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Timeout
 import org.http4k.core.Filter
@@ -10,8 +12,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
-import org.http4k.aws.ApiName
-import org.http4k.aws.Stage
 import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
 import org.http4k.serverless.lambda.client.apiGatewayClient
 import org.http4k.serverless.lambda.client.lambdaApiClient

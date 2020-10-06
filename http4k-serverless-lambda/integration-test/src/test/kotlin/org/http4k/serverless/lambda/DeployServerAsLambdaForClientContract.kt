@@ -6,12 +6,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.aws.FunctionHandler
-import org.http4k.aws.FunctionName
-import org.http4k.aws.FunctionPackage
 import org.http4k.aws.ApiIntegrationVersion
 import org.http4k.aws.ApiIntegrationVersion.v1
 import org.http4k.aws.ApiIntegrationVersion.v2
+import org.http4k.aws.FunctionHandler
+import org.http4k.aws.FunctionName
+import org.http4k.aws.FunctionPackage
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status

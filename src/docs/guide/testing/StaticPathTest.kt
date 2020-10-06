@@ -2,7 +2,6 @@ package guide.testing
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
-
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request

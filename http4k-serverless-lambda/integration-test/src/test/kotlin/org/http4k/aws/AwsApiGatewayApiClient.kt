@@ -2,6 +2,8 @@ package org.http4k.aws
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.http4k.aws.ApiGatewayJackson.auto
+import org.http4k.aws.ApiIntegrationVersion.*
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -14,8 +16,6 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
-import org.http4k.aws.ApiGatewayJackson.auto
-import org.http4k.aws.ApiIntegrationVersion.*
 
 class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     private val client = ApiGatewayApi(region).then(rawClient)
