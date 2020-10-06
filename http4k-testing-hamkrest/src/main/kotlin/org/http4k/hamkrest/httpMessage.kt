@@ -18,13 +18,13 @@ internal fun <T : HttpMessage, R> httpMessageHas(name: String, feature: (T) -> R
     override fun invoke(actual: T) =
         featureMatcher(feature(actual)).let {
             when (it) {
-                is MatchResult.Mismatch -> MatchResult.Mismatch("had ${name} that ${it.description}\nin: $actual")
+                is MatchResult.Mismatch -> MatchResult.Mismatch("had $name that ${it.description}\nin: $actual")
                 else -> it
             }
         }
 
-    override val description = "has ${name} that ${featureMatcher.description}"
-    override val negatedDescription = "does not have ${name} that ${featureMatcher.description}"
+    override val description = "has $name that ${featureMatcher.description}"
+    override val negatedDescription = "does not have $name that ${featureMatcher.description}"
 }
 
 fun <T> hasHeader(lens: HeaderLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(httpMessageHas("Header '${lens.meta.name}'", { req: HttpMessage -> lens(req) }, matcher))
