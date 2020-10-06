@@ -14,3 +14,4 @@ indent_size = 2
 ij_continuation_indent_size = 4
 ij_kotlin_name_count_to_use_star_import = 99
 ij_kotlin_name_count_to_use_star_import_for_members = 99
+disabled_rules=no-wildcard-imports,import-ordering,no-consecutive-blank-lines,colon-spacing,curly-spacing,range-spacing,no-var,dump,chain-wrapping,comment-spacing,filename,final-newline,indent,max-line-length,modifier-order,no-blank-line-before-rbrace,no-line-break-after-else,no-line-break-before-assignment,no-semi,no-trailing-spaces,parameter-list-wrapping,colon-spacing,comma-spacing,curly-spacing,op-spacing,no-unused-imports,string-template,op-spacing,keyword-spacing,paren-spacing,no-empty-class-body
