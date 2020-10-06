@@ -253,4 +253,3 @@ class ContractRouteSpec10<out A, out B, out C, out D, out E, out F, out G, out H
 
     override infix fun bindContract(method: Method) = Binder(method)
 }
-

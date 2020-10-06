@@ -190,7 +190,6 @@ private class InMemoryResourceLoader(val resources: Map<String, Resource>) : Rou
     } ?: RouterMatch.Unmatched
 }
 
-
 /**
  * Returns a matcher that matches if all of the supplied matchers match.
  */
@@ -200,7 +199,6 @@ fun <T> allOf(matchers: List<Matcher<T>>): Matcher<T> = matchers.reducedWith(Mat
  * Returns a matcher that matches if all of the supplied matchers match.
  */
 fun <T> allOf(vararg matchers: Matcher<T>): Matcher<T> = allOf(matchers.asList())
-
 
 @Suppress("UNCHECKED_CAST")
 private fun <T> List<Matcher<T>>.reducedWith(op: (Matcher<T>, Matcher<T>) -> Matcher<T>): Matcher<T> = when {

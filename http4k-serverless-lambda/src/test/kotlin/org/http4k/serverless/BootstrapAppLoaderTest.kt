@@ -80,4 +80,3 @@ private object TestApp : AppLoader {
         }.body(request.removeHeader("x-http4k-context").toString())
     }
 }
-

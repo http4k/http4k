@@ -87,4 +87,3 @@ class AwsRealTest : AbstractAwsRealS3TestCase() {
             !containsSubstring(bucketName))
     }
 }
-

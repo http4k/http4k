@@ -31,4 +31,3 @@ fun main() {
 
     println(app(Request(GET, "/someUrl")))
 }
-

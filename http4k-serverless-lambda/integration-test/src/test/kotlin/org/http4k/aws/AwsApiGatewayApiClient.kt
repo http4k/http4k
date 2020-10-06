@@ -69,7 +69,6 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     }
 }
 
-
 data class ApiName(val value: String)
 data class ApiId(val value: String)
 

@@ -31,7 +31,6 @@ private fun ScriptEngine.eval(srcUrl: URL) {
     eval(srcUrl.readText())
 }
 
-
 // Must only be used on one thread.
 private class SingleThreadedDust(
     private val js: ScriptEngine,
@@ -104,7 +103,6 @@ private class SingleThreadedDust(
         }
     }
 }
-
 
 class Dust(
     private val cacheTemplates: Boolean,

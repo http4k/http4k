@@ -1,6 +1,5 @@
 package guide.modules.approvaltests
 
-
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.HttpHandler

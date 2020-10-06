@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-
 import org.http4k.contract.PreFlightExtraction.Companion
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -87,4 +86,3 @@ private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? 
 
 private fun PathSegments.extract(lenses: List<PathLens<*>>): ExtractedParts? =
     if (toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to this(index, lens::invoke) }.toMap()) else null
-

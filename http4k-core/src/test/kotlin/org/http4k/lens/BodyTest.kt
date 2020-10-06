@@ -101,5 +101,3 @@ class BodyTest {
             .body("hello world!")), equalTo(MyCustomType("hello world!")))
     }
 }
-
-

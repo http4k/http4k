@@ -6,7 +6,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import java.io.ByteArrayInputStream
 
-
 class ResourceListingHandler(
     private val dir: ResourceSummary,
     private val contents: Iterable<ResourceSummary>,

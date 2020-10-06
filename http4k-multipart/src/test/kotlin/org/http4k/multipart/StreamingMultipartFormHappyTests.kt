@@ -109,7 +109,6 @@ class StreamingMultipartFormHappyTests {
         assertThereAreNoMoreParts(form)
     }
 
-
     @Test
     fun uploadSmallField() {
         val boundary = "-----3456"
@@ -205,7 +204,6 @@ class StreamingMultipartFormHappyTests {
 
         val file = form.next()
 
-
         while (file.inputStream.read() > 0) {
             // keep reading.
         }
@@ -300,7 +298,6 @@ class StreamingMultipartFormHappyTests {
 
 val CR_LF = "\r\n"
 
-
 internal fun assertRealLifeFile(parts: Iterator<StreamingPart>, fileName: String, contentType: String) {
     val file = parts.next()
     assertThat("field name", file.fieldName, equalTo("uploadManuscript"))
@@ -315,12 +312,10 @@ internal fun compareStreamToFile(file: StreamingPart) {
     compareStreamToFile(formFile, file.fileName)
 }
 
-
 fun compareStreamToFile(actualSream: InputStream, fileName: String?) {
     val original = FileInputStream("examples/" + fileName!!)
     compareOneStreamToAnother(actualSream, original)
 }
-
 
 fun compareOneStreamToAnother(actualStream: InputStream, expectedStream: InputStream) {
     var index = 0
@@ -358,7 +353,6 @@ internal fun assertFieldPart(form: Iterator<StreamingPart>, fieldName: String, f
     assertPart(fieldName, fieldValue, field, encoding)
     return field
 }
-
 
 internal fun assertPart(fieldName: String, fieldValue: String, StreamingPart: StreamingPart, encoding: Charset) {
     assertThat("field name", StreamingPart.fieldName, equalTo(fieldName))

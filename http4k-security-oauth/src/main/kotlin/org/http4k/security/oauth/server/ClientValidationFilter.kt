@@ -33,4 +33,3 @@ class ClientValidationFilter(
         val validResponseTypes = ResponseType.values().map { it.queryParameterValue }
     }
 }
-

@@ -51,4 +51,3 @@ private fun calculate(recorder: Recorder, fn: (List<Int>) -> Int): (Request) -> 
 
 fun MyMathServer(port: Int, recorderBaseUri: Uri): Http4kServer =
     MyMathsApp(SetHostFrom(recorderBaseUri).then(OkHttp())).asServer(Jetty(port))
-

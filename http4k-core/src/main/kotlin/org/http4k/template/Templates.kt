@@ -57,4 +57,3 @@ fun TemplateRenderer.renderToResponse(
     contentType: ContentType = TEXT_HTML
 ): Response =
     Response(status).with(CONTENT_TYPE of contentType).body(invoke(viewModel))
-

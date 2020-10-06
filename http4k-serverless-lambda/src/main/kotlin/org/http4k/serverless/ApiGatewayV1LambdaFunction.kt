@@ -29,4 +29,3 @@ internal object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<APIGatewayProxyReque
         it.body = req.bodyString()
     }
 }
-

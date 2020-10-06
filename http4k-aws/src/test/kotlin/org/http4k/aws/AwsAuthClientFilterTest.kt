@@ -70,4 +70,3 @@ class AuditHandler : HttpHandler {
         return Response(OK)
     }
 }
-

@@ -34,4 +34,3 @@ class HttpHandlerTest {
         assertThat(response.bodyString(), equalTo("Hello, John Doe"))
     }
 }
-

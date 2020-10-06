@@ -46,4 +46,3 @@ class Apache4AsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, Apache4A
         latch.await()
     }
 }
-

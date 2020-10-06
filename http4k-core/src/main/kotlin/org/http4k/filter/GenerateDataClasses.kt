@@ -9,7 +9,6 @@ import org.http4k.format.JsonType.Object
 import java.io.PrintStream
 import kotlin.random.Random
 
-
 /**
  * This Filter is used to generate Data class definitions from a Response containing JSON. The Filter will try and reduce
  * the number of class definitions by selecting the definition with the most fields (for cases where lists of items

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tutorials.tdding_http4k._3.Matchers.answerShouldBe
 
-
 object Matchers {
     fun Response.answerShouldBe(expected: Int) {
         assertThat(this, hasStatus(OK).and(hasBody(expected.toString())))

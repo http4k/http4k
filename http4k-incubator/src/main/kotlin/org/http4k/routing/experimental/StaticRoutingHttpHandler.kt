@@ -42,7 +42,6 @@ internal data class StaticRoutingHttpHandler(
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }
 
-
 internal class ResourceLoadingHandler(
     private val pathSegments: String,
     private val resourceLoader: Router

@@ -54,4 +54,3 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
         assertThat(marshaller.asA(expectedCustomWrappedNumber, HolderHolder::class), equalTo(wrapper))
     }
 }
-

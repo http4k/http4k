@@ -26,4 +26,3 @@ fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
         }
     )
 )
-

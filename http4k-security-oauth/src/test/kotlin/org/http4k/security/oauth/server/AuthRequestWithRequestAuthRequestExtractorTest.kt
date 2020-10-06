@@ -313,8 +313,6 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
     }
 
-
-
     private fun success(authRequest: AuthRequest): Result<AuthRequest, InvalidAuthorizationRequest> = Success(authRequest)
     private fun failure(error: InvalidAuthorizationRequest): Result<AuthRequest, InvalidAuthorizationRequest> = Failure(error)
 

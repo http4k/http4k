@@ -92,7 +92,6 @@ internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEve
             }))
             .body(response.body.orEmpty())
 
-
     override fun invoke(request: Request) = APIGatewayV2HTTPEvent.builder()
         .withRawPath(request.uri.path)
 //        .withRawQueryString(request.uri.query)

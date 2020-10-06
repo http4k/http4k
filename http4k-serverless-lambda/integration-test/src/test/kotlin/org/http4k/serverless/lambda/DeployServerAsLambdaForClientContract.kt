@@ -69,4 +69,3 @@ fun main() {
     DeployServerAsLambdaForClientContract.deploy(v1)
     DeployServerAsLambdaForClientContract.deploy(v2)
 }
-

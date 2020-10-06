@@ -124,7 +124,6 @@ class MetricFiltersServerTest {
         assert(registry, hasRequestCounter(1, tags = arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
     }
 
-
     private fun hasRequestCounter(
         count: Long,
         name: String = "http.server.request.count",

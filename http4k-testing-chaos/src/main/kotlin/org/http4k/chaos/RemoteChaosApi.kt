@@ -127,7 +127,6 @@ object RemoteChaosApi {
             |See the <a href="https://www.http4k.org/guide/modules/chaos/">user guide</a> for details about the 
             | exact format of the JSON to post to the activation endpoint.""".trimMargin()
 
-
         val currentChaosDescription = Repeat {
             Wait.until(Delay(ofMinutes(1), clock))
                 .then(ReturnStatus(I_M_A_TEAPOT)

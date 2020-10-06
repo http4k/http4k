@@ -43,7 +43,5 @@ class AuthenticationComplete(
                 .get()
         }
 
-
     private fun String.addTo(responseRender: ResponseRender): ResponseRender = responseRender.addParameter("error_uri", this)
 }
-

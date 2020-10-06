@@ -1,6 +1,5 @@
 package tutorials.tdding_http4k._1
 
-
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.client.OkHttp
 import org.http4k.core.Method.GET

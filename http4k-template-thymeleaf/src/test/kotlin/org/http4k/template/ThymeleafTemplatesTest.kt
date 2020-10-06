@@ -19,4 +19,3 @@ class ThymeleafViewModelTest : ViewModelContract(ThymeleafTemplates()) {
         assertThat(renderer(HtmlFeature("pretty")), equalTo("<html><span>pretty</span></html>"))
     }
 }
-

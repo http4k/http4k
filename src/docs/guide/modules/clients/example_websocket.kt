@@ -45,9 +45,7 @@ fun main() {
         println("non-blocking client closing")
     }
 
-
     Thread.sleep(100)
 
     server.stop()
 }
-

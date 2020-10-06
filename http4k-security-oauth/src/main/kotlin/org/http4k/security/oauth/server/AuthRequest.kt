@@ -29,4 +29,3 @@ data class AuthRequest(
         const val OIDC_SCOPE = "openid"
     }
 }
-

@@ -77,7 +77,6 @@ data class ContractRoutingHttpHandler(
             .then(descriptionSecurity?.filter ?: Filter.NoOp)
             .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
-
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 
     override fun match(request: Request): RouterMatch {

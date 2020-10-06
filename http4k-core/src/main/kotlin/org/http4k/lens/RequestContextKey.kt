@@ -6,7 +6,6 @@ import org.http4k.core.Store
 import org.http4k.lens.ParamMeta.ObjectParam
 import java.util.*
 
-
 typealias RequestContextLens<T> = BiDiLens<Request, T>
 
 object RequestContextKey {

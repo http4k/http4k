@@ -31,7 +31,6 @@ class StreamingMultipartFormEncodingTests {
         testForm(constructForm(StandardCharsets.US_ASCII), "?", "?", StandardCharsets.US_ASCII)
     }
 
-
     private fun testForm(form: Iterator<StreamingPart>, simpleChar: String, complexChar: String, encoding: Charset) {
         assertFilePart(form, "file", "foo.tab$complexChar", "text/whatever$simpleChar$complexChar", "This is the content of the file$simpleChar$complexChar", encoding)
         assertFieldPart(form, "field$complexChar", "fieldValue$simpleChar$complexChar", encoding)
@@ -41,7 +40,6 @@ class StreamingMultipartFormEncodingTests {
 
         assertThereAreNoMoreParts(form)
     }
-
 
     private fun constructForm(encoding: Charset): Iterator<StreamingPart> {
         val boundary = "-----\u00E91234\uD83D\uDCA9"

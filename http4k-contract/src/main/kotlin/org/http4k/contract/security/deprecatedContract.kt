@@ -11,4 +11,3 @@ fun OAuthSecurity(
     filter: Filter,
     name: String = "oauthSecurity"
 ) = AuthCodeOAuthSecurity(authorizationUrl, tokenUrl, scopes, filter, name)
-

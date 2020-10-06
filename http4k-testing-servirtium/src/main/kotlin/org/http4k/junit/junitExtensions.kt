@@ -91,4 +91,3 @@ private fun ParameterContext.isInteractionControl() =
 
 private fun ParameterContext.isHttpHandler() =
     parameter.parameterizedType.typeName == "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
-

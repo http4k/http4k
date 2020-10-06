@@ -65,4 +65,3 @@ abstract class ResourceLoaderContract(private val loader: Router) {
         else -> error("Unmatched, got $this")
     }
 }
-

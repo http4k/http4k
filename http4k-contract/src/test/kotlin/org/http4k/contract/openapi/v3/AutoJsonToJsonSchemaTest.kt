@@ -202,5 +202,3 @@ class AutoJsonToJsonSchemaTest {
             .body(Jackson.asFormatString(creator.toSchema(obj, name))))
     }
 }
-
-

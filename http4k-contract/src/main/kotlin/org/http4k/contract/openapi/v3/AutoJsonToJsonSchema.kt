@@ -61,7 +61,6 @@ class AutoJsonToJsonSchema<NODE : Any>(
         SchemaNode.Reference(fieldName, "#/$refPrefix/${modelNamer(obj)}",
             SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { it.toString() }, null), metadata)
 
-
     private fun NODE.toObjectOrMapSchema(objName: String?, obj: Any, isNullable: Boolean, topLevel: Boolean, metadata: FieldMetadata?) =
         if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable, topLevel, metadata) else toObjectSchema(objName, obj, isNullable, topLevel, metadata)
 

@@ -47,4 +47,3 @@ class OAuthProvider(
 
     companion object
 }
-

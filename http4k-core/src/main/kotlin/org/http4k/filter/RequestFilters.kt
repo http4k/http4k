@@ -81,4 +81,3 @@ object RequestFilters {
         { next(it.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(it.body.payload.array()))))) }
     }
 }
-

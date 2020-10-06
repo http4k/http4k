@@ -41,7 +41,6 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
             }(viewModel)
     }
 
-
     /**
      * Hot-reloads (no-caching) templates from a file path
      *

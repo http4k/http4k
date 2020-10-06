@@ -52,4 +52,3 @@ class TestWsClient internal constructor(consumer: WsConsumer, request: Request) 
 
 fun WsHandler.testWsClient(request: Request): TestWsClient? = invoke(request)?.let { TestWsClient(it, request) }
 fun PolyHandler.testWsClient(request: Request): TestWsClient? = ws.testWsClient(request)
-

@@ -11,4 +11,3 @@ class ClientCredentialsAccessTokenGenerator(private val accessTokens: AccessToke
     override fun generate(request: Request, clientId: ClientId, tokenRequest: TokenRequest) =
         accessTokens.create(clientId, tokenRequest).map { AccessTokenDetails(it) }
 }
-

@@ -1,6 +1,5 @@
 package org.http4k.server
 
-
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBufInputStream
 import io.netty.channel.ChannelFactory
@@ -37,7 +36,6 @@ import org.http4k.core.then
 import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
 import java.net.InetSocketAddress
-
 
 /**
  * Exposed to allow for insertion into a customised Netty server instance

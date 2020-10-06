@@ -29,4 +29,3 @@ data class Claims(
 )
 
 data class Claim(val essential: Boolean = false, val value: String? = null, val values: List<String>? = null)
-

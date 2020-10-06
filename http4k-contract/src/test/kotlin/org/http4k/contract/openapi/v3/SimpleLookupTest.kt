@@ -31,4 +31,3 @@ class SimpleLookupTest {
         assertThat("non existent", { SimpleLookup()(Beany(), "non existent") }, throws<NoFieldFound>())
     }
 }
-

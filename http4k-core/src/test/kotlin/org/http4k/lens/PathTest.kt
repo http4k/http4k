@@ -23,7 +23,6 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 
-
 class PathTest {
 
     @Test
