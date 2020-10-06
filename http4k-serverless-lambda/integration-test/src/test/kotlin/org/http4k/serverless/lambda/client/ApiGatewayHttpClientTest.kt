@@ -9,15 +9,18 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.DebuggingFilters
 import org.http4k.serverless.lambda.DeployApiGateway.apiName
+import org.http4k.serverless.lambda.inIntelliJOnly
 import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Disabled
 import org.opentest4j.TestAbortedException
 
 private fun client(version: ApiIntegrationVersion): (Request) -> Response {
     val api = apiGatewayClient.listApis().find { it.name == apiName(version) }
         ?: throw TestAbortedException("API hasn't been deployed")
-    val apiClient = ClientFilters.SetBaseUriFrom(api.apiEndpoint).then(OkHttp())
+    val apiClient = ClientFilters.SetBaseUriFrom(api.apiEndpoint)
+        .then(inIntelliJOnly(DebuggingFilters.PrintRequestAndResponse()))
+        .then(OkHttp())
     return { request: Request -> apiClient(request) }
 }
 
@@ -30,5 +33,5 @@ abstract class ApiGatewayHttpClientTest(version: ApiIntegrationVersion) :
 
 class ApiGatewayV1ClientTest:ApiGatewayHttpClientTest(v1)
 
-@Disabled("v2 is not supported by the client yet")
+//@Disabled("v2 is not supported by the client yet")
 class ApiGatewayV2ClientTest:ApiGatewayHttpClientTest(v2)

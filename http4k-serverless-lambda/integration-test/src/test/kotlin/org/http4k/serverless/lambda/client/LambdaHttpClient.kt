@@ -16,6 +16,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.queries
 import org.http4k.core.then
 import org.http4k.core.toParameters
 import org.http4k.core.with
@@ -95,7 +96,8 @@ internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEve
 
     override fun invoke(request: Request) = APIGatewayV2HTTPEvent.builder()
         .withRawPath(request.uri.path)
-        .withRawQueryString(request.uri.query)
+//        .withRawQueryString(request.uri.query)
+        .withQueryStringParameters(request.uri.queries().toMap())
         .withBody(request.bodyString())
         .withHeaders(request.headers.toMap())
         .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()

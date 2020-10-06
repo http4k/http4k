@@ -16,7 +16,9 @@ import org.http4k.core.NoOp
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.DebuggingFilters
 import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract
+import org.http4k.serverless.lambda.inIntelliJOnly
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
 val testFunctionClient by lazy {
@@ -32,6 +34,7 @@ val apiGatewayClient by lazy { AwsApiGatewayApiClient(awsClient("apigateway"), C
 
 private fun awsClient(service: String) = Filter.NoOp
     .then(ClientFilters.AwsAuth(Config.scope(awsConfig, service), Config.credentials(awsConfig)))
+    .then(inIntelliJOnly(DebuggingFilters.PrintRequestAndResponse()))
     .then(JavaHttpClient())
 
 val awsConfig by lazy {
