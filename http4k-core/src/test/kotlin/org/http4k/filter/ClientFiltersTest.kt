@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import org.http4k.core.Body
+import org.http4k.core.Credentials
 import org.http4k.core.MemoryRequest
 import org.http4k.core.MemoryResponse
 import org.http4k.core.Method.GET
@@ -347,5 +348,16 @@ class ClientFiltersTest {
 
         assertThat(captured.get(), equalTo(req).and(isA<MemoryRequest>()))
         assertThat(output, equalTo(resp).and(isA<MemoryResponse>()))
+    }
+
+    @Test
+    fun `can do proxy basic auth`() {
+        val captured = AtomicReference<Request>()
+        val handler = ClientFilters.ProxyBasicAuth(Credentials("bob", "password")).then{req ->
+            captured.set(req)
+            Response(OK).body("hello")
+        }
+        handler(Request(GET, "/"))
+        assertThat(captured.get(), hasHeader("Proxy-Authorization", "Basic Ym9iOnBhc3N3b3Jk"))
     }
 }
