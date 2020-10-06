@@ -125,19 +125,24 @@ class MetricFiltersServerTest {
     }
 
 
-    private fun hasRequestCounter(count: Long,
-                                  name: String = "http.server.request.count",
-                                  description: String = "Total number of server requests",
-                                  vararg tags: Pair<String, String>) = hasCounter(name,
+    private fun hasRequestCounter(
+        count: Long,
+        name: String = "http.server.request.count",
+        description: String = "Total number of server requests",
+        vararg tags: Pair<String, String>
+    ) = hasCounter(name,
         tags.asList()
             .map { Tag.of(it.first, it.second) },
         description(description) and counterCount(count)
     )
 
-    private fun hasRequestTimer(count: Long, totalTimeSec: Long,
-                                name: String = "http.server.request.latency",
-                                description: String = "Timing of server requests",
-                                vararg tags: Pair<String, String>) = hasTimer(name,
+    private fun hasRequestTimer(
+        count: Long,
+        totalTimeSec: Long,
+        name: String = "http.server.request.latency",
+        description: String = "Timing of server requests",
+        vararg tags: Pair<String, String>
+    ) = hasTimer(name,
         tags.asList()
             .map { Tag.of(it.first, it.second) },
         description(description) and timerCount(count) and timerTotalTime(totalTimeSec * 1000)

@@ -21,16 +21,17 @@ import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.RoutingHttpHandler
 
-data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
-                                      private val security: Security?,
-                                      private val descriptionSecurity: Security?,
-                                      private val descriptionPath: String,
-                                      private val preFlightExtraction: PreFlightExtraction,
-                                      private val routes: List<ContractRoute> = emptyList(),
-                                      private val rootAsString: String = "",
-                                      private val preSecurityFilter: Filter = Filter.NoOp,
-                                      private val postSecurityFilter: Filter = Filter.NoOp,
-                                      private val includeDescriptionRoute: Boolean = false
+data class ContractRoutingHttpHandler(
+    private val renderer: ContractRenderer,
+    private val security: Security?,
+    private val descriptionSecurity: Security?,
+    private val descriptionPath: String,
+    private val preFlightExtraction: PreFlightExtraction,
+    private val routes: List<ContractRoute> = emptyList(),
+    private val rootAsString: String = "",
+    private val preSecurityFilter: Filter = Filter.NoOp,
+    private val postSecurityFilter: Filter = Filter.NoOp,
+    private val includeDescriptionRoute: Boolean = false
 ) : RoutingHttpHandler {
     private val contractRoot = PathSegments(rootAsString)
 

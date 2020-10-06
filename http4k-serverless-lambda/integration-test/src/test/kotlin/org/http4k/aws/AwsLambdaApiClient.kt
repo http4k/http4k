@@ -60,13 +60,15 @@ class AwsLambdaApiClient(client: HttpHandler, region: Region) {
 
     private data class Code(@JsonProperty("ZipFile") val zipFile: String)
 
-    private data class CreateFunction(@JsonProperty("Code") val code: Code,
-                                      @JsonProperty("FunctionName") val functionName: String,
-                                      @JsonProperty("Handler") val handler: String,
-                                      @JsonProperty("Role") val role: String,
-                                      @JsonProperty("Environment") val environment: Environment,
-                                      @JsonProperty("Timeout") val timeout: Int = 3,
-                                      @JsonProperty("Runtime") val runtime: String = "java8")
+    private data class CreateFunction(
+        @JsonProperty("Code") val code: Code,
+        @JsonProperty("FunctionName") val functionName: String,
+        @JsonProperty("Handler") val handler: String,
+        @JsonProperty("Role") val role: String,
+        @JsonProperty("Environment") val environment: Environment,
+        @JsonProperty("Timeout") val timeout: Int = 3,
+        @JsonProperty("Runtime") val runtime: String = "java8"
+    )
 
     private data class Environment(@JsonProperty("Variables") val variables: Map<String, String>)
 
@@ -78,9 +80,9 @@ class AwsLambdaApiClient(client: HttpHandler, region: Region) {
     private data class ListFunctionsResponse(@JsonProperty("Functions") val functions: List<FunctionDetailsData>)
 
     private data class Permission(
-         @JsonProperty("Action") val action: String = "lambda:InvokeFunction",
-         @JsonProperty("Principal") val principal: String,
-         @JsonProperty("StatementId") val statementId: String
+        @JsonProperty("Action") val action: String = "lambda:InvokeFunction",
+        @JsonProperty("Principal") val principal: String,
+        @JsonProperty("StatementId") val statementId: String
     ){
         companion object{
             val invokeFromApiGateway = Permission(principal = "apigateway.amazonaws.com", statementId = "apigateway")

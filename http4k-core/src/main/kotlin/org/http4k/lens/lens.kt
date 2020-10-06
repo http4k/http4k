@@ -3,8 +3,10 @@ package org.http4k.lens
 /**
  * A Lens provides the uni-directional extraction of an entity from a target.
  */
-open class Lens<in IN : Any, out FINAL>(val meta: Meta,
-                                        private val lensGet: (IN) -> FINAL) : LensExtractor<IN, FINAL>, Iterable<Meta> {
+open class Lens<in IN : Any, out FINAL>(
+    val meta: Meta,
+    private val lensGet: (IN) -> FINAL
+) : LensExtractor<IN, FINAL>, Iterable<Meta> {
     override fun iterator(): Iterator<Meta> = listOf(meta).iterator()
 
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
@@ -22,9 +24,11 @@ open class Lens<in IN : Any, out FINAL>(val meta: Meta,
  * A BiDiLens provides the bi-directional extraction of an entity from a target, or the insertion of an entity
  * into a target.
  */
-class BiDiLens<in IN : Any, FINAL>(meta: Meta,
-                                   get: (IN) -> FINAL,
-                                   private val lensSet: (FINAL, IN) -> IN) : LensInjector<FINAL, IN>, Lens<IN, FINAL>(meta, get) {
+class BiDiLens<in IN : Any, FINAL>(
+    meta: Meta,
+    get: (IN) -> FINAL,
+    private val lensSet: (FINAL, IN) -> IN
+) : LensInjector<FINAL, IN>, Lens<IN, FINAL>(meta, get) {
 
     @Suppress("UNCHECKED_CAST")
     override operator fun <R : IN> invoke(value: FINAL, target: R): R = lensSet(value, target) as R

@@ -12,8 +12,10 @@ import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor
 
-class AuthRequestWithRequestAuthRequestExtractor(private val requestJWTValidator: RequestJWTValidator,
-                                                 private val combineAuthRequestRequestStrategy: CombineAuthRequestRequestStrategy) : AuthRequestExtractor {
+class AuthRequestWithRequestAuthRequestExtractor(
+    private val requestJWTValidator: RequestJWTValidator,
+    private val combineAuthRequestRequestStrategy: CombineAuthRequestRequestStrategy
+) : AuthRequestExtractor {
 
     override fun extract(request: Request): Result<AuthRequest, InvalidAuthorizationRequest> {
 
@@ -51,16 +53,20 @@ class AuthRequestWithRequestAuthRequestExtractor(private val requestJWTValidator
         ))
     }
 
-    private fun <T> nonNullValueIfExistsOrErrorIfNotEqual(authRequestValue: T?,
-                                                          requestObjectValue: T?): Result<T?, InvalidAuthorizationRequest> {
+    private fun <T> nonNullValueIfExistsOrErrorIfNotEqual(
+        authRequestValue: T?,
+        requestObjectValue: T?
+    ): Result<T?, InvalidAuthorizationRequest> {
         if (authRequestValue != null && requestObjectValue != null && authRequestValue != requestObjectValue) {
             return Failure(InvalidAuthorizationRequest("request object is invalid"))
         }
         return Success(combineAuthRequestRequestStrategy.combine(authRequestValue, requestObjectValue))
     }
 
-    private fun nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequestValue: List<String>,
-                                                       requestObjectValue: List<String>): Result<List<String>, InvalidAuthorizationRequest> {
+    private fun nonEmptyScopeIfExistsOrErrorIfNotEqual(
+        authRequestValue: List<String>,
+        requestObjectValue: List<String>
+    ): Result<List<String>, InvalidAuthorizationRequest> {
         if (authRequestValue.isNotEmpty() && requestObjectValue.isNotEmpty() && authRequestValue.toSet() != requestObjectValue.toSet()) {
             return Failure(InvalidAuthorizationRequest("request object is invalid"))
         }

@@ -53,8 +53,10 @@ private fun renderUnexpectedInteration(interactions: Int, count: Int) = Response
 /**
  * Write HTTP traffic to disk in Servirtium markdown format.
  */
-fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
-                              options: InteractionOptions) = object : Sink {
+fun Sink.Companion.Servirtium(
+    target: Consumer<ByteArray>,
+    options: InteractionOptions
+) = object : Sink {
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
         val manipulatedRequest = options.modify(request)

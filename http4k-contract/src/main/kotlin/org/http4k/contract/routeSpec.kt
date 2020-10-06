@@ -7,9 +7,11 @@ import org.http4k.core.Uri
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
 
-abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments) -> PathSegments,
-                                                      val routeMeta: RouteMeta,
-                                                      vararg val pathLenses: PathLens<*>) {
+abstract class ContractRouteSpec internal constructor(
+    val pathFn: (PathSegments) -> PathSegments,
+    val routeMeta: RouteMeta,
+    vararg val pathLenses: PathLens<*>
+) {
     abstract infix operator fun <T> div(next: PathLens<T>): ContractRouteSpec
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
@@ -63,8 +65,13 @@ class ContractRouteSpec2<out A, out B> internal constructor(pathFn: (PathSegment
     override infix fun bindContract(method: Method) = Binder(method)
 }
 
-class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                                                   val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>) : ContractRouteSpec(pathFn, routeMeta, a, b, c) {
+class ContractRouteSpec3<out A, out B, out C> internal constructor(
+    pathFn: (PathSegments) -> PathSegments,
+    routeMeta: RouteMeta,
+    val a: PathLens<A>,
+    val b: PathLens<B>,
+    val c: PathLens<C>
+) : ContractRouteSpec(pathFn, routeMeta, a, b, c) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec4(pathFn, routeMeta, a, b, c, next)
@@ -78,8 +85,14 @@ class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (Path
     override infix fun bindContract(method: Method) = Binder(method)
 }
 
-class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                                                          val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d) {
+class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(
+    pathFn: (PathSegments) -> PathSegments,
+    routeMeta: RouteMeta,
+    val a: PathLens<A>,
+    val b: PathLens<B>,
+    val c: PathLens<C>,
+    val d: PathLens<D>
+) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec5(pathFn, routeMeta, a, b, c, d, next)
@@ -93,8 +106,15 @@ class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn
     override infix fun bindContract(method: Method) = Binder(method)
 }
 
-class ContractRouteSpec5<out A, out B, out C, out D, out E> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                                                                 val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e) {
+class ContractRouteSpec5<out A, out B, out C, out D, out E> internal constructor(
+    pathFn: (PathSegments) -> PathSegments,
+    routeMeta: RouteMeta,
+    val a: PathLens<A>,
+    val b: PathLens<B>,
+    val c: PathLens<C>,
+    val d: PathLens<D>,
+    val e: PathLens<E>
+) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec6(pathFn, routeMeta, a, b, c, d, e, next)
@@ -108,8 +128,16 @@ class ContractRouteSpec5<out A, out B, out C, out D, out E> internal constructor
     override infix fun bindContract(method: Method) = Binder(method)
 }
 
-class ContractRouteSpec6<out A, out B, out C, out D, out E, out F> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                                                                        val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>, val f: PathLens<F>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f) {
+class ContractRouteSpec6<out A, out B, out C, out D, out E, out F> internal constructor(
+    pathFn: (PathSegments) -> PathSegments,
+    routeMeta: RouteMeta,
+    val a: PathLens<A>,
+    val b: PathLens<B>,
+    val c: PathLens<C>,
+    val d: PathLens<D>,
+    val e: PathLens<E>,
+    val f: PathLens<F>
+) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec7(pathFn, routeMeta, a, b, c, d, e, f, next)
@@ -123,9 +151,17 @@ class ContractRouteSpec6<out A, out B, out C, out D, out E, out F> internal cons
     override infix fun bindContract(method: Method) = Binder(method)
 }
 
-class ContractRouteSpec7<out A, out B, out C, out D, out E, out F, out G> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                                                                               val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
-                                                                                               val f: PathLens<F>, val g: PathLens<G>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g) {
+class ContractRouteSpec7<out A, out B, out C, out D, out E, out F, out G> internal constructor(
+    pathFn: (PathSegments) -> PathSegments,
+    routeMeta: RouteMeta,
+    val a: PathLens<A>,
+    val b: PathLens<B>,
+    val c: PathLens<C>,
+    val d: PathLens<D>,
+    val e: PathLens<E>,
+    val f: PathLens<F>,
+    val g: PathLens<G>
+) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec8(pathFn, routeMeta, a, b, c, d, e, f, g, next)
@@ -139,9 +175,18 @@ class ContractRouteSpec7<out A, out B, out C, out D, out E, out F, out G> intern
     override infix fun bindContract(method: Method) = Binder(method)
 }
 
-class ContractRouteSpec8<out A, out B, out C, out D, out E, out F, out G, out H> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                                                                                      val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
-                                                                                                      val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h) {
+class ContractRouteSpec8<out A, out B, out C, out D, out E, out F, out G, out H> internal constructor(
+    pathFn: (PathSegments) -> PathSegments,
+    routeMeta: RouteMeta,
+    val a: PathLens<A>,
+    val b: PathLens<B>,
+    val c: PathLens<C>,
+    val d: PathLens<D>,
+    val e: PathLens<E>,
+    val f: PathLens<F>,
+    val g: PathLens<G>,
+    val h: PathLens<H>
+) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec9(pathFn, routeMeta, a, b, c, d, e, f, g, h, next)
@@ -155,9 +200,19 @@ class ContractRouteSpec8<out A, out B, out C, out D, out E, out F, out G, out H>
     override infix fun bindContract(method: Method) = Binder(method)
 }
 
-class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H, out I> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                                                                                             val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
-                                                                                                             val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>, val i: PathLens<I>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i) {
+class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H, out I> internal constructor(
+    pathFn: (PathSegments) -> PathSegments,
+    routeMeta: RouteMeta,
+    val a: PathLens<A>,
+    val b: PathLens<B>,
+    val c: PathLens<C>,
+    val d: PathLens<D>,
+    val e: PathLens<E>,
+    val f: PathLens<F>,
+    val g: PathLens<G>,
+    val h: PathLens<H>,
+    val i: PathLens<I>
+) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec10(pathFn, routeMeta, a, b, c, d, e, f, g, h, i, next)
@@ -172,10 +227,20 @@ class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H,
     override infix fun bindContract(method: Method) = Binder(method)
 }
 
-class ContractRouteSpec10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                                                                                                     val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
-                                                                                                                     val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>, val i: PathLens<I>,
-                                                                                                                     val j: PathLens<J>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i, j) {
+class ContractRouteSpec10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J> internal constructor(
+    pathFn: (PathSegments) -> PathSegments,
+    routeMeta: RouteMeta,
+    val a: PathLens<A>,
+    val b: PathLens<B>,
+    val c: PathLens<C>,
+    val d: PathLens<D>,
+    val e: PathLens<E>,
+    val f: PathLens<F>,
+    val g: PathLens<G>,
+    val h: PathLens<H>,
+    val i: PathLens<I>,
+    val j: PathLens<J>
+) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i, j) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = throw UnsupportedOperationException("no longer paths!")

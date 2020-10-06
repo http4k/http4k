@@ -51,8 +51,10 @@ fun TemplateRenderer.then(that: TemplateRenderer): TemplateRenderer = {
 /**
  * Convenience method for generating a Response from a view model.
  */
-fun TemplateRenderer.renderToResponse(viewModel: ViewModel,
-                                      status: Status = OK,
-                                      contentType: ContentType = TEXT_HTML): Response =
+fun TemplateRenderer.renderToResponse(
+    viewModel: ViewModel,
+    status: Status = OK,
+    contentType: ContentType = TEXT_HTML
+): Response =
     Response(status).with(CONTENT_TYPE of contentType).body(invoke(viewModel))
 

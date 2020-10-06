@@ -61,9 +61,11 @@ class ServirtiumRecording
 /**
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
-class ServirtiumReplay @JvmOverloads constructor(private val baseName: String,
-                       private val storageProvider: StorageProvider,
-                       private val options: InteractionOptions = Defaults) : ParameterResolver {
+class ServirtiumReplay @JvmOverloads constructor(
+    private val baseName: String,
+    private val storageProvider: StorageProvider,
+    private val options: InteractionOptions = Defaults
+) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isInteractionControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =

@@ -19,7 +19,8 @@ interface ApiRenderer<API, NODE> : JsonSchemaCreator<Any, NODE> {
          */
         fun <T : Any, NODE : Any> Auto(
             json: JsonLibAutoMarshallingJson<NODE>,
-            schema: JsonSchemaCreator<Any, NODE> = AutoJsonToJsonSchema(json)): ApiRenderer<T, NODE> {
+            schema: JsonSchemaCreator<Any, NODE> = AutoJsonToJsonSchema(json)
+        ): ApiRenderer<T, NODE> {
             val fallbackSchema = object : JsonSchemaCreator<Any, NODE> {
                 private val jsonNodes = JsonToJsonSchema(json)
                 override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> =

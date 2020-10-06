@@ -7,7 +7,10 @@ import org.http4k.core.Response
 import java.io.ByteArrayInputStream
 
 
-class ResourceListingHandler(private val dir: ResourceSummary, private val contents: Iterable<ResourceSummary>, private val renderer: DirectoryRenderer
+class ResourceListingHandler(
+    private val dir: ResourceSummary,
+    private val contents: Iterable<ResourceSummary>,
+    private val renderer: DirectoryRenderer
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response =

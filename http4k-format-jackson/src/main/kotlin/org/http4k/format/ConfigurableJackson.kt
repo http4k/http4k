@@ -79,8 +79,10 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
     fun <T : Any, V : Any> String.asUsingView(t: KClass<T>, v: KClass<V>): T = mapper.readerWithView(v.java).forType(t.java).readValue(this)
 
-    inline fun <reified T : Any, reified V : Any> Body.Companion.autoView(description: String? = null,
-                                                                          contentNegotiation: ContentNegotiation = None) =
+    inline fun <reified T : Any, reified V : Any> Body.Companion.autoView(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = None
+    ) =
         Body.string(APPLICATION_JSON, description, contentNegotiation).map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 
     inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =

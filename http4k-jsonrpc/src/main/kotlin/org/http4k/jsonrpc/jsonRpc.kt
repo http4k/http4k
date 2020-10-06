@@ -6,14 +6,18 @@ import org.http4k.jsonrpc.MethodBindings.Companion.Auto
 import org.http4k.jsonrpc.MethodBindings.Companion.Manual
 
 object JsonRpc {
-    fun <NODE : Any> auto(json: JsonLibAutoMarshallingJson<NODE>,
-                          errorHandler: ErrorHandler = defaultErrorHandler,
-                          fn: Auto<NODE>.() -> Unit): JsonRpcService<NODE> =
+    fun <NODE : Any> auto(
+        json: JsonLibAutoMarshallingJson<NODE>,
+        errorHandler: ErrorHandler = defaultErrorHandler,
+        fn: Auto<NODE>.() -> Unit
+    ): JsonRpcService<NODE> =
         JsonRpcService(json, errorHandler, Auto(json).apply(fn))
 
-    fun <NODE : Any> manual(json: Json<NODE>,
-                            errorHandler: ErrorHandler = defaultErrorHandler,
-                            fn: Manual<NODE>.() -> Unit): JsonRpcService<NODE> =
+    fun <NODE : Any> manual(
+        json: Json<NODE>,
+        errorHandler: ErrorHandler = defaultErrorHandler,
+        fn: Manual<NODE>.() -> Unit
+    ): JsonRpcService<NODE> =
         JsonRpcService(json, errorHandler, Manual(json).apply(fn))
 }
 

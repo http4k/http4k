@@ -332,8 +332,12 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
         override fun toString() = """{"jsonrpc":"2.0","result":$result,"id":$id}"""
     }
 
-    private data class Error(private val code: Int, private val message: String,
-                             private val data: String?, private val id: String?) : ExpectedResponse() {
+    private data class Error(
+        private val code: Int,
+        private val message: String,
+        private val data: String?,
+        private val id: String?
+    ) : ExpectedResponse() {
         constructor(code: Int, message: String, id: String?) : this(code, message, null, id)
 
         override fun toString() =

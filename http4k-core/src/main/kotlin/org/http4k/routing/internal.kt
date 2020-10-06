@@ -22,9 +22,11 @@ import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsConsumer
 
-internal class ResourceLoadingHandler(private val pathSegments: String,
-                                      private val resourceLoader: ResourceLoader,
-                                      extraFileExtensionToContentTypes: Map<String, ContentType>) : HttpHandler {
+internal class ResourceLoadingHandler(
+    private val pathSegments: String,
+    private val resourceLoader: ResourceLoader,
+    extraFileExtensionToContentTypes: Map<String, ContentType>
+) : HttpHandler {
     private val extMap = MimeTypes(extraFileExtensionToContentTypes)
 
     override fun invoke(p1: Request): Response = if (p1.uri.path.startsWith(pathSegments)) {
@@ -46,10 +48,11 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
     }
 }
 
-internal data class StaticRoutingHttpHandler(private val pathSegments: String,
-                                             private val resourceLoader: ResourceLoader,
-                                             private val extraFileExtensionToContentTypes: Map<String, ContentType>,
-                                             private val filter: Filter = Filter.NoOp
+internal data class StaticRoutingHttpHandler(
+    private val pathSegments: String,
+    private val resourceLoader: ResourceLoader,
+    private val extraFileExtensionToContentTypes: Map<String, ContentType>,
+    private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
 
     override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))
@@ -69,7 +72,8 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
 internal data class AggregateRoutingHttpHandler(
     private val list: List<RoutingHttpHandler>,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
-    private val methodNotMatchedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
+    private val methodNotMatchedHandler: HttpHandler = routeMethodNotAllowedHandler
+) : RoutingHttpHandler {
 
     constructor(vararg list: RoutingHttpHandler) : this(list.toList())
 
@@ -99,7 +103,8 @@ internal data class TemplateRoutingHttpHandler(
     private val template: UriTemplate,
     private val httpHandler: HttpHandler,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
-    private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
+    private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler
+) : RoutingHttpHandler {
 
     override fun match(request: Request): RouterMatch =
         if (template.matches(request.uri.path)) {
@@ -121,8 +126,10 @@ internal data class TemplateRoutingHttpHandler(
     override fun withBasePath(new: String): RoutingHttpHandler = copy(template = UriTemplate.from("$new/$template"))
 }
 
-internal data class TemplateRoutingWsHandler(private val template: UriTemplate,
-                                             private val consumer: WsConsumer) : RoutingWsHandler {
+internal data class TemplateRoutingWsHandler(
+    private val template: UriTemplate,
+    private val consumer: WsConsumer
+) : RoutingWsHandler {
     override operator fun invoke(request: Request): WsConsumer? = if (template.matches(request.uri.path)) { ws ->
         consumer(object : Websocket by ws {
             override val upgradeRequest: Request = RoutedRequest(ws.upgradeRequest, template)

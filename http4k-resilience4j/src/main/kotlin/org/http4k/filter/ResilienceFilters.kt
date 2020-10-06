@@ -23,9 +23,11 @@ object ResilienceFilters {
     object CircuitBreak {
         private object CircuitError : RuntimeException()
 
-        operator fun invoke(circuitBreaker: CircuitBreaker = CircuitBreaker.ofDefaults("Circuit"),
-                            isError: (Response) -> Boolean = { it.status.serverError },
-                            onError: () -> Response = { Response(SERVICE_UNAVAILABLE.description("Circuit is open")) }) = Filter { next ->
+        operator fun invoke(
+            circuitBreaker: CircuitBreaker = CircuitBreaker.ofDefaults("Circuit"),
+            isError: (Response) -> Boolean = { it.status.serverError },
+            onError: () -> Response = { Response(SERVICE_UNAVAILABLE.description("Circuit is open")) }
+        ) = Filter { next ->
             {
                 try {
                     circuitBreaker.executeCallable {
@@ -48,8 +50,10 @@ object ResilienceFilters {
 
         private class RetryError(val response: Response) : RuntimeException()
 
-        operator fun invoke(retry: Retry = ofDefaults("Retrying"),
-                            isError: (Response) -> Boolean = { it.status.serverError }) = Filter { next ->
+        operator fun invoke(
+            retry: Retry = ofDefaults("Retrying"),
+            isError: (Response) -> Boolean = { it.status.serverError }
+        ) = Filter { next ->
             {
                 try {
                     retry.executeCallable {
@@ -69,8 +73,10 @@ object ResilienceFilters {
      * By default, handles maximum of 50 requests per 5 seconds.
      */
     object RateLimit {
-        operator fun invoke(rateLimit: RateLimiter = RateLimiter.ofDefaults("RateLimit"),
-                            onError: () -> Response = { Response(TOO_MANY_REQUESTS.description("Rate limit exceeded")) }) = Filter { next ->
+        operator fun invoke(
+            rateLimit: RateLimiter = RateLimiter.ofDefaults("RateLimit"),
+            onError: () -> Response = { Response(TOO_MANY_REQUESTS.description("Rate limit exceeded")) }
+        ) = Filter { next ->
             {
                 try {
                     rateLimit.executeCallable { next(it) }
@@ -86,8 +92,10 @@ object ResilienceFilters {
      * By default, handles 25 parallel requests, with zero wait time.
      */
     object Bulkheading {
-        operator fun invoke(bulkhead: Bulkhead = Bulkhead.ofDefaults("Bulkhead"),
-                            onError: () -> Response = { Response(TOO_MANY_REQUESTS.description("Bulkhead limit exceeded")) }) = Filter { next ->
+        operator fun invoke(
+            bulkhead: Bulkhead = Bulkhead.ofDefaults("Bulkhead"),
+            onError: () -> Response = { Response(TOO_MANY_REQUESTS.description("Bulkhead limit exceeded")) }
+        ) = Filter { next ->
             {
                 try {
                     bulkhead.executeCallable { next(it) }

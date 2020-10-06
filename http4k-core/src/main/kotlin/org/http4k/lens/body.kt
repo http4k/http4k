@@ -28,10 +28,12 @@ open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentTy
  * A BiDiBodyLens provides the bi-directional extraction of an entity from a target body, or the insertion of an entity
  * into a target body.
  */
-class BiDiBodyLens<FINAL>(metas: List<Meta>,
-                          contentType: ContentType,
-                          get: (HttpMessage) -> FINAL,
-                          private val setLens: (FINAL, HttpMessage) -> HttpMessage)
+class BiDiBodyLens<FINAL>(
+    metas: List<Meta>,
+    contentType: ContentType,
+    get: (HttpMessage) -> FINAL,
+    private val setLens: (FINAL, HttpMessage) -> HttpMessage
+)
     : LensInjector<FINAL, HttpMessage>, BodyLens<FINAL>(metas, contentType, get) {
 
     @Suppress("UNCHECKED_CAST")
@@ -59,10 +61,12 @@ open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val co
 /**
  * Represents a bi-directional extraction of an entity from a target Body, or an insertion into a target Body.
  */
-open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
-                                 contentType: ContentType,
-                                 get: LensGet<HttpMessage, OUT>,
-                                 private val set: LensSet<HttpMessage, OUT>) : BodyLensSpec<OUT>(metas, contentType, get) {
+open class BiDiBodyLensSpec<OUT>(
+    metas: List<Meta>,
+    contentType: ContentType,
+    get: LensGet<HttpMessage, OUT>,
+    private val set: LensSet<HttpMessage, OUT>
+) : BodyLensSpec<OUT>(metas, contentType, get) {
 
     /**
      * Create another BiDiBodyLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be

@@ -120,9 +120,11 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     }
 }
 
-data class StreamingTestConfiguration(val beeps: Int = 5,
-                                      val beepSize: Int = 20000,
-                                      val sleepTimeBetweenBeepsInMillis: Long = 500,
-                                      val multiplier: Int = 2) {
+data class StreamingTestConfiguration(
+    val beeps: Int = 5,
+    val beepSize: Int = 20000,
+    val sleepTimeBetweenBeepsInMillis: Long = 500,
+    val multiplier: Int = 2
+) {
     val maxTotalWaitInMillis = beeps * sleepTimeBetweenBeepsInMillis * multiplier
 }

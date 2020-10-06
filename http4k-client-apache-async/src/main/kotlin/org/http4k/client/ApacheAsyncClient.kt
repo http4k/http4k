@@ -19,7 +19,8 @@ import java.net.SocketTimeoutException
 
 object ApacheAsyncClient {
     operator fun invoke(
-        client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient()): AsyncHttpClient {
+        client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient()
+    ): AsyncHttpClient {
         return object : AsyncHttpClient {
             override fun close() = client.close()
 

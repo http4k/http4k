@@ -50,19 +50,21 @@ class OAuthServer(
     documentationUri: String? = null
 ) {
 
-    constructor(tokenPath: String,
-                authRequestTracking: AuthRequestTracking,
-                clientValidator: ClientValidator,
-                authorizationCodes: AuthorizationCodes,
-                accessTokens: AccessTokens,
-                json: AutoMarshallingJson,
-                clock: Clock,
-                authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
-                grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
-                idTokens: IdTokens = IdTokens.Unsupported,
-                refreshTokens: RefreshTokens = RefreshTokens.unsupported,
-                requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
-                documentationUri: String? = null) : this(
+    constructor(
+        tokenPath: String,
+        authRequestTracking: AuthRequestTracking,
+        clientValidator: ClientValidator,
+        authorizationCodes: AuthorizationCodes,
+        accessTokens: AccessTokens,
+        json: AutoMarshallingJson,
+        clock: Clock,
+        authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
+        grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
+        idTokens: IdTokens = IdTokens.Unsupported,
+        refreshTokens: RefreshTokens = RefreshTokens.unsupported,
+        requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
+        documentationUri: String? = null
+    ) : this(
         tokenPath,
         authRequestTracking,
         SimpleAuthoriseRequestValidator(clientValidator),

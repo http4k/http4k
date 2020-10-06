@@ -15,9 +15,11 @@ import java.time.LocalDateTime
  * This is an example implementation which stores CSRF and AccessToken values in an INSECURE client-side cookie.
  * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
-class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
-                                          private val cookieValidity: Duration = Duration.ofHours(3),
-                                          private val clock: Clock = Clock.systemDefaultZone()) : OAuthPersistence {
+class InsecureCookieBasedOAuthPersistence(
+    cookieNamePrefix: String,
+    private val cookieValidity: Duration = Duration.ofHours(3),
+    private val clock: Clock = Clock.systemDefaultZone()
+) : OAuthPersistence {
 
     private val csrfName = "${cookieNamePrefix}Csrf"
 

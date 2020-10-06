@@ -7,8 +7,10 @@ import freemarker.template.TemplateNotFoundException
 import java.io.File
 import java.io.StringWriter
 
-class FreemarkerTemplates(private val configure: (Configuration) -> Configuration = { it },
-                          private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()) : Templates {
+class FreemarkerTemplates(
+    private val configure: (Configuration) -> Configuration = { it },
+    private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()
+) : Templates {
 
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer =
         FreemarkerTemplateResolver(configure(Configuration(Configuration.getVersion()).apply {

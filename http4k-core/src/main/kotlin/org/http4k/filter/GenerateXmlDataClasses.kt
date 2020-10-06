@@ -17,7 +17,8 @@ class GenerateXmlDataClasses<NODE : Any>(
     json: JsonLibAutoMarshallingJson<NODE>,
     xml: AutoMarshallingXml,
     out: PrintStream = System.out,
-    idGenerator: () -> Int = { Math.abs(java.util.Random().nextInt()) }) : Filter {
+    idGenerator: () -> Int = { Math.abs(java.util.Random().nextInt()) }
+) : Filter {
     private val chains = GenerateDataClasses(json, out, idGenerator).then(Filter { next ->
         {
             next(it).run { with(json.body().toLens() of json.asJsonObject(xml.asA(bodyString(), Map::class))) }

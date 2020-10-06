@@ -9,14 +9,17 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ofPattern
 import java.util.Locale.US
 
-data class Cookie(val name: String, val value: String,
-                  val maxAge: Long? = null,
-                  val expires: LocalDateTime? = null,
-                  val domain: String? = null,
-                  val path: String? = null,
-                  val secure: Boolean = false,
-                  val httpOnly: Boolean = false,
-                  val sameSite: SameSite? = null) {
+data class Cookie(
+    val name: String,
+    val value: String,
+    val maxAge: Long? = null,
+    val expires: LocalDateTime? = null,
+    val domain: String? = null,
+    val path: String? = null,
+    val secure: Boolean = false,
+    val httpOnly: Boolean = false,
+    val sameSite: SameSite? = null
+) {
 
     fun domain(domain: String) = copy(domain = domain)
     fun maxAge(seconds: Long) = copy(maxAge = seconds)

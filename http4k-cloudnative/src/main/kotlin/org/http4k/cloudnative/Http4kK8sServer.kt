@@ -29,12 +29,16 @@ class Http4kK8sServer(private val main: Http4kServer, private val health: Http4k
     }
 }
 
-fun HttpHandler.asK8sServer(serverConfig: (port: Int) -> ServerConfig,
-                            port: Int = 8000,
-                            healthApp: HttpHandler = Health(),
-                            healthPort: Int = 8001) = Http4kK8sServer(asServer(serverConfig(port)), healthApp.asServer(serverConfig(healthPort)))
+fun HttpHandler.asK8sServer(
+    serverConfig: (port: Int) -> ServerConfig,
+    port: Int = 8000,
+    healthApp: HttpHandler = Health(),
+    healthPort: Int = 8001
+) = Http4kK8sServer(asServer(serverConfig(port)), healthApp.asServer(serverConfig(healthPort)))
 
-fun HttpHandler.asK8sServer(serverConfig: (port: Int) -> ServerConfig,
-                            env: Environment = ENV,
-                            healthApp: HttpHandler = Health()) =
+fun HttpHandler.asK8sServer(
+    serverConfig: (port: Int) -> ServerConfig,
+    env: Environment = ENV,
+    healthApp: HttpHandler = Health()
+) =
     asK8sServer(serverConfig, SERVICE_PORT(env), healthApp, HEALTH_PORT(env))

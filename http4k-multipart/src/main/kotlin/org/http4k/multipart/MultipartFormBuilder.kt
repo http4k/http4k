@@ -66,16 +66,25 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
         boundary.push((String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).toByteArray(encoding))
     }
 
-    fun attachment(fileName: String, contentType: String, contents: String,
-                   headers: Parameters) =
+    fun attachment(
+        fileName: String,
+        contentType: String,
+        contents: String,
+        headers: Parameters
+    ) =
         part(contents,
             listOf(
                 "Content-Disposition" to """attachment; filename="$fileName"""",
                 "Content-Type" to contentType) + headers
         )
 
-    fun file(fieldName: String, filename: String, contentType: String, contents: InputStream,
-             headers: Parameters) =
+    fun file(
+        fieldName: String,
+        filename: String,
+        contentType: String,
+        contents: InputStream,
+        headers: Parameters
+    ) =
         part(contents,
             listOf(
                 "Content-Disposition" to """form-data; name="$fieldName"; filename="$filename"""",

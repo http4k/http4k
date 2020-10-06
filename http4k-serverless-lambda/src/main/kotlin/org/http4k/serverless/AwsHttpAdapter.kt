@@ -20,9 +20,11 @@ class RequestContent(
     private val queryStringParameters: Map<String, String>?,
     private val rawQueryString: String?,
     private val reqBody: String?,
-    private val reqBase64: Boolean?, private val reqMethod: String,
+    private val reqBase64: Boolean?,
+    private val reqMethod: String,
     private val reqHeaders: Map<String, String>?,
-    private val cookies: List<String>) {
+    private val cookies: List<String>
+) {
 
     fun asHttp4k(): Request {
         val body = reqBody?.let { MemoryBody(if (reqBase64 == true) Base64.getDecoder().decode(it.toByteArray()) else it.toByteArray()) } ?: Body.EMPTY

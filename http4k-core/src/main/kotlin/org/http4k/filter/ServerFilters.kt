@@ -31,10 +31,12 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
 import java.io.StringWriter
 
-data class CorsPolicy(val origins: List<String>,
-                      val headers: List<String>,
-                      val methods: List<Method>,
-                      val credentials: Boolean = false) {
+data class CorsPolicy(
+    val origins: List<String>,
+    val headers: List<String>,
+    val methods: List<Method>,
+    val credentials: Boolean = false
+) {
     companion object {
         val UnsafeGlobalPermissive = CorsPolicy(listOf("*"), listOf("content-type"), Method.values().toList(), true)
     }
@@ -75,7 +77,8 @@ object ServerFilters {
     object RequestTracing {
         operator fun invoke(
             startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }
+        ): Filter = Filter { next ->
             {
                 val fromRequest = ZipkinTraces(it)
                 startReportFn(it, fromRequest)
@@ -189,8 +192,10 @@ object ServerFilters {
         /**
          * ApiKey token checking using a typed lens.
          */
-        operator fun <T> invoke(lens: (Lens<Request, T>),
-                                validate: (T) -> Boolean) = ApiKeyAuth { req: Request ->
+        operator fun <T> invoke(
+            lens: (Lens<Request, T>),
+            validate: (T) -> Boolean
+        ) = ApiKeyAuth { req: Request ->
             try {
                 validate(lens(req))
             } catch (e: LensFailure) {
@@ -225,9 +230,11 @@ object ServerFilters {
      *
      * Pass the failResponseFn param to provide a custom response for the LensFailure case
      */
-    fun CatchLensFailure(failResponseFn: (LensFailure) -> Response = {
-        Response(BAD_REQUEST.description(it.failures.joinToString("; ")))
-    }) = Filter { next ->
+    fun CatchLensFailure(
+        failResponseFn: (LensFailure) -> Response = {
+Response(BAD_REQUEST.description(it.failures.joinToString("; ")))
+}
+    ) = Filter { next ->
         {
             try {
                 next(it)
@@ -287,8 +294,10 @@ object ServerFilters {
      * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
      */
-    class GZipContentTypes(private val compressibleContentTypes: Set<ContentType>,
-                           private val compressionMode: GzipCompressionMode = Memory) : Filter {
+    class GZipContentTypes(
+        private val compressibleContentTypes: Set<ContentType>,
+        private val compressionMode: GzipCompressionMode = Memory
+    ) : Filter {
         override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode)
             .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
             .invoke(next)
@@ -327,8 +336,9 @@ object ServerFilters {
      * after the status code.
      */
     object ReplaceResponseContentsWithStaticFile {
-        operator fun invoke(loader: ResourceLoader = Classpath(),
-                            toResourceName: (Response) -> String? = { if (it.status.successful) null else it.status.code.toString() }
+        operator fun invoke(
+            loader: ResourceLoader = Classpath(),
+            toResourceName: (Response) -> String? = { if (it.status.successful) null else it.status.code.toString() }
         ): Filter = Filter { next ->
             {
                 val response = next(it)

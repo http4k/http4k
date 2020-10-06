@@ -25,9 +25,10 @@ import java.nio.ByteBuffer
 /**
  * Basic JDK-based Client.
  */
-class JavaHttpClient(private val httpClient: HttpClient = defaultJavaHttpClient(),
-                     private val requestBodyMode: BodyMode = Memory,
-                     private val responseBodyMode: BodyMode = Memory
+class JavaHttpClient(
+    private val httpClient: HttpClient = defaultJavaHttpClient(),
+    private val requestBodyMode: BodyMode = Memory,
+    private val responseBodyMode: BodyMode = Memory
 ) : HttpHandler {
     override fun invoke(request: Request): Response = try {
         val javaRequest = request.toJavaHttpRequest(requestBodyMode)

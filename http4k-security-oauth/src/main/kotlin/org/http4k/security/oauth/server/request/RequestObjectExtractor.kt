@@ -96,17 +96,19 @@ object RequestObjectExtractor {
 
     )
 
-    internal data class RequestObjectJson(@JsonProperty("client_id") val client: ClientId? = null,
-                                          @JsonProperty("redirect_uri") val redirectUri: Uri? = null,
-                                          @JsonProperty("aud") val audience: JsonNode,
-                                          @JsonProperty("iss") val issuer: String? = null,
-                                          @JsonProperty("scope") val scope: String?,
-                                          @JsonProperty("response_mode") val responseMode: ResponseMode? = null,
-                                          @JsonProperty("response_type") val responseType: ResponseType? = null,
-                                          @JsonProperty("state") val state: State? = null,
-                                          @JsonProperty("nonce") val nonce: Nonce? = null,
-                                          @JsonProperty("max_age") val magAge: Long? = null,
-                                          @JsonProperty("exp") val expiry: Long? = null,
-                                          @JsonProperty("claims") val claims: Claims = Claims())
+    internal data class RequestObjectJson(
+        @JsonProperty("client_id") val client: ClientId? = null,
+        @JsonProperty("redirect_uri") val redirectUri: Uri? = null,
+        @JsonProperty("aud") val audience: JsonNode,
+        @JsonProperty("iss") val issuer: String? = null,
+        @JsonProperty("scope") val scope: String?,
+        @JsonProperty("response_mode") val responseMode: ResponseMode? = null,
+        @JsonProperty("response_type") val responseType: ResponseType? = null,
+        @JsonProperty("state") val state: State? = null,
+        @JsonProperty("nonce") val nonce: Nonce? = null,
+        @JsonProperty("max_age") val magAge: Long? = null,
+        @JsonProperty("exp") val expiry: Long? = null,
+        @JsonProperty("claims") val claims: Claims = Claims()
+    )
 
 }

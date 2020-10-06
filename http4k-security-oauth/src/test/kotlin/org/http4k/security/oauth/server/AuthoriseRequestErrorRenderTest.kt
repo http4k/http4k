@@ -220,11 +220,13 @@ internal class AuthoriseRequestErrorRenderTest {
         JsonResponseErrorRenderer(Jackson, documentationUri),
         documentationUri)
 
-    private fun generateARequestJwt(state: String? = null,
-                                    responseType: String? = null,
-                                    responseMode: String? = null,
-                                    clientId: String? = null,
-                                    redirectUri: String? = null): String {
+    private fun generateARequestJwt(
+        state: String? = null,
+        responseType: String? = null,
+        responseMode: String? = null,
+        clientId: String? = null,
+        redirectUri: String? = null
+    ): String {
         val data = mutableMapOf<String, Any>()
         if (state != null) {
             data["state"] = state

@@ -14,9 +14,11 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import java.io.Closeable
 import java.util.UUID
 
-data class MultipartForm(val fields: Map<String, List<MultipartFormField>> = emptyMap(),
-                         val files: Map<String, List<MultipartFormFile>> = emptyMap(),
-                         val errors: List<Failure> = emptyList()) : Closeable {
+data class MultipartForm(
+    val fields: Map<String, List<MultipartFormField>> = emptyMap(),
+    val files: Map<String, List<MultipartFormFile>> = emptyMap(),
+    val errors: List<Failure> = emptyList()
+) : Closeable {
 
     override fun close() = files.values.flatten().forEach(MultipartFormFile::close)
 

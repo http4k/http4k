@@ -45,8 +45,10 @@ object Xml : AutoMarshallingXml() {
 
     fun <IN : Any> BiDiLensSpec<IN, String>.xml() = map({ it.asXmlDocument() }, { it.asXmlString() })
 
-    fun Body.Companion.xml(description: String? = null,
-                           contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Document> =
+    fun Body.Companion.xml(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None
+    ): BiDiBodyLensSpec<Document> =
         httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
             .map(Body::payload) { Body(it) }
             .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlDocument() }, { it.asXmlString() })

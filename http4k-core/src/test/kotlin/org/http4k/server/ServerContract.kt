@@ -29,8 +29,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
 
-abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
-                              private val requiredMethods: Array<Method> = Method.values()) {
+abstract class ServerContract(
+    private val serverConfig: (Int) -> ServerConfig,
+    protected val client: HttpHandler,
+    private val requiredMethods: Array<Method> = Method.values()
+) {
     private lateinit var server: Http4kServer
 
     private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }

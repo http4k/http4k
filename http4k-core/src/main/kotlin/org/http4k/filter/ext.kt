@@ -21,8 +21,10 @@ sealed class GzipCompressionMode(internal val compress: (Body) -> CompressionRes
     object Streaming : GzipCompressionMode(Body::gzippedStream, Body::gunzippedStream)
 }
 
-data class CompressionResult(val body: Body,
-                             val contentEncoding: String?) {
+data class CompressionResult(
+    val body: Body,
+    val contentEncoding: String?
+) {
     fun apply(request: Request): Request =
         (contentEncoding?.let {
             request.header("content-encoding", it)

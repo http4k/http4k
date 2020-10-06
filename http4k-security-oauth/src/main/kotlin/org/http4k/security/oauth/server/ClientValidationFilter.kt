@@ -9,9 +9,11 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.security.ResponseType
 
-class ClientValidationFilter(private val authoriseRequestValidator: AuthoriseRequestValidator,
-                             private val errorRenderer: AuthoriseRequestErrorRender,
-                             private val extractor: AuthRequestExtractor) : Filter {
+class ClientValidationFilter(
+    private val authoriseRequestValidator: AuthoriseRequestValidator,
+    private val errorRenderer: AuthoriseRequestErrorRender,
+    private val extractor: AuthRequestExtractor
+) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =
         {

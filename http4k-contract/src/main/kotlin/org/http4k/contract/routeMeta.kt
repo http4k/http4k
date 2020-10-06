@@ -124,16 +124,18 @@ fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).ru
 
 data class Tag(val name: String, val description: String? = null)
 
-data class RouteMeta(val summary: String = "<unknown>",
-                     val description: String? = null,
-                     val tags: Set<Tag> = emptySet(),
-                     val body: BodyLens<*>? = null,
-                     val produces: Set<ContentType> = emptySet(),
-                     val consumes: Set<ContentType> = emptySet(),
-                     val requestParams: List<Lens<Request, *>> = emptyList(),
-                     val requests: List<HttpMessageMeta<Request>> = emptyList(),
-                     val responses: List<HttpMessageMeta<Response>> = emptyList(),
-                     val preFlightExtraction: PreFlightExtraction? = null,
-                     val security: Security? = null,
-                     val operationId: String? = null,
-                     val deprecated: Boolean = false)
+data class RouteMeta(
+    val summary: String = "<unknown>",
+    val description: String? = null,
+    val tags: Set<Tag> = emptySet(),
+    val body: BodyLens<*>? = null,
+    val produces: Set<ContentType> = emptySet(),
+    val consumes: Set<ContentType> = emptySet(),
+    val requestParams: List<Lens<Request, *>> = emptyList(),
+    val requests: List<HttpMessageMeta<Request>> = emptyList(),
+    val responses: List<HttpMessageMeta<Response>> = emptyList(),
+    val preFlightExtraction: PreFlightExtraction? = null,
+    val security: Security? = null,
+    val operationId: String? = null,
+    val deprecated: Boolean = false
+)

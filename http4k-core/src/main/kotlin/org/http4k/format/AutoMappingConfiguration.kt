@@ -87,59 +87,95 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
 /**
  * This is the set of utility methods which avoid the noise of creating a BiDiMapping when specifying mappings.
  */
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline inFn: (String) -> OUT,
-                                                                         noinline outFn: (OUT) -> String) = text(BiDiMapping(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(
+    noinline inFn: (String) -> OUT,
+    noinline outFn: (OUT) -> String
+) = text(BiDiMapping(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.boolean(noinline inFn: (Boolean) -> OUT,
-                                                                            noinline outFn: (OUT) -> Boolean) = boolean(BiDiMapping(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.boolean(
+    noinline inFn: (Boolean) -> OUT,
+    noinline outFn: (OUT) -> Boolean
+) = boolean(BiDiMapping(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.int(noinline inFn: (Int) -> OUT,
-                                                                        noinline outFn: (OUT) -> Int) = int(BiDiMapping(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.int(
+    noinline inFn: (Int) -> OUT,
+    noinline outFn: (OUT) -> Int
+) = int(BiDiMapping(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.long(noinline inFn: (Long) -> OUT,
-                                                                         noinline outFn: (OUT) -> Long) = long(BiDiMapping(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.long(
+    noinline inFn: (Long) -> OUT,
+    noinline outFn: (OUT) -> Long
+) = long(BiDiMapping(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.double(noinline outFn: (OUT) -> Double,
-                                                                           noinline inFn: (Double) -> OUT) = double(BiDiMapping(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.double(
+    noinline outFn: (OUT) -> Double,
+    noinline inFn: (Double) -> OUT
+) = double(BiDiMapping(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.bigInteger(noinline inFn: (BigInteger) -> OUT,
-                                                                               noinline outFn: (OUT) -> BigInteger) = bigInteger(BiDiMapping(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.bigInteger(
+    noinline inFn: (BigInteger) -> OUT,
+    noinline outFn: (OUT) -> BigInteger
+) = bigInteger(BiDiMapping(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.bigDecimal(noinline inFn: (BigDecimal) -> OUT,
-                                                                               noinline outFn: (OUT) -> BigDecimal) = bigDecimal(BiDiMapping(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.bigDecimal(
+    noinline inFn: (BigDecimal) -> OUT,
+    noinline outFn: (OUT) -> BigDecimal
+) = bigDecimal(BiDiMapping(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.uuid(noinline inFn: (UUID) -> OUT,
-                                                                         noinline outFn: (OUT) -> UUID) = text(uuid().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.uuid(
+    noinline inFn: (UUID) -> OUT,
+    noinline outFn: (OUT) -> UUID
+) = text(uuid().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.uri(noinline inFn: (Uri) -> OUT,
-                                                                        noinline outFn: (OUT) -> Uri) = text(uri().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.uri(
+    noinline inFn: (Uri) -> OUT,
+    noinline outFn: (OUT) -> Uri
+) = text(uri().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.duration(noinline inFn: (Duration) -> OUT,
-                                                                             noinline outFn: (OUT) -> Duration) = text(duration().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.duration(
+    noinline inFn: (Duration) -> OUT,
+    noinline outFn: (OUT) -> Duration
+) = text(duration().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.instant(noinline inFn: (Instant) -> OUT,
-                                                                            noinline outFn: (OUT) -> Instant) = text(instant().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.instant(
+    noinline inFn: (Instant) -> OUT,
+    noinline outFn: (OUT) -> Instant
+) = text(instant().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.localDate(noinline inFn: (LocalDate) -> OUT,
-                                                                              noinline outFn: (OUT) -> LocalDate) = text(localDate().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.localDate(
+    noinline inFn: (LocalDate) -> OUT,
+    noinline outFn: (OUT) -> LocalDate
+) = text(localDate().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.localDateTime(noinline inFn: (LocalDateTime) -> OUT,
-                                                                                  noinline outFn: (OUT) -> LocalDateTime) = text(localDateTime().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.localDateTime(
+    noinline inFn: (LocalDateTime) -> OUT,
+    noinline outFn: (OUT) -> LocalDateTime
+) = text(localDateTime().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.localTime(noinline inFn: (LocalTime) -> OUT,
-                                                                              noinline outFn: (OUT) -> LocalTime) = text(localTime().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.localTime(
+    noinline inFn: (LocalTime) -> OUT,
+    noinline outFn: (OUT) -> LocalTime
+) = text(localTime().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.offsetDateTime(noinline inFn: (OffsetDateTime) -> OUT,
-                                                                                   noinline outFn: (OUT) -> OffsetDateTime) = text(offsetDateTime().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.offsetDateTime(
+    noinline inFn: (OffsetDateTime) -> OUT,
+    noinline outFn: (OUT) -> OffsetDateTime
+) = text(offsetDateTime().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.offsetTime(noinline inFn: (OffsetTime) -> OUT,
-                                                                               noinline outFn: (OUT) -> OffsetTime) = text(offsetTime().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.offsetTime(
+    noinline inFn: (OffsetTime) -> OUT,
+    noinline outFn: (OUT) -> OffsetTime
+) = text(offsetTime().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.yearMonth(noinline inFn: (YearMonth) -> OUT,
-                                                                              noinline outFn: (OUT) -> YearMonth) = text(yearMonth().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.yearMonth(
+    noinline inFn: (YearMonth) -> OUT,
+    noinline outFn: (OUT) -> YearMonth
+) = text(yearMonth().map(inFn, outFn))
 
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.zonedDateTime(noinline inFn: (ZonedDateTime) -> OUT,
-                                                                                  noinline outFn: (OUT) -> ZonedDateTime) = text(zonedDateTime().map(inFn, outFn))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.zonedDateTime(
+    noinline inFn: (ZonedDateTime) -> OUT,
+    noinline outFn: (OUT) -> ZonedDateTime
+) = text(zonedDateTime().map(inFn, outFn))
 
 /**
  * Utility method for when only writing/serialization is required

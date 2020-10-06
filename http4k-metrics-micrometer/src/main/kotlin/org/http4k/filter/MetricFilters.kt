@@ -8,24 +8,30 @@ import java.time.Clock
 
 object MetricFilters {
 
-    open class FiltersTemplate(private val defaultTimer: Pair<String, String>,
-                               private val defaultCounter: Pair<String, String>,
-                               private val defaultLabeller: HttpTransactionLabeller) {
-        fun RequestTimer(meterRegistry: MeterRegistry,
-                         name: String = defaultTimer.first,
-                         description: String? = defaultTimer.second,
-                         labeller: HttpTransactionLabeller = defaultLabeller,
-                         clock: Clock = Clock.systemUTC()): Filter =
+    open class FiltersTemplate(
+        private val defaultTimer: Pair<String, String>,
+        private val defaultCounter: Pair<String, String>,
+        private val defaultLabeller: HttpTransactionLabeller
+    ) {
+        fun RequestTimer(
+            meterRegistry: MeterRegistry,
+            name: String = defaultTimer.first,
+            description: String? = defaultTimer.second,
+            labeller: HttpTransactionLabeller = defaultLabeller,
+            clock: Clock = Clock.systemUTC()
+        ): Filter =
             ResponseFilters.ReportHttpTransaction(clock) { tx ->
                 labeller(tx).labels.entries.fold(Timer.builder(name).description(description)) { memo, next ->
                     memo.tag(next.key, next.value)
                 }.register(meterRegistry).record(tx.duration)
             }
 
-        fun RequestCounter(meterRegistry: MeterRegistry,
-                           name: String = defaultCounter.first,
-                           description: String? = defaultCounter.second,
-                           labeller: HttpTransactionLabeller = defaultLabeller): Filter =
+        fun RequestCounter(
+            meterRegistry: MeterRegistry,
+            name: String = defaultCounter.first,
+            description: String? = defaultCounter.second,
+            labeller: HttpTransactionLabeller = defaultLabeller
+        ): Filter =
             ResponseFilters.ReportHttpTransaction(Clock.systemUTC()) { tx ->
                 labeller(tx).labels.entries.fold(Counter.builder(name).description(description)) { memo, next ->
                     memo.tag(next.key, next.value)

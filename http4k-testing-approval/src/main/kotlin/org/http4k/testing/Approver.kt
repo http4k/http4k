@@ -22,9 +22,11 @@ interface Approver {
     fun <T : HttpMessage> assertApproved(httpMessage: T)
 }
 
-class NamedResourceApprover(private val name: String,
-                            private val approvalContent: ApprovalContent,
-                            private val approvalSource: ApprovalSource) : Approver {
+class NamedResourceApprover(
+    private val name: String,
+    private val approvalContent: ApprovalContent,
+    private val approvalSource: ApprovalSource
+) : Approver {
 
     override fun <T : HttpMessage> assertApproved(httpMessage: T) {
         val approved = approvalSource.approvedFor(name)

@@ -12,8 +12,11 @@ import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 
 fun OAuthProvider.Companion.auth0(
     auth0Uri: Uri,
-    client: HttpHandler, credentials: Credentials,
-    callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =
+    client: HttpHandler,
+    credentials: Credentials,
+    callbackUri: Uri,
+    oAuthPersistence: OAuthPersistence
+): OAuthProvider =
 
     OAuthProvider(
         OAuthProviderConfig(auth0Uri, "/authorize", "/oauth/token", credentials),

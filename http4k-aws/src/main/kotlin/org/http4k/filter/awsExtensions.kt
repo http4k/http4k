@@ -19,18 +19,22 @@ import java.time.Clock
 /**
  * Sign AWS requests using static credentials.
  */
-fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
-                          credentials: AwsCredentials,
-                          clock: Clock = Clock.systemDefaultZone(),
-                          payloadMode: Payload.Mode = Payload.Mode.Signed) = ClientFilters.AwsAuth(scope, { credentials }, clock, payloadMode)
+fun ClientFilters.AwsAuth(
+    scope: AwsCredentialScope,
+    credentials: AwsCredentials,
+    clock: Clock = Clock.systemDefaultZone(),
+    payloadMode: Payload.Mode = Payload.Mode.Signed
+) = ClientFilters.AwsAuth(scope, { credentials }, clock, payloadMode)
 
 /**
  * Sign AWS requests using dynamically provided (expiring) credentials.
  */
-fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
-                          credentialsProvider: () -> AwsCredentials,
-                          clock: Clock = Clock.systemDefaultZone(),
-                          payloadMode: Payload.Mode = Payload.Mode.Signed) =
+fun ClientFilters.AwsAuth(
+    scope: AwsCredentialScope,
+    credentialsProvider: () -> AwsCredentials,
+    clock: Clock = Clock.systemDefaultZone(),
+    payloadMode: Payload.Mode = Payload.Mode.Signed
+) =
     Filter { next ->
         {
             val payload = payloadMode(it)
@@ -74,9 +78,12 @@ private val Method.allowsContent: Boolean
         else -> true
     }
 
-private fun buildAuthHeader(scope: AwsCredentialScope,
-                            credentials: AwsCredentials,
-                            canonicalRequest: AwsCanonicalRequest, date: AwsRequestDate) =
+private fun buildAuthHeader(
+    scope: AwsCredentialScope,
+    credentials: AwsCredentials,
+    canonicalRequest: AwsCanonicalRequest,
+    date: AwsRequestDate
+) =
     "AWS4-HMAC-SHA256 Credential=${credentials.accessKey}/${scope.datedScope(date)}, SignedHeaders=${canonicalRequest.signedHeaders}, Signature=${AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, date)}"
 
 data class CanonicalPayload(val hash: String, val length: Long)

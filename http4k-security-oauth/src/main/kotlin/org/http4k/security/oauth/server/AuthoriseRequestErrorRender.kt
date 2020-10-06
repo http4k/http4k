@@ -14,10 +14,12 @@ import org.http4k.security.oauth.server.ResponseRender.Companion.forAuthRequest
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.extractRequestJwtClaimsAsMap
 
-class AuthoriseRequestErrorRender(private val authoriseRequestValidator: AuthoriseRequestValidator,
-                                  private val requestJWTValidator: RequestJWTValidator,
-                                  private val fallBack: JsonResponseErrorRenderer,
-                                  private val documentationUri: String? = null) {
+class AuthoriseRequestErrorRender(
+    private val authoriseRequestValidator: AuthoriseRequestValidator,
+    private val requestJWTValidator: RequestJWTValidator,
+    private val fallBack: JsonResponseErrorRenderer,
+    private val documentationUri: String? = null
+) {
 
     fun errorFor(request: Request, error: OAuthError): Response {
         val requestClientId = extractValueFromRequestOrNull(request) { OAuthServer.clientIdQueryParameter(it) }
@@ -50,11 +52,13 @@ class AuthoriseRequestErrorRender(private val authoriseRequestValidator: Authori
         }
     }
 
-    private fun isUnsafeToRedirectBackToRedirectUri(isRequestJwtValid: Boolean?,
-                                                    requestClientId: ClientId?,
-                                                    requestJwtClientId: ClientId?,
-                                                    requestRedirectUri: Uri?,
-                                                    request: Request): Boolean {
+    private fun isUnsafeToRedirectBackToRedirectUri(
+        isRequestJwtValid: Boolean?,
+        requestClientId: ClientId?,
+        requestJwtClientId: ClientId?,
+        requestRedirectUri: Uri?,
+        request: Request
+    ): Boolean {
         return isRequestJwtValid == false ||
             requestClientId == null ||
             (requestJwtClientId != null && requestClientId != requestJwtClientId) ||

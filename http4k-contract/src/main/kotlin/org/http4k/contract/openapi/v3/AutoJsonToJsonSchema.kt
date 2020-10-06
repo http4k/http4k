@@ -50,8 +50,14 @@ class AutoJsonToJsonSchema<NODE : Any>(
         return SchemaNode.Array(name, isNullable, items, this, metadata)
     }
 
-    private fun NODE.toEnumSchema(fieldName: String, obj: Any, param: ParamMeta,
-                                  enumConstants: Array<Any>, isNullable: Boolean, metadata: FieldMetadata?): SchemaNode =
+    private fun NODE.toEnumSchema(
+        fieldName: String,
+        obj: Any,
+        param: ParamMeta,
+        enumConstants: Array<Any>,
+        isNullable: Boolean,
+        metadata: FieldMetadata?
+    ): SchemaNode =
         SchemaNode.Reference(fieldName, "#/$refPrefix/${modelNamer(obj)}",
             SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { it.toString() }, null), metadata)
 
@@ -193,18 +199,25 @@ private sealed class SchemaNode(
         override fun definitions() = items.definitions()
     }
 
-    class Object(name: String, isNullable: Boolean, val properties: Map<String, SchemaNode>,
-                 example: Any?, metadata: FieldMetadata?) : SchemaNode(name, ObjectParam, isNullable, example, metadata) {
+    class Object(
+        name: String,
+        isNullable: Boolean,
+        val properties: Map<String, SchemaNode>,
+        example: Any?,
+        metadata: FieldMetadata?
+    ) : SchemaNode(name, ObjectParam, isNullable, example, metadata) {
         val type = paramMeta().value
         val required = properties.filterNot { it.value.isNullable }.keys.sorted()
         override fun arrayItem() = ArrayItem.Ref(name())
         override fun definitions() = properties.values.flatMap { it.definitions() }
     }
 
-    class Reference(name: String,
-                    val `$ref`: String,
-                    private val schemaNode: SchemaNode,
-                    metadata: FieldMetadata?) : SchemaNode(name, ObjectParam, schemaNode.isNullable, null, metadata) {
+    class Reference(
+        name: String,
+        val `$ref`: String,
+        private val schemaNode: SchemaNode,
+        metadata: FieldMetadata?
+    ) : SchemaNode(name, ObjectParam, schemaNode.isNullable, null, metadata) {
         override fun arrayItem() = ArrayItem.Ref(`$ref`)
         override fun definitions() = listOf(schemaNode) + schemaNode.definitions()
     }

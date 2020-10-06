@@ -60,11 +60,12 @@ object ChaosBehaviours {
          * Get a latency range from the environment.
          * Defaults to CHAOS_LATENCY_MS_MIN/MAX and a value of 100ms -> 500ms
          */
-        fun fromEnv(env: (String) -> String? = System::getenv,
-                    defaultMin: Duration = ofMillis(100),
-                    defaultMax: Duration = ofMillis(500),
-                    minName: String = "CHAOS_LATENCY_MS_MIN",
-                    maxName: String = "CHAOS_LATENCY_MS_MAX"
+        fun fromEnv(
+            env: (String) -> String? = System::getenv,
+            defaultMin: Duration = ofMillis(100),
+            defaultMax: Duration = ofMillis(500),
+            minName: String = "CHAOS_LATENCY_MS_MIN",
+            maxName: String = "CHAOS_LATENCY_MS_MAX"
         ) = Latency(env(minName)?.let { ofMillis(it.toLong()) } ?: defaultMin,
             env(maxName)?.let { ofMillis(it.toLong()) } ?: defaultMax)
     }

@@ -43,24 +43,26 @@ import java.time.Instant.ofEpochSecond
  * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
  * Optionally a Security can be passed to limit access to the chaos controls.
  */
-fun HttpHandler.withChaosApi(engine: ChaosEngine = ChaosEngine(),
-                             security: Security = NoSecurity,
-                             controlsPath: String = "/chaos",
-                             openApiPath: String = "",
-                             corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
-                             clock: Clock = Clock.systemUTC()
+fun HttpHandler.withChaosApi(
+    engine: ChaosEngine = ChaosEngine(),
+    security: Security = NoSecurity,
+    controlsPath: String = "/chaos",
+    openApiPath: String = "",
+    corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
+    clock: Clock = Clock.systemUTC()
 ) = routes("/{path:.*}" bind this).withChaosApi(engine, security, controlsPath, openApiPath, corsPolicy, clock)
 
 /**
  * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
  * Optionally a Security can be passed to limit access to the chaos controls.
  */
-fun RoutingHttpHandler.withChaosApi(engine: ChaosEngine = ChaosEngine(),
-                                    security: Security = NoSecurity,
-                                    controlsPath: String = "/chaos",
-                                    openApiPath: String = "",
-                                    corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
-                                    clock: Clock = Clock.systemUTC()
+fun RoutingHttpHandler.withChaosApi(
+    engine: ChaosEngine = ChaosEngine(),
+    security: Security = NoSecurity,
+    controlsPath: String = "/chaos",
+    openApiPath: String = "",
+    corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
+    clock: Clock = Clock.systemUTC()
 ) = routes(
     RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy, clock),
     engine.then(this)

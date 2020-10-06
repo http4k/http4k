@@ -13,7 +13,8 @@ class AuthenticationComplete(
     private val authorizationCodes: AuthorizationCodes,
     private val requestTracking: AuthRequestTracking,
     private val idTokens: IdTokens,
-    private val documentationUri: String? = null) : HttpHandler {
+    private val documentationUri: String? = null
+) : HttpHandler {
 
     override fun invoke(request: Request): Response {
         val authorizationRequest = requestTracking.resolveAuthRequest(request)

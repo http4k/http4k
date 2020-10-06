@@ -30,7 +30,8 @@ object ClientFilters {
     object RequestTracing {
         operator fun invoke(
             startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }
+        ): Filter = Filter { next ->
             {
                 THREAD_LOCAL.get().run {
                     val updated = parentSpanId?.let {
@@ -130,8 +131,10 @@ object ClientFilters {
     }
 
     object Cookies {
-        operator fun invoke(clock: Clock = Clock.systemDefaultZone(),
-                            storage: CookieStorage = BasicCookieStorage()): Filter = Filter { next ->
+        operator fun invoke(
+            clock: Clock = Clock.systemDefaultZone(),
+            storage: CookieStorage = BasicCookieStorage()
+        ): Filter = Filter { next ->
             { request ->
                 val now = clock.now()
                 removeExpired(now, storage)

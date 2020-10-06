@@ -18,15 +18,19 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
                 methodMappings[name] = handler
             }
 
-            fun <IN, OUT : Any> handler(paramsLens: Mapping<NODE, IN>,
-                                        resultLens: Mapping<OUT, NODE>,
-                                        fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
+            fun <IN, OUT : Any> handler(
+                paramsLens: Mapping<NODE, IN>,
+                resultLens: Mapping<OUT, NODE>,
+                fn: (IN) -> OUT
+            ): JsonRpcHandler<NODE, NODE> =
                 handler(emptySet(), paramsLens, resultLens, fn)
 
-            fun <IN, OUT : Any> handler(paramsFieldNames: Set<String>,
-                                        paramsLens: Mapping<NODE, IN>,
-                                        resultLens: Mapping<OUT, NODE>,
-                                        fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
+            fun <IN, OUT : Any> handler(
+                paramsFieldNames: Set<String>,
+                paramsLens: Mapping<NODE, IN>,
+                resultLens: Mapping<OUT, NODE>,
+                fn: (IN) -> OUT
+            ): JsonRpcHandler<NODE, NODE> =
                 ParamMappingJsonRequestHandler(json, paramsFieldNames, paramsLens, fn, resultLens)
 
             fun <OUT : Any> handler(resultLens: Mapping<OUT, NODE>, block: () -> OUT): JsonRpcHandler<NODE, NODE> =
@@ -36,8 +40,10 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
         class Auto<NODE : Any>(val json: JsonLibAutoMarshallingJson<NODE>) :
             Manual<NODE>(json) {
 
-            inline fun <reified IN : Any, OUT : Any> handler(paramsFieldNames: Set<String>,
-                                                             noinline fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
+            inline fun <reified IN : Any, OUT : Any> handler(
+                paramsFieldNames: Set<String>,
+                noinline fn: (IN) -> OUT
+            ): JsonRpcHandler<NODE, NODE> =
                 handler(paramsFieldNames, Mapping { json.asA(it, IN::class) }, Mapping { json.asJsonObject(it) }, fn)
 
             inline fun <reified IN : Any, OUT : Any> handler(noinline fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =

@@ -80,9 +80,10 @@ object ChaosTriggers {
          * Get a percentage from the environment.
          * Defaults to CHAOS_PERCENTAGE and a value of 50%
          */
-        fun fromEnvironment(env: (String) -> String? = System::getenv,
-                            defaultPercentage: Int = 50,
-                            name: String = "CHAOS_PERCENTAGE"
+        fun fromEnvironment(
+            env: (String) -> String? = System::getenv,
+            defaultPercentage: Int = 50,
+            name: String = "CHAOS_PERCENTAGE"
         ) = PercentageBased(env(name)?.let(Integer::parseInt) ?: defaultPercentage)
     }
 
@@ -111,11 +112,13 @@ object ChaosTriggers {
      * Activates when matching attributes of a single received request are met.
      */
     object MatchRequest {
-        operator fun invoke(method: String? = null,
-                            path: Regex? = null,
-                            queries: Map<String, Regex>? = null,
-                            headers: Map<String, Regex>? = null,
-                            body: Regex? = null): Trigger {
+        operator fun invoke(
+            method: String? = null,
+            path: Regex? = null,
+            queries: Map<String, Regex>? = null,
+            headers: Map<String, Regex>? = null,
+            body: Regex? = null
+        ): Trigger {
             val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
             val queriesMatchers = queries?.map { hasQuery(it.key, it.value) } ?: emptyList()
             val pathMatchers = path?.let { listOf(hasUri(hasUriPath(it))) } ?: emptyList()

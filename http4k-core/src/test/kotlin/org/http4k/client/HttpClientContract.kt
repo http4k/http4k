@@ -27,9 +27,11 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 
-abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
-                                  val client: HttpHandler,
-                                  private val timeoutClient: HttpHandler) : AbstractHttpClientContract(serverConfig) {
+abstract class HttpClientContract(
+    serverConfig: (Int) -> ServerConfig,
+    val client: HttpHandler,
+    private val timeoutClient: HttpHandler
+) : AbstractHttpClientContract(serverConfig) {
 
     @Test
     open fun `can forward response body to another request`() {

@@ -50,9 +50,11 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
     fun <NEXT> map(nextIn: (OUT) -> NEXT): PathLensSpec<NEXT> = PathLensSpec(paramMeta, get.map(nextIn))
 }
 
-open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
-                                 get: LensGet<String, OUT>,
-                                 private val set: LensSet<Request, OUT>) : PathLensSpec<OUT>(paramMeta, get) {
+open class BiDiPathLensSpec<OUT>(
+    paramMeta: ParamMeta,
+    get: LensGet<String, OUT>,
+    private val set: LensSet<Request, OUT>
+) : PathLensSpec<OUT>(paramMeta, get) {
 
     /**
      * Create another BiDiPathLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be

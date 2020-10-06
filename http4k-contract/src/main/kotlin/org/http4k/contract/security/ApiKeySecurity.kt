@@ -14,10 +14,12 @@ import org.http4k.lens.LensFailure
  * Default implementation of ApiKey. Includes an option to NOT authorise OPTIONS requests, which is
  * currently not enabled for OpenAPI.
  */
-class ApiKeySecurity<out T>(val param: Lens<Request, T>,
-                            validateKey: (T) -> Boolean,
-                            authorizeOptionsRequests: Boolean = true,
-                            val name: String = "api_key") : Security {
+class ApiKeySecurity<out T>(
+    val param: Lens<Request, T>,
+    validateKey: (T) -> Boolean,
+    authorizeOptionsRequests: Boolean = true,
+    val name: String = "api_key"
+) : Security {
     override val filter = Filter { next ->
         {
             if (!authorizeOptionsRequests && it.method == Method.OPTIONS) {
