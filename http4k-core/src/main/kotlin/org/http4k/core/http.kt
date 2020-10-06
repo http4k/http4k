@@ -279,11 +279,11 @@ data class MemoryRequest(
 
     override fun toString(): String = toMessage()
 
-    override fun equals(other: Any?) = (other is Request
-        && headers.areSameHeadersAs(other.headers)
-        && method == other.method
-        && uri == other.uri
-        && body == other.body)
+    override fun equals(other: Any?) = (other is Request &&
+        headers.areSameHeadersAs(other.headers) &&
+        method == other.method &&
+        uri == other.uri &&
+        body == other.body)
 }
 
 @Suppress("EqualsOrHashCode")
@@ -339,10 +339,10 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
 
     override fun toString(): String = toMessage()
 
-    override fun equals(other: Any?) = (other is Response
-        && headers.areSameHeadersAs(other.headers)
-        && status == other.status
-        && body == other.body)
+    override fun equals(other: Any?) = (other is Response &&
+        headers.areSameHeadersAs(other.headers) &&
+        status == other.status &&
+        body == other.body)
 }
 
 data class RequestSource(val address: String, val port: Int? = 0, val scheme: String? = null)

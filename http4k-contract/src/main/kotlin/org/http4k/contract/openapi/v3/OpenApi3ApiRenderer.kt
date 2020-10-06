@@ -144,8 +144,8 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
 
     private fun List<RequestParameter<NODE>>.asJson(): NODE = json {
         array(
-            filterIsInstance<SchemaParameter<NODE>>().map { it.asJson() }
-                + filterIsInstance<PrimitiveParameter<NODE>>().map { it.asJson() }
+            filterIsInstance<SchemaParameter<NODE>>().map { it.asJson() } +
+                filterIsInstance<PrimitiveParameter<NODE>>().map { it.asJson() }
         )
     }
 

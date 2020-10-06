@@ -175,8 +175,8 @@ class OpenApi3<NODE : Any>(
 
     private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): BodyContent {
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
-            if (example is Array<*>
-                || example is Iterable<*>) !json.fields(schema.node).toMap().containsKey("\$ref")
+            if (example is Array<*> ||
+                example is Iterable<*>) !json.fields(schema.node).toMap().containsKey("\$ref")
             else apiRenderer.toSchema(object {}) != schema
 
         val jsonSchema = example
