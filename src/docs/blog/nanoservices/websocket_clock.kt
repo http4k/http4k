@@ -8,8 +8,7 @@ import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import java.time.Instant
 
-fun `ticking websocket clock`() =
-    { ws: Websocket ->
+fun `ticking websocket clock`() = { ws: Websocket ->
         while (true) {
             ws.send(WsMessage(Instant.now().toString()))
             Thread.sleep(1000)

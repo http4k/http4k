@@ -106,8 +106,7 @@ class MultipartFormBodyTest {
     }
 
     private fun List<TestInputStream>.toMultipartForm() =
-        foldIndexed(MultipartFormBody())
-        { index, acc, stream -> acc.plus("file$index" to MultipartFormFile("foo$index.txt", TEXT_PLAIN, stream)) }
+        foldIndexed(MultipartFormBody()) { index, acc, stream -> acc.plus("file$index" to MultipartFormFile("foo$index.txt", TEXT_PLAIN, stream)) }
 
     private class TestInputStream(private var text: String) : InputStream() {
         private val stream = text.byteInputStream()

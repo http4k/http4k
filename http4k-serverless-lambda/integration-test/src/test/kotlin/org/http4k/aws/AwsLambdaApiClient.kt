@@ -83,8 +83,8 @@ class AwsLambdaApiClient(client: HttpHandler, region: Region) {
         @JsonProperty("Action") val action: String = "lambda:InvokeFunction",
         @JsonProperty("Principal") val principal: String,
         @JsonProperty("StatementId") val statementId: String
-    ){
-        companion object{
+    ) {
+        companion object {
             val invokeFromApiGateway = Permission(principal = "apigateway.amazonaws.com", statementId = "apigateway")
         }
     }
