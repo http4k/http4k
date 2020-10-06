@@ -11,8 +11,8 @@ import org.http4k.core.Response
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
  */
-abstract class ApplicationLoadBalancerLambdaFunction(appLoader: AppLoaderWithContexts)
-    : AwsLambdaFunction<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent>(ApplicationLoadBalancerAwsHttpAdapter, appLoader) {
+abstract class ApplicationLoadBalancerLambdaFunction(appLoader: AppLoaderWithContexts) :
+    AwsLambdaFunction<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent>(ApplicationLoadBalancerAwsHttpAdapter, appLoader) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 

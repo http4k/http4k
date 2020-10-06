@@ -11,8 +11,8 @@ import org.http4k.core.Response
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
  */
-abstract class ApiGatewayV1LambdaFunction(appLoader: AppLoaderWithContexts)
-    : AwsLambdaFunction<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>(ApiGatewayV1AwsHttpAdapter, appLoader) {
+abstract class ApiGatewayV1LambdaFunction(appLoader: AppLoaderWithContexts) :
+    AwsLambdaFunction<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>(ApiGatewayV1AwsHttpAdapter, appLoader) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 

@@ -31,6 +31,6 @@ abstract class ApiGatewayHttpClientTest(version: ApiIntegrationVersion) :
     override fun `unknown host are converted into 503`() = assumeTrue(false, "Unsupported client feature")
 }
 
-class ApiGatewayV1ClientTest:ApiGatewayHttpClientTest(v1)
+class ApiGatewayV1ClientTest : ApiGatewayHttpClientTest(v1)
 
-class ApiGatewayV2ClientTest:ApiGatewayHttpClientTest(v2)
+class ApiGatewayV2ClientTest : ApiGatewayHttpClientTest(v2)

@@ -30,8 +30,8 @@ internal sealed class Part(fieldName: String?, formField: Boolean, contentType: 
         original: PartMetaData,
         override val bytes: ByteArray /* not immutable*/,
         internal val encoding: Charset
-    )
-        : Part(original.fieldName, original.isFormField, original.contentType, original.fileName, original.headers, bytes.size) {
+    ) :
+        Part(original.fieldName, original.isFormField, original.contentType, original.fileName, original.headers, bytes.size) {
 
         override val newInputStream: InputStream
             get() = ByteArrayInputStream(bytes)

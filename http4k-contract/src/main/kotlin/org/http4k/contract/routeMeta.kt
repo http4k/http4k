@@ -21,11 +21,11 @@ open class HttpMessageMeta<out T : HttpMessage>(
     val example: Any?
 )
 
-class RequestMeta(request: Request, definitionId: String? = null, example: Any? = null)
-    : HttpMessageMeta<Request>(request, "request", definitionId, example)
+class RequestMeta(request: Request, definitionId: String? = null, example: Any? = null) :
+    HttpMessageMeta<Request>(request, "request", definitionId, example)
 
-class ResponseMeta(description: String, response: Response, definitionId: String? = null, example: Any? = null)
-    : HttpMessageMeta<Response>(response, description, definitionId, example)
+class ResponseMeta(description: String, response: Response, definitionId: String? = null, example: Any? = null) :
+    HttpMessageMeta<Response>(response, description, definitionId, example)
 
 class RouteMetaDsl internal constructor() {
     var summary: String = "<unknown>"

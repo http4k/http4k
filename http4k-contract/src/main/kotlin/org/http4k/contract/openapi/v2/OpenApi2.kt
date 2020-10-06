@@ -109,8 +109,8 @@ open class OpenApi2<out NODE>(
         )
     }
 
-    private fun render(pathSegments: PathSegments, contractSecurity: Security?, route: ContractRoute)
-        : FieldAndDefinitions<NODE> {
+    private fun render(pathSegments: PathSegments, contractSecurity: Security?, route: ContractRoute):
+        FieldAndDefinitions<NODE> {
 
         val (responses, responseDefinitions) = route.meta.responses.render()
 

@@ -27,8 +27,8 @@ open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) :
     override fun toString(): String = "{${meta.name}}"
 }
 
-class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request)
-    : LensInjector<FINAL, Request>, PathLens<FINAL>(meta, get) {
+class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request) :
+    LensInjector<FINAL, Request>, PathLens<FINAL>(meta, get) {
     @Suppress("UNCHECKED_CAST")
     override operator fun <R : Request> invoke(value: FINAL, target: R): R = set(value, target) as R
 }
