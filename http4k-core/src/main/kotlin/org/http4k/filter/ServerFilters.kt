@@ -31,12 +31,22 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
 import java.io.StringWriter
 
-data class CorsPolicy(val origins: List<String>,
+data class CorsPolicy(val originPolicy: OriginPolicy,
                       val headers: List<String>,
                       val methods: List<Method>,
                       val credentials: Boolean = false) {
+    @Deprecated("Use the primary constructor with OriginPolicy instead")
+    constructor(origins: List<String>,
+                headers: List<String>,
+                methods: List<Method>,
+                credentials: Boolean = false) : this(
+        if ("*" in origins) {
+            AllowAllOriginPolicy()
+        } else {
+            MultipleOriginPolicy(origins)
+        }, headers, methods, credentials)
     companion object {
-        val UnsafeGlobalPermissive = CorsPolicy(listOf("*"), listOf("content-type"), Method.values().toList(), true)
+        val UnsafeGlobalPermissive = CorsPolicy(AllowAllOriginPolicy(), listOf("content-type"), Method.values().toList(), true)
     }
 }
 
@@ -54,8 +64,8 @@ object ServerFilters {
 
                 val origin = it.header("Origin")
                 val allowedOrigin = when {
-                    "*" in policy.origins -> "*"
-                    origin != null && origin in policy.origins -> origin
+                    policy.originPolicy is AllowAllOriginPolicy -> "*"
+                    origin != null && policy.originPolicy(origin) -> origin
                     else -> "null"
                 }
 
