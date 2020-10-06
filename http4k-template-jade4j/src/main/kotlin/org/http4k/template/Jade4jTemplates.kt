@@ -27,7 +27,7 @@ class Jade4jTemplates(private val configure: JadeConfiguration = JadeConfigurati
     }
 
     override fun Caching(baseTemplateDir: String): TemplateRenderer {
-        val loader = FileTemplateLoader(baseTemplateDir + File.separator, "UTF-8");
+        val loader = FileTemplateLoader(baseTemplateDir + File.separator, "UTF-8")
         configure.templateLoader = loader
 
         val cachingFun = fun(viewModel: ViewModel): String {
