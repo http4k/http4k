@@ -10,7 +10,6 @@ import org.http4k.security.openid.Nonce
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 /**
  * This is an example implementation which stores CSRF and AccessToken values in an INSECURE client-side cookie.

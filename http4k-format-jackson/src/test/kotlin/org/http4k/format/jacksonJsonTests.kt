@@ -8,7 +8,6 @@ import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.format.Jackson.asA
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody

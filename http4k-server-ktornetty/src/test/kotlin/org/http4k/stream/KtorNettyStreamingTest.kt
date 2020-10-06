@@ -5,7 +5,6 @@ import org.http4k.core.BodyMode.Stream
 import org.http4k.server.KtorNetty
 import org.http4k.streaming.StreamingContract
 import org.http4k.streaming.StreamingTestConfiguration
-import org.junit.jupiter.api.BeforeEach
 import java.util.Random
 
 class KtorNettyStreamingTest : StreamingContract(

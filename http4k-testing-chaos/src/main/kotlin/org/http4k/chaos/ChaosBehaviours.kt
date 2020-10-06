@@ -1,7 +1,6 @@
 package org.http4k.chaos
 
 import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.chaos.*
 import org.http4k.chaos.ChaosBehaviours.BlockThread
 import org.http4k.chaos.ChaosBehaviours.EatMemory
 import org.http4k.chaos.ChaosBehaviours.KillProcess

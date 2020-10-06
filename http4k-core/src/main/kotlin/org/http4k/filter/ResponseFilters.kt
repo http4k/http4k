@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import org.http4k.base64Encode
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
