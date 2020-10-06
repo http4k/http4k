@@ -44,7 +44,6 @@ class WsRoutingTest {
 
             override fun onMessage(fn: (WsMessage) -> Unit) {
             }
-
         })
         assertThat(request.get().path("name"), equalTo("correct"))
     }

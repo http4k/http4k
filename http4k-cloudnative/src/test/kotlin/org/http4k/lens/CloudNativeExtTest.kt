@@ -47,5 +47,4 @@ class CloudNativeExtTest {
         assertFormat(Authority(Host.localhost, Port(443)))
         assertFormat(Authority(Host.localhost))
     }
-
 }

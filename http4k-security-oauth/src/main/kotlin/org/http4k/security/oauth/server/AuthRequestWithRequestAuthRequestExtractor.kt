@@ -102,5 +102,4 @@ class AuthRequestWithRequestAuthRequestExtractor(
         abstract fun <T> combine(authRequestValue: T?, requestObjectValue: T?): T?
         abstract fun <T> combine(authRequestValue: List<T>, requestObjectValue: List<T>): List<T>
     }
-
 }

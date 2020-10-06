@@ -18,7 +18,6 @@ class Jade4jTemplatesTest : TemplatesContract<Jade4jTemplates>(Jade4jTemplates()
         val rendererBFirst = templates.HotReload("src/test/resources/b")
         assertThat(rendererBFirst(TemplateC), equalTo("c2"))
     }
-
 }
 
 class Jade4jViewModelTest : ViewModelContract(Jade4jTemplates())

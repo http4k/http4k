@@ -38,5 +38,4 @@ class RequestContent(
         val query = queryStringParameters?.toList() ?: Uri.of(rawQueryString.orEmpty()).queries()
         return Uri.of(path).query(query.toUrlFormEncoded())
     }
-
 }

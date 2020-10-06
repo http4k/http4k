@@ -21,5 +21,4 @@ class SimpleAuthoriseRequestValidator(private val clientValidator: ClientValidat
             Success(request)
         }
     }
-
 }

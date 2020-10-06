@@ -27,8 +27,6 @@ data class AuthRequest(
     companion object {
 
         const val OIDC_SCOPE = "openid"
-
     }
-
 }
 

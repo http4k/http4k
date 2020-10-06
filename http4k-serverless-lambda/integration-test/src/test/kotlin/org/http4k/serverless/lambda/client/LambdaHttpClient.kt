@@ -62,7 +62,6 @@ internal interface AwsClientHttpAdapter<Req, Resp> {
 
     val requestLens: BiDiBodyLens<Req>
     val responseLens: BiDiBodyLens<Resp>
-
 }
 
 class AwsClientV1HttpAdapter :

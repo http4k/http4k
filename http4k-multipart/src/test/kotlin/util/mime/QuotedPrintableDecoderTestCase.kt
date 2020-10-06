@@ -76,9 +76,7 @@ class QuotedPrintableDecoderTestCase {
             assertEncoded("=\r\n", "=3D=XD=XA")
             fail<Any>("did not throw")
         } catch (e: IOException) {
-
         }
-
     }
 
     /**
@@ -141,5 +139,4 @@ class QuotedPrintableDecoderTestCase {
             }
         }
     }
-
 }

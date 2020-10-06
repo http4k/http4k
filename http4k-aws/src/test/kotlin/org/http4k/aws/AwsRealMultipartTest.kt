@@ -100,5 +100,4 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
             client(Request(GET, s3Root)).bodyString(),
             !containsSubstring(bucketName))
     }
-
 }

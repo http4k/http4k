@@ -36,6 +36,5 @@ data class SubWithText1(val attr: String?, val content: String?)
 
 data class Xml(val SubWithText: List<SubWithText1>?, val subWithAttr: SubWithAttr?, val content: String?)
 """))
-
     }
 }

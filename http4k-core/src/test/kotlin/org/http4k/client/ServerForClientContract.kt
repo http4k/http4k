@@ -76,7 +76,6 @@ object ServerForClientContract : HttpHandler {
             val status = Status(code, "Description for $code")
             Response(status)
         })
-
 }
 
 fun testImageBytes() = ServerForClientContract::class.java.getResourceAsStream("/test.png").readBytes()

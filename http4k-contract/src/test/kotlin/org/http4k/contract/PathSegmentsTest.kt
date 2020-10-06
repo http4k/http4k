@@ -12,5 +12,4 @@ class PathSegmentsTest {
         assertThat(Root / PathSegments("/two/three"), equalTo(PathSegments("/two/three")))
         assertThat(PathSegments("/two/three") / Root, equalTo(PathSegments("/two/three")))
     }
-
 }

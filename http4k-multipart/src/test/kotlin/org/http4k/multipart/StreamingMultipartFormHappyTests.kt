@@ -219,7 +219,6 @@ class StreamingMultipartFormHappyTests {
         } catch (e: AlreadyClosedException) {
             // pass
         }
-
     }
 
     @Test
@@ -280,7 +279,6 @@ class StreamingMultipartFormHappyTests {
         assertRealLifeFile(parts, "starbucks.jpeg", "image/jpeg")
         assertRealLifeFile(parts, "utf8\uD83D\uDCA9.file", "application/octet-stream")
         assertRealLifeFile(parts, "utf8\uD83D\uDCA9.txt", "text/plain")
-
     }
 
     @Test
@@ -297,10 +295,7 @@ class StreamingMultipartFormHappyTests {
         assertRealLifeFile(parts, "starbucks.jpeg", "image/jpeg")
         assertRealLifeFile(parts, "utf8\uD83D\uDCA9.file", "application/octet-stream")
         assertRealLifeFile(parts, "utf8\uD83D\uDCA9.txt", "text/plain")
-
     }
-
-
 }
 
 val CR_LF = "\r\n"

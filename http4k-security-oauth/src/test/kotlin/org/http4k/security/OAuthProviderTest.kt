@@ -67,7 +67,6 @@ class OAuthProviderTest {
 
         val jwts = object : RequestJwts {
             override fun create(authRequest: AuthRequest, state: State, nonce: Nonce?) = RequestJwtContainer("myCustomJwt")
-
         }
         assertThat(oAuth(oAuthPersistence).authFilter(jwts).then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
@@ -113,5 +112,4 @@ class OAuthProviderTest {
 
         assertThat(oAuth(oAuthPersistence).callback(withCodeAndValidStateButNoUrl), equalTo(validRedirectToRoot))
     }
-
 }

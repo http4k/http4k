@@ -66,7 +66,6 @@ class CircularBufferedInputStreamTest {
         } catch (e: ArrayIndexOutOfBoundsException) {
             assertThat(e.localizedMessage, containsSubstring("Readlimit (5) cannot be bigger than buffer size (4)"))
         }
-
     }
 
     @Test
@@ -140,7 +139,6 @@ class CircularBufferedInputStreamTest {
         } catch (e: InvalidMarkException) {
             assertThat(e.message, equalTo<String>(null))
         }
-
     }
 
     @Test

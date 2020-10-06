@@ -52,5 +52,4 @@ class FragmentParametersTest {
         assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("code", "some different code"), equalTo(Request(GET, "http://localhost#code=12345&code=some+different+code")))
         assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("foo", null), equalTo(Request(GET, "http://localhost#code=12345&foo")))
     }
-
 }

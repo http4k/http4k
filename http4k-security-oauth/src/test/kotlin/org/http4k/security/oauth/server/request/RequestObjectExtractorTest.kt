@@ -140,5 +140,4 @@ internal class RequestObjectExtractorTest {
 
     private fun failure(): Result<Map<*, *>, InvalidRequestObject> = Failure(InvalidRequestObject)
     private fun <T> success(data: T): Result<T, InvalidRequestObject> = Success(data)
-
 }

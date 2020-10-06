@@ -29,5 +29,4 @@ internal class AuthRequestTest {
         responseType = ResponseType.Code,
         state = State("some state"),
         scopes = emptyList())
-
 }

@@ -19,7 +19,6 @@ class HandlebarsTemplatesTest : TemplatesContract<HandlebarsTemplates>(Handlebar
         val rendererBFirst = templates.HotReload("src/test/resources/b", "src/test/resources/a")
         assertThat(rendererBFirst(TemplateC), equalTo("c2"))
     }
-
 }
 
 class HandlebarsViewModelTest : ViewModelContract(HandlebarsTemplates())

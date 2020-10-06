@@ -48,5 +48,4 @@ class ExampleJsonApprovalTest {
     fun `combine approval with hamkrest matcher`(approver: Approver) {
         assertThat(app(Request(GET, "/url")), hasStatus(OK).and(approver.hasApprovedContent()))
     }
-
 }

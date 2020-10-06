@@ -59,5 +59,4 @@ class PushPullAdaptingWebSocketTest {
         adapter.triggerClose(NEVER_CONNECTED)
         assertThat(outboundClose.get(), equalTo(NEVER_CONNECTED))
     }
-
 }

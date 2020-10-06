@@ -130,5 +130,4 @@ class HeaderTest {
             equalTo("some value" to
                 listOf("bob" to null, "bob2" to "anotherValue")))
     }
-
 }

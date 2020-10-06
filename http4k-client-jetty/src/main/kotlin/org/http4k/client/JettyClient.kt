@@ -108,7 +108,6 @@ object JettyClient {
                 is TimeoutException -> CLIENT_TIMEOUT
                 else -> SERVICE_UNAVAILABLE
             }.description("Client Error: caused by $localizedMessage"))
-
         }
     }
 

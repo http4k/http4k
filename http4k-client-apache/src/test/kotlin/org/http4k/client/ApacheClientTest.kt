@@ -39,8 +39,6 @@ class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
 
             override fun close() {
             }
-
         })(Request(GET, "http://localhost:8000")), hasStatus(CLIENT_TIMEOUT))
     }
-
 }

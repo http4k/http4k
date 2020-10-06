@@ -110,5 +110,4 @@ object RequestObjectExtractor {
         @JsonProperty("exp") val expiry: Long? = null,
         @JsonProperty("claims") val claims: Claims = Claims()
     )
-
 }

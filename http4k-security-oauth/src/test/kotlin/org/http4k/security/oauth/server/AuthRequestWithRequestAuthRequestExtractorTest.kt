@@ -352,6 +352,4 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
     private fun underTest(strategy: AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy = Combine) =
         AuthRequestWithRequestAuthRequestExtractor(requestJWTValidator, strategy)
-
-
 }

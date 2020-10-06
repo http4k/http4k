@@ -113,5 +113,4 @@ class ParameterParserTest {
         val params = parser.parse(s, charArrayOf(',', ';'))
         assertEquals("If you can read this you understand the example.", params["filename"])
     }
-
 }

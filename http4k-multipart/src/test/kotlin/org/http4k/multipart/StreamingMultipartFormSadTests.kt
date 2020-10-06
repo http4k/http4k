@@ -27,7 +27,6 @@ class StreamingMultipartFormSadTests {
         } catch (e: ParseError) {
             assertThat(e.cause!!, has(Throwable::message, present(equalTo("Boundary not found <<-----1234>>"))))
         }
-
     }
 
     @Test
@@ -45,7 +44,6 @@ class StreamingMultipartFormSadTests {
         } catch (e: NoSuchElementException) {
             // pass
         }
-
     }
 
     @Test
@@ -64,7 +62,6 @@ class StreamingMultipartFormSadTests {
         } catch (e: NoSuchElementException) {
             // pass
         }
-
     }
 
     @Test
