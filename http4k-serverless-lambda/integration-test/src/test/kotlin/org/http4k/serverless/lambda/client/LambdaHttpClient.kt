@@ -30,7 +30,7 @@ class LambdaHttpClient(functionName: FunctionName, region: Region, version: ApiI
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->
         {
-            val request:Request = Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
+            val request: Request = Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
                 .header("X-Amz-Invocation-Type", "RequestResponse")
                 .header("X-Amz-Log-Type", "Tail")
                 .with(adapter.inject(it))
@@ -85,12 +85,19 @@ class AwsClientV1HttpAdapter :
 internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
     override fun invoke(response: APIGatewayV2HTTPResponse) =
         Response(Status(response.statusCode, ""))
+            .headers((response.headers
+                ?: emptyMap()).entries.fold(listOf(), { acc, next -> acc + (next.key to next.value) }))
+            .headers((response.multiValueHeaders ?: emptyMap()).entries.fold(listOf(), { acc, next ->
+                next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
+            }))
+            .body(response.body.orEmpty())
+
 
     override fun invoke(request: Request) = APIGatewayV2HTTPEvent.builder()
         .withRawPath(request.uri.path)
         .withRawQueryString(request.uri.query)
         .withBody(request.bodyString())
-//            .withHeaders(request.headers.)
+        .withHeaders(request.headers.toMap())
         .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
             .withHttp(
                 APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod(request.method.name).build()
