@@ -7,7 +7,6 @@ import org.http4k.client.HttpClientContract
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Disabled
 
 private fun client(version: ApiIntegrationVersion): (Request) -> Response {
     val functionClient = testFunctionClient(version)
@@ -25,5 +24,5 @@ abstract class LambdaHttpClientTest(version: ApiIntegrationVersion) :
 
 class LambdaV1HttpClientTest : LambdaHttpClientTest(v1)
 
-@Disabled("v2 is not supported by the client yet")
+//@Disabled("v2 is not supported by the client yet")
 class LambdaV2HttpClientTest : LambdaHttpClientTest(v2)

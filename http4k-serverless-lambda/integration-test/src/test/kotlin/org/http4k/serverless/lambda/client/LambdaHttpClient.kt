@@ -2,13 +2,8 @@ package org.http4k.serverless.lambda.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import org.http4k.aws.AwsCredentialScope
-import org.http4k.aws.AwsCredentials
 import org.http4k.aws.FunctionName
 import org.http4k.aws.Region
-import org.http4k.aws.Role
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -26,25 +21,17 @@ object LambdaHttpClient {
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->
         {
+            val adapter = AwsClientV1HttpAdapter()
             val lambdaResponse = next(
                 Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
                     .header("X-Amz-Invocation-Type", "RequestResponse")
                     .header("X-Amz-Log-Type", "Tail")
-                    .with(
-                        lambdaRequest of APIGatewayProxyRequestEvent()
-                            .withHttpMethod(it.method.name)
-                            .withHeaders(it.headers.toMap())
-                            .withPath(it.uri.path)
-                            .withQueryStringParameters(it.uri.query.toParameters().toMap())
-                            .withBody(it.bodyString())
-                    )
+                    .with(lambdaRequest of adapter(it))
             )
 
             val response = lambdaResponse(lambdaResponse)
 
-            Response(Status(response.statusCode, ""))
-                .headers(response.headers.map { kv -> kv.toPair() })
-                .body(response.body)
+            adapter(response)
         }
     }
 
@@ -58,3 +45,22 @@ object LambdaApi {
     }
 }
 
+internal interface AwsClientHttpAdapter<Req, Resp> {
+    operator fun invoke(response: Resp): Response
+    operator fun invoke(request: Request): Req
+}
+
+class AwsClientV1HttpAdapter :
+    AwsClientHttpAdapter<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
+    override fun invoke(response: APIGatewayProxyResponseEvent) = Response(Status(response.statusCode, ""))
+        .headers(response.headers.map { kv -> kv.toPair() })
+        .body(response.body)
+
+    override fun invoke(request: Request) = APIGatewayProxyRequestEvent()
+        .withHttpMethod(request.method.name)
+        .withHeaders(request.headers.toMap())
+        .withPath(request.uri.path)
+        .withQueryStringParameters(request.uri.query.toParameters().toMap())
+        .withBody(request.bodyString())
+}
