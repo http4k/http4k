@@ -22,7 +22,7 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
 
-class LambdaHttpClient(functionName: FunctionName, region: Region, version: ApiIntegrationVersion = v1) : Filter {
+class LambdaHttpClient(functionName: FunctionName, region: Region, version: ApiIntegrationVersion) : Filter {
     private val adapter = when (version) {
         v1 -> AwsClientV1HttpAdapter()
         v2 -> AwsClientV2HttpAdapter()

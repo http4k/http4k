@@ -24,7 +24,7 @@ val testFunctionClient by lazy {
 }
 
 fun testFunctionClient(version: ApiIntegrationVersion) =
-    LambdaHttpClient(DeployServerAsLambdaForClientContract.functionName(version), Config.region(awsConfig)).then(awsClient("lambda"))
+    LambdaHttpClient(DeployServerAsLambdaForClientContract.functionName(version), Config.region(awsConfig), version).then(awsClient("lambda"))
 
 val lambdaApiClient by lazy { AwsLambdaApiClient(awsClient("lambda"), Config.region(awsConfig)) }
 
