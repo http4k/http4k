@@ -14,7 +14,7 @@ import org.http4k.lens.composite
 import org.http4k.lens.int
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
+import java.util.Properties
 
 class EnvironmentKeyTest {
 

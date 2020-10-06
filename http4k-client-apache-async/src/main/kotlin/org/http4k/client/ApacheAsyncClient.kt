@@ -11,7 +11,11 @@ import org.apache.hc.core5.concurrent.FutureCallback
 import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.HttpResponse
-import org.http4k.core.*
+import org.http4k.core.Body
+import org.http4k.core.Headers
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import java.io.ByteArrayInputStream

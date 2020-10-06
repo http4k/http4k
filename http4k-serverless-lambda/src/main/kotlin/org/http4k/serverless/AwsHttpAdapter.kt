@@ -8,7 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.queries
 import org.http4k.core.toUrlFormEncoded
-import java.util.*
+import java.util.Base64
 
 internal interface AwsHttpAdapter<Req, Resp> {
     operator fun invoke(req: Req): Request

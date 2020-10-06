@@ -2,7 +2,8 @@ package org.http4k.webdriver
 
 import org.http4k.core.Body
 import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with

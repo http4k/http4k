@@ -3,7 +3,8 @@ package org.http4k.aws
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.aws.ApiGatewayJackson.auto
-import org.http4k.aws.ApiIntegrationVersion.*
+import org.http4k.aws.ApiIntegrationVersion.v1
+import org.http4k.aws.ApiIntegrationVersion.v2
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler

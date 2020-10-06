@@ -15,7 +15,7 @@ import org.http4k.format.Jackson.auto
 import org.http4k.serverless.lambda.client.LambdaApi
 import org.http4k.serverless.lambda.inIntelliJOnly
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Base64
 
 class AwsLambdaApiClient(client: HttpHandler, region: Region) {
     private val client = LambdaApi(region)

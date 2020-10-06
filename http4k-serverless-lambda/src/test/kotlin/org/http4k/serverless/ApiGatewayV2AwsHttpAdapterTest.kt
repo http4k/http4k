@@ -13,7 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Base64
 
 class ApiGatewayV2AwsHttpAdapterTest {
 
