@@ -2,6 +2,8 @@ package org.http4k.serverless.lambda.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import org.http4k.aws.ApiIntegrationVersion
 import org.http4k.aws.ApiIntegrationVersion.v1
 import org.http4k.aws.ApiIntegrationVersion.v2
@@ -20,25 +22,22 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
 
-class LambdaHttpClient(functionName: FunctionName, region: Region, version: ApiIntegrationVersion = v1):Filter {
-    private val adapter = when(version){
+class LambdaHttpClient(functionName: FunctionName, region: Region, version: ApiIntegrationVersion = v1) : Filter {
+    private val adapter = when (version) {
         v1 -> AwsClientV1HttpAdapter()
-        v2 -> AwsClientV1HttpAdapter()
+        v2 -> AwsClientV2HttpAdapter()
     }
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->
         {
+            val request:Request = Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
+                .header("X-Amz-Invocation-Type", "RequestResponse")
+                .header("X-Amz-Log-Type", "Tail")
+                .with(adapter.inject(it))
 
-            val lambdaResponse = next(
-                Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
-                    .header("X-Amz-Invocation-Type", "RequestResponse")
-                    .header("X-Amz-Log-Type", "Tail")
-                    .with(adapter.requestLens of adapter(it))
-            )
+            val lambdaResponse = next(request)
 
-            val response = adapter.responseLens(lambdaResponse)
-
-            adapter(response)
+            adapter.extract(lambdaResponse)
         }
     }
 
@@ -57,8 +56,12 @@ internal interface AwsClientHttpAdapter<Req, Resp> {
     operator fun invoke(response: Resp): Response
     operator fun invoke(request: Request): Req
 
+    fun inject(request: Request): (Request) -> Request = requestLens of this(request)
+    fun extract(response: Response): Response = this(responseLens(response))
+
     val requestLens: BiDiBodyLens<Req>
     val responseLens: BiDiBodyLens<Resp>
+
 }
 
 class AwsClientV1HttpAdapter :
@@ -77,4 +80,24 @@ class AwsClientV1HttpAdapter :
 
     override val requestLens = Body.auto<APIGatewayProxyRequestEvent>().toLens()
     override val responseLens = Body.auto<APIGatewayProxyResponseEvent>().toLens()
+}
+
+internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
+    override fun invoke(response: APIGatewayV2HTTPResponse) =
+        Response(Status(response.statusCode, ""))
+
+    override fun invoke(request: Request) = APIGatewayV2HTTPEvent.builder()
+        .withRawPath(request.uri.path)
+        .withRawQueryString(request.uri.query)
+        .withBody(request.bodyString())
+//            .withHeaders(request.headers.)
+        .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
+            .withHttp(
+                APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod(request.method.name).build()
+            ).build()
+        )
+        .build()
+
+    override val requestLens = Body.auto<APIGatewayV2HTTPEvent>().toLens()
+    override val responseLens = Body.auto<APIGatewayV2HTTPResponse>().toLens()
 }
