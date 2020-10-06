@@ -19,6 +19,7 @@ plugins {
     id 'com.github.kt3k.coveralls' version "2.10.1"
     id "com.jfrog.bintray" version "1.8.4"
     id 'de.fayard.buildSrcVersions' version "0.7.0"
+    id("org.jlleitschuh.gradle.ktlint") version("9.2.1")
 }
 
 allprojects {
@@ -279,4 +280,10 @@ buildSrcVersions {
 wrapper {
     gradleVersion = Versions.gradleLatestVersion
     distributionType = Wrapper.DistributionType.ALL
+}
+
+ktlint {
+    enableExperimentalRules = false
+    version = "0.39.0"
+    disabledRules = ["filename"]
 }
