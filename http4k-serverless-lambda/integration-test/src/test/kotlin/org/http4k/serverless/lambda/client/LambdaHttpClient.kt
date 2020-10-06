@@ -2,6 +2,9 @@ package org.http4k.serverless.lambda.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
+import org.http4k.aws.ApiIntegrationVersion
+import org.http4k.aws.ApiIntegrationVersion.v1
+import org.http4k.aws.ApiIntegrationVersion.v2
 import org.http4k.aws.FunctionName
 import org.http4k.aws.Region
 import org.http4k.core.Body
@@ -17,10 +20,15 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
 
-class LambdaHttpClient(functionName: FunctionName, region: Region):Filter {
+class LambdaHttpClient(functionName: FunctionName, region: Region, version: ApiIntegrationVersion = v1):Filter {
+    private val adapter = when(version){
+        v1 -> AwsClientV1HttpAdapter()
+        v2 -> AwsClientV1HttpAdapter()
+    }
+
     private fun callFunction(functionName: FunctionName) = Filter { next ->
         {
-            val adapter = AwsClientV1HttpAdapter()
+
             val lambdaResponse = next(
                 Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
                     .header("X-Amz-Invocation-Type", "RequestResponse")
