@@ -202,7 +202,7 @@ object ClientFilters {
         operator fun invoke() = Filter { next ->
             {
                 next(it.header("host")
-                    ?.let { host -> it.replaceHeader("X-Forwarded-Host", host) }
+                    ?.let { host -> it.header("X-Forwarded-Host", host) }
                     ?: it
                 )
             }
