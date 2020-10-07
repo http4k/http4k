@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.266.0 (uncut)
 - **http4k-core** : Add CustomBasicAuth and ProxyBasicAuth filters. H/T @raymanoz for the PR
+- **http4k-core** : Implemented OriginPolicy for CORS. H/T @kratostaine  for the PR
 
 ### v3.265.0
 - **http4k-*** : Upgrade some dependency versions.
