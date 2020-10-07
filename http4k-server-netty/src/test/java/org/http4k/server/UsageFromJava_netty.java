@@ -14,3 +14,4 @@ public interface UsageFromJava_netty {
     Function1<Request, Response> httpHandler = req -> response;
     Http4kServer http4kServer = asServer(httpHandler, netty);
 }
+
