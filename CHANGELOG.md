@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.266.0 (uncut)
+- **http4k-core** : Add CustomBasicAuth and ProxyBasicAuth filters. H/T @raymanoz for the PR
+
 ### v3.265.0
 - **http4k-*** : Upgrade some dependency versions.
 - [http4k-security-oauth] [Break (via repackaging of dependent JAR)] - Result4k changed published package structure. Changes made to accommodate new package `dev.forkhandles.result4k` instead of `com.natpryce`. To fix, simply find/replace the package names - everything else is identical.
