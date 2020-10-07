@@ -82,12 +82,24 @@ object ClientFilters {
     }
 
     object BasicAuth {
-        operator fun invoke(provider: () -> Credentials): Filter = Filter { next ->
-            { next(it.header("Authorization", "Basic ${provider().base64Encoded()}")) }
+        operator fun invoke(provider: () -> Credentials): Filter = CustomBasicAuth.invoke("Authorization", provider)
+        operator fun invoke(user: String, password: String): Filter = BasicAuth(Credentials(user, password))
+        operator fun invoke(credentials: Credentials): Filter = BasicAuth{ credentials }
+    }
+
+    object ProxyBasicAuth {
+        operator fun invoke(provider: () -> Credentials): Filter = CustomBasicAuth.invoke("Proxy-Authorization", provider)
+        operator fun invoke(user: String, password: String): Filter = ProxyBasicAuth(Credentials(user, password))
+        operator fun invoke(credentials: Credentials): Filter = ProxyBasicAuth{ credentials }
+    }
+
+    object CustomBasicAuth {
+        operator fun invoke(header: String, provider: () -> Credentials): Filter = Filter { next ->
+            { next(it.header(header, "Basic ${provider().base64Encoded()}")) }
         }
 
-        operator fun invoke(user: String, password: String): Filter = BasicAuth(Credentials(user, password))
-        operator fun invoke(credentials: Credentials): Filter = BasicAuth { credentials }
+        operator fun invoke(header: String, user: String, password: String): Filter = CustomBasicAuth(header, Credentials(user, password))
+        operator fun invoke(header: String, credentials: Credentials): Filter = CustomBasicAuth(header) {credentials}
 
         private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
     }
