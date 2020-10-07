@@ -4,6 +4,7 @@ on:
       - 'master'
 jobs:
   release-site:
+    if: github.repository_owner == 'http4k'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
