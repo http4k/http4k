@@ -71,8 +71,11 @@ object ClientFilters {
      * without affecting the rest of the request.
      */
     object SetAuthorityFrom {
-        operator fun invoke(uri: Uri): Filter = Filter { next -> { request ->
-            next(request.uri(request.uri.authority(uri.authority).scheme(uri.scheme))) } }
+        operator fun invoke(uri: Uri): Filter = Filter { next ->
+            { request ->
+                next(request.uri(request.uri.authority(uri.authority).scheme(uri.scheme)))
+            }
+        }
     }
 
     object ApiKeyAuth {
@@ -84,13 +87,13 @@ object ClientFilters {
     object BasicAuth {
         operator fun invoke(provider: () -> Credentials): Filter = CustomBasicAuth.invoke("Authorization", provider)
         operator fun invoke(user: String, password: String): Filter = BasicAuth(Credentials(user, password))
-        operator fun invoke(credentials: Credentials): Filter = BasicAuth{ credentials }
+        operator fun invoke(credentials: Credentials): Filter = BasicAuth { credentials }
     }
 
     object ProxyBasicAuth {
         operator fun invoke(provider: () -> Credentials): Filter = CustomBasicAuth.invoke("Proxy-Authorization", provider)
         operator fun invoke(user: String, password: String): Filter = ProxyBasicAuth(Credentials(user, password))
-        operator fun invoke(credentials: Credentials): Filter = ProxyBasicAuth{ credentials }
+        operator fun invoke(credentials: Credentials): Filter = ProxyBasicAuth { credentials }
     }
 
     object CustomBasicAuth {
@@ -99,7 +102,7 @@ object ClientFilters {
         }
 
         operator fun invoke(header: String, user: String, password: String): Filter = CustomBasicAuth(header, Credentials(user, password))
-        operator fun invoke(header: String, credentials: Credentials): Filter = CustomBasicAuth(header) {credentials}
+        operator fun invoke(header: String, credentials: Credentials): Filter = CustomBasicAuth(header) { credentials }
 
         private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
     }
@@ -188,6 +191,20 @@ object ClientFilters {
         operator fun invoke() = Filter { next ->
             {
                 next(it.run { Request(method, uri).body(body).headers(headers) }).run { Response(status).body(body).headers(headers) }
+            }
+        }
+    }
+
+    /**
+     * Set X-Forwarded-Host header from the content of the Host header if present
+     */
+    object SetXForwardedHost {
+        operator fun invoke() = Filter { next ->
+            {
+                next(it.header("host")
+                    ?.let { host -> it.replaceHeader("X-Forwarded-Host", host) }
+                    ?: it
+                )
             }
         }
     }
