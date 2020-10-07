@@ -160,6 +160,54 @@ class ServerFiltersTest {
     }
 
     @Test
+    fun `OPTIONS - requests are returned with expected headers when AllowAllOriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(AllowAllOriginPolicy(), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "*"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when SingleOriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(SingleOriginPolicy("foo"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "foo"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when MultipleOriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(MultipleOriginPolicy(listOf("foo", "bar")), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "bar"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "bar"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when PatternOriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(PatternOriginPolicy(Regex(".*.bar")), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "foo.bar"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "foo.bar"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
     fun `catch all exceptions`() {
         val e = RuntimeException("boom!")
         val handler = ServerFilters.CatchAll(I_M_A_TEAPOT).then { throw e }
