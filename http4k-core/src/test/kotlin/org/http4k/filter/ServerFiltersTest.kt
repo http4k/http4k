@@ -125,7 +125,7 @@ class ServerFiltersTest {
 
     @Test
     fun `OPTIONS - requests are intercepted and returned with expected headers`() {
-        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AnyOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
 
         assertThat(response, hasStatus(OK)
@@ -137,7 +137,7 @@ class ServerFiltersTest {
 
     @Test
     fun `OPTIONS - requests are returned with expected headers when origin does not match`() {
-        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AnyOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "baz"))
 
         assertThat(response, hasStatus(OK)
@@ -149,7 +149,7 @@ class ServerFiltersTest {
 
     @Test
     fun `OPTIONS - requests are returned with expected headers when origin is not set`() {
-        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AnyOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/"))
 
         assertThat(response, hasStatus(OK)
@@ -160,8 +160,8 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `OPTIONS - requests are returned with expected headers when AllowAllOriginPolicy is used`() {
-        val handler = ServerFilters.Cors(CorsPolicy(AllowAllOriginPolicy(), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+    fun `OPTIONS - requests are returned with expected headers when AllowAll OriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AllowAll(), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
 
         assertThat(response, hasStatus(OK)
@@ -172,8 +172,8 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `OPTIONS - requests are returned with expected headers when SingleOriginPolicy is used`() {
-        val handler = ServerFilters.Cors(CorsPolicy(SingleOriginPolicy("foo"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+    fun `OPTIONS - requests are returned with expected headers when Only OriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.Only("foo"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
 
         assertThat(response, hasStatus(OK)
@@ -184,8 +184,8 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `OPTIONS - requests are returned with expected headers when MultipleOriginPolicy is used`() {
-        val handler = ServerFilters.Cors(CorsPolicy(MultipleOriginPolicy(listOf("foo", "bar")), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+    fun `OPTIONS - requests are returned with expected headers when AnyOf OriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AnyOf(listOf("foo", "bar")), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "bar"))
 
         assertThat(response, hasStatus(OK)
@@ -196,8 +196,8 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `OPTIONS - requests are returned with expected headers when PatternOriginPolicy is used`() {
-        val handler = ServerFilters.Cors(CorsPolicy(PatternOriginPolicy(Regex(".*.bar")), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+    fun `OPTIONS - requests are returned with expected headers when Pattern OriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.Pattern(Regex(".*.bar")), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "foo.bar"))
 
         assertThat(response, hasStatus(OK)

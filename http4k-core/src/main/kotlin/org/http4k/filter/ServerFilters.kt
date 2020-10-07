@@ -40,13 +40,9 @@ data class CorsPolicy(val originPolicy: OriginPolicy,
                 headers: List<String>,
                 methods: List<Method>,
                 credentials: Boolean = false) : this(
-        if ("*" in origins) {
-            AllowAllOriginPolicy()
-        } else {
-            MultipleOriginPolicy(origins)
-        }, headers, methods, credentials)
+        if ("*" in origins) OriginPolicy.AnyOf() else OriginPolicy.AnyOf(origins), headers, methods, credentials)
     companion object {
-        val UnsafeGlobalPermissive = CorsPolicy(AllowAllOriginPolicy(), listOf("content-type"), Method.values().toList(), true)
+        val UnsafeGlobalPermissive = CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.values().toList(), true)
     }
 }
 

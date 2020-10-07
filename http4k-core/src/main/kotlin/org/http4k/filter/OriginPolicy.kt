@@ -3,40 +3,41 @@ package org.http4k.filter
 /**
  * For creating custom origin policy for allowing CORS
  */
-interface OriginPolicy: (String) -> Boolean
+interface OriginPolicy : (String) -> Boolean {
+    companion object
+}
 
 /**
  * Allows all origins for CORS
  */
-class AllowAllOriginPolicy : OriginPolicy {
-    override fun invoke(origin: String): Boolean {
-        return true
-    }
+fun OriginPolicy.Companion.AllowAll() = AllowAllOriginPolicy
+
+object AllowAllOriginPolicy : OriginPolicy {
+    override fun invoke(origin: String) = true
 }
 
 /**
  * Allows a given single origin for CORS
  */
-data class SingleOriginPolicy(val allowedOrigin: String) : OriginPolicy {
-    override fun invoke(origin: String): Boolean {
-        return allowedOrigin == origin
-    }
+fun OriginPolicy.Companion.Only(allowedOrigin: String) = object : OriginPolicy {
+    override fun invoke(origin: String) = allowedOrigin == origin
 }
 
 /**
  * Allows a given list of origins for CORS
  */
-data class MultipleOriginPolicy(val allowedOrigins: List<String>) : OriginPolicy {
-    override fun invoke(origin: String): Boolean {
-        return origin in allowedOrigins
-    }
+fun OriginPolicy.Companion.AnyOf(allowedOrigins: List<String>) = object : OriginPolicy {
+    override fun invoke(origin: String) = origin in allowedOrigins
 }
+
+/**
+ * Allows a given list of origins for CORS
+ */
+fun OriginPolicy.Companion.AnyOf(vararg allowedOrigins: String) = AnyOf(allowedOrigins.toList())
 
 /**
  * Allows origin(s) matching a Regex for CORS
  */
-data class PatternOriginPolicy(val originRegex: Regex) : OriginPolicy {
-    override fun invoke(origin: String): Boolean {
-        return originRegex.matches(origin)
-    }
+fun OriginPolicy.Companion.Pattern(originRegex: Regex) = object : OriginPolicy {
+    override fun invoke(origin: String) = originRegex.matches(origin)
 }
