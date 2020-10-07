@@ -12,18 +12,11 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.StreamBody
+import org.http4k.websocket.Http4kWebSocketAdapter
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
-
-
-class Http4kWebSocketAdapter(private val innerSocket: PushPullAdaptingWebSocket) {
-    fun onError(throwable: Throwable) = innerSocket.triggerError(throwable)
-    fun onClose(status: WsStatus) = innerSocket.triggerClose(status)
-
-    fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
-}
 
 class Http4kWsChannelHandler(private val wSocket: WsConsumer, private val upgradeRequest: Request): SimpleChannelInboundHandler<WebSocketFrame>() {
     private var websocket: Http4kWebSocketAdapter? = null
