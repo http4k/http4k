@@ -10,7 +10,7 @@ description: Example applications and usages of http4k, including TDD approach
 - *"Live coding: Server as a function with http4k"* ([video](https://bit.ly/dmitry-live-coding-http4k)) by [Dmitry Kandalov](https://twitter.com/dmitrykandalov), presented at Talking.Kt 2020.
 - *"Server as a Function. In Kotlin. _______________"* ([video](http://bit.ly/serverasafunction) / [slides](https://speakerdeck.com/daviddenton/server-as-a-function-in-kotlin)), by [David Denton](https://twitter.com/tarkaTheRotter) and [Ivan Sanchez](https://twitter.com/s4nchez), presented at KotlinConf 2018.
 
-Also, check out the [YouTube Playlist](https://http4k.org/youtube) for the lastest collection of talks featuring http4k.
+Also, check out the [YouTube Playlist](https://bit.ly/http4k-talks) for the lastest collection of talks featuring http4k.
 
 # See http4k in action in these example projects and repos:
 
