@@ -11,13 +11,13 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.0-RC2"
+    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.0"
 
     const val com_fasterxml_jackson_dataformat: String = "2.11.3"
 
-    const val io_github_resilience4j: String = "1.5.0"
+    const val io_github_resilience4j: String = "1.6.1"
 
-    const val software_amazon_awssdk: String = "2.15.2"
+    const val software_amazon_awssdk: String = "2.15.7"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
@@ -29,7 +29,7 @@ object Versions {
 
     const val dev_forkhandles: String = "1.2.0.0"
 
-    const val io_undertow: String = "2.2.0.Final"
+    const val io_undertow: String = "2.2.2.Final"
 
     const val io_ktor: String = "1.4.1"
 
@@ -49,7 +49,7 @@ object Versions {
 
     const val functions_framework_api: String = "1.0.2"
 
-    const val aws_lambda_java_events: String = "3.3.1"
+    const val aws_lambda_java_events: String = "3.4.0"
 
     const val jackson_module_kotlin: String = "2.11.3"
 
@@ -77,13 +77,13 @@ object Versions {
 
     const val selenium_api: String = "3.141.59"
 
-    const val httpclient5: String = "5.0.2"
+    const val httpclient5: String = "5.0.3"
 
     const val freemarker: String = "2.3.30"
 
     const val handlebars: String = "4.2.0"
 
-    const val httpclient: String = "4.5.12"
+    const val httpclient: String = "4.5.13"
 
     const val underscore: String = "1.59"
 
@@ -107,7 +107,7 @@ object Versions {
 
     const val pebble: String = "3.1.4"
 
-    const val shadow: String = "6.0.0"
+    const val shadow: String = "6.1.0"
 
     const val jsoup: String = "1.13.1"
 
