@@ -164,6 +164,19 @@ class ClientFiltersTest {
     }
 
     @Test
+    fun `set x-forwarded-host`() {
+        val handler = ClientFilters.SetXForwardedHost().then {
+            Response(OK)
+                .header("Host", it.header("Host"))
+                .header("X-forwarded-host", it.header("X-forwarded-host"))
+                .body(it.uri.toString())
+        }
+        assertThat(handler(Request(GET, "/").header("Host", "somehost")),
+            hasHeader("Host", "somehost").and(hasHeader("X-forwarded-host", "somehost"))
+        )
+    }
+
+    @Test
     fun `set base uri appends path and copy other uri details`() {
         val handler = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost/a-path?a=b")).then { Response(OK).header("Host", it.header("Host")).body(it.toString()) }
 
@@ -347,7 +360,7 @@ class ClientFiltersTest {
     @Test
     fun `can do proxy basic auth`() {
         val captured = AtomicReference<Request>()
-        val handler = ClientFilters.ProxyBasicAuth(Credentials("bob", "password")).then{req ->
+        val handler = ClientFilters.ProxyBasicAuth(Credentials("bob", "password")).then { req ->
             captured.set(req)
             Response(OK).body("hello")
         }
