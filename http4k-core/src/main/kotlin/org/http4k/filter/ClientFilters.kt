@@ -66,15 +66,6 @@ object ClientFilters {
         })
     }
 
-    /**
-     * Sets the base uri only (base path) on an outbound request. This is useful to override the destination server of a request
-     * without affecting the rest of the request.
-     */
-    object SetAuthorityFrom {
-        operator fun invoke(uri: Uri): Filter = Filter { next -> { request ->
-            next(request.uri(request.uri.authority(uri.authority).scheme(uri.scheme))) } }
-    }
-
     object ApiKeyAuth {
         operator fun invoke(set: (Request) -> Request): Filter = Filter { next ->
             { next(set(it)) }
