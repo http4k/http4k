@@ -1,6 +1,13 @@
 package org.http4k.serverless.lambda
 
 import org.http4k.aws.ApiIntegrationVersion
+import org.http4k.aws.ApiIntegrationVersion.v1
+import org.http4k.aws.ApiIntegrationVersion.v2
+import org.http4k.aws.ApiName
+import org.http4k.aws.LambdaIntegrationType
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.aws.Stage
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Timeout
 import org.http4k.core.Filter
@@ -10,8 +17,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
-import org.http4k.aws.ApiName
-import org.http4k.aws.Stage
 import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
 import org.http4k.serverless.lambda.client.apiGatewayClient
 import org.http4k.serverless.lambda.client.lambdaApiClient
@@ -23,7 +28,7 @@ import java.time.Instant
 object DeployApiGateway {
 
     fun deploy(version: ApiIntegrationVersion) {
-        val functionName = functionName(version)
+        val functionName = functionName(version.integrationType())
         val apiName = apiName(version)
 
         val functionArn = lambdaApiClient.list().find { it.name == functionName.value }?.arn
@@ -49,11 +54,15 @@ object DeployApiGateway {
     }
 
     fun apiName(version: ApiIntegrationVersion) = ApiName("http4k-test-function-${version.name}")
+
+    private fun ApiIntegrationVersion.integrationType(): LambdaIntegrationType = when (this) {
+        v1 -> ApiGatewayV1
+        v2 -> ApiGatewayV2
+    }
 }
 
 fun main() {
-    DeployApiGateway.deploy(ApiIntegrationVersion.v1)
-    DeployApiGateway.deploy(ApiIntegrationVersion.v2)
+    ApiIntegrationVersion.values().forEach(DeployApiGateway::deploy)
 }
 
 fun waitUntil(

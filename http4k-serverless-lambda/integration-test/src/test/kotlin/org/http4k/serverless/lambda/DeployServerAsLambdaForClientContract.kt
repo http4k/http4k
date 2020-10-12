@@ -9,9 +9,10 @@ import com.natpryce.hamkrest.present
 import org.http4k.aws.FunctionHandler
 import org.http4k.aws.FunctionName
 import org.http4k.aws.FunctionPackage
-import org.http4k.aws.ApiIntegrationVersion
-import org.http4k.aws.ApiIntegrationVersion.v1
-import org.http4k.aws.ApiIntegrationVersion.v2
+import org.http4k.aws.LambdaIntegrationType
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
@@ -25,7 +26,7 @@ import java.nio.ByteBuffer
 
 object DeployServerAsLambdaForClientContract {
 
-    fun deploy(version: ApiIntegrationVersion) {
+    fun deploy(version: LambdaIntegrationType) {
         val functionName = functionName(version)
 
         val lambdaBinary =
@@ -57,16 +58,22 @@ object DeployServerAsLambdaForClientContract {
         assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
     }
 
-    fun functionName(version: ApiIntegrationVersion) = FunctionName("test-function-${version.name}")
+    fun functionName(version: LambdaIntegrationType) = FunctionName("test-function-${version.functionNamePrefix()}")
 
-    private fun functionMainClass(version: ApiIntegrationVersion): String = when (version) {
-        v1 -> "org.http4k.serverless.lambda.TestFunctionV1"
-        v2 -> "org.http4k.serverless.lambda.TestFunctionV2"
+    private fun functionMainClass(version: LambdaIntegrationType): String = when (version) {
+        ApiGatewayV1 -> "org.http4k.serverless.lambda.TestFunctionV1"
+        ApiGatewayV2 -> "org.http4k.serverless.lambda.TestFunctionV2"
+        ApplicationLoadBalancer -> "org.http4k.serverless.lambda.TestFunctionAlb"
+    }
+
+    private fun LambdaIntegrationType.functionNamePrefix(): String = when (this) {
+        ApiGatewayV1 -> "apigw-v1"
+        ApiGatewayV2 -> "apigw-v2"
+        ApplicationLoadBalancer -> "alb"
     }
 }
 
 fun main() {
-    DeployServerAsLambdaForClientContract.deploy(v1)
-    DeployServerAsLambdaForClientContract.deploy(v2)
+    LambdaIntegrationType.values().forEach(DeployServerAsLambdaForClientContract::deploy)
 }
 

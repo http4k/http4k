@@ -4,10 +4,11 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
-import org.http4k.aws.ApiIntegrationVersion
-import org.http4k.aws.ApiIntegrationVersion.v1
-import org.http4k.aws.ApiIntegrationVersion.v2
 import org.http4k.aws.FunctionName
+import org.http4k.aws.LambdaIntegrationType
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.aws.Region
 import org.http4k.core.Body
 import org.http4k.core.Filter
@@ -23,10 +24,11 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
 
-class LambdaHttpClient(functionName: FunctionName, region: Region, version: ApiIntegrationVersion) : Filter {
+class LambdaHttpClient(functionName: FunctionName, region: Region, version: LambdaIntegrationType) : Filter {
     private val adapter = when (version) {
-        v1 -> AwsClientV1HttpAdapter()
-        v2 -> AwsClientV2HttpAdapter()
+        ApiGatewayV1 -> AwsClientV1HttpAdapter()
+        ApiGatewayV2 -> AwsClientV2HttpAdapter()
+        ApplicationLoadBalancer -> TODO()
     }
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->
