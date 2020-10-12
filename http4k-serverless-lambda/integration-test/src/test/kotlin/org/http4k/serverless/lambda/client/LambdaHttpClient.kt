@@ -4,6 +4,8 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
+import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
+import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
 import org.http4k.aws.FunctionName
 import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
@@ -28,7 +30,7 @@ class LambdaHttpClient(functionName: FunctionName, region: Region, version: Lamb
     private val adapter = when (version) {
         ApiGatewayV1 -> AwsClientV1HttpAdapter()
         ApiGatewayV2 -> AwsClientV2HttpAdapter()
-        ApplicationLoadBalancer -> TODO()
+        ApplicationLoadBalancer -> AwsClientAlbHttpAdapter()
     }
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->
@@ -98,7 +100,6 @@ internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEve
 
     override fun invoke(request: Request) = APIGatewayV2HTTPEvent.builder()
         .withRawPath(request.uri.path)
-//        .withRawQueryString(request.uri.query)
         .withQueryStringParameters(request.uri.queries().toMap())
         .withBody(request.bodyString())
         .withHeaders(request.headers.toMap())
@@ -112,3 +113,27 @@ internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEve
     override val requestLens = Body.auto<APIGatewayV2HTTPEvent>().toLens()
     override val responseLens = Body.auto<APIGatewayV2HTTPResponse>().toLens()
 }
+
+internal class AwsClientAlbHttpAdapter : AwsClientHttpAdapter<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
+    override fun invoke(response: ApplicationLoadBalancerResponseEvent) =
+        Response(Status(response.statusCode, ""))
+            .headers((response.headers
+                ?: emptyMap()).entries.fold(listOf(), { acc, next -> acc + (next.key to next.value) }))
+            .headers((response.multiValueHeaders ?: emptyMap()).entries.fold(listOf(), { acc, next ->
+                next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
+            }))
+            .body(response.body.orEmpty())
+
+
+    override fun invoke(request: Request) = ApplicationLoadBalancerRequestEvent().apply {
+        httpMethod = request.method.name
+        body = request.bodyString()
+        headers = request.headers.toMap()
+        path = request.uri.path
+        queryStringParameters = request.uri.query.toParameters().toMap()
+    }
+
+    override val requestLens = Body.auto<ApplicationLoadBalancerRequestEvent>().toLens()
+    override val responseLens = Body.auto<ApplicationLoadBalancerResponseEvent>().toLens()
+}
+

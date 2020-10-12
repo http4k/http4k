@@ -3,6 +3,7 @@ package org.http4k.serverless.lambda.client
 import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.client.HttpClientContract
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -25,3 +26,5 @@ abstract class LambdaHttpClientTest(version: LambdaIntegrationType) :
 class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1)
 
 class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2)
+
+class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer)
