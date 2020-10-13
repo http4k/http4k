@@ -89,14 +89,14 @@ class WebsocketClientTest {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/long-living/bob"), autoReconnection = true)
 
         client.send(WsMessage("hello"))
-        Thread.sleep(100) // wait until the message comes back
+        Thread.sleep(1000) // wait until the message comes back
 
         client.close()
 
         assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
 
         client.send(WsMessage("hi"))
-        Thread.sleep(100)
+        Thread.sleep(1000)
         client.close()
 
         assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hi"))))

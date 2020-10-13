@@ -158,15 +158,22 @@ class ClientFiltersTest {
     }
 
     @Test
-    fun `SetAuthorityFrom does not set path`() {
-        val handler = ClientFilters.SetAuthorityFrom(Uri.of("http://localhost:8080/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
-        assertThat(handler(Request(GET, "/loop").header("Host", "firstHost")), hasBody("http://localhost:8080/loop").and(hasHeader("Host", "firstHost")))
-    }
-
-    @Test
     fun `set base uri appends path`() {
         val handler = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
         assertThat(handler(Request(GET, "/loop")), hasBody("http://localhost/a-path/loop").and(hasHeader("Host", "localhost")))
+    }
+
+    @Test
+    fun `set x-forwarded-host`() {
+        val handler = ClientFilters.SetXForwardedHost().then {
+            Response(OK)
+                .header("Host", it.header("Host"))
+                .header("X-forwarded-host", it.header("X-forwarded-host"))
+                .body(it.uri.toString())
+        }
+        assertThat(handler(Request(GET, "/").header("Host", "somehost")),
+            hasHeader("Host", "somehost").and(hasHeader("X-forwarded-host", "somehost"))
+        )
     }
 
     @Test
@@ -353,7 +360,7 @@ class ClientFiltersTest {
     @Test
     fun `can do proxy basic auth`() {
         val captured = AtomicReference<Request>()
-        val handler = ClientFilters.ProxyBasicAuth(Credentials("bob", "password")).then{req ->
+        val handler = ClientFilters.ProxyBasicAuth(Credentials("bob", "password")).then { req ->
             captured.set(req)
             Response(OK).body("hello")
         }

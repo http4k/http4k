@@ -36,6 +36,7 @@ import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
+import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
 
 
@@ -43,7 +44,6 @@ import java.net.InetSocketAddress
  * Exposed to allow for insertion into a customised Netty server instance
  */
 class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<FullHttpRequest>() {
-
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
     override fun channelRead0(ctx: ChannelHandlerContext, request: FullHttpRequest) {
@@ -58,11 +58,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 
     private fun Response.asNettyResponse(): Pair<DefaultHttpResponse, ChunkedStream> =
         DefaultHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
-            this@asNettyResponse.headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
-            when (body.length) {
-                null -> headers().set("Transfer-Encoding", "chunked")
-                else -> headers().set("Content-Length", body.length.toString())
-            }
+            headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
         } to ChunkedStream(body.stream)
 
     private fun FullHttpRequest.asRequest(address: InetSocketAddress) =
@@ -72,8 +68,8 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
             .source(RequestSource(address.address.hostAddress, address.port))
 }
 
-data class Netty(val port: Int = 8000) : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+data class Netty(val port: Int = 8000)   : WsServerConfig  {
+    override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?): Http4kServer = object : Http4kServer {
         private val masterGroup = NioEventLoopGroup()
         private val workerGroup = NioEventLoopGroup()
         private var closeFuture: ChannelFuture? = null
@@ -88,8 +84,15 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                         ch.pipeline().addLast("codec", HttpServerCodec())
                         ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
+
+                        if(wsHandler != null) {
+                            ch.pipeline().addLast("websocket", WebSocketServerHandler(wsHandler))
+                        }
+
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
-                        ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
+                        if(httpHandler != null) {
+                            ch.pipeline().addLast("httpHandler", Http4kChannelHandler(httpHandler))
+                        }
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 1000)
@@ -109,3 +112,4 @@ data class Netty(val port: Int = 8000) : ServerConfig {
         override fun port(): Int = if (port > 0) port else address.port
     }
 }
+

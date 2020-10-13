@@ -27,20 +27,18 @@ object ClientFilters {
     /**
      * Adds Zipkin request tracing headers to the outbound request. (traceid, spanid, parentspanid)
      */
-    object RequestTracing {
-        operator fun invoke(
-            startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
-            {
-                THREAD_LOCAL.get().run {
-                    val updated = parentSpanId?.let {
-                        copy(parentSpanId = spanId, spanId = TraceId.new())
-                    } ?: this
-                    startReportFn(it, updated)
-                    val response = next(ZipkinTraces(updated, it))
-                    endReportFn(it, response, updated)
-                    response
-                }
+    fun RequestTracing(
+        startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
+        endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
+        {
+            THREAD_LOCAL.get().run {
+                val updated = parentSpanId?.let {
+                    copy(parentSpanId = spanId, spanId = TraceId.new())
+                } ?: this
+                startReportFn(it, updated)
+                val response = next(ZipkinTraces(updated, it))
+                endReportFn(it, response, updated)
+                response
             }
         }
     }
@@ -57,31 +55,28 @@ object ClientFilters {
     }
 
     /**
-     * Sets the base uri (host + base path) on an outbound request. This is useful to separate configuration of remote endpoints
-     * from the logic required to construct the rest of the request.
+     * Sets the base uri (host + base path) on an outbound request. This is useful to separate configuration of
+     * remote endpoints from the logic required to construct the rest of the request.
      */
-    object SetBaseUriFrom {
-        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
-            { request -> next(request.uri(uri.extend(request.uri))) }
-        })
-    }
+    fun SetBaseUriFrom(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
+        { request -> next(request.uri(uri.extend(request.uri))) }
+    })
 
     /**
-     * Sets the base uri only (base path) on an outbound request. This is useful to override the destination server of a request
-     * without affecting the rest of the request.
+     * Copy the Host header into the x-forwarded-host header of a request. Used when we are using proxies
+     * to divert traffic to another server.
      */
-    object SetAuthorityFrom {
-        operator fun invoke(uri: Uri): Filter = Filter { next ->
-            { request ->
-                next(request.uri(request.uri.authority(uri.authority).scheme(uri.scheme)))
-            }
+    fun SetXForwardedHost() = Filter { next ->
+        {
+            next(it.header("host")
+                ?.let { host -> it.replaceHeader("X-Forwarded-Host", host) }
+                ?: it
+            )
         }
     }
 
-    object ApiKeyAuth {
-        operator fun invoke(set: (Request) -> Request): Filter = Filter { next ->
-            { next(set(it)) }
-        }
+    fun ApiKeyAuth(set: (Request) -> Request): Filter = Filter { next ->
+        { next(set(it)) }
     }
 
     object BasicAuth {
@@ -168,44 +163,24 @@ object ClientFilters {
     /**
      * Support for GZipped responses from clients.
      */
-    object AcceptGZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory): Filter =
-            ResponseFilters.GunZip(compressionMode)
-    }
+    fun AcceptGZip(compressionMode: GzipCompressionMode = Memory): Filter =
+        ResponseFilters.GunZip(compressionMode)
 
     /**
      * Basic GZip and Gunzip support of Request/Response.
      * Only Gunzip responses when the response contains "transfer-encoding" header containing 'gzip'
      */
-    object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory): Filter =
-            RequestFilters.GZip(compressionMode)
-                .then(ResponseFilters.GunZip(compressionMode))
-    }
+    fun GZip(compressionMode: GzipCompressionMode = Memory): Filter =
+        RequestFilters.GZip(compressionMode)
+            .then(ResponseFilters.GunZip(compressionMode))
 
     /**
      * This Filter is used to clean the Request and Response when proxying directly to another system. The purpose
      * of this is to remove any routing metadata that we may have attached to it before sending it onwards.
      */
-    object CleanProxy {
-        operator fun invoke() = Filter { next ->
-            {
-                next(it.run { Request(method, uri).body(body).headers(headers) }).run { Response(status).body(body).headers(headers) }
-            }
-        }
-    }
-
-    /**
-     * Set X-Forwarded-Host header from the content of the Host header if present
-     */
-    object SetXForwardedHost {
-        operator fun invoke() = Filter { next ->
-            {
-                next(it.header("host")
-                    ?.let { host -> it.header("X-Forwarded-Host", host) }
-                    ?: it
-                )
-            }
+    fun CleanProxy() = Filter { next ->
+        {
+            next(it.run { Request(method, uri).body(body).headers(headers) }).run { Response(status).body(body).headers(headers) }
         }
     }
 }
