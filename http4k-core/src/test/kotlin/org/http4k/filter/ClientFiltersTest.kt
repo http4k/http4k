@@ -367,4 +367,13 @@ class ClientFiltersTest {
         handler(Request(GET, "/"))
         assertThat(captured.get(), hasHeader("Proxy-Authorization", "Basic Ym9iOnBhc3N3b3Jk"))
     }
+
+    @Test
+    fun `set x-forwarded-host header from the host header`() {
+        val handler = ClientFilters.SetXForwardedHost().then{
+            assertThat(it, hasHeader("x-forwarded-host", "bobhost").and(hasHeader("host", "bobhost")))
+            Response(OK)
+        }
+        handler(Request(GET, "/").header("host", "bobhost"))
+    }
 }
