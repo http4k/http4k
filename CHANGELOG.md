@@ -4,7 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v3.268.0
-- **http4k-core** : Add Parameter Match routing, so you can match on presence of parameters in a request.
+- **http4k-core** : Add Parameter Match routing, so you can match on presence of parameters in a request
+- **http4k-testing-kotest**: Re-add kotest matcher as is fixed in underlying kotest lib.
 
 ### v3.267.0
 - **http4k-*** : Upgrade some dependency versions.
