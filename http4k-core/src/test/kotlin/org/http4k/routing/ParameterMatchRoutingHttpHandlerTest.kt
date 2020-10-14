@@ -31,7 +31,6 @@ class ParameterMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         assertThat(withBasePath.matchAndInvoke(prefixReq), criteria)
         assertThat(withBasePath(prefixReq), criteria)
     }
-
 }
 
 class ParameterMatchRoutingHttpHandlerAlternateTest : RoutingHttpHandlerContract() {
