@@ -37,8 +37,6 @@ internal data class ParameterMatchRoutingHttpHandler(
         new.then(methodNotAllowedHandler)
     )
 
-    override fun withBasePath(new: String): ParameterMatchRoutingHttpHandler {
-        println(httpHandler.withBasePath(new))
-        return copy(httpHandler = httpHandler.withBasePath(new))
-    }
+    override fun withBasePath(new: String): RoutingHttpHandler =
+        copy(httpHandler = httpHandler.withBasePath(new))
 }
