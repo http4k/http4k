@@ -5,5 +5,10 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 
 class ParameterMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
-    override val handler = headers("host") bind routes(validPath bind GET to { Response(OK) })}
+    override val handler = validPath bind GET to routes(headers("host") bind { Response(OK) })
+}
+
+class ParameterMatchRoutingHttpHandlerAlternateTest : RoutingHttpHandlerContract() {
+    override val handler = headers("host") bind routes(validPath bind GET to { Response(OK) })
+}
 
