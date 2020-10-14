@@ -32,7 +32,12 @@ internal data class ParameterMatchRoutingHttpHandler(
         is RouterMatch.Unmatched -> notFoundHandler(request)
     }
 
-    override fun withFilter(new: Filter): RoutingHttpHandler = copy(httpHandler = new.then(httpHandler))
+    override fun withFilter(new: Filter): RoutingHttpHandler = ParameterMatchRoutingHttpHandler(
+        matched,
+        new.then(httpHandler),
+        new.then(notFoundHandler),
+        new.then(methodNotAllowedHandler)
+    )
 
     override fun withBasePath(new: String): RoutingHttpHandler = copy(httpHandler = httpHandler.withBasePath(new))
 }
