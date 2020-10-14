@@ -75,6 +75,16 @@ fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/pu
     SinglePageAppRoutingHandler("", StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
 
 /**
+ * For routes where certain queries are required for correct operation. ParameterMatch is composable.
+ */
+fun queries(vararg names: String): ParameterMatch = ParameterMatch.Query(*names)
+
+/**
+ * For routes where certain headers are required for correct operation. ParameterMatch is composable.
+ */
+fun headers(vararg names: String): ParameterMatch = ParameterMatch.Header(*names)
+
+/**
  * Matches the Host header to a matching Handler.
  */
 fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>): RoutingHttpHandler = HostDemuxRoutingHttpHandler(mapOf(*hosts))
