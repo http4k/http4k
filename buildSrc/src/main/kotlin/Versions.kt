@@ -59,7 +59,7 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.53.Final"
+    const val netty_codec_http2: String = "4.1.52.Final" // problematic upgrade to 53
 
     const val jackson_databind: String = "2.11.3"
 
