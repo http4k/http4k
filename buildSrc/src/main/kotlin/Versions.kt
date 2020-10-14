@@ -43,7 +43,7 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.32.v20200930"
 
-    const val kotest_assertions_core_jvm: String = "4.2.6"
+    const val kotest_assertions_core_jvm: String = "4.3.0"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
@@ -59,7 +59,7 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.52.Final"
+    const val netty_codec_http2: String = "4.1.53.Final"
 
     const val jackson_databind: String = "2.11.3"
 
