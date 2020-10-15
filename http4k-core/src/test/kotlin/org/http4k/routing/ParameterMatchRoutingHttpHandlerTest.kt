@@ -3,6 +3,7 @@ package org.http4k.routing
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -30,6 +31,11 @@ class ParameterMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val withBasePath = handler.withBasePath(prefix)
         assertThat(withBasePath.matchAndInvoke(prefixReq), criteria)
         assertThat(withBasePath(prefixReq), criteria)
+    }
+
+    @Test
+    fun `attempt to bind param handler without a verb`() {
+        assertThat({ routes(prefix bind (headers("host") bind { Response(OK) })) }, throws<UnsupportedOperationException>())
     }
 }
 

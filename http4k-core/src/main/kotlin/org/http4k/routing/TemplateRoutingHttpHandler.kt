@@ -30,7 +30,10 @@ internal data class TemplateRoutingHttpHandler(
     }
 
     override fun withFilter(new: Filter): RoutingHttpHandler =
-        copy(httpHandler = new.then(httpHandler), notFoundHandler = new.then(notFoundHandler), methodNotAllowedHandler = new.then(methodNotAllowedHandler))
+        copy(httpHandler = new.then(httpHandler),
+            notFoundHandler = new.then(notFoundHandler),
+            methodNotAllowedHandler = new.then(methodNotAllowedHandler)
+        )
 
     override fun withBasePath(new: String): RoutingHttpHandler = copy(template = UriTemplate.from("$new/$template"))
 }
