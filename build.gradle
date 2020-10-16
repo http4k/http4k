@@ -8,7 +8,6 @@ buildscript {
     dependencies {
         classpath Libs.kotlin_gradle_plugin
         classpath Libs.coveralls_gradle_plugin
-        classpath Libs.dokka_gradle_plugin
         classpath Libs.com_jfrog_bintray_gradle_plugin
         classpath Libs.openapi_generator_gradle_plugin
         classpath Libs.kotlin_serialization
@@ -17,8 +16,9 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.kt3k.coveralls' version "2.10.1"
-    id "com.jfrog.bintray" version "1.8.4"
+    id 'com.github.kt3k.coveralls'
+    id "com.jfrog.bintray"
+    id "org.jetbrains.dokka"
     //id 'de.fayard.buildSrcVersions' version "0.7.0"
 }
 
@@ -271,16 +271,4 @@ dokka {
         moduleName = "$rootProject.name"
         jdkVersion = 9
     }
-}
-
-/**
-buildSrcVersions {
-    indent = "    "
-}
- **/
-
-// To update Gradle, run `$ ./gradlew :buildSrcVersions && ./gradlew wrapper`
-wrapper {
-    gradleVersion = Versions.gradleLatestVersion
-    distributionType = Wrapper.DistributionType.ALL
 }

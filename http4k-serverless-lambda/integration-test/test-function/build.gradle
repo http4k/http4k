@@ -7,8 +7,8 @@ dependencies {
     compile project(path: ":http4k-core", configuration: 'testArtifacts')
 
     compile Libs.kotlin_stdlib_jdk8
-    compile "org.jetbrains.kotlin:kotlin-stdlib-common:" + Versions.org_jetbrains_kotlin
-    compile "org.jetbrains.kotlin:kotlin-stdlib:" + Versions.org_jetbrains_kotlin
+    compile Libs.kotlin_stdlib_common
+    compile Libs.kotlin_stdlib
     compile Libs.aws_lambda_java_core
     compile Libs.aws_lambda_java_events
     compile Libs.joda_time

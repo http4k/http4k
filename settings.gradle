@@ -3,6 +3,7 @@ import de.fayard.refreshVersions.RefreshVersionsSetup
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        jcenter()
     }
 }
 
