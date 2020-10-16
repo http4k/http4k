@@ -106,6 +106,7 @@ h4,
 
 p {
   opacity: 0.8;
+  font-size: 1.2rem;
 }
 
 .lead {
@@ -120,7 +121,7 @@ p {
 }
 
 nav a {
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   line-height: 1.17;
 }
 
