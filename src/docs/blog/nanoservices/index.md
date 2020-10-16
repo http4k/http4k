@@ -38,14 +38,12 @@ Applying a `DebuggingFilter` to the HTTP calls in a proxy dumps the entire conte
 
 <hr/>
 
-### 4. Build a web cache [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/remote_terminal.kt)
-Requires: `http4k-core`, `http4k-server-netty`
+### 4. Build a web cache [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/disk_cache.kt)
+Requires: `http4k-core`, `http4k-server-ktorcio`
 
-Use Websockets to remote control a terminal!*
+Recording all traffic to disk can be achieved by just creating a `ReadWriteCache` and then adding a couple of pre-supplied Filters to a proxy. When running this example you can see that only the first request is audited.
 
-<sub>*Obviously this is, in general, a really (really) bad idea.</sub>
-
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/web_terminal.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/disk_cache.kt"></script>
 
 <hr/>
 
@@ -94,7 +92,7 @@ Back to Websockets, we can watch the file system for changes and subscribe to th
 
 <hr/>
 
-### 10. Build a remote terminal! [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/remote_terminal.kt)
+### 10. Build a remote terminal! [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/web_terminal.kt)
 Requires: `http4k-core`, `http4k-server-netty`
 
 Use Websockets to remote control a terminal!*
