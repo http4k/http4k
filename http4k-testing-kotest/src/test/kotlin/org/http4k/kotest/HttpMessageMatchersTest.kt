@@ -1,5 +1,6 @@
 package org.http4k.kotest
 
+import io.kotest.matchers.Matcher
 import io.kotest.matchers.be
 import io.kotest.matchers.string.contain
 import org.http4k.core.Body
@@ -23,13 +24,13 @@ class HttpMessageMatchersTest {
     fun `header regex`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob"), haveHeader("header", Regex(".*bob")), haveHeader("header", Regex(".*bill")))
 
     @Test
-    fun `headers`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", listOf("bob", "bob2")), haveHeader("header", listOf("bill")))
+    fun headers() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", listOf("bob", "bob2")), haveHeader("header", listOf("bill")))
 
     @Test
     fun `header no value`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header"), haveHeader("header").invert())
 
     @Test
-    fun `header - non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", contain("bob")), haveHeader("header", be("bill")))
+    fun `header - non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), haveHeader("header", contain("bob")), haveHeader("header", be<String>("bill")))
 
     @Test
     fun `header lens`() =
@@ -47,13 +48,17 @@ class HttpMessageMatchersTest {
     fun `body regex`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(Regex(".*bob")), haveBody(Regex(".*bill")))
 
     @Test
-    fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be(Body("bob"))), haveBody(be(Body("bill"))))
+    fun `body string matcher`() {
+        val be: Matcher<Body> = be(Body("bob"))
+        val be1 = be(Body("bill"))
+        assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be), haveBody(be1))
+    }
 
     @Test
     fun `body non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(contain("bo")), haveBody(contain("foo")))
 
     @Test
-    fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be("bob")), haveBody(be("bill")))
+    fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be<String>("bob")), haveBody(be<String>("bill")))
 
     @Test
     fun `json body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.haveBody("""{"hello":"world"}"""), Jackson.haveBody("""{"hello":"w2orld"}"""))

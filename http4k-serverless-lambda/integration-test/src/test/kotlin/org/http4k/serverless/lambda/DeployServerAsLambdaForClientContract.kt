@@ -1,71 +1,79 @@
+@file:Suppress("EnumEntryName")
+
 package org.http4k.serverless.lambda
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.client.JavaHttpClient
-import org.http4k.cloudnative.env.Environment
+import org.http4k.aws.FunctionHandler
+import org.http4k.aws.FunctionName
+import org.http4k.aws.FunctionPackage
+import org.http4k.aws.LambdaIntegrationType
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.core.then
-import org.http4k.filter.AwsAuth
-import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
-import org.http4k.serverless.lambda.client.AwsLambdaApiClient
 import org.http4k.serverless.lambda.client.Config
-import org.http4k.serverless.lambda.client.FunctionHandler
-import org.http4k.serverless.lambda.client.FunctionName
-import org.http4k.serverless.lambda.client.FunctionPackage
-import org.http4k.serverless.lambda.client.LambdaHttpClient
+import org.http4k.serverless.lambda.client.awsConfig
+import org.http4k.serverless.lambda.client.lambdaApiClient
+import org.http4k.serverless.lambda.client.testFunctionClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.nio.ByteBuffer
 
 object DeployServerAsLambdaForClientContract {
-    private val config = Environment.ENV overrides Environment.fromResource("/local.properties")
-    private val region = Config.region(config)
 
-    private val client = DebuggingFilters.PrintResponse()
-        .then(ClientFilters.AwsAuth(Config.scope(config), Config.credentials(config)))
-        .then(JavaHttpClient())
+    fun deploy(version: LambdaIntegrationType) {
+        val functionName = functionName(version)
 
-    private val deployment = AwsLambdaApiClient(client, region)
-
-    fun deploy() {
         val lambdaBinary =
-            File("test-function/build/distributions/test-function-LOCAL.zip")
+            File("http4k-serverless-lambda/integration-test/test-function/build/distributions/test-function-LOCAL.zip")
 
-        assumeTrue(lambdaBinary.exists(), "lambda binary to deploy needs to be available")
-
-        val functionName = FunctionName("test-function")
+        assumeTrue(lambdaBinary.exists(), "lambda binary to deploy (${lambdaBinary.absolutePath}) needs to be available")
 
         println("Deleting existing function (if exists)...")
-        deployment.delete(functionName)
+        lambdaApiClient.delete(functionName)
 
         val functionPackage = FunctionPackage(
             functionName,
-            FunctionHandler("org.http4k.serverless.lambda.TestFunction::handle"),
+            FunctionHandler(functionMainClass(version)),
             ByteBuffer.wrap(lambdaBinary.readBytes()),
-            Config.role(config)
+            Config.role(awsConfig)
         )
 
         println("Deploying function...")
-        deployment.create(functionPackage)
+        val details = lambdaApiClient.create(functionPackage)
 
-        assertThat(deployment.list().find { it.name == functionName.value }, present())
+        println("Created function with arn ${details.arn}")
 
-        val lambdaClient = LambdaHttpClient(functionName, region).then(client)
+        assertThat(lambdaApiClient.list().find { it.name == functionName.value }, present())
 
         println("Performing a test request...")
-        val functionResponse = lambdaClient(Request(Method.POST, "/echo").body("Hello, http4k"))
+        val functionResponse = testFunctionClient(Request(Method.POST, "/echo").body("Hello, http4k"))
 
         assertThat(functionResponse.status, equalTo(Status.OK))
         assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
     }
+
+    fun functionName(version: LambdaIntegrationType) = FunctionName("test-function-${version.functionNamePrefix()}")
+
+    private fun functionMainClass(version: LambdaIntegrationType): String = when (version) {
+        ApiGatewayV1 -> "org.http4k.serverless.lambda.TestFunctionV1"
+        ApiGatewayV2 -> "org.http4k.serverless.lambda.TestFunctionV2"
+        ApplicationLoadBalancer -> "org.http4k.serverless.lambda.TestFunctionAlb"
+    }
+
+    private fun LambdaIntegrationType.functionNamePrefix(): String = when (this) {
+        ApiGatewayV1 -> "apigw-v1"
+        ApiGatewayV2 -> "apigw-v2"
+        ApplicationLoadBalancer -> "alb"
+    }
 }
 
 fun main() {
-    DeployServerAsLambdaForClientContract.deploy()
+    LambdaIntegrationType.values().forEach(DeployServerAsLambdaForClientContract::deploy)
 }
+

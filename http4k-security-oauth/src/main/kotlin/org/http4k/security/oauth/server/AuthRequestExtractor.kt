@@ -1,12 +1,12 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.http4k.core.Request
 import org.http4k.lens.LensFailure
 
-interface AuthRequestExtractor {
+fun interface AuthRequestExtractor {
     fun extract(request: Request): Result<AuthRequest, InvalidAuthorizationRequest>
 }
 

@@ -1,6 +1,6 @@
 package org.http4k.security.oauth.server.accesstoken
 
-import com.natpryce.map
+import dev.forkhandles.result4k.map
 import org.http4k.core.Request
 import org.http4k.security.AccessTokenDetails
 import org.http4k.security.oauth.server.AccessTokens

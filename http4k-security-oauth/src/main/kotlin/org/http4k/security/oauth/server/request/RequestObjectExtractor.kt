@@ -12,10 +12,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
-import com.natpryce.map
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.map
 import org.http4k.core.Uri
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable

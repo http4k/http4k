@@ -1,7 +1,9 @@
 title: http4k blog: A retrospective on http4k v3
 description: In preparation for the upcoming release of v4, the http4k team thought we'd do a bit of a retrospective about all the things that have gone in the >260 releases of v3
 
-#  A retrospective on http4k v3.
+# A retrospective on http4k v3.
+
+##### september 2020
 
 It's been quite a long time since we released version 3 of [http4k] all the way back in November 2017. Wow - that's over 1000 days in fact! Still, that doesn't mean that we've been sitting on our hands over in **http4k Towers** - far from it, we've been busier than ever making sure that we'll remember 2020 for more than just hibernating away in a bunker. In fact, the current interesting situation did give us an idea for a pretty original piece of swag... 
 

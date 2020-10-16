@@ -1,8 +1,8 @@
 package org.http4k.security.oauth.server.accesstoken
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.http4k.core.Request
 import org.http4k.security.oauth.server.AccessTokenError
 import org.http4k.security.oauth.server.ClientId

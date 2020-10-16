@@ -1,39 +1,21 @@
 package org.http4k.serverless.lambda.client
 
+import org.http4k.aws.LambdaIntegrationType
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.client.HttpClientContract
-import org.http4k.client.JavaHttpClient
-import org.http4k.cloudnative.env.Environment
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.NoOp
 import org.http4k.core.Request
-import org.http4k.core.then
-import org.http4k.filter.AwsAuth
-import org.http4k.filter.ClientFilters
-import org.http4k.server.Http4kServer
-import org.http4k.server.ServerConfig
+import org.http4k.core.Response
 import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.BeforeEach
 
-private val lazyClient by lazy {
-        val config = Environment.ENV overrides Environment.fromResource("/local.properties")
-        val region = Config.region(config)
-        val client = Filter.NoOp
-            .then(ClientFilters.AwsAuth(Config.scope(config), Config.credentials(config)))
-            .then(JavaHttpClient())
-
-        LambdaHttpClient(FunctionName("test-function"), region).then(client)
+private fun client(version: LambdaIntegrationType): (Request) -> Response {
+    val functionClient = testFunctionClient(version)
+    return { request: Request -> functionClient(request) }
 }
 
-private val client = { request: Request -> lazyClient(request) }
-
-class LambdaHttpClientTest : HttpClientContract({ NoOpServerConfig }, client, client) {
-
-    @BeforeEach
-    fun ensureLocalPropertiesExist(){
-        assumeTrue(LambdaHttpClientTest::class.java.getResourceAsStream("/local.properties") != null,
-            "local.properties must exist for this test to run")
-    }
+abstract class LambdaHttpClientTest(version: LambdaIntegrationType) :
+    HttpClientContract({ NoOpServerConfig }, client(version), client(version)) {
 
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
@@ -41,12 +23,8 @@ class LambdaHttpClientTest : HttpClientContract({ NoOpServerConfig }, client, cl
     override fun `send binary data`() = assumeTrue(false, "Unsupported client feature")
 }
 
-private object NoOpHttp4kServer : Http4kServer {
-    override fun start(): Http4kServer = this
-    override fun stop(): Http4kServer = this
-    override fun port(): Int = 0
-}
+class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1)
 
-private object NoOpServerConfig : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = NoOpHttp4kServer
-}
+class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2)
+
+class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer)

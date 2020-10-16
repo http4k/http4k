@@ -1,7 +1,7 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Result
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
 import org.http4k.core.Request
 import org.http4k.core.Uri
 
@@ -10,7 +10,6 @@ interface AuthoriseRequestValidator {
     fun isValidClientAndRedirectUriInCaseOfError(request: Request, clientId: ClientId, redirectUri: Uri): Boolean
 
     fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError>
-
 }
 
 class MustHaveRedirectUri(private val delegate: AuthoriseRequestValidator) : AuthoriseRequestValidator by delegate {

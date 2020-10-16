@@ -17,7 +17,7 @@ import java.io.InputStream
 /**
  * Provides matching of a Request to an HttpHandler which can service it.
  */
-interface Router {
+fun interface Router {
     /**
      * Attempt to supply an HttpHandler which can service the passed request.
      */
@@ -75,6 +75,16 @@ fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/pu
     SinglePageAppRoutingHandler("", StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
 
 /**
+ * For routes where certain queries are required for correct operation. ParameterMatch is composable.
+ */
+fun queries(vararg names: String): ParameterMatch = ParameterMatch.Query(*names)
+
+/**
+ * For routes where certain headers are required for correct operation. ParameterMatch is composable.
+ */
+fun headers(vararg names: String): ParameterMatch = ParameterMatch.Header(*names)
+
+/**
  * Matches the Host header to a matching Handler.
  */
 fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>): RoutingHttpHandler = HostDemuxRoutingHttpHandler(mapOf(*hosts))
@@ -95,13 +105,13 @@ fun Request.path(name: String): String? = when (this) {
     else -> throw IllegalStateException("Request was not routed, so no uri-template present")
 }
 
-data class PathMethod(val path: String, val method: Method) {
+data class PathMethod(val path: String, val method: Method?) {
     infix fun to(action: HttpHandler): RoutingHttpHandler =
         when (action) {
             is StaticRoutingHttpHandler -> action.withBasePath(path).let {
                 object : RoutingHttpHandler by it {
                     override fun match(request: Request) = when (method) {
-                        request.method -> it.match(request)
+                        null, request.method -> it.match(request)
                         else -> RouterMatch.MethodNotMatched
                     }
                 }

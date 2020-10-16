@@ -31,7 +31,7 @@ class RequestMatchersTest {
     fun `form`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), haveForm("form", "bob"), haveForm("form", "bill"))
 
     @Test
-    fun `form as matcher`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), haveForm("form", contain("bob")), haveForm("form", be("bill")))
+    fun `form as matcher`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), haveForm("form", contain("bob")), haveForm("form", be<String>("bill")))
 
     @Test
     fun `form as regex`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), haveForm("form", Regex(".*bob")), haveForm("form", Regex(".*bill")))
@@ -40,7 +40,7 @@ class RequestMatchersTest {
     fun `query`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), haveQuery("form", "bob"), haveQuery("form", "bill"))
 
     @Test
-    fun `query - matcher`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), haveQuery("form", be("bob")), haveQuery("form", contain("bill")))
+    fun `query - matcher`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), haveQuery("form", be<String>("bob")), haveQuery("form", contain("bill")))
 
     @Test
     fun `query as regex`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), haveQuery("form", Regex(".*bob")), haveQuery("form", Regex(".*bill")))

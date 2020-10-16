@@ -3,9 +3,44 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.261.0 (uncut)
+### v3.268.0
+- **http4k-core** : Add Parameter Match routing, so you can match on presence of parameters in a request
+- **http4k-testing-kotest**: Re-add kotest matcher as is fixed in underlying kotest lib.
+
+### v3.267.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v3.266.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Add CustomBasicAuth and ProxyBasicAuth filters. H/T @raymanoz for the PR
+- **http4k-core** : Implemented OriginPolicy for CORS. H/T @kratostaine for the PR
+- **http4k-server-netty** : Websocket support added. H/T @carbotaniuman for the PR
+
+### v3.265.0
+- **http4k-*** : Upgrade some dependency versions.
+- [http4k-security-oauth] [Break (via repackaging of dependent JAR)] - Result4k changed published package structure. Changes made to accommodate new package `dev.forkhandles.result4k` instead of `com.natpryce`. To fix, simply find/replace the package names - everything else is identical.
+- **http4k-serverless-lambda** : Work around various inconsistencies between the APIGateway V1 and V2.
+- **http4k-core** : Lenses can now be restricted to inject/extract types. This has an effect on BodyLenses which can be tied to Request/Response.
+
+### v3.264.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-serverless-lambda** : Support for ApiGateway V1 & v2 and AppLoadBalancer requests. Just extend the correct class. Converted functions to use the official AWS `RequestHandler` interfaces (which means that you can refer to just the name of the class when deploying lambda instead of `handle()`)
+
+### v3.263.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-cloudnative** : Add support for loading config files and YAML files into Environments.
+
+### v3.262.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.10
+- **http4k-*** : Take advantage of Kotlin Functional Interfaces, including for Filter. Breaking change to creation of Filters **from Java code only** as they can just be lambdas eg. `Filter filter = next -> req -> next.invoke(request.header("foo", "bar"));` 
+- **http4k-testing-kotest - Possible Break**: DUE TO KOTLIN 1.4.10. Remove a `haveBody` matcher which uses `Matcher<JsonNode>` directly, because of a bug in Kotest:
+https://github.com/kotest/kotest/issues/1727
+- **http4k-format-jackson - Possible Break**: DUE TO KOTLIN 1.4.10. Inline classes do not deserialise properly. See: https://github.com/FasterXML/jackson-module-kotlin/issues/356
+
+### v3.261.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-*** : Remove some example code which was mistakenly added to some main src dirs. No impact on anything other than JAR size.
+- **http4k-aws*** : Add pluggable Amazon SDK client, allowing you to plug an HttpHandler into the Amazon SDK.
 
 ### v3.260.0
 - **http4k-*** : Upgrade some dependency versions.

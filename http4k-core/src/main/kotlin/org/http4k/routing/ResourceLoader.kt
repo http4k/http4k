@@ -9,7 +9,7 @@ import java.net.URL
  * WARNING: A ResourceLoader serves ANY resource it finds within it's structure. This means that you should be
  * VERY careful to limit what resources it has access to.
  */
-interface ResourceLoader {
+fun interface ResourceLoader {
     fun load(path: String): URL?
 
     companion object {
@@ -42,6 +42,5 @@ interface ResourceLoader {
             override fun load(path: String): URL? =
                 File(finalBaseDir, path).let { f -> if (f.exists() && f.isFile) f.toURI().toURL() else null }
         }
-
     }
 }

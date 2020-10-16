@@ -89,6 +89,7 @@ nav:
     - Meet http4k: blog/meet_http4k/index.md
     - Typesafe Websockets: blog/typesafe_websockets/index.md
     - Retrospective on v3: blog/retrospective_v3/index.md
+    - Nanoservices: blog/nanoservices/index.md
   - Getting Support: support/index.md
   - Contribute/Support http4k: contributing/index.md
   - Code of Conduct: code-of-conduct/index.md

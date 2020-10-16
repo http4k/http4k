@@ -2,8 +2,6 @@ description = 'Http4k Serverless support for AWS Lambda'
 
 dependencies {
     compile project(":http4k-core")
-
-    compile Libs.kotlin_reflect
     compile Libs.aws_lambda_java_core
     compile Libs.aws_lambda_java_events
 

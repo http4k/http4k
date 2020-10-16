@@ -4,17 +4,16 @@ import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
 
-interface FieldRetrieval : (Any, String) -> Field {
+fun interface FieldRetrieval : (Any, String) -> Field {
     companion object {
-        fun compose(vararg retrieval: FieldRetrieval) = object : FieldRetrieval {
-            override fun invoke(target: Any, name: String): Field =
-                retrieval.asSequence().mapNotNull {
-                    try {
-                        it(target, name)
-                    } catch (e: NoFieldFound) {
-                        null
-                    }
-                }.firstOrNull() ?: throw NoFieldFound(name, target)
+        fun compose(vararg retrieval: FieldRetrieval) = FieldRetrieval { target, name ->
+            retrieval.asSequence().mapNotNull {
+                try {
+                    it(target, name)
+                } catch (e: NoFieldFound) {
+                    null
+                }
+            }.firstOrNull() ?: throw NoFieldFound(name, target)
         }
     }
 }
@@ -46,7 +45,7 @@ data class FieldMetadata(val description: String?) {
     }
 }
 
-interface FieldMetadataRetrievalStrategy : (Any, String) -> FieldMetadata
+fun interface FieldMetadataRetrievalStrategy : (Any, String) -> FieldMetadata
 
 class NoOpFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
     override fun invoke(target: Any, fieldName: String): FieldMetadata =

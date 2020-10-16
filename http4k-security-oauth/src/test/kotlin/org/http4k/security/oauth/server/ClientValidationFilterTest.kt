@@ -1,11 +1,11 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -19,7 +19,6 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.oauth.server.request.RequestJWTValidator
-import org.http4k.security.openid.RequestJwtContainer
 import org.junit.jupiter.api.Test
 
 internal class ClientValidationFilterTest {
@@ -46,13 +45,10 @@ internal class ClientValidationFilterTest {
 
     }
 
-    private val requestValidator = object : RequestJWTValidator {
-        override fun validate(clientId: ClientId, requestJwtContainer: RequestJwtContainer): InvalidAuthorizationRequest? {
-            return if (requestJwtContainer.value == "inValidRequest") {
-                InvalidAuthorizationRequest("request not correctly signed")
-            } else null
-        }
-
+    private val requestValidator = RequestJWTValidator { _, requestJwtContainer ->
+        if (requestJwtContainer.value == "inValidRequest") {
+            InvalidAuthorizationRequest("request not correctly signed")
+        } else null
     }
 
     private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(

@@ -14,15 +14,15 @@ import org.http4k.lens.LensExtractor
  * 2. Not pre-checking parts of the request is more efficient, which may be important given parsing of request
  * bodies could be expensive and pre-flight-extraction would involve performing this operation twice.
  */
-interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *>> {
+fun interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *>> {
     companion object {
 
         /**
          * Check the entire contract, including extracting the body, before passing it to the underlying
          * HttpHandler.
          */
-        object All : PreFlightExtraction {
-            override fun invoke(meta: RouteMeta) = meta.requestParams + (meta.body?.let { listOf(it) }
+        val All = PreFlightExtraction {
+            it.requestParams + (it.body?.let { listOf(it) }
                 ?: emptyList<BodyLens<*>>())
         }
 
@@ -30,17 +30,13 @@ interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *>> {
          * Check all parts of the contract apart from the body, relying on the HttpHandler code to raise a correct
          * LensFailure if extraction fails. Use this option to avoid re-extracting the body multiple times.
          */
-        object IgnoreBody : PreFlightExtraction {
-            override fun invoke(meta: RouteMeta) = meta.requestParams
-        }
+        val IgnoreBody = PreFlightExtraction { it.requestParams }
 
         /**
          * Check none the contract, relying entirely  on the HttpHandler code to raise a correct
          * LensFailure if extraction fails. Use this option to fully optimise performance, at the risk
          * of not checking
          */
-        object None : PreFlightExtraction {
-            override fun invoke(meta: RouteMeta) = emptyList<LensExtractor<Request, *>>()
-        }
+        val None = PreFlightExtraction { emptyList<LensExtractor<Request, *>>() }
     }
 }

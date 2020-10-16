@@ -21,7 +21,7 @@ fun haveName(expected: String): Matcher<Cookie> = object : Matcher<Cookie> {
 
 infix fun Cookie.shouldHaveValue(expected: String) = this should haveValue(expected)
 infix fun Cookie.shouldNotHaveValue(expected: String) = this shouldNot haveValue(expected)
-fun haveValue(expected: String): Matcher<Cookie> = haveValue(be(expected))
+fun haveValue(expected: String): Matcher<Cookie> = haveValue(be<String>(expected))
 
 @JvmName("haveCookieValueNullableString")
 fun haveValue(matcher: Matcher<String?>): Matcher<Cookie> = object : Matcher<Cookie> {
@@ -74,7 +74,7 @@ fun beHttpOnly(): Matcher<Cookie> = object : Matcher<Cookie> {
 
 infix fun Cookie.shouldHaveExpiry(expected: LocalDateTime) = this should expireOn(expected)
 infix fun Cookie.shouldNotHaveExpiry(expected: LocalDateTime) = this shouldNot expireOn(expected)
-fun expireOn(expected: LocalDateTime): Matcher<Cookie> = expireOn(be<LocalDateTime?>(expected))
+fun expireOn(expected: LocalDateTime): Matcher<Cookie> = expireOn(be(expected))
 fun expireOn(matcher: Matcher<LocalDateTime?>): Matcher<Cookie> = object : Matcher<Cookie> {
     override fun test(value: Cookie): MatcherResult {
         val testResult = matcher.test(value.expires)

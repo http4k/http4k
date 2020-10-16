@@ -14,7 +14,7 @@
 <a href="https://travis-ci.org/http4k/http4k"><img alt="build status" src="https://travis-ci.org/http4k/http4k.svg?branch=master"/></a>
 <a href="https://coveralls.io/github/http4k/http4k?branch=master"><img alt="coverage" src="https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master"></a>
 <a href="http//www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub license" src="https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat"></a>
-<a href="http://kotlinlang.org"><img alt="kotlin" src="https://img.shields.io/badge/kotlin-1.3-blue.svg"></a>
+<a href="http://kotlinlang.org"><img alt="kotlin" src="https://img.shields.io/badge/kotlin-1.4-blue.svg"></a>
 <a href="https://codebeat.co/projects/github-com-http4k-http4k-master"><img alt="codebeat badge" src="https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e"></a>
 <a href="https://kotlin.link"><img alt="Awesome Kotlin Badge" src="https://kotlin.link/awesome-kotlin.svg"></a>
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/backers/badge.svg"></a>
@@ -43,12 +43,15 @@ of 2 types of simple function:
 * **Immutability:** All entities in the library are immutable unless their function explicitly disallows this.
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as 
 plugging together of services without HTTP container being required.
-* **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has ZERO dependencies and weighs in at ~700kb. Add-on modules only have dependencies required for specific implementation.
+* **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has **ZERO** dependencies and weighs in at ~1mb. Add-on modules only have dependencies required for specific implementation.
 * **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
     * individual endpoints
     * applications
     * websockets
     * full suites of microservices
+    
+## Quickstart
+Bored with reading already and just want to get coding? For the impatient, visit the [quickstart](https://www.http4k.org/quickstart/) or the [examples repo](https://github.com/http4k/examples), which showcases a variety of [http4k] use-cases and features.
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
@@ -66,21 +69,22 @@ plugging together of services without HTTP container being required.
 * [Client:](https://http4k.org/guide/modules/clients) 
     * **1LOC** client adapters 
         * **Apache** sync + async HTTP
+        * **Java** (bundled with `http4k-core`)
         * **Jetty** HTTP (supports sync and async HTTP)
         * **OkHttp** HTTP (supports sync and async HTTP)
-        * **Java** (bundled with `http4k-core`)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
 * [Server:](https://http4k.org/guide/modules/servers)
-    * **1LOC** server backend spinup for:
+    * **1LOC** server backend spin-up for:
+        * **Apache v4 & v5** (from httpcore)
         * **Jetty** (including websocket support)
-        * **Undertow**
-        * **Apache** (from httpcore)
+        * **Ktor CIO & Netty**
         * **Netty**
-        * **Ktor CIO**
         * **SunHttp** (bundled with `http4k-core`)
-    * API design allows for plugging into configurable instances of each
+        * **Undertow**
+    * API design allows for simple customization of underying backend.
+    * **Native Friendly** Several of these backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/modules/serverless)
-    * AWS: Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway. 
+    * AWS: Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway/AppLoadBalancer. 
     * Google Cloud Functions: Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
     * Apache OpenWhisk: Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
@@ -117,6 +121,7 @@ plugging together of services without HTTP container being required.
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 
+    * Plug a standard `HttpHandler` into the AWS v2 SDKs. This massively simplifies testing and allows for sniffing of the exact traffic going to AWS - brilliant for debugging and building fakes.
     * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [OAuth Security](https://http4k.org/guide/modules/oauth) 
     * Implement OAuth Authorisation Code Grant flow with a single Interface
@@ -148,9 +153,9 @@ To install, add these dependencies to your **Gradle** file:
 
 ```groovy
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "3.260.0"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.260.0"
-    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "3.260.0"
+    implementation group: "org.http4k", name: "http4k-core", version: "3.268.0"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.268.0"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "3.268.0"
 }
 ```
 

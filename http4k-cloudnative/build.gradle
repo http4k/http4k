@@ -2,6 +2,7 @@ description = 'Machinery for running Http4k apps in cloud-native environments'
 
 dependencies {
     compile project(":http4k-core")
+    implementation project(":http4k-format-jackson-yaml")
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(":http4k-testing-hamkrest")
