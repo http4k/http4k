@@ -5,7 +5,7 @@ description: You thought that microservices were a thing? Pah! The powerful abst
 
 ##### october 2020 / [@daviddenton][github]
 
-http4k is a small library with a minimal dependency set, but what really makes it shine is the power afforded by the combination of the "Server as a Function" concepts of `HttpHandler` and `Filter`. 
+http4k is a small library with a zero dependencies (apart from Kotlin StdLib), but what really makes it shine is the power afforded by the combination of the "Server as a Function" concepts of `HttpHandler` and `Filter`. 
 
 Skeptical? We would be disappointed if you weren't! Hence, we decided to prove the types of things that can be accomplished with the APIs provided by [http4k] and a little ingenuity.
 
@@ -14,7 +14,7 @@ For each of the examples below, there is a fully formed [http4k] applications de
 ### 1. Build a simple proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt)
 Requires: `http4k-core`
 
-This simple proxy converts HTTP requests to HTTPS. Because of the symmetrical server/client `HttpHandler` signature, we can simply pipe an HTTP Client onto a Server, then add a `ProxyHost` filter to do the protocol conversion.
+This simple proxy converts HTTP requests to HTTPS. Because of the symmetrical server/client `HttpHandler` signature, we can simply pipe an HTTP Client onto a server, then add a `ProxyHost` filter to do the protocol conversion.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt"></script>
 
@@ -29,7 +29,7 @@ Building on the Simple Proxy example, we can simply layer on extra filters to ad
 
 <hr/>
 
-### 3. Build a cheap Wireshark to sniff inter-service traffic [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/wire_sniffing_proxy.kt)
+### 3. Build a Wireshark to sniff inter-service traffic [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/wire_sniffing_proxy.kt)
 Requires: `http4k-core`
 
 Applying a `DebuggingFilter` to the HTTP calls in a proxy dumps the entire contents out to `StdOut` (or other stream).
@@ -38,34 +38,7 @@ Applying a `DebuggingFilter` to the HTTP calls in a proxy dumps the entire conte
 
 <hr/>
 
-### 4. Build a web cache [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/disk_cache.kt)
-Requires: `http4k-core`, `http4k-server-ktorcio`
-
-Recording all traffic to disk can be achieved by just creating a `ReadWriteCache` and then adding a couple of pre-supplied Filters to a proxy. When running this example you can see that only the first request is audited.
-
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/disk_cache.kt"></script>
-
-<hr/>
-
-### 5. Record all traffic to disk and replay it later [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/record_and_replay_http_traffic_proxy.kt)
-Requires: `http4k-core`
-
-This example contains two apps. The first is a proxy which captures streams of traffic and records it to a directory on disk. The second app is configured to replay the requests from that disk store at the original server. This kind of traffic capture/replay is very useful for load testing or for tracking down hard-to-diagnose bugs - and it's easy to write other other stores such as an S3 bucket etc.
-
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/record_and_replay_http_traffic_proxy.kt"></script>
-
-<hr/>
-
-### 6. Serve static files from disk [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt)
-Requires: `http4k-core`, `http4k-server-undertow`
-
-Longer than the Python `SimpleHttpServer`, but still pretty small!
-
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt"></script>
-
-<hr/>
-
-### 7. Build a ticking Websocket clock [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/websocket_clock.kt)
+### 4. Build a ticking Websocket clock [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/websocket_clock.kt)
 Requires: `http4k-core`, `http4k-server-netty`
 
 Like HTTP handlers, Websockets in http4k can be modelled as simple functions that can be mounted onto a Server, or combined with path patterns if required.
@@ -74,16 +47,25 @@ Like HTTP handlers, Websockets in http4k can be modelled as simple functions tha
 
 <hr/>
 
-### 8. Build your own ChaosMonkey [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt)
-Requires: `http4k-core`, `http4k-testing-chaos`
+### 5. Build a web cache [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/disk_cache.kt)
+Requires: `http4k-core`, `http4k-server-ktorcio`
 
-As per the [Principles of Chaos](https://principlesofchaos.org/), this proxy adds Chaotic behaviour to a remote service, which is useful for modelling how a system might behave under various failure modes. Chaos can be dynamically injected via an `OpenApi` documented set of RPC endpoints.
+Recording all traffic to disk can be achieved by just creating a `ReadWriteCache` and then adding a couple of pre-supplied Filters to a proxy. When running this example you can see that only the first request is audited.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/disk_cache.kt"></script>
 
 <hr/>
 
-### 9. Watch for file changes [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/file_watcher.kt)
+### 6. Record all traffic to disk and replay it later [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/record_and_replay_http_traffic_proxy.kt)
+Requires: `http4k-core`
+
+This example contains two apps. The first is a proxy which captures streams of traffic and records it to a directory on disk. The second app is configured to replay the requests from that disk store at the original server. This kind of traffic capture/replay is very useful for load testing or for tracking down hard-to-diagnose bugs - and it's easy to write other other stores such as an S3 bucket etc.
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/record_and_replay_http_traffic_proxy.kt"></script>
+
+<hr/>
+
+### 7. Watch your FS for file changes [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/file_watcher.kt)
 Requires: `http4k-core`, `http4k-server-jetty`
 
 Back to Websockets, we can watch the file system for changes and subscribe to the event feed.
@@ -92,15 +74,34 @@ Back to Websockets, we can watch the file system for changes and subscribe to th
 
 <hr/>
 
+### 8. Serve static files from disk [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt)
+Requires: `http4k-core`, `http4k-server-undertow`
+
+Longer than the Python `SimpleHttpServer`, but still pretty small!
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt"></script>
+
+<hr/>
+
+### 9. Build your own ChaosMonkey [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt)
+Requires: `http4k-core`, `http4k-testing-chaos`
+
+As per the [Principles of Chaos](https://principlesofchaos.org/), this proxy adds Chaotic behaviour to a remote service, which is useful for modelling how a system might behave under various failure modes. Chaos can be dynamically injected via an `OpenApi` documented set of RPC endpoints.
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt"></script>
+
+<hr/>
+
 ### 10. Build a remote terminal! [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/web_terminal.kt)
 Requires: `http4k-core`, `http4k-server-netty`
 
-Use Websockets to remote control a terminal!*
+Use Websockets to remote control a terminal!* Run the example and just type commands into the prompt to have them magicked to the server backend
 
 <sub>*Obviously this is, in general, a really (really) bad idea.</sub>
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/web_terminal.kt"></script>
 
 <hr/>
+
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org
