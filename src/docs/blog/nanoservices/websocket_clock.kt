@@ -2,7 +2,7 @@ package blog.nanoservices
 
 import org.http4k.client.WebsocketClient
 import org.http4k.core.Uri
-import org.http4k.server.Jetty
+import org.http4k.server.Netty
 import org.http4k.server.asServer
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
@@ -14,7 +14,7 @@ fun `ticking websocket clock`() =
             ws.send(WsMessage(Instant.now().toString()))
             Thread.sleep(1000)
         }
-    }.asServer(Jetty()).start()
+    }.asServer(Netty()).start()
 
 fun main() {
     `ticking websocket clock`()
