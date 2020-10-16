@@ -38,7 +38,18 @@ Applying a `DebuggingFilter` to the HTTP calls in a proxy dumps the entire conte
 
 <hr/>
 
-### 4. Record all traffic to disk and replay it later [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/record_and_replay_http_traffic_proxy.kt)
+### 4. Build a web cache [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/remote_terminal.kt)
+Requires: `http4k-core`, `http4k-server-netty`
+
+Use Websockets to remote control a terminal!*
+
+<sub>*Obviously this is, in general, a really (really) bad idea.</sub>
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/web_terminal.kt"></script>
+
+<hr/>
+
+### 5. Record all traffic to disk and replay it later [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/record_and_replay_http_traffic_proxy.kt)
 Requires: `http4k-core`
 
 This example contains two apps. The first is a proxy which captures streams of traffic and records it to a directory on disk. The second app is configured to replay the requests from that disk store at the original server. This kind of traffic capture/replay is very useful for load testing or for tracking down hard-to-diagnose bugs - and it's easy to write other other stores such as an S3 bucket etc.
@@ -47,7 +58,7 @@ This example contains two apps. The first is a proxy which captures streams of t
 
 <hr/>
 
-### 5. Serve static files from disk [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt)
+### 6. Serve static files from disk [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt)
 Requires: `http4k-core`, `http4k-server-undertow`
 
 Longer than the Python `SimpleHttpServer`, but still pretty small!
@@ -56,7 +67,7 @@ Longer than the Python `SimpleHttpServer`, but still pretty small!
 
 <hr/>
 
-### 6. Build a ticking Websocket clock [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/websocket_clock.kt)
+### 7. Build a ticking Websocket clock [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/websocket_clock.kt)
 Requires: `http4k-core`, `http4k-server-netty`
 
 Like HTTP handlers, Websockets in http4k can be modelled as simple functions that can be mounted onto a Server, or combined with path patterns if required.
@@ -65,7 +76,7 @@ Like HTTP handlers, Websockets in http4k can be modelled as simple functions tha
 
 <hr/>
 
-### 7. Build your own ChaosMonkey [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt)
+### 8. Build your own ChaosMonkey [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt)
 Requires: `http4k-core`, `http4k-testing-chaos`
 
 As per the [Principles of Chaos](https://principlesofchaos.org/), this proxy adds Chaotic behaviour to a remote service, which is useful for modelling how a system might behave under various failure modes. Chaos can be dynamically injected via an `OpenApi` documented set of RPC endpoints.
@@ -74,15 +85,16 @@ As per the [Principles of Chaos](https://principlesofchaos.org/), this proxy add
 
 <hr/>
 
-### 8. Watch for file changes [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/file_watcher.kt)
+### 9. Watch for file changes [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/file_watcher.kt)
 Requires: `http4k-core`, `http4k-server-jetty`
 
 Back to Websockets, we can watch the file system for changes and subscribe to the event feed.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/file_watcher.kt"></script>
+
 <hr/>
 
-### 9. Build a remote terminal! [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/remote_terminal.kt)
+### 10. Build a remote terminal! [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/remote_terminal.kt)
 Requires: `http4k-core`, `http4k-server-netty`
 
 Use Websockets to remote control a terminal!*
