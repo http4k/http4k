@@ -618,8 +618,8 @@ header p {
 }
 
 .developers-custom p {
-  max-width: 485px;
-  margin: 48px auto;
+  max-width: 585px;
+  margin: 28px auto;
   text-align: left;
 }
 
@@ -631,7 +631,7 @@ header p {
 
 @media (max-width: 991.98px) {
   .developers-custom img {
-    margin-bottom: 50px;
+    margin-bottom: 10px;
   }
 }
 
