@@ -253,6 +253,19 @@ footer a {
   border-color: #ff9800;
 }
 
+.btn-github {
+  background-image: url("/img/GitHub-Mark.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 32px;
+  height: 32px;
+  margin: 8px;
+}
+
+.btn-github:hover {
+  background-image: url("/img/GitHub-Mark-black.png");
+}
+
 .spinner-loading, .spinner-loading img {
   position: fixed;
   z-index: 99999;
@@ -618,8 +631,8 @@ header p {
 }
 
 .developers-custom p {
-  max-width: 585px;
-  margin: 28px auto;
+  max-width: 485px;
+  margin: 48px auto;
   text-align: left;
 }
 
@@ -631,7 +644,7 @@ header p {
 
 @media (max-width: 991.98px) {
   .developers-custom img {
-    margin-bottom: 10px;
+    margin-bottom: 50px;
   }
 }
 
