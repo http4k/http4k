@@ -9,7 +9,7 @@ http4k is a small library with a minimal dependency set, but what really makes i
 
 Skeptical? We would be disappointed if you weren't! Hence, we decided to prove the types of things that can be accomplished with the APIs provided by [http4k] and a little ingenuity.
 
-For each of the examples below, there is a fully formed [http4k] applications declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()` using one of the swappable server backends. Even better, each of app's code (excluding import statements 🙂) fits in a single Tweet.
+For each of the examples below, there is a fully formed [http4k] applications declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()` using one of the swappable server backends. Even better, each of app's code (excluding import statements 🙂 ) fits in a single Tweet.
 
 ### 1. Build a simple proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt)
 Requires: `http4k-core`
