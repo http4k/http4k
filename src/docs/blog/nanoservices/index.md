@@ -1,7 +1,7 @@
-title: http4k blog: Nanoservices: 7 things you can accomplish with http4k in a single line of code
+title: http4k blog: Nanoservices: The Power of composition 
 description: You thought that microservices were a thing? Pah! The powerful abstractions in the http4k toolkit allow you to write entire useful apps which fit in a Tweet.
 
-# Nanoservices: 7 things you can accomplish with http4k in a single line of Kotlin
+# Nanoservices: The Power of Composition 
 
 ##### october 2020 / [@daviddenton][github]
 
