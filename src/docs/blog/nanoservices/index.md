@@ -72,6 +72,7 @@ As per the [Principles of Chaos](https://principlesofchaos.org/), this proxy add
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt"></script>
 
+<hr/>
 
 ### 8. Watch for file changes [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/file_watcher.kt)
 Requires: `http4k-core`, `http4k-server-jetty`
@@ -79,6 +80,16 @@ Requires: `http4k-core`, `http4k-server-jetty`
 Back to Websockets, we can watch the file system for changes and subscribe to the event feed.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/file_watcher.kt"></script>
+<hr/>
+
+### 9. Build a remote terminal! [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/remote_terminal.kt)
+Requires: `http4k-core`, `http4k-server-jetty`
+
+Use Websockets to remote control a terminal!*
+
+<sub>*Obviously this is, in general, a really (really) bad idea.</sub>
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/web_terminal.kt"></script>
 
 <hr/>
 [github]: http://github.com/daviddenton
