@@ -78,11 +78,11 @@ Bored with reading already and just want to get coding? For the impatient, visit
         * **Apache v4 & v5** (from httpcore)
         * **Jetty** (including websocket support)
         * **Ktor CIO & Netty**
-        * **Netty**
+        * **Netty** (including websocket support)
         * **SunHttp** (bundled with `http4k-core`)
         * **Undertow**
     * API design allows for simple customization of underying backend.
-    * **Native Friendly** Several of these backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
+    * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/modules/serverless)
     * AWS: Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway/AppLoadBalancer. 
     * Google Cloud Functions: Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 

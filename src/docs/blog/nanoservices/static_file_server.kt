@@ -5,12 +5,12 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.routing.ResourceLoader.Companion.Directory
 import org.http4k.routing.static
-import org.http4k.server.SunHttp
+import org.http4k.server.Undertow
 import org.http4k.server.asServer
 
 fun `static file server`() =
     static(Directory())
-        .asServer(SunHttp())
+        .asServer(Undertow())
         .start()
 
 fun main() {

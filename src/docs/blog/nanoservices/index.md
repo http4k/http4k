@@ -9,7 +9,7 @@ http4k is a small library with a minimal dependency set, but what really makes i
 
 Skeptical? We would be disappointed if you weren't! Hence, we decided to prove the types of things that can be accomplished with the APIs provided by [http4k] and a little ingenuity.
 
-For each of the examples below, there is a fully formed [http4k] applications declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()`. Even better, all of the main app code (excluding import statements 🙂) can fit in a single Tweet.
+For each of the examples below, there is a fully formed [http4k] applications declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()` using one of the swappable server backends. Even better, each of app's code (excluding import statements 🙂) fits in a single Tweet.
 
 ### 1. Build a simple proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt)
 Requires: `http4k-core`
@@ -48,7 +48,7 @@ This example contains two apps. The first is a proxy which captures streams of t
 <hr/>
 
 ### 5. Serve static files from disk [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/static_file_server.kt)
-Requires: `http4k-core`
+Requires: `http4k-core`, `http4k-server-undertow`
 
 Longer than the Python `SimpleHttpServer`, but still pretty small!
 
@@ -83,7 +83,7 @@ Back to Websockets, we can watch the file system for changes and subscribe to th
 <hr/>
 
 ### 9. Build a remote terminal! [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/remote_terminal.kt)
-Requires: `http4k-core`, `http4k-server-jetty`
+Requires: `http4k-core`, `http4k-server-netty`
 
 Use Websockets to remote control a terminal!*
 
