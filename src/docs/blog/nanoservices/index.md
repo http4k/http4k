@@ -1,4 +1,4 @@
-title: http4k blog: Nanoservices: The Power of composition 
+title: http4k blog: Nanoservices: The Power of Composition 
 description: You thought that microservices were a thing? Pah! The powerful abstractions in the http4k toolkit allow you to write entire useful apps which fit in a Tweet.
 
 # Nanoservices: The Power of Composition 
@@ -9,7 +9,7 @@ http4k is a small library with a zero dependencies (apart from Kotlin StdLib), b
 
 Skeptical? We would be disappointed if you weren't! Hence, we decided to prove the types of things that can be accomplished with the APIs provided by [http4k] and a little ingenuity.
 
-For each of the examples below, there is a fully formed [http4k] applications declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()` using one of the swappable server backends. Even better, each of app's code (excluding import statements 🙂 ) fits in a single Tweet.
+For each of the examples below, there is a fully formed [http4k] application declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()` using one of the swappable server backends. Even better, each of app's code (excluding import statements 🙂 ) fits in a single Tweet.
 
 ### 1. Build a simple proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt)
 Requires: `http4k-core`
@@ -86,7 +86,7 @@ Longer than the Python `SimpleHttpServer`, but still pretty small!
 ### 9. Build your own ChaosMonkey [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt)
 Requires: `http4k-core`, `http4k-testing-chaos`
 
-As per the [Principles of Chaos](https://principlesofchaos.org/), this proxy adds Chaotic behaviour to a remote service, which is useful for modelling how a system might behave under various failure modes. Chaos can be dynamically injected via an `OpenApi` documented set of RPC endpoints.
+As per the [Principles of Chaos], this proxy adds Chaotic behaviour to a remote service, which is useful for modelling how a system might behave under various failure modes. Chaos can be dynamically injected via an `OpenApi` documented set of RPC endpoints.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/chaos_proxy.kt"></script>
 
@@ -103,5 +103,9 @@ Use Websockets to remote control a terminal!* Run the example and just type comm
 
 <hr/>
 
+Obviously we haven't thought of everything here. We'd love to hear your ideas about other clever uses of the [http4k] building blocks, or to take PRs to integrate them into the library for wider use. You can get in touch through [GitHub](http://github.com/http4k) or the usual [channels].
+
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org
+[Principles of Chaos](https://principlesofchaos.org/)
+[channels]: https://www.http4k.org/support
