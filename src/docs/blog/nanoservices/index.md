@@ -3,7 +3,7 @@ description: You thought that microservices were a thing? Pah! The powerful abst
 
 # Nanoservices: 7 things you can accomplish with http4k in a single line of Kotlin
 
-##### september 2020 / [@daviddenton][github]
+##### october 2020 / [@daviddenton][github]
 
 http4k is a small library with a minimal dependency set, but what really makes it shine is the power afforded by the combination of the "Server as a Function" concepts of `HttpHandler` and `Filter`. 
 
