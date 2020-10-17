@@ -2,8 +2,6 @@ description = 'http4k incubator module'
 
 dependencies {
     compile project(":http4k-core")
-    compile project(":http4k-format-jackson")
-    compile project(":http4k-format-jackson-yaml")
 
     testCompile Config.TestDependencies
     testCompile project(":http4k-client-apache")
