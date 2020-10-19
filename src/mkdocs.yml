@@ -64,8 +64,8 @@ nav:
     - Client as a function: cookbook/client_as_a_function/index.md
     - Container integration: cookbook/container_integration/index.md
     - Simple routing: cookbook/simple_routing/index.md
-    - Service Virtualisation with Servirtium: cookbook/service_virtualisation/index.md
     - Nestable routes: cookbook/nestable_routes/index.md
+    - OpenAPI contracts/routing: cookbook/typesafe_http_contracts/index.md
     - Templating engines: cookbook/using_templates/index.md
     - Typesafe RequestContexts: cookbook/request_context/index.md
     - Typesafe HTTP requests with lenses: cookbook/typesafe_http_requests_with_lenses/index.md
@@ -74,11 +74,11 @@ nav:
     - Multipart forms: cookbook/multipart_forms/index.md
     - Generating data classes for messages: cookbook/generating_data_classes/index.md
     - Websockets: cookbook/websockets/index.md
-    - Typesafe HTTP contracts: cookbook/typesafe_http_contracts/index.md
     - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
     - Basic OAuth Server configuration: cookbook/basic_oauth_authorization_server/index.md
     - Custom OAuth Provider configuration: cookbook/custom_oauth_provider/index.md
     - Custom Server (SSL): cookbook/customised_servers/index.md
+    - Service Virtualisation with Servirtium: cookbook/service_virtualisation/index.md
     - Principal lookup: cookbook/principal_lookup/index.md
     - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
