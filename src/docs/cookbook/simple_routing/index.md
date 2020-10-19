@@ -1,7 +1,9 @@
 title: http4k Routing API (Simple)
 description: Recipes for using the http4k composable routing API
 
-This example shows how to use the simple routing functionality to bind several routes
+This example shows how to use the simple routing functionality to bind several routes.
+
+For the typesafe contract-style routing, refer to [this](/cookbook/typesafe_http_contracts/) recipe instead,
 
 ### Gradle setup
 
