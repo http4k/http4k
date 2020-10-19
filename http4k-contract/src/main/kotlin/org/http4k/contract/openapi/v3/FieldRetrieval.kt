@@ -2,6 +2,7 @@ package org.http4k.contract.openapi.v3
 
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaGetter
 
 fun interface FieldRetrieval : (Any, String) -> Field {
@@ -34,6 +35,7 @@ class SimpleLookup(
                 field.javaGetter
                     ?.let { it(target) }
                     ?.let { it to field.returnType.isMarkedNullable }
+                    ?: fields[name]?.javaField?.takeIf { it.trySetAccessible() }?.get(target)?.let { it to true }
             }
             ?.let { Field(it.first, it.second, metadataRetrievalStrategy(target, name)) } ?: throw NoFieldFound(name, target)
     }

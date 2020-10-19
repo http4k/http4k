@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 
 class SimpleLookupTest {
 
-    data class Beany(
+    data class KotlinBean(
         val nonNullable: String = "hello",
         @JsonPropertyDescription("A field description")
         val withMeta: String = "withMeta",
@@ -17,18 +17,23 @@ class SimpleLookupTest {
 
     @Test
     fun `finds value from object`() {
-        assertThat("nonNullable", SimpleLookup()(Beany(), "nonNullable"), equalTo(Field("hello", false, FieldMetadata.empty)))
-        assertThat("aNullable", SimpleLookup()(Beany(), "aNullable"), equalTo(Field("aNullable", true, FieldMetadata.empty)))
+        assertThat("nonNullable", SimpleLookup()(KotlinBean(), "nonNullable"), equalTo(Field("hello", false, FieldMetadata.empty)))
+        assertThat("aNullable", SimpleLookup()(KotlinBean(), "aNullable"), equalTo(Field("aNullable", true, FieldMetadata.empty)))
         assertThat(
             "withMeta",
-            SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy)(Beany(), "withMeta"),
+            SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy)(KotlinBean(), "withMeta"),
             equalTo(Field("withMeta", false, FieldMetadata(description = "A field description")))
         )
     }
 
     @Test
+    fun `finds value from java object`() {
+        assertThat("nonNullable", SimpleLookup()(JavaBean("hello"), "name"), equalTo(Field("hello", true, FieldMetadata.empty)))
+    }
+
+    @Test
     fun `throws on no field found`() {
-        assertThat("non existent", { SimpleLookup()(Beany(), "non existent") }, throws<NoFieldFound>())
+        assertThat("non existent", { SimpleLookup()(KotlinBean(), "non existent") }, throws<NoFieldFound>())
     }
 }
 
