@@ -10,6 +10,13 @@ description: How to look for help using http4k
 
 **Note:** As a general rule, you'll get a quicker response from the Slack channel.
 
+## http4k Training
+Whilst we hope that http4k is a simple library to use, there are significant nuances to being able to use it most effectively, especially around the areas of advanced application testing, deployment strategies, and migration to Kotlin-based development for Java-heritage teams.
+
+The http4k creators have used http4k on projects both (very) big and small, so can advise in this area with a lot of experience gained from experience. For this purpose, the team have developed various training materials which can be delivered to project teams.
+
+If you feel that you would like to take advantage of these experiences to turbo-charge your application development programs, please get in touch, so we can talk about how best the team could help.
+
 ## Commercial Support
 We recognise that although organisations use happily Open Source Software such as **http4k**, they may gain additional peace of mind from having direct access to expert advice. For this purpose, the project creators offer a range of professional services to support library users in making the most of the powerful feature set which **http4k** provides, including:
 
