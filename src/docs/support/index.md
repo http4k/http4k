@@ -24,5 +24,5 @@ We recognise that although organisations use happily Open Source Software such a
 Please get in touch at: **[support@http4k.org](mailto:support@http4k.org)**
 
 ## Logo Usage
-The **http4k** logo design and branding are copyright 2020 to the owners of http4k.org. If you'd like to use the **http4k** logo in a presentation or for other purposes, it's probably fine, but please reach out to let know first on the channels above that you'd like to do so and we can provide the relevant high-quality asset files. Here are the relevant [branding guidelines](https://logojoy.com/b/http4k).
+The **http4k** logo design and branding are copyright 2020 to the owners of http4k.org. If you'd like to use the **http4k** logo in a presentation or for other purposes, it's probably fine, but please reach out to let know first on the channels above. We can then look at providing the relevant high-quality asset files.
 
