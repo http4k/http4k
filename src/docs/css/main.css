@@ -254,7 +254,7 @@ footer a {
 }
 
 .btn-github {
-  background-image: url("/img/GitHub-Mark.png");
+  background-image: url("../img/GitHub-Mark.png");
   background-repeat: no-repeat;
   background-size: cover;
   width: 32px;
@@ -263,7 +263,7 @@ footer a {
 }
 
 .btn-github:hover {
-  background-image: url("/img/GitHub-Mark-black.png");
+  background-image: url("../img/GitHub-Mark-black.png");
 }
 
 .spinner-loading, .spinner-loading img {
