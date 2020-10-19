@@ -7,15 +7,11 @@ import org.junit.jupiter.api.Test
 
 class FieldRetrievalTest {
 
-    private val blowUp = object : FieldRetrieval {
-        override fun invoke(p1: Any, p2: String) = throw NoFieldFound(p2, p1)
-    }
+    private val blowUp = FieldRetrieval { p1, p2 -> throw NoFieldFound(p2, p1) }
 
     private val result = Field("hello", true, FieldMetadata.empty)
 
-    private val findIt = object : FieldRetrieval {
-        override fun invoke(p1: Any, p2: String): Field = result
-    }
+    private val findIt = FieldRetrieval { _, _ -> result }
 
     data class Beany(val nonNullable: String = "hello", val aNullable: String? = "aNullable")
 
