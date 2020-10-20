@@ -15,7 +15,9 @@ fun `file watcher`() =
         val w = getDefault().newWatchService()
         Paths.get("").register(w, ENTRY_MODIFY)
         val key = w.take()
-        while (true) key.pollEvents().forEach { ws.send(WsMessage(it.context().toString())) }
+        while (true)
+            key.pollEvents()
+                .forEach { ws.send(WsMessage(it.context().toString())) }
     }.asServer(Jetty()).start()
 
 fun main() {
