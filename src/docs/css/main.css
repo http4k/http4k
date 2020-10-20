@@ -125,6 +125,10 @@ nav a {
   line-height: 1.17;
 }
 
+footer {
+    color: white;
+}
+
 footer a {
   line-height: 1.19;
 }
