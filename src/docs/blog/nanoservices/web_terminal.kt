@@ -7,12 +7,16 @@ import org.http4k.server.asServer
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import java.lang.Runtime.getRuntime
-import java.util.Scanner
+import java.util.*
 
 fun `websocket terminal`() =
     { ws: Websocket ->
         ws.onMessage {
-            ws.send(WsMessage(getRuntime().exec(it.bodyString()).inputStream.reader().readText()))
+            ws.send(WsMessage(
+                getRuntime()
+                    .exec(it.bodyString())
+                    .inputStream.reader().readText()
+            ))
         }
     }.asServer(Netty()).start()
 
