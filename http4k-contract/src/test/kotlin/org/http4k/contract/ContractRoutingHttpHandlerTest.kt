@@ -13,6 +13,7 @@ import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -118,6 +119,21 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         assertThat(response.status, equalTo(OK))
     }
 
+    @Test
+    fun `OPTIONS traffic ignores missing body`() {
+        val root = routes(
+            "/root/bar" bind contract {
+                routes += "/foo/bar" meta {
+                    receiving(requiredBody)
+                } bindContract POST to { Response(NOT_IMPLEMENTED) }
+            }
+        )
+
+        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
+
+        assertThat(response.status, equalTo(OK))
+    }
+
 //    @Test
 //    fun `OPTIONS traffic goes to the path and handler specified if the route responds to OPTIONS`() {
 //        val root = org.http4k.routing.routes(
@@ -183,11 +199,11 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK) }
-        }.withFilter(Filter { next ->
+        }.withFilter { next ->
             {
                 next(it.query("key", "bob"))
             }
-        })
+        }
 
         assertThat(root(Request(GET, "/root/bob")).status, equalTo(OK))
     }
@@ -197,11 +213,11 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK).body(it.body) }
-        }.withPostSecurityFilter(Filter { next ->
+        }.withPostSecurityFilter { next ->
             {
                 next(it.body("body"))
             }
-        })
+        }
 
         assertThat(root(Request(GET, "/root/bob?key=bob")), hasStatus(OK).and(hasBody("body")))
     }
