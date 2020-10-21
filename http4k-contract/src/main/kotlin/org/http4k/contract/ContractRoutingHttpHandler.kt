@@ -73,9 +73,9 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                 .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
         } + (identify(descriptionRoute)
-        .then(preSecurityFilter)
-        .then(descriptionSecurity?.filter ?: Filter.NoOp)
-        .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+            .then(preSecurityFilter)
+            .then(descriptionSecurity?.filter ?: Filter.NoOp)
+            .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
