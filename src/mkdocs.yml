@@ -18,6 +18,9 @@ google_analytics: ['UA-125143867-1', 'auto']
 markdown_extensions:
   - meta
   - codehilite
+  - toc:
+      permalink: True
+      separator: "_"
 extra_css:
   - ./css/site.css
 extra:
