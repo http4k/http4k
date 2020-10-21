@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.269.0 (uncut)
+### v3.269.0
+- **http4k-contract** : Fix #502 - OPTIONS requests not honoured for requests with body
 - **http4k-contract** : Support for JavaBeans in OpenAPI descriptions.
 
 ### v3.268.0
