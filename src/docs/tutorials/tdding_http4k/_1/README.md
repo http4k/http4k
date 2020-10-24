@@ -8,13 +8,13 @@ pipeline is sound, and helps to set the direction for the testing strategy that 
 We start with in ICT (In-Container-Test), which have the job of testing server-level concerns such as monitoring,
 documentation, and checking in a high-level way that the business endpoints are wired correctly.
 
-## Requirements:
+### Requirements:
 - The service can be pinged over HTTP to prove that is still alive.
 
-## Tests:
+### Tests:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/tdding_http4k/_1/tests.kt"></script>
 
-## Production:
+### Production:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/tdding_http4k/_1/project.kt"></script>

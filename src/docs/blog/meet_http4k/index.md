@@ -5,7 +5,7 @@ description: An overview of the Kotlin "Server as a Function" library, http4k
 
 ##### november 2017 / [@daviddenton][github]
 
-## Meet [http4k]
+### Meet [http4k]
 
 [http4k] is an HTTP toolkit written in Kotlin that enables the serving and consuming 
 of HTTP services in a functional and consistent way.
@@ -28,7 +28,7 @@ and hello to automatic request validation and data class-based contracts for HTT
 * [http4k] is serverless. Or rather - server independent. Test an app out of 
 container and then deploy it into any supported local container with 1 LOC - or as a function into AWS Lambda.
 
-### Oh god, not another framework! Why does this even exist?!?
+#### Oh god, not another framework! Why does this even exist?!?
 Firstly - we don't consider [http4k] to be a framework - it's a set of libraries 
 providing a functional toolkit to serve and consume HTTP services, focusing on simple, consistent, and testable APIs. 
 Hence, whilst it does provide support for various APIs *relevant to serving and consuming HTTP*, it does not provide 
@@ -44,11 +44,11 @@ With the growing adoption of Kotlin, we wanted something that would fully levera
 and it felt like a good time to start something from scratch, whilst avoiding the *magic* that plagues other frameworks. 
 Hence, [http4k] is primarily designed to be a Kotlin-first library.
 
-## Claim A: Small, simple, immutable.
+### Claim A: Small, simple, immutable.
 Based on the awesome ["Your Server as a Function"] paper from Twitter, [http4k] 
 apps are modelled by composing 2 types of simple, independent function. 
 
-### Function 1: HttpHandler
+#### Function 1: HttpHandler
 An `HttpHandler` represents an HTTP endpoint. It's not even an Interface, modelled merely as a [Typealias]:
 ```kotlin
 typealias HttpHandler = (Request) -> Response
@@ -72,7 +72,7 @@ class AppTest {
 To plug it into a different Server-backend, just depend on the relevant module (Jetty, Undertow, Netty, Apache (httpcore), 
 Ktor CIO, Ktor Netty, and SunHttp are available) and change the call to `asServer()`.
 
-### Function 2: Filter
+#### Function 2: Filter
 `Filters` provides pre and post Request processing and are simply:
 ```kotlin
 interface Filter : (HttpHandler) -> HttpHandler
@@ -92,7 +92,7 @@ val decoratedApp: HttpHandler = composedFilter.then(app)
 ```
 Filters are also trivial to test independently, because they are generally just stateless functions.
 
-### Routing
+#### Routing
 [http4k]'s nestable routing looks a lot like every other Sinatra-style framework these 
 days, and allows for infinitely nesting `HttpHandlers` - this just exposes another `HttpHandler` so you can easily extract, 
 test and reuse sets of routes as easily as you could with one:
@@ -111,7 +111,7 @@ module rocks in at about 700kb, and has zero dependencies (other than the Kotlin
 in the core is *functional and predictable* - there is no static API magic going on under the covers (making it difficult 
 to have multiple apps in the same JVM), no annotations, no compiler-plugins, and no reflection.
 
-## Claim B. Symmetric HTTP
+### Claim B. Symmetric HTTP
 Out of the multitude of JVM http frameworks out there, not many actually consider how you app talks to other services, 
 yet in this Microservice™ world that's an absolutely massive part of what many apps do!
 
@@ -140,7 +140,7 @@ val app2: HttpHandler = MyApp2(app1)
 [http4k] provides a HTTP client adapters for both [Apache] and [OkHttp], 
 all with streaming support.
 
-## Claim C. Typesafe HTTP with Lenses
+### Claim C. Typesafe HTTP with Lenses
 The immutable [http4k] model for HTTP objects contains all the usual suspect methods for getting values from the messages. 
 For instance, if we are expecting a search parameter with a query containing a page number:
 ```kotlin
@@ -153,7 +153,7 @@ either of those things is not true. For this purpose, we can use a [Lens] to enf
 The use of Lenses in [http4k] applications can remove the need for writing any parsing or validation code for all incoming 
 data (including Forms), as validations are taken care of by the library. 
 
-### Lens basics
+#### Lens basics
 A Lens is a bi-directional entity which can be used to either *get* or *set* a particular value from/onto an HTTP message. 
 [http4k] provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time 
 specifying the requirement for those parts (i.e. mandatory or optional) and the type. For the above example, we could use 
@@ -195,7 +195,7 @@ val dateQuery = Query.localDate().map(::MyDate, MyDate::value).required("date")
 val myDate: MyDate = dateQuery(Request(GET, "http://server/search?date=2000-01-01"))
 ```
 
-### Lensing HTTP bodies with Data classes
+#### Lensing HTTP bodies with Data classes
 Some of the supported message libraries (eg. GSON, Jackson, Moshi, XML) provide the mechanism to automatically marshall 
 data objects to/from JSON and XML using reflection (oops - looks like we broke our reflection promise - but technically 
 we're not doing it ;) !). This behaviour is supported in [http4k] Lenses through the use of the `auto()` method, which 
@@ -214,18 +214,15 @@ This mechanism works for all incoming and outgoing JSON and XML Requests and Res
 using this type of auto-marshalling, we have created a [tool](http://http4k-data-class-gen.herokuapp.com/) to automatically 
 generate a set of data classes for a given messages.
 
-## Claim D. Serverless
+### Claim D. Serverless
 Ah yes - Serverless - the latest in the Cool Kids Club and killer fodder for the resume. Well, since [http4k] is server 
 independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda], 
 and then call them by setting up the [API Gateway] to proxy requests to the function. 
 Effectively, the combination of these two services become just another Server back-end supported by the library.
 
 In order to achieve this, only a single interface `AppLoader` needs to be implemented - this is responsible for creating 
-the `HttpHandler` which is adapted to the API of the `ApiGatewayProxyRequest/ApiGatewayProxyResponse` used by AWS. As this 
-is AWS, there is a fair amount of configuration required to make this possible, but the only [http4k] specific config is to:
-
-1. Set the function execution to call `org.http4k.serverless.LambdaFunction::handle`
-2. Set an environment variable for the Lambda `HTTP4K_BOOTSTRAP_CLASS` to the class of your `AppLoader` class.
+the `HttpHandler` which is adapted to the API of the `ApiGatewayProxyRequest/ApiGatewayProxyResponse` used by AWS, and then a single class `ApiGatewayV2LambdaFunction` extended. As this 
+is AWS, there is a fair amount of configuration required to make this possible, but the only [http4k] specific config is to set the function execution to call `org.http4k.MyLambdaFunction`
 
 Here's a simple example:
 ```kotlin
@@ -234,13 +231,15 @@ object TweetEcho : AppLoader {
         Response(OK).body(it.bodyString().take(140))
     }
 }
+
+class MyLambdaFunction : ApiGatewayV2LambdaFunction(TweetEcho)
 ```
 Since [http4k] is very dependency-light, full binary uploads of these AWS Lambdas tend to be very small - and by utilising 
 [Proguard] we've seen the size of a Lambda UberJar go as small as 150kb.
 
 Introduced in v3.0.0, this support is available in the `http4k-serverless-lambda` module.
 
-## The final word(s)!
+#### The final word(s)!
 As pointed out above, `http4k-core` module has zero dependencies. It is also small, even though it also provides:
 
 * Support for static file-serving with HotReload.

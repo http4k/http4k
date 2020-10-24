@@ -11,10 +11,10 @@ The process here is to create fake versions of the dependency which can be teste
 This requires another style of testing, CDCs (Consumer Driven Contracts), to be created. These contract tests ensure that our
 interactions with the external service are valid.
 
-## Requirements:
+### Requirements:
 - Results from calculations should be POSTed via HTTP to another "answer recording" service.
 
-## Implementation Notes:
+### Implementation Notes:
 The following process is followed to us to the final state, whilst always allowing us to keep the build green:
 
 1. Determine the HTTP contract required by the Recorder (in this case an HTTP POST to /{answer}
@@ -27,10 +27,10 @@ The following process is followed to us to the final state, whilst always allowi
 1. Alter the AddFunctionalTest and MultiplyFunctionalTest to set the expectations on the interactions recorder in FakeRecorderHttp
 1. In MyMathApp, create the Recorder business implementation (Recorder) and pass it to calculate(), then implement the call to record()
 
-## Tests:
+### Tests:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/tdding_http4k/_4/tests.kt"></script>
 
-## Production:
+### Production:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/tdding_http4k/_4/project.kt"></script>

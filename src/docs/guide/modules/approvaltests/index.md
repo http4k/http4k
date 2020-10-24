@@ -34,14 +34,14 @@ mouse and keyboard shortcut to rename the file.
 The `http4k-testing-approval` module implements this functionality as a JUnit5 extension that 
 will inject the `Approver` automatically into test methods.
 
-## Standard Approval tests
+### Standard Approval tests
 By using the `ApprovalTest` extension, an instance of an `Approver` is injected into each test.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/approvaltests/example_standard.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/approvaltests/example_standard.kt"></script>
 
-## Content-type specific Approval tests
+### Content-type specific Approval tests
 Because so many APIs are based around messages with a particular content type, the 
 module also provides Junit 5 extensions that will:
 
@@ -59,7 +59,7 @@ The module also provides the following built-in extensions:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/approvaltests/example_json.kt"></script>
 
-## Implementing custom JUnit Extensions
+### Implementing custom JUnit Extensions
 As with the rest of [http4k], a base implementation, `BaseApprovalTest` of the Junit5 Extension is 
 provided, allowing API users to implement custom approval schemes or non-FS based approaches for 
 storing the approval files.

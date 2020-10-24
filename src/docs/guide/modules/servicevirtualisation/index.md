@@ -29,13 +29,13 @@ The result of these 2 implementations is that we can exercise the `Client-Under-
 
 Climate API Demo: [github.com/http4k/servirtium-demo-kotlin-climate-tck](https://github.com/http4k/servirtium-demo-kotlin-climate-tck). The climate API tested uses a simple programatic wrapper for World Bank's climate-data service. It can respond to requests with XML or JSON payloads, and the `http4k-testing-servirtium` module can record and payback either. This is a standard showcase for Servirtium.
 
-## Kotlin Examples:
+### Kotlin Examples:
 
 * Playback of a Servirtium recording: [kotlin/DiskPlaybackClimateApiTests.kt](https://github.com/http4k/servirtium-demo-kotlin-climate-tck/blob/master/src/test/kotlin/servirtium/http4k/kotlin/DiskPlaybackClimateApiTests.kt)
 * Making a Servirtium recording: [kotlin/DiskRecordingClimateApiTest.kt](https://github.com/http4k/servirtium-demo-kotlin-climate-tck/blob/master/src/test/kotlin/servirtium/http4k/kotlin/DiskRecordingClimateApiTest.kt)
 * In the same package, see also a direct example for contrast, and one that can playback from recordings themselves on a website rather than from local disk.
 
-## Java Examples:
+### Java Examples:
 
 * Playback of a Servirtium recording: [java/DiskReplayClimateApiTests.java](https://github.com/http4k/servirtium-demo-kotlin-climate-tck/blob/master/src/test/java/servirtium/http4k/java/DiskReplayClimateApiTests.java)
 * Making a Servirtium recording: [java/DiskRecordingClimateApiTests.java](https://github.com/http4k/servirtium-demo-kotlin-climate-tck/blob/master/src/test/java/servirtium/http4k/java/DiskRecordingClimateApiTests.java)

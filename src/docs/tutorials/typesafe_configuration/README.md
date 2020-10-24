@@ -3,12 +3,12 @@ description: An overview of how to configure http4k applications using the http4
 
 # Add typesafe 12-factor configuration to http4k apps with Environments.
 
-## Intro
+### Intro
 This post covers the various concerns around configuring HTTP apps, and introduces the [http4k] 
 approach for addressing these when deploying applications into cloud-native environments, which leverages the Kotlin type 
 system for maximum safely and code reuse.
 
-## Concerns when configuring applications
+### Concerns when configuring applications
 One of the tenets of operating applications according to the principles of [12factor], 
 and especially in containerised cloud-native apps, is to inject all app configuration through the use of environmental 
 variables. Additionally, when using more restrictive settings (such as utilising JVM security manager policies or through 
@@ -96,7 +96,7 @@ Implementing this kind of fallback logic manually, you'd end up with code like t
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/typesafe_configuration/pre/overriding.kt"></script>
 
-## The http4k approach...
+### The http4k approach...
 There are [already][properlty] [many][config4k] [options][konf] [for][cfg4k] [configurational][configur8] 
 [libraries][kaconf] written in Kotlin, but [http4k] also provides an option in the `http4k-cloudnative` add-on module 
 which leverages the power of the Lens system already built into the core library to provide a consistent experience to 
@@ -140,7 +140,7 @@ In [http4k], Lenses are typically used to provide typesafe conversion of typed v
 although this concept has been extended within the [http4k] ecosystem to support that of a form handling and request 
 contexts.
 
-## http4k Environments
+### http4k Environments
 in [http4k], an `Environment` object is a context which holds configuration values. It effectively behaves like a 
 `Map`, in that it can be composed with other `Environment` objects to provide a consolidated view of all of it's 
 component values. 

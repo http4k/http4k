@@ -15,7 +15,7 @@ Testing is just matter of calling the correct function! Additionally, because th
 That said, possibly the most useful thing is to demonstrate the process that we have developed to test micro-services. A simple example of the development process can be found 
 [here](/tutorials/tdding_http4k).
 
-## Testing modules
+### Testing modules
 We have developed the following modules to help with testing:
 
 - [http4k-testing-hamkrest](/guide/modules/hamkrest): a set of composable Hamkrest matchers for matching [http4k] message objects against.
@@ -23,7 +23,7 @@ We have developed the following modules to help with testing:
 - [http4k-testing-approval](/guide/modules/approvaltests): JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of [http4k] Request and Response messages.
 - [http4k-testing-chaos](/guide/modules/chaos): API for declaring and injecting failure modes into [http4k] applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
 
-## Example code for testing
+### Example code for testing
 
 #### Testing HttpHandlers with static paths [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/StaticPathTest.kt)
 

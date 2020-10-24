@@ -1,21 +1,21 @@
 title: http4k Chaos Module
 description: Feature overview of the http4k-testing-chaos module
 
-## Installation (Gradle)
+### Installation (Gradle)
 
 ```groovy
 implementation group: "org.http4k", name: "http4k-testing-chaos", version: "3.269.0"
 ```
 
-## About
+### About
 The http4k Chaos module provides the facility to statically or dynamically inject failure modes into http4k applications, such as random HTTP failures, killing of processes, and extra latency injection. By modelling these modes, it is possible to plan for mitigation of particular scenarios on a wider scale, resulting either from failures within your system boundary, or those caused by dependent remote HTTP services.
 
 The [Principles of Chaos Engineering](http://principlesofchaos.org/) approach was made prominent by Netflix open-sourcing the [Simian Army](https://github.com/Netflix/SimianArmy) libraries. 
 
-## API concepts
+### API concepts
 To understand the API, these domain-language concepts are important, all modelled as simple Kotlin typealiases and interfaces in order that API users can create their own:
 
-### Behaviours: `typealias Behaviour = Filter` 
+#### Behaviours: `typealias Behaviour = Filter` 
 A **Behaviour** applies the failure mode to the HTTP call. This could involve blocking a thread permanently, introducing extra latency into an HTTP service, or even causing a Stack Overflow or Killing the running process.
 
 -----------------------------------
@@ -31,7 +31,7 @@ A **Behaviour** applies the failure mode to the HTTP call. This could involve bl
 |BlockThread|Permanently blocks the request thread|`{"type":"block"}`|
 |None|Requests complete normally|`{"type":"none"}`|
 
-### Triggers: `typealias Trigger = (req: Request) -> Boolean`
+#### Triggers: `typealias Trigger = (req: Request) -> Boolean`
 A **Trigger** is just a predicate which determines if an HTTP call should have an `Behaviour` applied to it. `Triggers` can be stateless, based on the request content, or stateful - deadlines or countdowns.
 
 -----------------------------------------------
@@ -45,7 +45,7 @@ A **Trigger** is just a predicate which determines if an HTTP call should have a
 |PercentageBased|Applies to a certain (randomly decided) percentage of requests|`{"type":"percentage", "percentage":100}`|
 |Always|For all requests|`{"type":"always"}`|
 
-### Stages: `interface Stage: (Request) -> Filter?`
+#### Stages: `interface Stage: (Request) -> Filter?`
 A **Stage** provides the lifecycle for applying a behaviour, and applies until a `Trigger` indicates that the stage is complete. `Stages` can be chained with `then()`, or can be produced by combining a `Behaviour` and a `Trigger` using `appliedWhen()`.
 
 ----------------------------------------
@@ -55,14 +55,14 @@ A **Stage** provides the lifecycle for applying a behaviour, and applies until a
 |Repeat|Loops through the stages and then repeats|`{"type":"repeat","stages":[<insert stage json elements>],"until":<insert trigger json>}`|
 |(Triggered)|Combines a Trigger and a Behaviour |`{"type":"trigger","behaviour":{"type":"body"},"trigger":<insert trigger json>,"until":<insert trigger json>}}`|
 
-## Manually injecting Chaos
+### Manually injecting Chaos
 For use in automated test suites, it is simple to define the Chaos behaviour programmatically using the API and then use the `ChaosEngine` to add it onto an existing application.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos.kt"></script>
 
-## Dynamic behaviour injection using Chaos Controls
+### Dynamic behaviour injection using Chaos Controls
 For use in deployed environments or when experimenting with the reaction of systems to failure, there is the need to vary (and otherwise control) the Chaos behaviour that an application or downstream fake exhibits, in order to simulate periods of failures and then observe the after-effects.
 
 The module contains a simple extension method `HttpHandler.withChaosEngine()` that decorates an existing http4k application with the ability to dynamically inject Chaos behaviour using a set of RPC-style endpoints. This API is presented via an OpenAPI specification, which allows it to be controlled by a simple Swagger client. 
@@ -108,12 +108,11 @@ Apart from being able to turn the Chaos on/off and check the status, the most po
 ]
 ```
 
-
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_openapi.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_openapi.kt"></script>
 
-## Interacting with ChaosEngine using an HTTP client
+### Interacting with ChaosEngine using an HTTP client
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_client.kt)
 
