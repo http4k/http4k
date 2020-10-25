@@ -12,9 +12,6 @@ dependencies {
     compile Libs.aws_lambda_java_core
     compile Libs.aws_lambda_java_events
     compile Libs.joda_time
-
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile Config.TestDependencies
 }
 
 task buildZip(type: Zip) {
