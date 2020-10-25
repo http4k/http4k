@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.270.0 (uncut)
+### v3.270.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-alibaba** : New serverless module for Alibaba Function Compute!
 - **http4k-serverless-tencent** : New serverless module for Tencent Serverless Cloud Functions!
