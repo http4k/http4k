@@ -124,40 +124,43 @@ allprojects {
         }
     }
 
-    bintray {
-        user = System.getenv('BINTRAY_USER')
-        key = System.getenv('BINTRAY_KEY')
+    if (!project.name.contains("test-function") && !project.name.contains("integration-test") ) {
+        bintray {
+            user = System.getenv('BINTRAY_USER')
+            key = System.getenv('BINTRAY_KEY')
 
-        publications = ['mavenJava']
-        dryRun = false
-        publish = true
-        pkg {
-            repo = 'maven'
-            userOrg = 'http4k'
-            name = project.name
+            publications = ['mavenJava']
+            dryRun = true
+            publish = true
+            pkg {
+                repo = 'maven'
+                userOrg = 'http4k'
+                name = project.name
 
-            desc = description
-            websiteUrl = 'https://github.com/http4k/http4k'
-            issueTrackerUrl = 'https://github.com/http4k/http4k/issues'
-            vcsUrl = 'https://github.com/http4k/http4k.git'
-            licenses = ['Apache-2.0']
-            labels = []
-            publicDownloadNumbers = true
-            version {
-                name = project.version
-                vcsTag = project.version
-                gpg {
-                    sign = true
-                }
-                mavenCentralSync {
-                    sync = false
-                    user = System.getenv('SONATYPE_USER')
-                    password = System.getenv('SONATYPE_KEY')
-                    close = '1'
+                desc = description
+                websiteUrl = 'https://github.com/http4k/http4k'
+                issueTrackerUrl = 'https://github.com/http4k/http4k/issues'
+                vcsUrl = 'https://github.com/http4k/http4k.git'
+                licenses = ['Apache-2.0']
+                labels = []
+                publicDownloadNumbers = true
+                version {
+                    name = project.version
+                    vcsTag = project.version
+                    gpg {
+                        sign = true
+                    }
+                    mavenCentralSync {
+                        sync = false
+                        user = System.getenv('SONATYPE_USER')
+                        password = System.getenv('SONATYPE_KEY')
+                        close = '1'
+                    }
                 }
             }
         }
     }
+
 
     jacocoTestReport {
         reports {
