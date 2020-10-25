@@ -4,6 +4,7 @@ import com.google.cloud.functions.HttpFunction
 import com.google.cloud.functions.HttpRequest
 import com.google.cloud.functions.HttpResponse
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.valueOf
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
@@ -15,6 +16,7 @@ const val GCF_REQUEST_KEY = "HTTP4K_GCF_REQUEST"
 
 open class GoogleCloudFunction(appLoader: AppLoaderWithContexts) : HttpFunction {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+    constructor(input: HttpHandler) : this(AppLoader { input })
 
     private val contexts = RequestContexts()
     private val app = appLoader(System.getenv(), contexts)

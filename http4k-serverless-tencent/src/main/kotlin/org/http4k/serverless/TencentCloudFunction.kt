@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.http4k.serverless
 
 import com.qcloud.scf.runtime.Context
@@ -18,7 +20,7 @@ import org.http4k.filter.ServerFilters.InitialiseRequestContext
 const val TENCENT_REQUEST_KEY = "HTTP4K_TENCENT_REQUEST"
 const val TENCENT_CONTEXT_KEY = "HTTP4K_TENCENT_CONTEXT"
 
-abstract class TencentSCFunction(appLoader: AppLoaderWithContexts) {
+abstract class TencentCloudFunction(appLoader: AppLoaderWithContexts) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 

@@ -13,7 +13,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 
-class TencentSCFunctionTest {
+class TencentCloudFunctionTest {
 
     @Test
     fun `adapts API Gateway request and response and receives context`() {
@@ -28,7 +28,7 @@ class TencentSCFunctionTest {
             queryStringParameters = mapOf("query" to "value")
         }
 
-        val tencent = object : TencentSCFunction(AppLoaderWithContexts { env, contexts ->
+        val tencent = object : TencentCloudFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it][TENCENT_CONTEXT_KEY], sameInstance(context))
                 assertThat(contexts[it][TENCENT_REQUEST_KEY], equalTo(request))

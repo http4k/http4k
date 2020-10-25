@@ -10,7 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
-import org.http4k.serverless.TencentSCFunction
+import org.http4k.serverless.TencentCloudFunction
 import org.http4k.util.proxy
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
@@ -22,7 +22,7 @@ object TweetEchoLambda : AppLoader {
 }
 
 // This class is the entry-point for the function call - configure it when deploying
-class FunctionsExampleEntryClass : TencentSCFunction(TweetEchoLambda)
+class FunctionsExampleEntryClass : TencentCloudFunction(TweetEchoLambda)
 
 fun main() {
     // Launching your SCF locally - by simply providing the operating ENVIRONMENT map as would

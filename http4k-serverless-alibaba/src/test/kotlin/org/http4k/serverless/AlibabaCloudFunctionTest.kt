@@ -11,14 +11,14 @@ import org.http4k.servlet.FakeHttpServletResponse
 import org.junit.jupiter.api.Test
 
 
-class AlibabaFunctionTest {
+class AlibabaCloudFunctionTest {
     @Test
     fun `calls the handler and returns proper body`() {
         val app = { req: Request -> Response(OK).body(req.bodyString()) }
         val request = FakeHttpServletRequest(Request(GET, "").body("hello alibaba"))
         val response = FakeHttpServletResponse()
 
-        object : AlibabaFunction(AppLoader { app }) {}.handleRequest(request, response, null)
+        object : AlibabaCloudFunction(AppLoader { app }) {}.handleRequest(request, response, null)
 
         assertThat(response.http4k.bodyString(), equalTo("hello alibaba"))
     }
