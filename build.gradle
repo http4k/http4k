@@ -222,6 +222,7 @@ dependencies {
     compile project(":http4k-server-netty")
     compile project(":http4k-server-ratpack")
     compile project(":http4k-server-undertow")
+    compile project(":http4k-serverless-alibaba")
     compile project(":http4k-serverless-gcf")
     compile project(":http4k-serverless-lambda")
     compile project(":http4k-serverless-openwhisk")

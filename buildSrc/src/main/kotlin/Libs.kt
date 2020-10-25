@@ -273,6 +273,12 @@ object Libs {
     const val micrometer_core: String = "io.micrometer:micrometer-core:" + Versions.micrometer_core
 
     /**
+     * https://www.aliyun.com/product/fc
+     */
+    const val fc_java_common: String = "com.aliyun.fc.runtime:fc-java-common:" +
+            Versions.fc_java_common
+
+    /**
      * https://github.com/TooTallNate/Java-WebSocket
      */
     const val java_websocket: String = "org.java-websocket:Java-WebSocket:" +

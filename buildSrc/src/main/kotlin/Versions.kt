@@ -67,6 +67,8 @@ object Versions {
 
     const val micrometer_core: String = "1.5.5"
 
+    const val fc_java_common: String = "2.2.2"
+
     const val java_websocket: String = "1.5.1"
 
     const val commons_pool2: String = "2.9.0"
