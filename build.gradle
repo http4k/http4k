@@ -199,13 +199,13 @@ dependencies {
         .findAll {
             !it.name.contains("test-function") && !it.name.contains("integration-test")
         }
-        .forEach { compile project(it.name) }
+        .forEach {
+            compile project(it.name)
+            testCompile project(path: it.name, configuration: 'testArtifacts')
+        }
 
     testCompile Libs.s3
     testCompile Config.TestDependencies
-    testCompile project(path: ":http4k-testing-servirtium", configuration: 'testArtifacts')
-    testCompile project(path: ":http4k-serverless-gcf", configuration: 'testArtifacts')
-    testCompile project(path: ":http4k-serverless-openwhisk", configuration: 'testArtifacts')
 }
 
 sourceSets {
