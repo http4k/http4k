@@ -46,7 +46,7 @@ class FunctionsExampleEntryClass : AlibabaFunction(TweetEchoLambda)
 fun main() {
 
     // Launching your Function locally - by simply providing the operating ENVIRONMENT map as would
-    // be configured in GCP.
+    // be configured in AFC.
     fun runFunctionLocally() {
         println("RUNNING LOCALLY:")
 

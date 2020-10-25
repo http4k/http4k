@@ -1,6 +1,6 @@
-package guide.modules.serverless.lambda
+package guide.modules.serverless.tencent
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import com.qcloud.services.scf.runtime.events.APIGatewayProxyRequestEvent
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -9,8 +9,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.serverless.ApiGatewayV1LambdaFunction
 import org.http4k.serverless.AppLoader
+import org.http4k.serverless.TencentSCFunction
 import org.http4k.util.proxy
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
@@ -22,12 +22,12 @@ object TweetEchoLambda : AppLoader {
 }
 
 // This class is the entry-point for the function call - configure it when deploying
-class FunctionsExampleEntryClass : ApiGatewayV1LambdaFunction(TweetEchoLambda)
+class FunctionsExampleEntryClass : TencentSCFunction(TweetEchoLambda)
 
 fun main() {
-    // Launching your Lambda Function locally - by simply providing the operating ENVIRONMENT map as would
-    // be configured on AWS.
-    fun runLambdaLocally() {
+    // Launching your SCF locally - by simply providing the operating ENVIRONMENT map as would
+    // be configured on SCF.
+    fun runFunctionLocally() {
         val app: HttpHandler = TweetEchoLambda(mapOf())
         val localLambda = app.asServer(SunHttp(8000)).start()
         val response = ApacheClient()(Request(POST, "http://localhost:8000/").body("hello hello hello, i suppose this isn't 140 characters anymore.."))
@@ -36,8 +36,8 @@ fun main() {
         localLambda.stop()
     }
 
-    // the following code is purely here for demonstration purposes, to explain exactly what is happening at AWS.
-    fun runLambdaAsAwsWould() {
+    // the following code is purely here for demonstration purposes, to explain exactly what is happening at SCF.
+    fun runFunctionAsSCFWould() {
         val response = FunctionsExampleEntryClass().handleRequest(APIGatewayProxyRequestEvent().apply {
             path = "/"
             body = "hello hello hello, i suppose this isn't 140 characters anymore.."
@@ -48,6 +48,6 @@ fun main() {
         println(response)
     }
 
-    runLambdaLocally()
-    runLambdaAsAwsWould()
+    runFunctionLocally()
+    runFunctionAsSCFWould()
 }

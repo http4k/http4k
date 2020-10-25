@@ -226,6 +226,7 @@ dependencies {
     compile project(":http4k-serverless-gcf")
     compile project(":http4k-serverless-lambda")
     compile project(":http4k-serverless-openwhisk")
+    compile project(":http4k-serverless-tencent")
     compile project(":http4k-template-dust")
     compile project(":http4k-template-freemarker")
     compile project(":http4k-template-handlebars")

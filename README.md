@@ -88,6 +88,7 @@ Bored with reading already and just want to get coding? For the impatient, visit
     * Google Cloud Functions: Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
     * Apache OpenWhisk: Implement a single Factory method, then upload your [http4k] applications to Google 
     * Alibaba Function Compute: Implement a single Factory method, then upload your [http4k] applications to Alibaba. 
+    * Tencent Serverless Cloud Functio: Implement a single Factory method, then upload your [http4k] applications to SCF. 
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
