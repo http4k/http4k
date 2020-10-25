@@ -1,6 +1,5 @@
 package guide.modules.serverless.alibaba
 
-import guide.modules.serverless.lambda.proxy
 import org.http4k.client.ApacheClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -13,12 +12,13 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.serverless.AlibabaFunction
+import org.http4k.serverless.AlibabaCloudFunction
 import org.http4k.serverless.AppLoader
 import org.http4k.servlet.FakeHttpServletRequest
 import org.http4k.servlet.FakeHttpServletResponse
+import org.http4k.util.proxy
 
-// This AppLoader is responsible for building our HttpHandler which is supplied to GCF
+// This AppLoader is responsible for building our HttpHandler which is supplied to ACF
 // Along with the extension class below, is the only actual piece of code that needs to be written.
 object TweetEchoLambda : AppLoader {
     private val timer = Filter { next: HttpHandler ->
@@ -41,12 +41,12 @@ object TweetEchoLambda : AppLoader {
 }
 
 // This class is the entry-point for the function call - configure it when deploying
-class FunctionsExampleEntryClass : AlibabaFunction(TweetEchoLambda)
+class FunctionsExampleEntryClass : AlibabaCloudFunction(TweetEchoLambda)
 
 fun main() {
 
     // Launching your Function locally - by simply providing the operating ENVIRONMENT map as would
-    // be configured in GCP.
+    // be configured in AFC.
     fun runFunctionLocally() {
         println("RUNNING LOCALLY:")
 

@@ -15,6 +15,9 @@ implementation group: "org.http4k", name: "http4k-serverless-openwhisk", version
 
 // Alibaba Function Compute: 
 implementation group: "org.http4k", name: "http4k-serverless-alibaba", version: "3.269.0"
+
+// Tencent Serverless Cloud Functions: 
+implementation group: "org.http4k", name: "http4k-serverless-tencent", version: "3.269.0"
 ```
 
 ### About

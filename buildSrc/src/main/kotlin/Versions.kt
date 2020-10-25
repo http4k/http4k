@@ -67,6 +67,8 @@ object Versions {
 
     const val micrometer_core: String = "1.5.5"
 
+    const val scf_java_events: String = "0.0.2"
+
     const val fc_java_common: String = "2.2.2"
 
     const val java_websocket: String = "1.5.1"
@@ -120,7 +122,7 @@ object Versions {
     const val json: String = "20200518"
 
     /**
-     * Current version: "6.6"
+     * Current version: "6.7"
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */

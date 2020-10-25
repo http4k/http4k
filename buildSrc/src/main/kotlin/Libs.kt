@@ -273,6 +273,12 @@ object Libs {
     const val micrometer_core: String = "io.micrometer:micrometer-core:" + Versions.micrometer_core
 
     /**
+     * https://cloud.tencent.com/
+     */
+    const val scf_java_events: String = "com.tencentcloudapi:scf-java-events:" +
+            Versions.scf_java_events
+
+    /**
      * https://www.aliyun.com/product/fc
      */
     const val fc_java_common: String = "com.aliyun.fc.runtime:fc-java-common:" +
