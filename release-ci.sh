@@ -18,14 +18,14 @@ LOCAL_VERSION=`jq -r .http4k.version $DIR/version.json`
 
 BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/http4k/maven/http4k-core/versions/_latest | jq -r .name`
 
-if [[ "$LOCAL_VERSION" == "$BINTRAY_VERSION" ]]; then
-    echo "Version has not changed"
-    exit 0
-fi
-
+#if [[ "$LOCAL_VERSION" == "$BINTRAY_VERSION" ]]; then
+#    echo "Version has not changed"
+#    exit 0
+#fi
+#
 echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
-./gradlew -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble \
+./gradlew --stacktrace -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble \
     :http4k-core:bintrayUpload \
     :http4k-aws:bintrayUpload \
     :http4k-bom:bintrayUpload \
