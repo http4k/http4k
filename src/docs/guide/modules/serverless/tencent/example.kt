@@ -28,6 +28,8 @@ fun main() {
     // Launching your SCF locally - by simply providing the operating ENVIRONMENT map as would
     // be configured on SCF.
     fun runFunctionLocally() {
+        println("RUNNING LOCALLY:")
+
         val app: HttpHandler = TweetEchoLambda(mapOf())
         val localLambda = app.asServer(SunHttp(8000)).start()
         val response = ApacheClient()(Request(POST, "http://localhost:8000/").body("hello hello hello, i suppose this isn't 140 characters anymore.."))
@@ -38,6 +40,8 @@ fun main() {
 
     // the following code is purely here for demonstration purposes, to explain exactly what is happening at SCF.
     fun runFunctionAsSCFWould() {
+        println("RUNNING AS AFC:")
+
         val response = FunctionsExampleEntryClass().handleRequest(APIGatewayProxyRequestEvent().apply {
             path = "/"
             body = "hello hello hello, i suppose this isn't 140 characters anymore.."

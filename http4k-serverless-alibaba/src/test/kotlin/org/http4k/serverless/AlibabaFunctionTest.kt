@@ -18,7 +18,7 @@ class AlibabaFunctionTest {
         val request = FakeHttpServletRequest(Request(GET, "").body("hello alibaba"))
         val response = FakeHttpServletResponse()
 
-        AlibabaFunction(AppLoader { app }).handleRequest(request, response, null)
+        object : AlibabaFunction(AppLoader { app }) {}.handleRequest(request, response, null)
 
         assertThat(response.http4k.bodyString(), equalTo("hello alibaba"))
     }

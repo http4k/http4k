@@ -18,7 +18,7 @@ import org.http4k.servlet.FakeHttpServletRequest
 import org.http4k.servlet.FakeHttpServletResponse
 import org.http4k.util.proxy
 
-// This AppLoader is responsible for building our HttpHandler which is supplied to GCF
+// This AppLoader is responsible for building our HttpHandler which is supplied to ACF
 // Along with the extension class below, is the only actual piece of code that needs to be written.
 object TweetEchoLambda : AppLoader {
     private val timer = Filter { next: HttpHandler ->

@@ -28,6 +28,8 @@ fun main() {
     // Launching your Lambda Function locally - by simply providing the operating ENVIRONMENT map as would
     // be configured on AWS.
     fun runLambdaLocally() {
+        println("RUNNING LOCALLY:")
+
         val app: HttpHandler = TweetEchoLambda(mapOf())
         val localLambda = app.asServer(SunHttp(8000)).start()
         val response = ApacheClient()(Request(POST, "http://localhost:8000/").body("hello hello hello, i suppose this isn't 140 characters anymore.."))
@@ -38,6 +40,8 @@ fun main() {
 
     // the following code is purely here for demonstration purposes, to explain exactly what is happening at AWS.
     fun runLambdaAsAwsWould() {
+        println("RUNNING AS LAMBDA:")
+
         val response = FunctionsExampleEntryClass().handleRequest(APIGatewayProxyRequestEvent().apply {
             path = "/"
             body = "hello hello hello, i suppose this isn't 140 characters anymore.."
