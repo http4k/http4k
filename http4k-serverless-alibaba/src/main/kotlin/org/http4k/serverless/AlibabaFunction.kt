@@ -3,6 +3,7 @@ package org.http4k.serverless
 import com.aliyun.fc.runtime.Context
 import com.aliyun.fc.runtime.HttpRequestHandler
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.RequestContexts
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
@@ -16,6 +17,7 @@ const val ALIBABA_CONTEXT_KEY = "HTTP4K_ALIBABA_CONTEXT"
 
 open class AlibabaFunction(appLoader: AppLoaderWithContexts) : HttpRequestHandler {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+    constructor(input: HttpHandler) : this(AppLoader { input })
 
     private val contexts = RequestContexts()
     private val app = appLoader(System.getenv(), contexts)
