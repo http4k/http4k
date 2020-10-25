@@ -1,8 +1,6 @@
 title: http4k in Action
 description: Example applications and usages of http4k, including TDD approach 
 
-# http4k in Action
-
 ### Presentations: 
 
 - *"Writing Test Driven Apps with http4k"* ([video](https://bit.ly/tdd-http4k-kotliners)), by [David Denton](https://twitter.com/tarkaTheRotter) and [Ivan Sanchez](https://twitter.com/s4nchez), presented at Kotliners 2020. 
@@ -14,7 +12,7 @@ Also, check out the [YouTube Playlist](https://bit.ly/http4k-talks) for the last
 
 ### See http4k in action in these example projects and repos:
 
-There is a repository of helpful examples at [http4k/examples](https://github.com/http4k/examples), covering how to build [http4k] applications using various features.
+There is a repository of helpful examples at [http4k/examples](https://github.com/http4k/examples), covering how to build **http4k** applications using various features.
 
 ### Standalone projects...
 Each project is tagged with the http4k features it demonstrates:
