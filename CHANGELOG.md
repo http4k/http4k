@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.270.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-serverless-alibaba** : New serverless module for Alibaba Function Compute!
 
 ### v3.269.0
 - **http4k-contract** : Fix #502 - OPTIONS requests not honoured for requests with body

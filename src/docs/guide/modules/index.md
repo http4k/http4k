@@ -19,6 +19,7 @@ description: Details about the various http4k integration libraries
 <a href="https://http4k.org/guide/modules/servers"><span class="pill">AWS Lambda</span></a>
 <a href="https://http4k.org/guide/modules/servers"><span class="pill">Google Cloud Functions</span></a>
 <a href="https://http4k.org/guide/modules/servers"><span class="pill">Apache OpenWhisk</span></a>
+<a href="https://http4k.org/guide/modules/servers"><span class="pill">Alibaba Function Compute</span></a>
 
 ### HTTP Clients
 <a href="https://http4k.org/guide/modules/clients"><span class="pill">Apache</span></a>

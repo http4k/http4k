@@ -12,6 +12,9 @@ implementation group: "org.http4k", name: "http4k-serverless-gcf", version: "3.2
 
 // Apache OpenWhisk: 
 implementation group: "org.http4k", name: "http4k-serverless-openwhisk", version: "3.269.0"
+
+// Alibaba Function Compute: 
+implementation group: "org.http4k", name: "http4k-serverless-alibaba", version: "3.269.0"
 ```
 
 ### About
