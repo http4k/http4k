@@ -1,6 +1,7 @@
 configurations{
     runtimeClasspath.transitive = false
 }
+
 dependencies {
     compile project(":http4k-core")
     compile project(":http4k-serverless-lambda")
