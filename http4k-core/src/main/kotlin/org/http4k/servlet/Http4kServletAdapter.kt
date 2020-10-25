@@ -20,13 +20,13 @@ class Http4kServletAdapter(private val handler: HttpHandler) {
 }
 
 @Suppress("DEPRECATION")
-private fun Response.transferTo(destination: HttpServletResponse) {
+fun Response.transferTo(destination: HttpServletResponse) {
     destination.setStatus(status.code, status.description)
     headers.forEach { (key, value) -> destination.addHeader(key, value) }
     body.stream.use { input -> destination.outputStream.use { output -> input.copyTo(output) } }
 }
 
-private fun HttpServletRequest.asHttp4kRequest() =
+fun HttpServletRequest.asHttp4kRequest() =
     Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
         .body(inputStream, getHeader("Content-Length").safeLong()).headers(headerParameters())
         .source(RequestSource(remoteAddr, remotePort, scheme))
