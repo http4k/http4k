@@ -1,6 +1,5 @@
 package guide.modules.serverless.alibaba
 
-import guide.modules.serverless.lambda.proxy
 import org.http4k.client.ApacheClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -17,6 +16,7 @@ import org.http4k.serverless.AlibabaFunction
 import org.http4k.serverless.AppLoader
 import org.http4k.servlet.FakeHttpServletRequest
 import org.http4k.servlet.FakeHttpServletResponse
+import org.http4k.util.proxy
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to GCF
 // Along with the extension class below, is the only actual piece of code that needs to be written.
