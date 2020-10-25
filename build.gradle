@@ -87,78 +87,79 @@ allprojects {
         testArtifacts testJar
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                artifactId = archivesBaseName
+    if (!project.name.contains("test-function") && !project.name.contains("integration-test")) {
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    artifactId = archivesBaseName
 
-                pom.withXml {
-                    asNode().appendNode('name', archivesBaseName)
-                    asNode().appendNode('description', description)
-                    asNode().appendNode('url', 'https://http4k.org')
-                    asNode().appendNode('developers')
-                        .appendNode('developer').appendNode('name', 'Ivan Sanchez').parent().appendNode('email', 'ivan@http4k.org')
-                        .parent().parent()
-                        .appendNode('developer').appendNode('name', 'David Denton').parent().appendNode('email', 'david@http4k.org')
-                    asNode().appendNode('scm').
-                        appendNode('url', 'git@github.com:http4k/' + archivesBaseName + '.git').parent().
-                        appendNode('connection', 'scm:git:git@github.com:http4k/http4k.git').parent().
-                        appendNode('developerConnection', 'scm:git:git@github.com:http4k/http4k.git')
-                    asNode().appendNode('licenses').appendNode('license').
-                        appendNode('name', 'Apache License, Version 2.0').parent().
-                        appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
+                    pom.withXml {
+                        asNode().appendNode('name', archivesBaseName)
+                        asNode().appendNode('description', description)
+                        asNode().appendNode('url', 'https://http4k.org')
+                        asNode().appendNode('developers')
+                            .appendNode('developer').appendNode('name', 'Ivan Sanchez').parent().appendNode('email', 'ivan@http4k.org')
+                            .parent().parent()
+                            .appendNode('developer').appendNode('name', 'David Denton').parent().appendNode('email', 'david@http4k.org')
+                        asNode().appendNode('scm').
+                            appendNode('url', 'git@github.com:http4k/' + archivesBaseName + '.git').parent().
+                            appendNode('connection', 'scm:git:git@github.com:http4k/http4k.git').parent().
+                            appendNode('developerConnection', 'scm:git:git@github.com:http4k/http4k.git')
+                        asNode().appendNode('licenses').appendNode('license').
+                            appendNode('name', 'Apache License, Version 2.0').parent().
+                            appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
+                    }
+                    from components.java
+
+                    // replace all runtime dependencies with provided
+                    pom.withXml {
+                        asNode().dependencies.'*'.findAll() {
+                            it.scope.text() == 'runtime'
+                        }.each() {
+                            it.scope*.value = 'provided'
+                        }
+                    }
+                    artifact sourcesJar
+                    artifact javadocJar
                 }
-                from components.java
+            }
+        }
 
-                // replace all runtime dependencies with provided
-                pom.withXml {
-                    asNode().dependencies.'*'.findAll() {
-                        it.scope.text() == 'runtime'
-                    }.each() {
-                        it.scope*.value = 'provided'
+        bintray {
+            user = System.getenv('BINTRAY_USER')
+            key = System.getenv('BINTRAY_KEY')
+
+            publications = ['mavenJava']
+            dryRun = false
+            publish = true
+            pkg {
+                repo = 'maven'
+                userOrg = 'http4k'
+                name = project.name
+
+                desc = description
+                websiteUrl = 'https://github.com/http4k/http4k'
+                issueTrackerUrl = 'https://github.com/http4k/http4k/issues'
+                vcsUrl = 'https://github.com/http4k/http4k.git'
+                licenses = ['Apache-2.0']
+                labels = []
+                publicDownloadNumbers = true
+                version {
+                    name = project.version
+                    vcsTag = project.version
+                    gpg {
+                        sign = true
+                    }
+                    mavenCentralSync {
+                        sync = false
+                        user = System.getenv('SONATYPE_USER')
+                        password = System.getenv('SONATYPE_KEY')
+                        close = '1'
                     }
                 }
-                artifact sourcesJar
-                artifact javadocJar
             }
         }
     }
-
-    bintray {
-        user = System.getenv('BINTRAY_USER')
-        key = System.getenv('BINTRAY_KEY')
-
-        publications = ['mavenJava']
-        dryRun = false
-        publish = !project.name.contains("test-function") && !project.name.contains("integration-test")
-        pkg {
-            repo = 'maven'
-            userOrg = 'http4k'
-            name = project.name
-
-            desc = description
-            websiteUrl = 'https://github.com/http4k/http4k'
-            issueTrackerUrl = 'https://github.com/http4k/http4k/issues'
-            vcsUrl = 'https://github.com/http4k/http4k.git'
-            licenses = ['Apache-2.0']
-            labels = []
-            publicDownloadNumbers = true
-            version {
-                name = project.version
-                vcsTag = project.version
-                gpg {
-                    sign = true
-                }
-                mavenCentralSync {
-                    sync = false
-                    user = System.getenv('SONATYPE_USER')
-                    password = System.getenv('SONATYPE_KEY')
-                    close = '1'
-                }
-            }
-        }
-    }
-
 
     jacocoTestReport {
         reports {
