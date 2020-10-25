@@ -17,13 +17,13 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.6.1"
 
-    const val software_amazon_awssdk: String = "2.15.7"
+    const val software_amazon_awssdk: String = "2.15.14"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
     const val com_squareup_moshi: String = "1.11.0"
 
-    const val org_eclipse_jetty: String = "9.4.32.v20200930"
+    const val org_eclipse_jetty: String = "9.4.33.v20201020"
 
     const val org_junit_jupiter: String = "5.7.0"
 
@@ -41,7 +41,7 @@ object Versions {
 
     const val openapi_generator_gradle_plugin: String = "4.3.1"
 
-    const val javax_websocket_server_impl: String = "9.4.32.v20200930"
+    const val javax_websocket_server_impl: String = "9.4.33.v20201020"
 
     const val kotest_assertions_core_jvm: String = "4.3.0"
 
@@ -55,7 +55,7 @@ object Versions {
 
     const val aws_lambda_java_core: String = "1.2.1"
 
-    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.10"
+    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.10.2"
 
     const val javax_servlet_api: String = "4.0.1"
 
@@ -71,7 +71,7 @@ object Versions {
 
     const val commons_pool2: String = "2.9.0"
 
-    const val http2_server: String = "9.4.32.v20200930"
+    const val http2_server: String = "9.4.33.v20201020"
 
     const val ratpack_core: String = "1.8.0"
 
@@ -91,7 +91,7 @@ object Versions {
 
     const val httpcore5: String = "5.0.2"
 
-    const val joda_time: String = "2.10.6"
+    const val joda_time: String = "2.10.8"
 
     const val slf4j_nop: String = "1.7.30"
 
@@ -122,7 +122,7 @@ object Versions {
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */
-    const val gradleLatestVersion: String = "6.6.1"
+    const val gradleLatestVersion: String = "6.7"
 }
 
 /**
