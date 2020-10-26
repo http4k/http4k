@@ -15,8 +15,3 @@ maven_publish "http4k-serverless-gcf"
 maven_publish "http4k-serverless-lambda"
 maven_publish "http4k-serverless-openwhisk"
 maven_publish "http4k-serverless-tencent"
-
-maven_publish "http4k-jsonrpc"
-maven_publish "http4k-multipart"
-maven_publish "http4k-aws"
-maven_publish "http4k-resilience4j"

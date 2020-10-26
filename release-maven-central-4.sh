@@ -2,10 +2,12 @@
 
 source ./release-functions.sh
 
-maven_publish "http4k-format-jackson-xml"
-maven_publish "http4k-format-jackson-yaml"
-maven_publish "http4k-format-xml"
-maven_publish "http4k-format-kotlinx-serialization"
+maven_publish "http4k-testing-approval"
+maven_publish "http4k-testing-chaos"
+maven_publish "http4k-testing-hamkrest"
+maven_publish "http4k-testing-kotest"
+maven_publish "http4k-testing-servirtium"
+maven_publish "http4k-testing-webdriver"
 
 maven_publish "http4k-template-handlebars"
 maven_publish "http4k-template-pebble"
