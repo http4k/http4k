@@ -25,58 +25,7 @@ fi
 
 echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
-./gradlew --stacktrace -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble \
-    :http4k-core:bintrayUpload \
-    :http4k-aws:bintrayUpload \
-    :http4k-bom:bintrayUpload \
-    :http4k-cloudnative:bintrayUpload \
-    :http4k-client-apache:bintrayUpload \
-    :http4k-client-apache4:bintrayUpload \
-    :http4k-client-apache-async:bintrayUpload \
-    :http4k-client-apache4-async:bintrayUpload \
-    :http4k-client-okhttp:bintrayUpload \
-    :http4k-client-jetty:bintrayUpload \
-    :http4k-client-websocket:bintrayUpload \
-    :http4k-contract:bintrayUpload \
-    :http4k-incubator:bintrayUpload \
-    :http4k-format-argo:bintrayUpload \
-    :http4k-format-gson:bintrayUpload \
-    :http4k-format-jackson:bintrayUpload \
-    :http4k-format-jackson-xml:bintrayUpload \
-    :http4k-format-jackson-yaml:bintrayUpload \
-    :http4k-format-kotlinx-serialization:bintrayUpload \
-    :http4k-format-moshi:bintrayUpload \
-    :http4k-format-xml:bintrayUpload \
-    :http4k-jsonrpc:bintrayUpload \
-    :http4k-metrics-micrometer:bintrayUpload \
-    :http4k-multipart:bintrayUpload \
-    :http4k-resilience4j:bintrayUpload \
-    :http4k-security-oauth:bintrayUpload \
-    :http4k-server-apache:bintrayUpload \
-    :http4k-server-apache4:bintrayUpload \
-    :http4k-server-jetty:bintrayUpload \
-    :http4k-server-ktorcio:bintrayUpload \
-    :http4k-server-ktornetty:bintrayUpload \
-    :http4k-server-netty:bintrayUpload \
-    :http4k-server-ratpack:bintrayUpload \
-    :http4k-server-undertow:bintrayUpload \
-    :http4k-serverless-alibaba:bintrayUpload \
-    :http4k-serverless-gcf:bintrayUpload \
-    :http4k-serverless-lambda:bintrayUpload \
-    :http4k-serverless-openwhisk:bintrayUpload \
-    :http4k-serverless-tencent:bintrayUpload \
-    :http4k-template-dust:bintrayUpload \
-    :http4k-template-freemarker:bintrayUpload \
-    :http4k-template-jade4j:bintrayUpload \
-    :http4k-template-handlebars:bintrayUpload \
-    :http4k-template-pebble:bintrayUpload \
-    :http4k-template-thymeleaf:bintrayUpload \
-    :http4k-testing-approval:bintrayUpload \
-    :http4k-testing-chaos:bintrayUpload \
-    :http4k-testing-hamkrest:bintrayUpload \
-    :http4k-testing-kotest:bintrayUpload \
-    :http4k-testing-servirtium:bintrayUpload \
-    :http4k-testing-webdriver:bintrayUpload
+./gradlew --stacktrace -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble bintrayUpload
 
 function notify_slack {
     local MESSAGE=$1
