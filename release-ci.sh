@@ -25,7 +25,12 @@ fi
 
 echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
-./gradlew --stacktrace -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble bintrayUpload
+./gradlew -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble
+
+for i in $(find http4k* -maxdepth 0 -type d); do
+    ./gradlew --stacktrace -PreleaseVersion=$LOCAL_VERSION :$i:bintrayUpload
+done
+
 
 function notify_slack {
     local MESSAGE=$1
