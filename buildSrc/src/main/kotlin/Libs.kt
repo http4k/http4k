@@ -202,6 +202,13 @@ object Libs {
             Versions.openapi_generator_gradle_plugin
 
     /**
+     * https://azure.microsoft.com/en-us/services/functions
+     */
+    const val azure_functions_java_library: String =
+            "com.microsoft.azure.functions:azure-functions-java-library:" +
+            Versions.azure_functions_java_library
+
+    /**
      * https://eclipse.org/jetty
      */
     const val javax_websocket_server_impl: String =

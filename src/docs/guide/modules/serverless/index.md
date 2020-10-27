@@ -10,8 +10,11 @@ implementation group: "org.http4k", name: "http4k-serverless-lambda", version: "
 // Google Cloud Functions: 
 implementation group: "org.http4k", name: "http4k-serverless-gcf", version: "3.270.0"
 
-// Apache OpenWhisk: 
+// Apache OpenWhisk (IBM Cloud Functions): 
 implementation group: "org.http4k", name: "http4k-serverless-openwhisk", version: "3.270.0"
+
+// Azure Functions: 
+implementation group: "org.http4k", name: "http4k-serverless-azure", version: "3.270.0"
 
 // Alibaba Function Compute: 
 implementation group: "org.http4k", name: "http4k-serverless-alibaba", version: "3.270.0"

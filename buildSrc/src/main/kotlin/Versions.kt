@@ -35,11 +35,13 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.2"
+    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1" // available: "2.10.2"
 
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
 
     const val openapi_generator_gradle_plugin: String = "4.3.1"
+
+    const val azure_functions_java_library: String = "1.4.0"
 
     const val javax_websocket_server_impl: String = "9.4.33.v20201020"
 
@@ -59,7 +61,7 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.52.Final" // problematic upgrade to 53
+    const val netty_codec_http2: String = "4.1.52.Final" // available: "4.1.53.Final"
 
     const val jackson_databind: String = "2.11.3"
 
