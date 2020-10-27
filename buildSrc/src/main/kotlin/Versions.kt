@@ -35,7 +35,7 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1" // available: "2.10.2"
+    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.2"
 
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
 
@@ -61,7 +61,7 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.52.Final" // available: "4.1.53.Final"
+    const val netty_codec_http2: String = "4.1.52.Final" // ignore due to bug: "4.1.53.Final"
 
     const val jackson_databind: String = "2.11.3"
 
