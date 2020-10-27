@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.271.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-serverless-alibaba** : New serverless module for Azure Functions!
+- **http4k-serverless-azure** : New serverless module for Azure Functions!
 
 ### v3.270.0
 - **http4k-*** : Upgrade some dependency versions.
