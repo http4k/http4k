@@ -87,6 +87,7 @@ Bored with reading already and just want to get coding? For the impatient, visit
     * **AWS Lambda** Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway or AppLoadBalancer. 
     * **Google Cloud Functions** Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
     * **Apache OpenWhisk** Implement a single Factory method, then upload your [http4k] applications to Google 
+    * **Azure Functions** Implement a single Factory method, then upload your [http4k] applications to the MS Cloud. 
     * **Alibaba Function Compute** Implement a single Factory method, then upload your [http4k] applications to Alibaba. 
     * **Tencent Serverless Cloud Functions** Implement a single Factory method, then upload your [http4k] applications to SCF. 
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
