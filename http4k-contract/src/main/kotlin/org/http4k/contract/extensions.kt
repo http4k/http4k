@@ -1,6 +1,7 @@
 package org.http4k.contract
 
 import org.http4k.contract.PreFlightExtraction.Companion.All
+import org.http4k.contract.openapi.v3.ServerObject
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -13,7 +14,8 @@ fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
     ContractRoutingHttpHandler(renderer, security, descriptionSecurity, descriptionPath, preFlightExtraction, routes.all,
         preSecurityFilter = preSecurityFilter,
         postSecurityFilter = postSecurityFilter,
-        includeDescriptionRoute = includeDescriptionRoute)
+        includeDescriptionRoute = includeDescriptionRoute,
+        servers = servers)
 }
 
 class ContractBuilder internal constructor() {
@@ -26,6 +28,7 @@ class ContractBuilder internal constructor() {
     var preSecurityFilter = Filter.NoOp
     var postSecurityFilter = Filter.NoOp
     var includeDescriptionRoute = false
+    var servers: List<ServerObject> = emptyList()
 }
 
 operator fun <A> String.div(next: PathLens<A>): ContractRouteSpec1<A> = ContractRouteSpec0(toBaseFn(this), RouteMeta()) / next

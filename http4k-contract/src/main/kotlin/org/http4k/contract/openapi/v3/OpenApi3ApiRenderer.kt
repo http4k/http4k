@@ -3,10 +3,7 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
-import org.http4k.contract.openapi.v3.BodyContent.FormContent
-import org.http4k.contract.openapi.v3.BodyContent.NoSchema
-import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
-import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
+import org.http4k.contract.openapi.v3.BodyContent.*
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.format.Json
@@ -26,7 +23,8 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
                     "info" to info.asJson(),
                     "tags" to array(tags.map { it.asJson() }),
                     "paths" to paths.asJson(),
-                    "components" to components.asJson()
+                    "components" to components.asJson(),
+                    "servers" to array(servers.map { it.asJson() })
                 )
             }
         }
@@ -45,6 +43,31 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
         obj(
             "schemas" to schemas,
             "securitySchemes" to securitySchemes
+        )
+    }
+
+    private fun ServerObject.asJson() = json {
+        obj(
+            "url" to string(url),
+            "description" to string(description ?: ""),
+            "variables" to variables.asJson()
+        )
+    }
+
+    @JvmName("asJsonStringServerVariableObject")
+    private fun Map<String, ServerVariableObject>.asJson() = json {
+        obj(
+            map {
+                it.key to it.value.asJson()
+            }
+        )
+    }
+
+    private fun ServerVariableObject.asJson() = json {
+        obj(
+            "enum" to array(enum.map { string(it) }),
+            "default" to string(default),
+            "description" to string(description ?: ""),
         )
     }
 

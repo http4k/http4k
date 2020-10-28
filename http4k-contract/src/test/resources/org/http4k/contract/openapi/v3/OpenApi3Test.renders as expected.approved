@@ -1079,6 +1079,28 @@
       }
     }
   },
+  "servers": [
+    {
+      "url": "https://localhost",
+      "description": "description",
+      "variables": {
+      }
+    },
+    {
+      "url": "https://localhost/{customer}",
+      "description": "description2",
+      "variables": {
+        "customer": {
+          "enum": [
+            "customer1",
+            "customer2"
+          ],
+          "default": "defaultCustomer",
+          "description": "description3"
+        }
+      }
+    }
+  ],
   "x-extension": [
     "extensionField"
   ]

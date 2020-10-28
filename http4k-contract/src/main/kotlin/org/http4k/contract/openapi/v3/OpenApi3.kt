@@ -57,7 +57,7 @@ class OpenApi3<NODE : Any>(
 
     constructor(apiInfo: ApiInfo, json: JsonLibAutoMarshallingJson<NODE>, extensions: List<OpenApiExtension> = emptyList()) : this(apiInfo, json, extensions, ApiRenderer.Auto(json))
 
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>): Response {
+    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, servers: List<ServerObject>): Response {
         val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)
         val paths = routes.map { it.asPath(security, contractRoot) }
 
@@ -71,7 +71,8 @@ class OpenApi3<NODE : Any>(
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
                     }
                     .toSortedMap(),
-                Components(json.obj(paths.flatMap { it.pathSpec.definitions() }), json(allSecurities.filterNotNull().combineFull()))
+                Components(json.obj(paths.flatMap { it.pathSpec.definitions() }), json(allSecurities.filterNotNull().combineFull())),
+                servers
             )
         )
 

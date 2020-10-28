@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.contract.openapi.v3.ServerObject
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -31,7 +32,8 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                                       private val rootAsString: String = "",
                                       private val preSecurityFilter: Filter = Filter.NoOp,
                                       private val postSecurityFilter: Filter = Filter.NoOp,
-                                      private val includeDescriptionRoute: Boolean = false
+                                      private val includeDescriptionRoute: Boolean = false,
+                                      private val servers: List<ServerObject> = emptyList()
 ) : RoutingHttpHandler {
     private val contractRoot = PathSegments(rootAsString)
 
@@ -61,7 +63,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
         .let {
             val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { Response(OK) } else null)
-            it bindContract GET to { renderer.description(contractRoot, security, routes + extra) }
+            it bindContract GET to { renderer.description(contractRoot, security, routes + extra, servers) }
         }
 
     private val routers = routes
@@ -73,9 +75,9 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                 .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
         } + (identify(descriptionRoute)
-            .then(preSecurityFilter)
-            .then(descriptionSecurity?.filter ?: Filter.NoOp)
-            .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+        .then(preSecurityFilter)
+        .then(descriptionSecurity?.filter ?: Filter.NoOp)
+        .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }

@@ -2,6 +2,8 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.contract.openapi.v3.ServerObject
+import org.http4k.contract.openapi.v3.ServerVariableObject
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
@@ -76,10 +78,19 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
     @Test
     open fun `renders as expected`(approver: Approver) {
         val customBody = json.body("the body of the message").toLens()
-
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
+            servers = listOf(
+                ServerObject("https://localhost", "description", emptyMap()),
+                ServerObject(
+                    "https://localhost/{customer}",
+                    "description2",
+                    mapOf("customer" to ServerVariableObject(listOf(
+                        "customer1",
+                        "customer2"
+                    ), "defaultCustomer", "description3"))
+                ))
             routes += "/nometa" bindContract GET to { Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"

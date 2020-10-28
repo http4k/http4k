@@ -62,6 +62,8 @@
       }
     }
   },
+  "servers": [
+  ],
   "x-extension": [
     "extensionField"
   ]
