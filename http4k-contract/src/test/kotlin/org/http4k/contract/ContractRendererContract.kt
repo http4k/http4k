@@ -83,14 +83,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
             servers = listOf(
                 ServerObject("https://localhost", "description", emptyMap()),
-                ServerObject(
-                    "https://localhost/{customer}",
-                    "description2",
-                    mapOf("customer" to ServerVariableObject(listOf(
-                        "customer1",
-                        "customer2"
-                    ), "defaultCustomer", "description3"))
-                ))
+            )
             routes += "/nometa" bindContract GET to { Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"

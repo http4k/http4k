@@ -1,0 +1,34 @@
+{
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "tags": [
+  ],
+  "paths": {
+  },
+  "components": {
+    "schemas": {
+    },
+    "securitySchemes": {
+    }
+  },
+  "servers": [
+    {
+      "url": "https://localhost/{customer}",
+      "description": "description2",
+      "variables": {
+        "customer": {
+          "enum": [
+            "customer1",
+            "customer2"
+          ],
+          "default": "defaultCustomer",
+          "description": "description3"
+        }
+      }
+    }
+  ],
+  "openapi": "3.0.0"
+}
