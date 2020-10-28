@@ -1,0 +1,8 @@
+description = 'Testing against a functions deployed to Fn Project'
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+dependencies {
+    compile project(":http4k-serverless-fn")
+    compile project(path: ":http4k-core", configuration: 'testArtifacts')
+}

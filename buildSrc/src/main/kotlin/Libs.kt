@@ -414,4 +414,6 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
+
+    const val api: String = "com.fnproject.fn:api:" + Versions.api
 }

@@ -23,6 +23,10 @@ plugins {
 
 allprojects {
     repositories {
+        maven {
+            url "https://dl.bintray.com/fnproject/fnproject"
+        }
+
         mavenCentral()
         jcenter()
     }

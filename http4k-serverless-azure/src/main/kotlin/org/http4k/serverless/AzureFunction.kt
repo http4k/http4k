@@ -43,12 +43,9 @@ private fun AddAzure(request: HttpRequestMessage<Optional<String>>, ctx: Executi
     }
 }
 
-fun HttpRequestMessage<Optional<String>>.asHttp4k(): Request {
-    println("URI: $uri")
-    return headers.entries.fold(
-        Request(Method.valueOf(httpMethod.name), uri.toString()).body(this.body.orElse(""))
-    ) { acc, next -> acc.header(next.key, next.value) }
-}
+fun HttpRequestMessage<Optional<String>>.asHttp4k() = headers.entries.fold(
+    Request(Method.valueOf(httpMethod.name), uri.toString()).body(this.body.orElse(""))
+) { acc, next -> acc.header(next.key, next.value) }
 
 fun Response.asAzure(request: HttpRequestMessage<Optional<String>>) =
     headers.fold(

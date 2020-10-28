@@ -17,7 +17,7 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.6.1"
 
-    const val software_amazon_awssdk: String = "2.15.14"
+    const val software_amazon_awssdk: String = "2.15.16"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
@@ -122,6 +122,8 @@ object Versions {
     const val gson: String = "2.8.6"
 
     const val json: String = "20200518"
+
+    const val api: String = "1.0.116"
 
     /**
      * Current version: "6.7"
