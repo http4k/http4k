@@ -2,7 +2,7 @@ description = 'Http4k Serverless support for Fn Project'
 
 dependencies {
     compile project(":http4k-core")
-    compile 'com.fnproject.fn:api:1.0.116'
+    compile Libs.api
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
