@@ -11,13 +11,13 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.0"
+    const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.1"
 
     const val com_fasterxml_jackson_dataformat: String = "2.11.3"
 
     const val io_github_resilience4j: String = "1.6.1"
 
-    const val software_amazon_awssdk: String = "2.15.16"
+    const val software_amazon_awssdk: String = "2.15.18"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
@@ -51,13 +51,13 @@ object Versions {
 
     const val functions_framework_api: String = "1.0.2"
 
-    const val aws_lambda_java_events: String = "3.4.0"
+    const val aws_lambda_java_events: String = "3.5.0"
 
     const val jackson_module_kotlin: String = "2.11.3"
 
     const val aws_lambda_java_core: String = "1.2.1"
 
-    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.10.2"
+    const val dokka_gradle_plugin: String = "0.10.1" // ignore due to bug: "1.4.10.2"
 
     const val javax_servlet_api: String = "4.0.1"
 
@@ -67,7 +67,7 @@ object Versions {
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val micrometer_core: String = "1.5.5"
+    const val micrometer_core: String = "1.6.0"
 
     const val scf_java_events: String = "0.0.2"
 
@@ -139,4 +139,4 @@ object Versions {
  */
 val PluginDependenciesSpec.buildSrcVersions: PluginDependencySpec
     inline get() =
-            id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
+        id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)

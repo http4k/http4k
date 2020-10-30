@@ -7,6 +7,9 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-fn** : New serverless module for Fn Project!
 
+### v3.272.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v3.271.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-azure** : New serverless module for Azure Functions!
