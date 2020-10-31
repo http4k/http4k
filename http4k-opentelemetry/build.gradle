@@ -1,4 +1,4 @@
-description = 'Http4k Open Telemetry support'
+description = 'Http4k OpenTelemetry support'
 
 dependencies {
     compile project(":http4k-core")
