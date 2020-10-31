@@ -1,7 +1,6 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.endsWith
 import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.OpenTelemetry
 import io.opentelemetry.common.AttributeKey.stringKey
@@ -16,9 +15,9 @@ import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
@@ -84,33 +83,67 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `server and client context propogates when existing span`() {
-        val originalTraceId = "11111111111111111111111111111111"
-        val spanId = "2222222222222222"
+    fun `client creates new span when no parent`() {
+        var createdContext: SpanData? = null
 
-        val tracer = OpenTelemetry.getTracer("http4k", "semver:0.0.0")
-        OpenTelemetry.setPropagators(builder().addTextMapPropagator(getMultipleHeaderPropagator()).build())
+        val app = ClientFilters.OpenTelemetryTracing(tracer)
+            .then {
+                createdContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+                Response(I_M_A_TEAPOT)
+            }
+
+        app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
+
+        with(createdContext!!) {
+            assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
+            assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
+            assertThat(traceId, !equalTo(TraceId.getInvalid()))
+            assertThat(spanId, !equalTo(SpanId.getInvalid()))
+            assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
+            println(totalAttributeCount)
+        }
+    }
+
+    @Test
+    fun `server and client propagate correctly`() {
+        val sentTraceId = "11111111111111111111111111111111"
+        val originalSpanId = "2222222222222222"
+
+        var serverContext: SpanData? = null
+        var clientContext: SpanData? = null
 
         val app = ServerFilters.OpenTelemetryTracing(tracer)
             .then(Filter { next ->
                 {
-                    // clean the request
-                    next(Request(GET, ""))
+                    serverContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+                    next(Request(GET, "http://localhost:8080/client"))
                 }
             })
             .then(ClientFilters.OpenTelemetryTracing(tracer))
             .then {
-                Response(OK).headers(it.headers)
+                clientContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+                Response(I_M_A_TEAPOT)
             }
 
-        val message = app(Request(GET, "http://localhost:8080/foo/bar?a=b")
-            .header("x-b3-traceid", originalTraceId)
-            .header("x-b3-spanid", spanId)
-            .header("x-b3-sampled", "1")
-        )
+        app(Request(GET, "http://localhost:8080/server")
+            .header("x-b3-traceid", sentTraceId)
+            .header("x-b3-spanid", originalSpanId)
+            .header("x-b3-sampled", "1"))
 
-        assertThat(message, hasHeader("x-b3-traceid", endsWith(originalTraceId)))
-        assertThat(message, hasHeader("x-b3-spanid", !equalTo(spanId)))
-        assertThat(message, hasHeader("x-b3-sampled", equalTo("1")))
+        with(serverContext!!) {
+            assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
+            assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/server"))
+            assertThat(traceId, equalTo(sentTraceId))
+            assertThat(spanId, !equalTo(parentSpanId))
+            assertThat(parentSpanId, equalTo(originalSpanId))
+        }
+
+        with(clientContext!!) {
+            assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
+            assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/client"))
+            assertThat(traceId, equalTo(sentTraceId))
+            assertThat(spanId, !equalTo(serverContext!!.spanId))
+            assertThat(parentSpanId, equalTo(serverContext!!.spanId))
+        }
     }
 }
