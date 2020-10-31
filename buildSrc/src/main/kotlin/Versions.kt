@@ -1,3 +1,4 @@
+import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
