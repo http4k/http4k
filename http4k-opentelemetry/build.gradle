@@ -1,0 +1,10 @@
+description = 'Http4k Open Telemetry support'
+
+dependencies {
+    compile project(":http4k-core")
+    compile Libs.opentelemetry_api
+
+    testCompile Libs.opentelemetry_extension_trace_propagators
+    testCompile Config.TestDependencies
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+}
