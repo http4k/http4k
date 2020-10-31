@@ -9,6 +9,8 @@ import io.opentelemetry.context.propagation.DefaultContextPropagators.builder
 import io.opentelemetry.extensions.trace.propagation.B3Propagator.getMultipleHeaderPropagator
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.data.SpanData
+import io.opentelemetry.trace.SpanId
+import io.opentelemetry.trace.TraceId
 import io.opentelemetry.trace.TracingContextUtils
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
@@ -32,7 +34,7 @@ class OpenTelemetryTracingTest {
     @Test
     fun `server creates new span when existing trace`() {
         val sentTraceId = "11111111111111111111111111111111"
-        val parentSpandId = "2222222222222222"
+        val parentSpanId = "2222222222222222"
 
         var createdContext: SpanData? = null
 
@@ -44,7 +46,7 @@ class OpenTelemetryTracingTest {
 
         app(Request(GET, "http://localhost:8080/foo/bar?a=b")
             .header("x-b3-traceid", sentTraceId)
-            .header("x-b3-spanid", parentSpandId)
+            .header("x-b3-spanid", parentSpanId)
             .header("x-b3-sampled", "1")
         )
 
@@ -53,9 +55,31 @@ class OpenTelemetryTracingTest {
             assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
             assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{:id}"))
             assertThat(traceId, equalTo(sentTraceId))
-            assertThat(spanId, !equalTo(parentSpandId))
-            assertThat(parentSpanId, equalTo(parentSpandId))
+            assertThat(spanId, !equalTo(parentSpanId))
+            assertThat(parentSpanId, equalTo(parentSpanId))
             assertThat(isSampled, equalTo(true))
+        }
+    }
+
+    @Test
+    fun `server creates new span when no parent`() {
+        var createdContext: SpanData? = null
+
+        val app = ServerFilters.OpenTelemetryTracing(tracer)
+            .then(routes("/foo/{:id}" bind GET to {
+                createdContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+                Response(OK)
+            }))
+
+        app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
+
+        with(createdContext!!) {
+            assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
+            assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
+            assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{:id}"))
+            assertThat(traceId, !equalTo(TraceId.getInvalid()))
+            assertThat(spanId, !equalTo(SpanId.getInvalid()))
+            assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
         }
     }
 
