@@ -16,13 +16,12 @@ import org.http4k.routing.RoutedRequest
 import java.util.concurrent.atomic.AtomicReference
 
 fun ServerFilters.OpenTelemetryTracing(tracer: Tracer,
+                                       spanNamer: (Request) -> String = { it.uri.toString() },
                                        error: (Request, Throwable) -> String = { _, t -> t.localizedMessage }
 ): Filter {
     val textMapPropagator = OpenTelemetry.getPropagators().textMapPropagator
 
-    val getter = TextMapPropagator.Getter<Request> { carrier, key ->
-        carrier.header(key)
-    }
+    val getter = TextMapPropagator.Getter<Request> { req, name -> req.header(name) }
 
     return Filter { next ->
         { req ->
@@ -52,8 +51,8 @@ fun ClientFilters.OpenTelemetryTracing(tracer: Tracer,
 
     val textMapPropagator = OpenTelemetry.getPropagators().textMapPropagator
 
-    val setter = Setter<AtomicReference<Request>> { ref, key, value ->
-        ref?.run { set(get().header(key, value)) }
+    val setter = Setter<AtomicReference<Request>> { ref, name, value ->
+        ref?.run { set(get().header(name, value)) }
     }
 
     return Filter { next ->
