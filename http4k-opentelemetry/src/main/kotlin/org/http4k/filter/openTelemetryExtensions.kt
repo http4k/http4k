@@ -2,7 +2,6 @@ package org.http4k.filter
 
 import io.grpc.Context.current
 import io.opentelemetry.OpenTelemetry
-import io.opentelemetry.context.ContextUtils.withScopedContext
 import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.context.propagation.TextMapPropagator.Setter
 import io.opentelemetry.trace.Span.Kind.CLIENT
@@ -25,13 +24,17 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer,
 
     return Filter { next ->
         { req ->
-            val context = current()
-            withScopedContext(textMapPropagator.extract(context, req, getter)).use {
-                with(tracer.spanBuilder(req.uri.toString()).setParent(context).setSpanKind(SERVER).startSpan()) {
+            with(tracer.spanBuilder(spanNamer(req))
+                .setParent(textMapPropagator.extract(current(), req, getter))
+                .setSpanKind(SERVER)
+                .startSpan()
+            ) {
+                setAttribute("http.method", req.method.name)
+                setAttribute("http.url", req.uri.toString())
+                if (req is RoutedRequest) setAttribute("http.route", req.xUriTemplate.toString())
+
+                currentContextWith(this).use {
                     try {
-                        setAttribute("http.method", req.method.name)
-                        setAttribute("http.url", req.uri.toString())
-                        if (req is RoutedRequest) setAttribute("http.route", req.xUriTemplate.toString())
                         next(req)
                     } catch (t: Throwable) {
                         setStatus(ERROR, error(req, t))
@@ -41,11 +44,13 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer,
                     }
                 }
             }
+
         }
     }
 }
 
 fun ClientFilters.OpenTelemetryTracing(tracer: Tracer,
+                                       spanNamer: (Request) -> String = { it.uri.toString() },
                                        error: (Request, Throwable) -> String = { _, t -> t.localizedMessage }
 ): Filter {
 
@@ -57,14 +62,13 @@ fun ClientFilters.OpenTelemetryTracing(tracer: Tracer,
 
     return Filter { next ->
         { req ->
-            with(tracer.spanBuilder(req.uri.toString()).setSpanKind(CLIENT).startSpan()) {
+            with(tracer.spanBuilder(spanNamer(req)).setSpanKind(CLIENT).startSpan()) {
+                setAttribute("http.method", req.method.name);
+                setAttribute("http.url", req.uri.toString());
                 try {
-                    val current = current()
                     currentContextWith(this).use {
-                        setAttribute("http.method", req.method.name);
-                        setAttribute("http.url", req.uri.toString());
                         val ref = AtomicReference(req)
-                        textMapPropagator.inject(current, ref, setter)
+                        textMapPropagator.inject(current(), ref, setter)
                         next(ref.get()).apply {
                             setAttribute("http.status_code", status.code.toString());
                         }

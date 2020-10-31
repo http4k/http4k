@@ -34,12 +34,18 @@ class OpenTelemetryTracingTest {
             .then {
                 Response(OK).headers(it.headers)
             }
-        val traces = ZipkinTraces.forCurrentThread()
 
-        val message = app(ZipkinTraces(traces, Request(GET, "http://localhost:8080/foo/bar?a=b")))
+        val traceId = "11111111111111111111111111111111"
+        val spanId = "2222222222222222"
 
-        assertThat(message, hasHeader("x-b3-traceid", endsWith(traces.traceId.value)))
-        assertThat(message, hasHeader("x-b3-spanid", equalTo(traces.spanId.value)))
+        val message = app(Request(GET, "http://localhost:8080/foo/bar?a=b")
+            .header("x-b3-traceid", traceId)
+            .header("x-b3-spanid", spanId)
+            .header("x-b3-sampled", "1")
+        )
+
+        assertThat(message, hasHeader("x-b3-traceid", endsWith(traceId)))
+        assertThat(message, hasHeader("x-b3-spanid", !equalTo(spanId)))
         assertThat(message, hasHeader("x-b3-sampled", equalTo("1")))
 
     }
