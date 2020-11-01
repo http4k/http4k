@@ -1,4 +1,3 @@
-import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -18,7 +17,7 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.6.1"
 
-    const val software_amazon_awssdk: String = "2.15.18"
+    const val software_amazon_awssdk: String = "2.15.19"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
@@ -48,7 +47,7 @@ object Versions {
 
     const val javax_websocket_server_impl: String = "9.4.33.v20201020"
 
-    const val kotest_assertions_core_jvm: String = "4.3.0"
+    const val kotest_assertions_core_jvm: String = "4.3.1"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
@@ -94,7 +93,7 @@ object Versions {
 
     const val httpclient: String = "4.5.13"
 
-    const val underscore: String = "1.59"
+    const val underscore: String = "1.60"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 

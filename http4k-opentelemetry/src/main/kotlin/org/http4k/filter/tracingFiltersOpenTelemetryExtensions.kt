@@ -13,10 +13,11 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.metrics.Http4kOpenTelemetry
 import org.http4k.routing.RoutedRequest
 import java.util.concurrent.atomic.AtomicReference
 
-fun ClientFilters.OpenTelemetryTracing(tracer: Tracer,
+fun ClientFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.tracer,
                                        spanNamer: (Request) -> String = { it.uri.toString() },
                                        error: (Request, Throwable) -> String = { _, t -> t.localizedMessage }
 ): Filter {
@@ -49,7 +50,7 @@ fun ClientFilters.OpenTelemetryTracing(tracer: Tracer,
 }
 
 
-fun ServerFilters.OpenTelemetryTracing(tracer: Tracer,
+fun ServerFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.tracer,
                                        spanNamer: (Request) -> String = { it.uri.toString() },
                                        error: (Request, Throwable) -> String = { _, t -> t.localizedMessage }
 ): Filter {

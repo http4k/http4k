@@ -6,6 +6,7 @@ dependencies {
 
     testCompile Libs.opentelemetry_sdk
     testCompile Libs.opentelemetry_extension_trace_propagators
+    testCompile Libs.opentelemetry_exporters_inmemory
     testCompile Config.TestDependencies
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
 }
