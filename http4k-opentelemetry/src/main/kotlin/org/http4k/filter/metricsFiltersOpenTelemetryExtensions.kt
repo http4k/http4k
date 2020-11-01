@@ -5,7 +5,10 @@ import io.opentelemetry.metrics.Meter
 import org.http4k.core.Filter
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.metrics.MetricsDefaults
+import org.http4k.metrics.MetricsDefaults.Companion.client
+import org.http4k.metrics.MetricsDefaults.Companion.server
 import java.time.Clock
+import java.time.Clock.systemUTC
 
 class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
 
@@ -13,7 +16,7 @@ class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
                      name: String = defaults.timerDescription.first,
                      description: String = defaults.timerDescription.second,
                      labeler: HttpTransactionLabeler = defaults.labeler,
-                     clock: Clock = Clock.systemUTC()): Filter {
+                     clock: Clock = systemUTC()): Filter {
         val meterInstance = meter.longValueRecorderBuilder(name).setDescription(description).build()
 
         return ReportHttpTransaction(clock) { tx ->
@@ -25,7 +28,7 @@ class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
                        name: String = defaults.counterDescription.first,
                        description: String = defaults.counterDescription.second,
                        labeler: HttpTransactionLabeler = defaults.labeler,
-                       clock: Clock = Clock.systemUTC()): Filter {
+                       clock: Clock = systemUTC()): Filter {
         val counterInstance = meter.longCounterBuilder(name).setDescription(description).build()
 
         return ReportHttpTransaction(clock) {
@@ -34,5 +37,5 @@ class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
     }
 }
 
-val ClientFilters.OpenTelemetryMetrics get() = OpenTelemetryMetrics(MetricsDefaults.client)
-val ServerFilters.OpenTelemetryMetrics get() = OpenTelemetryMetrics(MetricsDefaults.server)
+val ClientFilters.OpenTelemetryMetrics get() = OpenTelemetryMetrics(client)
+val ServerFilters.OpenTelemetryMetrics get() = OpenTelemetryMetrics(server)
