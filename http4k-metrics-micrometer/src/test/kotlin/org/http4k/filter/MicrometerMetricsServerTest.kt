@@ -26,7 +26,7 @@ class MicrometerMetricsServerTest {
     private val registry = SimpleMeterRegistry()
     private val clock = TickingClock
     private var requestTimer = ServerFilters.MicrometerMetrics.RequestTimer(registry, clock = clock)
-    private var requestCounter = ServerFilters.MicrometerMetrics.RequestCounter(registry)
+    private var requestCounter = ServerFilters.MicrometerMetrics.RequestCounter(registry, clock = clock)
     private val server by lazy {
         routes(
             "/timed" bind routes(

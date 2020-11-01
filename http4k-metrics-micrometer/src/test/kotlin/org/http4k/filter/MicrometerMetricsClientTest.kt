@@ -21,7 +21,7 @@ class MicrometerMetricsClientTest {
     private val registry = SimpleMeterRegistry()
     private val clock = TickingClock
     private var requestTimer = ClientFilters.MicrometerMetrics.RequestTimer(registry, clock = clock)
-    private var requestCounter = ClientFilters.MicrometerMetrics.RequestCounter(registry)
+    private var requestCounter = ClientFilters.MicrometerMetrics.RequestCounter(registry, clock = clock)
     private val remoteServerMock: HttpHandler = {
         when (it.uri.path) {
             "/one" -> Response(OK)
