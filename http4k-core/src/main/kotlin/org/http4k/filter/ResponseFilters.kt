@@ -29,7 +29,7 @@ object ResponseFilters {
     }
 
     /**
-     * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeller to
+     * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeler to
      * create custom labels.
      * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
