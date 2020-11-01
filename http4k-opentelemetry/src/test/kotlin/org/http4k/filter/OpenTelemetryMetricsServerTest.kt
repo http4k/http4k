@@ -125,7 +125,6 @@ class OpenTelemetryMetricsServerTest {
             hasRequestCounter(1, Labels.of("path", "UNMAPPED", "method", "GET", "status", "200")))
     }
 
-
     private fun hasNoRequestTimer(method: Method, path: String, status: Status) =
         object : Matcher<List<MetricData>> {
             override val description = "http.server.request.latency"
