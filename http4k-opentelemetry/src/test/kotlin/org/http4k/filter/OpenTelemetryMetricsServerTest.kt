@@ -135,43 +135,4 @@ class OpenTelemetryMetricsServerTest {
                         ?.any { it.labels == Labels.of("path", path, "method", method.name, "status", status.code.toString()) } != true) Match else Mismatch(actual.toString())
         }
 
-    private fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "http.server.request.latency") =
-        object : Matcher<List<MetricData>> {
-            override val description = name
-
-            override fun invoke(actual: List<MetricData>): MatchResult {
-                val summary = actual
-                    .first { it.name == name }
-                    .points
-                    .first { it.labels == labels } as MetricData.SummaryPoint
-                return if (
-                    summary.count != count.toLong() &&
-                    summary.percentileValues.last().value != value
-                ) Mismatch(actual.toString())
-                else Match
-            }
-        }
-
-    private fun hasRequestCounter(count: Int, labels: Labels, name: String = "http.server.request.count") =
-        object : Matcher<List<MetricData>> {
-            override val description = name
-
-            override fun invoke(actual: List<MetricData>): MatchResult {
-                val counter = actual
-                    .first { it.name == name }
-                    .points
-                    .first { it.labels == labels } as MetricData.LongPoint
-                return if (counter.value == count.toLong()) Match else Mismatch(actual.toString())
-            }
-        }
-
-    private fun hasNoRequestCounter(method: Method, path: String, status: Status) =
-        object : Matcher<List<MetricData>> {
-            override val description = "http.server.request.count"
-
-            override fun invoke(actual: List<MetricData>): MatchResult =
-                if (actual.find { it.name == description }
-                        ?.points
-                        ?.any { it.labels == Labels.of("path", path, "method", method.name, "status", status.code.toString()) } != true) Match else Mismatch(actual.toString())
-        }
 }
