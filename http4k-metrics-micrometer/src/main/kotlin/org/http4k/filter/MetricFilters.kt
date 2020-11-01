@@ -11,14 +11,14 @@ object MetricFilters {
 
     open class MetricsFilterTemplate(private val defaultTimer: Pair<String, String>,
                                      private val defaultCounter: Pair<String, String>,
-                                     private val defaultLabeler: HttpTransactionLabeller) {
+                                     private val defaultLabeler: HttpTransactionLabeler) {
         fun RequestTimer(meterRegistry: MeterRegistry,
                          name: String = defaultTimer.first,
                          description: String? = defaultTimer.second,
-                         labeller: HttpTransactionLabeller = defaultLabeler,
+                         labeler: HttpTransactionLabeler = defaultLabeler,
                          clock: Clock = Clock.systemUTC()): Filter =
             ReportHttpTransaction(clock) {
-                labeller(it).labels.entries.fold(Timer.builder(name).description(description)) { memo, next ->
+                labeler(it).labels.entries.fold(Timer.builder(name).description(description)) { memo, next ->
                     memo.tag(next.key, next.value)
                 }.register(meterRegistry).record(it.duration)
             }
@@ -26,7 +26,7 @@ object MetricFilters {
         fun RequestCounter(meterRegistry: MeterRegistry,
                            name: String = defaultCounter.first,
                            description: String? = defaultCounter.second,
-                           labeler: HttpTransactionLabeller = defaultLabeler,
+                           labeler: HttpTransactionLabeler = defaultLabeler,
                            clock: Clock = Clock.systemUTC()): Filter =
             ReportHttpTransaction(clock) {
                 labeler(it).labels.entries.fold(Counter.builder(name).description(description)) { memo, next ->

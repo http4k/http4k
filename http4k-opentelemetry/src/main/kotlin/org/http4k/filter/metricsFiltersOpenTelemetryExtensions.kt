@@ -10,33 +10,33 @@ import java.time.Clock
 object MetricsFilters {
     open class MetricsFilterTemplate(private val defaultTimer: Pair<String, String>,
                                      private val defaultCounter: Pair<String, String>,
-                                     private val defaultLabeler: HttpTransactionLabeller) {
+                                     private val defaultLabeler: HttpTransactionLabeler) {
         fun RequestTimer(meter: Meter,
                          name: String = defaultTimer.first,
                          description: String? = defaultTimer.second,
-                         labeler: HttpTransactionLabeller = defaultLabeler,
+                         labeler: HttpTransactionLabeler = defaultLabeler,
                          clock: Clock = Clock.systemUTC()): Filter {
             val meterInstance = meter.longValueRecorderBuilder(name).setDescription(description).build()
 
             return ReportHttpTransaction(clock) { tx ->
-                meterInstance.record(tx.duration.toMillis(), Labels.of(labels(labeler, tx)))
+                meterInstance.record(tx.duration.toMillis(), Labels.of(labeler.labels(tx)))
             }
         }
 
         fun RequestCounter(meter: Meter,
                            name: String = defaultCounter.first,
                            description: String? = defaultCounter.second,
-                           labeler: HttpTransactionLabeller = defaultLabeler,
+                           labeler: HttpTransactionLabeler = defaultLabeler,
                            clock: Clock = Clock.systemUTC()): Filter {
             val meterInstance = meter.longCounterBuilder(name).setDescription(description).build()
 
             return ReportHttpTransaction(clock) {
-                meterInstance.add(1, Labels.of(labels(labeler, it)))
+                meterInstance.add(1, Labels.of(labeler.labels(it)))
             }
         }
 
-        private fun labels(labeler: HttpTransactionLabeller, tx: HttpTransaction) =
-            labeler(tx).labels.map { listOf(it.key, it.value) }.flatten().toTypedArray()
+        private fun HttpTransactionLabeler.labels(tx: HttpTransaction) =
+            this(tx).labels.map { listOf(it.key, it.value) }.flatten().toTypedArray()
     }
 
     private val notAlphaNumUnderscore: Regex = "[^a-zA-Z0-9_]".toRegex()

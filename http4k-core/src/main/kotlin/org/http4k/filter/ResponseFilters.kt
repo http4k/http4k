@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import org.http4k.base64Encode
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -37,13 +36,13 @@ object ResponseFilters {
     object ReportHttpTransaction {
         operator fun invoke(
             clock: Clock = Clock.systemUTC(),
-            transactionLabeller: HttpTransactionLabeller = { it },
+            transactionLabeler: HttpTransactionLabeler = { it },
             recordFn: (HttpTransaction) -> Unit
         ): Filter = Filter { next ->
             {
                 clock.instant().let { start ->
                     next(it).apply {
-                        recordFn(transactionLabeller(HttpTransaction(it, this, between(start, clock.instant()))))
+                        recordFn(transactionLabeler(HttpTransaction(it, this, between(start, clock.instant()))))
                     }
                 }
             }
@@ -134,4 +133,4 @@ object ResponseFilters {
     }
 }
 
-typealias HttpTransactionLabeller = (HttpTransaction) -> HttpTransaction
+typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction
