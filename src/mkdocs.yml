@@ -29,10 +29,11 @@ edit_uri: edit/master/src/docs/
 strict: false
 nav:
   - Introduction: documentation/index.md
-  - Rationale & Concepts: rationale/index.md
+  - Rationale & concepts: rationale/index.md
   - Installation:  installation/index.md
+  - Changelog: changelog/index.md
   - Getting started: quickstart/index.md
-  - Developer Guide:
+  - Developer guide:
     - Modules:
       - Overview: guide/modules/index.md
       - Core: guide/modules/core/index.md
@@ -58,7 +59,7 @@ nav:
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
       - Service Virtualisaion: guide/modules/servicevirtualisation/index.md
-    - Application Testing: guide/testing/index.md
+    - Application testing: guide/testing/index.md
   - Tutorials:
     - TDDing http4k: tutorials/tdding_http4k/index.md
     - Documenting http4k apps with OpenApi3: tutorials/documenting_apis_with_openapi/index.md
@@ -87,16 +88,15 @@ nav:
     - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md
-  - Performance: performance/index.md
-  - In action: in_action/index.md
+  - http4k in action: in_action/index.md
   - Blog:
     - Meet http4k: blog/meet_http4k/index.md
     - Typesafe Websockets: blog/typesafe_websockets/index.md
     - Retrospective on v3: blog/retrospective_v3/index.md
     - Nanoservices: blog/nanoservices/index.md
-  - Getting Support: support/index.md
-  - Contribute/Support http4k: contributing/index.md
+  - Performance: performance/index.md
+  - FAQ: faq/index.md
+  - Getting support: support/index.md
+  - Contribute/support http4k: contributing/index.md
   - Code of Conduct: code-of-conduct/index.md
   - API docs: api/index.md
-  - Changelog: changelog/index.md
-  - FAQ: faq/index.md
