@@ -1,38 +1,42 @@
 package org.http4k.filter
 
-import io.micrometer.core.instrument.Counter
-import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Timer
+import io.opentelemetry.common.Labels
+import io.opentelemetry.metrics.Meter
 import org.http4k.core.Filter
+import org.http4k.core.HttpTransaction
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import java.time.Clock
 
-object MetricFilters {
-
+object MetricsFilters {
     open class MetricsFilterTemplate(private val defaultTimer: Pair<String, String>,
                                      private val defaultCounter: Pair<String, String>,
                                      private val defaultLabeler: HttpTransactionLabeller) {
-        fun RequestTimer(meterRegistry: MeterRegistry,
+        fun RequestTimer(meter: Meter,
                          name: String = defaultTimer.first,
                          description: String? = defaultTimer.second,
-                         labeller: HttpTransactionLabeller = defaultLabeler,
-                         clock: Clock = Clock.systemUTC()): Filter =
-            ReportHttpTransaction(clock) {
-                labeller(it).labels.entries.fold(Timer.builder(name).description(description)) { memo, next ->
-                    memo.tag(next.key, next.value)
-                }.register(meterRegistry).record(it.duration)
-            }
+                         labeler: HttpTransactionLabeller = defaultLabeler,
+                         clock: Clock = Clock.systemUTC()): Filter {
+            val meterInstance = meter.longValueRecorderBuilder(name).setDescription(description).build()
 
-        fun RequestCounter(meterRegistry: MeterRegistry,
+            return ReportHttpTransaction(clock) { tx ->
+                meterInstance.record(tx.duration.toMillis(), Labels.of(labels(labeler, tx)))
+            }
+        }
+
+        fun RequestCounter(meter: Meter,
                            name: String = defaultCounter.first,
                            description: String? = defaultCounter.second,
-                           labeller: HttpTransactionLabeller = defaultLabeler,
-                           clock: Clock = Clock.systemUTC()): Filter =
-            ReportHttpTransaction(clock) {
-                labeller(it).labels.entries.fold(Counter.builder(name).description(description)) { memo, next ->
-                    memo.tag(next.key, next.value)
-                }.register(meterRegistry).increment()
+                           labeler: HttpTransactionLabeller = defaultLabeler,
+                           clock: Clock = Clock.systemUTC()): Filter {
+            val meterInstance = meter.longCounterBuilder(name).setDescription(description).build()
+
+            return ReportHttpTransaction(clock) {
+                meterInstance.add(1, Labels.of(labels(labeler, it)))
             }
+        }
+
+        private fun labels(labeller: HttpTransactionLabeller, tx: HttpTransaction) =
+            labeller(tx).labels.map { listOf(it.key, it.value) }.flatten().toTypedArray()
     }
 
     private val notAlphaNumUnderscore: Regex = "[^a-zA-Z0-9_]".toRegex()
