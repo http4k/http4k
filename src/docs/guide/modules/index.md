@@ -1,6 +1,8 @@
 title: http4k extension modules and integrations
 description: Details about the various http4k integration libraries
 
+# http4k Modules overview
+
 ### Core functionality
 <a href="https://http4k.org/guide/modules/core"><span class="pill">Core</span></a>
 <a href="https://http4k.org/guide/modules/contracts"><span class="pill">OpenAPI Contracts</span></a>
