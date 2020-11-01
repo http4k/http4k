@@ -25,7 +25,7 @@ fun main() {
             .addTextMapPropagator(AwsXRayPropagator.getInstance())
             .build())
 
-    // this HttpHandler represents the 3rd party service, and will repeat the request body
+    // this HttpHandler represents a 3rd party service, and will repeat the request body
     val repeater: HttpHandler = {
         println("REMOTE REQUEST WITH TRACING HEADERS: $it")
         Response(OK).body(it.bodyString() + it.bodyString())
