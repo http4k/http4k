@@ -9,4 +9,4 @@ implementation group: "org.http4k", name: "http4k-metrics-opentelemetry", versio
 
 ### About
 
-This module provides configurable Filters to provide metrics for http4k apps, plugging into the awesome [OpenTelemetry APIs](https://opentelemetry.io/) library.
+This module provides configurable Filters to provide metrics for http4k apps, plugging into the awesome [OpenTelemetry](https://opentelemetry.io/) APIs.
