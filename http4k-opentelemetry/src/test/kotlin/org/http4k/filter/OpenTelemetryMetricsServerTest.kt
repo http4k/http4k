@@ -1,17 +1,20 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.MatchResult
+import com.natpryce.hamkrest.MatchResult.Match
 import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import io.opentelemetry.common.Labels
 import io.opentelemetry.sdk.metrics.data.MetricData
+import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
@@ -54,8 +57,8 @@ class OpenTelemetryMetricsServerTest {
         }
 
         val data = exportMetricsFromOpenTelemetry()
-        assertThat(data, hasRequestLatency(1, 1000.0, Labels.of("path", "timed_one", "method", "GET", "status", "200")))
-        assertThat(data, hasRequestLatency(2, 2000.0, Labels.of("path", "timed_two_name", "method", "POST", "status", "200")))
+        assertThat(data, hasRequestTimer(1, 1000.0, Labels.of("path", "timed_one", "method", "GET", "status", "200")))
+        assertThat(data, hasRequestTimer(2, 2000.0, Labels.of("path", "timed_two_name", "method", "POST", "status", "200")))
     }
 
     @Test
@@ -70,85 +73,39 @@ class OpenTelemetryMetricsServerTest {
         assertThat(data, hasRequestCounter(2, Labels.of("path", "counted_two_name", "method", "POST", "status", "200")))
     }
 
-    private fun hasRequestLatency(count: Int, value: Double, labels: Labels) =
-        object : Matcher<List<MetricData>> {
-            override val description = "http.server.request.latency"
+    @Test
+    fun `routes without metrics generate nothing`() {
+        assertThat(server(Request(GET, "/unmetered/one")), hasStatus(OK))
+        assertThat(server(Request(DELETE, "/unmetered/two")), hasStatus(INTERNAL_SERVER_ERROR))
 
-            override fun invoke(actual: List<MetricData>): MatchResult {
-                val summary = actual
-                    .first { it.name == description }
-                    .points
-                    .first { it.labels == labels } as MetricData.SummaryPoint
-                return if (
-                    summary.count != count.toLong() &&
-                    summary.percentileValues.last().value != value
-                ) Mismatch(actual.toString())
-                else MatchResult.Match
-            }
-        }
+        val data = exportMetricsFromOpenTelemetry()
 
-    private fun hasRequestCounter(count: Int, labels: Labels) =
-        object : Matcher<List<MetricData>> {
-            override val description = "http.server.request.count"
+        assertThat(data, hasNoRequestTimer(GET, "unmetered_one", OK))
+        assertThat(data, hasNoRequestTimer(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR))
+        assertThat(data, hasNoRequestCounter(GET, "unmetered_one", OK))
+        assertThat(data, hasNoRequestCounter(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR))
+    }
 
-            override fun invoke(actual: List<MetricData>): MatchResult {
-                val counter = actual
-                    .first { it.name == description }
-                    .points
-                    .first { it.labels == labels } as MetricData.LongPoint
-                return if (counter.value == count.toLong()) MatchResult.Match else Mismatch(actual.toString())
-            }
-        }
-//
-//    @Test
-//    fun `routes with counter generate request count metrics tagged with path and method and status`() {
-//        assertThat(server(Request(GET, "/counted/one")), hasStatus(OK))
-//        repeat(2) {
-//            assertThat(server(Request(POST, "/counted/two/bob")), (hasStatus(OK) and hasBody("bob")))
-//        }
-//
-//        assert(registry,
-//            hasRequestCounter(1, tags = arrayOf("path" to "counted_one", "method" to "GET", "status" to "200")),
-//            hasRequestCounter(2, tags = arrayOf("path" to "counted_two_name", "method" to "POST", "status" to "200"))
-//        )
-//    }
-//
-//    @Test
-//    fun `routes without metrics generate nothing`() {
-//        assertThat(server(Request(GET, "/unmetered/one")), hasStatus(OK))
-//        assertThat(server(Request(DELETE, "/unmetered/two")), hasStatus(INTERNAL_SERVER_ERROR))
-//
-//        assert(registry,
-//            hasNoRequestTimer(GET, "unmetered_one", OK),
-//            hasNoRequestTimer(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR),
-//            hasNoRequestCounter(GET, "unmetered_one", OK),
-//            hasNoRequestCounter(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR)
-//        )
-//    }
-//
-//    @Test
-//    fun `request timer meter names and request id formatter can be configured`() {
-//        requestTimer = ServerFilters.OpenTelemetryMetrics.RequestTimer(registry, "custom.requests", "custom.description",
-//            { it.label("foo", "bar") }, clock)
-//
-//        assertThat(server(Request(GET, "/timed/one")), hasStatus(OK))
-//
-//        assert(registry,
-//            hasRequestTimer(1, 1, "custom.requests", "custom.description", "foo" to "bar")
-//        )
-//    }
-//
-//    @Test
-//    fun `request counter meter names and request id formatter can be configured`() {
-//        requestCounter = ServerFilters.OpenTelemetryMetrics.RequestCounter(registry, "custom.requests", "custom.description",
-//            { it.label("foo", "bar") })
-//
-//        assertThat(server(Request(GET, "/counted/one")), hasStatus(OK))
-//
-//        assert(registry,
-//            hasRequestCounter(1, "custom.requests", "custom.description", "foo" to "bar")
-//        )
-//    }
+    @Test
+    fun `request timer meter names and request id formatter can be configured`() {
+        requestTimer = ServerFilters.OpenTelemetryMetrics.RequestTimer(name = "custom.requests", description = "custom.description", labeler = { it.label("foo", "bar") })
+
+        assertThat(server(Request(GET, "/timed/one")), hasStatus(OK))
+
+        val data = exportMetricsFromOpenTelemetry()
+        assertThat(data, hasRequestTimer(1, 1000.0, Labels.of("foo", "bar", "routingGroup", "timed/one"), "custom.requests"))
+    }
+
+    @Test
+    fun `request counter meter names and request id formatter can be configured`() {
+        requestCounter = ServerFilters.OpenTelemetryMetrics.RequestCounter(name = "custom.requests", description = "custom.description", labeler = { it.label("foo", "bar") })
+
+        assertThat(server(Request(GET, "/counted/one")), hasStatus(OK))
+
+        assertThat(exportMetricsFromOpenTelemetry(),
+            hasRequestCounter(1, Labels.of("foo", "bar", "routingGroup", "counted/one"), "custom.requests")
+        )
+    }
 //
 //    @Test
 //    fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() {
@@ -191,4 +148,54 @@ class OpenTelemetryMetricsServerTest {
 //        !hasCounter("http.server.request.count",
 //            listOf(Tag.of("path", path), Tag.of("method", method.name), Tag.of("status", status.code.toString()))
 //        )
+
+    private fun hasNoRequestTimer(method: Method, path: String, status: Status) =
+        object : Matcher<List<MetricData>> {
+            override val description = "http.server.request.latency"
+
+            override fun invoke(actual: List<MetricData>): MatchResult =
+                if (actual.firstOrNull { it.name == description }
+                        ?.points
+                        ?.any { it.labels == Labels.of("path", path, "method", method.name, "status", status.code.toString()) } != true) Match else Mismatch(actual.toString())
+        }
+
+    private fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "http.server.request.latency") =
+        object : Matcher<List<MetricData>> {
+            override val description = name
+
+            override fun invoke(actual: List<MetricData>): MatchResult {
+                val summary = actual
+                    .first { it.name == name }
+                    .points
+                    .first { it.labels == labels } as MetricData.SummaryPoint
+                return if (
+                    summary.count != count.toLong() &&
+                    summary.percentileValues.last().value != value
+                ) Mismatch(actual.toString())
+                else Match
+            }
+        }
+
+    private fun hasRequestCounter(count: Int, labels: Labels, name: String = "http.server.request.count") =
+        object : Matcher<List<MetricData>> {
+            override val description = name
+
+            override fun invoke(actual: List<MetricData>): MatchResult {
+                val counter = actual
+                    .first { it.name == name }
+                    .points
+                    .first { it.labels == labels } as MetricData.LongPoint
+                return if (counter.value == count.toLong()) Match else Mismatch(actual.toString())
+            }
+        }
+
+    private fun hasNoRequestCounter(method: Method, path: String, status: Status) =
+        object : Matcher<List<MetricData>> {
+            override val description = "http.server.request.count"
+
+            override fun invoke(actual: List<MetricData>): MatchResult =
+                if (actual.find { it.name == description }
+                        ?.points
+                        ?.any { it.labels == Labels.of("path", path, "method", method.name, "status", status.code.toString()) } != true) Match else Mismatch(actual.toString())
+        }
 }
