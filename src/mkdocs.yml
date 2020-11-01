@@ -41,7 +41,7 @@ nav:
       - HTTP & Websocket clients: guide/modules/clients/index.md
       - Micrometer: guide/modules/micrometer/index.md
       - Multipart forms: guide/modules/multipart/index.md
-      - Resilience: guide/modules/resilience/index.md
+      - Resilience: guide/modules/resilience4j/index.md
       - Server backend: guide/modules/servers/index.md
       - Serverless backend: guide/modules/serverless/index.md
       - Templating: guide/modules/templating/index.md

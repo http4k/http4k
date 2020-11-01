@@ -86,7 +86,7 @@ Bored with reading already and just want to get coding? For the impatient, visit
 * [Serverless:](https://http4k.org/guide/modules/serverless)
     * **AWS Lambda** Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway or AppLoadBalancer. 
     * **Google Cloud Functions** Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
-    * **Apache OpenWhisk** Implement a single Factory method, then upload your [http4k] applications to Google 
+    * **Apache OpenWhisk** Implement a single Factory method, then upload your [http4k] applications to IBM Cloud/OpenWhisk installations.
     * **Azure Functions** Implement a single Factory method, then upload your [http4k] applications to the MS Cloud. 
     * **Alibaba Function Compute** Implement a single Factory method, then upload your [http4k] applications to Alibaba. 
     * **Tencent Serverless Cloud Functions** Implement a single Factory method, then upload your [http4k] applications to SCF. 
@@ -118,11 +118,11 @@ Bored with reading already and just want to get coding? For the impatient, visit
         * **[YAML](https://www.http4k.org/guide/modules/yaml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
 * [Resilience4J:](https://http4k.org/guide/modules/resilience4j) 
-    * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration.
+    * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
 * [Micrometer:](https://http4k.org/guide/modules/micrometer) 
-    * Support for plugging http4k apps into Micrometer
+    * Support for plugging http4k apps into Micrometer.
 * [OpenTelemetry:](https://http4k.org/guide/modules/opentelemetry) 
-    * Support for instrumenting http4k apps with OpenTelemetry tooling
+    * Support for instrumenting http4k apps with OpenTelemetry tooling.
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 
