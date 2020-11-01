@@ -9,6 +9,7 @@ import io.opentelemetry.trace.Tracer
 import io.opentelemetry.trace.TracingContextUtils
 import org.http4k.core.Filter
 import org.http4k.core.Request
+import org.http4k.routing.RoutedRequest
 import java.util.concurrent.atomic.AtomicReference
 
 fun ClientFilters.OpenTelemetryTracing(tracer: Tracer,
@@ -45,3 +46,40 @@ fun ClientFilters.OpenTelemetryTracing(tracer: Tracer,
         }
     }
 }
+
+
+fun ServerFilters.OpenTelemetryTracing(tracer: Tracer,
+                                       spanNamer: (Request) -> String = { it.uri.toString() },
+                                       error: (Request, Throwable) -> String = { _, t -> t.localizedMessage }
+): Filter {
+    val textMapPropagator = OpenTelemetry.getPropagators().textMapPropagator
+
+    val getter = TextMapPropagator.Getter<Request> { req, name -> req.header(name) }
+
+    return Filter { next ->
+        { req ->
+            with(tracer.spanBuilder(spanNamer(req))
+                .setParent(textMapPropagator.extract(Context.current(), req, getter))
+                .setSpanKind(Span.Kind.SERVER)
+                .startSpan()
+            ) {
+                setAttribute("http.method", req.method.name)
+                setAttribute("http.url", req.uri.toString())
+                if (req is RoutedRequest) setAttribute("http.route", req.xUriTemplate.toString())
+
+                TracingContextUtils.currentContextWith(this).use {
+                    try {
+                        next(req)
+                    } catch (t: Throwable) {
+                        setStatus(StatusCanonicalCode.ERROR, error(req, t))
+                        throw t
+                    } finally {
+                        end()
+                    }
+                }
+            }
+
+        }
+    }
+}
+
