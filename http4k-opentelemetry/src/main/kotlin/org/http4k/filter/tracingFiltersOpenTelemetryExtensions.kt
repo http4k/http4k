@@ -1,21 +1,18 @@
 package org.http4k.filter
 
 import io.grpc.Context
-import io.opentelemetry.OpenTelemetry
 import io.opentelemetry.OpenTelemetry.getPropagators
-import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.context.propagation.TextMapPropagator.Getter
 import io.opentelemetry.context.propagation.TextMapPropagator.Setter
-import io.opentelemetry.trace.Span
 import io.opentelemetry.trace.Span.Kind.CLIENT
 import io.opentelemetry.trace.Span.Kind.SERVER
-import io.opentelemetry.trace.StatusCanonicalCode
 import io.opentelemetry.trace.StatusCanonicalCode.ERROR
 import io.opentelemetry.trace.Tracer
-import io.opentelemetry.trace.TracingContextUtils
 import io.opentelemetry.trace.TracingContextUtils.currentContextWith
 import org.http4k.core.Filter
+import org.http4k.core.HttpMessage
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.routing.RoutedRequest
 import java.util.concurrent.atomic.AtomicReference
 
@@ -25,10 +22,7 @@ fun ClientFilters.OpenTelemetryTracing(tracer: Tracer,
 ): Filter {
 
     val textMapPropagator = getPropagators().textMapPropagator
-
-    val setter = Setter<AtomicReference<Request>> { ref, name, value ->
-        ref?.run { set(get().header(name, value)) }
-    }
+    val setter = setter<Request>()
 
     return Filter { next ->
         { req ->
@@ -61,8 +55,8 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer,
 ): Filter {
     val textMapPropagator = getPropagators().textMapPropagator
 
-    val getter = Getter<Request> { req, name -> req.header(name) }
-
+    val getter = getter<Request>()
+    val setter = setter<Response>()
     return Filter { next ->
         { req ->
             with(tracer.spanBuilder(spanNamer(req))
@@ -76,7 +70,9 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer,
 
                 currentContextWith(this).use {
                     try {
-                        next(req)
+                        val ref = AtomicReference(next(req))
+                        textMapPropagator.inject(Context.current(), ref, setter)
+                        ref.get()
                     } catch (t: Throwable) {
                         setStatus(ERROR, error(req, t))
                         throw t
@@ -85,8 +81,13 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer,
                     }
                 }
             }
-
         }
     }
 }
 
+@Suppress("UNCHECKED_CAST")
+internal fun <T : HttpMessage> setter() = Setter<AtomicReference<T>> { ref, name, value ->
+    ref?.run { set(get().header(name, value) as T) }
+}
+
+internal fun <T : HttpMessage> getter() = Getter<T> { req, name -> req.header(name) }

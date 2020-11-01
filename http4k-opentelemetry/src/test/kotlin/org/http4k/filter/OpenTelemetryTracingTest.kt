@@ -11,6 +11,7 @@ import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.trace.SpanId
 import io.opentelemetry.trace.TraceId
 import io.opentelemetry.trace.TracingContextUtils
+import io.opentelemetry.trace.TracingContextUtils.getCurrentSpan
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -18,6 +19,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
@@ -38,21 +40,25 @@ class OpenTelemetryTracingTest {
         var createdContext: SpanData? = null
 
         val app = ServerFilters.OpenTelemetryTracing(tracer)
-            .then(routes("/foo/{:id}" bind GET to {
-                createdContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+            .then(routes("/foo/{id}" bind GET to {
+                createdContext = (getCurrentSpan() as ReadableSpan).toSpanData()
                 Response(OK)
             }))
 
-        app(Request(GET, "http://localhost:8080/foo/bar?a=b")
+        val resp = app(Request(GET, "http://localhost:8080/foo/bar?a=b")
             .header("x-b3-traceid", sentTraceId)
             .header("x-b3-spanid", parentSpanId)
             .header("x-b3-sampled", "1")
         )
 
+        assertThat(resp, hasHeader("x-b3-traceid", equalTo(sentTraceId)))
+        assertThat(resp, hasHeader("x-b3-spanid", !equalTo(TraceId.getInvalid())))
+        assertThat(resp, hasHeader("x-b3-sampled", equalTo("1")))
+
         with(createdContext!!) {
             assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
             assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
-            assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{:id}"))
+            assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{id}"))
             assertThat(traceId, equalTo(sentTraceId))
             assertThat(spanId, !equalTo(parentSpanId))
             assertThat(parentSpanId, equalTo(parentSpanId))
@@ -65,17 +71,21 @@ class OpenTelemetryTracingTest {
         var createdContext: SpanData? = null
 
         val app = ServerFilters.OpenTelemetryTracing(tracer)
-            .then(routes("/foo/{:id}" bind GET to {
-                createdContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+            .then(routes("/foo/{id}" bind GET to {
+                createdContext = (getCurrentSpan() as ReadableSpan).toSpanData()
                 Response(OK)
             }))
 
-        app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
+        val resp = app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
+
+        assertThat(resp, hasHeader("x-b3-traceid", !equalTo(TraceId.getInvalid())))
+        assertThat(resp, hasHeader("x-b3-spanid", !equalTo(TraceId.getInvalid())))
+        assertThat(resp, hasHeader("x-b3-sampled", equalTo("1")))
 
         with(createdContext!!) {
             assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
             assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
-            assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{:id}"))
+            assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{id}"))
             assertThat(traceId, !equalTo(TraceId.getInvalid()))
             assertThat(spanId, !equalTo(SpanId.getInvalid()))
             assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
@@ -88,7 +98,7 @@ class OpenTelemetryTracingTest {
 
         val app = ClientFilters.OpenTelemetryTracing(tracer)
             .then {
-                createdContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+                createdContext = (getCurrentSpan() as ReadableSpan).toSpanData()
                 Response(I_M_A_TEAPOT)
             }
 
@@ -100,7 +110,6 @@ class OpenTelemetryTracingTest {
             assertThat(traceId, !equalTo(TraceId.getInvalid()))
             assertThat(spanId, !equalTo(SpanId.getInvalid()))
             assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
-            println(totalAttributeCount)
         }
     }
 
@@ -115,13 +124,13 @@ class OpenTelemetryTracingTest {
         val app = ServerFilters.OpenTelemetryTracing(tracer)
             .then(Filter { next ->
                 {
-                    serverContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+                    serverContext = (getCurrentSpan() as ReadableSpan).toSpanData()
                     next(Request(GET, "http://localhost:8080/client"))
                 }
             })
             .then(ClientFilters.OpenTelemetryTracing(tracer))
             .then {
-                clientContext = (TracingContextUtils.getCurrentSpan() as ReadableSpan).toSpanData()
+                clientContext = (getCurrentSpan() as ReadableSpan).toSpanData()
                 Response(I_M_A_TEAPOT)
             }
 
