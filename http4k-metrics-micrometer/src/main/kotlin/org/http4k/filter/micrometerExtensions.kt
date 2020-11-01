@@ -24,13 +24,12 @@ class MicrometerMetrics(private val defaults: MetricsDefaults) {
         }
 
     fun RequestCounter(meterRegistry: MeterRegistry,
-                       name: String = defaults.timerDescription.first,
-                       description: String = defaults.timerDescription.second,
+                       name: String = defaults.counterDescription.first,
+                       description: String = defaults.counterDescription.second,
                        labeler: HttpTransactionLabeler = defaults.labeler,
                        clock: Clock = Clock.systemUTC()): Filter =
         ReportHttpTransaction(clock) {
             labeler(it).labels.entries.fold(Counter.builder(name).description(description)) { memo, next ->
-                println(next)
                 memo.tag(next.key, next.value)
             }.register(meterRegistry).increment()
         }
