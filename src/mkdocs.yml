@@ -31,8 +31,8 @@ nav:
   - Introduction: documentation/index.md
   - Rationale & concepts: rationale/index.md
   - Installation:  installation/index.md
-  - Changelog: changelog/index.md
   - Getting started: quickstart/index.md
+  - Changelog: changelog/index.md
   - Developer guide:
     - Modules:
       - Overview: guide/modules/index.md
