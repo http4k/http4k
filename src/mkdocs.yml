@@ -41,7 +41,6 @@ nav:
       - HTTP & Websocket clients: guide/modules/clients/index.md
       - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
       - JSON handling: guide/modules/json/index.md
-      - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
       - Templating: guide/modules/templating/index.md
       - Multipart forms: guide/modules/multipart/index.md
       - Cloud native Configuration: guide/modules/cloud_native/index.md
