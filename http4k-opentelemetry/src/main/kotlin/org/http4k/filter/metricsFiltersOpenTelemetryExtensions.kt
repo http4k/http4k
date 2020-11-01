@@ -35,8 +35,8 @@ object MetricsFilters {
             }
         }
 
-        private fun labels(labeller: HttpTransactionLabeller, tx: HttpTransaction) =
-            labeller(tx).labels.map { listOf(it.key, it.value) }.flatten().toTypedArray()
+        private fun labels(labeler: HttpTransactionLabeller, tx: HttpTransaction) =
+            labeler(tx).labels.map { listOf(it.key, it.value) }.flatten().toTypedArray()
     }
 
     private val notAlphaNumUnderscore: Regex = "[^a-zA-Z0-9_]".toRegex()

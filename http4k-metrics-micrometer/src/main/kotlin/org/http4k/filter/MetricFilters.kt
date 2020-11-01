@@ -26,10 +26,10 @@ object MetricFilters {
         fun RequestCounter(meterRegistry: MeterRegistry,
                            name: String = defaultCounter.first,
                            description: String? = defaultCounter.second,
-                           labeller: HttpTransactionLabeller = defaultLabeler,
+                           labeler: HttpTransactionLabeller = defaultLabeler,
                            clock: Clock = Clock.systemUTC()): Filter =
             ReportHttpTransaction(clock) {
-                labeller(it).labels.entries.fold(Counter.builder(name).description(description)) { memo, next ->
+                labeler(it).labels.entries.fold(Counter.builder(name).description(description)) { memo, next ->
                     memo.tag(next.key, next.value)
                 }.register(meterRegistry).increment()
             }
