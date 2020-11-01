@@ -1,5 +1,5 @@
-title: http4k Metrics Modules
-description: Feature overview of the http4k-metrics modules
+title: http4k OpenTelemetry Modules
+description: Feature overview of the http4k-opentelemetry module
 
 ### Installation (Gradle)
 
