@@ -117,10 +117,12 @@ Bored with reading already and just want to get coding? For the impatient, visit
             * **Xml** - includes support for **one way automatic marshalling of Data classes**
         * **[YAML](https://www.http4k.org/guide/modules/yaml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
-* [Resilience:](https://http4k.org/guide/modules/resilience) 
+* [Resilience4J:](https://http4k.org/guide/modules/resilience4j) 
     * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration.
-* [Metrics:](https://http4k.org/guide/modules/metrics) 
-    * Support for plugging http4k apps into micrometer
+* [Micrometer:](https://http4k.org/guide/modules/micrometer) 
+    * Support for plugging http4k apps into Micrometer
+* [OpenTelemetry:](https://http4k.org/guide/modules/opentelemetry) 
+    * Support for instrumenting http4k apps with OpenTelemetry tooling
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 

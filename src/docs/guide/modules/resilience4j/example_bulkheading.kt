@@ -1,4 +1,4 @@
-package guide.modules.resilience
+package guide.modules.resilience4j
 
 import io.github.resilience4j.bulkhead.Bulkhead
 import io.github.resilience4j.bulkhead.BulkheadConfig

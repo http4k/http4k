@@ -1,4 +1,4 @@
-package guide.modules.resilience
+package guide.modules.resilience4j
 
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig

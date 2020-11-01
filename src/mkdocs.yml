@@ -39,7 +39,7 @@ nav:
       - Core: guide/modules/core/index.md
       - JSON handling: guide/modules/json/index.md
       - HTTP & Websocket clients: guide/modules/clients/index.md
-      - Metrics: guide/modules/metrics/index.md
+      - Micrometer: guide/modules/micrometer/index.md
       - Multipart forms: guide/modules/multipart/index.md
       - Resilience: guide/modules/resilience/index.md
       - Server backend: guide/modules/servers/index.md

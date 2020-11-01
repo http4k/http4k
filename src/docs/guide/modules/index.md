@@ -47,12 +47,13 @@ description: Details about the various http4k integration libraries
 <a href="https://http4k.org/guide/modules/yaml"><span class="pill">YAML</span></a>
 <a href="https://http4k.org/guide/modules/jsonrpc"><span class="pill">JSON RPC</span></a>
 
-### Cloud-Native & Operability
-<a href="https://http4k.org/guide/modules/resilience"><span class="pill">Resilience</span></a>
-<a href="https://http4k.org/guide/modules/metrics"><span class="pill">Micrometer</span></a>
+### Cloud-Native & Obervability
 <a href="https://http4k.org/guide/modules/aws"><span class="pill">AWS</span></a>
-<a href="https://http4k.org/guide/modules/oauth"><span class="pill">OAuth</span></a>
 <a href="https://http4k.org/guide/modules/cloud_native"><span class="pill">Cloud Native</span></a>
+<a href="https://http4k.org/guide/modules/oauth"><span class="pill">OAuth</span></a>
+<a href="https://http4k.org/guide/modules/micrometer"><span class="pill">Micrometer</span></a>
+<a href="https://http4k.org/guide/modules/opentelemetry"><span class="pill">OpenTelemetry</span></a>
+<a href="https://http4k.org/guide/modules/resilience4j"><span class="pill">Resilience4J</span></a>
 
 ### Testing
 <a href="https://http4k.org/guide/modules/webdriver"><span class="pill">WebDriver</span></a>

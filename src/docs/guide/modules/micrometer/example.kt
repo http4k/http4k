@@ -1,4 +1,4 @@
-package guide.modules.metrics
+package guide.modules.micrometer
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.client.ApacheClient
