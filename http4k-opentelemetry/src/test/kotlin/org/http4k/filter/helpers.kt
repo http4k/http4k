@@ -3,8 +3,8 @@ package org.http4k.filter
 import com.natpryce.hamkrest.MatchResult
 import com.natpryce.hamkrest.Matcher
 import io.opentelemetry.common.Labels
-import io.opentelemetry.exporters.inmemory.InMemoryMetricExporter
-import io.opentelemetry.sdk.OpenTelemetrySdk
+import io.opentelemetry.exporters.inmemory.InMemoryMetricExporter.create
+import io.opentelemetry.sdk.OpenTelemetrySdk.getMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.core.Method
 import org.http4k.core.Status
@@ -12,10 +12,9 @@ import org.http4k.core.Status
 /**
  * Use the InMemory exporter to get the recorded metrics from the global state.
  */
-fun exportMetricsFromOpenTelemetry(): List<MetricData> = InMemoryMetricExporter.create().apply {
-    export(OpenTelemetrySdk.getMeterProvider().metricProducer.collectAllMetrics())
+fun exportMetricsFromOpenTelemetry(): List<MetricData> = create().apply {
+    export(getMeterProvider().metricProducer.collectAllMetrics())
 }.finishedMetricItems
-
 
 fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "http.server.request.latency") =
     object : Matcher<List<MetricData>> {

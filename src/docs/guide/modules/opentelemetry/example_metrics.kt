@@ -1,5 +1,8 @@
 package guide.modules.opentelemetry
 
+import io.opentelemetry.exporters.inmemory.InMemoryMetricExporter
+import io.opentelemetry.sdk.OpenTelemetrySdk
+import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -9,7 +12,6 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.OpenTelemetryMetrics
 import org.http4k.filter.ServerFilters
-import org.http4k.filter.exportMetricsFromOpenTelemetry
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
@@ -38,3 +40,7 @@ fun main() {
         println("metric: " + it.name + ", value: " + it.points)
     }
 }
+
+private fun exportMetricsFromOpenTelemetry(): List<MetricData> = InMemoryMetricExporter.create().apply {
+    export(OpenTelemetrySdk.getMeterProvider().metricProducer.collectAllMetrics())
+}.finishedMetricItems
