@@ -47,7 +47,7 @@ description: Details about the various http4k integration libraries
 <a href="https://http4k.org/guide/modules/yaml"><span class="pill">YAML</span></a>
 <a href="https://http4k.org/guide/modules/jsonrpc"><span class="pill">JSON RPC</span></a>
 
-### Cloud-Native & Obervability
+### Cloud-Native & Observability
 <a href="https://http4k.org/guide/modules/aws"><span class="pill">AWS</span></a>
 <a href="https://http4k.org/guide/modules/cloud_native"><span class="pill">Cloud Native</span></a>
 <a href="https://http4k.org/guide/modules/oauth"><span class="pill">OAuth</span></a>
