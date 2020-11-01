@@ -22,11 +22,11 @@ import org.http4k.routing.static
 import org.http4k.util.TickingClock
 import org.junit.jupiter.api.Test
 
-class MetricFiltersServerTest {
+class MicrometerMetricsServerTest {
     private val registry = SimpleMeterRegistry()
     private val clock = TickingClock
-    private var requestTimer = MetricFilters.Server.RequestTimer(registry, clock = clock)
-    private var requestCounter = MetricFilters.Server.RequestCounter(registry)
+    private var requestTimer = ServerFilters.MicrometerMetrics.RequestTimer(registry, clock = clock)
+    private var requestCounter = ServerFilters.MicrometerMetrics.RequestCounter(registry, clock = clock)
     private val server by lazy {
         routes(
             "/timed" bind routes(
@@ -89,7 +89,7 @@ class MetricFiltersServerTest {
 
     @Test
     fun `request timer meter names and request id formatter can be configured`() {
-        requestTimer = MetricFilters.Server.RequestTimer(registry, "custom.requests", "custom.description",
+        requestTimer = ServerFilters.MicrometerMetrics.RequestTimer(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") }, clock)
 
         assertThat(server(Request(GET, "/timed/one")), hasStatus(OK))
@@ -101,7 +101,7 @@ class MetricFiltersServerTest {
 
     @Test
     fun `request counter meter names and request id formatter can be configured`() {
-        requestCounter = MetricFilters.Server.RequestCounter(registry, "custom.requests", "custom.description",
+        requestCounter = ServerFilters.MicrometerMetrics.RequestCounter(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") })
 
         assertThat(server(Request(GET, "/counted/one")), hasStatus(OK))

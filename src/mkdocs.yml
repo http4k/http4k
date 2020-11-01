@@ -35,19 +35,21 @@ nav:
   - Developer Guide:
     - Modules:
       - Overview: guide/modules/index.md
-      - AWS: guide/modules/aws/index.md
       - Core: guide/modules/core/index.md
-      - JSON handling: guide/modules/json/index.md
-      - HTTP & Websocket clients: guide/modules/clients/index.md
-      - Metrics: guide/modules/metrics/index.md
-      - Multipart forms: guide/modules/multipart/index.md
-      - Resilience: guide/modules/resilience/index.md
       - Server backend: guide/modules/servers/index.md
       - Serverless backend: guide/modules/serverless/index.md
-      - Templating: guide/modules/templating/index.md
+      - HTTP & Websocket clients: guide/modules/clients/index.md
       - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
-      - OAuth: guide/modules/oauth/index.md
+      - JSON handling: guide/modules/json/index.md
+      - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
+      - Templating: guide/modules/templating/index.md
+      - Multipart forms: guide/modules/multipart/index.md
       - Cloud native Configuration: guide/modules/cloud_native/index.md
+      - Micrometer: guide/modules/micrometer/index.md
+      - OpenTelemetry: guide/modules/opentelemetry/index.md
+      - Resilience4J: guide/modules/resilience4j/index.md
+      - AWS: guide/modules/aws/index.md
+      - OAuth: guide/modules/oauth/index.md
       - JSON RPC: guide/modules/jsonrpc/index.md
       - XML handling: guide/modules/xml/index.md
       - YAML handling: guide/modules/yaml/index.md

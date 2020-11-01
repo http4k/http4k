@@ -59,6 +59,14 @@ allprojects {
         from sourceSets.main.allSource
     }
 
+    jar {
+        manifest {
+            attributes(
+                'http4k_version': version
+            )
+        }
+    }
+
 //    task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true, dependsOn: javadoc) {
 //        outputDirectory = javadoc.destinationDir
 //        outputFormat = "javadoc"

@@ -1,4 +1,4 @@
-package guide.modules.resilience
+package guide.modules.resilience4j
 
 import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.RetryConfig

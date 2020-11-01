@@ -156,6 +156,31 @@ object Libs {
             Versions.org_junit_jupiter
 
     /**
+     * https://github.com/open-telemetry/opentelemetry-java
+     */
+    const val opentelemetry_api: String = "io.opentelemetry:opentelemetry-api:" +
+            Versions.io_opentelemetry
+
+    /**
+     * https://github.com/open-telemetry/opentelemetry-java
+     */
+    const val opentelemetry_exporters_inmemory: String =
+            "io.opentelemetry:opentelemetry-exporters-inmemory:" + Versions.io_opentelemetry
+
+    /**
+     * https://github.com/open-telemetry/opentelemetry-java
+     */
+    const val opentelemetry_extension_trace_propagators: String =
+            "io.opentelemetry:opentelemetry-extension-trace-propagators:" +
+            Versions.io_opentelemetry
+
+    /**
+     * https://github.com/open-telemetry/opentelemetry-java
+     */
+    const val opentelemetry_sdk: String = "io.opentelemetry:opentelemetry-sdk:" +
+            Versions.io_opentelemetry
+
+    /**
      * https://forkhandles.dev
      */
     const val bunting4k: String = "dev.forkhandles:bunting4k:" + Versions.dev_forkhandles

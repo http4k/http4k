@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import org.http4k.base64Encode
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -30,20 +29,20 @@ object ResponseFilters {
     }
 
     /**
-     * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeller to
+     * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeler to
      * create custom labels.
      * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportHttpTransaction {
         operator fun invoke(
             clock: Clock = Clock.systemUTC(),
-            transactionLabeller: HttpTransactionLabeller = { it },
+            transactionLabeler: HttpTransactionLabeler = { it },
             recordFn: (HttpTransaction) -> Unit
         ): Filter = Filter { next ->
             {
                 clock.instant().let { start ->
                     next(it).apply {
-                        recordFn(transactionLabeller(HttpTransaction(it, this, between(start, clock.instant()))))
+                        recordFn(transactionLabeler(HttpTransaction(it, this, between(start, clock.instant()))))
                     }
                 }
             }
@@ -134,4 +133,7 @@ object ResponseFilters {
     }
 }
 
-typealias HttpTransactionLabeller = (HttpTransaction) -> HttpTransaction
+typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction
+
+fun HttpTransactionLabeler.labels(tx: HttpTransaction) =
+    this(tx).labels.map { listOf(it.key, it.value) }.flatten().toTypedArray()

@@ -16,12 +16,12 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.util.TickingClock
 import org.junit.jupiter.api.Test
 
-class MetricFiltersClientTest {
+class MicrometerMetricsClientTest {
 
     private val registry = SimpleMeterRegistry()
     private val clock = TickingClock
-    private var requestTimer = MetricFilters.Client.RequestTimer(registry, clock = clock)
-    private var requestCounter = MetricFilters.Client.RequestCounter(registry)
+    private var requestTimer = ClientFilters.MicrometerMetrics.RequestTimer(registry, clock = clock)
+    private var requestCounter = ClientFilters.MicrometerMetrics.RequestCounter(registry, clock = clock)
     private val remoteServerMock: HttpHandler = {
         when (it.uri.path) {
             "/one" -> Response(OK)
@@ -59,7 +59,7 @@ class MetricFiltersClientTest {
 
     @Test
     fun `request timer meter names and transaction labelling can be configured`() {
-        requestTimer = MetricFilters.Client.RequestTimer(registry, "custom.requests", "custom.description",
+        requestTimer = ClientFilters.MicrometerMetrics.RequestTimer(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") }, clock)
 
         assertThat(timedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
@@ -71,7 +71,7 @@ class MetricFiltersClientTest {
 
     @Test
     fun `request counter meter names and transaction labelling can be configured`() {
-        requestCounter = MetricFilters.Client.RequestCounter(registry, "custom.requests", "custom.description",
+        requestCounter = ClientFilters.MicrometerMetrics.RequestCounter(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") })
 
         assertThat(countedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
