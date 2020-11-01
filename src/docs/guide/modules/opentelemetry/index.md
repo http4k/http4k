@@ -9,7 +9,7 @@ implementation group: "org.http4k", name: "http4k-opentelemetry", version: "3.27
 
 ### About
 
-This module provides configurable Filters to provide metrics for http4k apps, plugging into the awesome [OpenTelemetry](https://opentelemetry.io/) APIs.
+This module provides configurable Filters to provide distributed tracing and metrics for http4k apps, plugging into the awesome [OpenTelemetry](https://opentelemetry.io/) APIs.
 
 `OpenTelemetry is a collection of tools, APIs, and SDKs. You use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior.`
 
