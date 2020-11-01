@@ -17,7 +17,7 @@ class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
                      description: String = defaults.timerDescription.second,
                      labeler: HttpTransactionLabeler = defaults.labeler,
                      clock: Clock = systemUTC()): Filter {
-        val meterInstance = meter.longValueRecorderBuilder(name).setDescription(description).build()
+        val meterInstance = meter.longValueRecorderBuilder(name).setDescription(description).setUnit("ms").build()
 
         return ReportHttpTransaction(clock) { tx ->
             meterInstance.record(tx.duration.toMillis(), Labels.of(labeler.labels(tx)))

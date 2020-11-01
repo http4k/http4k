@@ -18,7 +18,7 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 
 fun main() {
-    // configure OpenTelemetry using the Amazon XRAY trace propagator API
+    // configure OpenTelemetry using the Amazon XRAY tracing scheme
     val tracer = OpenTelemetry.getTracer("http4k", "semver:0.0.0")
     OpenTelemetry.setPropagators(
         DefaultContextPropagators.builder()
