@@ -34,7 +34,6 @@ fun main() {
     // we will propagate the tracing headers using the tracer instance
     val repeaterClient = ClientFilters.OpenTelemetryTracing(tracer).then(repeater)
 
-
     // this is the server app which will add tracing spans to incoming requests
     val app = ServerFilters.OpenTelemetryTracing(tracer)
         .then(routes("/echo/{name}" bind GET to {
