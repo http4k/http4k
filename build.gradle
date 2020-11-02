@@ -95,7 +95,7 @@ allprojects {
         testArtifacts testJar
     }
 
-    if (!project.name.contains("integration-test") && !project.name.contains("test-function")) {
+    if (hasAnArtifact(project)) {
         apply plugin: 'com.jfrog.bintray'
         apply plugin: 'maven'
         apply plugin: 'maven-publish'
@@ -195,7 +195,7 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
     getSourceDirectories().from(subprojects.sourceSets.main.allSource.srcDirs)
     getClassDirectories().from(subprojects.sourceSets.main.output)
     getExecutionData().from(subprojects
-        .findAll { it.name != 'http4k-bom' && !it.name.contains("integration-test") && !it.name.contains("test-function") }
+        .findAll { it.name != 'http4k-bom' && hasAnArtifact(it) }
         .jacocoTestReport.executionData)
 
     reports {
@@ -209,7 +209,7 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 dependencies {
     subprojects
         .findAll {
-            !it.name.contains("test-function") && !it.name.contains("integration-test")
+            hasAnArtifact(it)
         }
         .forEach {
             compile project(it.name)
@@ -218,6 +218,10 @@ dependencies {
 
     testCompile Libs.s3
     testCompile Config.TestDependencies
+}
+
+private boolean hasAnArtifact(Project it) {
+    !it.name.contains("test-function") && !it.name.contains("integration-test")
 }
 
 sourceSets {
@@ -242,6 +246,14 @@ dokka {
         includes = ['src/packages.md']
         moduleName = "$rootProject.name"
         jdkVersion = 9
+    }
+}
+
+tasks.create("listProjects") {
+    doLast {
+        subprojects
+            .findAll { hasAnArtifact(it) }
+            .forEach { println(it.name) }
     }
 }
 
