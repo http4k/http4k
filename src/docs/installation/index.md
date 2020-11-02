@@ -17,7 +17,7 @@ implementation "org.http4k:http4k-core"
 <hr/>
 
 ### http4k Toolbox 
-We have developed a set of useful tools for Developers working with the **http4k** toolset to turbo-charge development. Collectively, this is known as the <a href="https://toolbox.http4k.org">http4k Toolbox</a>. These tools include:
+We have developed a set of useful tools for Developers working with the **http4k** toolset to turbo-charge app development. Collectively, this is known as the <a href="https://toolbox.http4k.org">http4k Toolbox</a>. These tools include:
 
 - A **Project Wizard** that generates entire bootstrap Server and Serverless project source folders - including 
 fully working starter code, build tooling, extra modules and packaging options.
