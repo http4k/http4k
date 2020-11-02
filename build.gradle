@@ -253,7 +253,7 @@ tasks.create("listProjects") {
     doLast {
         subprojects
             .findAll { hasAnArtifact(it) }
-            .forEach { println(it.name) }
+            .forEach { System.err.println(it.name) }
     }
 }
 
