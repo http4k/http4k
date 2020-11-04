@@ -1,7 +1,7 @@
 title: http4k blog: Documenting http4k APIs with OpenApi3
 description: An overview of the OpenApi3 support available in the http4k library.
 
-# http4k blog: Documenting http4k APIs with OpenApi3
+# Documenting http4k APIs with OpenApi3
 
 ##### may 2019 / [@daviddenton](github)
 
