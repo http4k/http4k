@@ -29,9 +29,8 @@ edit_uri: edit/master/src/docs/
 strict: false
 nav:
   - Introduction: documentation/index.md
+  - Quickstart: quickstart/index.md
   - Rationale & concepts: rationale/index.md
-  - Installation:  installation/index.md
-  - Getting started: quickstart/index.md
   - Changelog: changelog/index.md
   - Developer guide:
     - Modules:

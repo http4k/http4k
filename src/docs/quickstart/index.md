@@ -18,6 +18,14 @@ The following creates a simple endpoint, binds it to a Netty server then starts,
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/quickstart/example.kt"></script>
 
+# http4k Toolbox 
+We have developed a set of useful tools for Developers working with the **http4k** toolset to turbo-charge app development. Collectively, this is known as the <a href="https://toolbox.http4k.org">http4k Toolbox</a>. These tools include:
+
+- A **Project Wizard** that generates entire bootstrap Server and Serverless project source folders - including 
+fully working starter code, build tooling, extra modules and packaging options.
+- From **OpenAPI v2 & V3** specification JSON/YAML, generate an entire working **http4k** Server, Client and Model objects (generated from JSON Schema).
+- **Generate Kotlin Data Class** definitions from an inputted JSON, YAML, or XML document.
+
 # Examples Repo
 For fully self-contained examples demonstrates the standout features of **http4k**, there is a GitHub repository at [http4k/examples](https://github.com/http4k/examples).
 
