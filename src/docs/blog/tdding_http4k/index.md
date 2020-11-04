@@ -4,7 +4,7 @@ description: A step-by-step guide to TDDing a simple http4k application
 
 # TDDing http4k
 
-##### feb 2018 / [@daviddenton](github)
+##### february 2018 / [@daviddenton](github)
 
 This post is a guide to *how* we build [http4k] applications test first to provide excellent test coverage driven by decoupled tests. 
 
