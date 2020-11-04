@@ -1,12 +1,12 @@
-title: http4k tutorials: Add typesafe 12-factor configuration to http4k apps with Environments.
+title: http4k blog: Add typesafe 12-factor configuration to http4k apps with Environments.
 description: An overview of how to configure http4k applications using the http4k-cloudnative module
 
 # Add typesafe 12-factor configuration to http4k apps with Environments.
 
+##### november 2018 / [@daviddenton][github]
+
 ### Intro
-This post covers the various concerns around configuring HTTP apps, and introduces the [http4k] 
-approach for addressing these when deploying applications into cloud-native environments, which leverages the Kotlin type 
-system for maximum safely and code reuse.
+This post covers the various concerns around configuring HTTP apps, and introduces the [http4k] approach for addressing these when deploying applications into cloud-native environments, which leverages the Kotlin type system for maximum safely and code reuse.
 
 ### Concerns when configuring applications
 One of the tenets of operating applications according to the principles of [12factor], 

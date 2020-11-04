@@ -87,9 +87,9 @@ nav:
   - http4k in action: in_action/index.md
   - Blog:
     - Meet http4k: blog/meet_http4k/index.md
+    - Typesafe Websockets: blog/typesafe_websockets/index.md
     - TDDing http4k: blog/tdding_http4k/index.md
     - Documenting http4k apps with OpenApi3: blog/documenting_apis_with_openapi/index.md
-    - Typesafe Websockets: blog/typesafe_websockets/index.md
     - Retrospective on v3: blog/retrospective_v3/index.md
     - Nanoservices: blog/nanoservices/index.md
   - Performance: performance/index.md
