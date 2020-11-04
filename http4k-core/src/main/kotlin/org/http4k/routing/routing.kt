@@ -87,7 +87,10 @@ fun headers(vararg names: String) = RequestMatch { req -> names.all { req.header
 /**
  * Matches the Host header to a matching Handler.
  */
-fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>): RoutingHttpHandler = HostDemuxRoutingHttpHandler(mapOf(*hosts))
+fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, RoutingHttpHandler>): RoutingHttpHandler {
+    val hostHandlerPairs = listOf(head) + tail
+    return routes(*hostHandlerPairs.map { RequestMatch { req -> req.header("host") == it.first } bind it.second }.toTypedArray())
+}
 
 interface RoutingWsHandler : WsHandler {
     fun withBasePath(new: String): RoutingWsHandler
