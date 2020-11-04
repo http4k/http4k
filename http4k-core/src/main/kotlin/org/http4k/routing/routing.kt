@@ -75,14 +75,14 @@ fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/pu
     SinglePageAppRoutingHandler("", StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
 
 /**
- * For routes where certain queries are required for correct operation. ParameterMatch is composable.
+ * For routes where certain queries are required for correct operation. RequestMatch is composable.
  */
-fun queries(vararg names: String) = ParameterMatch { req -> names.all { req.query(it) != null } }
+fun queries(vararg names: String) = RequestMatch { req -> names.all { req.query(it) != null } }
 
 /**
- * For routes where certain headers are required for correct operation. ParameterMatch is composable.
+ * For routes where certain headers are required for correct operation. RequestMatch is composable.
  */
-fun headers(vararg names: String) = ParameterMatch { req -> names.all { req.header(it) != null } }
+fun headers(vararg names: String) = RequestMatch { req -> names.all { req.header(it) != null } }
 
 /**
  * Matches the Host header to a matching Handler.

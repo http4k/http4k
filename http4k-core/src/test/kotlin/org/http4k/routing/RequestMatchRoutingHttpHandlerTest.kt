@@ -12,7 +12,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class ParameterMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
+class RequestMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler = validPath bind GET to routes(headers("host") bind { Response(OK) })
 
     @Test
@@ -39,7 +39,7 @@ class ParameterMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 }
 
-class ParameterMatchRoutingHttpHandlerAlternateTest : RoutingHttpHandlerContract() {
+class RequestMatchRoutingHttpHandlerAlternateTest : RoutingHttpHandlerContract() {
     override val handler = headers("host") bind routes(validPath bind GET to { Response(OK) })
 }
 

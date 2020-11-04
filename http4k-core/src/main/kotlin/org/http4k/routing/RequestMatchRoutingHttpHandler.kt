@@ -8,11 +8,11 @@ import org.http4k.core.then
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.Unmatched
 
-class ParameterMatch(private val predicate: (Request) -> Boolean) : (Request) -> Boolean by predicate {
+class RequestMatch(private val predicate: (Request) -> Boolean) : (Request) -> Boolean by predicate {
     infix fun bind(handler: HttpHandler): RoutingHttpHandler = PredicatedHandler(predicate, handler)
 
-    infix fun bind(handler: RoutingHttpHandler): RoutingHttpHandler = ParameterMatchRoutingHttpHandler(this, handler)
-    infix fun and(that: ParameterMatch): ParameterMatch = ParameterMatch { listOf(this, that).fold(true) { acc, next -> acc && next(it) } }
+    infix fun bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
+    infix fun and(that: RequestMatch): RequestMatch = RequestMatch { listOf(this, that).fold(true) { acc, next -> acc && next(it) } }
 }
 
 internal class PredicatedHandler(private val predicate: (Request) -> Boolean, private val handler: HttpHandler) : RoutingHttpHandler {
@@ -34,7 +34,7 @@ internal class PredicatedHandler(private val predicate: (Request) -> Boolean, pr
     }
 }
 
-internal data class ParameterMatchRoutingHttpHandler(
+internal data class RequestMatchRoutingHttpHandler(
     private val matched: (Request) -> Boolean,
     private val httpHandler: RoutingHttpHandler,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
@@ -48,7 +48,7 @@ internal data class ParameterMatchRoutingHttpHandler(
         is Unmatched -> notFoundHandler(request)
     }
 
-    override fun withFilter(new: Filter): RoutingHttpHandler = ParameterMatchRoutingHttpHandler(
+    override fun withFilter(new: Filter): RoutingHttpHandler = RequestMatchRoutingHttpHandler(
         matched,
         httpHandler.withFilter(new),
         new.then(notFoundHandler),
