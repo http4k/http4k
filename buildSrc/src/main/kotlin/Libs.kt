@@ -210,6 +210,10 @@ object Libs {
      */
     const val ktor_server_netty: String = "io.ktor:ktor-server-netty:" + Versions.io_ktor
 
+    const val com_microsoft_azure_azurefunctions_gradle_plugin: String =
+            "com.microsoft.azure.azurefunctions:com.microsoft.azure.azurefunctions.gradle.plugin:" +
+            Versions.com_microsoft_azure_azurefunctions_gradle_plugin
+
     const val de_fayard_buildsrcversions_gradle_plugin: String =
             "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
             Versions.de_fayard_buildsrcversions_gradle_plugin
@@ -439,6 +443,4 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
-
-    const val api: String = "com.fnproject.fn:api:" + Versions.api
 }
