@@ -5,7 +5,10 @@ import io.ktor.features.origin
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.request.*
+import io.ktor.request.ApplicationRequest
+import io.ktor.request.header
+import io.ktor.request.httpMethod
+import io.ktor.request.uri
 import io.ktor.response.ApplicationResponse
 import io.ktor.response.header
 import io.ktor.response.respondOutputStream
