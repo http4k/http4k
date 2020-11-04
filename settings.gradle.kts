@@ -68,7 +68,7 @@ include("http4k-security-oauth")
     includeModule("tencent:integration-test:test-function")
 }
 
-"http4k-serverless".apply {
+"http4k-template".apply {
     includeModule("dust")
     includeModule("freemarker")
     includeModule("handlebars")
