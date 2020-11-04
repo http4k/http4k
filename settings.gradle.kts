@@ -3,7 +3,7 @@ rootProject.name = "http4k"
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")
-    project(":$projectName").projectDir = File("$this/$this-$name")
+    project(":$projectName").projectDir = File("$this/${name.replace(':','/')}")
 }
 
 fun includeWithDirectory(projectName: String, name: String) {
