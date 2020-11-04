@@ -22,6 +22,7 @@ function maven_publish {
 
 echo "Deleting $LOCAL_VERSION..."
 
-for i in $(find http4k* -maxdepth 0 -type d); do
+for i in $(./gradlew listProjects -q > /dev/null
+2>&1); do
     maven_publish "$i"
 done
