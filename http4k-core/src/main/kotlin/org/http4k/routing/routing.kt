@@ -77,12 +77,12 @@ fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/pu
 /**
  * For routes where certain queries are required for correct operation. ParameterMatch is composable.
  */
-fun queries(vararg names: String): ParameterMatch = ParameterMatch.Query(*names)
+fun queries(vararg names: String) = ParameterMatch { req -> names.all { req.query(it) != null } }
 
 /**
  * For routes where certain headers are required for correct operation. ParameterMatch is composable.
  */
-fun headers(vararg names: String): ParameterMatch = ParameterMatch.Header(*names)
+fun headers(vararg names: String) = ParameterMatch { req -> names.all { req.header(it) != null } }
 
 /**
  * Matches the Host header to a matching Handler.

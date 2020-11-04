@@ -8,24 +8,20 @@ import org.http4k.core.then
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.Unmatched
 
-sealed class ParameterMatch(private val predicate: (Request) -> Boolean) : (Request) -> Boolean by predicate {
+class ParameterMatch(private val predicate: (Request) -> Boolean) : (Request) -> Boolean by predicate {
     infix fun bind(handler: HttpHandler): RoutingHttpHandler = PredicatedHandler(predicate, handler)
 
     infix fun bind(handler: RoutingHttpHandler): RoutingHttpHandler = ParameterMatchRoutingHttpHandler(this, handler)
-    infix fun and(that: ParameterMatch): ParameterMatch = Composite(this, that)
-
-    internal class Query(vararg names: String) : ParameterMatch({ req -> names.all { req.query(it) != null } })
-    internal class Header(vararg names: String) : ParameterMatch({ req -> names.all { req.header(it) != null } })
-    internal class Composite(vararg parts: ParameterMatch) : ParameterMatch({ parts.fold(true) { acc, next -> acc && next(it) } })
+    infix fun and(that: ParameterMatch): ParameterMatch = ParameterMatch { listOf(this, that).fold(true) { acc, next -> acc && next(it) } }
 }
 
 internal class PredicatedHandler(private val predicate: (Request) -> Boolean, private val handler: HttpHandler) : RoutingHttpHandler {
-    override fun withFilter(new: Filter) = PredicatedHandler(predicate, when(handler) {
+    override fun withFilter(new: Filter) = PredicatedHandler(predicate, when (handler) {
         is RoutingHttpHandler -> handler.withFilter(new)
         else -> new.then(handler)
     })
 
-    override fun withBasePath(new: String) = when(handler) {
+    override fun withBasePath(new: String) = when (handler) {
         is RoutingHttpHandler -> handler.withBasePath(new)
         else -> throw UnsupportedOperationException("Cannot apply new base path without binding to an HTTP verb")
     }

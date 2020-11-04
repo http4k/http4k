@@ -10,7 +10,7 @@ class ParameterMatchTest {
 
     @Test
     fun `query match`() {
-        val query = ParameterMatch.Query("a", "b", "c")
+        val query = queries("a", "b", "c")
 
         assertFalse(query((Request(GET, ""))))
         assertFalse(query(Request(GET, "").query("a", "value").query("b", "value")))
@@ -20,7 +20,7 @@ class ParameterMatchTest {
 
     @Test
     fun `header match`() {
-        val header = ParameterMatch.Header("a", "b", "c")
+        val header = headers("a", "b", "c")
 
         assertFalse(header((Request(GET, ""))))
         assertFalse(header(Request(GET, "").header("a", "value").header("b", "value")))
