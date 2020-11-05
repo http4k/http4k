@@ -9,6 +9,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
+import org.http4k.routing.RouterMatch.*
 import org.http4k.websocket.WsConsumer
 import java.io.InputStream
 
@@ -35,8 +36,8 @@ sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
 }
 
 fun RouterMatch.and(other: RouterMatch): RouterMatch = when(this){
-    is RouterMatch.MatchingHandler, RouterMatch.MatchedWithoutHandler -> other
-    RouterMatch.MethodNotMatched, RouterMatch.Unmatched -> this
+    is MatchingHandler, MatchedWithoutHandler -> other
+    is MethodNotMatched, Unmatched -> Unmatched
 }
 
 /**
@@ -77,7 +78,7 @@ data class PathMethod(val path: String, val method: Method?) {
                 object : RoutingHttpHandler by it {
                     override fun match(request: Request) = when (method) {
                         null, request.method -> it.match(request)
-                        else -> RouterMatch.MethodNotMatched
+                        else -> MethodNotMatched
                     }
                 }
             }
