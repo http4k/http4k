@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -91,7 +92,7 @@ class OpenWhiskFunctionTest {
         detectBinaryBody: DetectBinaryBody
     ) {
         val function = OpenWhiskFunction(AppLoader {
-            { req: Request ->
+            HttpHandler { req: Request ->
                 Response(OK).body(req.uri.toString() + req.bodyString()).headers(req.headers)
             }
         }, detectBinaryBody = detectBinaryBody)

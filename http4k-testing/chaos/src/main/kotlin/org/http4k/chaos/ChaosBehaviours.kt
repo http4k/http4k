@@ -47,7 +47,7 @@ object ChaosBehaviours {
      */
     object Latency {
         operator fun invoke(min: Duration = ofMillis(100), max: Duration = ofMillis(500)) = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override fun invoke(next: HttpHandler) = HttpHandler {
                 val delay = ThreadLocalRandom.current()
                     .nextInt(min.toMillis().toInt(), max.toMillis().toInt())
                 sleep(delay.toLong())
@@ -75,7 +75,7 @@ object ChaosBehaviours {
      */
     object ThrowException {
         operator fun invoke(e: Throwable = RuntimeException("Chaos behaviour injected!")) = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = { throw e }
+            override fun invoke(next: HttpHandler) = HttpHandler { throw e }
             override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
         }
     }
@@ -85,7 +85,7 @@ object ChaosBehaviours {
      */
     object ReturnStatus {
         operator fun invoke(status: Status = INTERNAL_SERVER_ERROR) = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override fun invoke(next: HttpHandler) = HttpHandler {
                 Response(status).with(Header.CHAOS of "Status ${status.code}")
             }
 
@@ -105,7 +105,7 @@ object ChaosBehaviours {
      */
     object SnipBody {
         operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override fun invoke(next: HttpHandler) = HttpHandler {
                 with(next(it)) {
                     val max = limitFn(body.length ?: 0)
                     val limit = if (max == 0L) 0L else random.nextLong(max)
@@ -122,7 +122,7 @@ object ChaosBehaviours {
      */
     object SnipRequestBody {
         operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override fun invoke(next: HttpHandler) = HttpHandler {
                 next(with(it) {
                     val max = limitFn(body.length ?: 0)
                     val limit = if (max == 0L) 0L else random.nextLong(max)
@@ -139,7 +139,7 @@ object ChaosBehaviours {
      */
     object EatMemory {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override fun invoke(next: HttpHandler) = HttpHandler {
                 mutableListOf<ByteArray>().run { while (true) this += ByteArray(1024 * 1024) }
                 next(it)
             }
@@ -155,7 +155,7 @@ object ChaosBehaviours {
         operator fun invoke() = object : Behaviour {
             fun overflow(): Nothing = overflow()
 
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override fun invoke(next: HttpHandler) = HttpHandler {
                 overflow()
             }
 
@@ -168,7 +168,7 @@ object ChaosBehaviours {
      */
     object KillProcess {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override fun invoke(next: HttpHandler) = HttpHandler {
                 exitProcess(1)
                 throw NotImplementedError()
             }
@@ -182,7 +182,7 @@ object ChaosBehaviours {
      */
     object BlockThread {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override fun invoke(next: HttpHandler) = HttpHandler {
                 next(it).apply { Thread.currentThread().join() }
             }
 
@@ -195,7 +195,7 @@ object ChaosBehaviours {
      */
     object None {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = { next(it) }
+            override fun invoke(next: HttpHandler) = HttpHandler { next(it) }
             override fun toString() = "None"
         }
     }
@@ -204,7 +204,7 @@ object ChaosBehaviours {
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
     class Variable(var current: Behaviour = None()) : Behaviour {
-        override fun invoke(next: HttpHandler): HttpHandler = {
+        override fun invoke(next: HttpHandler) = HttpHandler {
             current.then(next)(it)
         }
 
