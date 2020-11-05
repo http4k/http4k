@@ -25,8 +25,7 @@ import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 
-class
-ContractRoute internal constructor(val method: Method,
+class ContractRoute internal constructor(val method: Method,
                                          val spec: ContractRouteSpec,
                                          val meta: RouteMeta,
                                          internal val toHandler: (ExtractedParts) -> HttpHandler) : HttpHandler {
