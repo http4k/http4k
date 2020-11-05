@@ -8,6 +8,29 @@ import org.http4k.core.then
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.Unmatched
 
+typealias RequestMatch = (Request) -> Boolean
+
+/**
+ * For routes where certain queries are required for correct operation. RequestMatch is composable.
+ */
+fun queries(vararg names: String): RequestMatch = { req -> names.all { req.query(it) != null } }
+
+/**
+ * For routes where certain headers are required for correct operation. RequestMatch is composable.
+ */
+fun headers(vararg names: String): RequestMatch = { req -> names.all { req.header(it) != null } }
+
+/**
+ * Matches the Host header to a matching Handler.
+ */
+fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, RoutingHttpHandler>): RoutingHttpHandler {
+    val hostHandlerPairs = listOf(head) + tail
+    return routes(*hostHandlerPairs.map { { req: Request -> req.header("host") == it.first } bind it.second }.toTypedArray())
+}
+
+infix fun RequestMatch.bind(handler: HttpHandler): RoutingHttpHandler = PredicatedHandler(this, handler)
+infix fun RequestMatch.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
+infix fun RequestMatch.and(that: RequestMatch): RequestMatch = { listOf(this, that).fold(true) { acc, next -> acc && next(it) } }
 
 internal class PredicatedHandler(private val predicate: (Request) -> Boolean, private val handler: HttpHandler) : RoutingHttpHandler {
     override fun withFilter(new: Filter) = PredicatedHandler(predicate, when (handler) {
