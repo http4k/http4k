@@ -28,7 +28,7 @@ class WildcardTest {
             })))
 
         assertThat(a(Request(GET, "/name/bob/is/great")
-            .header("bob", "jill")), hasBody("name/bob/is/great"))
+            .header("bob", "jill")), hasBody("bob/is/great"))
     }
 
 }
