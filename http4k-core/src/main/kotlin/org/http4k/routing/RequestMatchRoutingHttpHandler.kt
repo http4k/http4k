@@ -8,12 +8,6 @@ import org.http4k.core.then
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.Unmatched
 
-class RequestMatch(private val predicate: (Request) -> Boolean) : (Request) -> Boolean by predicate {
-    infix fun bind(handler: HttpHandler): RoutingHttpHandler = PredicatedHandler(predicate, handler)
-
-    infix fun bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
-    infix fun and(that: RequestMatch): RequestMatch = RequestMatch { listOf(this, that).fold(true) { acc, next -> acc && next(it) } }
-}
 
 internal class PredicatedHandler(private val predicate: (Request) -> Boolean, private val handler: HttpHandler) : RoutingHttpHandler {
     override fun withFilter(new: Filter) = PredicatedHandler(predicate, when (handler) {

@@ -77,19 +77,25 @@ fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/pu
 /**
  * For routes where certain queries are required for correct operation. RequestMatch is composable.
  */
-fun queries(vararg names: String) = RequestMatch { req -> names.all { req.query(it) != null } }
+fun queries(vararg names: String): RequestMatch = { req -> names.all { req.query(it) != null } }
 
 /**
  * For routes where certain headers are required for correct operation. RequestMatch is composable.
  */
-fun headers(vararg names: String) = RequestMatch { req -> names.all { req.header(it) != null } }
+fun headers(vararg names: String): RequestMatch = { req -> names.all { req.header(it) != null } }
+
+typealias RequestMatch = (Request) -> Boolean
+
+infix fun RequestMatch.bind(handler: HttpHandler): RoutingHttpHandler = PredicatedHandler(this, handler)
+infix fun RequestMatch.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
+infix fun RequestMatch.and(that: RequestMatch): RequestMatch = { listOf(this, that).fold(true) { acc, next -> acc && next(it) } }
 
 /**
  * Matches the Host header to a matching Handler.
  */
 fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, RoutingHttpHandler>): RoutingHttpHandler {
     val hostHandlerPairs = listOf(head) + tail
-    return routes(*hostHandlerPairs.map { RequestMatch { req -> req.header("host") == it.first } bind it.second }.toTypedArray())
+    return routes(*hostHandlerPairs.map { { req: Request -> req.header("host") == it.first } bind it.second }.toTypedArray())
 }
 
 interface RoutingWsHandler : WsHandler {
