@@ -24,6 +24,7 @@ fun interface Router {
      * Attempt to supply an HttpHandler which can service the passed request.
      */
     fun match(request: Request): RouterMatch
+    fun withBasePath(new: String): Router = this
 }
 
 sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
@@ -62,7 +63,7 @@ interface RoutingHttpHandler : Router, HttpHandler {
      * Returns a RoutingHttpHandler which prepends the passed base path to the logic determining the match()
      * To follow the trend of immutability, this will generally be a new instance.
      */
-    fun withBasePath(new: String): RoutingHttpHandler
+    override fun withBasePath(new: String): RoutingHttpHandler
 }
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
