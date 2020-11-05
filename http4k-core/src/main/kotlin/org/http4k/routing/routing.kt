@@ -35,8 +35,9 @@ sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
 }
 
-fun RouterMatch.and(other: RouterMatch): RouterMatch = when(this){
-    is MatchingHandler, MatchedWithoutHandler -> other
+fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
+    is MatchingHandler -> this
+    is MatchedWithoutHandler -> other
     is MethodNotMatched, Unmatched -> Unmatched
 }
 
