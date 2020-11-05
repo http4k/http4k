@@ -30,10 +30,7 @@ fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, 
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = PredicatedHandler(this, handler)
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
-infix fun Router.and(that: Router): Router = Router { it: Request ->
-    val initial: RouterMatch = Matched
-    listOf(this, that).fold(initial) { acc, next -> acc.and(next.match(it)) }
-}
+infix fun Router.and(that: Router): Router = Router { listOf(this, that).fold(Matched as RouterMatch) { acc, next -> acc.and(next.match(it)) } }
 
 internal class PredicatedHandler(private val predicate: Router, private val handler: HttpHandler) : RoutingHttpHandler {
     override fun withFilter(new: Filter) = PredicatedHandler(predicate, when (handler) {
