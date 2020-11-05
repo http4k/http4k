@@ -29,4 +29,4 @@ class RequestMatchTest {
     }
 }
 
-fun RouterMatch.matched() = (this == RouterMatch.Matched)
+fun RouterMatch.matched() = (this == RouterMatch.MatchedWithoutHandler)
