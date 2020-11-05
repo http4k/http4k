@@ -28,27 +28,24 @@ fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, 
     return routes(*hostHandlerPairs.map { Router { req: Request -> (req.header("host") == it.first).asRouterMatch() } bind it.second }.toTypedArray())
 }
 
-infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = PredicatedHandler(this, handler)
+infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, Passthrough(handler))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
 infix fun Router.and(that: Router): Router = Router { listOf(this, that).fold(MatchedWithoutHandler as RouterMatch) { acc, next -> acc.and(next.match(it)) } }
 
-internal class PredicatedHandler(private val predicate: Router, private val handler: HttpHandler) : RoutingHttpHandler {
-    override fun withFilter(new: Filter) = PredicatedHandler(predicate, when (handler) {
+class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
+    override fun withFilter(new: Filter) = when (handler) {
         is RoutingHttpHandler -> handler.withFilter(new)
-        else -> new.then(handler)
-    })
+        else -> Passthrough(new.then(handler))
+    }
 
     override fun withBasePath(new: String) = when (handler) {
         is RoutingHttpHandler -> handler.withBasePath(new)
-        else -> throw UnsupportedOperationException("Cannot apply new base path without binding to an HTTP verb")
+        else -> throw UnsupportedOperationException("Cannot apply new base path")
     }
 
-    override fun match(request: Request) = if (predicate.match(request) == MatchedWithoutHandler) MatchingHandler(handler) else Unmatched
+    override fun match(request: Request): RouterMatch = MatchingHandler(handler)
 
-    override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
-        is MatchingHandler -> matchResult(request)
-        else -> routeNotFoundHandler(request)
-    }
+    override fun invoke(request: Request): Response = handler(request)
 }
 
 internal data class RequestMatchRoutingHttpHandler(
