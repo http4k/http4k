@@ -129,7 +129,7 @@ class ClientFiltersTest {
 
     @Test
     fun `adds new request tracing to outgoing request when not present`() {
-        val svc = ClientFilters.RequestTracing().then {
+        val svc = ClientFilters.RequestTracing().then { it ->
             val actual = ZipkinTraces(it)
             assertThat(actual, present())
             assertThat(actual.parentSpanId, absent())
