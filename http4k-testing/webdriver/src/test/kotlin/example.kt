@@ -12,7 +12,7 @@ import org.openqa.selenium.By
 fun main() {
 
     val app = routes(
-        "/hello" bind GET to {
+        "/hello" bind GET to { req -> Request
             Response(OK).body("<html><title>hello</title></html>")
         }
     )
