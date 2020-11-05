@@ -5,7 +5,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.SearchContext
 import org.openqa.selenium.WebElement
 
-internal class JSoupElementFinder(
+class JSoupElementFinder(
     private val navigate: Navigate,
     private val getURL: GetURL,
     private val element: Element
