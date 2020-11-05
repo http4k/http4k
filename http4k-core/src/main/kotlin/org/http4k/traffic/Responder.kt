@@ -28,6 +28,6 @@ object Responder {
             .filter(shouldReplay)
             .iterator()
             .let {
-                Filter { next -> { req -> if (it.hasNext()) it.next() else next(req) } }.then(fallback)
+                Filter { next -> HttpHandler { req -> if (it.hasNext()) it.next() else next(req) } }.then(fallback)
             }
 }

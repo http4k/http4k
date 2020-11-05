@@ -18,7 +18,7 @@ import java.nio.ByteBuffer
  * Use this legacy Java client when you're not yet on Java 11.
  */
 object Java8HttpClient {
-    operator fun invoke(): HttpHandler = { request: Request ->
+    operator fun invoke() = HttpHandler { request: Request ->
         try {
             val connection = (URL(request.uri.toString()).openConnection() as HttpURLConnection).apply {
                 instanceFollowRedirects = false

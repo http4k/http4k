@@ -19,7 +19,7 @@ object ResponseFilters {
      */
     object Tap {
         operator fun invoke(fn: (Response) -> Unit) = Filter { next ->
-            {
+            HttpHandler {
                 next(it).let {
                     fn(it)
                     it
@@ -39,7 +39,7 @@ object ResponseFilters {
             transactionLabeler: HttpTransactionLabeler = { it },
             recordFn: (HttpTransaction) -> Unit
         ): Filter = Filter { next ->
-            {
+            HttpHandler {
                 clock.instant().let { start ->
                     next(it).apply {
                         recordFn(transactionLabeler(HttpTransaction(it, this, between(start, clock.instant()))))
@@ -100,7 +100,7 @@ object ResponseFilters {
      */
     object GZip {
         operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
-            { request ->
+            HttpHandler { request ->
                 next(request).let {
                     if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
                         compressionMode.compress(it.body).apply(it)
@@ -115,7 +115,7 @@ object ResponseFilters {
      */
     object GunZip {
         operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
-            { request ->
+            HttpHandler { request ->
                 next(request.header("accept-encoding", "gzip")).let { response ->
                     response.header("content-encoding")
                         ?.let { if (it.contains("gzip")) it else null }
@@ -129,7 +129,7 @@ object ResponseFilters {
      * Some platforms deliver bodies as Base64 encoded strings.
      */
     fun Base64EncodeBody() = Filter { next ->
-        { next(it).run { body(Base64.getEncoder().encodeToString(body.payload.array())) } }
+        HttpHandler { next(it).run { body(Base64.getEncoder().encodeToString(body.payload.array())) } }
     }
 }
 

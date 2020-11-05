@@ -31,7 +31,7 @@ internal data class SinglePageAppRoutingHandler(
             else -> null
         }
 
-        val fallbackHandler = matchOnIndex ?: { Response(Status.NOT_FOUND) }
+        val fallbackHandler = matchOnIndex ?: HttpHandler { Response(Status.NOT_FOUND) }
         return matchOnStatic ?: fallbackHandler(Request(Method.GET, pathSegments))
     }
 

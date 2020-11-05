@@ -32,7 +32,7 @@ object ClientFilters {
     fun RequestTracing(
         startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
         endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
-        {
+        HttpHandler {
             THREAD_LOCAL.get().run {
                 val updated = parentSpanId?.let {
                     copy(parentSpanId = spanId, spanId = TraceId.new())
@@ -50,7 +50,7 @@ object ClientFilters {
      * from the logic required to construct the rest of the request.
      */
     fun SetHostFrom(uri: Uri): Filter = Filter { next ->
-        {
+        HttpHandler {
             next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))
                 .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}"))
         }
@@ -61,7 +61,7 @@ object ClientFilters {
      * remote endpoints from the logic required to construct the rest of the request.
      */
     fun SetBaseUriFrom(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
-        { request -> next(request.uri(uri.extend(request.uri))) }
+        HttpHandler { request -> next(request.uri(uri.extend(request.uri))) }
     })
 
     /**
@@ -69,7 +69,7 @@ object ClientFilters {
      * to divert traffic to another server.
      */
     fun SetXForwardedHost() = Filter { next ->
-        {
+        HttpHandler {
             next(it.header("host")
                 ?.let { host -> it.replaceHeader("X-Forwarded-Host", host) }
                 ?: it
@@ -78,7 +78,7 @@ object ClientFilters {
     }
 
     fun ApiKeyAuth(set: (Request) -> Request): Filter = Filter { next ->
-        { next(set(it)) }
+        HttpHandler { next(set(it)) }
     }
 
     object BasicAuth {
@@ -95,7 +95,7 @@ object ClientFilters {
 
     object CustomBasicAuth {
         operator fun invoke(header: String, provider: () -> Credentials): Filter = Filter { next ->
-            { next(it.header(header, "Basic ${provider().base64Encoded()}")) }
+            HttpHandler { next(it.header(header, "Basic ${provider().base64Encoded()}")) }
         }
 
         operator fun invoke(header: String, user: String, password: String): Filter = CustomBasicAuth(header, Credentials(user, password))
@@ -106,14 +106,14 @@ object ClientFilters {
 
     object BearerAuth {
         operator fun invoke(provider: () -> String): Filter = Filter { next ->
-            { next(it.header("Authorization", "Bearer ${provider()}")) }
+            HttpHandler { next(it.header("Authorization", "Bearer ${provider()}")) }
         }
 
         operator fun invoke(token: String): Filter = BearerAuth { token }
     }
 
     object FollowRedirects {
-        operator fun invoke(): Filter = Filter { next -> { makeRequest(next, it) } }
+        operator fun invoke(): Filter = Filter { next -> HttpHandler { makeRequest(next::invoke, it) } }
 
         private fun makeRequest(next: HandleRequest, request: Request, attempt: Int = 1): Response =
             next(request).let {
@@ -144,7 +144,7 @@ object ClientFilters {
     object Cookies {
         operator fun invoke(clock: Clock = Clock.systemDefaultZone(),
                             storage: CookieStorage = BasicCookieStorage()): Filter = Filter { next ->
-            { request ->
+            HttpHandler { request ->
                 val now = clock.now()
                 removeExpired(now, storage)
                 val response = next(request.withLocalCookies(storage))
@@ -181,7 +181,7 @@ object ClientFilters {
      * of this is to remove any routing metadata that we may have attached to it before sending it onwards.
      */
     fun CleanProxy() = Filter { next ->
-        {
+        HttpHandler {
             next(it.run { Request(method, uri).body(body).headers(headers) }).run { Response(status).body(body).headers(headers) }
         }
     }

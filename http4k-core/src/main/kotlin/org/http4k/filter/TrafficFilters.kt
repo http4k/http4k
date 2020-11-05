@@ -1,6 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -14,14 +15,14 @@ object TrafficFilters {
      * Responds to requests with a stored Response if possible, or falls back to the next Http Handler
      */
     object ServeCachedFrom {
-        operator fun invoke(source: Source): Filter = Filter { next -> { source[it] ?: next(it) } }
+        operator fun invoke(source: Source): Filter = Filter { next -> HttpHandler { source[it] ?: next(it) } }
     }
 
     /**
      * Intercepts and Writes Request/Response traffic
      */
     object RecordTo {
-        operator fun invoke(sink: Sink): Filter = Filter { next -> { next(it).apply { sink[it] = this } } }
+        operator fun invoke(sink: Sink): Filter = Filter { next -> HttpHandler { next(it).apply { sink[it] = this } } }
     }
 
     /**
@@ -33,7 +34,7 @@ object TrafficFilters {
         ): Filter = Filter {
             val zipped = replay.requests().zip(replay.responses()).iterator()
 
-            val responder = { received: Request ->
+            val responder = HttpHandler { received: Request ->
                 val (stored, response) = zipped.next()
                 if (matchFn(received, stored)) Response(BAD_REQUEST)
                 else response

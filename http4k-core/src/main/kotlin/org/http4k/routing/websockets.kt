@@ -10,7 +10,7 @@ interface RoutingWsHandler : WsHandler {
     fun withBasePath(new: String): RoutingWsHandler
 }
 
-fun websockets(ws: WsConsumer): WsHandler = { ws }
+fun websockets(ws: WsConsumer): WsHandler = WsHandler { ws }
 
 fun websockets(vararg list: RoutingWsHandler): RoutingWsHandler = object : RoutingWsHandler {
     override operator fun invoke(request: Request): WsConsumer? = list.firstOrNull { it(request) != null }?.invoke(request)
