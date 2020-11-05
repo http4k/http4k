@@ -49,12 +49,12 @@ class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
 }
 
 internal data class RequestMatchRoutingHttpHandler(
-    private val matched: Router,
+    private val router: Router,
     private val httpHandler: RoutingHttpHandler,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
     private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
 
-    override fun match(request: Request) = if (matched.match(request) != MatchedWithoutHandler) Unmatched else httpHandler.match(request)
+    override fun match(request: Request) = if (router.match(request) != MatchedWithoutHandler) Unmatched else httpHandler.match(request)
 
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
         is MatchingHandler -> matchResult(request)
@@ -64,7 +64,7 @@ internal data class RequestMatchRoutingHttpHandler(
     }
 
     override fun withFilter(new: Filter): RoutingHttpHandler = RequestMatchRoutingHttpHandler(
-        matched,
+        router,
         httpHandler.withFilter(new),
         new.then(notFoundHandler),
         new.then(methodNotAllowedHandler)
