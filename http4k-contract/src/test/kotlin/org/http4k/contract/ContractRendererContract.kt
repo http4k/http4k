@@ -140,7 +140,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 security = BasicAuthSecurity("foo", credentials, "or1").or(BasicAuthSecurity("foo", credentials, "or2"))
             } bindContract POST to { Response(OK) }
             routes += "/oauth2_auth" meta {
-                security = AuthCodeOAuthSecurity(OAuthProvider.gitHub(HttpHandler { Response(OK) },
+                security = AuthCodeOAuthSecurity(OAuthProvider.gitHub({ Response(OK) },
                     credentials,
                     Uri.of("http://localhost/callback"),
                     FakeOAuthPersistence(), listOf("user")))

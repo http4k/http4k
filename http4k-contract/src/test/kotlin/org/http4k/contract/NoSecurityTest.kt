@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 class NoSecurityTest {
     @Test
     fun `no security is rather lax`() {
-        val response = (NoSecurity.filter.then(HttpHandler { Response(Status.OK).body("hello") })(Request(Method.GET, "")))
+        val response = (NoSecurity.filter.then { Response(OK).body("hello") }(Request(GET, "")))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))

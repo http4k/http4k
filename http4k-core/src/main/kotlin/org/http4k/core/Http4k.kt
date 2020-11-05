@@ -4,14 +4,8 @@ import org.http4k.routing.RoutingHttpHandler
 
 typealias HandleRequest = (Request) -> Response
 
-interface HttpHandler {
-    operator fun invoke(request: Request): Response
-
-    companion object {
-        operator fun invoke(fn: HandleRequest) = object : HttpHandler {
-            override operator fun invoke(request: Request): Response = fn(request)
-        }
-    }
+fun interface HttpHandler: (Request) -> Response {
+    companion object
 }
 
 fun interface Filter : (HttpHandler) -> HttpHandler {

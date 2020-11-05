@@ -72,7 +72,7 @@ class ApiKeySecurityTest {
 
     @Test
     fun `no security is rather lax`() {
-        val response = filter(HttpHandler { Response(OK).body("hello") })(Request(Method.GET, ""))
+        val response = filter { Response(OK).body("hello") }(Request(Method.GET, ""))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))
