@@ -9,6 +9,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.routing.and
 import org.http4k.routing.bind
 import org.http4k.routing.headers
 import org.http4k.routing.path
