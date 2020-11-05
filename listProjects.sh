@@ -1,6 +1,5 @@
 #!/bin/bash
 
-for i in $(./gradlew listProjects -q > /dev/null
-2>&1); do
-    echo "$i"
-done
+./gradlew listProjects -q 2> errors.txt
+cat errors.txt
+rm errors.txt
