@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.273.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** [Small break]: Rework of ParameterMatch to consolidate with RouterMatch as they are kind of the same thing. ParameterMatch methods are now floating extensions instead, so just import them.
+- **http4k-metrics-micrometer** : Remove logging spam. H/T @NersesAM for tracking it down!
 
 ### v3.272.0
 - **http4k-*** : Upgrade some dependency versions.
