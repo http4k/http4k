@@ -168,7 +168,8 @@ interface HttpMessage : Closeable {
 enum class Method {
     GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD;
 
-    infix fun to(fn: HandleRequest): Pair<Method, HttpHandler> = this to HttpHandler(fn)
+    infix fun to(fn: HandleRequest): Pair<Method, HttpHandler> = Pair(this, HttpHandler(fn))
+    infix fun to(fn: HttpHandler): Pair<Method, HttpHandler> = Pair(this, fn)
 }
 
 interface Request : HttpMessage {
