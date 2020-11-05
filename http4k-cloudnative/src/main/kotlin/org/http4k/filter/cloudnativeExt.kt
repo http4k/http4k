@@ -7,6 +7,7 @@ import org.http4k.cloudnative.NotFound
 import org.http4k.cloudnative.RemoteRequestFailed
 import org.http4k.cloudnative.Unauthorized
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
@@ -26,7 +27,7 @@ fun ServerFilters.HandleRemoteRequestFailed(
     fun Status.toResponse(e: RemoteRequestFailed) = Response(this).body(e.exceptionToBody())
 
     return Filter { next ->
-        {
+        HttpHandler {
             try {
                 next(it)
             } catch (e: RemoteRequestFailed) {
@@ -51,7 +52,7 @@ fun ClientFilters.HandleRemoteRequestFailed(
     responseWasSuccessful: Response.() -> Boolean = { status.successful },
     responseToMessage: Response.() -> String = Response::bodyString
 ) = Filter { next ->
-    {
+    HttpHandler {
         next(it).apply {
             if (!responseWasSuccessful())
                 when (status) {

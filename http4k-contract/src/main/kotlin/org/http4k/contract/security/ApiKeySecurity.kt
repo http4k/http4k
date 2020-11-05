@@ -1,6 +1,7 @@
 package org.http4k.contract.security
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -19,7 +20,7 @@ class ApiKeySecurity<out T>(val param: Lens<Request, T>,
                             authorizeOptionsRequests: Boolean = true,
                             val name: String = "api_key") : Security {
     override val filter = Filter { next ->
-        {
+        HttpHandler {
             if (!authorizeOptionsRequests && it.method == Method.OPTIONS) {
                 next(it)
             } else {

@@ -10,6 +10,7 @@ import io.opentelemetry.trace.StatusCanonicalCode.ERROR
 import io.opentelemetry.trace.Tracer
 import io.opentelemetry.trace.TracingContextUtils.currentContextWith
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -26,7 +27,7 @@ fun ClientFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.trac
     val setter = setter<Request>()
 
     return Filter { next ->
-        { req ->
+        HttpHandler { req ->
             with(tracer.spanBuilder(spanNamer(req)).setSpanKind(CLIENT).startSpan()) {
                 setAttribute("http.method", req.method.name)
                 setAttribute("http.url", req.uri.toString())
@@ -59,7 +60,7 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.trac
     val getter = getter<Request>()
     val setter = setter<Response>()
     return Filter { next ->
-        { req ->
+        HttpHandler { req ->
             with(tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)

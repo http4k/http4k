@@ -26,7 +26,7 @@ import java.util.Arrays
 object ServerForClientContract : HttpHandler {
     override fun invoke(request: Request) = app(request)
 
-    private val defaultHandler = { request: Request ->
+    private val defaultHandler = HttpHandler { request: Request ->
         Response(OK)
             .header("uri", request.uri.toString())
             .header("header", request.header("header"))

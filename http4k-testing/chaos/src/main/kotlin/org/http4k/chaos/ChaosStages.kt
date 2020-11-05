@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.then
@@ -41,7 +42,7 @@ fun Stage.until(trigger: Trigger): Stage = object : Stage {
  * Converts this chaos stage to a standard http4k Filter.
  */
 fun Stage.asFilter(): Filter = Filter { next ->
-    {
+    HttpHandler {
         (this@asFilter(it) ?: Filter.NoOp).then(next)(it)
     }
 }

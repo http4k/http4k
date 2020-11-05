@@ -1,4 +1,6 @@
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
@@ -12,7 +14,7 @@ import org.openqa.selenium.By
 fun main() {
 
     val app = routes(
-        "/hello" bind GET to { req -> Request
+        "/hello" bind GET to HttpHandler { req -> Request
             Response(OK).body("<html><title>hello</title></html>")
         }
     )

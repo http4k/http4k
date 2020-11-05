@@ -64,7 +64,7 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
 
     object ApiGatewayApi {
         operator fun invoke(region: Region): Filter = Filter { next ->
-            { request -> next(request.uri(request.uri.host("apigateway.${region.name}.amazonaws.com").scheme("https"))) }
+            HttpHandler { request -> next(request.uri(request.uri.host("apigateway.${region.name}.amazonaws.com").scheme("https"))) }
         }
     }
 }

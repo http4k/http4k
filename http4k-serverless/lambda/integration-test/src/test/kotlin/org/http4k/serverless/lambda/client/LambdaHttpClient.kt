@@ -34,7 +34,7 @@ class LambdaHttpClient(functionName: FunctionName, region: Region, version: Lamb
     }
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->
-        {
+        HttpHandler {
             val request: Request = Request(Method.POST, "/2015-03-31/functions/${functionName.value}/invocations")
                 .header("X-Amz-Invocation-Type", "RequestResponse")
                 .header("X-Amz-Log-Type", "Tail")
@@ -53,7 +53,7 @@ class LambdaHttpClient(functionName: FunctionName, region: Region, version: Lamb
 
 object LambdaApi {
     operator fun invoke(region: Region): Filter = Filter { next ->
-        { request -> next(request.uri(request.uri.host("lambda.${region.name}.amazonaws.com").scheme("https"))) }
+        HttpHandler { request -> next(request.uri(request.uri.host("lambda.${region.name}.amazonaws.com").scheme("https"))) }
     }
 }
 

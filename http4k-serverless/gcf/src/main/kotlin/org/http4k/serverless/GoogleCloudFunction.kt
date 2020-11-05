@@ -42,7 +42,7 @@ private fun toHttp4kHeaders(gcfHeaders: Map<String, List<String>>) = gcfHeaders.
     }.flatten()
 
 private fun AddGCPRequest(request: HttpRequest, contexts: RequestContexts) = Filter { next ->
-    {
+    HttpHandler {
         contexts[it][GCF_REQUEST_KEY] = request
         next(it)
     }

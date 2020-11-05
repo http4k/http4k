@@ -76,7 +76,7 @@ class ContractRouteTest {
 
     @Test
     fun `0 parts - matches route`() {
-        val handler: (Request) -> Response = { Response(OK) }
+        val handler = HttpHandler { Response(OK) }
         val route = "/" bindContract GET to handler
         val router = route.toRouter(Root)
         assertThat(router.match(Request(GET, "/")), equalTo(MatchingHandler(handler, router.description) as RouterMatch))

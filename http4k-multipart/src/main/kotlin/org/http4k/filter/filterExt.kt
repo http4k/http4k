@@ -3,6 +3,7 @@ package org.http4k.filter
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.MultipartEntity
 import org.http4k.core.body.form
 import org.http4k.core.multipartIterator
@@ -12,7 +13,7 @@ import org.http4k.core.multipartIterator
  * The form file is replaced in the form with this reference.
  */
 fun ServerFilters.ProcessFiles(fileConsumer: (MultipartEntity.File) -> String) = Filter { next ->
-    {
+    HttpHandler {
         val withProcessedFiles = it.multipartIterator().asSequence().fold(
             it.body(Body.EMPTY)
                 .replaceHeader("content-type", ContentType.APPLICATION_FORM_URLENCODED.toHeaderValue())

@@ -22,7 +22,7 @@ import org.http4k.util.proxy
 // Along with the extension class below, is the only actual piece of code that needs to be written.
 object TweetEchoLambda : AppLoader {
     private val timer = Filter { next: HttpHandler ->
-        { request: Request ->
+        HttpHandler { request: Request ->
             val start = System.currentTimeMillis()
             val response = next(request)
             val latency = System.currentTimeMillis() - start

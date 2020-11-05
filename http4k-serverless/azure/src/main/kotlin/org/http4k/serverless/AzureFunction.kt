@@ -36,7 +36,7 @@ abstract class AzureFunction(appLoader: AppLoaderWithContexts) {
 
 private fun AddAzure(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext,
                      contexts: RequestContexts) = Filter { next ->
-    {
+    HttpHandler {
         contexts[it][AZURE_CONTEXT_KEY] = ctx
         contexts[it][AZURE_REQUEST_KEY] = request
         next(it)

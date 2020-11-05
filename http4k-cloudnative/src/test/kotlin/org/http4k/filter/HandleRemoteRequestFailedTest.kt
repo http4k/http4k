@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.throws
 import org.http4k.cloudnative.RemoteRequestFailed
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -65,7 +66,7 @@ class HandleRemoteRequestFailedTest {
     fun `multi stack errors looks sane`(approver: Approver) {
         fun stack(clientUri: String) = ServerFilters.HandleRemoteRequestFailed()
             .then(Filter { next ->
-                {
+                HttpHandler {
                     next(it.uri(Uri.of(clientUri)))
                 }
             })

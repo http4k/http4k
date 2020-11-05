@@ -46,7 +46,7 @@ class ServirtiumRecordingIntegrationTest : TestContract {
 
     private val storage = InMemory()
 
-    private val originalHandler: HttpHandler = { Response(OK).body("hello") }
+    private val originalHandler = HttpHandler { Response(OK).body("hello") }
 
     @JvmField
     @RegisterExtension

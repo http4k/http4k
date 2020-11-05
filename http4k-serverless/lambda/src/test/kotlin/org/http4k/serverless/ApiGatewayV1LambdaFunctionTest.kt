@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -28,7 +29,7 @@ class ApiGatewayV1LambdaFunctionTest {
         }
 
         val lambda = object : ApiGatewayV1LambdaFunction(AppLoaderWithContexts { env, contexts ->
-            {
+            HttpHandler {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
                 assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))

@@ -35,7 +35,7 @@ abstract class TencentCloudFunction(appLoader: AppLoaderWithContexts) {
 }
 
 private fun AddTencent(request: APIGatewayProxyRequestEvent, ctx: Context?, contexts: RequestContexts) = Filter { next ->
-    {
+    HttpHandler {
         ctx?.apply { contexts[it][TENCENT_CONTEXT_KEY] = this }
         contexts[it][TENCENT_REQUEST_KEY] = request
         next(it)

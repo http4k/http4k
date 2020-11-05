@@ -23,18 +23,20 @@ public class JavaExample {
     public static void main(String[] args) {
         Filter f = next -> req -> next.invoke(req.body(req.bodyString().substring(0, 5)));
 
-        RoutingHttpHandler routing = routes(bind("/path", POST).to(req -> Response.Companion.create(Status.ACCEPTED)));
+        // TODO FIXME
 
-        RoutingHttpHandler app = then(f, routing);
-
-        Http4kServer http4kServer = asServer(app, new SunHttp(8000));
-
-        http4kServer.start();
-
-        DualSyncAsyncHttpHandler client = OkHttp.create(new OkHttpClient.Builder().build(), BodyMode.Memory.INSTANCE);
-
-        System.out.println(client.invoke(Request.Companion.create(POST, "http://localhost:8000/path").body("1234567890")));
-
-        http4kServer.stop();
+//        RoutingHttpHandler routing = routes(bind("/path", POST).to(req -> Response.Companion.create(Status.ACCEPTED)));
+//
+//        RoutingHttpHandler app = then(f, routing);
+//
+//        Http4kServer http4kServer = asServer(app, new SunHttp(8000));
+//
+//        http4kServer.start();
+//
+//        DualSyncAsyncHttpHandler client = OkHttp.create(new OkHttpClient.Builder().build(), BodyMode.Memory.INSTANCE);
+//
+//        System.out.println(client.invoke(Request.Companion.create(POST, "http://localhost:8000/path").body("1234567890")));
+//
+//        http4kServer.stop();
     }
 }

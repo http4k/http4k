@@ -137,7 +137,7 @@ class ChaosEngineTest {
 
     @Test
     fun `chaos API is available as openapi JSON`(approver: Approver) {
-        val app = { _: Request -> Response(I_M_A_TEAPOT) }
+        val app = HttpHandler { _: Request -> Response(I_M_A_TEAPOT) }
 
         approver.assertApproved(app.withChaosApi(clock = FixedClock)(Request(GET, "/chaos")))
     }

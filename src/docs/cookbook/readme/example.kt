@@ -38,7 +38,7 @@ fun main() {
 
     // this is a Filter - it performs pre/post processing on a request or response
     val timingFilter = Filter { next ->
-        { request: Request ->
+        HttpHandler { request: Request ->
             val start = System.currentTimeMillis()
             val response = next(request)
             val latency = System.currentTimeMillis() - start

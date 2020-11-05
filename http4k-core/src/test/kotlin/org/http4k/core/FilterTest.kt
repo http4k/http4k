@@ -11,8 +11,8 @@ class FilterTest {
 
     private val echoHeaders = { req: Request -> req.headers.fold(Response(OK)) { memo, next -> memo.header(next.first, next.second) } }
 
-    private val addRequestHeader = Filter { next -> { next(it.header("hello", "world")) } }
-    private val addResponseHeader = Filter { next -> { next(it).header("goodbye", "cruel") } }
+    private val addRequestHeader = Filter { next -> HttpHandler { next(it.header("hello", "world")) } }
+    private val addResponseHeader = Filter { next -> HttpHandler { next(it).header("goodbye", "cruel") } }
 
     @Test
     fun `can manipulate value on way in and out of service`() {
@@ -24,8 +24,8 @@ class FilterTest {
 
     @Test
     fun `applies in order of chain`() {
-        val minus10 = Filter { next -> { next(it.replaceHeader("hello", (it.header("hello")!!.toInt() - 10).toString())) } }
-        val double = Filter { next -> { next(it.replaceHeader("hello", (it.header("hello")!!.toInt() * 2).toString())) } }
+        val minus10 = Filter { next -> HttpHandler { next(it.replaceHeader("hello", (it.header("hello")!!.toInt() - 10).toString())) } }
+        val double = Filter { next -> HttpHandler { next(it.replaceHeader("hello", (it.header("hello")!!.toInt() * 2).toString())) } }
 
         val final = double.then(minus10).then(echoHeaders)
         val response = final(Request(GET, of("/")).header("hello", "10"))

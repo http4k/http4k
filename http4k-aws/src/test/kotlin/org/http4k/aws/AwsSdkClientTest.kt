@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -33,10 +34,10 @@ class AwsSdkClientTest {
 
         val response = Response(I_M_A_TEAPOT).headers(headers).body("world")
 
-        val client = AwsSdkClient {
+        val client = AwsSdkClient( HttpHandler {
             assertThat(it.toString(), equalTo(request.toString()))
             response
-        }
+        })
 
         val out = client.prepareRequest(
             builder().request(

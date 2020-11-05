@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.NoSecurity.filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request

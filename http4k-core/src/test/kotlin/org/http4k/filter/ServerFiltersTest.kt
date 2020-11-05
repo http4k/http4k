@@ -12,6 +12,7 @@ import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Filter
 import org.http4k.core.Headers
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -424,7 +425,7 @@ class ServerFiltersTest {
         val contexts = RequestContexts()
         val handler = ServerFilters.InitialiseRequestContext(contexts)
             .then(Filter { next ->
-                {
+                HttpHandler {
                     contexts[it].set("foo", "manchu")
                     next(it)
                 }

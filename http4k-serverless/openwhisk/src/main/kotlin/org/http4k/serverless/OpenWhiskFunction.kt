@@ -4,6 +4,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.http4k.core.Body
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
@@ -72,7 +73,7 @@ class OpenWhiskFunction(
 }
 
 private fun AddOpenWhiskRequest(request: JsonElement, contexts: RequestContexts) = Filter { next ->
-    {
+    HttpHandler {
         contexts[it][OW_REQUEST_KEY] = request
         next(it)
     }

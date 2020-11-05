@@ -36,7 +36,7 @@ class ServirtiumRecordingTest {
             .header("toBeRemoved", "respHeaderValue2")
             .body("helloWorldResponse")
 
-        val httpHandler = { it: Request ->
+        val httpHandler = HttpHandler {
             assertThat(it, equalTo(originalRequest))
             originalResponse
         }

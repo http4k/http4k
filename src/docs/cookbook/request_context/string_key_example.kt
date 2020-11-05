@@ -14,7 +14,7 @@ fun main() {
     data class SharedState(val message: String)
 
     fun AddState(contexts: RequestContexts) = Filter { next ->
-        {
+        HttpHandler {
             contexts[it]["myKey"] = SharedState("hello there")
             next(it)
         }

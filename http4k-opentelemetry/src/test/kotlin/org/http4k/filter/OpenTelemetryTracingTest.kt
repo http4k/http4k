@@ -10,9 +10,9 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.trace.SpanId
 import io.opentelemetry.trace.TraceId
-import io.opentelemetry.trace.TracingContextUtils
 import io.opentelemetry.trace.TracingContextUtils.getCurrentSpan
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -123,7 +123,7 @@ class OpenTelemetryTracingTest {
 
         val app = ServerFilters.OpenTelemetryTracing(tracer)
             .then(Filter { next ->
-                {
+                HttpHandler {
                     serverContext = (getCurrentSpan() as ReadableSpan).toSpanData()
                     next(Request(GET, "http://localhost:8080/client"))
                 }

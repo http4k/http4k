@@ -6,6 +6,7 @@ import com.microsoft.azure.functions.HttpResponseMessage
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.sameInstance
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -29,7 +30,7 @@ class AzureFunctionTest {
         val response = Response(Status(200, "")).header("a", "b").body("hello there")
 
         val function = object : AzureFunction(AppLoaderWithContexts { env, contexts ->
-            {
+            HttpHandler {
                 assertThat(contexts[it][AZURE_CONTEXT_KEY], sameInstance(context))
                 assertThat(contexts[it][AZURE_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))

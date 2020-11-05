@@ -41,7 +41,7 @@ internal class AccessTokenFetcherTest {
     @Test
     fun `can get access token from form encoded body`() {
         val accessTokenDetails = AccessTokenDetails(AccessToken("some-access-token", "doo", 123, "scope", RefreshToken("bob")), IdToken("id"))
-        val api = { _: Request ->
+        val api = HttpHandler {
             Response(OK)
                 .with(responseForm of accessTokenDetails)
         }
@@ -53,7 +53,7 @@ internal class AccessTokenFetcherTest {
 
     @Test
     fun `can get access token from json body for content-type without directive`() {
-        val api = { _: Request ->
+        val api = HttpHandler {
             Response(OK)
                 .header("Content-Type", "application/json")
                 .body("{\"access_token\": \"some-access-token\"}")

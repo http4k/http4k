@@ -10,6 +10,7 @@ import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -121,5 +122,5 @@ class ChaosStageOperationsTest {
 }
 
 private fun chaosStage(status: Status): Stage = object : Stage {
-    override fun invoke(tx: Request) = Filter { { Response(status) } }
+    override fun invoke(tx: Request) = Filter { HttpHandler { Response(status) } }
 }

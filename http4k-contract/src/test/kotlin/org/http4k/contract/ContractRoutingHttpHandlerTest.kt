@@ -80,7 +80,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     @Test
     fun `passes through contract filter`() {
         val filter = Filter { next ->
-            { next(it.with(header of "true")) }
+            HttpHandler { next(it.with(header of "true")) }
         }
 
         val root = "/root" bind contract {
@@ -200,7 +200,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK) }
         }.withFilter { next ->
-            {
+            HttpHandler {
                 next(it.query("key", "bob"))
             }
         }
@@ -214,7 +214,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK).body(it.body) }
         }.withPostSecurityFilter { next ->
-            {
+            HttpHandler {
                 next(it.body("body"))
             }
         }
@@ -266,7 +266,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     @Test
     fun `only calls filters once`() {
         val filter = Filter { next ->
-            {
+            HttpHandler {
                 next(it.header("foo", "bar"))
             }
         }

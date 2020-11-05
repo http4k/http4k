@@ -25,7 +25,7 @@ fun main() {
             .build())
 
     // this HttpHandler represents a 3rd party service, and will repeat the request body
-    val repeater: HttpHandler = {
+    val repeater = HttpHandler {
         println("REMOTE REQUEST WITH TRACING HEADERS: $it")
         Response(OK).body(it.bodyString() + it.bodyString())
     }

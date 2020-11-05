@@ -3,6 +3,7 @@ package org.http4k.serverless
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.RequestContexts
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
@@ -21,7 +22,7 @@ abstract class AwsLambdaFunction<Req : Any, Resp> internal constructor(
 }
 
 internal fun AddLambdaContextAndRequest(ctx: Context?, request: Any, contexts: RequestContexts) = Filter { next ->
-    {
+    HttpHandler {
         ctx?.apply { contexts[it][LAMBDA_CONTEXT_KEY] = ctx }
         contexts[it][LAMBDA_REQUEST_KEY] = request
         next(it)

@@ -19,7 +19,7 @@ fun main() {
 
 
     fun AddState(key: RequestContextLens<SharedState>) = Filter { next ->
-        {
+        HttpHandler {
             // "modify" the request like any other Lens
             next(it.with(key of SharedState("hello there")))
         }

@@ -20,7 +20,7 @@ class OpenTelemetryMetricsClientTest {
     private var requestTimer = ClientFilters.OpenTelemetryMetrics.RequestTimer(clock = clock)
     private var requestCounter = ClientFilters.OpenTelemetryMetrics.RequestCounter(clock = clock)
 
-    private val remoteServerMock: HttpHandler = {
+    private val remoteServerMock = HttpHandler {
         when (it.uri.path) {
             "/one" -> Response(OK)
             else -> Response(NOT_FOUND)

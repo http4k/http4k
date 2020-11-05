@@ -11,6 +11,7 @@ import org.http4k.cloudnative.health.Health
 import org.http4k.cloudnative.health.ReadinessCheck
 import org.http4k.cloudnative.health.ReadinessCheckResult
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -50,7 +51,7 @@ object App {
     }
 
     private val rewriteUriToLocalhostAsWeDoNotHaveDns = Filter { next ->
-        {
+        HttpHandler {
             println("Rewriting ${it.uri} so we can proxy properly")
             next(it.uri(it.uri.authority("localhost:9000")))
         }

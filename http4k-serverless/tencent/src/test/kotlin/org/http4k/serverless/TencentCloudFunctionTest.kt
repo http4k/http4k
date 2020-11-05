@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.sameInstance
 import com.qcloud.scf.runtime.Context
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyRequestEvent
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyResponseEvent
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -29,7 +30,7 @@ class TencentCloudFunctionTest {
         }
 
         val tencent = object : TencentCloudFunction(AppLoaderWithContexts { env, contexts ->
-            {
+            HttpHandler {
                 assertThat(contexts[it][TENCENT_CONTEXT_KEY], sameInstance(context))
                 assertThat(contexts[it][TENCENT_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))

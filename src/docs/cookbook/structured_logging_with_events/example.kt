@@ -25,7 +25,7 @@ fun main() {
             .then(AddRequestCount())
             .then(AutoJsonEvents(Jackson))
 
-    val app: HttpHandler = { _: Request -> Response(OK).body("hello") }
+    val app = HttpHandler { _: Request -> Response(OK).body("hello") }
 
     val appWithEvents =
         ResponseFilters.ReportHttpTransaction {

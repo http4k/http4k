@@ -13,19 +13,18 @@ class ClientValidationFilter(private val authoriseRequestValidator: AuthoriseReq
                              private val errorRenderer: AuthoriseRequestErrorRender,
                              private val extractor: AuthRequestExtractor) : Filter {
 
-    override fun invoke(next: HttpHandler)  = HttpHandler
-        {
-            if (!validResponseTypes.contains(it.query("response_type"))) {
-                errorRenderer.errorFor(it, UnsupportedResponseType(it.query("response_type").orEmpty()))
-            } else {
-                extractor.extract(it).map { authorizationRequest ->
-                    when (val result = MustHaveRedirectUri(authoriseRequestValidator).validate(it, authorizationRequest)) {
-                        is Success -> next(result.value)
-                        is Failure -> errorRenderer.errorFor(it, result.reason)
-                    }
-                }.mapFailure { error -> errorRenderer.errorFor(it, error) }.get()
-            }
+    override fun invoke(next: HttpHandler) = HttpHandler {
+        if (!validResponseTypes.contains(it.query("response_type"))) {
+            errorRenderer.errorFor(it, UnsupportedResponseType(it.query("response_type").orEmpty()))
+        } else {
+            extractor.extract(it).map { authorizationRequest ->
+                when (val result = MustHaveRedirectUri(authoriseRequestValidator).validate(it, authorizationRequest)) {
+                    is Success -> next(result.value)
+                    is Failure -> errorRenderer.errorFor(it, result.reason)
+                }
+            }.mapFailure { error -> errorRenderer.errorFor(it, error) }.get()
         }
+    }
 
     companion object {
         val validResponseTypes = ResponseType.values().map { it.queryParameterValue }

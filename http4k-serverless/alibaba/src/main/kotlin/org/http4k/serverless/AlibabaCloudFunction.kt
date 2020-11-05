@@ -31,7 +31,7 @@ abstract class AlibabaCloudFunction(appLoader: AppLoaderWithContexts) : HttpRequ
 }
 
 private fun AddAlibabaRequest(request: HttpServletRequest, ctx: Context?, contexts: RequestContexts) = Filter { next ->
-    {
+    HttpHandler {
         ctx?.apply { contexts[it][ALIBABA_CONTEXT_KEY] = this }
         contexts[it][ALIBABA_REQUEST_KEY] = request
         next(it)

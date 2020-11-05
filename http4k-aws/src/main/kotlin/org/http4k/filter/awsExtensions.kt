@@ -7,6 +7,7 @@ import org.http4k.aws.AwsHmacSha256
 import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -32,7 +33,7 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                           clock: Clock = Clock.systemDefaultZone(),
                           payloadMode: Payload.Mode = Payload.Mode.Signed) =
     Filter { next ->
-        {
+        HttpHandler {
             val payload = payloadMode(it)
 
             val credentials = credentialsProvider()

@@ -7,5 +7,7 @@ import static org.http4k.server.Http4kServerKt.asServer;
 
 public interface UsageFromJava_ktorcio {
     KtorCIO ktorcio = new KtorCIO(8000);
-    Http4kServer http4kServer = asServer(req -> Response.Companion.create(Status.ACCEPTED), ktorcio);
+    // TODO FIXME
+
+//    Http4kServer http4kServer = asServer(req -> Response.Companion.create(Status.ACCEPTED), ktorcio);
 }

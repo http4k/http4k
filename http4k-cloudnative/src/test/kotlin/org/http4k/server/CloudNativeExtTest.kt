@@ -12,6 +12,6 @@ class CloudNativeExtTest {
 
     @Test
     fun `can convert HttpHandler to a server with port`() {
-        assertThat( HttpHandler { _: Request -> Response(OK) }.asServer(::SunHttp, Port(65412)).port(), equalTo(65412))
+        assertThat( HttpHandler { Response(OK) }.asServer(::SunHttp, Port(65412)).port(), equalTo(65412))
     }
 }

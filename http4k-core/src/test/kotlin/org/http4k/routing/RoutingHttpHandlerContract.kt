@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -98,7 +99,7 @@ abstract class RoutingHttpHandlerContract {
     }
 
     protected fun filterAppending(value: String) = Filter { next ->
-        {
+        HttpHandler {
             val response = next(it)
             response.replaceHeader("res-header", response.header("res-header").orEmpty() + value)
         }

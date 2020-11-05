@@ -76,7 +76,7 @@ class ServirtiumReplay @JvmOverloads constructor(private val baseName: String,
 }
 
 private fun ConvertBadResponseToAssertionFailed() = Filter { next ->
-    {
+    HttpHandler {
         with(next(it)) {
             if (status == NOT_IMPLEMENTED) throw AssertionFailedError(bodyString())
             this

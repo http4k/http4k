@@ -23,7 +23,7 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
     val interactions = requests().zip(responses()).iterator()
     val count = AtomicInteger()
 
-    return { received: Request ->
+    return HttpHandler { received: Request ->
         val index = count.getAndIncrement()
 
         when {

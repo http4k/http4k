@@ -2,6 +2,7 @@ package org.http4k.serverless
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test
 class AlibabaCloudFunctionTest {
     @Test
     fun `calls the handler and returns proper body`() {
-        val app = { req: Request -> Response(OK).body(req.bodyString()) }
+        val app = HttpHandler { req: Request -> Response(OK).body(req.bodyString()) }
         val request = FakeHttpServletRequest(Request(GET, "").body("hello alibaba"))
         val response = FakeHttpServletResponse()
 

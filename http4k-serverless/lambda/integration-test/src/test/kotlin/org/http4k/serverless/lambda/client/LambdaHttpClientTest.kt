@@ -5,13 +5,11 @@ import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.client.HttpClientContract
-import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.HttpHandler
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-private fun client(version: LambdaIntegrationType): (Request) -> Response {
-    val functionClient = testFunctionClient(version)
-    return { request: Request -> functionClient(request) }
+private fun client(version: LambdaIntegrationType): HttpHandler {
+    return testFunctionClient(version)
 }
 
 abstract class LambdaHttpClientTest(version: LambdaIntegrationType) :

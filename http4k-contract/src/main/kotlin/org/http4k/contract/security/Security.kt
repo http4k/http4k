@@ -1,6 +1,7 @@
 package org.http4k.contract.security
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.NoOp
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
@@ -33,7 +34,7 @@ internal data class OrSecurity(internal val all: List<Security>) : Security, Ite
     override fun iterator() = all.iterator()
 
     override val filter = Filter { next ->
-        {
+        HttpHandler {
             all.asSequence().map { sec -> sec.filter.then(next)(it) }
                 .firstOrNull { it.status != UNAUTHORIZED } ?: Response(UNAUTHORIZED)
         }
