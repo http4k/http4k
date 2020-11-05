@@ -18,7 +18,6 @@ class MicrometerMetrics(private val defaults: MetricsDefaults) {
                      clock: Clock = Clock.systemUTC()): Filter =
         ReportHttpTransaction(clock) {
             labeler(it).labels.entries.fold(Timer.builder(name).description(description)) { memo, next ->
-                println(next)
                 memo.tag(next.key, next.value)
             }.register(meterRegistry).record(it.duration)
         }
