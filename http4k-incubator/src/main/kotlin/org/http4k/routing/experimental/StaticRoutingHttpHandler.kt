@@ -12,6 +12,7 @@ import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.Matched
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
@@ -54,6 +55,7 @@ internal class ResourceLoadingHandler(
                 is MatchingHandler -> matchResult(request)
                 is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
                 is Unmatched -> Response(NOT_FOUND)
+                is Matched -> Response(NOT_FOUND)
             }
         else
             Response(NOT_FOUND)
