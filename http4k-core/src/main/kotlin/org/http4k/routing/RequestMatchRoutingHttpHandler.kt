@@ -5,10 +5,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.then
+import org.http4k.routing.RouterMatch.Matched
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.Unmatched
-
-private fun Boolean.asRouterMatch() = if (this) RouterMatch.Matched else Unmatched
 
 /**
  * For routes where certain queries are required for correct operation. RequestMatch is composable.
@@ -32,7 +31,7 @@ fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = PredicatedHandler(this, handler)
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
 infix fun Router.and(that: Router): Router = Router { it: Request ->
-    val initial: RouterMatch = RouterMatch.Matched
+    val initial: RouterMatch = Matched
     listOf(this, that).fold(initial) { acc, next -> acc.and(next.match(it)) }
 }
 
@@ -47,7 +46,7 @@ internal class PredicatedHandler(private val predicate: Router, private val hand
         else -> throw UnsupportedOperationException("Cannot apply new base path without binding to an HTTP verb")
     }
 
-    override fun match(request: Request) = if (predicate.match(request) == RouterMatch.Matched) MatchingHandler(handler) else Unmatched
+    override fun match(request: Request) = if (predicate.match(request) == Matched) MatchingHandler(handler) else Unmatched
 
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
         is MatchingHandler -> matchResult(request)
@@ -61,11 +60,11 @@ internal data class RequestMatchRoutingHttpHandler(
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
     private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
 
-    override fun match(request: Request) = if (matched.match(request) != RouterMatch.Matched) Unmatched else httpHandler.match(request)
+    override fun match(request: Request) = if (matched.match(request) != Matched) Unmatched else httpHandler.match(request)
 
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
         is MatchingHandler -> matchResult(request)
-        is RouterMatch.Matched -> httpHandler(request)
+        is Matched -> httpHandler(request)
         is RouterMatch.MethodNotMatched -> methodNotAllowedHandler(request)
         is Unmatched -> notFoundHandler(request)
     }
@@ -80,3 +79,5 @@ internal data class RequestMatchRoutingHttpHandler(
     override fun withBasePath(new: String): RoutingHttpHandler =
         copy(httpHandler = httpHandler.withBasePath(new))
 }
+
+private fun Boolean.asRouterMatch() = if (this) Matched else Unmatched
