@@ -27,7 +27,7 @@ internal data class TemplateRoutingHttpHandler(
         is RouterMatch.MatchingHandler -> matchResult(request)
         is RouterMatch.MethodNotMatched -> methodNotAllowedHandler(request)
         is RouterMatch.Unmatched -> notFoundHandler(request)
-        RouterMatch.Matched -> TODO()
+        RouterMatch.MatchedWithoutHandler -> TODO()
     }
 
     override fun withFilter(new: Filter): RoutingHttpHandler =

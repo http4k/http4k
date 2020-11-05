@@ -17,7 +17,7 @@ internal data class AggregateRoutingHttpHandler(
         is RouterMatch.MatchingHandler -> matchResult(request)
         is RouterMatch.MethodNotMatched -> methodNotMatchedHandler(request)
         is RouterMatch.Unmatched -> notFoundHandler(request)
-        is RouterMatch.Matched -> notFoundHandler(request)
+        is RouterMatch.MatchedWithoutHandler -> notFoundHandler(request)
     }
 
     override fun match(request: Request): RouterMatch = list.asSequence()
