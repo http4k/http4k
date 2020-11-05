@@ -14,9 +14,6 @@ internal data class TemplateRoutingHttpHandler(
     private val filter: Filter = Filter.NoOp,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
     private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
-    constructor(method: Method?,
-                template: UriTemplate,
-                httpHandler: HttpHandler) : this(TemplatingRouter(method, template, httpHandler))
 
     override fun match(request: Request): RouterMatch = when (val matchResult = router.match(request)) {
         is RouterMatch.MatchingHandler -> RouterMatch.MatchingHandler(filter.then(matchResult))
