@@ -12,19 +12,21 @@ class RequestMatchTest {
     fun `query match`() {
         val query = queries("a", "b", "c")
 
-        assertFalse(query((Request(GET, ""))))
-        assertFalse(query(Request(GET, "").query("a", "value").query("b", "value")))
-        assertFalse(query(Request(GET, "").header("a", "value").query("b", "value")))
-        assertTrue(query((Request(GET, "").query("a", "value").query("b", "value").query("c", "value"))))
+        assertFalse(query((Request(GET, ""))).matched())
+        assertFalse(query(Request(GET, "").query("a", "value").query("b", "value")).matched())
+        assertFalse(query(Request(GET, "").header("a", "value").query("b", "value")).matched())
+        assertTrue(query((Request(GET, "").query("a", "value").query("b", "value").query("c", "value"))).matched())
     }
 
     @Test
     fun `header match`() {
         val header = headers("a", "b", "c")
 
-        assertFalse(header((Request(GET, ""))))
-        assertFalse(header(Request(GET, "").header("a", "value").header("b", "value")))
-        assertFalse(header(Request(GET, "").query("a", "value").header("b", "value")))
-        assertTrue(header((Request(GET, "").header("a", "value").header("b", "value").header("c", "value"))))
+        assertFalse(header((Request(GET, ""))).matched())
+        assertFalse(header(Request(GET, "").header("a", "value").header("b", "value")).matched())
+        assertFalse(header(Request(GET, "").query("a", "value").header("b", "value")).matched())
+        assertTrue(header((Request(GET, "").header("a", "value").header("b", "value").header("c", "value"))).matched())
     }
 }
+
+fun RouterMatch.matched() = (this == RouterMatch.Matched)

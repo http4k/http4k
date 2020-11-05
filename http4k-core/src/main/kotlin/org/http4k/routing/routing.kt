@@ -27,10 +27,16 @@ sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
         override fun invoke(request: Request): Response = httpHandler(request)
     }
 
-    object MethodNotMatched : RouterMatch(1)
-    object Unmatched : RouterMatch(2)
+    object Matched : RouterMatch(1)
+    object MethodNotMatched : RouterMatch(2)
+    object Unmatched : RouterMatch(3)
 
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
+}
+
+fun RouterMatch.and(other: RouterMatch): RouterMatch = when(this){
+    is RouterMatch.MatchingHandler, RouterMatch.Matched -> other
+    RouterMatch.MethodNotMatched, RouterMatch.Unmatched -> this
 }
 
 /**
