@@ -28,12 +28,12 @@ class CachingFiltersTest {
     private val maxAge = ofSeconds(10)
     private val timings = DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(ofSeconds(2000)), StaleWhenRevalidateTtl(ofSeconds(3000)))
 
-    private val request = org.http4k.core.Request(GET, "")
+    private val request = Request(GET, "")
     private val response = Response(OK)
 
     @Test
     fun `Adds If-Modified-Since to Request`() {
-        val maxAge = Duration.ofSeconds(1)
+        val maxAge = ofSeconds(1)
         val response = AddIfModifiedSince(clock, maxAge).then { Response(OK).header("If-modified-since", it.header("If-modified-since")) }(
             request)
         assertThat(response, hasHeader("If-modified-since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))

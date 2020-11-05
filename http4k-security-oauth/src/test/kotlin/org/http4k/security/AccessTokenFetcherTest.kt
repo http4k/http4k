@@ -3,7 +3,6 @@ package org.http4k.security
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Body
 import org.http4k.core.Credentials
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -11,18 +10,6 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.lens.FormField
-import org.http4k.lens.Validator
-import org.http4k.lens.Validator.Ignore
-import org.http4k.lens.Validator.Strict
-import org.http4k.lens.WebForm
-import org.http4k.lens.string
-import org.http4k.lens.webForm
-import org.http4k.security.AccessTokenFetcher.Companion.Forms.clientId
-import org.http4k.security.AccessTokenFetcher.Companion.Forms.code
-import org.http4k.security.AccessTokenFetcher.Companion.Forms.grantType
-import org.http4k.security.AccessTokenFetcher.Companion.Forms.redirectUri
-import org.http4k.security.AccessTokenFetcher.Companion.Forms.requestForm
 import org.http4k.security.AccessTokenFetcher.Companion.Forms.responseForm
 import org.http4k.security.oauth.server.refreshtoken.RefreshToken
 import org.http4k.security.openid.IdToken

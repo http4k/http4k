@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
-import java.util.function.Supplier
 
 @ExtendWith(ApprovalTest::class)
 class TrafficExtensionTests {
@@ -66,7 +65,7 @@ class TrafficExtensionTests {
 
     @Test
     fun `replay replays traffic from servirtium markdown format`() {
-        val replay = Replay.Servirtium(Supplier {
+        val replay = Replay.Servirtium({
             javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readBytes()
         })
 
@@ -84,7 +83,7 @@ class TrafficExtensionTests {
 
     @Test
     fun `replay replays binary traffic from servirtium markdown format`() {
-        val replay = Replay.Servirtium(Supplier {
+        val replay = Replay.Servirtium({
             javaClass.getResourceAsStream("/org/http4k/traffic/storedBinaryTraffic.txt").readBytes()
         },
             object : InteractionOptions {

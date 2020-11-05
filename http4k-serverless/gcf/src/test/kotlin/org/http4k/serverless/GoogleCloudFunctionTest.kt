@@ -16,9 +16,7 @@ class GoogleCloudFunctionTest {
         val request = FakeGCFRequest(Request(GET, "").body("hello gcf"))
         val response = FakeGCFResponse()
 
-        GoogleCloudFunction(object : AppLoader {
-            override fun invoke(p1: Map<String, String>) = app
-        }).service(request, response)
+        GoogleCloudFunction(AppLoader { app }).service(request, response)
 
         assertThat((String(response.outputStream.toByteArray())), equalTo("hello gcf"))
     }

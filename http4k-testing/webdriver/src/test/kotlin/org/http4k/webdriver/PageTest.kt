@@ -14,7 +14,7 @@ class PageTest {
     private val state = Page(OK, {}, { null }, UUID.randomUUID(), "someUrl", contents)
 
     @Test
-    fun `title`() = assertThat(state.title, equalTo("Page title"))
+    fun title() = assertThat(state.title, equalTo("Page title"))
 
     @Test
     fun `find elements`() = assertThat(state.findElement(By.tagName("span"))!!.text, equalTo("this is a span"))

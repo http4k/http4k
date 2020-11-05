@@ -18,6 +18,7 @@ package org.apache.commons.fileupload.util.mime;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * @since 1.3
@@ -75,9 +76,7 @@ public final class Base64Decoder {
 
     static {
         // Initialise as all invalid characters
-        for (int i = 0; i < DECODING_TABLE.length; i++) {
-            DECODING_TABLE[i] = INVALID_BYTE;
-        }
+        Arrays.fill(DECODING_TABLE, (byte) INVALID_BYTE);
         // set up valid characters
         for (int i = 0; i < ENCODING_TABLE.length; i++) {
             DECODING_TABLE[ENCODING_TABLE[i]] = (byte) i;

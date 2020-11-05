@@ -49,19 +49,19 @@ class JSoupWebElementTest {
     fun `equality is based on jsoup element`() = assertThat(element(), equalTo(element()))
 
     @Test
-    fun `equality fails for different element`() = assertThat(element().equals(JSoupWebElement(navigate, getURL, Jsoup.parse("<blink />"))), equalTo(false))
+    fun `equality fails for different element`() = assertThat(element() == JSoupWebElement(navigate, getURL, Jsoup.parse("<blink />")), equalTo(false))
 
     @Test
     fun `tag name`() = assertThat(element().tagName, equalTo("a"))
 
     @Test
-    fun `attribute`() = assertThat(element().getAttribute("id"), equalTo("bob"))
+    fun attribute() = assertThat(element().getAttribute("id"), equalTo("bob"))
 
     @Test
-    fun `text`() = assertThat(element().text, equalTo("hello disabled"))
+    fun text() = assertThat(element().text, equalTo("hello disabled"))
 
     @Test
-    fun `clear`() {
+    fun clear() {
         fun assertClearable(type: String) {
             val input = input(type)
             input.click()
@@ -126,7 +126,7 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `disabled`() {
+    fun disabled() {
         assertThat(element().isEnabled, equalTo(true))
         assertThat(element().findElement(By.tagName("disabled")).isEnabled, equalTo(false))
     }

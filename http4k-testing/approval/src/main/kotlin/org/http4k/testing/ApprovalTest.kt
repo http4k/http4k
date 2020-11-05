@@ -85,7 +85,7 @@ class JsonApprovalTest(
     testNamer: TestNamer = ClassAndMethod,
     approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
 ) : ContentTypeAwareApprovalTest(APPLICATION_JSON, testNamer, approvalSource) {
-    override fun format(input: String) = try {
+    override fun format(input: String): String = try {
         formatJson(input, TWO_SPACES)
     } catch (e: Json.ParseException) {
         throw AssertionFailedError("Invalid JSON generated", "<valid JSON>", input)
@@ -100,7 +100,7 @@ class HtmlApprovalTest(
     testNamer: TestNamer = ClassAndMethod,
     approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
 ) : ContentTypeAwareApprovalTest(TEXT_HTML, testNamer, approvalSource) {
-    override fun format(input: String) = try {
+    override fun format(input: String): String = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
         throw AssertionFailedError("Invalid HTML generated", "<valid HTML>", input)
@@ -114,7 +114,7 @@ class XmlApprovalTest(
     testNamer: TestNamer = ClassAndMethod,
     approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
 ) : ContentTypeAwareApprovalTest(APPLICATION_XML, testNamer, approvalSource) {
-    override fun format(input: String) = try {
+    override fun format(input: String): String = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
         throw AssertionFailedError("Invalid XML generated", "<valid XML>", input)

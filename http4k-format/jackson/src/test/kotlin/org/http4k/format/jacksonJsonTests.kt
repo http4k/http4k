@@ -37,8 +37,8 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val publicLens = Body.autoView<ArbObjectWithView, Public>().toLens()
         val privateLens = Body.autoView<ArbObjectWithView, Private>().toLens()
 
-        assertThat(Response(OK).with(publicLens of arbObjectWithView), hasBody(equalTo<String>("""{"pub":5}""")))
-        assertThat(Response(OK).with(privateLens of arbObjectWithView), hasBody(equalTo<String>("""{"priv":3,"pub":5}""")))
+        assertThat(Response(OK).with(publicLens of arbObjectWithView), hasBody(equalTo("""{"pub":5}""")))
+        assertThat(Response(OK).with(privateLens of arbObjectWithView), hasBody(equalTo("""{"priv":3,"pub":5}""")))
 
         assertThat(publicLens(Response(OK).with(privateLens of arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }

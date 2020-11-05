@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 class RequestMatchersTest {
 
     @Test
-    fun `method`() = assertMatchAndNonMatch(Request(GET, "/bob"), hasMethod(GET), hasMethod(POST))
+    fun method() = assertMatchAndNonMatch(Request(GET, "/bob"), hasMethod(GET), hasMethod(POST))
 
     @Test
     fun `uri as string`() = assertMatchAndNonMatch(Request(GET, "/bob"), hasUri("/bob"), hasUri("/bill"))
@@ -28,7 +28,7 @@ class RequestMatchersTest {
     fun `uri as regex`() = assertMatchAndNonMatch(Request(GET, "/bob123"), hasUri(Regex(".*123")), hasUri(Regex(".*124")))
 
     @Test
-    fun `form`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", "bob"), hasForm("form", "bill"))
+    fun form() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", "bob"), hasForm("form", "bill"))
 
     @Test
     fun `form as matcher`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", containsSubstring("bob")), hasForm("form", equalTo("bill")))
@@ -37,7 +37,7 @@ class RequestMatchersTest {
     fun `form as regex`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", Regex(".*bob")), hasForm("form", Regex(".*bill")))
 
     @Test
-    fun `query`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", "bob"), hasQuery("form", "bill"))
+    fun query() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", "bob"), hasQuery("form", "bill"))
 
     @Test
     fun `query - matcher`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", equalTo("bob")), hasQuery("form", containsSubstring("bill")))
@@ -46,7 +46,7 @@ class RequestMatchersTest {
     fun `query as regex`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", Regex(".*bob")), hasQuery("form", Regex(".*bill")))
 
     @Test
-    fun `queries`() = assertMatchAndNonMatch(Request(GET, "/bob?query=bob&query=bob2"), hasQuery("query", listOf("bob", "bob2")), hasQuery("query", listOf("bill")))
+    fun queries() = assertMatchAndNonMatch(Request(GET, "/bob?query=bob&query=bob2"), hasQuery("query", listOf("bob", "bob2")), hasQuery("query", listOf("bill")))
 
     @Test
     fun `query lens`() =
@@ -55,7 +55,7 @@ class RequestMatchersTest {
         }
 
     @Test
-    fun `cookie`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), hasCookie(Cookie("name", "bob")), hasCookie(Cookie("name", "bill")))
+    fun cookie() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), hasCookie(Cookie("name", "bob")), hasCookie(Cookie("name", "bill")))
 
     @Test
     fun `cookie matcher`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), hasCookie("name", equalTo(Cookie("name", "bob"))), hasCookie("name", equalTo(Cookie("name", "bill"))))

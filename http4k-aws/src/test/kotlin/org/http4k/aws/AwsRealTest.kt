@@ -30,7 +30,7 @@ class AwsRealTest : AbstractAwsRealS3TestCase() {
     }
 
     @Test
-    fun `streaming`() {
+    fun streaming() {
         val client = awsClientFilter(Payload.Mode.Unsigned)
             .then(JavaHttpClient())
 

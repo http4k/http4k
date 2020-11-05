@@ -110,6 +110,6 @@ class ClientCookiesTest {
         assertThat(client(Request(GET, "/get")), hasBody("gone"))
     }
 
-    fun Request.counterCookie() = cookie("counter")?.value?.toInt() ?: 0
-    fun Response.counterCookie(value: Int) = cookie(Cookie("counter", value.toString()))
+    private fun Request.counterCookie() = cookie("counter")?.value?.toInt() ?: 0
+    private fun Response.counterCookie(value: Int) = cookie(Cookie("counter", value.toString()))
 }

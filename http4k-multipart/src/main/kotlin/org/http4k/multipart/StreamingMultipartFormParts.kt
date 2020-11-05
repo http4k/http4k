@@ -194,8 +194,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
         override fun read(): Int = if (closed) throw AlreadyClosedException() else if (endOfStream) -1 else readNextByte()
 
         private fun readNextByte(): Int {
-            val result = inputStream.readByteFromStreamUnlessTokenMatched(boundaryWithPrefix)
-            return when (result) {
+            return when (val result = inputStream.readByteFromStreamUnlessTokenMatched(boundaryWithPrefix)) {
                 -1 -> {
                     state = FindPrefix
                     endOfStream = true

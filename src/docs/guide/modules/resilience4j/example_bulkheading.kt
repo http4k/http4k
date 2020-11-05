@@ -25,7 +25,7 @@ fun main() {
     }
 
     // throw a bunch of requests at the filter - only 5 should pass
-    (1..10).forEach {
+    for (it in 1..10) {
         thread {
             println(bulkheading(Request(GET, "/")).status)
         }

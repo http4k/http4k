@@ -20,7 +20,7 @@ import org.http4k.websocket.WsStatus
 
 class Http4kWsChannelHandler(private val wSocket: WsConsumer, private val upgradeRequest: Request): SimpleChannelInboundHandler<WebSocketFrame>() {
     private var websocket: Http4kWebSocketAdapter? = null
-    private var normalClose = false;
+    private var normalClose = false
 
     override fun handlerAdded(ctx: ChannelHandlerContext) {
         websocket = Http4kWebSocketAdapter(object : PushPullAdaptingWebSocket(upgradeRequest) {
@@ -33,7 +33,7 @@ class Http4kWsChannelHandler(private val wSocket: WsConsumer, private val upgrad
 
             override fun close(status: WsStatus) {
                 ctx.writeAndFlush(CloseWebSocketFrame(status.code, status.description)).addListeners(ChannelFutureListener {
-                    normalClose = true;
+                    normalClose = true
                     websocket?.onClose(status)
                 }, ChannelFutureListener.CLOSE)
             }

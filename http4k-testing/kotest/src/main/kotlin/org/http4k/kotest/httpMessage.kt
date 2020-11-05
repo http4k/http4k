@@ -30,7 +30,7 @@ fun haveHeader(name: String, matcher: Matcher<String>): Matcher<HttpMessage> = h
 
 fun HttpMessage.shouldHaveHeader(name: String, expected: String) = this should haveHeader(name, expected)
 fun HttpMessage.shouldNotHaveHeader(name: String, expected: String) = this shouldNot haveHeader(name, expected)
-fun haveHeader(name: String, expected: String): Matcher<HttpMessage> = haveHeader(name, be(expected.toString()))
+fun haveHeader(name: String, expected: String): Matcher<HttpMessage> = haveHeader(name, be(expected))
 
 fun HttpMessage.shouldHaveHeader(name: String, expected: Regex) = this should haveHeader(name, expected)
 fun HttpMessage.shouldNotHaveHeader(name: String, expected: Regex) = this shouldNot haveHeader(name, expected)

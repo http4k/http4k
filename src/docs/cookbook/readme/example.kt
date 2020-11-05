@@ -19,7 +19,7 @@ fun main() {
     // we can bind HttpHandlers (which are just functions from  Request -> Response) to paths/methods to create a Route,
     // then combine many Routes together to make another HttpHandler
     val app: HttpHandler = routes(
-        "/ping" bind GET to { _: Request -> Response(OK).body("pong!") },
+        "/ping" bind GET to { Response(OK).body("pong!") },
         "/greet/{name}" bind GET to { req: Request ->
             val path: String = req.path("name")!!
             Response(OK).body("hello $path")

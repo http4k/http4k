@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 
 class FormMatchersTest {
     @Test
-    fun `formField`() =
+    fun formField() =
         FormField.required("name").let {
             assertMatchAndNonMatch(WebForm().with(it of "bob"), haveFormField(it, be("bob")), haveFormField(it, be("bill")))
         }

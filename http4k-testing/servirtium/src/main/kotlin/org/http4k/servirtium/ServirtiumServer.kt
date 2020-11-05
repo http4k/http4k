@@ -39,7 +39,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
                         .replayingMatchingContent(options::modify)
                 )
                 .asServer(serverFn(port)),
-            InteractionControl by InteractionControl.Companion.NoOp {}
+            InteractionControl by InteractionControl.NoOp {}
 
         /**
          * MiTM proxy server which sits in between the client and the target and stores traffic in the

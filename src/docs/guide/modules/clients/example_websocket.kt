@@ -16,7 +16,7 @@ fun main() {
         "/bob" bind { ws: Websocket ->
             ws.send(WsMessage("bob"))
             ws.onMessage {
-                println("server received: " + it)
+                println("server received: $it")
                 ws.send(it)
             }
         }
@@ -25,7 +25,7 @@ fun main() {
     // blocking client - connection is done on construction
     val blockingClient = WebsocketClient.blocking(Uri.of("ws://localhost:8000/bob"))
     blockingClient.send(WsMessage("server sent on connection"))
-    blockingClient.received().take(2).forEach { println("blocking client received: " + it) }
+    blockingClient.received().take(2).forEach { println("blocking client received: $it") }
     blockingClient.close()
 
     // non-blocking client - exposes a Websocket interface for attaching listeners,
@@ -38,7 +38,7 @@ fun main() {
     }
 
     nonBlockingClient.onMessage {
-        println("non-blocking client received:" + it)
+        println("non-blocking client received:$it")
     }
 
     nonBlockingClient.onClose {

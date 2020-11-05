@@ -65,7 +65,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
             val form = WebForm(inputs.plus(textareas).plus(selects).plus(buttons)
                 .groupBy { it.first }
-                .mapValues { it.value.map { it.second }.flatMap { it } })
+                .mapValues { it.value.map { it.second }.flatten() })
 
             val body = Body.webForm(Validator.Strict,
                 *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()

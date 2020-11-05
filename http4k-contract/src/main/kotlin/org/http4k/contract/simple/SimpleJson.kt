@@ -17,5 +17,5 @@ class SimpleJson<out NODE>(private val json: Json<NODE>) : ContractRenderer, Err
 
     override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>): Response =
         Response(OK)
-            .with(json { body().toLens().of<Response>(obj("resources" to obj(routes.map { render(contractRoot, it) }))) })
+            .with(json { body().toLens().of(obj("resources" to obj(routes.map { render(contractRoot, it) }))) })
 }

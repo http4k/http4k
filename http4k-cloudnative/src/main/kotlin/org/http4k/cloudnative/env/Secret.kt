@@ -1,7 +1,6 @@
 package org.http4k.cloudnative.env
 
 import java.io.Closeable
-import java.nio.charset.StandardCharsets
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.concurrent.atomic.AtomicReference
 
@@ -10,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference
  * You can "use" the value only once, after which the value is destroyed
  */
 class Secret(input: ByteArray) : Closeable {
-    constructor(value: String) : this(value.toByteArray(StandardCharsets.UTF_8))
+    constructor(value: String) : this(value.toByteArray(UTF_8))
 
     init {
         require(input.isNotEmpty()) { "Cannot create an empty secret" }

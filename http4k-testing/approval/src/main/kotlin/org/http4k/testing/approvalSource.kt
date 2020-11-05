@@ -36,5 +36,5 @@ internal class FileReadWriteResource(private val target: File) : ReadWriteResour
             outputStream()
         }
 
-    override fun toString() = target.absolutePath
+    override fun toString(): String = target.absolutePath
 }

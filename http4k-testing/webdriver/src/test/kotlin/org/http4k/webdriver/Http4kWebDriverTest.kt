@@ -132,7 +132,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `navigation`() {
+    fun navigation() {
         driver.navigate().to("https://localhost/rita")
         driver.assertOnPage("https://localhost/rita")
         assertThat(driver.currentUrl, equalTo("https://localhost/rita"))
@@ -228,7 +228,7 @@ class Http4kWebDriverTest {
     @Test
     fun `cookies are added to request`() {
         val driver = Http4kWebDriver { req ->
-            Response(OK).body(req.cookies().map { it.name + "=" + it.value }.joinToString("; \n"))
+            Response(OK).body(req.cookies().joinToString("; \n") { it.name + "=" + it.value })
         }
         driver.manage().addCookie(Cookie("foo1", "bar1", "domain", "/", Date(0), true, true))
         driver.manage().addCookie(Cookie("foo2", "bar2"))

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 
 class ResponseMatchersTest {
     @Test
-    fun `status`() = assertMatchAndNonMatch(Response(OK), haveStatus(OK), haveStatus(BAD_GATEWAY))
+    fun status() = assertMatchAndNonMatch(Response(OK), haveStatus(OK), haveStatus(BAD_GATEWAY))
 
     @Test
     fun `set cookie`() = assertMatchAndNonMatch(Response(OK).cookie(Cookie("name", "bob")), haveSetCookie(Cookie("name", "bob")), haveSetCookie(Cookie("name", "bill")))

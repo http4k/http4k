@@ -36,7 +36,7 @@ class ContractRouteTest {
             summary = ""
             queries += Query.required("")
         } bindContract GET
-        val route = pair to { _, _ -> { _: Request -> Response(OK) } }
+        val route = pair to { _, _ -> { Response(OK) } }
         val request = route.newRequest(Uri.of("http://rita.com"))
 
         assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello%20world")))
@@ -93,7 +93,7 @@ class ContractRouteTest {
         val handler: HttpHandler = { Response(OK) }
 
         assertRequest("/" bindContract GET to handler, "http://foo.com")
-        assertRequest(Path.of("value") bindContract GET to { _ -> handler }, "http://foo.com/{value}")
+        assertRequest(Path.of("value") bindContract GET to { handler }, "http://foo.com/{value}")
         assertRequest(Path.of("value") / Path.of("value2") bindContract GET to { _, _ -> handler }, "http://foo.com/{value}/{value2}")
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") bindContract GET to { _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}")
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") bindContract GET to { _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}")
@@ -104,7 +104,7 @@ class ContractRouteTest {
 
     @Test
     fun `route as HttpHandler matches as expected`() {
-        val route = Path.int().of("value") meta {} bindContract GET to { { _: Request -> Response(OK) } }
+        val route = Path.int().of("value") meta {} bindContract GET to { { Response(OK) } }
 
         assertThat(route(Request(GET, "/1")), hasStatus(OK))
         assertThat(route(Request(DELETE, "/1")), hasStatus(NOT_FOUND))
@@ -115,7 +115,7 @@ class ContractRouteTest {
     fun `route as HttpHandler validates security of route`() {
         val route = Path.int().of("value") meta {
             security = ApiKeySecurity(Query.required("foo"), { true })
-        } bindContract GET to { { _: Request -> Response(OK) } }
+        } bindContract GET to { { Response(OK) } }
         assertThat(route(Request(GET, "/1")), hasStatus(UNAUTHORIZED))
         assertThat(route(Request(GET, "/1").query("foo", "bar")), hasStatus(OK))
     }
@@ -124,7 +124,7 @@ class ContractRouteTest {
     fun `route as HttpHandler performs pre-extraction of route`() {
         val route = Path.int().of("value") meta {
             queries += Query.required("foo")
-        } bindContract GET to { { _: Request -> Response(OK) } }
+        } bindContract GET to { { Response(OK) } }
         assertThat(route(Request(GET, "/1")), hasStatus(BAD_REQUEST))
         assertThat(route(Request(GET, "/1").query("foo", "bar")), hasStatus(OK))
     }

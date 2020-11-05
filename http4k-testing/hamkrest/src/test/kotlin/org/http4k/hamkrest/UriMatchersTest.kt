@@ -6,20 +6,20 @@ import org.junit.jupiter.api.Test
 class UriMatchersTest {
 
     @Test
-    fun `path`() = assertMatchAndNonMatch(Uri.of("/bob"), hasUriPath("/bob"), hasUriPath("bill"))
+    fun path() = assertMatchAndNonMatch(Uri.of("/bob"), hasUriPath("/bob"), hasUriPath("bill"))
 
     @Test
     fun `path regex`() = assertMatchAndNonMatch(Uri.of("/bob"), hasUriPath(Regex(".*bob")), hasUriPath(Regex(".*bill")))
 
     @Test
-    fun `authority`() = assertMatchAndNonMatch(Uri.of("http://bob:80"), hasAuthority("bob:80"), hasAuthority("bill:80"))
+    fun authority() = assertMatchAndNonMatch(Uri.of("http://bob:80"), hasAuthority("bob:80"), hasAuthority("bill:80"))
 
     @Test
-    fun `host`() = assertMatchAndNonMatch(Uri.of("http://bob:80"), hasHost("bob"), hasHost("bill"))
+    fun host() = assertMatchAndNonMatch(Uri.of("http://bob:80"), hasHost("bob"), hasHost("bill"))
 
     @Test
-    fun `port`() = assertMatchAndNonMatch(Uri.of("http://bob:80"), hasPort(80), hasPort(81))
+    fun port() = assertMatchAndNonMatch(Uri.of("http://bob:80"), hasPort(80), hasPort(81))
 
     @Test
-    fun `query`() = assertMatchAndNonMatch(Uri.of("http://bob:80?query=bob"), hasUriQuery("query=bob"), hasUriQuery("query=bill"))
+    fun query() = assertMatchAndNonMatch(Uri.of("http://bob:80?query=bob"), hasUriQuery("query=bob"), hasUriQuery("query=bill"))
 }

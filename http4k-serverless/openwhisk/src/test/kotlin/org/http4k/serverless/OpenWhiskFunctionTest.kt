@@ -90,8 +90,8 @@ class OpenWhiskFunctionTest {
         expected: FakeOpenWhiskResponse,
         detectBinaryBody: DetectBinaryBody
     ) {
-        val function = OpenWhiskFunction(object : AppLoader {
-            override fun invoke(p1: Map<String, String>) = { req: Request ->
+        val function = OpenWhiskFunction(AppLoader {
+            { req: Request ->
                 Response(OK).body(req.uri.toString() + req.bodyString()).headers(req.headers)
             }
         }, detectBinaryBody = detectBinaryBody)

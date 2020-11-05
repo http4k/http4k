@@ -81,7 +81,7 @@ open class ConfigurableKotlinxSerialization(
     override fun decimal(value: JsonElement): BigDecimal = BigDecimal(value.jsonPrimitive.content)
 
     override fun textValueOf(node: JsonElement, name: String) = when (node) {
-        is JsonObject -> node[name]?.let { it.jsonPrimitive.content }
+        is JsonObject -> node[name]?.jsonPrimitive?.content
         else -> throw IllegalArgumentException("node is not an object")
     }
 }

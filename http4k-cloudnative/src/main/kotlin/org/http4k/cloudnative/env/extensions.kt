@@ -15,7 +15,7 @@ fun Environment.Companion.fromYaml(file: File): Environment {
             val keyString = (key ?: "").toString()
 
             return when (value) {
-                is List<*> -> listOf(keyString to value.flatMap { convert(null, it) }.map { it.second }.joinToString(","))
+                is List<*> -> listOf(keyString to value.flatMap { convert(null, it) }.joinToString(",") { it.second })
                 is Map<*, *> -> value.flatten().map { "$keyString.${it.first}" to it.second }
                 else -> listOf((keyString to (value ?: "").toString()))
             }

@@ -23,7 +23,7 @@ class HttpMessageMatchersTest {
     fun `header regex`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob"), hasHeader("header", Regex(".*bob")), hasHeader("header", Regex(".*bill")))
 
     @Test
-    fun `headers`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header", listOf("bob", "bob2")), hasHeader("header", listOf("bill")))
+    fun headers() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header", listOf("bob", "bob2")), hasHeader("header", listOf("bill")))
 
     @Test
     fun `header no value`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header"), !hasHeader("header"))

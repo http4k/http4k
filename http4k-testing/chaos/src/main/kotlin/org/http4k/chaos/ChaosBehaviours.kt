@@ -1,7 +1,6 @@
 package org.http4k.chaos
 
 import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.chaos.*
 import org.http4k.chaos.ChaosBehaviours.BlockThread
 import org.http4k.chaos.ChaosBehaviours.EatMemory
 import org.http4k.chaos.ChaosBehaviours.KillProcess
@@ -30,6 +29,7 @@ import java.time.Duration
 import java.time.Duration.ofMillis
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
+import kotlin.system.exitProcess
 
 /**
  * Encapsulates the type of bad behaviour to apply to the response.
@@ -169,7 +169,7 @@ object ChaosBehaviours {
     object KillProcess {
         operator fun invoke() = object : Behaviour {
             override fun invoke(next: HttpHandler): HttpHandler = {
-                System.exit(1)
+                exitProcess(1)
                 throw NotImplementedError()
             }
 

@@ -11,7 +11,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CREATED
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
@@ -75,7 +74,7 @@ private object TestAppWithContexts : AppLoaderWithContexts {
 
 private object TestApp : AppLoader {
     override fun invoke(env: Map<String, String>): HttpHandler = { request ->
-        env.toList().fold(Response(Status.CREATED)) { memo, (key, value) ->
+        env.toList().fold(Response(CREATED)) { memo, (key, value) ->
             memo.header(key, value)
         }.body(request.removeHeader("x-http4k-context").toString())
     }

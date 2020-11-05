@@ -19,7 +19,7 @@ object Argo : Json<JsonNode> {
             JsonNodeType.FALSE -> JsonType.Boolean
             JsonNodeType.NUMBER -> JsonType.Number
             JsonNodeType.ARRAY -> JsonType.Array
-            JsonNodeType.OBJECT -> JsonType.Object
+            JsonNodeType.OBJECT -> Object
             JsonNodeType.NULL -> JsonType.Null
             else -> throw IllegalArgumentException("Don't know now to translate $value")
         }
@@ -58,12 +58,12 @@ object Argo : Json<JsonNode> {
         if (typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
-    override fun text(value: JsonNode) = value.text
-    override fun bool(value: JsonNode) = value.getBooleanValue()
+    override fun text(value: JsonNode): String = value.text
+    override fun bool(value: JsonNode): Boolean = value.getBooleanValue()
     override fun integer(value: JsonNode) = value.getNumberValue().toLong()
     override fun decimal(value: JsonNode) = value.getNumberValue().toBigDecimal()
 
-    override fun textValueOf(node: JsonNode, name: String) = with(node.getNode(name)) {
+    override fun textValueOf(node: JsonNode, name: String): String = with(node.getNode(name)) {
         when (type) {
             JsonNodeType.STRING -> text
             JsonNodeType.TRUE -> "true"

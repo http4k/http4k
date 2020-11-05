@@ -32,7 +32,7 @@ fun main() {
             .then(ApacheClient())
 
     // make some calls
-    (0..10).forEach {
+    repeat((0..10).count()) {
         app(Request(GET, "/metrics"))
         client(Request(GET, "https://http4k.org"))
     }

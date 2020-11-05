@@ -138,7 +138,7 @@ class CircularBufferedInputStreamTest {
             inputStream.reset()
             fail("Have read past readlimit, should fail")
         } catch (e: InvalidMarkException) {
-            assertThat(e.message, equalTo<String>(null))
+            assertThat(e.message, equalTo(null))
         }
 
     }
@@ -169,7 +169,7 @@ class CircularBufferedInputStreamTest {
             inputStream.reset()
             fail("Have read past readlimit, should fail")
         } catch (e: InvalidMarkException) {
-            assertThat(e.message, equalTo<String>(null))
+            assertThat(e.message, equalTo(null))
         }
     }
 

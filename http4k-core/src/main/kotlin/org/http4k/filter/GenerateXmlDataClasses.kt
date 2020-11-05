@@ -7,6 +7,8 @@ import org.http4k.core.with
 import org.http4k.format.AutoMarshallingXml
 import org.http4k.format.JsonLibAutoMarshallingJson
 import java.io.PrintStream
+import java.util.Random
+import kotlin.math.abs
 
 /**
  * This Filter is used to generate Data class definitions from a Response containing XML. The Filter will try and reduce
@@ -17,7 +19,7 @@ class GenerateXmlDataClasses<NODE : Any>(
     json: JsonLibAutoMarshallingJson<NODE>,
     xml: AutoMarshallingXml,
     out: PrintStream = System.out,
-    idGenerator: () -> Int = { Math.abs(java.util.Random().nextInt()) }) : Filter {
+    idGenerator: () -> Int = { abs(Random().nextInt()) }) : Filter {
     private val chains = GenerateDataClasses(json, out, idGenerator).then(Filter { next ->
         {
             next(it).run { with(json.body().toLens() of json.asJsonObject(xml.asA(bodyString(), Map::class))) }
