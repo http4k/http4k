@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
@@ -34,8 +35,15 @@ class RequestMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `attempt to bind param handler without a verb`() {
-        assertThat({ routes(prefix bind (headers("host") bind { Response(OK) })) }, throws<UnsupportedOperationException>())
+    fun `attempt to bind param handler without a verb - without header`() {
+        val app = routes(prefix bind (headers("host") bind { Response(OK) }))
+        assertThat(app(Request(GET, "")), hasStatus(NOT_FOUND))
+    }
+
+    @Test
+    fun `attempt to bind param handler without a verb - with header`() {
+        val app = routes(prefix bind (headers("host") bind { Response(OK) }))
+        assertThat(app(Request(GET, "").header("host", "foo")), hasStatus(OK))
     }
 }
 

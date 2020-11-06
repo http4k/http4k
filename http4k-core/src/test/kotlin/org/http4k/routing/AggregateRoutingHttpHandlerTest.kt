@@ -7,7 +7,7 @@ import org.http4k.core.UriTemplate
 class AggregateRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler: RoutingHttpHandler =
         AggregateRoutingHttpHandler(
-            TemplateRoutingHttpHandler(TemplatingRouter(
+            RouterRoutingHandler(TemplatingRouter(
                 method = null,
                 template = UriTemplate.from(validPath),
                 httpHandler = { Response(OK) }

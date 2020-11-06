@@ -9,7 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 
-internal data class TemplateRoutingHttpHandler(
+internal data class RouterRoutingHandler(
     private val router: Router,
     private val filter: Filter = Filter.NoOp,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
