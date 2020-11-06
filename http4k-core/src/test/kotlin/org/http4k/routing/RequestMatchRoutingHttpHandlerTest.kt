@@ -37,13 +37,19 @@ class RequestMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `attempt to bind param handler without a verb - without header`() {
         val app = routes(prefix bind (headers("host") bind { Response(OK) }))
-        assertThat(app(Request(GET, "")), hasStatus(NOT_FOUND))
+        assertThat(app(Request(GET, prefix)), hasStatus(NOT_FOUND))
+    }
+
+    @Test
+    fun `attempt to bind param handler without a verb - wrong route`() {
+        val app = routes(prefix bind (headers("host") bind { Response(OK) }))
+        assertThat(app(Request(GET, "/unknown").header("host", "foo")), hasStatus(NOT_FOUND))
     }
 
     @Test
     fun `attempt to bind param handler without a verb - with header`() {
         val app = routes(prefix bind (headers("host") bind { Response(OK) }))
-        assertThat(app(Request(GET, "").header("host", "foo")), hasStatus(OK))
+        assertThat(app(Request(GET, prefix).header("host", "foo")), hasStatus(OK))
     }
 }
 
