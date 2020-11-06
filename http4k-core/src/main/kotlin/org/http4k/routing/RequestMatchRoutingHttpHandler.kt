@@ -28,9 +28,35 @@ fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, 
     return routes(*hostHandlerPairs.map { Router { req: Request -> (req.header("host") == it.first).asRouterMatch() } bind it.second }.toTypedArray())
 }
 
-infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHandler(and(Passthrough(handler)))
-infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHandler(and(handler))
+infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, Passthrough(handler))
+infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
 infix fun Router.and(that: Router): Router = Router { listOf(this, that).fold(MatchedWithoutHandler as RouterMatch) { acc, next -> acc.and(next.match(it)) } }
+
+internal data class RequestMatchRoutingHttpHandler(
+    private val router: Router,
+    private val httpHandler: RoutingHttpHandler,
+    private val notFoundHandler: HttpHandler = routeNotFoundHandler,
+    private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
+
+    override fun match(request: Request) = if (router.match(request) != MatchedWithoutHandler) Unmatched else httpHandler.match(request)
+
+    override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
+        is MatchingHandler -> matchResult(request)
+        is MatchedWithoutHandler -> httpHandler(request)
+        is RouterMatch.MethodNotMatched -> methodNotAllowedHandler(request)
+        is Unmatched -> notFoundHandler(request)
+    }
+
+    override fun withFilter(new: Filter): RoutingHttpHandler = RequestMatchRoutingHttpHandler(
+        router,
+        httpHandler.withFilter(new),
+        new.then(notFoundHandler),
+        new.then(methodNotAllowedHandler)
+    )
+
+    override fun withBasePath(new: String): RoutingHttpHandler =
+        copy(httpHandler = httpHandler.withBasePath(new))
+}
 
 class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
     override fun withFilter(new: Filter) = when (handler) {
@@ -47,5 +73,6 @@ class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
 
     override fun invoke(request: Request): Response = handler(request)
 }
+
 
 private fun Boolean.asRouterMatch() = if (this) MatchedWithoutHandler else Unmatched
