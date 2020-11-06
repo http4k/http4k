@@ -1,6 +1,7 @@
 package org.http4k.client;
 
+import org.http4k.core.HttpHandler;
+
 public interface UsageFromJava_okhttp {
-    // TODO FIXME
-//    Function1<Request, Response> apache = OkHttp.create();
+    HttpHandler apache = OkHttp.create();
 }

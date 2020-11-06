@@ -7,7 +7,5 @@ import static org.http4k.server.Http4kServerKt.asServer;
 
 public interface UsageFromJava_apache4 {
     Apache4Server apache = new Apache4Server(8000);
-    // TODO FIXME
-
-//    Http4kServer http4kServer = asServer(req -> Response.Companion.create(Status.ACCEPTED), apache);
+    Http4kServer http4kServer = asServer(req -> Response.Companion.create(Status.ACCEPTED), apache);
 }

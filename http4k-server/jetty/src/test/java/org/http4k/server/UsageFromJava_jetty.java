@@ -7,7 +7,5 @@ import static org.http4k.server.Http4kServerKt.asServer;
 
 public interface UsageFromJava_jetty {
     ServerConfig jetty = new Jetty(8000);
-    // TODO FIXME
-
-//    Http4kServer http4kServer = asServer(req -> Response.Companion.create(Status.ACCEPTED), jetty);
+    Http4kServer http4kServer = asServer(req -> Response.Companion.create(Status.ACCEPTED), jetty);
 }

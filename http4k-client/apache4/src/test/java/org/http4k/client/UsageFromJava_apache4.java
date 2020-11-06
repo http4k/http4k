@@ -1,7 +1,7 @@
 package org.http4k.client;
 
-public interface UsageFromJava_apache4 {
-    // TODO FIXME
+import org.http4k.core.HttpHandler;
 
-//    Function1<Request, Response> apache = Apache4Client.create();
+public interface UsageFromJava_apache4 {
+    HttpHandler apache = Apache4Client.create();
 }
