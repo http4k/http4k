@@ -7,5 +7,5 @@ import static org.http4k.server.Http4kServerKt.asServer;
 
 public interface UsageFromJava_undertow {
     Undertow undertow = new Undertow(8000);
-    Http4kServer http4kServer = asServer(req -> Response.create(Status.ACCEPTED), undertow);
+    Http4kServer http4kServer = asServer(req -> Response.Companion.create(Status.ACCEPTED), undertow);
 }

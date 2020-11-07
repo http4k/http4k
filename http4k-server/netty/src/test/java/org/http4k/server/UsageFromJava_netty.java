@@ -10,7 +10,7 @@ import static org.http4k.server.Http4kServerKt.asServer;
 
 public interface UsageFromJava_netty {
     Netty netty = new Netty(8000);
-    Response response = Response.create(ACCEPTED).body(Body.create("hello"));
+    Response response = Response.Companion.create(ACCEPTED).body(Body.create("hello"));
     Function1<Request, Response> httpHandler = req -> response;
     Http4kServer http4kServer = asServer(httpHandler, netty);
 }

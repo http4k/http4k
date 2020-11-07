@@ -7,5 +7,5 @@ import static org.http4k.server.Http4kServerKt.asServer;
 
 public interface UsageFromJava_core {
     SunHttp sunHttp = new SunHttp(8000);
-    Http4kServer http4kServer = asServer(req -> Response.create(ACCEPTED), sunHttp);
+    Http4kServer http4kServer = asServer(req -> Response.Companion.create(ACCEPTED), sunHttp);
 }
