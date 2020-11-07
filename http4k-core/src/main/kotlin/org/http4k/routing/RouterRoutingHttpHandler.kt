@@ -33,14 +33,13 @@ internal data class RouterRoutingHttpHandler(
 }
 
 data class Prefix(private val template: String) : Router {
-
     override fun match(request: Request) =
         when {
             UriTemplate.from("$template{match:.*}").matches(request.uri.path) -> RouterMatch.MatchedWithoutHandler
             else -> RouterMatch.Unmatched
         }
 
-    override fun withBasePath(new: String) = Prefix("$new/${template}")
+    override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
 }
 
 data class TemplatingRouter(private val method: Method?,
