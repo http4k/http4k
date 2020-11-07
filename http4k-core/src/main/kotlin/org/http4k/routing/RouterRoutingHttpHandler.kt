@@ -13,10 +13,7 @@ internal data class RouterRoutingHttpHandler(
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
     private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
 
-    override fun match(request: Request): RouterMatch = when (val matchResult = router.match(request)) {
-        is RouterMatch.MatchingHandler -> RouterMatch.MatchingHandler(matchResult)
-        else -> matchResult
-    }
+    override fun match(request: Request): RouterMatch = router.match(request)
 
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
         is RouterMatch.MatchingHandler -> matchResult
