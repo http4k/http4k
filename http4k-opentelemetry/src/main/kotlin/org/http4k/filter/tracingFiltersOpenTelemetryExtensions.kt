@@ -60,8 +60,6 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.trac
     val setter = setter<Response>()
     return Filter { next ->
         { req ->
-            println("IN OPEN TELEMETRY")
-            println(req::class)
             with(tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)
@@ -75,7 +73,7 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.trac
                     try {
                         val ref = AtomicReference(next(req))
                         textMapPropagator.inject(Context.current(), ref, setter)
-                        ref.get()
+                        ref.get().also { setAttribute("http.status_code", it.status.code.toString()) }
                     } catch (t: Throwable) {
                         setStatus(ERROR, error(req, t))
                         throw t
