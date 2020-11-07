@@ -60,6 +60,8 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.trac
     val setter = setter<Response>()
     return Filter { next ->
         { req ->
+            println("IN OPEN TELEMETRY")
+            println(req::class)
             with(tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)
