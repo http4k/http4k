@@ -7,11 +7,9 @@ import org.http4k.core.Response
 import org.http4k.core.then
 
 internal data class AggregateRoutingHttpHandler(
-    private val list: List<RoutingHttpHandler>,
+    private val router: Router,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
     private val methodNotMatchedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
-
-    constructor(vararg list: RoutingHttpHandler) : this(list.toList())
 
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
         is RouterMatch.MatchingHandler -> matchResult(request)
@@ -20,13 +18,24 @@ internal data class AggregateRoutingHttpHandler(
         is RouterMatch.MatchedWithoutHandler -> notFoundHandler(request)
     }
 
-    override fun match(request: Request): RouterMatch = list.asSequence()
+    override fun match(request: Request): RouterMatch = router.match(request)
+
+    override fun withFilter(new: Filter): RoutingHttpHandler =
+        copy(router = router.withFilter(new),
+            notFoundHandler = new.then(notFoundHandler),
+            methodNotMatchedHandler = new.then(methodNotMatchedHandler))
+
+    override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new))
+}
+
+class OrRouter(private val list: List<Router>) : Router {
+    override fun match(request: Request) = list.asSequence()
         .map { next -> next.match(request) }
         .sorted()
         .firstOrNull() ?: RouterMatch.Unmatched
 
-    override fun withFilter(new: Filter): RoutingHttpHandler =
-        copy(list = list.map { it.withFilter(new) }, notFoundHandler = new.then(notFoundHandler), methodNotMatchedHandler = new.then(methodNotMatchedHandler))
+    override fun withFilter(new: Filter) =
+        OrRouter(list.map { it.withFilter(new) })
 
-    override fun withBasePath(new: String): RoutingHttpHandler = copy(list = list.map { it.withBasePath(new) })
+    override fun withBasePath(new: String) = OrRouter(list.map { it.withBasePath(new) })
 }
