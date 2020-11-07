@@ -12,8 +12,8 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class RouterRoutingHandlerTest : RoutingHttpHandlerContract() {
-    override val handler: RoutingHttpHandler = RouterRoutingHandler(TemplatingRouter(
+class RouterRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
+    override val handler: RoutingHttpHandler = RouterRoutingHttpHandler(TemplatingRouter(
         method = null,
         template = UriTemplate.from(validPath),
         httpHandler = { Response(OK) }
