@@ -17,13 +17,13 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.6.1"
 
-    const val software_amazon_awssdk: String = "2.15.20"
+    const val software_amazon_awssdk: String = "2.15.23"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
     const val com_squareup_moshi: String = "1.11.0"
 
-    const val org_eclipse_jetty: String = "9.4.33.v20201020"
+    const val org_eclipse_jetty: String = "9.4.34.v20201102"
 
     const val org_junit_jupiter: String = "5.7.0"
 
@@ -47,7 +47,7 @@ object Versions {
 
     const val azure_functions_java_library: String = "1.4.0"
 
-    const val javax_websocket_server_impl: String = "9.4.33.v20201020"
+    const val javax_websocket_server_impl: String = "9.4.34.v20201102"
 
     const val kotest_assertions_core_jvm: String = "4.3.1"
 
@@ -55,7 +55,7 @@ object Versions {
 
     const val functions_framework_api: String = "1.0.2"
 
-    const val aws_lambda_java_events: String = "3.5.0"
+    const val aws_lambda_java_events: String = "3.6.0"
 
     const val jackson_module_kotlin: String = "2.11.3"
 
@@ -81,7 +81,7 @@ object Versions {
 
     const val commons_pool2: String = "2.9.0"
 
-    const val http2_server: String = "9.4.33.v20201020"
+    const val http2_server: String = "9.4.34.v20201102"
 
     const val ratpack_core: String = "1.8.0"
 
