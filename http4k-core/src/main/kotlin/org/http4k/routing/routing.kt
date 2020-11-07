@@ -1,17 +1,14 @@
 package org.http4k.routing
 
-import org.http4k.core.Body
 import org.http4k.core.Filter
-import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
+import org.http4k.core.then
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.websocket.WsConsumer
-import java.io.InputStream
 
 /**
  * Composite HttpHandler which can potentially service many different URL patterns. Should
@@ -69,50 +66,42 @@ infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingW
 
 infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)
 
-data class RoutedRequest(private val delegate: Request, val xUriTemplate: UriTemplate) : Request by delegate {
-    override fun equals(other: Any?): Boolean = delegate == other
+/**
+ * For routes where certain queries are required for correct operation. Router is composable.
+ */
+fun queries(vararg names: String): Router = Router { request -> names.all { request.query(it) != null }.asRouterMatch() }
 
-    override fun hashCode(): Int = delegate.hashCode()
+/**
+ * For routes where certain headers are required for correct operation. Router is composable.
+ */
+fun headers(vararg names: String): Router = Router { request -> names.all { request.header(it) != null }.asRouterMatch() }
 
-    override fun toString(): String = delegate.toString()
-
-    override fun method(method: Method): Request = RoutedRequest(delegate.method(method), xUriTemplate)
-
-    override fun uri(uri: Uri): Request = RoutedRequest(delegate.uri(uri), xUriTemplate)
-
-    override fun query(name: String, value: String?): Request = RoutedRequest(delegate.query(name, value), xUriTemplate)
-
-    override fun header(name: String, value: String?): Request = RoutedRequest(delegate.header(name, value), xUriTemplate)
-
-    override fun headers(headers: Headers): Request = RoutedRequest(delegate.headers(headers), xUriTemplate)
-
-    override fun replaceHeader(name: String, value: String?): Request = RoutedRequest(delegate.replaceHeader(name, value), xUriTemplate)
-
-    override fun removeHeader(name: String): Request = RoutedRequest(delegate.removeHeader(name), xUriTemplate)
-
-    override fun body(body: Body): Request = RoutedRequest(delegate.body(body), xUriTemplate)
-
-    override fun body(body: String): Request = RoutedRequest(delegate.body(body), xUriTemplate)
-
-    override fun body(body: InputStream, length: Long?): Request = RoutedRequest(delegate.body(body, length), xUriTemplate)
+/**
+ * Matches the Host header to a matching Handler.
+ */
+fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, RoutingHttpHandler>): RoutingHttpHandler {
+    val hostHandlerPairs = listOf(head) + tail
+    return routes(*hostHandlerPairs.map { Router { req: Request -> (req.header("host") == it.first).asRouterMatch() } bind it.second }.toTypedArray())
 }
 
-class RoutedResponse(private val delegate: Response, val xUriTemplate: UriTemplate) : Response by delegate {
-    override fun equals(other: Any?): Boolean = delegate == other
+infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(Passthrough(handler)))
+infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(handler))
+infix fun Router.and(that: Router): Router = AndRouter(this, that)
 
-    override fun hashCode(): Int = delegate.hashCode()
+internal class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
+    override fun withFilter(new: Filter) = when (handler) {
+        is RoutingHttpHandler -> handler.withFilter(new)
+        else -> Passthrough(new.then(handler))
+    }
 
-    override fun toString(): String = delegate.toString()
+    override fun withBasePath(new: String) = when (handler) {
+        is RoutingHttpHandler -> handler.withBasePath(new)
+        else -> this
+    }
 
-    override fun header(name: String, value: String?): Response = RoutedResponse(delegate.header(name, value), xUriTemplate)
+    override fun match(request: Request): RouterMatch = RouterMatch.MatchingHandler(handler)
 
-    override fun replaceHeader(name: String, value: String?): Response = RoutedResponse(delegate.replaceHeader(name, value), xUriTemplate)
-
-    override fun removeHeader(name: String): Response = RoutedResponse(delegate.removeHeader(name), xUriTemplate)
-
-    override fun body(body: Body): Response = RoutedResponse(delegate.body(body), xUriTemplate)
-
-    override fun body(body: String): Response = RoutedResponse(delegate.body(body), xUriTemplate)
-
-    override fun body(body: InputStream, length: Long?): Response = RoutedResponse(delegate.body(body, length), xUriTemplate)
+    override fun invoke(request: Request): Response = handler(request)
 }
+
+private fun Boolean.asRouterMatch() = if (this) RouterMatch.MatchedWithoutHandler else RouterMatch.Unmatched
