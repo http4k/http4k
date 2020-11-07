@@ -25,6 +25,7 @@ fun interface Router {
      */
     fun match(request: Request): RouterMatch
     fun withBasePath(new: String): Router = this
+    fun withFilter(new: Filter): Router = this
 }
 
 sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
@@ -57,7 +58,7 @@ interface RoutingHttpHandler : Router, HttpHandler {
      * Returns a RoutingHttpHandler which applies the passed Filter to all received requests before servicing them.
      * To follow the trend of immutability, this will generally be a new instance.
      */
-    fun withFilter(new: Filter): RoutingHttpHandler
+    override fun withFilter(new: Filter): RoutingHttpHandler
 
     /**
      * Returns a RoutingHttpHandler which prepends the passed base path to the logic determining the match()

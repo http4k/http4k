@@ -45,4 +45,9 @@ data class TemplatingRouter(private val method: Method?,
     override fun withBasePath(new: String): Router = copy(
         template = UriTemplate.from("$new/${template}")
     )
+
+    override fun withFilter(new: Filter): Router = copy(httpHandler = when(httpHandler) {
+        is RoutingHttpHandler -> httpHandler.withFilter(new)
+        else -> new.then(httpHandler)
+    })
 }
