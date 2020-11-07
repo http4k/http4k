@@ -12,24 +12,12 @@ import org.http4k.routing.RouterMatch.Unmatched
 /**
  * For routes where certain queries are required for correct operation. RequestMatch is composable.
  */
-fun queries(vararg names: String): Router = object : Router {
-    override fun match(request: Request) = names.all { request.query(it) != null }.asRouterMatch()
-
-    override fun withBasePath(new: String) = Prefix(new).and(this)
-
-    override fun withFilter(new: Filter) = this
-}
+fun queries(vararg names: String): Router = Router { request -> names.all { request.query(it) != null }.asRouterMatch() }
 
 /**
  * For routes where certain headers are required for correct operation. RequestMatch is composable.
  */
-fun headers(vararg names: String): Router = object : Router {
-    override fun match(request: Request) = names.all { request.header(it) != null }.asRouterMatch()
-
-    override fun withBasePath(new: String) = Prefix(new).and(this)
-
-    override fun withFilter(new: Filter) = this
-}
+fun headers(vararg names: String): Router = Router { request -> names.all { request.header(it) != null }.asRouterMatch() }
 
 /**
  * Matches the Host header to a matching Handler.
@@ -71,7 +59,7 @@ internal data class RequestMatchRoutingHttpHandler(
             httpHandler = httpHandler.withBasePath(new))
 }
 
-class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
+internal class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
     override fun withFilter(new: Filter) = when (handler) {
         is RoutingHttpHandler -> handler.withFilter(new)
         else -> Passthrough(new.then(handler))
