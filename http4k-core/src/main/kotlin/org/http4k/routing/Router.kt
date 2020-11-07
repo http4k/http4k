@@ -46,7 +46,7 @@ internal class OrRouter(private val list: List<Router>) : Router {
         .sorted()
         .firstOrNull() ?: Unmatched
 
-    override fun withBasePath(new: String) = OrRouter(list.map { it.withBasePath(new) })
+    override fun withBasePath(new: String) = Prefix(new).and(OrRouter(list.map { it.withBasePath(new) }))
 
     override fun withFilter(new: Filter) = OrRouter(list.map { it.withFilter(new) })
 }
