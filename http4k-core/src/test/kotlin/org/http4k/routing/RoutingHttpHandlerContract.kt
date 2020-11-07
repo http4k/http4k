@@ -88,7 +88,8 @@ abstract class RoutingHttpHandlerContract {
 
     @Test
     fun `with base path - multiple levels`() {
-        val withBase = handler.withBasePath(prefix).withBasePath(prePrefix)
+        val withBasePath = handler.withBasePath(prefix)
+        val withBase = withBasePath.withBasePath(prePrefix)
         val request = Request(GET, "$prePrefix$prefix$validPath").header("host", "host")
         val criteria = hasStatus(OK)
 

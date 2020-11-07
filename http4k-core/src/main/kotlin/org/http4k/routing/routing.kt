@@ -24,7 +24,9 @@ fun interface Router {
      * Attempt to supply an HttpHandler which can service the passed request.
      */
     fun match(request: Request): RouterMatch
-    fun withBasePath(new: String): Router = this
+
+    fun withBasePath(new: String): Router = Prefix(new).and(this)
+
     fun withFilter(new: Filter): Router = this
 }
 
