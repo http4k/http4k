@@ -35,12 +35,12 @@ sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
 }
 
-fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
+internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
     is MatchedWithoutHandler -> other
     is MatchingHandler, MethodNotMatched, Unmatched -> this
 }
 
-class OrRouter(private val list: List<Router>) : Router {
+internal class OrRouter(private val list: List<Router>) : Router {
     override fun match(request: Request) = list.asSequence()
         .map { next -> next.match(request) }
         .sorted()
@@ -51,7 +51,7 @@ class OrRouter(private val list: List<Router>) : Router {
     override fun withBasePath(new: String) = OrRouter(list.map { it.withBasePath(new) })
 }
 
-class AndRouter(private val first: Router, private val second: Router) : Router {
+internal class AndRouter(private val first: Router, private val second: Router) : Router {
     override fun match(request: Request) =
         listOf(first, second).fold(MatchedWithoutHandler as RouterMatch) { acc, next -> acc.and(next.match(request)) }
 
