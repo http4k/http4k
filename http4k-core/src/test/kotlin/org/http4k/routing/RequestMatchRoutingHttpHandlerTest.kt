@@ -3,7 +3,6 @@ package org.http4k.routing
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
-import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -43,7 +42,8 @@ class RequestMatchRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `attempt to bind param handler without a verb - wrong route`() {
         val app = routes(prefix bind (headers("host") bind { Response(OK) }))
-        assertThat(app(Request(GET, "/unknown").header("host", "foo")), hasStatus(NOT_FOUND))
+        val header = Request(GET, "/unknown").header("host", "foo")
+        assertThat(app(header), hasStatus(NOT_FOUND))
     }
 
     @Test

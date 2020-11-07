@@ -9,7 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 
-internal data class RouterRoutingHandler(
+internal data class RouterRoutingHttpHandler(
     private val router: Router,
     private val filter: Filter = Filter.NoOp,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
@@ -32,6 +32,16 @@ internal data class RouterRoutingHandler(
     override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new))
 }
 
+data class Prefix(private val template: UriTemplate) : Router {
+    constructor(template: String) : this(UriTemplate.from(template))
+
+    override fun match(request: Request) = if (template.matches(request.uri.path)) {
+        RouterMatch.MatchedWithoutHandler
+    } else RouterMatch.Unmatched
+
+    override fun withBasePath(new: String) = Prefix(UriTemplate.from("$new/${template}"))
+}
+
 data class TemplatingRouter(private val method: Method?,
                             private val template: UriTemplate,
                             private val httpHandler: HttpHandler) : Router {
@@ -46,7 +56,7 @@ data class TemplatingRouter(private val method: Method?,
         template = UriTemplate.from("$new/${template}")
     )
 
-    override fun withFilter(new: Filter): Router = copy(httpHandler = when(httpHandler) {
+    override fun withFilter(new: Filter): Router = copy(httpHandler = when (httpHandler) {
         is RoutingHttpHandler -> httpHandler.withFilter(new)
         else -> new.then(httpHandler)
     })

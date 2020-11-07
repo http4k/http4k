@@ -87,7 +87,7 @@ data class PathMethod(val path: String, val method: Method?) {
                     }
                 }
             }
-            else -> RouterRoutingHandler(TemplatingRouter(method, UriTemplate.from(path), action))
+            else -> RouterRoutingHttpHandler(TemplatingRouter(method, UriTemplate.from(path), action))
         }
 }
 
@@ -95,7 +95,7 @@ infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 
 infix fun String.bind(httpHandler: RoutingHttpHandler): RoutingHttpHandler = httpHandler.withBasePath(this)
 
-infix fun String.bind(action: HttpHandler): RoutingHttpHandler = RouterRoutingHandler(TemplatingRouter(null, UriTemplate.from(this), action))
+infix fun String.bind(action: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(TemplatingRouter(null, UriTemplate.from(this), action))
 
 infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
 

@@ -12,13 +12,24 @@ import org.http4k.routing.RouterMatch.Unmatched
 /**
  * For routes where certain queries are required for correct operation. RequestMatch is composable.
  */
-fun queries(vararg names: String): Router = Router { req: Request -> names.all { req.query(it) != null }.asRouterMatch() }
+fun queries(vararg names: String): Router = object : Router {
+    override fun match(request: Request) = names.all { request.query(it) != null }.asRouterMatch()
+
+    override fun withBasePath(new: String) = Prefix(new).and(this)
+
+    override fun withFilter(new: Filter) = this
+}
 
 /**
  * For routes where certain headers are required for correct operation. RequestMatch is composable.
  */
-fun headers(vararg names: String): Router = Router { req: Request -> names.all { req.header(it) != null }.asRouterMatch() }
+fun headers(vararg names: String): Router = object : Router {
+    override fun match(request: Request) = names.all { request.header(it) != null }.asRouterMatch()
 
+    override fun withBasePath(new: String) = Prefix(new).and(this)
+
+    override fun withFilter(new: Filter) = this
+}
 
 /**
  * Matches the Host header to a matching Handler.
