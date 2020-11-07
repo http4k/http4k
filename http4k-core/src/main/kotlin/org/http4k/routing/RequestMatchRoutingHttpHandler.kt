@@ -48,14 +48,16 @@ internal data class RequestMatchRoutingHttpHandler(
     }
 
     override fun withFilter(new: Filter): RoutingHttpHandler = RequestMatchRoutingHttpHandler(
-        router,
+        router.withFilter(new),
         httpHandler.withFilter(new),
         new.then(notFoundHandler),
         new.then(methodNotAllowedHandler)
     )
 
     override fun withBasePath(new: String): RoutingHttpHandler =
-        copy(httpHandler = httpHandler.withBasePath(new))
+        copy(
+            router.withBasePath(new),
+            httpHandler = httpHandler.withBasePath(new))
 }
 
 class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
@@ -66,7 +68,7 @@ class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
 
     override fun withBasePath(new: String) = when (handler) {
         is RoutingHttpHandler -> handler.withBasePath(new)
-        else -> throw UnsupportedOperationException("Cannot apply new base path")
+        else -> this
     }
 
     override fun match(request: Request): RouterMatch = MatchingHandler(handler)
