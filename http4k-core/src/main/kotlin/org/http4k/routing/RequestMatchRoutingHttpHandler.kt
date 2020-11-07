@@ -43,16 +43,6 @@ infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RequestMatchRo
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RequestMatchRoutingHttpHandler(this, handler)
 infix fun Router.and(that: Router): Router = AndRouter(this, that)
 
-class AndRouter(private val first: Router, private val second: Router) : Router {
-    override fun match(request: Request) =
-        listOf(first, second).fold(MatchedWithoutHandler as RouterMatch) { acc, next -> acc.and(next.match(request)) }
-
-    override fun withBasePath(new: String) =
-        Prefix(new).and(first.withBasePath(new).and(second.withBasePath(new)))
-
-    override fun withFilter(new: Filter) = AndRouter(first.withFilter(new), second.withFilter(new))
-}
-
 internal data class RequestMatchRoutingHttpHandler(
     private val router: Router,
     private val httpHandler: RoutingHttpHandler,

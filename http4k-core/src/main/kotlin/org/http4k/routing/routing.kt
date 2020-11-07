@@ -37,7 +37,7 @@ interface RoutingHttpHandler : Router, HttpHandler {
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
 
-fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = AggregateRoutingHttpHandler(OrRouter(list.toList()))
+fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(OrRouter(list.toList()))
 
 fun Request.path(name: String): String? = when (this) {
     is RoutedRequest -> xUriTemplate.extract(uri.path)[name]
