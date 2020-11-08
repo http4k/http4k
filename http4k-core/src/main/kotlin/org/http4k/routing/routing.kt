@@ -19,16 +19,7 @@ import org.http4k.websocket.WsConsumer
  * the API user in an API-consistent manner.
  */
 interface RoutingHttpHandler : Router, HttpHandler {
-    /**
-     * Returns a RoutingHttpHandler which applies the passed Filter to all received requests before servicing them.
-     * To follow the trend of immutability, this will generally be a new instance.
-     */
     override fun withFilter(new: Filter): RoutingHttpHandler
-
-    /**
-     * Returns a RoutingHttpHandler which prepends the passed base path to the logic determining the match()
-     * To follow the trend of immutability, this will generally be a new instance.
-     */
     override fun withBasePath(new: String): RoutingHttpHandler
 }
 

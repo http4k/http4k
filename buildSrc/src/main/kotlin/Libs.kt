@@ -158,14 +158,14 @@ object Libs {
     /**
      * https://github.com/open-telemetry/opentelemetry-java
      */
-    const val opentelemetry_api: String = "io.opentelemetry:opentelemetry-api:" +
-            Versions.io_opentelemetry
+    const val opentelemetry_exporters_inmemory: String =
+            "io.opentelemetry:opentelemetry-exporters-inmemory:" + Versions.io_opentelemetry
 
     /**
      * https://github.com/open-telemetry/opentelemetry-java
      */
-    const val opentelemetry_exporters_inmemory: String =
-            "io.opentelemetry:opentelemetry-exporters-inmemory:" + Versions.io_opentelemetry
+    const val opentelemetry_api: String = "io.opentelemetry:opentelemetry-api:" +
+            Versions.io_opentelemetry
 
     /**
      * https://github.com/open-telemetry/opentelemetry-java
