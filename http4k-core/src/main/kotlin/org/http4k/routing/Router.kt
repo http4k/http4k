@@ -30,7 +30,7 @@ fun interface Router {
 }
 
 sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
-    class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatch(0), HttpHandler {
+    data class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatch(0), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
     }
 
