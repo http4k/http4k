@@ -77,7 +77,7 @@ fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, 
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(Passthrough(handler)))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(handler))
-infix fun Router.and(that: Router): Router = AndRouter(this, that)
+infix fun Router.and(that: Router): Router = AndRouter(listOf(this, that))
 
 internal class Passthrough(private val handler: HttpHandler) : RoutingHttpHandler {
     override fun withFilter(new: Filter) = when (handler) {

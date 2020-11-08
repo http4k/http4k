@@ -30,7 +30,7 @@ fun interface Router {
 }
 
 sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
-    data class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatch(0), HttpHandler {
+    class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatch(0), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
     }
 
@@ -57,12 +57,11 @@ internal class OrRouter(private val list: List<Router>) : Router {
     override fun withFilter(new: Filter) = OrRouter(list.map { it.withFilter(new) })
 }
 
-internal class AndRouter(private val first: Router, private val second: Router) : Router {
+internal class AndRouter(private val list: List<Router>) : Router {
     override fun match(request: Request) =
-        listOf(first, second).fold(MatchedWithoutHandler as RouterMatch) { acc, next -> acc.and(next.match(request)) }
+        list.fold(MatchedWithoutHandler as RouterMatch) { acc, next -> acc.and(next.match(request)) }
 
-    override fun withBasePath(new: String) =
-        Prefix(new).and(first.withBasePath(new).and(second.withBasePath(new)))
+    override fun withBasePath(new: String) = AndRouter(listOf(Prefix(new)) + list.map { it.withBasePath(new) })
 
-    override fun withFilter(new: Filter) = AndRouter(first.withFilter(new), second.withFilter(new))
+    override fun withFilter(new: Filter) = AndRouter(list.map { it.withFilter(new) })
 }
