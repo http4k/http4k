@@ -38,4 +38,5 @@ fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>) =
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(PassthroughRouter(handler)))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(handler))
+infix fun Router.bind(method: Method) = RouterMethod(this, method)
 infix fun Router.and(that: Router): Router = AndRouter(listOf(this, that))
