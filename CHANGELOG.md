@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 ### v3.274.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-kotlinx-serialization** : Now supports Automarshalling. H/T @zsambek  for the PR. 
+- **http4k-core** : Added Markdown to static Mime-types. H/T @razvn for the PR.
 
 ### v3.273.0
 - **http4k-*** : Upgrade some dependency versions.
