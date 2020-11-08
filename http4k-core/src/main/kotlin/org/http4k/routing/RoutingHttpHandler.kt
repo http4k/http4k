@@ -31,15 +31,6 @@ class PathMethod(private val path: String, private val method: Method) {
                     }
                 }
             }
-            else -> RouterRoutingHttpHandler(method.asRouter().and(when (action) {
-                is RoutingHttpHandler -> action.withBasePath(path)
-                else -> TemplateRouter(UriTemplate.from(path), action)
-            }))
+            else -> RouterRoutingHttpHandler(method.asRouter().and(TemplateRouter(UriTemplate.from(path), action)))
         }
-}
-
-class RouterMethod(private val router: Router, private val method: Method) {
-    infix fun to(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(
-        router.and(method.asRouter()).and(PassthroughRouter(handler))
-    )
 }
