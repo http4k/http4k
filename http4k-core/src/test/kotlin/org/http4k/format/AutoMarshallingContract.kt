@@ -11,17 +11,8 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.net.URL
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.OffsetTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.util.UUID
+import java.time.*
+import java.util.*
 
 data class CommonJdkPrimitives(
     val duration: Duration,
@@ -71,14 +62,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
     @Test
-    fun `roundtrip arbitary object to and from string`() {
+    open fun `roundtrip arbitary object to and from string`() {
         val out = marshaller.asFormatString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResult))
         assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
     }
 
     @Test
-    fun `roundtrip object with common java primitive types`() {
+    open fun `roundtrip object with common java primitive types`() {
         val localDate = LocalDate.of(2000, 1, 1)
         val localTime = LocalTime.of(1, 1, 1)
         val zoneOffset = ZoneOffset.UTC
@@ -102,7 +93,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    fun `roundtrip regex special as equals isn't comparable`() {
+    open fun `roundtrip regex special as equals isn't comparable`() {
         val obj = RegexHolder(".*".toRegex())
         val out = marshaller.asFormatString(obj)
         assertThat(out, equalTo(expectedRegexSpecial))
@@ -110,14 +101,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    fun `roundtrip wrapped map`() {
+    open fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
         assertThat(marshaller.asFormatString(wrapper), equalTo(expectedWrappedMap))
         assertThat(marshaller.asA(marshaller.asFormatString(wrapper), MapHolder::class), equalTo(wrapper))
     }
 
     @Test
-    fun `roundtrip custom number`() {
+    open fun `roundtrip custom number`() {
         val marshaller = customMarshaller()
 
         val wrapper = BigIntegerHolder(1.toBigInteger())
@@ -126,7 +117,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    fun `roundtrip custom decimal`() {
+    open fun `roundtrip custom decimal`() {
         val marshaller = customMarshaller()
 
         val wrapper = BigDecimalHolder(1.01.toBigDecimal())
@@ -144,12 +135,12 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    fun `convert to inputstream`() {
+    open fun `convert to inputstream`() {
         assertThat(marshaller.asInputStream(StringHolder("hello")).reader().use { it.readText() }, equalTo(expectedConvertToInputStream))
     }
 
     @Test
-    fun `throwable is marshalled`() {
+    open fun `throwable is marshalled`() {
         assertThat(marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))), startsWith(expectedThrowable))
     }
 

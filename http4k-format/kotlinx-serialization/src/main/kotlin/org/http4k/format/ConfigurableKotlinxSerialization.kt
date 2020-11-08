@@ -1,25 +1,31 @@
 package org.http4k.format
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonBuilder
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.long
+import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveKind.*
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.*
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.plus
+import org.http4k.core.Body
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.lens.BiDiMapping
+import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.ContentNegotiation.Companion.None
+import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.jvm.internal.Reflection
+import kotlin.reflect.KClass
 import kotlinx.serialization.json.Json as KotlinxJson
 
 open class ConfigurableKotlinxSerialization(
     json: JsonBuilder.() -> Unit,
-) : Json<JsonElement> {
-    private val json = KotlinxJson { json() }
+) : JsonLibAutoMarshallingJson<JsonElement>() {
+    val json = KotlinxJson { json() }
     private val prettyJson =
         KotlinxJson {
             json()
@@ -84,4 +90,64 @@ open class ConfigurableKotlinxSerialization(
         is JsonObject -> node[name]?.jsonPrimitive?.content
         else -> throw IllegalArgumentException("node is not an object")
     }
+
+    // auto
+    @ExperimentalSerializationApi
+    override fun asJsonObject(input: Any): JsonElement =
+        json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
+
+    @ExperimentalSerializationApi
+    override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T {
+        @Suppress("UNCHECKED_CAST")
+        return json.decodeFromJsonElement(json.serializersModule.serializer(target.java), j) as T
+    }
+
+    override fun <T : Any> asA(input: String, target: KClass<T>): T =
+        json.parseToJsonElement(input).asA(target)
+
+    inline fun <reified T : Any> JsonElement.asA(): T = json.decodeFromJsonElement(this)
+
+    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
+
+    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
+        httpBodyLens(description, contentNegotiation, APPLICATION_JSON).map({ json.decodeFromString<T>(it) }, { json.encodeToString(it) })
+
 }
+
+
+fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {
+
+    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = adapter(mapping, Decoder::decodeBoolean, Encoder::encodeBoolean, "BooleanSerializer", BOOLEAN)
+    override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, Decoder::decodeInt, Encoder::encodeInt, "IntSerializer", INT)
+    override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = adapter(mapping, Decoder::decodeLong, Encoder::encodeLong, "LongSerializer", LONG)
+    override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) = adapter(mapping, Decoder::decodeDouble, Encoder::encodeDouble, "DoubleSerializer", DOUBLE)
+    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = adapter(mapping, Decoder::decodeString, Encoder::encodeString, "TextSerializer", STRING)
+    override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) = throw UnsupportedOperationException("kotlinx.serialization does not support BigInteger.")
+    override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) = throw UnsupportedOperationException("kotlinx.serialization does not support BigDecimal.")
+
+    private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, decode: Decoder.() -> IN, encode: Encoder.(IN) -> Unit, serialName: String, kind: PrimitiveKind): AutoMappingConfiguration<JsonBuilder> =
+        apply {
+            @Suppress("UNCHECKED_CAST")
+            val serializer = object : KSerializer<Any> {
+                override val descriptor: SerialDescriptor
+                    get() = PrimitiveSerialDescriptor(serialName, kind)
+
+                override fun deserialize(decoder: Decoder): Any {
+                    return mapping.invoke(decoder.decode()) as Any
+                }
+
+                override fun serialize(encoder: Encoder, value: Any) {
+                    encoder.encode(mapping(value as OUT))
+                }
+
+            }
+            this@asConfigurable.serializersModule += (SerializersModule { contextual(Reflection.getOrCreateKotlinClass(mapping.clazz), serializer) })
+        }
+
+
+    override fun done(): JsonBuilder = this@asConfigurable
+
+}
+

@@ -32,7 +32,7 @@ objects, including custom Lens methods for each library so that JSON node object
 
 ### Auto-marshalling capabilities
 
-Some of the message libraries (eg. GSON, Jackson, Moshi, XML) provide the mechanism to automatically marshall data objects 
+Some of the message libraries (eg. GSON, Jackson, Kotlin serialization, Moshi, XML) provide the mechanism to automatically marshall data objects 
 to/from JSON and XML using reflection.
 
 We can use this facility in [http4k] to automatically marshall objects to/from HTTP message bodies using **Lenses**:
@@ -66,6 +66,10 @@ These data classes are compatible with using the `Body.auto<T>()` functionality.
 **Q. Declared with `Body.auto<List<XXX>>().toLens()`, my auto-marshalled List doesn't extract properly!**
 
 **A.** This occurs in Moshi when serialising bare lists to/from JSON and is to do with the underlying library being lazy in deserialising objects (using LinkedHashTreeMap) ()). Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
+
+**Q. Using Kotlin serialization, the standard mappings are not working on my data classes.**
+
+**A.** This happens because [http4k] adds the standard mappings to Kotlin serialization as contextual serializers. This can be solved by marking the fields as `@Contextual`.
 
 This can be demonstrated by the following, where you can see that the output of the auto-unmarshalling a naked JSON is NOT 
 the same as a native Kotlin list of objects. This can make tests break as the unmarshalled list is NOT equal to the native list.
