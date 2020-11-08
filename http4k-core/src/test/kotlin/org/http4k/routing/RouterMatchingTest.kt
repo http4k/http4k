@@ -9,6 +9,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.matches
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
+import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Test
 
@@ -46,4 +47,12 @@ class RouterMatchingTest {
         assertThat(router.match(Request(GET, "")), equalTo(MatchedWithoutHandler))
         assertThat(router.match(Request(POST, "")), equalTo(Unmatched))
     }
+
+    @Test
+    fun `method router`() {
+        val router = GET.asRouter()
+        assertThat(router.match(Request(GET, "")), equalTo(MatchedWithoutHandler))
+        assertThat(router.match(Request(POST, "")), equalTo(MethodNotMatched))
+    }
+
 }
