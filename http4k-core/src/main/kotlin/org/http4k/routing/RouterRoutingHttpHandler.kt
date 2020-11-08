@@ -52,7 +52,7 @@ internal val routeMethodNotAllowedHandler: HttpHandler = { Response(METHOD_NOT_A
 
 internal data class TemplateRouter(private val template: UriTemplate,
                                    private val httpHandler: HttpHandler) : Router {
-    override fun match(request: Request): RouterMatch = when {
+    override fun match(request: Request) = when {
         template.matches(request.uri.path) ->
             MatchingHandler { RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }
         else -> Unmatched
