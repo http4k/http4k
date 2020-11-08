@@ -18,14 +18,13 @@ class RouterRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         httpHandler = { Response(OK) }
     )
 
-    @Test
-    @Disabled
-    fun `multi param routes`() {
-        val handler = routes("/{foo}" bind Method.GET to routes("/{bar}" bind { it: Request ->
-            Response(OK).body(it.path("foo")!! + " then " + it.path("bar"))
-        }))
+        @Test
+        fun `multi param routes`() {
+            val handler = routes("/{foo}" bind Method.GET to routes("/{bar}" bind { it: Request ->
+                Response(OK).body(it.path("foo")!! + " then " + it.path("bar"))
+            }))
 
-        assertThat(handler(Request(Method.GET, "/one/two")), hasStatus(OK).and(hasBody("one then two")))
-    }
+            assertThat(handler(Request(Method.GET, "/one/two")), hasStatus(OK).and(hasBody("one then two")))
+        }
 
 }
