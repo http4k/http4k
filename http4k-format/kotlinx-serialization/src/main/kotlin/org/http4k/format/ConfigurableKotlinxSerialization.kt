@@ -93,9 +93,8 @@ open class ConfigurableKotlinxSerialization(
 
     // auto
     @ExperimentalSerializationApi
-    override fun asJsonObject(input: Any): JsonElement {
-        return json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
-    }
+    override fun asJsonObject(input: Any): JsonElement =
+        json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
 
     @ExperimentalSerializationApi
     override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T {
@@ -103,9 +102,8 @@ open class ConfigurableKotlinxSerialization(
         return json.decodeFromJsonElement(json.serializersModule.serializer(target.java), j) as T
     }
 
-    override fun <T : Any> asA(input: String, target: KClass<T>): T {
-        return json.parseToJsonElement(input).asA(target)
-    }
+    override fun <T : Any> asA(input: String, target: KClass<T>): T =
+        json.parseToJsonElement(input).asA(target)
 
     inline fun <reified T : Any> JsonElement.asA(): T = json.decodeFromJsonElement(this)
 

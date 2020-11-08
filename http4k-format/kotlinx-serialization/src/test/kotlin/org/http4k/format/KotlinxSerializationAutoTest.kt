@@ -4,9 +4,10 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import org.http4k.core.Status
-import org.http4k.core.Uri
+import org.http4k.core.*
+import org.http4k.format.KotlinxSerialization.auto
 import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -15,59 +16,68 @@ import java.net.URL
 import java.time.*
 import java.util.*
 
+
+@Serializable
+data class MapHolder(val value: Map<String, String>)
+
+@Serializable
+data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
+
+@Serializable
+data class CommonJdkPrimitives(
+    @Contextual
+    val duration: Duration,
+    @Contextual
+    val localDate: LocalDate,
+    @Contextual
+    val localTime: LocalTime,
+    @Contextual
+    val localDateTime: LocalDateTime,
+    @Contextual
+    val zonedDateTime: ZonedDateTime,
+    @Contextual
+    val offsetTime: OffsetTime,
+    @Contextual
+    val offsetDateTime: OffsetDateTime,
+    @Contextual
+    val instant: Instant,
+    @Contextual
+    val uuid: UUID,
+    @Contextual
+    val uri: Uri,
+    @Contextual
+    val url: URL,
+    @Contextual
+    val status: Status
+)
+
+@Serializable
+data class RegexHolder(@Contextual val regex: Regex)
+
+@Serializable
+data class StringHolder(@Contextual val value: String)
+
+@Serializable
+data class OutOnlyHolder(@Contextual val value: OutOnly)
+
+@Serializable
+data class InOnlyHolder(@Contextual val value: InOnly)
+
+@Serializable
+data class HolderHolder(@Contextual val value: MappedBigDecimalHolder)
+
+data class MappedBigDecimalHolder(val value: BigDecimal)
+
+@Serializable
+sealed class PolymorphicParent
+
+@Serializable
+data class FirstChild(val something: String) : PolymorphicParent()
+
+@Serializable
+data class SecondChild(val somethingElse: String) : PolymorphicParent()
+
 class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerialization) {
-
-    @Serializable
-    data class MapHolder(val value: Map<String, String>)
-
-    @Serializable
-    data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
-
-    @Serializable
-    data class CommonJdkPrimitives(
-        @Contextual
-        val duration: Duration,
-        @Contextual
-        val localDate: LocalDate,
-        @Contextual
-        val localTime: LocalTime,
-        @Contextual
-        val localDateTime: LocalDateTime,
-        @Contextual
-        val zonedDateTime: ZonedDateTime,
-        @Contextual
-        val offsetTime: OffsetTime,
-        @Contextual
-        val offsetDateTime: OffsetDateTime,
-        @Contextual
-        val instant: Instant,
-        @Contextual
-        val uuid: UUID,
-        @Contextual
-        val uri: Uri,
-        @Contextual
-        val url: URL,
-        @Contextual
-        val status: Status
-    )
-
-    @Serializable
-    data class RegexHolder(@Contextual val regex: Regex)
-
-    @Serializable
-    data class StringHolder(@Contextual val value: String)
-
-    @Serializable
-    data class OutOnlyHolder(@Contextual val value: OutOnly)
-
-    @Serializable
-    data class InOnlyHolder(@Contextual val value: InOnly)
-
-    @Serializable
-    data class HolderHolder(@Contextual val value: MappedBigDecimalHolder)
-
-    data class MappedBigDecimalHolder(val value: BigDecimal)
-
     @Test
     override fun `roundtrip arbitary object to and from string`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -182,6 +192,52 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
         assertThat(marshaller.asFormatString(wrapper), equalTo(expectedCustomWrappedNumber))
         assertThat(marshaller.asA(expectedCustomWrappedNumber, HolderHolder::class), equalTo(wrapper))
+    }
+
+    @ExperimentalSerializationApi
+    @Test
+    fun `roundtrip arbitary object to and from JSON element`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        val out = KotlinxSerialization.asJsonObject(obj)
+        assertThat(KotlinxSerialization.asA(out, ArbObject::class), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip list of arbitary objects to and from body`() {
+        val body = Body.auto<List<ArbObject>>().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(Response(Status.OK).with(body of listOf(obj))), equalTo(listOf(obj)))
+    }
+
+    @Test
+    fun `roundtrip array of arbitary objects to and from body`() {
+        val body = Body.auto<Array<ArbObject>>().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).toList(), equalTo(listOf(obj)))
+    }
+
+    @Test
+    fun `roundtrip polymorphic object to and from body`() {
+        val body = Body.auto<PolymorphicParent>().toLens()
+
+        val firstChild: PolymorphicParent = FirstChild("hello")
+        val secondChild: PolymorphicParent = SecondChild("world")
+
+        assertThat(body(Response(Status.OK).with(body of firstChild)), equalTo(firstChild))
+        assertThat(body(Response(Status.OK).with(body of secondChild)), equalTo(secondChild))
+    }
+
+    @Test
+    fun `roundtrip list of polymorphic objects to and from body`() {
+        val body = Body.auto<List<PolymorphicParent>>().toLens()
+
+        val list = listOf(FirstChild("hello"), SecondChild("world"))
+
+        assertThat(body(Response(Status.OK).with(body of list)), equalTo(list))
     }
 
     override fun customMarshaller(): AutoMarshalling =
