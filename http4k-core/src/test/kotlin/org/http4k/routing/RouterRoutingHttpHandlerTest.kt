@@ -19,8 +19,8 @@ class RouterRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     )
 
     @Test
-    fun `multi param routes - verb second`() {
-        val handler = routes("/{foo}" bind routes("/{bar}" bind GET to { it: Request ->
+    fun `multi param routes - verb first`() {
+        val handler = routes("/{foo}" bind GET to routes("/{bar}" bind { it: Request ->
             Response(OK).body(it.path("foo")!! + " then " + it.path("bar"))
         }))
 
@@ -28,8 +28,8 @@ class RouterRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `multi param routes - verb first`() {
-        val handler = routes("/{foo}" bind GET to routes("/{bar}" bind { it: Request ->
+    fun `multi param routes - verb second`() {
+        val handler = routes("/{foo}" bind routes("/{bar}" bind GET to { it: Request ->
             Response(OK).body(it.path("foo")!! + " then " + it.path("bar"))
         }))
 
