@@ -18,8 +18,14 @@ fun interface Router {
      */
     fun match(request: Request): RouterMatch
 
+    /**
+     * Returns a Router which prepends the passed base path to the logic determining the match()
+     */
     fun withBasePath(new: String): Router = Prefix(new).and(this)
 
+    /**
+     * Returns a Router which applies the passed Filter to all received requests before servicing them.
+     */
     fun withFilter(new: Filter): Router = this
 }
 
