@@ -4,6 +4,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.then
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
@@ -64,4 +65,18 @@ internal class AndRouter(private val list: List<Router>) : Router {
     override fun withBasePath(new: String) = AndRouter(listOf(Prefix(new)) + list.map { it.withBasePath(new) })
 
     override fun withFilter(new: Filter) = AndRouter(list.map { it.withFilter(new) })
+}
+
+internal class PassthroughRouter(private val handler: HttpHandler) : Router {
+    override fun match(request: Request): RouterMatch = MatchingHandler(handler)
+
+    override fun withBasePath(new: String) = when (handler) {
+        is RoutingHttpHandler -> handler.withBasePath(new)
+        else -> this
+    }
+
+    override fun withFilter(new: Filter) = when (handler) {
+        is RoutingHttpHandler -> handler.withFilter(new)
+        else -> PassthroughRouter(new.then(handler))
+    }
 }

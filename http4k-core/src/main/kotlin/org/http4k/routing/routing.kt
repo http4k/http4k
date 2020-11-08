@@ -36,6 +36,6 @@ fun headers(vararg names: String): Router = Router { request -> names.all { requ
 fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>) =
     routes(*hosts.map { Router { req: Request -> (req.header("host") == it.first).asRouterMatch() } bind it.second }.toTypedArray())
 
-infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(Passthrough(handler)))
+infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(PassthroughRouter(handler)))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(handler))
 infix fun Router.and(that: Router): Router = AndRouter(listOf(this, that))
