@@ -50,12 +50,11 @@ internal val routeNotFoundHandler: HttpHandler = { Response(NOT_FOUND.descriptio
 
 internal val routeMethodNotAllowedHandler: HttpHandler = { Response(METHOD_NOT_ALLOWED.description("Method not allowed")) }
 
-internal data class TemplatingRouter(private val template: UriTemplate,
-                                     private val httpHandler: HttpHandler) : Router {
+internal data class TemplateRouter(private val template: UriTemplate,
+                                   private val httpHandler: HttpHandler) : Router {
     override fun match(request: Request): RouterMatch = when {
-        template.matches(request.uri.path) -> {
+        template.matches(request.uri.path) ->
             MatchingHandler { RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }
-        }
         else -> Unmatched
     }
 

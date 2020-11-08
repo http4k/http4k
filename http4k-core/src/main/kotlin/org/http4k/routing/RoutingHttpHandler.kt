@@ -5,6 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
+import org.http4k.routing.RouterMatch.MethodNotMatched
 
 /**
  * Composite HttpHandler which can potentially service many different URL patterns. Should
@@ -19,18 +20,17 @@ interface RoutingHttpHandler : Router, HttpHandler {
     override fun withBasePath(new: String): RoutingHttpHandler
 }
 
-data class PathMethod(val path: String, val method: Method?) {
+data class PathMethod(val path: String, val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler =
-        when  {
-            action is StaticRoutingHttpHandler -> action.withBasePath(path).let {
+        when (action) {
+            is StaticRoutingHttpHandler -> action.withBasePath(path).let {
                 object : RoutingHttpHandler by it {
                     override fun match(request: Request) = when (method) {
-                        null, request.method -> it.match(request)
-                        else -> RouterMatch.MethodNotMatched
+                        request.method -> it.match(request)
+                        else -> MethodNotMatched
                     }
                 }
             }
-            method != null -> RouterRoutingHttpHandler(method.asRouter().and(TemplatingRouter(UriTemplate.from(path), action)))
-            else -> RouterRoutingHttpHandler(TemplatingRouter(UriTemplate.from(path), action))
+            else -> RouterRoutingHttpHandler(method.asRouter().and(TemplateRouter(UriTemplate.from(path), action)))
         }
 }
