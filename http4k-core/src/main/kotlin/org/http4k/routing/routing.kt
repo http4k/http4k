@@ -4,8 +4,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
-import org.http4k.lens.Lens
-import org.http4k.lens.LensFailure
 import org.http4k.websocket.WsConsumer
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
@@ -31,17 +29,6 @@ fun queries(vararg names: String): Router = Router { request -> names.all { requ
  * For routes where certain headers are required for correct operation. Router is composable.
  */
 fun headers(vararg names: String): Router = Router { request -> names.all { request.header(it) != null }.asRouterMatch() }
-
-/**
- *
- */
-fun <T> Lens<Request, T>.matches(fn: (T) -> Boolean) = Router {
-    try {
-        fn(this(it))
-    } catch (e: LensFailure) {
-        false
-    }.asRouterMatch()
-}
 
 /**
  * Matches the Host header to a matching Handler.
