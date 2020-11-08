@@ -70,10 +70,8 @@ fun headers(vararg names: String): Router = Router { request -> names.all { requ
 /**
  * Matches the Host header to a matching Handler.
  */
-fun hostDemux(head: Pair<String, RoutingHttpHandler>, vararg tail: Pair<String, RoutingHttpHandler>): RoutingHttpHandler {
-    val hostHandlerPairs = listOf(head) + tail
-    return routes(*hostHandlerPairs.map { Router { req: Request -> (req.header("host") == it.first).asRouterMatch() } bind it.second }.toTypedArray())
-}
+fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>) =
+    routes(*hosts.map { Router { req: Request -> (req.header("host") == it.first).asRouterMatch() } bind it.second }.toTypedArray())
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(Passthrough(handler)))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(handler))
