@@ -97,15 +97,15 @@ abstract class RoutingHttpHandlerContract {
         assertThat(withBase(request), criteria)
     }
 
-    protected fun RoutingHttpHandler.matchAndInvoke(request: Request) = when (val matchResult = match(request)) {
-        is MatchingHandler -> matchResult(request)
-        else -> null
-    }
-
     protected fun filterAppending(value: String) = Filter { next ->
         {
             val response = next(it)
             response.replaceHeader("res-header", response.header("res-header").orEmpty() + value)
         }
     }
+}
+
+fun RoutingHttpHandler.matchAndInvoke(request: Request) = when (val matchResult = match(request)) {
+    is MatchingHandler -> matchResult(request)
+    else -> null
 }
