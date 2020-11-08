@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 
 class RouterRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler: RoutingHttpHandler = RouterRoutingHttpHandler(TemplatingRouter(
-        method = null,
         template = UriTemplate.from(validPath),
         httpHandler = { Response(OK) }
     )

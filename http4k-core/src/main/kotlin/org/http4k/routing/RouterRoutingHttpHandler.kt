@@ -2,7 +2,6 @@ package org.http4k.routing
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
@@ -51,15 +50,14 @@ internal val routeNotFoundHandler: HttpHandler = { Response(NOT_FOUND.descriptio
 
 internal val routeMethodNotAllowedHandler: HttpHandler = { Response(METHOD_NOT_ALLOWED.description("Method not allowed")) }
 
-internal data class TemplatingRouter(private val method: Method?,
-                                     private val template: UriTemplate,
+internal data class TemplatingRouter(private val template: UriTemplate,
                                      private val httpHandler: HttpHandler) : Router {
-    override fun match(request: Request): RouterMatch = if (template.matches(request.uri.path)) {
-        when (method) {
-            null, request.method -> MatchingHandler { RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }
-            else -> MethodNotMatched
+    override fun match(request: Request): RouterMatch = when {
+        template.matches(request.uri.path) -> {
+            MatchingHandler { RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }
         }
-    } else Unmatched
+        else -> Unmatched
+    }
 
     override fun withBasePath(new: String): Router = copy(
         template = UriTemplate.from("$new/${template}")
