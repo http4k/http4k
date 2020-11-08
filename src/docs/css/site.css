@@ -56,3 +56,13 @@ ul.statusLink li {
     margin: 4px 2px;
     border-radius: 5px;
 }
+
+.headerlink {
+    font-size: 1.5rem;
+    display: none;
+    padding-left: .3em;
+}
+
+h1:hover .headerlink, h2:hover .headerlink, h3:hover .headerlink, h4:hover .headerlink, h5:hover .headerlink, h6:hover .headerlink{
+    display:inline-block;
+}
