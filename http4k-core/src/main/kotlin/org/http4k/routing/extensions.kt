@@ -1,5 +1,6 @@
 package org.http4k.routing
 
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.Unmatched
@@ -14,4 +15,8 @@ fun ((Request) -> Boolean).asRouter(): Router = Router { r: Request ->
 fun Request.path(name: String): String? = when (this) {
     is RoutedRequest -> xUriTemplate.extract(uri.path)[name]
     else -> throw IllegalStateException("Request was not routed, so no uri-template present")
+}
+
+fun Method.asRouter() = Router {
+    if(this@asRouter == it.method) MatchedWithoutHandler else RouterMatch.MethodNotMatched
 }
