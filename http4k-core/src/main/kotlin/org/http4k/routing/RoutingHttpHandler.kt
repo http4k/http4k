@@ -21,8 +21,8 @@ interface RoutingHttpHandler : Router, HttpHandler {
 
 data class PathMethod(val path: String, val method: Method?) {
     infix fun to(action: HttpHandler): RoutingHttpHandler =
-        when (action) {
-            is StaticRoutingHttpHandler -> action.withBasePath(path).let {
+        when  {
+            action is StaticRoutingHttpHandler -> action.withBasePath(path).let {
                 object : RoutingHttpHandler by it {
                     override fun match(request: Request) = when (method) {
                         null, request.method -> it.match(request)
@@ -30,6 +30,7 @@ data class PathMethod(val path: String, val method: Method?) {
                     }
                 }
             }
-            else -> RouterRoutingHttpHandler(TemplatingRouter(method, UriTemplate.from(path), action))
+            method != null -> RouterRoutingHttpHandler(method.asRouter().and(TemplatingRouter(UriTemplate.from(path), action)))
+            else -> RouterRoutingHttpHandler(TemplatingRouter(UriTemplate.from(path), action))
         }
 }
