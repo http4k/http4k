@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class RouterRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
-    override val handler: RoutingHttpHandler = RouterRoutingHttpHandler(TemplatingRouter(
+    override val handler: RoutingHttpHandler = RouterRoutingHttpHandler(TemplateRouter(
         template = UriTemplate.from(validPath),
         httpHandler = { Response(OK) }
     )
