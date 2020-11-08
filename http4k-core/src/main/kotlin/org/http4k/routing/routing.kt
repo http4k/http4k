@@ -23,18 +23,18 @@ infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler
 /**
  * For routes where certain queries are required for correct operation. Router is composable.
  */
-fun queries(vararg names: String): Router = Router { request -> names.all { request.query(it) != null }.asRouterMatch() }
+fun queries(vararg names: String) = { req: Request -> names.all { req.query(it) != null } }.asRouter()
 
 /**
  * For routes where certain headers are required for correct operation. Router is composable.
  */
-fun headers(vararg names: String): Router = Router { request -> names.all { request.header(it) != null }.asRouterMatch() }
+fun headers(vararg names: String) = { req: Request -> names.all { req.header(it) != null } }.asRouter()
 
 /**
  * Matches the Host header to a matching Handler.
  */
 fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>) =
-    routes(*hosts.map { Router { req: Request -> (req.header("host") == it.first).asRouterMatch() } bind it.second }.toTypedArray())
+    routes(*hosts.map { { req: Request -> (req.header("host") == it.first) }.asRouter() bind it.second }.toTypedArray())
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(PassthroughRouter(handler)))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(handler))
