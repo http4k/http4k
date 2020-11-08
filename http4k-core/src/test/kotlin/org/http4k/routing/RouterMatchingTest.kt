@@ -3,6 +3,7 @@ package org.http4k.routing
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.lens.Query
 import org.http4k.lens.int
@@ -37,5 +38,12 @@ class RouterMatchingTest {
         assertThat(router.match(Request(GET, "").query("foo", "1")), equalTo(Unmatched))
         assertThat(router.match(Request(GET, "").query("bar", "2")), equalTo(Unmatched))
         assertThat(router.match(Request(GET, "").query("foo2", "5")), equalTo(Unmatched))
+    }
+
+    @Test
+    fun `generic router`() {
+        val router = { r: Request -> r.method == GET }.asRouter()
+        assertThat(router.match(Request(GET, "")), equalTo(MatchedWithoutHandler))
+        assertThat(router.match(Request(POST, "")), equalTo(Unmatched))
     }
 }

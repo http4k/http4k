@@ -5,6 +5,8 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
@@ -45,9 +47,13 @@ internal data class Prefix(private val template: String) : Router {
     override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
 }
 
+internal val routeNotFoundHandler: HttpHandler = { Response(NOT_FOUND.description("Route not found")) }
+
+internal val routeMethodNotAllowedHandler: HttpHandler = { Response(METHOD_NOT_ALLOWED.description("Method not allowed")) }
+
 internal data class TemplatingRouter(private val method: Method?,
-                            private val template: UriTemplate,
-                            private val httpHandler: HttpHandler) : Router {
+                                     private val template: UriTemplate,
+                                     private val httpHandler: HttpHandler) : Router {
     override fun match(request: Request): RouterMatch = if (template.matches(request.uri.path)) {
         when (method) {
             null, request.method -> MatchingHandler { RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }
