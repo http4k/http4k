@@ -30,6 +30,9 @@ fun interface Router {
     fun withFilter(new: Filter): Router = this
 }
 
+/**
+ * The result of a matching operation. May or may not contain a matched HttpHandler.
+ */
 sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
     data class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatch(0), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
