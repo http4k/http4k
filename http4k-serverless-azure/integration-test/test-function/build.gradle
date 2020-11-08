@@ -1,8 +1,0 @@
-description = 'Testing against a functions deployed to Azure Functions'
-
-apply plugin: 'com.github.johnrengelman.shadow'
-
-dependencies {
-    compile project(":http4k-serverless-azure")
-    compile project(path: ":http4k-core", configuration: 'testArtifacts')
-}

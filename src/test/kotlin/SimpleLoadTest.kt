@@ -28,9 +28,9 @@ fun testWith(threads: Int, reps: Int, fn: (Int) -> ServerConfig, port: Int): Res
     val latch = CountDownLatch(threads)
     val start = System.currentTimeMillis()
     val errors = AtomicLong(0)
-    (0..threads).forEach {
+    for (it in 0..threads) {
         thread {
-            (0..reps).forEach {
+            repeat((0..reps).count()) {
                 if (client(Request(GET, "http://localhost:$port")).status != OK) {
                     errors.incrementAndGet()
                 }

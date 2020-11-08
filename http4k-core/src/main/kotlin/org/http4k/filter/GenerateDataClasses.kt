@@ -7,6 +7,7 @@ import org.http4k.format.JsonType
 import org.http4k.format.JsonType.Array
 import org.http4k.format.JsonType.Object
 import java.io.PrintStream
+import kotlin.math.abs
 import kotlin.random.Random
 
 
@@ -17,9 +18,9 @@ import kotlin.random.Random
  */
 class GenerateDataClasses<out NODE>(private val json: Json<NODE>,
                                     private val out: PrintStream = System.out,
-                                    private val idGenerator: () -> Int = { Math.abs(Random.nextInt()) }) : Filter {
+                                    private val idGenerator: () -> Int = { abs(Random.nextInt()) }) : Filter {
 
-    private fun flatten(list: Set<Gen>): Set<Gen> = list.flatMap { it }.toSet().let { if (it == list) list else flatten(it) }
+    private fun flatten(list: Set<Gen>): Set<Gen> = list.flatten().toSet().let { if (it == list) list else flatten(it) }
 
     override fun invoke(next: HttpHandler): HttpHandler = { req ->
         val response = next(req)
@@ -27,7 +28,7 @@ class GenerateDataClasses<out NODE>(private val json: Json<NODE>,
         out.println(flatten(setOf(process("Base", json.body().toLens()(response))))
             .toSet()
             .groupBy { it.asClassName() }
-            .mapNotNull { (_, gens) -> gens.mapNotNull(Gen::asDefinitionString).sortedByDescending { it.length }.firstOrNull() }
+            .mapNotNull { (_, gens) -> gens.mapNotNull(Gen::asDefinitionString).maxByOrNull { it.length } }
             .sorted()
             .joinToString("\n\n"))
         response

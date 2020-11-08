@@ -1,7 +1,6 @@
 package org.http4k.routing
 
 import org.http4k.core.Body
-import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
@@ -11,7 +10,6 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.websocket.WsConsumer
-import org.http4k.websocket.WsHandler
 import java.io.InputStream
 
 /**
@@ -60,45 +58,6 @@ interface RoutingHttpHandler : Router, HttpHandler {
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
 
 fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = AggregateRoutingHttpHandler(*list)
-
-/**
- * Serve static content using the passed ResourceLoader. Note that for security, by default ONLY mime-types registered in
- * mime.types (resource file) will be served. All other types are registered as application/octet-stream and are not served.
- */
-fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
-
-/**
- * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
- * /public package (on the Classpath).
- */
-fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/public"), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler =
-    SinglePageAppRoutingHandler("", StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
-
-/**
- * For routes where certain queries are required for correct operation. ParameterMatch is composable.
- */
-fun queries(vararg names: String): ParameterMatch = ParameterMatch.Query(*names)
-
-/**
- * For routes where certain headers are required for correct operation. ParameterMatch is composable.
- */
-fun headers(vararg names: String): ParameterMatch = ParameterMatch.Header(*names)
-
-/**
- * Matches the Host header to a matching Handler.
- */
-fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>): RoutingHttpHandler = HostDemuxRoutingHttpHandler(mapOf(*hosts))
-
-interface RoutingWsHandler : WsHandler {
-    fun withBasePath(new: String): RoutingWsHandler
-}
-
-fun websockets(ws: WsConsumer): WsHandler = { ws }
-
-fun websockets(vararg list: RoutingWsHandler): RoutingWsHandler = object : RoutingWsHandler {
-    override operator fun invoke(request: Request): WsConsumer? = list.firstOrNull { it(request) != null }?.invoke(request)
-    override fun withBasePath(new: String): RoutingWsHandler = websockets(*list.map { it.withBasePath(new) }.toTypedArray())
-}
 
 fun Request.path(name: String): String? = when (this) {
     is RoutedRequest -> xUriTemplate.extract(uri.path)[name]

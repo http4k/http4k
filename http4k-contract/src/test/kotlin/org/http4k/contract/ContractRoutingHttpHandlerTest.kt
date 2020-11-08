@@ -99,7 +99,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     fun `traffic goes to the path specified`() {
         val root = routes(
             "/root/bar" bind contract {
-                routes += "/foo/bar" / Path.of("world") bindContract GET to { _ -> { Response(OK) } }
+                routes += "/foo/bar" / Path.of("world") bindContract GET to { { Response(OK) } }
             })
         val response = root(Request(GET, "/root/bar/foo/bar/hello")) as RoutedResponse
 

@@ -9,6 +9,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.routing.and
 import org.http4k.routing.bind
 import org.http4k.routing.headers
 import org.http4k.routing.path
@@ -22,7 +23,7 @@ fun main() {
         PrintRequestAndResponse().then(
             routes(
                 "/get/{name}" bind GET to { req: Request -> Response(OK).body(req.path("name")!!) },
-                "/post/{name}" bind POST to { _: Request -> Response(OK) }
+                "/post/{name}" bind POST to { Response(OK) }
             )
         )
     println(routesWithFilter(Request(GET, "/get/value")))
@@ -33,8 +34,8 @@ fun main() {
         "/static" bind staticWithFilter,
         "/pattern/{rest:.*}" bind { req: Request -> Response(OK).body(req.path("rest") ?: "") },
         "/rita" bind routes(
-            "/delete/{name}" bind DELETE to { _: Request -> Response(OK) },
-            "/post/{name}" bind POST to { _: Request -> Response(OK) }
+            "/delete/{name}" bind DELETE to { Response(OK) },
+            "/post/{name}" bind POST to { Response(OK) }
         ),
         "/matching" bind GET to routes(
             headers("requiredheader").and(queries("requiredquery")) bind { Response(OK).body("matched 2 parameters") },

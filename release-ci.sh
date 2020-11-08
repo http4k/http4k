@@ -25,7 +25,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
 ./gradlew -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble
 
-for i in $(find http4k* -maxdepth 0 -type d); do
+for i in $(./listProjects.sh); do
     ./gradlew --stacktrace -PreleaseVersion=$LOCAL_VERSION :$i:bintrayUpload
 done
 

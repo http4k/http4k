@@ -37,6 +37,6 @@ fun interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *
          * LensFailure if extraction fails. Use this option to fully optimise performance, at the risk
          * of not checking
          */
-        val None = PreFlightExtraction { emptyList<LensExtractor<Request, *>>() }
+        val None = PreFlightExtraction { emptyList() }
     }
 }

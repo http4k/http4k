@@ -155,7 +155,7 @@ private sealed class SchemaNode(
     private val _paramMeta: ParamMeta,
     private val isNullable: Boolean,
     val example: Any?,
-    private val metadata: FieldMetadata?
+    metadata: FieldMetadata?
 ) {
     abstract fun definitions(): Iterable<SchemaNode>
 

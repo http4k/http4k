@@ -7,7 +7,9 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.filter.MetricFilters
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.MicrometerMetrics
+import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
@@ -19,14 +21,14 @@ fun main() {
     val server = routes("/metrics/{name}" bind GET to { Response(OK) })
 
     // apply filters to a server...
-    val app = MetricFilters.Server.RequestCounter(registry)
-        .then(MetricFilters.Server.RequestTimer(registry))
+    val app = ServerFilters.MicrometerMetrics.RequestCounter(registry)
+        .then(ServerFilters.MicrometerMetrics.RequestTimer(registry))
         .then(server)
 
     // ... or to a client
     val client =
-        MetricFilters.Client.RequestCounter(registry)
-            .then(MetricFilters.Client.RequestTimer(registry))
+        ClientFilters.MicrometerMetrics.RequestCounter(registry)
+            .then(ClientFilters.MicrometerMetrics.RequestTimer(registry))
             .then(ApacheClient())
 
     // make some calls

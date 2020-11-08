@@ -24,7 +24,7 @@ class AwsClientFilterTest {
 
     private val clock = fixed(LocalDateTime.of(2016, 1, 27, 15, 32, 50, 27).toInstant(ZoneOffset.UTC), ZoneId.of("UTC"))
 
-    val audit = AuditHandler()
+    private val audit = AuditHandler()
 
     private val client = ClientFilters.AwsAuth(scope, credentials, clock).then(audit)
 

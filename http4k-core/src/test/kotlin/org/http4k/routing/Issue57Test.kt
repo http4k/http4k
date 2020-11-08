@@ -10,7 +10,7 @@ class Issue57Test {
     private val resourceLoader = ResourceLoader.Classpath()
 
     @Test
-    fun `a`() {
+    fun a() {
         val routes = routes(
             "/path1" bind static(resourceLoader),
             "/path2" bind static(resourceLoader)
@@ -21,7 +21,7 @@ class Issue57Test {
     }
 
     @Test
-    fun `b`() {
+    fun b() {
         val routes = routes(
             "/path1" bind GET to static(resourceLoader),
             "/path2" bind static(resourceLoader)
@@ -32,7 +32,7 @@ class Issue57Test {
     }
 
     @Test
-    fun `c`() {
+    fun c() {
         val routes = routes(
             "/path1" bind static(resourceLoader),
             "/path2" bind GET to static(resourceLoader)
@@ -43,7 +43,7 @@ class Issue57Test {
     }
 
     @Test
-    fun `d`() {
+    fun d() {
         val routes = routes(
             "/path1" bind GET to static(resourceLoader),
             "/path2" bind GET to static(resourceLoader)

@@ -104,7 +104,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
         val line = "b".repeat(config.beepSize) + "\n"
 
         thread {
-            (1..5).forEach {
+            for (it in 1..5) {
                 if (runningInIdea) println("$location sent")
 
                 output.write(line.toByteArray())

@@ -29,25 +29,26 @@ edit_uri: edit/master/src/docs/
 strict: false
 nav:
   - Introduction: documentation/index.md
-  - Rationale & Concepts: rationale/index.md
-  - Installation:  installation/index.md
-  - Getting started: quickstart/index.md
-  - Developer Guide:
+  - Quickstart: quickstart/index.md
+  - Rationale & concepts: rationale/index.md
+  - Changelog: changelog/index.md
+  - Developer guide:
     - Modules:
       - Overview: guide/modules/index.md
-      - AWS: guide/modules/aws/index.md
       - Core: guide/modules/core/index.md
-      - JSON handling: guide/modules/json/index.md
-      - HTTP & Websocket clients: guide/modules/clients/index.md
-      - Metrics: guide/modules/metrics/index.md
-      - Multipart forms: guide/modules/multipart/index.md
-      - Resilience: guide/modules/resilience/index.md
       - Server backend: guide/modules/servers/index.md
       - Serverless backend: guide/modules/serverless/index.md
-      - Templating: guide/modules/templating/index.md
+      - HTTP & Websocket clients: guide/modules/clients/index.md
       - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
-      - OAuth: guide/modules/oauth/index.md
+      - JSON handling: guide/modules/json/index.md
+      - Templating: guide/modules/templating/index.md
+      - Multipart forms: guide/modules/multipart/index.md
       - Cloud native Configuration: guide/modules/cloud_native/index.md
+      - Micrometer: guide/modules/micrometer/index.md
+      - OpenTelemetry: guide/modules/opentelemetry/index.md
+      - Resilience4J: guide/modules/resilience4j/index.md
+      - AWS: guide/modules/aws/index.md
+      - OAuth: guide/modules/oauth/index.md
       - JSON RPC: guide/modules/jsonrpc/index.md
       - XML handling: guide/modules/xml/index.md
       - YAML handling: guide/modules/yaml/index.md
@@ -57,10 +58,7 @@ nav:
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
       - Service Virtualisaion: guide/modules/servicevirtualisation/index.md
-    - Application Testing: guide/testing/index.md
-  - Tutorials:
-    - TDDing http4k: tutorials/tdding_http4k/index.md
-    - Documenting http4k apps with OpenApi3: tutorials/documenting_apis_with_openapi/index.md
+    - Application testing: guide/testing/index.md
   - Cookbook:
     - How to use this guide: cookbook/index.md
     - Server as a function: cookbook/server_as_a_function/index.md
@@ -86,16 +84,17 @@ nav:
     - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md
-  - Performance: performance/index.md
-  - In action: in_action/index.md
+  - http4k in action: in_action/index.md
   - Blog:
     - Meet http4k: blog/meet_http4k/index.md
     - Typesafe Websockets: blog/typesafe_websockets/index.md
+    - TDDing http4k: blog/tdding_http4k/index.md
+    - Documenting http4k apps with OpenApi3: blog/documenting_apis_with_openapi/index.md
     - Retrospective on v3: blog/retrospective_v3/index.md
     - Nanoservices: blog/nanoservices/index.md
-  - Getting Support: support/index.md
-  - Contribute/Support http4k: contributing/index.md
+  - Performance: performance/index.md
+  - FAQ: faq/index.md
+  - Getting support: support/index.md
+  - Contribute/support http4k: contributing/index.md
   - Code of Conduct: code-of-conduct/index.md
   - API docs: api/index.md
-  - Changelog: changelog/index.md
-  - FAQ: faq/index.md

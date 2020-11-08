@@ -23,7 +23,7 @@ class EventFiltersTests {
     }
 
     @Test
-    fun `AddZipkinTraces captures instant`() {
+    fun `AddZipkinTraces captures traces`() {
         val expected = ZipkinTraces.THREAD_LOCAL.get()
         val events = EventFilters.AddZipkinTraces().then(recording)
         val event = MyEvent()

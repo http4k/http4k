@@ -156,6 +156,31 @@ object Libs {
             Versions.org_junit_jupiter
 
     /**
+     * https://github.com/open-telemetry/opentelemetry-java
+     */
+    const val opentelemetry_api: String = "io.opentelemetry:opentelemetry-api:" +
+            Versions.io_opentelemetry
+
+    /**
+     * https://github.com/open-telemetry/opentelemetry-java
+     */
+    const val opentelemetry_exporters_inmemory: String =
+            "io.opentelemetry:opentelemetry-exporters-inmemory:" + Versions.io_opentelemetry
+
+    /**
+     * https://github.com/open-telemetry/opentelemetry-java
+     */
+    const val opentelemetry_extension_trace_propagators: String =
+            "io.opentelemetry:opentelemetry-extension-trace-propagators:" +
+            Versions.io_opentelemetry
+
+    /**
+     * https://github.com/open-telemetry/opentelemetry-java
+     */
+    const val opentelemetry_sdk: String = "io.opentelemetry:opentelemetry-sdk:" +
+            Versions.io_opentelemetry
+
+    /**
      * https://forkhandles.dev
      */
     const val bunting4k: String = "dev.forkhandles:bunting4k:" + Versions.dev_forkhandles
@@ -184,6 +209,10 @@ object Libs {
      * https://github.com/ktorio/ktor
      */
     const val ktor_server_netty: String = "io.ktor:ktor-server-netty:" + Versions.io_ktor
+
+    const val com_microsoft_azure_azurefunctions_gradle_plugin: String =
+            "com.microsoft.azure.azurefunctions:com.microsoft.azure.azurefunctions.gradle.plugin:" +
+            Versions.com_microsoft_azure_azurefunctions_gradle_plugin
 
     const val de_fayard_buildsrcversions_gradle_plugin: String =
             "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
@@ -414,6 +443,4 @@ object Libs {
      * https://github.com/douglascrockford/JSON-java
      */
     const val json: String = "org.json:json:" + Versions.json
-
-    const val api: String = "com.fnproject.fn:api:" + Versions.api
 }

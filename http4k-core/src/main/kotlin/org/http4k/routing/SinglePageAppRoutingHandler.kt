@@ -1,11 +1,19 @@
 package org.http4k.routing
 
+import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+
+/**
+ * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
+ * /public package (on the Classpath).
+ */
+fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/public"), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler =
+    SinglePageAppRoutingHandler("", StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
 
 internal data class SinglePageAppRoutingHandler(
     private val pathSegments: String,

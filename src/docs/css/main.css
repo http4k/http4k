@@ -104,16 +104,6 @@ h4,
   font-weight: 700;
 }
 
-.headerlink {
-    font-size: 1.5rem;
-    display: none;
-    padding-left: .3em;
-}
-
-h1:hover .headerlink, h2:hover .headerlink, h3:hover .headerlink, h4:hover .headerlink, h5:hover .headerlink, h6:hover .headerlink{
-    display:inline-block;
-}
-
 p {
   opacity: 0.8;
   font-size: 1.2rem;
@@ -136,7 +126,7 @@ nav a {
 }
 
 footer {
-    color: white;
+  color: white;
 }
 
 footer a {
@@ -268,7 +258,7 @@ footer a {
 }
 
 .btn-github {
-  background-image: url("../img/GitHub-Mark.png");
+  background-image: url("/img/GitHub-Mark.png");
   background-repeat: no-repeat;
   background-size: cover;
   width: 32px;
@@ -277,7 +267,7 @@ footer a {
 }
 
 .btn-github:hover {
-  background-image: url("../img/GitHub-Mark-black.png");
+  background-image: url("/img/GitHub-Mark-black.png");
 }
 
 .spinner-loading, .spinner-loading img {
@@ -441,12 +431,6 @@ header p {
 
 .company p {
   max-width: 100%;
-}
-
-.logo-repeater {
-  background: url("../img/logo-repeater.svg");
-  height: 56px;
-  background-repeat: space;
 }
 
 .developers {
@@ -668,7 +652,7 @@ header p {
 
 .intro .aside {
   background-color: #f8f8f8;
-  padding: 40px;
+  padding: 20px;
   height: calc(100vh - 8px);
   overflow: scroll;
   width: 320px;
@@ -700,7 +684,7 @@ header p {
 }
 
 .intro .aside .logo {
-  margin-bottom: 45px;
+  margin: 20px 0 45px 20px;
 }
 
 .intro .aside .form-group {
@@ -739,7 +723,7 @@ header p {
 }
 
 .intro .aside .nav .nav-item {
-  transition: 0.15s ease-in-out all;
+  transition: 0.05s ease-in-out all;
 }
 
 .intro .aside .nav .nav-item.active {
@@ -763,7 +747,7 @@ header p {
   border: none;
   position: static !important;
   width: 75%;
-  margin-left: 35px;
+  margin-left: 15px;
   transform: none !important;
 }
 
@@ -780,9 +764,9 @@ header p {
 }
 
 .intro .aside .nav .dropdown-menu .dropdown-item {
-  padding: 0.5rem 0.5rem;
-  margin-bottom: 10px;
-  transition: 0.15s ease-in-out all;
+  padding: 0.2rem 0.5rem;
+  margin-bottom: 7px;
+  transition: 0.05s ease-in-out all;
 }
 
 .intro .aside .nav .dropdown-menu .dropdown-item.active,

@@ -30,11 +30,11 @@ fun Request.cookies(): List<Cookie> = headers
     .mapNotNull { it.second?.toCookieList() }
     .fold(listOf()) { acc, current -> acc.plus(current) }
 
-fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.sortedByDescending {
+fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.maxByOrNull {
     it.path?.length ?: 0
-}.firstOrNull()
+}
 
-private fun List<Cookie>.toCookieString() = map(Cookie::keyValueCookieString).joinToString("; ")
+private fun List<Cookie>.toCookieString() = joinToString("; ", transform = Cookie::keyValueCookieString)
 
 fun Response.cookies(): List<Cookie> = headerValues("set-cookie").filterNotNull().mapNotNull { Cookie.parse(it) }
 

@@ -114,7 +114,7 @@ class QuotedPrintableDecoderTestCase {
 
     companion object {
 
-        private val US_ASCII_CHARSET = "US-ASCII"
+        private const val US_ASCII_CHARSET = "US-ASCII"
 
         @Throws(Exception::class)
         private fun assertEncoded(clearText: String, encoded: String) {
