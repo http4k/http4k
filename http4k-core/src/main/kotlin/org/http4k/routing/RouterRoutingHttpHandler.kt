@@ -33,15 +33,20 @@ internal data class RouterRoutingHttpHandler(
         methodNotAllowedHandler = new.then(methodNotAllowedHandler)
     )
 
-    override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new))
+    override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new)).also { println(it) }
+
+    fun with(pathMethod: PathMethod): RoutingHttpHandler =
+        copy(router = pathMethod.method.asRouter().and(when (router) {
+            is TemplateRouter -> withBasePath(pathMethod.path)
+            else -> TemplateRouter(UriTemplate.from(pathMethod.path), withBasePath(pathMethod.path))
+        }))
 }
 
 internal data class Prefix(private val template: String) : Router {
-    override fun match(request: Request) =
-        when {
-            UriTemplate.from("$template{match:.*}").matches(request.uri.path) -> MatchedWithoutHandler
-            else -> Unmatched
-        }
+    override fun match(request: Request) = when {
+        UriTemplate.from("$template{match:.*}").matches(request.uri.path) -> MatchedWithoutHandler
+        else -> Unmatched
+    }
 
     override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
 }
@@ -58,9 +63,12 @@ internal data class TemplateRouter(private val template: UriTemplate,
         else -> Unmatched
     }
 
-    override fun withBasePath(new: String): Router = copy(
-        template = UriTemplate.from("$new/${template}")
-    )
+    override fun withBasePath(new: String): Router =
+        TemplateRouter(UriTemplate.from("$new/${template}"),
+        when (httpHandler) {
+            is RoutingHttpHandler -> httpHandler.withBasePath(new)
+            else -> httpHandler
+        })
 
     override fun withFilter(new: Filter): Router = copy(httpHandler = when (httpHandler) {
         is RoutingHttpHandler -> httpHandler.withFilter(new)

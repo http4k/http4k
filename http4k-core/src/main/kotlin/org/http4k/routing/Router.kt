@@ -81,12 +81,12 @@ internal data class AndRouter private constructor(private val list: List<Router>
 internal data class PassthroughRouter(private val handler: HttpHandler) : Router {
     override fun match(request: Request): RouterMatch = MatchingHandler(handler)
 
-    override fun withBasePath(new: String): Router = when (handler) {
+    override fun withBasePath(new: String) = when (handler) {
         is RoutingHttpHandler -> handler.withBasePath(new)
         else -> this
     }
 
-    override fun withFilter(new: Filter): Router = when (handler) {
+    override fun withFilter(new: Filter) = when (handler) {
         is RoutingHttpHandler -> handler.withFilter(new)
         else -> PassthroughRouter(new.then(handler))
     }
