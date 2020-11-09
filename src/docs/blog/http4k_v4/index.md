@@ -56,10 +56,15 @@ As documented in the [Toolbox announcement post](/blog/guns_for_show), we've bee
 #### New Routing implementation
 
 #### OpenTelemetry: Monitor all the things!
-3. OpenTelemetry is now supported, bringing a standard way of instrumenting apps with distributed tracing (XRay, Jaeger, Zipkin) and metrics. Docs here: https://www.http4k.org/guide/modules/opentelemetry/
+The [OpenTelemetry] project describes itself as...
+> **"... a collection of tools, APIs, and SDKs. You use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior."
 
-#### Library API changes
-Like the neat little worker bunnies we are, we've taken the opportunity to clean up the source code. All previously Deprecated code has been removed
+It's a great project run by the CNCF and very well fits in with the ethos that the [http4k] team believes in. As with all [http4k] integration modules, we want to enable [http4k] developers to be able to plug in their apps as simply as possible - in this case, just configure the OpenTelemetry API or Java-agent, then just add some simple `Filters` to your code to start collecting Distributed Traces or Metrics. Several tracing schemes are supported, including Amazon XRay, Jaeger and Zipkin.
+
+For more docs on how to get it all working, head over to the [docs](/guide/modules/opentelemetry).
+
+#### Upgrading & library API changes
+Like the neat little worker bunnies we are, we've taken the opportunity to clean up the source code. All previously deprecated code has been removed, leaving the codebase nice and tidy. If you are upgrading, the best idea is to first upgrade to a late v3 version (v3.254.0), deal with the deprecations in place, then simply upgrade again to v4.
 
 #### The http4k website
 
