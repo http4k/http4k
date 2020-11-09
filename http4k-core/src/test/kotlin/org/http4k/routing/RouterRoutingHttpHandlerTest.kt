@@ -26,6 +26,17 @@ class RouterRoutingHttpHandlerSpecialCaseTests {
 
     @Test
     fun `multi param routes - verb first`() {
+        val handler = routes(GET to routes("/{foo}" bind
+            routes("/{bar}" bind { it: Request ->
+                Response(OK).body(it.path("foo")!! + " then " + it.path("bar"))
+            })
+        ))
+
+        assertThat(handler(Request(GET, "/one/two")), hasStatus(OK).and(hasBody("one then two")))
+    }
+
+    @Test
+    fun `multi param routes - verb middle`() {
         val handler = routes("/{foo}" bind GET to routes(
             "/{bar}" bind { r: Request -> Response(OK).body(r.path("foo")!! + " then " + r.path("bar")) }
         ))
