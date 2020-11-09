@@ -6,11 +6,11 @@ import com.natpryce.hamkrest.present
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class RouterRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
@@ -77,5 +77,17 @@ class RouterRoutingHttpHandlerSpecialCaseTests {
     fun `attempt to bind param handler without a verb - with header`() {
         val app = routes(prefix bind (headers("host") bind { Response(OK) }))
         assertThat(app(Request(GET, prefix).header("host", "foo")), hasStatus(OK))
+    }
+
+    @Test
+    fun `attempt to bind fallback handler without a verb - wrong route`() {
+        val app = routes(prefix bind routes(
+            header("host", "host1") bind { Response(OK) },
+            header("host", "host2") bind { Response(INTERNAL_SERVER_ERROR) }
+        ))
+        assertThat(app(Request(GET, prefix).header("host", "host1")), hasStatus(OK))
+        assertThat(app(Request(GET, prefix).header("host", "host2")), hasStatus(INTERNAL_SERVER_ERROR))
+        assertThat(app(Request(GET, prefix).header("host", "foo")), hasStatus(NOT_FOUND))
+        assertThat(app(Request(GET, prefix)), hasStatus(NOT_FOUND))
     }
 }
