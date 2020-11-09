@@ -12,7 +12,7 @@ import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 
 /**
- * Provides matching of a Request to an HttpHandler which can service it.
+ * Matches requests for routing purposes.
  */
 fun interface Router {
     /**
@@ -21,7 +21,7 @@ fun interface Router {
     fun match(request: Request): RouterMatch
 
     /**
-     * Returns a Router which prepends the passed base path to the logic determining the match()
+     * Returns a Router which prepends the passed base path to the logic determining the match().
      */
     fun withBasePath(new: String): Router = Prefix(new).and(this)
 
