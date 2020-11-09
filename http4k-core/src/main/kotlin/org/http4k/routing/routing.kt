@@ -8,8 +8,7 @@ import org.http4k.websocket.WsConsumer
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
 
-fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler =
-    RouterRoutingHttpHandler(if(list.size == 1) list.first() else OrRouter(list.toList()))
+fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(OrRouter.from(list.toList()))
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 
@@ -39,4 +38,4 @@ fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>) =
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(PassthroughRouter(handler)))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(handler))
-infix fun Router.and(that: Router): Router = AndRouter(listOf(this, that))
+infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))

@@ -50,35 +50,43 @@ internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
     is MatchingHandler, MethodNotMatched, Unmatched -> this
 }
 
-internal class OrRouter(private val list: List<Router>) : Router {
+internal data class OrRouter private constructor(private val list: List<Router>) : Router {
     override fun match(request: Request) = list.asSequence()
         .map { next -> next.match(request) }
         .sorted()
         .firstOrNull() ?: Unmatched
 
-    override fun withBasePath(new: String) = Prefix(new).and(OrRouter(list.map { it.withBasePath(new) }))
+    override fun withBasePath(new: String) = Prefix(new).and(from(list.map { it.withBasePath(new) }))
 
-    override fun withFilter(new: Filter) = OrRouter(list.map { it.withFilter(new) })
+    override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
+
+    companion object {
+        fun from(list: List<Router>): Router = if (list.size == 1) list.first() else OrRouter(list)
+    }
 }
 
-internal class AndRouter(private val list: List<Router>) : Router {
+internal data class AndRouter private constructor(private val list: List<Router>) : Router {
     override fun match(request: Request) =
         list.fold(MatchedWithoutHandler as RouterMatch) { acc, next -> acc.and(next.match(request)) }
 
-    override fun withBasePath(new: String) = AndRouter(listOf(Prefix(new)) + list.map { it.withBasePath(new) })
+    override fun withBasePath(new: String) = from(listOf(Prefix(new)) + list.map { it.withBasePath(new) })
 
-    override fun withFilter(new: Filter) = AndRouter(list.map { it.withFilter(new) })
+    override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
+
+    companion object {
+        fun from(list: List<Router>): Router = if (list.size == 1) list.first() else AndRouter(list)
+    }
 }
 
-internal class PassthroughRouter(private val handler: HttpHandler) : Router {
+internal data class PassthroughRouter(private val handler: HttpHandler) : Router {
     override fun match(request: Request): RouterMatch = MatchingHandler(handler)
 
-    override fun withBasePath(new: String) = when (handler) {
+    override fun withBasePath(new: String): Router = when (handler) {
         is RoutingHttpHandler -> handler.withBasePath(new)
         else -> this
     }
 
-    override fun withFilter(new: Filter) = when (handler) {
+    override fun withFilter(new: Filter): Router = when (handler) {
         is RoutingHttpHandler -> handler.withFilter(new)
         else -> PassthroughRouter(new.then(handler))
     }
