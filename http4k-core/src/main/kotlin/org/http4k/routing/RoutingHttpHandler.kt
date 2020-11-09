@@ -20,7 +20,7 @@ interface RoutingHttpHandler : Router, HttpHandler {
     override fun withBasePath(new: String): RoutingHttpHandler
 }
 
-class PathMethod(internal val path: String, internal val method: Method) {
+class PathMethod(private val path: String, private val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler =
         when (action) {
             is StaticRoutingHttpHandler -> action.withBasePath(path).let {
@@ -31,7 +31,10 @@ class PathMethod(internal val path: String, internal val method: Method) {
                     }
                 }
             }
-            is RouterRoutingHttpHandler -> action.with(this)
+            is RouterRoutingHttpHandler -> action.copy(router = method.asRouter().and(when (action.router) {
+                is TemplateRouter -> action.withBasePath(path)
+                else -> TemplateRouter(UriTemplate.from(path), action.withBasePath(path))
+            }))
             else -> RouterRoutingHttpHandler(method.asRouter().and(TemplateRouter(UriTemplate.from(path), action)))
         }
 }
