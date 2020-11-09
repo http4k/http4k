@@ -56,7 +56,7 @@ internal data class OrRouter private constructor(private val list: List<Router>)
         .sorted()
         .firstOrNull() ?: Unmatched
 
-    override fun withBasePath(new: String) = Prefix(new).and(from(list.map { it.withBasePath(new) }))
+    override fun withBasePath(new: String) = from(list.map { it.withBasePath(new) })
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
@@ -69,7 +69,7 @@ internal data class AndRouter private constructor(private val list: List<Router>
     override fun match(request: Request) =
         list.fold(MatchedWithoutHandler as RouterMatch) { acc, next -> acc.and(next.match(request)) }
 
-    override fun withBasePath(new: String) = from(listOf(Prefix(new)) + list.map { it.withBasePath(new) })
+    override fun withBasePath(new: String) = from(list.map { it.withBasePath(new) })
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
