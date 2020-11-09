@@ -25,16 +25,12 @@ class PathMethod(private val path: String, private val method: Method) {
         when (action) {
             is StaticRoutingHttpHandler -> action.withBasePath(path).let {
                 object : RoutingHttpHandler by it {
-                    override fun match(request: Request) = when (method) {
+                    override fun match(request: Request)= when (method) {
                         request.method -> it.match(request)
                         else -> MethodNotMatched
                     }
                 }
             }
-            is RouterRoutingHttpHandler -> action.copy(router = method.asRouter().and(when (action.router) {
-                is TemplateRouter -> action.withBasePath(path)
-                else -> TemplateRouter(UriTemplate.from(path), action.withBasePath(path))
-            }))
             else -> RouterRoutingHttpHandler(method.asRouter().and(TemplateRouter(UriTemplate.from(path), action)))
         }
 }
