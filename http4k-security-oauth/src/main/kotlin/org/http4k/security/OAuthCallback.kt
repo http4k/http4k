@@ -4,7 +4,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
-import org.http4k.core.toParameters
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
 
@@ -16,9 +15,8 @@ class OAuthCallback(
 
     override fun invoke(request: Request) = request.queryOrFragmentParameter("code")
         ?.let { code ->
-            val state = request.queryOrFragmentParameter("state")?.toParameters() ?: emptyList()
-            state.find { it.first == "csrf" }?.second
-                ?.let(::CrossSiteRequestForgeryToken)
+            val state = request.queryOrFragmentParameter("state")
+            state?.let(::CrossSiteRequestForgeryToken)
                 ?.takeIf { it == oAuthPersistence.retrieveCsrf(request) }
                 ?.let {
                     val idToken = request.queryOrFragmentParameter("id_token")?.let { IdToken(it) }
@@ -27,7 +25,7 @@ class OAuthCallback(
                         accessTokenFetcher.fetch(code)
                             ?.let { tokenDetails ->
                                 tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
-                                val originalUri = state.find { it.first == "uri" }?.second ?: "/"
+                                val originalUri = oAuthPersistence.retrieveOriginalUri(request)?.toString() ?: "/"
                                 oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT)
                                     .header("Location", originalUri), tokenDetails.accessToken)
                             }

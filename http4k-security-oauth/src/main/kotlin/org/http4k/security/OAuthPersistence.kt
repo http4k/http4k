@@ -3,6 +3,7 @@ package org.http4k.security
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.core.Uri
 import org.http4k.security.openid.Nonce
 
 /**
@@ -33,6 +34,21 @@ interface OAuthPersistence {
      * Retrieve the stored nonce token for this user request
      */
     fun retrieveNonce(request: Request): Nonce?
+
+    /**
+     * opportunity to store the uri that the request was made before authentication
+     * this will then be redirected back to after auth
+     *
+     * Be careful not to create scenarios where an open redirector is created,
+     * by applications attempting some sort of phishing attack
+     */
+    fun assignOriginalUri(redirect: Response, originalUri: Uri): Response
+
+    /**
+     * Retrieve the stored original uri for this user request
+     */
+    fun retrieveOriginalUri(request: Request): Uri?
+
 
     /**
      * Assign the swapped AccessToken returned by the end-service. Opportunity here to modify the
