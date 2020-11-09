@@ -14,7 +14,7 @@ import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 
 internal data class RouterRoutingHttpHandler(
-    private val router: Router,
+    internal val router: Router,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
     private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
 
@@ -33,13 +33,7 @@ internal data class RouterRoutingHttpHandler(
         methodNotAllowedHandler = new.then(methodNotAllowedHandler)
     )
 
-    override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new)).also { println(it) }
-
-    fun with(pathMethod: PathMethod): RoutingHttpHandler =
-        copy(router = pathMethod.method.asRouter().and(when (router) {
-            is TemplateRouter -> withBasePath(pathMethod.path)
-            else -> TemplateRouter(UriTemplate.from(pathMethod.path), withBasePath(pathMethod.path))
-        }))
+    override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new))
 }
 
 internal data class Prefix(private val template: String) : Router {
