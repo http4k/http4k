@@ -4,6 +4,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
@@ -83,7 +84,7 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
 
     override fun withBasePath(new: String) = when (handler) {
         is RoutingHttpHandler -> handler.withBasePath(new)
-        else -> this
+        else -> TemplateRouter(UriTemplate.from(new), handler)
     }
 
     override fun withFilter(new: Filter) = when (handler) {
