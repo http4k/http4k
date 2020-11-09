@@ -78,13 +78,4 @@ class RouterRoutingHttpHandlerSpecialCaseTests {
         val app = routes(prefix bind (headers("host") bind { Response(OK) }))
         assertThat(app(Request(GET, prefix).header("host", "foo")), hasStatus(OK))
     }
-
-//    @Test
-//    fun `binding RouterMethod`() {
-//        val app = routes(headers("host") bind GET to {
-//            Response(OK)
-//        })
-//        assertThat(app(Request(GET, "").header("host", "asd")), hasStatus(OK))
-//        assertThat(app(Request(GET, "")), hasStatus(NOT_FOUND))
-//    }
 }
