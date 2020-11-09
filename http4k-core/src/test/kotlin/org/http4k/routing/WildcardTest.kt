@@ -24,8 +24,8 @@ class WildcardTest {
         val a =
             routes("/name" bind (
                 headers("bob") bind routes("/{wildcard:.*}" bind GET to { r: Request ->
-                Response(Status.OK).body(r.path("wildcard").orEmpty())
-            })))
+                    Response(Status.OK).body(r.path("wildcard").orEmpty())
+                })))
 
         assertThat(a(Request(GET, "/name/bob/is/great")
             .header("bob", "jill")), hasBody("bob/is/great"))
