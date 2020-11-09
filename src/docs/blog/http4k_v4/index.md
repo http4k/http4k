@@ -5,7 +5,7 @@ description: In preparation for the upcoming release of v4, the http4k team thou
 
 ##### november 2020 / the http4k team
 
-Well, at last it's here - after 3 years - [http4k] v4! Following on from the [retrospective](/blog/retrospective_v3) that we did on version 3, we've been polishing up, tidying up the edges, and pushing out a bunch of changes to make the project sparkle. Ready? Then let's dive into the good stuff...
+Well, at last it's here - after 3 years - [http4k] v4! Following on from the [retrospective](/blog/retrospective_v3) that we did on version 3, we've been polishing up, tidying up the edges, and pushing out a bunch of changes to make the project sparkle. Ready? Then let's dive into the good stuff that's been going on at [http4k] towers.
 
 #### "Four digits good" - the new http4k versioning scheme
 Ah yes - versioning - everyone's favourite topic. The reason that [http4k] v3 has been around so long is that we've somewhat been abusing the [Semantic versioning](https://semver.org/) system, something which we've been unhappy with. Here's how it should work:
@@ -50,24 +50,25 @@ class TestFunction : GoogleCloudFunction(
 
 The good news is that testing your Serverless functions locally is identical to testing any other [http4k] app - and as ever there's no magic involved - just test them entirely in-memory, or bind them to a standard backend Server.
 
-#### Toolbox
-2. the http4k Toolbox is now ready for general use - it's a collection of tools to generate code for http4k projects. Try it out and let us know what you think! https://toolbox.http4k.org/ or install `http4k` via Brew/SDKman!
+#### http4k Toolbox
+As documented in the [Toolbox announcement post](/blog/guns_for_show), we've been busy consolidating a bunch of handy tools for generating code to work with [http4k] projects, and we christened this the **http4k Toolbox** and it's avaiable both as a [website](https://toolbox.httpk.org) and a command-line utility from Brew and SDKMan. From [Project Generation](https://toolbox.httpk.org/project) to our own more sophisticated [OpenAPI3 Generator](https://toolbox.httpk.org/openapi), we hope that this will be the essential Swiss Army Knife in every **http4k** developer's pocket.
 
 #### New Routing implementation
 
-#### OpenTelemetry
+#### OpenTelemetry: Monitor all the things!
 3. OpenTelemetry is now supported, bringing a standard way of instrumenting apps with distributed tracing (XRay, Jaeger, Zipkin) and metrics. Docs here: https://www.http4k.org/guide/modules/opentelemetry/
 
-#### Library changes
+#### Library API changes
 Like the neat little worker bunnies we are, we've taken the opportunity to clean up the source code. All previously Deprecated code has been removed
 
-#### Connect
-5. http4k-connect is our newest project which we hope to eventually standardise patterns for building 3rd party adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory and Redis). https://github.com/http4k/examples
+#### The http4k website
 
-#### Examples
+#### Examples Repo
 4. The examples repo continues to grow - there are now examples for deploying http4k apps to *GraalVM* and *Quarkus*, and an 
+https://github.com/http4k/examples
 
-#### The site and more...
+#### http4k Connect
+5. http4k-connect is our newest project which we hope to eventually standardise patterns for building 3rd party adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory and Redis). 
 
 [http4k]: https://http4k.org
 [Slack]: http://slack.kotlinlang.org/
