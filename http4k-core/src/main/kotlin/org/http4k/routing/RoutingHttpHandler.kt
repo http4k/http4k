@@ -31,7 +31,7 @@ class PathMethod(private val path: String, private val method: Method) {
                     }
                 }
             }
-            is RouterRoutingHttpHandler -> action.copy(router = method.asRouter().and(action.router.withBasePath(path)))
+            is RouterRoutingHttpHandler -> action.copy(router = method.asRouter().and(action.withBasePath(path)))
             else -> RouterRoutingHttpHandler(method.asRouter().and(TemplateRouter(UriTemplate.from(path), action)))
         }
 }
