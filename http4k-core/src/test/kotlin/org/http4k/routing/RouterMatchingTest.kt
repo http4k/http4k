@@ -5,6 +5,8 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.matches
@@ -89,11 +91,10 @@ class RouterMatchingTest {
 
     @Test
     fun `composite router`() {
-        val router = GET.asRouter().and(header("foo", "bar").and(query("bar", "foo")))
+        val router = GET.and(header("foo", "bar").and(query("bar", "foo")))
         assertThat(router.match(Request(GET, "").header("foo", "bar").query("bar", "foo")), equalTo(MatchedWithoutHandler))
         assertThat(router.match(Request(POST, "").header("foo", "bar").query("bar", "foo")), equalTo(MethodNotMatched))
         assertThat(router.match(Request(GET, "").header("foo", "bar")), equalTo(Unmatched))
         assertThat(router.match(Request(GET, "").query("bar", "foo")), equalTo(Unmatched))
     }
-
 }

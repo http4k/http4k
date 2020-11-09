@@ -20,3 +20,5 @@ fun Request.path(name: String): String? = when (this) {
 fun Method.asRouter() = Router {
     if(this@asRouter == it.method) MatchedWithoutHandler else RouterMatch.MethodNotMatched
 }
+
+fun Method.and(that: Router) = asRouter().and(that)
