@@ -23,8 +23,7 @@ infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
 /**
  * Matches the Host header to a matching Handler.
  */
-fun hostDemux(vararg hosts: Pair<String, RoutingHttpHandler>) =
-    routes(*hosts.map { { req: Request -> (req.header("host") == it.first) }.asRouter() bind it.second }.toTypedArray())
+fun hostDemux(vararg hosts: Pair<String, HttpHandler>) = routes(*hosts.map { header("host", it.first) bind it.second }.toTypedArray())
 
 /**
  * Apply routing predicate to a query
