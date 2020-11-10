@@ -86,6 +86,7 @@ nav:
     - Test driven apps: cookbook/test_driven_apps/index.md
   - http4k in action: in_action/index.md
   - Blog:
+    - Overview: blog/index.md
     - Meet http4k: blog/meet_http4k/index.md
     - Typesafe Websockets: blog/typesafe_websockets/index.md
     - TDDing http4k: blog/tdding_http4k/index.md

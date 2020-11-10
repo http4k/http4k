@@ -1,8 +1,12 @@
 title: http4k blog
 description: List of articles published on the http4k library
 
+# http4k blog
+<span style="display: none">
 * 2020/11: [http4k v4 Unleashed](./http4k_v4)
     - There's a new major http4k release! Read about all the new stuff the team have been working on for http4k v4.
+</span>
+
 * 2020/11: [http4k Toolbox: Guns for show, knives for a pro](./toolbox)
     - Introduction to the http4k Toolbox website and CLI.
 * 2020/10: [Nanoservices: The Power of Composition](./nanoservices)
