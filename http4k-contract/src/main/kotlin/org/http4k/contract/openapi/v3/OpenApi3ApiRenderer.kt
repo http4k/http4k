@@ -12,7 +12,7 @@ import org.http4k.util.JsonSchema
 /**
  * Converts a API to OpenApi3 format JSON.
  */
-class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
+class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>, private val servers: List<ServerObject>) : ApiRenderer<Api<NODE>, NODE> {
     private val jsonToJsonSchema = JsonToJsonSchema(json, "components/schemas")
 
     override fun api(api: Api<NODE>): NODE =
@@ -49,25 +49,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     private fun ServerObject.asJson() = json {
         obj(
             "url" to string(url),
-            "description" to string(description ?: ""),
-            "variables" to variables.asJson()
-        )
-    }
-
-    @JvmName("asJsonStringServerVariableObject")
-    private fun Map<String, ServerVariableObject>.asJson() = json {
-        obj(
-            map {
-                it.key to it.value.asJson()
-            }
-        )
-    }
-
-    private fun ServerVariableObject.asJson() = json {
-        obj(
-            "enum" to array(enum.map { string(it) }),
-            "default" to string(default),
-            "description" to string(description ?: ""),
+            "description" to string(description ?: "")
         )
     }
 

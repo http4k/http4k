@@ -1,18 +1,10 @@
 package org.http4k.contract.openapi.v2
 
-import org.http4k.contract.ContractRenderer
-import org.http4k.contract.ContractRoute
-import org.http4k.contract.ErrorResponseRenderer
-import org.http4k.contract.HttpMessageMeta
-import org.http4k.contract.JsonErrorResponseRenderer
-import org.http4k.contract.PathSegments
-import org.http4k.contract.ResponseMeta
-import org.http4k.contract.Tag
+import org.http4k.contract.*
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.operationId
-import org.http4k.contract.openapi.v3.ServerObject
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
@@ -46,7 +38,7 @@ open class OpenApi2<out NODE>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, servers: List<ServerObject>) =
+    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>) =
         with(renderPaths(routes, contractRoot, security)) {
             Response(OK)
                 .with(Header.CONTENT_TYPE of APPLICATION_JSON)

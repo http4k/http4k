@@ -1260,14 +1260,6 @@
       }
     }
   },
-  "servers": [
-    {
-      "url": "https://localhost",
-      "description": "description",
-      "variables": {
-      }
-    }
-  ],
   "openapi": "3.0.0",
   "x-extension": [
     "extensionField"
