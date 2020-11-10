@@ -138,4 +138,3 @@ Peace out.
 ### // the http4k team
 
 [http4k]: https://http4k.org
-[Slack]: http://slack.kotlinlang.org/
