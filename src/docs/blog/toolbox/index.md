@@ -32,7 +32,7 @@ The http4k team are massive fans of automation, so we also wanted to enable team
 Where we introduce each of the functions of the [Toolbox], with a rationale and a bit of background on each.
 
 <hr/>
-##### Generating a project
+#### Generating a project
 <img src="./project.png" alt="project generator"/>
 
 This is quite a common one for various libraries, but they tend to be quite basic - and we thought we could do better. 
@@ -46,7 +46,7 @@ As well as downloading the project, you can also browse the generated code in a 
 Try out the project generator [here](https://toolbox.http4k.org/project).
 
 <hr/>
-##### OpenAPI3 Server, Client, & Models
+#### OpenAPI3 Server, Client, & Models
 <img src="./project.png" alt="project generator"/>
 
 [http4k] already supports generating OpenAPI3 specification documents from your code, but one thing that you often come across is when you need to generate an HTTP server or Client for someone else's application which is documented with using the same format. Initially we did look at the existing OpenAPI generator projects available for other libraries, but they are mostly based around static templates, and once again we thought we could do something a little more sophisticated.
