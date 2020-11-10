@@ -118,8 +118,6 @@ Build HTTP messages from raw HTTP [here](https://toolbox.http4k.org/http).
 #### Wrapping up
 We hope you'll find the various tools that we've built into the [Toolbox] useful to either get started with [http4k] or to make your life even more productive. As ever, let us know how we're doing, and if there are any other tools that you think might be helpful then we'd love to hear about them!
 
-### // the http4k team
-
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org
 [Toolbox]: https://toolbox.http4k.org
