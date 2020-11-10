@@ -99,18 +99,35 @@ For more docs on how to get it all working, head over to the [docs](/guide/modul
 Like the neat little worker bunnies we are, we've also taken the opportunity to clean up the [http4k] source code. All previously deprecated code has been removed, leaving the codebase nice and tidy. If you are upgrading, the best idea is to first upgrade to a late v3 version (v3.254.0), deal with the deprecations in place, then simply upgrade again to v4.
 
 <hr/>
-#### The http4k website
-One of the things that our users often feed back about was that the structure of the docs in [http4k.org][http4k] could be improved, so we've begun overhauling the site to simplify the content. Expect this to be a continual improvement thing, but on the whole the content will be organised as follows:
+#### http4k.org
+One of the things that our users feedback about was that the structure of the docs in [http4k.org][http4k] could be improved, so we've begun overhauling the site to simplify the content. Expect this to be a continual improvement thing, but on the whole the content will be organised as follows:
 
 - The [Developer guide](/guide) will contain descriptions of the underlying concepts in and around the libraries. Code in the guide will be snippet-based.
 - The [Cookbook](/cookbook) will contain extended examples of how to accomplish particular tasks. eg. provide a custom `ServerConfig` implementation. Code here will generally be complete and contain runnable examples.
 - The [Examples repo](https://github.com/http4k/examples) hosts fully self-contained, runnable projects that can be used as a baseline for particular features - eg. how to write and run an [app on Quarkus](https://github.com/http4k/examples/tree/master/quarkus) or use the cloudnative module to enable [typesafe configuration](https://github.com/http4k/examples/tree/master/typesafe-configuration)
 
 <hr/>
+#### Support & training
+
+There has been a decent amount of interest lately from our users to come to us to ask for advice about how we can help teams get the best out of [http4k]. In that vein, we have also been busy building training materials which we can deliver to teams either new to (or experienced in) the library, or to visit teams (currently virtually) to help them out. If your team would also like to take advantage of our experience in delivering projects using [http4k], then please visit the [support/training](/support) page, reach out and we'd love to see how we can help.
+
+<hr/>
 #### http4k Connect
 
 <img src="./connect.png" alt="http4k connect"/>
-5. http4k-connect is our newest project which we hope to eventually standardise patterns for building 3rd party adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory and Redis). 
+
+[http4k-connect](http://github.com/http4k/http4k-connect) is the team's newest side project, the purpose of which is to eventually standardise patterns for building 3rd party adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory, S3 or Redis). 
+
+Mostly, the existence of the project is to avoid us having to reinvent the same things again and again. It's pretty hot off the press, but will be receiving a lot of attention over the coming weeks and months, and we'll be documenting the mechanisms in both web and live talks.
+
+<hr/>
+#### That's all folks... (for the moment)
+
+We're pretty excited about this release and hope the library will continue to provide tools of all of our existing (and new!) users' lives easier to create kick ass, rock solid HTTP applications.
+
+As ever, we'd love to hear how we're doing, so please drop into the comm channels to get in touch.
+
+### // the http4k team
 
 [http4k]: https://http4k.org
 [Slack]: http://slack.kotlinlang.org/
