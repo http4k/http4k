@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Filter
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -292,6 +293,13 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         handler.assertFilterCalledOnce("/mybob.xml", OK)
         handler.assertFilterCalledOnce("/notmybob.xml", NOT_FOUND)
         handler.assertFilterCalledOnce("/foo/bob.xml", NOT_FOUND)
+    }
+
+    @Test
+    fun `nested static`(){
+        val handler = routes("/foo" bind routes("/bob" bind GET to static()))
+
+        assertThat(handler(Request(GET, "/foo/bob/mybob.xml")), hasStatus(OK))
     }
 
     private fun RoutingHttpHandler.assertFilterCalledOnce(path: String, expected: Status) {
