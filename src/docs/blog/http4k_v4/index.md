@@ -109,7 +109,9 @@ One of the things that our users feedback about was that the structure of the do
 <hr/>
 #### Support & training
 
-There has been a decent amount of interest lately from our users to come to us to ask for advice about how we can help teams get the best out of [http4k]. In that vein, we have also been busy building training materials which we can deliver to teams either new to (or experienced in) the library, or to visit teams (currently virtually) to help them out. If your team would also like to take advantage of our experience in delivering projects using [http4k], then please visit the [support/training](/support) page, reach out and we'd love to see how we can help.
+There has been a decent amount of interest lately from our users to come to us to ask for advice about how we can help teams get the best out of [http4k]. In that vein, we have also been busy building training materials which we can deliver to teams either new to (or experienced in) the library, or to visit teams (currently virtually) to help them out. 
+
+If your team would also like to take advantage of our experience in delivering projects using [http4k], then please visit the [support/training](/support) page, reach out and we'd love to see how we can help.
 
 <hr/>
 #### http4k Connect
@@ -125,7 +127,11 @@ Mostly, the existence of the project is to avoid us having to reinvent the same 
 
 We're pretty excited about this release and hope the library will continue to provide tools of all of our existing (and new!) users' lives easier to create kick ass, rock solid HTTP applications.
 
+In the meantime, we'd also love to get more [sponsors](https://github.com/sponsors/http4k) to help offset the cost of running the project. 
+
 As ever, we'd love to hear how we're doing, so please drop into the comm channels to get in touch.
+
+Peace out.
 
 ### // the http4k team
 
