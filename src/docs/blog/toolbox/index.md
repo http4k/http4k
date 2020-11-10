@@ -11,6 +11,8 @@ Over the years of creating apps with [http4k], we've collated several tools that
 
 These tools are mostly based around code generation of some sort or another and are mainly used to shortcut repetitive or mundane development tasks that you might encounter when developing and testing applications with [http4k]. For development, we made extensive use of the excellent [http4k] web library (have you heard of it? it's really rather good!), as well as [KotlinPoet](https://square.github.io/kotlinpoet/) and [Bunting4k](https://github.com/fork-handles/forkhandles/tree/trunk/bunting4k), a new CLI flags library that we created for this task.
 
+A lot of the credit for the creation of the Toolbox has to go to the amazing [Albert Latacz](https://github.com/albertlatacz), who not only created large parts of the functionality, but also investigated build and deployment options.
+
 <hr/>
 #### Web toolbox
 <img src="./toolbox.png" alt="http4k toolbox"/>
