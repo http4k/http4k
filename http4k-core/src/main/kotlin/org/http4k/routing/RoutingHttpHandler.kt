@@ -3,9 +3,7 @@ package org.http4k.routing
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.core.UriTemplate
-import org.http4k.routing.RouterMatch.MethodNotMatched
 
 /**
  * Composite HttpHandler which can potentially service many different URL patterns. Should
@@ -23,14 +21,7 @@ interface RoutingHttpHandler : Router, HttpHandler {
 class PathMethod(private val path: String, private val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler =
         when (action) {
-            is StaticRoutingHttpHandler -> action.withBasePath(path).let {
-                object : RoutingHttpHandler by it {
-                    override fun match(request: Request) = when (method) {
-                        request.method -> it.match(request)
-                        else -> MethodNotMatched
-                    }
-                }
-            }
+            is StaticRoutingHttpHandler -> method.asRouter().bind(action.withBasePath(path))
             is RouterRoutingHttpHandler -> action.copy(router = method.asRouter().and(action.withBasePath(path)))
             else -> RouterRoutingHttpHandler(method.asRouter().and(TemplateRouter(UriTemplate.from(path), action)))
         }
