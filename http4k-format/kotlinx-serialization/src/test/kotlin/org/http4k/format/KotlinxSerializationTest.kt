@@ -16,6 +16,7 @@ import java.io.PrintStream
 import java.math.BigDecimal
 import java.math.BigInteger
 
+
 class KotlinxSerializationTest : JsonContract<JsonElement>(KotlinxSerialization) {
     override val prettyString = """{
     "hello": "world"

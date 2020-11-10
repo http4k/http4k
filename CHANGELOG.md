@@ -3,8 +3,14 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.274.0 (uncut)
+### v3.275.0 (uncut)
+- **http4k-core** : Reimplement the routing logic to be fully based on Routers. It is now possible to nest arbitrary levels of request matching in a mix-and-match way.
+
+### v3.274.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-kotlinx-serialization** : Now supports Automarshalling. H/T @zsambek  for the PR. 
+- **http4k-core** : Added Markdown to static Mime-types. H/T @razvn for the PR.
+- **http4k-security-oauth** [Breaking]: Don't store the original call that required authentication in the state as it runs the risk of being used in an open-redirector phishing attack, instead store it as a value in the oauth persistence and retrieved on successful requests  H/T @tom
 
 ### v3.273.0
 - **http4k-*** : Upgrade some dependency versions.

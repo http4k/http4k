@@ -17,6 +17,7 @@ import org.http4k.lens.Validator
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
@@ -53,6 +54,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
             is MatchingHandler -> matchResult(it)
             is MethodNotMatched -> notFound(it)
             is Unmatched -> notFound(it)
+            is MatchedWithoutHandler -> notFound(it)
         }
     }
 

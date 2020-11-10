@@ -1,5 +1,7 @@
 package org.http4k.routing
 
+import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -10,10 +12,17 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class HostDemuxRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
+class HostDemuxRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler = hostDemux("host" to routes(validPath bind GET to { Response(OK) }))
 
     private val otherHandler = hostDemux(hostFor("host1"), hostFor("host2"))
+
+    @Test
+    override fun `does not match a particular route`() {
+        assertThat(handler.matchAndInvoke(Request(GET, "/not-found").header("host", "unknown")), absent())
+        assertThat(handler.matchAndInvoke(Request(GET, "/not-found").header("host", "host"))!!, hasStatus(NOT_FOUND))
+        assertThat(handler(Request(GET, "/not-found").header("host", "host")), hasStatus(NOT_FOUND) and hasBody(expectedNotFoundBody))
+    }
 
     @Test
     fun `matching handler`() {
@@ -33,11 +42,11 @@ class HostDemuxRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
 
     @Test
     fun `with filter`() {
-        val handler2 = otherHandler.withFilter({ next ->
+        val handler2 = otherHandler.withFilter { next ->
             {
                 next(it.replaceHeader("host", "foobar"))
             }
-        })
+        }
         assertThat(handler2(requestWithHost("host1", "/foo")), hasBody("host1foobar"))
         assertThat(handler2(requestWithHost("host2", "/foo")), hasBody("host2foobar"))
         assertThat(handler2(Request(GET, "")), hasStatus(NOT_FOUND))

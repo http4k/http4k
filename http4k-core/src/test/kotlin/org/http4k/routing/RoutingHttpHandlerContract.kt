@@ -88,17 +88,13 @@ abstract class RoutingHttpHandlerContract {
 
     @Test
     fun `with base path - multiple levels`() {
-        val withBase = handler.withBasePath(prefix).withBasePath(prePrefix)
+        val withBasePath = handler.withBasePath(prefix)
+        val withBase = withBasePath.withBasePath(prePrefix)
         val request = Request(GET, "$prePrefix$prefix$validPath").header("host", "host")
         val criteria = hasStatus(OK)
 
         assertThat(withBase.matchAndInvoke(request), present(criteria))
         assertThat(withBase(request), criteria)
-    }
-
-    protected fun RoutingHttpHandler.matchAndInvoke(request: Request) = when (val matchResult = match(request)) {
-        is MatchingHandler -> matchResult(request)
-        else -> null
     }
 
     protected fun filterAppending(value: String) = Filter { next ->
@@ -107,4 +103,9 @@ abstract class RoutingHttpHandlerContract {
             response.replaceHeader("res-header", response.header("res-header").orEmpty() + value)
         }
     }
+}
+
+fun RoutingHttpHandler.matchAndInvoke(request: Request) = when (val matchResult = match(request)) {
+    is MatchingHandler -> matchResult(request)
+    else -> null
 }

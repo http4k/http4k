@@ -20,6 +20,7 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
@@ -70,6 +71,7 @@ class ContractRoute internal constructor(val method: Method,
             }
             is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
             is Unmatched -> Response(NOT_FOUND)
+            is MatchedWithoutHandler -> Response(NOT_FOUND)
         }
     }
 

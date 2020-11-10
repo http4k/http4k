@@ -15,11 +15,11 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     override val inputEmptyObject = "{}"
     override val expectedRegexSpecial = """{"regex":".*"}"""
 
-    private val expectedCustomWrappedNumber = """{"value":"1.01"}"""
-    private val expectedInOutOnly = """{"value":"foobar"}"""
+    val expectedCustomWrappedNumber = """{"value":"1.01"}"""
+    val expectedInOutOnly = """{"value":"foobar"}"""
 
     @Test
-    fun `out only string`() {
+    open fun `out only string`() {
         val marshaller = customMarshaller()
 
         val wrapper = OutOnlyHolder(OutOnly("foobar"))
@@ -29,7 +29,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    fun `in only string`() {
+    open fun `in only string`() {
         val marshaller = customMarshaller()
 
         val wrapper = InOnlyHolder(InOnly("foobar"))
@@ -38,7 +38,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    fun `prohibit strings`() {
+    open fun `prohibit strings`() {
         val marshaller = customMarshaller()
 
         assertThat(marshaller.asFormatString(StringHolder("hello")), equalTo(expectedConvertToInputStream))
@@ -46,7 +46,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    fun `roundtrip custom mapped number`() {
+    open fun `roundtrip custom mapped number`() {
         val marshaller = customMarshaller()
 
         val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))

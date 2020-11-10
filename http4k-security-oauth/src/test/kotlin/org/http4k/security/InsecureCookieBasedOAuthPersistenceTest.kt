@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
+import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
@@ -29,7 +30,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
     @Test
     fun `failed response has correct cookies`() {
         assertThat(persistence.authFailureResponse(), equalTo(
-            Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken").invalidateCookie("prefixNonce")
+            Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken").invalidateCookie("prefixNonce").invalidateCookie("prefixOriginalUri")
         ))
     }
 
@@ -52,6 +53,12 @@ class InsecureCookieBasedOAuthPersistenceTest {
     }
 
     @Test
+    fun `original uri retrieval based on cookie`() {
+        assertThat(persistence.retrieveOriginalUri(Request(GET, "")), absent())
+        assertThat(persistence.retrieveOriginalUri(Request(GET, "").cookie(Cookie("prefixOriginalUri", "https://foo.com"))), equalTo(Uri.of("https://foo.com")))
+    }
+
+    @Test
     fun `adds csrf as a cookie to the auth redirect`() {
         assertThat(persistence.assignCsrf(Response(TEMPORARY_REDIRECT), CrossSiteRequestForgeryToken("csrfValue")),
             equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixCsrf", "csrfValue", expires = expectedCookieExpiry, path = "/"))))
@@ -61,7 +68,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
     fun `adds csrf as a cookie to the token redirect`() {
         assertThat(persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessToken("tokenValue")),
             equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue", expires = expectedCookieExpiry, path = "/"))
-                .invalidateCookie("prefixCsrf").invalidateCookie("prefixNonce")
+                .invalidateCookie("prefixCsrf").invalidateCookie("prefixNonce").invalidateCookie("prefixOriginalUri")
             ))
     }
 
