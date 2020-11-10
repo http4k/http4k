@@ -62,7 +62,7 @@ The even better news is that testing your [http4k] apps locally (regardless of p
 
 <img src="./toolbox.png" alt="toolbox"/>
 
-As documented in the [Toolbox announcement post](/blog/guns_for_show), we've been busy consolidating a bunch of handy tools for generating code to work with [http4k] projects, and we christened this the **http4k Toolbox** and it's available in both [online](https://toolbox.http4k.org) and a CLI flavours (available from Brew and SDKMan!). From [Project Generation](https://toolbox.httpk.org/project) to our own more sophisticated [OpenAPI3 Generator](https://toolbox.httpk.org/openapi), we hope that this become an essential tool in every **http4k** developer's pocket.
+As documented in the [Toolbox announcement post](/blog/toolbox), we've been busy consolidating a bunch of handy tools for generating code to work with [http4k] projects, and we christened this the **http4k Toolbox** and it's available in both [online](https://toolbox.http4k.org) and a CLI flavours (available from Brew and SDKMan!). From [Project Generation](https://toolbox.httpk.org/project) to our own more sophisticated [OpenAPI3 Generator](https://toolbox.httpk.org/openapi), we hope that this become an essential tool in every **http4k** developer's pocket.
 
 <hr/>
 #### Infinirouting
