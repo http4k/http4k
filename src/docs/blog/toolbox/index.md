@@ -1,5 +1,5 @@
 title: http4k blog: http4k Toolbox: Guns for show, knives for a pro
-description: An introduction to the http4k Toolbox website and CLI, and how we developed them.
+description: An introduction to the http4k Toolbox website and CLI.
 
 # http4k Toolbox: Guns for show, knives for a pro
 
