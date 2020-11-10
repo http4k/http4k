@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import org.http4k.contract.openapi.v3.ServerObject
 import org.http4k.contract.security.Security
 import org.http4k.core.*
 import org.http4k.core.Method.GET
@@ -24,8 +23,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                                       private val rootAsString: String = "",
                                       private val preSecurityFilter: Filter = Filter.NoOp,
                                       private val postSecurityFilter: Filter = Filter.NoOp,
-                                      private val includeDescriptionRoute: Boolean = false,
-                                      private val servers: List<ServerObject> = emptyList()
+                                      private val includeDescriptionRoute: Boolean = false
 ) : RoutingHttpHandler {
     private val contractRoot = PathSegments(rootAsString)
 
