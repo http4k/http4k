@@ -23,8 +23,7 @@ internal data class RouterRoutingHttpHandler(
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
         is MatchingHandler -> matchResult
         is MethodNotMatched -> methodNotAllowedHandler
-        is Unmatched -> notFoundHandler
-        is MatchedWithoutHandler -> notFoundHandler
+        else -> notFoundHandler
     }(request)
 
     override fun withFilter(new: Filter): RoutingHttpHandler = copy(
