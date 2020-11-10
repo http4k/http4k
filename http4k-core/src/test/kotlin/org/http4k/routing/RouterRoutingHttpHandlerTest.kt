@@ -3,12 +3,14 @@ package org.http4k.routing
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
@@ -51,6 +53,19 @@ class RouterRoutingHttpHandlerSpecialCaseTests {
         ))
 
         assertThat(handler(Request(GET, "/one/two")), hasStatus(OK).and(hasBody("one then two")))
+    }
+
+    @Test
+    fun `router + passthrough with filter`(){
+        val filter = Filter { next ->
+            {
+                next(it.body(it.query("foo").orEmpty()))
+            }
+        }
+
+        val handler = filter.then(routes(queries("foo") bind { Response(OK).body(it.body) }))
+
+        assertThat(handler(Request(GET, "").query("foo", "bar")), hasStatus(OK).and(hasBody("bar")))
     }
 
     @Test
