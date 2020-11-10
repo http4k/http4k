@@ -7,7 +7,7 @@ description: An introduction to the http4k Toolbox website and CLI, and how we d
 
 <img src="./guns.jpg" alt="lock stock: guns for show"/>
 
-Over the years of creating apps with [http4k], we've collated several tools that we use to turbo charge our development activities. With the advent of v4 of the library, and with a little time on our hands, we decided to bring all of these tools together into a single place so that all of our users could get their benefits. 
+Over the years of creating apps with [http4k], we've collated several tools that we use to turbo charge our development activities. While working on v4 of the library, and with a little time on our hands, we decided to bring all of these tools together into a single place so that all of our users could get their benefits. 
 
 These tools are mostly based around code generation of some sort or another and are mainly used to shortcut repetitive or mundane development tasks that you might encounter when developing and testing applications with [http4k]. For development, we made extensive use of the excellent [http4k] web library (have you heard of it? it's really rather good!), as well as [KotlinPoet](https://square.github.io/kotlinpoet/) and [Bunting4k](https://github.com/fork-handles/forkhandles/tree/trunk/bunting4k), a new CLI flags library that we created for this task.
 
@@ -62,7 +62,7 @@ As well as downloading the files as a ZIP archive, you can also browse the gener
 The OpenAPI generator is available [here](https://toolbox.http4k.org/openapi).
 
 <hr/>
-##### Generating Data Classes for wire formats
+##### Generating Data Classes from JSON, XML and YAML
 Most of the time when working with API models in [http4k], you have example messages in the native format which need to be auto-marshalled into Kotlin using Jackson or one of the other supported format libraries. This results in a very boring exercise in conversion, so we wrote this [converter](https://toolbox.http4k.org/dataclass) that will generate Data Classes to support reading/writing of JSON, XML and YAML messages. For example, this JSON...
 
 ```json
