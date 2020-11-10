@@ -92,3 +92,33 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
         else -> PassthroughRouter(new.then(handler))
     }
 }
+
+internal data class Prefix(private val template: String) : Router {
+    override fun match(request: Request) = when {
+        UriTemplate.from("$template{match:.*}").matches(request.uri.path) -> MatchedWithoutHandler
+        else -> Unmatched
+    }
+
+    override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
+}
+
+internal data class TemplateRouter(private val template: UriTemplate,
+                                   private val httpHandler: HttpHandler) : Router {
+    override fun match(request: Request) = when {
+        template.matches(request.uri.path) ->
+            MatchingHandler { RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }
+        else -> Unmatched
+    }
+
+    override fun withBasePath(new: String): Router =
+        TemplateRouter(UriTemplate.from("$new/${template}"),
+            when (httpHandler) {
+                is RoutingHttpHandler -> httpHandler.withBasePath(new)
+                else -> httpHandler
+            })
+
+    override fun withFilter(new: Filter): Router = copy(httpHandler = when (httpHandler) {
+        is RoutingHttpHandler -> httpHandler.withFilter(new)
+        else -> new.then(httpHandler)
+    })
+}
