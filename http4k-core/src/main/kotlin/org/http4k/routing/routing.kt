@@ -8,16 +8,16 @@ import org.http4k.core.UriTemplate
 import org.http4k.websocket.WsConsumer
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
-fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(OrRouter.from(list.toList()))
+fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(OrRouter.from(list.toList()))
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 infix fun String.bind(httpHandler: RoutingHttpHandler): RoutingHttpHandler = httpHandler.withBasePath(this)
-infix fun String.bind(action: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(TemplateRouter(UriTemplate.from(this), action))
+infix fun String.bind(action: HttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(TemplateRouter(UriTemplate.from(this), action))
 infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
 infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)
 
-infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(PassthroughRouter(handler)))
-infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterRoutingHttpHandler(and(handler))
+infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(and(PassthroughRouter(handler)))
+infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(and(handler))
 infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
 
 /**

@@ -22,7 +22,7 @@ class PathMethod(private val path: String, private val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler =
         when (action) {
             is StaticRoutingHttpHandler -> method.asRouter().bind(action.withBasePath(path))
-            is RouterRoutingHttpHandler -> action.copy(router = method.asRouter().and(action.withBasePath(path)))
-            else -> RouterRoutingHttpHandler(method.asRouter().and(TemplateRouter(UriTemplate.from(path), action)))
+            is RouterBasedHttpHandler -> action.copy(router = method.asRouter().and(action.withBasePath(path)))
+            else -> RouterBasedHttpHandler(method.asRouter().and(TemplateRouter(UriTemplate.from(path), action)))
         }
 }
