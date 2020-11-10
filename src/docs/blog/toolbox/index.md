@@ -57,7 +57,7 @@ The [OpenAPI generator](https://toolbox.http4k.org/openapi). accepts a JSON or Y
 - **Template http4k Server implementation** containing a set of generated API endpoint functions and Lens implementations for all defined HTTP contract parts (path, query etc), as well as auto-marshalled JSON request and response bodies. Security implementations (API Key, Basic, Bearer) are also generated.
 - **http4k API client implementation** with functions generated for each API endpoint. Lens implementations are generated and HTTP contract parts (path, query etc) are marshalled both into and out of the Request and Response messages.
 
-As well as downloading z ZIP, you can also browse the generated code in a browser.
+As well as downloading the files as a ZIP archive, you can also browse the generated code in a browser.
 
 The OpenAPI generator is available [here](https://toolbox.http4k.org/openapi).
 
