@@ -1,7 +1,7 @@
-title: http4k blog: http4k v4
+title: http4k blog: http4k v4 Unleashed
 description: There's a new major http4k release! Read about all the new stuff the team have been working on for http4k v4.
 
-# http4k v4 unleashed
+# http4k v4 Unleashed
 
 ##### november 2020 / the http4k team
 
