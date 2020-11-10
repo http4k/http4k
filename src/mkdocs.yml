@@ -92,6 +92,7 @@ nav:
     - Documenting http4k apps with OpenApi3: blog/documenting_apis_with_openapi/index.md
     - Retrospective on v3: blog/retrospective_v3/index.md
     - Nanoservices: blog/nanoservices/index.md
+    - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
   - Performance: performance/index.md
   - FAQ: faq/index.md
   - Getting support: support/index.md
