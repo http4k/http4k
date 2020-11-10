@@ -1,5 +1,5 @@
 title: http4k blog: Websockets. But typesafe. And testable. Without the Server.
-description: An overview of Websocket support in http4k
+description: An overview of typesafe Websocket support in http4k
 
 # Websockets. But typesafe. And testable. Without the Server.
 
