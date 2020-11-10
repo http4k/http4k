@@ -1,6 +1,10 @@
 package org.http4k.contract.simple
 
-import org.http4k.contract.*
+import org.http4k.contract.ContractRenderer
+import org.http4k.contract.ContractRoute
+import org.http4k.contract.ErrorResponseRenderer
+import org.http4k.contract.JsonErrorResponseRenderer
+import org.http4k.contract.PathSegments
 import org.http4k.contract.security.Security
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
