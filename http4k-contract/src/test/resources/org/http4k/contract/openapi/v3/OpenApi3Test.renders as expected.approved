@@ -1080,6 +1080,10 @@
     }
   },
   "servers": [
+    {
+      "url": "http://localhost",
+      "description": "server description"
+    }
   ],
   "x-extension": [
     "extensionField"
