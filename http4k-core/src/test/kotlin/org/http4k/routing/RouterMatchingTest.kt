@@ -2,11 +2,10 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.matches
@@ -87,6 +86,23 @@ class RouterMatchingTest {
         val router = GET.asRouter()
         assertThat(router.match(Request(GET, "")), equalTo(MatchedWithoutHandler))
         assertThat(router.match(Request(POST, "")), equalTo(MethodNotMatched))
+    }
+
+    @Test
+    fun `body string router`() {
+        val router = body { it: String -> it == "hello" }
+        assertThat(router.match(Request(POST, "")), equalTo(Unmatched))
+        assertThat(router.match(Request(POST, "").body("anything")), equalTo(Unmatched))
+        assertThat(router.match(Request(POST, "").body("hello")), equalTo(MatchedWithoutHandler))
+    }
+
+    @Test
+    fun `body router`() {
+        val router = body { it: Body -> it.length?.toInt() == 3 }
+        assertThat(router.match(Request(POST, "")), equalTo(Unmatched))
+        assertThat(router.match(Request(POST, "").body("anything")), equalTo(Unmatched))
+        assertThat(router.match(Request(POST, "").body("foo")), equalTo(MatchedWithoutHandler))
+        assertThat(router.match(Request(POST, "").body("bar")), equalTo(MatchedWithoutHandler))
     }
 
     @Test
