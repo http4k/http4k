@@ -1,6 +1,13 @@
 package org.http4k.contract.openapi.v2
 
-import org.http4k.contract.*
+import org.http4k.contract.ContractRenderer
+import org.http4k.contract.ContractRoute
+import org.http4k.contract.ErrorResponseRenderer
+import org.http4k.contract.HttpMessageMeta
+import org.http4k.contract.JsonErrorResponseRenderer
+import org.http4k.contract.PathSegments
+import org.http4k.contract.ResponseMeta
+import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
