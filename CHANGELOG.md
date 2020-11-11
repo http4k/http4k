@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v3.275.0 (uncut)
-- **http4k-core** : Reimplement the routing logic to be fully based on Routers. It is now possible to nest arbitrary levels of request matching in a mix-and-match way.
+- **http4k-core** : Reimplement core routing logic to be fully based on `Routers`. It is now possible to nest arbitrary levels of request matching in a mix-and-match way. And it's ace. :) 
 
 ### v3.274.0
 - **http4k-*** : Upgrade some dependency versions.
