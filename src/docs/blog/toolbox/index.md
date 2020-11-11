@@ -47,7 +47,7 @@ Try out the project generator [here](https://toolbox.http4k.org/project).
 
 <hr/>
 #### OpenAPI3 Server, Client, & Models
-<img src="./project.png" alt="project generator"/>
+<img src="./I penali.png" alt="Openapi"/>
 
 [http4k] already supports generating OpenAPI3 specification documents from your code, but one thing that you often come across is when you need to generate an HTTP server or Client for someone else's application which is documented with using the same format. Initially we did look at the existing OpenAPI generator projects available for other libraries, but they are mostly based around static templates, and once again we thought we could do something a little more sophisticated.
 
