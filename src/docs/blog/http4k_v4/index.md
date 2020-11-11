@@ -80,7 +80,7 @@ val app = routes("/{name}" bind POST to (
 )
 ```
 
-So after a lot of clattering and banging of heads, we cracked it - and in doing so managed to rewrite the entire of the [http4k] routing layer in terms of these predicate Routers. It's really neat, powerful and infinitely(ish) nestable.
+So after a lot of clattering and banging of heads, we cracked it - and in doing so managed to rewrite the entire of the [http4k] routing layer in terms of these predicate `Routers`. It's really neat, infinitely(ish) nestable, and makes us feel just a little bit smug for getting it working.
 
 <hr/>
 #### OpenTelemetry: Monitor all the things!
