@@ -41,7 +41,7 @@ We can use this facility in [http4k] to automatically marshall objects to/from H
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/autoJson.kt"></script>
 
-There is a utility to generate Kotlin data class code for JSON documents [here](http://http4k-data-class-gen.herokuapp.com). 
+There is a utility to generate Kotlin data class code for JSON documents [here](http://toolbox.http4k.org/dataclasses). 
 These data classes are compatible with using the `Body.auto<T>()` functionality. 
 
 #### FAQ (aka gotchas) regarding Auto-marshalling capabilities
