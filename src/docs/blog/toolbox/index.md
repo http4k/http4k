@@ -3,7 +3,7 @@ description: An introduction to the http4k Toolbox website and CLI.
 
 # http4k Toolbox: Guns for show, knives for a pro
 
-##### november 2018 / [@daviddenton][github]
+##### november 2020 / [@daviddenton][github]
 
 <img src="./guns.jpg" alt="lock stock: guns for show"/>
 
