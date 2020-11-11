@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/checkout@v2
         with:
           repository: http4k/api
           path: tmp
@@ -24,7 +23,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.AUTHOR_TOKEN }}
       - name: Push changes
-        uses: ad-m/github-push-action@master
+        uses: ad-m/github-push-action@0.6.0
         with:
           github_token: ${{ secrets.AUTHOR_TOKEN }}
           directory: tmp

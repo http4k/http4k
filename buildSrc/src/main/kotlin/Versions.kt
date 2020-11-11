@@ -1,3 +1,4 @@
+import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -17,7 +18,7 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.6.1"
 
-    const val software_amazon_awssdk: String = "2.15.23"
+    const val software_amazon_awssdk: String = "2.15.25"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
@@ -33,7 +34,7 @@ object Versions {
 
     const val io_undertow: String = "2.2.2.Final"
 
-    const val io_ktor: String = "1.4.1"
+    const val io_ktor: String = "1.4.2"
 
     const val com_microsoft_azure_azurefunctions_gradle_plugin: String = "1.5.0"
 
