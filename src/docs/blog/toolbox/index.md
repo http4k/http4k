@@ -115,6 +115,15 @@ fun request(): Request = Request(Method.POST, "/example/index.html")
 Build HTTP messages from raw HTTP [here](https://toolbox.http4k.org/http).
 
 <hr/>
+#### IntelliJ Live Templates
+
+One of our most favourite power features of IntelliJ is Live Templates, which allow you to add code generation macros to your IDE and activate them with a shortcut + tab. For [http4k] development, we got bored with typing things longhand, so decided to create a bunch of templates and share them with our favourite people (our users!). Even better, anyone can use our shortcuts in their IDE by adding a read-only "Settings Repository". 
+
+<img src="./livetemplates.gif" alt="live templates"/>
+
+Install the [http4k] live templates (and save your fingers!) by following the instructions at the bottom of [this page](https://toolbox.http4k.org/).
+
+<hr/>
 #### Wrapping up
 We hope you'll find the various tools that we've built into the [Toolbox] useful to either get started with [http4k] or to make your life even more productive. As ever, let us know how we're doing, and if there are any other tools that you think might be helpful then we'd love to hear about them!
 

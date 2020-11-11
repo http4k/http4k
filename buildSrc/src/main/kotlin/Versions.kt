@@ -34,7 +34,7 @@ object Versions {
 
     const val io_undertow: String = "2.2.2.Final"
 
-    const val io_ktor: String = "1.4.2"
+    const val io_ktor: String = "1.4.1"
 
     const val com_microsoft_azure_azurefunctions_gradle_plugin: String = "1.5.0"
 
