@@ -76,6 +76,10 @@ The `http4k-core` module comes with a set of handy Filters for application to bo
 
 Check out the `org.http4k.filter` package for the exact list.
 
+#### Testing Filters [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/core/FilterTest.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/core/FilterTest.kt"></script>
+
 ### Routers - Nestable, path-based Routing
 Create a Router using routes() to bind a static or dynamic path to either an HttpHandler, or to another sub-Router. These Routers can be nested infinitely deep and [http4k] will search for a matching route using a depth-first search algorithm, before falling back finally to a 404:
 ```kotlin
