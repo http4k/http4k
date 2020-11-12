@@ -5,7 +5,7 @@ description: An introduction to the http4k Toolbox website and CLI.
 
 ##### november 2020 / [@daviddenton][github]
 
-<img src="./guns.jpg" alt="lock stock: guns for show"/>
+<img class="blogImage" src="./guns.jpg" alt="lock stock: guns for show"/>
 
 Over the years of creating apps with [http4k], we've collated several tools that we use to turbo charge our development activities. While working on v4 of the library, and with a little time on our hands, we decided to bring all of these tools together into a single place so that all of our users could get their benefits. 
 
@@ -15,7 +15,7 @@ A lot of the credit for the creation of the Toolbox has to go to the amazing [Al
 
 <hr/>
 #### Web toolbox
-<img src="./toolbox.png" alt="http4k toolbox"/>
+<img class="blogImage" src="./toolbox.png" alt="http4k toolbox"/>
 
 The Toolbox is now the main starting point for working with [http4k] The main concept behind each of the functions is to allow the user to preview any generated code before they download it. We have also set up automated pipelines to update the Toolbox whenever we do a release of [http4k] so it should always be up to date. It's worth noting that the Toolbox is also entirely stateless, so no user content is recorded in any form.
 
@@ -23,7 +23,7 @@ The http4k Toolbox is available @ [toolbox.http4k.org][Toolbox]
 
 <hr/>
 #### CLI
-<img src="./cli.png" alt="toolbox CLI"/>
+<img class="blogImage" src="./cli.png" alt="toolbox CLI"/>
 
 The http4k team are massive fans of automation, so we also wanted to enable teams to use the functions of the [Toolbox] in a shell. Hence, we decided to also make a CLI agent for the Toolbox, which is available to install via both [Brew](https://brew.sh) and [SDKMan](https://sdkman.io). You can find instructions about how to install it on the [Toolbox homepage](https://toolbox.http4k.org). 
 
@@ -33,7 +33,7 @@ Where we introduce each of the functions of the [Toolbox], with a rationale and 
 
 <hr/>
 #### Generating a project
-<img src="./project.png" alt="project generator"/>
+<img class="blogImage" src="./project.png" alt="project generator"/>
 
 This is quite a common one for various libraries, but they tend to be quite basic - and we thought we could do better. 
 
@@ -47,7 +47,7 @@ Try out the project generator [here](https://toolbox.http4k.org/project).
 
 <hr/>
 #### OpenAPI3 Server, Client, & Models
-<img src="./openapi.png" alt="Openapi"/>
+<img class="blogImage" src="./openapi.png" alt="Openapi"/>
 
 [http4k] already supports generating OpenAPI3 specification documents from your code, but one thing that you often come across is when you need to generate an HTTP server or Client for someone else's application which is documented with using the same format. Initially we did look at the existing OpenAPI generator projects available for other libraries, but they are mostly based around static templates, and once again we thought we could do something a little more sophisticated.
 
@@ -119,7 +119,7 @@ Build HTTP messages from raw HTTP [here](https://toolbox.http4k.org/http).
 
 One of our most favourite power features of IntelliJ is Live Templates, which allow you to add code generation macros to your IDE and activate them with a shortcut + tab. For [http4k] development, we got bored with typing things longhand, so decided to create a bunch of templates and share them with our favourite people (our users!). Even better, anyone can use our shortcuts in their IDE by adding a read-only "Settings Repository". 
 
-<img src="./livetemplates.gif" alt="live templates"/>
+<img class="blogImage" src="./livetemplates.gif" alt="live templates"/>
 
 Install the [http4k] live templates (and save your fingers!) by following the instructions at the bottom of [this page](https://toolbox.http4k.org/).
 

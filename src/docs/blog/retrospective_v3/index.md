@@ -7,7 +7,7 @@ description: In preparation for the upcoming release of v4, the http4k team thou
 
 It's been quite a long time since we released version 3 of [http4k] all the way back in November 2017. Wow - that's over 1000 days in fact! Still, that doesn't mean that we've been sitting on our hands over in **http4k Towers** - far from it, we've been busier than ever making sure that we'll remember 2020 for more than just hibernating away in a bunker. In fact, the current interesting situation did give us an idea for a pretty original piece of swag... 
 
-<img src="./mask_black.png" alt="mask"/>
+<img class="blogImage" src="./mask_black.png" alt="mask"/>
 
 The eagle-eyed amongst you may have noticed that the project branding has undergone a bit of cosmetic surgery - we thought we'd treat ourselves to a professional job as opposed to the one we knocked up on the cheap way back at the start of the project. We're planning to do an entire refit of the content over the next few months, hopefully to make everything a little easier to find and to provide a few more pointers about where to start with the library. Stay tuned...
 
@@ -36,7 +36,7 @@ If you'd like to check out the old version in the GitHub time machine, [here][v3
 
 One of the most important things to us when we were developing was to create a library that we loved using, and we're thrilled that our users are so positive about [http4k] as well. The community around the library is just the type that we envisaged - a friendly, helpful and collaborative space, and some of the very best code (be it new modules or and fixes) have come directly from there.
  
- <img src="./community.jpg" alt="community"/>
+ <img class="blogImage" src="./community.jpg" alt="community"/>
   
  Our favourite piece of feedback was this post to our Slack channel:
 
@@ -61,7 +61,7 @@ Another high point for us was having [http4k] featured in the [Thoughtworks Tech
 
 > **"Apart from its elegance and simplicity, we also like its emphasis on testability — given that the entities in the libraries are immutable and the routes in the app, as well as the app itself, are just functions, they're super easy to test." - TW TechRadar**
 
-<img src="./radar.png" alt="radar"/>
+<img class="blogImage" src="./radar.png" alt="radar"/>
 
 As Kotlin cements its reputation as a solid choice for serverside (and eventually everywhere!) development, and continues to receive backing from successful projects across the proprietary and open source ecosystems, we hope to be able to do our bit to nudge it ever further upwards in the ["most loved language"] tables.
 
@@ -69,7 +69,7 @@ As Kotlin cements its reputation as a solid choice for serverside (and eventuall
 #### Performing to a crowd
 One of the most frequent questions that we get asked about http4k is "how does it perform?". We attempted to answer that question by entering our baby into the TechEmpower benchmarks, which is a suite of tests which pits each library against the rest of the pack in a set of real-world-esque scenarios to see how it performs including JSON serialisation, database access and HTML templating generation.
 
-<a href="https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=composite&l=xan9xb-1r"><img src="./benchmark.png" alt="benchmark"/></a>
+<a href="https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=composite&l=xan9xb-1r"><img class="blogImage" src="./benchmark.png" alt="benchmark"/></a>
 
 Overall, we were thrilled (and continue to be) with the results of the benchmarks. Since the first round (16), [http4k] has been the best performing pure Kotlin web library across the contenders. The most important factor to us that there were no special tricks involved in the implementations - ie. the endpoints under test were written exactly as they would be on a "real" project and no custom tuning other than standard JVM options applied.
 
@@ -93,7 +93,7 @@ dependencies {
 
 Just as in every codebase there is a package called "utils", this also happens with libraries - useful code that doesn't quite fit anywhere else, yet you just always end up needing. For [http4k], these utils were about the ancillary stuff that goes around an application to make it support 12-factor ideals such as configuration and relative primitives. We didn't want to put this stuff into the `http4k-core` module as we felt it wasn't absolutely necessary (and we wanted to continue to keep the binary size of the core module down). Thus, `http4k-cloudnative` was born! The major feature of this module is loading typesafe Environmental configuration of applications, using - what else...
 
-<img src="./lenses.png" alt="lenses"/>
+<img class="blogImage" src="./lenses.png" alt="lenses"/>
 
 Yep - the reusing of the existing [http4k] lens system to cover configuring your apps, meaning that it's now impossible to make easy mistakes such as setting a 10-second timeout as 10-milliseconds! You can check out exactly how to use the feature [in the docs][cloudnative].
 
@@ -106,14 +106,14 @@ It's no secret that the [http4k] team love testing - it's part of our core DNA a
 * [Chaos Testing] was made famous by Netflix for proving out how systems react when everything heads south. `http4k-testing-chaos` adds transparent, programmable failure-generation to any [http4k] app using only a simple `Filter`.
 * [Service Virtualization] enables API test contracts to be encoded and then shipped, simplifying the process of proving that apps retain compatibility, `http4k-testing-servirtium` provides the basis for recording and replaying contracts from disk or from other sources such as GitHub.
 
-<img src="./testing.jpg" alt="testing"/>
+<img class="blogImage" src="./testing.jpg" alt="testing"/>
 
 <hr/>
 #### OpenAPI FTW
 
 One of the most popular and standout [http4k] features is the support for the OpenApi specification. Originally supporting Swagger 2 spec via the `http4k-contract` module, we rewrote the implementation to add support for much more complete (and consistent!) version 3 of specification in May 2019. The module will now generate fully compliant OpenAPI3 documentation, including full JSON Schema breakdowns for class models and taking advantage of Kotlin class features such as enums and nullability. Powered by the [http4k] lens API, this runtime system allows developers to avoid concerning themselves with tediously documenting API models which can easily go stale.
 
-<img src="./swagger.png" alt="swagger"/>
+<img class="blogImage" src="./swagger.png" alt="swagger"/>
 
 <hr/>
 
@@ -125,7 +125,7 @@ The major [http4k] feature in version 3.0.0 was the addition of support for Serv
  
 So - we did what any good dev team would do and replaced the magic function loading mechanism with a more developer friendly API working by class extension. Fear not readers - the guilty parties have been appropriately punished, and it (probably) won't happen again. 😉
 
-<img src="./serverless.png" alt="serverless"/>
+<img class="blogImage" src="./serverless.png" alt="serverless"/>
 
 One other piece of interesting research which came out and somewhat vindicated the dependency-lite approach of [http4k] was [Cold Start War], which performed a lot of experiments and concluded that:
 
@@ -139,7 +139,7 @@ For production deployments, we continue to recommend the use of a tool such as P
 
 Apart from Serverless, one of the most exciting things happening in JVM-land right now is the advent of native technologies such as Quarkus and GraalVM, giving the possibility of compiling apps direct to binaries - which give a massive performance boost. It's a young technology and often involves various amounts of trickery to get around limitations of the native system regarding areas such as reflection. Luckily for us (and you!), [http4k] operates on an anti-magic principle (see the 5th commandment above) and it was a nice surprise when it occurred that, with the correct server engine (Apache for the curious), [http4k] applications can be packaged out-of-the-box to this format with absolutely no modifications of aforementioned trickery. 
 
-<img src="./smug-mode.jpg" alt="smug-mode"/>
+<img class="blogImage" src="./smug-mode.jpg" alt="smug-mode"/>
 
 We look forward to further supporting these technologies as they develop, and will endeavour to provide custom modules to suppport teams who want to take advantage of them.
 
@@ -153,7 +153,7 @@ So what's next? Well, we've got a load of good stuff coming up for post version 
 
 Whatever happens though, the focus of [http4k] will always be on providing a best-in-class Developer and Testing experience. We'd love to hear how we're doing, so please drop into the comm channels to get in touch. Here's to the future. Stay safe out there and we'll see you in it.
 
-<img src="./future.jpg" alt="future"/>
+<img class="blogImage" src="./future.jpg" alt="future"/>
 
 ### // the http4k team
 

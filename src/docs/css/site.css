@@ -34,6 +34,11 @@ ul.statusLink li {
     background-color: rgba(46, 123, 244, 0.96);
 }
 
+.blogImage {
+    width: 100%;
+    height: auto;
+}
+
 .github {
     display: none;
 }
