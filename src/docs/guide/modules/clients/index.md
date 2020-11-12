@@ -48,3 +48,7 @@ http4k supplies both blocking and non-blocking Websocket clients. The former is 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/example_websocket.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/example_websocket.kt"></script>
+
+#### Testing Websockets with offline and online clients [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/TestingWebsockets.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/TestingWebsockets.kt"></script>
