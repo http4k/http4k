@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.275.0 (uncut)
 - **http4k-core** : Reimplemented core routing logic to be fully based on `Routers`. It is now possible to nest arbitrary levels of request matching in a mix-and-match way. And it's ace. :) 
+- **http4k-*** : Pulled out a set of core modules for the various module types (format, template). This has shrunk the core module by ~10% in size
 
 ### v3.274.0
 - **http4k-*** : Upgrade some dependency versions.
