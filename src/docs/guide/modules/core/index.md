@@ -93,6 +93,11 @@ routes(
 
 Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality, with runtime-generated live documentation in OpenApi/Swagger format.
 
+#### Testing Routers [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/core/RoutingTest.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/core/RoutingTest.kt"></script>
+
+
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
 Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. 
 For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing). 
