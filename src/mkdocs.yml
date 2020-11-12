@@ -51,12 +51,14 @@ nav:
     - JSON RPC: guide/modules/jsonrpc/index.md
     - XML handling: guide/modules/xml/index.md
     - YAML handling: guide/modules/yaml/index.md
-    - Hamkrest: guide/modules/hamkrest/index.md
-    - Kotest: guide/modules/kotest/index.md
-    - Approval Testing: guide/modules/approvaltests/index.md
-    - WebDriver: guide/modules/webdriver/index.md
-    - Chaos Testing: guide/modules/chaos/index.md
-    - Service Virtualisaion: guide/modules/servicevirtualisation/index.md
+    - Testing:
+      - Overview: guide/modules/testing/index.md
+      - Hamkrest: guide/modules/hamkrest/index.md
+      - Kotest: guide/modules/kotest/index.md
+      - WebDriver: guide/modules/webdriver/index.md
+      - Approval Testing: guide/modules/approvaltests/index.md
+      - Chaos Testing: guide/modules/chaos/index.md
+      - Service Virtualisaion: guide/modules/servicevirtualisation/index.md
   - Cookbook:
     - How to use this guide: cookbook/index.md
     - Server as a function: cookbook/server_as_a_function/index.md
