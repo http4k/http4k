@@ -1,11 +1,12 @@
 description = 'Http4k YAML support using Jackson as an underlying engine'
 
 dependencies {
-    compile project(":http4k-core")
+    compile project(":http4k-format-core")
     compile project(":http4k-format-jackson")
     compile Libs.jackson_dataformat_yaml
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile project(path: ":http4k-format-core", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-format-jackson", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }
