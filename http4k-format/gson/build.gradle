@@ -1,11 +1,11 @@
 description = 'Http4k GSON JSON support'
 
 dependencies {
-    compile project(":http4k-core")
+    compile project(":http4k-format-core")
 
     compile Libs.gson
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
+    testCompile project(path: ":http4k-format-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }

@@ -7,5 +7,3 @@ class ArgoTest : JsonContract<JsonNode>(Argo) {
 	"hello": "world"
 }"""
 }
-
-class ArgoGenerateDataClassesTest : GenerateDataClassesContract<JsonNode>(Argo)

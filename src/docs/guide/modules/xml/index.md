@@ -35,7 +35,3 @@ As above, we recommend using `http4k-format-jackson-xml` as it has more predicta
 #### XML Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/autoXml.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/autoXml.kt"></script>
-
-<!--
-There is a utility to generate data class code from XML input [here](http://http4k-data-class-gen.herokuapp.com) . These data classes are compatible with using the `Body.auto<T>()` functionality. 
--->

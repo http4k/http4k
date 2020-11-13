@@ -2,6 +2,7 @@ description = 'A set of kotest matchers for common http4k types'
 
 dependencies {
     compile project(":http4k-core")
+    implementation project(":http4k-format-core")
 
     compile Libs.kotest_assertions_core_jvm
 

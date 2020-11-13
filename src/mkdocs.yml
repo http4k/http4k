@@ -73,7 +73,6 @@ nav:
     - Custom JSON marshallers: cookbook/custom_json_marshallers/index.md
     - HTML forms: cookbook/html_forms/index.md
     - Multipart forms: cookbook/multipart_forms/index.md
-    - Generating data classes for messages: cookbook/generating_data_classes/index.md
     - Websockets: cookbook/websockets/index.md
     - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
     - Basic OAuth Server configuration: cookbook/basic_oauth_authorization_server/index.md

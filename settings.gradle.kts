@@ -25,6 +25,7 @@ include("http4k-bom")
 include("http4k-cloudnative")
 include("http4k-contract")
 "http4k-format".apply {
+    includeModule("core")
     includeModule("argo")
     includeModule("gson")
     includeModule("jackson")
@@ -71,6 +72,7 @@ include("http4k-security-oauth")
 }
 
 "http4k-template".apply {
+    includeModule("core")
     includeModule("dust")
     includeModule("freemarker")
     includeModule("handlebars")
