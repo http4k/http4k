@@ -23,7 +23,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.AUTHOR_TOKEN }}
       - name: Push changes
-        uses: ad-m/github-push-action@0.6.0
+        uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.AUTHOR_TOKEN }}
           directory: tmp
