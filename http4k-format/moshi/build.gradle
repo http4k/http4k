@@ -6,6 +6,7 @@ dependencies {
     compile Libs.moshi
     compile Libs.moshi_kotlin
 
+    testCompile project(":http4k-core")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-format-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
