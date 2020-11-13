@@ -9,6 +9,7 @@ maven_publish "http4k-testing-kotest"
 maven_publish "http4k-testing-servirtium"
 maven_publish "http4k-testing-webdriver"
 
+maven_publish "http4k-template-core"
 maven_publish "http4k-template-handlebars"
 maven_publish "http4k-template-pebble"
 maven_publish "http4k-template-thymeleaf"

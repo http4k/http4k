@@ -2,6 +2,7 @@
 
 source ./release-functions.sh
 
+maven_publish "http4k-format-core"
 maven_publish "http4k-format-jackson"
 maven_publish "http4k-format-gson"
 maven_publish "http4k-format-moshi"
