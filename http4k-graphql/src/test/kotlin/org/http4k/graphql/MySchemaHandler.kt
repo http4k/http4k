@@ -35,7 +35,7 @@ class MySchemaHandler : GraphQLHandler {
 
     private val mutations = listOf(LoginMutationService()).asTopLevel()
 
-    private val graphQL = GraphQL.newGraphQL(toSchema(config, queries, mutations)).build()!!
+    private val graphQL = GraphQL.newGraphQL(toSchema(config, queries, mutations)).build()
 
     private val dataLoaderRegistry = DataLoaderRegistry()
 
