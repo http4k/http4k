@@ -9,10 +9,7 @@ data class User(
     val universityId: Long?,
     val isAdmin: Boolean = false
 ) {
-    fun university(): University? {
-        universityId ?: return null
-        return University.search(listOf(universityId))[0]
-    }
+    fun university() = universityId?.let { University.search(listOf(universityId))[0] }
 
     fun longThatNeverComes(): Long {
         throw GraphQLException("This value will never return")

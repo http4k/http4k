@@ -9,7 +9,7 @@ import org.http4k.graphql.schema.models.Book
 class BookQueryService {
     @GraphQLDescription("Return list of books based on BookSearchParameter options")
     @Suppress("unused")
-    fun searchBooks(params: BookSearchParameters) = Book.search(params.ids)
+    fun searchBooks(params: BookQuery) = Book.search(params.ids)
 }
 
-data class BookSearchParameters(val ids: List<Long>)
+data class BookQuery(val ids: List<Long>)

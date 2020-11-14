@@ -18,10 +18,9 @@ data class Course(
     val universityId: Long? = null,
     val bookIds: List<Long> = listOf()
 ) {
-    fun university(dataFetchingEnvironment: DataFetchingEnvironment): University? {
-        return dataFetchingEnvironment.getDataLoader<Long, University>(UNIVERSITY_LOADER_NAME)
+    fun university(dataFetchingEnvironment: DataFetchingEnvironment) =
+        dataFetchingEnvironment.getDataLoader<Long, University>(UNIVERSITY_LOADER_NAME)
             .load(universityId).get()
-    }
 
     fun books(dataFetchingEnvironment: DataFetchingEnvironment) = dataFetchingEnvironment.listBooks()
 
@@ -34,13 +33,11 @@ data class Course(
             .load(bookIds).get()
 
     companion object {
-        fun search(ids: List<Long>): List<Course> {
-            return listOf(
-                Course(id = 1, name = "Biology 101", universityId = 1, bookIds = listOf(1, 2)),
-                Course(id = 2, name = "Cultural Anthropology", universityId = 1),
-                Course(id = 3, name = "Computer Science 101", universityId = 1, bookIds = listOf(3, 4)),
-                Course(id = 4, name = "Computer Science 101", universityId = 3, bookIds = listOf(3, 4))
-            ).filter { ids.contains(it.id) }
-        }
+        fun search(ids: List<Long>) = listOf(
+            Course(id = 1, name = "Biology 101", universityId = 1, bookIds = listOf(1, 2)),
+            Course(id = 2, name = "Cultural Anthropology", universityId = 1),
+            Course(id = 3, name = "Computer Science 101", universityId = 1, bookIds = listOf(3, 4)),
+            Course(id = 4, name = "Computer Science 101", universityId = 3, bookIds = listOf(3, 4))
+        ).filter { ids.contains(it.id) }
     }
 }

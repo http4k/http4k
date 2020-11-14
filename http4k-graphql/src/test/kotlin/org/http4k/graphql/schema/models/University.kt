@@ -8,7 +8,7 @@ const val UNIVERSITY_LOADER_NAME = "UNIVERSITY_LOADER"
 
 val batchUniversityLoader = DataLoader<Long, University?> { ids ->
     CompletableFuture.supplyAsync {
-        University.search(ids).toMutableList()
+        University.search(ids)
     }
 }
 

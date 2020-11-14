@@ -4,7 +4,7 @@ import org.http4k.graphql.schema.models.Course
 
 class CourseQueryService {
     @Suppress("unused")
-    fun searchCourses(params: CourseSearchParameters) = Course.search(params.ids)
+    fun searchCourses(params: CourseQuery) = Course.search(params.ids)
 }
 
-data class CourseSearchParameters(val ids: List<Long>)
+data class CourseQuery(val ids: List<Long>)
