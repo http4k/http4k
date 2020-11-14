@@ -1,0 +1,11 @@
+description = 'Http4k JSON-RPC support'
+
+dependencies {
+    compile project(":http4k-core")
+    compile project(":http4k-format-jackson")
+    compile Libs.graphql_java
+
+    compile Libs.graphql_kotlin_schema_generator
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile Config.TestDependencies
+}

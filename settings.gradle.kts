@@ -35,6 +35,7 @@ include("http4k-contract")
     includeModule("moshi")
     includeModule("xml")
 }
+include("http4k-graphql")
 include("http4k-incubator")
 include("http4k-jsonrpc")
 include("http4k-metrics-micrometer")
