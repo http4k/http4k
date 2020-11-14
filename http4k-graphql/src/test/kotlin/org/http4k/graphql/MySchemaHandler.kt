@@ -24,27 +24,22 @@ import org.http4k.graphql.schema.models.batchUniversityLoader
 data class AuthorizedContext(val authorizedUser: User? = null, var guestUUID: String? = null)
 
 class MySchemaHandler : GraphQLHandler {
-    private val config = SchemaGeneratorConfig(supportedPackages = listOf("org.http4k.graphql.schema"))
+    private val graphQL = GraphQL.newGraphQL(
+        toSchema(
+            SchemaGeneratorConfig(supportedPackages = listOf("org.http4k.graphql.schema")),
+            listOf(
+                HelloQueryService(),
+                BookQueryService(),
+                CourseQueryService(),
+                UniversityQueryService()
+            ).asTopLevelObject(),
+            listOf(LoginMutationService()).asTopLevelObject()
+        )).build()
 
-    private val queries = listOf(
-        HelloQueryService(),
-        BookQueryService(),
-        CourseQueryService(),
-        UniversityQueryService()
-    ).asTopLevel()
-
-    private val mutations = listOf(LoginMutationService()).asTopLevel()
-
-    private val graphQL = GraphQL.newGraphQL(toSchema(config, queries, mutations)).build()
-
-    private val dataLoaderRegistry = DataLoaderRegistry()
-
-    init {
-        dataLoaderRegistry.apply {
-            register(UNIVERSITY_LOADER_NAME, batchUniversityLoader)
-            register(COURSE_LOADER_NAME, batchCourseLoader)
-            register(BATCH_BOOK_LOADER_NAME, batchBookLoader)
-        }
+    private val dataLoaderRegistry = DataLoaderRegistry().apply {
+        register(UNIVERSITY_LOADER_NAME, batchUniversityLoader)
+        register(COURSE_LOADER_NAME, batchCourseLoader)
+        register(BATCH_BOOK_LOADER_NAME, batchBookLoader)
     }
 
     /**
@@ -68,4 +63,4 @@ class MySchemaHandler : GraphQLHandler {
             ))
 }
 
-private fun List<Any>.asTopLevel() = map(::TopLevelObject)
+private fun List<Any>.asTopLevelObject() = map(::TopLevelObject)
