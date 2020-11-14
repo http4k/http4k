@@ -3,6 +3,7 @@ package org.http4k.graphql.schema
 import org.http4k.graphql.schema.models.University
 
 class UniversityQueryService {
+    @Suppress("unused")
     fun searchUniversities(params: UniversitySearchParameters): List<University> =
         University.search(params.ids)
 }
