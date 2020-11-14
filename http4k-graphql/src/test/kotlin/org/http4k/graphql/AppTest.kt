@@ -3,11 +3,13 @@ package org.http4k.graphql
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.asGraphQLHandler
+import org.http4k.format.Jackson
 import org.junit.jupiter.api.Test
 
 class AppTest {
+
     @Test
-    fun `asd`() {
+    fun `app responds with expected data`() {
         val response = App().asGraphQLHandler()(GraphQLRequest("{\n" +
             "  searchUniversities(params: { ids: [1]}) {\n" +
             "    id\n" +
@@ -15,15 +17,9 @@ class AppTest {
             "  }\n" +
             "}"))
 
-        println(response.data!!.javaClass)
         assertThat(
-            response,
-            equalTo(
-                GraphQLResponse(
-                    mapOf("searchUniversities" to listOf(mapOf("id" to 1, "name" to "University of Nebraska-Lincoln")))
-                )
-            )
-        )
+            Jackson.asFormatString(response),
+            equalTo("""{"data":{"searchUniversities":[{"id":1,"name":"University of Nebraska-Lincoln"}]},"errors":null}"""))
     }
 
 }
