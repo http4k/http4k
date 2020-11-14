@@ -3,6 +3,7 @@ description = 'Http4k Format supporting code'
 dependencies {
     compile project(":http4k-core")
 
+    testCompile project(":http4k-core")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-contract", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
