@@ -73,6 +73,7 @@ Bored with reading already and just want to get coding? For the impatient, visit
         * **Jetty** HTTP (supports sync and async HTTP)
         * **OkHttp** HTTP (supports sync and async HTTP)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
+    * **GraphQL** client (bundled with GraphQL module)
 * [Server:](https://http4k.org/guide/modules/servers)
     * **1LOC** server backend spin-up for:
         * **Apache v4 & v5** (from httpcore)
@@ -125,6 +126,8 @@ Bored with reading already and just want to get coding? For the impatient, visit
     * Support for instrumenting http4k apps with OpenTelemetry tooling.
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
+* [GraphQL:](https://http4k.org/guide/modules/graphql) 
+    * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
 * [AWS:](https://http4k.org/guide/modules/aws) 
     * Plug a standard `HttpHandler` into the AWS v2 SDKs. This massively simplifies testing and allows for sniffing of the exact traffic going to AWS - brilliant for debugging and building fakes.
     * Client filter to allow super-simple interaction with AWS services (via request signing)

@@ -6,7 +6,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.graphql.GraphQLRequest
 import org.http4k.graphql.GraphQLResponse
@@ -16,7 +15,7 @@ class GraphQLClientTest {
 
     @Test
     fun `convert a standard HttpHandler into a GraphQL client`() {
-        val uri = Uri.of("/foo")
+        val uri = "/foo"
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))
         val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar")))
