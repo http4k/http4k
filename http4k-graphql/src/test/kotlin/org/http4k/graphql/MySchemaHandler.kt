@@ -6,8 +6,6 @@ import com.expediagroup.graphql.toSchema
 import graphql.ExecutionInput
 import graphql.GraphQL
 import org.dataloader.DataLoaderRegistry
-import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.graphql.schema.BookQueryService
 import org.http4k.graphql.schema.CourseQueryService
 import org.http4k.graphql.schema.HelloQueryService
@@ -16,14 +14,11 @@ import org.http4k.graphql.schema.UniversityQueryService
 import org.http4k.graphql.schema.models.BATCH_BOOK_LOADER_NAME
 import org.http4k.graphql.schema.models.COURSE_LOADER_NAME
 import org.http4k.graphql.schema.models.UNIVERSITY_LOADER_NAME
-import org.http4k.graphql.schema.models.User
 import org.http4k.graphql.schema.models.batchBookLoader
 import org.http4k.graphql.schema.models.batchCourseLoader
 import org.http4k.graphql.schema.models.batchUniversityLoader
 
-data class AuthorizedContext(val authorizedUser: User? = null, var guestUUID: String? = null)
-
-class MySchemaHandler : GraphQLHandler {
+class MySchemaHandler() : GraphQLWithContextHandler<String> {
     private val graphQL = GraphQL.newGraphQL(
         toSchema(
             SchemaGeneratorConfig(supportedPackages = listOf("org.http4k.graphql.schema")),
@@ -42,25 +37,14 @@ class MySchemaHandler : GraphQLHandler {
         register(BATCH_BOOK_LOADER_NAME, batchBookLoader)
     }
 
-    /**
-     * Find attache user to context (authentication would go here)
-     */
-    private fun getContext(request: Request) = AuthorizedContext(User(
-        email = "fake@site.com",
-        firstName = "Someone",
-        lastName = "You Don't know",
-        universityId = 4
-    ))
-
-    override fun invoke(payload: GraphQLRequest) =
-        GraphQLResponse.from(
-            graphQL.execute(
-                ExecutionInput.Builder()
-                    .query(payload.query)
-                    .variables(payload.variables)
-                    .dataLoaderRegistry(dataLoaderRegistry)
-                    .context(getContext(Request(Method.GET, "")))
-            ))
+    override fun invoke(payload: GraphQLRequest, context: String) = GraphQLResponse.from(
+        graphQL.execute(
+            ExecutionInput.Builder()
+                .query(payload.query)
+                .variables(payload.variables)
+                .dataLoaderRegistry(dataLoaderRegistry)
+                .context(context)
+        ))
 }
 
 private fun List<Any>.asTopLevelObject() = map(::TopLevelObject)

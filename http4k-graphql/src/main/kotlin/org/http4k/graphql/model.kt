@@ -9,6 +9,8 @@ import org.http4k.format.Jackson.auto
 
 typealias GraphQLHandler = (GraphQLRequest) -> GraphQLResponse
 
+typealias GraphQLWithContextHandler<T> = (GraphQLRequest, T) -> GraphQLResponse
+
 data class GraphQLRequest(val query: String = "",
                           val operationName: String? = null,
                           val variables: Map<String, Any> = emptyMap()) {
