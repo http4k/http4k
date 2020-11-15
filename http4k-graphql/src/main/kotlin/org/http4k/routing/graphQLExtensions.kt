@@ -6,8 +6,8 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.graphql.GraphQLHandler
-import org.http4k.graphql.requestLens
-import org.http4k.graphql.responseLens
+import org.http4k.graphql.GraphQLRequest.Companion.requestLens
+import org.http4k.graphql.GraphQLResponse.Companion.responseLens
 import org.http4k.lens.LensFailure
 
 /**

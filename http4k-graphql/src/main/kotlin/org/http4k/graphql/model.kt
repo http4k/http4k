@@ -10,7 +10,11 @@ typealias GraphQLHandler = (GraphQLRequest) -> GraphQLResponse
 
 data class GraphQLRequest(val query: String = "",
                           val operationName: String? = null,
-                          val variables: Map<String, Any> = emptyMap())
+                          val variables: Map<String, Any> = emptyMap()) {
+    companion object {
+        val requestLens = Body.auto<GraphQLRequest>().toLens()
+    }
+}
 
 data class GraphQLResponse(
     val data: Any? = null,
@@ -31,8 +35,7 @@ data class GraphQLResponse(
                         }
                 )
             }
+
+        val responseLens = Body.auto<GraphQLResponse>().toLens()
     }
 }
-
-internal val requestLens = Body.auto<GraphQLRequest>().toLens()
-internal val responseLens = Body.auto<GraphQLResponse>().toLens()
