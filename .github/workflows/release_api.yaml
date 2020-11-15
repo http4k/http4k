@@ -7,14 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          repository: http4k/api
-          path: tmp
-          token: ${{ secrets.AUTHOR_TOKEN }}
       - uses: actions/setup-java@v1
         with:
           java-version: 11
       - run: ./gradlew -i dokka
+      - uses: actions/checkout@v2
+        with:
+          repository: http4k/api
+          path: tmp
+          token: ${{ secrets.AUTHOR_TOKEN }}
       - run: cp -R build/ddoc/http4k/* tmp/
       - uses: EndBug/add-and-commit@v4
         with:
