@@ -6,6 +6,7 @@ maven_publish "http4k-core"
 maven_publish "http4k-contract"
 maven_publish "http4k-security-oauth"
 maven_publish "http4k-cloudnative"
+maven_publish "http4k-graphql"
 maven_publish "http4k-metrics-micrometer"
 
 maven_publish "http4k-server-undertow"
