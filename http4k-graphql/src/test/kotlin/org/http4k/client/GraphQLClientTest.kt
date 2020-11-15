@@ -12,8 +12,6 @@ import org.http4k.graphql.GraphQLRequest
 import org.http4k.graphql.GraphQLResponse
 import org.junit.jupiter.api.Test
 
-data class MyData(val message: String)
-
 class GraphQLClientTest {
 
     @Test
