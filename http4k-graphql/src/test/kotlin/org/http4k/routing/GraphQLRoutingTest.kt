@@ -36,19 +36,19 @@ class GraphQLRoutingTest {
 
     @Test
     fun `with context`() {
-        val uri = Uri.of("/bob")
+        val path = "/bob"
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))
         val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar")))
 
         val contextValue = "context"
-        val app = routes("/bob" bind graphQL({ req, context ->
+        val app = routes(path bind graphQL({ req, context ->
             assertThat(req, equalTo(graphQLRequest))
             assertThat(context, equalTo(contextValue))
             graphQLResponse
         }, { contextValue }))
 
-        assertThat(app(Request(POST, uri).body(asFormatString(graphQLRequest))),
+        assertThat(app(Request(POST, path).body(asFormatString(graphQLRequest))),
             hasStatus(OK)
                 .and(hasBody(asFormatString(graphQLResponse)))
         )

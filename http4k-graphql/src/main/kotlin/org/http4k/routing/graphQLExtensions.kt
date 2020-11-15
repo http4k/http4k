@@ -13,7 +13,7 @@ import org.http4k.graphql.GraphQLWithContextHandler
 import org.http4k.lens.LensFailure
 
 /**
- * Routing plugin for GraphQL handling
+ * Routing plugin for GraphQL handling.
  */
 fun graphQL(handler: GraphQLHandler,
             badRequestFn: (LensFailure) -> Response = { Response(BAD_REQUEST) }
@@ -26,7 +26,7 @@ fun graphQL(handler: GraphQLHandler,
 })
 
 /**
- * Routing plugin for GraphQL handling
+ * Routing plugin for GraphQL handling with contextual data.
  */
 fun <T> graphQL(handler: GraphQLWithContextHandler<T>,
                 getContext: (Request) -> T,
