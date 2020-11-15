@@ -48,6 +48,7 @@ nav:
     - Resilience4J: guide/modules/resilience4j/index.md
     - AWS: guide/modules/aws/index.md
     - OAuth: guide/modules/oauth/index.md
+    - GraphQL: guide/modules/graphql/index.md
     - JSON RPC: guide/modules/jsonrpc/index.md
     - XML handling: guide/modules/xml/index.md
     - YAML handling: guide/modules/yaml/index.md
