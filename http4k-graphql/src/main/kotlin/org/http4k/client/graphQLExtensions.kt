@@ -9,6 +9,7 @@ import org.http4k.graphql.GraphQLRequest
 import org.http4k.graphql.GraphQLRequest.Companion.requestLens
 import org.http4k.graphql.GraphQLResponse.Companion.responseLens
 
-fun HttpHandler.asGraphQLHandler(uri: Uri = Uri.of("")) = { req: GraphQLRequest ->
-    responseLens(this(Request(POST, uri).with(requestLens of req)))
+fun HttpHandler.asGraphQLHandler(endpoint: Uri) = { req: GraphQLRequest ->
+    responseLens(this(Request(POST, endpoint).with(requestLens of req)))
 }
+fun HttpHandler.asGraphQLHandler(endpoint: String) = asGraphQLHandler(Uri.of(endpoint))

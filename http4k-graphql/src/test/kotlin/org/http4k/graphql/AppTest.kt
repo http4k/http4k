@@ -10,7 +10,7 @@ class AppTest {
 
     @Test
     fun `app responds with expected data`() {
-        val response = App().asGraphQLHandler()(GraphQLRequest("{\n" +
+        val response = App().asGraphQLHandler("/")(GraphQLRequest("{\n" +
             "  searchUniversities(params: { ids: [1]}) {\n" +
             "    id\n" +
             "    name\n" +

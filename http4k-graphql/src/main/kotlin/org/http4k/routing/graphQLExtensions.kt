@@ -13,10 +13,12 @@ import org.http4k.lens.LensFailure
 /**
  * Routing plugin for GraphQL handling
  */
-fun graphQL(handler: GraphQLHandler): HttpHandler = {
+fun graphQL(handler: GraphQLHandler,
+            badRequestFn: (LensFailure) -> Response = { Response(BAD_REQUEST) }
+): HttpHandler = {
     try {
         Response(OK).with(responseLens of handler(requestLens(it)))
     } catch (e: LensFailure) {
-        Response(BAD_REQUEST)
+        badRequestFn(e)
     }
 }

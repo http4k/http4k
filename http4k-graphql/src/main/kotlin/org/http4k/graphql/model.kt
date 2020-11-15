@@ -2,8 +2,9 @@ package org.http4k.graphql
 
 import graphql.ExceptionWhileDataFetching
 import graphql.ExecutionResult
-import graphql.GraphQLError
 import org.http4k.core.Body
+import org.http4k.format.Jackson
+import org.http4k.format.Jackson.asA
 import org.http4k.format.Jackson.auto
 
 typealias GraphQLHandler = (GraphQLRequest) -> GraphQLResponse
@@ -17,24 +18,24 @@ data class GraphQLRequest(val query: String = "",
 }
 
 data class GraphQLResponse(
-    val data: Any? = null,
-    val errors: List<GraphQLError>? = null) {
+    val data: Any?,
+    val errors: List<Map<String, Any>>?) {
 
     companion object {
-        fun from(executionResult: ExecutionResult) =
-            with(executionResult) {
-                GraphQLResponse(
-                    data = try {
-                        getData<Any>()
-                    } catch (e: Exception) {
-                        null
-                    },
-                    errors = errors.takeIf { it.isNotEmpty() }
-                        ?.run {
-                            distinctBy { if (it is ExceptionWhileDataFetching) it.exception else it }
-                        }
-                )
-            }
+        fun from(executionResult: ExecutionResult) = with(executionResult) {
+            val errorList: List<Map<String, Any>>? = executionResult.errors.takeIf { it.isNotEmpty() }
+                ?.run { distinctBy { if (it is ExceptionWhileDataFetching) it.exception else it } }
+                ?.let { Jackson.asJsonObject(it).asA() }
+
+            GraphQLResponse(
+                try {
+                    getData<Any>()
+                } catch (e: Exception) {
+                    null
+                },
+                errorList
+            )
+        }
 
         val responseLens = Body.auto<GraphQLResponse>().toLens()
     }
