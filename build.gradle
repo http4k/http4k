@@ -217,6 +217,7 @@ dependencies {
         }
 
     testCompile Libs.s3
+    testCompile Libs.graphql_kotlin_schema_generator
     testCompile Config.TestDependencies
 }
 

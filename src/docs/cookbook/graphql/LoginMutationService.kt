@@ -1,6 +1,4 @@
-package org.http4k.graphql.schema
-
-import org.http4k.graphql.schema.models.User
+package cookbook.graphql
 
 data class AuthPayload(val token: String? = null, val user: User? = null)
 

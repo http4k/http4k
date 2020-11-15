@@ -1,7 +1,6 @@
-package org.http4k.graphql.schema
+package cookbook.graphql
 
 import com.expediagroup.graphql.annotations.GraphQLDescription
-import org.http4k.graphql.schema.models.Book
 
 /**
  * Provide Search options for book data

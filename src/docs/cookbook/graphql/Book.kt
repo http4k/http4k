@@ -1,4 +1,4 @@
-package org.http4k.graphql.schema.models
+package cookbook.graphql
 
 import com.expediagroup.graphql.annotations.GraphQLDescription
 import org.dataloader.DataLoader

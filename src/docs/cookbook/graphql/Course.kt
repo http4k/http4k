@@ -1,4 +1,4 @@
-package org.http4k.graphql.schema.models
+package cookbook.graphql
 
 import graphql.schema.DataFetchingEnvironment
 import org.dataloader.DataLoader

@@ -1,4 +1,4 @@
-package org.http4k.graphql.schema
+package cookbook.graphql
 
 class HelloQueryService {
     fun hello() = "World!"

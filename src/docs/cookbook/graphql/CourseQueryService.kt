@@ -1,6 +1,4 @@
-package org.http4k.graphql.schema
-
-import org.http4k.graphql.schema.models.Course
+package cookbook.graphql
 
 class CourseQueryService {
     @Suppress("unused")
