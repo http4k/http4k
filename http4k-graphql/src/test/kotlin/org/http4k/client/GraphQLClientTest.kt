@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 class GraphQLClientTest {
 
     @Test
-    fun `convert a standard HttpHandler into a GraplQL client`() {
+    fun `convert a standard HttpHandler into a GraphQL client`() {
         val uri = Uri.of("/foo")
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))
