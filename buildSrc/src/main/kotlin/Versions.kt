@@ -1,4 +1,3 @@
-import kotlin.String
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -18,7 +17,7 @@ object Versions {
 
     const val io_github_resilience4j: String = "1.6.1"
 
-    const val software_amazon_awssdk: String = "2.15.25"
+    const val software_amazon_awssdk: String = "2.15.25" // available: "2.15.28"
 
     const val org_jetbrains_kotlin: String = "1.4.10"
 
@@ -34,15 +33,17 @@ object Versions {
 
     const val io_undertow: String = "2.2.2.Final"
 
-    const val io_ktor: String = "1.4.1"
+    const val io_ktor: String = "1.4.1" // available: "1.4.2"
 
     const val com_microsoft_azure_azurefunctions_gradle_plugin: String = "1.5.0"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.2"
+    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1" // available: "2.10.2"
 
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
+
+    const val graphql_kotlin_schema_generator: String = "3.6.6" // available: "3.6.7"
 
     const val openapi_generator_gradle_plugin: String = "4.3.1"
 
@@ -62,17 +63,17 @@ object Versions {
 
     const val aws_lambda_java_core: String = "1.2.1"
 
-    const val dokka_gradle_plugin: String = "0.10.1" // ignore due to bug: "1.4.10.2"
+    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.10.2"
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.52.Final" // ignore due to bug: "4.1.53.Final"
+    const val netty_codec_http2: String = "4.1.52.Final" // available: "4.1.54.Final"
 
     const val jackson_databind: String = "2.11.3"
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val micrometer_core: String = "1.6.0"
+    const val micrometer_core: String = "1.6.0" // available: "1.6.1"
 
     const val scf_java_events: String = "0.0.2"
 
@@ -81,6 +82,8 @@ object Versions {
     const val java_websocket: String = "1.5.1"
 
     const val commons_pool2: String = "2.9.0"
+
+    const val graphql_java: String = "15.0"
 
     const val http2_server: String = "9.4.34.v20201102"
 

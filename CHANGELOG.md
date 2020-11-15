@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.276.0 (uncut)
+- **http4k-graphql** : New module! Adds integration with `GraphQL-Java` and the ability to serve/consume GQL using the standard routing patterns.
+
 ### v3.275.0
 - **http4k-core** : Reimplemented core routing logic to be fully based on `Routers`. It is now possible to nest arbitrary levels of request matching in a mix-and-match way. And it's ace. :) 
 - **http4k-*** : Pulled out a set of core modules for the various module types (format, template). This has shrunk the core module by ~10% in size

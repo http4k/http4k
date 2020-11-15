@@ -1,14 +1,14 @@
-title: http4k blog: http4k v4 Unleashed
+title: http4k blog: http4k v4 Unleashed. Four digits good... 
 description: There's a new major http4k release! Read about all the new stuff the team have been working on for http4k v4.
 
-# http4k v4 Unleashed
+# http4k v4 Unleashed. Four digits good... 
 
 ##### november 2020 / the http4k team
 
 Well, at last it's here - after 3 years - [http4k] v4! Following on from the [retrospective](/blog/retrospective_v3) that we did on version 3, we've been busy polishing, tidying up the edges, and pushing out a bunch of changes to make the project sparkle. Ready? Then let's dive into the good stuff that's been going on at [http4k] Towers.
 
 <hr/>
-#### Four digits good: the new http4k versioning scheme
+#### ...3 digits bad. The new http4k versioning scheme
 Ah yes - versioning - everyone's favourite topic. Part of the reason that [http4k] v3 has been around so long is that we've somewhat been abusing the [Semantic versioning](https://semver.org/) system, something which we've been unhappy with. Here's how it should work:
 
 ```text
@@ -81,6 +81,14 @@ val app = routes("/{name}" bind POST to (
 ```
 
 So after a lot of clattering and banging of heads, we cracked it - and in doing so managed to rewrite the entire of the [http4k] routing layer in terms of these predicate `Routers`. It's really neat, infinitely(ish) nestable, and makes us feel just a little bit smug for getting it working.
+
+<hr/>
+#### Graph power
+<img class="blogImage" src="./graphql.png" alt="http4k graphql"/>
+
+Traditionally, [http4k] has concentrated on providing routing for REST-style APIs. However, there is this new thing called GraphQL that has suddenly sprung up overnight and seems quite popular. 
+
+Not wanting our users to miss out on anything, we've added support for simply integrating [http4k] with the official Java implementation of the library, [GraphQL-Java](https://www.graphql-java.com/). This module allows you to both serve and consume GQL APIs, and as per tradition allows you to test your APIs entirely in-memory making for super-fast test suites.
 
 <hr/>
 #### OpenTelemetry: Monitor all the things!
