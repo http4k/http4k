@@ -56,6 +56,17 @@ class RoutingTest {
     }
 
     @Test
+    fun `mismatched path with no alternate method should be unmatched`() {
+        val routes = routes(
+            "/search/foo" bind POST to { Response(OK) },
+            "/search/bar" bind GET to { Response(OK) }
+        )
+
+        val responseMismatch = routes(Request(GET, "/serch/foo"))
+        assertThat(responseMismatch, hasStatus(NOT_FOUND))
+    }
+
+    @Test
     fun `matches uri template and method`() {
         val routes = routes(
             "/a/{route}" bind GET to { Response(OK).body("matched") }

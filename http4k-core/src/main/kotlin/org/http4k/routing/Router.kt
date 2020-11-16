@@ -48,7 +48,11 @@ sealed class RouterMatch(private val priority: Int) : Comparable<RouterMatch> {
 
 internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
     is MatchedWithoutHandler -> other
-    is MatchingHandler, MethodNotMatched, Unmatched -> this
+    is MethodNotMatched -> when (other) {
+        is MatchingHandler, MatchedWithoutHandler, MethodNotMatched -> this
+        is Unmatched -> other
+    }
+    is MatchingHandler, Unmatched -> this
 }
 
 internal data class OrRouter private constructor(private val list: List<Router>) : Router {
