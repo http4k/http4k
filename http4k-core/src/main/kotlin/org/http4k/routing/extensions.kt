@@ -8,8 +8,11 @@ import org.http4k.routing.RouterMatch.Unmatched
 /**
  * Convert any predicate on a request into a router
  */
-fun ((Request) -> Boolean).asRouter(): Router = Router { r: Request ->
-    if (this(r)) MatchedWithoutHandler else Unmatched
+fun ((Request) -> Boolean).asRouter(): Router = object:Router {
+    override fun match(request: Request): RouterMatch =
+        if (this@asRouter(request)) MatchedWithoutHandler else Unmatched
+
+    override  val description = "request matching logic"
 }
 
 fun Request.path(name: String): String? = when (this) {
@@ -17,8 +20,11 @@ fun Request.path(name: String): String? = when (this) {
     else -> throw IllegalStateException("Request was not routed, so no uri-template present")
 }
 
-fun Method.asRouter() = Router {
-    if(this@asRouter == it.method) MatchedWithoutHandler else RouterMatch.MethodNotMatched
+fun Method.asRouter() = object:Router {
+    override fun match(request: Request): RouterMatch =
+        if(this@asRouter == request.method) MatchedWithoutHandler else RouterMatch.MethodNotMatched
+
+    override val description: String = "method == ${this@asRouter}"
 }
 
 fun Method.and(that: Router) = asRouter().and(that)

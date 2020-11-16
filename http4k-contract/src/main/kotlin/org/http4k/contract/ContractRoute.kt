@@ -52,6 +52,8 @@ class ContractRoute internal constructor(val method: Method,
                     Unmatched
                 }
             } else Unmatched
+
+        override val description = "<contract>"
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)

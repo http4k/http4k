@@ -188,6 +188,8 @@ private class InMemoryResourceLoader(val resources: Map<String, Resource>) : Rou
     override fun match(request: Request): RouterMatch = resources[request.uri.path]?.let {
         RouterMatch.MatchingHandler(it)
     } ?: RouterMatch.Unmatched
+
+    override val description: String = "mapped in-memory resource"
 }
 
 

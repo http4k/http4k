@@ -14,7 +14,7 @@ import org.http4k.routing.RouterMatch.Unmatched
 /**
  * Matches requests for routing purposes.
  */
-fun interface Router {
+interface Router {
     /**
      * Attempt to supply an HttpHandler which can service the passed request.
      */
@@ -29,6 +29,8 @@ fun interface Router {
      * Returns a Router which applies the passed Filter to all received requests before servicing them.
      */
     fun withFilter(new: Filter): Router = this
+
+    val description: String
 }
 
 /**
@@ -64,6 +66,8 @@ internal data class OrRouter private constructor(private val list: List<Router>)
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
+    override val description = list.joinToString("\nor\n") { "(${it.description})" }
+
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else OrRouter(list)
     }
@@ -76,6 +80,8 @@ internal data class AndRouter private constructor(private val list: List<Router>
     override fun withBasePath(new: String) = from(list.map { it.withBasePath(new) })
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
+
+    override val description = list.joinToString(" and ") { it.description }
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else AndRouter(list)
@@ -94,6 +100,8 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
         is RoutingHttpHandler -> handler.withFilter(new)
         else -> PassthroughRouter(new.then(handler))
     }
+
+    override val description = "<http-handler>"
 }
 
 internal data class Prefix(private val template: String) : Router {
@@ -103,6 +111,7 @@ internal data class Prefix(private val template: String) : Router {
     }
 
     override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
+    override  val description = "prefix == '$template'"
 }
 
 internal data class TemplateRouter(private val template: UriTemplate,
@@ -124,4 +133,6 @@ internal data class TemplateRouter(private val template: UriTemplate,
         is RoutingHttpHandler -> httpHandler.withFilter(new)
         else -> new.then(httpHandler)
     })
+
+    override  val description = "template == '$template'"
 }
