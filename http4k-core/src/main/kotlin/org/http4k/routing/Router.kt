@@ -66,9 +66,8 @@ internal data class OrRouter private constructor(private val list: List<Router>)
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override fun getDescription(depth: Int): String {
-        val indent = " ".repeat(depth * 2)
-        return "\n"+list.joinToString("\n${indent}or\n") { "$indent(${it.getDescription(depth + 1)})" }
+    override fun getDescription(depth: Int): String = (" ".repeat(depth * 2)).let { indent ->
+        "\n" + list.joinToString("\n${indent}or\n") { "$indent(${it.getDescription(depth + 1)})" }
     }
 
     companion object {
