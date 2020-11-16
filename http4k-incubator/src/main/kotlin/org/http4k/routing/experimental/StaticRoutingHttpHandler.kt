@@ -40,7 +40,7 @@ internal data class StaticRoutingHttpHandler(
             Unmatched
     }
 
-    override val description: String = "pathSegments == '$pathSegments'"
+    override fun getDescription(depth: Int): String = "pathSegments == '$pathSegments'"
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }

@@ -16,7 +16,7 @@ internal data class RouterBasedHttpHandler(
     private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
 
     override fun match(request: Request): RouterMatch = router.match(request)
-    override  val description  = router.description
+    override fun getDescription(depth: Int) = router.getDescription(depth)
 
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
         is MatchingHandler -> matchResult

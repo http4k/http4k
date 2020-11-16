@@ -62,8 +62,6 @@ class RoutingTest {
             "/search/bar" bind GET to { Response(OK) }
         )
 
-        println(routes.description)
-
         val responseMismatch = routes(Request(GET, "/serch/foo"))
         assertThat(responseMismatch, hasStatus(NOT_FOUND))
     }

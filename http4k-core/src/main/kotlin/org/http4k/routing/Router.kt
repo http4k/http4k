@@ -30,7 +30,7 @@ interface Router {
      */
     fun withFilter(new: Filter): Router = this
 
-    val description: String
+    fun getDescription(depth: Int): String
 }
 
 /**
@@ -66,7 +66,10 @@ internal data class OrRouter private constructor(private val list: List<Router>)
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override val description = list.joinToString("\nor\n") { "(${it.description})" }
+    override fun getDescription(depth: Int): String {
+        val indent = " ".repeat(depth * 2)
+        return "\n"+list.joinToString("\n${indent}or\n") { "$indent(${it.getDescription(depth + 1)})" }
+    }
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else OrRouter(list)
@@ -81,7 +84,7 @@ internal data class AndRouter private constructor(private val list: List<Router>
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override val description = list.joinToString(" and ") { it.description }
+    override fun getDescription(depth: Int) = list.joinToString(" and ") { it.getDescription(depth) }
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else AndRouter(list)
@@ -101,7 +104,7 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
         else -> PassthroughRouter(new.then(handler))
     }
 
-    override val description = "<http-handler>"
+    override fun getDescription(depth: Int) = "<http-handler>"
 }
 
 internal data class Prefix(private val template: String) : Router {
@@ -111,7 +114,7 @@ internal data class Prefix(private val template: String) : Router {
     }
 
     override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
-    override  val description = "prefix == '$template'"
+    override fun getDescription(depth: Int) = "prefix == '$template'"
 }
 
 internal data class TemplateRouter(private val template: UriTemplate,
@@ -134,5 +137,5 @@ internal data class TemplateRouter(private val template: UriTemplate,
         else -> new.then(httpHandler)
     })
 
-    override  val description = "template == '$template'"
+    override fun getDescription(depth: Int) = "template == '$template'"
 }

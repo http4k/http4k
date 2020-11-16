@@ -31,7 +31,7 @@ object ResourceLoaders {
                 return javaClass.getResource(resourcePath)?.toResource(mimeTypes.forFile(resourcePath), lastModifiedFinder(resourcePath))
             }
 
-            override  val description = "serving from classpath at $basePackagePath"
+            override fun getDescription(depth: Int) = "serving from classpath at $basePackagePath"
         }
 
         private fun String.orIndexFile() = if (isEmpty() || endsWith("/")) pathJoin("index.html") else this

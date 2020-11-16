@@ -36,7 +36,7 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
         if (it.status != Status.NOT_FOUND) RouterMatch.MatchingHandler(filter.then { _: Request -> it }) else null
     } ?: RouterMatch.Unmatched
 
-    override  val description = "static with path segments of $pathSegments"
+    override fun getDescription(depth: Int) = "static with path segments of $pathSegments"
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }

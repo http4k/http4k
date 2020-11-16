@@ -19,7 +19,7 @@ internal data class DirectoryResourceLoader(
         }
     }
 
-    override  val description = "serving from directory $baseDir"
+    override fun getDescription(depth: Int) = "serving from directory $baseDir"
 
     private fun indexFileIn(path: String) = path.pathJoin("index.html")
 

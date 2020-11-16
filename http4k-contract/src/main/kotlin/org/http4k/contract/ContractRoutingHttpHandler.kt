@@ -98,7 +98,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
         } else unmatched
     }
 
-    override val description: String = "<contract>"
+    override fun getDescription(depth: Int): String = "<contract>"
 
     private fun identify(route: ContractRoute) =
         route.describeFor(contractRoot).let { routeIdentity ->
