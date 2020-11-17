@@ -117,7 +117,7 @@ class RoutingTest {
             )
         )
 
-//        println(routes.getDescription(0))
+        println(routes.getDescription())
 
         assertThat(routes(Request(GET, "/a")).bodyString(), equalTo("matched a"))
         assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))

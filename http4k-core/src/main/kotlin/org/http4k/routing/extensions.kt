@@ -22,7 +22,7 @@ fun Method.asRouter() = object:Router {
     override fun match(request: Request): RouterMatch =
         if(this@asRouter == request.method) MatchedWithoutHandler else RouterMatch.MethodNotMatched
 
-    override fun getDescription(depth: Int) = RouterDescription("method == ${this@asRouter}")
+    override fun getDescription() = RouterDescription("method == ${this@asRouter}")
 }
 
 fun Method.and(that: Router) = asRouter().and(that)
