@@ -35,9 +35,9 @@ internal data class StaticRoutingHttpHandler(
 
     override fun match(request: Request): RouterMatch = handlerNoFilter(request).let {
         if (it.status != NOT_FOUND)
-            MatchingHandler(filter.then { _: Request -> it })
+            MatchingHandler(filter.then { _: Request -> it }, getDescription())
         else
-            Unmatched
+            Unmatched(getDescription())
     }
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)

@@ -19,7 +19,6 @@ import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
-import org.http4k.routing.RouterDescription
 import org.http4k.routing.RouterMatch
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
@@ -46,13 +45,13 @@ class ContractRoute internal constructor(val method: Method,
                         .extract(spec.pathLenses.toList())
                         ?.let {
                             if (request.method == OPTIONS) {
-                                MatchingHandler { Response(OK) }
-                            } else MatchingHandler(toHandler(it))
-                        } ?: Unmatched
+                                MatchingHandler({ Response(OK) }, getDescription())
+                            } else MatchingHandler(toHandler(it), getDescription())
+                        } ?: Unmatched(getDescription())
                 } catch (e: LensFailure) {
-                    Unmatched
+                    Unmatched(getDescription())
                 }
-            } else Unmatched
+            } else Unmatched(getDescription())
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)

@@ -47,9 +47,9 @@ sealed class RouterMatch(private val priority: Int, open val description: Router
         override fun invoke(request: Request): Response = httpHandler(request)
     }
 
-    class MatchedWithoutHandler(description: RouterDescription) : RouterMatch(1, description)
-    class MethodNotMatched(description: RouterDescription) : RouterMatch(2, description)
-    class Unmatched(description: RouterDescription) : RouterMatch(3, description)
+    data class MatchedWithoutHandler(override val description: RouterDescription) : RouterMatch(1, description)
+    data class MethodNotMatched(override val description: RouterDescription) : RouterMatch(2, description)
+    data class Unmatched(override val description: RouterDescription) : RouterMatch(3, description)
 
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
 }
