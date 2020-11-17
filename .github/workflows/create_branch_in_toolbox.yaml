@@ -8,6 +8,8 @@ jobs:
   create-toolbox-release:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Action
+        uses: hmarr/debug-action@v1.0.0
       - name: Grab tag name
         uses: olegtarasov/get-tag@v2
         id: tagName
