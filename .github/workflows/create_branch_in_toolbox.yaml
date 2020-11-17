@@ -2,6 +2,8 @@ on:
   push:
     tags:
       - '*'
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:
   create-toolbox-release:
     runs-on: ubuntu-latest
