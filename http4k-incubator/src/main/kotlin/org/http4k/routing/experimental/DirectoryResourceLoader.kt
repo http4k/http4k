@@ -19,8 +19,6 @@ internal data class DirectoryResourceLoader(
         }
     }
 
-    override fun getDescription(depth: Int) = "serving from directory $baseDir"
-
     private fun indexFileIn(path: String) = path.pathJoin("index.html")
 
     private fun directoryRenderingHandler(dir: File, renderer: DirectoryRenderer) =

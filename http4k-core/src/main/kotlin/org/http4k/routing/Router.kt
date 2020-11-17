@@ -30,7 +30,13 @@ interface Router {
      */
     fun withFilter(new: Filter): Router = this
 
-    fun getDescription(depth: Int): String
+    fun getDescription(depth: Int): RouterDescription = RouterDescription.unavailable
+}
+
+data class RouterDescription(val description: String, val children: List<RouterDescription> = listOf()){
+    companion object{
+        val unavailable = RouterDescription("unavailable")
+    }
 }
 
 /**
@@ -66,9 +72,8 @@ internal data class OrRouter private constructor(private val list: List<Router>)
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override fun getDescription(depth: Int): String = (" ".repeat(depth * 2)).let { indent ->
-        "\n" + list.joinToString("\n${indent}or\n") { "$indent(${it.getDescription(depth + 1)})" }
-    }
+    override fun getDescription(depth: Int): RouterDescription =
+        RouterDescription("or", list.map { it.getDescription(depth + 1) })
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else OrRouter(list)
@@ -83,7 +88,7 @@ internal data class AndRouter private constructor(private val list: List<Router>
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override fun getDescription(depth: Int) = list.joinToString(" and ") { it.getDescription(depth) }
+    override fun getDescription(depth: Int) = RouterDescription("and", list.map { it.getDescription(depth + 1) })
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else AndRouter(list)
@@ -103,7 +108,7 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
         else -> PassthroughRouter(new.then(handler))
     }
 
-    override fun getDescription(depth: Int) = "<http-handler>"
+    override fun getDescription(depth: Int) = RouterDescription("<http-handler>")
 }
 
 internal data class Prefix(private val template: String) : Router {
@@ -113,7 +118,7 @@ internal data class Prefix(private val template: String) : Router {
     }
 
     override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
-    override fun getDescription(depth: Int) = "prefix == '$template'"
+    override fun getDescription(depth: Int) = RouterDescription("prefix == '$template'")
 }
 
 internal data class TemplateRouter(private val template: UriTemplate,
@@ -136,5 +141,5 @@ internal data class TemplateRouter(private val template: UriTemplate,
         else -> new.then(httpHandler)
     })
 
-    override fun getDescription(depth: Int) = "template == '$template'"
+    override fun getDescription(depth: Int) = RouterDescription("template == '$template'")
 }

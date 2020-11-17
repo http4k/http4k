@@ -36,7 +36,6 @@ internal data class SinglePageAppRoutingHandler(
     }
 
     override fun match(request: Request) = RouterMatch.MatchingHandler(this)
-    override fun getDescription(depth: Int) = "with path segment of $pathSegments"
 
     override fun withFilter(new: Filter) = copy(staticHandler = staticHandler.withFilter(new) as StaticRoutingHttpHandler)
 

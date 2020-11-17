@@ -98,8 +98,6 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
         } else unmatched
     }
 
-    override fun getDescription(depth: Int): String = "<contract>"
-
     private fun identify(route: ContractRoute) =
         route.describeFor(contractRoot).let { routeIdentity ->
             Filter { next ->
