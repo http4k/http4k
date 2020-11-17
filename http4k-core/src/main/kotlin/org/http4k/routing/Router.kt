@@ -33,8 +33,8 @@ interface Router {
     fun getDescription(): RouterDescription = RouterDescription.unavailable
 }
 
-data class RouterDescription(val description: String, val children: List<RouterDescription> = listOf()){
-    companion object{
+data class RouterDescription(val description: String, val children: List<RouterDescription> = listOf()) {
+    companion object {
         val unavailable = RouterDescription("unavailable")
     }
 }
@@ -43,13 +43,13 @@ data class RouterDescription(val description: String, val children: List<RouterD
  * The result of a matching operation. May or may not contain a matched HttpHandler.
  */
 sealed class RouterMatch(private val priority: Int, open val description: RouterDescription) : Comparable<RouterMatch> {
-    data class MatchingHandler(private val httpHandler: HttpHandler, override val description:RouterDescription) : RouterMatch(0, description), HttpHandler {
+    data class MatchingHandler(private val httpHandler: HttpHandler, override val description: RouterDescription) : RouterMatch(0, description), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
     }
 
-     class MatchedWithoutHandler(description: RouterDescription) : RouterMatch(1, description)
-     class MethodNotMatched(description: RouterDescription) : RouterMatch(2, description)
-     class Unmatched(description: RouterDescription) : RouterMatch(3, description)
+    class MatchedWithoutHandler(description: RouterDescription) : RouterMatch(1, description)
+    class MethodNotMatched(description: RouterDescription) : RouterMatch(2, description)
+    class Unmatched(description: RouterDescription) : RouterMatch(3, description)
 
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
 }
