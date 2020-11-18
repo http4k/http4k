@@ -27,7 +27,7 @@ class OAuthCallback(
                                 tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
                                 val originalUri = oAuthPersistence.retrieveOriginalUri(request)?.toString() ?: "/"
                                 oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT)
-                                    .header("Location", originalUri), tokenDetails.accessToken)
+                                    .header("Location", originalUri), tokenDetails.accessToken, tokenDetails.idToken)
                             }
                     } else {
                         null

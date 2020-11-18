@@ -4,6 +4,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Uri
+import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.Nonce
 
 /**
@@ -49,12 +50,14 @@ interface OAuthPersistence {
      */
     fun retrieveOriginalUri(request: Request): Uri?
 
-
     /**
-     * Assign the swapped AccessToken returned by the end-service. Opportunity here to modify the
+     * Assign the swapped AccessToken (and optional IdToken) returned by the end-service. Opportunity here to modify the
      * response returned to the user when the redirection happens.
+     *
+     * Notice that both accessToken and idToken contain the raw response from the authorization server and may
+     * require extra validation before use.
      */
-    fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response
+    fun assignToken(request: Request, redirect: Response, accessToken: AccessToken, idToken: IdToken? = null): Response
 
     /**
      * Retrieve the stored AccessToken token for this user request

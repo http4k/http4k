@@ -3,6 +3,7 @@ package org.http4k.security
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.Nonce
 
 class FakeOAuthPersistence : OAuthPersistence {
@@ -17,7 +18,7 @@ class FakeOAuthPersistence : OAuthPersistence {
         return redirect.header("action", "assignNonce")
     }
 
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response {
+    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken, idToken: IdToken?): Response {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }
