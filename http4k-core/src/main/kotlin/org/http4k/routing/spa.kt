@@ -35,7 +35,7 @@ internal data class SinglePageAppRoutingHandler(
         return matchOnStatic ?: fallbackHandler(Request(Method.GET, pathSegments))
     }
 
-    override fun match(request: Request) = RouterMatch.MatchingHandler(this, getDescription())
+    override fun match(request: Request) = RouterMatch.MatchingHandler(this, description)
 
     override fun withFilter(new: Filter) = copy(staticHandler = staticHandler.withFilter(new) as StaticRoutingHttpHandler)
 

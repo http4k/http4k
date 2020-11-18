@@ -41,7 +41,7 @@ class RoutePrintingTest {
 
     @Test
     fun `describe routes`(approvalTest: Approver) {
-        approvalTest.assertApproved(routes.getDescription().prettify(escapeMode = Pseudo))
+        approvalTest.assertApproved(routes.description.prettify(escapeMode = Pseudo))
     }
 
     @Test

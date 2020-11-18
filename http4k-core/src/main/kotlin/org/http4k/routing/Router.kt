@@ -30,7 +30,7 @@ interface Router {
      */
     fun withFilter(new: Filter): Router = this
 
-    fun getDescription(): RouterDescription = RouterDescription.unavailable
+    val description: RouterDescription get() = RouterDescription.unavailable
 }
 
 data class RouterDescription(val description: String, val children: List<RouterDescription> = listOf()) {
@@ -76,16 +76,16 @@ internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
 internal data class OrRouter private constructor(private val list: List<Router>) : Router {
     override fun match(request: Request): RouterMatch {
         val matches = list.map { next -> next.match(request) }
-        val result = matches.minOrNull() ?: Unmatched(getDescription())
-        return result.aggregatedBy(getDescription(), matches)
+        val result = matches.minOrNull() ?: Unmatched(description)
+        return result.aggregatedBy(description, matches)
     }
 
     override fun withBasePath(new: String) = from(list.map { it.withBasePath(new) })
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override fun getDescription(): RouterDescription =
-        RouterDescription("or", list.map { it.getDescription() })
+    override val description: RouterDescription get() =
+        RouterDescription("or", list.map { it.description })
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else OrRouter(list)
@@ -96,14 +96,14 @@ internal data class AndRouter private constructor(private val list: List<Router>
     override fun match(request: Request): RouterMatch {
         val matches = list.map { it.match(request) }
         val result = matches.reduce(RouterMatch::and)
-        return result.aggregatedBy(getDescription(), matches)
+        return result.aggregatedBy(description, matches)
     }
 
     override fun withBasePath(new: String) = from(list.map { it.withBasePath(new) })
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override fun getDescription() = RouterDescription("and", list.map { it.getDescription() })
+    override val description = RouterDescription("and", list.map { it.description })
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else AndRouter(list)
@@ -111,7 +111,7 @@ internal data class AndRouter private constructor(private val list: List<Router>
 }
 
 internal data class PassthroughRouter(private val handler: HttpHandler) : Router {
-    override fun match(request: Request): RouterMatch = MatchingHandler(handler, getDescription())
+    override fun match(request: Request): RouterMatch = MatchingHandler(handler, description)
 
     override fun withBasePath(new: String) = when (handler) {
         is RoutingHttpHandler -> handler.withBasePath(new)
@@ -123,25 +123,26 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
         else -> PassthroughRouter(new.then(handler))
     }
 
-    override fun getDescription() = RouterDescription("<http-handler>")
+    override val description = RouterDescription("<http-handler>")
 }
 
 internal data class Prefix(private val template: String) : Router {
     override fun match(request: Request) = when {
-        UriTemplate.from("$template{match:.*}").matches(request.uri.path) -> MatchedWithoutHandler(getDescription())
-        else -> Unmatched(getDescription())
+        UriTemplate.from("$template{match:.*}").matches(request.uri.path) -> MatchedWithoutHandler(description)
+        else -> Unmatched(description)
     }
 
     override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
-    override fun getDescription() = RouterDescription("prefix == '$template'")
+
+    override val description = RouterDescription("prefix == '$template'")
 }
 
 internal data class TemplateRouter(private val template: UriTemplate,
                                    private val httpHandler: HttpHandler) : Router {
     override fun match(request: Request) = when {
         template.matches(request.uri.path) ->
-            MatchingHandler({ RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }, getDescription())
-        else -> Unmatched(getDescription())
+            MatchingHandler({ RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }, description)
+        else -> Unmatched(description)
     }
 
     override fun withBasePath(new: String): Router =
@@ -156,5 +157,5 @@ internal data class TemplateRouter(private val template: UriTemplate,
         else -> new.then(httpHandler)
     })
 
-    override fun getDescription() = RouterDescription("template == '$template'")
+    override val description = RouterDescription("template == '$template'")
 }

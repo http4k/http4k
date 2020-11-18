@@ -10,7 +10,7 @@ import org.http4k.routing.RouterMatch.Unmatched
  */
 fun ((Request) -> Boolean).asRouter(): Router = object:Router {
     override fun match(request: Request): RouterMatch =
-        if (this@asRouter(request)) MatchedWithoutHandler(getDescription()) else Unmatched(getDescription())
+        if (this@asRouter(request)) MatchedWithoutHandler(description) else Unmatched(description)
 }
 
 fun Request.path(name: String): String? = when (this) {
@@ -20,9 +20,9 @@ fun Request.path(name: String): String? = when (this) {
 
 fun Method.asRouter() = object:Router {
     override fun match(request: Request): RouterMatch =
-        if(this@asRouter == request.method) MatchedWithoutHandler(getDescription()) else RouterMatch.MethodNotMatched(getDescription())
+        if(this@asRouter == request.method) MatchedWithoutHandler(description) else RouterMatch.MethodNotMatched(description)
 
-    override fun getDescription() = RouterDescription("method == ${this@asRouter}")
+    override val description = RouterDescription("method == ${this@asRouter}")
 }
 
 fun Method.and(that: Router) = asRouter().and(that)
