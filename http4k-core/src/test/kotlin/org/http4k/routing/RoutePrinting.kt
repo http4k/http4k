@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import org.http4k.routing.ForegroundColour.*
 import org.http4k.routing.RouterMatch.*
+import org.http4k.routing.Variation.Strikethrough
 
 fun RouterDescription.prettify(depth: Int = 0): String = (" ".repeat(depth * 2)).let { indent ->
     val lineBreak = if(description == "or") "\n" else ""
@@ -17,14 +18,16 @@ fun RouterMatch.prettify(depth: Int = 0): String = (" ".repeat(depth * 2)).let {
     val lineBreak = if(this.description.description == "or") "\n" else ""
     val indentValue = if(this.description.description == "or") indent else ""
     if (this.subMatches.isEmpty()) {
-        this.description.description.coloured(colour)
+        this.description.description.styled(colour)
     } else {
-        "$lineBreak$indentValue${"(".coloured(colour)}${this.subMatches.joinToString("$lineBreak$indentValue ${this.description.description.coloured(colour)} ") { it.prettify(depth + 1) }}${")".coloured(this.colour)}"
+        "$lineBreak$indentValue${"(".styled(colour)}${this.subMatches.joinToString("$lineBreak$indentValue ${this.description.description.styled(colour)} ") { it.prettify(depth + 1) }}${")".styled(colour)}"
     }
 }
 
-private val RouterMatch.colour: ForegroundColour
+private val RouterMatch.colour: TextStyle
     get() = when(this){
-        is MatchingHandler,is MatchedWithoutHandler -> Green
-        is MethodNotMatched, is Unmatched -> Red
+        is MatchingHandler,is MatchedWithoutHandler -> TextStyle(Green)
+        is MethodNotMatched, is Unmatched -> TextStyle(Red, variation = Strikethrough)
     }
+
+
