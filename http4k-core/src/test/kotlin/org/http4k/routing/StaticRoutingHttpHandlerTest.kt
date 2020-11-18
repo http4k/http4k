@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
@@ -199,7 +200,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `as a router when does not fine file`() {
         val handler = "/svc" bind static()
 
-        assertThat(handler.match(Request(GET, of("/svc/../svc/Bob.xml"))), equalTo(RouterMatch.Unmatched as RouterMatch))
+        assertThat(handler.match(Request(GET, of("/svc/../svc/Bob.xml"))), isA<RouterMatch.Unmatched>())
     }
 
     @Test

@@ -45,13 +45,13 @@ class ContractRoute internal constructor(val method: Method,
                         .extract(spec.pathLenses.toList())
                         ?.let {
                             if (request.method == OPTIONS) {
-                                MatchingHandler { Response(OK) }
-                            } else MatchingHandler(toHandler(it))
-                        } ?: Unmatched
+                                MatchingHandler({ Response(OK) }, description)
+                            } else MatchingHandler(toHandler(it), description)
+                        } ?: Unmatched(description)
                 } catch (e: LensFailure) {
-                    Unmatched
+                    Unmatched(description)
                 }
-            } else Unmatched
+            } else Unmatched(description)
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)

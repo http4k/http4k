@@ -3,6 +3,7 @@ package org.http4k.routing.experimental
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.or
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
@@ -51,7 +52,7 @@ abstract class ResourceLoaderContract(private val loader: Router) {
     protected fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
         val request = Request(GET, of(path))
         if (expected == null)
-            assertThat(loader.match(request), equalTo(Unmatched as RouterMatch))
+            assertThat(loader.match(request), isA<Unmatched>())
         else {
             val response = loader.match(request).matchOrExplode().invoke(request)
             assertThat(response, hasBody(expected))
