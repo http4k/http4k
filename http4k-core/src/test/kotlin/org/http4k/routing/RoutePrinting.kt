@@ -17,9 +17,9 @@ fun RouterMatch.prettify(depth: Int = 0): String = (" ".repeat(depth * 2)).let {
     val lineBreak = if(this.description.description == "or") "\n" else ""
     val indentValue = if(this.description.description == "or") indent else ""
     if (this.subMatches.isEmpty()) {
-        this.description.description.coloured(this.colour)
+        this.description.description.coloured(colour)
     } else {
-        "$lineBreak$indentValue${"(".coloured(this.colour)}${this.subMatches.joinToString("$lineBreak$indentValue ${this.description.description} ") { it.prettify(depth + 1) }}${")".coloured(this.colour)}"
+        "$lineBreak$indentValue${"(".coloured(colour)}${this.subMatches.joinToString("$lineBreak$indentValue ${this.description.description.coloured(colour)} ") { it.prettify(depth + 1) }}${")".coloured(this.colour)}"
     }
 }
 
