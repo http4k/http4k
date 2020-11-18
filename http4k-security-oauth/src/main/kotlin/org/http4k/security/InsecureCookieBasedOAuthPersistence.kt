@@ -7,6 +7,7 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
+import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.Nonce
 import java.time.Clock
 import java.time.Duration
@@ -38,7 +39,8 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     override fun assignCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken) = redirect.cookie(expiring(csrfName, csrf.value))
 
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken) = redirect.cookie(expiring(accessTokenCookieName, accessToken.value))
+    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken, idToken: IdToken?) =
+        redirect.cookie(expiring(accessTokenCookieName, accessToken.value))
         .invalidateCookie(csrfName)
         .invalidateCookie(nonceName)
         .invalidateCookie(originalUriName)
