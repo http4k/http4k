@@ -116,10 +116,6 @@ class RoutingTest {
                 "/" bind GET to { Response(OK).body("matched b/c") }
             )
         )
-        println("Routing:")
-        println(routes.getDescription().prettify())
-        println("\n\nMatch result for POST /b/c/e/g:")
-        println(routes.match(Request(POST, "/b/c/e/g")).prettify())
 
         assertThat(routes(Request(GET, "/a")).bodyString(), equalTo("matched a"))
         assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))
