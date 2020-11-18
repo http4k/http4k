@@ -1,10 +1,10 @@
-package org.http4k.routing
+package org.http4k.routing.inspect
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.routing.EscapeMode.Ansi
-import org.http4k.routing.EscapeMode.None
-import org.http4k.routing.EscapeMode.Pseudo
+import org.http4k.routing.inspect.EscapeMode.Ansi
+import org.http4k.routing.inspect.EscapeMode.None
+import org.http4k.routing.inspect.EscapeMode.Pseudo
 import org.junit.jupiter.api.Test
 
 class ColouringTest {
