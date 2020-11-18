@@ -74,9 +74,11 @@ internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
 }
 
 internal data class OrRouter private constructor(private val list: List<Router>) : Router {
-    override fun match(request: Request) = list
-        .map { next -> next.match(request) }
-        .minOrNull() ?: Unmatched(getDescription())
+    override fun match(request: Request): RouterMatch {
+        val matches = list.map { next -> next.match(request) }
+        val result = matches.minOrNull() ?: Unmatched(getDescription())
+        return result.aggregatedBy(getDescription(), matches)
+    }
 
     override fun withBasePath(new: String) = from(list.map { it.withBasePath(new) })
 
