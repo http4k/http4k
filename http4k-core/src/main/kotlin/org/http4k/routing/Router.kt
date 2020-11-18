@@ -42,16 +42,26 @@ data class RouterDescription(val description: String, val children: List<RouterD
 /**
  * The result of a matching operation. May or may not contain a matched HttpHandler.
  */
-sealed class RouterMatch(private val priority: Int, open val description: RouterDescription) : Comparable<RouterMatch> {
-    data class MatchingHandler(private val httpHandler: HttpHandler, override val description: RouterDescription) : RouterMatch(0, description), HttpHandler {
+sealed class RouterMatch(private val priority: Int, open val description: RouterDescription, open val subMatches: List<RouterMatch>) : Comparable<RouterMatch> {
+    data class MatchingHandler(private val httpHandler: HttpHandler, override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(0, description, subMatches), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
+        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
     }
 
-    data class MatchedWithoutHandler(override val description: RouterDescription) : RouterMatch(1, description)
-    data class MethodNotMatched(override val description: RouterDescription) : RouterMatch(2, description)
-    data class Unmatched(override val description: RouterDescription) : RouterMatch(3, description)
+    data class MatchedWithoutHandler(override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(1, description, subMatches) {
+        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
+    }
+
+    data class MethodNotMatched(override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(2, description, subMatches) {
+        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
+    }
+
+    data class Unmatched(override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(3, description, subMatches) {
+        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
+    }
 
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
+    abstract fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch
 }
 
 internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
@@ -81,8 +91,11 @@ internal data class OrRouter private constructor(private val list: List<Router>)
 }
 
 internal data class AndRouter private constructor(private val list: List<Router>) : Router {
-    override fun match(request: Request) =
-        list.fold(MatchedWithoutHandler(getDescription()) as RouterMatch) { acc, next -> acc.and(next.match(request)) }
+    override fun match(request: Request): RouterMatch {
+        val matches = list.map { it.match(request) }
+        val result = matches.reduce(RouterMatch::and)
+        return result.aggregatedBy(getDescription(), matches)
+    }
 
     override fun withBasePath(new: String) = from(list.map { it.withBasePath(new) })
 
