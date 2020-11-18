@@ -86,7 +86,7 @@ Bored with reading already and just want to get coding? For the impatient, visit
     * API design allows for simple customization of underying backend.
     * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/modules/serverless)
-    * **AWS Lambda** Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway or AppLoadBalancer. 
+    * **AWS Lambda** Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called from API Gateway/AppLoadBalancer/Direct invocation. 
     * **Google Cloud Functions** Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
     * **Apache OpenWhisk** Implement a single Factory method, then upload your [http4k] applications to IBM Cloud/OpenWhisk installations.
     * **Azure Functions** Implement a single Factory method, then upload your [http4k] applications to the MS Cloud. 
