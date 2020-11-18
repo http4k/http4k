@@ -116,19 +116,20 @@ class RoutingTest {
                 "/" bind GET to { Response(OK).body("matched b/c") }
             )
         )
-
+        println("Routing:")
         println(routes.getDescription().prettify())
-        println(routes.match(Request(POST, "/b/c/e/g")))
+        println("\n\nMatch result for POST /b/c/e/g:")
+        println(routes.match(Request(POST, "/b/c/e/g")).prettify())
 
-//        assertThat(routes(Request(GET, "/a")).bodyString(), equalTo("matched a"))
-//        assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))
-//        assertThat(routes(Request(GET, "/b/c")).bodyString(), equalTo("matched b/c"))
-//        assertThat(routes(Request(GET, "/b/c/e/f")).bodyString(), equalTo("matched b/c/e/f"))
-//        assertThat(routes(Request(GET, "/b/c/e/g")).bodyString(), equalTo("matched b/c/e/g/GET"))
-//        assertThat(routes(Request(POST, "/b/c/e/g")).bodyString(), equalTo("matched b/c/e/g/POST"))
-//        assertThat(routes(Request(GET, "/b/c/e/h")).status, equalTo(NOT_FOUND))
-//        assertThat(routes(Request(GET, "/b")).status, equalTo(NOT_FOUND))
-//        assertThat(routes(Request(GET, "/b/e")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/a")).bodyString(), equalTo("matched a"))
+        assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))
+        assertThat(routes(Request(GET, "/b/c")).bodyString(), equalTo("matched b/c"))
+        assertThat(routes(Request(GET, "/b/c/e/f")).bodyString(), equalTo("matched b/c/e/f"))
+        assertThat(routes(Request(GET, "/b/c/e/g")).bodyString(), equalTo("matched b/c/e/g/GET"))
+        assertThat(routes(Request(POST, "/b/c/e/g")).bodyString(), equalTo("matched b/c/e/g/POST"))
+        assertThat(routes(Request(GET, "/b/c/e/h")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b/e")).status, equalTo(NOT_FOUND))
     }
 
     @Test
