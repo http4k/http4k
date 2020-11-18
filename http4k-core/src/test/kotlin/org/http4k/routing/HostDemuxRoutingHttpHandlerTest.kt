@@ -3,6 +3,7 @@ package org.http4k.routing
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -43,7 +44,7 @@ class HostDemuxRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `with filter`() {
         val handler2 = otherHandler.withFilter { next ->
-            {
+            HttpHandler {
                 next(it.replaceHeader("host", "foobar"))
             }
         }

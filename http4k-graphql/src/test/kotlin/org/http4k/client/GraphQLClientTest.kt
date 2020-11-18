@@ -2,6 +2,7 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -20,7 +21,7 @@ class GraphQLClientTest {
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))
         val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar")))
 
-        val client = { req: Request ->
+        val client = HttpHandler { req: Request ->
             assertThat(req, equalTo(Request(POST, uri).with(GraphQLRequest.requestLens of graphQLRequest)))
             Response(OK).with(GraphQLResponse.responseLens of graphQLResponse)
         }

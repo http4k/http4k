@@ -43,7 +43,7 @@ data class RouterDescription(val description: String, val children: List<RouterD
  * The result of a matching operation. May or may not contain a matched HttpHandler.
  */
 sealed class RouterMatch(private val priority: Int, open val description: RouterDescription, open val subMatches: List<RouterMatch>) : Comparable<RouterMatch> {
-    data class MatchingHandler(private val httpHandler: HttpHandler, override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(0, description, subMatches), HttpHandler {
+    data class MatchingHandler(val httpHandler: HttpHandler, override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(0, description, subMatches), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
         override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
     }

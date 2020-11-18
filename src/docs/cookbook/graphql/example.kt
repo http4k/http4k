@@ -89,7 +89,7 @@ fun App(): HttpHandler {
 }
 
 private fun AddUserToContext(user: RequestContextLens<String>) = Filter { next ->
-    {
+    HttpHandler {
         next(it.with(user of it.method.toString()))
     }
 }

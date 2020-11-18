@@ -27,7 +27,7 @@ internal data class SinglePageAppRoutingHandler(
         }
 
         val matchOnIndex: HttpHandler? = when (val matchResult = staticHandler.match(Request(Method.GET, pathSegments))) {
-            is RouterMatch.MatchingHandler -> matchResult
+            is RouterMatch.MatchingHandler -> matchResult.httpHandler
             else -> null
         }
 

@@ -9,7 +9,7 @@ import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Filter
-import org.http4k.core.Method
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -100,7 +100,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `can apply filters`() {
         val rewritePathToRootIndex = Filter { next ->
-            {
+            HttpHandler {
                 next(it.uri(it.uri.path("/index.html")))
             }
         }
@@ -214,7 +214,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `can add filter to router`() {
         val changePathFilter = Filter { next ->
-            { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
+            HttpHandler { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = "/svc" bind changePathFilter.then(static())
         val request = Request(GET, of("/svc/notmybob.xml"))
@@ -228,7 +228,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `can add filter to a RoutingHttpHandler`() {
         val calls = AtomicInteger(0)
         val changePathFilter = Filter { next ->
-            {
+            HttpHandler {
                 calls.incrementAndGet()
                 next(it.uri(it.uri.path("/svc/mybob.xml")))
             }
@@ -305,7 +305,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
     private fun RoutingHttpHandler.assertFilterCalledOnce(path: String, expected: Status) {
         val calls = AtomicInteger(0)
-        val handler = Filter { next -> { calls.incrementAndGet(); next(it) } }.then(this)
+        val handler = Filter { next -> HttpHandler { calls.incrementAndGet(); next(it) } }.then(this)
         assertThat(handler(Request(GET, of(path))), hasStatus(expected))
         assertThat(calls.get(), equalTo(1))
     }

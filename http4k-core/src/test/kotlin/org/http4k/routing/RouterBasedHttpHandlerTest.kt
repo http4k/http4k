@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -58,7 +59,7 @@ class RouterBasedHttpHandlerSpecialCaseTests {
     @Test
     fun `router + passthrough with filter`(){
         val filter = Filter { next ->
-            {
+            HttpHandler {
                 next(it.body(it.query("foo").orEmpty()))
             }
         }

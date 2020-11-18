@@ -30,7 +30,7 @@ internal data class RouterBasedHttpHandler(
     override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new))
 }
 
-internal val routeNotFoundHandler: HttpHandler = { Response(NOT_FOUND.description("Route not found")) }
+internal val routeNotFoundHandler: HttpHandler = HttpHandler { Response(NOT_FOUND.description("Route not found")) }
 
-internal val routeMethodNotAllowedHandler: HttpHandler = { Response(METHOD_NOT_ALLOWED.description("Method not allowed")) }
+internal val routeMethodNotAllowedHandler: HttpHandler = HttpHandler { Response(METHOD_NOT_ALLOWED.description("Method not allowed")) }
 
