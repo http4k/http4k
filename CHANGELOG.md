@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v3.279.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.20
-- **http4k-core** : Adding routing description
+- **http4k-core** : Adding routing description to RouterMatch. Simplify Routing logic to remove duplication.
+- **http4k-core** : [Breaking from Java] Improved API for Java clients for `Request` and `Response`. To fix, just replace `Request.Companion.create()` with `Request.create()`
 
 ### v3.278.0
 - **http4k-security-oauth** [Breaking]: extend `OAuthPersisence.assignToken` to receive an optional IdToken.

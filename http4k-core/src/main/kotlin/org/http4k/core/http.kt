@@ -226,10 +226,12 @@ interface Request : HttpMessage {
     override fun toMessage() = listOf("$method $uri $version", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
+        @JvmStatic
         @JvmOverloads
         @JvmName("create")
         operator fun invoke(method: Method, uri: Uri, version: String = HTTP_1_1): Request = MemoryRequest(method, uri, listOf(), EMPTY, version)
 
+        @JvmStatic
         @JvmOverloads
         @JvmName("create")
         operator fun invoke(method: Method, uri: String, version: String = HTTP_1_1): Request = Request(method, Uri.of(uri), version)
@@ -311,6 +313,7 @@ interface Response : HttpMessage {
     override fun toMessage(): String = listOf("$version $status", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
+        @JvmStatic
         @JvmOverloads
         @JvmName("create")
         operator fun invoke(status: Status, version: String = HTTP_1_1): Response = MemoryResponse(status, listOf(), EMPTY, version)

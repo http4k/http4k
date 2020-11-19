@@ -11,7 +11,7 @@ import org.http4k.servirtium.ServirtiumServer;
 
 public interface UsageFromJava_servirtium {
     // junit extension
-    ServirtiumRecording servirtiumRecording = new ServirtiumRecording("", req -> Response.Companion.create(Status.ACCEPTED), InteractionStorage.InMemory());
+    ServirtiumRecording servirtiumRecording = new ServirtiumRecording("", req -> Response.create(Status.ACCEPTED), InteractionStorage.InMemory());
     ServirtiumReplay servirtiumReplay = new ServirtiumReplay("", InteractionStorage.InMemory());
 
     // standalone server
