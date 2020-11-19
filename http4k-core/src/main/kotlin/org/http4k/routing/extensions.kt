@@ -18,7 +18,7 @@ fun Request.path(name: String): String? = when (this) {
     else -> throw IllegalStateException("Request was not routed, so no uri-template present")
 }
 
-fun Method.asRouter() = object : Router {
+internal fun Method.asRouter() = object : Router {
     override fun match(request: Request): RouterMatch =
         if (this@asRouter == request.method) MatchedWithoutHandler(description) else RouterMatch.MethodNotMatched(description)
 
@@ -27,4 +27,4 @@ fun Method.asRouter() = object : Router {
     override fun withBasePath(new: String): Router = this
 }
 
-fun Method.and(that: Router) = asRouter().and(that)
+internal fun Method.and(that: Router) = asRouter().and(that)
