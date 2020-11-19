@@ -1,10 +1,10 @@
 
 (([cyan]method == GET[cyan] and [cyan]template == 'a'[cyan])
  or 
-  ((([cyan]prefix == '/b/c'[cyan] and [cyan]method == GET[cyan]) and [cyan]template == 'b/c/d'[cyan])
+  (([cyan]method == GET[cyan] and [cyan]template == 'b/c/d'[cyan])
    or 
-    ((([cyan]prefix == '/b/c/e'[cyan] and ([cyan]prefix == '/b/c'[cyan] and [cyan]method == GET[cyan])) and [cyan]template == 'b/c/e/f'[cyan])
+    (([cyan]method == GET[cyan] and [cyan]template == 'b/c/e/f'[cyan])
      or 
-      ((([cyan]prefix == '/b/c/e/g'[cyan] and ([cyan]prefix == '/b/c/e'[cyan] and ([cyan]prefix == '/b/c'[cyan] and [cyan]method == GET[cyan]))) and [cyan]template == 'b/c/e/g'[cyan])
-       or (([cyan]prefix == '/b/c/e/g'[cyan] and ([cyan]prefix == '/b/c/e'[cyan] and ([cyan]prefix == '/b/c'[cyan] and [cyan]method == POST[cyan]))) and [cyan]template == 'b/c/e/g'[cyan])))
-   or (([cyan]prefix == '/b/c'[cyan] and [cyan]method == GET[cyan]) and [cyan]template == 'b/c'[cyan])))
+      (([cyan]method == GET[cyan] and [cyan]template == 'b/c/e/g'[cyan])
+       or ([cyan]method == POST[cyan] and [cyan]template == 'b/c/e/g'[cyan])))
+   or ([cyan]method == GET[cyan] and [cyan]template == 'b/c'[cyan])))

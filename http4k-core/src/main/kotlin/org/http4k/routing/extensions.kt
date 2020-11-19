@@ -23,6 +23,8 @@ fun Method.asRouter() = object : Router {
         if (this@asRouter == request.method) MatchedWithoutHandler(description) else RouterMatch.MethodNotMatched(description)
 
     override val description = RouterDescription("method == ${this@asRouter}")
+
+    override fun withBasePath(new: String): Router = this
 }
 
 fun Method.and(that: Router) = asRouter().and(that)

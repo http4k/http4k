@@ -1,10 +1,10 @@
 
 [green]([green]~[red]([red]~~[red]method == GET[red]~ ~[red]and[red]~ ~[red]template == 'a'[red]~~[red])[red]~
  [green]or[green] 
-  [green]([green]~[red]([red]~~[red]([red]~[green]prefix == '/b/c'[green] ~[red]and[red]~ ~[red]method == GET[red]~~[red])[red]~ ~[red]and[red]~ ~[red]template == 'b/c/d'[red]~~[red])[red]~
+  [green]([green]~[red]([red]~~[red]method == GET[red]~ ~[red]and[red]~ ~[red]template == 'b/c/d'[red]~~[red])[red]~
    [green]or[green] 
-    [green]([green]~[red]([red]~~[red]([red]~[green]prefix == '/b/c/e'[green] ~[red]and[red]~ ~[red]([red]~[green]prefix == '/b/c'[green] ~[red]and[red]~ ~[red]method == GET[red]~~[red])[red]~~[red])[red]~ ~[red]and[red]~ ~[red]template == 'b/c/e/f'[red]~~[red])[red]~
+    [green]([green]~[red]([red]~~[red]method == GET[red]~ ~[red]and[red]~ ~[red]template == 'b/c/e/f'[red]~~[red])[red]~
      [green]or[green] 
-      [green]([green]~[red]([red]~~[red]([red]~[green]prefix == '/b/c/e/g'[green] ~[red]and[red]~ ~[red]([red]~[green]prefix == '/b/c/e'[green] ~[red]and[red]~ ~[red]([red]~[green]prefix == '/b/c'[green] ~[red]and[red]~ ~[red]method == GET[red]~~[red])[red]~~[red])[red]~~[red])[red]~ ~[red]and[red]~ [green]template == 'b/c/e/g'[green]~[red])[red]~
-       [green]or[green] [green]([green][green]([green][green]prefix == '/b/c/e/g'[green] [green]and[green] [green]([green][green]prefix == '/b/c/e'[green] [green]and[green] [green]([green][green]prefix == '/b/c'[green] [green]and[green] [green]method == POST[green][green])[green][green])[green][green])[green] [green]and[green] [green]template == 'b/c/e/g'[green][green])[green][green])[green][green])[green]
-   [green]or[green] ~[red]([red]~~[red]([red]~[green]prefix == '/b/c'[green] ~[red]and[red]~ ~[red]method == GET[red]~~[red])[red]~ ~[red]and[red]~ ~[red]template == 'b/c'[red]~~[red])[red]~[green])[green][green])[green]
+      [green]([green]~[red]([red]~~[red]method == GET[red]~ ~[red]and[red]~ [green]template == 'b/c/e/g'[green]~[red])[red]~
+       [green]or[green] [green]([green][green]method == POST[green] [green]and[green] [green]template == 'b/c/e/g'[green][green])[green][green])[green][green])[green]
+   [green]or[green] ~[red]([red]~~[red]method == GET[red]~ ~[red]and[red]~ ~[red]template == 'b/c'[red]~~[red])[red]~[green])[green][green])[green]
