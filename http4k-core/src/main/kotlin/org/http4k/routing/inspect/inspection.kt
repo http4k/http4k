@@ -7,30 +7,32 @@ import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 
+private val regularDescriptionStyle = TextStyle(ForegroundColour.Cyan)
+
 fun RouterDescription.prettify(depth: Int = 0, escapeMode: EscapeMode = EscapeMode.Ansi) = when (description) {
-    "or" -> orRendering(depth, escapeMode)
-    "and" -> andRenderer(depth, escapeMode)
-    else -> normalRenderer(escapeMode)
+    "or" -> orRendering(depth, escapeMode, regularDescriptionStyle)
+    "and" -> andRenderer(depth, escapeMode, regularDescriptionStyle)
+    else -> normalRenderer(escapeMode, regularDescriptionStyle)
 }
 
-private fun RouterDescription.orRendering(depth: Int, escapeMode: EscapeMode): String =
+private fun RouterDescription.orRendering(depth: Int, escapeMode: EscapeMode, style: TextStyle): String =
     (" ".repeat(depth * 2)).let { indent ->
         if (children.isEmpty()) {
-            description.styled(TextStyle(ForegroundColour.Cyan), escapeMode)
+            description.styled(style, escapeMode)
         } else {
             "\n$indent(${children.joinToString("\n$indent $description ") { it.prettify(depth + 1, escapeMode) }})"
         }
     }
 
-private fun RouterDescription.andRenderer(depth: Int, escapeMode: EscapeMode): String =
+private fun RouterDescription.andRenderer(depth: Int, escapeMode: EscapeMode, style: TextStyle): String =
     if (children.isEmpty()) {
-        description.styled(TextStyle(ForegroundColour.Cyan), escapeMode)
+        description.styled(style, escapeMode)
     } else {
         "(${children.joinToString(" $description ") { it.prettify(depth + 1, escapeMode) }})"
     }
 
-private fun RouterDescription.normalRenderer(escapeMode: EscapeMode) =
-    description.styled(TextStyle(ForegroundColour.Cyan), escapeMode)
+private fun RouterDescription.normalRenderer(escapeMode: EscapeMode, style: TextStyle) =
+    description.styled(style, escapeMode)
 
 fun RouterMatch.prettify(depth: Int = 0, escapeMode: EscapeMode = EscapeMode.Ansi): String = (" ".repeat(depth * 2)).let { indent ->
     val lineBreak = if (description.description == "or") "\n" else ""
