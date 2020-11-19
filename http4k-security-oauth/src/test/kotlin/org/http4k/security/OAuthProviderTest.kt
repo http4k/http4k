@@ -16,7 +16,6 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.query
 import org.http4k.core.then
-import org.http4k.core.toUrlFormEncoded
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -64,7 +63,7 @@ class OAuthProviderTest {
     fun `filter - accepts custom request JWT container`() {
         val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&request=myCustomJwt&response_mode=form_post"""
 
-        val jwts = RequestJwts { authRequest, state, nonce -> RequestJwtContainer("myCustomJwt") }
+        val jwts = RequestJwts { _, _, _ -> RequestJwtContainer("myCustomJwt") }
         assertThat(oAuth(oAuthPersistence).authFilter(jwts).then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
