@@ -4,6 +4,7 @@ import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
+import org.http4k.aws.LambdaIntegrationType.Direct
 import org.http4k.client.HttpClientContract
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -28,3 +29,5 @@ class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1)
 class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2)
 
 class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer)
+
+class LambdaDirectHttpClientTest : LambdaHttpClientTest(Direct)
