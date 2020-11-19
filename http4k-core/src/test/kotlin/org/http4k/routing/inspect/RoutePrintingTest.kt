@@ -10,6 +10,7 @@ import org.http4k.routing.routes
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
+import org.http4k.util.inIntelliJOnly
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -34,13 +35,20 @@ class RoutePrintingTest {
 
     @Test
     fun `describe routes`(approvalTest: Approver) {
-        approvalTest.assertApproved(routes.description.prettify(escapeMode = Pseudo))
+        routes.description.let {
+            inIntelliJOnly { println(it.prettify()) }
+            approvalTest.assertApproved(it.prettify(escapeMode = Pseudo))
+        }
     }
 
     @Test
     fun `describe matching`(approvalTest: Approver) {
         val request = Request(Method.POST, "/b/c/e/g")
-        approvalTest.assertApproved(routes.match(request).prettify(escapeMode = Pseudo))
+
+        routes.match(request).let {
+            inIntelliJOnly { println(it.prettify()) }
+            approvalTest.assertApproved(it.prettify(escapeMode = Pseudo))
+        }
     }
 }
 
