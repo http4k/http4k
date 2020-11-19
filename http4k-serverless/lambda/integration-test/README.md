@@ -3,6 +3,7 @@
 ## Pre-requisites
 
 * Valid AWS account
+* A IAM Role containing the `AWSLambdaBasicExecutionRole` permission policy added to it
 * Credentials defined in `src/test/resources` (see example)
 
 ## Building and deploying the test function
