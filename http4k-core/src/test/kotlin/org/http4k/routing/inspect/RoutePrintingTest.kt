@@ -37,7 +37,7 @@ class RoutePrintingTest {
     fun `describe routes`(approvalTest: Approver) {
         routes.description.let {
             inIntelliJOnly { println(it.prettify()) }
-            approvalTest.assertApproved(it.prettify(escapeMode = Pseudo))
+            approvalTest.assertApproved(it.prettify(escape = Pseudo))
         }
     }
 
@@ -47,7 +47,7 @@ class RoutePrintingTest {
 
         routes.match(request).let {
             inIntelliJOnly { println(it.prettify()) }
-            approvalTest.assertApproved(it.prettify(escapeMode = Pseudo))
+            approvalTest.assertApproved(it.prettify(escape = Pseudo))
         }
     }
 }
