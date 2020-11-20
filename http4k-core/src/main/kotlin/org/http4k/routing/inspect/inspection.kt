@@ -38,7 +38,10 @@ private data class PrettyNode(val name: String, val textStyle: TextStyle, val gr
             if (children.isEmpty()) {
                 name.styled(textStyle, escapeMode)
             } else {
-                "\n$indent${"(".styled(groupStyle, escapeMode)}${children.joinToString("\n$indent ${name.styled(groupStyle, escapeMode)} ") { it.prettify(depth + 1, escapeMode) }}${")".styled(groupStyle, escapeMode)}"
+                "\n${indent}" +
+                    "(".styled(groupStyle, escapeMode) +
+                    children.joinToString("\n$indent ${name.styled(groupStyle, escapeMode)} ") { it.prettify(depth + 1, escapeMode) } +
+                    ")".styled(groupStyle, escapeMode)
             }
         }
 
@@ -46,7 +49,9 @@ private data class PrettyNode(val name: String, val textStyle: TextStyle, val gr
         if (children.isEmpty()) {
             name.styled(textStyle, escapeMode)
         } else {
-            "${"(".styled(groupStyle, escapeMode)}${children.joinToString(" ${name.styled(groupStyle, escapeMode)} ") { it.prettify(depth + 1, escapeMode) }}${")".styled(groupStyle, escapeMode)}"
+            "(".styled(groupStyle, escapeMode) +
+                children.joinToString(" ${name.styled(groupStyle, escapeMode)} ") { it.prettify(depth + 1, escapeMode) } +
+                ")".styled(groupStyle, escapeMode)
         }
 }
 
