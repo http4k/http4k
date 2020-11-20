@@ -28,15 +28,15 @@ private data class PrettyNode(val name: String, val textStyle: TextStyle, val gr
     )
 
     fun prettify(depth: Int = 0, escapeMode: EscapeMode = Ansi) = when (name) {
-        "or" -> orRendering(depth, escapeMode, textStyle)
+        "or" -> orRendering(depth, escapeMode)
         "and" -> andRenderer(depth, escapeMode)
         else -> name.styled(textStyle, escapeMode)
     }
 
-    private fun orRendering(depth: Int, escapeMode: EscapeMode, style: TextStyle): String =
+    private fun orRendering(depth: Int, escapeMode: EscapeMode): String =
         (" ".repeat(depth * 2)).let { indent ->
             if (children.isEmpty()) {
-                name.styled(style, escapeMode)
+                name.styled(textStyle, escapeMode)
             } else {
                 "\n$indent${"(".styled(groupStyle, escapeMode)}${children.joinToString("\n$indent ${name.styled(groupStyle, escapeMode)} ") { it.prettify(depth + 1, escapeMode) }}${")".styled(groupStyle, escapeMode)}"
             }
