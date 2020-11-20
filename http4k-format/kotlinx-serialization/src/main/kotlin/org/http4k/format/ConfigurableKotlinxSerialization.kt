@@ -45,6 +45,7 @@ import kotlinx.serialization.json.Json as KotlinxJson
 
 open class ConfigurableKotlinxSerialization(
     json: JsonBuilder.() -> Unit,
+    val defaultContentType: ContentType = APPLICATION_JSON
 ) : JsonLibAutoMarshallingJson<JsonElement>() {
     val json = KotlinxJson { json() }
     private val prettyJson =
@@ -132,11 +133,11 @@ open class ConfigurableKotlinxSerialization(
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
                                                      contentNegotiation: ContentNegotiation = None,
-                                                     contentType: ContentType = APPLICATION_JSON) = autoBody<T>(description, contentNegotiation)
+                                                     contentType: ContentType = defaultContentType) = autoBody<T>(description, contentNegotiation, contentType)
 
     inline fun <reified T : Any> autoBody(description: String? = null,
                                           contentNegotiation: ContentNegotiation = None,
-                                          contentType: ContentType = APPLICATION_JSON) =
+                                          contentType: ContentType = defaultContentType) =
         httpBodyLens(description, contentNegotiation, contentType).map({ json.decodeFromString<T>(it) }, { json.encodeToString(it) })
 }
 

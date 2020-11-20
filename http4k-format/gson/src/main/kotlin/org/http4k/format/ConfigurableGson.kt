@@ -25,7 +25,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<JsonElement>() {
+open class ConfigurableGson(builder: GsonBuilder,
+                            val defaultContentType: ContentType = APPLICATION_JSON) : JsonLibAutoMarshallingJson<JsonElement>() {
 
     val mapper: Gson = builder.create()
     private val pretty = builder.setPrettyPrinting().create()
@@ -96,11 +97,11 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
                                                      contentNegotiation: ContentNegotiation = None,
-                                                     contentType: ContentType = APPLICATION_JSON) = autoBody<T>(description, contentNegotiation, contentType)
+                                                     contentType: ContentType = defaultContentType) = autoBody<T>(description, contentNegotiation, contentType)
 
     inline fun <reified T : Any> autoBody(description: String? = null,
                                           contentNegotiation: ContentNegotiation = None,
-                                          contentType: ContentType = APPLICATION_JSON) =
+                                          contentType: ContentType = defaultContentType) =
         httpBodyLens(description, contentNegotiation, contentType).map(mapper.read<T>(), { mapper.toJson(it) })
 }
 

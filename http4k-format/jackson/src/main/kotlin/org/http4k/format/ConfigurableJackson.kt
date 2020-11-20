@@ -26,7 +26,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallingJson<JsonNode>() {
+open class ConfigurableJackson(val mapper: ObjectMapper,
+                               val defaultContentType: ContentType = APPLICATION_JSON) : JsonLibAutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
         is TextNode -> JsonType.String
@@ -73,11 +74,11 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
                                                      contentNegotiation: ContentNegotiation = None,
-                                                     contentType: ContentType = APPLICATION_JSON) = autoBody<T>(description, contentNegotiation, contentType)
+                                                     contentType: ContentType = defaultContentType) = autoBody<T>(description, contentNegotiation, contentType)
 
     inline fun <reified T : Any> autoBody(description: String? = null,
                                           contentNegotiation: ContentNegotiation = None,
-                                          contentType: ContentType = APPLICATION_JSON)
+                                          contentType: ContentType = defaultContentType)
         : BiDiBodyLensSpec<T> = httpBodyLens(description, contentNegotiation, contentType).map(mapper.read(), mapper.write())
 
     // views

@@ -19,7 +19,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
+open class ConfigurableMoshi(builder: Moshi.Builder,
+                             val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshallingJson() {
 
     private val moshi: Moshi = builder.build()
 
@@ -31,7 +32,7 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
                                                      contentNegotiation: ContentNegotiation = None,
-                                                     contentType: ContentType = APPLICATION_JSON): BiDiBodyLensSpec<T> =
+                                                     contentType: ContentType = defaultContentType): BiDiBodyLensSpec<T> =
         Body.string(contentType, description, contentNegotiation).map({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asFormatString(it) })
