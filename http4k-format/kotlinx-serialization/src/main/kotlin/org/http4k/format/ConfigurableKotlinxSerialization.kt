@@ -1,16 +1,37 @@
 package org.http4k.format
 
-import kotlinx.serialization.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveKind.*
+import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN
+import kotlinx.serialization.descriptors.PrimitiveKind.DOUBLE
+import kotlinx.serialization.descriptors.PrimitiveKind.INT
+import kotlinx.serialization.descriptors.PrimitiveKind.LONG
+import kotlinx.serialization.descriptors.PrimitiveKind.STRING
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonBuilder
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
+import kotlinx.serialization.serializer
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
@@ -109,13 +130,15 @@ open class ConfigurableKotlinxSerialization(
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
+                                                     contentNegotiation: ContentNegotiation = None,
+                                                     contentType: ContentType = APPLICATION_JSON) = autoBody<T>(description, contentNegotiation)
 
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        httpBodyLens(description, contentNegotiation, APPLICATION_JSON).map({ json.decodeFromString<T>(it) }, { json.encodeToString(it) })
-
+    inline fun <reified T : Any> autoBody(description: String? = null,
+                                          contentNegotiation: ContentNegotiation = None,
+                                          contentType: ContentType = APPLICATION_JSON) =
+        httpBodyLens(description, contentNegotiation, contentType).map({ json.decodeFromString<T>(it) }, { json.encodeToString(it) })
 }
-
 
 fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {
 

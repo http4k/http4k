@@ -15,6 +15,7 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -70,9 +71,14 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
+                                                     contentNegotiation: ContentNegotiation = None,
+                                                     contentType: ContentType = APPLICATION_JSON) = autoBody<T>(description, contentNegotiation, contentType)
 
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> = httpBodyLens(description, contentNegotiation, APPLICATION_JSON).map(mapper.read(), mapper.write())
+    inline fun <reified T : Any> autoBody(description: String? = null,
+                                          contentNegotiation: ContentNegotiation = None,
+                                          contentType: ContentType = APPLICATION_JSON)
+        : BiDiBodyLensSpec<T> = httpBodyLens(description, contentNegotiation, contentType).map(mapper.read(), mapper.write())
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
@@ -80,8 +86,9 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
     fun <T : Any, V : Any> String.asUsingView(t: KClass<T>, v: KClass<V>): T = mapper.readerWithView(v.java).forType(t.java).readValue(this)
 
     inline fun <reified T : Any, reified V : Any> Body.Companion.autoView(description: String? = null,
-                                                                          contentNegotiation: ContentNegotiation = None) =
-        Body.string(APPLICATION_JSON, description, contentNegotiation).map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
+                                                                          contentNegotiation: ContentNegotiation = None,
+                                                                          contentType: ContentType = APPLICATION_JSON) =
+        Body.string(contentType, description, contentNegotiation).map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 
     inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =
         WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
