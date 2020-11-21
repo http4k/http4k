@@ -29,7 +29,7 @@ object Versions {
 
     const val io_opentelemetry: String = "0.9.1"
 
-    const val dev_forkhandles: String = "1.2.0.0"
+    const val dev_forkhandles: String = "1.4.0.0"
 
     const val io_undertow: String = "2.2.2.Final"
 
