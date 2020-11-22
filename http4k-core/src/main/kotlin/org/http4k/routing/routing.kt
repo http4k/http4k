@@ -33,7 +33,7 @@ fun query(name: String, predicate: (String) -> Boolean) = { req: Request -> req.
 /**
  * Apply routing predicate to a query
  */
-fun query(name: String, value: String) = query(name) { it == value}
+fun query(name: String, value: String) = query(name) { it == value }
 
 /**
  * Ensure all queries are present
@@ -48,7 +48,7 @@ fun header(name: String, predicate: (String) -> Boolean) = { req: Request -> req
 /**
  * Apply routing predicate to a header
  */
-fun header(name: String, value: String) = header(name) { it == value}
+fun header(name: String, value: String) = header(name) { it == value }
 
 /**
  * Ensure all headers are present

@@ -84,8 +84,9 @@ internal data class OrRouter private constructor(private val list: List<Router>)
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override val description: RouterDescription get() =
-        RouterDescription("or", list.map { it.description })
+    override val description: RouterDescription
+        get() =
+            RouterDescription("or", list.map { it.description })
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else OrRouter(list)
