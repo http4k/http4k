@@ -3,11 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.279.0 (uncut)
+### v3.279.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.20
 - **http4k-core** : Adding routing description to RouterMatch. Simplify Routing logic to remove duplication.
 - **http4k-core** : [Breaking from Java] Improved API for Java clients for `Request` and `Response`. To fix, just replace `Request.Companion.create()` with `Request.create()`
 - **http4k-format-*** : Add ability to override content type for auto-marshalling for JSON .
+- **http4k-aws-*** : Fix AwsSdkClient to correctly pass body.
 
 ### v3.278.0
 - **http4k-security-oauth** [Breaking]: extend `OAuthPersisence.assignToken` to receive an optional IdToken.
