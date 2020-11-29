@@ -59,7 +59,7 @@ object Versions {
 
     const val aws_lambda_java_events: String = "3.6.0"
 
-    const val jackson_module_kotlin: String = "2.11.3"
+    const val jackson_module_kotlin: String = "2.12.0"
 
     const val aws_lambda_java_core: String = "1.2.1"
 
@@ -69,7 +69,7 @@ object Versions {
 
     const val netty_codec_http2: String = "4.1.52.Final" // ignore: "4.1.54.Final"
 
-    const val jackson_databind: String = "2.11.3"
+    const val jackson_databind: String = "2.12.0"
 
     const val httpasyncclient: String = "4.1.4"
 
@@ -117,6 +117,8 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
+    const val klaxon: String = "5.4"
+
     const val okhttp: String = "4.9.0"
 
     const val pebble: String = "3.1.4"
@@ -125,13 +127,11 @@ object Versions {
 
     const val jsoup: String = "1.13.1"
 
-    const val argo: String = "5.14"
+    const val argo: String = "5.15"
 
     const val gson: String = "2.8.6"
 
     const val json: String = "20201115"
-
-    const val klaxon: String = "5.4"
 
     /**
      * Current version: "6.7"
@@ -147,4 +147,4 @@ object Versions {
  */
 val PluginDependenciesSpec.buildSrcVersions: PluginDependencySpec
     inline get() =
-        id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
+            id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
