@@ -1,31 +1,15 @@
 package org.http4k.format
 
-import com.beust.klaxon.JsonObject
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.format.Klaxon.asA
 import org.http4k.format.Klaxon.auto
 import org.junit.jupiter.api.Test
 
 class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
-
-    @Test
-    fun `roundtrip arbitary object to and from JSON element`() {
-        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
-        val out = Klaxon.asJsonObject(obj)
-        assertThat(Klaxon.asA(out, ArbObject::class), equalTo(obj))
-    }
-
-    @Test
-    fun `roundtrip list of arbitary objects to and from node`() {
-        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
-
-        assertThat(Klaxon.asJsonObject(listOf(obj)).asA(), equalTo(listOf(obj)))
-    }
 
     override fun customMarshaller() = object : ConfigurableKlaxon(com.beust.klaxon.Klaxon().asConfigurable().customise()) {}
 
@@ -86,12 +70,6 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
 
         assertThat(body(Response(OK).with(body of list)), equalTo(list))
     }
-}
-
-class KlaxonTest : JsonContract<JsonObject>(Klaxon) {
-    override val prettyString = """{
-  "hello" : "world"
-}"""
 }
 
 class KlaxonAutoEventsTest : AutoJsonEventsContract(Klaxon)
