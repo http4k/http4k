@@ -1,6 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
 import org.http4k.core.then
@@ -48,3 +49,5 @@ object DebuggingFilters {
         operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream) = PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
     }
 }
+
+fun HttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) = DebuggingFilters.PrintRequestAndResponse(out, debugStream).then(this)
