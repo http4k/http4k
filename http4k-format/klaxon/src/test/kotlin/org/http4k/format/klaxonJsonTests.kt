@@ -7,6 +7,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Klaxon.auto
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import com.beust.klaxon.Klaxon as KKlaxon
 
@@ -73,6 +74,18 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
         val list = listOf(FirstChild("hello"), SecondChild("world"))
 
         assertThat(body(Response(OK).with(body of list)), equalTo(list))
+    }
+
+    @Disabled("not supported by Klaxon")
+    override fun `roundtrip custom number`() {
+    }
+
+    @Disabled("not supported by Klaxon")
+    override fun `roundtrip custom decimal`() {
+    }
+
+    @Disabled("not supported by Klaxon")
+    override fun `roundtrip custom boolean`() {
     }
 }
 

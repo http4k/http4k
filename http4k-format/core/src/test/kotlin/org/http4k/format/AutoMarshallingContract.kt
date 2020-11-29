@@ -97,7 +97,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
             Status.OK
         )
         val out = marshaller.asFormatString(obj)
-        assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResultPrimitives))
+        assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResultPrimitives.normaliseJson()))
         assertThat(marshaller.asA(out, CommonJdkPrimitives::class), equalTo(obj))
     }
 
@@ -135,7 +135,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    fun `roundtrip custom boolean`() {
+    open fun `roundtrip custom boolean`() {
         val marshaller = customMarshaller()
 
         val wrapper = BooleanHolder(true)
