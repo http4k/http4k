@@ -1,7 +1,6 @@
 package org.http4k.format
 
 import com.beust.klaxon.JsonObject
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
@@ -10,9 +9,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Klaxon.asA
 import org.http4k.format.Klaxon.auto
-import org.http4k.format.Klaxon.autoView
-import org.http4k.hamkrest.hasBody
-import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
 
 class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
@@ -31,31 +27,7 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
         assertThat(Klaxon.asJsonObject(listOf(obj)).asA(), equalTo(listOf(obj)))
     }
 
-    @Test
-    fun `roundtrip body using view`() {
-        val arbObjectWithView = ArbObjectWithView(3, 5)
-        val publicLens = Body.autoView<ArbObjectWithView, Public>().toLens()
-        val privateLens = Body.autoView<ArbObjectWithView, Private>().toLens()
-
-        assertThat(Response(OK).with(publicLens of arbObjectWithView), hasBody(equalTo<String>("""{"pub":5}""")))
-        assertThat(Response(OK).with(privateLens of arbObjectWithView), hasBody(equalTo<String>("""{"priv":3,"pub":5}""")))
-
-        assertThat(publicLens(Response(OK).with(privateLens of arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
-    }
-
-    @Test
-    fun `roundtrip WsMessage using view`() {
-        val arbObjectWithView = ArbObjectWithView(3, 5)
-        val publicLens = WsMessage.autoView<ArbObjectWithView, Public>().toLens()
-        val privateLens = WsMessage.autoView<ArbObjectWithView, Private>().toLens()
-
-        assertThat(publicLens(arbObjectWithView).bodyString(), equalTo("""{"pub":5}"""))
-        assertThat(privateLens(arbObjectWithView).bodyString(), equalTo("""{"priv":3,"pub":5}"""))
-
-        assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
-    }
-
-    override fun customMarshaller() = object : ConfigurableKlaxon(KotlinModule().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableKlaxon(com.beust.klaxon.Klaxon().asConfigurable().customise()) {}
 
     @Test
     fun `roundtrip list of arbitary objects to and from body`() {
