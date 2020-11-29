@@ -73,7 +73,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     @Test
     open fun `roundtrip arbitary object to and from string`() {
         val out = marshaller.asFormatString(obj)
-        assertThat(out, equalTo(expectedAutoMarshallingResult))
+        assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult))
         assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
     }
 
@@ -97,7 +97,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
             Status.OK
         )
         val out = marshaller.asFormatString(obj)
-        assertThat(out, equalTo(expectedAutoMarshallingResultPrimitives))
+        assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResultPrimitives))
         assertThat(marshaller.asA(out, CommonJdkPrimitives::class), equalTo(obj))
     }
 
@@ -105,14 +105,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     open fun `roundtrip regex special as equals isn't comparable`() {
         val obj = RegexHolder(".*".toRegex())
         val out = marshaller.asFormatString(obj)
-        assertThat(out, equalTo(expectedRegexSpecial))
+        assertThat(out.normaliseJson(), equalTo(expectedRegexSpecial))
         assertThat(marshaller.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
     }
 
     @Test
     open fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
-        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedWrappedMap))
+        assertThat(marshaller.asFormatString(wrapper).normaliseJson(), equalTo(expectedWrappedMap))
         assertThat(marshaller.asA(marshaller.asFormatString(wrapper), MapHolder::class), equalTo(wrapper))
     }
 
@@ -145,12 +145,13 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     open fun `convert to inputstream`() {
-        assertThat(marshaller.asInputStream(StringHolder("hello")).reader().use { it.readText() }, equalTo(expectedConvertToInputStream))
+        assertThat(marshaller.asInputStream(StringHolder("hello")).reader().use { it.readText() }
+            .normaliseJson(), equalTo(expectedConvertToInputStream.replace(" : ", ":")))
     }
 
     @Test
     open fun `throwable is marshalled`() {
-        assertThat(marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))), startsWith(expectedThrowable))
+        assertThat(marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))).normaliseJson(), startsWith(expectedThrowable))
     }
 
     @Test
@@ -185,3 +186,5 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
     .zonedDateTime({ it }, { it })
     .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
     .done()
+
+fun String.normaliseJson() = replace(" : ", ":").replace(": ", ":")
