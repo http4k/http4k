@@ -425,6 +425,11 @@ object Libs {
     const val jade4j: String = "de.neuland-bfi:jade4j:" + Versions.jade4j
 
     /**
+     * https://github.com/cbeust/klaxon
+     */
+    const val klaxon: String = "com.beust:klaxon:" + Versions.klaxon
+
+    /**
      * https://square.github.io/okhttp/
      */
     const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
