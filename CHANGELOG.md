@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.280.0
+- **http4k-format-klaxon** : New format module for the lightweight Kotlin JSON library.
+
 ### v3.279.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.20
 - **http4k-core** : Adding routing description to RouterMatch. Simplify Routing logic to remove duplication.

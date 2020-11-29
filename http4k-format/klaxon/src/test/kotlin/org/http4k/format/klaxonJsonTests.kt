@@ -19,35 +19,6 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     override fun customMarshaller() = object : ConfigurableKlaxon(KKlaxon().asConfigurable().customise()) {}
 
     @Test
-    fun `roundtrip list of arbitary objects to and from body`() {
-        val body = Body.auto<List<ArbObject>>().toLens()
-
-        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
-
-        assertThat(body(Response(OK).with(body of listOf(obj))), equalTo(listOf(obj)))
-    }
-
-    @Test
-    fun `roundtrip array of arbitary objects to and from body`() {
-        val body = Body.auto<Array<ArbObject>>().toLens()
-
-        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
-
-        assertThat(body(Response(OK).with(body of arrayOf(obj))).toList(), equalTo(listOf(obj)))
-    }
-
-    @Test
-    fun `roundtrip polymorphic object to and from body`() {
-        val body = Body.auto<PolymorphicParent>().toLens()
-
-        val firstChild: PolymorphicParent = FirstChild("hello")
-        val secondChild: PolymorphicParent = SecondChild("world")
-
-        assertThat(body(Response(OK).with(body of firstChild)), equalTo(firstChild))
-        assertThat(body(Response(OK).with(body of secondChild)), equalTo(secondChild))
-    }
-
-    @Test
     fun `write interface implementation to body`() {
         assertThat(Response(OK).with(
             Body.auto<Interface>().toLens() of InterfaceImpl()
@@ -67,15 +38,6 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
         assertThat(Response(OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""{"something" : "hello"}"""))
     }
 
-    @Test
-    fun `roundtrip list of polymorphic objects to and from body`() {
-        val body = Body.auto<List<PolymorphicParent>>().toLens()
-
-        val list = listOf(FirstChild("hello"), SecondChild("world"))
-
-        assertThat(body(Response(OK).with(body of list)), equalTo(list))
-    }
-
     @Disabled("not supported by Klaxon")
     override fun `roundtrip custom number`() {
     }
@@ -87,6 +49,8 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     @Disabled("not supported by Klaxon")
     override fun `roundtrip custom boolean`() {
     }
+
+
 }
 
 class KlaxonAutoEventsTest : AutoJsonEventsContract(Klaxon)

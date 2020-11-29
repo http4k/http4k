@@ -13,6 +13,9 @@ implementation group: "org.http4k", name: "http4k-format-gson", version: "3.279.
 // Jackson: 
 implementation group: "org.http4k", name: "http4k-format-jackson", version: "3.279.0"
 
+// Klaxon: 
+implementation group: "org.http4k", name: "http4k-format-klaxon", version: "3.279.0"
+
 // Moshi: 
 implementation group: "org.http4k", name: "http4k-format-moshi", version: "3.279.0"
 
