@@ -73,7 +73,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     @Test
     open fun `roundtrip arbitary object to and from string`() {
         val out = marshaller.asFormatString(obj)
-        assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult))
+        assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult.normaliseJson()))
         assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
     }
 
@@ -105,14 +105,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     open fun `roundtrip regex special as equals isn't comparable`() {
         val obj = RegexHolder(".*".toRegex())
         val out = marshaller.asFormatString(obj)
-        assertThat(out.normaliseJson(), equalTo(expectedRegexSpecial))
+        assertThat(out.normaliseJson(), equalTo(expectedRegexSpecial.normaliseJson()))
         assertThat(marshaller.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
     }
 
     @Test
     open fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
-        assertThat(marshaller.asFormatString(wrapper).normaliseJson(), equalTo(expectedWrappedMap))
+        assertThat(marshaller.asFormatString(wrapper).normaliseJson(), equalTo(expectedWrappedMap.normaliseJson()))
         assertThat(marshaller.asA(marshaller.asFormatString(wrapper), MapHolder::class), equalTo(wrapper))
     }
 
@@ -146,7 +146,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     @Test
     open fun `convert to inputstream`() {
         assertThat(marshaller.asInputStream(StringHolder("hello")).reader().use { it.readText() }
-            .normaliseJson(), equalTo(expectedConvertToInputStream.replace(" : ", ":")))
+            .normaliseJson(), equalTo(expectedConvertToInputStream.normaliseJson()))
     }
 
     @Test
