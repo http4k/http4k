@@ -43,6 +43,7 @@ description: Details about the various http4k integration libraries
 <a href="https://http4k.org/guide/modules/yaml"><span class="pill">Jackson YAML</span></a>
 <a href="https://http4k.org/guide/modules/jsonrpc"><span class="pill">JSON RPC</span></a>
 <a href="https://http4k.org/guide/modules/json"><span class="pill">KotlinX Serialisation
+<a href="https://http4k.org/guide/modules/json"><span class="pill">Klaxon</span></a>
 <a href="https://http4k.org/guide/modules/json"><span class="pill">Moshi</span></a>
 
 ### Templating libraries

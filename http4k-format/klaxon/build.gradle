@@ -1,11 +1,8 @@
-description = 'Http4k Jackson JSON support'
+description = 'Http4k Klaxon JSON support'
 
 dependencies {
     compile project(":http4k-format-core")
-
-    compile Libs.jackson_databind
-    compile Libs.jackson_module_kotlin
-    compile Libs.kotlin_reflect
+    compile Libs.klaxon
 
     testCompile project(":http4k-core")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')

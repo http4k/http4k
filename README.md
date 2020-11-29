@@ -110,6 +110,7 @@ Bored with reading already and just want to get coding? For the impatient, visit
         * **[JSON](https://www.http4k.org/guide/modules/json/)** - with support for: 
             * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
             * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
+            * **Klaxon** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
             * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
             * **KotlinX Serialization** - official Kotlin JSON API. 
             * **Argo** - lightweight Java JSON API with zero dependencies.            
