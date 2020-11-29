@@ -187,4 +187,4 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
     .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
     .done()
 
-fun String.normaliseJson() = replace(" : ", ":").replace(": ", ":")
+fun String.normaliseJson() = replace(" : ", ":").replace(": ", ":").replace(", ", ",")

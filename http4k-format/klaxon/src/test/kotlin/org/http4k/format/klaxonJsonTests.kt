@@ -63,7 +63,7 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     @Test
     fun `writes using non-sealed parent type`() {
         val nonSealedChild = NonSealedChild("hello")
-        assertThat(Response(OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""{"something":"hello"}"""))
+        assertThat(Response(OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""{"something" : "hello"}"""))
     }
 
     @Test
