@@ -59,7 +59,7 @@ object Versions {
 
     const val aws_lambda_java_events: String = "3.6.0"
 
-    const val jackson_module_kotlin: String = "2.12.0"
+    const val jackson_module_kotlin: String = "2.11.3"
 
     const val aws_lambda_java_core: String = "1.2.1"
 
@@ -69,7 +69,7 @@ object Versions {
 
     const val netty_codec_http2: String = "4.1.52.Final" // ignore: "4.1.54.Final"
 
-    const val jackson_databind: String = "2.12.0"
+    const val jackson_databind: String = "2.11.3"
 
     const val httpasyncclient: String = "4.1.4"
 
