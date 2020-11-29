@@ -10,7 +10,6 @@ import kotlinx.serialization.descriptors.PrimitiveKind.INT
 import kotlinx.serialization.descriptors.PrimitiveKind.LONG
 import kotlinx.serialization.descriptors.PrimitiveKind.STRING
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -155,12 +154,9 @@ fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder
         apply {
             @Suppress("UNCHECKED_CAST")
             val serializer = object : KSerializer<Any> {
-                override val descriptor: SerialDescriptor
-                    get() = PrimitiveSerialDescriptor(serialName, kind)
+                override val descriptor = PrimitiveSerialDescriptor(serialName, kind)
 
-                override fun deserialize(decoder: Decoder): Any {
-                    return mapping.invoke(decoder.decode()) as Any
-                }
+                override fun deserialize(decoder: Decoder) = mapping.invoke(decoder.decode()) as Any
 
                 override fun serialize(encoder: Encoder, value: Any) {
                     encoder.encode(mapping(value as OUT))
@@ -170,8 +166,6 @@ fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder
             this@asConfigurable.serializersModule += (SerializersModule { contextual(Reflection.getOrCreateKotlinClass(mapping.clazz), serializer) })
         }
 
-
     override fun done(): JsonBuilder = this@asConfigurable
-
 }
 
