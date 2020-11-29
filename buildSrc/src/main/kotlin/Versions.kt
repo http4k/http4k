@@ -13,7 +13,7 @@ import org.gradle.plugin.use.PluginDependencySpec
 object Versions {
     const val org_jetbrains_kotlinx_kotlinx_serialization: String = "1.0.1"
 
-    const val com_fasterxml_jackson_dataformat: String = "2.11.3" // available: "2.12.0"
+    const val com_fasterxml_jackson_dataformat: String = "2.11.3"
 
     const val io_github_resilience4j: String = "1.6.1"
 
@@ -33,13 +33,13 @@ object Versions {
 
     const val io_undertow: String = "2.2.2.Final"
 
-    const val io_ktor: String = "1.4.1" // available: "1.4.2"
+    const val io_ktor: String = "1.4.1" // ignore: "1.4.2"
 
     const val com_microsoft_azure_azurefunctions_gradle_plugin: String = "1.5.0"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.1" // available: "2.10.2"
+    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.2"
 
     const val com_jfrog_bintray_gradle_plugin: String = "1.8.5"
 
@@ -59,17 +59,17 @@ object Versions {
 
     const val aws_lambda_java_events: String = "3.6.0"
 
-    const val jackson_module_kotlin: String = "2.11.3" // available: "2.12.0"
+    const val jackson_module_kotlin: String = "2.11.3"
 
     const val aws_lambda_java_core: String = "1.2.1"
 
-    const val dokka_gradle_plugin: String = "0.10.1" // available: "1.4.10.2"
+    const val dokka_gradle_plugin: String = "0.10.1" // ignore: "1.4.10.2"
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val netty_codec_http2: String = "4.1.52.Final" // available: "4.1.54.Final"
+    const val netty_codec_http2: String = "4.1.52.Final" // ignore: "4.1.54.Final"
 
-    const val jackson_databind: String = "2.11.3" // available: "2.12.0"
+    const val jackson_databind: String = "2.11.3"
 
     const val httpasyncclient: String = "4.1.4"
 
@@ -117,8 +117,6 @@ object Versions {
 
     const val jade4j: String = "1.3.2"
 
-    const val klaxon: String = "5.4"
-
     const val okhttp: String = "4.9.0"
 
     const val pebble: String = "3.1.4"
@@ -127,11 +125,13 @@ object Versions {
 
     const val jsoup: String = "1.13.1"
 
-    const val argo: String = "5.14" // available: "5.15"
+    const val argo: String = "5.14"
 
     const val gson: String = "2.8.6"
 
     const val json: String = "20201115"
+
+    const val klaxon: String = "5.4"
 
     /**
      * Current version: "6.7"
@@ -147,4 +147,4 @@ object Versions {
  */
 val PluginDependenciesSpec.buildSrcVersions: PluginDependencySpec
     inline get() =
-            id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
+        id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
