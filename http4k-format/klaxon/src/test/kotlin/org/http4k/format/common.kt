@@ -1,19 +1,20 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonView
+import com.beust.klaxon.TypeAdapter
+import com.beust.klaxon.TypeFor
 
 open class Public
 class Private : Public()
 
-data class ArbObjectWithView(@JsonView(Private::class) @JvmField val priv: Int, @JsonView(Public::class) @JvmField val pub: Int)
+object PolymorphicAdapter : TypeAdapter<PolymorphicParent> {
+    override fun classFor(type: Any) = when(type as String) {
+        "first" -> FirstChild::class
+        "second" -> SecondChild::class
+        else -> throw IllegalArgumentException("Unknown type: $type")
+    }
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@class")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = FirstChild::class, name = "first"),
-    JsonSubTypes.Type(value = SecondChild::class, name = "second")
-)
+}
+@TypeFor(field = "type", adapter = PolymorphicAdapter::class)
 sealed class PolymorphicParent
 
 data class FirstChild(val something: String) : PolymorphicParent()

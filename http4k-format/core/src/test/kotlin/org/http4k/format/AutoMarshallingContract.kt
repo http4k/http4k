@@ -151,7 +151,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     open fun `throwable is marshalled`() {
-        assertThat(marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))).normaliseJson(), startsWith(expectedThrowable))
+        assertThat(marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))).normaliseJson(), startsWith(expectedThrowable.normaliseJson()))
     }
 
     @Test

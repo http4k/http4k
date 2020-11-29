@@ -19,7 +19,6 @@ open class ConfigurableKlaxon(private val klaxon: KKlaxon,
                               val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshallingJson() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> asA(input: String, target: KClass<T>): T {
-        println(target)
         val parse = klaxon.parser(target).parse(StringReader(input)) as JsonBase
         return when (parse) {
             is JsonObject -> klaxon.fromJsonObject(parse, target.java, target) as T
@@ -33,7 +32,12 @@ open class ConfigurableKlaxon(private val klaxon: KKlaxon,
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
                                                      contentNegotiation: ContentNegotiation = ContentNegotiation.None,
-                                                     contentType: ContentType = defaultContentType): BiDiBodyLensSpec<T> =
+                                                     contentType: ContentType = defaultContentType): BiDiBodyLensSpec<T> = autoBody(description, contentNegotiation, contentType)
+
+    inline fun <reified T : Any> autoBody(description: String? = null,
+                                          contentNegotiation: ContentNegotiation = ContentNegotiation.None,
+                                          contentType: ContentType = defaultContentType)
+        : BiDiBodyLensSpec<T> =
         Body.string(contentType, description, contentNegotiation).map({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asFormatString(it) })
