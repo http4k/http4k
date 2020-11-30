@@ -35,7 +35,7 @@ class LambdaHttpClient(functionName: FunctionName, region: Region, version: Lamb
         ApiGatewayV1 -> AwsClientV1HttpAdapter()
         ApiGatewayV2 -> AwsClientV2HttpAdapter()
         ApplicationLoadBalancer -> AwsClientAlbHttpAdapter()
-        Direct -> AwsClientDirectHttpAdapter()
+        Direct -> AwsClientInvocationHttpAdapter()
     }
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->
@@ -90,7 +90,7 @@ class AwsClientV1HttpAdapter : AwsClientHttpAdapter<APIGatewayProxyRequestEvent,
     override val responseLens = Body.auto<APIGatewayProxyResponseEvent>().toLens()
 }
 
-class AwsClientDirectHttpAdapter : AwsClientHttpAdapter<String, String> {
+class AwsClientInvocationHttpAdapter : AwsClientHttpAdapter<String, String> {
     override fun invoke(response: String) = Response(OK)
         .body(response)
 
