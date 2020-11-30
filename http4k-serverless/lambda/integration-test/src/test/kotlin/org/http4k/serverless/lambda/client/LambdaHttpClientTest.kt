@@ -30,4 +30,4 @@ class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2)
 
 class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer)
 
-class LambdaDirectHttpClientTest : LambdaHttpClientTest(Direct)
+class LambdaInvocationHttpClientTest : LambdaHttpClientTest(Direct)
