@@ -11,7 +11,7 @@ import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
-import org.http4k.aws.LambdaIntegrationType.Direct
+import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.aws.Region
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -35,7 +35,7 @@ class LambdaHttpClient(functionName: FunctionName, region: Region, version: Lamb
         ApiGatewayV1 -> AwsClientV1HttpAdapter()
         ApiGatewayV2 -> AwsClientV2HttpAdapter()
         ApplicationLoadBalancer -> AwsClientAlbHttpAdapter()
-        Direct -> AwsClientInvocationHttpAdapter()
+        Invocation -> AwsClientInvocationHttpAdapter()
     }
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->

@@ -15,7 +15,7 @@ import org.http4k.format.Jackson.auto
 import org.http4k.serverless.lambda.client.LambdaApi
 import org.http4k.serverless.lambda.inIntelliJOnly
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Base64
 
 class AwsLambdaApiClient(client: HttpHandler, region: Region) {
     private val client = LambdaApi(region)
@@ -107,4 +107,4 @@ data class Role(val name: String)
 
 data class Region(val name: String)
 
-enum class LambdaIntegrationType { ApiGatewayV1, ApiGatewayV2, ApplicationLoadBalancer, Direct }
+enum class LambdaIntegrationType { ApiGatewayV1, ApiGatewayV2, ApplicationLoadBalancer, Invocation }
