@@ -28,7 +28,7 @@ class ApplicationLoadBalancerHttpAdapterTest {
         }
 
         assertThat(
-            ApplicationLoadBalancerAwsHttpAdapter(request),
+            ApplicationLoadBalancerAwsHttpAdapter(request, LambdaContextMock()),
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")
@@ -48,7 +48,7 @@ class ApplicationLoadBalancerHttpAdapterTest {
         }
 
         assertThat(
-            ApplicationLoadBalancerAwsHttpAdapter(request),
+            ApplicationLoadBalancerAwsHttpAdapter(request, LambdaContextMock()),
             equalTo(Request(POST, "/")
                 .body(Body(ByteBuffer.wrap(imageBytes)))
             ))
@@ -66,7 +66,7 @@ class ApplicationLoadBalancerHttpAdapterTest {
         }
 
         assertThat(
-            ApplicationLoadBalancerAwsHttpAdapter(request),
+            ApplicationLoadBalancerAwsHttpAdapter(request, LambdaContextMock()),
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")

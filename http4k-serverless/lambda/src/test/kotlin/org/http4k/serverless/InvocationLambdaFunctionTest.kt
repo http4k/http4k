@@ -8,20 +8,24 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 
-class DirectLambdaFunctionTest {
+class InvocationLambdaFunctionTest {
 
     @Test
     fun `adapts Direct request and response and receives context`() {
-        val lambdaContext = LambdaContextMock()
+        val lambdaContext = LambdaContextMock("myFunction")
 
         val request = "input body"
 
-        val lambda = object : DirectLambdaFunction(AppLoaderWithContexts { env, contexts ->
+        val lambda = object : InvocationLambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
                 assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(POST, "").body(request)))
+                assertThat(it.removeHeader("x-http4k-context"), equalTo(
+                    Request(POST, "/2015-03-31/functions/myFunction/invocations")
+                        .header("X-Amz-Invocation-Type", "RequestResponse")
+                        .header("X-Amz-Log-Type", "Tail")
+                        .body(request)))
                 Response(OK).body(request + request)
             }
         }) {}

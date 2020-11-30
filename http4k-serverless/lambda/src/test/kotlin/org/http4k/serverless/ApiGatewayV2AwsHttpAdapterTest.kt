@@ -13,7 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Base64
 
 class ApiGatewayV2AwsHttpAdapterTest {
 
@@ -31,7 +31,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .build()
 
         assertThat(
-            ApiGatewayV2AwsHttpAdapter(request),
+            ApiGatewayV2AwsHttpAdapter(request, LambdaContextMock()),
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")
@@ -54,7 +54,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .build()
 
         assertThat(
-            ApiGatewayV2AwsHttpAdapter(request),
+            ApiGatewayV2AwsHttpAdapter(request, LambdaContextMock()),
             equalTo(Request(POST, "/")
                 .body(Body(ByteBuffer.wrap(imageBytes)))
             ))
@@ -75,7 +75,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .build()
 
         assertThat(
-            ApiGatewayV2AwsHttpAdapter(request),
+            ApiGatewayV2AwsHttpAdapter(request, LambdaContextMock()),
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")

@@ -20,8 +20,9 @@ abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts)
 }
 
 internal object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
-    override fun invoke(req: APIGatewayV2HTTPEvent) =
-        RequestContent(req.rawPath, req.queryStringParameters, req.rawQueryString, req.body, req.isBase64Encoded, req.requestContext.http.method, req.headers, req.cookies?: emptyList()).asHttp4k()
+    override fun invoke(req: APIGatewayV2HTTPEvent, ctx: Context) =
+        RequestContent(req.rawPath, req.queryStringParameters, req.rawQueryString, req.body, req.isBase64Encoded, req.requestContext.http.method, req.headers, req.cookies
+            ?: emptyList()).asHttp4k()
 
     override fun invoke(req: Response) = APIGatewayV2HTTPResponse().also {
         it.statusCode = req.status.code
