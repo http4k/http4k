@@ -78,6 +78,9 @@ object ServerForClientContract : HttpHandler {
         },
         "/multiRequestHeader" bind POST to { r: Request ->
             Response(OK).body(r.headers.filter { it.first == "echo" }.map { it.first + ": " + it.second }.sorted().joinToString("\n"))
+        },
+        "/multiResponseHeader" bind POST to { r: Request ->
+            Response(OK).header("serverHeader", "foo").header("serverHeader", "bar")
         }
     )
 }

@@ -213,4 +213,11 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
         assertThat(response, hasBody("echo: bar\necho: foo"))
     }
+
+    @Test
+    open fun `can receive multiple headers with same name`(){
+        val response = client(Request(POST, "http://localhost:$port/multiResponseHeader"))
+
+        assertThat(response.headerValues("serverHeader").toSet(), equalTo(setOf("foo", "bar")))
+    }
 }
