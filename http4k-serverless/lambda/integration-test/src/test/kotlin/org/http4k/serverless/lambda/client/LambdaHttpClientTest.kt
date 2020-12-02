@@ -21,14 +21,21 @@ abstract class LambdaHttpClientTest(version: LambdaIntegrationType) :
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `unknown host are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `send binary data`() = assumeTrue(false, "Unsupported client feature")
+}
+
+class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1){
     override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
-    override fun `can send multiple cookies`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
 }
 
-class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1)
+class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2){
+    override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
+    override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
+}
 
-class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2)
-
-class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer)
+class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer){
+    override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
+    override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
+    override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
+}
