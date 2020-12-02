@@ -23,6 +23,7 @@ abstract class LambdaHttpClientTest(version: LambdaIntegrationType) :
     override fun `send binary data`() = assumeTrue(false, "Unsupported client feature")
     override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
+    override fun `can send multiple cookies`() = assumeTrue(false, "Unsupported feature")
 }
 
 class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1)

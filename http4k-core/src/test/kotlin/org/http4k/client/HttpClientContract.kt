@@ -20,6 +20,8 @@ import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
@@ -219,5 +221,12 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
         val response = client(Request(POST, "http://localhost:$port/multiResponseHeader"))
 
         assertThat(response.headerValues("serverHeader").toSet(), equalTo(setOf("foo", "bar")))
+    }
+
+    @Test
+    open fun `can send multiple cookies`(){
+        val response = client(Request(POST, "http://localhost:$port/multiRequestCookies").cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar")))
+
+        assertThat(response, hasBody("bar: vbar\nfoo: vfoo"))
     }
 }
