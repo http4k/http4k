@@ -29,7 +29,7 @@ abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts) : Re
 
     override fun handleRequest(inputStream: InputStream, outputStream: OutputStream, ctx: Context) {
         val req = inputStream.use { Jackson.asA<AwsGatewayProxyRequestV2>(String(it.readAllBytes())) }
-        val res = ApiGatewayV2AwsHttpAdapter(ServerFilters.InitialiseRequestContext(contexts).then(AddLambdaContextAndRequest(ctx, req, contexts)).then(app)(ApiGatewayV2AwsHttpAdapter(req))).also { ctx.logger.log(it.toString()) }
+        val res = ApiGatewayV2AwsHttpAdapter(ServerFilters.InitialiseRequestContext(contexts).then(AddLambdaContextAndRequest(ctx, req, contexts)).then(app)(ApiGatewayV2AwsHttpAdapter(req)))
         outputStream.use { it.write(Jackson.asFormatString(res).toByteArray()) }
     }
 }

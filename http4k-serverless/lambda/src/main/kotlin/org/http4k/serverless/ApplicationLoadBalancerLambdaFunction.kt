@@ -21,7 +21,7 @@ abstract class ApplicationLoadBalancerLambdaFunction(appLoader: AppLoaderWithCon
 
 object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
     override fun invoke(req: ApplicationLoadBalancerRequestEvent, ctx: Context) =
-        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, req.headers, emptyList()).asHttp4k()
+        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, (req.headers?: emptyMap()).mapValues { listOf(it.value) }, emptyList()).asHttp4k()
 
     override fun invoke(req: Response) = ApplicationLoadBalancerResponseEvent().also {
         it.statusCode = req.status.code

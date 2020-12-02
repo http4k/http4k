@@ -1,6 +1,5 @@
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -18,17 +17,12 @@ class ApiGatewayV2LambdaFunctionTest {
     fun `adapts API Gateway request and response and receives context`() {
         val lambdaContext = LambdaContextMock()
 
-        val request = APIGatewayV2HTTPEvent.builder()
-            .withRawPath("/path")
-            .withQueryStringParameters(mapOf("query" to "value"))
-            .withBody("input body")
-            .withHeaders(mapOf("c" to "d"))
-            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-                .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
-                ).build()
-            )
-            .build()
+        val request =  AwsGatewayProxyRequestV2(requestContext = RequestContext(Http("GET"))).apply {
+            rawPath = "/path"
+            queryStringParameters = mapOf("query" to "value")
+            body = "input body"
+            headers = mapOf("c" to "d")
+        }
 
         val lambda = object : ApiGatewayV2LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
@@ -51,6 +45,7 @@ class ApiGatewayV2LambdaFunctionTest {
             equalTo(
                 APIGatewayV2HTTPResponse.builder()
                     .withStatusCode(200)
+                    .withCookies(emptyList())
                     .withBody("hello there")
                     .withHeaders(mapOf("a" to "b"))
                     .withCookies(emptyList())
