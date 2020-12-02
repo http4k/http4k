@@ -22,12 +22,12 @@ class RequestContent(
     private val rawQueryString: String?,
     private val reqBody: String?,
     private val reqBase64: Boolean?, private val reqMethod: String,
-    private val reqHeaders: Map<String, String>?,
+    private val reqHeaders: Map<String, List<String>>?,
     private val cookies: List<String>) {
 
     fun asHttp4k(): Request {
         val body = reqBody?.let { MemoryBody(if (reqBase64 == true) Base64.getDecoder().decode(it.toByteArray()) else it.toByteArray()) } ?: Body.EMPTY
-        return (reqHeaders ?: emptyMap()).toList().fold(
+        return (reqHeaders ?: emptyMap()).map { (k, vs) -> vs.map { v -> k to v } }.toList().flatten().fold(
             Request(Method.valueOf(reqMethod), uri()).body(body)) { memo, (fst, snd) ->
             memo.header(fst, snd)
         }.headers(cookies.map { "Cookie" to it })

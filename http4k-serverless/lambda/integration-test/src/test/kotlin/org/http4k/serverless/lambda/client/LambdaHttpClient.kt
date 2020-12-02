@@ -104,7 +104,7 @@ internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<AwsGatewayProxyRequ
         rawPath = request.uri.path
         queryStringParameters = request.uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
         body = request.bodyString()
-        headers = request.headers.filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
+        headers = request.headers.groupBy { it.first }.mapValues { (k, v) -> v.map { it.second }.joinToString(",") }
     }
 
     override val requestLens = Body.auto<AwsGatewayProxyRequestV2>().toLens()

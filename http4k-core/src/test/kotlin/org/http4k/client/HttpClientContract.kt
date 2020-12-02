@@ -211,28 +211,28 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    open fun `can send multiple headers with same name`(){
+    open fun `can send multiple headers with same name`() {
         val response = client(Request(POST, "http://localhost:$port/multiRequestHeader").header("echo", "foo").header("echo", "bar"))
 
         assertThat(response, hasBody("echo: bar\necho: foo"))
     }
 
     @Test
-    open fun `can receive multiple headers with same name`(){
+    open fun `can receive multiple headers with same name`() {
         val response = client(Request(POST, "http://localhost:$port/multiResponseHeader"))
 
         assertThat(response.headerValues("serverHeader").toSet(), equalTo(setOf("foo", "bar")))
     }
 
     @Test
-    open fun `can send multiple cookies`(){
+    open fun `can send multiple cookies`() {
         val response = client(Request(POST, "http://localhost:$port/multiRequestCookies").cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar")))
 
         assertThat(response, hasBody("bar: vbar\nfoo: vfoo"))
     }
 
     @Test
-    open fun `can receive multiple cookies`(){
+    open fun `can receive multiple cookies`() {
         val response = client(Request(POST, "http://localhost:$port/multiResponseCookies"))
 
         assertThat(response.cookies().sortedBy(Cookie::name).joinToString("\n") { "${it.name}: ${it.value}" }, equalTo("bar: vbar\nfoo: vfoo"))

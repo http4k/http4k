@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import org.http4k.core.HttpHandler
+import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
@@ -32,9 +33,7 @@ abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts) : Re
 }
 
 object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<AwsGatewayProxyRequestV2, APIGatewayV2HTTPResponse> {
-    override fun invoke(req: AwsGatewayProxyRequestV2) =
-        RequestContent(req.rawPath.orEmpty(), req.queryStringParameters, req.rawQueryString, req.body, req.isBase64Encoded, req.requestContext?.http?.method
-            ?: "HEAD", req.headers, req.cookies ?: emptyList()).asHttp4k()
+    override fun invoke(req: AwsGatewayProxyRequestV2): Request = req.toHttp4kRequest()
 
     override fun invoke(req: Response) = APIGatewayV2HTTPResponse().also {
         it.statusCode = req.status.code
