@@ -205,4 +205,11 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
         checkNoBannedHeaders(POST)
         checkNoBannedHeaders(PUT)
     }
+
+    @Test
+    open fun `can send and receive multiple headers with same name`(){
+        val response = client(Request(POST, "http://localhost:$port/echoHeader").header("echo", "foo").header("echo", "bar"))
+
+        assertThat(response.headerValues("echo").toSet(), equalTo(setOf("foo", "bar")))
+    }
 }

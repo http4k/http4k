@@ -21,7 +21,7 @@ import org.http4k.lens.binary
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import java.util.Arrays
+import java.util.*
 
 object ServerForClientContract : HttpHandler {
     override fun invoke(request: Request) = app(request)
@@ -75,8 +75,11 @@ object ServerForClientContract : HttpHandler {
             val code = r.path("status")!!.toInt()
             val status = Status(code, "Description for $code")
             Response(status)
-        })
-
+        },
+        "/echoHeader" bind POST to { r: Request ->
+            Response(OK).headers(r.headers)
+        }
+    )
 }
 
 fun testImageBytes() = ServerForClientContract::class.java.getResourceAsStream("/test.png").readBytes()

@@ -29,6 +29,7 @@ abstract class ApiGatewayHttpClientTest(version: ApiIntegrationVersion) :
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
     override fun `unknown host are converted into 503`() = assumeTrue(false, "Unsupported client feature")
+    override fun `can send and receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
 }
 
 class ApiGatewayV1ClientTest : ApiGatewayHttpClientTest(v1)
