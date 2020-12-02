@@ -2,7 +2,6 @@ package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import org.http4k.core.HttpHandler
 import org.http4k.core.RequestContexts
@@ -26,14 +25,14 @@ abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts) : Re
     private val app = appLoader(System.getenv(), contexts)
 
     override fun handleRequest(inputStream: InputStream, outputStream: OutputStream, ctx: Context) {
-        val req = Jackson.asA<APIGatewayV2HTTPEvent>(String(inputStream.readAllBytes()))
+        val req = Jackson.asA<AwsGatewayProxyRequestV2>(String(inputStream.readAllBytes()))
         val res = ApiGatewayV2AwsHttpAdapter(ServerFilters.InitialiseRequestContext(contexts).then(AddLambdaContextAndRequest(ctx, req, contexts)).then(app)(ApiGatewayV2AwsHttpAdapter(req)))
         outputStream.write(Jackson.asFormatString(res).toByteArray())
     }
 }
 
-object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
-    override fun invoke(req: APIGatewayV2HTTPEvent) =
+object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<AwsGatewayProxyRequestV2, APIGatewayV2HTTPResponse> {
+    override fun invoke(req: AwsGatewayProxyRequestV2) =
         RequestContent(req.rawPath.orEmpty(), req.queryStringParameters, req.rawQueryString, req.body, req.isBase64Encoded, req.requestContext?.http?.method
             ?: "HEAD", req.headers, req.cookies ?: emptyList()).asHttp4k()
 
