@@ -30,7 +30,8 @@ data class Http(var method: String? = null)
 fun AwsGatewayProxyRequestV2.toHttp4kRequest() = Request(http4kMethod(), uri()).body(body()).headers(http4kHeaders())
 
 private fun AwsGatewayProxyRequestV2.http4kHeaders(): Parameters =
-    headers?.map { (k, v) -> v.split(",").map { k to it } }?.flatten() ?: emptyList()
+    (headers?.map { (k, v) -> v.split(",").map { k to it } }?.flatten() ?: emptyList()) +
+        (cookies?.map { "Cookie" to it } ?: emptyList())
 
 private fun AwsGatewayProxyRequestV2.http4kMethod(): Method = Method.valueOf(requestContext?.http?.method ?: "HEAD")
 

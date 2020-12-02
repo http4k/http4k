@@ -95,7 +95,7 @@ data class FunctionPackage(
     val jar: ByteBuffer,
     val role: Role,
     val environmentProperties: Map<String, String> = mapOf(),
-    val timeoutInSeconds: Int = 15
+    val timeoutInSeconds: Int = 30
 )
 
 data class FunctionName(val value: String)

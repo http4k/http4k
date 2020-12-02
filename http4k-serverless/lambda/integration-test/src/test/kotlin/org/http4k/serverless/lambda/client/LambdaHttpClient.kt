@@ -97,6 +97,7 @@ internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<AwsGatewayProxyRequ
             .headers((response.multiValueHeaders ?: emptyMap()).entries.fold(listOf(), { acc, next ->
                 next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
             }))
+            .headers((response.cookies ?: emptyList()).fold(listOf(), { acc, next -> acc + ("set-cookie" to next) }))
             .body(response.body.orEmpty())
 
 
