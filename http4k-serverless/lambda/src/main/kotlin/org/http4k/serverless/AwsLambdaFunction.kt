@@ -10,7 +10,7 @@ import org.http4k.filter.ServerFilters
 const val LAMBDA_CONTEXT_KEY = "HTTP4K_LAMBDA_CONTEXT"
 const val LAMBDA_REQUEST_KEY = "HTTP4K_LAMBDA_REQUEST"
 
-abstract class AwsLambdaFunction<Req : Any, Resp> internal constructor(
+abstract class AwsLambdaFunction<Req : Any, Resp> protected constructor(
     private val adapter: AwsHttpAdapter<Req, Resp>,
     appLoader: AppLoaderWithContexts
 ) : RequestHandler<Req, Resp> {

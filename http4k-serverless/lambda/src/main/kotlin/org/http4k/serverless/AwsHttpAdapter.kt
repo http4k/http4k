@@ -10,7 +10,7 @@ import org.http4k.core.queries
 import org.http4k.core.toUrlFormEncoded
 import java.util.*
 
-internal interface AwsHttpAdapter<Req, Resp> {
+interface AwsHttpAdapter<Req, Resp> {
     operator fun invoke(req: Req): Request
     operator fun invoke(req: Response): Resp
 }

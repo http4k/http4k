@@ -19,7 +19,7 @@ abstract class ApplicationLoadBalancerLambdaFunction(appLoader: AppLoaderWithCon
     override fun handleRequest(req: ApplicationLoadBalancerRequestEvent, ctx: Context) = handle(req, ctx)
 }
 
-internal object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
+object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
     override fun invoke(req: ApplicationLoadBalancerRequestEvent) =
         RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, req.headers, emptyList()).asHttp4k()
 
