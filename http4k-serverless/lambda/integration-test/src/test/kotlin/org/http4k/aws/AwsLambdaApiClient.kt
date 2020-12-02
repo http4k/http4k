@@ -66,7 +66,8 @@ class AwsLambdaApiClient(client: HttpHandler, region: Region) {
                                       @JsonProperty("Role") val role: String,
                                       @JsonProperty("Environment") val environment: Environment,
                                       @JsonProperty("Timeout") val timeout: Int = 3,
-                                      @JsonProperty("Runtime") val runtime: String = "java8")
+                                      @JsonProperty("Runtime") val runtime: String = "java11",
+                                      @JsonProperty("MemorySize") val memory: Int = 256)
 
     private data class Environment(@JsonProperty("Variables") val variables: Map<String, String>)
 

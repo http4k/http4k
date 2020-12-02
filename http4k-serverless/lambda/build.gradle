@@ -4,6 +4,7 @@ dependencies {
     compile project(":http4k-core")
     compile Libs.aws_lambda_java_core
     compile Libs.aws_lambda_java_events
+    compile project(":http4k-format-jackson")
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

@@ -8,7 +8,9 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.format.Jackson
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayOutputStream
 
 class ApiGatewayV2LambdaFunctionTest {
 
@@ -42,7 +44,10 @@ class ApiGatewayV2LambdaFunctionTest {
             }
         }) {}
 
-        assertThat(lambda.handle(request, lambdaContext),
+        val out = ByteArrayOutputStream()
+        lambda.handleRequest(Jackson.asFormatString(request).byteInputStream(), out, lambdaContext)
+
+        assertThat(Jackson.asA(out.toString()),
             equalTo(
                 APIGatewayV2HTTPResponse.builder()
                     .withStatusCode(200)
