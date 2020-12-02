@@ -22,6 +22,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
+import org.http4k.hamkrest.hasBody
 import org.http4k.server.ServerConfig
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -207,9 +208,9 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    open fun `can send and receive multiple headers with same name`(){
-        val response = client(Request(POST, "http://localhost:$port/echoHeader").header("echo", "foo").header("echo", "bar"))
+    open fun `can send multiple headers with same name`(){
+        val response = client(Request(POST, "http://localhost:$port/multiRequestHeader").header("echo", "foo").header("echo", "bar"))
 
-        assertThat(response.headerValues("echo").toSet(), equalTo(setOf("foo", "bar")))
+        assertThat(response, hasBody("echo: bar\necho: foo"))
     }
 }

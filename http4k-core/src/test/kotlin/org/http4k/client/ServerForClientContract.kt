@@ -76,8 +76,8 @@ object ServerForClientContract : HttpHandler {
             val status = Status(code, "Description for $code")
             Response(status)
         },
-        "/echoHeader" bind POST to { r: Request ->
-            Response(OK).headers(r.headers)
+        "/multiRequestHeader" bind POST to { r: Request ->
+            Response(OK).body(r.headers.filter { it.first == "echo" }.map { it.first + ": " + it.second }.sorted().joinToString("\n"))
         }
     )
 }
