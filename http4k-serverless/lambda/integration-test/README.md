@@ -8,11 +8,11 @@
 ## Building and deploying the test function
 
 ```bash
-../../gradlew deployTestFunction
+../../../gradlew deployTestFunction
 ```
 
 # Running the integration tests
 
 ``bash
-../../gradlew test
+../../../gradlew test
 ``
