@@ -22,6 +22,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
+import org.http4k.core.cookie.cookies
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
@@ -228,5 +229,12 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
         val response = client(Request(POST, "http://localhost:$port/multiRequestCookies").cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar")))
 
         assertThat(response, hasBody("bar: vbar\nfoo: vfoo"))
+    }
+
+    @Test
+    open fun `can receive multiple cookies`(){
+        val response = client(Request(POST, "http://localhost:$port/multiResponseCookies"))
+
+        assertThat(response.cookies().sortedBy(Cookie::name).joinToString("\n") { "${it.name}: ${it.value}" }, equalTo("bar: vbar\nfoo: vfoo"))
     }
 }

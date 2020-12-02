@@ -28,4 +28,5 @@ class AppLoadBalancerHttpClientTest :
     override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can send multiple cookies`() = assumeTrue(false, "Unsupported feature")
+    override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
 }

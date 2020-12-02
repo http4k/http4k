@@ -84,6 +84,9 @@ object ServerForClientContract : HttpHandler {
         },
         "/multiRequestCookies" bind POST to { r: Request ->
             Response(OK).body(r.cookies().sortedBy(Cookie::name).joinToString("\n") { "${it.name}: ${it.value}" })
+        },
+        "/multiResponseCookies" bind POST to { r: Request ->
+            Response(OK).cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar"))
         }
     )
 }
