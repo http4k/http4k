@@ -48,6 +48,7 @@ class ApiGatewayV2LambdaFunctionTest {
                     .withStatusCode(200)
                     .withBody("hello there")
                     .withHeaders(mapOf("a" to "b"))
+                    .withCookies(emptyList())
                     .withMultiValueHeaders(mapOf("a" to listOf("b")))
                     .build()
             )
