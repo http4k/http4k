@@ -13,7 +13,7 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.queries
 import org.http4k.core.toUrlFormEncoded
-import java.util.*
+import java.util.Base64
 
 /**
  * This is the main entry point for lambda invocations using the V2 payload format.
@@ -25,19 +25,28 @@ abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts)
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    override fun handleRequest(req: Map<String,Any>, ctx: Context) = handle(req, ctx)
+    override fun handleRequest(req: Map<String, Any>, ctx: Context) = handle(req, ctx)
 }
 
 object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String, Any>> {
-    fun Map<String, Any>.toHttp4kRequest(): Request {
+    private fun Map<String, Any>.toHttp4kRequest(): Request {
         val method = (getNested("requestContext")?.getNested("http")?.get("method") as? String)
             ?: error("method is invalid")
-        val query: Parameters = getStringMap("queryStringParameters")?.toList()
+        val query: Parameters = getStringMap("queryStringParameters")
+            ?.toList()
             ?: Uri.of(getString("rawQueryString").orEmpty()).queries()
         val uri = getString("rawPath").orEmpty()
-        val body = getString("body")?.let { MemoryBody(if (getBoolean("isBase64Encoded") == true) Base64.getDecoder().decode(it.toByteArray()) else it.toByteArray()) }
+        val body = getString("body")
+            ?.let {
+                MemoryBody(when {
+                    getBoolean("isBase64Encoded") == true -> Base64.getDecoder().decode(it.toByteArray())
+                    else -> it.toByteArray()
+                })
+            }
             ?: Body.EMPTY
-        val headers = (getStringMap("headers")?.map { (k, v) -> v.split(",").map { k to it } }?.flatten() ?: emptyList()) +
+        val headers = (getStringMap("headers")
+            ?.map { (k, v) -> v.split(",").map { k to it } }?.flatten()
+            ?: emptyList()) +
             (getStringList("cookies")?.map { "Cookie" to it } ?: emptyList())
 
         return Request(Method.valueOf(method), Uri.of(uri).query(query.toUrlFormEncoded())).body(body).headers(headers)
@@ -48,12 +57,12 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
     override fun invoke(req: Response): Map<String, Any> {
         val nonCookies = req.headers.filterNot { it.first.toLowerCase() == "set-cookie" }
         return mapOf(
-                "statusCode" to req.status.code,
-                "headers" to nonCookies.toMap(),
-                "multiValueHeaders" to nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap(),
-                "cookies" to req.cookies().map(Cookie::fullCookieString),
-                "body" to req.bodyString()
-            )
+            "statusCode" to req.status.code,
+            "headers" to nonCookies.toMap(),
+            "multiValueHeaders" to nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap(),
+            "cookies" to req.cookies().map(Cookie::fullCookieString),
+            "body" to req.bodyString()
+        )
     }
 
     fun Map<*, *>.getNested(name: String): Map<*, *>? = get(name) as? Map<*, *>
