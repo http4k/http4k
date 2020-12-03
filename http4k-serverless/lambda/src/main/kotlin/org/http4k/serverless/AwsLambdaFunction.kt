@@ -17,7 +17,7 @@ abstract class AwsLambdaFunction<Req : Any, Resp> protected constructor(
     private val contexts = RequestContexts()
     private val app = appLoader(System.getenv(), contexts)
 
-    internal fun handle(req: Req, ctx: Context): Resp = adapter(ServerFilters.InitialiseRequestContext(contexts).then(AddLambdaContextAndRequest(ctx, req, contexts)).then(app)(adapter(req)))
+    internal fun handle(req: Req, ctx: Context): Resp = adapter(ServerFilters.InitialiseRequestContext(contexts).then(AddLambdaContextAndRequest(ctx, req, contexts)).then(app)(adapter(req, ctx)))
 }
 
 internal fun AddLambdaContextAndRequest(ctx: Context?, request: Any, contexts: RequestContexts) = Filter { next ->

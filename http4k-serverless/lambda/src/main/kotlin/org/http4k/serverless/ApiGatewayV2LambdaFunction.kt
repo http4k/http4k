@@ -22,7 +22,7 @@ abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts) :
 }
 
 object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
-    override fun invoke(req: APIGatewayV2HTTPEvent) =
+    override fun invoke(req: APIGatewayV2HTTPEvent, ctx: Context) =
         RequestContent(req.rawPath,
             req.queryStringParameters,
             req.rawQueryString,

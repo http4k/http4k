@@ -43,7 +43,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .build()
 
         assertThat(
-            ApiGatewayV2AwsHttpAdapter(request),
+            ApiGatewayV2AwsHttpAdapter(request, LambdaContextMock()),
             hasMethod(GET)
                 .and(hasUri("/path?query=value"))
                 .and(hasHeader("c", "d"))
@@ -67,7 +67,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .build()
 
         assertThat(
-            ApiGatewayV2AwsHttpAdapter(request),
+            ApiGatewayV2AwsHttpAdapter(request, LambdaContextMock()),
             equalTo(Request(POST, "/")
                 .body(Body(ByteBuffer.wrap(imageBytes)))
             ))
@@ -92,7 +92,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             .build()
 
         assertThat(
-            ApiGatewayV2AwsHttpAdapter(request),
+            ApiGatewayV2AwsHttpAdapter(request, LambdaContextMock()),
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")
