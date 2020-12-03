@@ -13,6 +13,7 @@ import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
+import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
@@ -64,12 +65,14 @@ object DeployServerAsLambdaForClientContract {
         ApiGatewayV1 -> "org.http4k.serverless.lambda.TestFunctionV1"
         ApiGatewayV2 -> "org.http4k.serverless.lambda.TestFunctionV2"
         ApplicationLoadBalancer -> "org.http4k.serverless.lambda.TestFunctionAlb"
+        Invocation -> "org.http4k.serverless.lambda.TestFunctionInvocation"
     }
 
     private fun LambdaIntegrationType.functionNamePrefix(): String = when (this) {
         ApiGatewayV1 -> "apigw-v1"
         ApiGatewayV2 -> "apigw-v2"
         ApplicationLoadBalancer -> "alb"
+        Invocation -> "invoke"
     }
 }
 

@@ -10,20 +10,24 @@ import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
+import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.aws.Region
 import org.http4k.core.Body
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.queries
 import org.http4k.core.then
 import org.http4k.core.toParameters
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
+import org.http4k.lens.string
 import org.http4k.serverless.aws.AwsGatewayProxyRequestV2
 import org.http4k.serverless.aws.Http
 import org.http4k.serverless.aws.RequestContext
@@ -33,6 +37,7 @@ class LambdaHttpClient(functionName: FunctionName, region: Region, version: Lamb
         ApiGatewayV1 -> AwsClientV1HttpAdapter()
         ApiGatewayV2 -> AwsClientV2HttpAdapter()
         ApplicationLoadBalancer -> AwsClientAlbHttpAdapter()
+        Invocation -> AwsClientInvocationHttpAdapter()
     }
 
     private fun callFunction(functionName: FunctionName) = Filter { next ->
@@ -133,5 +138,14 @@ internal class AwsClientAlbHttpAdapter : AwsClientHttpAdapter<ApplicationLoadBal
 
     override val requestLens = Body.auto<ApplicationLoadBalancerRequestEvent>().toLens()
     override val responseLens = Body.auto<ApplicationLoadBalancerResponseEvent>().toLens()
+}
+
+internal class AwsClientInvocationHttpAdapter : AwsClientHttpAdapter<String, String> {
+    override fun invoke(response: String) = Response(OK).body(response)
+
+
+    override fun invoke(request: Request) = request.bodyString()
+    override val requestLens = Body.string(TEXT_PLAIN).toLens()
+    override val responseLens = Body.string(TEXT_PLAIN).toLens()
 }
 
