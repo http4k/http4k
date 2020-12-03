@@ -10,6 +10,9 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.serverless.aws.AwsGatewayProxyRequestV2
+import org.http4k.serverless.aws.Http
+import org.http4k.serverless.aws.RequestContext
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.util.*

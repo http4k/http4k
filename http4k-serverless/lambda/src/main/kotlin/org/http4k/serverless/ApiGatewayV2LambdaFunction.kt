@@ -17,6 +17,7 @@ import org.http4k.core.then
 import org.http4k.core.toUrlFormEncoded
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson
+import org.http4k.serverless.aws.AwsGatewayProxyRequestV2
 import org.http4k.serverless.aws.AwsGatewayProxyResponseV2
 import java.io.InputStream
 import java.io.OutputStream

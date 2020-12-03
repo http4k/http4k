@@ -1,4 +1,4 @@
-package org.http4k.serverless
+package org.http4k.serverless.aws
 
 data class AwsGatewayProxyRequestV2(var version: String? = null,
                                     var routeKey: String? = null,

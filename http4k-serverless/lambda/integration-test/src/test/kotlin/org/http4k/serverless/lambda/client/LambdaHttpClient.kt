@@ -24,9 +24,9 @@ import org.http4k.core.toParameters
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
-import org.http4k.serverless.AwsGatewayProxyRequestV2
-import org.http4k.serverless.Http
-import org.http4k.serverless.RequestContext
+import org.http4k.serverless.aws.AwsGatewayProxyRequestV2
+import org.http4k.serverless.aws.Http
+import org.http4k.serverless.aws.RequestContext
 
 class LambdaHttpClient(functionName: FunctionName, region: Region, version: LambdaIntegrationType) : Filter {
     private val adapter = when (version) {
