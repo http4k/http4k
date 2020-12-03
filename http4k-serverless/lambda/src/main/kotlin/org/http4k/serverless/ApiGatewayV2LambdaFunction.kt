@@ -42,7 +42,8 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
 
         return Request(Method.valueOf(method), Uri.of(uri).query(query.toUrlFormEncoded())).body(body).headers(headers)
     }
-    override fun invoke(req: Map<String, Any>): Request = req.toHttp4kRequest()
+
+    override fun invoke(req: Map<String, Any>, ctx: Context): Request = req.toHttp4kRequest()
 
     override fun invoke(req: Response): Map<String, Any> {
         val nonCookies = req.headers.filterNot { it.first.toLowerCase() == "set-cookie" }
