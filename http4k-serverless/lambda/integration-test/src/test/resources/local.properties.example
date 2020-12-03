@@ -2,5 +2,5 @@ accessKey=
 secretKey=
 region=us-east-1
 
-#see https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html
+#the ARN used to invoke the function (see https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html)
 lambdaRuntimeRole=
