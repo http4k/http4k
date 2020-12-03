@@ -33,7 +33,7 @@ private fun AwsGatewayProxyRequestV2.http4kHeaders(): Parameters =
     (headers?.map { (k, v) -> v.split(",").map { k to it } }?.flatten() ?: emptyList()) +
         (cookies?.map { "Cookie" to it } ?: emptyList())
 
-private fun AwsGatewayProxyRequestV2.http4kMethod(): Method = Method.valueOf(requestContext?.http?.method ?: "HEAD")
+private fun AwsGatewayProxyRequestV2.http4kMethod(): Method = Method.valueOf(requestContext?.http?.method ?: error("method is missing"))
 
 private fun AwsGatewayProxyRequestV2.uri(): Uri {
     val query = queryStringParameters?.toList() ?: Uri.of(rawQueryString.orEmpty()).queries()
