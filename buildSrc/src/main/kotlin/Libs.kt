@@ -21,10 +21,6 @@ public object Libs {
     public const val graphql_kotlin_schema_generator: String =
             "com.expediagroup:graphql-kotlin-schema-generator:_"
 
-    public const val jackson_core: String = "com.fasterxml.jackson.core:jackson-core:_"
-
-    public const val jackson_annotations: String = "com.fasterxml.jackson.core:jackson-annotations:_"
-
     public const val jackson_databind: String = "com.fasterxml.jackson.core:jackson-databind:_"
 
     public const val jackson_dataformat_xml: String =
