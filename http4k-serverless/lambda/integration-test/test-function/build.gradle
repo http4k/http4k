@@ -4,9 +4,7 @@ configurations{
 
 dependencies {
     compile project(":http4k-core")
-    compile project(":http4k-format-core")
     compile project(":http4k-serverless-lambda")
-    compile project(":http4k-format-jackson")
     compile project(path: ":http4k-core", configuration: 'testArtifacts')
 
     compile Libs.kotlin_stdlib_jdk8
@@ -15,11 +13,6 @@ dependencies {
     compile Libs.aws_lambda_java_core
     compile Libs.aws_lambda_java_events
     compile Libs.joda_time
-    compile Libs.jackson_core
-    compile Libs.jackson_annotations
-    compile Libs.jackson_databind
-    compile Libs.jackson_module_kotlin
-    compile Libs.kotlin_reflect
 }
 
 task buildZip(type: Zip) {

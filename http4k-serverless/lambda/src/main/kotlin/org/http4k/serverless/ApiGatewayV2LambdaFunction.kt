@@ -1,26 +1,18 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
-import com.amazonaws.services.lambda.runtime.RequestStreamHandler
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.MemoryBody
 import org.http4k.core.Method
+import org.http4k.core.Parameters
 import org.http4k.core.Request
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.queries
-import org.http4k.core.then
 import org.http4k.core.toUrlFormEncoded
-import org.http4k.filter.ServerFilters
-import org.http4k.format.Jackson
-import org.http4k.serverless.aws.AwsGatewayProxyRequestV2
-import org.http4k.serverless.aws.AwsGatewayProxyResponseV2
-import java.io.InputStream
-import java.io.OutputStream
 import java.util.*
 
 /**
@@ -28,39 +20,48 @@ import java.util.*
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
  */
-abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts) : RequestStreamHandler {
+abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts)
+    : AwsLambdaFunction<Map<String, Any>, Map<String, Any>>(ApiGatewayV2AwsHttpAdapter, appLoader) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts()
-    private val app = appLoader(System.getenv(), contexts)
-
-    override fun handleRequest(inputStream: InputStream, outputStream: OutputStream, ctx: Context) {
-        val req = inputStream.use { Jackson.asA<AwsGatewayProxyRequestV2>(String(it.readAllBytes())) }
-        val res = ApiGatewayV2AwsHttpAdapter(ServerFilters.InitialiseRequestContext(contexts).then(AddLambdaContextAndRequest(ctx, req, contexts)).then(app)(ApiGatewayV2AwsHttpAdapter(req)))
-        outputStream.use { it.write(Jackson.asFormatString(res).toByteArray()) }
-    }
+    override fun handleRequest(req: Map<String,Any>, ctx: Context) = handle(req, ctx)
 }
 
-object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<AwsGatewayProxyRequestV2, AwsGatewayProxyResponseV2> {
-    override fun invoke(req: AwsGatewayProxyRequestV2): Request {
-        val method = Method.valueOf(req.requestContext?.http?.method ?: error("method is missing"))
-        val query = req.queryStringParameters?.toList() ?: Uri.of(req.rawQueryString.orEmpty()).queries()
-        val uri = Uri.of(req.rawPath.orEmpty()).query(query.toUrlFormEncoded())
-        val body = req.body?.let { MemoryBody(if (req.isBase64Encoded) Base64.getDecoder().decode(it.toByteArray()) else it.toByteArray()) } ?: Body.EMPTY
-        val headers = (req.headers?.map { (k, v) -> v.split(",").map { k to it } }?.flatten() ?: emptyList()) +
-            (req.cookies?.map { "Cookie" to it } ?: emptyList())
-        return Request(method, uri).body(body).headers(headers)
+object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String, Any>> {
+    fun Map<String, Any>.toHttp4kRequest(): Request {
+        val method = (getNested("requestContext")?.getNested("http")?.get("method") as? String)
+            ?: error("method is invalid")
+        val query: Parameters = getStringMap("queryStringParameters")?.toList()
+            ?: Uri.of(getString("rawQueryString").orEmpty()).queries()
+        val uri = getString("rawPath").orEmpty()
+        val body = getString("body")?.let { MemoryBody(if (getBoolean("isBase64Encoded") == true) Base64.getDecoder().decode(it.toByteArray()) else it.toByteArray()) }
+            ?: Body.EMPTY
+        val headers = (getStringMap("headers")?.map { (k, v) -> v.split(",").map { k to it } }?.flatten() ?: emptyList()) +
+            (getStringList("cookies")?.map { "Cookie" to it } ?: emptyList())
+
+        return Request(Method.valueOf(method), Uri.of(uri).query(query.toUrlFormEncoded())).body(body).headers(headers)
+    }
+    override fun invoke(req: Map<String, Any>): Request = req.toHttp4kRequest()
+
+    override fun invoke(req: Response): Map<String, Any> {
+        val nonCookies = req.headers.filterNot { it.first.toLowerCase() == "set-cookie" }
+        return mapOf(
+                "statusCode" to req.status.code,
+                "headers" to nonCookies.toMap(),
+                "multiValueHeaders" to nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap(),
+                "cookies" to req.cookies().map(Cookie::fullCookieString),
+                "body" to req.bodyString()
+            )
     }
 
-    override fun invoke(req: Response): AwsGatewayProxyResponseV2 {
-        val nonCookies = req.headers.filterNot { it.first.toLowerCase() == "set-cookie" }
-        return AwsGatewayProxyResponseV2(
-            statusCode = req.status.code,
-            multiValueHeaders = nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap(),
-            headers = nonCookies.toMap(),
-            body = req.bodyString(),
-            cookies = req.cookies().map(Cookie::fullCookieString)
-        )
-    }
+    fun Map<*, *>.getNested(name: String): Map<*, *>? = get(name) as? Map<*, *>
+    fun Map<*, *>.getString(name: String): String? = get(name) as? String
+    fun Map<*, *>.getBoolean(name: String): Boolean? = get(name) as? Boolean
+
+    @Suppress("UNCHECKED_CAST")
+    fun Map<*, *>.getStringMap(name: String): Map<String, String>? = get(name) as? Map<String, String>
+
+    @Suppress("UNCHECKED_CAST")
+    fun Map<*, *>.getStringList(name: String): List<String>? = get(name) as? List<String>
 }
