@@ -11,6 +11,8 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.util.*
@@ -19,11 +21,13 @@ class ApiGatewayV2AwsHttpAdapterTest {
 
     @Test
     fun `converts into http4k request`() {
+        val inputCookie = Cookie("name", "value")
         val request = APIGatewayV2HTTPEvent.builder()
             .withRawPath("/path")
             .withQueryStringParameters(mapOf("query" to "value"))
             .withBody("input body")
             .withHeaders(mapOf("c" to "d"))
+            .withCookies(listOf(inputCookie.keyValueCookieString()))
             .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
                 .withHttp(
                     APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
@@ -35,6 +39,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")
+                .cookie(inputCookie)
                 .body("input body")
             ))
     }
@@ -62,11 +67,14 @@ class ApiGatewayV2AwsHttpAdapterTest {
 
     @Test
     fun `converts into http4k request when body is base 64 encoded`() {
+        val inputCookie = Cookie("name", "value")
+
         val request = APIGatewayV2HTTPEvent.builder()
             .withRawPath("/path")
             .withQueryStringParameters(mapOf("query" to "value"))
             .withBody("input body".base64Encode())
             .withHeaders(mapOf("c" to "d"))
+            .withCookies(listOf(inputCookie.fullCookieString()))
             .withIsBase64Encoded(true)
             .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
                 .withHttp(
@@ -79,6 +87,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")
+                .cookie(inputCookie)
                 .body("input body")
             ))
     }
