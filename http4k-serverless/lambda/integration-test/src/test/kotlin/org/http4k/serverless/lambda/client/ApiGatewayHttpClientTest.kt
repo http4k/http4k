@@ -38,7 +38,5 @@ class ApiGatewayV1ClientTest : ApiGatewayHttpClientTest(v1) {
 }
 
 class ApiGatewayV2ClientTest : ApiGatewayHttpClientTest(v2) {
-    override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
-    override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
 }

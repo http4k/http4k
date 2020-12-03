@@ -29,10 +29,7 @@ class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1){
     override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
 }
 
-class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2){
-    override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
-    override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
-}
+class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2)
 
 class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer){
     override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")

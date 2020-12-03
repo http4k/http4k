@@ -2,7 +2,6 @@ package org.http4k.serverless.lambda.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
@@ -25,6 +24,9 @@ import org.http4k.core.toParameters
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
+import org.http4k.serverless.aws.AwsGatewayProxyRequestV2
+import org.http4k.serverless.aws.Http
+import org.http4k.serverless.aws.RequestContext
 
 class LambdaHttpClient(functionName: FunctionName, region: Region, version: LambdaIntegrationType) : Filter {
     private val adapter = when (version) {
@@ -87,7 +89,7 @@ class AwsClientV1HttpAdapter :
     override val responseLens = Body.auto<APIGatewayProxyResponseEvent>().toLens()
 }
 
-internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
+internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<AwsGatewayProxyRequestV2, APIGatewayV2HTTPResponse> {
     override fun invoke(response: APIGatewayV2HTTPResponse) =
         Response(Status(response.statusCode, ""))
             .headers((response.headers
@@ -95,22 +97,18 @@ internal class AwsClientV2HttpAdapter : AwsClientHttpAdapter<APIGatewayV2HTTPEve
             .headers((response.multiValueHeaders ?: emptyMap()).entries.fold(listOf(), { acc, next ->
                 next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
             }))
+            .headers((response.cookies ?: emptyList()).fold(listOf(), { acc, next -> acc + ("set-cookie" to next) }))
             .body(response.body.orEmpty())
 
 
-    override fun invoke(request: Request) = APIGatewayV2HTTPEvent.builder()
-        .withRawPath(request.uri.path)
-        .withQueryStringParameters(request.uri.queries().toMap())
-        .withBody(request.bodyString())
-        .withHeaders(request.headers.toMap())
-        .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-            .withHttp(
-                APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod(request.method.name).build()
-            ).build()
-        )
-        .build()
+    override fun invoke(request: Request) = AwsGatewayProxyRequestV2(requestContext = RequestContext(Http(request.method.name))).apply {
+        rawPath = request.uri.path
+        queryStringParameters = request.uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
+        body = request.bodyString()
+        headers = request.headers.groupBy { it.first }.mapValues { (k, v) -> v.map { it.second }.joinToString(",") }
+    }
 
-    override val requestLens = Body.auto<APIGatewayV2HTTPEvent>().toLens()
+    override val requestLens = Body.auto<AwsGatewayProxyRequestV2>().toLens()
     override val responseLens = Body.auto<APIGatewayV2HTTPResponse>().toLens()
 }
 

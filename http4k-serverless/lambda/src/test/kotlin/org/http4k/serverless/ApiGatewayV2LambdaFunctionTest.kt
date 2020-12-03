@@ -1,7 +1,5 @@
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
@@ -16,17 +14,13 @@ class ApiGatewayV2LambdaFunctionTest {
     fun `adapts API Gateway request and response and receives context`() {
         val lambdaContext = LambdaContextMock()
 
-        val request = APIGatewayV2HTTPEvent.builder()
-            .withRawPath("/path")
-            .withQueryStringParameters(mapOf("query" to "value"))
-            .withBody("input body")
-            .withHeaders(mapOf("c" to "d"))
-            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-                .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
-                ).build()
-            )
-            .build()
+        val request = mapOf(
+            "rawPath" to "/path",
+            "queryStringParameters" to mapOf("query" to "value"),
+            "body" to "input body",
+            "headers" to mapOf("c" to "d"),
+            "requestContext" to mapOf("http" to mapOf("method" to "GET"))
+        )
 
         val lambda = object : ApiGatewayV2LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
@@ -42,15 +36,17 @@ class ApiGatewayV2LambdaFunctionTest {
             }
         }) {}
 
-        assertThat(lambda.handle(request, lambdaContext),
+        val out = lambda.handle(request, lambdaContext)
+
+        assertThat(out,
             equalTo(
-                APIGatewayV2HTTPResponse.builder()
-                    .withStatusCode(200)
-                    .withBody("hello there")
-                    .withHeaders(mapOf("a" to "b"))
-                    .withCookies(emptyList())
-                    .withMultiValueHeaders(mapOf("a" to listOf("b")))
-                    .build()
+                mapOf(
+                    "statusCode" to 200,
+                    "cookies" to emptyList<String>(),
+                    "body" to "hello there",
+                    "headers" to mapOf("a" to "b"),
+                    "multiValueHeaders" to mapOf("a" to listOf("b")),
+                )
             )
         )
     }
