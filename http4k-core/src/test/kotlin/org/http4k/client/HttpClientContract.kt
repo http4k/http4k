@@ -241,7 +241,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     open fun `unhandled exceptions converted into 500`() {
-        val response = timeoutClient(Request(GET, "http://localhost:$port/boom"))
+        val response = client(Request(GET, "http://localhost:$port/boom"))
 
         assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
     }
