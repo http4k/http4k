@@ -40,7 +40,7 @@ object DeployServerAsLambdaForClientContract {
 
         val functionPackage = FunctionPackage(
             functionName,
-            FunctionHandler(functionMainClass(version)),
+            FunctionHandler(version.functionMainClass()),
             ByteBuffer.wrap(lambdaBinary.readBytes()),
             Config.role(awsConfig)
         )
@@ -61,7 +61,7 @@ object DeployServerAsLambdaForClientContract {
 
     fun functionName(version: LambdaIntegrationType) = FunctionName("test-function-${version.functionNamePrefix()}")
 
-    private fun functionMainClass(version: LambdaIntegrationType): String = when (version) {
+    private fun LambdaIntegrationType.functionMainClass(): String = when (this) {
         ApiGatewayV1 -> "org.http4k.serverless.lambda.TestFunctionV1"
         ApiGatewayV2 -> "org.http4k.serverless.lambda.TestFunctionV2"
         ApplicationLoadBalancer -> "org.http4k.serverless.lambda.TestFunctionAlb"
