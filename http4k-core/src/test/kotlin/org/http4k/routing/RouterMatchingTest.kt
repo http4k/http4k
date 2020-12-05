@@ -89,6 +89,12 @@ class RouterMatchingTest {
     }
 
     @Test
+    fun `fallback router`() {
+        assertThat(Fallback.match(Request(GET, "")), isA<MatchedWithoutHandler>())
+        assertThat(Fallback.match(Request(POST, "")), isA<MatchedWithoutHandler>())
+    }
+
+    @Test
     fun `body string router`() {
         val router = body { it: String -> it == "hello" }
         assertThat(router.match(Request(POST, "")), isA<Unmatched>())
