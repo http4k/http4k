@@ -240,6 +240,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
+    @Disabled
     open fun `unhandled exceptions converted into 500`() {
         val response = client(Request(GET, "http://localhost:$port/boom"))
 

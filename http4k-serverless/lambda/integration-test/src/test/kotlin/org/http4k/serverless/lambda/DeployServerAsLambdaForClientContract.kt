@@ -14,10 +14,10 @@ import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.aws.LambdaIntegrationType.Invocation
+import org.http4k.client.ApiGatewayV1LambdaClient
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.serverless.lambda.client.ApiGatewayV1LambdaClient
 import org.http4k.serverless.lambda.client.Config
 import org.http4k.serverless.lambda.client.awsConfig
 import org.http4k.serverless.lambda.client.lambdaApiClient

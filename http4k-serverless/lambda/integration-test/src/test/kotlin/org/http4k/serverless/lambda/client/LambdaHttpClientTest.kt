@@ -7,7 +7,12 @@ import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.aws.Region
+import org.http4k.client.ApiGatewayV1LambdaClient
+import org.http4k.client.ApiGatewayV2LambdaClient
+import org.http4k.client.ApplicationLoadBalancerLambdaClient
 import org.http4k.client.HttpClientContract
+import org.http4k.client.InvocationLambdaClient
+import org.http4k.client.LambdaHttpClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 

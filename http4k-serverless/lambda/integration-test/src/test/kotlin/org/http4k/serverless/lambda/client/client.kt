@@ -9,6 +9,7 @@ import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.Region
 import org.http4k.aws.Role
 import org.http4k.client.JavaHttpClient
+import org.http4k.client.LambdaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.Filter

@@ -1,6 +1,7 @@
 package org.http4k.aws
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.http4k.client.LambdaApi
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
@@ -12,7 +13,6 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.DebuggingFilters
 import org.http4k.format.Jackson.auto
-import org.http4k.serverless.lambda.client.LambdaApi
 import org.http4k.serverless.lambda.inIntelliJOnly
 import java.nio.ByteBuffer
 import java.util.Base64
