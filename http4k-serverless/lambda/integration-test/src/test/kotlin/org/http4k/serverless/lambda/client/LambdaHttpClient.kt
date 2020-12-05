@@ -27,20 +27,19 @@ import org.http4k.serverless.aws.AwsGatewayProxyRequestV2
 import org.http4k.serverless.aws.Http
 import org.http4k.serverless.aws.RequestContext
 
-abstract class LambdaHttpClient<Req, Resp>(functionName: FunctionName, region: Region,
-                                           private val adapter: AwsClientHttpAdapter<Req, Resp>) : Filter {
+abstract class LambdaHttpClient<Req, Resp>(functionName: FunctionName, region: Region) : Filter {
     private fun callFunction(functionName: FunctionName) = Filter { next ->
         {
-            val request: Request = Request(POST, "/2015-03-31/functions/${functionName.value}/invocations")
+            extract(next(Request(POST, "/2015-03-31/functions/${functionName.value}/invocations")
                 .header("X-Amz-Invocation-Type", "RequestResponse")
                 .header("X-Amz-Log-Type", "Tail")
-                .with(adapter.inject(it))
-
-            val lambdaResponse = next(request)
-
-            adapter.extract(lambdaResponse)
+                .with(inject(it))))
         }
     }
+
+    protected abstract fun inject(it: Request): (Request) -> Request
+
+    protected abstract fun extract(lambdaResponse: Response): Response
 
     private val filter = callFunction(functionName).then(LambdaApi(region))
 
@@ -48,16 +47,33 @@ abstract class LambdaHttpClient<Req, Resp>(functionName: FunctionName, region: R
 }
 
 class ApiGatewayV1LambdaClient(functionName: FunctionName, region: Region) :
-    LambdaHttpClient<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>(functionName, region, AwsClientV1HttpAdapter)
+    LambdaHttpClient<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>(functionName, region) {
+    override fun inject(it: Request) = AwsClientV1HttpAdapter.inject(it)
+
+    override fun extract(lambdaResponse: Response) = AwsClientV1HttpAdapter.extract(lambdaResponse)
+}
 
 class ApiGatewayV2LambdaClient(functionName: FunctionName, region: Region) :
-    LambdaHttpClient<AwsGatewayProxyRequestV2, APIGatewayV2HTTPResponse>(functionName, region, AwsClientV2HttpAdapter)
+    LambdaHttpClient<AwsGatewayProxyRequestV2, APIGatewayV2HTTPResponse>(functionName, region) {
+    override fun inject(it: Request) = AwsClientV2HttpAdapter.inject(it)
+
+    override fun extract(lambdaResponse: Response) = AwsClientV2HttpAdapter.extract(lambdaResponse)
+}
 
 class ApplicationLoadBalancerLambdaClient(functionName: FunctionName, region: Region) :
-    LambdaHttpClient<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent>(functionName, region, AwsClientAlbHttpAdapter)
+    LambdaHttpClient<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent>(functionName, region) {
+    override fun inject(it: Request) = AwsClientAlbHttpAdapter.inject(it)
+
+    override fun extract(lambdaResponse: Response) = AwsClientAlbHttpAdapter.extract(lambdaResponse)
+}
 
 class InvocationLambdaClient(functionName: FunctionName, region: Region) :
-    LambdaHttpClient<String, String>(functionName, region, AwsClientInvocationHttpAdapter)
+    LambdaHttpClient<String, String>(functionName, region) {
+
+    override fun inject(it: Request) = AwsClientInvocationHttpAdapter.inject(it)
+
+    override fun extract(lambdaResponse: Response) = AwsClientInvocationHttpAdapter.extract(lambdaResponse)
+}
 
 object LambdaApi {
     operator fun invoke(region: Region): Filter = Filter { next ->
