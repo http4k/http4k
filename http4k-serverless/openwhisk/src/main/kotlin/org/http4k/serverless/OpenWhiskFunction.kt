@@ -20,18 +20,16 @@ const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 
 class OpenWhiskFunction(
     appLoader: AppLoaderWithContexts,
-    env: Map<String, String> = System.getenv(),
     private val detectBinaryBody: DetectBinaryBody = NonBinary
 ) : (JsonObject) -> JsonObject {
 
     constructor(
         input: AppLoader,
-        env: Map<String, String> = System.getenv(),
         detectBinaryBody: DetectBinaryBody = NonBinary
-    ) : this(AppLoaderWithContexts { env, _ -> input(env) }, env, detectBinaryBody)
+    ) : this(AppLoaderWithContexts { env, _ -> input(env) }, detectBinaryBody)
 
     private val contexts = RequestContexts()
-    private val app = appLoader(env, contexts)
+    private val app = appLoader(System.getenv(), contexts)
 
     override fun invoke(request: JsonObject) =
         CatchAll()
