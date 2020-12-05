@@ -4,8 +4,8 @@ import org.http4k.aws.AwsApiGatewayApiClient
 import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
 import org.http4k.aws.AwsLambdaApiClient
+import org.http4k.aws.FunctionName
 import org.http4k.aws.LambdaIntegrationType
-import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.Region
 import org.http4k.aws.Role
 import org.http4k.client.JavaHttpClient
@@ -21,12 +21,8 @@ import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract
 import org.http4k.serverless.lambda.inIntelliJOnly
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-val testFunctionClient by lazy {
-    testFunctionClient(ApiGatewayV1)
-}
-
-fun testFunctionClient(version: LambdaIntegrationType) =
-    LambdaHttpClient(DeployServerAsLambdaForClientContract.functionName(version), Config.region(awsConfig), version).then(awsClient("lambda"))
+fun testFunctionClient(type: LambdaIntegrationType, clientFn: (FunctionName, Region) -> LambdaHttpClient<*, *>) =
+    clientFn(DeployServerAsLambdaForClientContract.functionName(type), Config.region(awsConfig)).then(awsClient("lambda"))
 
 val lambdaApiClient by lazy { AwsLambdaApiClient(awsClient("lambda"), Config.region(awsConfig)) }
 

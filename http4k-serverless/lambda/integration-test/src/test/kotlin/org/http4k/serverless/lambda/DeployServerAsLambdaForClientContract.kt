@@ -17,6 +17,7 @@ import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.serverless.lambda.client.ApiGatewayV1LambdaClient
 import org.http4k.serverless.lambda.client.Config
 import org.http4k.serverless.lambda.client.awsConfig
 import org.http4k.serverless.lambda.client.lambdaApiClient
@@ -53,7 +54,8 @@ object DeployServerAsLambdaForClientContract {
         assertThat(lambdaApiClient.list().find { it.name == functionName.value }, present())
 
         println("Performing a test request...")
-        val functionResponse = testFunctionClient(Request(Method.POST, "/echo").body("Hello, http4k"))
+        val client = testFunctionClient(ApiGatewayV1, ::ApiGatewayV1LambdaClient)
+        val functionResponse = client(Request(Method.POST, "/echo").body("Hello, http4k"))
 
         assertThat(functionResponse.status, equalTo(Status.OK))
         assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
