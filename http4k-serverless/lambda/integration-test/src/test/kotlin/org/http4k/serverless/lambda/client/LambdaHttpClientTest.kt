@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 
 abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
-                                    clientFn: (FunctionName, Region) -> LambdaHttpClient<*, *>) :
+                                    clientFn: (FunctionName, Region) -> LambdaHttpClient) :
     HttpClientContract({ NoOpServerConfig }, testFunctionClient(type, clientFn), testFunctionClient(type, clientFn)) {
 
     override fun `handles response with custom status message`() = unsupportedFeature()

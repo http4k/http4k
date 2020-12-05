@@ -12,7 +12,7 @@ import org.http4k.core.toParameters
 import org.http4k.format.Jackson.auto
 
 class ApiGatewayV1LambdaClient(functionName: FunctionName, region: Region) :
-    LambdaHttpClient<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>(functionName, region) {
+    LambdaHttpClient(functionName, region) {
     override fun inject(it: Request): (Request) -> Request = requestLens of APIGatewayProxyRequestEvent()
         .withHttpMethod(it.method.name)
         .withHeaders(it.headers.toMap())

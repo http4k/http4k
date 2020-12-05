@@ -22,7 +22,7 @@ import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract
 import org.http4k.serverless.lambda.inIntelliJOnly
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-fun testFunctionClient(type: LambdaIntegrationType, clientFn: (FunctionName, Region) -> LambdaHttpClient<*, *>) =
+fun testFunctionClient(type: LambdaIntegrationType, clientFn: (FunctionName, Region) -> LambdaHttpClient) =
     clientFn(DeployServerAsLambdaForClientContract.functionName(type), Config.region(awsConfig)).then(awsClient("lambda"))
 
 val lambdaApiClient by lazy { AwsLambdaApiClient(awsClient("lambda"), Config.region(awsConfig)) }

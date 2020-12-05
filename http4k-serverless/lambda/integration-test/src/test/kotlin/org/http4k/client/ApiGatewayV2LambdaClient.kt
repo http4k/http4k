@@ -14,7 +14,7 @@ import org.http4k.serverless.aws.Http
 import org.http4k.serverless.aws.RequestContext
 
 class ApiGatewayV2LambdaClient(functionName: FunctionName, region: Region) :
-    LambdaHttpClient<AwsGatewayProxyRequestV2, APIGatewayV2HTTPResponse>(functionName, region) {
+    LambdaHttpClient(functionName, region) {
     override fun inject(it: Request): (Request) -> Request = requestLens of AwsGatewayProxyRequestV2(requestContext = RequestContext(Http(it.method.name))).apply {
         rawPath = it.uri.path
         queryStringParameters = it.uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()

@@ -10,7 +10,7 @@ import org.http4k.core.Status
 import org.http4k.lens.string
 
 class InvocationLambdaClient(functionName: FunctionName, region: Region) :
-    LambdaHttpClient<String, String>(functionName, region) {
+    LambdaHttpClient(functionName, region) {
 
     override fun inject(it: Request): (Request) -> Request = requestLens of it.bodyString()
 

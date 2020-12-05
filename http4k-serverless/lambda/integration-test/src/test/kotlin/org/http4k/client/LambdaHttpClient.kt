@@ -10,7 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.core.with
 
-abstract class LambdaHttpClient<Req, Resp>(functionName: FunctionName, region: Region) : Filter {
+abstract class LambdaHttpClient(functionName: FunctionName, region: Region) : Filter {
     private fun callFunction(functionName: FunctionName) = Filter { next ->
         {
             extract(next(Request(POST, "/2015-03-31/functions/${functionName.value}/invocations")

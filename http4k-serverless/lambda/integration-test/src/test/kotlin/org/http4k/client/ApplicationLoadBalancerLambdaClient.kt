@@ -12,7 +12,7 @@ import org.http4k.core.toParameters
 import org.http4k.format.Jackson.auto
 
 class ApplicationLoadBalancerLambdaClient(functionName: FunctionName, region: Region) :
-    LambdaHttpClient<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent>(functionName, region) {
+    LambdaHttpClient(functionName, region) {
     override fun inject(it: Request): (Request) -> Request = requestLens of ApplicationLoadBalancerRequestEvent().apply {
         httpMethod = it.method.name
         body = it.bodyString()
