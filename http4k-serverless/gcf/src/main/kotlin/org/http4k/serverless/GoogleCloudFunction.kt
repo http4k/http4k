@@ -10,6 +10,7 @@ import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 
 const val GCF_REQUEST_KEY = "HTTP4K_GCF_REQUEST"
@@ -22,7 +23,8 @@ open class GoogleCloudFunction(appLoader: AppLoaderWithContexts) : HttpFunction 
     private val app = appLoader(System.getenv(), contexts)
 
     override fun service(request: HttpRequest, response: HttpResponse) =
-        InitialiseRequestContext(contexts)
+        CatchAll()
+            .then(InitialiseRequestContext(contexts))
             .then(AddGCPRequest(request, contexts))
             .then(app)(request.asHttp4kRequest())
             .into(response)

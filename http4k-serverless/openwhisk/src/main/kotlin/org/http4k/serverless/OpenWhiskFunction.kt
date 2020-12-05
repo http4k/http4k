@@ -9,6 +9,7 @@ import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import java.nio.ByteBuffer
@@ -32,10 +33,12 @@ class OpenWhiskFunction(
     private val contexts = RequestContexts()
     private val app = appLoader(env, contexts)
 
-    override fun invoke(request: JsonObject): JsonObject = InitialiseRequestContext(contexts)
-        .then(AddOpenWhiskRequest(request, contexts))
-        .then(app)
-        .invoke(request.asHttp4k()).toGson()
+    override fun invoke(request: JsonObject) =
+        CatchAll()
+            .then(InitialiseRequestContext(contexts))
+            .then(AddOpenWhiskRequest(request, contexts))
+            .then(app)
+            .invoke(request.asHttp4k()).toGson()
 
     private fun Response.toGson() = JsonObject().apply {
         addProperty("statusCode", status.code)

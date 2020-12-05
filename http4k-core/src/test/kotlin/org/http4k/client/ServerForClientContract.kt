@@ -21,7 +21,7 @@ import org.http4k.lens.binary
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import java.util.*
+import java.util.Arrays
 
 object ServerForClientContract : HttpHandler {
     override fun invoke(request: Request) = app(request)
@@ -87,7 +87,8 @@ object ServerForClientContract : HttpHandler {
         },
         "/multiResponseCookies" bind POST to { r: Request ->
             Response(OK).cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar"))
-        }
+        },
+        "/boom" bind GET to { throw IllegalArgumentException("BOOM!") },
     )
 }
 

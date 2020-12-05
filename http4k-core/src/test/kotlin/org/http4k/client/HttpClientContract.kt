@@ -18,6 +18,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.FOUND
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import org.http4k.core.cookie.Cookie
@@ -237,4 +238,12 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
         assertThat(response.cookies().sortedBy(Cookie::name).joinToString("\n") { "${it.name}: ${it.value}" }, equalTo("bar: vbar\nfoo: vfoo"))
     }
+
+    @Test
+    open fun `unhandled exceptions converted into 500`() {
+        val response = timeoutClient(Request(GET, "http://localhost:$port/boom"))
+
+        assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
+    }
+
 }

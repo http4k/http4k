@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import java.util.Optional
 
@@ -28,7 +29,8 @@ abstract class AzureFunction(appLoader: AppLoaderWithContexts) {
                                ctx: ExecutionContext): HttpResponseMessage
 
     protected fun handle(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext) =
-        InitialiseRequestContext(contexts)
+        CatchAll()
+            .then(InitialiseRequestContext(contexts))
             .then(AddAzure(request, ctx, contexts))
             .then(app)(request.asHttp4k())
             .asAzure(request)
