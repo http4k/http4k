@@ -10,7 +10,8 @@ import org.http4k.aws.Region
 import org.http4k.client.HttpClientContract
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-abstract class LambdaHttpClientTest(type: LambdaIntegrationType, clientFn: (FunctionName, Region) -> LambdaHttpClient<*, *>) :
+abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
+                                    clientFn: (FunctionName, Region) -> LambdaHttpClient<*, *>) :
     HttpClientContract({ NoOpServerConfig }, testFunctionClient(type, clientFn), testFunctionClient(type, clientFn)) {
 
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
