@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerReque
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -42,8 +43,9 @@ class ApplicationLoadBalancerLambdaFunctionTest {
             equalTo(
                 ApplicationLoadBalancerResponseEvent().apply {
                     statusCode = 200
-                    body = "hello there"
+                    body = "hello there".base64Encode()
                     headers = mapOf("a" to "b")
+                    isBase64Encoded = true
                 })
         )
     }
