@@ -34,7 +34,8 @@ object ServerForClientContract : HttpHandler {
             .body(request.body)
     }
 
-    private val app = routes("/someUri" bind POST to defaultHandler,
+    private val app = routes(
+        "/someUri" bind POST to defaultHandler,
         "/cookies/set" bind GET to { req: Request ->
             Response(FOUND).header("Location", "/cookies").cookie(Cookie(req.query("name")!!, req.query("value")!!))
         },
@@ -62,6 +63,7 @@ object ServerForClientContract : HttpHandler {
         "/check-image" bind POST to { request: Request ->
             if (Arrays.equals(testImageBytes(), request.body.payload.array()))
                 Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
+                .body("EXPECTED " + testImageBytes().size + " GOT " + request.body.payload.array().size)
         },
         "/image" bind GET to { _: Request ->
             Response(CREATED).with(Body.binary(ContentType("image/png")).toLens() of testImageBytes().inputStream())
