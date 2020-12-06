@@ -19,7 +19,6 @@ class InvocationLambdaFunctionTest {
         val lambda = object : InvocationLambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
-                assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
                 assertThat(it.removeHeader("x-http4k-context"), equalTo(
                     Request(POST, "/2015-03-31/functions/myFunction/invocations")
@@ -30,6 +29,8 @@ class InvocationLambdaFunctionTest {
             }
         }) {}
 
-        assertThat(lambda.handle(request, lambdaContext), equalTo(request + request))
+        assertThat(
+            lambda.handle(request.byteInputStream(), lambdaContext).reader().readText(),
+            equalTo(request + request))
     }
 }

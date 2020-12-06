@@ -14,7 +14,7 @@ class InvocationLambdaAwsHttpAdapterTest {
     fun `converts into http4k request`() {
         val request = "helloworld"
         assertThat(
-            InvocationLambdaAwsHttpAdapter(request, LambdaContextMock()),
+            InvocationLambdaAwsHttpAdapter(request.byteInputStream(), LambdaContextMock()),
             equalTo(Request(POST, "/2015-03-31/functions/LambdaContextMock/invocations")
                 .header("X-Amz-Invocation-Type", "RequestResponse")
                 .header("X-Amz-Log-Type", "Tail")
@@ -28,7 +28,7 @@ class InvocationLambdaAwsHttpAdapterTest {
             InvocationLambdaAwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
                 .header("c", "d")
                 .body("output body")
-            ),
+            ).reader().readText(),
             equalTo("output body")
         )
     }
