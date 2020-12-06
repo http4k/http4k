@@ -1,7 +1,6 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
@@ -79,14 +78,15 @@ class ApiGatewayV1AwsHttpAdapterTest {
         assertThat(
             ApiGatewayV1AwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
                 .header("c", "d")
+                .header("c", "e")
                 .body("output body")
             ),
-            equalTo(APIGatewayProxyResponseEvent().apply {
-                statusCode = 418
-                body = "output body".base64Encode()
-                headers = mapOf("c" to "d")
-                isBase64Encoded = true
-            })
+            equalTo(mapOf(
+                "statusCode" to 418,
+                "body" to "output body".base64Encode(),
+                "headers" to mapOf("c" to "e"),
+                "isBase64Encoded" to true,
+            ))
         )
     }
 }
