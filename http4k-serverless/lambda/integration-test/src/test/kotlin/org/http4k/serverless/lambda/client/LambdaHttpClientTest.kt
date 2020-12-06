@@ -14,12 +14,16 @@ import org.http4k.client.ApplicationLoadBalancerLambdaClient
 import org.http4k.client.HttpClientContract
 import org.http4k.client.InvocationLambdaClient
 import org.http4k.client.LambdaHttpClient
+import org.http4k.core.then
+import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 
 abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
                                     clientFn: (Function, Region) -> LambdaHttpClient) :
-    HttpClientContract({ NoOpServerConfig }, awsCliUserProfiles().profile().testFunctionClient(type, clientFn)) {
+    HttpClientContract({ NoOpServerConfig },
+        clientFn(functionName(type), Region(awsCliUserProfiles().profile().region))
+            .then(awsCliUserProfiles().profile().awsClientFor("lambda"))) {
 
     override fun `handles response with custom status message`() = unsupportedFeature()
     override fun `connection refused are converted into 503`() = unsupportedFeature()
@@ -27,7 +31,7 @@ abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
     override fun `send binary data`() = unsupportedFeature()
 }
 
-class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1, ::ApiGatewayV1LambdaClient){
+class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1, ::ApiGatewayV1LambdaClient) {
     override fun `can send multiple headers with same name`() = unsupportedFeature()
     override fun `can receive multiple headers with same name`() = unsupportedFeature()
     override fun `can receive multiple cookies`() = unsupportedFeature()
@@ -35,7 +39,7 @@ class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1, ::ApiGatewayV1
 
 class LambdaV2HttpClientTest : LambdaHttpClientTest(ApiGatewayV2, ::ApiGatewayV2LambdaClient)
 
-class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer, ::ApplicationLoadBalancerLambdaClient){
+class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer, ::ApplicationLoadBalancerLambdaClient) {
     override fun `can send multiple headers with same name`() = unsupportedFeature()
     override fun `can receive multiple headers with same name`() = unsupportedFeature()
     override fun `can receive multiple cookies`() = unsupportedFeature()

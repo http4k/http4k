@@ -12,7 +12,7 @@ import org.http4k.core.toParameters
 import org.http4k.format.Jackson.auto
 
 class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
-    override fun Request.toLamdbaFormat(): (Request) -> Request = requestLens of APIGatewayProxyRequestEvent()
+    override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of APIGatewayProxyRequestEvent()
         .withHttpMethod(method.name)
         .withHeaders(headers.toMap())
         .withPath(uri.path)

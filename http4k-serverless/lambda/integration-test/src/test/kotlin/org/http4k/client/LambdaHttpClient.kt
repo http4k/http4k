@@ -19,11 +19,11 @@ abstract class LambdaHttpClient(function: Function, region: Region) : Filter {
                 Request(POST, "/2015-03-31/functions/${function.value}/invocations")
                     .header("X-Amz-Invocation-Type", "RequestResponse")
                     .header("X-Amz-Log-Type", "Tail")
-                    .with(it.toLamdbaFormat())).fromLambdaFormat()
+                    .with(it.toLambdaFormat())).fromLambdaFormat()
         }
     }
 
-    protected abstract fun Request.toLamdbaFormat(): (Request) -> Request
+    protected abstract fun Request.toLambdaFormat(): (Request) -> Request
 
     protected abstract fun Response.fromLambdaFormat(): Response
 

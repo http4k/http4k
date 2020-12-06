@@ -18,7 +18,7 @@ import org.opentest4j.TestAbortedException
 
 private fun client(version: ApiIntegrationVersion): (Request) -> Response {
     val api = awsCliUserProfiles().profile("default")
-        .apiGatewayClient().listApis()
+        .apiGatewayApiClient().listApis()
         .find { it.name == apiName(version) }
         ?: throw TestAbortedException("API hasn't been deployed")
     val apiClient = ClientFilters.SetBaseUriFrom(api.apiEndpoint)

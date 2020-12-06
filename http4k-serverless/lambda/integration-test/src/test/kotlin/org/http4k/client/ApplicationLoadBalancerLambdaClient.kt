@@ -12,10 +12,10 @@ import org.http4k.core.toParameters
 import org.http4k.format.Jackson.auto
 
 class ApplicationLoadBalancerLambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
-    override fun Request.toLamdbaFormat(): (Request) -> Request = requestLens of ApplicationLoadBalancerRequestEvent().apply {
+    override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of ApplicationLoadBalancerRequestEvent().apply {
         httpMethod = method.name
         body = bodyString()
-        headers = this@toLamdbaFormat.headers.toMap()
+        headers = this@toLambdaFormat.headers.toMap()
         path = uri.path
         queryStringParameters = uri.query.toParameters().toMap()
     }

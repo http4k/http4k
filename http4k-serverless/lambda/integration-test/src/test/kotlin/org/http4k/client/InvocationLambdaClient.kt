@@ -12,7 +12,7 @@ import org.http4k.lens.string
 class InvocationLambdaClient(function: Function, region: Region) :
     LambdaHttpClient(function, region) {
 
-    override fun Request.toLamdbaFormat(): (Request) -> Request = requestLens of bodyString()
+    override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of bodyString()
 
     override fun Response.fromLambdaFormat() = Response(Status.OK).body(responseLens(this))
 

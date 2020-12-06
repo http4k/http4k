@@ -14,11 +14,11 @@ import org.http4k.serverless.aws.Http
 import org.http4k.serverless.aws.RequestContext
 
 class ApiGatewayV2LambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
-    override fun Request.toLamdbaFormat(): (Request) -> Request = requestLens of AwsGatewayProxyRequestV2(requestContext = RequestContext(Http(method.name))).apply {
+    override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of AwsGatewayProxyRequestV2(requestContext = RequestContext(Http(method.name))).apply {
         rawPath = uri.path
         queryStringParameters = uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
         body = bodyString()
-        headers = this@toLamdbaFormat.headers.groupBy { it.first }.mapValues { (_, v) -> v.map { it.second }.joinToString(",") }
+        headers = this@toLambdaFormat.headers.groupBy { it.first }.mapValues { (_, v) -> v.map { it.second }.joinToString(",") }
     }
 
     override fun Response.fromLambdaFormat(): Response {

@@ -14,24 +14,30 @@ import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.aws.LambdaIntegrationType.Invocation
+import org.http4k.aws.Region
 import org.http4k.aws.Role
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.ApiGatewayV1LambdaClient
+import org.http4k.client.ApiGatewayV2LambdaClient
+import org.http4k.client.ApplicationLoadBalancerLambdaClient
+import org.http4k.client.LambdaHttpClient
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
+import org.http4k.core.then
+import org.http4k.filter.debug
+import org.http4k.serverless.lambda.client.awsClientFor
 import org.http4k.serverless.lambda.client.awsLambdaApiClient
-import org.http4k.serverless.lambda.client.testFunctionClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.nio.ByteBuffer
 
 object DeployServerAsLambdaForClientContract {
 
-    fun deploy(version: LambdaIntegrationType) {
-        val functionName = functionName(version)
+    fun deploy(type: LambdaIntegrationType, clientFn: (Function, Region) -> LambdaHttpClient) {
+        val functionName = functionName(type)
 
         val config = awsCliUserProfiles().profile("default")
 
@@ -47,7 +53,7 @@ object DeployServerAsLambdaForClientContract {
 
         val functionPackage = FunctionPackage(
             functionName,
-            FunctionHandler(version.functionMainClass()),
+            FunctionHandler(type.functionMainClass()),
             ByteBuffer.wrap(lambdaBinary.readBytes()),
             Role(config["lambda_runtime_role"])
         )
@@ -60,7 +66,8 @@ object DeployServerAsLambdaForClientContract {
         assertThat(lambdaApiClient.list().find { it.name == functionName.value }, present())
 
         println("Performing a test request...")
-        val client = config.testFunctionClient(ApiGatewayV1, ::ApiGatewayV1LambdaClient)
+        val client = clientFn(functionName(type), Region(config.region))
+            .then(config.awsClientFor("lambda").debug())
         val functionResponse = client(Request(Method.POST, "/echo")
             .query("query1", "queryValue1")
             .query("query1", "queryValue2")
@@ -94,7 +101,9 @@ object DeployServerAsLambdaForClientContract {
 }
 
 fun main() {
-//    DeployServerAsLambdaForClientContract.deploy(ApiGatewayV1)
-    LambdaIntegrationType.values().forEach(DeployServerAsLambdaForClientContract::deploy)
+//    DeployServerAsLambdaForClientContract.deploy(Invocation, ::InvocationLambdaClient)
+    DeployServerAsLambdaForClientContract.deploy(ApiGatewayV1, ::ApiGatewayV1LambdaClient)
+    DeployServerAsLambdaForClientContract.deploy(ApiGatewayV2, ::ApiGatewayV2LambdaClient)
+    DeployServerAsLambdaForClientContract.deploy(ApplicationLoadBalancer, ::ApplicationLoadBalancerLambdaClient)
 }
 
