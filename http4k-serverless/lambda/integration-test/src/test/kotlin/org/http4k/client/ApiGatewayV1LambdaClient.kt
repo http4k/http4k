@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.http4k.aws.Function
 import org.http4k.aws.Region
+import org.http4k.base64Decoded
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -23,7 +24,7 @@ class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpC
         val response = responseLens(this)
         return Response(Status(response.statusCode, ""))
             .headers(response.headers.map { kv -> kv.toPair() })
-            .body(response.body)
+            .body((if(response.isBase64Encoded == true) response.body?.base64Decoded() else response.body) ?: "")
     }
 
     private val requestLens = Body.auto<APIGatewayProxyRequestEvent>().toLens()

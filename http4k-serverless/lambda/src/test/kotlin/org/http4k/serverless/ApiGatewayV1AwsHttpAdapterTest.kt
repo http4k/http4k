@@ -83,8 +83,9 @@ class ApiGatewayV1AwsHttpAdapterTest {
             ),
             equalTo(APIGatewayProxyResponseEvent().apply {
                 statusCode = 418
-                body = "output body"
+                body = "output body".base64Encode()
                 headers = mapOf("c" to "d")
+                isBase64Encoded = true
             })
         )
     }

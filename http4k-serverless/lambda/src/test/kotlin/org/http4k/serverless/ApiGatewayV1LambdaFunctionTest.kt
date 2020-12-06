@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -44,8 +45,9 @@ class ApiGatewayV1LambdaFunctionTest {
             equalTo(
                 APIGatewayProxyResponseEvent().apply {
                     statusCode = 200
-                    body = "hello there"
+                    body = "hello there".base64Encode()
                     headers = mapOf("a" to "b")
+                    isBase64Encoded = true
                 })
         )
     }

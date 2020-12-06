@@ -2,10 +2,11 @@ package org.http4k.serverless
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 
 class ApiGatewayV2LambdaFunctionTest {
@@ -32,7 +33,7 @@ class ApiGatewayV2LambdaFunctionTest {
                     .header("c", "d")
                     .body("input body")
                 ))
-                Response(Status.OK).header("a", "b").body("hello there")
+                Response(OK).header("a", "b").body("hello there")
             }
         }) {}
 
@@ -43,9 +44,10 @@ class ApiGatewayV2LambdaFunctionTest {
                 mapOf(
                     "statusCode" to 200,
                     "cookies" to emptyList<String>(),
-                    "body" to "hello there",
+                    "body" to "hello there".base64Encode(),
                     "headers" to mapOf("a" to "b"),
                     "multiValueHeaders" to mapOf("a" to listOf("b")),
+                    "isBase64Encoded" to true
                 )
             )
         )

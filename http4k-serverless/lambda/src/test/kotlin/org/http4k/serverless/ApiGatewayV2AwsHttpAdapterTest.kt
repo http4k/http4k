@@ -10,7 +10,7 @@ import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.hamkrest.hasBody
@@ -19,7 +19,7 @@ import org.http4k.hamkrest.hasMethod
 import org.http4k.hamkrest.hasUri
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Base64
 
 class ApiGatewayV2AwsHttpAdapterTest {
 
@@ -92,20 +92,19 @@ class ApiGatewayV2AwsHttpAdapterTest {
 
     @Test
     fun `converts from http4k response`() {
-        val response = mapOf(
-            "statusCode" to 418,
-            "body" to "output body",
-            "cookies" to emptyList<String>(),
-            "multiValueHeaders" to mapOf("c" to listOf("d")),
-            "headers" to mapOf("c" to "d"),
-        )
-
         assertThat(
-            ApiGatewayV2AwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
+            ApiGatewayV2AwsHttpAdapter(Response(I_M_A_TEAPOT)
                 .header("c", "d")
                 .body("output body")
             ),
-            equalTo(response)
+            equalTo(mapOf(
+                "statusCode" to 418,
+                "body" to "output body".base64Encode(),
+                "cookies" to emptyList<String>(),
+                "multiValueHeaders" to mapOf("c" to listOf("d")),
+                "headers" to mapOf("c" to "d"),
+                "isBase64Encoded" to true,
+            ))
         )
     }
 }

@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerReque
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
 import org.http4k.aws.Function
 import org.http4k.aws.Region
+import org.http4k.base64Decoded
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -28,7 +29,7 @@ class ApplicationLoadBalancerLambdaClient(function: Function, region: Region) : 
                 .headers((response.multiValueHeaders ?: emptyMap()).entries.fold(listOf(), { acc, next ->
                     next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
                 }))
-                .body(response.body.orEmpty())
+            .body((if(response.isBase64Encoded) response.body?.base64Decoded() else response.body) ?: "")
     }
 
     private val requestLens = Body.auto<ApplicationLoadBalancerRequestEvent>().toLens()

@@ -21,7 +21,8 @@ class RequestContent(
     private val queryStringParameters: Map<String, String>?,
     private val rawQueryString: String?,
     private val reqBody: String?,
-    private val reqBase64: Boolean?, private val reqMethod: String,
+    private val reqBase64: Boolean?,
+    private val reqMethod: String,
     private val reqHeaders: Map<String, List<String>>?,
     private val cookies: List<String>) {
 
@@ -37,5 +38,4 @@ class RequestContent(
         val query = queryStringParameters?.toList() ?: Uri.of(rawQueryString.orEmpty()).queries()
         return Uri.of(path).query(query.toUrlFormEncoded())
     }
-
 }

@@ -3,6 +3,7 @@ package org.http4k.client
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import org.http4k.aws.Function
 import org.http4k.aws.Region
+import org.http4k.base64Decoded
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -30,7 +31,7 @@ class ApiGatewayV2LambdaClient(function: Function, region: Region) : LambdaHttpC
                 next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
             }))
             .headers((response.cookies ?: emptyList()).fold(listOf(), { acc, next -> acc + ("set-cookie" to next) }))
-            .body(response.body.orEmpty())
+            .body((if(response.isBase64Encoded) response.body?.base64Decoded() else response.body) ?: "")
     }
 
     private val requestLens = Body.auto<AwsGatewayProxyRequestV2>().toLens()

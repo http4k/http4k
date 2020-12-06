@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
+import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 
@@ -29,6 +30,7 @@ object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBal
     override fun invoke(resp: Response) = ApplicationLoadBalancerResponseEvent().also {
         it.statusCode = resp.status.code
         it.headers = resp.headers.toMap()
-        it.body = resp.bodyString()
+        it.body = resp.bodyString().base64Encode()
+        it.isBase64Encoded = true
     }
 }

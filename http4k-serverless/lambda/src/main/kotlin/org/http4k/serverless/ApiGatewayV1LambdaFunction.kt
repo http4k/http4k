@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
+import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 
@@ -28,7 +29,8 @@ object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<APIGatewayProxyRequestEvent, 
     override fun invoke(resp: Response) = APIGatewayProxyResponseEvent().also {
         it.statusCode = resp.status.code
         it.headers = resp.headers.toMap()
-        it.body = resp.bodyString()
+        it.body = resp.bodyString().base64Encode()
+        it.isBase64Encoded = true
     }
 }
 

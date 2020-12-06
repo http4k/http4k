@@ -2,6 +2,7 @@ package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.MemoryBody
@@ -63,7 +64,8 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
             "headers" to nonCookies.toMap(),
             "multiValueHeaders" to nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap(),
             "cookies" to resp.cookies().map(Cookie::fullCookieString),
-            "body" to resp.bodyString()
+            "body" to resp.bodyString().base64Encode(),
+            "isBase64Encoded" to true
         )
     }
 }
