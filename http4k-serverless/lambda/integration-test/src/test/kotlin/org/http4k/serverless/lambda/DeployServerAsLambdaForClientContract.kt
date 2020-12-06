@@ -22,17 +22,19 @@ import org.http4k.client.ApiGatewayV2LambdaClient
 import org.http4k.client.ApplicationLoadBalancerLambdaClient
 import org.http4k.client.InvocationLambdaClient
 import org.http4k.client.LambdaHttpClient
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
-import org.http4k.filter.debug
 import org.http4k.serverless.lambda.client.awsClientFor
 import org.http4k.serverless.lambda.client.awsLambdaApiClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
+import java.io.PrintStream
 import java.nio.ByteBuffer
 
 object DeployServerAsLambdaForClientContract {
@@ -68,7 +70,7 @@ object DeployServerAsLambdaForClientContract {
 
         println("Performing a test request...")
         val client = clientFn(functionName(type), Region(config.region))
-            .then(config.awsClientFor("lambda").debug())
+            .then(config.awsClientFor("lambda").debugBodies())
         val functionResponse = client(Request(POST, "/")
             .query("query1", "queryValue1")
             .query("query1", "queryValue2")
@@ -110,3 +112,9 @@ fun main() {
     }
 }
 
+private fun HttpHandler.debugBodies(out: PrintStream = System.out) = Filter { next ->
+    {
+        out.println("******** REQUEST ${it.method} ${it.uri}\n" + it.bodyString())
+        next(it).also { r -> out.println("******** RESPONSE ${it.method} ${it.uri}\n" + r.bodyString()) }
+    }
+}.then(this)
