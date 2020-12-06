@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.aws.AwsLambdaApiClient
 import org.http4k.aws.Function
 import org.http4k.aws.FunctionHandler
 import org.http4k.aws.FunctionPackage
@@ -15,14 +14,13 @@ import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.aws.LambdaIntegrationType.Invocation
-import org.http4k.aws.Region
 import org.http4k.aws.Role
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.ApiGatewayV1LambdaClient
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.serverless.lambda.client.awsClientFor
+import org.http4k.serverless.lambda.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.client.testFunctionClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
@@ -40,7 +38,7 @@ object DeployServerAsLambdaForClientContract {
 
         assumeTrue(lambdaBinary.exists(), "lambda binary to deploy (${lambdaBinary.absolutePath}) needs to be available")
 
-        val lambdaApiClient = AwsLambdaApiClient(config.awsClientFor("lambda"), Region(config.region))
+        val lambdaApiClient = config.awsLambdaApiClient()
 
         println("Deleting existing function (if exists)...")
         lambdaApiClient.delete(functionName)
