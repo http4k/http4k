@@ -30,6 +30,6 @@ object InvocationLambdaAwsHttpAdapter : AwsHttpAdapter<InputStream, InputStream>
             .header("X-Amz-Invocation-Type", "RequestResponse")
             .header("X-Amz-Log-Type", "Tail").body(req)
 
-    override fun invoke(req: Response) = req.body.stream
+    override fun invoke(resp: Response) = resp.body.stream
 }
 

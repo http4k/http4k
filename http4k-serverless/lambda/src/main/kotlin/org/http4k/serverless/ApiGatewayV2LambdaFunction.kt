@@ -56,14 +56,14 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
 
     override fun invoke(req: Map<String, Any>, ctx: Context): Request = req.toHttp4kRequest()
 
-    override fun invoke(req: Response): Map<String, Any> {
-        val nonCookies = req.headers.filterNot { it.first.toLowerCase() == "set-cookie" }
+    override fun invoke(resp: Response): Map<String, Any> {
+        val nonCookies = resp.headers.filterNot { it.first.toLowerCase() == "set-cookie" }
         return mapOf(
-            "statusCode" to req.status.code,
+            "statusCode" to resp.status.code,
             "headers" to nonCookies.toMap(),
             "multiValueHeaders" to nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap(),
-            "cookies" to req.cookies().map(Cookie::fullCookieString),
-            "body" to req.bodyString()
+            "cookies" to resp.cookies().map(Cookie::fullCookieString),
+            "body" to resp.bodyString()
         )
     }
 }

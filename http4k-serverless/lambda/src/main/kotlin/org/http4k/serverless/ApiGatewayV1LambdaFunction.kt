@@ -25,10 +25,10 @@ object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<APIGatewayProxyRequestEvent, 
         RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, (req.headers
             ?: emptyMap()).mapValues { listOf(it.value) }, emptyList()).asHttp4k()
 
-    override fun invoke(req: Response) = APIGatewayProxyResponseEvent().also {
-        it.statusCode = req.status.code
-        it.headers = req.headers.toMap()
-        it.body = req.bodyString()
+    override fun invoke(resp: Response) = APIGatewayProxyResponseEvent().also {
+        it.statusCode = resp.status.code
+        it.headers = resp.headers.toMap()
+        it.body = resp.bodyString()
     }
 }
 

@@ -13,7 +13,7 @@ import java.util.Base64
 
 interface AwsHttpAdapter<Req, Resp> {
     operator fun invoke(req: Req, ctx: Context): Request
-    operator fun invoke(req: Response): Resp
+    operator fun invoke(resp: Response): Resp
 }
 
 class RequestContent(
