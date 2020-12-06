@@ -6,8 +6,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import org.http4k.aws.Function
 import org.http4k.aws.FunctionHandler
-import org.http4k.aws.FunctionName
 import org.http4k.aws.FunctionPackage
 import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
@@ -61,7 +61,7 @@ object DeployServerAsLambdaForClientContract {
         assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
     }
 
-    fun functionName(version: LambdaIntegrationType) = FunctionName("test-function-${version.functionNamePrefix()}")
+    fun functionName(version: LambdaIntegrationType) = Function("test-function-${version.functionNamePrefix()}")
 
     private fun LambdaIntegrationType.functionMainClass(): String = when (this) {
         ApiGatewayV1 -> "org.http4k.serverless.lambda.TestFunctionV1"

@@ -1,6 +1,6 @@
 package org.http4k.client
 
-import org.http4k.aws.FunctionName
+import org.http4k.aws.Function
 import org.http4k.aws.Region
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -9,14 +9,19 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.SetAwsServiceUrl
 
-abstract class LambdaHttpClient(functionName: FunctionName, region: Region) : Filter {
-    private fun callFunction(functionName: FunctionName) = Filter { next ->
+abstract class LambdaHttpClient(function: Function, region: Region) : Filter {
+    private fun createFunctionRequest(function: Function) = Filter { next ->
         {
-            extract(next(Request(POST, "/2015-03-31/functions/${functionName.value}/invocations")
-                .header("X-Amz-Invocation-Type", "RequestResponse")
-                .header("X-Amz-Log-Type", "Tail")
-                .with(inject(it))))
+            extract(
+                next(
+                    Request(POST, "/2015-03-31/functions/${function.value}/invocations")
+                        .header("X-Amz-Invocation-Type", "RequestResponse")
+                        .header("X-Amz-Log-Type", "Tail")
+                        .with(inject(it)))
+            )
         }
     }
 
@@ -24,7 +29,8 @@ abstract class LambdaHttpClient(functionName: FunctionName, region: Region) : Fi
 
     protected abstract fun extract(lambdaResponse: Response): Response
 
-    private val filter = callFunction(functionName).then(LambdaApi(region))
+    private val filter = createFunctionRequest(function)
+        .then(ClientFilters.SetAwsServiceUrl("lambda", region.name))
 
     override fun invoke(handler: HttpHandler): HttpHandler = filter(handler)
 }

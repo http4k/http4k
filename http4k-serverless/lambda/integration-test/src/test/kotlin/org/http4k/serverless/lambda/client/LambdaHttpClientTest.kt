@@ -1,6 +1,6 @@
 package org.http4k.serverless.lambda.client
 
-import org.http4k.aws.FunctionName
+import org.http4k.aws.Function
 import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 
 abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
-                                    clientFn: (FunctionName, Region) -> LambdaHttpClient) :
+                                    clientFn: (Function, Region) -> LambdaHttpClient) :
     HttpClientContract({ NoOpServerConfig }, testFunctionClient(type, clientFn), testFunctionClient(type, clientFn)) {
 
     override fun `handles response with custom status message`() = unsupportedFeature()
