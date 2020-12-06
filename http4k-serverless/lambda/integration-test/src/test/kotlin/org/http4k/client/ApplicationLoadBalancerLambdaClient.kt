@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRespo
 import org.http4k.aws.Function
 import org.http4k.aws.Region
 import org.http4k.base64Decoded
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -15,7 +16,8 @@ import org.http4k.format.Jackson.auto
 class ApplicationLoadBalancerLambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
     override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of ApplicationLoadBalancerRequestEvent().apply {
         httpMethod = method.name
-        body = bodyString()
+        body = bodyString().base64Encode()
+        isBase64Encoded = true
         headers = this@toLambdaFormat.headers.toMap()
         path = uri.path
         queryStringParameters = uri.query.toParameters().toMap()

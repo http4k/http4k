@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.http4k.aws.Function
 import org.http4k.aws.Region
 import org.http4k.base64Decoded
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -18,7 +19,8 @@ class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpC
         .withHeaders(headers.toMap())
         .withPath(uri.path)
         .withQueryStringParameters(uri.query.toParameters().toMap())
-        .withBody(bodyString())
+        .withBody(bodyString().base64Encode())
+        .withIsBase64Encoded(true)
 
     override fun Response.fromLambdaFormat(): Response {
         val response = responseLens(this)

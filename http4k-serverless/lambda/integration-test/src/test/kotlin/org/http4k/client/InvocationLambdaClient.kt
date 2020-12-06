@@ -18,5 +18,4 @@ class InvocationLambdaClient(function: Function, region: Region) :
 
     private val requestLens = Body.string(ContentType.TEXT_PLAIN).toLens()
     private val responseLens = Body.string(ContentType.TEXT_PLAIN).toLens()
-
 }

@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import org.http4k.aws.Function
 import org.http4k.aws.Region
 import org.http4k.base64Decoded
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -18,7 +19,8 @@ class ApiGatewayV2LambdaClient(function: Function, region: Region) : LambdaHttpC
     override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of AwsGatewayProxyRequestV2(requestContext = RequestContext(Http(method.name))).apply {
         rawPath = uri.path
         queryStringParameters = uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
-        body = bodyString()
+        body = bodyString().base64Encode()
+        isBase64Encoded = true
         headers = this@toLambdaFormat.headers.groupBy { it.first }.mapValues { (_, v) -> v.map { it.second }.joinToString(",") }
     }
 
