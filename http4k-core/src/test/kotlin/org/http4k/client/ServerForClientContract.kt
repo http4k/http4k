@@ -91,6 +91,7 @@ object ServerForClientContract : HttpHandler {
             Response(OK).cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar"))
         },
         "/boom" bind GET to { throw IllegalArgumentException("BOOM!") },
+        "/" bind POST to { Response(OK).body(it.toMessage()) },
     )
 }
 

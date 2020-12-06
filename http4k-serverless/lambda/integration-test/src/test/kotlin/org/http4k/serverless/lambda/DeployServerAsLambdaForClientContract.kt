@@ -22,9 +22,9 @@ import org.http4k.client.ApiGatewayV2LambdaClient
 import org.http4k.client.ApplicationLoadBalancerLambdaClient
 import org.http4k.client.InvocationLambdaClient
 import org.http4k.client.LambdaHttpClient
-import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
@@ -69,7 +69,7 @@ object DeployServerAsLambdaForClientContract {
         println("Performing a test request...")
         val client = clientFn(functionName(type), Region(config.region))
             .then(config.awsClientFor("lambda").debug())
-        val functionResponse = client(Request(Method.POST, "/echo")
+        val functionResponse = client(Request(POST, "/")
             .query("query1", "queryValue1")
             .query("query1", "queryValue2")
             .query("query2", "queryValue3")
@@ -80,7 +80,7 @@ object DeployServerAsLambdaForClientContract {
             .cookie(Cookie("cookie2", "value2"))
             .body("""{"hello":"http4k"}"""))
 
-        assertThat(functionResponse.status, equalTo(Status.OK))
+        assertThat(functionResponse.status, equalTo(OK))
         assertThat(functionResponse.bodyString(), containsSubstring("""{"hello":"http4k"}"""))
     }
 
