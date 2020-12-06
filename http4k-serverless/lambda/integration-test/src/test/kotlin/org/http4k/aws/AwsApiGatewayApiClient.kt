@@ -2,23 +2,25 @@ package org.http4k.aws
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.http4k.aws.ApiGatewayJackson.auto
+import org.http4k.aws.ApiIntegrationVersion.v1
+import org.http4k.aws.ApiIntegrationVersion.v2
 import org.http4k.core.Body
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.SetAwsServiceUrl
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
-import org.http4k.aws.ApiGatewayJackson.auto
-import org.http4k.aws.ApiIntegrationVersion.*
 
 class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
-    private val client = ApiGatewayApi(region).then(rawClient)
+    private val client = ClientFilters.SetAwsServiceUrl("apigateway", region.name).then(rawClient)
 
     fun createApi(name: ApiName) =
         apiDetailsLens(client(Request(Method.POST, "/v2/apis").with(createApiLens of Api(name.value))))
@@ -61,12 +63,6 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     private data class IntegrationInfo(val integrationId: IntegrationId)
     private data class ListApiResponse(val items: List<ApiDetails>)
     private data class Route(val target: String, val routeKey: String = "\$default")
-
-    object ApiGatewayApi {
-        operator fun invoke(region: Region): Filter = Filter { next ->
-            { request -> next(request.uri(request.uri.host("apigateway.${region.name}.amazonaws.com").scheme("https"))) }
-        }
-    }
 }
 
 

@@ -10,16 +10,17 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
+import org.http4k.filter.SetAwsServiceUrl
+import org.http4k.filter.inIntelliJOnly
 import org.http4k.format.Jackson.auto
-import org.http4k.serverless.lambda.client.LambdaApi
-import org.http4k.serverless.lambda.inIntelliJOnly
 import java.nio.ByteBuffer
 import java.util.Base64
 
 class AwsLambdaApiClient(client: HttpHandler, region: Region) {
-    private val client = LambdaApi(region)
-        .then(inIntelliJOnly(DebuggingFilters.PrintRequestAndResponse()))
+    private val client = ClientFilters.SetAwsServiceUrl("lambda", region.name)
+        .then(PrintRequestAndResponse().inIntelliJOnly())
         .then(client)
 
     fun create(functionPackage: FunctionPackage): FunctionDetails {
@@ -42,8 +43,8 @@ class AwsLambdaApiClient(client: HttpHandler, region: Region) {
         return FunctionDetails(details.arn, details.name)
     }
 
-    fun delete(functionName: FunctionName) {
-        client(Request(DELETE, Uri.of("/2015-03-31/functions/${functionName.value}")))
+    fun delete(function: Function) {
+        client(Request(DELETE, Uri.of("/2015-03-31/functions/${function.value}")))
     }
 
     fun list() =
@@ -90,7 +91,7 @@ class AwsLambdaApiClient(client: HttpHandler, region: Region) {
 }
 
 data class FunctionPackage(
-    val name: FunctionName,
+    val name: Function,
     val handler: FunctionHandler,
     val jar: ByteBuffer,
     val role: Role,
@@ -98,7 +99,7 @@ data class FunctionPackage(
     val timeoutInSeconds: Int = 15
 )
 
-data class FunctionName(val value: String)
+data class Function(val value: String)
 
 data class FunctionHandler(val value: String)
 

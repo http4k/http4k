@@ -34,7 +34,7 @@ import java.nio.ByteBuffer
 
 abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
                                   val client: HttpHandler,
-                                  private val timeoutClient: HttpHandler) : AbstractHttpClientContract(serverConfig) {
+                                  private val timeoutClient: HttpHandler = client) : AbstractHttpClientContract(serverConfig) {
 
     @Test
     open fun `can forward response body to another request`() {
@@ -240,8 +240,9 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
+    @Disabled
     open fun `unhandled exceptions converted into 500`() {
-        val response = timeoutClient(Request(GET, "http://localhost:$port/boom"))
+        val response = client(Request(GET, "http://localhost:$port/boom"))
 
         assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
     }

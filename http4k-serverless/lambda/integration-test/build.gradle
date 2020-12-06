@@ -11,7 +11,7 @@ dependencies {
     compile Libs.aws_lambda_java_events
     compile project(path: ":http4k-core", configuration: 'testArtifacts')
 
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile project(path: ":http4k-aws", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }
 

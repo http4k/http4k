@@ -6,20 +6,21 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import org.http4k.aws.Function
 import org.http4k.aws.FunctionHandler
-import org.http4k.aws.FunctionName
 import org.http4k.aws.FunctionPackage
 import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.aws.LambdaIntegrationType.Invocation
+import org.http4k.aws.Role
+import org.http4k.aws.awsCliUserProfiles
+import org.http4k.client.ApiGatewayV1LambdaClient
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.serverless.lambda.client.Config
-import org.http4k.serverless.lambda.client.awsConfig
-import org.http4k.serverless.lambda.client.lambdaApiClient
+import org.http4k.serverless.lambda.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.client.testFunctionClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
@@ -30,19 +31,23 @@ object DeployServerAsLambdaForClientContract {
     fun deploy(version: LambdaIntegrationType) {
         val functionName = functionName(version)
 
+        val config = awsCliUserProfiles().profile("default")
+
         val lambdaBinary =
             File("test-function/build/distributions/test-function-LOCAL.zip")
 
         assumeTrue(lambdaBinary.exists(), "lambda binary to deploy (${lambdaBinary.absolutePath}) needs to be available")
+
+        val lambdaApiClient = config.awsLambdaApiClient()
 
         println("Deleting existing function (if exists)...")
         lambdaApiClient.delete(functionName)
 
         val functionPackage = FunctionPackage(
             functionName,
-            FunctionHandler(functionMainClass(version)),
+            FunctionHandler(version.functionMainClass()),
             ByteBuffer.wrap(lambdaBinary.readBytes()),
-            Config.role(awsConfig)
+            Role(config["lambda_runtime_role"])
         )
 
         println("Deploying function...")
@@ -53,15 +58,16 @@ object DeployServerAsLambdaForClientContract {
         assertThat(lambdaApiClient.list().find { it.name == functionName.value }, present())
 
         println("Performing a test request...")
-        val functionResponse = testFunctionClient(Request(Method.POST, "/echo").body("Hello, http4k"))
+        val client = config.testFunctionClient(ApiGatewayV1, ::ApiGatewayV1LambdaClient)
+        val functionResponse = client(Request(Method.POST, "/echo").body("Hello, http4k"))
 
         assertThat(functionResponse.status, equalTo(Status.OK))
         assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
     }
 
-    fun functionName(version: LambdaIntegrationType) = FunctionName("test-function-${version.functionNamePrefix()}")
+    fun functionName(version: LambdaIntegrationType) = Function("test-function-${version.functionNamePrefix()}")
 
-    private fun functionMainClass(version: LambdaIntegrationType): String = when (version) {
+    private fun LambdaIntegrationType.functionMainClass(): String = when (this) {
         ApiGatewayV1 -> "org.http4k.serverless.lambda.TestFunctionV1"
         ApiGatewayV2 -> "org.http4k.serverless.lambda.TestFunctionV2"
         ApplicationLoadBalancer -> "org.http4k.serverless.lambda.TestFunctionAlb"

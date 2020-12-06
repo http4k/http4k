@@ -3,6 +3,7 @@ package org.http4k.serverless.lambda.client
 import org.http4k.aws.ApiIntegrationVersion
 import org.http4k.aws.ApiIntegrationVersion.v1
 import org.http4k.aws.ApiIntegrationVersion.v2
+import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.HttpClientContract
 import org.http4k.client.OkHttp
 import org.http4k.core.Request
@@ -10,16 +11,18 @@ import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.inIntelliJOnly
 import org.http4k.serverless.lambda.DeployApiGateway.apiName
-import org.http4k.serverless.lambda.inIntelliJOnly
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 
 private fun client(version: ApiIntegrationVersion): (Request) -> Response {
-    val api = apiGatewayClient.listApis().find { it.name == apiName(version) }
+    val api = awsCliUserProfiles().profile("default")
+        .apiGatewayClient().listApis()
+        .find { it.name == apiName(version) }
         ?: throw TestAbortedException("API hasn't been deployed")
     val apiClient = ClientFilters.SetBaseUriFrom(api.apiEndpoint)
-        .then(inIntelliJOnly(DebuggingFilters.PrintRequestAndResponse()))
+        .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
         .then(OkHttp())
     return { request: Request -> apiClient(request) }
 }
