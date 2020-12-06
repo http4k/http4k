@@ -1,7 +1,6 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
-import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
@@ -76,19 +75,18 @@ class ApplicationLoadBalancerHttpAdapterTest {
 
     @Test
     fun `converts from http4k response`() {
-        val response = ApplicationLoadBalancerResponseEvent().apply {
-            statusCode = 418
-            body = "output body".base64Encode()
-            headers = mapOf("c" to "d")
-            isBase64Encoded = true
-        }
-
         assertThat(
             ApplicationLoadBalancerAwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
                 .header("c", "d")
+                .header("c", "e")
                 .body("output body")
             ),
-            equalTo(response)
+            equalTo(mapOf(
+                "statusCode" to 418,
+                "body" to "output body".base64Encode(),
+                "headers" to mapOf("c" to "e"),
+                "isBase64Encoded" to true,
+            ))
         )
     }
 }
