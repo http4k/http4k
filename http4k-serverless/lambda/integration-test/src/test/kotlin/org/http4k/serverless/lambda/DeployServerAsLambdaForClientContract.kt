@@ -94,7 +94,7 @@ object DeployServerAsLambdaForClientContract {
 }
 
 fun main() {
-    DeployServerAsLambdaForClientContract.deploy(ApiGatewayV1)
-//    LambdaIntegrationType.values().forEach(DeployServerAsLambdaForClientContract::deploy)
+//    DeployServerAsLambdaForClientContract.deploy(ApiGatewayV1)
+    LambdaIntegrationType.values().forEach(DeployServerAsLambdaForClientContract::deploy)
 }
 
