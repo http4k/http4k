@@ -66,14 +66,4 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
             "body" to req.bodyString()
         )
     }
-
-    fun Map<*, *>.getNested(name: String): Map<*, *>? = get(name) as? Map<*, *>
-    fun Map<*, *>.getString(name: String): String? = get(name) as? String
-    fun Map<*, *>.getBoolean(name: String): Boolean? = get(name) as? Boolean
-
-    @Suppress("UNCHECKED_CAST")
-    fun Map<*, *>.getStringMap(name: String): Map<String, String>? = get(name) as? Map<String, String>
-
-    @Suppress("UNCHECKED_CAST")
-    fun Map<*, *>.getStringList(name: String): List<String>? = get(name) as? List<String>
 }
