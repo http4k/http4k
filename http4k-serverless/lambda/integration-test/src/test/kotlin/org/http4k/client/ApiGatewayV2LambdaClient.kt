@@ -26,7 +26,7 @@ class ApiGatewayV2LambdaClient(functionName: FunctionName, region: Region) :
         val response = responseLens(lambdaResponse)
         return Response(Status(response.statusCode, ""))
             .headers((response.headers
-                ?: emptyMap()).entries.fold(listOf(), { acc, next -> acc + (next.key to next.value) }))
+                ?: emptyMap()).entries.fold(listOf()) { acc, next -> acc + (next.key to next.value) })
             .headers((response.multiValueHeaders ?: emptyMap()).entries.fold(listOf(), { acc, next ->
                 next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
             }))
