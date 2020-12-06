@@ -1,6 +1,7 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
+import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
 import org.http4k.core.HttpHandler
@@ -12,7 +13,8 @@ import org.http4k.core.Response
  * for further invocations.
  */
 abstract class ApplicationLoadBalancerLambdaFunction(appLoader: AppLoaderWithContexts)
-    : AwsLambdaFunction<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent>(ApplicationLoadBalancerAwsHttpAdapter, appLoader) {
+    : AwsLambdaFunction<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent>(ApplicationLoadBalancerAwsHttpAdapter, appLoader),
+    RequestHandler<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
@@ -21,7 +23,8 @@ abstract class ApplicationLoadBalancerLambdaFunction(appLoader: AppLoaderWithCon
 
 object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBalancerRequestEvent, ApplicationLoadBalancerResponseEvent> {
     override fun invoke(req: ApplicationLoadBalancerRequestEvent, ctx: Context) =
-        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, (req.headers?: emptyMap()).mapValues { listOf(it.value) }, emptyList()).asHttp4k()
+        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, (req.headers
+            ?: emptyMap()).mapValues { listOf(it.value) }, emptyList()).asHttp4k()
 
     override fun invoke(req: Response) = ApplicationLoadBalancerResponseEvent().also {
         it.statusCode = req.status.code

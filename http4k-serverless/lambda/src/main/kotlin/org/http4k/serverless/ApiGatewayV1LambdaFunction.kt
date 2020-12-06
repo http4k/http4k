@@ -1,6 +1,7 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
+import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.http4k.core.HttpHandler
@@ -12,7 +13,7 @@ import org.http4k.core.Response
  * for further invocations.
  */
 abstract class ApiGatewayV1LambdaFunction(appLoader: AppLoaderWithContexts)
-    : AwsLambdaFunction<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>(ApiGatewayV1AwsHttpAdapter, appLoader) {
+    : AwsLambdaFunction<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>(ApiGatewayV1AwsHttpAdapter, appLoader), RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
@@ -21,7 +22,8 @@ abstract class ApiGatewayV1LambdaFunction(appLoader: AppLoaderWithContexts)
 
 object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     override fun invoke(req: APIGatewayProxyRequestEvent, ctx: Context) =
-        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, (req.headers?: emptyMap()).mapValues { listOf(it.value) }, emptyList()).asHttp4k()
+        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, (req.headers
+            ?: emptyMap()).mapValues { listOf(it.value) }, emptyList()).asHttp4k()
 
     override fun invoke(req: Response) = APIGatewayProxyResponseEvent().also {
         it.statusCode = req.status.code

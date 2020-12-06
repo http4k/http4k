@@ -20,6 +20,7 @@ import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.ApiGatewayV1LambdaClient
 import org.http4k.client.ApiGatewayV2LambdaClient
 import org.http4k.client.ApplicationLoadBalancerLambdaClient
+import org.http4k.client.InvocationLambdaClient
 import org.http4k.client.LambdaHttpClient
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -101,9 +102,11 @@ object DeployServerAsLambdaForClientContract {
 }
 
 fun main() {
-//    DeployServerAsLambdaForClientContract.deploy(Invocation, ::InvocationLambdaClient)
-    DeployServerAsLambdaForClientContract.deploy(ApiGatewayV1, ::ApiGatewayV1LambdaClient)
-    DeployServerAsLambdaForClientContract.deploy(ApiGatewayV2, ::ApiGatewayV2LambdaClient)
-    DeployServerAsLambdaForClientContract.deploy(ApplicationLoadBalancer, ::ApplicationLoadBalancerLambdaClient)
+    DeployServerAsLambdaForClientContract.apply {
+        deploy(ApiGatewayV1, ::ApiGatewayV1LambdaClient)
+        deploy(ApiGatewayV2, ::ApiGatewayV2LambdaClient)
+        deploy(ApplicationLoadBalancer, ::ApplicationLoadBalancerLambdaClient)
+        deploy(Invocation, ::InvocationLambdaClient)
+    }
 }
 

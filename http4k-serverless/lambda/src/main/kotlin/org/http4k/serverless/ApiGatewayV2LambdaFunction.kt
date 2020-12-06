@@ -1,6 +1,7 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
+import com.amazonaws.services.lambda.runtime.RequestHandler
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.MemoryBody
@@ -21,7 +22,8 @@ import java.util.Base64
  * for further invocations.
  */
 abstract class ApiGatewayV2LambdaFunction(appLoader: AppLoaderWithContexts)
-    : AwsLambdaFunction<Map<String, Any>, Map<String, Any>>(ApiGatewayV2AwsHttpAdapter, appLoader) {
+    : AwsLambdaFunction<Map<String, Any>, Map<String, Any>>(ApiGatewayV2AwsHttpAdapter, appLoader),
+    RequestHandler<Map<String, Any>, Map<String, Any>> {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
