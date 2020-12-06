@@ -20,6 +20,8 @@ import org.http4k.client.ApiGatewayV1LambdaClient
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
 import org.http4k.serverless.lambda.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.client.testFunctionClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
@@ -59,10 +61,19 @@ object DeployServerAsLambdaForClientContract {
 
         println("Performing a test request...")
         val client = config.testFunctionClient(ApiGatewayV1, ::ApiGatewayV1LambdaClient)
-        val functionResponse = client(Request(Method.POST, "/echo").body("Hello, http4k"))
+        val functionResponse = client(Request(Method.POST, "/echo")
+            .query("query1", "queryValue1")
+            .query("query1", "queryValue2")
+            .query("query2", "queryValue3")
+            .header("single", "value1")
+            .header("multi", "value2")
+            .header("multi", "value3")
+            .cookie(Cookie("cookie1", "value1"))
+            .cookie(Cookie("cookie2", "value2"))
+            .body("""{"hello":"http4k"}"""))
 
         assertThat(functionResponse.status, equalTo(Status.OK))
-        assertThat(functionResponse.bodyString(), containsSubstring("Hello, http4k"))
+        assertThat(functionResponse.bodyString(), containsSubstring("""{"hello":"http4k"}"""))
     }
 
     fun functionName(version: LambdaIntegrationType) = Function("test-function-${version.functionNamePrefix()}")
@@ -83,6 +94,7 @@ object DeployServerAsLambdaForClientContract {
 }
 
 fun main() {
-    LambdaIntegrationType.values().forEach(DeployServerAsLambdaForClientContract::deploy)
+    DeployServerAsLambdaForClientContract.deploy(ApiGatewayV1)
+//    LambdaIntegrationType.values().forEach(DeployServerAsLambdaForClientContract::deploy)
 }
 
