@@ -8,6 +8,7 @@ import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.Stage
+import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Timeout
 import org.http4k.core.Method.GET
@@ -17,33 +18,39 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
 import org.http4k.serverless.lambda.client.apiGatewayClient
-import org.http4k.serverless.lambda.client.lambdaApiClient
+import org.http4k.serverless.lambda.client.awsLambdaApiClient
 import org.junit.jupiter.api.fail
 import java.time.Duration
 import java.time.Instant
 
 object DeployApiGateway {
 
-    fun deploy(version: ApiIntegrationVersion) {
-        val functionName = functionName(version.integrationType())
-        val apiName = apiName(version)
+    fun deploy(integrationVersion: ApiIntegrationVersion) {
 
-        val functionArn = lambdaApiClient.list().find { it.name == functionName.value }?.arn
+        val config = awsCliUserProfiles().profile("default")
+
+        val functionName = functionName(integrationVersion.integrationType())
+
+        val lambdaApi = config.awsLambdaApiClient()
+
+        val functionArn = lambdaApi.list().find { it.name == functionName.value }?.arn
             ?: error("Lambda ${functionName.value} does not exist.")
 
-        val apis = apiGatewayClient.listApis()
+        val apiGateway = config.apiGatewayClient()
 
-        apis.filter { it.name == apiName }.forEach {
+        val apis = apiGateway.listApis()
+
+        apis.filter { it.name == apiName(integrationVersion) }.forEach {
             println("Deleting ${it.apiId.value}")
-            apiGatewayClient.delete(it.apiId)
+            apiGateway.delete(it.apiId)
         }
 
-        val api = apiGatewayClient.createApi(apiName)
-        apiGatewayClient.createStage(api.apiId, Stage.default)
+        val api = apiGateway.createApi(apiName(integrationVersion))
+        apiGateway.createStage(api.apiId, Stage.default)
 
-        val integrationId = apiGatewayClient.createLambdaIntegration(api.apiId, functionArn, version)
+        val integrationId = apiGateway.createLambdaIntegration(api.apiId, functionArn, integrationVersion)
 
-        apiGatewayClient.createDefaultRoute(api.apiId, integrationId)
+        apiGateway.createDefaultRoute(api.apiId, integrationId)
 
         waitUntil(OK) {
             JavaHttpClient()(Request(GET, api.apiEndpoint.path("/empty"))).also { println(it.status) }

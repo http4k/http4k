@@ -7,6 +7,7 @@ import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.aws.Region
+import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.ApiGatewayV1LambdaClient
 import org.http4k.client.ApiGatewayV2LambdaClient
 import org.http4k.client.ApplicationLoadBalancerLambdaClient
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.Disabled
 
 abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
                                     clientFn: (Function, Region) -> LambdaHttpClient) :
-    HttpClientContract({ NoOpServerConfig }, testFunctionClient(type, clientFn), testFunctionClient(type, clientFn)) {
+    HttpClientContract({ NoOpServerConfig }, awsCliUserProfiles().profile().testFunctionClient(type, clientFn)) {
 
     override fun `handles response with custom status message`() = unsupportedFeature()
     override fun `connection refused are converted into 503`() = unsupportedFeature()

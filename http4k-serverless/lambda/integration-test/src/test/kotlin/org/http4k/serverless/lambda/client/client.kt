@@ -1,53 +1,30 @@
 package org.http4k.serverless.lambda.client
 
 import org.http4k.aws.AwsApiGatewayApiClient
-import org.http4k.aws.AwsCredentialScope
-import org.http4k.aws.AwsCredentials
 import org.http4k.aws.AwsLambdaApiClient
+import org.http4k.aws.AwsProfile
 import org.http4k.aws.Function
 import org.http4k.aws.LambdaIntegrationType
 import org.http4k.aws.Region
-import org.http4k.aws.Role
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.LambdaHttpClient
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
-import org.http4k.core.Filter
-import org.http4k.core.NoOp
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.filter.inIntelliJOnly
-import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract
-import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
 
-fun testFunctionClient(type: LambdaIntegrationType, clientFn: (Function, Region) -> LambdaHttpClient) =
-    clientFn(DeployServerAsLambdaForClientContract.functionName(type), Config.region(awsConfig)).then(awsClient("lambda"))
+fun AwsProfile.testFunctionClient(type: LambdaIntegrationType, clientFn: (Function, Region) -> LambdaHttpClient) =
+    clientFn(functionName(type), Region(region))
+        .then(awsClientFor("lambda"))
 
-val lambdaApiClient by lazy { AwsLambdaApiClient(awsClient("lambda"), Config.region(awsConfig)) }
+fun AwsProfile.apiGatewayClient() = AwsApiGatewayApiClient(awsClientFor("apigateway"), Region(region))
 
-val apiGatewayClient by lazy { AwsApiGatewayApiClient(awsClient("apigateway"), Config.region(awsConfig)) }
+fun AwsProfile.awsLambdaApiClient() = AwsLambdaApiClient(awsClientFor("lambda"), Region(region))
 
-private fun awsClient(service: String) = Filter.NoOp
-    .then(ClientFilters.AwsAuth(Config.scope(awsConfig, service), Config.credentials(awsConfig)))
-    .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
-    .then(JavaHttpClient())
+fun AwsProfile.awsClientFor(service: String) =
+    ClientFilters.AwsAuth(scopeFor(service), credentials)
+        .then(PrintRequestAndResponse().inIntelliJOnly())
+        .then(JavaHttpClient())
 
-val awsConfig by lazy {
-    assumeTrue(AwsLambdaApiClient::class.java.getResourceAsStream("/local.properties") != null,
-        "local.properties must exist for this test to run")
-    Environment.ENV overrides Environment.fromResource("/local.properties")
-}
-
-object Config {
-    private val regionKey = EnvironmentKey.map(::Region).required("region")
-    private val roleKey = EnvironmentKey.map(::Role).required("lambdaRuntimeRole")
-
-    fun credentials(config: Environment) =
-        AwsCredentials(EnvironmentKey.required("accessKey")(config), EnvironmentKey.required("secretKey")(config))
-
-    fun region(config: Environment) = regionKey(config)
-    fun role(config: Environment) = roleKey(config)
-    fun scope(config: Environment, service: String) = AwsCredentialScope(region(config).name, service)
-}
