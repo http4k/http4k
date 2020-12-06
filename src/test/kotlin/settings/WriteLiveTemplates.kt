@@ -103,6 +103,7 @@ fun File.writeLiveTemplates() {
     File(this, "templates").apply {
         mkdirs()
         File(this, "http4k.xml").apply {
+            delete()
             writeText(templates(TemplateSet("all", standard.templates + methods.templates + statii.templates)))
         }
     }

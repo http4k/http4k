@@ -1,4 +1,4 @@
-description = 'Http4k AWS API client'
+description = 'Http4k AWS integration and request signing'
 
 dependencies {
     compile project(":http4k-core")

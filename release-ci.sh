@@ -28,6 +28,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 ./gradlew -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble \
     :http4k-core:bintrayUpload \
     :http4k-aws:bintrayUpload \
+    :http4k-bom:bintrayUpload \
     :http4k-cloudnative:bintrayUpload \
     :http4k-client-apache:bintrayUpload \
     :http4k-client-apache-async:bintrayUpload \
