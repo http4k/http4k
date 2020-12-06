@@ -12,15 +12,15 @@ import org.http4k.core.toParameters
 import org.http4k.format.Jackson.auto
 
 class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
-    override fun inject(it: Request): (Request) -> Request = requestLens of APIGatewayProxyRequestEvent()
-        .withHttpMethod(it.method.name)
-        .withHeaders(it.headers.toMap())
-        .withPath(it.uri.path)
-        .withQueryStringParameters(it.uri.query.toParameters().toMap())
-        .withBody(it.bodyString())
+    override fun Request.toLamdbaFormat(): (Request) -> Request = requestLens of APIGatewayProxyRequestEvent()
+        .withHttpMethod(method.name)
+        .withHeaders(headers.toMap())
+        .withPath(uri.path)
+        .withQueryStringParameters(uri.query.toParameters().toMap())
+        .withBody(bodyString())
 
-    override fun extract(lambdaResponse: Response): Response {
-        val response = responseLens(lambdaResponse)
+    override fun Response.fromLambdaFormat(): Response {
+        val response = responseLens(this)
         return Response(Status(response.statusCode, ""))
             .headers(response.headers.map { kv -> kv.toPair() })
             .body(response.body)

@@ -15,19 +15,17 @@ import org.http4k.filter.SetAwsServiceUrl
 abstract class LambdaHttpClient(function: Function, region: Region) : Filter {
     private fun createFunctionRequest(function: Function) = Filter { next ->
         {
-            extract(
-                next(
-                    Request(POST, "/2015-03-31/functions/${function.value}/invocations")
-                        .header("X-Amz-Invocation-Type", "RequestResponse")
-                        .header("X-Amz-Log-Type", "Tail")
-                        .with(inject(it)))
-            )
+            next(
+                Request(POST, "/2015-03-31/functions/${function.value}/invocations")
+                    .header("X-Amz-Invocation-Type", "RequestResponse")
+                    .header("X-Amz-Log-Type", "Tail")
+                    .with(it.toLamdbaFormat())).fromLambdaFormat()
         }
     }
 
-    protected abstract fun inject(it: Request): (Request) -> Request
+    protected abstract fun Request.toLamdbaFormat(): (Request) -> Request
 
-    protected abstract fun extract(lambdaResponse: Response): Response
+    protected abstract fun Response.fromLambdaFormat(): Response
 
     private val filter = createFunctionRequest(function)
         .then(ClientFilters.SetAwsServiceUrl("lambda", region.name))

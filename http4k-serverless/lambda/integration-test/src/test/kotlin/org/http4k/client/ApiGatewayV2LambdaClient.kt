@@ -14,15 +14,15 @@ import org.http4k.serverless.aws.Http
 import org.http4k.serverless.aws.RequestContext
 
 class ApiGatewayV2LambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
-    override fun inject(it: Request): (Request) -> Request = requestLens of AwsGatewayProxyRequestV2(requestContext = RequestContext(Http(it.method.name))).apply {
-        rawPath = it.uri.path
-        queryStringParameters = it.uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
-        body = it.bodyString()
-        headers = it.headers.groupBy { it.first }.mapValues { (_, v) -> v.map { it.second }.joinToString(",") }
+    override fun Request.toLamdbaFormat(): (Request) -> Request = requestLens of AwsGatewayProxyRequestV2(requestContext = RequestContext(Http(method.name))).apply {
+        rawPath = uri.path
+        queryStringParameters = uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
+        body = bodyString()
+        headers = this@toLamdbaFormat.headers.groupBy { it.first }.mapValues { (_, v) -> v.map { it.second }.joinToString(",") }
     }
 
-    override fun extract(lambdaResponse: Response): Response {
-        val response = responseLens(lambdaResponse)
+    override fun Response.fromLambdaFormat(): Response {
+        val response = responseLens(this)
         return Response(Status(response.statusCode, ""))
             .headers((response.headers
                 ?: emptyMap()).entries.fold(listOf()) { acc, next -> acc + (next.key to next.value) })
