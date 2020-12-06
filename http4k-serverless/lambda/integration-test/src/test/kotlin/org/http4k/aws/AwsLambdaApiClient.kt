@@ -11,7 +11,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.filter.SetAwsServiceUrl
 import org.http4k.filter.inIntelliJOnly
 import org.http4k.format.Jackson.auto
@@ -20,7 +20,7 @@ import java.util.Base64
 
 class AwsLambdaApiClient(client: HttpHandler, region: Region) {
     private val client = ClientFilters.SetAwsServiceUrl("lambda", region.name)
-        .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
+        .then(PrintRequestAndResponse().inIntelliJOnly())
         .then(client)
 
     fun create(functionPackage: FunctionPackage): FunctionDetails {

@@ -21,12 +21,13 @@ fun Environment.awsCliUserProfiles(): AwsCliUserProfiles {
     val env = this
     return object : AwsCliUserProfiles {
         override fun profile(profileName: String) = object : AwsProfile {
-            override fun scopeFor(service: String) = AwsCredentialScope("region", region)
+            override fun scopeFor(service: String) = AwsCredentialScope(region, service)
 
             override val credentials = AwsCredentials(
                 EnvironmentKey.required("${profileName}-aws-access-key-id")(env),
                 EnvironmentKey.required("${profileName}-aws-secret-access-key")(env)
             )
+
             override val region = get("region")
 
             override fun get(keyName: String) = EnvironmentKey.required(
