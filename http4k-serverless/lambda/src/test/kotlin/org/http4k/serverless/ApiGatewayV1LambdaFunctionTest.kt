@@ -1,7 +1,6 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
@@ -43,12 +42,13 @@ class ApiGatewayV1LambdaFunctionTest {
 
         assertThat(lambda.handle(request, lambdaContext),
             equalTo(
-                APIGatewayProxyResponseEvent().apply {
-                    statusCode = 200
-                    body = "hello there".base64Encode()
-                    headers = mapOf("a" to "b")
-                    isBase64Encoded = true
-                })
+                mapOf(
+                    "statusCode" to 200,
+                    "body" to "hello there".base64Encode(),
+                    "headers" to mapOf("a" to "b"),
+                    "isBase64Encoded" to true
+                )
+            )
         )
     }
 }
