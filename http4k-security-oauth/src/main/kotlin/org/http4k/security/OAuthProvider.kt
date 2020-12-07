@@ -26,13 +26,14 @@ class OAuthProvider(
     private val responseType: ResponseType = ResponseType.Code,
     idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
     accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(providerConfig),
+    standardRedirectionUrlBuilder: RedirectionUriBuilder = defaultUriBuilder,
     private val jwtRedirectionUriBuilder: (RequestJwts) -> RedirectionUriBuilder = ::uriBuilderWithRequestJwt
 ) {
     // pre-configured API client for this provider
     val api = ClientFilters.SetHostFrom(providerConfig.apiBase).then(client)
 
     // use this filter to protect endpoints
-    val authFilter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType)
+    val authFilter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType, standardRedirectionUrlBuilder)
 
     // protect endpoint and provide custom request JWT creation mechanism
     fun authFilter(requestJwts: RequestJwts) =
