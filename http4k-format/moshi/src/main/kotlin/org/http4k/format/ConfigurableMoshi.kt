@@ -59,5 +59,17 @@ fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Bui
         }
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
-    override fun done(): Moshi.Builder = this@asConfigurable.add(KotlinJsonAdapterFactory())
+    override fun done(): Moshi.Builder {
+        return this@asConfigurable.add(KotlinJsonAdapterFactory()).add(Unit::class.java, UnitAdapter)
+    }
+}
+
+private object UnitAdapter : JsonAdapter<Unit>() {
+    override fun fromJson(reader: JsonReader) {
+        reader.readJsonValue(); Unit
+    }
+
+    override fun toJson(writer: JsonWriter, value: Unit?) {
+        value?.let { writer.beginObject().endObject() } ?: writer.nullValue()
+    }
 }

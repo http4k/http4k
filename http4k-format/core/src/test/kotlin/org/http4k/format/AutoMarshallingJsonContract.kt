@@ -53,5 +53,10 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
         assertThat(marshaller.asFormatString(wrapper).normaliseJson(), equalTo(expectedCustomWrappedNumber))
         assertThat(marshaller.asA(expectedCustomWrappedNumber, HolderHolder::class), equalTo(wrapper))
     }
+
+    @Test
+    fun `handles unit`() {
+        customMarshaller().asA<Unit>("{}")
+    }
 }
 
