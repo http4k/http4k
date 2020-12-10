@@ -26,9 +26,10 @@ class OAuthProvider(
     private val responseType: ResponseType = ResponseType.Code,
     idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
     accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(providerConfig),
-    standardRedirectionUrlBuilder: RedirectionUriBuilder = defaultUriBuilder,
-    private val jwtRedirectionUriBuilder: (RequestJwts) -> RedirectionUriBuilder = ::uriBuilderWithRequestJwt
+    private val jwtRedirectionUriBuilder: (RequestJwts) -> RedirectionUriBuilder = ::uriBuilderWithRequestJwt,
+    standardRedirectionUrlBuilder: RedirectionUriBuilder = defaultUriBuilder
 ) {
+
     // pre-configured API client for this provider
     val api = ClientFilters.SetHostFrom(providerConfig.apiBase).then(client)
 
