@@ -48,8 +48,9 @@ fun HttpHandler.withChaosApi(engine: ChaosEngine = ChaosEngine(),
                              controlsPath: String = "/chaos",
                              openApiPath: String = "",
                              corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
-                             clock: Clock = Clock.systemUTC()
-) = routes("/{path:.*}" bind this).withChaosApi(engine, security, controlsPath, openApiPath, corsPolicy, clock)
+                             clock: Clock = Clock.systemUTC(),
+                             apiName: String = "http4k"
+) = routes("/{path:.*}" bind this).withChaosApi(engine, security, controlsPath, openApiPath, corsPolicy, clock, apiName)
 
 /**
  * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
@@ -60,9 +61,10 @@ fun RoutingHttpHandler.withChaosApi(engine: ChaosEngine = ChaosEngine(),
                                     controlsPath: String = "/chaos",
                                     openApiPath: String = "",
                                     corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
-                                    clock: Clock = Clock.systemUTC()
+                                    clock: Clock = Clock.systemUTC(),
+                                    apiName: String = "http4k"
 ) = routes(
-    RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy, clock),
+    RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy, clock, apiName),
     engine.then(this)
 )
 
@@ -82,7 +84,8 @@ object RemoteChaosApi {
         chaosSecurity: Security = NoSecurity,
         openApiPath: String = "",
         corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
-        clock: Clock = Clock.systemUTC()
+        clock: Clock = Clock.systemUTC(),
+        apiName: String = "http4k"
     ): RoutingHttpHandler {
         val setStages = Body.json().map { node ->
             (if (node.isArray) node.elements().asSequence() else sequenceOf(node))
@@ -118,7 +121,8 @@ object RemoteChaosApi {
                 next(it)
             }
         }
-        val apiDescription = """This is the Open API interface for the http4k Chaos Engine. 
+
+        val apiDescription = """This is the Open API interface for the $apiName Chaos Engine. 
             |
             |Using this UI you can inject new dynamic chaotic behaviour into any http4k application, or toggle/disable it. 
             |
@@ -141,7 +145,7 @@ object RemoteChaosApi {
                 .then(ServerFilters.CatchAll())
                 .then(
                     contract {
-                        renderer = OpenApi3(ApiInfo("http4k Chaos Engine", "1.0", apiDescription))
+                        renderer = OpenApi3(ApiInfo("$apiName Chaos Engine", "1.0", apiDescription))
                         descriptionPath = openApiPath
                         security = chaosSecurity
                         routes += "/status" meta {
