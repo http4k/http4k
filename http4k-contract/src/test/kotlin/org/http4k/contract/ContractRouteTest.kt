@@ -39,7 +39,7 @@ class ContractRouteTest {
         val route = pair to { _, _ -> { Response(OK) } }
         val request = route.newRequest(Uri.of("http://rita.com"))
 
-        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello%20world")))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello+world")))
     }
 
     @Test
@@ -60,7 +60,7 @@ class ContractRouteTest {
             queries += Query.required("")
         } bindContract GET).newRequest(Uri.of("http://rita.com/base"))
 
-        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello%20world")))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello+world")))
     }
 
     @Test
@@ -71,7 +71,7 @@ class ContractRouteTest {
             queries += Query.required("")
         } bindContract GET).newRequest()
 
-        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "/123/hello%20world")))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "/123/hello+world")))
     }
 
     @Test

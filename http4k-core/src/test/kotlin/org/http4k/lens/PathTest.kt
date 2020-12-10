@@ -75,10 +75,25 @@ class PathTest {
 
     @Test
     fun `sets value on request uri with proper encoding`() {
-        val pathParam = Path.string().of("bob")
-        val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of "123 45/6"), UriTemplate.from("/first/{bob}/second") )
-        assertThat(pathParam(updated), equalTo("123 45/6"))
-        assertThat(updated, equalTo(Request(GET, "http://bob.com/first/123%2045%2F6/second")))
+        fun checkEncodeDecode(unencoded: String, encoded: String) {
+            val pathParam = Path.of("bob")
+            val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of unencoded), UriTemplate.from("/first/{bob}/second"))
+            assertThat(updated, equalTo(Request(GET, "http://bob.com/first/$encoded/second")))
+            assertThat(pathParam(updated), equalTo(unencoded))
+        }
+
+        fun checkDecode(encoded: String, unencoded: String) {
+            val pathParam = Path.of("bob")
+            val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/$encoded/second")), UriTemplate.from("/first/{bob}/second"))
+            assertThat(pathParam(updated), equalTo(unencoded))
+        }
+
+        checkEncodeDecode("123 45/6", "123+45%2F6")
+        checkEncodeDecode("Bob Tables%/M", "Bob+Tables%25%2FM")
+        checkEncodeDecode("2020-03-19T19:12:34.567+01:00", "2020-03-19T19%3A12%3A34.567%2B01%3A00")
+        checkEncodeDecode("ÅÄÖ", "%C3%85%C3%84%C3%96")
+        checkDecode("Bob%20Tables%25%2FM", "Bob Tables%/M")
+        checkDecode("ÅÄÖ", "ÅÄÖ")
     }
 
     @Test
