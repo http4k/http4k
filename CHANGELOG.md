@@ -3,6 +3,13 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.283.0 (uncut)
+- **http4k-core** : Fix #536 - Path encoding fixed using lens.
+- **http4k-core** : Support multiple, nested RequestContexts.
+- **http4k-format-moshi** : Add support for (de)serialising Unit.
+- **http4k-security-oauth** : Ability to provide custom `RedirectionUriBuilder` for non-JWT cases.
+- **http4k-testing-chaos** : Ability to name Chaos API in OpenApi document.
+
 ### v3.282.0
 - **http4k-serverless-*** : Tidy implementations to be consistent.
 - **http4k-testing-webdriver-*** : Fixed radio buttons submitting even when not selected.
