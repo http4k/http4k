@@ -20,7 +20,7 @@ class InvocationLambdaFunctionTest {
             {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(
+                assertThat(it.removeHeader("x-http4k-context-lambda"), equalTo(
                     Request(POST, "/2015-03-31/functions/myFunction/invocations")
                         .header("X-Amz-Invocation-Type", "RequestResponse")
                         .header("X-Amz-Log-Type", "Tail")

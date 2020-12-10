@@ -20,7 +20,7 @@ abstract class AlibabaCloudFunction(appLoader: AppLoaderWithContexts) : HttpRequ
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts()
+    private val contexts = RequestContexts("alibaba")
     private val app = appLoader(System.getenv(), contexts)
 
     override fun handleRequest(request: HttpServletRequest, response: HttpServletResponse, context: Context?) {

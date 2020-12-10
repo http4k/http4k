@@ -19,7 +19,7 @@ open class GoogleCloudFunction(appLoader: AppLoaderWithContexts) : HttpFunction 
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts()
+    private val contexts = RequestContexts("gcf")
     private val app = appLoader(System.getenv(), contexts)
 
     override fun service(request: HttpRequest, response: HttpResponse) =

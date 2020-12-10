@@ -100,6 +100,6 @@ class OpenWhiskFunctionTest {
 
         val actual = Gson.asA(response, FakeOpenWhiskResponse::class)
 
-        assertThat(actual.copy(headers = actual.headers.minus("x-http4k-context")), equalTo(expected))
+        assertThat(actual.copy(headers = actual.headers.minus("x-http4k-context-openwhisk")), equalTo(expected))
     }
 }

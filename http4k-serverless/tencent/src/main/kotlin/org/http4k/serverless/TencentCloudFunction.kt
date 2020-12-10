@@ -25,7 +25,7 @@ abstract class TencentCloudFunction(appLoader: AppLoaderWithContexts) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts()
+    private val contexts = RequestContexts("tencent")
     private val app = appLoader(System.getenv(), contexts)
 
     fun handleRequest(request: APIGatewayProxyRequestEvent, context: Context?) =

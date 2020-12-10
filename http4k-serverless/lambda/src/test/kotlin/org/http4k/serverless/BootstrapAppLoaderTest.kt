@@ -67,7 +67,7 @@ private object TestAppWithContexts : AppLoaderWithContexts {
             request
                 .header("LAMBDA_CONTEXT_FUNCTION_NAME", lambdaContext?.functionName)
                 .header("LAMBDA_REQUEST_ACCOUNT_ID", lambdaRequest?.requestContext?.accountId)
-                .removeHeader("x-http4k-context").toString()
+                .removeHeader("x-http4k-context-lambda").toString()
         )
     }
 }
@@ -76,7 +76,7 @@ private object TestApp : AppLoader {
     override fun invoke(env: Map<String, String>): HttpHandler = { request ->
         env.toList().fold(Response(CREATED)) { memo, (key, value) ->
             memo.header(key, value)
-        }.body(request.removeHeader("x-http4k-context").toString())
+        }.body(request.removeHeader("x-http4k-context-lambda").toString())
     }
 }
 

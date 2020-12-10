@@ -28,7 +28,7 @@ class ApiGatewayV2LambdaFunctionTest {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
                 assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
+                assertThat(it.removeHeader("x-http4k-context-lambda"), equalTo(Request(GET, "/path")
                     .query("query", "value")
                     .header("c", "d")
                     .body("input body")

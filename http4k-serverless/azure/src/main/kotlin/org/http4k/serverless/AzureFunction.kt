@@ -22,7 +22,7 @@ abstract class AzureFunction(appLoader: AppLoaderWithContexts) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts()
+    private val contexts = RequestContexts("azure")
     private val app = appLoader(System.getenv(), contexts)
 
     abstract fun handleRequest(req: HttpRequestMessage<Optional<String>>,

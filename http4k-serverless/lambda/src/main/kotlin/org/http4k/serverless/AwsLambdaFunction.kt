@@ -14,7 +14,7 @@ abstract class AwsLambdaFunction<Req : Any, Resp> protected constructor(
     private val adapter: AwsHttpAdapter<Req, Resp>,
     appLoader: AppLoaderWithContexts
 ) {
-    private val contexts = RequestContexts()
+    private val contexts = RequestContexts("lambda")
     private val app = appLoader(System.getenv(), contexts)
 
     internal fun handle(req: Req, ctx: Context): Resp = adapter(

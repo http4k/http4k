@@ -10,7 +10,6 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
-import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -18,7 +17,6 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -417,21 +415,6 @@ class ServerFiltersTest {
         val response = handler(Request(GET, "/"))
 
         assertThat(response, hasStatus(UNSUPPORTED_MEDIA_TYPE))
-    }
-
-    @Test
-    fun `initialises request context for use further down the stack`() {
-        val contexts = RequestContexts()
-        val handler = ServerFilters.InitialiseRequestContext(contexts)
-            .then(Filter { next ->
-                {
-                    contexts[it].set("foo", "manchu")
-                    next(it)
-                }
-            })
-            .then { Response(OK).body(contexts[it].get<String>("foo")!!) }
-
-        assertThat(handler(Request(GET, "/")), hasBody("manchu"))
     }
 
     @Test

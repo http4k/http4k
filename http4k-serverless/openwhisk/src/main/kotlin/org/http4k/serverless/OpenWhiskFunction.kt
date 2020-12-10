@@ -28,7 +28,7 @@ class OpenWhiskFunction(
         detectBinaryBody: DetectBinaryBody = NonBinary
     ) : this(AppLoaderWithContexts { env, _ -> input(env) }, detectBinaryBody)
 
-    private val contexts = RequestContexts()
+    private val contexts = RequestContexts("openwhisk")
     private val app = appLoader(System.getenv(), contexts)
 
     override fun invoke(request: JsonObject) =
