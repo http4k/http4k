@@ -12,7 +12,10 @@ changes with their rationale when appropriate:
 - **http4k-testing-chaos** : Ability to name Chaos API in OpenApi document.
 - **http4k-opentelemetry** : **Breaking (dependency change)** Upgrade to new 0.12.0 of OpenTelemetry Java API has caused some API changes.
 - **http4k-format-jackson** : **Breaking (dependency change)** Upgrade to new version of Jackson. PropertyNamingStrategies will need to be replaced as old one could cause deadlock: https://github.com/FasterXML/jackson-databind/issues/2715
-- **http4k-format-jackson** : Add support for (de)serialising Unit.
+- **http4k-format-jackson-xml** : **Breaking** We recommend that users of this lib **DO NOT UPGRADE** to this release due to open bug with nullable fields. See: https://github.com/FasterXML/jackson-dataformat-xml/issues/435 .  There is a workaround which is to add default values into the nullable fields in your DTO classes. eg.
+ ```kotlin
+data class MyDto(val field: String? = null)
+```
 
 ### v3.282.0
 - **http4k-serverless-*** : Tidy implementations to be consistent.
