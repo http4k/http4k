@@ -10,7 +10,7 @@ data class Container(val field: String)
 data class UriContainer(val field: Uri)
 
 data class ListContainer(val children: List<String>)
-data class NullableListContainer(val children: List<String>?)
+data class NullableListContainer(val children: List<String>? = null)
 
 abstract class AutoMarshalingXmlContract(private val x: AutoMarshallingXml) {
 
