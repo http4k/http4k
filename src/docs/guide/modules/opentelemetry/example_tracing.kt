@@ -1,8 +1,8 @@
 package guide.modules.opentelemetry
 
-import io.opentelemetry.OpenTelemetry
-import io.opentelemetry.context.propagation.DefaultContextPropagators
-import io.opentelemetry.extensions.trace.propagation.AwsXRayPropagator
+import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.context.propagation.ContextPropagators
+import io.opentelemetry.extension.trace.propagation.AwsXRayPropagator
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -19,10 +19,7 @@ import org.http4k.routing.routes
 
 fun main() {
     // configure OpenTelemetry using the Amazon XRAY tracing scheme
-    OpenTelemetry.setPropagators(
-        DefaultContextPropagators.builder()
-            .addTextMapPropagator(AwsXRayPropagator.getInstance())
-            .build())
+    OpenTelemetry.setGlobalPropagators(ContextPropagators.create(AwsXRayPropagator.getInstance()))
 
     // this HttpHandler represents a 3rd party service, and will repeat the request body
     val repeater: HttpHandler = {

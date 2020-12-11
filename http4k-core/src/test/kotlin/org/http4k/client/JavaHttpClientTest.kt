@@ -10,13 +10,13 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
-import org.http4k.server.Jetty
+import org.http4k.server.ApacheServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class JavaHttpClientTest : HttpClientContract({ Jetty(it) }, JavaHttpClient(),
+class JavaHttpClientTest : HttpClientContract({ ApacheServer(it) }, JavaHttpClient(),
     ApacheClient(HttpClients.custom()
         .setDefaultRequestConfig(
             RequestConfig.custom()

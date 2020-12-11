@@ -42,5 +42,5 @@ fun main() {
 }
 
 private fun exportMetricsFromOpenTelemetry(): List<MetricData> = InMemoryMetricExporter.create().apply {
-    export(OpenTelemetrySdk.getMeterProvider().metricProducer.collectAllMetrics())
+    export(OpenTelemetrySdk.getGlobalMeterProvider().metricProducer.collectAllMetrics())
 }.finishedMetricItems

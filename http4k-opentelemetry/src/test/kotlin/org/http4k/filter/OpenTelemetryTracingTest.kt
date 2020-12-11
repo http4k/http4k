@@ -2,16 +2,20 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import io.opentelemetry.OpenTelemetry
-import io.opentelemetry.common.AttributeKey.stringKey
+import io.opentelemetry.api.DefaultOpenTelemetry
+import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.common.AttributeKey.stringKey
+import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanId
+import io.opentelemetry.api.trace.TraceId
+import io.opentelemetry.api.trace.TraceState
+import io.opentelemetry.context.Context
+import io.opentelemetry.context.propagation.ContextPropagators
 import io.opentelemetry.context.propagation.DefaultContextPropagators.builder
-import io.opentelemetry.extensions.trace.propagation.B3Propagator.getMultipleHeaderPropagator
+import io.opentelemetry.extension.trace.propagation.B3Propagator
+import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.data.SpanData
-import io.opentelemetry.trace.SpanId
-import io.opentelemetry.trace.TraceId
-import io.opentelemetry.trace.TracingContextUtils
-import io.opentelemetry.trace.TracingContextUtils.getCurrentSpan
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -26,10 +30,10 @@ import org.junit.jupiter.api.Test
 
 class OpenTelemetryTracingTest {
 
-    private val tracer = OpenTelemetry.getTracer("http4k", "semver:0.0.0")
+    private val tracer = OpenTelemetry.getGlobalTracer("http4k", "semver:0.0.0")
 
     init {
-        OpenTelemetry.setPropagators(builder().addTextMapPropagator(getMultipleHeaderPropagator()).build())
+        OpenTelemetrySdk.get().propagators = ContextPropagators.create(B3Propagator.builder().injectMultipleHeaders().build())
     }
 
     @Test
@@ -41,7 +45,7 @@ class OpenTelemetryTracingTest {
 
         val app = ServerFilters.OpenTelemetryTracing(tracer)
             .then(routes("/foo/{id}" bind GET to {
-                createdContext = (getCurrentSpan() as ReadableSpan).toSpanData()
+                createdContext = (Span.current() as ReadableSpan).toSpanData()
                 Response(OK)
             }))
 
@@ -72,7 +76,8 @@ class OpenTelemetryTracingTest {
 
         val app = ServerFilters.OpenTelemetryTracing(tracer)
             .then(routes("/foo/{id}" bind GET to {
-                createdContext = (getCurrentSpan() as ReadableSpan).toSpanData()
+                Span.current().spanContext
+                createdContext = (Span.current() as ReadableSpan).toSpanData()
                 Response(OK)
             }))
 
@@ -98,7 +103,7 @@ class OpenTelemetryTracingTest {
 
         val app = ClientFilters.OpenTelemetryTracing(tracer)
             .then {
-                createdContext = (getCurrentSpan() as ReadableSpan).toSpanData()
+                createdContext = (Span.current() as ReadableSpan).toSpanData()
                 Response(I_M_A_TEAPOT)
             }
 
@@ -124,13 +129,13 @@ class OpenTelemetryTracingTest {
         val app = ServerFilters.OpenTelemetryTracing(tracer)
             .then(Filter { next ->
                 {
-                    serverContext = (getCurrentSpan() as ReadableSpan).toSpanData()
+                    serverContext = (Span.current() as ReadableSpan).toSpanData()
                     next(Request(GET, "http://localhost:8080/client"))
                 }
             })
             .then(ClientFilters.OpenTelemetryTracing(tracer))
             .then {
-                clientContext = (getCurrentSpan() as ReadableSpan).toSpanData()
+                clientContext = (Span.current() as ReadableSpan).toSpanData()
                 Response(I_M_A_TEAPOT)
             }
 

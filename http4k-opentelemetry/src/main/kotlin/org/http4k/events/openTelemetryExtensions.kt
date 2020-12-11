@@ -1,17 +1,16 @@
 package org.http4k.events
 
-import io.opentelemetry.trace.Tracer
+import io.opentelemetry.api.trace.Span
 import org.http4k.filter.SamplingDecision
 import org.http4k.filter.TraceId
 import org.http4k.filter.ZipkinTraces
-import org.http4k.metrics.Http4kOpenTelemetry
 
 /**
  * Adds OpenTelemetry traces metadata to the event.
  */
-fun EventFilters.AddOpenTelemetryTraces(tracer: Tracer = Http4kOpenTelemetry.tracer) = EventFilter { next ->
+fun EventFilters.AddOpenTelemetryTraces() = EventFilter { next ->
     {
-        val context = tracer.currentSpan.context
+        val context = Span.current().spanContext
         next(it + ("traces" to ZipkinTraces(
             TraceId(context.traceIdAsHexString),
             TraceId(context.spanIdAsHexString),

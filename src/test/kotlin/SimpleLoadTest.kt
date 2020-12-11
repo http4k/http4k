@@ -3,7 +3,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.server.Jetty
+import org.http4k.server.ApacheServer
 import org.http4k.server.Netty
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
@@ -49,7 +49,7 @@ fun main() {
     val threads = 250
     val reps = 400
 
-    listOf<(Int) -> ServerConfig>({ Jetty(it) }, { Undertow(it) }, { SunHttp(it) }, { Netty(it) })
+    listOf<(Int) -> ServerConfig>({ ApacheServer(it) }, { Undertow(it) }, { SunHttp(it) }, { Netty(it) })
         .map { testWith(threads, reps, it, 8000) }
         .sortedBy { it.time }
         .forEach(::println)

@@ -1,7 +1,7 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
-import io.opentelemetry.common.Labels
+import io.opentelemetry.api.common.Labels
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
