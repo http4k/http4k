@@ -11,8 +11,7 @@ import org.http4k.server.asServer
 import java.lang.System.setProperty
 
 fun `simple proxy`() =
-    ProxyHost(Https)
-        .then(JavaHttpClient())
+    JavaHttpClient()
         .asServer(SunHttp())
         .start()
 

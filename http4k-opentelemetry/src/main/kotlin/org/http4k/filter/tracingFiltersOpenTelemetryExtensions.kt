@@ -1,14 +1,14 @@
 package org.http4k.filter
 
-import io.grpc.Context
-import io.opentelemetry.OpenTelemetry.getPropagators
+import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.trace.Span.Kind.CLIENT
+import io.opentelemetry.api.trace.Span.Kind.SERVER
+import io.opentelemetry.api.trace.StatusCode.ERROR
+import io.opentelemetry.api.trace.Tracer
+import io.opentelemetry.context.Context
+import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.context.propagation.TextMapPropagator.Getter
 import io.opentelemetry.context.propagation.TextMapPropagator.Setter
-import io.opentelemetry.trace.Span.Kind.CLIENT
-import io.opentelemetry.trace.Span.Kind.SERVER
-import io.opentelemetry.trace.StatusCanonicalCode.ERROR
-import io.opentelemetry.trace.Tracer
-import io.opentelemetry.trace.TracingContextUtils.currentContextWith
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
@@ -22,16 +22,16 @@ fun ClientFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.trac
                                        error: (Request, Throwable) -> String = { _, t -> t.localizedMessage }
 ): Filter {
 
-    val textMapPropagator = getPropagators().textMapPropagator
+    val textMapPropagator = OpenTelemetry.getGlobalPropagators().textMapPropagator
     val setter = setter<Request>()
 
     return Filter { next ->
         { req ->
             with(tracer.spanBuilder(spanNamer(req)).setSpanKind(CLIENT).startSpan()) {
-                setAttribute("http.method", req.method.name)
-                setAttribute("http.url", req.uri.toString())
                 try {
-                    currentContextWith(this).use {
+                    setAttribute("http.method", req.method.name)
+                    setAttribute("http.url", req.uri.toString())
+                    makeCurrent().use {
                         val ref = AtomicReference(req)
                         textMapPropagator.inject(Context.current(), ref, setter)
                         next(ref.get()).apply {
@@ -54,23 +54,21 @@ fun ServerFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.trac
                                        spanNamer: (Request) -> String = { it.uri.toString() },
                                        error: (Request, Throwable) -> String = { _, t -> t.localizedMessage }
 ): Filter {
-    val textMapPropagator = getPropagators().textMapPropagator
+    val textMapPropagator = OpenTelemetry.getGlobalPropagators().textMapPropagator
 
-    val getter = getter<Request>()
+    val getter = getter<Request>(textMapPropagator)
     val setter = setter<Response>()
     return Filter { next ->
         { req ->
             with(tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)
-                .startSpan()
-            ) {
-                setAttribute("http.method", req.method.name)
-                setAttribute("http.url", req.uri.toString())
-                if (req is RoutedRequest) setAttribute("http.route", req.xUriTemplate.toString())
-
-                currentContextWith(this).use {
+                .startSpan()) {
+                makeCurrent().use {
                     try {
+                        if (req is RoutedRequest) setAttribute("http.route", req.xUriTemplate.toString())
+                        setAttribute("http.method", req.method.name)
+                        setAttribute("http.url", req.uri.toString())
                         val ref = AtomicReference(next(req))
                         textMapPropagator.inject(Context.current(), ref, setter)
                         ref.get().also { setAttribute("http.status_code", it.status.code.toString()) }
@@ -91,4 +89,8 @@ internal fun <T : HttpMessage> setter() = Setter<AtomicReference<T>> { ref, name
     ref?.run { set(get().header(name, value) as T) }
 }
 
-internal fun <T : HttpMessage> getter() = Getter<T> { req, name -> req.header(name) }
+internal fun <T : HttpMessage> getter(textMapPropagator: TextMapPropagator) = object : Getter<T> {
+    override fun keys(carrier: T) = textMapPropagator.fields()
+
+    override fun get(carrier: T?, key: String) = carrier?.header(key)
+}
