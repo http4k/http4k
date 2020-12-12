@@ -161,4 +161,4 @@ internal data class TemplateRouter(private val template: UriTemplate,
     override val description = RouterDescription("template == '$template'")
 }
 
-val Fallback = { r: Request -> true }.asRouter()
+val Fallback = { _: Request -> true }.asRouter()

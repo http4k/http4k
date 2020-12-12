@@ -51,6 +51,21 @@ fun OAuthProvider.Companion.google(client: HttpHandler, credentials: Credentials
         SECURE_CSRF
     )
 
+fun OAuthProvider.Companion.firebase(client: HttpHandler, credentials: Credentials, callbackUri: Uri,
+                                     oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("openid")): OAuthProvider =
+    OAuthProvider(
+        OAuthProviderConfig(Uri.of("https://accounts.google.com"), "/o/oauth2/auth", "/token", credentials, Uri.of("https://oauth2.googleapis.com"),
+            tokenUri = Uri.of("https://oauth2.googleapis.com/token")
+        ),
+        client,
+        callbackUri,
+        scopes,
+        oAuthPersistence,
+        { it.query("nonce", SECURE_CSRF().value) },
+        SECURE_CSRF
+    )
+
+
 fun OAuthProvider.Companion.soundCloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =
     OAuthProvider(
         OAuthProviderConfig(Uri.of("https://soundcloud.com"), "/connect", "/oauth2/token", credentials, Uri.of("https://api.soundcloud.com")),

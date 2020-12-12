@@ -28,9 +28,10 @@ class OAuthProvidersTest {
         assertProvider(OAuthProvider.auth0(uri, client("foo"), credentials, uri, oAuthPersistence), "https://foo/authorize")
         assertProvider(OAuthProvider.dropbox(client("api.dropboxapi.com"), credentials, uri, oAuthPersistence), "https://www.dropbox.com/oauth2/authorize")
         assertProvider(OAuthProvider.facebook(client("graph.facebook.com"), credentials, uri, oAuthPersistence), "https://www.facebook.com/dialog/oauth")
+        assertProvider(OAuthProvider.firebase(client("oauth2.googleapis.com"), credentials, uri, oAuthPersistence), "https://accounts.google.com/o/oauth2/auth")
         assertProvider(OAuthProvider.gitHub(client("github.com"), credentials, uri, oAuthPersistence), "https://github.com/login/oauth/authorize")
-        assertProvider(OAuthProvider.soundCloud(client("api.soundcloud.com"), credentials, uri, oAuthPersistence), "https://soundcloud.com/connect")
         assertProvider(OAuthProvider.google(client("www.googleapis.com"), credentials, uri, oAuthPersistence), "https://accounts.google.com/o/oauth2/v2/auth")
+        assertProvider(OAuthProvider.soundCloud(client("api.soundcloud.com"), credentials, uri, oAuthPersistence), "https://soundcloud.com/connect")
     }
 
     private fun assertProvider(provider: OAuthProvider, expectedRedirectPrefix: String) {
