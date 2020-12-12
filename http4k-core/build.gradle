@@ -10,6 +10,6 @@ dependencies {
     testCompile project(":http4k-client-websocket")
     testCompile project(":http4k-testing-approval")
     testCompile project(":http4k-testing-hamkrest")
-    testCompile project(":http4k-server-jetty")
+    testCompile project(":http4k-server-apache")
     testCompile Libs.slf4j_nop
 }
