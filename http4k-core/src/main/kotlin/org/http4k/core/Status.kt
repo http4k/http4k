@@ -2,7 +2,7 @@ package org.http4k.core
 
 class Status internal constructor(val code: Int, val description: String, private val clientGenerated: Boolean = false) {
 
-    constructor(code: Int, description: String?) : this(code, description ?: descriptions.getOrDefault(code, "Description not available"), false)
+    constructor(code: Int, description: String?) : this(code, description ?: descriptions.getOrDefault(code, "No description"), false)
 
     companion object {
         private val INFORMATIONAL = 100..199
