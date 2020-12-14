@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.238.1 (uncut)
+
+- **http4k-core** : fix handling of null status descriptions. H/T @Hakky54 for report and fix.
+
 ### v3.283.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Fix #536 - Path encoding fixed using lens.
