@@ -21,13 +21,6 @@ class StatusTest {
     }
 
     @Test
-    fun `uses build-in description based on status code when description is not available`() {
-        val status = Status(200, null)
-
-        assertThat(status.description, equalTo("OK"))
-    }
-
-    @Test
     fun `use default description when there is no matching description for the status code`() {
         val status = Status(510, null)
 
