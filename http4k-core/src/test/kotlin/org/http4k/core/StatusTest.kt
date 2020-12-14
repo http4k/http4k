@@ -31,7 +31,7 @@ class StatusTest {
     fun `use default description when there is no matching description for the status code`() {
         val status = Status(510, null)
 
-        assertThat(status.description, equalTo("Description not available"))
+        assertThat(status.description, equalTo("No description"))
     }
 
 }
