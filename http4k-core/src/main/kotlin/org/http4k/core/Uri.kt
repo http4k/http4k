@@ -2,6 +2,7 @@ package org.http4k.core
 
 import org.http4k.appendIfNotBlank
 import org.http4k.appendIfPresent
+import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
 
@@ -67,6 +68,7 @@ fun Uri.removeQuery(name: String) = copy(query = query.toParameters().filterNot 
 fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
 
 fun String.toPathEncoded() = URLEncoder.encode(this, UTF_8)
+fun String.toPathDecoded() = URLDecoder.decode(this, UTF_8)
 
 fun Uri.extend(uri: Uri): Uri =
     appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())
