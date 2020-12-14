@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.238.1 (uncut)
+### v3.283.1 (uncut)
 
 - **http4k-core** : fix handling of null status descriptions. H/T @Hakky54 for report and fix.
 
