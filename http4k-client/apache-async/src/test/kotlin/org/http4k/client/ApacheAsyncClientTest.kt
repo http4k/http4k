@@ -31,7 +31,7 @@ class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsy
     ApacheAsyncClient(HttpAsyncClients.custom()
         .setIOReactorConfig(IOReactorConfig.custom()
             .setSoTimeout(100, TimeUnit.MILLISECONDS)
-            .build()).build().apply { start() })) {
+            .build()).build())) {
     @Test
     fun `connect timeout is handled`() {
 
