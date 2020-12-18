@@ -11,6 +11,7 @@ import org.apache.hc.core5.concurrent.FutureCallback
 import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.HttpResponse
+import org.apache.hc.core5.reactor.IOReactorStatus.INACTIVE
 import org.http4k.core.Body
 import org.http4k.core.Headers
 import org.http4k.core.Request
@@ -23,7 +24,10 @@ import java.net.SocketTimeoutException
 
 object ApacheAsyncClient {
     operator fun invoke(
-        client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient()): AsyncHttpClient {
+        client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient()
+    ): AsyncHttpClient {
+        if (client.status == INACTIVE) client.start()
+
         return object : AsyncHttpClient {
             override fun close() = client.close()
 
