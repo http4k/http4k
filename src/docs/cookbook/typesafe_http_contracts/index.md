@@ -6,7 +6,7 @@ This contract example shows:
 - 2 endpoints with typesafe contracts (marshalling of path parameters and bodies)
 - Custom filters (reporting latency)
 - API key security via a typesafe Query parameter (this can be a header or a body parameter as well)
-- OpenApi v3 documentation - Run this example and point a browser [here](https://http4k.org/openapi3?url=http://localhost:8000/context/swagger.json)
+- OpenApi v3 documentation - Run this example and point a browser [here](https://http4k.org/openapi3?url=http://localhost:8000/context/docs/swagger.json)
 
 ### Gradle setup
 
