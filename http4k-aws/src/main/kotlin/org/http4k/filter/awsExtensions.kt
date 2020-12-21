@@ -99,5 +99,5 @@ object Payload {
     }
 }
 
-fun ClientFilters.SetAwsServiceUrl(serviceNsme: String, region: String) =
-    SetHostFrom(Uri.of("https://$serviceNsme.${region}.amazonaws.com"))
+fun ClientFilters.SetAwsServiceUrl(serviceName: String, region: String) =
+    SetHostFrom(Uri.of("https://$serviceName.${region}.amazonaws.com"))
