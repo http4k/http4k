@@ -24,7 +24,7 @@ fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "h
             val summary = actual
                 .first { it.name == name }
                 .points
-                .first { it.labels == labels }
+                .first { it.labels == labels } as MetricData.DoubleSummaryPoint
             return if (
                 summary.count != count.toLong() &&
                 summary.percentileValues.last().value != value
