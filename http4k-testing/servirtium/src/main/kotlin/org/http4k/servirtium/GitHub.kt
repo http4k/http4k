@@ -11,7 +11,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.BasicAuth
-import org.http4k.filter.ClientFilters.SetBaseUriFrom
+import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.HandleRemoteRequestFailed
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.Query
@@ -27,7 +27,7 @@ class GitHub @JvmOverloads constructor(private val owner: String,
                                        credentials: Credentials,
                                        private val basePath: Path = Paths.get(""),
                                        private val reference: String? = null,
-                                       http: HttpHandler = SetBaseUriFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
+                                       http: HttpHandler = SetHostFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
 ) : StorageProvider {
 
     private val authed = BasicAuth(credentials)

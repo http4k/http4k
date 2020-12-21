@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 
 private fun client(): (Request) -> Response {
-    val apiClient = ClientFilters.SetBaseUriFrom(Uri.of("http://http4k-load-balancer-<something>.eu-west-2.elb.amazonaws.com"))
+    val apiClient = ClientFilters.SetHostFrom(Uri.of("http://http4k-load-balancer-<something>.eu-west-2.elb.amazonaws.com"))
         .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
         .then(OkHttp())
     return { request: Request -> apiClient(request) }

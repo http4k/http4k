@@ -47,7 +47,7 @@ interface InteractionOptions {
     }
 }
 
-internal fun InteractionOptions.trafficPrinter() = when {
+fun InteractionOptions.trafficPrinter() = when {
     debugTraffic() -> DebuggingFilters.PrintRequestAndResponse()
     else -> Filter.NoOp
 }

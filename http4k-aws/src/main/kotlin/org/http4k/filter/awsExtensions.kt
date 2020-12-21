@@ -100,4 +100,4 @@ object Payload {
 }
 
 fun ClientFilters.SetAwsServiceUrl(serviceNsme: String, region: String) =
-    SetBaseUriFrom(Uri.of("https://$serviceNsme.${region}.amazonaws.com"))
+    SetHostFrom(Uri.of("https://$serviceNsme.${region}.amazonaws.com"))
