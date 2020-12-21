@@ -2,16 +2,12 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import io.opentelemetry.api.DefaultOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanId
 import io.opentelemetry.api.trace.TraceId
-import io.opentelemetry.api.trace.TraceState
-import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.ContextPropagators
-import io.opentelemetry.context.propagation.DefaultContextPropagators.builder
 import io.opentelemetry.extension.trace.propagation.B3Propagator
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.ReadableSpan

@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v3.284.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-servirtium** : ServirtiumServer now only changes the base Url of proxied requests instead of the entire path.
 
 ### v3.283.1

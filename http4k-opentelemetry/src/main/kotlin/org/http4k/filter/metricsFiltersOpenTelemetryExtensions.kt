@@ -22,7 +22,8 @@ class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
             .setDescription(description).setUnit("ms").build()
 
         return ReportHttpTransaction(clock) { tx ->
-            meterInstance.record(tx.duration.toMillis(), Labels.of(labeler.labels(tx)))
+            val labels = labeler(tx).labels.flatMap { listOf(it.key, it.value) }.toTypedArray()
+            meterInstance.record(tx.duration.toMillis(), Labels.of(*labels))
         }
     }
 
@@ -34,8 +35,9 @@ class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
         val counterInstance = meter.longCounterBuilder(name)
             .setDescription(description).setUnit("1").build()
 
-        return ReportHttpTransaction(clock) {
-            counterInstance.add(1, Labels.of(labeler.labels(it)))
+        return ReportHttpTransaction(clock) { tx ->
+            val labels = labeler(tx).labels.flatMap { listOf(it.key, it.value) }.toTypedArray()
+            counterInstance.add(1, Labels.of(*labels))
         }
     }
 }
