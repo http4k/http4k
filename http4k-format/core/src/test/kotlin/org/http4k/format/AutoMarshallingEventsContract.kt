@@ -23,7 +23,7 @@ import java.io.StringWriter
 abstract class AutoMarshallingEventsContract(private val j: AutoMarshallingJson) {
 
     @Test
-    fun `event serialises to json`(approver: Approver) {
+    fun `event serialises to library format`(approver: Approver) {
         val final = MyEvent() + ("first" to "1") + ("second" to 2)
         val w = StringWriter()
 
