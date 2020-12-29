@@ -7,6 +7,7 @@ import org.eclipse.jetty.websocket.core.Frame
 import org.eclipse.jetty.websocket.core.FrameHandler
 import org.eclipse.jetty.websocket.core.OpCode.BINARY
 import org.eclipse.jetty.websocket.core.OpCode.TEXT
+import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.StreamBody
 import org.http4k.websocket.Http4kWebSocketAdapter
@@ -22,25 +23,28 @@ class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
 
     override fun onFrame(frame: Frame, callback: Callback) {
         when (frame.opCode) {
-            TEXT -> websocket?.onMessage(org.http4k.core.Body(frame.payloadAsUTF8))
-            BINARY -> websocket?.onMessage(org.http4k.core.Body(frame.payload))
+            TEXT, BINARY -> websocket?.onMessage(Body(frame.payloadAsUTF8))
         }
         callback.succeeded()
     }
 
     override fun onOpen(session: CoreSession, callback: Callback) {
-        println("on open!")
         websocket = Http4kWebSocketAdapter(object : PushPullAdaptingWebSocket(upgradeRequest) {
             override fun send(message: WsMessage) {
                 session.sendFrame(Frame(
                     if (message.body is StreamBody) BINARY else TEXT,
-                    message.body.payload), callback, false)
+                    message.body.payload), object : Callback {
+                    override fun succeeded() = session.flush(object : Callback {})
+                }, false)
             }
 
             override fun close(status: WsStatus) {
-                session.close(status.code, status.description, callback)
+                session.close(status.code, status.description, object : Callback {
+                    override fun succeeded() = session.flush(object : Callback {})
+                })
             }
         }.apply(wSocket))
+        callback.succeeded()
     }
 
     override fun onError(cause: Throwable, callback: Callback) {
