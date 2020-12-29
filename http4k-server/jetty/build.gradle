@@ -5,8 +5,9 @@ dependencies {
 
     compile Libs.jetty_server
     compile Libs.jetty_servlet
-    compile Libs.javax_websocket_server_impl
     compile Libs.javax_servlet_api
+
+    compile Libs.websocket_core_server
 
     // this list is for reference since http2 support is optional
     implementation Libs.http2_server
