@@ -43,22 +43,18 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
                 "/{name}" bind { ws: Websocket ->
                     val name = ws.upgradeRequest.path("name")!!
                     ws.send(WsMessage(name))
-                    ws.onMessage {
-                        ws.send(WsMessage("goodbye $name".byteInputStream()))
-                    }
-                    ws.onClose { println("bob is closing") }
+                    ws.onMessage { ws.send(WsMessage("goodbye $name".byteInputStream())) }
+                    ws.onClose { println("$name is closing") }
                 }
             ),
             "/errors" bind { ws: Websocket ->
-                ws.onMessage {
-                    lens.extract(it)
+                ws.onMessage { lens(it) }
+                ws.onError {
+                    ws.send(WsMessage(it.localizedMessage))
                 }
-                ws.onError { ws.send(WsMessage(it.localizedMessage)) }
             },
             "/queries" bind { ws: Websocket ->
-                ws.onMessage {
-                    ws.send(WsMessage(ws.upgradeRequest.query("query") ?: "not set"))
-                }
+                ws.onMessage { ws.send(WsMessage(ws.upgradeRequest.query("query") ?: "not set")) }
                 ws.onError { ws.send(WsMessage(it.localizedMessage)) }
             })
 
@@ -151,7 +147,6 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         server.close()
 
         latch.await()
-        println(closeStatus)
         assertThat(closeStatus, present())
         client.close()
     }

@@ -21,10 +21,15 @@ class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
     private var websocket: PushPullAdaptingWebSocket? = null
 
     override fun onFrame(frame: Frame, callback: Callback) {
-        when (frame.opCode) {
-            TEXT, BINARY -> websocket?.triggerMessage(WsMessage(Body(frame.payloadAsUTF8)))
+        try {
+            when (frame.opCode) {
+                TEXT, BINARY -> websocket?.triggerMessage(WsMessage(Body(frame.payloadAsUTF8)))
+            }
+            callback.succeeded()
+        } catch (e: Throwable) {
+            websocket?.triggerError(e)
+            callback.failed(e)
         }
-        callback.succeeded()
     }
 
     override fun onOpen(session: CoreSession, callback: Callback) {
