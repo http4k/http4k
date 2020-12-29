@@ -51,12 +51,8 @@ class Http4kWsChannelHandler(private val wSocket: WsConsumer, private val upgrad
 
     override fun channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) {
         when (msg) {
-            is TextWebSocketFrame -> {
-                websocket?.onMessage(Body(msg.text()))
-            }
-            is BinaryWebSocketFrame -> {
-                websocket?.onMessage(Body(ByteBufInputStream(msg.content())))
-            }
+            is TextWebSocketFrame -> websocket?.onMessage(Body(msg.text()))
+            is BinaryWebSocketFrame -> websocket?.onMessage(Body(ByteBufInputStream(msg.content())))
             is CloseWebSocketFrame -> {
                 msg.retain()
                 ctx.writeAndFlush(msg).addListeners(ChannelFutureListener {

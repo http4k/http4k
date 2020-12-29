@@ -10,7 +10,6 @@ import org.eclipse.jetty.websocket.core.OpCode.TEXT
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.StreamBody
-import org.http4k.websocket.Http4kWebSocketAdapter
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
@@ -19,17 +18,17 @@ import org.http4k.websocket.WsStatus
 class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
                                   private val upgradeRequest: Request) : FrameHandler {
 
-    private var websocket: Http4kWebSocketAdapter? = null
+    private var websocket: PushPullAdaptingWebSocket? = null
 
     override fun onFrame(frame: Frame, callback: Callback) {
         when (frame.opCode) {
-            TEXT, BINARY -> websocket?.onMessage(Body(frame.payloadAsUTF8))
+            TEXT, BINARY -> websocket?.triggerMessage(WsMessage(Body(frame.payloadAsUTF8)))
         }
         callback.succeeded()
     }
 
     override fun onOpen(session: CoreSession, callback: Callback) {
-        websocket = Http4kWebSocketAdapter(object : PushPullAdaptingWebSocket(upgradeRequest) {
+        websocket = object : PushPullAdaptingWebSocket(upgradeRequest) {
             override fun send(message: WsMessage) {
                 session.sendFrame(Frame(
                     if (message.body is StreamBody) BINARY else TEXT,
@@ -43,17 +42,17 @@ class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
                     override fun succeeded() = session.flush(object : Callback {})
                 })
             }
-        }.apply(wSocket))
+
+        }.apply(wSocket)
         callback.succeeded()
     }
 
     override fun onError(cause: Throwable, callback: Callback) {
-        websocket?.onError(cause)
+        websocket?.triggerError(cause)
         callback.succeeded()
     }
 
     override fun onClosed(closeStatus: CloseStatus, callback: Callback) {
-        websocket?.onClose(WsStatus(closeStatus.code, closeStatus.reason ?: "<unknown>"))
-        callback.succeeded()
+        websocket?.triggerClose(WsStatus(closeStatus.code, closeStatus.reason ?: "<unknown>"))
     }
 }
