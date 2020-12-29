@@ -27,8 +27,7 @@ import java.math.BigInteger
 import kotlin.reflect.KClass
 
 open class ConfigurableJackson(val mapper: ObjectMapper,
-                               val defaultContentType: ContentType = APPLICATION_JSON) : JsonLibAutoMarshallingJson<JsonNode>() {
-open class ConfigurableJackson(val mapper: ObjectMapper) : AutoMarshallingJson<JsonNode>() {
+                               val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
         is TextNode -> JsonType.String

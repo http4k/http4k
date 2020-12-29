@@ -49,8 +49,6 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     @Disabled("not supported by Klaxon")
     override fun `roundtrip custom boolean`() {
     }
-
-
 }
 
 class KlaxonAutoEventsTest : AutoMarshallingEventsContract(Klaxon)
