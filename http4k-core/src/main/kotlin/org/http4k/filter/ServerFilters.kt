@@ -35,12 +35,6 @@ data class CorsPolicy(val originPolicy: OriginPolicy,
                       val headers: List<String>,
                       val methods: List<Method>,
                       val credentials: Boolean = false) {
-    @Deprecated("Use the primary constructor with OriginPolicy instead")
-    constructor(origins: List<String>,
-                headers: List<String>,
-                methods: List<Method>,
-                credentials: Boolean = false) : this(
-        if ("*" in origins) OriginPolicy.AnyOf() else OriginPolicy.AnyOf(origins), headers, methods, credentials)
     companion object {
         val UnsafeGlobalPermissive = CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.values().toList(), true)
     }
