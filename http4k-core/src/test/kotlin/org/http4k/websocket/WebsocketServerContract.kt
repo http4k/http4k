@@ -84,7 +84,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
     }
 
     @Test
-    fun `errors are propagated to the "on error" handler`() {
+    fun `errors are propagated to the 'on error' handler`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/errors"))
         client.send(WsMessage("hello"))
         assertThat(client.received().take(1).toList(), equalTo(listOf(WsMessage("websocket 'message' must be object"))))
