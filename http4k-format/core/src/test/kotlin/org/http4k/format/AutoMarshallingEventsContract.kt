@@ -20,7 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.io.StringWriter
 
 @ExtendWith(ApprovalTest::class)
-abstract class AutoMarshallingEventsContract(private val j: AutoMarshallingJson) {
+abstract class AutoMarshallingEventsContract(private val j: AutoMarshalling) {
 
     @Test
     fun `event serialises to library format`(approver: Approver) {
