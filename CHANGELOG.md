@@ -4,7 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v3.285.0 (uncut)
-- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Upgrade some dependency versions,including Jetty to v10. 
+- **http4k-server-jetty* : [Unlikely API break] Caused by Jetty API change.
 
 ### v3.284.0
 - **http4k-*** : Upgrade some dependency versions.
