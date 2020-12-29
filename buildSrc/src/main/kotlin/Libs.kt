@@ -141,8 +141,6 @@ public object Libs {
 
     public const val jetty_servlet: String = "org.eclipse.jetty:jetty-servlet:_"
 
-    public const val websocket_jetty_client: String = "org.eclipse.jetty.websocket:websocket-jetty-client:_"
-
     public const val websocket_core_server: String = "org.eclipse.jetty.websocket:websocket-core-server:_"
 
     public const val freemarker: String = "org.freemarker:freemarker:_"
