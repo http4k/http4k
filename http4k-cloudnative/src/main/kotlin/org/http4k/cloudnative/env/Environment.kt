@@ -68,6 +68,8 @@ interface Environment {
         fun defaults(vararg fn: (Environment) -> Environment) = fn.fold(EMPTY) { acc, next -> next(acc) }
 
         fun from(vararg pairs: Pair<String, String>): Environment = MapEnvironment.from(pairs.toMap().toProperties())
+
+        fun from(env: Map<String, String>): Environment = MapEnvironment.from(env.toProperties())
     }
 }
 
