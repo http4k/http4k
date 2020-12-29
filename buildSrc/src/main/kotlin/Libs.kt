@@ -132,9 +132,6 @@ public object Libs {
 
     public const val http2_server: String = "org.eclipse.jetty.http2:http2-server:_"
 
-    public const val javax_websocket_server_impl: String =
-            "org.eclipse.jetty.websocket:javax-websocket-server-impl:_"
-
     public const val jetty_alpn_conscrypt_server: String =
             "org.eclipse.jetty:jetty-alpn-conscrypt-server:_"
 
@@ -143,6 +140,10 @@ public object Libs {
     public const val jetty_server: String = "org.eclipse.jetty:jetty-server:_"
 
     public const val jetty_servlet: String = "org.eclipse.jetty:jetty-servlet:_"
+
+    public const val websocket_jetty_client: String = "org.eclipse.jetty.websocket:websocket-jetty-client:_"
+
+    public const val websocket_core_server: String = "org.eclipse.jetty.websocket:websocket-core-server:_"
 
     public const val freemarker: String = "org.freemarker:freemarker:_"
 
@@ -159,9 +160,6 @@ public object Libs {
             "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:_"
 
     public const val kotlin_serialization: String = "org.jetbrains.kotlin:kotlin-serialization:_"
-
-    public const val kotlin_serialization_unshaded: String =
-            "org.jetbrains.kotlin:kotlin-serialization-unshaded:_"
 
     public const val kotlin_stdlib: String = "org.jetbrains.kotlin:kotlin-stdlib:_"
 
