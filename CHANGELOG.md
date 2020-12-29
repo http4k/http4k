@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.285.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions,including Jetty to v10. 
 - **http4k-server-jetty* : [Unlikely API break] Caused by Jetty API change.
+- **http4k-core* : Renamed AutoJsonEvents to AutoMarshallingEvents
 
 ### v3.284.0
 - **http4k-*** : Upgrade some dependency versions.

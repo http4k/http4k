@@ -7,7 +7,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.events.AutoJsonEvents
+import org.http4k.events.AutoMarshallingEvents
 import org.http4k.events.Event
 import org.http4k.events.EventFilter
 import org.http4k.events.EventFilters
@@ -23,7 +23,7 @@ fun main() {
         EventFilters.AddTimestamp()
             .then(EventFilters.AddZipkinTraces())
             .then(AddRequestCount())
-            .then(AutoJsonEvents(Jackson))
+            .then(AutoMarshallingEvents(Jackson))
 
     val app: HttpHandler = { _: Request -> Response(OK).body("hello") }
 

@@ -122,4 +122,4 @@ class JacksonTest : JsonContract<JsonNode>(Jackson) {
 }"""
 }
 
-class JacksonAutoEventsTest : AutoJsonEventsContract(Jackson)
+class JacksonAutoEventsTest : AutoMarshallingEventsContract(Jackson)

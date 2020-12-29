@@ -53,4 +53,4 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
 
 }
 
-class KlaxonAutoEventsTest : AutoJsonEventsContract(Klaxon)
+class KlaxonAutoEventsTest : AutoMarshallingEventsContract(Klaxon)

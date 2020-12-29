@@ -61,4 +61,4 @@ class GsonTest : JsonContract<JsonElement>(Gson) {
 }"""
 }
 
-class GsonAutoEventsTest : AutoJsonEventsContract(Gson)
+class GsonAutoEventsTest : AutoMarshallingEventsContract(Gson)
