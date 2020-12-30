@@ -7,10 +7,13 @@ import org.http4k.aws.Region
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
 import org.http4k.core.Body
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.then
 import org.http4k.core.toParameters
+import org.http4k.filter.DebuggingFilters
 import org.http4k.format.Jackson.auto
 
 class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
@@ -31,5 +34,15 @@ class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpC
 
     private val requestLens = Body.auto<APIGatewayProxyRequestEvent>().toLens()
     private val responseLens = Body.auto<APIGatewayProxyResponseEvent>().toLens()
+}
 
+fun main() {
+    ApiGatewayV1LambdaClient(Function("hello"), Region("foo"))
+        .then(DebuggingFilters.PrintRequestAndResponse())
+        .then { Response(Status.OK) }(Request(POST, "/helloworld")
+        .query("q1", "qv1")
+        .query("q1", "qv2")
+        .header("h1", "hv1")
+        .header("h2", "hv2")
+        .body("hello"))
 }

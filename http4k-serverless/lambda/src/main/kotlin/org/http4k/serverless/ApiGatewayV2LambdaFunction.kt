@@ -3,9 +3,7 @@ package org.http4k.serverless
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import org.http4k.base64Encode
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
-import org.http4k.core.MemoryBody
 import org.http4k.core.Method
 import org.http4k.core.Parameters
 import org.http4k.core.Request
@@ -15,7 +13,6 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.queries
 import org.http4k.core.toUrlFormEncoded
-import java.util.Base64
 
 /**
  * This is the main entry point for lambda invocations using the V2 payload format.
@@ -38,21 +35,14 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
         val query: Parameters = getStringMap("queryStringParameters")
             ?.toList()
             ?: Uri.of(getString("rawQueryString").orEmpty()).queries()
-        val uri = getString("rawPath").orEmpty()
-        val body = getString("body")
-            ?.let {
-                MemoryBody(when {
-                    getBoolean("isBase64Encoded") == true -> Base64.getDecoder().decode(it.toByteArray())
-                    else -> it.toByteArray()
-                })
-            }
-            ?: Body.EMPTY
-        val headers = (getStringMap("headers")
-            ?.map { (k, v) -> v.split(",").map { k to it } }?.flatten()
-            ?: emptyList()) +
+        val headers = toHeaders() +
             (getStringList("cookies")?.map { "Cookie" to it } ?: emptyList())
 
-        return Request(Method.valueOf(method), Uri.of(uri).query(query.toUrlFormEncoded())).body(body).headers(headers)
+        return Request(Method.valueOf(method),
+            Uri.of(getString("rawPath").orEmpty())
+                .query(query.toUrlFormEncoded()))
+            .headers(headers)
+            .body(toBody())
     }
 
     override fun invoke(req: Map<String, Any>, ctx: Context): Request = req.toHttp4kRequest()

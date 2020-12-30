@@ -1,6 +1,5 @@
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
@@ -14,18 +13,16 @@ class ApiGatewayV1LambdaFunctionTest {
 
     @Test
     fun `adapts API Gateway request and response and receives context`() {
-        val context = APIGatewayProxyRequestEvent.ProxyRequestContext().apply { accountId = "123456789012" }
-
         val lambdaContext = LambdaContextMock()
 
-        val request = APIGatewayProxyRequestEvent().apply {
-            httpMethod = "GET"
-            body = "input body"
-            headers = mapOf("c" to "d")
-            path = "/path"
-            queryStringParameters = mapOf("query" to "value")
-            requestContext = context
-        }
+        val request = mapOf(
+            "path" to "/path",
+            "queryStringParameters" to mapOf("query" to "value"),
+            "body" to "input body",
+            "headers" to mapOf("c" to "d"),
+            "isBase64Encoded" to false,
+            "httpMethod" to "GET"
+        )
 
         val lambda = object : ApiGatewayV1LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {

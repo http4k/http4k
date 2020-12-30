@@ -1,6 +1,5 @@
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
@@ -18,13 +17,14 @@ class ApiGatewayV1AwsHttpAdapterTest {
 
     @Test
     fun `converts into http4k request`() {
-        val request = APIGatewayProxyRequestEvent().apply {
-            httpMethod = "GET"
-            body = "input body"
-            headers = mapOf("c" to "d")
-            path = "/path"
-            queryStringParameters = mapOf("query" to "value")
-        }
+        val request = mapOf(
+            "path" to "/path",
+            "queryStringParameters" to mapOf("query" to "value"),
+            "body" to "input body",
+            "headers" to mapOf("c" to "d"),
+            "isBase64Encoded" to false,
+            "httpMethod" to "GET"
+        )
 
         assertThat(
             ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()),
@@ -37,14 +37,14 @@ class ApiGatewayV1AwsHttpAdapterTest {
 
     @Test
     fun `converts into http4k request when body is base 64 encoded`() {
-        val request = APIGatewayProxyRequestEvent().apply {
-            httpMethod = "GET"
-            body = "input body".base64Encode()
-            headers = mapOf("c" to "d")
-            path = "/path"
-            queryStringParameters = mapOf("query" to "value")
-            isBase64Encoded = true
-        }
+        val request = mapOf(
+            "path" to "/path",
+            "queryStringParameters" to mapOf("query" to "value"),
+            "body" to "input body".base64Encode(),
+            "headers" to mapOf("c" to "d"),
+            "isBase64Encoded" to true,
+            "httpMethod" to "GET"
+        )
 
         assertThat(
             ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()),
@@ -59,12 +59,12 @@ class ApiGatewayV1AwsHttpAdapterTest {
     fun `handles binary data`() {
         val imageBytes = this::class.java.getResourceAsStream("/test.png").readBytes()
 
-        val request = APIGatewayProxyRequestEvent().apply {
-            httpMethod = "POST"
-            body = String(Base64.getEncoder().encode(imageBytes))
-            path = "/path"
-            isBase64Encoded = true
-        }
+        val request = mapOf(
+            "path" to "/path",
+            "body" to String(Base64.getEncoder().encode(imageBytes)),
+            "isBase64Encoded" to true,
+            "httpMethod" to "POST"
+        )
 
         assertThat(
             ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()),
