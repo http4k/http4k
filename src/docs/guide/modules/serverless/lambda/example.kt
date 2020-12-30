@@ -1,6 +1,5 @@
 package guide.modules.serverless.lambda
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -42,13 +41,14 @@ fun main() {
     fun runLambdaAsAwsWould() {
         println("RUNNING AS LAMBDA:")
 
-        val response = FunctionsExampleEntryClass().handleRequest(APIGatewayProxyRequestEvent().apply {
-            path = "/"
-            body = "hello hello hello, i suppose this isn't 140 characters anymore.."
-            httpMethod = "GET"
-            headers = mapOf()
-            queryStringParameters = mapOf()
-        }, proxy())
+        val response = FunctionsExampleEntryClass().handleRequest(mapOf(
+            "path" to "/",
+            "queryStringParameters" to emptyMap<String, String>(),
+            "body" to "hello hello hello, i suppose this isn't 140 characters anymore..",
+            "headers" to emptyMap<String, String>(),
+            "isBase64Encoded" to false,
+            "httpMethod" to "GET"
+        ), proxy())
         println(response)
     }
 
