@@ -17,7 +17,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
 
     @Test
     @Disabled("Currently doesn't work because of need for custom list adapters")
-    fun `roundtrip list of arbitary objects to and from body`() {
+    fun `roundtrip list of arbitrary objects to and from body`() {
         val body = Body.auto<List<ArbObject>>().toLens()
 
         val expected = listOf(obj)
@@ -26,7 +26,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
     }
 
     @Test
-    fun `roundtrip array of arbitary objects to and from JSON`() {
+    fun `roundtrip array of arbitrary objects to and from JSON`() {
         val expected = arrayOf(obj)
         val asJsonString = Moshi.asFormatString(expected)
         val actual: Array<ArbObject> = Moshi.asA(asJsonString)
@@ -34,7 +34,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
     }
 
     @Test
-    fun `roundtrip list of arbitary objects to and from JSON`() {
+    fun `roundtrip list of arbitrary objects to and from JSON`() {
         val jsonString = Moshi.asJsonString(listOf(obj), List::class)
         val actual = Moshi.asA<Array<ArbObject>>(jsonString)
         val expected = arrayOf(obj)
