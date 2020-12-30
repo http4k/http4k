@@ -13,7 +13,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.BasicAuth
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.HandleRemoteRequestFailed
-import org.http4k.format.Jackson.auto
+import org.http4k.format.Moshi.auto
 import org.http4k.lens.Query
 import java.nio.file.Path
 import java.nio.file.Paths
