@@ -18,7 +18,7 @@ import org.http4k.format.Jackson
 
 fun main() {
     // Stack filters for Events in the same way as HttpHandlers to transform or add metadata to the Events.
-    // We use AutoJsonEvents (here with Jackson) to handle the final serialisation process.
+    // We use AutoMarshallingEvents (here with Jackson) to handle the final serialisation process.
     val events =
         EventFilters.AddTimestamp()
             .then(EventFilters.AddZipkinTraces())
