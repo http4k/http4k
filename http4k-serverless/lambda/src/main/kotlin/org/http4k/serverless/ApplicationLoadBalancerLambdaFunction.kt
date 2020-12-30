@@ -2,10 +2,13 @@ package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
-import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
 import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Uri
+import org.http4k.core.toUrlFormEncoded
 
 /**
  * This is the main entry point for lambda invocations coming from an Application LoadBalancer.
@@ -13,18 +16,23 @@ import org.http4k.core.Response
  * for further invocations.
  */
 abstract class ApplicationLoadBalancerLambdaFunction(appLoader: AppLoaderWithContexts)
-    : AwsLambdaFunction<ApplicationLoadBalancerRequestEvent, Map<String, Any>>(ApplicationLoadBalancerAwsHttpAdapter, appLoader),
-    RequestHandler<ApplicationLoadBalancerRequestEvent, Map<String, Any>> {
+    : AwsLambdaFunction<Map<String, Any>, Map<String, Any>>(ApplicationLoadBalancerAwsHttpAdapter, appLoader),
+    RequestHandler<Map<String, Any>, Map<String, Any>> {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    override fun handleRequest(req: ApplicationLoadBalancerRequestEvent, ctx: Context) = handle(req, ctx)
+    override fun handleRequest(req: Map<String, Any>, ctx: Context) = handle(req, ctx)
 }
 
-object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<ApplicationLoadBalancerRequestEvent, Map<String, Any>> {
-    override fun invoke(req: ApplicationLoadBalancerRequestEvent, ctx: Context) =
-        RequestContent(req.path, req.queryStringParameters, null, req.body, req.isBase64Encoded, req.httpMethod, (req.headers
-            ?: emptyMap()).mapValues { listOf(it.value) }, emptyList()).asHttp4k()
+object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String, Any>> {
+    private fun Map<String, Any>.toHttp4kRequest() =
+        Request(Method.valueOf(getString("httpMethod") ?: error("method is invalid")),
+            Uri.of(getString("path").orEmpty())
+                .query((getStringMap("queryStringParameters")?.toList() ?: emptyList()).toUrlFormEncoded()))
+            .headers(toHeaders())
+            .body(toBody())
+
+    override fun invoke(req: Map<String, Any>, ctx: Context): Request = req.toHttp4kRequest()
 
     override fun invoke(resp: Response) = mapOf(
         "statusCode" to resp.status.code,
