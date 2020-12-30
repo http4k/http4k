@@ -4,7 +4,7 @@ description: Feature overview of the YAML http4k-format modules, several of whic
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-format-jackson-yaml", version: "3.284.0"
+implementation group: "org.http4k", name: "http4k-format-jackson-yaml", version: "3.285.0"
 ```
 
 ### About
