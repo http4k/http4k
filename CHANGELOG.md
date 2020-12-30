@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions,including Jetty to v10. 
 - **http4k-server-jetty* : [Unlikely API break] Caused by Jetty API change.
 - **http4k-core* : Renamed AutoJsonEvents to AutoMarshallingEvents
+- **http4k-serverless-lambda* : [Unlikely API break] Remove dependency on AWS Events JAR. We now use a Map<String, Any> instead. This will only affect you if you needed access to the raw ApiGateway events.
 
 ### v3.284.0
 - **http4k-*** : Upgrade some dependency versions.
