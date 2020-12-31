@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.285.1
+- **http4k-format-moshi** : Undo change relating to reading Moshi body lenses from HTTP message streams.
+
 ### v3.285.0
 - **http4k-*** : Upgrade some dependency versions, including Jetty to v10. 
 - **http4k-server-jetty* : [Unlikely API break] Caused by Jetty API change.
