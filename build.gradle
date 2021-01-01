@@ -60,7 +60,7 @@ allprojects {
     jar {
         manifest {
             attributes(
-                'http4k_version': version
+                'http4k_version': archiveVersion
             )
         }
     }
@@ -76,7 +76,7 @@ allprojects {
 //    }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from javadoc.destinationDir
     }
 
@@ -95,7 +95,6 @@ allprojects {
 
     if (hasAnArtifact(project)) {
         apply plugin: 'com.jfrog.bintray'
-        apply plugin: 'maven'
         apply plugin: 'maven-publish'
         publishing {
             publications {
