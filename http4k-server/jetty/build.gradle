@@ -1,13 +1,13 @@
 description = 'Http4k HTTP Server built on top of jetty'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
 
-    compile Libs.jetty_server
-    compile Libs.jetty_servlet
-    compile Libs.javax_servlet_api
+    api Libs.jetty_server
+    api Libs.jetty_servlet
+    api Libs.javax_servlet_api
 
-    compile Libs.websocket_core_server
+    api Libs.websocket_core_server
 
     // this list is for reference since http2 support is optional
     implementation Libs.http2_server

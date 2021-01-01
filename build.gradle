@@ -210,7 +210,7 @@ dependencies {
             hasAnArtifact(it)
         }
         .forEach {
-            compile project(it.name)
+            api project(it.name)
             testCompile project(path: it.name, configuration: 'testArtifacts')
         }
 

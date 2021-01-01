@@ -7,8 +7,8 @@ description = 'Testing against a functions deployed to Azure Functions'
 apply plugin: "com.microsoft.azure.azurefunctions"
 
 dependencies {
-    compile project(":http4k-serverless-azure")
-    compile project(path: ":http4k-core", configuration: 'testArtifacts')
+    api project(":http4k-serverless-azure")
+    api project(path: ":http4k-core", configuration: 'testArtifacts')
 }
 
 // config based on Azure's example: https://github.com/Azure-Samples/azure-functions-samples-java

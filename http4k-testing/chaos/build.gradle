@@ -1,11 +1,11 @@
 description = 'Http4k support for chaos testing'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
 
-    compile project(":http4k-contract")
-    compile project(":http4k-format-jackson")
-    compile project(":http4k-testing-hamkrest")
+    api project(":http4k-contract")
+    api project(":http4k-format-jackson")
+    api project(":http4k-testing-hamkrest")
 
     testCompile project(":http4k-testing-approval")
     testCompile Config.TestDependencies

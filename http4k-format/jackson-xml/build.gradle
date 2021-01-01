@@ -1,10 +1,10 @@
 description = 'Http4k XML support using Jackson as an underlying engine'
 
 dependencies {
-    compile project(":http4k-format-core")
+    api project(":http4k-format-core")
 
-    compile project(":http4k-format-jackson")
-    compile Libs.jackson_dataformat_xml
+    api project(":http4k-format-jackson")
+    api Libs.jackson_dataformat_xml
 
     testCompile project(":http4k-core")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')

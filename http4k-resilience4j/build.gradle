@@ -1,12 +1,12 @@
 description = 'Http4k Resilience4j support'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
 
-    compile Libs.resilience4j_bulkhead
-    compile Libs.resilience4j_circuitbreaker
-    compile Libs.resilience4j_ratelimiter
-    compile Libs.resilience4j_retry
+    api Libs.resilience4j_bulkhead
+    api Libs.resilience4j_circuitbreaker
+    api Libs.resilience4j_ratelimiter
+    api Libs.resilience4j_retry
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

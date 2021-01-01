@@ -1,12 +1,12 @@
 description = 'http4k incubator module'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
     implementation Libs.junit_jupiter_api
 
-    compile project(":http4k-cloudnative")
-    compile project(":http4k-format-moshi")
-    compile project(":http4k-client-apache")
+    api project(":http4k-cloudnative")
+    api project(":http4k-format-moshi")
+    api project(":http4k-client-apache")
 
     testCompile Config.TestDependencies
     testCompile project(":http4k-format-jackson")

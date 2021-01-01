@@ -1,8 +1,8 @@
 description = 'Http4k metrics support, integrating with micrometer.io'
 
 dependencies {
-    compile project(":http4k-core")
-    compile Libs.micrometer_core
+    api project(":http4k-core")
+    api Libs.micrometer_core
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

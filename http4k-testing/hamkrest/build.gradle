@@ -1,10 +1,10 @@
 description = 'A set of Hamkrest matchers for common http4k types'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
     implementation project(":http4k-format-core")
 
-    compile Libs.hamkrest
+    api Libs.hamkrest
 
     testCompile project(":http4k-format-jackson")
     testCompile Config.TestDependencies

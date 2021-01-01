@@ -1,7 +1,7 @@
 description = 'Dependency-lite Server as a Function in pure Kotlin'
 
 dependencies {
-    compile Libs.kotlin_stdlib_jdk8
+    api Libs.kotlin_stdlib_jdk8
     implementation Libs.javax_servlet_api
     implementation Libs.result4k
 

@@ -1,9 +1,9 @@
 description = 'Http4k HTTP Client built on top of async apache httpclient'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
 
-    compile Libs.httpasyncclient
+    api Libs.httpasyncclient
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
     testCompile Config.TestDependencies

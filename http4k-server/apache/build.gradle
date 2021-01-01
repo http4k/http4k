@@ -1,9 +1,9 @@
 description = 'Http4k HTTP Server built on top of Apache httpcore'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
 
-    compile Libs.httpcore5 // apache
+    api Libs.httpcore5 // apache
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

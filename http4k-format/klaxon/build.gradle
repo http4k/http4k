@@ -1,8 +1,8 @@
 description = 'Http4k Klaxon JSON support'
 
 dependencies {
-    compile project(":http4k-format-core")
-    compile Libs.klaxon
+    api project(":http4k-format-core")
+    api Libs.klaxon
 
     testCompile project(":http4k-core")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')

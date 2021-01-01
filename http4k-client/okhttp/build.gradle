@@ -1,9 +1,9 @@
 description = 'HTTP Client built on top of okhttp'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
 
-    compile Libs.okhttp
+    api Libs.okhttp
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
     testCompile Config.TestDependencies

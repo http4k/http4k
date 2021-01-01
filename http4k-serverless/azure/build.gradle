@@ -1,8 +1,8 @@
 description = 'Http4k Serverless support for Azure Functions'
 
 dependencies {
-    compile project(":http4k-core")
-    compile Libs.azure_functions_java_library
+    api project(":http4k-core")
+    api Libs.azure_functions_java_library
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

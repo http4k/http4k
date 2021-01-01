@@ -1,9 +1,9 @@
 description = 'Http4k Handlebars templating support'
 
 dependencies {
-    compile project(":http4k-template-core")
+    api project(":http4k-template-core")
 
-    compile Libs.handlebars
+    api Libs.handlebars
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
     testCompile project(path: ":http4k-template-core", configuration: "testArtifacts")

@@ -1,8 +1,8 @@
 description = 'Http4k OpenTelemetry support'
 
 dependencies {
-    compile project(":http4k-core")
-    compile Libs.opentelemetry_api
+    api project(":http4k-core")
+    api Libs.opentelemetry_api
 
     testCompile Libs.opentelemetry_sdk
     testCompile Libs.opentelemetry_extension_trace_propagators

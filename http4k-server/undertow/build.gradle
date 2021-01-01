@@ -1,10 +1,10 @@
 description = 'Http4k HTTP Server built on top of Undertow'
 
 dependencies {
-    compile project(":http4k-core")
+    api project(":http4k-core")
 
-    compile Libs.undertow_core
-    compile Libs.undertow_servlet
+    api Libs.undertow_core
+    api Libs.undertow_servlet
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
