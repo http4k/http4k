@@ -9,13 +9,13 @@ dependencies {
     implementation project(":http4k-security-oauth")
     implementation project(":http4k-format-jackson")
 
-    testCompile project(":http4k-format-jackson")
-    testCompile project(":http4k-format-argo")
-    testCompile project(":http4k-multipart")
-    testCompile project(":http4k-testing-approval")
-    testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-    testCompile project(path: ":http4k-security-oauth", configuration: "testArtifacts")
-    testCompile Config.TestDependencies
+    testImplementation project(":http4k-format-jackson")
+    testImplementation project(":http4k-format-argo")
+    testImplementation project(":http4k-multipart")
+    testImplementation project(":http4k-testing-approval")
+    testImplementation project(path: ":http4k-core", configuration: "testArtifacts")
+    testImplementation project(path: ":http4k-security-oauth", configuration: "testArtifacts")
+    testImplementation Config.TestDependencies
 }
 
 task generateOpenApi3AutoClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {

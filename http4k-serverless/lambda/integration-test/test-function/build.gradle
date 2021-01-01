@@ -9,6 +9,7 @@ dependencies {
 
     api Libs.aws_lambda_java_events
     api Libs.joda_time
+    testImplementation Config.TestDependencies
 }
 
 task buildZip(type: Zip) {

@@ -7,7 +7,7 @@ dependencies {
     api project(":http4k-format-jackson")
     api project(":http4k-testing-hamkrest")
 
-    testCompile project(":http4k-testing-approval")
-    testCompile Config.TestDependencies
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation project(":http4k-testing-approval")
+    testImplementation Config.TestDependencies
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
 }

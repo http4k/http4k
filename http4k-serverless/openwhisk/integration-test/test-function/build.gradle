@@ -6,4 +6,5 @@ dependencies {
     api project(":http4k-serverless-openwhisk")
     api project(path: ":http4k-core", configuration: 'testArtifacts')
     compileOnly Libs.gson
+    testImplementation Config.TestDependencies
 }

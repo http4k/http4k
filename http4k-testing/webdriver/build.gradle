@@ -6,5 +6,5 @@ dependencies {
     api Libs.selenium_api
     api Libs.jsoup
 
-    testCompile Config.TestDependencies
+    testImplementation Config.TestDependencies
 }

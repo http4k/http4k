@@ -9,8 +9,8 @@ dependencies {
     api Libs.aws_lambda_java_events
     api project(path: ":http4k-core", configuration: 'testArtifacts')
 
-    testCompile project(path: ":http4k-aws", configuration: 'testArtifacts')
-    testCompile Config.TestDependencies
+    testImplementation project(path: ":http4k-aws", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
 }
 
 task deployTestFunction(type: JavaExec) {

@@ -3,6 +3,6 @@ description = 'Http4k multipart form support'
 dependencies {
     api project(":http4k-core")
 
-    testCompile Config.TestDependencies
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
 }

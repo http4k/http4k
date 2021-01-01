@@ -5,7 +5,7 @@ dependencies {
 
     api Libs.java_websocket
 
-    testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-    testCompile project(path: ":http4k-server-jetty")
-    testCompile Config.TestDependencies
+    testImplementation project(path: ":http4k-core", configuration: "testArtifacts")
+    testImplementation project(path: ":http4k-server-jetty")
+    testImplementation Config.TestDependencies
 }

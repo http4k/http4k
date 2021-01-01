@@ -4,6 +4,6 @@ dependencies {
     api project(":http4k-core")
     implementation Libs.gson
 
-    testCompile project(":http4k-format-gson")
-    testCompile Config.TestDependencies
+    testImplementation project(":http4k-format-gson")
+    testImplementation Config.TestDependencies
 }

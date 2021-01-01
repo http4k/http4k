@@ -6,6 +6,6 @@ dependencies {
 
     api Libs.kotest_assertions_core_jvm
 
-    testCompile project(":http4k-format-jackson")
-    testCompile Config.TestDependencies - Libs.hamkrest
+    testImplementation project(":http4k-format-jackson")
+    testImplementation Config.TestDependencies - Libs.hamkrest
 }

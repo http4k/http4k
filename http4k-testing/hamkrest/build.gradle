@@ -6,6 +6,6 @@ dependencies {
 
     api Libs.hamkrest
 
-    testCompile project(":http4k-format-jackson")
-    testCompile Config.TestDependencies
+    testImplementation project(":http4k-format-jackson")
+    testImplementation Config.TestDependencies
 }

@@ -86,7 +86,7 @@ allprojects {
     }
 
     configurations {
-        testArtifacts.extendsFrom testRuntime
+        testArtifacts.extendsFrom testApi
     }
 
     artifacts {
@@ -211,12 +211,12 @@ dependencies {
         }
         .forEach {
             api project(it.name)
-            testCompile project(path: it.name, configuration: 'testArtifacts')
+            testImplementation project(path: it.name, configuration: 'testArtifacts')
         }
 
-    testCompile Libs.s3
-    testCompile Libs.graphql_kotlin_schema_generator
-    testCompile Config.TestDependencies
+    testImplementation Libs.s3
+    testImplementation Libs.graphql_kotlin_schema_generator
+    testImplementation Config.TestDependencies
 }
 
 private boolean hasAnArtifact(Project it) {

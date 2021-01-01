@@ -5,6 +5,6 @@ dependencies {
     api project(":http4k-format-jackson")
     api Libs.graphql_java
 
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile Config.TestDependencies
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
 }

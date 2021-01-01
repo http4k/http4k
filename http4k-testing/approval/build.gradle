@@ -7,7 +7,7 @@ dependencies {
 
     api Libs.underscore
 
-    testCompile project(":http4k-core")
-    testCompile project(":http4k-testing-hamkrest")
-    testCompile Config.TestDependencies
+    testImplementation project(":http4k-core")
+    testImplementation project(":http4k-testing-hamkrest")
+    testImplementation Config.TestDependencies
 }
