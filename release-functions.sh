@@ -31,3 +31,11 @@ function create_tag {
     git tag -a "$LOCAL_VERSION" -m "http4k version $LOCAL_VERSION"
     git push origin "$LOCAL_VERSION"
 }
+
+function ensure_release_commit {
+    local CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD)
+
+    if [[ "$CHANGED_FILES" != *version.json* ]]; then
+        echo "Version did not change on this commit. Ignoring"; exit 0;
+    fi
+}
