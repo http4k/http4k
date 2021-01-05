@@ -51,7 +51,7 @@ class AccessTokenFetcher(
                 ?.let {
                     when {
                         APPLICATION_JSON.equalsIgnoringDirectives(it) -> with(accessTokenResponseBody(msg)) {
-                            AccessTokenDetails(AccessToken(accessToken), idToken?.let(::IdToken))
+                            AccessTokenDetails(toAccessToken(), idToken?.let(::IdToken))
                         }
                         APPLICATION_FORM_URLENCODED.equalsIgnoringDirectives(it) -> responseForm(msg)
                         else -> null
@@ -61,6 +61,15 @@ class AccessTokenFetcher(
 
     private fun Request.authenticate(accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator): Request =
         accessTokenFetcherAuthenticator.authenticate(this)
+
+    private fun AccessTokenResponse.toAccessToken(): AccessToken =
+        AccessToken(
+            accessToken,
+            type = tokenType ?: "Bearer",
+            expiresIn = expiresIn,
+            scope = scope,
+            refreshToken = refreshToken?.let(::RefreshToken)
+        )
 
     companion object {
         object Forms {
