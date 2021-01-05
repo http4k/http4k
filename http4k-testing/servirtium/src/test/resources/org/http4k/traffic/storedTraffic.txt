@@ -11,7 +11,9 @@ header1: value1
 ### Request body recorded for playback ():
 
 ```
-body
+{
+    "body": "value"
+}
 ```
 
 ## some other note
@@ -25,6 +27,8 @@ header3: value3
 ### Response body recorded for playback (200: ):
 
 ```
-body1
+{
+    "body1": "value1"
+}
 ```
 

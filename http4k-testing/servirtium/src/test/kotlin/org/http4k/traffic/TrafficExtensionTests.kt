@@ -71,11 +71,15 @@ class TrafficExtensionTests {
 
         val request1 = Request(GET, "/hello?query=123")
             .header("header1", "value1")
-            .body("body")
+            .body("{\n" +
+                "    \"body\": \"value\"\n" +
+                "}")
 
         val response1 = Response(OK)
             .header("header3", "value3")
-            .body("body1")
+            .body("{\n" +
+                "    \"body1\": \"value1\"\n" +
+                "}")
 
         assertThat(replay.requests().toList(), equalTo(listOf(request1)))
         assertThat(replay.responses().toList(), equalTo(listOf(response1)))

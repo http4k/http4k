@@ -1,11 +1,8 @@
-Unexpected request received for Interaction 0 ==> expected:<POST /foobar HTTP/1.1
-Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
-Connection: keep-alive
+Unexpected request received for Interaction 0 ==> expected: <POST /foobar HTTP/1.1
 Content-type: application/x-www-form-urlencoded
 Content-length: 7
 
-welcome> but was:<GET /foo HTTP/1.1
-Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
-Connection: keep-alive
+welcome> but was: <GET /foo HTTP/1.1
+Content-length: 0
 
 >
