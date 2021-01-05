@@ -62,9 +62,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             val storage = storageProvider(name).apply { clean() }
             return object : ServirtiumServer,
                 Http4kServer by
-                TrafficFilters.RecordTo(
-                    Sink.Servirtium(storage, options)
-                )
+                TrafficFilters.RecordTo(Sink.Servirtium(storage, options))
                     .then(SetHostFrom(target))
                     .then(options.trafficPrinter())
                     .then(proxyClient)
