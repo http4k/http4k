@@ -31,11 +31,27 @@ internal class AccessTokenFetcherTest {
     @Test
     fun `can get access token from json body`() {
         //see https://tools.ietf.org/html/rfc6749#section-4.1.4
-        val api = { _: Request -> Response(OK).with(accessTokenResponseBody of AccessTokenResponse("some-access-token")) }
+        val token = AccessToken(
+            value = "some-access-token",
+            type = "Bearer",
+            expiresIn = 42,
+            scope = "all, the, scopes",
+            refreshToken = RefreshToken("some-refresh-token")
+        )
+
+        val response = AccessTokenResponse(
+            accessToken = token.value,
+            tokenType = token.type,
+            expiresIn = token.expiresIn,
+            scope = token.scope,
+            refreshToken = token.refreshToken?.value,
+        )
+
+        val api = { _: Request -> Response(OK).with(accessTokenResponseBody of response) }
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
-        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessToken("some-access-token"))))
+        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(token)))
     }
 
     @Test
