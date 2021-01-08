@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.286.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v3.285.2
 - **http4k-testing-servirtium** : Fixed #553 - Servirtium storage fix for multi-line bodies.
 - **http4k-security-oauth** : Fixed #552 - AccessTokenFetcher initializes all AccessToken fields. H/T @@paraseba
