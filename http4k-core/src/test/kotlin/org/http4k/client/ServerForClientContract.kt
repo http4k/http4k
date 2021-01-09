@@ -81,13 +81,13 @@ object ServerForClientContract : HttpHandler {
         "/multiRequestHeader" bind POST to { r: Request ->
             Response(OK).body(r.headers.filter { it.first == "echo" }.map { it.first + ": " + it.second }.sorted().joinToString("\n"))
         },
-        "/multiResponseHeader" bind POST to { r: Request ->
+        "/multiResponseHeader" bind POST to { _: Request ->
             Response(OK).header("serverHeader", "foo").header("serverHeader", "bar")
         },
         "/multiRequestCookies" bind POST to { r: Request ->
             Response(OK).body(r.cookies().sortedBy(Cookie::name).joinToString("\n") { "${it.name}: ${it.value}" })
         },
-        "/multiResponseCookies" bind POST to { r: Request ->
+        "/multiResponseCookies" bind POST to { _: Request ->
             Response(OK).cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar"))
         },
         "/boom" bind GET to { throw IllegalArgumentException("BOOM!") },
