@@ -3,7 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.286.0 (uncut)
+### v4.0.0.0
+- New versioning scheme! See [announcement](https://www.http4k.org/blog/http4k_v4/) for details.
+- **http4k-*** : Remove all deprecations. To upgrade cleanly, follow the simple instructions in the [announcement](https://www.http4k.org/blog/http4k_v4/#upgrading_library_api_changes)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Replace `hostDemux()` with `reverseProxy()`.
 
