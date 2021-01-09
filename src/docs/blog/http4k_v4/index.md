@@ -1,14 +1,14 @@
-title: http4k blog: http4k v4 Unleashed. Four digits good... 
+title: http4k blog: 17 platforms and counting: http4k v4 Unleashed.
 description: There's a new major http4k release! Read about all the new stuff the team have been working on for http4k v4.
 
 # http4k v4 Unleashed. Four digits good... 
 
-##### november 2020 / the http4k team
+##### january 2021 / the http4k team
 
 Well, at last it's here - after 3 years - [http4k] v4! Following on from the [retrospective](/blog/retrospective_v3) that we did on version 3, we've been busy polishing, tidying up the edges, and pushing out a bunch of changes to make the project sparkle. Ready? Then let's dive into the good stuff that's been going on at [http4k] Towers.
 
 <hr/>
-#### ...3 digits bad. The new http4k versioning scheme
+#### Four digits good...3 digits bad. The new http4k versioning scheme
 Ah yes - versioning - everyone's favourite topic. Part of the reason that [http4k] v3 has been around so long is that we've somewhat been abusing the [Semantic versioning](https://semver.org/) system, something which we've been unhappy with. Here's how it should work:
 
 ```text
@@ -42,8 +42,8 @@ When [http4k] v3 was released, we only supported 3 JVM Server backends and 1 Ser
 
 ```text
 10 JVM Backends - Apache 4 & 5, Jetty, Ktor CIO & Netty, Netty, Ratpack, SunHttp and Undertow (+ any Servlet container)
-1 Native platform - GraalVM (+ Quarkus)
 6 Serverless platforms - Alibaba, AWS Lamba, Azure, Google Cloud, OpenWhisk (IBM/Adobe/Nimbella/Cloudstation), Tencent
+1 Native platform - GraalVM (+ Quarkus)
 ```
 
 Switching between all platforms is super easy - just plug the standard `HttpHandler` into the the relevant [http4k] module class with a single line of code. Serverless modules all require just one more line,  plus configuring the Serverless platform to call the relevant function. Here's examples for both:
@@ -122,13 +122,26 @@ There has been a decent amount of interest lately from our users to come to us t
 If your team would also like to take advantage of our experience in delivering projects using [http4k], then please visit the [support/training](/support) page, reach out and we'd love to see how we can help.
 
 <hr/>
-#### http4k Connect
+#### http4k Connect - Flyweight 3rd party adapters
 
 <img class="blogImage" src="./connect.png" alt="http4k connect"/>
 
-[http4k-connect](http://github.com/http4k/http4k-connect) is the team's newest side project, the purpose of which is to eventually standardise patterns for building 3rd party adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory, S3 or Redis). 
+[http4k-connect](http://github.com/http4k/http4k-connect) is the team's newest side project, the purpose of which is to eventually standardise patterns for building 3rd party system adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory, S3 or Redis). So far (v2.7.1.0), http4k-connect supports:
 
-Mostly, the existence of the project is to avoid us having to reinvent the same things again and again. It's pretty hot off the press, but will be receiving a lot of attention over the coming weeks and months, and we'll be documenting the mechanisms in both web and live talks.
+1. AWS KMS: Key Management Service
+1. AWS Lambda
+1. AWS S3: Simple Storage Service
+1. AWS Secrets Manager
+1. AWS SQS: Simple Queue Service
+1. AWS SSM: Systems Manager
+1. AWS STS: Security Token Service
+1. Google Analytics
+
+Mostly, the existence of the project is has been driven by 2 factors:
+1. to reduce dependency weight of bringing in SDK modules, especially when in a Serverless context. The AWS service SDKs are especially heavy. Using http4k-connect instead of official SDKs, overall Serverless Function distribution size should be reduced by at least an order of magnitude.
+2. to avoid us having to reinvent the same things again and again! (Because we're very very lazy developers!)
+
+It's pretty hot off the press, but will be receiving a lot of attention over the coming weeks and months, and we'll be documenting the mechanisms in both web and live talks.
 
 <hr/>
 #### That's all folks... (for the moment)
