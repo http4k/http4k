@@ -1,9 +1,8 @@
-on:
-  push:
-    tags:
-      - '*'
+on: [repository_dispatch]
+
 jobs:
   release-api:
+    if: github.event.action == 'http4k-release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
