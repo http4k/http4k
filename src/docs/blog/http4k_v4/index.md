@@ -5,11 +5,11 @@ description: There's a new major http4k release! Read about all the new stuff th
 
 ##### january 2021 / the http4k team
 
-Well, at last it's here - after 3 years - [http4k] v4! Following on from the [retrospective](/blog/retrospective_v3) that we did on version 3, we've been busy polishing, tidying up the edges, and pushing out a bunch of changes to make the project sparkle. Ready? Then let's dive into the good stuff that's been going on at [http4k] Towers.
+Well, at last it's here - after 3 years - http4k v4! Following on from the [retrospective](/blog/retrospective_v3) that we did on version 3, we've been busy polishing, tidying up the edges, and pushing out a bunch of changes to make the project sparkle. Ready? Then let's dive into the good stuff that's been going on at http4k Towers.
 
 <hr/>
 #### Four digits good, three digits bad. The new http4k versioning scheme
-Ah yes - versioning - everyone's favourite topic. Part of the reason that [http4k] v3 has been around so long is that we've somewhat been abusing the [Semantic versioning](https://semver.org/) system, something which we've been unhappy with. Here's how it should work:
+Ah yes - versioning - everyone's favourite topic. Part of the reason that http4k v3 has been around so long is that we've somewhat been abusing the [Semantic versioning](https://semver.org/) system, something which we've been unhappy with. Here's how it should work:
 
 ```text
 For Version <A>.<B>.<C>
@@ -38,7 +38,7 @@ As you can see, for our users we'll be concentrating on changes in numbers A (oc
 
 <img class="blogImage" src="./backends.png" alt="http4k backends"/>
 
-When [http4k] v3 was released, we only supported 3 JVM Server backends and 1 Serverless platform. Since then, we've added a bunch, and are now up to a very respectable 17 standard deployment options for http4k apps...
+When http4k v3 was released, we only supported 3 JVM Server backends and 1 Serverless platform. Since then, we've added a bunch, and are now up to a very respectable 17 standard deployment options for http4k apps...
 
 ```text
 10 JVM Backends - Apache 4 & 5, Jetty, Ktor CIO & Netty, Netty, Ratpack, SunHttp and Undertow (+ any Servlet container)
@@ -46,7 +46,7 @@ When [http4k] v3 was released, we only supported 3 JVM Server backends and 1 Ser
 1 Native platform - GraalVM (+ Quarkus)
 ```
 
-Switching between all platforms is super easy - just plug the standard `HttpHandler` into the the relevant [http4k] module class with a single line of code. Serverless modules all require just one more line,  plus configuring the Serverless platform to call the relevant function. Here's examples for both:
+Switching between all platforms is super easy - just plug the standard `HttpHandler` into the the relevant http4k module class with a single line of code. Serverless modules all require just one more line, plus configuring the Serverless platform to call the relevant function. Here's examples for both:
 ```kotlin
 val app: HttpHandler = { req: Request -> Response(OK).body("hello world!") }
 
@@ -55,14 +55,14 @@ val jvmApp = app.asServer(Netty(8080)).start()
 class MyServerlessFunction : GoogleCloudFunction(app)
 ```
 
-The even better news is that testing your [http4k] apps locally (regardless of platform) is simple - and as ever there's no magic involved - just test them entirely in-memory, or bind them to a standard backend Server.
+The even better news is that testing your http4k apps locally (regardless of platform) is simple - and as ever there's no magic involved - just test them entirely in-memory, or bind them to a standard backend Server.
 
 <hr/>
 #### http4k Toolbox: your new Swiss Army Knife
 
 <img class="blogImage" src="./toolbox.png" alt="toolbox"/>
 
-As documented in the [Toolbox announcement post](/blog/toolbox), we've been busy consolidating a bunch of handy tools for generating code to work with [http4k] projects, and we christened this the **http4k Toolbox** and it's available in both [online](https://toolbox.http4k.org) and a CLI flavours (available from Brew and SDKMan!). From [Project Generation](https://toolbox.httpk.org/project) to our own more sophisticated [OpenAPI3 Generator](https://toolbox.httpk.org/openapi), we hope that this become an essential tool in every **http4k** developer's pocket.
+As documented in the [Toolbox announcement post](/blog/toolbox), we've been busy consolidating a bunch of handy tools for generating code to work with http4k projects, and we christened this the **http4k Toolbox** and it's available in both [online](https://toolbox.http4k.org) and a CLI flavours (available from Brew and SDKMan!). From [Project Generation](https://toolbox.httpk.org/project) to our own more sophisticated [OpenAPI3 Generator](https://toolbox.httpk.org/openapi), we hope that this become an essential tool in every **http4k** developer's pocket.
 
 <hr/>
 #### Infinirouting
@@ -80,15 +80,15 @@ val app = routes("/{name}" bind POST to (
 )
 ```
 
-So after a lot of clattering and banging of heads, we cracked it - and in doing so managed to rewrite the entire of the [http4k] routing layer in terms of these predicate `Routers`. It's really neat, infinitely(ish) nestable, and makes us feel just a little bit smug for getting it working.
+So after a lot of clattering and banging of heads, we cracked it - and in doing so managed to rewrite the entire of the http4k routing layer in terms of these predicate `Routers`. It's really neat, infinitely(ish) nestable, and makes us feel just a little bit smug for getting it working.
 
 <hr/>
 #### Graph power
 <img class="blogImage" src="./graphql.png" alt="http4k graphql"/>
 
-Traditionally, [http4k] has concentrated on providing routing for REST-style APIs. However, there is this new thing called GraphQL that has suddenly sprung up overnight and seems quite popular. 
+Traditionally, http4k has concentrated on providing routing for REST-style APIs. However, there is this new thing called GraphQL that has suddenly sprung up overnight and seems quite popular. 
 
-Not wanting our users to miss out on anything, we've added support for simply integrating [http4k] with the official Java implementation of the library, [GraphQL-Java](https://www.graphql-java.com/). This module allows you to both serve and consume GQL APIs, and as per tradition allows you to test your APIs entirely in-memory making for super-fast test suites.
+Not wanting our users to miss out on anything, we've added support for simply integrating http4k with the official Java implementation of the library, [GraphQL-Java](https://www.graphql-java.com/). This module allows you to both serve and consume GQL APIs, and as per tradition allows you to test your APIs entirely in-memory making for super-fast test suites.
 
 <hr/>
 #### OpenTelemetry: Monitor all the things!
@@ -98,19 +98,19 @@ Not wanting our users to miss out on anything, we've added support for simply in
 The [OpenTelemetry](https://opentelemetry.io/) project describes itself as...
 > **"... a collection of tools, APIs, and SDKs. You use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior." - OpenTelemetry.io**
 
-It's a great project run by the CNCF and very well fits in with the ethos that the [http4k] team believes in. As with all [http4k] integration modules, we want to enable [http4k] developers to be able to plug in their apps as simply as possible - in this case, just configure the OpenTelemetry API or Java-agent, then just add some simple `Filters` to your code to start collecting Distributed Traces or Metrics. Several tracing schemes are supported, including Amazon XRay, Jaeger and Zipkin.
+It's a great project run by the CNCF and very well fits in with the ethos that the http4k team believes in. As with all http4k integration modules, we want to enable http4k developers to be able to plug in their apps as simply as possible - in this case, just configure the OpenTelemetry API or Java-agent, then just add some simple `Filters` to your code to start collecting Distributed Traces or Metrics. Several tracing schemes are supported, including Amazon XRay, Jaeger and Zipkin.
 
 For more docs on how to get it all working, head over to the [docs](/guide/modules/opentelemetry).
 
 <hr/>
 #### Upgrading & library API changes
-Like the neat little worker bunnies we are, we've also taken the opportunity to clean up the [http4k] source code. All previously deprecated code has been removed, leaving the codebase nice and tid17 platforms and counting: http4k v4 Unleashedy. If you are upgrading, the best idea is to first upgrade to the last v3 version (v3.285.2), deal with any existing deprecations in place, then simply upgrade again to v4.0.0.0.
+Like the neat little worker bunnies we are, we've also taken the opportunity to clean up the http4k source code. All previously deprecated code has been removed, leaving the codebase nice and tidy. If you are upgrading, the best idea is to first upgrade to the last v3 version (v3.285.2), deal with any existing deprecations in place, then simply upgrade again to v4.0.0.0.
 
 <hr/>
 #### http4k.org
-One of the things that our users feedback about was that the structure of the docs in [http4k.org][http4k] could be improved, so we've begun overhauling the site to simplify the content. Expect this to be a continual improvement thing, but on the whole the content will be organised as follows:
+One of the things that our users feedback about was that the structure of the docs in [http4k.org]http4k could be improved, so we've begun overhauling the site to simplify the content. Expect this to be a continual improvement thing, but on the whole the content will be organised as follows:
 
-- The [Developer guide](/guide) will contain descriptions of the underlying concepts in and around the libraries. Code in the guide will be snippet-based.
+- The [Developer guide](/guide/modules) will contain descriptions of the underlying concepts in and around the libraries. Code in the guide will be snippet-based.
 - The [Cookbook](/cookbook) will contain extended examples of how to accomplish particular tasks. eg. provide a custom `ServerConfig` implementation. Code here will generally be complete and contain runnable examples.
 - The [Examples repo](https://github.com/http4k/examples) hosts fully self-contained, runnable projects that can be used as a baseline for particular features - eg. how to write and run an [app on Quarkus](https://github.com/http4k/examples/tree/master/quarkus) or use the cloudnative module to enable [typesafe configuration](https://github.com/http4k/examples/tree/master/typesafe-configuration)
 

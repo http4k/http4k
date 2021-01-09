@@ -7,9 +7,9 @@ description: You thought that microservices were a thing? Pah! The powerful abst
 
 http4k is a small library with a zero dependencies (apart from Kotlin StdLib), but what really makes it shine is the power afforded by the combination of the "Server as a Function" concepts of `HttpHandler` and `Filter`. 
 
-Skeptical? We would be disappointed if you weren't! Hence, we decided to prove the types of things that can be accomplished with the APIs provided by [http4k] and a little ingenuity.
+Skeptical? We would be disappointed if you weren't! Hence, we decided to prove the types of things that can be accomplished with the APIs provided by http4k and a little ingenuity.
 
-For each of the examples below, there is a fully formed [http4k] application declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()` using one of the swappable server backends. Even better, each of app's code (excluding import statements 🙂 ) fits in a single Tweet.
+For each of the examples below, there is a fully formed http4k application declared inside a function, and the scaffolding to demonstrating it working in an accompanying `main()` using one of the swappable server backends. Even better, each of app's code (excluding import statements 🙂 ) fits in a single Tweet.
 
 ### 1. Build a simple proxy [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/simple_proxy.kt)
 Requires: `http4k-core`
@@ -103,7 +103,7 @@ Use Websockets to remote control a terminal!* Run the example and just type comm
 
 <hr/>
 
-Obviously we haven't thought of everything here. We'd love to hear your ideas about other clever uses of the [http4k] building blocks, or to take PRs to integrate them into the library for wider use. You can get in touch through [GitHub](http://github.com/http4k) or the usual [channels].
+Obviously we haven't thought of everything here. We'd love to hear your ideas about other clever uses of the http4k building blocks, or to take PRs to integrate them into the library for wider use. You can get in touch through [GitHub](http://github.com/http4k) or the usual [channels].
 
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org

@@ -6,7 +6,7 @@ description: An overview of how to configure http4k applications using the http4
 ##### november 2018 / [@daviddenton][github]
 
 ### Intro
-This post covers the various concerns around configuring HTTP apps, and introduces the [http4k] approach for addressing these when deploying applications into cloud-native environments, which leverages the Kotlin type system for maximum safely and code reuse.
+This post covers the various concerns around configuring HTTP apps, and introduces the http4k approach for addressing these when deploying applications into cloud-native environments, which leverages the Kotlin type system for maximum safely and code reuse.
 
 ### Concerns when configuring applications
 One of the tenets of operating applications according to the principles of [12factor], 
@@ -98,13 +98,13 @@ Implementing this kind of fallback logic manually, you'd end up with code like t
 
 ### The http4k approach...
 There are [already][properlty] [many][config4k] [options][konf] [for][cfg4k] [configurational][configur8] 
-[libraries][kaconf] written in Kotlin, but [http4k] also provides an option in the `http4k-cloudnative` add-on module 
+[libraries][kaconf] written in Kotlin, but http4k also provides an option in the `http4k-cloudnative` add-on module 
 which leverages the power of the Lens system already built into the core library to provide a consistent experience to 
 API users. In case you're new to Lenses, here's a recap...
 
 ### Lenses - a recap
 In [http4k], Lenses are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
-although this concept has been extended within the [http4k] ecosystem to support that of a form handling and request 
+although this concept has been extended within the http4k ecosystem to support that of a form handling and request 
 contexts.
 
 A Lens is an stateless object responsible for either the one-way (or Bidirectional) transformation of
@@ -127,7 +127,7 @@ an overall target and a name within that target.
 This is done in code using the `map()` method defined on the Lens.
 4. the **optionality** of a Lens denotes the behaviour if/when a value cannot be found in the target.
 
-To define a Lens instance through the [http4k] Lens API, we take an initial **target** specification, decide it's 
+To define a Lens instance through the http4k Lens API, we take an initial **target** specification, decide it's 
 **multiplicity**, provide any **transformations** with `map()`, and finally reify the specification into a Lens instance 
 by deciding it's optionality.
 
@@ -137,7 +137,7 @@ here we define a bi-directional Lens for custom type `Page`, extracted from a qu
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/lens_example.kt"></script>
 
 In [http4k], Lenses are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
-although this concept has been extended within the [http4k] ecosystem to support that of a form handling and request 
+although this concept has been extended within the http4k ecosystem to support that of a form handling and request 
 contexts.
 
 ### http4k Environments
@@ -149,13 +149,13 @@ component values.
 
 If you're using any of the other Kotlin-based configuration libraries, the above should look pretty familiar. The 
 difference starts to become apparent when attempting to retrieve values from the `Environment` instance. This is done 
-using `EnviromentKey` Lenses, which are an extension of the [http4k] Lens system that specifically targets `Environment` 
+using `EnviromentKey` Lenses, which are an extension of the http4k Lens system that specifically targets `Environment` 
 objects. 
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/typesafe.kt"></script>
 
 ##### Handling failure
-When using the [http4k] Environment to define config, missing or values which cannot be deserialised all now cause 
+When using the http4k Environment to define config, missing or values which cannot be deserialised all now cause 
 a `LensFailure` to be thrown with a descriptive error message. As before, this results in the application failing to 
 start, but as the exception if both consistent and explicit, diagnosing the problem becomes much simpler.
 
