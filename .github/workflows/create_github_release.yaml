@@ -1,0 +1,17 @@
+on: [repository_dispatch]
+jobs:
+  release:
+    if: github.event.action == 'http4k-release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./build-release-note.sh ${{ github.event.client_payload.version }} > NOTE.md
+      - uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.client_payload.version }}
+          release_name: ${{ github.event.client_payload.version }}
+          body_path: NOTE.md
+          draft: false
+          prerelease: false

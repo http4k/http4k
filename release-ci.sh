@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#if [[ `git rev-parse --abbrev-ref HEAD` != "master" ]]; then
-#    echo "not master branch, so skipping"
-#    exit 0
-#fi
-
 set -e
 set -o errexit
 set -o pipefail
@@ -28,15 +23,3 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 for i in $(./listProjects.sh); do
     ./gradlew --stacktrace -PreleaseVersion=$LOCAL_VERSION :$i:bintrayUpload
 done
-
-function notify_slack {
-    local MESSAGE=$1
-    echo "Notifying on Slack..."
-    curl -X POST -H 'Content-type: application/json' --data "{'text':'$MESSAGE'}" $SLACK_WEBHOOK
-}
-
-if [ $? -ne 0 ]; then
-    notify_slack "Release has failed. for details."
-else
-    notify_slack "Released version <https://bintray.com/http4k/maven/http4k-core/$LOCAL_VERSION|$LOCAL_VERSION> (See <https://github.com/http4k/http4k/blob/master/CHANGELOG.md#changelog|Changelog> for details)."
-fi

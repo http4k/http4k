@@ -1,20 +1,13 @@
 on: [repository_dispatch]
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:
   create-toolbox-release:
     if: github.event.action == 'http4k-release'
     runs-on: ubuntu-latest
     steps:
-      - name: Debug Action
-        uses: hmarr/debug-action@v1.0.0
-      - name: Grab tag name
-        uses: olegtarasov/get-tag@v2
-        id: tagName
       - name: Trigger toolbox
         uses: peter-evans/repository-dispatch@v1.1.1
         with:
           token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
           repository: http4k/toolbox
           event-type: http4k-release
-          client-payload: '{"version": "${{ steps.tagName.outputs.tag }}"}'
+          client-payload: '{"version": "${{ github.event.client_payload.version }}"}'

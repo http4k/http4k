@@ -1,0 +1,10 @@
+on: [repository_dispatch]
+jobs:
+  tweet:
+    if: github.event.action == 'http4k-release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./notify-slack.sh
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
