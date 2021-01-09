@@ -8,7 +8,7 @@ description: There's a new major http4k release! Read about all the new stuff th
 Well, at last it's here - after 3 years - [http4k] v4! Following on from the [retrospective](/blog/retrospective_v3) that we did on version 3, we've been busy polishing, tidying up the edges, and pushing out a bunch of changes to make the project sparkle. Ready? Then let's dive into the good stuff that's been going on at [http4k] Towers.
 
 <hr/>
-#### Four digits good...3 digits bad. The new http4k versioning scheme
+#### Four digits good, three digits bad. The new http4k versioning scheme
 Ah yes - versioning - everyone's favourite topic. Part of the reason that [http4k] v3 has been around so long is that we've somewhat been abusing the [Semantic versioning](https://semver.org/) system, something which we've been unhappy with. Here's how it should work:
 
 ```text
