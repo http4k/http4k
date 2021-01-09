@@ -130,14 +130,14 @@ If your team would also like to take advantage of our experience in delivering p
 
 [http4k-connect](http://github.com/http4k/http4k-connect) is the team's newest side project, the purpose of which is to eventually standardise patterns for building 3rd party system adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory, S3 or Redis). So far (v2.7.1.0), http4k-connect supports:
 
-1. AWS KMS: Key Management Service
-1. AWS Lambda
-1. AWS S3: Simple Storage Service
-1. AWS Secrets Manager
-1. AWS SQS: Simple Queue Service
-1. AWS SSM: Systems Manager
-1. AWS STS: Security Token Service
-1. Google Analytics
+- AWS KMS: Key Management Service
+- AWS Lambda
+- AWS S3: Simple Storage Service
+- AWS Secrets Manager
+- AWS SQS: Simple Queue Service
+- AWS SSM: Systems Manager
+- AWS STS: Security Token Service
+- Google Analytics
 
 Mostly, the existence of the project is has been driven by 2 factors:
 1. to reduce dependency weight of bringing in SDK modules, especially when in a Serverless context. The AWS service SDKs are especially heavy. Using http4k-connect instead of official SDKs, overall Serverless Function distribution size should be reduced by at least an order of magnitude.
