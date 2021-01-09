@@ -5,8 +5,9 @@ changes with their rationale when appropriate:
 
 ### v4.0.0.0
 - New versioning scheme! See [announcement](https://www.http4k.org/blog/http4k_v4/) for details.
-- **http4k-*** : Remove all deprecations. To upgrade cleanly, follow the simple instructions in the [announcement](https://www.http4k.org/blog/http4k_v4/#upgrading_library_api_changes)
+- **http4k-*** : Remove all previous deprecations from all modules. To upgrade cleanly, follow the simple instructions in the [announcement](https://www.http4k.org/blog/http4k_v4/#upgrading_library_api_changes)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-webdriver** : Upgrade of APIs to match new v4 Selenium APIs. It is quite safe to continue to use previous versions of the `http4k-testing-webdriver` JAR if you are unable to upgrade immediately.
 - **http4k-core** : Replace `hostDemux()` with `reverseProxy()`.
 
 ### v3.285.2
