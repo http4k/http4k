@@ -1,7 +1,7 @@
 on: [repository_dispatch]
 jobs:
-  tweet:
-    if: github.event.action == 'http4k-release'
+  slackify:
+    if: github.event.action == 'http4k-release2'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
