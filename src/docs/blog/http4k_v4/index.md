@@ -128,7 +128,7 @@ If your team would also like to take advantage of our experience in delivering p
 
 <img class="blogImage" src="./connect.png" alt="http4k connect"/>
 
-[http4k-connect](http://github.com/http4k/http4k-connect) is the team's newest side project, the purpose of which is to eventually standardise patterns for building 3rd party system adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory, S3 or Redis). So far (v2.7.1.0), http4k-connect supports:
+[http4k-connect](http://github.com/http4k/http4k-connect) is the team's newest side project, the purpose of which is to eventually standardise patterns for building 3rd party system adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory, S3 or Redis). So far (v2.8.0.0), http4k-connect supports:
 
 - AWS KMS: Key Management Service
 - AWS Lambda
