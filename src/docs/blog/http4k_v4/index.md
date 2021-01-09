@@ -1,7 +1,7 @@
-title: http4k blog: 17 platforms and counting: http4k v4 Unleashed
+title: http4k blog: http4k v4: 17 platforms and counting...
 description: There's a new major http4k release! Read about all the new stuff the team have been working on for http4k v4.
 
-# 17 platforms and counting: http4k v4 Unleashed
+# http4k v4: 17 platforms and counting...
 
 ##### january 2021 / the http4k team
 
