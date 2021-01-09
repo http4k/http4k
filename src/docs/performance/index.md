@@ -1,11 +1,11 @@
 title: http4k Performance
 description: An overview of http4k performance
 
-The [http4k] server-backend modules provide a very thin adapter layer over the raw APIs of the underlying servers, so 
+The http4k server-backend modules provide a very thin adapter layer over the raw APIs of the underlying servers, so 
 generally performs at a very low overhead compared to the raw server.
 
 ### Tech Empower Benchmarks
-We have entered [http4k] into the prominent [Tech Empower Framework Benchmarks](https://www.techempower.com/benchmarks/) 
+We have entered http4k into the prominent [Tech Empower Framework Benchmarks](https://www.techempower.com/benchmarks/) 
 project, which assesses frameworks over a series of realistic tests. 
 
 For this benchmark, no customisation or performance tuning of the underlying servers was done - the default application 

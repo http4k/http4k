@@ -24,7 +24,7 @@ implementation group: "org.http4k", name: "http4k-template-thymeleaf", version: 
 ```
 
 ### About
-The [http4k] templating API provides a standard mechanism for rendering using common templating libraries. Simply implement the `ViewModel` interface on a model class and pass it to the renderer to get a string. All of the implementations support view rendering using the following strategies:
+The http4k templating API provides a standard mechanism for rendering using common templating libraries. Simply implement the `ViewModel` interface on a model class and pass it to the renderer to get a string. All of the implementations support view rendering using the following strategies:
 
 * Cached on the classpath
 * Cached from the filesystem

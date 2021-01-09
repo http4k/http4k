@@ -9,7 +9,7 @@ implementation group: "org.http4k", name: "http4k-testing-webdriver", version: "
 
 ### About
 
-A basic Selenium WebDriver API implementation for [http4k] HttpHandlers, which runs completely out of container (no network) for ultra fast tests, backed by JSoup.
+A basic Selenium WebDriver API implementation for http4k HttpHandlers, which runs completely out of container (no network) for ultra fast tests, backed by JSoup.
 
 | Feature | Supported | Notes |
 |---------|-----------|-------|

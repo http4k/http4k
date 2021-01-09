@@ -8,7 +8,7 @@ implementation group: "org.http4k", name: "http4k-testing-servirtium", version: 
 ```
 
 ### About
-Service Virtualisation testing technology provides a way of declaring contracts which can record HTTP conversations to a custom Markdown format and then replaying them later offline. [http4k] provides a fully featured implementation of the [Servirtium] solution to implement this concept.
+Service Virtualisation testing technology provides a way of declaring contracts which can record HTTP conversations to a custom Markdown format and then replaying them later offline. http4k provides a fully featured implementation of the [Servirtium] solution to implement this concept.
 
 The basic idea is that you define an abstract contract Class/Interface which describes the expected behaviour for a system using a Client class (aka the `Client-Under-Test`). This contract is then implemented twice:
 
@@ -19,9 +19,9 @@ The result of these 2 implementations is that we can exercise the `Client-Under-
 
 [http4k] provides a few different pieces of support for [Serviritum]:
 
-1. [JUnit5] extensions which provide the record/replay behaviour, providing a way to record and replay contracts without the use of a real server. This is only compatible when the `Client-Under-Test` utilises a [http4k] Client, since it leverages the Server-as-a-Function paradigm.
+1. [JUnit5] extensions which provide the record/replay behaviour, providing a way to record and replay contracts without the use of a real server. This is only compatible when the `Client-Under-Test` utilises a http4k Client, since it leverages the Server-as-a-Function paradigm.
 
-2. MiTM proxy servers for record/replay behaviour, by inserting themselves as a proxy in the HTTP call chain and intercepting the HTTP traffic. This is compatible with HTTP clients using any JVM technology, not just [http4k] services - so can be used as a general JVM-based solution for implementing [Servirtium]-style tests.
+2. MiTM proxy servers for record/replay behaviour, by inserting themselves as a proxy in the HTTP call chain and intercepting the HTTP traffic. This is compatible with HTTP clients using any JVM technology, not just http4k services - so can be used as a general JVM-based solution for implementing [Servirtium]-style tests.
 
 3. A Storage Provider abstraction for storing and loading recorded contracts from various locations including disk and directly from [GitHub].
 

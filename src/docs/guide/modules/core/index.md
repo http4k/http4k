@@ -81,7 +81,7 @@ Check out the `org.http4k.filter` package for the exact list.
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/core/FilterTest.kt"></script>
 
 ### Routers - Nestable, path-based Routing
-Create a Router using routes() to bind a static or dynamic path to either an HttpHandler, or to another sub-Router. These Routers can be nested infinitely deep and [http4k] will search for a matching route using a depth-first search algorithm, before falling back finally to a 404:
+Create a Router using routes() to bind a static or dynamic path to either an HttpHandler, or to another sub-Router. These Routers can be nested infinitely deep and http4k will search for a matching route using a depth-first search algorithm, before falling back finally to a 404:
 ```kotlin
 routes(
     "/hello" bind routes(
@@ -102,7 +102,7 @@ Note that the `http4k-contract` module contains a more typesafe implementation o
 Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. 
 For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing). 
 
-A Lens is a bi-directional entity which can be used to either **get** or **set** a particular value from/onto an HTTP message. [http4k] provides a DSL 
+A Lens is a bi-directional entity which can be used to either **get** or **set** a particular value from/onto an HTTP message. http4k provides a DSL 
 to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). 
 
 To utilise a lens, first you have to declare it with the form `<Location>.<configuration and mapping operations>.<terminator>`.
@@ -201,7 +201,7 @@ client.received.take(2).forEach(::println)
 ```
 
 ### Request and Response toString()
-The HttpMessages used by [http4k] toString in the HTTP wire format, which it simple to capture and replay HTTP message streams later in a similar way to tools like [Mountebank](http://www.mbtest.org/).
+The HttpMessages used by http4k toString in the HTTP wire format, which it simple to capture and replay HTTP message streams later in a similar way to tools like [Mountebank](http://www.mbtest.org/).
 
 ### CURL format
 Creates `curl` command for a given request - this is useful to include in audit logs so exact requests can be replayed if required:

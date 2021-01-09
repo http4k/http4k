@@ -27,7 +27,7 @@ implementation group: "org.http4k", name: "http4k-serverless-tencent", version: 
 These modules provide integration with Serverless deployment environments, such as AWS Lambda or Google Cloud Functions by implementing a single interface. 
 
 #### AWS Lambda integration
-Since [http4k] is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
+Since http4k is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
 
 In order to achieve this, only a single interface `AppLoader` needs to be implemented and a simple extension of `AwsLambdaFunction` supplied depending on which invocation type is required - Direct, ApiGateway V1/2 or ApplicationLoadBalancer.
 
