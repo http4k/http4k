@@ -1,7 +1,7 @@
 on: [repository_dispatch]
 jobs:
   slackify:
-    if: github.event.action == 'http4k-release2'
+    if: github.event.action == 'http4k-release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
