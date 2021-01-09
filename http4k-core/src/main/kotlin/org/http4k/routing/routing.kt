@@ -21,12 +21,6 @@ infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterB
 infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
 
 /**
- * Matches the Host header to a matching Handler.
- */
-@Deprecated("Replaced by reverseProxy()", ReplaceWith("reverseProxy(hosts)"))
-fun hostDemux(vararg hosts: Pair<String, HttpHandler>) = reverseProxy(*hosts)
-
-/**
  * Simple Reverse Proxy which will split and direct traffic to the appropriate
  * HttpHandler based on the content of the Host header
  */
