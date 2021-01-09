@@ -4,7 +4,7 @@ description: Feature overview of the http4k-graphql module.
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-graphql", version: "3.285.2"
+implementation group: "org.http4k", name: "http4k-graphql", version: "4.0.0.0"
 ```
 
 ### About
