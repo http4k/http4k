@@ -104,7 +104,7 @@ For more docs on how to get it all working, head over to the [docs](/guide/modul
 
 <hr/>
 #### Upgrading & library API changes
-Like the neat little worker bunnies we are, we've also taken the opportunity to clean up the [http4k] source code. All previously deprecated code has been removed, leaving the codebase nice and tidy. If you are upgrading, the best idea is to first upgrade to a late v3 version (v4.0.0.0), deal with any existing deprecations in place, then simply upgrade again to v4.0.0.0.
+Like the neat little worker bunnies we are, we've also taken the opportunity to clean up the [http4k] source code. All previously deprecated code has been removed, leaving the codebase nice and tid17 platforms and counting: http4k v4 Unleashedy. If you are upgrading, the best idea is to first upgrade to the last v3 version (v3.285.2), deal with any existing deprecations in place, then simply upgrade again to v4.0.0.0.
 
 <hr/>
 #### http4k.org
