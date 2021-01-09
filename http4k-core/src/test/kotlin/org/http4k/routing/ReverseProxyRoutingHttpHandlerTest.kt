@@ -12,10 +12,10 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class HostDemuxRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
-    override val handler = hostDemux("host" to routes(validPath bind GET to { Response(OK) }))
+class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
+    override val handler = reverseProxy("host" to routes(validPath bind GET to { Response(OK) }))
 
-    private val otherHandler = hostDemux(hostFor("host1"), hostFor("host2"))
+    private val otherHandler = reverseProxy(hostFor("host1"), hostFor("host2"))
 
     @Test
     override fun `does not match a particular route`() {

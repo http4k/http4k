@@ -23,7 +23,19 @@ infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
 /**
  * Matches the Host header to a matching Handler.
  */
-fun hostDemux(vararg hosts: Pair<String, HttpHandler>) = routes(*hosts.map { header("host", it.first) bind it.second }.toTypedArray())
+@Deprecated("Replaced by reverseProxy()", ReplaceWith("reverseProxy(hosts)"))
+fun hostDemux(vararg hosts: Pair<String, HttpHandler>) = reverseProxy(*hosts)
+
+/**
+ * Simple Reverse Proxy which will split and direct traffic to the appropriate
+ * HttpHandler based on the content of the Host header
+ */
+fun reverseProxy(vararg hostToHandler: Pair<String, HttpHandler>) = routes(
+    *hostToHandler
+        .map { service ->
+            header("host") { it.contains(service.first) } bind service.second
+        }.toTypedArray()
+)
 
 /**
  * Apply routing predicate to a query

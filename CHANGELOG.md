@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.286.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Replace `hostDemux()` with `reverseProxy()`.
 
 ### v3.285.2
 - **http4k-testing-servirtium** : Fixed #553 - Servirtium storage fix for multi-line bodies.
