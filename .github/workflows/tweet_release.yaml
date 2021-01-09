@@ -1,5 +1,4 @@
 on: [repository_dispatch]
-
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:

@@ -1,5 +1,4 @@
 on: [repository_dispatch]
-
 jobs:
   release:
     if: github.event.action == 'http4k-release'
