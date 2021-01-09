@@ -10,7 +10,6 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.junit.jupiter.api.Test
-import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
@@ -199,7 +198,7 @@ class Http4kWebDriverTest {
         assertLinkGoesTo("/", By.id("rootBackPath"), "/bob/link")
     }
 
-    private fun assertLinkGoesTo(initial: String, by: By, expected: String) {
+    private fun assertLinkGoesTo(initial: String, by: org.openqa.selenium.By, expected: String) {
         driver.get(initial)
         driver.findElement(by)!!.click()
         driver.assertOnPage(expected)
