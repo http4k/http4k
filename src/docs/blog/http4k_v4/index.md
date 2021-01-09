@@ -69,13 +69,15 @@ As documented in the [Toolbox announcement post](/blog/toolbox), we've been busy
 
 <img class="blogImage" src="./routing.png" alt="http4k routing"/>
 
-The v3 routing scheme was pretty good as you could bind routes on static or dynamic paths and HTTP verbs, but being rampant power seekers, we wanted it to be better. We reasoned that if we could route traffic to HttpHandlers based on those things, then why not be able to route on *any* part of the request? We'd like to be able to do complicated matching this:
+The v3 routing scheme was pretty good as you could bind routes on static or dynamic paths and HTTP verbs, but being rampant power seekers, we wanted it to be better. We reasoned that if we could route traffic to HttpHandlers based on those things, then why not be able to route on *any* part of the request? We'd like to be able to do complicated matching - so for instance: 
+
+> **"Match the `/name` path, but only when the `host` header is `http4k.org`. Then add 2 submatches, one where there is a query parameter named `queryName`, the other where the body is > 50 bytes long."**
 
 ```kotlin
 val app = routes("/{name}" bind POST to (
     header("host") { it == "http4k.org" } bind routes(
         queries("queryName") bind { Response(OK).body("i had a query") },
-        body { body: String -> body.length > 5000 } bind { Response(OK).body("I was long") }
+        body { body: String -> body.length > 50 } bind { Response(OK).body("I was long") }
     ))
 )
 ```
