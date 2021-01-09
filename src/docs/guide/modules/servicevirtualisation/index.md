@@ -17,7 +17,7 @@ The basic idea is that you define an abstract contract Class/Interface which des
 
 The result of these 2 implementations is that we can exercise the `Client-Under-Test` code against different versions of the contract without performing any actual remote calls to prove compatibility. This is important because there may be complicated orchestration required for testing against a real system, or the end service may be unavailable or flaky.
 
-[http4k] provides a few different pieces of support for [Serviritum]:
+http4k provides a few different pieces of support for [Serviritum]:
 
 1. [JUnit5] extensions which provide the record/replay behaviour, providing a way to record and replay contracts without the use of a real server. This is only compatible when the `Client-Under-Test` utilises a http4k Client, since it leverages the Server-as-a-Function paradigm.
 

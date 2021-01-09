@@ -21,7 +21,7 @@ Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the
 - APIs to **record and replay** HTTP traffic to disk or memory
 
 #### HttpHandlers 
-In [http4k], an HTTP service is just a typealias of a simple function:
+In http4k, an HTTP service is just a typealias of a simple function:
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
@@ -41,7 +41,7 @@ println(response.bodyString())
 To mount the `HttpHandler` in a container, the can simply be converted to a Servlet by calling ```handler.asServlet()```
 
 ### Filters
-Filters add extra processing to either the Request or Response. In [http4k], they are modelled as:
+Filters add extra processing to either the Request or Response. In http4k, they are modelled as:
 ```kotlin
 interface Filter : (HttpHandler) -> HttpHandler
 ``` 
@@ -149,7 +149,7 @@ Websockets have been modeled using the same methodology as standard HTTP endpoin
 
 1. `WsHandler` - represented as a typealias: `WsHandler =  (Request) -> WsConsumer?`. This is responsible for matching an HTTP request to a websocket.
 1. `WsConsumer` - represented as a typealias: `WsConsumer = (WebSocket) -> Unit`. This function is called on connection of a websocket and allow the API user to react to events coming from the connected websocket.
-1. `WsMessage` - a message which is sent or received on a websocket. This message can take advantage of the typesafety accorded to other entities in http4k by using the Lens API. Just like the [http4k](https://github.com/http4k/http4k) HTTP message model, WsMessages are immutable data classes.
+1. `WsMessage` - a message which is sent or received on a websocket. This message can take advantage of the typesafety accorded to other entities in http4k by using the Lens API. Just like the http4k HTTP message model, WsMessages are immutable data classes.
 
 The routing aspect of Websockets is done using a very similar API to the standard HTTP routing for HTTP messages and dynamic parts of the upgrade request are available when constructing a websocket instance:
 

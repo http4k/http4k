@@ -93,7 +93,7 @@ val decoratedApp: HttpHandler = composedFilter.then(app)
 Filters are also trivial to test independently, because they are generally just stateless functions.
 
 #### Routing
-[http4k]'s nestable routing looks a lot like every other Sinatra-style framework these 
+http4k's nestable routing looks a lot like every other Sinatra-style framework these 
 days, and allows for infinitely nesting `HttpHandlers` - this just exposes another `HttpHandler` so you can easily extract, 
 test and reuse sets of routes as easily as you could with one:
 ```kotlin

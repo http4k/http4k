@@ -60,7 +60,7 @@ The module also provides the following built-in extensions:
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/approvaltests/example_json.kt"></script>
 
 ### Implementing custom JUnit Extensions
-As with the rest of [http4k], a base implementation, `BaseApprovalTest` of the Junit5 Extension is 
+As with the rest of http4k, a base implementation, `BaseApprovalTest` of the Junit5 Extension is 
 provided, allowing API users to implement custom approval schemes or non-FS based approaches for 
 storing the approval files.
 

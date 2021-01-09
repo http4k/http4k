@@ -110,7 +110,7 @@ Like the neat little worker bunnies we are, we've also taken the opportunity to 
 
 <hr/>
 #### http4k.org
-One of the things that our users feedback about was that the structure of the docs in [http4k.org]http4k could be improved, so we've begun overhauling the site to simplify the content. Expect this to be a continual improvement thing, but on the whole the content will be organised as follows:
+One of the things that our users feedback about was that the structure of the docs in [http4k.org](https://http4k.org) could be improved, so we've begun overhauling the site to simplify the content. Expect this to be a continual improvement thing, but on the whole the content will be organised as follows:
 
 - The [Developer guide](/guide/modules) will contain descriptions of the underlying concepts in and around the libraries. Code in the guide will be snippet-based.
 - The [Cookbook](/cookbook) will contain extended examples of how to accomplish particular tasks. eg. provide a custom `ServerConfig` implementation. Code here will generally be complete and contain runnable examples.
