@@ -5,7 +5,7 @@ description: An overview of the Kotlin "Server as a Function" library, http4k
 
 ##### november 2017 / [@daviddenton][github]
 
-### Meet [http4k]
+### Meet http4k
 
 http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming 
 of HTTP services in a functional and consistent way.

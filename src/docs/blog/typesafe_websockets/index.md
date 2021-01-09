@@ -9,9 +9,9 @@ Reaction to the last post introducing http4k was pretty good, and one of the mos
 
 The answer to that question at the time was an emphatic **"Not yet"** - because they didn't fit the "Server as a Function" model, and the team hadn't worked out a way to deliver them in a simple, offline testable&ast; way.
 
-Well, a month is a long time, and we've been beavering away, so now we're thrilled to release **Websockets for [http4k]**, which are:
+Well, a month is a long time, and we've been beavering away, so now we're thrilled to release **Websockets for http4k**, which are:
 
-- **Simple**: using the same style of API as the rest of [http4k], allowing the same dynamic path-based routing as is available for standard `HttpHandlers`.
+- **Simple**: using the same style of API as the rest of http4k, allowing the same dynamic path-based routing as is available for standard `HttpHandlers`.
 - **Typesafe**: Marshall and unmarshall typed objects from Websocket Messages using the established Lens API.
 - **Testable**: This is something that is massively important to us - and just like standard HttpHandlers, http4k Websockets are completely testable in a synchronous online or offline environment. No. Server. Required.
 

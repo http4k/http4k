@@ -49,7 +49,7 @@ As for community reach, we've been in touch with http4k users from all corners o
 <hr/>
 #### Globe-trotting
 
-In 2018, we were lucky enough to be invited to [KotlinConf] in Amsterdam to talk about the development of [http4k], and this led to us presenting at a total of 10 international conferences, meetups and privately hosted company events spanning across 5 timezones to talk about the library and it's development story. As (apparent) ambassadors for how successful Kotlin can be in the serverside arena, so watch this space in the latter part of 2020 and beyond...
+In 2018, we were lucky enough to be invited to [KotlinConf] in Amsterdam to talk about the development of http4k, and this led to us presenting at a total of 10 international conferences, meetups and privately hosted company events spanning across 5 timezones to talk about the library and it's development story. As (apparent) ambassadors for how successful Kotlin can be in the serverside arena, so watch this space in the latter part of 2020 and beyond...
 
 <div style="padding-top: 20px">
 <iframe width="560" height="315" src="https://www.youtube.com/embed/vdxBNh1qx1Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
@@ -57,7 +57,7 @@ In 2018, we were lucky enough to be invited to [KotlinConf] in Amsterdam to talk
 <hr/>
 #### On the radar
 
-Another high point for us was having http4k featured in the [Thoughtworks Technology Radar], which is a quarterly publication highlighting tools, techniques and languages that the well-known consultancy have been using to successfully deliver projects across the globe. ThoughtWorks called out the test-driven nature of [http4k], citing:
+Another high point for us was having http4k featured in the [Thoughtworks Technology Radar], which is a quarterly publication highlighting tools, techniques and languages that the well-known consultancy have been using to successfully deliver projects across the globe. ThoughtWorks called out the test-driven nature of http4k, citing:
 
 > **"Apart from its elegance and simplicity, we also like its emphasis on testability — given that the entities in the libraries are immutable and the routes in the app, as well as the app itself, are just functions, they're super easy to test." - TW TechRadar**
 
@@ -78,7 +78,7 @@ In terms of the performance of the server backends, Apache HttpComponents (versi
 <hr/>
 #### Enter the platform!
 
-When we conceived [http4k], it was a simple 40 line shim over the top of another Java-based framework, bashed together on a HackDay. Never did we realise that a few years later it would be a very popular library with over 40 modules! For this reason (and to save on typing), we introduced the `http4k-bom` module (learn more about BOM [here][BOM], allowing users to use a single version of all http4k libraries and then just import the modules they need.
+When we conceived http4k, it was a simple 40 line shim over the top of another Java-based framework, bashed together on a HackDay. Never did we realise that a few years later it would be a very popular library with over 40 modules! For this reason (and to save on typing), we introduced the `http4k-bom` module (learn more about BOM [here][BOM], allowing users to use a single version of all http4k libraries and then just import the modules they need.
 
 ```groovy
 dependencies {
@@ -91,7 +91,7 @@ dependencies {
 <hr/>
 #### Cloudy-wowdy stuff
 
-Just as in every codebase there is a package called "utils", this also happens with libraries - useful code that doesn't quite fit anywhere else, yet you just always end up needing. For [http4k], these utils were about the ancillary stuff that goes around an application to make it support 12-factor ideals such as configuration and relative primitives. We didn't want to put this stuff into the `http4k-core` module as we felt it wasn't absolutely necessary (and we wanted to continue to keep the binary size of the core module down). Thus, `http4k-cloudnative` was born! The major feature of this module is loading typesafe Environmental configuration of applications, using - what else...
+Just as in every codebase there is a package called "utils", this also happens with libraries - useful code that doesn't quite fit anywhere else, yet you just always end up needing. For http4k, these utils were about the ancillary stuff that goes around an application to make it support 12-factor ideals such as configuration and relative primitives. We didn't want to put this stuff into the `http4k-core` module as we felt it wasn't absolutely necessary (and we wanted to continue to keep the binary size of the core module down). Thus, `http4k-cloudnative` was born! The major feature of this module is loading typesafe Environmental configuration of applications, using - what else...
 
 <img class="blogImage" src="./lenses.png" alt="lenses"/>
 
@@ -149,7 +149,7 @@ We look forward to further supporting these technologies as they develop, and wi
 
 > **“And the open road rolled out in front of us.” - Alexandra Bracken, In The Afterlight**
 
-So what's next? Well, we've got a load of good stuff coming up for post version 4 of [http4k], the rest of 2020 and beyond. As well as the website improvements, we've got a bunch of tools in the works to make the library more quick-start friendly, including the ability to autogenerate advanced http4k Clients and Server stubs from OpenApi specifications - both from the command-line and from the browser. We're also looking at improvements in the versioning scheme to better communicate breaking changes, and rolling out modules to enable better Serverless platform support. 
+So what's next? Well, we've got a load of good stuff coming up for post version 4 of http4k, the rest of 2020 and beyond. As well as the website improvements, we've got a bunch of tools in the works to make the library more quick-start friendly, including the ability to autogenerate advanced http4k Clients and Server stubs from OpenApi specifications - both from the command-line and from the browser. We're also looking at improvements in the versioning scheme to better communicate breaking changes, and rolling out modules to enable better Serverless platform support. 
 
 Whatever happens though, the focus of http4k will always be on providing a best-in-class Developer and Testing experience. We'd love to hear how we're doing, so please drop into the comm channels to get in touch. Here's to the future. Stay safe out there and we'll see you in it.
 

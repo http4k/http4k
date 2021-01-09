@@ -103,7 +103,7 @@ which leverages the power of the Lens system already built into the core library
 API users. In case you're new to Lenses, here's a recap...
 
 ### Lenses - a recap
-In [http4k], Lenses are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
+In http4k, Lenses are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
 although this concept has been extended within the http4k ecosystem to support that of a form handling and request 
 contexts.
 
@@ -136,12 +136,12 @@ here we define a bi-directional Lens for custom type `Page`, extracted from a qu
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/lens_example.kt"></script>
 
-In [http4k], Lenses are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
+In http4k, Lenses are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
 although this concept has been extended within the http4k ecosystem to support that of a form handling and request 
 contexts.
 
 ### http4k Environments
-in [http4k], an `Environment` object is a context which holds configuration values. It effectively behaves like a 
+in http4k, an `Environment` object is a context which holds configuration values. It effectively behaves like a 
 `Map`, in that it can be composed with other `Environment` objects to provide a consolidated view of all of it's 
 component values. 
 

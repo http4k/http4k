@@ -117,9 +117,9 @@ One of the things that our users feedback about was that the structure of the do
 <hr/>
 #### Support & training
 
-There has been a decent amount of interest lately from our users to come to us to ask for advice about how we can help teams get the best out of [http4k]. In that vein, we have also been busy building training materials which we can deliver to teams either new to (or experienced in) the library, or to visit teams (currently virtually) to help them out. 
+There has been a decent amount of interest lately from our users to come to us to ask for advice about how we can help teams get the best out of http4k. In that vein, we have also been busy building training materials which we can deliver to teams either new to (or experienced in) the library, or to visit teams (currently virtually) to help them out. 
 
-If your team would also like to take advantage of our experience in delivering projects using [http4k], then please visit the [support/training](/support) page, reach out and we'd love to see how we can help.
+If your team would also like to take advantage of our experience in delivering projects using http4k, then please visit the [support/training](/support) page, reach out and we'd love to see how we can help.
 
 <hr/>
 #### http4k Connect - Flyweight 3rd party adapters
