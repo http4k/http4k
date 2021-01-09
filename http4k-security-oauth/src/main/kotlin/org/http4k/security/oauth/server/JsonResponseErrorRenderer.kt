@@ -10,7 +10,7 @@ import org.http4k.lens.Header
 
 
 class JsonResponseErrorRenderer(
-    private val json: AutoMarshallingJson,
+    private val json: AutoMarshallingJson<*>,
     private val documentationUri: String? = null
 ) {
 

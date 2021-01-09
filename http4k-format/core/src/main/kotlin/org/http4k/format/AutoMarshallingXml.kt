@@ -20,10 +20,6 @@ abstract class AutoMarshallingXml : AutoMarshalling() {
 
     override fun asFormatString(input: Any): String = input.asXmlString()
 
-    @JvmName("anyAsXmlString")
-    @Deprecated("Use asFormatString instead", ReplaceWith("asFormatString(input"))
-    fun asXmlString(input: Any): String = input.asXmlString()
-
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> =
         httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_XML, contentNegotiation)
             .map({ it.payload.asString() }, { Body(it) })

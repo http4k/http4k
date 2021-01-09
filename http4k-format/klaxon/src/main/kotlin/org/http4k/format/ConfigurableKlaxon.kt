@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 import com.beust.klaxon.Klaxon as KKlaxon
 
 open class ConfigurableKlaxon(private val klaxon: KKlaxon,
-                              val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshallingJson() {
+                              val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshalling() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> asA(input: String, target: KClass<T>): T {
         val json = klaxon.parser(target).parse(StringReader(input)) as JsonBase

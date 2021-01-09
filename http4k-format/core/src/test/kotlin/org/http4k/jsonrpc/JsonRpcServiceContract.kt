@@ -15,8 +15,8 @@ import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.with
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
-import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasStatus
@@ -362,7 +362,7 @@ abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE>)
     }
 }
 
-abstract class AutoMappingJsonRpcServiceContract<NODE : Any>(json: JsonLibAutoMarshallingJson<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
+abstract class AutoMappingJsonRpcServiceContract<NODE : Any>(json: AutoMarshallingJson<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
     JsonRpc.auto(json, CounterErrorHandler) {
         method("increment", handler(counter::increment))
         method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))

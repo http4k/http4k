@@ -1,6 +1,6 @@
 package org.http4k.contract.openapi.v3
 
-import org.http4k.format.JsonLibAutoMarshallingJson
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
@@ -14,7 +14,7 @@ import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 
 class AutoJsonToJsonSchema<NODE : Any>(
-    private val json: JsonLibAutoMarshallingJson<NODE>,
+    private val json: AutoMarshallingJson<NODE>,
     private val fieldRetrieval: FieldRetrieval = FieldRetrieval.compose(SimpleLookup()),
     private val modelNamer: SchemaModelNamer = SchemaModelNamer.Simple,
     private val refPrefix: String = "components/schemas"
