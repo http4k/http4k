@@ -140,8 +140,9 @@ If your team would also like to take advantage of our experience in delivering p
 - Google Analytics
 
 Mostly, the existence of the project is has been driven by 2 factors:
-1. to reduce dependency weight of bringing in SDK modules, especially when in a Serverless context. The AWS service SDKs are especially heavy. Using http4k-connect instead of official SDKs, overall Serverless Function distribution size should be reduced by at least an order of magnitude.
-2. to avoid us having to reinvent the same things again and again! (Because we're very very lazy developers!)
+
+- to reduce dependency weight of bringing in SDK modules, especially when in a Serverless context. The AWS service SDKs are especially heavy. Using http4k-connect instead of official SDKs, overall Serverless Function distribution size should be reduced by at least an order of magnitude.
+- to avoid us having to reinvent the same things again and again! (Because we're very very lazy developers!)
 
 It's pretty hot off the press, but will be receiving a lot of attention over the coming weeks and months, and we'll be documenting the mechanisms in both web and live talks.
 
