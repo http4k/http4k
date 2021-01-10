@@ -149,7 +149,7 @@ It's pretty hot off the press, but will be receiving a lot of attention over the
 <hr/>
 #### That's all folks... (for the moment)
 
-We're pretty excited about this release and hope the library will continue to provide tools of all of our existing (and new!) users' lives easier to create kick ass, rock solid HTTP applications.
+We're pretty excited about this release and hope the library will continue to provide powerful tools to make all of our existing (and new!) users' lives easier in creating kick ass and rock solid HTTP applications.
 
 In the meantime, if you are using http4k, please consider [sponsoring the project](https://github.com/sponsors/http4k) to help offset the costs of development, documentation, and support. 
 
