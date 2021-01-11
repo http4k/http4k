@@ -128,7 +128,7 @@ If your team would also like to take advantage of our experience in delivering p
 
 <img class="blogImage" src="./connect.png" alt="http4k connect"/>
 
-[http4k-connect](http://github.com/http4k/http4k-connect) is the team's newest side project, the purpose of which is to eventually standardise patterns for building 3rd party system adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory, S3 or Redis). So far (v2.8.0.0), http4k-connect supports:
+[http4k-connect](http://github.com/http4k/http4k-connect) is the team's newest side project, the purpose of which is to eventually standardise patterns for building 3rd party system adapters to various backend services, and for building your own Fakes (backed by data-stores such as InMemory, S3 or Redis). So far (v2.8.0.0), http4k-connect supports at least the common-use case actions for the following systems (and the API is easily extendable for non-supplied actions):
 
 - AWS KMS: Key Management Service
 - AWS Lambda
@@ -141,9 +141,7 @@ If your team would also like to take advantage of our experience in delivering p
 
 Mostly, the existence of the project is has been driven by 2 factors:
 
-- to reduce dependency weight of bringing in SDK modules, especially when in a Serverless context. The AWS service SDKs are especially heavy. Using http4k-connect instead of official SDKs, overall Serverless Function distribution size should be reduced by at least an order of magnitude. By way of example, on an empty Kotlin-based project these are the dependency weights (ie. size of new JARs) for adding:
-    1. `software.amazon.awssdk:ssm:2.15.35` : 13474110b (13.47mb)
-    1. `org.http4k:http4k-connect-amazon-systemsmanager:2.8.0.0` = 3150022b (3.15mb)
+- to reduce dependency weight of bringing in SDK modules, especially when in a Serverless context. The AWS service SDKs are especially heavy for dependency weight. Using http4k-connect instead of official SDKs, overall Serverless Function distribution size should be reduced by at least an order of magnitude.
 - to avoid us having to reinvent the same things again and again! (Because we're very very lazy developers!)
 
 It's pretty hot off the press, but will be receiving a lot of attention over the coming weeks and months, and we'll be documenting the mechanisms in both web and live talks.
