@@ -20,6 +20,7 @@ import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
+import org.http4k.routing.RoutingHttpHandler
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -112,9 +113,7 @@ object ClientFilters {
         operator fun invoke(token: String): Filter = BearerAuth { token }
     }
 
-    object FollowRedirects {
-        operator fun invoke(): Filter = Filter { next -> { makeRequest(next, it) } }
-
+    class FollowRedirects : Filter {
         private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response =
             next(request).let {
                 if (it.isRedirection()) {
@@ -143,6 +142,16 @@ object ClientFilters {
             Uri.of(location).run {
                 if (host.isBlank()) authority(uri.authority).scheme(uri.scheme) else this
             }
+
+        override fun invoke(next: HttpHandler): HttpHandler = { makeRequest(next, it) }
+
+        /**
+         * This filter requires special treatment for routing handlers.
+         *
+         * In general, Filters are applied _after_ routing (i.e. routing information is available to filters).
+         * This filter, however, needs to behave like a browser, and for that we apply the filter _before_ the routing.
+         */
+        fun then(router: RoutingHttpHandler): HttpHandler = { this(router)(it) }
     }
 
     object Cookies {

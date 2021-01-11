@@ -33,6 +33,8 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -83,6 +85,17 @@ class ClientFiltersTest {
     @Test
     fun `follows redirect for put`() {
         assertThat(followRedirects(Request(PUT, "/redirect")), equalTo(Response(OK).body("ok")))
+    }
+
+    @Test
+    fun `follow redirects in-memory routed handler`(){
+        val server = routes(
+            "/ok" bind GET to { Response(OK) },
+            "/redirect" bind GET to { Response(SEE_OTHER).header("Location", "/ok") }
+        )
+        val client = ClientFilters.FollowRedirects().then(server)
+        assertThat(client(Request(GET, "/ok")).status, equalTo(OK))
+        assertThat(client(Request(GET, "/redirect")).status, equalTo(OK))
     }
 
     @Test
