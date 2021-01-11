@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.1.0.0 (uncut)
+- **http4k-core** : [Breaking] Remove previously deprecated AutoJsonEvents which was mistakenly left in the 4.0.0.0 release.
+
 ### v4.0.0.0
 - New versioning scheme! See [announcement](https://www.http4k.org/blog/http4k_v4/) for details.
 - **http4k-*** : Remove all previous deprecations from all modules. To upgrade cleanly, follow the simple instructions in the [announcement](https://www.http4k.org/blog/http4k_v4/#upgrading_library_api_changes)
