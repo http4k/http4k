@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import org.http4k.core.Body
+import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.Credentials
 import org.http4k.core.MemoryRequest
 import org.http4k.core.MemoryResponse
@@ -58,7 +59,9 @@ class ClientFiltersTest {
 
     @Test
     fun `see other redirect doesn't forward any payload`() {
-        assertThat(followRedirects(Request(GET, "/see-other").body("body here")), equalTo(Response(OK)))
+        val response = followRedirects(Request(GET, "/see-other").body("body here"))
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.body, equalTo(EMPTY))
     }
 
     @Test
@@ -219,20 +222,20 @@ class ClientFiltersTest {
         @Test
         fun `in-memory empty bodies are not encoded`() {
             val handler = ClientFilters.GZip().then {
-                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
-                Response(OK).body(Body.EMPTY)
+                assertThat(it, hasBody(equalTo<Body>(EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                Response(OK).body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
         }
 
         @Test
         fun `in-memory encoded empty responses are handled`() {
             val handler = ClientFilters.GZip().then {
-                Response(OK).header("content-encoding", "gzip").body(Body.EMPTY)
+                Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
         }
 
         @Test
@@ -248,20 +251,20 @@ class ClientFiltersTest {
         @Test
         fun `streaming empty bodies are not encoded`() {
             val handler = ClientFilters.GZip(Streaming).then {
-                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
-                Response(OK).body(Body.EMPTY)
+                assertThat(it, hasBody(equalTo<Body>(EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                Response(OK).body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
         }
 
         @Test
         fun `streaming encoded empty responses are handled`() {
             val handler = ClientFilters.GZip(Streaming).then {
-                Response(OK).header("content-encoding", "gzip").body(Body.EMPTY)
+                Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
         }
 
         @Test
@@ -300,16 +303,16 @@ class ClientFiltersTest {
         @Test
         fun `in-memory encoded empty responses are handled`() {
             val handler = ClientFilters.AcceptGZip().then {
-                Response(OK).header("content-encoding", "gzip").body(Body.EMPTY)
+                Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK).and(hasBody("")))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK).and(hasBody("")))
         }
 
         @Test
         fun `streaming encoded empty responses are handled`() {
             val handler = ClientFilters.AcceptGZip(Streaming).then {
-                Response(OK).header("content-encoding", "gzip").body(Body.EMPTY)
+                Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
             assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("")))
