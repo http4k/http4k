@@ -1,6 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.base64Encode
+import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -8,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.HEAD
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
@@ -118,7 +120,11 @@ object ClientFilters {
                 if (it.isRedirection()) {
                     if (attempt == 10) throw IllegalStateException("Too many redirection")
                     it.assureBodyIsConsumed()
-                    makeRequest(next, request.toNewLocation(it.location()), attempt + 1)
+                    if (it.status == SEE_OTHER) {
+                        makeRequest(next, request.body(EMPTY).toNewLocation(it.location()), attempt + 1)
+                    } else {
+                        makeRequest(next, request.toNewLocation(it.location()), attempt + 1)
+                    }
                 } else it
             }
 

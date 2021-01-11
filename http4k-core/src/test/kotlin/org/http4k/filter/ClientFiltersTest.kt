@@ -19,6 +19,7 @@ import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.MOVED_PERMANENTLY
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.parse
@@ -41,17 +42,24 @@ class ClientFiltersTest {
     val server = { request: Request ->
         when (request.uri.path) {
             "/redirect" -> Response(FOUND).header("location", "/ok")
+            "/see-other" -> Response(SEE_OTHER).header("location", "/ok-with-no-body")
             "/loop" -> Response(FOUND).header("location", "/loop")
             "/absolute-target" -> if (request.uri.host == "example.com") Response(OK).body("absolute") else Response(INTERNAL_SERVER_ERROR)
             "/absolute-redirect" -> Response(MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
             "/redirect-with-charset" -> Response(MOVED_PERMANENTLY).header("location", "/destination; charset=utf8")
             "/destination" -> Response(OK).body("destination")
             "/ok" -> Response(OK).body("ok")
+            "/ok-with-no-body" -> Response(OK).body(request.body)
             else -> Response(OK).let { if (request.query("foo") != null) it.body("with query") else it }
         }
     }
 
     private val followRedirects = ClientFilters.FollowRedirects().then(server)
+
+    @Test
+    fun `see other redirect doesn't forward any payload`() {
+        assertThat(followRedirects(Request(GET, "/see-other").body("body here")), equalTo(Response(OK)))
+    }
 
     @Test
     fun `does not follow redirect by default`() {
