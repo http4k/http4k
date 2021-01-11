@@ -27,7 +27,7 @@ object DeployApiGateway {
 
     fun deploy(integrationVersion: ApiIntegrationVersion) {
 
-        val config = awsCliUserProfiles().profile("default")
+        val config = awsCliUserProfiles().profile("http4k-integration-test")
 
         val functionName = functionName(integrationVersion.integrationType())
 

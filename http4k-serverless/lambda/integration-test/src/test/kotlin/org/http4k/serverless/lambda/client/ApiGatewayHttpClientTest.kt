@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 
 private fun client(version: ApiIntegrationVersion): (Request) -> Response {
-    val api = awsCliUserProfiles().profile("default")
+    val api = awsCliUserProfiles().profile("http4k-integration-test")
         .apiGatewayApiClient().listApis()
         .find { it.name == apiName(version) }
         ?: throw TestAbortedException("API hasn't been deployed")

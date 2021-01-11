@@ -1,5 +1,5 @@
 configurations{
-    runtimeClasspath.transitive = false
+    runtimeClasspath.transitive = true
 }
 
 dependencies {

@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Disabled
 abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
                                     clientFn: (Function, Region) -> LambdaHttpClient) :
     HttpClientContract({ NoOpServerConfig },
-        clientFn(functionName(type), Region(awsCliUserProfiles().profile().region))
-            .then(awsCliUserProfiles().profile().awsClientFor("lambda"))) {
+        clientFn(functionName(type), Region(awsCliUserProfiles().profile("http4k-integration-test").region))
+            .then(awsCliUserProfiles().profile("http4k-integration-test").awsClientFor("lambda"))) {
 
     override fun `handles response with custom status message`() = unsupportedFeature()
     override fun `connection refused are converted into 503`() = unsupportedFeature()

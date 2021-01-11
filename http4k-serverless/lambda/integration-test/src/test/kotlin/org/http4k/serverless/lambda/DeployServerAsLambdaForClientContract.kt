@@ -42,7 +42,7 @@ object DeployServerAsLambdaForClientContract {
     fun deploy(type: LambdaIntegrationType, clientFn: (Function, Region) -> LambdaHttpClient) {
         val functionName = functionName(type)
 
-        val config = awsCliUserProfiles().profile("default")
+        val config = awsCliUserProfiles().profile("http4k-integration-test")
 
         val lambdaBinary =
             File("test-function/build/distributions/test-function-LOCAL.zip")
