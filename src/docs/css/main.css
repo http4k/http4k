@@ -795,10 +795,6 @@ header p {
   margin-bottom: 32px;
 }
 
-.intro main .content h4 {
-  color: #60c0ff;
-}
-
 .intro main .content a {
   color: #60c0ff;
 }
@@ -822,6 +818,14 @@ header p {
     width: auto;
     transform: translate(0px);
   }
+}
+
+.intro .content li {
+  font-size: 1.2rem;
+}
+
+.intro .content ul {
+  font-size: 1.2rem;
 }
 
 /*# sourceMappingURL=main.css.map */
