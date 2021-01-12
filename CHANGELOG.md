@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 ### v4.1.0.0 (uncut)
 - **http4k-core** : [Breaking] Remove previously deprecated AutoJsonEvents which was mistakenly left in the 4.0.0.0 release.
+- **http4k-core** : Strip body of GET request in 303 (See Other) redirections in `FollowRedirects`. H/T @dgliosca
+- **http4k-core** : Fix behaviour of `FollowRedirects` for in-memory routed handlers.
 
 ### v4.0.0.0
 - New versioning scheme! See [announcement](https://www.http4k.org/blog/http4k_v4/) for details.
