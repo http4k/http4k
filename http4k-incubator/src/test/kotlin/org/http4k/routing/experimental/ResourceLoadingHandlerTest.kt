@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.apache.http.impl.io.EmptyInputStream
+import org.apache.hc.core5.http.impl.io.EmptyInputStream
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.MemoryRequest
 import org.http4k.core.Method.GET
@@ -186,8 +186,8 @@ private class IndeterminateLengthResource : Resource {
 
 private class InMemoryResourceLoader(val resources: Map<String, Resource>) : Router {
     override fun match(request: Request): RouterMatch = resources[request.uri.path]?.let {
-        RouterMatch.MatchingHandler(it)
-    } ?: RouterMatch.Unmatched
+        RouterMatch.MatchingHandler(it, description)
+    } ?: RouterMatch.Unmatched(description)
 }
 
 

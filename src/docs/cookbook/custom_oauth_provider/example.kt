@@ -17,6 +17,7 @@ import org.http4k.security.CrossSiteRequestForgeryToken
 import org.http4k.security.OAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.Nonce
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -53,10 +54,14 @@ fun main() {
 
 // this interface allows us to provide custom logic for storing and verifying the CSRF and AccessTokens.
 // to be maximally secure, never let the end-user see the access token!
+// also avoid allowing third parties set the original uri as this might allow phishing attacks
+// on strategy is might be to use an enum to map to a set of know uris
+// e.g. shoppingCart -> /cart
 class CustomOAuthPersistence : OAuthPersistence {
     var nonce: Nonce? = null
     var csrf: CrossSiteRequestForgeryToken? = null
     var accessToken: AccessToken? = null
+    var originalUri: Uri? = null
 
     override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
 
@@ -72,9 +77,16 @@ class CustomOAuthPersistence : OAuthPersistence {
 
     override fun retrieveNonce(request: Request): Nonce? = nonce
 
+    override fun assignOriginalUri(redirect: Response, originalUri: Uri): Response {
+        this.originalUri = originalUri
+        return redirect.header("action", "assignOriginalUri")
+    }
+
+    override fun retrieveOriginalUri(request: Request): Uri? = originalUri
+
     override fun retrieveToken(request: Request): AccessToken? = accessToken
 
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response {
+    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken, idToken: IdToken?): Response {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }

@@ -1,7 +1,0 @@
-Unexpected request received for Interaction 2 ==> expected:<> but was:<GET /foo HTTP/1.1
-Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
-Connection: keep-alive
-Host: localhost
-User-agent: bob
-
->

@@ -11,7 +11,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.ClientFilters.SetBaseUriFrom
+import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.HandleRemoteRequestFailed
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -46,7 +46,7 @@ fun WordCounterApp(port: Int): Http4kServer {
  * This client wraps the calls to a remote WordCounter service
  */
 class WordCounterClient(baseUri: Uri) {
-    private val http = SetBaseUriFrom(baseUri)
+    private val http = SetHostFrom(baseUri)
         .then(ClientFilters.HandleRemoteRequestFailed())
         .then(ApacheClient())
 

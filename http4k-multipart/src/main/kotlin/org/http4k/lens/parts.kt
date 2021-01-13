@@ -1,9 +1,12 @@
 package org.http4k.lens
 
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Headers
 import java.io.Closeable
 import java.io.InputStream
+import kotlin.Int.Companion.MAX_VALUE
+import kotlin.random.Random.Default.nextInt
 
 data class MultipartFormField(val value: String, val headers: Headers = emptyList()) {
     companion object : BiDiLensSpec<MultipartForm, MultipartFormField>("form",
@@ -41,5 +44,10 @@ data class MultipartFormFile(val filename: String, val contentType: ContentType,
                 ?: emptyList()
         },
         LensSet { name, values, target -> values.fold(target.minusFile(name)) { m, next -> m + (name to next) } }
-    )
+    ) {
+        /**
+         * Use this when it doesn't matter about the name or content type of the file uploaded.
+         */
+        fun inputStream() = map({ it.content }, { MultipartFormFile(nextInt(0, MAX_VALUE).toString(), OCTET_STREAM, it) })
+    }
 }

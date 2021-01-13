@@ -10,7 +10,7 @@ import org.http4k.lens.Header
 
 
 class JsonResponseErrorRenderer(
-    private val json: AutoMarshallingJson,
+    private val json: AutoMarshallingJson<*>,
     private val documentationUri: String? = null
 ) {
 
@@ -21,7 +21,7 @@ class JsonResponseErrorRenderer(
 
     private fun createResponse(error: OAuthError, response: Response) =
         response.with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(json.asJsonString(ErrorResponse(
+            .body(json.asFormatString(ErrorResponse(
                 error.rfcError.rfcValue,
                 error.description,
                 documentationUri

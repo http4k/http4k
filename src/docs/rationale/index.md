@@ -1,10 +1,10 @@
 title: http4k Rationale & Concepts
 description: Overview of why we created http4k, the problems it solves, and the core concepts
 
-## tldr;
+### tldr;
 [Presentation](https://www.http4k.org/server_as_a_function_in_kotlin) about the development of http4k given at the Kotlin London meetup.
 
-## About
+### About
 **http4k** is the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - 
 the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the "Server as a function" and filter model is stolen from 
 [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io). With the growing 
@@ -31,7 +31,7 @@ As a bonus, we can also easily create simple Fake servers for any HTTP contract,
 
 Scenarios such as "what happens if this HTTP dependency continually takes > 5 seconds to respond?" are easily modelled - answers you can't easily get if you're faking out your dependencies inside the HTTP boundary.
 
-## Concepts
+### Concepts
 
 * All incoming and outgoing HTTP services are modelled as `HttpHandler`, which is modelled as `(Request) -> Response`:
 ```kotlin

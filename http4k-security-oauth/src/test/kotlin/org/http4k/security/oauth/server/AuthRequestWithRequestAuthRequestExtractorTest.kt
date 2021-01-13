@@ -5,18 +5,20 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory.instance
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.apache.commons.codec.binary.Base64
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.State
-import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.*
+import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.AuthRequestOnly
+import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.Combine
+import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.RequestObjectOnly
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor
@@ -30,14 +32,8 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
     private val invalidJwt = RequestJwtContainer("invalidJwt")
 
-    private val requestJWTValidator = object : RequestJWTValidator {
-        override fun validate(clientId: ClientId, requestJwtContainer: RequestJwtContainer): InvalidAuthorizationRequest? {
-            return if (requestJwtContainer == invalidJwt) {
-                InvalidAuthorizationRequest("Query 'request' is invalid")
-            } else {
-                null
-            }
-        }
+    private val requestJWTValidator = RequestJWTValidator { _, requestJwtContainer ->
+        if (requestJwtContainer == invalidJwt) InvalidAuthorizationRequest("Query 'request' is invalid") else null
     }
 
     @Test
@@ -337,7 +333,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
             expiry = requestObject.expiry,
             claims = requestObject.claims
         )
-        return "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asJsonString(requestObjectJson).toByteArray()).replace("=", "")}.someSignature"
+        return "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asFormatString(requestObjectJson).toByteArray()).replace("=", "")}.someSignature"
     }
 
     private fun audienceToJson(audience: List<String>): JsonNode {

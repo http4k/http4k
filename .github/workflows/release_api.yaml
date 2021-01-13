@@ -1,0 +1,28 @@
+on: [repository_dispatch]
+jobs:
+  release-api:
+    if: github.event.action == 'http4k-release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - run: ./gradlew -i dokka
+      - uses: actions/checkout@v2
+        with:
+          repository: http4k/api
+          path: tmp
+          token: ${{ secrets.AUTHOR_TOKEN }}
+      - run: cp -R build/ddoc/http4k/* tmp/
+      - uses: EndBug/add-and-commit@v4
+        with:
+          cwd: 'tmp'
+          message: 'release API docs'
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTHOR_TOKEN }}
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.AUTHOR_TOKEN }}
+          directory: tmp
+          repository: http4k/api

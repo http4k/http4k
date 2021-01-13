@@ -1,0 +1,4 @@
+Have 2 interaction(s) in the script but called 3 times. Unexpected interaction: <GET /foo HTTP/1.1
+Content-length: 0
+
+>

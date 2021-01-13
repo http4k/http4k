@@ -13,6 +13,7 @@ import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -23,6 +24,7 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.auto
 import org.http4k.hamkrest.hasBody
@@ -37,7 +39,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
+class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
 
     private data class ARandomObject(val field: String)
 
@@ -64,6 +66,27 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     private val header = Header.optional("FILTER")
 
     override val expectedNotFoundBody = "{\"message\":\"No route found on this path. Have you used the correct HTTP verb?\"}"
+
+    override val handler =
+        ServerFilters.CatchAll()
+            .then(
+                contract {
+                    renderer = SimpleJson(Jackson)
+                    routes += contractRoutes.toList()
+                }
+            )
+
+    @Test
+    fun `can bind under a route match`() {
+        val app =
+            routes("/hello" bind routes("/there" bind
+                contract {
+                    renderer = SimpleJson(Jackson)
+                    routes += validPath bindContract GET to { Response(OK) }
+                })
+            )
+        assertThat(app(Request(GET, "/hello/there$validPath")), hasStatus(OK))
+    }
 
     @Test
     fun `by default the description lives at the route`() {
@@ -98,7 +121,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     fun `traffic goes to the path specified`() {
         val root = routes(
             "/root/bar" bind contract {
-                routes += "/foo/bar" / Path.of("world") bindContract GET to { _ -> { Response(OK) } }
+                routes += "/foo/bar" / Path.of("world") bindContract GET to { { Response(OK) } }
             })
         val response = root(Request(GET, "/root/bar/foo/bar/hello")) as RoutedResponse
 
@@ -113,6 +136,21 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
                 routes += "/foo/bar" bindContract GET to { Response(NOT_IMPLEMENTED) }
             }
         )
+        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
+
+        assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
+    fun `OPTIONS traffic ignores missing body`() {
+        val root = routes(
+            "/root/bar" bind contract {
+                routes += "/foo/bar" meta {
+                    receiving(requiredBody)
+                } bindContract POST to { Response(NOT_IMPLEMENTED) }
+            }
+        )
+
         val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
 
         assertThat(response.status, equalTo(OK))
@@ -183,11 +221,11 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK) }
-        }.withFilter(Filter { next ->
+        }.withFilter { next ->
             {
                 next(it.query("key", "bob"))
             }
-        })
+        }
 
         assertThat(root(Request(GET, "/root/bob")).status, equalTo(OK))
     }
@@ -197,11 +235,11 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK).body(it.body) }
-        }.withPostSecurityFilter(Filter { next ->
+        }.withPostSecurityFilter { next ->
             {
                 next(it.body("body"))
             }
-        })
+        }
 
         assertThat(root(Request(GET, "/root/bob?key=bob")), hasStatus(OK).and(hasBody("body")))
     }

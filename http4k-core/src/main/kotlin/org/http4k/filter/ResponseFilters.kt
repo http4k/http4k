@@ -10,6 +10,7 @@ import org.http4k.filter.GzipCompressionMode.Memory
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
+import java.util.Base64
 
 object ResponseFilters {
 
@@ -28,16 +29,20 @@ object ResponseFilters {
     }
 
     /**
-     * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeller to
+     * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeler to
      * create custom labels.
      * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportHttpTransaction {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), transactionLabeller: HttpTransactionLabeller = { it }, recordFn: (HttpTransaction) -> Unit): Filter = Filter { next ->
+        operator fun invoke(
+            clock: Clock = Clock.systemUTC(),
+            transactionLabeler: HttpTransactionLabeler = { it },
+            recordFn: (HttpTransaction) -> Unit
+        ): Filter = Filter { next ->
             {
                 clock.instant().let { start ->
                     next(it).apply {
-                        recordFn(transactionLabeller(HttpTransaction(it, this, between(start, clock.instant()))))
+                        recordFn(transactionLabeler(HttpTransaction(it, this, between(start, clock.instant()))))
                     }
                 }
             }
@@ -51,16 +56,21 @@ object ResponseFilters {
     object ReportRouteLatency {
         operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit): Filter =
             ReportHttpTransaction(clock) { tx ->
-                recordFn("${tx.request.method}.${tx.routingGroup.replace('.', '_').replace(':', '.').replace('/', '_')}" +
-                    ".${tx.response.status.code / 100}xx" +
-                    ".${tx.response.status.code}", tx.duration)
+                recordFn(
+                    "${tx.request.method}.${tx.routingGroup.replace('.', '_').replace(':', '.').replace('/', '_')}" +
+                        ".${tx.response.status.code / 100}xx" +
+                        ".${tx.response.status.code}", tx.duration
+                )
             }
     }
 
     /**
      * GZipping of the response where the content-type (sans-charset) matches an allowed list of compressible types.
      */
-    class GZipContentTypes(compressibleContentTypes: Set<ContentType>, private val compressionMode: GzipCompressionMode = Memory) : Filter {
+    class GZipContentTypes(
+        compressibleContentTypes: Set<ContentType>,
+        private val compressionMode: GzipCompressionMode = Memory
+    ) : Filter {
         private val compressibleMimeTypes = compressibleContentTypes
             .map { it.value }
             .map { it.split(";").first() }
@@ -115,6 +125,15 @@ object ResponseFilters {
         }
     }
 
+    /**
+     * Some platforms deliver bodies as Base64 encoded strings.
+     */
+    fun Base64EncodeBody() = Filter { next ->
+        { next(it).run { body(Base64.getEncoder().encodeToString(body.payload.array())) } }
+    }
 }
 
-typealias HttpTransactionLabeller = (HttpTransaction) -> HttpTransaction
+typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction
+
+fun HttpTransactionLabeler.labels(tx: HttpTransaction) =
+    this(tx).labels.map { listOf(it.key, it.value) }.flatten().toTypedArray()

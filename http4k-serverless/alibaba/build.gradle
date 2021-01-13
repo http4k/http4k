@@ -1,0 +1,9 @@
+description = 'Http4k Serverless support for Alibaba Function Compute'
+
+dependencies {
+    api project(":http4k-core")
+    api Libs.fc_java_common
+
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
+}

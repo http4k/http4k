@@ -2,19 +2,35 @@ title: http4k Server Modules
 description: Feature overview of the http4k-server modules, covering Server backends
 
 ### Installation (Gradle)
-**Apache:** ```compile group: "org.http4k", name: "http4k-server-apache", version: "3.247.0"```
 
-**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "3.247.0"```
+```groovy
+// Apache v5: 
+implementation group: "org.http4k", name: "http4k-server-apache", version: "4.0.0.0"
 
-**Ktor CIO:** ```compile group: "org.http4k", name: "http4k-server-ktorcio", version: "3.247.0"```
+// Apache v4: 
+implementation group: "org.http4k", name: "http4k-server-apache4", version: "4.0.0.0"
 
-**Ktor Netty:** ```compile group: "org.http4k", name: "http4k-server-ktornetty", version: "3.247.0"```
+// Jetty: 
+implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.0.0.0"
 
-**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "3.247.0"```
+// Ktor CIO: 
+implementation group: "org.http4k", name: "http4k-server-ktorcio", version: "4.0.0.0"
 
-**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "3.247.0"```
+// Ktor Netty: 
+implementation group: "org.http4k", name: "http4k-server-ktornetty", version: "4.0.0.0"
 
-**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.247.0"```
+// Netty: 
+implementation group: "org.http4k", name: "http4k-server-netty", version: "4.0.0.0"
+
+// Ratpack: 
+implementation group: "org.http4k", name: "http4k-server-ratpack", version: "4.0.0.0"
+
+// Undertow: 
+implementation group: "org.http4k", name: "http4k-server-undertow", version: "4.0.0.0"
+
+// SunHttp (for development only): 
+implementation group: "org.http4k", name: "http4k-core", version: "4.0.0.0"
+```
 
 ### About
 Server-backend modules provide a consistent API to mount HttpHandlers into the specified container in 1 LOC, by 
@@ -27,4 +43,4 @@ simply passing it to the relevant `ServerConfig` implementation (in this case `J
 ### Customisation
 Each of the server backends implement an interface `ServerConfig`, which is written with sensible defaults for the server in questions, 
 but is also designed to be used as a starting point for tweaking to API user needs. To customize, simply use the relevant `ServerConfig` 
-class as a starting point and reimplement as required.
+class as a starting point and reimplement as required. See the Cookbook for an example of this in use.

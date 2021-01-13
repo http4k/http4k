@@ -37,3 +37,4 @@ private fun formParametersFrom(target: String): Map<String, List<String>> = targ
     .groupBy { it.first }
     .mapValues { it.value.map { it.second } }
 
+inline fun <reified T : Enum<T>> BiDiLensSpec<WebForm, String>.enum() = map(StringBiDiMappings.enum<T>())

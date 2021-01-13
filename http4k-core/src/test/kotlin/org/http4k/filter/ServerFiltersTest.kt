@@ -10,7 +10,6 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
-import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -18,7 +17,6 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -125,7 +123,7 @@ class ServerFiltersTest {
 
     @Test
     fun `OPTIONS - requests are intercepted and returned with expected headers`() {
-        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AnyOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
 
         assertThat(response, hasStatus(OK)
@@ -137,7 +135,7 @@ class ServerFiltersTest {
 
     @Test
     fun `OPTIONS - requests are returned with expected headers when origin does not match`() {
-        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AnyOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "baz"))
 
         assertThat(response, hasStatus(OK)
@@ -149,11 +147,59 @@ class ServerFiltersTest {
 
     @Test
     fun `OPTIONS - requests are returned with expected headers when origin is not set`() {
-        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AnyOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/"))
 
         assertThat(response, hasStatus(OK)
             .and(hasHeader("access-control-allow-origin", "null"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when AllowAll OriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AllowAll(), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "*"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when Only OriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.Only("foo"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "foo"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when AnyOf OriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.AnyOf(listOf("foo", "bar")), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "bar"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "bar"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(!hasHeader("access-control-allow-credentials")))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when Pattern OriginPolicy is used`() {
+        val handler = ServerFilters.Cors(CorsPolicy(OriginPolicy.Pattern(Regex(".*.bar")), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "foo.bar"))
+
+        assertThat(response, hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "foo.bar"))
             .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
             .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
             .and(!hasHeader("access-control-allow-credentials")))
@@ -196,23 +242,23 @@ class ServerFiltersTest {
         @Test
         fun `gunzip request and gzip response`() {
             val handler = ServerFilters.GZip().then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzipped().body))))
         }
 
         @Test
         fun `handle empty messages with incorrect content-encoding`() {
             val handler = ServerFilters.GZip().then {
-                assertThat(it, hasBody(equalTo(Body.EMPTY)))
+                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)))
                 Response(OK).body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body.EMPTY)),
-                hasBody(equalTo(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
         }
 
         @Test
@@ -228,23 +274,23 @@ class ServerFiltersTest {
         @Test
         fun `gunzip request and gzip response with matching content type`() {
             val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN)).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzipped().body))))
         }
 
         @Test
         fun `gunzip request and do not gzip response with unmatched content type`() {
             val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
+                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello")))))
         }
 
         @Test
@@ -263,23 +309,23 @@ class ServerFiltersTest {
         @Test
         fun `gunzip request and gzip response`() {
             val handler = ServerFilters.GZip(Streaming).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).body(Body("hello"))
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body))))
         }
 
         @Test
         fun `handle empty messages with incorrect content-encoding`() {
             val handler = ServerFilters.GZip(Streaming).then {
-                assertThat(it, hasBody(equalTo(Body.EMPTY)))
+                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)))
                 Response(OK).body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body.EMPTY)),
-                hasBody(equalTo(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
         }
 
         @Test
@@ -295,23 +341,23 @@ class ServerFiltersTest {
         @Test
         fun `gunzip request and gzip response with matching content type`() {
             val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN), Streaming).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(Body("hello"))
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream().body))))
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body))))
         }
 
         @Test
         fun `gunzip request and do not gzip response with unmatched content type`() {
             val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), Streaming).then {
-                assertThat(it, hasBody(equalTo("hello")))
+                assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
             }
 
             assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped().body)),
-                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
+                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello")))))
         }
 
         @Test
@@ -369,21 +415,6 @@ class ServerFiltersTest {
         val response = handler(Request(GET, "/"))
 
         assertThat(response, hasStatus(UNSUPPORTED_MEDIA_TYPE))
-    }
-
-    @Test
-    fun `initialises request context for use further down the stack`() {
-        val contexts = RequestContexts()
-        val handler = ServerFilters.InitialiseRequestContext(contexts)
-            .then(Filter { next ->
-                {
-                    contexts[it].set("foo", "manchu")
-                    next(it)
-                }
-            })
-            .then { Response(OK).body(contexts[it].get<String>("foo")!!) }
-
-        assertThat(handler(Request(GET, "/")), hasBody("manchu"))
     }
 
     @Test

@@ -83,7 +83,7 @@ class BodyTest {
 
     @Test
     fun `can create a custom Body type and get and set on request`() {
-        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomType, { it.value }).toLens()
+        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomType, MyCustomType::value).toLens()
 
         val custom = MyCustomType("hello world!")
         val reqWithBody = customBody(custom, emptyRequest)

@@ -1,7 +1,7 @@
 title: http4k Routing API (Advanced)
 description: Recipes for using the http4k composable routing API, including serving static content
 
-This is a fairly comprehensive example of the core-routing logic available:
+This is a fairly comprehensive example of the core-routing logic available: 
 
 - Individual HTTP endpoints are represented as `HttpHandlers`.
 - Binding an `HttpHandler` to a path and HTTP verb yields a `Route`.
@@ -13,10 +13,13 @@ This is a fairly comprehensive example of the core-routing logic available:
 - Support for Single Page Applications using a `singlePageApp()` block - resources loaded from here are loaded from the underlying `ResourceLoader` or fallback to `/` (and passed to the SPA code)
 
 ### Gradle setup
-```
-    compile group: "org.http4k", name: "http4k-core", version: "3.247.0"
+
+```groovy
+implementation group: "org.http4k", name: "http4k-core", version: "4.0.0.0"
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/nestable_routes/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/nestable_routes/example.kt"></script>
+
+For the typesafe contract-style routing, refer to [this](/cookbook/typesafe_http_contracts/) recipe instead,

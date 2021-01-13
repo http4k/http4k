@@ -1,11 +1,12 @@
 package org.http4k.server
 
+import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.asByteBuffer
+import com.natpryce.hamkrest.present
 import org.http4k.core.Body
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -26,6 +27,7 @@ import org.http4k.routing.routes
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.net.InetAddress
 
 abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
                               private val requiredMethods: Array<Method> = Method.values()) {
@@ -45,19 +47,25 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             },
             "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
-            "/stream" bind GET to { Response(OK).with(Body.binary(ContentType.TEXT_PLAIN).toLens() of Body("hello".asByteBuffer())) },
+            "/stream" bind GET to { Response(OK).with(Body.binary(TEXT_PLAIN).toLens() of "hello".byteInputStream()) },
             "/presetlength" bind GET to { Response(OK).header("Content-Length", "0") },
             "/echo" bind POST to { Response(OK).body(it.bodyString()) },
             "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
             "/length" bind { req: Request ->
                 when (req.body) {
                     is StreamBody -> Response(OK).body(req.body.length.toString())
-                    else -> Response(INTERNAL_SERVER_ERROR)
+                    else -> Response(INTERNAL_SERVER_ERROR).body("Expected stream body")
                 }
             },
             "/uri" bind GET to { Response(OK).body(it.uri.toString()) },
             "/multiple-headers" bind GET to { Response(OK).header("foo", "value1").header("foo", "value2") },
-            "/boom" bind GET to { throw IllegalArgumentException("BOOM!") }
+            "/boom" bind GET to { throw IllegalArgumentException("BOOM!") },
+            "/request-source" bind GET to { request ->
+                Response(OK)
+                    .header("x-address", request.source?.address ?: "")
+                    .header("x-port", (request.source?.port ?: 0).toString())
+                    .header("x-scheme", (request.source?.scheme ?: "unsupported").toString())
+            }
         )
 
     @BeforeEach
@@ -174,6 +182,20 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             assertThat(client(Request(GET, "http://localhost:${it.port()}/uri")).status, equalTo(OK))
         }
     }
+
+    @Test
+    fun `can resolve request source`() {
+        assertThat(client(Request(GET, "$baseUrl/request-source")),
+            allOf(hasStatus(OK),
+                hasHeader("x-address", clientAddress()),
+                hasHeader("x-port", present()),
+                hasHeader("x-scheme", requestScheme())
+            ))
+    }
+
+    open fun clientAddress() = equalTo(InetAddress.getLocalHost().hostAddress)
+
+    open fun requestScheme() = equalTo("unsupported")
 
     @AfterEach
     fun after() {

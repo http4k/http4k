@@ -1,8 +1,8 @@
 package org.http4k.security.oauth.server.accesstoken
 
-import com.natpryce.get
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.get
 import org.http4k.core.Uri
 import org.http4k.security.oauth.server.AccessTokenError
 import org.http4k.security.oauth.server.AuthorizationCode

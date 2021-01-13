@@ -1,14 +1,15 @@
 description = 'Dependency-lite Server as a Function in pure Kotlin'
 
 dependencies {
-    compile Libs.kotlin_stdlib_jdk8
+    api Libs.kotlin_stdlib_jdk8
     implementation Libs.javax_servlet_api
+    implementation Libs.result4k
 
-    testCompile Config.TestDependencies
-    testCompile project(":http4k-client-apache")
-    testCompile project(":http4k-client-websocket")
-    testCompile project(":http4k-testing-approval")
-    testCompile project(":http4k-testing-hamkrest")
-    testCompile project(":http4k-server-jetty")
-    testCompile Libs.slf4j_nop
+    testImplementation Config.TestDependencies
+    testApi project(":http4k-client-apache")
+    testApi project(":http4k-client-websocket")
+    testApi project(":http4k-testing-approval")
+    testApi project(":http4k-testing-hamkrest")
+    testApi project(":http4k-server-apache")
+    testApi Libs.slf4j_nop
 }

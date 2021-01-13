@@ -14,6 +14,7 @@ import org.http4k.core.Method.HEAD
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.TRACE
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import java.time.Clock
 
 /**
@@ -97,3 +98,6 @@ object Payload {
         }
     }
 }
+
+fun ClientFilters.SetAwsServiceUrl(serviceName: String, region: String) =
+    SetHostFrom(Uri.of("https://$serviceName.${region}.amazonaws.com"))

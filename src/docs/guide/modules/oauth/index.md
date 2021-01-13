@@ -2,7 +2,10 @@ title: http4k OAuth security Module
 description: Feature overview of the http4k-security-oauth form module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-security-oauth", version: "3.247.0"```
+
+```groovy
+implementation group: "org.http4k", name: "http4k-security-oauth", version: "4.0.0.0"
+```
 
 ### About
 
@@ -21,8 +24,9 @@ Specifically, http4k supports the popular `OAuth2 Authorization Code Grant`. Thi
 There is a single user-defined interface, `OAuthPersistence`, required to implement to enable this flow. This interface is required to provide the custom way in which your application will store and retrieve the `CSRF` and `AccessToken` for a request. A common way to do this is through Cookies, but the values should definitely be encrypted. http4k only provides an insecure version of this class that you can use for testing. In order to remain provider-agnostic, the AccessToken object also contains the entirety of the (typically JSON) token response from the provider, which may include other fields depending on the types of scope for which your application is authorised by the user.
 
 To enable OAuth integration, construct a configured instance of `OAuthProvider`. This provides 3 things:
+
 1. A filter to protect application resources
-1. A callback HttpHandler for the OAuth provider to redirect the authticated user to
+1. A callback HttpHandler for the OAuth provider to redirect the authenticated user to
 1. A fully configured API client (which populated the Host on the URI) - this allows different
 implementations of the provider to be used across environments.
 

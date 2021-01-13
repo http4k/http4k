@@ -2,17 +2,32 @@ title: http4k Client Modules
 description: Feature overview of the http4k-client modules
 
 ### Installation (Gradle)
-**Java (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.247.0"```
 
-**Apache (Sync):** ```compile group: "org.http4k", name: "http4k-client-apache", version: "3.247.0"```
+```groovy
+// Java (for development only):
+implementation group: "org.http4k", name: "http4k-core", version: "4.0.0.0"
 
-**Apache (Async):** ```compile group: "org.http4k", name: "http4k-client-apache-async", version: "3.247.0"```
+// Apache v5 (Sync): 
+implementation group: "org.http4k", name: "http4k-client-apache", version: "4.0.0.0"
 
-**Jetty (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-jetty", version: "3.247.0"```
+// Apache v4 (Sync): 
+implementation group: "org.http4k", name: "http4k-client-apache4", version: "4.0.0.0"
 
-**OkHttp (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.247.0"```
+// Apache v5 (Async): 
+implementation group: "org.http4k", name: "http4k-client-apache-async", version: "4.0.0.0"
 
-**Websocket:** ```compile group: "org.http4k", name: "http4k-client-websocket", version: "3.247.0"```
+// Apache v4 (Async): 
+implementation group: "org.http4k", name: "http4k-client-apache4-async", version: "4.0.0.0"
+
+// Jetty (Sync + Async): 
+implementation group: "org.http4k", name: "http4k-client-jetty", version: "4.0.0.0"
+
+// OkHttp (Sync + Async): 
+implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.0.0.0"
+
+// Websocket: 
+implementation group: "org.http4k", name: "http4k-client-websocket", version: "4.0.0.0"
+```
 
 ### HTTP
 Supported HTTP client adapter APIs are wrapped to provide an `HttpHandler` interface in 1 LOC.
@@ -33,3 +48,7 @@ http4k supplies both blocking and non-blocking Websocket clients. The former is 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/example_websocket.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/example_websocket.kt"></script>
+
+#### Testing Websockets with offline and online clients [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/TestingWebsockets.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/TestingWebsockets.kt"></script>

@@ -14,45 +14,33 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Method.TRACE
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.FOUND
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
+import org.http4k.core.cookie.cookies
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.ServerFilters
+import org.http4k.hamkrest.hasBody
 import org.http4k.server.ServerConfig
-import org.http4k.server.SunHttp
-import org.http4k.server.asServer
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 
 abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
                                   val client: HttpHandler,
-                                  private val timeoutClient: HttpHandler) : AbstractHttpClientContract(serverConfig) {
+                                  private val timeoutClient: HttpHandler = client) : AbstractHttpClientContract(serverConfig) {
 
     @Test
     open fun `can forward response body to another request`() {
         val response = client(Request(GET, "http://localhost:$port/stream"))
         val echoResponse = client(Request(POST, "http://localhost:$port/echo").body(response.body))
         assertThat(echoResponse.bodyString(), equalTo("stream"))
-    }
-
-    @Test
-    fun `supports gzipped content`() {
-        val asServer = ServerFilters.GZip().then { Response(OK).body("hello") }.asServer(SunHttp(0))
-        asServer.start()
-        val client = JavaHttpClient()
-
-        val request = Request(GET, "http://localhost:${asServer.port()}").header("accept-encoding", "gzip")
-        client(request)
-        client(request)
-        client(request)
-        asServer.stop()
     }
 
     @Test
@@ -145,9 +133,16 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    fun `send binary data`() {
+    open fun `send binary data`() {
         val response = client(Request(POST, "http://localhost:$port/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
+        assertThat(response.bodyString(), equalTo(""))
         assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
+    open fun `download binary data`() {
+        val response = client(Request(GET, "http://localhost:$port/image"))
+        assertThat(response.bodyString(), equalTo(String(testImageBytes())))
     }
 
     @Test
@@ -216,4 +211,40 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
         checkNoBannedHeaders(POST)
         checkNoBannedHeaders(PUT)
     }
+
+    @Test
+    open fun `can send multiple headers with same name`() {
+        val response = client(Request(POST, "http://localhost:$port/multiRequestHeader").header("echo", "foo").header("echo", "bar"))
+
+        assertThat(response, hasBody("echo: bar\necho: foo"))
+    }
+
+    @Test
+    open fun `can receive multiple headers with same name`() {
+        val response = client(Request(POST, "http://localhost:$port/multiResponseHeader"))
+
+        assertThat(response.headerValues("serverHeader").toSet(), equalTo(setOf("foo", "bar")))
+    }
+
+    @Test
+    open fun `can send multiple cookies`() {
+        val response = client(Request(POST, "http://localhost:$port/multiRequestCookies").cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar")))
+
+        assertThat(response, hasBody("bar: vbar\nfoo: vfoo"))
+    }
+
+    @Test
+    open fun `can receive multiple cookies`() {
+        val response = client(Request(POST, "http://localhost:$port/multiResponseCookies"))
+
+        assertThat(response.cookies().sortedBy(Cookie::name).joinToString("\n") { "${it.name}: ${it.value}" }, equalTo("bar: vbar\nfoo: vfoo"))
+    }
+
+    @Test
+    open fun `unhandled exceptions converted into 500`() {
+        val response = client(Request(GET, "http://localhost:$port/boom"))
+
+        assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
+    }
+
 }

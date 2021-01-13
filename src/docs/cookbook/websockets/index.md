@@ -2,11 +2,12 @@ title: http4k Websocket APIs
 description: Recipes for using http4k with websockets
 
 ### Gradle setup
-```
-    compile group: "org.http4k", name: "http4k-core", version: "3.247.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.247.0"
-    compile group: "org.http4k", name: "http4k-client-websocket", version: "3.247.0"
-    compile group: "org.http4k", name: "http4k-format-jackson", version: "3.247.0"
+
+```groovy
+implementation group: "org.http4k", name: "http4k-core", version: "4.0.0.0"
+implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.0.0.0"
+implementation group: "org.http4k", name: "http4k-client-websocket", version: "4.0.0.0"
+implementation group: "org.http4k", name: "http4k-format-jackson", version: "4.0.0.0"
 ```
 
 **http4k** provides Websocket support using a simple, consistent, typesafe, and testable API on supported server backends (see above). Websocket communication consists of 3 main concepts:
@@ -26,7 +27,7 @@ Both Websockets and Http handlers in **http4k** are routed using a similar path-
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt"></script>
 
-### Automarshalling Websockets messages [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_automarshalling.kt)
+### Auto-marshalling Websockets messages [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_auto-marshalling.kt)
 Using the standard Lens API, we can auto-convert Websocket messages on and off the wire. This example uses the Jackson for the marshalling:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_automarshalling.kt"></script>

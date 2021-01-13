@@ -37,8 +37,7 @@ data class JsonRpcService<NODE : Any>(
     private val handler = CatchLensFailure { Response(OK).with(jsonLens of renderError(ParseError)) }
         .then(Filter { next -> { if (it.method == POST) next(it) else Response(METHOD_NOT_ALLOWED) } })
         .then {
-            val responseJson = process(jsonLens(it))
-            when (responseJson) {
+            when (val responseJson = process(jsonLens(it))) {
                 null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
                 else -> Response(OK).with(jsonLens of responseJson)
             }
@@ -55,8 +54,7 @@ data class JsonRpcService<NODE : Any>(
     private fun processSingleRequest(fields: Map<String, NODE>) =
         JsonRpcRequest(json, fields).mapIfValid { request ->
             try {
-                val method = methods[request.method]
-                when (method) {
+                when (val method = methods[request.method]) {
                     null -> renderError(MethodNotFound, request.id)
                     else -> with(method(request.params ?: json.nullNode())) {
                         request.id?.let { renderResult(this, it) }

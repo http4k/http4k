@@ -1,6 +1,7 @@
 {
   "node": {
     "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.MapHolder",
+    "description": null,
     "example": null
   },
   "definitions": [
@@ -13,10 +14,12 @@
               "properties": {
                 "value1": {
                   "example": "value",
+                  "description": null,
                   "type": "string"
                 },
                 "1970-01-01": {
                   "example": "value",
+                  "description": null,
                   "type": "string"
                 }
               },
@@ -24,12 +27,14 @@
                 "value1": "value",
                 "1970-01-01": "value"
               },
+              "description": null,
               "type": "object",
               "required": [
                 "1970-01-01",
                 "value1"
               ]
             },
+            "description": null,
             "example": null,
             "type": "object"
           }
@@ -40,6 +45,7 @@
             "1970-01-01": "value"
           }
         },
+        "description": null,
         "type": "object",
         "required": [
           "value"

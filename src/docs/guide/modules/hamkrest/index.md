@@ -2,11 +2,14 @@ title: http4k Hamkrest Module
 description: Feature overview of the http4k-testing-hamkrest module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-hamkrest", version: "3.247.0"```
+
+```groovy
+implementation group: "org.http4k", name: "http4k-testing-hamkrest", version: "4.0.0.0"
+```
 
 ### About
 
-A set of Hamkrest matchers for use when testing [http4k] apps.
+A set of Hamkrest matchers for use when testing http4k apps.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/hamkrest/example.kt)
 

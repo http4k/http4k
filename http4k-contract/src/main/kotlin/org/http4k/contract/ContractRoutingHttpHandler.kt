@@ -4,6 +4,7 @@ import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.OPTIONS
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -16,6 +17,7 @@ import org.http4k.lens.Validator
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
@@ -52,6 +54,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
             is MatchingHandler -> matchResult(it)
             is MethodNotMatched -> notFound(it)
             is Unmatched -> notFound(it)
+            is MatchedWithoutHandler -> notFound(it)
         }
     }
 
@@ -80,14 +83,14 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 
     override fun match(request: Request): RouterMatch {
-        val unmatched: RouterMatch = Unmatched
+        val unmatched: RouterMatch = Unmatched(description)
 
         return if (request.isIn(contractRoot)) {
             routers.fold(unmatched) { memo, (routeFilter, router) ->
                 when (memo) {
                     is MatchingHandler -> memo
                     else -> when (val matchResult = router.match(request)) {
-                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult))
+                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult), description)
                         else -> minOf(memo, matchResult)
                     }
                 }
@@ -109,7 +112,12 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 internal class PreFlightExtractionFilter(meta: RouteMeta, preFlightExtraction: PreFlightExtraction) : Filter {
     private val preFlightChecks = (meta.preFlightExtraction ?: preFlightExtraction)(meta).toTypedArray()
     override fun invoke(next: HttpHandler): HttpHandler = {
-        val failures = Validator.Strict(it, *preFlightChecks)
-        if (failures.isEmpty()) next(it) else throw LensFailure(failures, target = it)
+        when (it.method) {
+            OPTIONS -> next(it)
+            else -> {
+                val failures = Validator.Strict(it, *preFlightChecks)
+                if (failures.isEmpty()) next(it) else throw LensFailure(failures, target = it)
+            }
+        }
     }
 }

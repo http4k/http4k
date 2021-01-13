@@ -3,7 +3,7 @@ package org.http4k.core
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.util.loadMetaResource
 
-data class MimeTypes private constructor(private val map: Map<String, ContentType>) {
+class MimeTypes private constructor(private val map: Map<String, ContentType>) {
     fun forFile(file: String): ContentType =
         file.drop(file.lastIndexOf('.') + 1).let {
             if (it == file) OCTET_STREAM else map[it.toLowerCase()] ?: OCTET_STREAM

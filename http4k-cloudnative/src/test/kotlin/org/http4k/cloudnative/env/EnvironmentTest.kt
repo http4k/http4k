@@ -31,6 +31,13 @@ class EnvironmentTest {
     }
 
     @Test
+    fun `overriding overrides separator`() {
+        val finalEnv = MapEnvironment.from(listOf("FOO" to "foo;bar").toMap().toProperties(), separator = ";") overrides Environment.from("FOO" to "bob")
+
+        assertThat(EnvironmentKey.required("FOO")[finalEnv], equalTo("foo"))
+    }
+
+    @Test
     fun `add to overriding environment`() {
         val finalEnv = Environment.from("FOO" to "bob") overrides Environment.from("BAR" to "bill")
         val extendedEnv = finalEnv.set("BAZ", "bud")

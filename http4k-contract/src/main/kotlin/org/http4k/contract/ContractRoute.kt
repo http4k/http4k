@@ -15,11 +15,13 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.core.toPathDecoded
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
@@ -43,14 +45,15 @@ class ContractRoute internal constructor(val method: Method,
                     request.without(spec.pathFn(contractRoot))
                         .extract(spec.pathLenses.toList())
                         ?.let {
-                            if (request.method == OPTIONS) {
-                                MatchingHandler { Response(OK) }
-                            } else MatchingHandler(toHandler(it))
-                        } ?: Unmatched
+                            MatchingHandler(
+                                if (request.method == OPTIONS) {
+                                    { Response(OK) }
+                                } else toHandler(it), description)
+                        } ?: Unmatched(description)
                 } catch (e: LensFailure) {
-                    Unmatched
+                    Unmatched(description)
                 }
-            } else Unmatched
+            } else Unmatched(description)
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)
@@ -70,6 +73,7 @@ class ContractRoute internal constructor(val method: Method,
             }
             is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
             is Unmatched -> Response(NOT_FOUND)
+            is MatchedWithoutHandler -> Response(NOT_FOUND)
         }
     }
 
@@ -84,5 +88,10 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
 private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
 private fun PathSegments.extract(lenses: List<PathLens<*>>): ExtractedParts? =
-    if (toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to this(index, lens::invoke) }.toMap()) else null
+    when (toList().size) {
+        lenses.size -> ExtractedParts(
+            lenses.mapIndexed { i, lens -> lens to this(i) { lens(it.toPathDecoded()) } }.toMap()
+        )
+        else -> null
+    }
 

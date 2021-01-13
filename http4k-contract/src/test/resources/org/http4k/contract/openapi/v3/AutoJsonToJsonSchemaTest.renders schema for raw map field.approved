@@ -4,10 +4,12 @@
       "properties": {
         "key": {
           "example": "value",
+          "description": null,
           "type": "string"
         },
         "key2": {
           "example": 123,
+          "description": null,
           "type": "number"
         },
         "key3": {
@@ -15,6 +17,7 @@
             "properties": {
               "inner": {
                 "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+                "description": null,
                 "example": null
               }
             },
@@ -23,16 +26,19 @@
                 "uri": "foobar"
               }
             },
+            "description": null,
             "type": "object",
             "required": [
               "inner"
             ]
           },
+          "description": null,
           "example": null,
           "type": "object"
         },
         "key4": {
           "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+          "description": null,
           "example": null
         },
         "key5": {
@@ -94,10 +100,12 @@
               "enumVal": "value2"
             }
           ],
+          "description": null,
           "type": "array"
         },
         "key6": {
           "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericListHolder",
+          "description": null,
           "example": null
         }
       },
@@ -211,6 +219,7 @@
           ]
         }
       },
+      "description": null,
       "type": "object",
       "required": [
         "key",
@@ -221,6 +230,7 @@
         "key6"
       ]
     },
+    "description": null,
     "example": null,
     "type": "object"
   },
@@ -231,12 +241,14 @@
         "properties": {
           "uri": {
             "example": "foobar",
+            "description": null,
             "type": "string"
           }
         },
         "example": {
           "uri": "foobar"
         },
+        "description": null,
         "type": "object",
         "required": [
           "uri"
@@ -249,6 +261,7 @@
         "properties": {
           "child": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+            "description": null,
             "example": null
           },
           "list": {
@@ -267,6 +280,7 @@
                 "uri": "foobar"
               }
             ],
+            "description": null,
             "type": "array"
           },
           "nestedList": {
@@ -294,10 +308,12 @@
                 }
               ]
             ],
+            "description": null,
             "type": "array"
           },
           "nullableChild": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+            "description": null,
             "example": null
           },
           "stringList": {
@@ -312,6 +328,7 @@
               "hello",
               "goodbye"
             ],
+            "description": null,
             "type": "array"
           },
           "anyList": {
@@ -350,10 +367,12 @@
                 }
               ]
             ],
+            "description": null,
             "type": "array"
           },
           "enumVal": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo",
+            "description": null,
             "example": null
           }
         },
@@ -400,6 +419,7 @@
           ],
           "enumVal": "value2"
         },
+        "description": null,
         "type": "object",
         "required": [
           "anyList",
@@ -418,6 +438,7 @@
           "value1",
           "value2"
         ],
+        "description": null,
         "type": "string"
       }
     },
@@ -484,6 +505,7 @@
                 "enumVal": "value2"
               }
             ],
+            "description": null,
             "type": "array"
           }
         },
@@ -537,6 +559,7 @@
             }
           ]
         },
+        "description": null,
         "type": "object",
         "required": [
           "value"

@@ -1,7 +1,8 @@
 package org.http4k.contract.openapi.v3
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.*
 import com.fasterxml.jackson.databind.PropertyNamingStrategy.SNAKE_CASE
-import com.fasterxml.jackson.databind.PropertyNamingStrategy.UpperCamelCaseStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
@@ -23,9 +24,9 @@ internal class JacksonJsonNamingAnnotatedTest {
 
     @Test
     fun `finds value from object`() {
-        assertThat("nonNullable", standard(Renamed(), "RenamedValue"), equalTo(Field("bob", false)))
-        assertThat("nonNullableNoRename", standard(Snake(), "renamedValue"), equalTo(Field("bob", false)))
-        assertThat("nullable", standard(Renamed(), "Nullable"), equalTo(Field("nullable", true)))
+        assertThat("nonNullable", standard(Renamed(), "RenamedValue"), equalTo(Field("bob", false, FieldMetadata.empty)))
+        assertThat("nonNullableNoRename", standard(Snake(), "renamedValue"), equalTo(Field("bob", false, FieldMetadata.empty)))
+        assertThat("nullable", standard(Renamed(), "Nullable"), equalTo(Field("nullable", true, FieldMetadata.empty)))
     }
 
     @Test
@@ -36,11 +37,11 @@ internal class JacksonJsonNamingAnnotatedTest {
     object CustomJackson : ConfigurableJackson(KotlinModule()
         .asConfigurable()
         .withStandardMappings()
-        .done().setPropertyNamingStrategy(SNAKE_CASE)
+        .done().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
     )
 
     @Test
     fun `use custom Jackson naming strategy`() {
-        assertThat(JacksonJsonNamingAnnotated(CustomJackson)(Snake(), "renamed_value"), equalTo(Field("bob", false)))
+        assertThat(JacksonJsonNamingAnnotated(CustomJackson)(Snake(), "renamed_value"), equalTo(Field("bob", false, FieldMetadata.empty)))
     }
 }

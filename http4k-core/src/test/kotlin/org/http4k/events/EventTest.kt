@@ -8,6 +8,6 @@ class EventTest {
     @Test
     fun `combines into a singular event with metadata`() {
         val final = MyEvent() + ("first" to "1") + ("second" to 2)
-        assertThat(final, equalTo<Event>(MetadataEvent(MyEvent(), mapOf("first" to "1", "second" to 2))))
+        assertThat(final, equalTo(MetadataEvent(MyEvent(), mapOf("first" to "1", "second" to 2))))
     }
 }

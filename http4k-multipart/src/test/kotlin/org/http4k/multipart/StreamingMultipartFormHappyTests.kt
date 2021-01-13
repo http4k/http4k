@@ -215,7 +215,7 @@ class StreamingMultipartFormHappyTests {
         file.inputStream.close() // can close multiple times
         try {
             val ignored = file.inputStream.read()
-            fail("Should have complained that the StreamingPart has been closed " + ignored)
+            fail("Should have complained that the StreamingPart has been closed $ignored")
         } catch (e: AlreadyClosedException) {
             // pass
         }
@@ -233,7 +233,7 @@ class StreamingMultipartFormHappyTests {
 
         try {
             val ignored = file.inputStream.read()
-            fail("Should have complained that the StreamingPart has been closed " + ignored)
+            fail("Should have complained that the StreamingPart has been closed $ignored")
         } catch (e: AlreadyClosedException) {
             // pass
         }
@@ -256,7 +256,7 @@ class StreamingMultipartFormHappyTests {
 
         try {
             val ignored = file1.inputStream.read()
-            fail("Should have complained that the StreamingPart has been closed " + ignored)
+            fail("Should have complained that the StreamingPart has been closed $ignored")
         } catch (e: AlreadyClosedException) {
             // pass
         }
@@ -303,7 +303,7 @@ class StreamingMultipartFormHappyTests {
 
 }
 
-val CR_LF = "\r\n"
+const val CR_LF = "\r\n"
 
 
 internal fun assertRealLifeFile(parts: Iterator<StreamingPart>, fileName: String, contentType: String) {
@@ -332,7 +332,7 @@ fun compareOneStreamToAnother(actualStream: InputStream, expectedStream: InputSt
     while (true) {
         val actual = actualStream.read()
         val expected = expectedStream.read()
-        assertThat("index " + index, actual, equalTo(expected))
+        assertThat("index $index", actual, equalTo(expected))
         index++
         if (actual < 0) {
             break

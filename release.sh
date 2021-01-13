@@ -17,6 +17,7 @@ find . -name "*.md" | grep -v "CHANGELOG" | xargs -I '{}' sed -i '' s/"$BINTRAY_
 sed -i '' s/"$BINTRAY_VERSION"/"$NEW_VERSION"/g version.json
 
 git commit -am"Release $NEW_VERSION"
+
 git push
 
 git stash apply

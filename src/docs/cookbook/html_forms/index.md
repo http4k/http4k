@@ -7,8 +7,9 @@ HTML form support is provided on 2 levels:
 1. Using the Lens system, which adds the facility to define form fields in a typesafe way, and to validate form contents (in either a strict (400) or "feedback" mode).
 
 ### Gradle setup
-```
-    compile group: "org.http4k", name: "http4k-core", version: "3.247.0"
+
+```groovy
+implementation group: "org.http4k", name: "http4k-core", version: "4.0.0.0"
 ```
 
 ### Standard (non-typesafe) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_standard.kt)

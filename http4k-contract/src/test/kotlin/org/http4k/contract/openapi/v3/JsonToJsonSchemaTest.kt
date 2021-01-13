@@ -53,6 +53,6 @@ class JsonToJsonSchemaTest {
     private fun Approver.assertApproved(obj: JsonNode, name: String) {
         assertApproved(Response(OK)
             .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(Jackson.asJsonString(creator.toSchema(obj, name))))
+            .body(Jackson.asFormatString(creator.toSchema(obj, name))))
     }
 }

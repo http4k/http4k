@@ -31,8 +31,8 @@ import org.http4k.core.Method.HEAD
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
-import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta.FileParam
@@ -55,7 +55,7 @@ class OpenApi3<NODE : Any>(
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
-    constructor(apiInfo: ApiInfo, json: JsonLibAutoMarshallingJson<NODE>, extensions: List<OpenApiExtension> = emptyList()) : this(apiInfo, json, extensions, ApiRenderer.Auto(json))
+    constructor(apiInfo: ApiInfo, json: AutoMarshallingJson<NODE>, extensions: List<OpenApiExtension> = emptyList()) : this(apiInfo, json, extensions, ApiRenderer.Auto(json))
 
     override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>): Response {
         val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)

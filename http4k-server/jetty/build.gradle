@@ -1,0 +1,19 @@
+description = 'Http4k HTTP Server built on top of jetty'
+
+dependencies {
+    api project(":http4k-core")
+
+    api Libs.jetty_server
+    api Libs.jetty_servlet
+    api Libs.javax_servlet_api
+
+    api Libs.websocket_core_server
+
+    // this list is for reference since http2 support is optional
+    implementation Libs.http2_server
+    implementation Libs.jetty_alpn_conscrypt_server
+    implementation Libs.alpn_boot
+
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
+}

@@ -30,6 +30,7 @@ object ResourceLoaders {
                 val resourcePath = basePackagePath.withLeadingSlash().pathJoin(path.orIndexFile())
                 return javaClass.getResource(resourcePath)?.toResource(mimeTypes.forFile(resourcePath), lastModifiedFinder(resourcePath))
             }
+
         }
 
         private fun String.orIndexFile() = if (isEmpty() || endsWith("/")) pathJoin("index.html") else this
@@ -54,7 +55,7 @@ interface ResourceLoading : Router {
     fun match(path: String): HttpHandler?
 
     override fun match(request: Request): RouterMatch = when (val matchResult = match(request.uri.path)) {
-        is HttpHandler -> MatchingHandler(matchResult)
-        else -> Unmatched
+        is HttpHandler -> MatchingHandler(matchResult, description)
+        else -> Unmatched(description)
     }
 }

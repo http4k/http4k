@@ -1,0 +1,14 @@
+on: [repository_dispatch]
+jobs:
+  sync-maven-central:
+    if: github.event.action == 'http4k-release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: ./release-maven-central.sh
+        env:
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+          SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+          SONATYPE_KEY: ${{ secrets.SONATYPE_KEY }}

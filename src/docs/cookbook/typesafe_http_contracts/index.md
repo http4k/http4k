@@ -6,13 +6,14 @@ This contract example shows:
 - 2 endpoints with typesafe contracts (marshalling of path parameters and bodies)
 - Custom filters (reporting latency)
 - API key security via a typesafe Query parameter (this can be a header or a body parameter as well)
-- OpenApi v3 documentation - Run this example and point a browser [here](https://http4k.org/openapi3?url=http://localhost:8000/context/swagger.json)
+- OpenApi v3 documentation - Run this example and point a browser [here](https://http4k.org/openapi3?url=http%3A%2F%2Flocalhost%3A8000%2Fcontext%2Fdocs%2Fswagger.json)
 
 ### Gradle setup
-```
-    compile group: "org.http4k", name: "http4k-core", version: "3.247.0"
-    compile group: "org.http4k", name: "http4k-contract", version: "3.247.0"
-    compile group: "org.http4k", name: "http4k-format-argo", version: "3.247.0"
+
+```groovy
+implementation group: "org.http4k", name: "http4k-core", version: "4.0.0.0"
+implementation group: "org.http4k", name: "http4k-contract", version: "4.0.0.0"
+implementation group: "org.http4k", name: "http4k-format-argo", version: "4.0.0.0"
 ```
 
 Note: although we use Argo here as our JSON API, you could also switch in any of the `http4k-format-xxx` JSON modules. 

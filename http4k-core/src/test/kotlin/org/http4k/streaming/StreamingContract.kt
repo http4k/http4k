@@ -31,7 +31,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     private lateinit var server: Http4kServer
 
-    protected val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
+    private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val sharedList = CopyOnWriteArrayList<Char>()
 
@@ -68,7 +68,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     }
 
     @Test
-    fun `can stream request`() {
+    open fun `can stream request`() {
         createClient()(Request(POST, "$baseUrl/stream-request").body(beeper("client")))
 
         waitForCompletion()
@@ -104,7 +104,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
         val line = "b".repeat(config.beepSize) + "\n"
 
         thread {
-            (1..5).forEach {
+            for (it in 1..5) {
                 if (runningInIdea) println("$location sent")
 
                 output.write(line.toByteArray())

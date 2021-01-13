@@ -4,8 +4,9 @@ description: Recipes for using http4k to record and replay HTTP traffic
 A set of classes to provide simple recording/replaying of HTTP traffic. This is perfect for testing purposes, or in short lived, low traffic environments where no proper caches are available.
 
 ### Gradle setup
-```
-    compile group: "org.http4k", name: "http4k-core", version: "3.247.0"
+
+```groovy
+implementation group: "org.http4k", name: "http4k-core", version: "4.0.0.0"
 ```
 
 ### Caching HTTP Traffic 

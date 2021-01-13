@@ -35,7 +35,7 @@ interface Environment {
      * Used to chain: eg. Local File -> System Properties -> Env Properties -> Defaults
      */
     infix fun overrides(that: Environment): Environment = MapEnvironment.from(
-        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties()
+        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties(), separator = separator
     )
 
     companion object {
@@ -68,13 +68,15 @@ interface Environment {
         fun defaults(vararg fn: (Environment) -> Environment) = fn.fold(EMPTY) { acc, next -> next(acc) }
 
         fun from(vararg pairs: Pair<String, String>): Environment = MapEnvironment.from(pairs.toMap().toProperties())
+
+        fun from(env: Map<String, String>): Environment = MapEnvironment.from(env.toProperties())
     }
 }
 
 class MapEnvironment private constructor(private val contents: Map<String, String>, override val separator: String = ",") : Environment {
     override operator fun <T> get(key: Lens<Environment, T>) = key(this)
     override operator fun get(key: String): String? = contents[key.convertFromKey()]
-    override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value))
+    override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value), separator)
     override fun minus(key: String): Environment = MapEnvironment(contents - key.convertFromKey(), separator)
     override fun keys() = contents.keys
 

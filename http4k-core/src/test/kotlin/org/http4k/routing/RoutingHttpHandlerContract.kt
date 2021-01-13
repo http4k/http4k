@@ -29,21 +29,21 @@ abstract class RoutingHttpHandlerContract {
     fun `matches a particular route`() {
         val criteria = hasStatus(OK)
 
-        assertThat(handler.matchAndInvoke(Request(GET, validPath)), present(criteria))
-        assertThat(handler(Request(GET, validPath)), criteria)
+        assertThat(handler.matchAndInvoke(Request(GET, validPath).header("host", "host")), present(criteria))
+        assertThat(handler(Request(GET, validPath).header("host", "host")), criteria)
     }
 
     @Test
     open fun `does not match a particular route`() {
-        assertThat(handler.matchAndInvoke(Request(GET, "/not-found")), absent())
-        assertThat(handler(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasBody(expectedNotFoundBody))
+        assertThat(handler.matchAndInvoke(Request(GET, "/not-found").header("host", "host")), absent())
+        assertThat(handler(Request(GET, "/not-found").header("host", "host")), hasStatus(NOT_FOUND) and hasBody(expectedNotFoundBody))
     }
 
     @Test
     fun `with filter - applies to matching handler`() {
         val filtered = handler.withFilter(filterAppending("bar"))
         val criteria = hasStatus(OK) and hasHeader("res-header", "bar")
-        val request = Request(GET, validPath)
+        val request = Request(GET, validPath).header("host", "host")
 
         assertThat(filtered.matchAndInvoke(request), present(criteria))
         assertThat(filtered(request), criteria)
@@ -52,7 +52,7 @@ abstract class RoutingHttpHandlerContract {
     @Test
     open fun `with filter - applies when not found`() {
         val filtered = handler.withFilter(filterAppending("foo"))
-        val request = Request(GET, "/not-found")
+        val request = Request(GET, "/not-found").header("host", "host")
 
         assertThat(filtered.matchAndInvoke(request), absent())
         assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody))
@@ -61,7 +61,7 @@ abstract class RoutingHttpHandlerContract {
     @Test
     open fun `with filter - applies in correct order`() {
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
-        val request = Request(GET, "/not-found")
+        val request = Request(GET, "/not-found").header("host", "host")
 
         assertThat(filtered.matchAndInvoke(request), absent())
         assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foobar"))
@@ -70,7 +70,7 @@ abstract class RoutingHttpHandlerContract {
     @Test
     fun `with base path - matches`() {
         val withBase = handler.withBasePath(prefix)
-        val request = Request(GET, "$prefix$validPath")
+        val request = Request(GET, "$prefix$validPath").header("host", "host")
         val criteria = hasStatus(OK)
 
         assertThat(withBase.matchAndInvoke(request), present(criteria))
@@ -80,7 +80,7 @@ abstract class RoutingHttpHandlerContract {
     @Test
     open fun `with base path - no longer matches original`() {
         val withBase = handler.withBasePath(prefix)
-        val request = Request(GET, validPath)
+        val request = Request(GET, validPath).header("host", "host")
 
         assertThat(withBase.matchAndInvoke(request), absent())
         assertThat(withBase(request), hasStatus(NOT_FOUND))
@@ -88,17 +88,13 @@ abstract class RoutingHttpHandlerContract {
 
     @Test
     fun `with base path - multiple levels`() {
-        val withBase = handler.withBasePath(prefix).withBasePath(prePrefix)
-        val request = Request(GET, "$prePrefix$prefix$validPath")
+        val withBasePath = handler.withBasePath(prefix)
+        val withBase = withBasePath.withBasePath(prePrefix)
+        val request = Request(GET, "$prePrefix$prefix$validPath").header("host", "host")
         val criteria = hasStatus(OK)
 
         assertThat(withBase.matchAndInvoke(request), present(criteria))
         assertThat(withBase(request), criteria)
-    }
-
-    protected fun RoutingHttpHandler.matchAndInvoke(request: Request) = when (val matchResult = match(request)) {
-        is MatchingHandler -> matchResult(request)
-        else -> null
     }
 
     protected fun filterAppending(value: String) = Filter { next ->
@@ -107,4 +103,9 @@ abstract class RoutingHttpHandlerContract {
             response.replaceHeader("res-header", response.header("res-header").orEmpty() + value)
         }
     }
+}
+
+fun RoutingHttpHandler.matchAndInvoke(request: Request) = when (val matchResult = match(request)) {
+    is MatchingHandler -> matchResult(request)
+    else -> null
 }

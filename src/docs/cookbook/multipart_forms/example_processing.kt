@@ -32,7 +32,7 @@ fun main() {
         multipartFile.file.filename
     }
         .then { req: Request ->
-            // this is the web-form definition - it it DIFFERENT to the multipart form definition,
+            // this is the web-form definition - it is DIFFERENT to the multipart form definition,
             // because the fields and content-type have been replaced in the ProcessFiles filter
             val nameField = FormField.map(::AName, AName::value).required("name")
             val imageFile = FormField.optional("image")

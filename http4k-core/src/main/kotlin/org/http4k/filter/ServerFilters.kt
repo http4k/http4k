@@ -23,20 +23,20 @@ import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 import org.http4k.lens.RequestContextLens
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.lang.IllegalArgumentException
 
-data class CorsPolicy(val origins: List<String>,
+data class CorsPolicy(val originPolicy: OriginPolicy,
                       val headers: List<String>,
                       val methods: List<Method>,
                       val credentials: Boolean = false) {
     companion object {
-        val UnsafeGlobalPermissive = CorsPolicy(listOf("*"), listOf("content-type"), Method.values().toList(), true)
+        val UnsafeGlobalPermissive = CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.values().toList(), true)
     }
 }
 
@@ -54,8 +54,8 @@ object ServerFilters {
 
                 val origin = it.header("Origin")
                 val allowedOrigin = when {
-                    "*" in policy.origins -> "*"
-                    origin != null && origin in policy.origins -> origin
+                    policy.originPolicy is AllowAllOriginPolicy -> "*"
+                    origin != null && policy.originPolicy(origin) -> origin
                     else -> "null"
                 }
 
@@ -180,6 +180,35 @@ object ServerFilters {
             ?.takeIf { it.startsWith("Bearer") }
             ?.substringAfter("Bearer")
             ?.trim()
+    }
+
+    /**
+     * ApiKey token checking.
+     */
+    object ApiKeyAuth {
+        /**
+         * ApiKey token checking using a typed lens.
+         */
+        operator fun <T> invoke(lens: (Lens<Request, T>),
+                                validate: (T) -> Boolean) = ApiKeyAuth { req: Request ->
+            try {
+                validate(lens(req))
+            } catch (e: LensFailure) {
+                false
+            }
+        }
+
+        /**
+         * ApiKey token checking using standard request inspection.
+         */
+        operator fun invoke(validate: (Request) -> Boolean): Filter = Filter { next ->
+            {
+                when {
+                    validate(it) -> next(it)
+                    else -> Response(UNAUTHORIZED)
+                }
+            }
+        }
     }
 
     /**

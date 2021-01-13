@@ -16,11 +16,9 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.query
 import org.http4k.core.then
-import org.http4k.core.toUrlFormEncoded
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.security.oauth.server.AuthRequest
 import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import org.http4k.security.openid.RequestJwts
@@ -57,18 +55,15 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - when no accessToken value present, request is redirected to expected location`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&response_mode=form_post"""
+        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&response_mode=form_post"""
         assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
     @Test
     fun `filter - accepts custom request JWT container`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&request=myCustomJwt&response_mode=form_post"""
+        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&request=myCustomJwt&response_mode=form_post"""
 
-        val jwts = object : RequestJwts {
-            override fun create(authRequest: AuthRequest, state: State, nonce: Nonce?) = RequestJwtContainer("myCustomJwt")
-
-        }
+        val jwts = RequestJwts { _, _, _ -> RequestJwtContainer("myCustomJwt") }
         assertThat(oAuth(oAuthPersistence).authFilter(jwts).then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
@@ -81,8 +76,8 @@ class OAuthProviderTest {
     private val base = Request(GET, "/")
     private val withCookie = Request(GET, "/").cookie("serviceCsrf", "randomCsrf")
     private val withCode = withCookie.query("code", "value")
-    private val withCodeAndInvalidState = withCode.query("state", listOf("csrf" to "notreal").toUrlFormEncoded())
-    private val withCodeAndValidStateButNoUrl = withCode.query("state", listOf("csrf" to "randomCsrf").toUrlFormEncoded())
+    private val withCodeAndInvalidState = withCode.query("state", "notreal")
+    private val withCodeAndValidState = withCode.query("state", "randomCsrf")
 
     @Test
     fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {
@@ -99,11 +94,24 @@ class OAuthProviderTest {
 
     @Test
     fun `when api returns bad status`() {
-        assertThat(oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidStateButNoUrl), equalTo(Response(FORBIDDEN)))
+        assertThat(oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidState), equalTo(Response(FORBIDDEN)))
     }
 
     @Test
-    fun `callback - when valid inputs passed, defaults to root`() {
+    fun `callback - when valid inputs passed, defaults value stored in oauth persistance`() {
+
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        oAuthPersistence.assignOriginalUri(Response(OK), Uri.of("/defaulted"))
+
+        val validRedirectToRoot = Response(TEMPORARY_REDIRECT)
+            .header("Location", "/defaulted")
+            .header("action", "assignToken")
+
+        assertThat(oAuth(oAuthPersistence).callback(withCodeAndValidState), equalTo(validRedirectToRoot))
+    }
+
+    @Test
+    fun `callback - when valid inputs passed, defaults to root if no uri is stored in oauth persistance`() {
 
         oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
 
@@ -111,7 +119,7 @@ class OAuthProviderTest {
             .header("Location", "/")
             .header("action", "assignToken")
 
-        assertThat(oAuth(oAuthPersistence).callback(withCodeAndValidStateButNoUrl), equalTo(validRedirectToRoot))
+        assertThat(oAuth(oAuthPersistence).callback(withCodeAndValidState), equalTo(validRedirectToRoot))
     }
 
 }

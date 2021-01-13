@@ -1,10 +1,10 @@
 package org.http4k.security.oauth.server.request
 
-import com.natpryce.Failure
-import com.natpryce.Result
-import com.natpryce.Success
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.apache.commons.codec.binary.Base64
 import org.http4k.core.Uri
 import org.http4k.format.Jackson
@@ -99,7 +99,7 @@ internal class RequestObjectExtractorTest {
             )
         )
 
-        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asJsonString(rawData).toByteArray()).replace("=", "")}.someSignature"
+        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asFormatString(rawData).toByteArray()).replace("=", "")}.someSignature"
 
         assertThat(RequestObjectExtractor.extractRequestObjectFromJwt(requestJwt), equalTo(success(correspondingExpectedRequestObject)))
     }
@@ -117,7 +117,7 @@ internal class RequestObjectExtractorTest {
             claims = Claims()
         )
 
-        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asJsonString(rawData).toByteArray()).replace("=", "")}.someSignature"
+        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asFormatString(rawData).toByteArray()).replace("=", "")}.someSignature"
 
         assertThat(RequestObjectExtractor.extractRequestObjectFromJwt(requestJwt), equalTo(success(correspondingExpectedRequestObject)))
     }
@@ -133,7 +133,7 @@ internal class RequestObjectExtractorTest {
             scope = emptyList()
         )
 
-        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asJsonString(rawData).toByteArray()).replace("=", "")}.someSignature"
+        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asFormatString(rawData).toByteArray()).replace("=", "")}.someSignature"
 
         assertThat(RequestObjectExtractor.extractRequestObjectFromJwt(requestJwt), equalTo(success(correspondingExpectedRequestObject)))
     }

@@ -36,10 +36,10 @@ class ContractRouteTest {
             summary = ""
             queries += Query.required("")
         } bindContract GET
-        val route = pair to { _, _ -> { _: Request -> Response(OK) } }
+        val route = pair to { _, _ -> { Response(OK) } }
         val request = route.newRequest(Uri.of("http://rita.com"))
 
-        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello%20world")))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello+world")))
     }
 
     @Test
@@ -60,7 +60,7 @@ class ContractRouteTest {
             queries += Query.required("")
         } bindContract GET).newRequest(Uri.of("http://rita.com/base"))
 
-        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello%20world")))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello+world")))
     }
 
     @Test
@@ -71,7 +71,7 @@ class ContractRouteTest {
             queries += Query.required("")
         } bindContract GET).newRequest()
 
-        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "/123/hello%20world")))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "/123/hello+world")))
     }
 
     @Test
@@ -79,9 +79,9 @@ class ContractRouteTest {
         val handler: (Request) -> Response = { Response(OK) }
         val route = "/" bindContract GET to handler
         val router = route.toRouter(Root)
-        assertThat(router.match(Request(GET, "/")), equalTo(MatchingHandler(handler) as RouterMatch))
-        assertThat(router.match(Request(POST, "/")), equalTo(Unmatched as RouterMatch))
-        assertThat(router.match(Request(GET, "/bob")), equalTo(Unmatched as RouterMatch))
+        assertThat(router.match(Request(GET, "/")), equalTo(MatchingHandler(handler, router.description) as RouterMatch))
+        assertThat(router.match(Request(POST, "/")), equalTo(Unmatched(router.description) as RouterMatch))
+        assertThat(router.match(Request(GET, "/bob")), equalTo(Unmatched(router.description) as RouterMatch))
     }
 
     @Test
@@ -93,7 +93,7 @@ class ContractRouteTest {
         val handler: HttpHandler = { Response(OK) }
 
         assertRequest("/" bindContract GET to handler, "http://foo.com")
-        assertRequest(Path.of("value") bindContract GET to { _ -> handler }, "http://foo.com/{value}")
+        assertRequest(Path.of("value") bindContract GET to { handler }, "http://foo.com/{value}")
         assertRequest(Path.of("value") / Path.of("value2") bindContract GET to { _, _ -> handler }, "http://foo.com/{value}/{value2}")
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") bindContract GET to { _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}")
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") bindContract GET to { _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}")
@@ -104,7 +104,7 @@ class ContractRouteTest {
 
     @Test
     fun `route as HttpHandler matches as expected`() {
-        val route = Path.int().of("value") meta {} bindContract GET to { { _: Request -> Response(OK) } }
+        val route = Path.int().of("value") meta {} bindContract GET to { { Response(OK) } }
 
         assertThat(route(Request(GET, "/1")), hasStatus(OK))
         assertThat(route(Request(DELETE, "/1")), hasStatus(NOT_FOUND))
@@ -115,7 +115,7 @@ class ContractRouteTest {
     fun `route as HttpHandler validates security of route`() {
         val route = Path.int().of("value") meta {
             security = ApiKeySecurity(Query.required("foo"), { true })
-        } bindContract GET to { { _: Request -> Response(OK) } }
+        } bindContract GET to { { Response(OK) } }
         assertThat(route(Request(GET, "/1")), hasStatus(UNAUTHORIZED))
         assertThat(route(Request(GET, "/1").query("foo", "bar")), hasStatus(OK))
     }
@@ -124,7 +124,7 @@ class ContractRouteTest {
     fun `route as HttpHandler performs pre-extraction of route`() {
         val route = Path.int().of("value") meta {
             queries += Query.required("foo")
-        } bindContract GET to { { _: Request -> Response(OK) } }
+        } bindContract GET to { { Response(OK) } }
         assertThat(route(Request(GET, "/1")), hasStatus(BAD_REQUEST))
         assertThat(route(Request(GET, "/1").query("foo", "bar")), hasStatus(OK))
     }
@@ -250,13 +250,13 @@ class ContractRouteTest {
         assertThat(route(Request(DELETE, valid)), hasStatus(NOT_FOUND))
 
         val routerOnNoPrefix = route.toRouter(Root)
-        assertThat(routerOnNoPrefix.match(Request(GET, "")), equalTo(Unmatched as RouterMatch))
-        assertThat(routerOnNoPrefix.match(Request(POST, valid)), equalTo(Unmatched as RouterMatch))
+        assertThat(routerOnNoPrefix.match(Request(GET, "")), equalTo(Unmatched(routerOnNoPrefix.description) as RouterMatch))
+        assertThat(routerOnNoPrefix.match(Request(POST, valid)), equalTo(Unmatched(routerOnNoPrefix.description) as RouterMatch))
         assertThat(routerOnNoPrefix.match(Request(GET, valid)).matchOrNull()?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
 
         val routerOnPrefix = route.toRouter(Root / "somePrefix")
-        assertThat(routerOnPrefix.match(Request(GET, "/somePrefix")), equalTo(Unmatched as RouterMatch))
-        assertThat(routerOnPrefix.match(Request(POST, "/somePrefix/$valid")), equalTo(Unmatched as RouterMatch))
+        assertThat(routerOnPrefix.match(Request(GET, "/somePrefix")), equalTo(Unmatched(routerOnPrefix.description) as RouterMatch))
+        assertThat(routerOnPrefix.match(Request(POST, "/somePrefix/$valid")), equalTo(Unmatched(routerOnPrefix.description) as RouterMatch))
         assertThat(routerOnPrefix.match(Request(GET, "/somePrefix/$valid")).matchOrNull()?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
     }
 

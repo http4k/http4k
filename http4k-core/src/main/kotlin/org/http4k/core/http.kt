@@ -25,14 +25,22 @@ interface Body : Closeable {
     val length: Long?
 
     companion object {
+        @JvmStatic
+        @JvmName("create")
         operator fun invoke(body: String): Body = MemoryBody(body)
+
+        @JvmStatic
+        @JvmName("create")
         operator fun invoke(body: ByteBuffer): Body = when {
             body.hasArray() -> MemoryBody(body)
             else -> MemoryBody(ByteArray(body.remaining()).also { body.get(it) })
         }
 
+        @JvmStatic
+        @JvmName("create")
         operator fun invoke(body: InputStream, length: Long? = null): Body = StreamBody(body, length)
 
+        @JvmField
         val EMPTY: Body = MemoryBody("")
     }
 }
@@ -162,6 +170,7 @@ enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD }
 interface Request : HttpMessage {
     val method: Method
     val uri: Uri
+    val source: RequestSource?
 
     /**
      * (Copy &) sets the method.
@@ -193,6 +202,11 @@ interface Request : HttpMessage {
      */
     fun removeQuery(name: String): Request
 
+    /**
+     * (Copy &) sets request source.
+     */
+    fun source(source: RequestSource): Request
+
     override fun header(name: String, value: String?): Request
 
     override fun headers(headers: Headers): Request
@@ -212,14 +226,29 @@ interface Request : HttpMessage {
     override fun toMessage() = listOf("$method $uri $version", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
+        @JvmStatic
+        @JvmOverloads
+        @JvmName("create")
         operator fun invoke(method: Method, uri: Uri, version: String = HTTP_1_1): Request = MemoryRequest(method, uri, listOf(), EMPTY, version)
+
+        @JvmStatic
+        @JvmOverloads
+        @JvmName("create")
         operator fun invoke(method: Method, uri: String, version: String = HTTP_1_1): Request = Request(method, Uri.of(uri), version)
+
         operator fun invoke(method: Method, template: UriTemplate, version: String = HTTP_1_1): Request = RoutedRequest(Request(method, template.toString(), version), template)
     }
 }
 
 @Suppress("EqualsOrHashCode")
-data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY, override val version: String = HTTP_1_1) : Request {
+data class MemoryRequest(
+    override val method: Method,
+    override val uri: Uri,
+    override val headers: Headers = listOf(),
+    override val body: Body = EMPTY,
+    override val version: String = HTTP_1_1,
+    override val source: RequestSource? = null
+) : Request {
     override fun method(method: Method): Request = copy(method = method)
 
     override fun uri(uri: Uri) = copy(uri = uri)
@@ -237,6 +266,8 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
     override fun headers(headers: Headers) = copy(headers = this.headers + headers)
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
+
+    override fun source(source: RequestSource) = copy(source = source)
 
     override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
 
@@ -282,6 +313,9 @@ interface Response : HttpMessage {
     override fun toMessage(): String = listOf("$version $status", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
+        @JvmStatic
+        @JvmOverloads
+        @JvmName("create")
         operator fun invoke(status: Status, version: String = HTTP_1_1): Response = MemoryResponse(status, listOf(), EMPTY, version)
     }
 }
@@ -314,5 +348,8 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
         && body == other.body)
 }
 
+data class RequestSource(val address: String, val port: Int? = 0, val scheme: String? = null)
+
 fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this) { memo, next -> next(memo) }
+
 fun WebForm.with(vararg modifiers: (WebForm) -> WebForm) = modifiers.fold(this) { memo, next -> next(memo) }

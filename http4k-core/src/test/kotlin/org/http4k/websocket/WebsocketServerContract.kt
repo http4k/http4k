@@ -2,6 +2,8 @@ package org.http4k.websocket
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.throws
 import org.http4k.client.WebsocketClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -18,6 +20,7 @@ import org.http4k.routing.websockets
 import org.http4k.server.Http4kServer
 import org.http4k.server.WsServerConfig
 import org.http4k.server.asServer
+import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,22 +43,18 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
                 "/{name}" bind { ws: Websocket ->
                     val name = ws.upgradeRequest.path("name")!!
                     ws.send(WsMessage(name))
-                    ws.onMessage {
-                        ws.send(WsMessage("goodbye $name".byteInputStream()))
-                    }
-                    ws.onClose { println("bob is closing") }
+                    ws.onMessage { ws.send(WsMessage("goodbye $name".byteInputStream())) }
+                    ws.onClose { println("$name is closing") }
                 }
             ),
             "/errors" bind { ws: Websocket ->
-                ws.onMessage {
-                    lens.extract(it)
+                ws.onMessage { lens(it) }
+                ws.onError {
+                    ws.send(WsMessage(it.localizedMessage))
                 }
-                ws.onError { ws.send(WsMessage(it.localizedMessage)) }
             },
             "/queries" bind { ws: Websocket ->
-                ws.onMessage {
-                    ws.send(WsMessage(ws.upgradeRequest.query("query") ?: "not set"))
-                }
+                ws.onMessage { ws.send(WsMessage(ws.upgradeRequest.query("query") ?: "not set")) }
                 ws.onError { ws.send(WsMessage(it.localizedMessage)) }
             })
 
@@ -81,10 +80,75 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
     }
 
     @Test
-    fun `errors are propagated to the "on error" handler`() {
+    fun `errors are propagated to the 'on error' handler`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/errors"))
         client.send(WsMessage("hello"))
         assertThat(client.received().take(1).toList(), equalTo(listOf(WsMessage("websocket 'message' must be object"))))
+    }
+
+    @Test
+    fun `should propagate close on client close`() {
+        val latch = CountDownLatch(1)
+        var closeStatus: WsStatus? = null
+
+        val server = websockets(
+            "/closes" bind { ws: Websocket ->
+                ws.onClose {
+                    closeStatus = it
+                    latch.countDown()
+                }
+            }).asServer(serverConfig(0)).start()
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+        client.close()
+
+        latch.await()
+        assertThat(closeStatus, present())
+        server.close()
+    }
+
+    @Test
+    fun `should propagate close on server close`() {
+        val latch = CountDownLatch(1)
+        var closeStatus: WsStatus? = null
+
+        val server = websockets(
+            "/closes" bind { ws: Websocket ->
+                ws.onMessage {
+                    ws.close()
+                }
+                ws.onClose {
+                    closeStatus = it
+                    latch.countDown()
+                }
+            }).asServer(serverConfig(0)).start()
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+        client.send(WsMessage("message"))
+
+        latch.await()
+        assertThat(closeStatus, present())
+        client.close()
+        server.close()
+    }
+
+    @Test
+    fun `should propagate close on server stop`() {
+        val latch = CountDownLatch(1)
+        var closeStatus: WsStatus? = null
+
+        val server = websockets(
+            "/closes" bind { ws: Websocket ->
+                ws.onClose {
+                    closeStatus = it
+                    latch.countDown()
+                }
+            }).asServer(serverConfig(0)).start()
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+        client.send(WsMessage("message"))
+        server.close()
+
+        latch.await()
+        assertThat(closeStatus, present())
+        client.close()
     }
 
     @Test
@@ -103,5 +167,13 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         }
 
         latch.await()
+    }
+
+    @Test
+    fun `should fail on invalid url`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/aaa"))
+        assertThat({
+            client.send(WsMessage("hello"))
+        }, throws<WebsocketNotConnectedException>())
     }
 }

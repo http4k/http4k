@@ -1,0 +1,76 @@
+<meta charset="utf-8">
+<link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+{% if page and page.meta.title %}
+<meta itemprop="name" content="{{ page.meta.title }}">
+<meta name="twitter:title" content="{{ page.meta.title }}">
+<meta property="og:title" content="{{ page.meta.title }}" />
+{% else %}
+<meta itemprop="name" content="http4k - a functional Kotlin HTTP toolkit">
+<meta property="og:title" content="http4k - a functional Kotlin HTTP toolkit" />
+<meta property="og:image" content="https://www.http4k.org/img/logo-intro.png">
+<meta name="twitter:title" content="http4k - a functional Kotlin HTTP toolkit">
+<meta property="twitter:image" content="https://www.http4k.org/img/logo-intro.png">
+{% endif %}
+
+{% if page and page.meta and page.meta.description %}
+<meta name="description" content="{{ page.meta.description }}">
+<meta property="og:description" content="{{ page.meta.description }}" />
+<meta name="twitter:description" content="{{ page.meta.description }}">
+{% elif config.site_description %}
+<meta name="description" content="{{ config.site_description }}">
+<meta property="og:description" content="{{ config.site_description }}" />
+<meta name="twitter:description" content="{{ config.site_description }}">
+{% endif %}
+
+{% if page.canonical_url %}
+<link rel="canonical" href="{{ page.canonical_url }}">
+{% endif %}
+
+{% if page and page.meta and page.meta.author %}
+<meta name="author" content="{{ page.meta.author }}">
+<meta name="twitter:creator" content="{{ page.meta.author }}">
+{% elif config.site_author %}
+<meta name="author" content="{{ config.site_author }}">
+<meta name="twitter:creator" content="{{ config.site_author }}">
+{% endif %}
+
+
+{% for key in [
+"clipboard.copy",
+"clipboard.copied",
+"search.language",
+"search.pipeline.stopwords",
+"search.pipeline.trimmer",
+"search.result.none",
+"search.result.one",
+"search.result.other",
+"search.tokenizer"
+] %}
+<meta name="lang:{{ key }}" content="en">
+{% endfor %}
+<!-- ****** faviconit.com favicons ****** -->
+<link rel="shortcut icon" href="/img/favicon.ico">
+<link rel="icon" sizes="16x16 32x32 64x64" href="/img/favicon.ico">
+<link rel="icon" type="image/png" sizes="196x196" href="/img/favicon-192.png">
+<link rel="icon" type="image/png" sizes="160x160" href="/img/favicon-160.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/img/favicon-64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+<link rel="apple-touch-icon" href="/img/favicon-57.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/img/favicon-114.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/img/favicon-72.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/img/favicon-144.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/img/favicon-60.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/img/favicon-120.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/img/favicon-76.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/img/favicon-152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180.png">
+<meta name="msapplication-TileColor" content="#FFFFFF">
+<meta name="msapplication-TileImage" content="/img/favicon-144.png">
+<meta name="msapplication-config" content="/img/browserconfig.xml">
+<!-- ****** faviconit.com favicons ****** -->
+<meta name="generator" content="mkdocs-{{ mkdocs_version }}, mkdocs-material-3.0.4">

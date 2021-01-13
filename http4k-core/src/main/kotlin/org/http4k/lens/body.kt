@@ -84,7 +84,7 @@ open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
 }
 
 fun httpBodyRoot(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) =
-    BiDiBodyLensSpec<Body>(metas, acceptedContentType,
+    BiDiBodyLensSpec(metas, acceptedContentType,
         LensGet { _, target ->
             contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
             listOf(target.body)
@@ -95,7 +95,7 @@ fun httpBodyRoot(metas: List<Meta>, acceptedContentType: ContentType, contentNeg
 /**
  * Modes for determining if a passed content type is acceptable.
  */
-interface ContentNegotiation {
+fun interface ContentNegotiation {
 
     @Throws(LensFailure::class)
     operator fun invoke(expected: ContentType, actual: ContentType?)
@@ -104,36 +104,22 @@ interface ContentNegotiation {
         /**
          * The received Content-type header passed back MUST equal the expected Content-type, including directive
          */
-        val Strict = object : ContentNegotiation {
-            override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual)
-            }
-        }
+        val Strict = ContentNegotiation { expected, actual -> if (actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual) }
 
         /**
          * The received Content-type header passed back MUST equal the expected Content-type, not including the directive
          */
-        val StrictNoDirective = object : ContentNegotiation {
-            override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (expected.value != actual?.value) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual)
-            }
-        }
+        val StrictNoDirective = ContentNegotiation { expected, actual -> if (expected.value != actual?.value) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual) }
 
         /**
          * If present, the received Content-type header passed back MUST equal the expected Content-type, including directive
          */
-        val NonStrict = object : ContentNegotiation {
-            override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (actual != null && actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual)
-            }
-        }
+        val NonStrict = ContentNegotiation { expected, actual -> if (actual != null && actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual) }
 
         /**
          * No validation is done on the received content type at all
          */
-        val None = object : ContentNegotiation {
-            override fun invoke(expected: ContentType, actual: ContentType?) {}
-        }
+        val None = ContentNegotiation { _, _ -> }
     }
 }
 
@@ -143,6 +129,7 @@ fun Body.Companion.string(contentType: ContentType, description: String? = null,
 fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = string(contentType, description, contentNegotiation).map(StringBiDiMappings.nonEmpty())
 
 fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = httpBodyRoot(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
+    .map({ it.stream }, { Body(it) })
 
 fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = None) =
     StringBiDiMappings.regex(pattern, group).let { string(contentType, description, contentNegotiation).map(it) }

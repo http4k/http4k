@@ -12,7 +12,7 @@ class TestResourcesTest {
     @Test
     fun `can load resource that exists`(resourceLoader: ResourceLoader) {
         assertThat(resourceLoader.text("file.txt").trim(), equalTo("content"))
-        assertThat(resourceLoader.stream("file.txt").reader().readText().trim(), equalTo("content"))
+        assertThat(resourceLoader.stream("file.txt").reader().use { it.readText().trim() }, equalTo("content"))
         assertThat(String(resourceLoader.bytes("file.txt")).trim(), equalTo("content"))
     }
 
