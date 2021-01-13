@@ -44,6 +44,9 @@ We can use this facility in http4k to automatically marshall objects to/from HTT
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/autoJson.kt"></script>
 
+serializing an object/class for a Response via `Lens.inject()` - this properly sets the `Content-Type` header to `application/json`:
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/autoJsonResponse.kt"></script>
+
 There is a utility to generate Kotlin data class code for JSON documents [here](http://toolbox.http4k.org/dataclasses). 
 These data classes are compatible with using the `Body.auto<T>()` functionality. 
 
