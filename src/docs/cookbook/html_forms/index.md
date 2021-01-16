@@ -9,7 +9,7 @@ HTML form support is provided on 2 levels:
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.0.0.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.1.0.0"
 ```
 
 ### Standard (non-typesafe) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_standard.kt)
