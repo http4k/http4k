@@ -156,7 +156,7 @@ class ClientFiltersTest {
         val svc = ClientFilters.RequestTracing().then { it ->
             val actual = ZipkinTraces(it)
             assertThat(actual, present())
-            assertThat(actual.parentSpanId, absent())
+            assertThat(actual.parentSpanId, present())
             Response(OK)
         }
 
