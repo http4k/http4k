@@ -1,10 +1,12 @@
 on: [repository_dispatch]
 jobs:
-  tweet:
+  trigger:
     if: github.event.action == 'trigger'
     runs-on: ubuntu-latest
     steps:
       - uses: peter-evans/repository-dispatch@v1.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           repository: http4k/http4k
           event-type: trigger2
