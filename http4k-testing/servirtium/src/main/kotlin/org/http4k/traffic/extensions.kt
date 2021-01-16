@@ -11,10 +11,10 @@ import org.http4k.core.parse
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionOptions.Companion.Defaults
-import org.http4k.servirtium.InteractionStorage
 import java.nio.ByteBuffer
 import java.util.Base64
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Consumer
 import java.util.function.Supplier
 
 fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }): HttpHandler {
@@ -42,8 +42,7 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
 
 private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Response(NOT_IMPLEMENTED).body(
     "Unexpected request received for Interaction $index ==> " +
-        "expected: <$expectedReq> but was: <$actual>"
-)
+        "expected: <$expectedReq> but was: <$actual>")
 
 /**
  * Interaction was called more times than there are interactions
@@ -55,10 +54,8 @@ private fun renderUnexpectedInteraction(interactions: Int, count: Int, actual: S
 /**
  * Write HTTP traffic to disk in Servirtium markdown format.
  */
-fun Sink.Companion.Servirtium(
-    target: InteractionStorage,
-    options: InteractionOptions
-) = object : Sink {
+fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
+                              options: InteractionOptions) = object : Sink {
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
         val manipulatedRequest = options.modify(request)
@@ -75,10 +72,8 @@ fun Sink.Companion.Servirtium(
     private fun Response.middle() = ("\n```\n\n" +
         headerLine<Response>() + ":\n" +
         headerBlock() + "\n" +
-        bodyLine<Response>() + " (${status.code}: ${
-        (CONTENT_TYPE(this)?.toHeaderValue()
-            ?: "")
-    }):\n\n```\n"
+        bodyLine<Response>() + " (${status.code}: ${(CONTENT_TYPE(this)?.toHeaderValue()
+        ?: "")}):\n\n```\n"
         ).toByteArray()
 
     private fun Request.header() = ("## Interaction ${count.getAndIncrement()}: ${method.name} $uri\n\n" +
@@ -89,11 +84,9 @@ fun Sink.Companion.Servirtium(
 
     private fun footer() = "\n```\n\n".toByteArray()
 
-    private fun HttpMessage.headerBlock() = "\n```\n${
-        headers.joinToString("\n") {
-            it.first + ": " + (it.second ?: "")
-        }
-    }\n```\n"
+    private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
+        it.first + ": " + (it.second ?: "")
+    }}\n```\n"
 
     private fun HttpMessage.encodedBody() =
         CONTENT_TYPE(this)
@@ -140,11 +133,10 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
 
                 val resp = Response.parse(
                     listOf(
-                        listOf(
-                            HTTP_1_1 +
-                                " " +
-                                sections[6].first { it.startsWith(bodyLine<Response>()) }.split('(', ':')[1] +
-                                " "
+                        listOf(HTTP_1_1 +
+                            " " +
+                            sections[6].first { it.startsWith(bodyLine<Response>()) }.split('(', ':')[1] +
+                            " "
                         ),
                         sections[5].dropWhile(String::isBlank) + "\r\n",
                         listOf(sections[7].dropWhile(String::isBlank).joinToString("\n"))
@@ -157,8 +149,5 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
 
 }
 
-private inline fun <reified T : HttpMessage> headerLine() =
-    """### ${T::class.java.simpleName} headers recorded for playback"""
-
-private inline fun <reified T : HttpMessage> bodyLine() =
-    """### ${T::class.java.simpleName} body recorded for playback"""
+private inline fun <reified T : HttpMessage> headerLine() = """### ${T::class.java.simpleName} headers recorded for playback"""
+private inline fun <reified T : HttpMessage> bodyLine() = """### ${T::class.java.simpleName} body recorded for playback"""

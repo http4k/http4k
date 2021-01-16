@@ -11,7 +11,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.servirtium.InteractionOptions
-import org.http4k.servirtium.InteractionStorage
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -24,9 +23,8 @@ class TrafficExtensionTests {
 
     @Test
     fun `sink stores traffic in servirtium markdown format, applying manipulations to recording only`(approver: Approver) {
-        val target = InMemoryInteractionStorage()
-        val sink = Sink.Servirtium(
-            target,
+        val received = AtomicReference<ByteArray>()
+        val sink = Sink.Servirtium(Consumer(received::set),
             object : InteractionOptions {
                 override fun modify(request: Request) =
                     request.removeHeader("toBeRemoved").body(request.bodyString() + request.bodyString())
@@ -48,14 +46,13 @@ class TrafficExtensionTests {
 
         sink[request1] = response1
 
-        approver.assertApproved(Response(OK).body(target.received.get().inputStream()))
+        approver.assertApproved(Response(OK).body(received.get().inputStream()))
     }
 
     @Test
     fun `sink stores binary artifacts as base64 encoded`(approver: Approver) {
-        val target = InMemoryInteractionStorage()
-        val sink = Sink.Servirtium(
-            target,
+        val received = AtomicReference<ByteArray>()
+        val sink = Sink.Servirtium(Consumer(received::set),
             object : InteractionOptions {
                 override fun isBinary(contentType: ContentType?) = true
             }
@@ -63,7 +60,7 @@ class TrafficExtensionTests {
 
         sink[Request(GET, "/").body("body1").with(CONTENT_TYPE of APPLICATION_PDF)] = Response(OK).body("body2").with(CONTENT_TYPE of APPLICATION_PDF)
 
-        approver.assertApproved(Response(OK).body(target.received.get().inputStream()))
+        approver.assertApproved(Response(OK).body(received.get().inputStream()))
     }
 
     @Test
@@ -109,15 +106,4 @@ class TrafficExtensionTests {
         assertThat(replay.requests().toList(), equalTo(listOf(request1)))
         assertThat(replay.responses().toList(), equalTo(listOf(response1)))
     }
-}
-
-private class InMemoryInteractionStorage : InteractionStorage {
-    val received = AtomicReference<ByteArray>()
-    override fun clean(): Boolean {
-        received.set(null)
-        return true
-    }
-    override fun get(): ByteArray = ByteArray(0)
-
-    override fun accept(t: ByteArray) = received.set(t)
 }
