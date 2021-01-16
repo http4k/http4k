@@ -21,3 +21,4 @@ As with the ethos of http4k, the uniform Server/Client GraphQLHandler model mean
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/graphql/example.kt"></script>
 
 [http4k]: https://http4k.org
+[GraphQL]: https://graphql.org
