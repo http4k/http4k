@@ -1,5 +1,7 @@
 package org.http4k.format
 
+import dev.forkhandles.values.Value
+import dev.forkhandles.values.ValueFactory
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiMapping
@@ -140,6 +142,9 @@ inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.yearMonth(no
 
 inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.zonedDateTime(noinline inFn: (ZonedDateTime) -> OUT,
                                                                                   noinline outFn: (OUT) -> ZonedDateTime) = text(zonedDateTime().map(inFn, outFn))
+
+inline fun <BUILD, reified VALUE : Value<T>, T : Any> AutoMappingConfiguration<BUILD>.value(fn: ValueFactory<VALUE, T>) =
+    text(fn::parse, fn::print)
 
 /**
  * Utility method for when only writing/serialization is required
