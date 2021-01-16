@@ -21,5 +21,5 @@ jobs:
       - uses: peter-evans/repository-dispatch@v1.1.1
         with:
           repository: http4k/http4k
-          event-type: http4k-release
+          event-type: release
           client-payload: '{"version": "${{ steps.tagName.outputs.tag }}"}'

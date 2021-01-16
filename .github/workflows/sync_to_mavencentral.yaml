@@ -1,7 +1,7 @@
 on: [repository_dispatch]
 jobs:
   sync-maven-central:
-    if: github.event.action == 'http4k-release'
+    if: github.event.action == 'release'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
