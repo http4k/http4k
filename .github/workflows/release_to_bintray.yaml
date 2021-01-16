@@ -20,6 +20,7 @@ jobs:
         id: tagName
       - uses: peter-evans/repository-dispatch@v1.1.1
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           repository: http4k/http4k
           event-type: release
           client-payload: '{"version": "${{ steps.tagName.outputs.tag }}"}'
