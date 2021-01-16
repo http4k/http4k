@@ -7,7 +7,7 @@ import java.math.BigInteger
 
 @JvmName("stringMapper")
 inline fun <BUILD, reified VALUE : Value<T>, T : Any> AutoMappingConfiguration<BUILD>.value(fn: ValueFactory<VALUE, T>) =
-    text(BiDiMapping(fn::parse, fn::print))
+    text(BiDiMapping(fn::parse, fn::show))
 
 @JvmName("booleanMapper")
 inline fun <BUILD, reified VALUE : Value<Boolean>> AutoMappingConfiguration<BUILD>.value(fn: ValueFactory<VALUE, Boolean>) =
