@@ -2,9 +2,11 @@ package org.http4k
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
 import org.http4k.TracingFunctionalTest.Service.ServiceA
 import org.http4k.TracingFunctionalTest.Service.ServiceB
+import org.http4k.TracingFunctionalTest.Service.ServiceC
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -25,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class TracingFunctionalTest {
 
-    enum class Service { ServiceA, ServiceB }
+    enum class Service { ServiceA, ServiceB, ServiceC }
 
     private val traces = ConcurrentHashMap<Service, ZipkinTraces>()
     private val registry = ConcurrentHashMap<Service, Int>()
@@ -79,5 +81,23 @@ class TracingFunctionalTest {
         assertThat(traceA.traceId, equalTo(traceB.traceId))
         assertThat(traceB.parentSpanId, equalTo(traceA.spanId))
         assertThat(traceB.spanId, !equalTo(traceA.spanId))
+    }
+
+    @Test
+    fun `multiple calls`() {
+        ServiceB.start()
+        ServiceC.start()
+        ServiceA.start(clientFor(ServiceB), clientFor(ServiceC))
+        val clientA = clientFor(ServiceA)
+
+        clientA(Request(GET, "/"))
+
+        val traceA = ServiceA.traces()
+        val traceB = ServiceB.traces()
+        val traceC = ServiceC.traces()
+
+        assertThat(setOf(traceA.traceId, traceB.traceId, traceC.traceId), hasSize(equalTo(1)))
+        assertThat(setOf(traceB.parentSpanId, traceC.parentSpanId), equalTo(setOf(traceA.spanId)))
+        assertThat(setOf(traceA.spanId, traceB.spanId, traceC.spanId), hasSize(equalTo(3)))
     }
 }
