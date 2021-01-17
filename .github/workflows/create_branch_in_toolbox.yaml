@@ -7,7 +7,7 @@ jobs:
       - name: Trigger toolbox
         uses: peter-evans/repository-dispatch@v1.1.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
           repository: http4k/toolbox
           event-type: http4k-release
           client-payload: '{"version": "${{ github.event.client_payload.version }}"}'
