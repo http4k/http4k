@@ -32,9 +32,9 @@ class TracingFunctionalTest {
     private val traces = ConcurrentHashMap<Service, ZipkinTraces>()
     private val registry = ConcurrentHashMap<Service, Int>()
 
-    private fun Service.start(vararg clients: HttpHandler) =
+    private fun Service.start(vararg otherServices: HttpHandler) =
         ServerFilters.RequestTracing(recordTraces())
-            .then(makeCalls(*clients))
+            .then(makeCalls(*otherServices))
             .then { Response(Status.OK) }
             .asServer(SunHttp(0)).start().apply { registry[this@start] = port() }
 
