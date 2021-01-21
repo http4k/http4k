@@ -15,7 +15,6 @@ import org.http4k.filter.debug
 import org.http4k.hamkrest.hasBody
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
-import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthProvider
@@ -28,27 +27,33 @@ class FakeOAuthServerTest {
         val authPath = "/auth"
         val tokenPath = "/token"
         val callbackPath = "/cb"
+        val protectedPath = "/getit"
 
         val oauth = FakeOAuthServer(authPath, tokenPath)
-        val app = App(authPath, tokenPath, oauth, callbackPath)
+        val app = App(authPath, tokenPath, oauth, callbackPath, protectedPath)
 
         val browser = FollowRedirects()
             .then(Cookies())
-            .then(
-                reverseProxy(
-                    "auth" to oauth.debug(),
-                    "app" to app
-                )
-            )
+            .then { r ->
+                when (r.uri.host) {
+                    "app" -> app
+                    else -> oauth
+                }(r)
+            }
 
-        assertThat(browser(Request(GET, "http://app/getit")), hasBody("LOGGEDIN"))
+        assertThat(
+            browser(
+                Request(GET, "http://app$protectedPath")
+            ), hasBody("LOGGEDIN")
+        )
     }
 
     private fun App(
         authPath: String,
         tokenPath: String,
         oauth: HttpHandler,
-        callbackPath: String
+        callbackPath: String,
+        protectedPath: String
     ): RoutingHttpHandler {
         val oauthProvider = OAuthProvider(
             OAuthProviderConfig(
@@ -64,7 +69,7 @@ class FakeOAuthServerTest {
 
         return routes(
             callbackPath bind GET to oauthProvider.callback,
-            "/getit" bind GET to oauthProvider.authFilter.then { Response(OK).body("LOGGEDIN") }
+            protectedPath bind GET to oauthProvider.authFilter.then { Response(OK).body("LOGGEDIN") }
         )
     }
 }
