@@ -40,14 +40,14 @@ object FakeOAuthServer {
         authPath: String,
         tokenPath: String,
         clock: Clock = Clock.systemDefaultZone(),
-        name: String = "OAUTH"
+        accessCodePrefix: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() }
     ): HttpHandler {
         val server = OAuthServer(
             tokenPath,
             InMemoryAuthRequestTracking(),
             AlwaysOkClientValidator(),
             InMemoryAuthorizationCodes(clock),
-            SimpleAccessTokens(name),
+            SimpleAccessTokens(accessCodePrefix),
             Jackson,
             clock
         )
@@ -110,7 +110,7 @@ private class InMemoryAuthRequestTracking : AuthRequestTracking {
         }
 }
 
-private class SimpleAccessTokens(private val prefix: String) : AccessTokens {
+private class SimpleAccessTokens(private val prefix: (AuthorizationCode) -> String) : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest) =
         Failure(UnsupportedGrantType("client_credentials"))
 
@@ -118,5 +118,5 @@ private class SimpleAccessTokens(private val prefix: String) : AccessTokens {
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest,
         authorizationCode: AuthorizationCode
-    ) = Success(AccessToken(prefix + authorizationCode.value.reversed()))
+    ) = Success(AccessToken(prefix(authorizationCode)))
 }
