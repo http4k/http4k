@@ -66,12 +66,12 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
 
 object JacksonFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
     override fun invoke(target: Any, fieldName: String): FieldMetadata =
-        FieldMetadata(description = target.javaClass.findPropertyDescription(fieldName))
+        FieldMetadata(description = findPropertyDescription(target.javaClass, fieldName))
 
-    private fun Class<Any>.findPropertyDescription(name: String): String? =
-        kotlin.constructors.first().parameters
+    fun findPropertyDescription(clazz: Class<Any>, name: String): String? =
+        clazz.kotlin.constructors.first().parameters
             .firstOrNull { p -> p.kind == KParameter.Kind.VALUE && p.name == name }
             ?.let { p ->
                 p.annotations.filterIsInstance<JsonPropertyDescription>().firstOrNull()?.value
-            } ?: superclass?.findPropertyDescription(name)
+            } ?: clazz.superclass?.let { findPropertyDescription(it, name) }
 }

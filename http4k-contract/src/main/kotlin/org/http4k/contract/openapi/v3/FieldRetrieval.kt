@@ -41,9 +41,9 @@ class SimpleLookup(
     }
 }
 
-data class FieldMetadata(val description: String?) {
+data class FieldMetadata(val description: String?, val extra: Map<String, Any> = mapOf()) {
     companion object {
-        val empty: FieldMetadata = FieldMetadata(description = null)
+        val empty: FieldMetadata = FieldMetadata(description = null, extra = mapOf())
     }
 }
 

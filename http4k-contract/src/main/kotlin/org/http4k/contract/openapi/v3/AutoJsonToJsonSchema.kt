@@ -166,6 +166,8 @@ private sealed class SchemaNode(
 
     val description = metadata?.description
 
+    val extra = metadata?.extra
+
     class Primitive(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?, metadata: FieldMetadata?) :
         SchemaNode(name, paramMeta, isNullable, example, metadata) {
         val type = paramMeta().value
