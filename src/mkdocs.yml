@@ -2,7 +2,7 @@ site_name: http4k
 site_url: https://www.http4k.org/
 site_description: The Functional toolkit for Kotlin HTTP applications
 site_author: David Denton (@daviddenton), Ivan Sanchez (@s4nchez)
-copyright: 'Copyright &copy; 2020 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
+copyright: 'Copyright &copy; 2021 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
 remote_branch: master
 repo_url: https://github.com/http4k/http4k/
 theme:
