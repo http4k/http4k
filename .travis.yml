@@ -20,7 +20,4 @@ matrix:
         directories:
           - "$HOME/.m2"
           - "$HOME/.gradle"
-    - stage: tag
-      if: branch = master AND type != "pull_request"
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-tag.sh; fi'
 
