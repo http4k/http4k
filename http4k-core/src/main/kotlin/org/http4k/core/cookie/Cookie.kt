@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ofPattern
+import java.util.*
 import java.util.Locale.US
 
 data class Cookie(val name: String, val value: String,
@@ -64,10 +65,12 @@ data class Cookie(val name: String, val value: String,
         private fun Parameters.sameSite(): SameSite? = find { it.first.equals("SameSite", true) }?.second?.parseSameSite()
 
         private fun String.parseDate(): LocalDateTime? {
+            println("got $this")
             for (supportedFormat in supportedFormats) {
                 try {
-                    return LocalDateTime.parse(this, supportedFormat)
-                } catch (_: Exception) {
+                    return supportedFormat.parse(this).let { LocalDateTime.from(it) }
+                } catch (e: Exception) {
+                    println("error: $e")
                 }
             }
             return null
@@ -99,9 +102,9 @@ enum class SameSite {
 private val RFC822 = ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz", US)
 
 private val supportedFormats = listOf(RFC822,
-    ofPattern("EEE, dd-MMM-yyyy HH:mm:ss zzz"),
-    ofPattern("EEE, dd-MMM-yy HH:mm:ss zzz"),
-    ofPattern("EEE, dd MMM yy HH:mm:ss zzz"),
-    ofPattern("EEE MMM dd yy HH:mm:ss zzz"),
-    ofPattern("EEE MMM dd yyyy HH:mm:ss zzz")
+    ofPattern("EEE, dd-MMM-yyyy HH:mm:ss zzz", US),
+    ofPattern("EEE, dd-MMM-yy HH:mm:ss zzz", US),
+    ofPattern("EEE, dd MMM yy HH:mm:ss zzz", US),
+    ofPattern("EEE MMM dd yy HH:mm:ss zzz", US),
+    ofPattern("EEE MMM dd yyyy HH:mm:ss zzz", US)
 )
