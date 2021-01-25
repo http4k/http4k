@@ -65,12 +65,10 @@ data class Cookie(val name: String, val value: String,
         private fun Parameters.sameSite(): SameSite? = find { it.first.equals("SameSite", true) }?.second?.parseSameSite()
 
         private fun String.parseDate(): LocalDateTime? {
-            println("got $this")
             for (supportedFormat in supportedFormats) {
                 try {
                     return supportedFormat.parse(this).let { LocalDateTime.from(it) }
                 } catch (e: Exception) {
-                    println("error: $e")
                 }
             }
             return null
