@@ -7,7 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2 # required by release-tag.sh to correctly identify files changed in the last commit
+          persist-credentials: false # required by release-tag.sh to allow pushing with another credentials so other workflows are triggered
       - uses: actions/setup-java@v1
         with:
           java-version: 11
       - run: ./build-ci.sh
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git remote set-url origin https://x-access-token:${{ secrets.HTTP4K_RELEASE_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
+      - run: ./release-tag.sh
