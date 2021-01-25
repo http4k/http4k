@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.1.1.2
+- **http4k-core** : Fix cookie parsing for systems using non-english locale.
+
 ### v4.1.1.1
 - **http4k-core** : `RequestTracing` should add a new `parent_id` even if a previous one wasn't previously set. 
 
