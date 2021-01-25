@@ -1,7 +1,8 @@
-on: [repository_dispatch]
+on:
+  repository_dispatch:
+    types: [http4k-release]
 jobs:
   sync-maven-central:
-    if: github.event.action == 'release'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

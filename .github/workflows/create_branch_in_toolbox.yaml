@@ -1,7 +1,8 @@
-on: [repository_dispatch]
+on:
+  repository_dispatch:
+    types: [http4k-release]
 jobs:
   create-toolbox-release:
-    if: github.event.action == 'release'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger toolbox
