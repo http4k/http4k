@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.1.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Added view support for WebSocket messages.
+
 ### v4.1.1.2
 - **http4k-core** : Fix cookie parsing for systems using non-English locale. H/T @dzappold for spotting it.
 
