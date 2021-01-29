@@ -21,4 +21,4 @@ jobs:
       - run: ./release-tag.sh
         if: github.ref == 'refs/heads/master'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.HTTP4K_RELEASE_TOKEN }}
