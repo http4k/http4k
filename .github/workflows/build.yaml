@@ -14,9 +14,11 @@ jobs:
         with:
           java-version: 11
       - run: ./build-ci.sh
-      - run: |        
+      - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git remote set-url origin https://x-access-token:${{ secrets.HTTP4K_RELEASE_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
       - run: ./release-tag.sh
         if: github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
