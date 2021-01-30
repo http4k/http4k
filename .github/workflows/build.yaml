@@ -17,8 +17,8 @@ jobs:
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git remote set-url origin https://x-access-token:${{ secrets.HTTP4K_RELEASE_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
+          git remote set-url origin https://x-access-token:${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}@github.com/${GITHUB_REPOSITORY}.git
       - run: ./release-tag.sh
         if: github.ref == 'refs/heads/master'
         env:
-          GH_TOKEN: ${{ secrets.HTTP4K_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}
