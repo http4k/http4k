@@ -38,9 +38,6 @@ public object Libs {
 
     public const val handlebars: String = "com.github.jknack:handlebars:_"
 
-    public const val com_github_kt3k_coveralls_gradle_plugin: String =
-            "com.github.kt3k.coveralls:com.github.kt3k.coveralls.gradle.plugin:_"
-
     public const val functions_framework_api: String =
             "com.google.cloud.functions:functions-framework-api:_"
 
@@ -177,9 +174,6 @@ public object Libs {
     public const val junit_jupiter_api: String = "org.junit.jupiter:junit-jupiter-api:_"
 
     public const val junit_jupiter_engine: String = "org.junit.jupiter:junit-jupiter-engine:_"
-
-    public const val coveralls_gradle_plugin: String =
-            "org.kt3k.gradle.plugin:coveralls-gradle-plugin:_"
 
     public const val alpn_boot: String = "org.mortbay.jetty.alpn:alpn-boot:_"
 

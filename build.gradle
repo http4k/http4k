@@ -6,7 +6,6 @@ buildscript {
 
     dependencies {
         classpath Libs.kotlin_gradle_plugin
-        classpath Libs.coveralls_gradle_plugin
         classpath Libs.openapi_generator_gradle_plugin
         classpath Libs.kotlin_serialization
         classpath Libs.shadow
@@ -14,7 +13,6 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.kt3k.coveralls'
     id "com.jfrog.bintray"
     id "org.jetbrains.dokka"
 }
@@ -33,7 +31,6 @@ allprojects {
     apply plugin: 'kotlin'
     apply plugin: 'org.jetbrains.dokka'
     apply plugin: 'jacoco'
-    apply plugin: 'com.github.kt3k.coveralls'
 
     compileKotlin.kotlinOptions.jvmTarget = "1.8"
     compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
@@ -180,11 +177,6 @@ allprojects {
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
     freeCompilerArgs += "-Xjvm-default=enable"
-}
-
-coveralls {
-    sourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs).files.absolutePath
-    jacocoReportPath = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")
 }
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
