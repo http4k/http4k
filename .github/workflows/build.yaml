@@ -23,7 +23,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build
-      - run: ./build-ci.sh
+        run: ./build-ci.sh
       - name: Cleanup Gradle Cache
           # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
           # Restoring these files from a GitHub Actions cache might cause problems for future builds.
@@ -31,11 +31,11 @@ jobs:
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -f ~/.gradle/caches/modules-2/gc.properties
       - name: Release (if required)
-      - run: |
+        run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git remote set-url origin https://x-access-token:${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}@github.com/${GITHUB_REPOSITORY}.git
-      - run: ./release-tag.sh
+          ./release-tag.sh
         if: github.ref == 'refs/heads/master'
         env:
           GH_TOKEN: ${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}
