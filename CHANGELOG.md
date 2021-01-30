@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.1.2.1
+ - (empty release for testing our automated release process)  
+
 ### v4.1.2.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Added view support for WebSocket messages.
