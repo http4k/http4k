@@ -13,11 +13,4 @@ matrix:
       language: java
       jdk: openjdk11
       script:
-        - "./gradlew -i check jacocoRootReport"
-      after_success:
-        - bash <(curl -s https://codecov.io/bash)
-      cache:
-        directories:
-          - "$HOME/.m2"
-          - "$HOME/.gradle"
-
+        - echo "bye Travis"
