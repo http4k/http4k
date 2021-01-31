@@ -11,6 +11,7 @@ import io.undertow.websockets.core.WebSockets.sendClose
 import io.undertow.websockets.core.WebSockets.sendText
 import io.undertow.websockets.spi.WebSocketHttpExchange
 import org.http4k.core.Body
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.StreamBody
@@ -68,4 +69,8 @@ private fun WebSocketHttpExchange.asRequest() = Request(GET, requestURI)
 fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = {
     (it.requestHeaders["Connection"]?.any { it.equals("upgrade", true) } ?: false) &&
         (it.requestHeaders["Upgrade"]?.any { it.equals("websocket", true) } ?: false)
+}
+
+fun eventStreamContentType(): (HttpServerExchange) -> Boolean = {
+    it.requestHeaders["Content-Type"]?.any { it.equals(TEXT_EVENT_STREAM.value, true) } ?: false
 }

@@ -68,55 +68,55 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
         assertThat(client(Request(GET, "http://localhost:$port/hello/bob")), hasBody("bob"))
     }
 
-    @Test
-    fun `can send and receive messages from sse`() {
-        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/hello/bob"))
-
-        client.send(WsMessage("hello"))
-        assertThat(
-            client.received().take(2).toList(),
-            equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
-        )
-    }
-
-    @Test
-    fun `should propagate close on client close`() {
-        val latch = CountDownLatch(1)
-        var closeStatus = false
-
-        val server = sse(
-            "/closes" bind { sse: Sse ->
-                sse.onClose {
-                    closeStatus = true
-                    latch.countDown()
-                }
-            }).asServer(serverConfig(0)).start()
-        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
-        client.close()
-
-        latch.await()
-        assertThat(closeStatus, present())
-        server.close()
-    }
-
-    @Test
-    fun `should propagate close on server close`() {
-        val latch = CountDownLatch(1)
-        var closeStatus = false
-        val server = sse(
-            "/closes" bind { sse: Sse ->
-                closeStatus = true
-                sse.close()
-            }).asServer(serverConfig(0)).start()
-
-        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
-        client.send(WsMessage("message"))
-
-        latch.await()
-        assertThat(closeStatus, present())
-        client.close()
-        server.close()
-    }
+//    @Test
+//    fun `can send and receive messages from sse`() {
+//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/hello/bob"))
+//
+//        client.send(WsMessage("hello"))
+//        assertThat(
+//            client.received().take(2).toList(),
+//            equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
+//        )
+//    }
+//
+//    @Test
+//    fun `should propagate close on client close`() {
+//        val latch = CountDownLatch(1)
+//        var closeStatus = false
+//
+//        val server = sse(
+//            "/closes" bind { sse: Sse ->
+//                sse.onClose {
+//                    closeStatus = true
+//                    latch.countDown()
+//                }
+//            }).asServer(serverConfig(0)).start()
+//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+//        client.close()
+//
+//        latch.await()
+//        assertThat(closeStatus, present())
+//        server.close()
+//    }
+//
+//    @Test
+//    fun `should propagate close on server close`() {
+//        val latch = CountDownLatch(1)
+//        var closeStatus = false
+//        val server = sse(
+//            "/closes" bind { sse: Sse ->
+//                closeStatus = true
+//                sse.close()
+//            }).asServer(serverConfig(0)).start()
+//
+//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+//        client.send(WsMessage("message"))
+//
+//        latch.await()
+//        assertThat(closeStatus, present())
+//        client.close()
+//        server.close()
+//    }
 //
 //    @Test
 //    fun `should propagate close on server stop`() {
