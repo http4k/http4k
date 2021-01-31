@@ -17,11 +17,6 @@ typealias SseConsumer = (Sse) -> Unit
 
 typealias SseHandler = (Request) -> SseConsumer?
 
-/**
- * A PolyHandler represents the combined routing logic of an HTTP handler and an SSE handler.
- */
-class PolyHandler(val http: HttpHandler, internal val sse: SseHandler)
-
 sealed class SseMessage {
     data class Data(val data: String) : SseMessage() {
         constructor(data: ByteArray) : this(getEncoder().encodeToString(data))
