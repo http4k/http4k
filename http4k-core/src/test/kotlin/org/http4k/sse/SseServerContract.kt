@@ -2,6 +2,7 @@ package org.http4k.sse
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -23,11 +24,10 @@ import org.http4k.sse.SseMessage.Event
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CountDownLatch
 
 abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
-
-    private val port by lazy { server.port() }
 
     @BeforeEach
     fun before() {
@@ -55,12 +55,12 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
 
     @Test
     fun `can do standard http traffic`() {
-        assertThat(client(Request(GET, "http://localhost:$port/hello/bob")), hasBody("bob"))
+        assertThat(client(Request(GET, "http://localhost:${server.port()}/hello/bob")), hasBody("bob"))
     }
 
     @Test
     fun `can receive messages from sse`() {
-        val client = BlockingSseClient(Uri.of("http://localhost:$port/hello/bob"))
+        val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/bob"))
 
         assertThat(
             client.received().take(3).toList(),
@@ -71,97 +71,5 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
             ))
         )
     }
-
-//    @Test
-//    fun `should propagate close on client close`() {
-//        val latch = CountDownLatch(2)
-//        var closeStatus = false
-//
-//        val server = sse(
-//            "/closes" bind { sse: Sse ->
-//                println("connected")
-//                sse.onClose {
-//                    closeStatus = true
-//                }
-//                latch.countDown()
-//            }).asServer(serverConfig(0)).start()
-//
-//        val client = BlockingSseClient(Uri.of("http://localhost:$port/closes"))
-//        latch.await()
-//        client.close()
-//
-//        assertThat(closeStatus, present())
-//        server.close()
-//    }
-
-//    @Test
-//    fun `should propagate close on server stop`() {
-//        val latch = CountDownLatch(2)
-//        var closeStatus = false
-//        val server = sse(
-//            "/closes" bind { sse: Sse ->
-//                println("hello")
-//                sse.onClose {
-//                    println("hello")
-//                    closeStatus = true
-//                    latch.await()
-//                }
-//                latch.countDown()
-//            }).asServer(serverConfig(0)).start()
-//
-//        val client = BlockingSseClient(Uri.of("http://localhost:$port/closes"))
-//        server.close()
-//
-//        latch.await()
-//        assertThat(closeStatus, present())
-//        client.close()
-//    }
-//
-//    @Test
-//    fun `should propagate close on server stop`() {
-//        val latch = CountDownLatch(1)
-//        var closeStatus = false
-//
-//        val server = sse(
-//            "/closes" bind { sse: Sse ->
-//                sse.onClose {
-//                    closeStatus = true
-//                    latch.countDown()
-//                }
-//            }).asServer(serverConfig(0)).start()
-//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
-//        client.send(WsMessage("message"))
-//        server.close()
-//
-//        latch.await()
-//        assertThat(closeStatus, present())
-//        client.close()
-//    }
-//
-//    @Test
-//    fun `should correctly set query parameters on upgrade request passed into the web socket`() {
-//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=foo"))
-//        client.send(WsMessage("hello"))
-//        assertThat(client.received().take(1).toList(), equalTo(listOf(WsMessage("foo"))))
-//    }
-//
-//    @Test
-//    fun `can connect with non-blocking client`() {
-//        val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/hello/bob"))
-//        val latch = CountDownLatch(1)
-//        client.onMessage {
-//            latch.countDown()
-//        }
-//
-//        latch.await()
-//    }
-//
-//    @Test
-//    fun `should fail on invalid url`() {
-//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/aaa"))
-//        assertThat({
-//            client.send(WsMessage("hello"))
-//        }, throws<WebsocketNotConnectedException>())
-//    }
 }
 

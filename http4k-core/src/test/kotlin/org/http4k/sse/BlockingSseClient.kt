@@ -42,10 +42,9 @@ private class Handler(private val queue: LinkedBlockingQueue<() -> SseMessage?>)
     }
 
     override fun onComment(comment: String) {
-        println(comment)
     }
 
     override fun onError(t: Throwable) {
-        println(t.localizedMessage)
+        t.printStackTrace()
     }
 }
