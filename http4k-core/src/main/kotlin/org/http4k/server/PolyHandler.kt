@@ -7,7 +7,7 @@ import org.http4k.websocket.WsHandler
 /**
  * A PolyHandler represents the combined routing logic of an multiple protocol handlers
  */
-class PolyHandler(
+class PolyHandler @JvmOverloads constructor(
     val http: HttpHandler? = null,
     val ws: WsHandler? = null,
     val sse: SseHandler? = null
