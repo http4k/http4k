@@ -19,7 +19,7 @@ import org.http4k.routing.routes
 import org.http4k.routing.websockets
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
-import org.http4k.server.WsServerConfig
+import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServerConfig, private val client: HttpHandler) {
+abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
 
     private val port by lazy { server.port() }
