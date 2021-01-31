@@ -16,7 +16,7 @@ import org.http4k.filter.ServerFilters
 /**
  * Exposed to allow for insertion into a customised Undertow server instance
  */
-class Http4kHttpHandler(handler: HttpHandler) : io.undertow.server.HttpHandler {
+class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpHandler {
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
     private fun Response.into(exchange: HttpServerExchange) {
