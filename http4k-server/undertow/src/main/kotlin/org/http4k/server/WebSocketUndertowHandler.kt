@@ -22,10 +22,10 @@ import org.http4k.websocket.WsStatus
 class WebSocketUndertowCallback(private val ws: WsHandler) : WebSocketConnectionCallback {
 
     override fun onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel) {
-        var socket: PushPullAdaptingWebSocket? = null
         val upgradeRequest = exchange.asRequest()
+
         ws(upgradeRequest)?.also {
-            socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
+            val socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
                 override fun send(message: WsMessage) =
                     if (message.body is StreamBody) sendBinary(message.body.payload, channel, null)
                     else sendText(message.bodyString(), channel, null)
@@ -34,32 +34,25 @@ class WebSocketUndertowCallback(private val ws: WsHandler) : WebSocketConnection
                     println("sending close to client")
                     sendClose(status.code, status.description, channel, null)
                 }
-            }
+            }.apply(it)
 
             channel.addCloseTask {
-                socket?.triggerClose(WsStatus(it.closeCode, it.closeReason ?: "unknown"))
+                socket.triggerClose(WsStatus(it.closeCode, it.closeReason ?: "unknown"))
             }
 
             channel.receiveSetter.set(object : AbstractReceiveListener() {
-                override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
-                    println("onFullTextMessage")
-                    socket?.triggerMessage(WsMessage(Body(message.data)))
-                }
+                override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) =
+                    socket.triggerMessage(WsMessage(Body(message.data)))
 
-                override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) {
-                    println("onFullBinaryMessage")
-                    socket?.let { s ->
-                        message.data.resource.forEach { s.triggerMessage(WsMessage(Body(it))) }
-                    }
-                }
+                override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) =
+                    message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }
 
                 override fun onError(channel: WebSocketChannel, error: Throwable) {
                     println("on error")
-                    socket?.triggerError(error)
+                    socket.triggerError(error)
                 }
             })
             channel.resumeReceives()
-            socket?.apply(it)
         }
     }
 }
