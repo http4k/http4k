@@ -3,6 +3,7 @@ package org.http4k.server
 import io.undertow.Handlers.predicate
 import io.undertow.Undertow
 import io.undertow.UndertowOptions.ENABLE_HTTP2
+import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.BlockingHandler
 import org.http4k.core.HttpHandler
 import org.http4k.websocket.WsHandler
@@ -17,7 +18,7 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : WsServerCo
         val ws = wsHandler?.let(::WebSocketUndertowHandler)
 
         val handler = when {
-            http != null && ws != null -> predicate({ false }, ws, http)
+            http != null && ws != null -> predicate(requiresWebSocketUpgrade(), ws, http)
             ws != null -> ws
             else -> http
         }
@@ -38,4 +39,11 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : WsServerCo
             }
         }
     }
+}
+
+private fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = {
+    it.requestHeaders["Connection"].any { it.equals("upgrade", true) } &&
+    it.requestHeaders["Upgrade"].any {  it.equals("websocket", true) }
+
+
 }
