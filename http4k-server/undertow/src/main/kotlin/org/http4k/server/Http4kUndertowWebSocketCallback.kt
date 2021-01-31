@@ -70,7 +70,3 @@ fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = {
     (it.requestHeaders["Connection"]?.any { it.equals("upgrade", true) } ?: false) &&
         (it.requestHeaders["Upgrade"]?.any { it.equals("websocket", true) } ?: false)
 }
-
-fun eventStreamContentType(): (HttpServerExchange) -> Boolean = {
-    it.requestHeaders["Content-Type"]?.any { it.equals(TEXT_EVENT_STREAM.value, true) } ?: false
-}

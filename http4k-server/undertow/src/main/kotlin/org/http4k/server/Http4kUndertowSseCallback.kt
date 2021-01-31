@@ -1,14 +1,19 @@
 package org.http4k.server
 
+import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.sse.ServerSentEventConnection
+import io.undertow.server.handlers.sse.ServerSentEventConnection.EventCallback
 import io.undertow.server.handlers.sse.ServerSentEventConnectionCallback
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
-import org.http4k.sse.SseMessage.*
+import org.http4k.sse.SseMessage.Data
+import org.http4k.sse.SseMessage.Event
+import org.http4k.sse.SseMessage.Retry
 import java.io.IOException
 
 class Http4kSseCallback(private val sse: SseHandler) : ServerSentEventConnectionCallback {
@@ -40,7 +45,7 @@ class Http4kSseCallback(private val sse: SseHandler) : ServerSentEventConnection
                 .flatMap { header -> header.map { header.headerName.toString() to it } })
 }
 
-object NoOp : ServerSentEventConnection.EventCallback {
+private object NoOp : EventCallback {
     override fun done(
         connection: ServerSentEventConnection?,
         data: String?,
@@ -56,5 +61,10 @@ object NoOp : ServerSentEventConnection.EventCallback {
         id: String?,
         e: IOException?
     ) {
+        e?.printStackTrace()
     }
+}
+
+fun hasEventStreamContentType(): (HttpServerExchange) -> Boolean = {
+    it.requestHeaders["Accept"]?.any { it.equals(TEXT_EVENT_STREAM.value, true) } ?: false
 }

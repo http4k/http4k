@@ -26,7 +26,7 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : PolyServer
         }
 
         val handlerWithSse = sseCallback
-            ?.let { predicate(requiresWebSocketUpgrade(), sseCallback, handlerWithWs) }
+            ?.let { predicate(hasEventStreamContentType(), sseCallback, handlerWithWs) }
             ?: handlerWithWs
 
         return object : Http4kServer {

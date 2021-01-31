@@ -1,15 +1,14 @@
 package org.http4k.sse
 
-import com.launchdarkly.eventsource.EventHandler
-import com.launchdarkly.eventsource.EventSource
-import com.launchdarkly.eventsource.MessageEvent
 import com.natpryce.hamkrest.assertion.assertThat
-import org.http4k.client.JavaHttpClient
+import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.hamkrest.hasBody
 import org.http4k.routing.bind
 import org.http4k.routing.path
@@ -21,13 +20,9 @@ import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
-import org.http4k.util.proxy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.net.URI
-import java.util.concurrent.Executors
-
 
 abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
@@ -42,21 +37,10 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
         val sse = sse(
             "/hello" bind sse(
                 "/{name}" bind { sse: Sse ->
-                    println(sse.connectRequest)
                     val name = sse.connectRequest.path("name")!!
-                    sse.send(Event("event", "hello $name", "123"))
-                    sse.send(Data("goodbye $name"))
-                    sse.close()
-                },
-                "/binary" bind { sse: Sse ->
-                    println(sse.connectRequest)
-                    val name = sse.connectRequest.path("name")!!
+                    sse.send(Event("event1", "hello $name", "123"))
+                    sse.send(Event("event2", "again $name", "456"))
                     sse.send(Data("goodbye $name".byteInputStream()))
-                    sse.close()
-                },
-                "/close" bind { sse: Sse ->
-                    println(sse.connectRequest)
-                    sse.onClose { println("closing") }
                 }
             )
         )
@@ -76,63 +60,61 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
 
     @Test
     fun `can receive messages from sse`() {
-        val handler = TestHandler()
-        val client = EventSource.Builder(handler,
-            URI.create("http://localhost:${server.port()}/hello/bob"))
-            .build()
+        val client = BlockingSseClient(Uri.of("http://localhost:$port/hello/bob"))
 
-        client.start()
-
-        Thread.sleep(5000)
-
-
-//        println(JavaHttpClient()(Request(GET, "/hello/bob")).bodyString())
-//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/hello/bob"))
-//
-//        client.send(WsMessage("hello"))
-//        assertThat(
-//            client.received().take(2).toList(),
-//            equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
-//        )
+        assertThat(
+            client.received().take(3).toList(),
+            equalTo(listOf(
+                Event("event1", "hello bob", "123"),
+                Event("event2", "again bob", "456"),
+                Data("goodbye bob".base64Encode())
+            ))
+        )
     }
-//
+
 //    @Test
 //    fun `should propagate close on client close`() {
-//        val latch = CountDownLatch(1)
+//        val latch = CountDownLatch(2)
 //        var closeStatus = false
 //
 //        val server = sse(
 //            "/closes" bind { sse: Sse ->
+//                println("connected")
 //                sse.onClose {
 //                    closeStatus = true
-//                    latch.countDown()
 //                }
+//                latch.countDown()
 //            }).asServer(serverConfig(0)).start()
-//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
+//
+//        val client = BlockingSseClient(Uri.of("http://localhost:$port/closes"))
+//        latch.await()
 //        client.close()
 //
-//        latch.await()
 //        assertThat(closeStatus, present())
 //        server.close()
 //    }
-//
+
 //    @Test
-//    fun `should propagate close on server close`() {
-//        val latch = CountDownLatch(1)
+//    fun `should propagate close on server stop`() {
+//        val latch = CountDownLatch(2)
 //        var closeStatus = false
 //        val server = sse(
 //            "/closes" bind { sse: Sse ->
-//                closeStatus = true
-//                sse.close()
+//                println("hello")
+//                sse.onClose {
+//                    println("hello")
+//                    closeStatus = true
+//                    latch.await()
+//                }
+//                latch.countDown()
 //            }).asServer(serverConfig(0)).start()
 //
-//        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
-//        client.send(WsMessage("message"))
+//        val client = BlockingSseClient(Uri.of("http://localhost:$port/closes"))
+//        server.close()
 //
 //        latch.await()
 //        assertThat(closeStatus, present())
 //        client.close()
-//        server.close()
 //    }
 //
 //    @Test
@@ -183,28 +165,3 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
 //    }
 }
 
-
-class TestHandler : EventHandler {
-    val events = mutableListOf<String>()
-    override fun onOpen() {
-        println("open")
-    }
-
-    override fun onClosed() {
-        println("closed")
-    }
-
-    override fun onMessage(event: String, messageEvent: MessageEvent) {
-        println(event)
-        println(messageEvent)
-        events += event
-    }
-
-    override fun onComment(comment: String) {
-        println(comment)
-    }
-
-    override fun onError(t: Throwable) {
-        println(t.localizedMessage)
-    }
-}

@@ -1,6 +1,5 @@
 package org.http4k.sse
 
-import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import java.io.InputStream
 import java.time.Duration
