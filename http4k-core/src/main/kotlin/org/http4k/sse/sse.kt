@@ -1,20 +1,19 @@
 package org.http4k.sse
 
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
-import org.http4k.websocket.Websocket
 import java.io.InputStream
+import java.time.Duration
+import java.util.Base64.getEncoder
 
 interface Sse {
     val connectRequest: Request
     fun send(message: SseMessage)
-    fun close(status: SseStatus = SseStatus.NORMAL)
-    fun onError(fn: (Throwable) -> Unit)
-    fun onClose(fn: (SseStatus) -> Unit)
+    fun close()
+    fun onClose(fn: () -> Unit)
 }
 
-typealias SseConsumer = (Websocket) -> Unit
+typealias SseConsumer = (Sse) -> Unit
 
 typealias SseHandler = (Request) -> SseConsumer?
 
@@ -23,12 +22,23 @@ typealias SseHandler = (Request) -> SseConsumer?
  */
 class PolyHandler(val http: HttpHandler, internal val sse: SseHandler)
 
-data class SseMessage(val body: Body) {
-    constructor(value: String) : this(Body(value))
-    constructor(value: InputStream) : this(Body(value))
+sealed class SseMessage {
+    data class Data(val data: String) : SseMessage() {
+        constructor(data: ByteArray) : this(getEncoder().encodeToString(data))
+        constructor(data: InputStream) : this(data.readAllBytes())
+    }
 
-    fun body(new: Body): SseMessage = copy(body = new)
-    fun bodyString(): String = String(body.payload.array())
+    data class Event(val event: String, val data: String, val id: String? = null) : SseMessage() {
+        constructor(event: String, data: ByteArray, id: String? = null) : this(
+            event,
+            getEncoder().encodeToString(data),
+            id
+        )
+
+        constructor(event: String, data: InputStream, id: String? = null) : this(event, data.readAllBytes(), id)
+    }
+
+    data class Retry(val backoff: Duration) : SseMessage()
 
     companion object
 }

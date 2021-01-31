@@ -5,6 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
+import org.http4k.sse.SseConsumer
 import org.http4k.websocket.WsConsumer
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
@@ -13,12 +14,16 @@ fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHtt
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 infix fun String.bind(httpHandler: RoutingHttpHandler): RoutingHttpHandler = httpHandler.withBasePath(this)
 infix fun String.bind(action: HttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(TemplateRouter(UriTemplate.from(this), action))
-infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
-infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(and(PassthroughRouter(handler)))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(and(handler))
 infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
+
+infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
+infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)
+
+infix fun String.bind(consumer: SseConsumer): RoutingSseHandler = TemplateRoutingSseHandler(UriTemplate.from(this), consumer)
+infix fun String.bind(sseHandler: RoutingSseHandler): RoutingSseHandler = sseHandler.withBasePath(this)
 
 /**
  * Simple Reverse Proxy which will split and direct traffic to the appropriate

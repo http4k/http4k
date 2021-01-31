@@ -39,18 +39,18 @@ interface WsServerConfig : ServerConfig {
  */
 interface SseServerConfig : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = toServer(httpHandler, null)
-    fun toSseServer(sseHandler: SseHandler): Http4kServer = toServer(null, sseHandler)
+//    fun toSseServer(sseHandler: SseHandler): Http4kServer = toServer(null, sseHandler)
     fun toServer(httpHandler: HttpHandler? = null, wsHandler: WsHandler? = null): Http4kServer
 }
 
-@JvmName("consumerAsServer")
-fun SseConsumer.asServer(config: SseServerConfig): Http4kServer = { _: Request -> this@asServer }.asServer(config)
+//@JvmName("consumerAsServer")
+//fun SseConsumer.asServer(config: SseServerConfig): Http4kServer = { _: Request -> this@asServer }.asServer(config)
 
 @JvmName("consumerAsServer")
 fun WsConsumer.asServer(config: WsServerConfig): Http4kServer = { _: Request -> this@asServer }.asServer(config)
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
-fun SseHandler.asServer(config: SseServerConfig): Http4kServer = config.toSseServer(this)
+//fun SseHandler.asServer(config: SseServerConfig): Http4kServer = config.toSseServer(this)
 fun WsHandler.asServer(config: WsServerConfig): Http4kServer = config.toWsServer(this)
 fun org.http4k.websocket.PolyHandler.asServer(config: WsServerConfig): Http4kServer = config.toServer(http, ws)
-fun org.http4k.sse.PolyHandler.asServer(config: SseServerConfig): Http4kServer = config.toServer(http, sse)
+//fun org.http4k.sse.PolyHandler.asServer(config: SseServerConfig): Http4kServer = config.toServer(http, sse)
