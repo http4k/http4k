@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import io.undertow.Handlers.predicate
+import io.undertow.Handlers.websocket
 import io.undertow.Undertow
 import io.undertow.UndertowOptions.ENABLE_HTTP2
 import io.undertow.server.handlers.BlockingHandler
@@ -12,9 +13,8 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : WsServerCo
     constructor(port: Int = 8000) : this(port, false)
 
     override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?): Http4kServer {
-
         val http = httpHandler?.let(::HttpUndertowHandler)?.let(::BlockingHandler)
-        val ws = wsHandler?.let(::WebSocketUndertowHandler)
+        val ws = wsHandler?.let { websocket(WebSocketUndertowCallback(it)) }
 
         val handler = when {
             http != null && ws != null -> predicate(requiresWebSocketUpgrade(), ws, http)
