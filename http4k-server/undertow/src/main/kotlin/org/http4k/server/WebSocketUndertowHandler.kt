@@ -19,8 +19,9 @@ import org.http4k.websocket.WsStatus
 
 fun WebSocketUndertowHandler(ws: WsHandler) =
     websocket { exchange, channel ->
-        ws(exchange.asRequest())?.also {
-            val socket = object : PushPullAdaptingWebSocket(exchange.asRequest()) {
+        val upgradeRequest = exchange.asRequest()
+        ws(upgradeRequest)?.also {
+            val socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
                 override fun send(message: WsMessage) {
                     sendText(message.bodyString(), channel, null)
                 }
@@ -31,21 +32,16 @@ fun WebSocketUndertowHandler(ws: WsHandler) =
             }
 
             channel.receiveSetter.set(object : AbstractReceiveListener() {
-                override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
+                override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) =
                     socket.triggerMessage(WsMessage(Body(message.data)))
-                }
 
-                override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) {
+                override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) =
                     message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }
-                }
 
-                override fun onCloseMessage(cm: CloseMessage, channel: WebSocketChannel) {
+                override fun onCloseMessage(cm: CloseMessage, channel: WebSocketChannel) =
                     socket.triggerClose(WsStatus(cm.code, cm.reason))
-                }
 
-                override fun onFullCloseMessage(channel: WebSocketChannel?, message: BufferedBinaryMessage?) {
-                    socket.triggerClose()
-                }
+                override fun onError(channel: WebSocketChannel, error: Throwable) = socket.triggerError(error)
             })
             channel.resumeReceives()
         }
