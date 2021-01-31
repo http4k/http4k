@@ -2,21 +2,49 @@ package org.http4k.server
 
 import io.undertow.Handlers.websocket
 import io.undertow.websockets.core.AbstractReceiveListener
+import io.undertow.websockets.core.BufferedBinaryMessage
 import io.undertow.websockets.core.BufferedTextMessage
+import io.undertow.websockets.core.CloseMessage
 import io.undertow.websockets.core.WebSocketChannel
+import io.undertow.websockets.core.WebSockets.sendClose
 import io.undertow.websockets.core.WebSockets.sendText
 import io.undertow.websockets.spi.WebSocketHttpExchange
+import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsHandler
+import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus
 
 fun WebSocketUndertowHandler(ws: WsHandler) =
     websocket { exchange, channel ->
         ws(exchange.asRequest())?.also {
-            channel.receiveSetter.set(object : AbstractReceiveListener() {
+            val socket = object : PushPullAdaptingWebSocket(exchange.asRequest()) {
+                override fun send(message: WsMessage) {
+                    sendText(message.bodyString(), channel, null)
+                }
 
+                override fun close(status: WsStatus) {
+                    sendClose(status.code, status.description, channel, null)
+                }
+            }
+
+            channel.receiveSetter.set(object : AbstractReceiveListener() {
                 override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
-                    sendText(message.data, channel, null)
+                    socket.triggerMessage(WsMessage(Body(message.data)))
+                }
+
+                override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) {
+                    message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }
+                }
+
+                override fun onCloseMessage(cm: CloseMessage, channel: WebSocketChannel) {
+                    socket.triggerClose(WsStatus(cm.code, cm.reason))
+                }
+
+                override fun onFullCloseMessage(channel: WebSocketChannel?, message: BufferedBinaryMessage?) {
+                    socket.triggerClose()
                 }
             })
             channel.resumeReceives()
@@ -24,4 +52,4 @@ fun WebSocketUndertowHandler(ws: WsHandler) =
     }
 
 private fun WebSocketHttpExchange.asRequest() = Request(GET, requestURI)
-        .headers(requestHeaders.toList().flatMap { h -> h.second.map { h.first to it } })
+    .headers(requestHeaders.toList().flatMap { h -> h.second.map { h.first to it } })
