@@ -20,9 +20,9 @@ import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 
 class WebSocketUndertowCallback(private val ws: WsHandler) : WebSocketConnectionCallback {
-    private var socket: PushPullAdaptingWebSocket? = null
 
     override fun onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel) {
+        var socket: PushPullAdaptingWebSocket? = null
         val upgradeRequest = exchange.asRequest()
         ws(upgradeRequest)?.also {
             socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
