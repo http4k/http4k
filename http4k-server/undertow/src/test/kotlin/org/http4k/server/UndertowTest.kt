@@ -7,3 +7,5 @@ import org.http4k.client.ApacheClient
 class UndertowTest : ServerContract({ Undertow(it) }, ApacheClient()) {
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 }
+
+

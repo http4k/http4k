@@ -82,7 +82,7 @@ Bored with reading already and just want to get coding? For the impatient, visit
         * **Ktor CIO & Netty**
         * **Netty** (including websocket support)
         * **SunHttp** (bundled with `http4k-core`)
-        * **Undertow**
+        * **Undertow** (including websocket support)
     * API design allows for simple customization of underying backend.
     * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/modules/serverless)
