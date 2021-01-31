@@ -23,11 +23,8 @@ typealias WsConsumer = (Websocket) -> Unit
 
 typealias WsHandler = (Request) -> WsConsumer?
 
-/**
- * A PolyHandler represents the combined routing logic of an Http handler and a Websocket handler.
- * ws:// and http:// protocol calls are passed relevantly.
- */
-class PolyHandler(val http: HttpHandler, internal val ws: WsHandler)
+@Deprecated("moved to org.http4k.server", ReplaceWith("org.http4k.server.PolyHandler"))
+typealias PolyHandler = org.http4k.server.PolyHandler
 
 data class WsMessage(val body: Body) {
     constructor(value: String) : this(Body(value))

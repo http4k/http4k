@@ -2,7 +2,6 @@ package org.http4k.server
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
-import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 

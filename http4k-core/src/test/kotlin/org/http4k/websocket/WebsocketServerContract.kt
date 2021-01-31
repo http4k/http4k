@@ -18,6 +18,7 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.routing.websockets
 import org.http4k.server.Http4kServer
+import org.http4k.server.PolyHandler
 import org.http4k.server.WsServerConfig
 import org.http4k.server.asServer
 import org.java_websocket.exceptions.WebsocketNotConnectedException
