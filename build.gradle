@@ -17,6 +17,7 @@ buildscript {
 plugins {
     id "com.jfrog.bintray"
     id "org.jetbrains.dokka"
+    id("org.jlleitschuh.gradle.ktlint") version("9.2.1")
 }
 
 allprojects {
@@ -249,4 +250,10 @@ tasks.create("listProjects") {
             .findAll { hasAnArtifact(it) }
             .forEach { System.err.println(it.name) }
     }
+}
+
+ktlint {
+    // for details, see description in .editorconfig file
+    enableExperimentalRules = false
+    version = "0.40.0"
 }
