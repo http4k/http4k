@@ -6,12 +6,14 @@ import io.undertow.websockets.core.BufferedBinaryMessage
 import io.undertow.websockets.core.BufferedTextMessage
 import io.undertow.websockets.core.CloseMessage
 import io.undertow.websockets.core.WebSocketChannel
+import io.undertow.websockets.core.WebSockets.sendBinary
 import io.undertow.websockets.core.WebSockets.sendClose
 import io.undertow.websockets.core.WebSockets.sendText
 import io.undertow.websockets.spi.WebSocketHttpExchange
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.StreamBody
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
@@ -22,7 +24,9 @@ fun WebSocketUndertowHandler(ws: WsHandler) =
         val upgradeRequest = exchange.asRequest()
         ws(upgradeRequest)?.also {
             val socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
-                override fun send(message: WsMessage) = sendText(message.bodyString(), channel, null)
+                override fun send(message: WsMessage) =
+                    if (message.body is StreamBody) sendBinary(message.body.payload, channel, null)
+                    else sendText(message.bodyString(), channel, null)
 
                 override fun close(status: WsStatus) = sendClose(status.code, status.description, channel, null)
             }.apply(it)

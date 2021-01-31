@@ -42,8 +42,6 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : WsServerCo
 }
 
 private fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = {
-    it.requestHeaders["Connection"].any { it.equals("upgrade", true) } &&
-    it.requestHeaders["Upgrade"].any {  it.equals("websocket", true) }
-
-
+    (it.requestHeaders["Connection"]?.any { it.equals("upgrade", true) } ?: false) &&
+        (it.requestHeaders["Upgrade"]?.any { it.equals("websocket", true) } ?: false)
 }
