@@ -41,6 +41,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         val ws = websockets(
             "/hello" bind websockets(
                 "/{name}" bind { ws: Websocket ->
+                    println("!!")
                     val name = ws.upgradeRequest.path("name")!!
                     ws.send(WsMessage(name))
                     ws.onMessage { ws.send(WsMessage("goodbye $name".byteInputStream())) }

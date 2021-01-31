@@ -25,7 +25,7 @@ fun WebSocketUndertowHandler(ws: WsHandler) =
                 override fun send(message: WsMessage) = sendText(message.bodyString(), channel, null)
 
                 override fun close(status: WsStatus) = sendClose(status.code, status.description, channel, null)
-            }
+            }.apply(it)
 
             channel.receiveSetter.set(object : AbstractReceiveListener() {
                 override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) =
