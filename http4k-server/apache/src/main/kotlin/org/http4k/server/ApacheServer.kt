@@ -75,7 +75,7 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, 
 
     constructor(port: Int = 8000) : this(port, null, null)
 
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+    override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer
 
         init {
@@ -87,7 +87,7 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, 
                     .setSoReuseAddress(true)
                     .setBacklogSize(1000)
                     .build())
-                .register("*", Http4kRequestHandler(httpHandler))
+                .register("*", Http4kRequestHandler(http))
 
             if (canonicalHostname != null)
                 bootstrap.setCanonicalHostName(canonicalHostname)

@@ -15,7 +15,7 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : PolyServer
     constructor(port: Int = 8000) : this(port, false)
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
-        val httpHandler = http?.let(::HttpUndertowHandler)?.let(::BlockingHandler)
+        val httpHandler = http?.let(::Http4kHttpHandler)?.let(::BlockingHandler)
         val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
         val sseCallback = sse?.let { serverSentEvents(Http4kSseCallback(sse)) }
 

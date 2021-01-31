@@ -22,11 +22,8 @@ interface Http4kServer : AutoCloseable {
  * Standard interface for creating a configured WebServer
  */
 fun interface ServerConfig {
-    fun toServer(httpHandler: HttpHandler): Http4kServer
+    fun toServer(http: HttpHandler): Http4kServer
 }
-
-@Deprecated("replaced", ReplaceWith("PolyServerConfig"))
-typealias WsServerConfig = PolyServerConfig
 
 /**
  * Standard interface for creating a configured WebServer which supports Websockets

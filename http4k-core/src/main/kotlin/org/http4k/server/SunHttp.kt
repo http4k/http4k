@@ -46,12 +46,12 @@ class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
 }
 
 data class SunHttp(val port: Int = 8000) : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+    override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         override fun port(): Int = if (port > 0) port else server.address.port
 
         private val server = HttpServer.create(InetSocketAddress(port), 1000)
         override fun start(): Http4kServer = apply {
-            server.createContext("/", HttpExchangeHandler(httpHandler))
+            server.createContext("/", HttpExchangeHandler(http))
             server.executor = newWorkStealingPool()
             server.start()
         }
