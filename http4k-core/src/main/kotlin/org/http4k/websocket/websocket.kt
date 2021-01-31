@@ -23,9 +23,6 @@ typealias WsConsumer = (Websocket) -> Unit
 
 typealias WsHandler = (Request) -> WsConsumer?
 
-@Deprecated("moved to org.http4k.server", ReplaceWith("org.http4k.server.PolyHandler"))
-typealias PolyHandler = org.http4k.server.PolyHandler
-
 data class WsMessage(val body: Body) {
     constructor(value: String) : this(Body(value))
     constructor(value: InputStream) : this(Body(value))

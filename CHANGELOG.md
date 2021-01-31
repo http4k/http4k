@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.1.3.0
-- **http4k-server-undertow** : Add websocket support to Undertow.
+### v4.2.0.0
+- **http4k-server-undertow** : Add WebSocket and SSE support to Undertow.
+- **http4k-core** : [Breaking] Related to above, `WsHandler` is now `PolyHandler`. The old type has been deprecated, but only API users who are implementing their own handlers may notice.
 
 ### v4.1.2.1
  - (empty release for testing our automated release process)  

@@ -15,10 +15,10 @@ import ratpack.server.ServerConfig.builder
 class Ratpack(port: Int = 8000) : ServerConfig {
     private val serverConfig = builder().connectQueueSize(1000).port(port)
 
-    override fun toServer(httpHandler: HttpHandler): Http4kServer {
+    override fun toServer(http: HttpHandler): Http4kServer {
         val server = RatpackServer.of { server: RatpackServerSpec ->
             server.serverConfig(serverConfig)
-                .handler { RatpackHttp4kHandler(httpHandler) }
+                .handler { RatpackHttp4kHandler(http) }
         }
 
         return object : Http4kServer {

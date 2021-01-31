@@ -29,6 +29,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         val TEXT_YAML = Text("text/yaml")
         val TEXT_XML = Text("text/xml")
         val TEXT_PLAIN = Text("text/plain")
+        val TEXT_EVENT_STREAM = Text("text/event-stream")
         val OCTET_STREAM = ContentType("application/octet-stream")
     }
 }

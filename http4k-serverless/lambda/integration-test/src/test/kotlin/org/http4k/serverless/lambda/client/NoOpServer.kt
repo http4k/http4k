@@ -11,5 +11,5 @@ private object NoOpHttp4kServer : Http4kServer {
 }
 
 internal object NoOpServerConfig : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = NoOpHttp4kServer
+    override fun toServer(http: HttpHandler): Http4kServer = NoOpHttp4kServer
 }

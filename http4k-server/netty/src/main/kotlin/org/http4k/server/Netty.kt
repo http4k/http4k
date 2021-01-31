@@ -36,6 +36,7 @@ import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
+import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
 
@@ -68,8 +69,12 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
             .source(RequestSource(address.address.hostAddress, address.port))
 }
 
-data class Netty(val port: Int = 8000)   : WsServerConfig  {
-    override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?): Http4kServer = object : Http4kServer {
+data class Netty(val port: Int = 8000) : PolyServerConfig {
+    override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?, sse: SseHandler?): Http4kServer = object : Http4kServer {
+        init {
+            if(sse != null) throw UnsupportedOperationException("Netty does not support sse")
+        }
+
         private val masterGroup = NioEventLoopGroup()
         private val workerGroup = NioEventLoopGroup()
         private var closeFuture: ChannelFuture? = null
@@ -85,7 +90,7 @@ data class Netty(val port: Int = 8000)   : WsServerConfig  {
                         ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
 
-                        if(wsHandler != null) ch.pipeline().addLast("websocket", WebSocketServerHandler(wsHandler))
+                        if (wsHandler != null) ch.pipeline().addLast("websocket", WebSocketServerHandler(wsHandler))
 
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
                         if (httpHandler != null) ch.pipeline().addLast("httpHandler", Http4kChannelHandler(httpHandler))

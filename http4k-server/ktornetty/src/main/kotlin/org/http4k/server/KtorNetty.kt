@@ -30,10 +30,10 @@ import io.ktor.http.Headers as KHeaders
 @Suppress("EXPERIMENTAL_API_USAGE")
 data class KtorNetty(val port: Int = 8000) : ServerConfig {
 
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+    override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine: NettyApplicationEngine = embeddedServer(Netty, port) {
             intercept(Call) {
-                with(context) { response.fromHttp4K(httpHandler(request.asHttp4k())) }
+                with(context) { response.fromHttp4K(http(request.asHttp4k())) }
                 return@intercept finish()
             }
         }

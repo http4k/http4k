@@ -65,7 +65,7 @@ class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
 data class Apache4Server(val port: Int = 8000, val address: InetAddress?) : ServerConfig {
     constructor(port: Int = 8000) : this(port, null)
 
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+    override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer
 
         init {
@@ -77,7 +77,7 @@ data class Apache4Server(val port: Int = 8000, val address: InetAddress?) : Serv
                     .setSoReuseAddress(true)
                     .setBacklogSize(1000)
                     .build())
-                .registerHandler("*", Http4kApache4RequestHandler(httpHandler))
+                .registerHandler("*", Http4kApache4RequestHandler(http))
 
             if (address != null)
                 bootstrap.setLocalAddress(address)
