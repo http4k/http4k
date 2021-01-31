@@ -18,8 +18,9 @@ import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
+import java.io.IOException
 
-class WebSocketUndertowCallback(private val ws: WsHandler) : WebSocketConnectionCallback {
+class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCallback {
 
     override fun onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel) {
         val upgradeRequest = exchange.asRequest()
@@ -31,7 +32,6 @@ class WebSocketUndertowCallback(private val ws: WsHandler) : WebSocketConnection
                     else sendText(message.bodyString(), channel, null)
 
                 override fun close(status: WsStatus) {
-                    println("sending close to client")
                     sendClose(status.code, status.description, channel, null)
                 }
             }.apply(it)
@@ -44,6 +44,8 @@ class WebSocketUndertowCallback(private val ws: WsHandler) : WebSocketConnection
                 override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
                     try {
                         socket.triggerMessage(WsMessage(Body(message.data)))
+                    } catch (e: IOException) {
+                        throw e
                     } catch (e: Exception) {
                         socket.triggerError(e)
                         throw e
@@ -53,13 +55,10 @@ class WebSocketUndertowCallback(private val ws: WsHandler) : WebSocketConnection
                 override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) =
                     message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }
 
-                override fun onError(channel: WebSocketChannel, error: Throwable) {
-                    println("on error")
-                    socket.triggerError(error)
-                }
+                override fun onError(channel: WebSocketChannel, error: Throwable) = socket.triggerError(error)
             })
             channel.resumeReceives()
-        }
+        } ?: exchange.close()
     }
 }
 

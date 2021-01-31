@@ -14,7 +14,7 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : WsServerCo
 
     override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?): Http4kServer {
         val http = httpHandler?.let(::HttpUndertowHandler)?.let(::BlockingHandler)
-        val ws = wsHandler?.let { websocket(WebSocketUndertowCallback(it)) }
+        val ws = wsHandler?.let { websocket(Http4kWebSocketCallback(it)) }
 
         val handler = when {
             http != null && ws != null -> predicate(requiresWebSocketUpgrade(), ws, http)
