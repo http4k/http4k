@@ -11,6 +11,6 @@ dependencies {
     testApi(project(":http4k-testing-approval"))
     testApi(project(":http4k-testing-hamkrest"))
     testApi(project(":http4k-server-apache"))
-    testApi("com.launchdarkly:okhttp-eventsource:2.3.1")
+    testApi(Libs.okhttp_eventsource)
     testApi Libs.slf4j_nop
 }
