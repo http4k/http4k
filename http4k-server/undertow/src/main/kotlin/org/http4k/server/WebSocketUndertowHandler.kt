@@ -22,13 +22,9 @@ fun WebSocketUndertowHandler(ws: WsHandler) =
         val upgradeRequest = exchange.asRequest()
         ws(upgradeRequest)?.also {
             val socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
-                override fun send(message: WsMessage) {
-                    sendText(message.bodyString(), channel, null)
-                }
+                override fun send(message: WsMessage) = sendText(message.bodyString(), channel, null)
 
-                override fun close(status: WsStatus) {
-                    sendClose(status.code, status.description, channel, null)
-                }
+                override fun close(status: WsStatus) = sendClose(status.code, status.description, channel, null)
             }
 
             channel.receiveSetter.set(object : AbstractReceiveListener() {
