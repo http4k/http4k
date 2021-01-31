@@ -47,7 +47,7 @@ fun KKlaxon.asConfigurable(klaxon: KKlaxon): AutoMappingConfiguration<KKlaxon> =
             @Suppress("UNCHECKED_CAST")
             override fun toJson(value: Any): String {
                 val asIn = mapping.asIn(value as OUT)
-                return if(asIn is String) """"$asIn"""" else asIn.toString()
+                return if (asIn is String) """"$asIn"""" else asIn.toString()
             }
         })
     }

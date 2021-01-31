@@ -1,14 +1,14 @@
-import kotlinx.serialization.Serializable  // could use one of many json libraries: Gson, Jackson, Moshi, etc.
+import kotlinx.serialization.Serializable // could use one of many json libraries: Gson, Jackson, Moshi, etc.
 import org.http4k.core.*
 import org.http4k.format.KotlinxSerialization.auto
 import org.http4k.lens.BiDiBodyLens
 
-@Serializable  // required by Kotlinx.Serialization
+@Serializable // required by Kotlinx.Serialization
 data class Car(val brand: String, val model: String, val year: Int, val miles: Int)
 
 // 'auto' is an extension function of each org.http4k.format.[serialization library]
 // example: https://github.com/http4k/http4k/blob/master/http4k-format/kotlinx-serialization/src/main/kotlin/org/http4k/format/ConfigurableKotlinxSerialization.kt
-val lensCarResponse : BiDiBodyLens<Car> = Body.auto<Car>().toLens()  // BiDi allows for outgoing + incoming
+val lensCarResponse : BiDiBodyLens<Car> = Body.auto<Car>().toLens() // BiDi allows for outgoing + incoming
 
 fun main() {
 

@@ -72,7 +72,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 data class Netty(val port: Int = 8000) : PolyServerConfig {
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer = object : Http4kServer {
         init {
-            if(sse != null) throw UnsupportedOperationException("Netty does not support sse")
+            if (sse != null) throw UnsupportedOperationException("Netty does not support sse")
         }
 
         private val masterGroup = NioEventLoopGroup()
@@ -113,4 +113,3 @@ data class Netty(val port: Int = 8000) : PolyServerConfig {
         override fun port(): Int = if (port > 0) port else address.port
     }
 }
-

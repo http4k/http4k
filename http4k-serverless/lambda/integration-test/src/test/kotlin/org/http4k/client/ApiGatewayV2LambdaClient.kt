@@ -33,7 +33,7 @@ class ApiGatewayV2LambdaClient(function: Function, region: Region) : LambdaHttpC
                 next.value.fold(acc, { acc2, next2 -> acc2 + (next.key to next2) })
             }))
             .headers((response.cookies ?: emptyList()).fold(listOf(), { acc, next -> acc + ("set-cookie" to next) }))
-            .body((if(response.isBase64Encoded) response.body?.base64Decoded() else response.body) ?: "")
+            .body((if (response.isBase64Encoded) response.body?.base64Decoded() else response.body) ?: "")
     }
 
     private val requestLens = Body.auto<AwsGatewayProxyRequestV2>().toLens()

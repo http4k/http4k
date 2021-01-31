@@ -29,7 +29,7 @@ class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpC
         val response = responseLens(this)
         return Response(Status(response.statusCode, ""))
             .headers(response.headers.map { kv -> kv.toPair() })
-            .body((if(response.isBase64Encoded == true) response.body?.base64Decoded() else response.body) ?: "")
+            .body((if (response.isBase64Encoded == true) response.body?.base64Decoded() else response.body) ?: "")
     }
 
     private val requestLens = Body.auto<APIGatewayProxyRequestEvent>().toLens()
