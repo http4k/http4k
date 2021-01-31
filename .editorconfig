@@ -18,3 +18,6 @@ ij_continuation_indent_size = 4
 ij_continuation_indent_size = 4
 ij_kotlin_name_count_to_use_star_import = 99
 ij_kotlin_name_count_to_use_star_import_for_members = 99
+# These are currently disabled ktlint rules, used for: git precommit hook (see `tools/ktlint-precommit-hook.sh`),
+# gradle ktlint check (see `build.gradle`) and manual reformatting with `ktlint -F`.
+disabled_rules = indent,no-wildcard-imports,import-ordering,no-consecutive-blank-lines,colon-spacing,curly-spacing,range-spacing,no-blank-line-before-rbrace,chain-wrapping,comment-spacing,parameter-list-wrapping,comma-spacing,no-unused-imports,string-template,filename
