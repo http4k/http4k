@@ -24,7 +24,6 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.IOException
 import java.util.concurrent.CountDownLatch
 
 abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServerConfig, private val client: HttpHandler) {
@@ -124,6 +123,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
             }).asServer(serverConfig(0)).start()
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
         client.send(WsMessage("message"))
+
         latch.await()
         assertThat(closeStatus, present())
         client.close()
@@ -137,10 +137,6 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
 
         val server = websockets(
             "/closes" bind { ws: Websocket ->
-                ws.onMessage {
-                    println("ws onmessage")
-
-                }
                 ws.onClose {
                     closeStatus = it
                     latch.countDown()
