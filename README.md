@@ -48,7 +48,7 @@ plugging together of services without HTTP container being required.
 * **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
     * individual endpoints
     * applications
-    * websockets
+    * websockets/sse
     * full suites of microservices
     
 ## Quickstart
@@ -64,7 +64,8 @@ Bored with reading already and just want to get coding? For the impatient, visit
     * **Single Page Application** support with **Caching and Hot-Reload** 
     * Servlet implementation to allow **plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
-    * **Path-based websockets** including typesafe message marshalling using Lenses, which are **testable without a running container**
+    * **Path-based WebSockets** including typesafe message marshalling using Lenses, which are **testable without a running container**
+    * **Path-based Server-Sent Events** which are **testable without a running container**
     * APIs to **record and replay** HTTP traffic to disk or memory
     * Core **abstraction APIs** implemented by the other modules 
 * [Client:](https://http4k.org/guide/modules/clients) 
@@ -78,11 +79,11 @@ Bored with reading already and just want to get coding? For the impatient, visit
 * [Server:](https://http4k.org/guide/modules/servers)
     * **1LOC** server backend spin-up for:
         * **Apache v4 & v5** (from httpcore)
-        * **Jetty** (including websocket support)
+        * **Jetty** (including WebSocket support)
         * **Ktor CIO & Netty**
-        * **Netty** (including websocket support)
+        * **Netty** (including WebSocket support)
         * **SunHttp** (bundled with `http4k-core`)
-        * **Undertow** (including websocket support)
+        * **Undertow** (including SSE and WebSocket support)
     * API design allows for simple customization of underying backend.
     * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/modules/serverless)

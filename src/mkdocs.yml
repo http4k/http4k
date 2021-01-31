@@ -75,6 +75,7 @@ nav:
     - HTML forms: cookbook/html_forms/index.md
     - Multipart forms: cookbook/multipart_forms/index.md
     - Websockets: cookbook/websockets/index.md
+    - Server-Sent Events: cookbook/sse/index.md
     - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
     - Basic OAuth Server configuration: cookbook/basic_oauth_authorization_server/index.md
     - Custom OAuth Provider configuration: cookbook/custom_oauth_provider/index.md
