@@ -41,8 +41,14 @@ class WebSocketUndertowCallback(private val ws: WsHandler) : WebSocketConnection
             }
 
             channel.receiveSetter.set(object : AbstractReceiveListener() {
-                override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) =
-                    socket.triggerMessage(WsMessage(Body(message.data)))
+                override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
+                    try {
+                        socket.triggerMessage(WsMessage(Body(message.data)))
+                    } catch (e: Exception) {
+                        socket.triggerError(e)
+                        throw e
+                    }
+                }
 
                 override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) =
                     message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }

@@ -115,19 +115,15 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         val server = websockets(
             "/closes" bind { ws: Websocket ->
                 ws.onMessage {
-                    println("on message close")
                     ws.close()
                 }
                 ws.onClose {
-                    println("on close")
                     closeStatus = it
                     latch.countDown()
                 }
             }).asServer(serverConfig(0)).start()
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
         client.send(WsMessage("message"))
-
-        println("sent")
         latch.await()
         assertThat(closeStatus, present())
         client.close()
@@ -141,20 +137,17 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
 
         val server = websockets(
             "/closes" bind { ws: Websocket ->
-                println("connecting")
                 ws.onMessage {
                     println("ws onmessage")
 
                 }
                 ws.onClose {
-                    println("ws closing")
                     closeStatus = it
                     latch.countDown()
                 }
             }).asServer(serverConfig(0)).start()
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
         client.send(WsMessage("message"))
-        println("sent")
         server.close()
 
         latch.await()
