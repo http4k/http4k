@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import io.undertow.Handlers.websocket
+import io.undertow.server.HttpServerExchange
 import io.undertow.websockets.core.AbstractReceiveListener
 import io.undertow.websockets.core.BufferedBinaryMessage
 import io.undertow.websockets.core.BufferedTextMessage
@@ -49,3 +50,9 @@ fun WebSocketUndertowHandler(ws: WsHandler) =
 
 private fun WebSocketHttpExchange.asRequest() = Request(GET, requestURI)
     .headers(requestHeaders.toList().flatMap { h -> h.second.map { h.first to it } })
+
+
+fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = {
+    (it.requestHeaders["Connection"]?.any { it.equals("upgrade", true) } ?: false) &&
+        (it.requestHeaders["Upgrade"]?.any { it.equals("websocket", true) } ?: false)
+}
