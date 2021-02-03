@@ -10,7 +10,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.filter.GzipCompressionMode.Memory
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
@@ -138,11 +137,7 @@ object ResponseFilters {
 
     class EtagSupport : Filter {
         private val md5 = ThreadLocal.withInitial {
-            try {
-                MessageDigest.getInstance("MD5")
-            } catch (e: NoSuchAlgorithmException) {
-                throw RuntimeException("Unable to instantiate MD5 digest", e)
-            }
+            MessageDigest.getInstance("MD5")
         }
 
         override fun invoke(next: HttpHandler): HttpHandler = { request ->
@@ -192,9 +187,9 @@ object ResponseFilters {
             this
         }
 
-        private fun generateStrongEtag(content: ByteArray): String = "\"${hash(content).toHex()}\""
+        private fun generateStrongEtag(content: ByteArray): String = "\"${content.hash().toHex()}\""
 
-        private fun hash(bytes: ByteArray): ByteArray = md5.get().digest(bytes)
+        private fun ByteArray.hash(): ByteArray = md5.get().digest(this)
 
         private fun ByteArray.toHex() = joinToString("") { "%02x".format(it) }
 
