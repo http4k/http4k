@@ -4,9 +4,13 @@ import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.filter.GzipCompressionMode.Memory
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
@@ -131,6 +135,74 @@ object ResponseFilters {
     fun Base64EncodeBody() = Filter { next ->
         { next(it).run { body(Base64.getEncoder().encodeToString(body.payload.array())) } }
     }
+
+    class EtagSupport : Filter {
+        private val md5 = ThreadLocal.withInitial {
+            try {
+                MessageDigest.getInstance("MD5")
+            } catch (e: NoSuchAlgorithmException) {
+                throw RuntimeException("Unable to instantiate MD5 digest", e)
+            }
+        }
+
+        override fun invoke(next: HttpHandler): HttpHandler = { request ->
+            next(request).let { response ->
+                if (request.method == Method.GET && response.status == Status.OK) {
+                    checkEtag(request, response)
+                } else response
+            }
+        }
+
+        private fun checkEtag(request: Request, response: Response): Response {
+            val upstreamEtag = response.header("etag")
+            return if (upstreamEtag == null && isStreamingResponse(response)) {
+                response
+            } else {
+                val etag = upstreamEtag ?: generateStrongEtag(response.body.payload.array())
+                when {
+                    etag == request.header("if-none-match") -> {
+                        closeOldResponse(response)
+                        Response(Status.NOT_MODIFIED).withSafeHeadersFrom(response)
+                    }
+                    upstreamEtag == null -> response.header("etag", etag)
+                    else -> response
+                }
+            }
+        }
+
+        private fun closeOldResponse(response: Response) =
+            try {
+                response.close()
+            } catch (ignored: Exception) {
+            }
+
+        private fun isStreamingResponse(response: Response): Boolean = response.body.length == null
+
+        private fun Response.withSafeHeadersFrom(sourceResponse: Response) =
+            SAFE_HEADERS.fold(this) { response, headerName ->
+                response.headerIfPresent(
+                    headerName,
+                    sourceResponse.header(headerName)
+                )
+            }
+
+        private fun Response.headerIfPresent(name: String, value: String?) = if (value != null) {
+            this.header(name, value)
+        } else {
+            this
+        }
+
+        private fun generateStrongEtag(content: ByteArray): String = "\"${hash(content).toHex()}\""
+
+        private fun hash(bytes: ByteArray): ByteArray = md5.get().digest(bytes)
+
+        private fun ByteArray.toHex() = joinToString("") { "%02x".format(it) }
+
+        companion object {
+            private val SAFE_HEADERS = listOf("date", "last-modified", "cache-control", "expires", "set-cookie", "vary")
+        }
+    }
+
 }
 
 typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction

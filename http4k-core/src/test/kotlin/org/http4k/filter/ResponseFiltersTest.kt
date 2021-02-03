@@ -3,18 +3,22 @@ package org.http4k.filter
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isNullOrEmptyString
 import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpTransaction
 import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP_LABEL
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.filter.GzipCompressionMode.Streaming
+import org.http4k.filter.ResponseFilters.EtagSupport
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
@@ -28,6 +32,7 @@ import org.http4k.util.TickingClock
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
 import java.time.Clock
 import java.time.Clock.fixed
 import java.time.Duration.ZERO
@@ -286,5 +291,122 @@ class ResponseFiltersTest {
         val handler = ResponseFilters.Base64EncodeBody().then { Response(OK).body("hello") }
 
         assertThat(handler(Request(GET, "")), hasBody("hello".base64Encode()))
+    }
+
+    @Nested
+    inner class Etags {
+
+        @Test
+        fun `calculates strong etag and formats it correctly`() {
+            val handler = EtagSupport().then {
+                Response(OK).body("abc")
+            }
+            val response = handler(Request(GET, "/"))
+            assertThat(
+                response,
+                hasHeader("etag", equalTo("\"900150983cd24fb0d6963f7d28e17f72\""))
+            )
+        }
+
+        @Test
+        fun `reuses upstream etag if present`() {
+            val handler = EtagSupport().then {
+                Response(OK)
+                    .body("abc")
+                    .header("etag", "\"UPSTREAM_ETAG\"")
+            }
+            val response = handler(Request(GET, "/"))
+            assertThat(response.headerValues("etag").size, equalTo(1))
+            assertThat(response, hasHeader("etag", equalTo("\"UPSTREAM_ETAG\"")))
+        }
+
+        @Test
+        fun `only applies etags to OK responses to GETs`() {
+            val postHandler = EtagSupport().then {
+                Response(OK).body("abc")
+            }
+            val postResponse = postHandler(Request(Method.POST, "/"))
+            assertThat(postResponse, !hasHeader("etag"))
+
+            val redirectHandler = EtagSupport().then {
+                Response(Status.SEE_OTHER).body("abc")
+            }
+            val redirectResponse = redirectHandler(Request(GET, "/"))
+            assertThat(redirectResponse, !hasHeader("etag"))
+        }
+
+        @Test
+        fun `does not attempt to generate an etag for a streaming response`() {
+            val handler = EtagSupport().then {
+                Response(OK).body(ByteArrayInputStream("abc".toByteArray()))
+            }
+            val getResponse = handler(Request(GET, "/"))
+            assertThat(getResponse, !hasHeader("etag"))
+        }
+
+        @Test
+        fun `reuses upstream etags for a streaming response`() {
+            val handler = EtagSupport().then {
+                Response(OK)
+                    .body(ByteArrayInputStream("abc".toByteArray()))
+                    .header("etag", "\"UPSTREAM_ETAG\"")
+            }
+            val getResponse = handler(Request(GET, "/"))
+            assertThat(getResponse, hasHeader("etag", "\"UPSTREAM_ETAG\""))
+        }
+
+        @Test
+        fun `returns not modified if the etag matches`() {
+            val handler = EtagSupport().then {
+                Response(OK).body("abc")
+            }
+            val response = handler(Request(GET, "/").header("if-none-match", "\"900150983cd24fb0d6963f7d28e17f72\""))
+            assertThat(
+                response,
+                hasStatus(Status.NOT_MODIFIED) and hasBody(isNullOrEmptyString)
+            )
+        }
+
+        @Test
+        fun `the original response is closed when the new response is created`() {
+            class TestInputStream(buffer: ByteArray) : ByteArrayInputStream(buffer) {
+                var closed = false
+                override fun close() {
+                    closed = true
+                    super.close()
+                }
+            }
+
+            val responseStream = TestInputStream("some content".encodeToByteArray())
+            val handler = EtagSupport().then {
+                Response(OK)
+                    .header("etag", "\"upstream-tag\"")
+                    .body(responseStream)
+            }
+            handler(Request(GET, "/").header("if-none-match", "\"upstream-tag\""))
+            assertThat(responseStream.closed, equalTo(true))
+        }
+
+        @Test
+        fun `only safe headers are copied to the not-modified response`() {
+            val handler = EtagSupport().then {
+                Response(OK)
+                    .body("abc")
+                    .header("date", "passesThroughDate")
+                    .header("vary", "passesThroughVary")
+                    .header("X-foo", "doesntPassThrough")
+            }
+
+            val response = handler(
+                Request(GET, "/")
+                    .header("if-none-match", """"900150983cd24fb0d6963f7d28e17f72"""")
+            )
+
+            assertThat(
+                response, !hasHeader("x-foo")
+                    and hasHeader("date", equalTo("passesThroughDate"))
+                    and hasHeader("vary", equalTo("passesThroughVary"))
+            )
+        }
     }
 }
