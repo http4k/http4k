@@ -56,7 +56,7 @@ interface Json<NODE> {
     fun boolean(value: Boolean): NODE = value.asJsonValue()
     fun <T : NODE> array(value: T): NODE = array(listOf(value))
     fun <T : NODE> array(value: Iterable<T>): NODE = value.asJsonArray()
-    fun obj(): NODE = obj(emptyList())
+    fun obj(): NODE = obj<NODE>(emptyList())
     fun <T : NODE> obj(value: Iterable<Pair<String, T>>): NODE = value.asJsonObject()
     fun <T : NODE> obj(vararg fields: Pair<String, T>): NODE = obj(fields.asIterable())
     fun nullNode(): NODE {
