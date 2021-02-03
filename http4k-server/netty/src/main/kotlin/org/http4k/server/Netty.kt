@@ -70,7 +70,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 }
 
 data class Netty(val port: Int = 8000) : PolyServerConfig {
-    override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?, sse: SseHandler?): Http4kServer = object : Http4kServer {
+    override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer = object : Http4kServer {
         init {
             if(sse != null) throw UnsupportedOperationException("Netty does not support sse")
         }
@@ -90,10 +90,10 @@ data class Netty(val port: Int = 8000) : PolyServerConfig {
                         ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
 
-                        if (wsHandler != null) ch.pipeline().addLast("websocket", WebSocketServerHandler(wsHandler))
+                        if (ws != null) ch.pipeline().addLast("websocket", WebSocketServerHandler(ws))
 
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
-                        if (httpHandler != null) ch.pipeline().addLast("httpHandler", Http4kChannelHandler(httpHandler))
+                        if (http != null) ch.pipeline().addLast("httpHandler", Http4kChannelHandler(http))
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 1000)
