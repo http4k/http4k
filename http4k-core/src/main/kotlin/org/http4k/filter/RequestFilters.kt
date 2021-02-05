@@ -82,8 +82,8 @@ object RequestFilters {
     }
 
     /**
-     * Set a Header on the outbound message.
+     * Set a Header on the request message.
      */
-    fun SetHeader(name: String, value: String) = Filter { next -> { next(it.header(name, value)) } }
+    fun SetHeader(name: String, value: String?) = Filter { next -> { next(it.header(name, value)) } }
 }
 

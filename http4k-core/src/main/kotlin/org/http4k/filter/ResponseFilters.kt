@@ -199,9 +199,9 @@ object ResponseFilters {
     }
 
     /**
-     * Set a Header on the outbound message.
+     * Set a Header on the response message.
      */
-    fun SetHeader(name: String, value: String) = Filter { next -> { next(it).header(name, value) } }
+    fun SetHeader(name: String, value: String?) = Filter { next -> { next(it).header(name, value) } }
 }
 
 typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction
