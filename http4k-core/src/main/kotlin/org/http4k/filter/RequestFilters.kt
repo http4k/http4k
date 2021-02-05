@@ -80,5 +80,10 @@ object RequestFilters {
     fun Base64DecodeBody() = Filter { next ->
         { next(it.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(it.body.payload.array()))))) }
     }
+
+    /**
+     * Set a Header on the outbound message.
+     */
+    fun SetHeader(name: String, value: String) = Filter { next -> { next(it.header(name, value)) } }
 }
 

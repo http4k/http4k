@@ -15,6 +15,7 @@ import org.http4k.filter.RequestFilters.Base64DecodeBody
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Http
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Https
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Port
+import org.http4k.filter.RequestFilters.SetHeader
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -125,5 +126,11 @@ class RequestFiltersTest {
     fun `base 64 decode body`() {
         val handler = Base64DecodeBody().then(RequestFilters.Assert(hasBody("hello"))).then { Response(OK) }
         handler(Request(GET, "").body("hello".base64Encode()))
+    }
+
+    @Test
+    fun `set header`() {
+        val handler = SetHeader("foo", "bar").then(RequestFilters.Assert(hasHeader("foo", "bar"))).then { Response(OK) }
+        assertThat(handler(Request(GET, "")), hasStatus(OK))
     }
 }

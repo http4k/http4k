@@ -409,4 +409,10 @@ class ResponseFiltersTest {
             )
         }
     }
+
+    @Test
+    fun `set header`() {
+        val handler = ResponseFilters.SetHeader("foo", "bar").then { Response(OK) }
+        assertThat(handler(Request(GET, "")), hasHeader("foo", "bar"))
+    }
 }
