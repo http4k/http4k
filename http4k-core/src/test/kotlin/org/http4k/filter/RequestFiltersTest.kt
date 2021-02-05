@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
 import org.http4k.core.Body
+import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,6 +13,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.RequestFilters.Base64DecodeBody
+import org.http4k.filter.RequestFilters.Modify
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Http
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Https
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Port
@@ -19,6 +21,7 @@ import org.http4k.filter.RequestFilters.SetHeader
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.toHttpHandler
 import org.junit.jupiter.api.Test
 
@@ -84,7 +87,10 @@ class RequestFiltersTest {
     @Test
     fun `gzip request and add content encoding`() {
         val handler = RequestFilters.GZip().then {
-            assertThat(it, hasBody(equalTo<Body>(Body("foobar").gzipped().body)).and(hasHeader("content-encoding", "gzip")))
+            assertThat(
+                it,
+                hasBody(equalTo<Body>(Body("foobar").gzipped().body)).and(hasHeader("content-encoding", "gzip"))
+            )
             Response(OK)
         }
         handler(Request(GET, "").body("foobar"))
@@ -131,6 +137,16 @@ class RequestFiltersTest {
     @Test
     fun `set header`() {
         val handler = SetHeader("foo", "bar").then(RequestFilters.Assert(hasHeader("foo", "bar"))).then { Response(OK) }
+        assertThat(handler(Request(GET, "")), hasStatus(OK))
+    }
+
+    @Test
+    fun `modify request`() {
+        val handler = Modify(CONTENT_TYPE of APPLICATION_PDF).then(
+            RequestFilters.Assert(
+                hasHeader("content-type", "application/pdf; charset=utf-8")
+            )
+        ).then { Response(OK) }
         assertThat(handler(Request(GET, "")), hasStatus(OK))
     }
 }

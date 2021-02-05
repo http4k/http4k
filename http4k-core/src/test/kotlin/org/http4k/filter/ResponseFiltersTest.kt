@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.isNullOrEmptyString
 import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.HttpTransaction
 import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP_LABEL
 import org.http4k.core.Method
@@ -23,6 +24,7 @@ import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
@@ -414,5 +416,11 @@ class ResponseFiltersTest {
     fun `set header`() {
         val handler = ResponseFilters.SetHeader("foo", "bar").then { Response(OK) }
         assertThat(handler(Request(GET, "")), hasHeader("foo", "bar"))
+    }
+
+    @Test
+    fun `modify response`() {
+        val handler = ResponseFilters.Modify(CONTENT_TYPE of APPLICATION_PDF).then { Response(OK) }
+        assertThat(handler(Request(GET, "")), hasHeader("content-type", "application/pdf; charset=utf-8"))
     }
 }

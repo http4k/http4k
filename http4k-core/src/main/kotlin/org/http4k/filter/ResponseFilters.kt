@@ -8,6 +8,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
 import java.security.MessageDigest
 import java.time.Clock
@@ -202,6 +203,11 @@ object ResponseFilters {
      * Set a Header on the response message.
      */
     fun SetHeader(name: String, value: String?) = Filter { next -> { next(it).header(name, value) } }
+
+    /**
+     * Modify response with lenses
+     */
+    fun Modify(vararg modifiers: (Response) -> Response): Filter = Filter { next -> { next(it).with(*modifiers) } }
 }
 
 typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction
