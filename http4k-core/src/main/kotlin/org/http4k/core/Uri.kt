@@ -65,6 +65,8 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 
 fun Uri.removeQuery(name: String) = copy(query = query.toParameters().filterNot { it.first == name }.toUrlFormEncoded())
 
+fun Uri.removeQueries(prefix: String) = copy(query = query.toParameters().filterNot { it.first.startsWith(prefix) }.toUrlFormEncoded())
+
 fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
 
 fun String.toPathEncoded() = URLEncoder.encode(this, UTF_8)

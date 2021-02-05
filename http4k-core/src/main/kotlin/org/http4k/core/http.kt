@@ -129,6 +129,11 @@ interface HttpMessage : Closeable {
     fun removeHeader(name: String): HttpMessage
 
     /**
+     * (Copy &) remove headers with this prefix. Default removes all headers.
+     */
+    fun removeHeaders(prefix: String = ""): HttpMessage
+
+    /**
      * (Copy &) sets the body content.
      */
     fun body(body: Body): HttpMessage
@@ -203,6 +208,11 @@ interface Request : HttpMessage {
     fun removeQuery(name: String): Request
 
     /**
+     * (Copy &) remove queries with this prefix. Default removes all queries.
+     */
+    fun removeQueries(prefix: String = ""): Request
+
+    /**
      * (Copy &) sets request source.
      */
     fun source(source: RequestSource): Request
@@ -216,6 +226,8 @@ interface Request : HttpMessage {
     override fun replaceHeaders(source: Headers): Request
 
     override fun removeHeader(name: String): Request
+
+    override fun removeHeaders(prefix: String): Request
 
     override fun body(body: Body): Request
 
@@ -271,7 +283,11 @@ data class MemoryRequest(
 
     override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
 
+    override fun removeHeaders(prefix: String) = copy(headers = headers.removeHeaders(prefix))
+
     override fun removeQuery(name: String) = copy(uri = uri.removeQuery(name))
+
+    override fun removeQueries(prefix: String) = copy(uri = uri.removeQueries(prefix))
 
     override fun body(body: Body) = copy(body = body)
 
@@ -302,6 +318,8 @@ interface Response : HttpMessage {
 
     override fun removeHeader(name: String): Response
 
+    override fun removeHeaders(prefix: String): Response
+
     override fun body(body: Body): Response
 
     override fun body(body: String): Response
@@ -331,6 +349,8 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun replaceHeaders(source: Headers) = copy(headers = source)
 
     override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
+
+    override fun removeHeaders(prefix: String) = copy(headers = headers.removeHeaders(prefix))
 
     override fun body(body: Body) = copy(body = body)
 

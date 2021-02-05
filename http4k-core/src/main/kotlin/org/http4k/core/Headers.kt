@@ -6,6 +6,8 @@ internal fun Headers.headerValues(name: String) = filter { it.first.equals(name,
 
 internal fun Headers.removeHeader(name: String) = filterNot { it.first.equals(name, true) }
 
+internal fun Headers.removeHeaders(name: String) = filterNot { it.first.startsWith(name) }
+
 internal fun Headers.replaceHeader(name: String, value: String?) = removeHeader(name).plus(name to value)
 
 internal fun Headers.toHeaderMessage() = joinToString("\r\n") { "${it.first}: ${it.second}" }.plus("\r\n")
