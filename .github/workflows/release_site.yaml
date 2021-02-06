@@ -1,6 +1,7 @@
 on:
-  repository_dispatch:
-    types: [http4k-release]
+  push:
+    branches:
+      - master
 jobs:
   release-site:
     runs-on: ubuntu-latest
