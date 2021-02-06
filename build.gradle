@@ -206,7 +206,10 @@ dependencies {
             testImplementation project(path: it.name, configuration: 'testArtifacts')
         }
 
-    testImplementation Libs.s3
+    testImplementation(Libs.s3) {
+        exclude group: "software.amazon.awssdk", module: "netty-nio-client"
+        exclude group: "software.amazon.awssdk", module: "apache-client"
+    }
     testImplementation Libs.graphql_kotlin_schema_generator
     testImplementation Config.TestDependencies
 }
