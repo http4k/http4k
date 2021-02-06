@@ -7,6 +7,8 @@ description: List of articles published on the http4k library
     - There's a new major http4k release! Read about all the new stuff the team have been working on for http4k v4.
 </span>
 
+* 2021/2: [Reassurance to http4k users regarding JCenter shutdown](./regarding_jcenter)
+    - Regarding the JCenter shutdown.
 * 2021/1: [http4k v4: 17 platforms and counting...](./http4k_v4)
     - Announcement post for http4k v4.
 * 2020/11: [http4k Toolbox: Guns for show, knives for a pro](./toolbox)
