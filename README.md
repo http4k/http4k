@@ -52,7 +52,9 @@ plugging together of services without HTTP container being required.
     * full suites of microservices
     
 ## Quickstart
-Bored with reading already and just want to get coding? For the impatient, visit the [quickstart](https://www.http4k.org/quickstart/) or the [examples repo](https://github.com/http4k/examples), which showcases a variety of [http4k] use-cases and features. Alternatively, visit the [http4k toolbox](https://toolbox.http4k.org) to generate a complete project from whe wide variety of http4k modules.
+Bored with reading already and just want to get coding? For the impatient, visit the [http4k toolbox](https://toolbox.http4k.org) to generate a complete project from whe wide variety of http4k modules.
+
+Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take a look at the [examples repo](https://github.com/http4k/examples), which showcases a variety of [http4k] use-cases and features.
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
