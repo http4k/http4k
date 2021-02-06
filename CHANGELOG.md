@@ -3,11 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.3.0.0 (uncut)
+### v4.3.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.30
+- **http4k-core** : Removing dependency on JCenter for all compile dependencies.
 - **http4k-core** : Add ETag filter. H/T @jshiell
 - **http4k-core** : Add more useful filters for request/respons
-
 
 ### v4.2.0.0
 - **http4k-server-undertow** : Add WebSocket and SSE support to Undertow.

@@ -97,6 +97,7 @@ nav:
     - Nanoservices: blog/nanoservices/index.md
     - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
     - http4k v4 - 17 platforms and counting...: blog/http4k_v4/index.md
+    - JCenter Shutdown: blog/regarding_jcenter/index.md
   - Performance: performance/index.md
   - FAQ: faq/index.md
   - Getting support: support/index.md

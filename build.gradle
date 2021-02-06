@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
     }
 
     dependencies {
@@ -24,7 +23,6 @@ allprojects {
         }
 
         mavenCentral()
-        jcenter()
     }
 
     apply plugin: 'java'
