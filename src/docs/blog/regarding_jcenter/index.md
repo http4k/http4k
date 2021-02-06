@@ -1,7 +1,7 @@
 title: http4k blog: Reassurance to http4k users regarding JCenter shutdown
 description: Announcement regarding JCenter shutdown
 
-# Reassurance to our users
+# Reassurance to http4k users regarding JCenter shutdown
 
 ##### feb 2021 / the http4k team
 
