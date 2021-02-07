@@ -60,30 +60,50 @@ class HttpMessageMatchersTest {
     fun `content type`() = assertMatchAndNonMatch(
         Request(GET, "/").header("Content-Type", "application/json; charset=utf-8"),
         { shouldHaveContentType(APPLICATION_JSON) },
-        { shouldHaveContentType(APPLICATION_FORM_URLENCODED) }
+        { shouldNotHaveContentType(APPLICATION_JSON) }
     )
 
     @Test
-    fun `body string`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody("bob"), haveBody("bill"))
+    fun `body string`() = assertMatchAndNonMatch(
+        Request(GET, "/").body("bob"),
+        { shouldHaveBody("bob") },
+        { shouldNotHaveBody("bob") }
+    )
 
     @Test
     fun `body regex`() =
-        assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(Regex(".*bob")), haveBody(Regex(".*bill")))
+        assertMatchAndNonMatch(
+            Request(GET, "/").body("bob"),
+            { shouldHaveBody(Regex(".*bob")) },
+            { shouldHaveBody(Regex(".*bill")) }
+        )
 
     @Test
     fun `body string matcher`() {
         val be: Matcher<Body> = be(Body("bob"))
         val be1 = be(Body("bill"))
-        assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be), haveBody(be1))
+        assertMatchAndNonMatch(
+            Request(GET, "/").body("bob"),
+            { shouldHaveBody(be) },
+            { shouldHaveBody(be1) }
+        )
     }
 
     @Test
     fun `body non-nullable string matcher`() =
-        assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(contain("bo")), haveBody(contain("foo")))
+        assertMatchAndNonMatch(
+            Request(GET, "/").body("bob"),
+            { shouldHaveBody(contain("bo")) },
+            { shouldHaveBody(contain("foo")) }
+        )
 
     @Test
     fun `body matcher`() =
-        assertMatchAndNonMatch(Request(GET, "/").body("bob"), haveBody(be<String>("bob")), haveBody(be<String>("bill")))
+        assertMatchAndNonMatch(
+            Request(GET, "/").body("bob"),
+            { shouldHaveBody(be<String>("bob")) },
+            { shouldHaveBody(be<String>("bill")) }
+        )
 
     @Test
     fun `json body matcher`() = assertMatchAndNonMatch(
