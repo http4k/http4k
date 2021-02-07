@@ -16,53 +16,91 @@ import org.junit.jupiter.api.Test
 class RequestMatchersTest {
 
     @Test
-    fun method() = assertMatchAndNonMatch(Request(GET, "/bob"), haveMethod(GET), haveMethod(POST))
+    fun method() = assertMatchAndNonMatch(Request(GET, "/bob"),
+        { shouldHaveMethod(GET) }, { shouldHaveMethod(POST) })
 
     @Test
-    fun `uri as string`() = assertMatchAndNonMatch(Request(GET, "/bob"), haveUri("/bob"), haveUri("/bill"))
+    fun `uri as string`() = assertMatchAndNonMatch(Request(GET, "/bob"),
+        { shouldHaveUri("/bob") }, { shouldHaveUri("/bill") })
 
     @Test
-    fun `uri as uri`() = assertMatchAndNonMatch(Request(GET, "/bob"), haveUri(Uri.of("/bob")), haveUri(Uri.of("/bill")))
+    fun `uri as uri`() = assertMatchAndNonMatch(Request(GET, "/bob"),
+        { shouldHaveUri(Uri.of("/bob")) },
+        { shouldHaveUri(Uri.of("/bill")) })
 
     @Test
-    fun `uri as regex`() = assertMatchAndNonMatch(Request(GET, "/bob123"), haveUri(Regex(".*123")), haveUri(Regex(".*124")))
+    fun `uri as regex`() = assertMatchAndNonMatch(Request(GET, "/bob123"),
+        { shouldHaveUri(Regex(".*123")) },
+        { shouldHaveUri(Regex(".*124")) })
 
     @Test
-    fun form() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), haveForm("form", "bob"), haveForm("form", "bill"))
+    fun form() = assertMatchAndNonMatch(
+        Request(GET, "/").form("form", "bob"),
+        { shouldHaveForm("form", "bob") },
+        { shouldHaveForm("form", "bill") })
 
     @Test
-    fun `form as matcher`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), haveForm("form", contain("bob")), haveForm("form", be<String>("bill")))
+    fun `form as matcher`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"),
+        { shouldHaveForm("form", contain("bob")) },
+        { shouldHaveForm("form", be<String>("bill")) })
 
     @Test
-    fun `form as regex`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), haveForm("form", Regex(".*bob")), haveForm("form", Regex(".*bill")))
+    fun `form as regex`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"),
+        { shouldHaveForm("form", Regex(".*bob")) },
+        { shouldHaveForm("form", Regex(".*bill")) })
 
     @Test
-    fun query() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), haveQuery("form", "bob"), haveQuery("form", "bill"))
+    fun query() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), {
+        shouldHaveQuery("form", "bob")
+    }, { shouldHaveQuery("form", "bill") })
 
     @Test
-    fun `query - matcher`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), haveQuery("form", be<String>("bob")), haveQuery("form", contain("bill")))
+    fun `query - matcher`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"),
+        { shouldHaveQuery("form", be<String>("bob")) },
+        { shouldHaveQuery("form", contain("bill")) })
 
     @Test
-    fun `query as regex`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), haveQuery("form", Regex(".*bob")), haveQuery("form", Regex(".*bill")))
+    fun `query as regex`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"),
+        { shouldHaveQuery("form", Regex(".*bob")) },
+        { shouldHaveQuery("form", Regex(".*bill")) })
 
     @Test
-    fun queries() = assertMatchAndNonMatch(Request(GET, "/bob?query=bob&query=bob2"), haveQuery("query", listOf("bob", "bob2")), haveQuery("query", listOf("bill")))
+    fun queries() = assertMatchAndNonMatch(Request(GET, "/bob?query=bob&query=bob2"),
+        { shouldHaveQuery("query", listOf("bob", "bob2")) },
+        { shouldHaveQuery("query", listOf("bill")) })
 
     @Test
     fun `query lens`() =
         Query.required("bob").let {
-            assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), haveQuery(it, be("bob")), haveQuery(it, be("bill")))
+            assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"),
+                { shouldHaveQuery(it, be("bob")) },
+                { shouldHaveQuery(it, be("bill")) })
         }
 
     @Test
-    fun cookie() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), haveCookie(Cookie("name", "bob")), haveCookie(Cookie("name", "bill")))
+    fun cookie() = assertMatchAndNonMatch(
+        Request(GET, "").cookie(Cookie("name", "bob")),
+        { shouldHaveCookie(Cookie("name", "bob")) },
+        { shouldHaveCookie(Cookie("name", "bill")) })
 
     @Test
-    fun `cookie matcher`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), haveCookie("name", be(Cookie("name", "bob"))), haveCookie("name", be(Cookie("name", "bill"))))
+    fun `cookie matcher`() = assertMatchAndNonMatch(
+        Request(GET, "").cookie(Cookie("name", "bob")),
+        { shouldHaveCookie("name", be(Cookie("name", "bob"))) },
+        {
+            shouldHaveCookie(
+                "name",
+                be(Cookie("name", "bill"))
+            )
+        })
 
     @Test
-    fun `cookie as a regex`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), haveCookie("name", Regex(".*bob")), haveCookie("name", Regex(".*bill")))
+    fun `cookie as a regex`() = assertMatchAndNonMatch(
+        Request(GET, "").cookie(Cookie("name", "bob")),
+        { shouldHaveCookie("name", Regex(".*bob")) },
+        { shouldHaveCookie("name", Regex(".*bill")) })
 
     @Test
-    fun `cookie value`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), haveCookie("name", "bob"), haveCookie("name", "bill"))
+    fun `cookie value`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")),
+        { shouldHaveCookie("name", "bob") }, { shouldHaveCookie("name", "bill") })
 }
