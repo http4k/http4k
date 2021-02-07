@@ -39,7 +39,7 @@ class HttpMessageMatchersTest {
     fun `header no value`() = assertMatchAndNonMatch(
         Request(GET, "/").header("header", "bob").header("header", "bob2"),
         { shouldHaveHeader("header") },
-        { shouldNotHaveHeader("header")})
+        { shouldNotHaveHeader("header") })
 
     @Test
     fun `header - non-nullable string matcher`() = assertMatchAndNonMatch(
@@ -59,8 +59,8 @@ class HttpMessageMatchersTest {
     @Test
     fun `content type`() = assertMatchAndNonMatch(
         Request(GET, "/").header("Content-Type", "application/json; charset=utf-8"),
-        haveContentType(APPLICATION_JSON),
-        haveContentType(APPLICATION_FORM_URLENCODED)
+        { shouldHaveContentType(APPLICATION_JSON) },
+        { shouldHaveContentType(APPLICATION_FORM_URLENCODED) }
     )
 
     @Test
@@ -125,8 +125,8 @@ class HttpMessageMatchersTest {
         Body.string(TEXT_PLAIN).toLens().let {
             assertMatchAndNonMatch(
                 Request(GET, "/").with(it of "bob"),
-                haveBody(it, be("bob")),
-                haveBody(it, be("bill"))
+                { shouldHaveBody(it, be("bob")) },
+                { shouldHaveBody(it, be("bill")) }
             )
         }
 }
