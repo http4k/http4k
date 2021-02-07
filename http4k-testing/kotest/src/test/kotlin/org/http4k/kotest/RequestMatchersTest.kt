@@ -50,9 +50,10 @@ class RequestMatchersTest {
         { shouldHaveForm("form", Regex(".*bill")) })
 
     @Test
-    fun query() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), {
-        shouldHaveQuery("form", "bob")
-    }, { shouldHaveQuery("form", "bill") })
+    fun query() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"),
+        { shouldHaveQuery("form", "bob") },
+        { shouldHaveQuery("form", "bill") }
+    )
 
     @Test
     fun `query - matcher`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"),
