@@ -1,6 +1,8 @@
 on:
   repository_dispatch:
     types: [http4k-release]
+  schedule:
+    - cron: "0 12 * * *"
 jobs:
   sync-maven-central:
     runs-on: ubuntu-latest
