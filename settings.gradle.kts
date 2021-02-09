@@ -52,6 +52,7 @@ include("http4k-bom")
     includeModule("okhttp")
     includeModule("websocket")
 }
+include("http4k-cloudevents")
 include("http4k-cloudnative")
 include("http4k-contract")
 "http4k-format".apply {
