@@ -138,8 +138,10 @@ internal data class Prefix(private val template: String) : Router {
     override val description = RouterDescription("prefix == '$template'")
 }
 
-internal data class TemplateRouter(private val template: UriTemplate,
-                                   private val httpHandler: HttpHandler) : Router {
+internal data class TemplateRouter(
+    private val template: UriTemplate,
+    private val httpHandler: HttpHandler
+) : Router {
     override fun match(request: Request) = when {
         template.matches(request.uri.path) ->
             MatchingHandler({ RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }, description)

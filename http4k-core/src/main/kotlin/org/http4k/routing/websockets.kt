@@ -17,8 +17,10 @@ fun websockets(vararg list: RoutingWsHandler): RoutingWsHandler = object : Routi
     override fun withBasePath(new: String): RoutingWsHandler = websockets(*list.map { it.withBasePath(new) }.toTypedArray())
 }
 
-internal data class TemplateRoutingWsHandler(private val template: UriTemplate,
-                                             private val consumer: WsConsumer) : RoutingWsHandler {
+internal data class TemplateRoutingWsHandler(
+    private val template: UriTemplate,
+    private val consumer: WsConsumer
+) : RoutingWsHandler {
     override operator fun invoke(request: Request): WsConsumer? = if (template.matches(request.uri.path)) { ws ->
         consumer(object : Websocket by ws {
             override val upgradeRequest: Request = RoutedRequest(ws.upgradeRequest, template)
