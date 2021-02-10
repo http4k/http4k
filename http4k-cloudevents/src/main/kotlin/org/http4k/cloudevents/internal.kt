@@ -2,27 +2,28 @@ package org.http4k.cloudevents
 
 import io.cloudevents.SpecVersion
 import io.cloudevents.core.data.BytesCloudEventData
+import io.cloudevents.core.message.MessageReader
 import io.cloudevents.core.message.impl.BaseGenericBinaryMessageReaderImpl
 import io.cloudevents.core.message.impl.GenericStructuredMessageReader
-import io.cloudevents.core.message.impl.MessageUtils.parseStructuredOrBinaryMessage
-import io.cloudevents.rw.CloudEventRWException
+import io.cloudevents.core.provider.EventFormatProvider
+import io.cloudevents.rw.CloudEventRWException.newUnknownEncodingException
 import org.http4k.core.Request
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-internal fun Request.toCloudEventReader() = parseStructuredOrBinaryMessage(
-    { header(CONTENT_TYPE) },
-    { eventFormat ->
-        body
-            .takeIf { it.length ?: 0 > 0 }
-            ?.let { GenericStructuredMessageReader(eventFormat, it.payload.array()) }
-            ?: throw CloudEventRWException.newOther(
-                IllegalStateException("Message was not " + eventFormat.serializedContentType())
-            )
-    },
-    { header(SPEC_VERSION) },
-    { specVersion -> BinaryMessageReader(specVersion, this) }
-)
+internal fun Request.toCloudEventReader(eventFormatProvider: EventFormatProvider): MessageReader {
+    val byContentType = header("ce-datacontenttype")
+        ?.let { eventFormatProvider.resolveFormat(it) }
+        ?.let { GenericStructuredMessageReader(it, body.payload.array()) }
+
+    val bySpecVersion = header("ce-specversion")
+        ?.let { SpecVersion.parse(it) }
+        ?.let {
+            BinaryMessageReader(it, this)
+        }
+
+    return byContentType ?: bySpecVersion ?: throw newUnknownEncodingException()
+}
 
 internal class BinaryMessageReader(version: SpecVersion, private val request: Request) :
     BaseGenericBinaryMessageReaderImpl<String, String>(
@@ -44,6 +45,3 @@ internal class BinaryMessageReader(version: SpecVersion, private val request: Re
     override fun toCloudEventsValue(value: String): String = value
 }
 
-internal const val CE_PREFIX = "ce-"
-internal const val SPEC_VERSION = CE_PREFIX + "specversion"
-internal const val CONTENT_TYPE = CE_PREFIX + "datacontenttype"

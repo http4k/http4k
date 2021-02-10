@@ -17,8 +17,8 @@ fun csv(vararg eventHandler: CEHandler): RoutingCEHandler = TODO()
 fun cloudEvent(handler: CEHandler): RoutingHttpHandler = routes("" bind handler.toHttp())
 
 fun CEHandler.toHttp(): HttpHandler = {
-    it.toCloudEventReader().toEvent()
-    this(it.toCloudEventReader().toEvent())
+    it.toCloudEventReader(EventFormatProvider.getInstance()).toEvent()
+    this(it.toCloudEventReader(EventFormatProvider.getInstance()).toEvent())
 }
 
 class RoutingHttpHandler1 : RoutingHttpHandler {
