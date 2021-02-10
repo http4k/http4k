@@ -9,8 +9,9 @@ class RequestContext internal constructor(val id: UUID = UUID.randomUUID()) {
     private val objects = mutableMapOf<String, Any>()
 
     companion object {
-        fun lensForStore(storeId: String?) = object :LensInjectorExtractor<Request, UUID> {
-            private val X_HTTP4K_CONTEXT = Header.map(UUID::fromString, UUID::toString).required("x-http4k-context" + (storeId?.let { "-$it" } ?: ""))
+        fun lensForStore(storeId: String?) = object : LensInjectorExtractor<Request, UUID> {
+            private val X_HTTP4K_CONTEXT = Header.map(UUID::fromString, UUID::toString)
+                .required("x-http4k-context" + (storeId?.let { "-$it" } ?: ""))
 
             override fun <R : Request> invoke(value: UUID, target: R): R = X_HTTP4K_CONTEXT(value, target)
 

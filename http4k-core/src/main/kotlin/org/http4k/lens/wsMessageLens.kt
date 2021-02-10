@@ -26,8 +26,10 @@ open class WsMessageLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>)
 /**
  * Represents a bi-directional extraction of an entity from a target Body, or an insertion into a target WsMessage.
  */
-open class BiDiWsMessageLensSpec<OUT>(get: LensGet<WsMessage, OUT>,
-                                      private val set: LensSet<WsMessage, OUT>) : WsMessageLensSpec<OUT>(get) {
+open class BiDiWsMessageLensSpec<OUT>(
+    get: LensGet<WsMessage, OUT>,
+    private val set: LensSet<WsMessage, OUT>
+) : WsMessageLensSpec<OUT>(get) {
 
     /**
      * Create another BiDiWsMessageLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
@@ -65,9 +67,10 @@ open class WsMessageLens<out FINAL>(private val getLens: (WsMessage) -> FINAL) :
  * A BiDiWsMessageLens provides the bi-directional extraction of an entity from a target body, or the insertion of an entity
  * into a target WsMessage.
  */
-class BiDiWsMessageLens<FINAL>(get: (WsMessage) -> FINAL,
-                               private val setLens: (FINAL, WsMessage) -> WsMessage)
-    : WsMessageLens<FINAL>(get) {
+class BiDiWsMessageLens<FINAL>(
+    get: (WsMessage) -> FINAL,
+    private val setLens: (FINAL, WsMessage) -> WsMessage
+) : WsMessageLens<FINAL>(get) {
 
     @Suppress("UNCHECKED_CAST")
     operator fun invoke(target: FINAL): WsMessage = setLens(target, WsMessage(Body.EMPTY))

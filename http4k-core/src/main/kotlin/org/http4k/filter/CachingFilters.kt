@@ -28,9 +28,11 @@ data class StaleIfErrorTtl(private val valueD: Duration) : CacheControlHeaderPar
 data class MaxAgeTtl(private val valueD: Duration) : CacheControlHeaderPart("max-age", valueD)
 
 
-data class DefaultCacheTimings(val maxAge: MaxAgeTtl,
-                               val staleIfErrorTtl: StaleIfErrorTtl,
-                               val staleWhenRevalidateTtl: StaleWhenRevalidateTtl)
+data class DefaultCacheTimings(
+    val maxAge: MaxAgeTtl,
+    val staleIfErrorTtl: StaleIfErrorTtl,
+    val staleWhenRevalidateTtl: StaleWhenRevalidateTtl
+)
 
 /**
  * Useful filters for applying Cache-Controls to request/responses

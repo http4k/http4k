@@ -13,7 +13,7 @@ import java.net.InetSocketAddress
 import java.util.concurrent.Executors.newWorkStealingPool
 import com.sun.net.httpserver.HttpHandler as SunHttpHandler
 
-class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
+class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
         httpResponse.headers.forEach { (key, value) -> responseHeaders.add(key, value) }
         if (requestMethod == "HEAD") {

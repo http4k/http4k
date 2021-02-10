@@ -59,9 +59,11 @@ interface MultiLensSpec<IN : Any, OUT> {
 /**
  * Represents a uni-directional extraction of an entity from a target.
  */
-open class LensSpec<IN : Any, OUT>(protected val location: String,
-                                   protected val paramMeta: ParamMeta,
-                                   internal val get: LensGet<IN, OUT>) {
+open class LensSpec<IN : Any, OUT>(
+    protected val location: String,
+    protected val paramMeta: ParamMeta,
+    internal val get: LensGet<IN, OUT>
+) {
     /**
      * Create another LensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a target.
@@ -136,10 +138,12 @@ interface BiDiMultiLensSpec<IN : Any, OUT> : MultiLensSpec<IN, OUT> {
 /**
  * Represents a bi-directional extraction of an entity from a target, or an insertion into a target.
  */
-open class BiDiLensSpec<IN : Any, OUT>(location: String,
-                                       paramMeta: ParamMeta,
-                                       get: LensGet<IN, OUT>,
-                                       private val set: LensSet<IN, OUT>) : LensSpec<IN, OUT>(location, paramMeta, get) {
+open class BiDiLensSpec<IN : Any, OUT>(
+    location: String,
+    paramMeta: ParamMeta,
+    get: LensGet<IN, OUT>,
+    private val set: LensSet<IN, OUT>
+) : LensSpec<IN, OUT>(location, paramMeta, get) {
 
     /**
      * Create another BiDiLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
