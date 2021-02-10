@@ -256,4 +256,26 @@ ktlint {
     // for details, see description in .editorconfig file
     enableExperimentalRules = false
     version = "0.40.0"
+    debug = false
+    disabledRules = [
+        "chain-wrapping",
+        "colon-spacing",
+        "comma-spacing",
+        "comment-spacing",
+        "curly-spacing",
+        "filename",
+        "final-newline",
+        "import-ordering",
+        "indent",
+        "indent_size",
+        "no-blank-line-before-rbrace",
+        "no-consecutive-blank-lines",
+        "no-multi-spaces",
+        "no-trailing-spaces",
+        "no-unused-imports",
+        "no-wildcard-imports",
+        "parameter-list-wrapping",
+        "range-spacing",
+        "string-template",
+    ]
 }
