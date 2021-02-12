@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ApprovalTest::class)
 class CustomFormatTest {
+
     @Test
     fun `can roundtrip custom format`(approver: Approver) {
         val format = CSVFormat()
@@ -29,21 +30,19 @@ class CustomFormatTest {
         val lens = Body.cloudEvent(format.contentType()).toLens()
 
         val data = MyCloudEventData(123)
-        val event = CloudEventBuilder.v03()
+        val originalEvent = CloudEventBuilder.v03()
             .withId("123")
             .withType("type")
             .withSource(Uri.of("http4k"))
             .withData(data)
             .build()
 
-        val withData = Request(GET, "").with(lens of event)
+        val withData = Request(GET, "").with(lens of originalEvent)
 
         approver.assertApproved(withData.toMessage())
 
-        val actual = lens(withData)
-        assertThat(
-            MyCloudEventData.fromStringBytes((actual.data as BytesCloudEventData).toBytes()),
-            equalTo(data)
-        )
+        val bytes = (lens(withData).data as BytesCloudEventData).toBytes()
+
+        assertThat(MyCloudEventData.fromStringBytes(bytes), equalTo(data))
     }
 }

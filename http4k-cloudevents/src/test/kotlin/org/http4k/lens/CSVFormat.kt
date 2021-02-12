@@ -14,23 +14,21 @@ import java.util.Objects
 import java.util.regex.Pattern
 
 class CSVFormat : EventFormat {
-    override fun serialize(event: CloudEvent): ByteArray {
-        return java.lang.String.join(
-            ",",
-            event.specVersion.toString(),
-            event.id,
-            event.type,
-            event.source.toString(),
-            Objects.toString(event.dataContentType),
-            Objects.toString(event.dataSchema),
-            Objects.toString(event.subject),
-            if (event.time != null) Time.writeTime(event.time) else "null",
-            if (event.data != null) String(
-                Base64.getEncoder().encode(event.data?.toBytes() ?: ByteArray(0)),
-                UTF_8
-            ) else "null"
-        ).toByteArray()
-    }
+    override fun serialize(event: CloudEvent) = java.lang.String.join(
+        ",",
+        event.specVersion.toString(),
+        event.id,
+        event.type,
+        event.source.toString(),
+        Objects.toString(event.dataContentType),
+        Objects.toString(event.dataSchema),
+        Objects.toString(event.subject),
+        if (event.time != null) Time.writeTime(event.time) else "null",
+        if (event.data != null) String(
+            Base64.getEncoder().encode(event.data?.toBytes() ?: ByteArray(0)),
+            UTF_8
+        ) else "null"
+    ).toByteArray()
 
     override fun deserialize(bytes: ByteArray, mapper: CloudEventDataMapper<*>): CloudEvent {
         val splitted = String(bytes, UTF_8).split(Pattern.quote(",").toRegex()).toTypedArray()
