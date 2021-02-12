@@ -30,7 +30,7 @@ internal fun HttpMessage.toCloudEventReader(): MessageReader {
 internal fun HttpMessage.write(cloudEvent: CloudEvent): HttpMessage =
     header("ce-datacontenttype", cloudEvent.dataContentType)
         .header("ce-specversion", cloudEvent.specVersion.toString()).body(
-            cloudEvent.dataContentType
+            header("content-type")
                 ?.let { EventFormatProvider.getInstance().resolveFormat(it) }
                 ?.serialize(cloudEvent)
                 ?.let { Body(ByteBuffer.wrap(it)) }

@@ -5,7 +5,7 @@ import org.http4k.core.Uri
 import java.net.URI
 
 @Suppress("UNCHECKED_CAST")
-fun <T : CloudEventBuilder> T.withContentType(contentType: ContentType): T = withDataContentType(contentType.value) as T
+fun <T : CloudEventBuilder> T.withDataContentType(contentType: ContentType): T = withDataContentType(contentType.value) as T
 
 @Suppress("UNCHECKED_CAST")
 fun <T : CloudEventBuilder> T.withSourceUri(uri: Uri): T = withSource(URI.create(uri.toString())) as T

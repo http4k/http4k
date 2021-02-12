@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import io.cloudevents.CloudEvent
 import io.cloudevents.CloudEventData
 import io.cloudevents.core.builder.CloudEventBuilder
-import io.cloudevents.core.builder.withContentType
+import io.cloudevents.core.builder.withDataContentType
 import io.cloudevents.jackson.JsonCloudEventData
 import io.cloudevents.jackson.PojoCloudEventDataMapper
 import io.cloudevents.rw.CloudEventDataMapper
@@ -14,6 +14,7 @@ import org.http4k.cloudevents.write
 import org.http4k.core.Body
 import org.http4k.core.CLOUD_EVENT_JSON
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.format.ConfigurableJackson
 import org.http4k.lens.ParamMeta.ObjectParam
 
@@ -24,7 +25,7 @@ fun Body.Companion.cloudEvent(contentType: ContentType = ContentType.CLOUD_EVENT
     LensGet { _, target -> listOf(target.toCloudEventReader().toEvent()) },
     LensSet { _, values, target ->
         values.fold(target) { memo, next ->
-            memo.write(next)
+            memo.header("content-type", contentType.toHeaderValue()).write(next)
         }
     }
 )
@@ -41,7 +42,7 @@ inline fun <reified T : CloudEventData> ConfigurableJackson.cloudEventDataLens()
     val set = LensSet<CloudEvent, T> { _, values, event ->
         values.fold(event) { acc, next ->
             CloudEventBuilder.from(acc)
-                .withContentType(ContentType.CLOUD_EVENT_JSON)
+                .withDataContentType(APPLICATION_JSON)
                 .withData(JsonCloudEventData.wrap(asJsonObject(next)))
                 .build()
         }
