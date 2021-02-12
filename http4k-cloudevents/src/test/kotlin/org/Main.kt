@@ -1,6 +1,5 @@
 package org
 
-import io.cloudevents.CloudEventData
 import io.cloudevents.core.builder.CloudEventBuilder.v03
 import io.cloudevents.core.builder.withSource
 import io.cloudevents.core.provider.EventFormatProvider
@@ -17,6 +16,7 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.filter.debug
 import org.http4k.format.Jackson
+import org.http4k.format.MyCloudEventData
 import org.http4k.format.cloudEventDataLens
 import org.http4k.lens.cloudEvent
 import org.http4k.routing.bind
@@ -52,8 +52,4 @@ fun main() {
             Request(POST, "/foo/bar").with(eventLens of cloudEvent.with(dataLens of data))
         )
     )
-}
-
-data class MyCloudEventData(val value: Int) : CloudEventData {
-    override fun toBytes() = value.toString().toByteArray()
 }
