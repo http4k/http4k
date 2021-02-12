@@ -1,8 +1,8 @@
 package org
 
 import io.cloudevents.CloudEventData
-import io.cloudevents.core.builder.CloudEventBuilder
-import io.cloudevents.core.builder.withSourceUri
+import io.cloudevents.core.builder.CloudEventBuilder.v03
+import io.cloudevents.core.builder.withSource
 import io.cloudevents.core.provider.EventFormatProvider
 import io.cloudevents.jackson.JsonFormat
 import io.cloudevents.with
@@ -41,9 +41,9 @@ fun main() {
 
     val data = MyCloudEventData(10)
 
-    val cloudEvent = CloudEventBuilder.v03()
+    val cloudEvent = v03()
         .withId("aaa")
-        .withSourceUri(Uri.of("localhost"))
+        .withSource(Uri.of("localhost"))
         .withType("bbb")
         .build()
 
@@ -53,7 +53,6 @@ fun main() {
         )
     )
 }
-
 
 data class MyCloudEventData(val value: Int) : CloudEventData {
     override fun toBytes() = value.toString().toByteArray()
