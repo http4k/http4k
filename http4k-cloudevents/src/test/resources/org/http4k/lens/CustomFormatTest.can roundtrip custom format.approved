@@ -1,0 +1,8 @@
+GET  HTTP/1.1
+content-type: application/cloudevents+csv
+ce-id: 123
+ce-source: http4k
+ce-specversion: 0.3
+ce-type: type
+
+0.3,123,type,http4k,null,null,null,null,MTIz
