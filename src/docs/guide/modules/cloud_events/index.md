@@ -7,7 +7,7 @@ description: Feature overview of the http4k-cloudevents module
 implementation group: "org.http4k", name: "http4k-cloudevents", version: "4.3.2.0"
 ```
 
-The [Cloud Events](https://cloudevents.io/) defines a common specification for Events produced by Cloud services.
+The [Cloud Events](https://cloudevents.io/) spec defines a common format for Events produced by Cloud services.
 
 http4k provides simple pluggability into the CloudEvents Java SDKs and custom event format libraries via the Lens system - making it trivial to both receive or send CloudEvents in the standard way.
 
