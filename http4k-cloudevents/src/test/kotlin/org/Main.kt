@@ -17,8 +17,8 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.filter.debug
 import org.http4k.format.Jackson
+import org.http4k.format.cloudEventDataLens
 import org.http4k.lens.cloudEvent
-import org.http4k.lens.cloudEventDataLens
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
