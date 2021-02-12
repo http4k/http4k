@@ -1,5 +1,6 @@
 package org.http4k.cloudevents
 
+import io.cloudevents.CloudEvent
 import io.cloudevents.SpecVersion
 import io.cloudevents.core.data.BytesCloudEventData
 import io.cloudevents.core.message.MessageReader
@@ -7,25 +8,36 @@ import io.cloudevents.core.message.impl.BaseGenericBinaryMessageReaderImpl
 import io.cloudevents.core.message.impl.GenericStructuredMessageReader
 import io.cloudevents.core.provider.EventFormatProvider
 import io.cloudevents.rw.CloudEventRWException.newUnknownEncodingException
-import org.http4k.core.Request
+import org.http4k.core.Body
+import org.http4k.core.Body.Companion.EMPTY
+import org.http4k.core.HttpMessage
+import java.nio.ByteBuffer
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-internal fun Request.toCloudEventReader(eventFormatProvider: EventFormatProvider): MessageReader {
+internal fun HttpMessage.toCloudEventReader(): MessageReader {
     val byContentType = header("ce-datacontenttype")
-        ?.let { eventFormatProvider.resolveFormat(it) }
+        ?.let { EventFormatProvider.getInstance().resolveFormat(it) }
         ?.let { GenericStructuredMessageReader(it, body.payload.array()) }
 
     val bySpecVersion = header("ce-specversion")
         ?.let { SpecVersion.parse(it) }
-        ?.let {
-            BinaryMessageReader(it, this)
-        }
+        ?.let { BinaryMessageReader(it, this) }
 
     return byContentType ?: bySpecVersion ?: throw newUnknownEncodingException()
 }
 
-internal class BinaryMessageReader(version: SpecVersion, private val request: Request) :
+internal fun HttpMessage.write(cloudEvent: CloudEvent): HttpMessage =
+    header("ce-datacontenttype", cloudEvent.dataContentType)
+        .header("ce-specversion", cloudEvent.specVersion.toString()).body(
+            cloudEvent.dataContentType
+                ?.let { EventFormatProvider.getInstance().resolveFormat(it) }
+                ?.serialize(cloudEvent)
+                ?.let { Body(ByteBuffer.wrap(it)) }
+                ?: EMPTY
+        )
+
+internal class BinaryMessageReader(version: SpecVersion, private val request: HttpMessage) :
     BaseGenericBinaryMessageReaderImpl<String, String>(
         version,
         request.body.takeIf { it.length ?: 0 > 0 }
