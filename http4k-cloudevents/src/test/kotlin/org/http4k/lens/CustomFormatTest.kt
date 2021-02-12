@@ -15,7 +15,6 @@ import org.http4k.core.with
 import org.http4k.format.MyCloudEventData
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
-import org.http4k.testing.assertApproved
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -39,7 +38,7 @@ class CustomFormatTest {
 
         val withData = Request(GET, "").with(lens of originalEvent)
 
-        approver.assertApproved(withData.toMessage())
+        approver.assertApproved(withData)
 
         val bytes = (lens(withData).data as BytesCloudEventData).toBytes()
 

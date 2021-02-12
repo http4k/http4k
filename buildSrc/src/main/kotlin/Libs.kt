@@ -76,6 +76,10 @@ public object Libs {
 
     public const val values4k: String = "dev.forkhandles:values4k:_"
 
+    public const val cloudevents_core: String = "io.cloudevents:cloudevents-core:_"
+
+    public const val cloudevents_json_jackson: String = "io.cloudevents:cloudevents-json-jackson:_"
+
     public const val resilience4j_bulkhead: String =
             "io.github.resilience4j:resilience4j-bulkhead:_"
 
