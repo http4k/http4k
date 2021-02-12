@@ -18,7 +18,6 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.format.ConfigurableJackson
 import org.http4k.lens.ParamMeta.ObjectParam
 
-
 fun Body.Companion.cloudEvent(contentType: ContentType = ContentType.CLOUD_EVENT_JSON) = BiDiBodyLensSpec<CloudEvent>(
     listOf(Meta(true, "body", ObjectParam, "Cloud Event", "Cloud Event")),
     contentType,

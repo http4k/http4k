@@ -8,15 +8,17 @@ import io.cloudevents.core.message.impl.BaseGenericBinaryMessageReaderImpl
 import io.cloudevents.core.message.impl.GenericStructuredMessageReader
 import io.cloudevents.core.provider.EventFormatProvider
 import io.cloudevents.rw.CloudEventRWException.newUnknownEncodingException
+import io.cloudevents.types.Time.writeTime
 import org.http4k.core.Body
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage
+import org.http4k.lens.Header.CONTENT_TYPE
 import java.nio.ByteBuffer
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 internal fun HttpMessage.toCloudEventReader(): MessageReader {
-    val byContentType = header("ce-datacontenttype")
+    val byContentType = header("content-type")
         ?.let { EventFormatProvider.getInstance().resolveFormat(it) }
         ?.let { GenericStructuredMessageReader(it, body.payload.array()) }
 
@@ -27,15 +29,25 @@ internal fun HttpMessage.toCloudEventReader(): MessageReader {
     return byContentType ?: bySpecVersion ?: throw newUnknownEncodingException()
 }
 
-internal fun HttpMessage.write(cloudEvent: CloudEvent): HttpMessage =
-    header("ce-datacontenttype", cloudEvent.dataContentType)
-        .header("ce-specversion", cloudEvent.specVersion.toString()).body(
-            header("content-type")
-                ?.let { EventFormatProvider.getInstance().resolveFormat(it) }
-                ?.serialize(cloudEvent)
-                ?.let { Body(ByteBuffer.wrap(it)) }
-                ?: EMPTY
-        )
+internal fun HttpMessage.write(cloudEvent: CloudEvent): HttpMessage = this
+    .addHeaderIfPresent("id", cloudEvent.id)
+    .addHeaderIfPresent("datacontenttype", cloudEvent.dataContentType)
+    .addHeaderIfPresent("schemaurl", cloudEvent.dataSchema?.toString())
+    .addHeaderIfPresent("source", cloudEvent.source?.toString())
+    .addHeaderIfPresent("specversion", cloudEvent.specVersion.toString())
+    .addHeaderIfPresent("subject", cloudEvent.subject)
+    .addHeaderIfPresent("time", cloudEvent.time?.let(::writeTime))
+    .addHeaderIfPresent("type", cloudEvent.type)
+    .body(
+        CONTENT_TYPE(this)
+            ?.let { EventFormatProvider.getInstance().resolveFormat(it.toHeaderValue()) }
+            ?.serialize(cloudEvent)
+            ?.let { Body(ByteBuffer.wrap(it)) }
+            ?: EMPTY
+    )
+
+private fun HttpMessage.addHeaderIfPresent(suffix: String, value: String?) =
+    value?.let { header("ce-$suffix", it) } ?: this
 
 internal class BinaryMessageReader(version: SpecVersion, private val request: HttpMessage) :
     BaseGenericBinaryMessageReaderImpl<String, String>(

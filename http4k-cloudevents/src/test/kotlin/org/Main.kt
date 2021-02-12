@@ -10,7 +10,6 @@ import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -30,15 +29,15 @@ fun main() {
     val eventLens = Body.cloudEvent().toLens()
     val dataLens = Jackson.cloudEventDataLens<MyCloudEventData>()
 
-    val app = ServerFilters.CatchLensFailure { Response(BAD_REQUEST).body(it.cause!!.message!!)}
+    val app = ServerFilters.CatchLensFailure()
         .then(routes(
             "/foo/bar" bind POST to {
                 val cloudEvent = eventLens(it)
                 val eventData = dataLens(cloudEvent)
+                println(eventData)
                 Response(OK)
             }
         )).debug()
-
 
     val data = MyCloudEventData(10)
 
