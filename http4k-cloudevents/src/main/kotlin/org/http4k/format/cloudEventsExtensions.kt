@@ -17,11 +17,8 @@ import org.http4k.lens.ParamMeta.ObjectParam
 
 inline fun <reified T : CloudEventData> ConfigurableJackson.cloudEventDataLens(): BiDiLens<CloudEvent, T> {
     val get = LensGet<CloudEvent, T> { _, target ->
-        target.data?.let {
-            listOf(
-                PojoCloudEventDataMapper.from(mapper, jacksonTypeRef<T>()).map(it).value
-            )
-        } ?: emptyList()
+        target.data?.let { listOf(PojoCloudEventDataMapper.from(mapper, jacksonTypeRef<T>()).map(it).value) }
+            ?: emptyList()
     }
 
     val set = LensSet<CloudEvent, T> { _, values, event ->
