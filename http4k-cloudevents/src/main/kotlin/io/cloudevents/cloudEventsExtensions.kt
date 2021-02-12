@@ -1,6 +1,4 @@
-package org.http4k.cloudevents
-
-import io.cloudevents.CloudEvent
+package io.cloudevents
 
 fun <T : CloudEvent> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this) { memo, next -> next(memo) }
 

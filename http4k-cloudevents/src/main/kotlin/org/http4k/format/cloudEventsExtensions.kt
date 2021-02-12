@@ -33,5 +33,5 @@ inline fun <reified T : CloudEventData> ConfigurableJackson.cloudEventDataLens()
         }
     }
 
-    return object : BiDiLensSpec<CloudEvent, T>("Cloud Event", ObjectParam, get, set) {}.required("data")
+    return object : BiDiLensSpec<CloudEvent, T>("Cloud Event", ObjectParam, get, set) {}.required(T::class.simpleName!!)
 }

@@ -5,7 +5,7 @@ import io.cloudevents.core.builder.CloudEventBuilder
 import io.cloudevents.core.builder.withSourceUri
 import io.cloudevents.core.provider.EventFormatProvider
 import io.cloudevents.jackson.JsonFormat
-import org.http4k.cloudevents.with
+import io.cloudevents.with
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request

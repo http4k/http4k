@@ -4,8 +4,6 @@ package org.http4k.lens
 import io.cloudevents.CloudEvent
 import io.cloudevents.CloudEventData
 import io.cloudevents.rw.CloudEventDataMapper
-import org.http4k.cloudevents.toCloudEventReader
-import org.http4k.cloudevents.write
 import org.http4k.core.Body
 import org.http4k.core.CLOUD_EVENT_JSON
 import org.http4k.core.ContentType
