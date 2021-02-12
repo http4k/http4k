@@ -56,7 +56,8 @@ description: Details about the various http4k integration libraries
 
 ### Cloud-Native & Observability
 <a href="https://http4k.org/guide/modules/aws"><span class="pill">AWS</span></a>
-<a href="https://http4k.org/guide/modules/cloud_native"><span class="pill">Cloud Native</span></a>
+<a href="https://http4k.org/guide/modules/cloud_native"><span class="pill">Cloud Native Configuration</span></a>
+<a href="https://http4k.org/guide/modules/cloud_events"><span class="pill">Cloud Events</span></a>
 <a href="https://http4k.org/guide/modules/oauth"><span class="pill">OAuth</span></a>
 <a href="https://http4k.org/guide/modules/micrometer"><span class="pill">Micrometer</span></a>
 <a href="https://http4k.org/guide/modules/opentelemetry"><span class="pill">OpenTelemetry</span></a>

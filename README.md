@@ -125,11 +125,13 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **[YAML](https://www.http4k.org/guide/modules/yaml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
 * [Resilience4J:](https://http4k.org/guide/modules/resilience4j) 
-    * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
+    * Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
 * [Micrometer:](https://http4k.org/guide/modules/micrometer) 
     * Support for plugging http4k apps into Micrometer.
+* [Cloud Events:](https://http4k.org/guide/modules/cloud_events) 
+    * Consume and produce CloudEvents using typesafe lenses.
 * [OpenTelemetry:](https://http4k.org/guide/modules/opentelemetry) 
-    * Support for instrumenting http4k apps with OpenTelemetry tooling.
+    * Instrument http4k apps with OpenTelemetry tooling.
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [GraphQL:](https://http4k.org/guide/modules/graphql) 

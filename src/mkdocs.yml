@@ -42,7 +42,8 @@ nav:
     - JSON handling: guide/modules/json/index.md
     - Templating: guide/modules/templating/index.md
     - Multipart forms: guide/modules/multipart/index.md
-    - Cloud native Configuration: guide/modules/cloud_native/index.md
+    - Cloud Native Configuration: guide/modules/cloud_native/index.md
+    - Cloud Events: guide/modules/cloud_events/index.md
     - Micrometer: guide/modules/micrometer/index.md
     - OpenTelemetry: guide/modules/opentelemetry/index.md
     - Resilience4J: guide/modules/resilience4j/index.md

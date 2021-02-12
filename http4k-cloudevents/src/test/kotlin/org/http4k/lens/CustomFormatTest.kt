@@ -3,11 +3,14 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.cloudevents.core.builder.CloudEventBuilder
+import io.cloudevents.core.builder.withDataContentType
+import io.cloudevents.core.builder.withDataSchema
 import io.cloudevents.core.builder.withSource
 import io.cloudevents.core.data.BytesCloudEventData
 import io.cloudevents.core.format.contentType
 import io.cloudevents.core.provider.EventFormatProvider
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -15,8 +18,12 @@ import org.http4k.core.with
 import org.http4k.format.MyCloudEventData
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
+import org.http4k.testing.assertApproved
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
 
 @ExtendWith(ApprovalTest::class)
 class CustomFormatTest {
@@ -32,13 +39,17 @@ class CustomFormatTest {
         val originalEvent = CloudEventBuilder.v03()
             .withId("123")
             .withType("type")
+            .withDataContentType(ContentType.OCTET_STREAM)
+            .withDataSchema(Uri.of("http4k"))
             .withSource(Uri.of("http4k"))
+            .withSubject("subject")
+            .withTime(OffsetDateTime.ofInstant(Instant.EPOCH, ZoneId.of("UTC")))
             .withData(data)
             .build()
 
         val withData = Request(GET, "").with(lens of originalEvent)
 
-        approver.assertApproved(withData)
+        approver.assertApproved(withData.toMessage().replace("\r",""))
 
         val bytes = (lens(withData).data as BytesCloudEventData).toBytes()
 

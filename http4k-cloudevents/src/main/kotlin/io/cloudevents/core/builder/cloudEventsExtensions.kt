@@ -9,3 +9,6 @@ fun <T : CloudEventBuilder> T.withDataContentType(contentType: ContentType): T =
 
 @Suppress("UNCHECKED_CAST")
 fun <T : CloudEventBuilder> T.withSource(uri: Uri): T = withSource(URI.create(uri.toString())) as T
+
+@Suppress("UNCHECKED_CAST")
+fun <T : CloudEventBuilder> T.withDataSchema(uri: Uri): T = withDataSchema(URI.create(uri.toString())) as T

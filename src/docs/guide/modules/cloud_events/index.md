@@ -1,0 +1,21 @@
+title: http4k Cloud Events support
+description: Feature overview of the http4k-cloudevents module
+
+### Installation (Gradle)
+
+```groovy
+implementation group: "org.http4k", name: "http4k-cloudevents", version: "4.3.0.0"
+```
+
+The [Cloud Events](https://cloudevents.io/) defines a common specification for Events produced by Cloud services.
+
+http4k provides simple pluggability into the CloudEvents Java SDKs and custom event format libraries via the Lens system - making it trivial to both receive or send CloudEvents in the standard way.
+
+### Example 
+
+In this example we are using the Jackson JSONFormat which is included by default with the `http4k-cloudevents` module.
+
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/cloud_events/example.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/cloud_events/example.kt"></script>
+
