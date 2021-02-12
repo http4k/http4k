@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ApprovalTest::class)
 class CustomFormatTest {
-
     @Test
     fun `can roundtrip custom format`(approver: Approver) {
         val format = CSVFormat()
