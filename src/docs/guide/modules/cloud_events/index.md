@@ -4,7 +4,7 @@ description: Feature overview of the http4k-cloudevents module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-cloudevents", version: "4.3.0.0"
+implementation group: "org.http4k", name: "http4k-cloudevents", version: "4.3.2.0"
 ```
 
 The [Cloud Events](https://cloudevents.io/) defines a common specification for Events produced by Cloud services.
