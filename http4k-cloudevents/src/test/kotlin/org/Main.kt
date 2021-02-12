@@ -1,14 +1,12 @@
-package org.http4k.routing
+package org
 
 import io.cloudevents.CloudEventData
-import io.cloudevents.core.builder.CloudEventBuilder.v1
-import io.cloudevents.core.builder.withContentType
+import io.cloudevents.core.builder.CloudEventBuilder
 import io.cloudevents.core.builder.withSourceUri
 import io.cloudevents.core.provider.EventFormatProvider
 import io.cloudevents.jackson.JsonFormat
+import org.http4k.cloudevents.with
 import org.http4k.core.Body
-import org.http4k.core.CLOUD_EVENT_JSON
-import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.Method.POST
 import org.http4k.core.NoOp
@@ -19,42 +17,44 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.debug
-import org.http4k.lens.CloudEvent
+import org.http4k.format.Jackson
 import org.http4k.lens.cloudEvent
+import org.http4k.lens.cloudEventDataLens
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 
 fun main() {
+
+    EventFormatProvider.getInstance().registerFormat(JsonFormat())
+
+    val eventLens = Body.cloudEvent().toLens()
+    val dataLens = Jackson.cloudEventDataLens<MyCloudEventData>()
+
     val app = Filter.NoOp
         .then(routes(
             "/foo/bar" bind POST to {
-                val eventLens = Body.cloudEvent().toLens()
-                val eventdata = CloudEvent.data<MyCloudEventData>()(eventLens(it))
-                println(eventdata)
+                val cloudEvent = eventLens(it)
+                val eventData = dataLens(cloudEvent)
                 Response(OK)
             }
         )).debug()
 
-    val lens = Body.cloudEvent().toLens()
-
-    EventFormatProvider.getInstance().registerFormat(JsonFormat())
 
     val data = MyCloudEventData(10)
 
-    val cloudEvent = v1()
+    val cloudEvent = CloudEventBuilder.v03()
         .withId("aaa")
         .withSourceUri(Uri.of("localhost"))
-        .withContentType(ContentType.CLOUD_EVENT_JSON)
         .withType("bbb")
-        .withData(data)
         .build()
 
     println(
         app(
-            Request(POST, "/foo/bar").with(
-                lens of cloudEvent
-            )
+            Request(POST, "/foo/bar").with(eventLens of cloudEvent.with(dataLens of data))
         )
     )
 }
+
 
 data class MyCloudEventData(val value: Int) : CloudEventData {
     override fun toBytes() = value.toString().toByteArray()
