@@ -36,8 +36,10 @@ fun main() {
     val app = CatchLensFailure()
         .then(routes(
             "/foo/bar" bind POST to {
-                // Our app uses lenses in the normal way to extract the data from the request..
+                // Our app uses lenses in the normal way to extract the event from the request..
                 val cloudEvent = eventLens(it)
+
+                // ... and then the typed event data from the event envelope
                 val eventData = dataLens(cloudEvent)
 
                 println("Event: $cloudEvent")
@@ -55,10 +57,10 @@ fun main() {
         .withType("myEventType")
         .build()
 
-    // then inject the data into the Event... this sets the content type of the event
+    // ...then inject the data into the Event... this sets the content type of the event
     val with = cloudEvent.with(dataLens of MyCloudEventData(10))
 
-    // lastly inject the event into the request and send it to the server
+    // ...lastly inject the event into the request and send it to the server
     app(Request(POST, "/foo/bar").with(eventLens of with))
 }
 
