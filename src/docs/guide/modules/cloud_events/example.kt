@@ -1,7 +1,7 @@
 package guide.modules.cloud_events
 
 import io.cloudevents.CloudEventData
-import io.cloudevents.core.builder.CloudEventBuilder.v03
+import io.cloudevents.core.builder.CloudEventBuilder
 import io.cloudevents.core.builder.withSource
 import io.cloudevents.core.provider.EventFormatProvider
 import io.cloudevents.jackson.JsonFormat
@@ -50,7 +50,7 @@ fun main() {
         )).debug()
 
     // Create the base CloudEvent without the data...
-    val cloudEvent = v03()
+    val cloudEvent = CloudEventBuilder.v1()
         .withId(UUID.randomUUID().toString())
         .withSource(Uri.of("localhost"))
         .withTime(OffsetDateTime.now())

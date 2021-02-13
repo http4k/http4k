@@ -36,7 +36,7 @@ class CustomFormatTest {
         val lens = Body.cloudEvent(format.contentType()).toLens()
 
         val data = MyCloudEventData(123)
-        val originalEvent = CloudEventBuilder.v03()
+        val originalEvent = CloudEventBuilder.v1()
             .withId("123")
             .withType("type")
             .withDataContentType(ContentType.OCTET_STREAM)
