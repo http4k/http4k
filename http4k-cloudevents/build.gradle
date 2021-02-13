@@ -5,7 +5,7 @@ dependencies {
     api project(":http4k-format-core")
     api Libs.cloudevents_core
     api Libs.cloudevents_json_jackson
-    implementation project(":http4k-format-jackson")
+    api project(":http4k-format-jackson")
 
     testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
     testImplementation project(":http4k-testing-hamkrest")
