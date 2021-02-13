@@ -39,3 +39,4 @@ function ensure_release_commit {
         echo "Version did not change on this commit. Ignoring"; exit 0;
     fi
 }
+
