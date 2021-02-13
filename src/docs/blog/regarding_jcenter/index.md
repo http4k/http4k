@@ -9,7 +9,7 @@ It was announced this week that the JCenter artifact repository would be [shutti
 
 The http4k project currently primarily builds and distributes our 50+ artifacts to Bintray and then syncs them to Maven Central automatically. As a result of this announcement, we have totally removed any dependency on JCenter from our builds and have verified that all of our dependencies resolve correctly without it. Hence we can say with absolute confidence that:
 
-> **As of v4.3.2.0, http4k users will be unaffected by the JCenter shutdown.**
+> **As of v4.3.2.1, http4k users will be unaffected by the JCenter shutdown.**
 
 http4k has always worked on the principle of being as lightweight as possible with respect to dependencies, and this situation has rather vindicated our position. Lots of Open Source projects will not be in such a fortunate position.
 
