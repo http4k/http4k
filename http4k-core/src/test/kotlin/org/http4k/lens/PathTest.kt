@@ -162,7 +162,7 @@ class PathTest {
     fun `enum`() = checkContract(Path.enum<Method>(), "DELETE", DELETE)
 
     @Test
-    fun value() = checkContract(Path.value(MyValue), "123", 123)
+    fun value() = checkContract(Path.value(MyValue), "123", MyValue.of(123))
 
     class MyValue private constructor(value: Int) : IntValue(value) {
         companion object : IntValueFactory<MyValue>(::MyValue)
