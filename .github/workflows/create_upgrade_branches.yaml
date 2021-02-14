@@ -1,6 +1,6 @@
 on:
   repository_dispatch:
-    types: [test]
+    types: [http4k-release]
 jobs:
   create-upgrade-branches:
     strategy:
@@ -20,7 +20,7 @@ jobs:
       - name: Trigger ${{ matrix.repo }}
         uses: peter-evans/repository-dispatch@v1.1.1
         with:
-          token: ${{ secrets.TOOLBOX_TOKEN }}
+          token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
           repository: ${{ matrix.repo }}
           event-type: http4k-release
           client-payload: '{"version": "${{ github.event.client_payload.version }}"}'
