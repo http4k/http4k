@@ -1,0 +1,26 @@
+on:
+  repository_dispatch:
+    types: [test]
+jobs:
+  create-upgrade-branches:
+    strategy:
+      matrix:
+        repo:
+          - 'http4k/toolbox'
+          - 'http4k/examples'
+          - 'http4k/http4k-by-example'
+          - 'http4k/http4k-connect'
+          - 'http4k/http4k-heroku-travis-example-app'
+          - 'http4k/http4k-contract-todo-backend'
+          - 'http4k/http4k-bin'
+          - 'http4k/http4k-todo-backend'
+          - 'http4k/http4k-bootstrap'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger ${{ matrix.repo }}
+        uses: peter-evans/repository-dispatch@v1.1.1
+        with:
+          token: ${{ secrets.GH_PRIVATE_REPO_TOKEN }}
+          repository: ${{ matrix.repo }}
+          event-type: http4k-release
+          client-payload: '{"version": "${{ github.event.client_payload.version }}"}'
