@@ -10,6 +10,6 @@ function replace() {
     mv "$TARGET_FILE".tmp "$TARGET_FILE"
 }
 
-export -f upgrade
+export -f replace
 
 find . -name $1 -exec bash -c "replace {} $2 $3" bash {} \;
