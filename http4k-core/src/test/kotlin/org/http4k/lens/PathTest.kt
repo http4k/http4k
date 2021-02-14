@@ -3,6 +3,8 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import dev.forkhandles.values.IntValue
+import dev.forkhandles.values.IntValueFactory
 import org.http4k.base64Encode
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -158,6 +160,13 @@ class PathTest {
 
     @Test
     fun `enum`() = checkContract(Path.enum<Method>(), "DELETE", DELETE)
+
+    @Test
+    fun value() = checkContract(Path.value(MyValue), "123", 123)
+
+    class MyValue private constructor(value: Int) : IntValue(value) {
+        companion object : IntValueFactory<MyValue>(::MyValue)
+    }
 
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")

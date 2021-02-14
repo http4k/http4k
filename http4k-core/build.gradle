@@ -4,6 +4,7 @@ dependencies {
     api(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.javax_servlet_api)
     implementation(Libs.result4k)
+    implementation(Libs.values4k)
 
     testImplementation Config.TestDependencies
     testApi(project(":http4k-client-apache"))
