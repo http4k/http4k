@@ -11,7 +11,6 @@ import org.http4k.core.RequestContexts
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-
 class RequestContextKeyTest {
     private val contexts = RequestContexts()
 

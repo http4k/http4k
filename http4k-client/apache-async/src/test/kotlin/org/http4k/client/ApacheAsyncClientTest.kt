@@ -64,4 +64,3 @@ class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsy
         latch.await()
     }
 }
-

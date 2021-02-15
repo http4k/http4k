@@ -12,4 +12,3 @@ class ClientCredentialsAccessTokenGenerator(private val accessTokens: AccessToke
         accessTokens.create(clientId, tokenRequest).map { AccessTokenDetails(it) }
 
 }
-

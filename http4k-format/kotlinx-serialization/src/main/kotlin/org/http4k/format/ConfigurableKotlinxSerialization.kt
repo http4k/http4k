@@ -168,4 +168,3 @@ fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder
 
     override fun done(): JsonBuilder = this@asConfigurable
 }
-

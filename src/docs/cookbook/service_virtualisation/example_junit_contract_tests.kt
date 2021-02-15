@@ -142,4 +142,3 @@ class ReplayFromGitHubTest : WordCounterContract {
         )
     )
 }
-

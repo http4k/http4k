@@ -40,4 +40,3 @@ object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
         "isBase64Encoded" to true
     )
 }
-

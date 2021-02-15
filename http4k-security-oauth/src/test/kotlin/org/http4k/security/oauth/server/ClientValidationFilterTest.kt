@@ -61,7 +61,6 @@ internal class ClientValidationFilterTest {
         ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, AuthRequestFromQueryParameters)
             .then(loginPage)
 
-
     @Test
     fun `allow accessing the login page`() {
         val response = filter(Request(GET, "/auth")
@@ -131,4 +130,3 @@ internal class ClientValidationFilterTest {
     }
 
 }
-

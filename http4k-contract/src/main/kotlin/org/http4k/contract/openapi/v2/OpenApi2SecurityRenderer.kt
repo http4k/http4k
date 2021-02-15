@@ -59,4 +59,3 @@ val ImplicitOAuthSecurity.Companion.renderer
             override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }
-

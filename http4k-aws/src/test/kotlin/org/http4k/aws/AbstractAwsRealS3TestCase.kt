@@ -52,7 +52,6 @@ abstract class AbstractAwsRealS3TestCase {
         aClient()(Request(DELETE, bucketUrl))
     }
 
-
     protected fun aClient() = awsClientFilter(Payload.Mode.Signed)
         .then(ApacheClient())
 

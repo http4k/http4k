@@ -11,7 +11,6 @@ import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
 
-
 class TraceIdTest {
 
     @Test

@@ -14,7 +14,6 @@ import org.http4k.util.inIntelliJOnly
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-
 @ExtendWith(ApprovalTest::class)
 class RoutePrintingTest {
 
@@ -51,5 +50,3 @@ class RoutePrintingTest {
         }
     }
 }
-
-

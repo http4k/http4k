@@ -108,7 +108,6 @@ class Http4kWebDriverTest {
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
-
     @Test
     fun `GET form`() {
         val driver = Http4kWebDriver { req ->

@@ -92,4 +92,3 @@ object RequestFilters {
      */
     fun Modify(vararg modifiers: (Request) -> Request): Filter = Filter { next -> { next(it.with(*modifiers)) } }
 }
-

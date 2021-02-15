@@ -26,4 +26,3 @@ internal fun String.fromFormEncoded() = URLDecoder.decode(this, "UTF-8")
 internal fun String.toFormEncoded() = URLEncoder.encode(this, "UTF-8")
 
 internal typealias Parameter = Pair<String, String?>
-

@@ -10,7 +10,6 @@ import org.http4k.servlet.FakeHttpServletRequest
 import org.http4k.servlet.FakeHttpServletResponse
 import org.junit.jupiter.api.Test
 
-
 class AlibabaCloudFunctionTest {
     @Test
     fun `calls the handler and returns proper body`() {

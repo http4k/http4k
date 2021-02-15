@@ -3,7 +3,6 @@ package org.http4k.core
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-
 /**
  * In-memory RequestContext store. Override the storeId to use multiple stores in one app.
  */

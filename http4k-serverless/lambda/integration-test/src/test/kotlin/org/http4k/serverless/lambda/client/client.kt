@@ -19,4 +19,3 @@ fun AwsProfile.awsClientFor(service: String) =
     ClientFilters.AwsAuth(scopeFor(service), credentials)
         .then(PrintRequestAndResponse().inIntelliJOnly())
         .then(JavaHttpClient())
-

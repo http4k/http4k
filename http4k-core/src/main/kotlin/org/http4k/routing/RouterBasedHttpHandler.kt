@@ -34,4 +34,3 @@ internal data class RouterBasedHttpHandler(
 internal val routeNotFoundHandler: HttpHandler = { Response(NOT_FOUND.description("Route not found")) }
 
 internal val routeMethodNotAllowedHandler: HttpHandler = { Response(METHOD_NOT_ALLOWED.description("Method not allowed")) }
-

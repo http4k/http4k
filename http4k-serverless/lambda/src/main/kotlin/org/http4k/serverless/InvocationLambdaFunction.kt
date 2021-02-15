@@ -32,4 +32,3 @@ object InvocationLambdaAwsHttpAdapter : AwsHttpAdapter<InputStream, InputStream>
 
     override fun invoke(resp: Response) = resp.body.stream
 }
-

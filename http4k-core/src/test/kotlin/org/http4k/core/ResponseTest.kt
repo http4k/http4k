@@ -38,6 +38,3 @@ class ResponseTest {
         assertThat(responseTwo, equalTo(responseThree))
     }
 }
-
-
-

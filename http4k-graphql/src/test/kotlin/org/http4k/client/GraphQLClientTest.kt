@@ -28,4 +28,3 @@ class GraphQLClientTest {
         assertThat(client.asGraphQLHandler(uri)(graphQLRequest), equalTo(graphQLResponse))
     }
 }
-

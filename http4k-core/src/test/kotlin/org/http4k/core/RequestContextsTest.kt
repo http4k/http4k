@@ -7,7 +7,6 @@ import org.http4k.core.Method.GET
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-
 class RequestContextsTest {
 
     @Test

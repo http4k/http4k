@@ -20,4 +20,3 @@ class ThymeleafViewModelTest : ViewModelContract(ThymeleafTemplates()) {
     }
 
 }
-

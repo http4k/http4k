@@ -99,7 +99,6 @@ fun main() {
 
     val graphQLClient = JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:5000/graphql"))
 
-
     fun runAndDisplay(query: String) {
         println(graphQLClient(GraphQLRequest(query)).data)
     }

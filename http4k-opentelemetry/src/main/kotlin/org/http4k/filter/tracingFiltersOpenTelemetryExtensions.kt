@@ -49,7 +49,6 @@ fun ClientFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.trac
     }
 }
 
-
 fun ServerFilters.OpenTelemetryTracing(tracer: Tracer = Http4kOpenTelemetry.tracer,
                                        spanNamer: (Request) -> String = { it.uri.toString() },
                                        error: (Request, Throwable) -> String = { _, t -> t.localizedMessage }

@@ -24,7 +24,6 @@ class SimpleAuthoriseRequestValidatorTest {
         validRedirectUri,
         expectedScopes = validScopes))
 
-
     @Test
     fun `return auth request when client is valid`() {
         val validAuthRequest = AuthRequest(

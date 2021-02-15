@@ -13,7 +13,6 @@ internal fun <T> assertMatchAndNonMatch(t: T, match: Matcher<T>, mismatch: Match
     shouldFail { t should mismatch }
 }
 
-
 internal fun <T> assertMatchAndNonMatch(t: T, match: T.() -> Unit, mismatch: T.() -> Unit) {
     match(t)
     shouldFail { mismatch(t) }

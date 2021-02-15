@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-
 class RequestContextTest {
 
     @Test

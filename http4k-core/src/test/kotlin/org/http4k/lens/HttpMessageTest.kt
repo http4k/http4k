@@ -42,5 +42,3 @@ class HttpMessageTest {
         assertThat(CONTENT_TYPE(populated), equalTo(TEXT_PLAIN))
     }
 }
-
-

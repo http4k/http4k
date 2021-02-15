@@ -11,7 +11,6 @@ import java.io.File
 import java.io.Reader
 import java.util.Properties
 
-
 /**
  * This models the runtime environment of the shell where the app is running. Optionally pass a separator to use for
  * multi-values otherwise a standard comma is used - this means you MUST override the separator if you have single values

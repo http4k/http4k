@@ -26,7 +26,6 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.UUID
 
-
 class BiDiLensSpecTest {
 
     data class Container(val s: String?)

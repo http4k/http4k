@@ -65,7 +65,6 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     private data class Route(val target: String, val routeKey: String = "\$default")
 }
 
-
 data class ApiName(val value: String)
 data class ApiId(val value: String)
 

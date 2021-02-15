@@ -30,4 +30,3 @@ fun main() {
 
     PolyHandler(http, sse = sse).asServer(Undertow(9000)).start()
 }
-

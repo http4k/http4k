@@ -61,6 +61,3 @@ class RequestTest {
         assertThat(request.source, equalTo(RequestSource("192.168.0.1", 32768)))
     }
 }
-
-
-

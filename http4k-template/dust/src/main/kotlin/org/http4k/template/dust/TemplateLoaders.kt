@@ -2,15 +2,12 @@ package org.http4k.template.dust
 
 import java.io.File
 
-
 internal fun loadFromFilesIn(baseDirectory: String): TemplateLoader =
     loadFromFilesIn(File(baseDirectory))
-
 
 internal fun loadFromFilesIn(baseDirectory: File): TemplateLoader =
     fun(name: String) =
         File(baseDirectory, "$name.dust").takeIf(File::exists)?.readText()
-
 
 internal fun loadFromResourcesIn(baseClasspathPackage: String): TemplateLoader {
     val resourceRoot = baseClasspathPackage.replace('.', '/')

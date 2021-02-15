@@ -33,5 +33,4 @@ class TemplateRendererTest {
         assertThat(finds.renderToResponse(TestViewModel), hasStatus(OK).and(hasBody("org/http4k/template/TestViewModel")).and(hasContentType(TEXT_HTML)))
     }
 
-
 }
