@@ -99,5 +99,4 @@ object RequestObjectExtractor {
                                           @JsonProperty("max_age") val magAge: Long? = null,
                                           @JsonProperty("exp") val expiry: Long? = null,
                                           @JsonProperty("claims") val claims: Claims = Claims())
-
 }

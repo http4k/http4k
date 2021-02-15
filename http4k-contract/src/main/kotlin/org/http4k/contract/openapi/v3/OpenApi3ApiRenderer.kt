@@ -185,5 +185,4 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
         } catch (e: ClassCastException) {
             jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId)
         }
-
 }

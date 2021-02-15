@@ -48,5 +48,4 @@ class CookieMatchersTest {
 
     @Test
     fun sameSite() = assertMatchAndNonMatch(Cookie("name", "value", sameSite = Strict), haveSameSite(Strict), haveSameSite(None))
-
 }

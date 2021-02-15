@@ -53,5 +53,4 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
     fun `nullable fields are supported - jackson bug`() {
         assertThat(JacksonXml.asA("<NullableListContainerBug/>"), equalTo(NullableListContainerBug(null)))
     }
-
 }

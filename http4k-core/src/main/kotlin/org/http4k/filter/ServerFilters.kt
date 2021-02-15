@@ -92,7 +92,6 @@ object ServerFilters {
                     ZipkinTraces.THREAD_LOCAL.remove()
                 }
             }
-
         }
     }
 

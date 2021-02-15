@@ -134,5 +134,4 @@ class OpenTelemetryMetricsServerTest {
                         ?.points
                         ?.any { it.labels == Labels.of("path", path, "method", method.name, "status", status.code.toString()) } != true) Match else Mismatch(actual.toString())
         }
-
 }

@@ -260,5 +260,4 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
                 .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
                 .done()
         }) {}
-
 }

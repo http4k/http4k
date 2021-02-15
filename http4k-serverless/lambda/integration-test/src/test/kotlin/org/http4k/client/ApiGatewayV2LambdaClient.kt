@@ -38,5 +38,4 @@ class ApiGatewayV2LambdaClient(function: Function, region: Region) : LambdaHttpC
 
     private val requestLens = Body.auto<AwsGatewayProxyRequestV2>().toLens()
     private val responseLens = Body.auto<APIGatewayV2HTTPResponse>().toLens()
-
 }

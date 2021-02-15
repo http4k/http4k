@@ -23,7 +23,6 @@ class AuthenticationComplete(
             .forAuthRequest(authorizationRequest).addResponseTypeValues(authorizationRequest, request)
             .withState(authorizationRequest.state)
             .complete()
-
     }
 
     private fun ResponseRender.addResponseTypeValues(authorizationRequest: AuthRequest, request: Request, response: Response = this.complete()): ResponseRender =

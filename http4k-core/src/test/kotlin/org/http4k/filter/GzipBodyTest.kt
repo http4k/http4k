@@ -33,7 +33,6 @@ class GzipBodyTest {
         fun `the content-encoding for an unmodified body is correct`() {
             assertThat(Body.EMPTY.gzipped().contentEncoding, absent())
         }
-
     }
 
     @Nested
@@ -125,5 +124,4 @@ class GzipBodyTest {
             assertThat(Body("".byteInputStream(Charsets.UTF_8)).gzipped().contentEncoding, absent())
         }
     }
-
 }

@@ -62,5 +62,4 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(
 
         approver.assertApproved(router(Request(GET, "/")))
     }
-
 }

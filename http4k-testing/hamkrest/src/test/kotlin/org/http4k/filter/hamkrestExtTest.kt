@@ -26,5 +26,4 @@ class ExtensionsTest {
 
         assertThat({ ResponseFilters.Assert(hasHeader("bob")).then { Response(OK) }(Request(GET, "")) }, throws<AssertionError>())
     }
-
 }

@@ -121,5 +121,4 @@ class OAuthProviderTest {
 
         assertThat(oAuth(oAuthPersistence).callback(withCodeAndValidState), equalTo(validRedirectToRoot))
     }
-
 }

@@ -29,5 +29,4 @@ class ContentTypeTest {
         assertThat(contentType3.toHeaderValue(), equalTo("bar; bob; bob2=jim"))
         assertThat(contentType3.toHeaderValue(), equalTo("bar; bob; bob2=jim"))
     }
-
 }

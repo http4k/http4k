@@ -40,5 +40,4 @@ class FiltersTest {
         assertThat(files, equalTo(listOf("foo.txt")))
         assertThat(response, hasBody("field=bar&file=foo.txt&field=bar"))
     }
-
 }

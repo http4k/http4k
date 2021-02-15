@@ -202,7 +202,6 @@ internal class AuthoriseRequestErrorRenderTest {
 
         override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> =
             throw UnsupportedOperationException("not needed for this test")
-
     }
 
     private val requestValidator = RequestJWTValidator { _, requestJwtContainer ->

@@ -220,7 +220,6 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
                     endOfStream = true
                     throw ParseError(e)
                 }
-
             }
         }
     }

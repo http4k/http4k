@@ -39,8 +39,6 @@ class Apache4ClientTest : HttpClientContract({ ApacheServer(it) }, Apache4Client
 
             override fun close() {
             }
-
         })(Request(GET, "http://localhost:8000")), hasStatus(CLIENT_TIMEOUT))
     }
-
 }

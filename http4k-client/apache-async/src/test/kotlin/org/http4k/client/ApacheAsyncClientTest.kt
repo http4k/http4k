@@ -55,7 +55,6 @@ class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsy
             override fun initiateShutdown() {}
 
             override fun close() {}
-
         })(Request(GET, "http://localhost:8000")) {
             assertThat(it, hasStatus(CLIENT_TIMEOUT))
             latch.countDown()

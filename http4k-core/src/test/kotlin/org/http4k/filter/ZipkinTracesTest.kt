@@ -40,7 +40,6 @@ class SamplingDecisionTest {
         assertThat(SamplingDecision.from("false"), equalTo(SAMPLE))
         assertThat(SamplingDecision.from("wibble"), equalTo(SAMPLE))
     }
-
 }
 
 class ZipkinTracesTest {
@@ -88,5 +87,4 @@ class ZipkinTracesTest {
     fun `puts expected things onto a request with a sampling decision`() {
         assertThat(ZipkinTraces(expectedWithDecision, Request(GET, "")), equalTo(requestWithDecision))
     }
-
 }

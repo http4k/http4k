@@ -161,7 +161,6 @@ fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder
                 override fun serialize(encoder: Encoder, value: Any) {
                     encoder.encode(mapping(value as OUT))
                 }
-
             }
             this@asConfigurable.serializersModule += (SerializersModule { contextual(Reflection.getOrCreateKotlinClass(mapping.clazz), serializer) })
         }

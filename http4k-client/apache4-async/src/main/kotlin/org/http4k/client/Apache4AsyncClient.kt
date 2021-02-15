@@ -73,7 +73,6 @@ object Apache4AsyncClient {
             private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
             private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
-
         }
     }
 

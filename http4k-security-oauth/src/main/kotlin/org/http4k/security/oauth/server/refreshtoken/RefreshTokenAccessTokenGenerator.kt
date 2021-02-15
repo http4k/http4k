@@ -17,5 +17,4 @@ class RefreshTokenAccessTokenGenerator(private val refreshTokens: RefreshTokens)
             ?: return Failure(InvalidRequest("missing required parameter `refresh_token`"))
         return refreshTokens.refreshAccessToken(clientId, tokenRequest, refreshToken).map { AccessTokenDetails(it) }
     }
-
 }
