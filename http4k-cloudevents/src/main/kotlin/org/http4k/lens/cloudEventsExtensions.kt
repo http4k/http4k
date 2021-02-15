@@ -1,6 +1,5 @@
 package org.http4k.lens
 
-
 import io.cloudevents.CloudEvent
 import io.cloudevents.CloudEventData
 import io.cloudevents.rw.CloudEventDataMapper

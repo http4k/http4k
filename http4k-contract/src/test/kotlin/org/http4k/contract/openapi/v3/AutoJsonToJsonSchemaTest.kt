@@ -100,7 +100,7 @@ class AutoJsonToJsonSchemaTest {
     fun `can write extra properties to map`(approver: Approver) {
         val creator = AutoJsonToJsonSchema(json,
             { _, name ->
-                if(name == "str") {
+                if (name == "str") {
                     Field("hello", false, FieldMetadata("string description", mapOf("key" to "string")))
                 } else {
                     Field(123, false, FieldMetadata("int description", mapOf("key" to 123)))
