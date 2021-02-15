@@ -31,7 +31,7 @@ class Jetty(private val port: Int, private val server: Server) : PolyServerConfi
     })
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
-        if(sse != null) throw UnsupportedOperationException("Jetty does not support sse")
+        if (sse != null) throw UnsupportedOperationException("Jetty does not support sse")
         http?.let { server.insertHandler(http.toJettyHandler()) }
         ws?.let {
             server.insertHandler(
