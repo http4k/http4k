@@ -15,7 +15,6 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-
 class OAuthServerTest {
 
     @Test

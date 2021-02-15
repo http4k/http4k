@@ -8,7 +8,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 
-
 class GoogleCloudFunctionTest {
     @Test
     fun `calls the handler and returns proper body`() {

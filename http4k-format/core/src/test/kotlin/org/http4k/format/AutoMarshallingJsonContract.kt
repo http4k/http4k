@@ -59,4 +59,3 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
         customMarshaller().asA<Unit>("{}")
     }
 }
-

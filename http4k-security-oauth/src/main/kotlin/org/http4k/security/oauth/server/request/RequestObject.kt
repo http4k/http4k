@@ -25,4 +25,3 @@ data class Claims(@JsonProperty("userinfo") val userInfo: Map<String, Claim>? = 
                   @JsonProperty("id_token") val idToken: Map<String, Claim>? = null)
 
 data class Claim(val essential: Boolean = false, val value: String? = null, val values: List<String>? = null)
-

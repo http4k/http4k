@@ -11,4 +11,3 @@ fun main() {
         writeLiveTemplates()
     }.also { println("Wrote settings to: " + it.absolutePath) }
 }
-

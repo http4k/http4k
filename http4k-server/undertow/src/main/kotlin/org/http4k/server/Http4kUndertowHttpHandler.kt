@@ -36,4 +36,3 @@ class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpH
 
     override fun handleRequest(exchange: HttpServerExchange) = safeHandler(exchange.asRequest()).into(exchange)
 }
-

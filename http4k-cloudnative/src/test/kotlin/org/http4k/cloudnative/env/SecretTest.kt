@@ -49,4 +49,3 @@ class SecretTest {
         assertTrue((field.get(secret) as AtomicReference<ByteArray>).get()!!.contentEquals(bytes))
     }
 }
-

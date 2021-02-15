@@ -1,6 +1,5 @@
 package org.http4k.server
 
-
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBufInputStream
 import io.netty.channel.ChannelFactory
@@ -39,7 +38,6 @@ import org.http4k.filter.ServerFilters
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
-
 
 /**
  * Exposed to allow for insertion into a customised Netty server instance
@@ -113,4 +111,3 @@ data class Netty(val port: Int = 8000) : PolyServerConfig {
         override fun port(): Int = if (port > 0) port else address.port
     }
 }
-

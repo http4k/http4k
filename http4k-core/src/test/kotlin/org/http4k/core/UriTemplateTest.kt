@@ -136,4 +136,3 @@ class UriTemplateTest {
 
     private fun pair(v1: String, v2: String) = v1 to v2
 }
-

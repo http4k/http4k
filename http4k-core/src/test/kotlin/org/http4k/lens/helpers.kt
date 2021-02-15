@@ -1,6 +1,5 @@
 package org.http4k.lens
 
-
 import com.natpryce.hamkrest.MatchResult.Match
 import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher

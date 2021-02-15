@@ -35,4 +35,3 @@ class ColouringTest {
         assertThat("test".styled(style, Ansi), equalTo("test$reset"))
     }
 }
-

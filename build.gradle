@@ -193,7 +193,6 @@ allprojects {
             "indent_size",
             "keyword-spacing",
             "no-blank-line-before-rbrace",
-            "no-consecutive-blank-lines",
             "no-multi-spaces",
             "no-trailing-spaces",
             "no-unused-imports",

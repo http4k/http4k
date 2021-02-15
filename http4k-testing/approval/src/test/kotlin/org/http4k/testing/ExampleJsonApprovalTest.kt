@@ -27,7 +27,6 @@ class ExampleJsonApprovalTest {
         approver.assertApproved(app(Request(GET, "/url")))
     }
 
-
     @Test
     fun `check response content with mismatching content type`(approver: Approver) {
         assertThat({ approver.assertApproved(Response(OK)) }, throws<AssertionError>())

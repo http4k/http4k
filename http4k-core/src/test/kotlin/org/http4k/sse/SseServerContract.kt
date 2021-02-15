@@ -72,4 +72,3 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
         )
     }
 }
-

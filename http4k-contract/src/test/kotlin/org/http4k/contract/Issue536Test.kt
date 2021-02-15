@@ -27,4 +27,3 @@ class Issue536Test {
         assertThat(app(Request(GET, "/G%C3%BCnter")), hasStatus(OK))
     }
 }
-

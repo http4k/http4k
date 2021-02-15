@@ -17,7 +17,6 @@ import org.http4k.security.google
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
-
 fun main() {
 
     // set these before running this example

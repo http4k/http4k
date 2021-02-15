@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
 
-
 abstract class TemplatesContract<out T : Templates>(protected val templates: T) {
 
     private val items = listOf(

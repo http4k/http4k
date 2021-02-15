@@ -9,4 +9,3 @@ interface ErrorResponseRenderer {
     fun badRequest(lensFailure: LensFailure) = Response(BAD_REQUEST)
     fun notFound() = Response(NOT_FOUND)
 }
-

@@ -24,7 +24,6 @@ object MyGraphQLHandler : GraphQLHandler {
             listOf()
         )).build()
 
-
     override fun invoke(request: GraphQLRequest) = GraphQLResponse.from(graphQL.execute(request.query))
 }
 

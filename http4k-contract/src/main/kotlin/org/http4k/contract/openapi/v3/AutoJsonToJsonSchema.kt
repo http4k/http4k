@@ -67,7 +67,6 @@ class AutoJsonToJsonSchema<NODE : Any>(
             metadata
         )
 
-
     private fun NODE.toObjectOrMapSchema(
         objName: String?,
         obj: Any,

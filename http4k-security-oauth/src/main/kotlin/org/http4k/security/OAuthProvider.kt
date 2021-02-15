@@ -50,4 +50,3 @@ class OAuthProvider(
 
     companion object
 }
-

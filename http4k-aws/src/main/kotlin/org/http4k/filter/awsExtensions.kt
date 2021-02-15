@@ -54,7 +54,6 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                     } ?: this
                 }
 
-
             val canonicalRequest = AwsCanonicalRequest.of(fullRequest, payload)
 
             val signedRequest = fullRequest

@@ -22,4 +22,3 @@ class MustHaveRedirectUri(private val delegate: AuthoriseRequestValidator) : Aut
     }
 
 }
-

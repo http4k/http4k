@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-
 import org.http4k.contract.PreFlightExtraction.Companion
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -94,4 +93,3 @@ private fun PathSegments.extract(lenses: List<PathLens<*>>): ExtractedParts? =
         )
         else -> null
     }
-

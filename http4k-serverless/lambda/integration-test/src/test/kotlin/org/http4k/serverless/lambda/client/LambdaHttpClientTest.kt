@@ -49,4 +49,3 @@ class LambdaAlbHttpClientTest : LambdaHttpClientTest(ApplicationLoadBalancer, ::
 class InvocationLambdaClientTest : LambdaHttpClientTest(Invocation, ::InvocationLambdaClient)
 
 private fun unsupportedFeature() = assumeTrue(false, "Unsupported feature")
-

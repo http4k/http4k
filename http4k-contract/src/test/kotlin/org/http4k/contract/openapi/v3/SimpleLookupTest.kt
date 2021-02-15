@@ -36,4 +36,3 @@ class SimpleLookupTest {
         assertThat("non existent", { SimpleLookup()(KotlinBean(), "non existent") }, throws<NoFieldFound>())
     }
 }
-

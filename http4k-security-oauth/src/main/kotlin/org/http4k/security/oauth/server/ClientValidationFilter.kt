@@ -31,4 +31,3 @@ class ClientValidationFilter(private val authoriseRequestValidator: AuthoriseReq
         val validResponseTypes = ResponseType.values().map { it.queryParameterValue }
     }
 }
-
