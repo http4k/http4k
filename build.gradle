@@ -181,22 +181,6 @@ allprojects {
         enableExperimentalRules = false
         version = "0.40.0"
         debug = false
-        disabledRules = [
-            "chain-wrapping",
-            "colon-spacing",
-            "comma-spacing",
-            "comment-spacing",
-            "curly-spacing",
-            "filename",
-            "import-ordering",
-            "indent",
-            "indent_size",
-            "no-unused-imports",
-            "no-wildcard-imports",
-            "parameter-list-wrapping",
-            "range-spacing",
-            "string-template",
-        ]
     }
 }
 
