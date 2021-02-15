@@ -18,5 +18,5 @@ ij_continuation_indent_size = 4
 ij_continuation_indent_size = 4
 ij_kotlin_name_count_to_use_star_import = 99
 ij_kotlin_name_count_to_use_star_import_for_members = 99
-disabled_rules=chain-wrapping,colon-spacing,comma-spacing,comment-spacing,curly-spacing,filename,import-ordering,indent,indent_size,no-unused-imports,no-wildcard-imports,parameter-list-wrapping,range-spacing,string-template
+disabled_rules = chain-wrapping,colon-spacing,comma-spacing,comment-spacing,curly-spacing,filename,import-ordering,indent,indent_size,no-unused-imports,no-wildcard-imports,parameter-list-wrapping,range-spacing,string-template
 
