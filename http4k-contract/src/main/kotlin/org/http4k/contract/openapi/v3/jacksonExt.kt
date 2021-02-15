@@ -56,7 +56,7 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
             ?.let { it.createInstance() as PropertyNamingStrategy }
             ?: json.mapper.propertyNamingStrategy
 
-        return if ( namingStrategy is PropertyNamingStrategies.NamingBase) {
+        return if (namingStrategy is PropertyNamingStrategies.NamingBase) {
             { name: String -> namingStrategy.translate(name) }
         } else {
             { name -> name }

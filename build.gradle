@@ -194,7 +194,6 @@ allprojects {
             "keyword-spacing",
             "no-unused-imports",
             "no-wildcard-imports",
-            "paren-spacing",
             "parameter-list-wrapping",
             "range-spacing",
             "string-template",
