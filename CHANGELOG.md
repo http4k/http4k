@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 ### v4.3.2.1
 - **http4k-core** : Fix bug with `ResourceLoader.Directory`.
+- **http4k-core** : Added values4k extensions for Lenses.
+- **http4k-cloudevents** : Jackson is now bundled with the JAR.
 
 ### v4.3.2.0
 - **http4k-*** : Upgrade some dependency versions
