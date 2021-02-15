@@ -47,7 +47,6 @@ class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
                     override fun succeeded() = session.flush(object : Callback {})
                 })
             }
-
         }.apply(wSocket)
         callback.succeeded()
     }

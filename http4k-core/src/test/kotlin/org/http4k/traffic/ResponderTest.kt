@@ -38,5 +38,4 @@ class ResponderTest {
         assertThat(responder(request2), equalTo(response))
         assertThat(responder(Request(GET, "/rita")), hasStatus(SERVICE_UNAVAILABLE))
     }
-
 }

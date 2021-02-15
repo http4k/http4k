@@ -42,5 +42,4 @@ class MultipartIteratorTest {
             MultipartEntity.Field("field2", "bar2", listOf("Content-Disposition" to "form-data; name=\"field2\""))
         )))
     }
-
 }

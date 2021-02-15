@@ -115,5 +115,4 @@ class EndToEndTest {
         assertThat(response, hasStatus(OK).and(hasBody("the answer is 579")))
         assertThat(recorderHttp.calls, equalTo(listOf(579)))
     }
-
 }

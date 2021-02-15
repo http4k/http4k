@@ -431,5 +431,4 @@ class ServerFiltersTest {
 
         assertThat(handler(Request(GET, "/")), hasContentType(OCTET_STREAM))
     }
-
 }

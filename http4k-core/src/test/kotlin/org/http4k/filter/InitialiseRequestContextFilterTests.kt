@@ -54,5 +54,4 @@ class InitialiseRequestContextFilterTests {
 
         assertThat(app(Request(Method.GET, "/")), hasBody("foobar"))
     }
-
 }

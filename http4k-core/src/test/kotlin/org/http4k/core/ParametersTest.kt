@@ -37,5 +37,4 @@ class ParametersTest {
         assertThat(map.getFirst("b"), equalTo("B"))
         assertThat(map.getFirst("c"), absent())
     }
-
 }

@@ -18,5 +18,4 @@ class FreemarkerViewModelTest : ViewModelContract(FreemarkerTemplates()) {
 
         assertThat(renderer(HtmlFeature("pretty")), equalTo("<html><span>pretty</span></html>"))
     }
-
 }

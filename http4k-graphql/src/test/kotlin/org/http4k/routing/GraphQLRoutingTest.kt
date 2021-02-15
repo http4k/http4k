@@ -53,5 +53,4 @@ class GraphQLRoutingTest {
                 .and(hasBody(asFormatString(graphQLResponse)))
         )
     }
-
 }

@@ -72,5 +72,4 @@ class StaticPrefixRoutingTest {
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("contents of bar/bar/bar-xyz.html"))
     }
-
 }

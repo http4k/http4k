@@ -246,5 +246,4 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
         assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
     }
-
 }

@@ -38,5 +38,4 @@ class LensFailureTest {
         assertThat(invalid.toString(), equalTo("query 'name' must be boolean"))
         assertThat(unsupported.toString(), equalTo("header 'content-type' is not acceptable"))
     }
-
 }

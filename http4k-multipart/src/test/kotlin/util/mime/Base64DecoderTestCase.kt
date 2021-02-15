@@ -84,7 +84,6 @@ class Base64DecoderTestCase {
             Base64Decoder.decode(x, ByteArrayOutputStream())
         } catch (e: IOException) {
         }
-
     }
 
     @Test

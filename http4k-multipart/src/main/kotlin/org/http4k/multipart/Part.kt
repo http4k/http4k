@@ -38,5 +38,4 @@ internal sealed class Part(fieldName: String?, formField: Boolean, contentType: 
             // do nothing
         }
     }
-
 }

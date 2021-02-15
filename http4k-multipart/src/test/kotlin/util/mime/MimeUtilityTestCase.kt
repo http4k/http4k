@@ -73,6 +73,5 @@ class MimeUtilityTestCase {
             MimeUtility.decodeText("=?invalid?B?xyz-?=")
         } catch (e: UnsupportedEncodingException) {
         }
-
     }
 }

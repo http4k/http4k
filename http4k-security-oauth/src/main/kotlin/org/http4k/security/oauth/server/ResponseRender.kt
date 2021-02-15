@@ -32,7 +32,6 @@ interface ResponseRender {
                 } else {
                     QueryResponseRender(redirectUri)
                 }
-
             }
     }
 }
@@ -42,7 +41,6 @@ class QueryResponseRender(private val uri: Uri) : ResponseRender {
     override fun addParameter(key: String, value: String?): ResponseRender = QueryResponseRender(uri.query(key, value))
 
     override fun complete(): Response = Response(SEE_OTHER).header("Location", uri.toString())
-
 }
 
 class FragmentResponseRender(private val uri: Uri) : ResponseRender {
@@ -50,5 +48,4 @@ class FragmentResponseRender(private val uri: Uri) : ResponseRender {
     override fun addParameter(key: String, value: String?): ResponseRender = FragmentResponseRender(uri.fragmentParameter(key, value))
 
     override fun complete(): Response = Response(SEE_OTHER).header("Location", uri.toString())
-
 }

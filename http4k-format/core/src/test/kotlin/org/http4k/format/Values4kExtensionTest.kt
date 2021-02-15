@@ -33,5 +33,4 @@ class Values4kExtensionTest {
         mapping.value(StringValueFactory(::TV))
         mapping.value(LocalDateTimeValueFactory(::TV))
     }
-
 }

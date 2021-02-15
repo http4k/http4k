@@ -26,5 +26,4 @@ class StatusTest {
 
         assertThat(status.description, equalTo("No description"))
     }
-
 }

@@ -65,5 +65,4 @@ class XmlTest {
         assertThat(out.asXmlString(), equalTo(xmlString))
         assertThat(lens(out, Request(GET, "/")), equalTo(original))
     }
-
 }

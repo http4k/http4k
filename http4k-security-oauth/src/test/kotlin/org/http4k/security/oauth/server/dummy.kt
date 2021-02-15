@@ -31,7 +31,6 @@ class DummyIdTokens(private val username: String? = null) : IdTokens {
 
     override fun createForAccessToken(authorizationCodeDetails: AuthorizationCodeDetails, code: AuthorizationCode, accessToken: AccessToken): IdToken =
         IdToken("dummy-id-token-for-access-token")
-
 }
 
 class DummyAccessTokens : AccessTokens {
@@ -56,7 +55,6 @@ class DummyRefreshTokens : RefreshTokens {
             scope = "openid",
             refreshToken = RefreshToken("new-valid-refresh-token"))
     }
-
 }
 
 class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {

@@ -146,7 +146,6 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
             }
             .map(fn)
             .asSequence()
-
 }
 
 private inline fun <reified T : HttpMessage> headerLine() = """### ${T::class.java.simpleName} headers recorded for playback"""

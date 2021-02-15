@@ -36,5 +36,4 @@ class ReadWriteStreamTest {
         assertThat(stream.requests().toList(), equalTo(listOf(request, otherRequest)))
         assertThat(stream.responses().toList(), equalTo(listOf(response, otherResponse)))
     }
-
 }
