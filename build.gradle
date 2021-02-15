@@ -191,7 +191,6 @@ allprojects {
             "import-ordering",
             "indent",
             "indent_size",
-            "keyword-spacing",
             "no-unused-imports",
             "no-wildcard-imports",
             "parameter-list-wrapping",
