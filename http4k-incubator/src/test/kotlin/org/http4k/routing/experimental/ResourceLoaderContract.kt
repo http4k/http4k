@@ -49,6 +49,11 @@ abstract class ResourceLoaderContract(private val loader: Router) {
         checkContents("notAFile", null, TEXT_HTML)
     }
 
+    @Test
+    fun `does not serve below route`() {
+        checkContents("../../../../.java-version", null, TEXT_HTML)
+    }
+
     protected fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
         val request = Request(GET, of(path))
         if (expected == null)

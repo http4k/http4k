@@ -35,6 +35,11 @@ class ResourceLoaderTest {
     }
 
     @Test
+    fun `directory loader should not load resources above the base directory`() {
+        assertThat(Directory("./src/test/resources").load("../../../../.java-version"), absent())
+    }
+
+    @Test
     fun `directory loader for missing file`() {
         assertThat(Directory("./src/test/resources").load("notAFile"), absent())
     }

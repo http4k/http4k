@@ -13,6 +13,7 @@ internal data class DirectoryResourceLoader(
 
     override fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
         when {
+            toPath().normalize().startsWith("..") -> null
             isFile -> FileResource(this, mimeTypes.forFile(path))
             isDirectory -> match(indexFileIn(path)) ?: directoryRenderer?.let { directoryRenderingHandler(this, it) }
             else -> null
