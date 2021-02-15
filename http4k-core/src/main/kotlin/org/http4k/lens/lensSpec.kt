@@ -187,7 +187,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>> =
-            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default })
+            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
         override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
