@@ -192,7 +192,6 @@ allprojects {
             "indent",
             "indent_size",
             "keyword-spacing",
-            "no-multi-spaces",
             "no-trailing-spaces",
             "no-unused-imports",
             "no-wildcard-imports",

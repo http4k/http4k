@@ -24,7 +24,7 @@ class AppLoadBalancerHttpClientTest :
     HttpClientContract({ NoOpServerConfig }, client(), client()) {
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
-    override fun `unknown host are converted into 503`()  = assumeTrue(false, "Unsupported client feature")
+    override fun `unknown host are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can send multiple cookies`() = assumeTrue(false, "Unsupported feature")
