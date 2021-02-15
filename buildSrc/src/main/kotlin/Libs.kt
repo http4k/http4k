@@ -183,6 +183,8 @@ public object Libs {
 
     public const val junit_jupiter_engine: String = "org.junit.jupiter:junit-jupiter-engine:_"
 
+    public const val ktlint_gradle: String = "org.jlleitschuh.gradle:ktlint-gradle:_"
+
     public const val alpn_boot: String = "org.mortbay.jetty.alpn:alpn-boot:_"
 
     public const val openapi_generator_gradle_plugin: String =
