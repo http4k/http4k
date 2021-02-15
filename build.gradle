@@ -188,7 +188,6 @@ allprojects {
             "comment-spacing",
             "curly-spacing",
             "filename",
-            "final-newline",
             "import-ordering",
             "indent",
             "indent_size",
