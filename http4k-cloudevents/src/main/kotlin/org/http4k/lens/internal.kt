@@ -68,4 +68,3 @@ internal class BinaryMessageReader(version: SpecVersion, private val request: Ht
 
     override fun toCloudEventsValue(value: String): String = value
 }
-
