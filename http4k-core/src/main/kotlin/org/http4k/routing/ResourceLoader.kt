@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import java.io.File
 import java.net.URL
+import java.nio.file.Path
 
 /**
  * Looks up contents of a resource path.
@@ -41,9 +42,11 @@ fun interface ResourceLoader {
 
             override fun load(path: String) = File(finalBaseDir, path)
                 .let {
-                    if (it.exists() && it.isFile && !it.toPath().normalize().startsWith("..")) it.toURI().toURL()
+                    if (it.exists() && it.isFile && it.isUnder(finalBaseDir)) it.toURI().toURL()
                     else null
                 }
+
+            private fun File.isUnder(baseDir: String) = canonicalPath.startsWith(File(baseDir).canonicalPath)
         }
     }
 }
