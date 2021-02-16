@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.3.2.2 (uncut)
+- **http4k-core** : Fix "and" logic when mixing handler + request routers.
+
 ### v4.3.2.1
 - **http4k-core** : Fix #580 - `ResourceLoader.Directory` can load resources outside of root directory.
 - **http4k-core** : Added values4k extensions for Lenses.
