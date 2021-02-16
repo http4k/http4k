@@ -3,7 +3,6 @@ package org.http4k.routing.experimental
 import org.http4k.core.HttpHandler
 import org.http4k.core.MimeTypes
 import java.io.File
-import java.nio.file.Path
 import java.time.Instant
 
 internal data class DirectoryResourceLoader(
