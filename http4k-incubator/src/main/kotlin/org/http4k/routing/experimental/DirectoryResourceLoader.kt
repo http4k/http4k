@@ -3,6 +3,7 @@ package org.http4k.routing.experimental
 import org.http4k.core.HttpHandler
 import org.http4k.core.MimeTypes
 import java.io.File
+import java.nio.file.Path
 import java.time.Instant
 
 internal data class DirectoryResourceLoader(
@@ -13,12 +14,14 @@ internal data class DirectoryResourceLoader(
 
     override fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
         when {
-            toPath().normalize().startsWith("..") -> null
+            !isUnder(baseDir) -> null
             isFile -> FileResource(this, mimeTypes.forFile(path))
             isDirectory -> match(indexFileIn(path)) ?: directoryRenderer?.let { directoryRenderingHandler(this, it) }
             else -> null
         }
     }
+
+    private fun File.isUnder(baseDir: String) = canonicalPath.startsWith(File(baseDir).canonicalPath)
 
     private fun indexFileIn(path: String) = path.pathJoin("index.html")
 
