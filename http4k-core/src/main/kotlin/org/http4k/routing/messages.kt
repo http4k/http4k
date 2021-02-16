@@ -9,7 +9,15 @@ import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import java.io.InputStream
 
-data class RoutedRequest(private val delegate: Request, val xUriTemplate: UriTemplate) : Request by delegate {
+interface RequestWithRoute : Request {
+    val xUriTemplate: UriTemplate
+}
+
+interface ResponseWithRoute : Response {
+    val xUriTemplate: UriTemplate
+}
+
+data class RoutedRequest(private val delegate: Request, override val xUriTemplate: UriTemplate) : Request by delegate, RequestWithRoute {
     override fun equals(other: Any?): Boolean = delegate == other
 
     override fun hashCode(): Int = delegate.hashCode()
@@ -37,7 +45,7 @@ data class RoutedRequest(private val delegate: Request, val xUriTemplate: UriTem
     override fun body(body: InputStream, length: Long?): Request = RoutedRequest(delegate.body(body, length), xUriTemplate)
 }
 
-class RoutedResponse(private val delegate: Response, val xUriTemplate: UriTemplate) : Response by delegate {
+class RoutedResponse(private val delegate: Response, override val xUriTemplate: UriTemplate) : Response by delegate, ResponseWithRoute {
     override fun equals(other: Any?): Boolean = delegate == other
 
     override fun hashCode(): Int = delegate.hashCode()

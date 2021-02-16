@@ -15,7 +15,7 @@ fun ((Request) -> Boolean).asRouter(): Router = object : Router {
 }
 
 fun Request.path(name: String): String? = when (this) {
-    is RoutedRequest -> xUriTemplate.extract(uri.path)[name]
+    is RequestWithRoute -> xUriTemplate.extract(uri.path)[name]
     else -> throw IllegalStateException("Request was not routed, so no uri-template present")
 }
 
