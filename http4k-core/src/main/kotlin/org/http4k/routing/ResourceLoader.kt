@@ -2,7 +2,6 @@ package org.http4k.routing
 
 import java.io.File
 import java.net.URL
-import java.nio.file.Path
 
 /**
  * Looks up contents of a resource path.
