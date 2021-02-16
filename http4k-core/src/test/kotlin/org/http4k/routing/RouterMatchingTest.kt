@@ -8,10 +8,12 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.matches
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
+import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Disabled
@@ -124,10 +126,10 @@ class RouterMatchingTest {
     }
 
     @Test
-    @Disabled
     fun `composite router with a bound router`() {
-        val getRouter: RoutingHttpHandler = GET.bind { Response(Status.OK) }
-        val router = getRouter.and(header("secret", "handshake"))
+        val router = GET.bind { Response(OK) }.and(header("foo", "bar"))
+
         assertThat(router.match(Request(GET, "")), isA<Unmatched>())
+        assertThat(router.match(Request(GET, "").header("foo", "bar")), isA<MatchingHandler>())
     }
 }
