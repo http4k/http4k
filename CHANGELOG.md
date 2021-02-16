@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.3.2.2 (uncut)
+### v4.3.2.2
 - **http4k-core** : Fix "and" logic when mixing handler + request routers.
+- **http4k-core** : Extend #580 fix to cover absolute paths.
 
 ### v4.3.2.1
 - **http4k-core** : Fix #580 - `ResourceLoader.Directory` can load resources outside of root directory.
