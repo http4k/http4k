@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.3.3.0 (uncut)
+- **http4k-core** : Introduce `RequestWithRoute` and `ResponseWithRoute` to allow extending messages post-routing. H/T @jenarros
+
 ### v4.3.2.2
 - **http4k-core** : Fix "and" logic when mixing handler + request routers.
 - **http4k-core** : Extend #580 fix to cover absolute paths.
