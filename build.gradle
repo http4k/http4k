@@ -18,7 +18,10 @@ buildscript {
 plugins {
     id "com.jfrog.bintray"
     id "org.jetbrains.dokka"
+    id "io.codearte.nexus-staging" version '0.22.0'
 }
+
+apply plugin: 'io.codearte.nexus-staging'
 
 allprojects {
     repositories {
@@ -91,11 +94,30 @@ allprojects {
 
     artifacts {
         testArtifacts testJar
+        archives sourcesJar, javadocJar
     }
 
     if (hasAnArtifact(project)) {
+        def enableSigning = project.findProperty('sign') == "true"
+
         apply plugin: 'com.jfrog.bintray'
-        apply plugin: 'maven-publish'
+        apply plugin: 'maven-publish' // required to configure bintray
+
+        apply plugin: 'maven' // required to upload to sonatype
+
+        if (enableSigning) { // when added it expects signing keys to be configured
+            apply plugin: 'signing'
+
+            signing {
+                def signingKey = findProperty("signingKey")
+                def signingPassword = findProperty("signingPassword")
+
+                useInMemoryPgpKeys(signingKey, signingPassword)
+                sign configurations.archives
+            }
+        }
+
+        /** start of bintray deployment config **/
         publishing {
             publications {
                 mavenJava(MavenPublication) {
@@ -167,6 +189,60 @@ allprojects {
                 }
             }
         }
+        /** end of bintray deployment config **/
+
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                    def nexusUsername = project.findProperty('nexusUsername') ?: "notset"
+                    def nexusPassword = project.findProperty('nexusPassword') ?: "notset"
+
+                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                        authentication(userName: nexusUsername, password: nexusPassword)
+                    }
+
+                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                        authentication(userName: nexusUsername, password: nexusPassword)
+                    }
+
+                    pom.project {
+                        name archivesBaseName
+                        packaging 'jar'
+                        description description
+                        url 'https://github.com/http4k/http4k'
+
+                        scm {
+                            connection 'https://github.com/http4k/http4k.git'
+                            developerConnection 'git@github.com:http4k/http4k.git'
+                            url 'https://github.com/http4k/http4k'
+                        }
+
+                        licenses {
+                            license {
+                                name 'Apache License, Version 2.0'
+                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id 'daviddenton'
+                                name 'David Denton'
+                                email 'david@http4k.org'
+                            }
+                            developer {
+                                id 's4nchez'
+                                name 'Ivan Sanchez'
+                                email 'ivan@http4k.org'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     jacocoTestReport {
