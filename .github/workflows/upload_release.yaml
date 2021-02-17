@@ -1,0 +1,50 @@
+on:
+  push:
+    tags:
+      - '*'
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+jobs:
+  Bintray:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Upload to Bintray
+        run: ./release-ci.sh
+        env:
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+          SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+          SONATYPE_KEY: ${{ secrets.SONATYPE_KEY }}
+      - name: Grab tag name
+        uses: olegtarasov/get-tag@v2
+        id: tagName
+      - name: Dispatch Release Event
+        uses: peter-evans/repository-dispatch@v1.1.1
+        with:
+          token: ${{ secrets.ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING }}
+          repository: http4k/http4k
+          event-type: http4k-release
+          client-payload: '{"version": "${{ steps.tagName.outputs.tag }}"}'
+  Sonatype:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Grab tag name
+        uses: olegtarasov/get-tag@v2
+        id: tagName
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Upload to Sonatype
+        run: |
+          ./gradlew uploadArchives \
+          -Psign=true \
+          -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
+          -PsigningKey="${{ secrets.SIGNING_KEY }}" \
+          -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}" \
+          -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
+          -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
