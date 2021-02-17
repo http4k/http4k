@@ -12,6 +12,7 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.operationId
+import org.http4k.contract.openapi.v3.value
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
@@ -25,6 +26,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 
@@ -83,16 +85,22 @@ open class OpenApi2<out NODE>(
     private fun normalisePath(path: String): String = if (path == "") "/" else path
 
     private fun Meta.renderMeta(schema: JsonSchema<NODE>? = null) = json {
+        val meta = paramMeta
         obj(
             listOf(
                 "in" to string(location),
                 "name" to string(name),
-                "required" to boolean(required),
-                when (ParamMeta.ObjectParam) {
-                    paramMeta -> "schema" to (schema?.node ?: obj("type" to string(paramMeta.value)))
-                    else -> "type" to string(paramMeta.value)
-                }
-            ) + (description?.let { listOf("description" to string(it)) } ?: emptyList())
+                "required" to boolean(required)
+            ) +
+                when (meta) {
+                    ObjectParam -> listOf("schema" to (schema?.node ?: obj("type" to string(meta.value))))
+                    is ParamMeta.ArrayParam -> listOf(
+                        "type" to string("array"),
+                        "items" to obj("type" to string(meta.itemType().value))
+                    )
+                    else -> listOf("type" to string(meta.value))
+                } +
+                (description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
     }
 
@@ -141,8 +149,7 @@ open class OpenApi2<out NODE>(
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
-                    "security" to array(
-                        security)
+                    "security" to array(security)
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(

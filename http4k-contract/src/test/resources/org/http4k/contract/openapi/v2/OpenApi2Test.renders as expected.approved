@@ -914,6 +914,9 @@
             "name": "b",
             "required": true,
             "type": "array",
+            "items": {
+              "type": "boolean"
+            },
             "description": "booleanQuery"
           },
           {
