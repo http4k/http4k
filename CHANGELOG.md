@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.3.4.0 (uncut)
+- **http4k-contract** : Support Array of parameters in OpenApi2/3 specs.
+- **http4k-template-freemarker** : Improvements to configuration of engine. 
+- **http4k-*** : Upgrade some dependency versions
+
 ### v4.3.3.0
 - **http4k-core** : Introduce `RequestWithRoute` and `ResponseWithRoute` to allow extending messages post-routing. H/T @jenarros
 

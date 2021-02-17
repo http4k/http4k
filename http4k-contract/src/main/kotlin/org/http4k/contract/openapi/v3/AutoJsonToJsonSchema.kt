@@ -6,6 +6,7 @@ import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
+import org.http4k.lens.ParamMeta.NullParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -30,7 +31,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     private fun NODE.toSchema(value: Any, objName: String?, topLevel: Boolean) =
         when (val param = json.typeOf(this).toParam()) {
-            ArrayParam -> toArraySchema("", value, false, null)
+            is ArrayParam -> toArraySchema("", value, false, null)
             ObjectParam -> toObjectOrMapSchema(objName, value, false, topLevel, null)
             else -> toSchema("", param, false, null)
         }
@@ -137,7 +138,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
         isNullable: Boolean,
         metadata: FieldMetadata?
     ) = when (val param = json.typeOf(field).toParam()) {
-        ArrayParam -> field.toArraySchema(fieldName, value, isNullable, metadata)
+        is ArrayParam -> field.toArraySchema(fieldName, value, isNullable, metadata)
         ObjectParam -> field.toObjectOrMapSchema(fieldName, value, isNullable, false, metadata)
         else -> with(field) {
             value.javaClass.enumConstants
@@ -161,7 +162,7 @@ fun interface SchemaModelNamer : (Any) -> String {
 
 private sealed class ArrayItem {
     data class Array(val items: Items) : ArrayItem() {
-        val type = ArrayParam.value
+        val type = ArrayParam(NullParam).value
     }
 
     class NonObject(paramMeta: ParamMeta) : ArrayItem() {
@@ -227,11 +228,11 @@ private sealed class SchemaNode(
     }
 
     class Array(name: String, isNullable: Boolean, val items: Items, example: Any?, metadata: FieldMetadata?) :
-        SchemaNode(name, ArrayParam, isNullable, example, metadata) {
+        SchemaNode(name, ArrayParam(items.definitions().map { it.paramMeta() }.toSet().firstOrNull() ?: NullParam), isNullable, example, metadata) {
         val type = paramMeta().value
 
         override fun arrayItem() = when (paramMeta()) {
-            ArrayParam -> ArrayItem.Array(items)
+            is ArrayParam -> ArrayItem.Array(items)
             ObjectParam -> ArrayItem.Ref(name())
             else -> ArrayItem.NonObject(paramMeta())
         }
@@ -278,7 +279,7 @@ private fun JsonType.toParam() = when (this) {
     JsonType.Integer -> IntegerParam
     JsonType.Number -> NumberParam
     JsonType.Boolean -> BooleanParam
-    JsonType.Array -> ArrayParam
+    JsonType.Array -> ArrayParam(NullParam)
     JsonType.Object -> ObjectParam
     JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
 }

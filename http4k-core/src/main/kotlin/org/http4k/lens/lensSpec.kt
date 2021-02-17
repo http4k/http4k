@@ -1,5 +1,6 @@
 package org.http4k.lens
 
+import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
@@ -187,7 +188,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>> =
-            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
+            defaulted(name, Lens(Meta(false, location, ArrayParam(paramMeta), name, description)) { default }, description)
 
         override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
@@ -201,7 +202,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
         override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?> {
             val getLens = get(name)
             val setLens = set(name)
-            return BiDiLens(Meta(false, location, paramMeta, name, description),
+            return BiDiLens(Meta(false, location, ArrayParam(paramMeta), name, description),
                 { getLens(it).run { if (isEmpty()) null else this } },
                 { out: List<OUT>?, target: IN -> setLens(out ?: emptyList(), target) }
             )
@@ -210,8 +211,8 @@ open class BiDiLensSpec<IN : Any, OUT>(
         override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
-            return BiDiLens(Meta(true, location, paramMeta, name, description),
-                { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)), target = it) else this } },
+            return BiDiLens(Meta(true, location, ArrayParam(paramMeta), name, description),
+                { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, ArrayParam(paramMeta), name, description)), target = it) else this } },
                 { out: List<OUT>, target: IN -> setLens(out, target) })
         }
     }
