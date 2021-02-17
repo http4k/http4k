@@ -913,7 +913,7 @@
             "in": "query",
             "name": "b",
             "required": true,
-            "type": "boolean",
+            "type": "array",
             "description": "booleanQuery"
           },
           {

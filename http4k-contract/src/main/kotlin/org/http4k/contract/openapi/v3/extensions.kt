@@ -12,7 +12,7 @@ import org.http4k.lens.ParamMeta.StringParam
 
 val ParamMeta.value
     get() = when (this) {
-        ArrayParam -> "array"
+        is ArrayParam -> "array"
         StringParam -> "string"
         ObjectParam -> "object"
         BooleanParam -> "boolean"

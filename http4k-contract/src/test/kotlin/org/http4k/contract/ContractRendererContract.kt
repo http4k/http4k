@@ -91,7 +91,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
             } bindContract GET to { Response(OK) }
             routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") bindContract POST to { a, _, _ -> { Response(OK).body(a) } }
             routes += "/queries" meta {
-                queries += Query.boolean().required("b", "booleanQuery")
+                queries += Query.boolean().multi.required("b", "booleanQuery")
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += json.lens(Query).optional("j", "jsonQuery")

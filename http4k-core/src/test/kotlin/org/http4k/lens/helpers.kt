@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.StringParam
 
 object BiDiLensContract {
@@ -39,7 +40,7 @@ object BiDiLensContract {
         assertThat((spec.map { it.toString() }.multi.optional("hello"))(validValue), equalTo(listOf(tValue.toString())))
         assertThat(optionalMultiLens(nullValue), absent())
         invalidValue?.let {
-            assertThat({ optionalMultiLens(invalidValue) }, throws(lensFailureWith<IN>(Invalid(optionalLens.meta), overallType = Failure.Type.Invalid)))
+            assertThat({ optionalMultiLens(invalidValue) }, throws(lensFailureWith<IN>(Invalid(optionalLens.meta.copy(paramMeta = ArrayParam(optionalLens.meta.paramMeta))), overallType = Failure.Type.Invalid)))
         }
         assertThat(optionalMultiLens(listOf(tValue, tValue), unmodifiedValue), equalTo(listModifiedValue))
 
@@ -55,9 +56,9 @@ object BiDiLensContract {
         val requiredMultiLens = spec.multi.required("hello")
         assertThat(requiredMultiLens(validValue), equalTo(listOf(tValue)))
         assertThat((spec.map { it.toString() }.multi.required("hello"))(validValue), equalTo(listOf(tValue.toString())))
-        assertThat({ requiredMultiLens(nullValue) }, throws(lensFailureWith<IN>(Missing(requiredLens.meta), overallType = Failure.Type.Missing)))
+        assertThat({ requiredMultiLens(nullValue) }, throws(lensFailureWith<IN>(Missing(requiredMultiLens.meta.copy(paramMeta = ArrayParam(requiredLens.meta.paramMeta))), overallType = Failure.Type.Missing)))
         invalidValue?.let {
-            assertThat({ requiredMultiLens(invalidValue) }, throws(lensFailureWith<IN>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+            assertThat({ requiredMultiLens(invalidValue) }, throws(lensFailureWith<IN>(Invalid(requiredMultiLens.meta.copy(paramMeta = ArrayParam(requiredLens.meta.paramMeta))), overallType = Failure.Type.Invalid)))
         }
         assertThat(requiredMultiLens(listOf(tValue, tValue), unmodifiedValue), equalTo(listModifiedValue))
 
