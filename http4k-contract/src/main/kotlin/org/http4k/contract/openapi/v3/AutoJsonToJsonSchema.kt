@@ -162,7 +162,7 @@ fun interface SchemaModelNamer : (Any) -> String {
 
 private sealed class ArrayItem {
     data class Array(val items: Items) : ArrayItem() {
-        val type = ArrayParam(items.definitions().map { it.paramMeta() }.toSet().firstOrNull() ?: NullParam)
+        val type = ArrayParam(NullParam).value
     }
 
     class NonObject(paramMeta: ParamMeta) : ArrayItem() {
