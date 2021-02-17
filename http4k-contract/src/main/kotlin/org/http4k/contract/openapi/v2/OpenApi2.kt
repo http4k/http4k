@@ -12,7 +12,6 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.operationId
-import org.http4k.contract.openapi.v3.value
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
