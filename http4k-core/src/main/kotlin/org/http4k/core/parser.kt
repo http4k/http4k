@@ -23,9 +23,9 @@ private fun lines(message: String, lineBreak: String): List<String> =
 
 private fun parseStatus(value: String): Status {
     val values = value.split(" ", limit = 3)
-    if (values.size < 3) throw IllegalArgumentException("Invalid status line: $value")
+    if (values.size < 2) throw IllegalArgumentException("Invalid status line: $value")
     val code = values[1].toIntOrNull() ?: throw IllegalArgumentException("Invalid HTTP status: ${values[1]}")
-    return Status(code, values[2])
+    return Status(code, values.getOrElse(2) { "" })
 }
 
 private fun parseBody(bodyLines: List<String>): Body = Body(bodyLines.joinToString(""))
