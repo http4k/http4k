@@ -64,6 +64,14 @@ body""".toPayload()), equalTo(Response(OK)
     }
 
     @Test
+    fun `parse status without description`() {
+        assertThat(Response.parse("""
+HTTP/1.1 200
+
+""".toPayload()), equalTo(Response(Status(200, ""))))
+    }
+
+    @Test
     fun `cannot parse empty request`() {
         assertParsingFailure({ Request.parse("") }, "Empty message")
     }
@@ -89,8 +97,10 @@ body""".toPayload()), equalTo(Response(OK)
     }
 
     @Test
-    fun `cannot parse invalid response status line`() {
-        assertParsingFailure({ Response.parse("do it") }, "Invalid status line: do it")
+    fun `parse using other character as line break`() {
+        assertThat(Request.parse("""GET http://www.somewhere.com/path HTTP/1.1,,body""", ","),
+            equalTo(Request(GET, Uri.of("http://www.somewhere.com/path")).body(Body("body"))
+        ))
     }
 
     private fun assertParsingFailure(action: () -> Any, message: String) {
