@@ -1,7 +1,7 @@
 package org.http4k.core
 
-fun Request.Companion.parse(request: String): Request {
-    val lines = lines(request)
+fun Request.Companion.parse(request: String, lineBreak: String = "\r\n"): Request {
+    val lines = lines(request, lineBreak)
     val (method, uri) = parseRequestLine(lines[0])
     val headers = parseHeaders(headerLines(lines))
     val body = parseBody(bodyLines(lines))
@@ -9,17 +9,17 @@ fun Request.Companion.parse(request: String): Request {
     ) { memo, (first, second) -> memo.header(first, second) }
 }
 
-fun Response.Companion.parse(response: String): Response {
-    val lines = lines(response)
+fun Response.Companion.parse(response: String, lineBreak: String = "\r\n"): Response {
+    val lines = lines(response, lineBreak)
     val status = parseStatus(lines[0])
     val headers = parseHeaders(headerLines(lines))
     val body = parseBody(bodyLines(lines))
     return headers.fold(Response(status).body(body)) { memo, (first, second) -> memo.header(first, second) }
 }
 
-private fun lines(message: String): List<String> =
+private fun lines(message: String, lineBreak: String): List<String> =
     if (message.isBlank()) throw IllegalArgumentException("Empty message") else
-        message.split("\r\n")
+        message.split(lineBreak)
 
 private fun parseStatus(value: String): Status {
     val values = value.split(" ", limit = 3)
