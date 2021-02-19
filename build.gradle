@@ -240,6 +240,29 @@ allprojects {
                         }
                     }
 
+                    if (project.name == 'http4k-bom'){
+                        pom.withXml {
+                            asNode().children().last() + {
+                                resolveStrategy = Closure.DELEGATE_FIRST
+
+                                dependencyManagement {
+                                    dependencies {
+                                        rootProject.subprojects
+                                            .findAll { it.name != 'http4k-bom' }
+                                            .sort { "$it.name" }
+                                            .each { dep ->
+                                                dependency {
+                                                    groupId "${dep.group}"
+                                                    artifactId "${dep.name}"
+                                                    version "${dep.version}"
+                                                }
+                                            }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     pom.withXml {
                         asNode().dependencies.'*'.findAll() {
                             it.scope.text() == 'runtime'
