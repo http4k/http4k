@@ -239,6 +239,14 @@ allprojects {
                             }
                         }
                     }
+
+                    pom.withXml {
+                        asNode().dependencies.'*'.findAll() {
+                            it.scope.text() == 'runtime'
+                        }.each() {
+                            it.scope*.value = 'provided'
+                        }
+                    }
                 }
             }
         }
