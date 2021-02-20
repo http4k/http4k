@@ -1,5 +1,5 @@
-title: http4k GraphQL support
-description: Recipe for using GraphQL plugins 
+title: http4k WebJars support
+description: Recipe for using WebJars with http4k 
 
 ### Gradle setup
 
