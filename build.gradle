@@ -44,6 +44,9 @@ allprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
+    version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
+    group = 'org.http4k'
+
     test {
         useJUnitPlatform()
     }
@@ -68,9 +71,6 @@ allprojects {
 }
 
 subprojects {
-    version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
-    group = 'org.http4k'
-
 
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
