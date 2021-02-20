@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.3.5.3
+- **http4k-*** : Define groupId for all modules so release to Maven Central can use the value from root.
+
 ### v4.3.5.2
 - **http4k-*** : Filter out irrelevant root artifact. Maven Central is very very annoying.
 
