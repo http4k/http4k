@@ -41,7 +41,7 @@ jobs:
           java-version: 11
       - name: Upload to Sonatype
         run: |
-          ./gradlew uploadArchives \
+          ./gradlew publishMavenJavaPublicationToSonatypeStagingRepository \
           -Psign=true \
           -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
           -PsigningKey="${{ secrets.SIGNING_KEY }}" \

@@ -113,12 +113,33 @@ allprojects {
                 def signingPassword = findProperty("signingPassword")
 
                 useInMemoryPgpKeys(signingKey, signingPassword)
-                sign configurations.archives
+                sign configurations.archives, publishing.publications
             }
         }
 
-        /** start of bintray deployment config **/
+        def nexusUsername = project.findProperty('nexusUsername') ?: "notset"
+        def nexusPassword = project.findProperty('nexusPassword') ?: "notset"
+
         publishing {
+            repositories {
+                maven {
+                    name 'SonatypeStaging'
+                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                    credentials {
+                        username nexusUsername
+                        password nexusPassword
+                    }
+                }
+                maven {
+                    name 'SonatypeSnapshot'
+                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                    credentials {
+                        username nexusUsername
+                        password nexusPassword
+                    }
+                }
+            }
+
             publications {
                 mavenJava(MavenPublication) {
                     artifactId = archivesBaseName
@@ -189,91 +210,6 @@ allprojects {
                 }
             }
         }
-        /** end of bintray deployment config **/
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    def nexusUsername = project.findProperty('nexusUsername') ?: "notset"
-                    def nexusPassword = project.findProperty('nexusPassword') ?: "notset"
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: nexusUsername, password: nexusPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: nexusUsername, password: nexusPassword)
-                    }
-
-                    pom.project {
-                        name archivesBaseName
-                        packaging 'jar'
-                        description description
-                        url 'https://github.com/http4k/http4k'
-
-                        scm {
-                            connection 'https://github.com/http4k/http4k.git'
-                            developerConnection 'git@github.com:http4k/http4k.git'
-                            url 'https://github.com/http4k/http4k'
-                        }
-
-                        licenses {
-                            license {
-                                name 'Apache License, Version 2.0'
-                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'daviddenton'
-                                name 'David Denton'
-                                email 'david@http4k.org'
-                            }
-                            developer {
-                                id 's4nchez'
-                                name 'Ivan Sanchez'
-                                email 'ivan@http4k.org'
-                            }
-                        }
-                    }
-
-                    if (project.name == 'http4k-bom'){
-                        pom.withXml {
-                            asNode().children().last() + {
-                                resolveStrategy = Closure.DELEGATE_FIRST
-
-                                dependencyManagement {
-                                    dependencies {
-                                        rootProject.subprojects
-                                            .findAll { it.name != 'http4k-bom' }
-                                            .sort { "$it.name" }
-                                            .each { dep ->
-                                                dependency {
-                                                    groupId "${dep.group}"
-                                                    artifactId "${dep.name}"
-                                                    version "${dep.version}"
-                                                }
-                                            }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    pom.withXml {
-                        asNode().dependencies.'*'.findAll() {
-                            it.scope.text() == 'runtime'
-                        }.each() {
-                            it.scope*.value = 'provided'
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
     jacocoTestReport {
