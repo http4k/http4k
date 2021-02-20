@@ -113,7 +113,7 @@ allprojects {
                 def signingPassword = findProperty("signingPassword")
 
                 useInMemoryPgpKeys(signingKey, signingPassword)
-                sign configurations.archives, publishing.publications
+                sign publishing.publications
             }
         }
 
