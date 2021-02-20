@@ -17,9 +17,9 @@ import org.junit.jupiter.api.Test
 
 abstract class RoutingHttpHandlerContract {
 
-    protected val validPath = "/route-contract"
-    protected val prefix = "/prefix"
-    private val prePrefix = "/pre-prefix"
+    protected open val validPath = "/route-contract"
+    protected open val prefix = "/prefix"
+    protected open val prePrefix = "/pre-prefix"
 
     abstract val handler: RoutingHttpHandler
 

@@ -60,6 +60,8 @@ public object Libs {
 
     public const val hamkrest: String = "com.natpryce:hamkrest:_"
 
+    public const val ktlint: String = "com.pinterest:ktlint:_"
+
     public const val moshi: String = "com.squareup.moshi:moshi:_"
 
     public const val moshi_kotlin: String = "com.squareup.moshi:moshi-kotlin:_"
@@ -79,6 +81,9 @@ public object Libs {
     public const val cloudevents_core: String = "io.cloudevents:cloudevents-core:_"
 
     public const val cloudevents_json_jackson: String = "io.cloudevents:cloudevents-json-jackson:_"
+
+    public const val io_codearte_nexus_staging_gradle_plugin: String =
+            "io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_"
 
     public const val resilience4j_bulkhead: String =
             "io.github.resilience4j:resilience4j-bulkhead:_"
@@ -175,6 +180,8 @@ public object Libs {
     public const val kotlinx_serialization_json: String =
             "org.jetbrains.kotlinx:kotlinx-serialization-json:_"
 
+    public const val ktlint_gradle: String = "org.jlleitschuh.gradle:ktlint-gradle:_"
+
     public const val json: String = "org.json:json:_"
 
     public const val jsoup: String = "org.jsoup:jsoup:_"
@@ -182,8 +189,6 @@ public object Libs {
     public const val junit_jupiter_api: String = "org.junit.jupiter:junit-jupiter-api:_"
 
     public const val junit_jupiter_engine: String = "org.junit.jupiter:junit-jupiter-engine:_"
-
-    public const val ktlint_gradle: String = "org.jlleitschuh.gradle:ktlint-gradle:_"
 
     public const val alpn_boot: String = "org.mortbay.jetty.alpn:alpn-boot:_"
 
@@ -195,6 +200,8 @@ public object Libs {
     public const val slf4j_nop: String = "org.slf4j:slf4j-nop:_"
 
     public const val thymeleaf: String = "org.thymeleaf:thymeleaf:_"
+
+    public const val swagger_ui: String = "org.webjars:swagger-ui:_"
 
     public const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:_"
 

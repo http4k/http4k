@@ -63,14 +63,15 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
     * **Path-based routing**, including nestable contexts
     * **Typesafe HTTP message construction/desconstruction and Request Contexts** using Lenses
-    * **Static file-serving** capability with **Caching and Hot-Reload** 
-    * **Single Page Application** support with **Caching and Hot-Reload** 
     * Servlet implementation to allow **plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
     * **Path-based WebSockets** including typesafe message marshalling using Lenses, which are **testable without a running container**
     * **Path-based Server-Sent Events** which are **testable without a running container**
     * APIs to **record and replay** HTTP traffic to disk or memory
     * Core **abstraction APIs** implemented by the other modules 
+    * **Static file-serving** capability with **Caching and Hot-Reload**
+    * **Single Page Application** support with **Caching and Hot-Reload**
+    * **WebJars** support in **1LOC**`
 * [Client:](https://http4k.org/guide/modules/clients) 
     * **1LOC** client adapters 
         * **Apache** sync + async HTTP

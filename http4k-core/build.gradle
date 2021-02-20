@@ -12,6 +12,7 @@ dependencies {
     testApi(project(":http4k-testing-approval"))
     testApi(project(":http4k-testing-hamkrest"))
     testApi(project(":http4k-server-apache"))
+    testApi(Libs.swagger_ui)
     testApi(Libs.okhttp_eventsource)
     testApi Libs.slf4j_nop
 }

@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.3.5.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core** : Add WebJars support. Activate WebJars with 1LOC!
+
 ### v4.3.4.1
 - **http4k-bom** : Fix #588 - Maven Central version of BOM is empty
 

@@ -75,6 +75,7 @@ nav:
     - Custom JSON marshallers: cookbook/custom_json_marshallers/index.md
     - HTML forms: cookbook/html_forms/index.md
     - Multipart forms: cookbook/multipart_forms/index.md
+    - WebJars: cookbook/webjars/index.md
     - Websockets: cookbook/websockets/index.md
     - Server-Sent Events: cookbook/sse/index.md
     - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
