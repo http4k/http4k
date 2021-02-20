@@ -44,9 +44,6 @@ allprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
-    version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
-    group = 'org.http4k'
-
     test {
         useJUnitPlatform()
     }
@@ -54,6 +51,26 @@ allprojects {
     jacoco {
         toolVersion = '0.8.6'
     }
+
+    ktlint {
+        // for details, see description in .editorconfig file
+        enableExperimentalRules = false
+        version = "0.40.0"
+        debug = false
+    }
+
+    jacocoTestReport {
+        reports {
+            html.enabled = true
+            xml.enabled = true
+        }
+    }
+}
+
+subprojects {
+    version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
+    group = 'org.http4k'
+
 
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
@@ -212,19 +229,6 @@ allprojects {
         }
     }
 
-    jacocoTestReport {
-        reports {
-            html.enabled = true
-            xml.enabled = true
-        }
-    }
-
-    ktlint {
-        // for details, see description in .editorconfig file
-        enableExperimentalRules = false
-        version = "0.40.0"
-        debug = false
-    }
 }
 
 compileTestKotlin.kotlinOptions {
