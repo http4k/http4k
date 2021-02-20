@@ -4,7 +4,7 @@ description: Recipe for using GraphQL plugins
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.3.4.1"
+implementation group: "org.http4k", name: "http4k-core", version: "4.3.5.0"
 
 // for the example...
 implementation group: "org.webjars", name: "swagger-ui", version: "3.43.0"

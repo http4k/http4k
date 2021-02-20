@@ -15,7 +15,7 @@ This simple example demonstrates how to serve and consume HTTP services using **
 
 ```groovy
 dependencies {
-    implementation platform("org.http4k:http4k-bom:4.3.4.1")
+    implementation platform("org.http4k:http4k-bom:4.3.5.0")
     implementation "org.http4k:http4k-core"
     implementation "org.http4k:http4k-server-netty"
     implementation "org.http4k:http4k-client-apache"
