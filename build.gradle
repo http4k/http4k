@@ -68,6 +68,10 @@ allprojects {
             xml.enabled = true
         }
     }
+
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
 }
 
 subprojects {
