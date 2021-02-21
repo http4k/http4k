@@ -8,6 +8,17 @@ import java.time.Clock
  */
 object EventFilters {
     /**
+     * Adds event name to the event.
+     */
+    fun AddEventName() = EventFilter { next ->
+        {
+            next(it + ("name" to when(it) {
+                is MetadataEvent -> it.event.javaClass.simpleName
+                else -> it.javaClass.simpleName
+            }))
+        }
+    }
+    /**
      * Adds timestamp metadata to the event.
      */
     fun AddTimestamp(clock: Clock = Clock.systemUTC()) = EventFilter { next ->

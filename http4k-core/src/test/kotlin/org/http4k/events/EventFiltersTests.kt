@@ -12,6 +12,26 @@ class EventFiltersTests {
     private val recording = RecordingEvents()
 
     @Test
+    fun `AddEventName captures name of event`() {
+        val events = EventFilters.AddEventName().then(recording)
+        val event = MyEvent()
+
+        events(event)
+
+        assertThat(recording.toList(), equalTo(listOf<Event>(MetadataEvent(event, mapOf("name" to "MyEvent")))))
+    }
+
+    @Test
+    fun `AddEventName captures name of metadata wrapped event`() {
+        val events = EventFilters.AddEventName().then(recording)
+        val event = MyEvent()
+
+        events(MetadataEvent(event))
+
+        assertThat(recording.toList(), equalTo(listOf<Event>(MetadataEvent(event, mapOf("name" to "MyEvent")))))
+    }
+
+    @Test
     fun `AddTimestamp captures instant`() {
         val clock = FixedClock
         val events = EventFilters.AddTimestamp(clock).then(recording)
