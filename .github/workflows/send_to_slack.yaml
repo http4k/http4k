@@ -6,6 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: ./notify-slack.sh
+      - run: ./notify-slack.sh ${{ github.event.client_payload.version }}
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
