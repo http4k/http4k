@@ -3,9 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.3.6.4 (uncut)
+- **http4k-format-moshi** : Moshi now supports AutoMarshallingEvents out of the box.
+
 ### v4.3.5.4
 - **http4k-*** : Disable publishing of gradle module metadata files to Maven Central.
-
+0 (
 ### v4.3.5.3
 - **http4k-*** : Define groupId for all modules so release to Maven Central can use the value from root.
 
