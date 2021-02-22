@@ -12,7 +12,7 @@ object EventFilters {
      */
     fun AddEventName() = EventFilter { next ->
         {
-            next(it + ("name" to when(it) {
+            next(it + ("name" to when (it) {
                 is MetadataEvent -> it.event.javaClass.simpleName
                 else -> it.javaClass.simpleName
             }))
