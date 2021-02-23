@@ -51,6 +51,8 @@ class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
     private val extensions: List<OpenApiExtension> = emptyList(),
+    // note that this is the basic OpenApi renderer - if you want reflective Schema generation
+    // then you want to use ApiRenderer.Auto() instead with a compatible JSON instance
     private val apiRenderer: ApiRenderer<Api<NODE>, NODE> = OpenApi3ApiRenderer(json),
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
