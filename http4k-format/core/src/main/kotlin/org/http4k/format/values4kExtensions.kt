@@ -1,6 +1,7 @@
+package org.http4k.format
+
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
-import org.http4k.format.AutoMappingConfiguration
 import org.http4k.lens.BiDiMapping
 import java.math.BigDecimal
 import java.math.BigInteger

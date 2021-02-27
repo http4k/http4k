@@ -12,7 +12,6 @@ import dev.forkhandles.values.LongValueFactory
 import dev.forkhandles.values.StringValueFactory
 import org.http4k.util.proxyReturnNull
 import org.junit.jupiter.api.Test
-import value
 
 class TV<T : Any>(value: T) : AbstractValue<T>(value)
 
