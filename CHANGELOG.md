@@ -4,6 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.4.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-server-jetty** : We have been alerted to some runtime changes around how Jetty parses paths containing . or /. Workaround is to use `For the record, I can confirm that HttpConfiguration.httpCompliance = HttpCompliance.RFC7230_LEGACY`, but this is marked as legacy and will be deprecated sooner or later. See details at: https://github.com/eclipse/jetty.project/issues/6001#issuecomment-786611040
 - **http4k-format-moshi** : Moshi now supports AutoMarshallingEvents out of the box.
 - **http4k-format-core** : [Break/Repackage] Format `value()` extension functions are now packaged properly.
 
