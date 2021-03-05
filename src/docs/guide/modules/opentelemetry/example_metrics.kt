@@ -2,7 +2,6 @@ package guide.modules.opentelemetry
 
 import io.opentelemetry.api.metrics.GlobalMetricsProvider
 import io.opentelemetry.exporters.inmemory.InMemoryMetricExporter
-import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.client.ApacheClient
@@ -42,7 +41,9 @@ fun main() {
 
     // see some results
     exportMetricsFromOpenTelemetry().forEach {
-        println("metric: " + it.name + ", value: " + it.doubleGaugeData.points)
+        println("metric: " + it.name + ", value: " +
+            (it.longSumData.points.takeIf { it.isNotEmpty() } ?: it.doubleSummaryData.points)
+        )
     }
 }
 
