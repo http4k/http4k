@@ -106,11 +106,6 @@ public object Libs {
 
     public const val netty_codec_http2: String = "io.netty:netty-codec-http2:_"
 
-    public const val opentelemetry_api: String = "io.opentelemetry:opentelemetry-api:_"
-
-    public const val opentelemetry_api_metrics: String =
-            "io.opentelemetry:opentelemetry-api-metrics:_"
-
     public const val opentelemetry_exporters_inmemory: String =
             "io.opentelemetry:opentelemetry-exporters-inmemory:_"
 

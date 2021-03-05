@@ -2,8 +2,6 @@ description = 'Http4k OpenTelemetry support'
 
 dependencies {
     api project(":http4k-core")
-    api Libs.opentelemetry_api
-    api Libs.opentelemetry_api_metrics
     api Libs.opentelemetry_sdk
     api Libs.opentelemetry_sdk_metrics
 
