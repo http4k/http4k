@@ -1,7 +1,9 @@
 package guide.modules.opentelemetry
 
+import io.opentelemetry.api.metrics.GlobalMetricsProvider
 import io.opentelemetry.exporters.inmemory.InMemoryMetricExporter
 import io.opentelemetry.sdk.OpenTelemetrySdk
+import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method.GET
@@ -16,6 +18,9 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 
 fun main() {
+    // test only: this sets up the metrics provider to something we can read
+    GlobalMetricsProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
+
     val server = routes("/metrics" bind GET to { Response(OK) })
 
     // apply metrics filters to a server...
@@ -42,5 +47,5 @@ fun main() {
 }
 
 private fun exportMetricsFromOpenTelemetry(): List<MetricData> = InMemoryMetricExporter.create().apply {
-//    export(OpenTelemetrySdk.getGlobalMeterProvider().metricProducer.collectAllMetrics())
+    export((GlobalMetricsProvider.get() as SdkMeterProvider).collectAllMetrics())
 }.finishedMetricItems
