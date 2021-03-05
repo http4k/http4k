@@ -119,6 +119,9 @@ public object Libs {
 
     public const val opentelemetry_sdk: String = "io.opentelemetry:opentelemetry-sdk:_"
 
+    public const val opentelemetry_sdk_metrics: String =
+            "io.opentelemetry:opentelemetry-sdk-metrics:_"
+
     public const val pebble: String = "io.pebbletemplates:pebble:_"
 
     public const val ratpack_core: String = "io.ratpack:ratpack-core:_"
