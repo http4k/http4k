@@ -17,8 +17,7 @@ import io.ktor.server.engine.stop
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.utils.io.jvm.javaio.toInputStream
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.withContext
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
@@ -36,7 +35,7 @@ data class KtorNetty(val port: Int = 8000) : ServerConfig {
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine: NettyApplicationEngine = embeddedServer(Netty, port) {
             intercept(Call) {
-                withContext(IO) {
+                withContext(Default) {
                     with(context) { response.fromHttp4K(http(request.asHttp4k())) }
                     finish()
                 }
