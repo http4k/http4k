@@ -5,9 +5,10 @@ changes with their rationale when appropriate:
 
 ### v4.4.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.31
-- **http4k-server-jetty** : We have been alerted to some runtime changes around how Jetty parses paths containing . or /. Workaround is to use `For the record, I can confirm that HttpConfiguration.httpCompliance = HttpCompliance.RFC7230_LEGACY`, but this is marked as legacy and will be deprecated sooner or later. See details at: https://github.com/eclipse/jetty.project/issues/6001#issuecomment-786611040
-- **http4k-format-moshi** : Moshi now supports AutoMarshallingEvents out of the box.
+- **http4k-opentelemetry** : [Break] OpenTelemetry has hit V1.0, so integrated API changes into filters for collecting data.
 - **http4k-format-core** : [Break/Repackage] Format `value()` extension functions are now packaged properly.
+- **http4k-server-jetty** : We have been alerted to some runtime changes around how Jetty parses paths containing . or /. Workaround is to use `HttpConfiguration.httpCompliance = HttpCompliance.RFC7230_LEGACY`, but this is marked as legacy and will be deprecated sooner or later. See details at: https://github.com/eclipse/jetty.project/issues/6001#issuecomment-786611040
+- **http4k-format-moshi** : Moshi now supports AutoMarshallingEvents out of the box.
 
 ### v4.3.5.4
 - **http4k-*** : Disable publishing of gradle module metadata files to Maven Central.
