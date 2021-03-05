@@ -1,7 +1,7 @@
 package org.http4k.filter
 
-import io.opentelemetry.api.common.Labels
 import io.opentelemetry.api.metrics.Meter
+import io.opentelemetry.api.metrics.common.Labels
 import org.http4k.core.Filter
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.metrics.Http4kOpenTelemetry
