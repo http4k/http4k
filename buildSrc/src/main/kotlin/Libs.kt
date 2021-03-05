@@ -114,6 +114,9 @@ public object Libs {
     public const val opentelemetry_exporters_inmemory: String =
             "io.opentelemetry:opentelemetry-exporters-inmemory:_"
 
+    public const val opentelemetry_extension_aws: String =
+            "io.opentelemetry:opentelemetry-extension-aws:_"
+
     public const val opentelemetry_extension_trace_propagators: String =
             "io.opentelemetry:opentelemetry-extension-trace-propagators:_"
 

@@ -6,8 +6,9 @@ dependencies {
     api Libs.opentelemetry_api_metrics
     api Libs.opentelemetry_sdk
     api Libs.opentelemetry_sdk_metrics
-    api Libs.opentelemetry_extension_trace_propagators
 
+    testApi Libs.opentelemetry_extension_trace_propagators
+    testApi Libs.opentelemetry_extension_aws
     testApi Libs.opentelemetry_exporters_inmemory
     testImplementation Config.TestDependencies
     testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')

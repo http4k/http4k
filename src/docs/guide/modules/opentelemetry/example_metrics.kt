@@ -37,10 +37,10 @@ fun main() {
 
     // see some results
     exportMetricsFromOpenTelemetry().forEach {
-        println("metric: " + it.name + ", value: " + it.points)
+        println("metric: " + it.name + ", value: " + it.doubleGaugeData.points)
     }
 }
 
 private fun exportMetricsFromOpenTelemetry(): List<MetricData> = InMemoryMetricExporter.create().apply {
-    export(OpenTelemetrySdk.getGlobalMeterProvider().metricProducer.collectAllMetrics())
+//    export(OpenTelemetrySdk.getGlobalMeterProvider().metricProducer.collectAllMetrics())
 }.finishedMetricItems
