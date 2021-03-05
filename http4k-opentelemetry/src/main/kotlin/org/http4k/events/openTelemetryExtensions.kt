@@ -12,8 +12,8 @@ fun EventFilters.AddOpenTelemetryTraces() = EventFilter { next ->
     {
         val context = Span.current().spanContext
         next(it + ("traces" to ZipkinTraces(
-            TraceId(context.traceIdAsHexString),
-            TraceId(context.spanIdAsHexString),
+            TraceId(context.traceId),
+            TraceId(context.spanId),
             null,
             SamplingDecision(if (context.isSampled) "1" else "0")
         )))
