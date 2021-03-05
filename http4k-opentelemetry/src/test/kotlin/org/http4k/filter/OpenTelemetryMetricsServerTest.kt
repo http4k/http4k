@@ -6,7 +6,9 @@ import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import io.opentelemetry.api.metrics.GlobalMetricsProvider
 import io.opentelemetry.api.metrics.common.Labels
+import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -24,9 +26,19 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
 import org.http4k.util.TickingClock
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 class OpenTelemetryMetricsServerTest {
+
+    companion object {
+        @BeforeAll
+        @JvmStatic
+        fun setup() {
+            GlobalMetricsProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
+        }
+    }
+
     private val clock = TickingClock
     private var requestTimer = ServerFilters.OpenTelemetryMetrics.RequestTimer(clock = clock)
     private var requestCounter = ServerFilters.OpenTelemetryMetrics.RequestCounter(clock = clock)

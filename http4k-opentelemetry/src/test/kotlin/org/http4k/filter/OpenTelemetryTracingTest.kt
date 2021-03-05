@@ -2,7 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanId
@@ -45,16 +45,17 @@ class OpenTelemetryTracingTest {
 
         var createdContext: SpanData? = null
 
-        val app = ServerFilters.OpenTelemetryTracing(Http4kOpenTelemetry.default)
+        val app = ServerFilters.OpenTelemetryTracing()
             .then(routes("/foo/{id}" bind GET to {
                 createdContext = (Span.current() as ReadableSpan).toSpanData()
                 Response(OK)
             }))
 
-        val resp = app(Request(GET, "http://localhost:8080/foo/bar?a=b")
-            .header("x-b3-traceid", sentTraceId)
-            .header("x-b3-spanid", parentSpanId)
-            .header("x-b3-sampled", "1")
+        val resp = app(
+            Request(GET, "http://localhost:8080/foo/bar?a=b")
+                .header("x-b3-traceid", sentTraceId)
+                .header("x-b3-spanid", parentSpanId)
+                .header("x-b3-sampled", "1")
         )
 
         assertThat(resp, hasHeader("x-b3-traceid", equalTo(sentTraceId)))
@@ -76,7 +77,7 @@ class OpenTelemetryTracingTest {
     fun `server creates new span when no parent`() {
         var createdContext: SpanData? = null
 
-        val app = ServerFilters.OpenTelemetryTracing(Http4kOpenTelemetry.default)
+        val app = ServerFilters.OpenTelemetryTracing()
             .then(routes("/foo/{id}" bind GET to {
                 Span.current().spanContext
                 createdContext = (Span.current() as ReadableSpan).toSpanData()
@@ -103,7 +104,7 @@ class OpenTelemetryTracingTest {
     fun `client creates new span when no parent`() {
         var createdContext: SpanData? = null
 
-        val app = ClientFilters.OpenTelemetryTracing(Http4kOpenTelemetry.default)
+        val app = ClientFilters.OpenTelemetryTracing()
             .then {
                 createdContext = (Span.current() as ReadableSpan).toSpanData()
                 Response(I_M_A_TEAPOT)
@@ -128,23 +129,25 @@ class OpenTelemetryTracingTest {
         var serverContext: SpanData? = null
         var clientContext: SpanData? = null
 
-        val app = ServerFilters.OpenTelemetryTracing(Http4kOpenTelemetry.default)
+        val app = ServerFilters.OpenTelemetryTracing()
             .then(Filter { next ->
                 {
                     serverContext = (Span.current() as ReadableSpan).toSpanData()
                     next(Request(GET, "http://localhost:8080/client"))
                 }
             })
-            .then(ClientFilters.OpenTelemetryTracing(Http4kOpenTelemetry.default))
+            .then(ClientFilters.OpenTelemetryTracing())
             .then {
                 clientContext = (Span.current() as ReadableSpan).toSpanData()
                 Response(I_M_A_TEAPOT)
             }
 
-        app(Request(GET, "http://localhost:8080/server")
-            .header("x-b3-traceid", sentTraceId)
-            .header("x-b3-spanid", originalSpanId)
-            .header("x-b3-sampled", "1"))
+        app(
+            Request(GET, "http://localhost:8080/server")
+                .header("x-b3-traceid", sentTraceId)
+                .header("x-b3-spanid", originalSpanId)
+                .header("x-b3-sampled", "1")
+        )
 
         with(serverContext!!) {
             assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))

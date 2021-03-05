@@ -9,6 +9,7 @@ import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.core.Method
 import org.http4k.core.Status
+import org.http4k.metrics.Http4kOpenTelemetry
 
 /**
  * Use the InMemory exporter to get the recorded metrics from the global state.
@@ -42,7 +43,7 @@ fun hasRequestCounter(count: Int, labels: Labels, name: String = "http.server.re
         override fun invoke(actual: List<MetricData>): MatchResult {
             val counter = actual
                 .first { it.name == name }
-                .longGaugeData
+                .longSumData
                 .points
                 .first { it.labels == labels }
             return if (counter.value == count.toLong()) MatchResult.Match else MatchResult.Mismatch(actual.toString())
@@ -55,7 +56,7 @@ fun hasNoRequestCounter(method: Method, path: String, status: Status) =
 
         override fun invoke(actual: List<MetricData>): MatchResult =
             if (actual.find { it.name == description }
-                    ?.longGaugeData
+                    ?.longSumData
                     ?.points
                     ?.any {
                         it.labels == Labels.of(

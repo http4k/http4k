@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.trace.SpanKind.CLIENT
 import io.opentelemetry.api.trace.SpanKind.SERVER
@@ -18,7 +19,7 @@ import org.http4k.routing.RoutedRequest
 import java.util.concurrent.atomic.AtomicReference
 
 fun ClientFilters.OpenTelemetryTracing(
-    openTelemetry: OpenTelemetry = Http4kOpenTelemetry.default,
+    openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = { it.uri.toString() },
     error: (Request, Throwable) -> String = { _, t -> t.localizedMessage },
 ): Filter {
@@ -51,7 +52,7 @@ fun ClientFilters.OpenTelemetryTracing(
 }
 
 fun ServerFilters.OpenTelemetryTracing(
-    openTelemetry: OpenTelemetry,
+    openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = { it.uri.toString() },
     error: (Request, Throwable) -> String = { _, t -> t.localizedMessage },
 ): Filter {
