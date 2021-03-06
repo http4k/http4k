@@ -17,6 +17,7 @@ import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.aws.Region
 import org.http4k.aws.Role
 import org.http4k.aws.awsCliUserProfiles
+import org.http4k.aws.awsClientFor
 import org.http4k.client.ApiGatewayV1LambdaClient
 import org.http4k.client.ApiGatewayV2LambdaClient
 import org.http4k.client.ApplicationLoadBalancerLambdaClient
@@ -30,7 +31,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
-import org.http4k.serverless.lambda.client.awsClientFor
 import org.http4k.serverless.lambda.client.awsLambdaApiClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File

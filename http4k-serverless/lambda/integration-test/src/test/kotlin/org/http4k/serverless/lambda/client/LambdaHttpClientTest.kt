@@ -8,6 +8,7 @@ import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.aws.Region
 import org.http4k.aws.awsCliUserProfiles
+import org.http4k.aws.awsClientFor
 import org.http4k.client.ApiGatewayV1LambdaClient
 import org.http4k.client.ApiGatewayV2LambdaClient
 import org.http4k.client.ApplicationLoadBalancerLambdaClient

@@ -1,8 +1,14 @@
 package org.http4k.aws
 
+import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.cloudnative.env.fromConfigFile
+import org.http4k.core.then
+import org.http4k.filter.AwsAuth
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.inIntelliJOnly
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 
@@ -47,3 +53,8 @@ fun awsCliUserProfiles(): AwsCliUserProfiles {
 
     return env.awsCliUserProfiles()
 }
+
+fun AwsProfile.awsClientFor(service: String) =
+    ClientFilters.AwsAuth(scopeFor(service), credentials)
+        .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
+        .then(JavaHttpClient())
