@@ -8,6 +8,7 @@ import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.Payload
 import org.http4k.filter.inIntelliJOnly
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
@@ -38,7 +39,8 @@ fun Environment.awsCliUserProfiles(): AwsCliUserProfiles {
 
             override fun get(keyName: String) = EnvironmentKey.required(
                 if (profileName == "default") "default-$keyName"
-                else "profile-$profileName-$keyName")(env)
+                else "profile-$profileName-$keyName"
+            )(env)
         }
     }
 }
@@ -54,7 +56,10 @@ fun awsCliUserProfiles(): AwsCliUserProfiles {
     return env.awsCliUserProfiles()
 }
 
-fun AwsProfile.awsClientFor(service: String) =
-    ClientFilters.AwsAuth(scopeFor(service), credentials)
+fun AwsProfile.awsClientFilterFor(service: String, mode: Payload.Mode) =
+    ClientFilters.AwsAuth(scopeFor(service), credentials, payloadMode = mode)
         .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
-        .then(JavaHttpClient())
+
+fun AwsProfile.awsClientFor(service: String, mode: Payload.Mode = Payload.Mode.Signed) =
+    awsClientFilterFor(service, mode).then(JavaHttpClient())
+
