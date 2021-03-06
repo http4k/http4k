@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.4.0.1
+- **http4k-aws** : Add x-amz-content-sha256 to SignedHeaders (required for on-premise s3). H/T @tkint
+
 ### v4.4.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.31
 - **http4k-opentelemetry** : [Break] OpenTelemetry has hit V1.0, so integrated API changes into filters for collecting data.
