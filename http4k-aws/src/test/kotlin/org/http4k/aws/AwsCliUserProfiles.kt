@@ -62,4 +62,3 @@ fun AwsProfile.awsClientFilterFor(service: String, mode: Payload.Mode) =
 
 fun AwsProfile.awsClientFor(service: String, mode: Payload.Mode = Payload.Mode.Signed) =
     awsClientFilterFor(service, mode).then(JavaHttpClient())
-
