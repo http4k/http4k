@@ -6,6 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.Payload
+import org.http4k.filter.Payload.Mode.Signed
 import org.http4k.lens.LensFailure
 import org.junit.jupiter.api.AfterEach
 import org.opentest4j.TestAbortedException
@@ -23,8 +24,7 @@ abstract class AbstractAwsRealS3TestCase {
         aClient()(Request(DELETE, bucketUrl))
     }
 
-    protected fun aClient() = awsClientFilter(Payload.Mode.Signed)
-        .then(JavaHttpClient())
+    protected fun aClient() = awsClientFilter(Signed).then(JavaHttpClient())
 
     protected fun awsClientFilter(signed: Payload.Mode) =
         awsCliUserProfiles().profileIfAvailable("http4k-integration-test").awsClientFilterFor("s3", signed)
