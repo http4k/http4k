@@ -17,7 +17,6 @@ buildscript {
 
 plugins {
     id "com.jfrog.bintray"
-    id "org.jetbrains.dokka"
     id "io.codearte.nexus-staging" version '0.22.0'
 }
 
@@ -34,7 +33,6 @@ allprojects {
 
     apply plugin: 'java'
     apply plugin: 'kotlin'
-    apply plugin: 'org.jetbrains.dokka'
     apply plugin: 'jacoco'
     apply plugin: 'org.jlleitschuh.gradle.ktlint'
 
@@ -88,16 +86,6 @@ subprojects {
             )
         }
     }
-
-//    task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true, dependsOn: javadoc) {
-//        outputDirectory = javadoc.destinationDir
-//        outputFormat = "javadoc"
-//        processConfigurations = []
-//    }
-//    task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
-//        classifier = 'javadoc'
-//        from dokkaJavadoc.outputDirectory
-//    }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
         archiveClassifier = 'javadoc'
@@ -287,19 +275,6 @@ sourceSets {
         resources {
             srcDir 'src/docs'
         }
-    }
-}
-
-dokka {
-    outputFormat = "gfm"
-    outputDirectory = "$buildDir/ddoc"
-
-    subProjects = subprojects.collect { i -> i.name }
-
-    configuration {
-        includes = ['src/packages.md']
-        moduleName = "$rootProject.name"
-        jdkVersion = 9
     }
 }
 
