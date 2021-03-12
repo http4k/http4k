@@ -19,9 +19,8 @@ import org.http4k.core.cookie.cookies
 import org.http4k.core.with
 import org.http4k.lens.binary
 import org.http4k.routing.bind
-import org.http4k.routing.path
 import org.http4k.routing.routes
-import java.util.Arrays
+import java.util.*
 
 object ServerForClientContract : HttpHandler {
     override fun invoke(request: Request) = app(request)
@@ -36,22 +35,22 @@ object ServerForClientContract : HttpHandler {
 
     private val app = routes(
         "/someUri" bind POST to defaultHandler,
-        "/cookies/set" bind GET to { req: Request ->
+        "/cookies-set" bind GET to { req: Request ->
             Response(FOUND).header("Location", "/cookies").cookie(Cookie(req.query("name")!!, req.query("value")!!))
         },
         "/cookies" bind GET to { req: Request ->
             Response(OK).body(req.cookies().joinToString(",") { it.name + "=" + it.value })
         },
         "/empty" bind GET to { Response(OK).body("") },
-        "/relative-redirect/{times}" bind GET to { req: Request ->
-            val times = req.path("times")?.toInt() ?: 0
+        "/relative-redirect" bind GET to { req: Request ->
+            val times = req.query("times")?.toInt() ?: 0
             if (times == 0) Response(OK)
-            else Response(FOUND).header("Location", "/relative-redirect/${times - 1}")
+            else Response(FOUND).header("Location", "/relative-redirect?times=${times - 1}")
         },
         "/redirect" bind GET to { Response(FOUND).header("Location", "/someUri").body("") },
         "/stream" bind GET to { Response(OK).body("stream".byteInputStream()) },
-        "/delay/{millis}" bind GET to { r: Request ->
-            Thread.sleep(r.path("millis")!!.toLong())
+        "/delay" bind GET to { r: Request ->
+            Thread.sleep(r.query("millis")!!.toLong())
             Response(OK)
         },
         "/echo" bind routes(
@@ -68,13 +67,13 @@ object ServerForClientContract : HttpHandler {
         "/image" bind GET to { _: Request ->
             Response(CREATED).with(Body.binary(ContentType("image/png")).toLens() of testImageBytes().inputStream())
         },
-        "/status/{status}" bind GET to { r: Request ->
-            val code = r.path("status")!!.toInt()
+        "/status" bind GET to { r: Request ->
+            val code = r.query("status")!!.toInt()
             val status = Status(code, "Description for $code")
             Response(status).body("body for status ${status.code}")
         },
-        "/status-no-body/{status}" bind GET to { r: Request ->
-            val code = r.path("status")!!.toInt()
+        "/status-no-body" bind GET to { r: Request ->
+            val code = r.query("status")!!.toInt()
             val status = Status(code, "Description for $code")
             Response(status)
         },

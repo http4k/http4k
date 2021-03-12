@@ -99,7 +99,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `does not store cookies`() {
-        client(Request(GET, "http://localhost:$port/cookies/set").query("name", "foo").query("value", "bar"))
+        client(Request(GET, "http://localhost:$port/cookies-set").query("name", "foo").query("value", "bar"))
 
         val response = client(Request(GET, "http://localhost:$port/cookies"))
 
@@ -111,7 +111,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     fun `filters enable cookies and redirects`() {
         val enhancedClient = ClientFilters.FollowRedirects().then(ClientFilters.Cookies()).then(client)
 
-        val response = enhancedClient(Request(GET, "http://localhost:$port/cookies/set").query("name", "foo").query("value", "bar"))
+        val response = enhancedClient(Request(GET, "http://localhost:$port/cookies-set").query("name", "foo").query("value", "bar"))
 
         assertThat(response.status.successful, equalTo(true))
         assertThat(response.bodyString(), containsSubstring("foo"))
@@ -127,7 +127,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `redirection response`() {
         val response = ClientFilters.FollowRedirects()
-            .then(client)(Request(GET, "http://localhost:$port/relative-redirect/5"))
+            .then(client)(Request(GET, "http://localhost:$port/relative-redirect").query("times", "5"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), anything)
     }
@@ -148,7 +148,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     @Disabled
     open fun `socket timeouts are converted into 504`() {
-        val response = timeoutClient(Request(GET, "http://localhost:$port/delay/150"))
+        val response = timeoutClient(Request(GET, "http://localhost:$port/delay?millis=150"))
 
         assertThat(response.status, equalTo(CLIENT_TIMEOUT))
     }
@@ -170,7 +170,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `can retrieve body for different statuses`() {
         listOf(200, 301, 404, 500).forEach { statusCode ->
-            val response = client(Request(GET, "http://localhost:$port/status/$statusCode"))
+            val response = client(Request(GET, "http://localhost:$port/status").query("status", statusCode.toString()))
             assertThat(response.status, equalTo(Status(statusCode, "")))
             assertThat(response.bodyString(), equalTo("body for status $statusCode"))
         }
@@ -179,7 +179,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     open fun `handles response with custom status message`() {
         listOf(200, 301, 404, 500).forEach { statusCode ->
-            val response = client(Request(GET, "http://localhost:$port/status/$statusCode"))
+            val response = client(Request(GET, "http://localhost:$port/status").query("status", statusCode.toString()))
             response.use {
                 assertThat(response.status.description, equalTo("Description for $statusCode"))
             }
@@ -189,7 +189,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `handles empty response body for different statuses`() {
         listOf(200, 301, 400, 404, 500).forEach { statusCode ->
-            val response = client(Request(GET, "http://localhost:$port/status-no-body/$statusCode"))
+            val response = client(Request(GET, "http://localhost:$port/status-no-body").query("status", statusCode.toString()))
             assertThat(response.status, equalTo(Status(statusCode, "")))
             assertThat(response.bodyString(), equalTo(""))
         }
