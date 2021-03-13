@@ -1,4 +1,4 @@
-package org.http4k.client
+package org.http4k.serverless.lambda.testing.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import org.http4k.aws.Function
@@ -11,12 +11,12 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.queries
 import org.http4k.format.Jackson.auto
-import org.http4k.serverless.aws.AwsGatewayProxyRequestV2
-import org.http4k.serverless.aws.Http
-import org.http4k.serverless.aws.RequestContext
 
 class ApiGatewayV2LambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
-    override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of AwsGatewayProxyRequestV2(requestContext = RequestContext(Http(method.name))).apply {
+    override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of AwsGatewayProxyRequestV2(requestContext = RequestContext(
+        Http(method.name)
+    )
+    ).apply {
         rawPath = uri.path
         queryStringParameters = uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
         body = bodyString().base64Encode()

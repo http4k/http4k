@@ -18,11 +18,6 @@ import org.http4k.aws.Region
 import org.http4k.aws.Role
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
-import org.http4k.client.ApiGatewayV1LambdaClient
-import org.http4k.client.ApiGatewayV2LambdaClient
-import org.http4k.client.ApplicationLoadBalancerLambdaClient
-import org.http4k.client.InvocationLambdaClient
-import org.http4k.client.LambdaHttpClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -32,6 +27,11 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
 import org.http4k.serverless.lambda.client.awsLambdaApiClient
+import org.http4k.serverless.lambda.testing.client.ApiGatewayV1LambdaClient
+import org.http4k.serverless.lambda.testing.client.ApiGatewayV2LambdaClient
+import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambdaClient
+import org.http4k.serverless.lambda.testing.client.InvocationLambdaClient
+import org.http4k.serverless.lambda.testing.client.LambdaHttpClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.io.PrintStream
