@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.client
+package org.http4k.serverless.lambda.testing
 
 import org.http4k.core.HttpHandler
 import org.http4k.server.Http4kServer

@@ -1,9 +1,10 @@
-package org.http4k.serverless.lambda.client
+package org.http4k.serverless.lambda
 
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
 import org.http4k.client.HttpClientContract
 import org.http4k.core.then
+import org.http4k.serverless.lambda.testing.NoOpServerConfig
 import org.http4k.serverless.lambda.testing.client.ApiGatewayV1LambdaClient
 import org.http4k.serverless.lambda.testing.client.ApiGatewayV2LambdaClient
 import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambdaClient
