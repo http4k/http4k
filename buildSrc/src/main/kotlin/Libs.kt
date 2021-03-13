@@ -200,8 +200,6 @@ public object Libs {
 
     public const val thymeleaf: String = "org.thymeleaf:thymeleaf:_"
 
-    public const val swagger_ui: String = "org.webjars:swagger-ui:_"
-
     public const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:_"
 
     public const val s3: String = "software.amazon.awssdk:s3:_"

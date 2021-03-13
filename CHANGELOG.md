@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.4.1.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions
+
 ### v4.4.0.1
 - **http4k-aws** : Add x-amz-content-sha256 to SignedHeaders (required for on-premise s3). H/T @tkint
 
