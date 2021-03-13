@@ -1,6 +1,5 @@
-package org.http4k.aws
+package org.http4k.serverless.lambda.testing.setup
 
-import org.http4k.aws.ApiGatewayJackson.auto
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -10,6 +9,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.SetAwsServiceUrl
+import org.http4k.serverless.lambda.testing.setup.ApiGatewayJackson.auto
 
 class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Region) {
     private val client = ClientFilters.SetAwsServiceUrl("apigateway", region.name).then(rawClient)

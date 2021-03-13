@@ -2,8 +2,6 @@ package org.http4k.serverless.lambda.testing.client
 
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
 import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
-import org.http4k.aws.Function
-import org.http4k.aws.Region
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
 import org.http4k.core.Body
@@ -12,6 +10,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.toParameters
 import org.http4k.format.Jackson.auto
+import org.http4k.serverless.lambda.testing.setup.Function
+import org.http4k.serverless.lambda.testing.setup.Region
 
 class ApplicationLoadBalancerLambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
     override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of ApplicationLoadBalancerRequestEvent().apply {

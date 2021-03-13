@@ -2,8 +2,6 @@ package org.http4k.serverless.lambda.testing.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import org.http4k.aws.Function
-import org.http4k.aws.Region
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
 import org.http4k.core.Body
@@ -15,6 +13,8 @@ import org.http4k.core.then
 import org.http4k.core.toParameters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.format.Jackson.auto
+import org.http4k.serverless.lambda.testing.setup.Function
+import org.http4k.serverless.lambda.testing.setup.Region
 
 class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
     override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of APIGatewayProxyRequestEvent()

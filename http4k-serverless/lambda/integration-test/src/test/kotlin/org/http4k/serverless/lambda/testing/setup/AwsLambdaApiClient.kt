@@ -1,4 +1,4 @@
-package org.http4k.aws
+package org.http4k.serverless.lambda.testing.setup
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.core.Body
@@ -16,7 +16,7 @@ import org.http4k.filter.SetAwsServiceUrl
 import org.http4k.filter.inIntelliJOnly
 import org.http4k.format.Jackson.auto
 import java.nio.ByteBuffer
-import java.util.Base64
+import java.util.*
 
 class AwsLambdaApiClient(client: HttpHandler, region: Region) {
     private val client = ClientFilters.SetAwsServiceUrl("lambda", region.name)
@@ -26,12 +26,15 @@ class AwsLambdaApiClient(client: HttpHandler, region: Region) {
     fun create(functionPackage: FunctionPackage): FunctionDetails {
         val code = String(Base64.getEncoder().encode(functionPackage.jar.array()))
         val request = Request(POST, Uri.of("/2015-03-31/functions/"))
-            .with(createFunctionRequestBody of CreateFunction(Code(code),
+            .with(
+                createFunctionRequestBody of CreateFunction(
+                    Code(code),
                 functionPackage.name.value,
                 functionPackage.handler.value,
                 functionPackage.role.name,
                 Environment(functionPackage.environmentProperties),
-                functionPackage.timeoutInSeconds))
+                functionPackage.timeoutInSeconds)
+            )
         val response = client(request)
         if (!response.status.successful) {
             throw RuntimeException("Could not create function (error ${response.status.code}): ${response.bodyString()}")

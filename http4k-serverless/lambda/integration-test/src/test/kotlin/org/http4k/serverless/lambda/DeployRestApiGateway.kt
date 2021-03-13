@@ -1,21 +1,21 @@
 package org.http4k.serverless.lambda
 
-import org.http4k.aws.ApiIntegrationVersion
-import org.http4k.aws.ApiIntegrationVersion.v1
-import org.http4k.aws.ApiIntegrationVersion.v2
-import org.http4k.aws.ApiName
-import org.http4k.aws.LambdaIntegrationType
-import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.aws.Stage
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.serverless.lambda.client.awsLambdaApiClient
-import org.http4k.serverless.lambda.client.restApiGatewayApiClient
+import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
+import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
+import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion
+import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v1
+import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v2
+import org.http4k.serverless.lambda.testing.setup.ApiName
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.serverless.lambda.testing.setup.Stage
 
 object DeployRestApiGateway {
 
