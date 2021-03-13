@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.4.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions
+- **http4k-serverless-lambda** : Introduce ApiGatewayRestLambdaFunction to be used with REST Api Gateways
 
 ### v4.4.0.1
 - **http4k-aws** : Add x-amz-content-sha256 to SignedHeaders (required for on-premise s3). H/T @tkint
