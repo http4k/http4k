@@ -1,8 +1,5 @@
 package org.http4k.serverless.lambda.client
 
-import org.http4k.aws.ApiIntegrationVersion
-import org.http4k.aws.ApiIntegrationVersion.v1
-import org.http4k.aws.ApiIntegrationVersion.v2
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.HttpClientContract
 import org.http4k.client.OkHttp
@@ -13,6 +10,10 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.inIntelliJOnly
 import org.http4k.serverless.lambda.DeployApiGateway.apiName
+import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
+import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion
+import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v1
+import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v2
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 

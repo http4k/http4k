@@ -1,10 +1,7 @@
-package org.http4k.aws
+package org.http4k.serverless.lambda.testing.setup
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import org.http4k.aws.ApiGatewayJackson.auto
-import org.http4k.aws.ApiIntegrationVersion.v1
-import org.http4k.aws.ApiIntegrationVersion.v2
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -18,6 +15,9 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
+import org.http4k.serverless.lambda.testing.setup.ApiGatewayJackson.auto
+import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v1
+import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v2
 
 class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
     private val client = ClientFilters.SetAwsServiceUrl("apigateway", region.name).then(rawClient)
@@ -37,13 +37,15 @@ class AwsApiGatewayApiClient(rawClient: HttpHandler, region: Region) {
 
     fun createLambdaIntegration(apiId: ApiId, functionArn: String, version: ApiIntegrationVersion): IntegrationId =
         integrationInfo(client(Request(Method.POST, "/v2/apis/${apiId.value}/integrations")
-            .with(createIntegrationLens of Integration(
+            .with(
+                createIntegrationLens of Integration(
                 integrationUri = functionArn,
                 payloadFormatVersion = when (version) {
                     v1 -> "1.0"
                     v2 -> "2.0"
                 }
-            )))).integrationId
+            )
+            ))).integrationId
 
     fun createDefaultRoute(apiId: ApiId, integrationId: IntegrationId) =
         client(Request(Method.POST, "/v2/apis/${apiId.value}/routes")

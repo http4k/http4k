@@ -1,13 +1,13 @@
 package org.http4k.serverless.lambda.testing.client
 
-import org.http4k.aws.Function
-import org.http4k.aws.Region
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.lens.string
+import org.http4k.serverless.lambda.testing.setup.Function
+import org.http4k.serverless.lambda.testing.setup.Region
 
 class InvocationLambdaClient(function: Function, region: Region) :
     LambdaHttpClient(function, region) {

@@ -1,12 +1,5 @@
 package org.http4k.serverless.lambda.client
 
-import org.http4k.aws.Function
-import org.http4k.aws.LambdaIntegrationType
-import org.http4k.aws.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.aws.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.aws.LambdaIntegrationType.ApplicationLoadBalancer
-import org.http4k.aws.LambdaIntegrationType.Invocation
-import org.http4k.aws.Region
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
 import org.http4k.client.HttpClientContract
@@ -17,6 +10,13 @@ import org.http4k.serverless.lambda.testing.client.ApiGatewayV2LambdaClient
 import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambdaClient
 import org.http4k.serverless.lambda.testing.client.InvocationLambdaClient
 import org.http4k.serverless.lambda.testing.client.LambdaHttpClient
+import org.http4k.serverless.lambda.testing.setup.Function
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApplicationLoadBalancer
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.Invocation
+import org.http4k.serverless.lambda.testing.setup.Region
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 

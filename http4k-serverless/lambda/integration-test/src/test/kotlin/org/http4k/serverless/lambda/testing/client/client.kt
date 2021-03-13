@@ -1,15 +1,15 @@
-package org.http4k.serverless.lambda.client
+package org.http4k.serverless.lambda.testing.client
 
 import okhttp3.OkHttpClient
-import org.http4k.aws.AwsApiGatewayApiClient
-import org.http4k.aws.AwsLambdaApiClient
 import org.http4k.aws.AwsProfile
-import org.http4k.aws.AwsRestApiGatewayApiClient
-import org.http4k.aws.Region
 import org.http4k.aws.awsClientFilterFor
 import org.http4k.client.OkHttp
 import org.http4k.core.then
 import org.http4k.filter.Payload.Mode.Signed
+import org.http4k.serverless.lambda.testing.setup.AwsApiGatewayApiClient
+import org.http4k.serverless.lambda.testing.setup.AwsLambdaApiClient
+import org.http4k.serverless.lambda.testing.setup.AwsRestApiGatewayApiClient
+import org.http4k.serverless.lambda.testing.setup.Region
 import java.util.concurrent.TimeUnit.SECONDS
 
 fun AwsProfile.apiGatewayApiClient(): AwsApiGatewayApiClient =

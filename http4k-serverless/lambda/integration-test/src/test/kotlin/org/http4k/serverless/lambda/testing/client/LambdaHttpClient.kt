@@ -1,7 +1,5 @@
 package org.http4k.serverless.lambda.testing.client
 
-import org.http4k.aws.Function
-import org.http4k.aws.Region
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -11,6 +9,8 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.SetAwsServiceUrl
+import org.http4k.serverless.lambda.testing.setup.Function
+import org.http4k.serverless.lambda.testing.setup.Region
 
 abstract class LambdaHttpClient(function: Function, region: Region) : Filter {
     private fun createFunctionRequest(function: Function) = Filter { next ->
