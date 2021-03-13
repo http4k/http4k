@@ -42,10 +42,6 @@ object DeployRestApiGateway {
         val api = apiGateway.createApi(apiName(integrationVersion))
         apiGateway.createStage(api.apiId, Stage.restDefault, functionArn)
 
-        val integrationId = apiGateway.createLambdaIntegration(api.apiId, functionArn, integrationVersion)
-
-        apiGateway.createDefaultRoute(api.apiId, integrationId)
-
         waitUntil(OK) {
             JavaHttpClient()(Request(GET, api.apiEndpoint.path("/default/empty"))).also { println(it.status) }
         }

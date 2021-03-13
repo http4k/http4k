@@ -68,7 +68,7 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
                 .with(createMethod of CreateMethod(authorizationType = "NONE"))
         )
 
-        val method = client(
+        client(
             Request(Method.PUT, "/restapis/${apiId.value}/resources/${proxyResource.id}/methods/ANY/integration")
                 .with(createMethodWithIntegrationLens of CreateMethodWithIntegration(uri = functionArn.invocation(region)))
         )
@@ -90,13 +90,6 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
         )
     }
 
-
-    fun createLambdaIntegration(apiId: ApiId, functionArn: String, version: ApiIntegrationVersion): IntegrationId =
-        IntegrationId("none")
-
-    fun createDefaultRoute(apiId: ApiId, integrationId: IntegrationId) =
-        Unit
-
     companion object {
         private val createApiLens = Body.auto<RestApi>().toLens()
         private val apiDetailsLens = Body.auto<RestApiDetails>().toLens()
@@ -107,9 +100,6 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
         private val createStageLens = Body.auto<RestStage>().toLens()
         private val createDeploymentLens = Body.auto<RestDeployment>().toLens()
         private val createDeploymentResponseLens = Body.auto<RestDeploymentResponse>().toLens()
-        private val createIntegrationLens = Body.auto<Integration>().toLens()
-        private val integrationInfo = Body.auto<IntegrationInfo>().toLens()
-        private val createRouteLens = Body.auto<Route>().toLens()
         private val createMethodWithIntegrationLens = Body.auto<CreateMethodWithIntegration>().toLens()
         private val createMethod = Body.auto<CreateMethod>().toLens()
     }
@@ -126,15 +116,13 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
     private data class RestStage(val stageName: String, val deploymentId: String)
     private data class RestDeployment(val name: String)
     private data class RestDeploymentResponse(val id: String)
-    private data class Route(val target: String, val routeKey: String = "\$default")
     private data class CreateMethodWithIntegration(
         val type: String = "AWS_PROXY",
         val uri: String,
         val httpMethod: String = "POST"
     )
-
     private data class CreateMethod(val authorizationType: String)
-}
 
-private fun String.invocation(region: Region): String =
-    "arn:aws:apigateway:${region.name}:lambda:path/2015-03-31/functions/${this}/invocations"
+    private fun String.invocation(region: Region): String =
+        "arn:aws:apigateway:${region.name}:lambda:path/2015-03-31/functions/${this}/invocations"
+}
