@@ -16,12 +16,14 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
+import org.http4k.serverless.lambda.testing.client.ApiGatewayRestLambdaClient
 import org.http4k.serverless.lambda.testing.client.ApiGatewayV1LambdaClient
 import org.http4k.serverless.lambda.testing.client.ApiGatewayV2LambdaClient
 import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambdaClient
 import org.http4k.serverless.lambda.testing.client.InvocationLambdaClient
 import org.http4k.serverless.lambda.testing.client.LambdaHttpClient
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayRest
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApplicationLoadBalancer
@@ -41,7 +43,10 @@ object DeployServerAsLambdaForClientContract {
         val lambdaBinary =
             File("test-function/build/distributions/test-function-LOCAL.zip")
 
-        assumeTrue(lambdaBinary.exists(), "lambda binary to deploy (${lambdaBinary.absolutePath}) needs to be available")
+        assumeTrue(
+            lambdaBinary.exists(),
+            "lambda binary to deploy (${lambdaBinary.absolutePath}) needs to be available"
+        )
 
         val lambdaApiClient = config.awsLambdaApiClient()
 
@@ -65,16 +70,18 @@ object DeployServerAsLambdaForClientContract {
         println("Performing a test request...")
         val client = clientFn(functionName(type), Region(config.region))
             .then(config.awsClientFor("lambda").debugBodies())
-        val functionResponse = client(Request(POST, "/")
-            .query("query1", "queryValue1")
-            .query("query1", "queryValue2")
-            .query("query2", "queryValue3")
-            .header("single", "value1")
-            .header("multi", "value2")
-            .header("multi", "value3")
-            .cookie(Cookie("cookie1", "value1"))
-            .cookie(Cookie("cookie2", "value2"))
-            .body("""{"hello":"http4k"}"""))
+        val functionResponse = client(
+            Request(POST, "/")
+                .query("query1", "queryValue1")
+                .query("query1", "queryValue2")
+                .query("query2", "queryValue3")
+                .header("single", "value1")
+                .header("multi", "value2")
+                .header("multi", "value3")
+                .cookie(Cookie("cookie1", "value1"))
+                .cookie(Cookie("cookie2", "value2"))
+                .body("""{"hello":"http4k"}""")
+        )
 
         assertThat(functionResponse.status, equalTo(OK))
         assertThat(functionResponse.bodyString(), containsSubstring("""{"hello":"http4k"}"""))
@@ -83,6 +90,7 @@ object DeployServerAsLambdaForClientContract {
     fun functionName(version: LambdaIntegrationType) = Function("test-function-${version.functionNamePrefix()}")
 
     private fun LambdaIntegrationType.functionMainClass(): String = when (this) {
+        ApiGatewayRest -> "org.http4k.serverless.lambda.TestFunctionRest"
         ApiGatewayV1 -> "org.http4k.serverless.lambda.TestFunctionV1"
         ApiGatewayV2 -> "org.http4k.serverless.lambda.TestFunctionV2"
         ApplicationLoadBalancer -> "org.http4k.serverless.lambda.TestFunctionAlb"
@@ -90,6 +98,7 @@ object DeployServerAsLambdaForClientContract {
     }
 
     private fun LambdaIntegrationType.functionNamePrefix(): String = when (this) {
+        ApiGatewayRest -> "apigw-rest"
         ApiGatewayV1 -> "apigw-v1"
         ApiGatewayV2 -> "apigw-v2"
         ApplicationLoadBalancer -> "alb"
@@ -99,6 +108,7 @@ object DeployServerAsLambdaForClientContract {
 
 fun main() {
     DeployServerAsLambdaForClientContract.apply {
+        deploy(ApiGatewayRest, ::ApiGatewayRestLambdaClient)
         deploy(ApiGatewayV1, ::ApiGatewayV1LambdaClient)
         deploy(ApiGatewayV2, ::ApiGatewayV2LambdaClient)
         deploy(ApplicationLoadBalancer, ::ApplicationLoadBalancerLambdaClient)

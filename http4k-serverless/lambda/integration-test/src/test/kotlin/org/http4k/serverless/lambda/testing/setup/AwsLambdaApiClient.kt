@@ -112,4 +112,4 @@ data class Role(val name: String)
 
 data class Region(val name: String)
 
-enum class LambdaIntegrationType { ApiGatewayV1, ApiGatewayV2, ApplicationLoadBalancer, Invocation }
+enum class LambdaIntegrationType { ApiGatewayRest, ApiGatewayV1, ApiGatewayV2, ApplicationLoadBalancer, Invocation }

@@ -7,19 +7,16 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
-import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v1
-import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v2
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayRest
 
 object DeployRestApiGateway {
 
-    fun deploy(integrationVersion: ApiIntegrationVersion) {
+    fun deploy() {
 
         val config = awsCliUserProfiles().profile("http4k-integration-test")
 
-        val functionName = functionName(integrationVersion.integrationType())
+        val functionName = functionName(ApiGatewayRest)
 
         val lambdaApi = config.awsLambdaApiClient()
 
@@ -30,12 +27,12 @@ object DeployRestApiGateway {
 
         val apis = apiGateway.listApis()
 
-        apis.filter { it.name == apiName(integrationVersion) }.forEach {
+        apis.filter { it.name == apiName() }.forEach {
             println("Deleting ${it.apiId.value}")
             apiGateway.delete(it.apiId)
         }
 
-        val api = apiGateway.createApi(apiName(integrationVersion))
+        val api = apiGateway.createApi(apiName())
         apiGateway.createStage(api.apiId, Stage.restDefault, functionArn)
 
         waitUntil(OK) {
@@ -43,14 +40,9 @@ object DeployRestApiGateway {
         }
     }
 
-    fun apiName(version: ApiIntegrationVersion) = ApiName("http4k-rest-api-${version.name}")
-
-    private fun ApiIntegrationVersion.integrationType(): LambdaIntegrationType = when (this) {
-        v1 -> ApiGatewayV1
-        v2 -> ApiGatewayV2
-    }
+    fun apiName() = ApiName("http4k-rest-api")
 }
 
 fun main() {
-    DeployRestApiGateway.deploy(v1)
+    DeployRestApiGateway.deploy()
 }
