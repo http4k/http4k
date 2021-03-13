@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.client
+package org.http4k.serverless.lambda
 
 import org.http4k.client.HttpClientContract
 import org.http4k.client.OkHttp
@@ -9,6 +9,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.inIntelliJOnly
+import org.http4k.serverless.lambda.testing.NoOpServerConfig
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 
