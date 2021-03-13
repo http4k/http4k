@@ -72,6 +72,7 @@ data class StageName(val value: String)
 
 data class Stage(val stageName: StageName, val autoDeploy: Boolean) {
     companion object {
+        val restDefault = Stage(StageName("default"), true)
         val default = Stage(StageName("\$default"), true)
     }
 }
