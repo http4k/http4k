@@ -4,12 +4,12 @@ import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
 import org.http4k.client.HttpClientContract
 import org.http4k.core.then
-import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
 import org.http4k.serverless.lambda.testing.client.ApiGatewayV1LambdaClient
 import org.http4k.serverless.lambda.testing.client.ApiGatewayV2LambdaClient
 import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambdaClient
 import org.http4k.serverless.lambda.testing.client.InvocationLambdaClient
 import org.http4k.serverless.lambda.testing.client.LambdaHttpClient
+import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
 import org.http4k.serverless.lambda.testing.setup.Function
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV1

@@ -1,6 +1,6 @@
 @file:Suppress("EnumEntryName")
 
-package org.http4k.serverless.lambda
+package org.http4k.serverless.lambda.testing.setup
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
@@ -22,16 +22,10 @@ import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambda
 import org.http4k.serverless.lambda.testing.client.InvocationLambdaClient
 import org.http4k.serverless.lambda.testing.client.LambdaHttpClient
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
-import org.http4k.serverless.lambda.testing.setup.Function
-import org.http4k.serverless.lambda.testing.setup.FunctionHandler
-import org.http4k.serverless.lambda.testing.setup.FunctionPackage
-import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.Invocation
-import org.http4k.serverless.lambda.testing.setup.Region
-import org.http4k.serverless.lambda.testing.setup.Role
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.io.PrintStream

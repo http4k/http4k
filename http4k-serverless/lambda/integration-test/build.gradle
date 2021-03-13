@@ -15,7 +15,7 @@ dependencies {
 
 task deployTestFunction(type: JavaExec) {
     classpath = classpath + sourceSets.test.runtimeClasspath
-    mainClass = 'org.http4k.serverless.lambda.DeployServerAsLambdaForClientContractKt'
+    mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContractKt'
 }
 
 deployTestFunction.dependsOn("test-function:buildZip")

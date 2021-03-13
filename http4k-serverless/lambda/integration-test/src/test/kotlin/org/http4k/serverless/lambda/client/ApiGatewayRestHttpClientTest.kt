@@ -9,10 +9,10 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.inIntelliJOnly
-import org.http4k.serverless.lambda.DeployRestApiGateway.apiName
 import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
 import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion
 import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v1
+import org.http4k.serverless.lambda.testing.setup.DeployRestApiGateway
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 import org.opentest4j.TestAbortedException
@@ -20,7 +20,7 @@ import org.opentest4j.TestAbortedException
 private fun client(version: ApiIntegrationVersion): (Request) -> Response {
     val api = awsCliUserProfiles().profile("http4k-integration-test")
         .restApiGatewayApiClient().listApis()
-        .find { it.name == apiName(version) }
+        .find { it.name == DeployRestApiGateway.apiName(version) }
         ?: throw TestAbortedException("API hasn't been deployed")
     val apiClient = ClientFilters.SetBaseUriFrom(api.apiEndpoint)
         .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
