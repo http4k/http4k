@@ -26,11 +26,11 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
         ApiDetails(ApiName(it.name), ApiId(it.id), apiEndpoint = Uri.of("https://${it.id}.execute-api.${region.name}.amazonaws.com/default"))
 
     fun delete(apiId: ApiId) {
-        client(Request(Method.DELETE, "/v2/apis/${apiId.value}"))
+        client(Request(Method.DELETE, "/restapis/${apiId.value}"))
     }
 
     fun createStage(apiId: ApiId, stage: Stage) {
-        client(Request(Method.POST, "/v2/apis/${apiId.value}/stages").with(createStageLens of stage))
+        client(Request(Method.POST, "/restapis/${apiId.value}/stages").with(createStageLens of stage))
     }
 
     fun createLambdaIntegration(apiId: ApiId, functionArn: String, version: ApiIntegrationVersion): IntegrationId =
