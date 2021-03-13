@@ -9,19 +9,20 @@ import org.http4k.aws.LambdaIntegrationType.Invocation
 import org.http4k.aws.Region
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
-import org.http4k.client.ApiGatewayV1LambdaClient
-import org.http4k.client.ApiGatewayV2LambdaClient
-import org.http4k.client.ApplicationLoadBalancerLambdaClient
 import org.http4k.client.HttpClientContract
-import org.http4k.client.InvocationLambdaClient
-import org.http4k.client.LambdaHttpClient
 import org.http4k.core.then
 import org.http4k.serverless.lambda.DeployServerAsLambdaForClientContract.functionName
+import org.http4k.serverless.lambda.testing.client.ApiGatewayV1LambdaClient
+import org.http4k.serverless.lambda.testing.client.ApiGatewayV2LambdaClient
+import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambdaClient
+import org.http4k.serverless.lambda.testing.client.InvocationLambdaClient
+import org.http4k.serverless.lambda.testing.client.LambdaHttpClient
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 
 abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
-                                    clientFn: (Function, Region) -> LambdaHttpClient) :
+                                    clientFn: (Function, Region) -> LambdaHttpClient
+) :
     HttpClientContract({ NoOpServerConfig },
         clientFn(functionName(type), Region(awsCliUserProfiles().profile("http4k-integration-test").region))
             .then(awsCliUserProfiles().profile("http4k-integration-test").awsClientFor("lambda"))) {

@@ -1,4 +1,4 @@
-package org.http4k.client
+package org.http4k.serverless.lambda.testing.client
 
 import org.http4k.aws.Function
 import org.http4k.aws.Region

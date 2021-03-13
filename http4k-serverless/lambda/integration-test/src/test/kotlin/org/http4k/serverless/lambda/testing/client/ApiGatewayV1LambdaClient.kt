@@ -1,4 +1,4 @@
-package org.http4k.client
+package org.http4k.serverless.lambda.testing.client
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
