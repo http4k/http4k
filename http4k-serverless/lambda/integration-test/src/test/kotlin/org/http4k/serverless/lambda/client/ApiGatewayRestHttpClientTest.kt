@@ -40,4 +40,3 @@ class ApiGatewayRestV1ClientTest : ApiGatewayRestHttpClientTest(v1) {
     override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
 }
-

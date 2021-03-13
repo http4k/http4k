@@ -64,4 +64,3 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
     private data class RestApiDetails(val name: String, val id: String)
     private data class Route(val target: String, val routeKey: String = "\$default")
 }
-
