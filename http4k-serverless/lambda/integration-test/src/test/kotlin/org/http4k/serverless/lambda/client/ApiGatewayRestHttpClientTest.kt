@@ -39,4 +39,6 @@ class ApiGatewayRestV1ClientTest : ApiGatewayRestHttpClientTest(v1) {
     override fun `can send multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
+    override fun `socket timeouts are converted into 504`() = assumeTrue(false, "Unsupported feature")
+    override fun `send binary data`() = assumeTrue(false, "Unsupported feature")
 }
