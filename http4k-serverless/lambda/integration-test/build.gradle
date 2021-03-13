@@ -18,4 +18,14 @@ task deployTestFunction(type: JavaExec) {
     mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContractKt'
 }
 
+task deployHttpApiGateway(type: JavaExec) {
+    classpath = classpath + sourceSets.test.runtimeClasspath
+    mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployApiGatewayKt'
+}
+
+task deployRestApiGateway(type: JavaExec) {
+    classpath = classpath + sourceSets.test.runtimeClasspath
+    mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployRestApiGatewayKt'
+}
+
 deployTestFunction.dependsOn("test-function:buildZip")
