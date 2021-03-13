@@ -1,9 +1,6 @@
 package org.http4k.aws
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.aws.ApiGatewayJackson.auto
-import org.http4k.aws.ApiIntegrationVersion.v1
-import org.http4k.aws.ApiIntegrationVersion.v2
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -18,49 +15,126 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
     private val client = ClientFilters.SetAwsServiceUrl("apigateway", region.name).then(rawClient)
 
     fun createApi(name: ApiName) =
-        apiDetailsLens(client(Request(Method.POST, "/restapis").with(createApiLens of RestApi(name.value)))).let(this@AwsRestApiGatewayApiClient::toApiDetails)
+        apiDetailsLens(
+            client(
+                Request(
+                    Method.POST,
+                    "/restapis"
+                ).with(createApiLens of RestApi(name.value))
+            )
+        ).let(this@AwsRestApiGatewayApiClient::toApiDetails)
 
-    fun listApis(): List<ApiDetails> = listApiLens(client(Request(Method.GET, "/restapis"))).embedded.item.map(this@AwsRestApiGatewayApiClient::toApiDetails)
+    fun listApis(): List<ApiDetails> = listApiLens(
+        client(
+            Request(
+                Method.GET,
+                "/restapis"
+            )
+        )
+    )._embedded.item.map(this@AwsRestApiGatewayApiClient::toApiDetails)
 
     private fun toApiDetails(it: RestApiDetails) =
-        ApiDetails(ApiName(it.name), ApiId(it.id), apiEndpoint = Uri.of("https://${it.id}.execute-api.${region.name}.amazonaws.com/default"))
+        ApiDetails(
+            ApiName(it.name),
+            ApiId(it.id),
+            apiEndpoint = Uri.of("https://${it.id}.execute-api.${region.name}.amazonaws.com/default")
+        )
 
     fun delete(apiId: ApiId) {
         client(Request(Method.DELETE, "/restapis/${apiId.value}"))
     }
 
-    fun createStage(apiId: ApiId, stage: Stage) {
-        client(Request(Method.POST, "/restapis/${apiId.value}/stages").with(createStageLens of stage))
+    fun createStage(apiId: ApiId, stage: Stage, functionArn: String) {
+        val rootResource = listResourcesLens(
+            client(
+                Request(
+                    Method.GET,
+                    "/restapis/${apiId.value}/resources"
+                )
+            )
+        )._embedded.item
+
+        val proxyResource = resourceDetailsLens(
+            client(
+                Request(
+                    Method.POST,
+                    "/restapis/${apiId.value}/resources/${rootResource.id}"
+                ).with(createProxyResource of CreateProxyResource())
+            )
+        )
+
+        client(
+            Request(Method.PUT, "/restapis/${apiId.value}/resources/${proxyResource.id}/methods/ANY")
+                .with(createMethod of CreateMethod(authorizationType = "NONE"))
+        )
+
+        val method = client(
+            Request(Method.PUT, "/restapis/${apiId.value}/resources/${proxyResource.id}/methods/ANY/integration")
+                .with(createMethodWithIntegrationLens of CreateMethodWithIntegration(uri = functionArn.invocation(region)))
+        )
+
+        val deploymentId =
+            createDeploymentResponseLens(
+                client(
+                    Request(
+                        Method.POST,
+                        "/restapis/${apiId.value}/deployments"
+                    ).with(createDeploymentLens of RestDeployment(stage.stageName.value))
+                )
+            )
+        client(
+            Request(
+                Method.POST,
+                "/restapis/${apiId.value}/stages"
+            ).with(createStageLens of RestStage(stage.stageName.value, deploymentId.id))
+        )
     }
 
+
     fun createLambdaIntegration(apiId: ApiId, functionArn: String, version: ApiIntegrationVersion): IntegrationId =
-        integrationInfo(client(Request(Method.POST, "/v2/apis/${apiId.value}/integrations")
-            .with(createIntegrationLens of Integration(
-                integrationUri = functionArn,
-                payloadFormatVersion = when (version) {
-                    v1 -> "1.0"
-                    v2 -> "2.0"
-                }
-            )))).integrationId
+        IntegrationId("none")
 
     fun createDefaultRoute(apiId: ApiId, integrationId: IntegrationId) =
-        client(Request(Method.POST, "/v2/apis/${apiId.value}/routes")
-            .with(createRouteLens of Route("integrations/${integrationId.value}")))
+        Unit
 
     companion object {
         private val createApiLens = Body.auto<RestApi>().toLens()
         private val apiDetailsLens = Body.auto<RestApiDetails>().toLens()
         private val listApiLens = Body.auto<ListApiResponse>().toLens()
-        private val createStageLens = Body.auto<Stage>().toLens()
+        private val listResourcesLens = Body.auto<ListResourcesResponse>().toLens()
+        private val resourceDetailsLens = Body.auto<RestResourceDetails>().toLens()
+        private val createProxyResource = Body.auto<CreateProxyResource>().toLens()
+        private val createStageLens = Body.auto<RestStage>().toLens()
+        private val createDeploymentLens = Body.auto<RestDeployment>().toLens()
+        private val createDeploymentResponseLens = Body.auto<RestDeploymentResponse>().toLens()
         private val createIntegrationLens = Body.auto<Integration>().toLens()
         private val integrationInfo = Body.auto<IntegrationInfo>().toLens()
         private val createRouteLens = Body.auto<Route>().toLens()
+        private val createMethodWithIntegrationLens = Body.auto<CreateMethodWithIntegration>().toLens()
+        private val createMethod = Body.auto<CreateMethod>().toLens()
     }
 
+    private data class CreateProxyResource(val pathPart: String = "{proxy+}")
     private data class RestApi(val name: String)
     private data class IntegrationInfo(val integrationId: IntegrationId)
-    private data class ListApiResponse(@JsonProperty("_embedded") val embedded: EmbeddedDetails)
+    private data class ListApiResponse(val _embedded: EmbeddedDetails)
+    private data class ListResourcesResponse(val _embedded: EmbeddedResourceDetails)
     private data class EmbeddedDetails(val item: List<RestApiDetails>)
+    private data class EmbeddedResourceDetails(val item: RestResourceDetails)
+    private data class RestResourceDetails(val id: String, val path: String)
     private data class RestApiDetails(val name: String, val id: String)
+    private data class RestStage(val stageName: String, val deploymentId: String)
+    private data class RestDeployment(val name: String)
+    private data class RestDeploymentResponse(val id: String)
     private data class Route(val target: String, val routeKey: String = "\$default")
+    private data class CreateMethodWithIntegration(
+        val type: String = "AWS_PROXY",
+        val uri: String,
+        val httpMethod: String = "POST"
+    )
+
+    private data class CreateMethod(val authorizationType: String)
 }
+
+private fun String.invocation(region: Region): String =
+    "arn:aws:apigateway:${region.name}:lambda:path/2015-03-31/functions/${this}/invocations"
