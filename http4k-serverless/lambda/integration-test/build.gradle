@@ -20,7 +20,7 @@ task deployTestFunction(type: JavaExec) {
 
 task deployHttpApiGateway(type: JavaExec) {
     classpath = classpath + sourceSets.test.runtimeClasspath
-    mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployApiGatewayKt'
+    mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployHttpApiGatewayKt'
 }
 
 task deployRestApiGateway(type: JavaExec) {

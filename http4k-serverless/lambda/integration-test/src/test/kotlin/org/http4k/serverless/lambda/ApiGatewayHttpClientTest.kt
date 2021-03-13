@@ -14,14 +14,14 @@ import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
 import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion
 import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v1
 import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v2
-import org.http4k.serverless.lambda.testing.setup.DeployApiGateway
+import org.http4k.serverless.lambda.testing.setup.DeployHttpApiGateway
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 
 private fun client(version: ApiIntegrationVersion): (Request) -> Response {
     val api = awsCliUserProfiles().profile("http4k-integration-test")
         .apiGatewayApiClient().listApis()
-        .find { it.name == DeployApiGateway.apiName(version) }
+        .find { it.name == DeployHttpApiGateway.apiName(version) }
         ?: throw TestAbortedException("API hasn't been deployed")
     val apiClient = ClientFilters.SetBaseUriFrom(api.apiEndpoint)
         .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())

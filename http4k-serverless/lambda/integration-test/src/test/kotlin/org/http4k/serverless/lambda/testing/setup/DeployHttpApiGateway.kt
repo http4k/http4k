@@ -19,7 +19,7 @@ import org.junit.jupiter.api.fail
 import java.time.Duration
 import java.time.Instant
 
-object DeployApiGateway {
+object DeployHttpApiGateway {
 
     fun deploy(integrationVersion: ApiIntegrationVersion) {
 
@@ -62,7 +62,7 @@ object DeployApiGateway {
 }
 
 fun main() {
-    ApiIntegrationVersion.values().forEach(DeployApiGateway::deploy)
+    ApiIntegrationVersion.values().forEach(DeployHttpApiGateway::deploy)
 }
 
 fun waitUntil(
