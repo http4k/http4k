@@ -73,6 +73,11 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
                 .with(createMethodWithIntegrationLens of CreateMethodWithIntegration(uri = functionArn.invocation(region)))
         )
 
+        client(
+            Request(Method.PUT, "/restapis/${apiId.value}/resources/${proxyResource.id}/methods/ANY/integration/responses/200")
+                .with(createIntegrationResponseLens of CreateIntegrationResponse())
+        )
+
         val deploymentId =
             createDeploymentResponseLens(
                 client(
@@ -101,12 +106,12 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
         private val createDeploymentLens = Body.auto<RestDeployment>().toLens()
         private val createDeploymentResponseLens = Body.auto<RestDeploymentResponse>().toLens()
         private val createMethodWithIntegrationLens = Body.auto<CreateMethodWithIntegration>().toLens()
+        private val createIntegrationResponseLens = Body.auto<CreateIntegrationResponse>().toLens()
         private val createMethod = Body.auto<CreateMethod>().toLens()
     }
 
     private data class CreateProxyResource(val pathPart: String = "{proxy+}")
     private data class RestApi(val name: String)
-    private data class IntegrationInfo(val integrationId: IntegrationId)
     private data class ListApiResponse(val _embedded: EmbeddedDetails)
     private data class ListResourcesResponse(val _embedded: EmbeddedResourceDetails)
     private data class EmbeddedDetails(val item: List<RestApiDetails>)
@@ -122,6 +127,7 @@ class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Reg
         val httpMethod: String = "POST"
     )
     private data class CreateMethod(val authorizationType: String)
+    private data class CreateIntegrationResponse(val selectionPattern:String = "\\d{3}", val contentHandling:String = "CONVERT_TO_TEXT")
 
     private fun String.invocation(region: Region): String =
         "arn:aws:apigateway:${region.name}:lambda:path/2015-03-31/functions/${this}/invocations"
