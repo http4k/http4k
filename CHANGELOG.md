@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.4.1.0 (uncut)
+### v4.4.1.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-serverless-lambda** : Introduce ApiGatewayRestLambdaFunction to be used with REST Api Gateways
 
