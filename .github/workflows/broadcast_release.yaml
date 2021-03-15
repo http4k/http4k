@@ -1,7 +1,10 @@
-name: Broadcast Release Event
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: '0 */12 * * *' # every 12 hours
+  push:
+    branches:
+      - master
+
 jobs:
   check-new-version:
     runs-on: ubuntu-latest
