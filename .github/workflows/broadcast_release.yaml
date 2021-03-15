@@ -1,6 +1,7 @@
+name: Broadcast http4k release event
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/5 * * * *"
 jobs:
   check-new-version:
     runs-on: ubuntu-latest
