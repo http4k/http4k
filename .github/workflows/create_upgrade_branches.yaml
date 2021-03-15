@@ -1,3 +1,4 @@
+name: New Release - Update other projects
 on:
   repository_dispatch:
     types: [http4k-release]

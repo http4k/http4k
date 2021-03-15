@@ -1,3 +1,4 @@
+name: Release Site
 on:
   push:
     branches:

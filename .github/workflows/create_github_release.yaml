@@ -1,3 +1,4 @@
+name: New Release - GitHub
 on:
   repository_dispatch:
     types: [http4k-release]

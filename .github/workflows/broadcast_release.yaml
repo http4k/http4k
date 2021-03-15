@@ -1,4 +1,4 @@
-name: Broadcast http4k release event
+name: Publish new http4k release event
 on:
   schedule:
     - cron: "*/5 * * * *"
