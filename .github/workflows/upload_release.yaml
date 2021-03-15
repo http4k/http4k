@@ -42,7 +42,6 @@ jobs:
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
   ReleaseBintray:
-    needs: [ReleaseMC]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,19 +53,3 @@ jobs:
           BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
           SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
           SONATYPE_KEY: ${{ secrets.SONATYPE_KEY }}
-  Release:
-    needs: [ReleaseBintray]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Grab tag name
-        uses: olegtarasov/get-tag@v2
-        id: tagName
-      - name: Dispatch Release Event
-        uses: peter-evans/repository-dispatch@v1.1.1
-        with:
-          token: ${{ secrets.ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING }}
-          repository: http4k/http4k
-          event-type: http4k-release
-          client-payload: '{"version": "${{ steps.tagName.outputs.tag }}"}'
