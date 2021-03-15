@@ -1,4 +1,4 @@
-name: New release - Slack
+name: New Release - Slack
 on:
   repository_dispatch:
     types: [http4k-release]

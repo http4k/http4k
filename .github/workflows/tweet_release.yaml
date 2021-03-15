@@ -1,4 +1,4 @@
-name: New release - Twitter
+name: New Release - Twitter
 on:
   repository_dispatch:
     types: [http4k-release]
