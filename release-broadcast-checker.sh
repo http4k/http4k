@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./release-functions.sh
+LOCAL_VERSION=$(tools/jq -r .http4k.version ./version.json)
 
 S3_VERSION=$(aws s3 cp s3://http4k/latest-broadcasted-version.txt -)
 
