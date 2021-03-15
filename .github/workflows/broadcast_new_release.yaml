@@ -23,7 +23,7 @@ jobs:
         id: check-version
         shell: bash
         run: |
-          LOCAL_VERSION=$(tools/jq -r .http4k.version ./version.json)
+          LOCAL_VERSION=$(jq -r .http4k.version ./version.json)
           S3_VERSION=$(aws s3 cp s3://http4k/latest-broadcasted-version.txt -)
 
           if [[ $S3_VERSION == $LOCAL_VERSION ]]; then
