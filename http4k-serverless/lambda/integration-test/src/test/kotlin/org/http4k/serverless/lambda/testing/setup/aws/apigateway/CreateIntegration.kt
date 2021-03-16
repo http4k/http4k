@@ -4,10 +4,10 @@ import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.http4k.serverless.lambda.testing.setup.Region
 import org.http4k.serverless.lambda.testing.setup.aws.apigateway.ApiGatewayJackson.auto
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiId
 import org.http4k.serverless.lambda.testing.setup.aws.kClass
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 
 class CreateIntegration(private val apiId: ApiId,
                         private val resource: RestResourceDetails,

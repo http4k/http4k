@@ -11,8 +11,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion.v1
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion.v2
@@ -24,6 +22,9 @@ import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createLambdaI
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createStage
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.delete
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.listApis
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV2
 import org.junit.jupiter.api.fail
 import java.time.Duration
 import java.time.Instant

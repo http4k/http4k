@@ -8,7 +8,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayRest
 import org.http4k.serverless.lambda.testing.setup.aws.apigateway.CreateDeployment
 import org.http4k.serverless.lambda.testing.setup.aws.apigateway.DeploymentName
 import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createApi
@@ -23,6 +22,8 @@ import org.http4k.serverless.lambda.testing.setup.aws.apigateway.listResources
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiName
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
 import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayRest
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 
 object DeployRestApiGateway {
 

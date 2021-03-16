@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.testing.setup
+package org.http4k.serverless.lambda.testing.setup.aws.lambda
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.core.Body

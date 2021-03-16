@@ -13,8 +13,8 @@ import org.http4k.core.then
 import org.http4k.core.toParameters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.format.Jackson.auto
-import org.http4k.serverless.lambda.testing.setup.Function
-import org.http4k.serverless.lambda.testing.setup.Region
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Function
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 
 class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
     override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of APIGatewayProxyRequestEvent()

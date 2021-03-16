@@ -6,8 +6,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.lens.string
-import org.http4k.serverless.lambda.testing.setup.Function
-import org.http4k.serverless.lambda.testing.setup.Region
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Function
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 
 class InvocationLambdaClient(function: Function, region: Region) :
     LambdaHttpClient(function, region) {

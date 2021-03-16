@@ -13,9 +13,9 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
-import org.http4k.serverless.lambda.testing.setup.Region
 import org.http4k.serverless.lambda.testing.setup.aws.RemoteFailure
 import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 
 
 interface AwsApiGatewayV2 {
