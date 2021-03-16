@@ -9,6 +9,8 @@ import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
 import org.http4k.serverless.lambda.testing.setup.LambdaIntegrationType.ApiGatewayRest
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiName
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
 
 object DeployRestApiGateway {
 

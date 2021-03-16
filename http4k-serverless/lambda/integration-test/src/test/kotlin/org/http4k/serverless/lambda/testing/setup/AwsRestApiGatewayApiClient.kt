@@ -9,7 +9,11 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.SetAwsServiceUrl
-import org.http4k.serverless.lambda.testing.setup.ApiGatewayJackson.auto
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiDetails
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiGatewayJackson.auto
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiId
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiName
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
 
 class AwsRestApiGatewayApiClient(rawClient: HttpHandler, private val region: Region) {
     private val client = ClientFilters.SetAwsServiceUrl("apigateway", region.name).then(rawClient)

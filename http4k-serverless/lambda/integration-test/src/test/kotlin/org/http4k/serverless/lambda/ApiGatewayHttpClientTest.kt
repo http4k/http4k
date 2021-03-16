@@ -11,10 +11,11 @@ import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.inIntelliJOnly
 import org.http4k.serverless.lambda.testing.NoOpServerConfig
 import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
-import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion
-import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v1
-import org.http4k.serverless.lambda.testing.setup.ApiIntegrationVersion.v2
 import org.http4k.serverless.lambda.testing.setup.DeployHttpApiGateway
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion.v1
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion.v2
+import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.listApis
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 
