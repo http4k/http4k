@@ -24,6 +24,7 @@ import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
 import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayRest
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
 
 object DeployRestApiGateway {
 

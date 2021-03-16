@@ -25,6 +25,7 @@ import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.listApis
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
 import org.junit.jupiter.api.fail
 import java.time.Duration
 import java.time.Instant

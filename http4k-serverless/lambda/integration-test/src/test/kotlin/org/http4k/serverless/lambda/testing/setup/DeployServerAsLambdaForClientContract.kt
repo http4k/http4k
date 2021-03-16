@@ -32,8 +32,13 @@ import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationTy
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.Invocation
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Permission
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.Role
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.createFunction
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.delete
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.setPermission
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.io.PrintStream
@@ -67,7 +72,8 @@ object DeployServerAsLambdaForClientContract {
         )
 
         println("Deploying function...")
-        val details = lambdaApiClient.create(functionPackage)
+        val details = lambdaApiClient.createFunction(functionPackage)
+        lambdaApiClient.setPermission(details, Permission.invokeFromApiGateway)
 
         println("Created function with arn ${details.arn}")
 

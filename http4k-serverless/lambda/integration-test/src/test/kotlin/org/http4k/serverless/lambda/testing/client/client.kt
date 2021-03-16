@@ -10,7 +10,8 @@ import org.http4k.serverless.lambda.testing.setup.aws.apigateway.AwsApiGateway
 import org.http4k.serverless.lambda.testing.setup.aws.apigateway.Http
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.AwsApiGatewayV2
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Http
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.AwsLambdaApiClient
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Http
+import org.http4k.serverless.lambda.testing.setup.aws.lambda.Lambda
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -18,7 +19,7 @@ fun AwsProfile.apiGatewayApiClient() = AwsApiGatewayV2.Http(client("apigateway")
 
 fun AwsProfile.restApiGatewayApiClient() = AwsApiGateway.Http(client("apigateway"), Region(region))
 
-fun AwsProfile.awsLambdaApiClient() = AwsLambdaApiClient(client("lambda"), Region(region))
+fun AwsProfile.awsLambdaApiClient() = Lambda.Http(client("lambda"), Region(region))
 
 private fun AwsProfile.client(service: String) = awsClientFilterFor(service, Signed)
     .then(
