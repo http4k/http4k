@@ -36,6 +36,4 @@ class CreateFunction(private val functionPackage: FunctionPackage) : LambdaActio
 
     private data class Code(@JsonProperty("ZipFile") val zipFile: String)
     private data class Environment(@JsonProperty("Variables") val variables: Map<String, String>)
-
-
 }
