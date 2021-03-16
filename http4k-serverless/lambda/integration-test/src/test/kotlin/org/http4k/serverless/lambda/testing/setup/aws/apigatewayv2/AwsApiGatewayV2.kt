@@ -17,7 +17,6 @@ import org.http4k.serverless.lambda.testing.setup.aws.RemoteFailure
 import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 
-
 interface AwsApiGatewayV2 {
     operator fun <R : Any> invoke(action: AwsApiGatewayV2Action<R>): Result<R, RemoteFailure>
 

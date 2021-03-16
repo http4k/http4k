@@ -21,4 +21,3 @@ data class RemoteFailure(val method: Method, val uri: Uri, val status: Status, v
 inline fun <reified T : Any> kClass(): KClass<T> = T::class
 
 fun <T> Result<T, RemoteFailure>.getOrThrow() = recover { it.throwIt() }
-
