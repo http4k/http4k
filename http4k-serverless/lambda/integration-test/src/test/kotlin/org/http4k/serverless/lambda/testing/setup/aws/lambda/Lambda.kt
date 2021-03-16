@@ -29,7 +29,7 @@ fun Lambda.Companion.Http(rawHttp: HttpHandler, region: Region) = object : Lambd
     )
 }
 
-fun Lambda.createFunction(functionPackage: FunctionPackage) =
+fun Lambda.createFunction(functionPackage: FunctionPackage): FunctionDetails =
     this(CreateFunction(functionPackage)).map { FunctionDetails(it.arn, it.name) }.getOrThrow()
 
 fun Lambda.setPermission(details: FunctionDetails, permission: Permission) =
@@ -37,7 +37,7 @@ fun Lambda.setPermission(details: FunctionDetails, permission: Permission) =
 
 fun Lambda.delete(function: Function) = this(DeleteFunction(function)).getOrThrow()
 
-fun Lambda.list() = this(ListFunctions()).map { it.functions.map { f -> FunctionDetails(f.arn, f.name) } }.getOrThrow()
+fun Lambda.list() = this(ListFunctions()).getOrThrow()
 
 data class ListFunctionsResponse(@JsonProperty("Functions") val functions: List<FunctionDetailsData>)
 

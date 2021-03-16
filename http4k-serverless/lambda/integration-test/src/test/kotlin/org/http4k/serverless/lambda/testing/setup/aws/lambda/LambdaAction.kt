@@ -5,6 +5,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.map
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
@@ -14,11 +16,15 @@ import org.http4k.serverless.lambda.testing.setup.aws.RemoteFailure
 import kotlin.reflect.KClass
 
 abstract class LambdaAction<R : Any>(private val clazz: KClass<R>) : Action<Result<R, RemoteFailure>> {
-    override fun toResult(response: Response) = with(response) {
-        when {
-            status.successful -> Success(LambdaJackson.asA(bodyString().let { if (it.isEmpty()) "{}" else it }, clazz))
-            else -> Failure(RemoteFailure(toRequest().method, toRequest().uri, status, bodyString()))
-        }
+    override fun toResult(response: Response) =
+        response.toActionResult(toRequest())
+            .map { LambdaJackson.asA(response.bodyString().let { if (it.isEmpty()) "{}" else it }, clazz) }
+}
+
+fun Response.toActionResult(originalRequest: Request) = with(this) {
+    when {
+        status.successful -> Success(this)
+        else -> Failure(RemoteFailure(originalRequest.method, originalRequest.uri, status, bodyString()))
     }
 }
 
