@@ -10,7 +10,7 @@ import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
 import org.http4k.serverless.lambda.testing.setup.aws.kClass
 
 class CreateStage(private val apiId: ApiId, private val stage: Stage, private val deploymentId: DeploymentId)
-    : AwsApiGatewayAction<DeploymentId>(kClass()) {
+    : AwsApiGatewayAction<Unit>(kClass()) {
     override fun toRequest() = Request(Method.POST, "/restapis/${apiId.value}/stages")
         .with(Body.auto<CreateStage>().toLens() of CreateStage(stage.stageName.value, deploymentId.id))
 
