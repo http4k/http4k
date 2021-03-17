@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.4.2.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions
+- **http4k-format-*** : Add support for reading inputstreams directly in all automarshaller implementations
 
 ### v4.4.1.0
 - **http4k-*** : Upgrade some dependency versions

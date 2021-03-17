@@ -9,6 +9,11 @@ import kotlin.reflect.KClass
 abstract class AutoMarshalling {
     abstract fun <T : Any> asA(input: String, target: KClass<T>): T
 
+    abstract fun <T : Any> asA(input: InputStream, target: KClass<T>): T
+
+    @JvmName("streamAsA")
+    inline fun <reified T : Any> asA(input: InputStream): T = asA(input, T::class)
+
     @JvmName("stringAsA")
     inline fun <reified T : Any> asA(input: String): T = asA(input, T::class)
 

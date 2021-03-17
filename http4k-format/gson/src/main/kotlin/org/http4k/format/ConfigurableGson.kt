@@ -13,6 +13,7 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonReader
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -20,6 +21,7 @@ import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.websocket.WsMessage
+import java.io.InputStream
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -89,6 +91,9 @@ open class ConfigurableGson(builder: GsonBuilder,
     override fun asJsonObject(input: Any): JsonElement = mapper.toJsonTree(input)
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.fromJson(input, target.java)
+
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = mapper.fromJson(JsonReader(input.reader()), target.java)
+
     override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = mapper.fromJson(j, target.java)
 
     inline fun <reified T : Any> JsonElement.asA(): T = mapper.fromJson(this, object : TypeToken<T>() {}.type)

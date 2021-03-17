@@ -13,6 +13,7 @@ import org.http4k.lens.ParamMeta
 import org.http4k.lens.httpBodyRoot
 import org.json.XML
 import org.w3c.dom.Document
+import java.io.InputStream
 import java.io.StringWriter
 import java.nio.ByteBuffer
 import javax.xml.parsers.DocumentBuilderFactory
@@ -26,6 +27,8 @@ object Xml : AutoMarshallingXml() {
     override fun Any.asXmlString(): String = throw UnsupportedOperationException("")
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = Gson.asA(input.asXmlToJsonElement(), target)
+
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = Gson.asA(input.reader().readText().asXmlToJsonElement(), target)
 
     fun String.asXmlToJsonElement(): JsonElement = Gson.parse(XML.toJSONObject(this, true).toString())
 

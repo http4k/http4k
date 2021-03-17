@@ -36,6 +36,7 @@ import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.websocket.WsMessage
+import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.jvm.internal.Reflection
@@ -123,8 +124,9 @@ open class ConfigurableKotlinxSerialization(
         return json.decodeFromJsonElement(json.serializersModule.serializer(target.java), j) as T
     }
 
-    override fun <T : Any> asA(input: String, target: KClass<T>): T =
-        json.parseToJsonElement(input).asA(target)
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = json.parseToJsonElement(input).asA(target)
+
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = asA(input.reader().readText(), target)
 
     inline fun <reified T : Any> JsonElement.asA(): T = json.decodeFromJsonElement(this)
 

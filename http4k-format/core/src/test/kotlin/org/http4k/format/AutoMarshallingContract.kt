@@ -78,6 +78,13 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
+    open fun `roundtrip arbitary object to and from inputstream`() {
+        val out = marshaller.asFormatString(obj)
+        assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult.normaliseJson()))
+        assertThat(marshaller.asA(out.byteInputStream(), ArbObject::class), equalTo(obj))
+    }
+
+    @Test
     open fun `roundtrip object with common java primitive types`() {
         val localDate = LocalDate.of(2000, 1, 1)
         val localTime = LocalTime.of(1, 1, 1)

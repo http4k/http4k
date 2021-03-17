@@ -8,10 +8,12 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
+import java.io.InputStream
 import kotlin.reflect.KClass
 
 open class ConfigurableJacksonYaml(val mapper: ObjectMapper) : AutoMarshalling() {
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = mapper.readValue(input, target.java)
 
     override fun asFormatString(input: Any): String = mapper.writeValueAsString(input)
 

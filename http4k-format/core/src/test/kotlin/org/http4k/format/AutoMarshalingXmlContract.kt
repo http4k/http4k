@@ -20,6 +20,11 @@ abstract class AutoMarshalingXmlContract(private val x: AutoMarshallingXml) {
     }
 
     @Test
+    fun `deserialise simple container with attribute from stream`() {
+        assertThat(x.asA("""<container field="value"/>""".byteInputStream(), Container::class), equalTo(Container("value")))
+    }
+
+    @Test
     fun `deserialise simple container with element`() {
         assertThat(x.asA("""<container><field>value</field></container>""", Container::class), equalTo(Container("value")))
     }
