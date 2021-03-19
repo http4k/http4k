@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.5.0.0 (uncut)
+### v4.5.0.0
+- **http4k-*** : Upgrade some dependency versions
 - **http4k-core** : [Slight break] Hide identity of `JavaHttpClient` and made the . You should be using `HttpHandler` anyway... ;) 
 - **http4k-core** : Fix #598 - Silent exception on 204 with SunHttp. H/T @ToastShaman
 - **http4k-core** : Fix #594 - Conditional filter. H/T @jainsahab
