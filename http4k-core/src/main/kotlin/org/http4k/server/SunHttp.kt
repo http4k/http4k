@@ -16,11 +16,12 @@ import com.sun.net.httpserver.HttpHandler as SunHttpHandler
 class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
         httpResponse.headers.forEach { (key, value) -> responseHeaders.add(key, value) }
-        if (requestMethod == "HEAD") {
-            sendResponseHeaders(httpResponse.status.code, -1)
-        } else {
-            sendResponseHeaders(httpResponse.status.code, httpResponse.calculateLength())
-            httpResponse.body.stream.use { it.copyTo(responseBody) }
+        when (requestMethod) {
+            "HEAD" -> sendResponseHeaders(httpResponse.status.code, -1)
+            else -> {
+                sendResponseHeaders(httpResponse.status.code, httpResponse.calculateLength())
+                httpResponse.body.stream.use { it.copyTo(responseBody) }
+            }
         }
     }
 
