@@ -19,9 +19,16 @@ class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
         if (requestMethod == "HEAD") {
             sendResponseHeaders(httpResponse.status.code, -1)
         } else {
-            sendResponseHeaders(httpResponse.status.code, httpResponse.body.length ?: 0)
+            sendResponseHeaders(httpResponse.status.code, httpResponse.calculateLength())
             httpResponse.body.stream.use { it.copyTo(responseBody) }
         }
+    }
+
+    // for SunHttp, -1 should be set for no content-length header to be sent
+    private fun Response.calculateLength() = when (val length = body.length) {
+        0L -> -1
+        null -> 0
+        else -> length
     }
 
     private fun HttpExchange.toRequest(): Request =

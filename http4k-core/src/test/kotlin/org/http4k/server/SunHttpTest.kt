@@ -24,8 +24,9 @@ class SunHttpTest : ServerContract(::SunHttp, ApacheClient()) {
         server.start().use {
             ApacheClient()(Request(GET, "http://localhost:8000/hello"))
             val output = String(err.toByteArray())
+            println(output)
             assertThat(output, !containsSubstring("Exception in thread"))
-//            assertThat(output, !containsSubstring("WARNING: sendResponseHeaders"))
+            assertThat(output, !containsSubstring("WARNING: sendResponseHeaders"))
         }
 
         System.setErr(orig)
