@@ -45,7 +45,7 @@ class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     }
 }
 
-data class SunHttp(val port: Int = 8000) : ServerConfig {
+class SunHttp(val port: Int = 8000) : ServerConfig {
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         override fun port(): Int = if (port > 0) port else server.address.port
 
