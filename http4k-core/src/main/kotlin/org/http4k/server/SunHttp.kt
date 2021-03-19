@@ -20,7 +20,7 @@ class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
             sendResponseHeaders(httpResponse.status.code, -1)
         } else {
             sendResponseHeaders(httpResponse.status.code, httpResponse.body.length ?: 0)
-            httpResponse.body.stream.use { input -> responseBody.use { input.copyTo(it) } }
+            httpResponse.body.stream.use { it.copyTo(responseBody) }
         }
     }
 
