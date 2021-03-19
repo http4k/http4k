@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.5.0.0 (uncut)
 - **http4k-core** : [Slight break] Hide identity of `JavaHttpClient` and made the . You should be using `HttpHandler` anyway... ;) 
+- **http4k-core** : Fix #598 - Silent exception on 204 with SunHttp. H/T @ToastShaman
 
 ### v4.4.2.0
 - **http4k-*** : Upgrade some dependency versions
