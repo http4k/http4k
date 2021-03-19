@@ -29,7 +29,7 @@ By default, the variable(s) will match anything. However you can append the vari
 "/sales/{region:(?:northeast|southeast|west|international)}" 
 ```
 
-Unlike some frameworks, there are no pre-defined types such as `int` or `path` but these are easy to replicate with RegEx's:
+There are no pre-defined types such as `int` or `path` for matching but these are easy to replicate with RegEx's:
 - string (excluding slashes) : `[^\\/]+` (note that Kotlin requires backslashes to be escaped, so `\w` in RegEx is expressed as `\\w` in Kotlin)
 - int : `\\d+`
 - float : `[+-]?([0-9]*[.])?[0-9]+` (this will match basic floats. Does not match exponents, or scientific notation)
