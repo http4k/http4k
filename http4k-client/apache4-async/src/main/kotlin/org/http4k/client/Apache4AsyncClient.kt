@@ -26,6 +26,9 @@ import java.net.SocketTimeoutException
 import java.net.URI
 
 object Apache4AsyncClient {
+    @JvmStatic
+    @JvmOverloads
+    @JvmName("create")
     operator fun invoke(
         client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient(),
         responseBodyMode: BodyMode = Memory,
