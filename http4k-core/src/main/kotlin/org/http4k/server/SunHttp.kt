@@ -7,6 +7,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import java.net.InetSocketAddress
@@ -16,7 +17,7 @@ import com.sun.net.httpserver.HttpHandler as SunHttpHandler
 class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
         httpResponse.headers.forEach { (key, value) -> responseHeaders.add(key, value) }
-        if (requestMethod == "HEAD") {
+        if (requestMethod == "HEAD" || httpResponse.status == NO_CONTENT) {
             sendResponseHeaders(httpResponse.status.code, -1)
         } else {
             sendResponseHeaders(httpResponse.status.code, httpResponse.body.length ?: 0)
