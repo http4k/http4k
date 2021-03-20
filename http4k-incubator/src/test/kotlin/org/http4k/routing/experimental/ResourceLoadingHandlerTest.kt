@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.apache.hc.core5.http.impl.io.EmptyInputStream
+import org.apache.hc.core5.http.io.entity.EmptyInputStream
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.MemoryRequest
 import org.http4k.core.Method.GET

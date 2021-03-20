@@ -19,7 +19,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.server.ApacheServer
 import org.junit.jupiter.api.Test
 
-class ApacheClientTest : HttpClientContract({ ApacheServer(it) }, ApacheClient(),
+class ApacheClientTest : HttpClientContract(::ApacheServer, ApacheClient(),
     ApacheClient(HttpClients.custom()
         .setDefaultRequestConfig(
             RequestConfig.custom()

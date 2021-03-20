@@ -5,7 +5,7 @@ import org.apache.hc.core5.util.Timeout
 import org.http4k.core.BodyMode.Stream
 import org.http4k.server.ApacheServer
 
-class ApacheClientStreamingTest : HttpClientContract({ ApacheServer(it) },
+class ApacheClientStreamingTest : HttpClientContract(::ApacheServer,
     ApacheClient(requestBodyMode = Stream, responseBodyMode = Stream),
     ApacheClient(org.apache.hc.client5.http.impl.classic.HttpClients.custom()
         .setDefaultRequestConfig(

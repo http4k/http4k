@@ -4,7 +4,7 @@ import org.http4k.core.BodyMode
 import org.http4k.server.ApacheServer
 import org.junit.jupiter.api.Test
 
-class JettyClientStreamingTest : HttpClientContract({ ApacheServer(it) }, JettyClient(bodyMode = BodyMode.Stream),
+class JettyClientStreamingTest : HttpClientContract(::ApacheServer, JettyClient(bodyMode = BodyMode.Stream),
     JettyClient(bodyMode = BodyMode.Stream, requestModifier = timeout)) {
 
     @Test
