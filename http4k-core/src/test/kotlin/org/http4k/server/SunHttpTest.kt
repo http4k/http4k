@@ -6,8 +6,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
