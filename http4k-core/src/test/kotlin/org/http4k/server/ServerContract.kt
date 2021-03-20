@@ -110,6 +110,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     }
 
     @Test
+    fun `can make multiple requests`() {
+        assertThat(client(Request(POST, "$baseUrl/echo").body("hello mum")), hasStatus(OK))
+        assertThat(client(Request(POST, "$baseUrl/echo").body("hello mum")), hasStatus(OK))
+    }
+
+    @Test
     fun `can set multiple headers with the same name`() {
         val response = client(Request(GET, "$baseUrl/multiple-headers"))
 
