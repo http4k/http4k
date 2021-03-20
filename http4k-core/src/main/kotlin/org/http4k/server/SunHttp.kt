@@ -15,6 +15,7 @@ import com.sun.net.httpserver.HttpHandler as SunHttpHandler
 
 class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
+        requestBody.close()
         httpResponse.headers.forEach { (key, value) -> responseHeaders.add(key, value) }
         when (requestMethod) {
             "HEAD" -> sendResponseHeaders(httpResponse.status.code, -1)
