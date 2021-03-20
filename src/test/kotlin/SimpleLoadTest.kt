@@ -49,7 +49,7 @@ fun main() {
     val threads = 250
     val reps = 400
 
-    listOf<(Int) -> ServerConfig>({ ApacheServer(it) }, { Undertow(it) }, { SunHttp(it) }, { Netty(it) })
+    listOf<(Int) -> ServerConfig>(::ApacheServer, ::Undertow, ::SunHttp, ::Netty)
         .map { testWith(threads, reps, it, 8000) }
         .sortedBy { it.time }
         .forEach(::println)
