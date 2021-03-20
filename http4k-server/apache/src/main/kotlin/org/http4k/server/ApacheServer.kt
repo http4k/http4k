@@ -8,9 +8,9 @@ import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.HttpEntityContainer
 import org.apache.hc.core5.http.impl.bootstrap.HttpServer
 import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap
-import org.apache.hc.core5.http.impl.io.EmptyInputStream
 import org.apache.hc.core5.http.io.HttpRequestHandler
 import org.apache.hc.core5.http.io.SocketConfig
+import org.apache.hc.core5.http.io.entity.EmptyInputStream.*
 import org.apache.hc.core5.http.io.entity.InputStreamEntity
 import org.apache.hc.core5.http.protocol.HttpContext
 import org.apache.hc.core5.http.protocol.HttpCoreContext
@@ -46,11 +46,22 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
         return Request(Method.valueOf(method), uri.httpUri())
             .headers(headers.toHttp4kHeaders()).let {
                 when (this) {
-                    is HttpEntityContainer -> entity?. let { httpEntity -> it.body(httpEntity.content, getFirstHeader("Content-Length")?.value.safeLong()) } ?: it
-                    else -> it.body(EmptyInputStream.INSTANCE, 0)
+                    is HttpEntityContainer -> entity?.let { httpEntity ->
+                        it.body(
+                            httpEntity.content,
+                            getFirstHeader("Content-Length")?.value.safeLong()
+                        )
+                    } ?: it
+                    else -> it.body(INSTANCE, 0)
                 }
             }
-            .source((connection.remoteAddress as InetSocketAddress).let { RequestSource(it.hostString, it.port, uri.scheme) })
+            .source((connection.remoteAddress as InetSocketAddress).let {
+                RequestSource(
+                    it.hostString,
+                    it.port,
+                    uri.scheme
+                )
+            })
     }
 
     private fun URI.httpUri(): String = path + if (query.isNullOrBlank()) "" else "?$query"
@@ -60,7 +71,8 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun Response.into(response: ApacheResponse) {
         response.code = status.code
         response.reasonPhrase = status.description
-        headers.filter { !headersThatApacheInterceptorSets.contains(it.first) }.forEach { (key, value) -> response.addHeader(key, value) }
+        headers.filter { !headersThatApacheInterceptorSets.contains(it.first) }
+            .forEach { (key, value) -> response.addHeader(key, value) }
         if (response is HttpEntityContainer) {
             val contentType = CONTENT_TYPE(this@into)?.let { ContentType.parse(it.toHeaderValue()) }
                 ?: ContentType.WILDCARD
@@ -71,7 +83,11 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun Array<Header>.toHttp4kHeaders(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
 }
 
-data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, private val canonicalHostname: String? = null) : ServerConfig {
+data class ApacheServer(
+    val port: Int = 8000,
+    val address: InetAddress? = null,
+    private val canonicalHostname: String? = null
+) : ServerConfig {
 
     constructor(port: Int = 8000) : this(port, null, null)
 
@@ -81,12 +97,14 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress? = null, 
         init {
             val bootstrap = ServerBootstrap.bootstrap()
                 .setListenerPort(port)
-                .setSocketConfig(SocketConfig.custom()
-                    .setTcpNoDelay(true)
-                    .setSoKeepAlive(true)
-                    .setSoReuseAddress(true)
-                    .setBacklogSize(1000)
-                    .build())
+                .setSocketConfig(
+                    SocketConfig.custom()
+                        .setTcpNoDelay(true)
+                        .setSoKeepAlive(true)
+                        .setSoReuseAddress(true)
+                        .setBacklogSize(1000)
+                        .build()
+                )
                 .register("*", Http4kRequestHandler(http))
 
             if (canonicalHostname != null)
