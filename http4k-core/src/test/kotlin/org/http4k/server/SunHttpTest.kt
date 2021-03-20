@@ -19,8 +19,8 @@ class SunHttpTest : ServerContract(::SunHttp, ApacheClient()) {
     @Test
     fun `does not complain when returning NO_CONTENT`() {
         checkOutput(
-            !containsSubstring("Exception thread")
-                .and(containsSubstring("WARNING: sendResponseHeaders"))
+            !containsSubstring("Exception in thread")
+                .and(!containsSubstring("WARNING: sendResponseHeaders"))
         ) { Response(NO_CONTENT) }
     }
 
