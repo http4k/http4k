@@ -4,7 +4,7 @@ description: Recipe for using WebJars with http4k
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.5.0.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.5.0.1"
 
 // for the example...
 implementation group: "org.webjars", name: "swagger-ui", version: "3.43.0"
