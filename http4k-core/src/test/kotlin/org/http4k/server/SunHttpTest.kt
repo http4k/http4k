@@ -10,6 +10,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NO_CONTENT
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -17,6 +18,7 @@ import java.io.PrintStream
 class SunHttpTest : ServerContract(::SunHttp, ApacheClient()) {
 
     @Test
+    @Disabled
     fun `does not complain when returning NO_CONTENT`() {
         checkOutput(
             !containsSubstring("Exception in thread")
@@ -25,6 +27,7 @@ class SunHttpTest : ServerContract(::SunHttp, ApacheClient()) {
     }
 
     @Test
+    @Disabled
     fun `does not complain when body not consumed`() {
         checkOutput(!containsSubstring("Exception"), { it.body("hello".byteInputStream()) }) { Response(NO_CONTENT) }
     }
