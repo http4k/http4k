@@ -111,8 +111,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Test
     fun `can make multiple requests`() {
-        assertThat(client(Request(POST, "$baseUrl/echo").body("hello mum")), hasStatus(OK))
-        assertThat(client(Request(POST, "$baseUrl/echo").body("hello mum")), hasStatus(OK))
+        for (i in 1..10) {
+            assertThat(client(Request(POST, "$baseUrl/echo").body("hello mum")), hasStatus(OK))
+        }
     }
 
     @Test
