@@ -15,22 +15,13 @@ import com.sun.net.httpserver.HttpHandler as SunHttpHandler
 
 class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
-        requestBody.close()
         httpResponse.headers.forEach { (key, value) -> responseHeaders.add(key, value) }
-        when (requestMethod) {
-            "HEAD" -> sendResponseHeaders(httpResponse.status.code, -1)
-            else -> {
-                sendResponseHeaders(httpResponse.status.code, httpResponse.calculateLength())
-                httpResponse.body.stream.use { it.copyTo(responseBody) }
-            }
+        if (requestMethod == "HEAD") {
+            sendResponseHeaders(httpResponse.status.code, -1)
+        } else {
+            sendResponseHeaders(httpResponse.status.code, httpResponse.body.length ?: 0)
+            httpResponse.body.stream.use { input -> responseBody.use { input.copyTo(it) } }
         }
-    }
-
-    // for SunHttp, -1 should be set for no content-length header to be sent
-    private fun Response.calculateLength() = when (val length = body.length) {
-        0L -> -1
-        null -> 0
-        else -> length
     }
 
     private fun HttpExchange.toRequest(): Request =
@@ -54,7 +45,7 @@ class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     }
 }
 
-class SunHttp(val port: Int = 8000) : ServerConfig {
+data class SunHttp(val port: Int = 8000) : ServerConfig {
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         override fun port(): Int = if (port > 0) port else server.address.port
 
