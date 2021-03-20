@@ -62,7 +62,7 @@ class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun Array<Header>.toHttp4kHeaders(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
 }
 
-data class Apache4Server(val port: Int = 8000, val address: InetAddress?) : ServerConfig {
+class Apache4Server(val port: Int = 8000, val address: InetAddress?) : ServerConfig {
     constructor(port: Int = 8000) : this(port, null)
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {

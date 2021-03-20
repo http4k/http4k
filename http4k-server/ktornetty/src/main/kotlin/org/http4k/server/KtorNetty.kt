@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-data class KtorNetty(val port: Int = 8000) : ServerConfig {
+class KtorNetty(val port: Int = 8000) : ServerConfig {
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine: NettyApplicationEngine = embeddedServer(Netty, port) {

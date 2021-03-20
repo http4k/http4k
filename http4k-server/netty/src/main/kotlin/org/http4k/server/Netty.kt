@@ -67,7 +67,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
             .source(RequestSource(address.address.hostAddress, address.port))
 }
 
-data class Netty(val port: Int = 8000) : PolyServerConfig {
+class Netty(val port: Int = 8000) : PolyServerConfig {
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer = object : Http4kServer {
         init {
             if (sse != null) throw UnsupportedOperationException("Netty does not support sse")
