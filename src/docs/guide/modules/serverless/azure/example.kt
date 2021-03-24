@@ -93,4 +93,3 @@ fun main() {
 
 // helper method to stub the Lambda Context
 private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, _, _ -> TODO("not implemented") } as T
-
