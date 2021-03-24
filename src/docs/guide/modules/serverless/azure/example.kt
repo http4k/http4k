@@ -22,7 +22,7 @@ import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
 import org.http4k.serverless.AzureFunction
 import org.http4k.serverless.FakeAzureRequest
-import org.http4k.util.proxy
+import java.lang.reflect.Proxy
 import java.util.Optional
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to ACF
@@ -90,3 +90,7 @@ fun main() {
     runFunctionLocally()
     runFunctionAsAzureWould()
 }
+
+// helper method to stub the Lambda Context
+private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, _, _ -> TODO("not implemented") } as T
+

@@ -10,7 +10,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.ApiGatewayV1LambdaFunction
 import org.http4k.serverless.AppLoader
-import org.http4k.util.proxy
+import java.lang.reflect.Proxy
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
 // It is the only actual piece of code that needs to be written.
@@ -55,3 +55,7 @@ fun main() {
     runLambdaLocally()
     runLambdaAsAwsWould()
 }
+
+// helper method to stub the Lambda Context
+private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, _, _ -> TODO("not implemented") } as T
+
