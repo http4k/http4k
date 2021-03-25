@@ -5,17 +5,11 @@ import java.net.URLEncoder
 import java.util.regex.Pattern
 
 data class UriTemplate private constructor(private val template: String) {
-    private val templateRegex: Regex
-    private val matches: Sequence<MatchResult>
-    private val parameterNames: List<String>
-
-    init {
-        matches = URI_TEMPLATE_FORMAT.findAll(template)
-        parameterNames = matches.map { it.groupValues[1] }.toList()
-        templateRegex = template.replace(URI_TEMPLATE_FORMAT,
-            { notMatched -> Pattern.quote(notMatched) },
-            { matched -> if (matched.groupValues[2].isBlank()) "([^/]+)" else "(${matched.groupValues[2]})" }).toRegex()
-    }
+    private val templateRegex = template.replace(URI_TEMPLATE_FORMAT,
+        { notMatched -> Pattern.quote(notMatched) },
+        { matched -> if (matched.groupValues[2].isBlank()) "([^/]+)" else "(${matched.groupValues[2]})" }).toRegex()
+    private val matches = URI_TEMPLATE_FORMAT.findAll(template)
+    private val parameterNames = matches.map { it.groupValues[1] }.toList()
 
     companion object {
         private val URI_TEMPLATE_FORMAT = "\\{([^}]+?)(?::([^}]+))?\\}".toRegex() // ignore redundant warning #100
@@ -26,7 +20,8 @@ data class UriTemplate private constructor(private val template: String) {
 
     fun matches(uri: String): Boolean = templateRegex.matches(uri.trimSlashes())
 
-    fun extract(uri: String): Map<String, String> = parameterNames.zip(templateRegex.findParameterValues(uri.trimSlashes())).toMap()
+    fun extract(uri: String): Map<String, String> =
+        parameterNames.zip(templateRegex.findParameterValues(uri.trimSlashes())).toMap()
 
     fun generate(parameters: Map<String, String>): String =
         template.replace(URI_TEMPLATE_FORMAT) { matchResult ->
