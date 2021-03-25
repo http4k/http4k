@@ -40,7 +40,7 @@ data class UriTemplate private constructor(private val template: String) {
             val before = substring(position, matchResult.range.first)
             if (before.isNotEmpty()) builder.append(notMatched(before))
             builder.append(matched(matchResult))
-            position = matchResult.range.endInclusive + 1
+            position = matchResult.range.last + 1
         }
         val after = substring(position, length)
         if (after.isNotEmpty()) builder.append(notMatched(after))
