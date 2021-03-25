@@ -18,8 +18,8 @@ import org.eclipse.jetty.websocket.core.server.WebSocketNegotiation
 import org.eclipse.jetty.websocket.core.server.WebSocketNegotiator.AbstractNegotiator
 import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler
 import org.http4k.core.HttpHandler
-import org.http4k.servlet.asHttp4kRequest
-import org.http4k.servlet.asServlet
+import org.http4k.servlet.jakarta.asHttp4kRequest
+import org.http4k.servlet.jakarta.asServlet
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.lang.UnsupportedOperationException
