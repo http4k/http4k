@@ -1,12 +1,14 @@
 package org.http4k.lens
 
-enum class ParamMeta(val description: String) {
-    ArrayParam("array"),
-    StringParam("string"),
-    ObjectParam("object"),
-    BooleanParam("boolean"),
-    IntegerParam("integer"),
-    FileParam("file"),
-    NumberParam("number"),
-    NullParam("null")
+sealed class ParamMeta(val description: String) {
+    data class ArrayParam(private val itemType: ParamMeta) : ParamMeta("array") {
+        fun itemType() = itemType
+    }
+    object StringParam : ParamMeta("string")
+    object ObjectParam : ParamMeta("object")
+    object BooleanParam : ParamMeta("boolean")
+    object IntegerParam : ParamMeta("integer")
+    object FileParam : ParamMeta("file")
+    object NumberParam : ParamMeta("number")
+    object NullParam : ParamMeta("null")
 }

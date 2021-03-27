@@ -13,9 +13,8 @@ import org.http4k.routing.RouterMatch.MethodNotMatched
 internal data class RouterBasedHttpHandler(
     private val router: Router,
     private val notFoundHandler: HttpHandler = routeNotFoundHandler,
-    private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler) : RoutingHttpHandler {
-
-    override fun match(request: Request): RouterMatch = router.match(request)
+    private val methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler
+) : RoutingHttpHandler, Router by router {
 
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
         is MatchingHandler -> matchResult
@@ -35,4 +34,3 @@ internal data class RouterBasedHttpHandler(
 internal val routeNotFoundHandler: HttpHandler = { Response(NOT_FOUND.description("Route not found")) }
 
 internal val routeMethodNotAllowedHandler: HttpHandler = { Response(METHOD_NOT_ALLOWED.description("Method not allowed")) }
-

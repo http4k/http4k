@@ -36,6 +36,42 @@ class HttpMessageTest {
     }
 
     @Test
+    fun can_remove_headers_response() {
+        val message = Response(OK).header("foo", "one").header("bar", "two").removeHeaders("foo")
+        assertThat(message.headers, equalTo(listOf("bar" to "two") as Headers))
+    }
+
+    @Test
+    fun can_remove_headers_response_default() {
+        val message = Response(OK).header("foo", "one").header("bar", "two").removeHeaders()
+        assertThat(message.headers.isEmpty(), equalTo(true))
+    }
+
+    @Test
+    fun can_remove_headers_request() {
+        val message = Request(GET, "").header("foo", "one").header("bar", "two").removeHeaders("foo")
+        assertThat(message.headers, equalTo(listOf("bar" to "two") as Headers))
+    }
+
+    @Test
+    fun can_remove_queries() {
+        val message = Request(GET, "").query("foo", "one").query("bar", "two").removeQueries("foo")
+        assertThat(message.uri.queries(), equalTo(listOf("bar" to "two")))
+    }
+
+    @Test
+    fun can_remove_queries_default() {
+        val message = Request(GET, "").query("foo", "one").query("bar", "two").removeQueries()
+        assertThat(message.uri.queries().isEmpty(), equalTo(true))
+    }
+
+    @Test
+    fun can_remove_headers_request_default() {
+        val message = Request(GET, "").header("foo", "one").header("bar", "two").removeHeaders()
+        assertThat(message.headers.isEmpty(), equalTo(true))
+    }
+
+    @Test
     fun header_removal_is_case_insensitive() {
         val message = Response(OK).header("foo", "bar").header("Foo", "Bar").removeHeader("foo")
 

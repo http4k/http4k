@@ -7,16 +7,17 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors.newWorkStealingPool
 import com.sun.net.httpserver.HttpHandler as SunHttpHandler
 
-class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
+class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
     private fun HttpExchange.populate(httpResponse: Response) {
         httpResponse.headers.forEach { (key, value) -> responseHeaders.add(key, value) }
-        if (requestMethod == "HEAD") {
+        if (requestMethod == "HEAD" || httpResponse.status == NO_CONTENT) {
             sendResponseHeaders(httpResponse.status.code, -1)
         } else {
             sendResponseHeaders(httpResponse.status.code, httpResponse.body.length ?: 0)
@@ -45,13 +46,13 @@ class HttpExchangeHandler(private val handler: HttpHandler): SunHttpHandler {
     }
 }
 
-data class SunHttp(val port: Int = 8000) : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+class SunHttp(val port: Int = 8000) : ServerConfig {
+    override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         override fun port(): Int = if (port > 0) port else server.address.port
 
         private val server = HttpServer.create(InetSocketAddress(port), 1000)
         override fun start(): Http4kServer = apply {
-            server.createContext("/", HttpExchangeHandler(httpHandler))
+            server.createContext("/", HttpExchangeHandler(http))
             server.executor = newWorkStealingPool()
             server.start()
         }

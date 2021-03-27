@@ -14,6 +14,7 @@ import org.http4k.core.Method.HEAD
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.TRACE
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import java.time.Clock
 
 /**
@@ -41,6 +42,7 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
 
             val fullRequest = it
                 .replaceHeader("host", it.uri.host)
+                .replaceHeader("x-amz-content-sha256", payload.hash)
                 .replaceHeader("x-amz-date", date.full).let {
                     if (it.method.allowsContent) {
                         it.replaceHeader("content-length", payload.length.toString())
@@ -53,12 +55,10 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                     } ?: this
                 }
 
-
             val canonicalRequest = AwsCanonicalRequest.of(fullRequest, payload)
 
             val signedRequest = fullRequest
                 .replaceHeader("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
-                .replaceHeader("x-amz-content-sha256", payload.hash)
 
             next(signedRequest)
         }
@@ -97,3 +97,6 @@ object Payload {
         }
     }
 }
+
+fun ClientFilters.SetAwsServiceUrl(serviceName: String, region: String) =
+    SetHostFrom(Uri.of("https://$serviceName.${region}.amazonaws.com"))

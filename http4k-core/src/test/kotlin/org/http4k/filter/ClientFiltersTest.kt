@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import org.http4k.core.Body
+import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.Credentials
 import org.http4k.core.MemoryRequest
 import org.http4k.core.MemoryResponse
@@ -19,6 +20,7 @@ import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.MOVED_PERMANENTLY
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.parse
@@ -31,6 +33,8 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -41,17 +45,26 @@ class ClientFiltersTest {
     val server = { request: Request ->
         when (request.uri.path) {
             "/redirect" -> Response(FOUND).header("location", "/ok")
+            "/see-other" -> Response(SEE_OTHER).header("location", "/ok-with-no-body")
             "/loop" -> Response(FOUND).header("location", "/loop")
             "/absolute-target" -> if (request.uri.host == "example.com") Response(OK).body("absolute") else Response(INTERNAL_SERVER_ERROR)
             "/absolute-redirect" -> Response(MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
             "/redirect-with-charset" -> Response(MOVED_PERMANENTLY).header("location", "/destination; charset=utf8")
             "/destination" -> Response(OK).body("destination")
             "/ok" -> Response(OK).body("ok")
+            "/ok-with-no-body" -> Response(OK).body(request.body)
             else -> Response(OK).let { if (request.query("foo") != null) it.body("with query") else it }
         }
     }
 
     private val followRedirects = ClientFilters.FollowRedirects().then(server)
+
+    @Test
+    fun `see other redirect doesn't forward any payload`() {
+        val response = followRedirects(Request(GET, "/see-other").body("body here"))
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.body, equalTo(EMPTY))
+    }
 
     @Test
     fun `does not follow redirect by default`() {
@@ -72,6 +85,17 @@ class ClientFiltersTest {
     @Test
     fun `follows redirect for put`() {
         assertThat(followRedirects(Request(PUT, "/redirect")), equalTo(Response(OK).body("ok")))
+    }
+
+    @Test
+    fun `follow redirects in-memory routed handler`(){
+        val server = routes(
+            "/ok" bind GET to { Response(OK) },
+            "/redirect" bind GET to { Response(SEE_OTHER).header("Location", "/ok") }
+        )
+        val client = ClientFilters.FollowRedirects().then(server)
+        assertThat(client(Request(GET, "/ok")).status, equalTo(OK))
+        assertThat(client(Request(GET, "/redirect")).status, equalTo(OK))
     }
 
     @Test
@@ -132,7 +156,7 @@ class ClientFiltersTest {
         val svc = ClientFilters.RequestTracing().then { it ->
             val actual = ZipkinTraces(it)
             assertThat(actual, present())
-            assertThat(actual.parentSpanId, absent())
+            assertThat(actual.parentSpanId, present())
             Response(OK)
         }
 
@@ -211,20 +235,20 @@ class ClientFiltersTest {
         @Test
         fun `in-memory empty bodies are not encoded`() {
             val handler = ClientFilters.GZip().then {
-                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
-                Response(OK).body(Body.EMPTY)
+                assertThat(it, hasBody(equalTo<Body>(EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                Response(OK).body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
         }
 
         @Test
         fun `in-memory encoded empty responses are handled`() {
             val handler = ClientFilters.GZip().then {
-                Response(OK).header("content-encoding", "gzip").body(Body.EMPTY)
+                Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
         }
 
         @Test
@@ -240,20 +264,20 @@ class ClientFiltersTest {
         @Test
         fun `streaming empty bodies are not encoded`() {
             val handler = ClientFilters.GZip(Streaming).then {
-                assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
-                Response(OK).body(Body.EMPTY)
+                assertThat(it, hasBody(equalTo<Body>(EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+                Response(OK).body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
         }
 
         @Test
         fun `streaming encoded empty responses are handled`() {
             val handler = ClientFilters.GZip(Streaming).then {
-                Response(OK).header("content-encoding", "gzip").body(Body.EMPTY)
+                Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
         }
 
         @Test
@@ -292,16 +316,16 @@ class ClientFiltersTest {
         @Test
         fun `in-memory encoded empty responses are handled`() {
             val handler = ClientFilters.AcceptGZip().then {
-                Response(OK).header("content-encoding", "gzip").body(Body.EMPTY)
+                Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
-            assertThat(handler(Request(GET, "/").body(Body.EMPTY)), hasStatus(OK).and(hasBody("")))
+            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK).and(hasBody("")))
         }
 
         @Test
         fun `streaming encoded empty responses are handled`() {
             val handler = ClientFilters.AcceptGZip(Streaming).then {
-                Response(OK).header("content-encoding", "gzip").body(Body.EMPTY)
+                Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
             assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("")))

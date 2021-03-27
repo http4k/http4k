@@ -13,18 +13,22 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonReader
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.websocket.WsMessage
+import java.io.InputStream
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<JsonElement>() {
+open class ConfigurableGson(builder: GsonBuilder,
+                            val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshallingJson<JsonElement>() {
 
     val mapper: Gson = builder.create()
     private val pretty = builder.setPrettyPrinting().create()
@@ -87,16 +91,23 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     override fun asJsonObject(input: Any): JsonElement = mapper.toJsonTree(input)
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.fromJson(input, target.java)
+
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = mapper.fromJson(JsonReader(input.reader()), target.java)
+
     override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = mapper.fromJson(j, target.java)
 
     inline fun <reified T : Any> JsonElement.asA(): T = mapper.fromJson(this, object : TypeToken<T>() {}.type)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
+                                                     contentNegotiation: ContentNegotiation = None,
+                                                     contentType: ContentType = defaultContentType) = autoBody<T>(description, contentNegotiation, contentType)
 
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        httpBodyLens(description, contentNegotiation, APPLICATION_JSON).map(mapper.read<T>(), { mapper.toJson(it) })
+    inline fun <reified T : Any> autoBody(description: String? = null,
+                                          contentNegotiation: ContentNegotiation = None,
+                                          contentType: ContentType = defaultContentType) =
+        httpBodyLens(description, contentNegotiation, contentType).map(mapper.read<T>(), { mapper.toJson(it) })
 }
 
 inline fun <reified T : Any> Gson.read(): (String) -> T =

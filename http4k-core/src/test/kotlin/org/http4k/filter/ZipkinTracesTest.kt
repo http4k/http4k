@@ -11,7 +11,6 @@ import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
 
-
 class TraceIdTest {
 
     @Test
@@ -41,7 +40,6 @@ class SamplingDecisionTest {
         assertThat(SamplingDecision.from("false"), equalTo(SAMPLE))
         assertThat(SamplingDecision.from("wibble"), equalTo(SAMPLE))
     }
-
 }
 
 class ZipkinTracesTest {
@@ -89,5 +87,4 @@ class ZipkinTracesTest {
     fun `puts expected things onto a request with a sampling decision`() {
         assertThat(ZipkinTraces(expectedWithDecision, Request(GET, "")), equalTo(requestWithDecision))
     }
-
 }

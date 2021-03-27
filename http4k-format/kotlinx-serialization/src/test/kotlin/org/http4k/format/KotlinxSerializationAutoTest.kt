@@ -16,7 +16,6 @@ import java.net.URL
 import java.time.*
 import java.util.*
 
-
 @Serializable
 data class MapHolder(val value: Map<String, String>)
 
@@ -261,5 +260,4 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
                 .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
                 .done()
         }) {}
-
 }

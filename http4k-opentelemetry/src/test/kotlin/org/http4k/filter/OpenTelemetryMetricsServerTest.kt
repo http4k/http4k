@@ -6,7 +6,9 @@ import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
-import io.opentelemetry.common.Labels
+import io.opentelemetry.api.metrics.GlobalMetricsProvider
+import io.opentelemetry.api.metrics.common.Labels
+import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -24,9 +26,19 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
 import org.http4k.util.TickingClock
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 class OpenTelemetryMetricsServerTest {
+
+    companion object {
+        @BeforeAll
+        @JvmStatic
+        fun setup() {
+            GlobalMetricsProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
+        }
+    }
+
     private val clock = TickingClock
     private var requestTimer = ServerFilters.OpenTelemetryMetrics.RequestTimer(clock = clock)
     private var requestCounter = ServerFilters.OpenTelemetryMetrics.RequestCounter(clock = clock)
@@ -58,7 +70,10 @@ class OpenTelemetryMetricsServerTest {
 
         val data = exportMetricsFromOpenTelemetry()
         assertThat(data, hasRequestTimer(1, 1000.0, Labels.of("path", "timed_one", "method", "GET", "status", "200")))
-        assertThat(data, hasRequestTimer(2, 2000.0, Labels.of("path", "timed_two_name", "method", "POST", "status", "200")))
+        assertThat(
+            data,
+            hasRequestTimer(2, 2000.0, Labels.of("path", "timed_two_name", "method", "POST", "status", "200"))
+        )
     }
 
     @Test
@@ -88,23 +103,31 @@ class OpenTelemetryMetricsServerTest {
 
     @Test
     fun `request timer meter names and request id formatter can be configured`() {
-        requestTimer = ServerFilters.OpenTelemetryMetrics.RequestTimer(name = "custom.requests", description = "custom.description", labeler = { it.label("foo", "bar") })
+        requestTimer = ServerFilters.OpenTelemetryMetrics.RequestTimer(
+            name = "custom.requests",
+            description = "custom.description",
+            labeler = { it.label("foo", "bar") })
 
         assertThat(server(Request(GET, "/timed/one")), hasStatus(OK))
 
         val data = exportMetricsFromOpenTelemetry()
-        assertThat(data,
+        assertThat(
+            data,
             hasRequestTimer(1, 1000.0, Labels.of("foo", "bar", "routingGroup", "timed/one"), "custom.requests")
         )
     }
 
     @Test
     fun `request counter meter names and request id formatter can be configured`() {
-        requestCounter = ServerFilters.OpenTelemetryMetrics.RequestCounter(name = "custom.requests2", description = "custom.description", labeler = { it.label("foo", "bar") })
+        requestCounter = ServerFilters.OpenTelemetryMetrics.RequestCounter(
+            name = "custom.requests2",
+            description = "custom.description",
+            labeler = { it.label("foo", "bar") })
 
         assertThat(server(Request(GET, "/counted/one")), hasStatus(OK))
 
-        assertThat(exportMetricsFromOpenTelemetry(),
+        assertThat(
+            exportMetricsFromOpenTelemetry(),
             hasRequestCounter(1, Labels.of("foo", "bar", "routingGroup", "counted/one"), "custom.requests2")
         )
     }
@@ -113,7 +136,8 @@ class OpenTelemetryMetricsServerTest {
     fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() {
         assertThat(server(Request(GET, "/otherTimed/test.json")), hasStatus(OK))
 
-        assertThat(exportMetricsFromOpenTelemetry(),
+        assertThat(
+            exportMetricsFromOpenTelemetry(),
             hasRequestTimer(1, 1000.0, Labels.of("path", "UNMAPPED", "method", "GET", "status", "200"))
         )
     }
@@ -121,8 +145,10 @@ class OpenTelemetryMetricsServerTest {
     @Test
     fun `counted routes without uri template generate request count metrics tagged with unmapped path value`() {
         assertThat(server(Request(GET, "/otherCounted/test.json")), hasStatus(OK))
-        assertThat(exportMetricsFromOpenTelemetry(),
-            hasRequestCounter(1, Labels.of("path", "UNMAPPED", "method", "GET", "status", "200")))
+        assertThat(
+            exportMetricsFromOpenTelemetry(),
+            hasRequestCounter(1, Labels.of("path", "UNMAPPED", "method", "GET", "status", "200"))
+        )
     }
 
     private fun hasNoRequestTimer(method: Method, path: String, status: Status) =
@@ -131,8 +157,17 @@ class OpenTelemetryMetricsServerTest {
 
             override fun invoke(actual: List<MetricData>): MatchResult =
                 if (actual.firstOrNull { it.name == description }
+                        ?.doubleGaugeData
                         ?.points
-                        ?.any { it.labels == Labels.of("path", path, "method", method.name, "status", status.code.toString()) } != true) Match else Mismatch(actual.toString())
+                        ?.any {
+                            Labels.of(
+                                "path",
+                                path,
+                                "method",
+                                method.name,
+                                "status",
+                                status.code.toString()
+                            ) == it.labels
+                        } != true) Match else Mismatch(actual.toString())
         }
-
 }

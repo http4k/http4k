@@ -9,6 +9,7 @@ import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import java.nio.ByteBuffer
@@ -19,23 +20,23 @@ const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 
 class OpenWhiskFunction(
     appLoader: AppLoaderWithContexts,
-    env: Map<String, String> = System.getenv(),
     private val detectBinaryBody: DetectBinaryBody = NonBinary
 ) : (JsonObject) -> JsonObject {
 
     constructor(
         input: AppLoader,
-        env: Map<String, String> = System.getenv(),
         detectBinaryBody: DetectBinaryBody = NonBinary
-    ) : this(AppLoaderWithContexts { env, _ -> input(env) }, env, detectBinaryBody)
+    ) : this(AppLoaderWithContexts { env, _ -> input(env) }, detectBinaryBody)
 
-    private val contexts = RequestContexts()
-    private val app = appLoader(env, contexts)
+    private val contexts = RequestContexts("openwhisk")
+    private val app = appLoader(System.getenv(), contexts)
 
-    override fun invoke(request: JsonObject): JsonObject = InitialiseRequestContext(contexts)
-        .then(AddOpenWhiskRequest(request, contexts))
-        .then(app)
-        .invoke(request.asHttp4k()).toGson()
+    override fun invoke(request: JsonObject) =
+        CatchAll()
+            .then(InitialiseRequestContext(contexts))
+            .then(AddOpenWhiskRequest(request, contexts))
+            .then(app)
+            .invoke(request.asHttp4k()).toGson()
 
     private fun Response.toGson() = JsonObject().apply {
         addProperty("statusCode", status.code)

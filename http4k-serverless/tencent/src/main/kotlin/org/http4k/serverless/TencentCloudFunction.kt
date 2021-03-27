@@ -15,6 +15,7 @@ import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 
 const val TENCENT_REQUEST_KEY = "HTTP4K_TENCENT_REQUEST"
@@ -24,11 +25,12 @@ abstract class TencentCloudFunction(appLoader: AppLoaderWithContexts) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts()
+    private val contexts = RequestContexts("tencent")
     private val app = appLoader(System.getenv(), contexts)
 
     fun handleRequest(request: APIGatewayProxyRequestEvent, context: Context?) =
-        InitialiseRequestContext(contexts)
+        CatchAll()
+            .then(InitialiseRequestContext(contexts))
             .then(AddTencent(request, context, contexts))
             .then(app)(request.asHttp4kRequest())
             .asTencent()

@@ -33,7 +33,7 @@ class AwsClientFilterTest {
         client(Request(GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
         assertThat(audit.captured?.header("Authorization"),
-            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-date, Signature=8afa7ee258c3eaa39b2764cbd52144fd7bbbe401876d4c9f359318963b82244d"))
+            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date, Signature=80641a5d87dd9aad7a993b341c98a04cdefa58ecf09f1df4af93cec0268a8eca"))
     }
 
     @Test
@@ -43,7 +43,7 @@ class AwsClientFilterTest {
         client(Request(GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
         assertThat(audit.captured?.header("Authorization"),
-            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-date;x-amz-security-token, Signature=f1cdc542e6d40d595876d461baa7f4ac6c9e5ef02b5f94bd983c493f677dcf41"))
+            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=f0522e59ba6c8d851970a1d4fb510cc37bb18330b66958992f653fc8966a2137"))
     }
 
     @Test
@@ -70,4 +70,3 @@ class AuditHandler : HttpHandler {
         return Response(OK)
     }
 }
-

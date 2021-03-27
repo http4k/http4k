@@ -1,6 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.base64Encode
+import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -8,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.HEAD
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
@@ -18,6 +20,7 @@ import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
+import org.http4k.routing.RoutingHttpHandler
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -29,12 +32,11 @@ object ClientFilters {
      */
     fun RequestTracing(
         startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-        endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
+        endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }
+    ): Filter = Filter { next ->
         {
             THREAD_LOCAL.get().run {
-                val updated = parentSpanId?.let {
-                    copy(parentSpanId = spanId, spanId = TraceId.new())
-                } ?: this
+                val updated = copy(parentSpanId = spanId, spanId = TraceId.new())
                 startReportFn(it, updated)
                 val response = next(ZipkinTraces(updated, it))
                 endReportFn(it, response, updated)
@@ -110,15 +112,17 @@ object ClientFilters {
         operator fun invoke(token: String): Filter = BearerAuth { token }
     }
 
-    object FollowRedirects {
-        operator fun invoke(): Filter = Filter { next -> { makeRequest(next, it) } }
-
+    class FollowRedirects : Filter {
         private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response =
             next(request).let {
                 if (it.isRedirection()) {
                     if (attempt == 10) throw IllegalStateException("Too many redirection")
                     it.assureBodyIsConsumed()
-                    makeRequest(next, request.toNewLocation(it.location()), attempt + 1)
+                    if (it.status == SEE_OTHER) {
+                        makeRequest(next, request.body(EMPTY).toNewLocation(it.location()), attempt + 1)
+                    } else {
+                        makeRequest(next, request.toNewLocation(it.location()), attempt + 1)
+                    }
                 } else it
             }
 
@@ -137,11 +141,23 @@ object ClientFilters {
             Uri.of(location).run {
                 if (host.isBlank()) authority(uri.authority).scheme(uri.scheme) else this
             }
+
+        override fun invoke(next: HttpHandler): HttpHandler = { makeRequest(next, it) }
+
+        /**
+         * This filter requires special treatment for routing handlers.
+         *
+         * In general, Filters are applied _after_ routing (i.e. routing information is available to filters).
+         * This filter, however, needs to behave like a browser, and for that we apply the filter _before_ the routing.
+         */
+        fun then(router: RoutingHttpHandler): HttpHandler = { this(router)(it) }
     }
 
     object Cookies {
-        operator fun invoke(clock: Clock = Clock.systemDefaultZone(),
-                            storage: CookieStorage = BasicCookieStorage()): Filter = Filter { next ->
+        operator fun invoke(
+            clock: Clock = Clock.systemDefaultZone(),
+            storage: CookieStorage = BasicCookieStorage()
+        ): Filter = Filter { next ->
             { request ->
                 val now = clock.now()
                 removeExpired(now, storage)

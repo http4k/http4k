@@ -13,6 +13,7 @@ import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.junit.jupiter.api.Test
 import software.amazon.awssdk.http.AbortableInputStream
 import software.amazon.awssdk.http.HttpExecuteRequest.builder
+import software.amazon.awssdk.http.HttpExecuteResponse
 import software.amazon.awssdk.http.SdkHttpFullRequest
 import software.amazon.awssdk.http.SdkHttpFullResponse
 import software.amazon.awssdk.http.SdkHttpMethod
@@ -58,14 +59,19 @@ class AwsSdkClientTest {
                         "foo" to listOf("bar1")
                     )))
                 )
-                .and(has(SdkHttpFullResponse::content, object : Matcher<Optional<AbortableInputStream>> {
-                    override val description = "same content"
+        )
 
-                    override fun invoke(actual: Optional<AbortableInputStream>): MatchResult {
-                        val content = actual.get().reader().readText()
-                        return if (content == response.bodyString()) MatchResult.Match else MatchResult.Mismatch(content)
-                    }
-                }))
+        assertThat(
+            out,
+            has(HttpExecuteResponse::responseBody, object : Matcher<Optional<AbortableInputStream>> {
+                override val description = "same content"
+
+                override fun invoke(actual: Optional<AbortableInputStream>): MatchResult {
+                    val content = actual.get().reader().readText()
+                    return if (content == response.bodyString()) MatchResult.Match else MatchResult.Mismatch(content)
+                }
+            }
+            )
         )
     }
 }

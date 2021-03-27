@@ -28,8 +28,9 @@ object TrafficFilters {
      * Replays Writes Request/Response traffic
      */
     object ReplayFrom {
-        operator fun invoke(replay: Replay,
-                            matchFn: (Request, Request) -> Boolean = { received, stored -> received.toString() != stored.toString() }
+        operator fun invoke(
+            replay: Replay,
+            matchFn: (Request, Request) -> Boolean = { received, stored -> received.toString() != stored.toString() }
         ): Filter = Filter {
             val zipped = replay.requests().zip(replay.responses()).iterator()
 

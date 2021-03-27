@@ -4,12 +4,12 @@ description: Feature overview of the http4k-testing-kotest module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-testing-kotest", version: "3.274.0"
+implementation group: "org.http4k", name: "http4k-testing-kotest", version: "4.5.0.1"
 ```
 
 ### About
 
-A set of [Kotest] matchers for use when testing [http4k] apps.
+A set of [Kotest] matchers for use when testing http4k apps.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/kotest/example.kt)
 

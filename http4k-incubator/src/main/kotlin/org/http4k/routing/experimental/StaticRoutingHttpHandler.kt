@@ -35,14 +35,13 @@ internal data class StaticRoutingHttpHandler(
 
     override fun match(request: Request): RouterMatch = handlerNoFilter(request).let {
         if (it.status != NOT_FOUND)
-            MatchingHandler(filter.then { _: Request -> it })
+            MatchingHandler(filter.then { _: Request -> it }, description)
         else
-            Unmatched
+            Unmatched(description)
     }
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }
-
 
 internal class ResourceLoadingHandler(
     private val pathSegments: String,

@@ -84,5 +84,4 @@ class AuthoriseRequestErrorRender(private val authoriseRequestValidator: Authori
             null
         }
     }
-
 }

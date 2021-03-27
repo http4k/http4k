@@ -23,7 +23,7 @@ public class JavaExample {
     public static void main(String[] args) {
         Filter f = next -> req -> next.invoke(req.body(req.bodyString().substring(0, 5)));
 
-        RoutingHttpHandler routing = routes(bind("/path", POST).to(req -> Response.Companion.create(Status.ACCEPTED)));
+        RoutingHttpHandler routing = routes(bind("/path", POST).to(req -> Response.create(Status.ACCEPTED)));
 
         RoutingHttpHandler app = then(f, routing);
 
@@ -33,7 +33,7 @@ public class JavaExample {
 
         DualSyncAsyncHttpHandler client = OkHttp.create(new OkHttpClient.Builder().build(), BodyMode.Memory.INSTANCE);
 
-        System.out.println(client.invoke(Request.Companion.create(POST, "http://localhost:8000/path").body("1234567890")));
+        System.out.println(client.invoke(Request.create(POST, "http://localhost:8000/path").body("1234567890")));
 
         http4kServer.stop();
     }

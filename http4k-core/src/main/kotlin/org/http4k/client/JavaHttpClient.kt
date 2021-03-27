@@ -25,22 +25,28 @@ import java.nio.ByteBuffer
 /**
  * Basic JDK-based Client.
  */
-class JavaHttpClient(private val httpClient: HttpClient = defaultJavaHttpClient(),
-                     private val requestBodyMode: BodyMode = Memory,
-                     private val responseBodyMode: BodyMode = Memory
-) : HttpHandler {
-    override fun invoke(request: Request): Response = try {
-        val javaRequest = request.toJavaHttpRequest(requestBodyMode)
-        when (responseBodyMode) {
-            is Memory -> httpClient.send(javaRequest, BodyHandlers.ofByteArray())
-                .run { coreResponse().body(Body(ByteBuffer.wrap(body()))) }
-            is Stream -> httpClient.send(javaRequest, BodyHandlers.ofInputStream())
-                .run { coreResponse().body(body()) }
+object JavaHttpClient {
+    @JvmStatic
+    @JvmOverloads
+    @JvmName("create")
+    operator fun invoke(
+        httpClient: HttpClient = defaultJavaHttpClient(),
+        requestBodyMode: BodyMode = Memory,
+        responseBodyMode: BodyMode = Memory
+    ) = object : HttpHandler {
+        override fun invoke(request: Request): Response = try {
+            val javaRequest = request.toJavaHttpRequest(requestBodyMode)
+            when (responseBodyMode) {
+                is Memory -> httpClient.send(javaRequest, BodyHandlers.ofByteArray())
+                    .run { coreResponse().body(Body(ByteBuffer.wrap(body()))) }
+                is Stream -> httpClient.send(javaRequest, BodyHandlers.ofInputStream())
+                    .run { coreResponse().body(body()) }
+            }
+        } catch (e: UnknownHostException) {
+            Response(UNKNOWN_HOST.toClientStatus(e))
+        } catch (e: ConnectException) {
+            Response(CONNECTION_REFUSED.toClientStatus(e))
         }
-    } catch (e: UnknownHostException) {
-        Response(UNKNOWN_HOST.toClientStatus(e))
-    } catch (e: ConnectException) {
-        Response(CONNECTION_REFUSED.toClientStatus(e))
     }
 }
 
@@ -77,5 +83,7 @@ private fun Body.toRequestPublisher(bodyMode: BodyMode) = when (bodyMode) {
 }
 
 // list copied from internal JDK Utils.ALLOWED_HEADERS
-private val disallowedHeaders = setOf("connection", "content-length",
-    "date", "expect", "from", "host", "upgrade", "via", "warning")
+private val disallowedHeaders = setOf(
+    "connection", "content-length",
+    "date", "expect", "from", "host", "upgrade", "via", "warning"
+)

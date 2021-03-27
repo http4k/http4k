@@ -54,7 +54,7 @@ interface ResourceLoading : Router {
     fun match(path: String): HttpHandler?
 
     override fun match(request: Request): RouterMatch = when (val matchResult = match(request.uri.path)) {
-        is HttpHandler -> MatchingHandler(matchResult)
-        else -> Unmatched
+        is HttpHandler -> MatchingHandler(matchResult, description)
+        else -> Unmatched(description)
     }
 }

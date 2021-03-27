@@ -1,5 +1,6 @@
 package org.http4k.lens
 
+import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
@@ -59,9 +60,11 @@ interface MultiLensSpec<IN : Any, OUT> {
 /**
  * Represents a uni-directional extraction of an entity from a target.
  */
-open class LensSpec<IN : Any, OUT>(protected val location: String,
-                                   protected val paramMeta: ParamMeta,
-                                   internal val get: LensGet<IN, OUT>) {
+open class LensSpec<IN : Any, OUT>(
+    protected val location: String,
+    protected val paramMeta: ParamMeta,
+    internal val get: LensGet<IN, OUT>
+) {
     /**
      * Create another LensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a target.
@@ -136,10 +139,12 @@ interface BiDiMultiLensSpec<IN : Any, OUT> : MultiLensSpec<IN, OUT> {
 /**
  * Represents a bi-directional extraction of an entity from a target, or an insertion into a target.
  */
-open class BiDiLensSpec<IN : Any, OUT>(location: String,
-                                       paramMeta: ParamMeta,
-                                       get: LensGet<IN, OUT>,
-                                       private val set: LensSet<IN, OUT>) : LensSpec<IN, OUT>(location, paramMeta, get) {
+open class BiDiLensSpec<IN : Any, OUT>(
+    location: String,
+    paramMeta: ParamMeta,
+    get: LensGet<IN, OUT>,
+    private val set: LensSet<IN, OUT>
+) : LensSpec<IN, OUT>(location, paramMeta, get) {
 
     /**
      * Create another BiDiLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
@@ -183,7 +188,7 @@ open class BiDiLensSpec<IN : Any, OUT>(location: String,
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>> =
-            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default })
+            defaulted(name, Lens(Meta(false, location, ArrayParam(paramMeta), name, description)) { default }, description)
 
         override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
@@ -197,7 +202,7 @@ open class BiDiLensSpec<IN : Any, OUT>(location: String,
         override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?> {
             val getLens = get(name)
             val setLens = set(name)
-            return BiDiLens(Meta(false, location, paramMeta, name, description),
+            return BiDiLens(Meta(false, location, ArrayParam(paramMeta), name, description),
                 { getLens(it).run { if (isEmpty()) null else this } },
                 { out: List<OUT>?, target: IN -> setLens(out ?: emptyList(), target) }
             )
@@ -206,8 +211,8 @@ open class BiDiLensSpec<IN : Any, OUT>(location: String,
         override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
-            return BiDiLens(Meta(true, location, paramMeta, name, description),
-                { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)), target = it) else this } },
+            return BiDiLens(Meta(true, location, ArrayParam(paramMeta), name, description),
+                { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, ArrayParam(paramMeta), name, description)), target = it) else this } },
                 { out: List<OUT>, target: IN -> setLens(out, target) })
         }
     }

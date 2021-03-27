@@ -10,7 +10,6 @@ import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 
-
 open class CacheControlHeaderPart(open val name: String, val value: Duration) {
     fun toHeaderValue(): String = if (value.seconds > 0) "$name=${value.seconds}" else ""
     fun replaceIn(header: String?): String? = header?.let {
@@ -27,10 +26,11 @@ data class StaleIfErrorTtl(private val valueD: Duration) : CacheControlHeaderPar
 
 data class MaxAgeTtl(private val valueD: Duration) : CacheControlHeaderPart("max-age", valueD)
 
-
-data class DefaultCacheTimings(val maxAge: MaxAgeTtl,
-                               val staleIfErrorTtl: StaleIfErrorTtl,
-                               val staleWhenRevalidateTtl: StaleWhenRevalidateTtl)
+data class DefaultCacheTimings(
+    val maxAge: MaxAgeTtl,
+    val staleIfErrorTtl: StaleIfErrorTtl,
+    val staleWhenRevalidateTtl: StaleWhenRevalidateTtl
+)
 
 /**
  * Useful filters for applying Cache-Controls to request/responses
@@ -47,7 +47,6 @@ object CachingFilters {
             }
         }
     }
-
 
     /**
      * These filters operate on Responses (post-flight)

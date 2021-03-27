@@ -3,6 +3,7 @@ description = 'Testing against a functions deployed to SCF'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    compile project(":http4k-serverless-tencent")
-    compile project(path: ":http4k-core", configuration: 'testArtifacts')
+    api project(":http4k-serverless-tencent")
+    api project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
 }

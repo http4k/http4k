@@ -36,7 +36,7 @@ import java.time.temporal.TemporalUnit
 
 class GenerateAccessTokenTest {
 
-    private val json: AutoMarshallingJson = Jackson
+    private val json: AutoMarshallingJson<*> = Jackson
     private val handlerClock = SettableClock()
     private val codes = InMemoryAuthorizationCodes(FixedClock)
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), State("state"))

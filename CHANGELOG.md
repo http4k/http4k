@@ -3,8 +3,184 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.275.0 (uncut)
-- **http4k-core** : Reimplement the routing logic to be fully based on Routers. It is now possible to nest arbitrary levels of request matching in a mix-and-match way.
+### v4.6.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-server-jetty** : [Breaking] The upgrade to Jetty 11.0.1 has resulted in some repackaged classes in the Jetty source, most notably the Servlet dependency is now based on `jakarta.servlet.http.XXX` classes instead of the standard `javax.servlet` package.
+
+### v4.5.0.1
+- **http4k-core** : Fix `SunHttp` not complaining if the entire request body is not consumed.
+
+### v4.5.0.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core** : [Slight break] Hide identity of `JavaHttpClient` and made the . You should be using `HttpHandler` anyway... ;) 
+- **http4k-core** : Fix #598 - Silent exception on 204 with SunHttp. H/T @ToastShaman
+- **http4k-core** : Fix #594 - Conditional filter. H/T @jainsahab
+
+### v4.4.2.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-format-*** : Add support for reading inputstreams directly in all automarshaller implementations
+
+### v4.4.1.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-serverless-lambda** : Introduce ApiGatewayRestLambdaFunction to be used with REST Api Gateways
+
+### v4.4.0.1
+- **http4k-aws** : Add x-amz-content-sha256 to SignedHeaders (required for on-premise s3). H/T @tkint
+
+### v4.4.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.31
+- **http4k-opentelemetry** : [Break] OpenTelemetry has hit V1.0, so integrated API changes into filters for collecting data.
+- **http4k-format-core** : [Break/Repackage] Format `value()` extension functions are now packaged properly.
+- **http4k-server-jetty** : We have been alerted to some runtime changes around how Jetty parses paths containing . or /. Workaround is to use `HttpConfiguration.httpCompliance = HttpCompliance.RFC7230_LEGACY`, but this is marked as legacy and will be deprecated sooner or later. See details at: https://github.com/eclipse/jetty.project/issues/6001#issuecomment-786611040
+- **http4k-format-moshi** : Moshi now supports AutoMarshallingEvents out of the box.
+
+### v4.3.5.4
+- **http4k-*** : Disable publishing of gradle module metadata files to Maven Central.
+0 (
+### v4.3.5.3
+- **http4k-*** : Define groupId for all modules so release to Maven Central can use the value from root.
+
+### v4.3.5.2
+- **http4k-*** : Filter out irrelevant root artifact. Maven Central is very very annoying.
+
+### v4.3.5.1
+- **http4k-*** : Fix artefact signing for maven central.
+
+### v4.3.5.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core** : Add WebJars support. Activate WebJars with 1LOC!
+
+### v4.3.4.1
+- **http4k-bom** : Fix #588 - Maven Central version of BOM is empty
+
+### v4.3.4.0
+- **http4k-contract** : Support Array of parameters in OpenApi2/3 specs.
+- **http4k-template-freemarker** : Improvements to configuration of engine. 
+- **http4k-*** : Upgrade some dependency versions
+
+### v4.3.3.0
+- **http4k-core** : Introduce `RequestWithRoute` and `ResponseWithRoute` to allow extending messages post-routing. H/T @jenarros
+
+### v4.3.2.2
+- **http4k-core** : Fix "and" logic when mixing handler + request routers.
+- **http4k-core** : Extend #580 fix to cover absolute paths.
+
+### v4.3.2.1
+- **http4k-core** : Fix #580 - `ResourceLoader.Directory` can load resources outside of root directory.
+- **http4k-core** : Added values4k extensions for Lenses.
+- **http4k-cloudevents** : Jackson is now bundled with the JAR.
+
+### v4.3.2.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-cloudevents** : New module! Support for CloudEvents using Jackson and pluggable event formats.
+
+### v4.3.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.30
+- **http4k-core** : Removing dependency on JCenter for all compile dependencies.
+- **http4k-core** : Add ETag filter. H/T @jshiell
+- **http4k-core** : Add more useful filters for request/respons
+
+### v4.2.0.0
+- **http4k-server-undertow** : Add WebSocket and SSE support to Undertow.
+- **http4k-core** : [Breaking] Related to above, `WsHandler` is now `PolyHandler`. The old type has been deprecated, but only API users who are implementing their own handlers may notice.
+
+### v4.1.2.1
+ - (empty release for testing our automated release process)  
+
+### v4.1.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Added view support for WebSocket messages.
+
+### v4.1.1.2
+- **http4k-core** : Fix cookie parsing for systems using non-English locale. H/T @dzappold for spotting it.
+
+### v4.1.1.1
+- **http4k-core** : `RequestTracing` should add a new `parent_id` even if a previous one wasn't previously set. 
+
+### v4.1.1.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.1.0.0
+- **http4k-core** : [Breaking] Remove previously deprecated AutoJsonEvents which was mistakenly left in the 4.0.0.0 release.
+- **http4k-core** : Strip body of GET request in 303 (See Other) redirections in `FollowRedirects`. H/T @dgliosca
+- **http4k-core** : Fix behaviour of `FollowRedirects` for in-memory routed handlers.
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.0.0.0
+- New versioning scheme! See [announcement](https://www.http4k.org/blog/http4k_v4/) for details.
+- **http4k-*** : Remove all previous deprecations from all modules. To upgrade cleanly, follow the simple instructions in the [announcement](https://www.http4k.org/blog/http4k_v4/#upgrading_library_api_changes)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-webdriver** : [Breaking] Upgrade of APIs to match new v4 Selenium APIs. It is quite safe to continue to use previous versions of the `http4k-testing-webdriver` JAR if you are unable to upgrade immediately. The API is reasonably the same, but some of the imports have changed. The main one is that instead of importing `org.openqa.selenium.By` you should import `org.http4k.webdriver.By`, which is the new custom implementation.
+- **http4k-core** : Replace `hostDemux()` with `reverseProxy()`.
+
+### v3.285.2
+- **http4k-testing-servirtium** : Fixed #553 - Servirtium storage fix for multi-line bodies.
+- **http4k-security-oauth** : Fixed #552 - AccessTokenFetcher initializes all AccessToken fields. H/T @@paraseba
+                       
+### v3.285.1
+- **http4k-format-moshi** : Undo change relating to reading Moshi body lenses from HTTP message streams.
+
+### v3.285.0
+- **http4k-*** : Upgrade some dependency versions, including Jetty to v10. 
+- **http4k-server-jetty* : [Unlikely API break] Caused by Jetty API change.
+- **http4k-core* : Renamed AutoJsonEvents to AutoMarshallingEvents
+- **http4k-serverless-lambda* : [Unlikely API break] Remove dependency on AWS Events JAR. We now use a Map<String, Any> instead. This will only affect you if you needed access to the raw ApiGateway events.
+
+### v3.284.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-servirtium** : ServirtiumServer now only changes the base Url of proxied requests instead of the entire path.
+
+### v3.283.1
+- **http4k-core** : Fix handling of null status descriptions. H/T @Hakky54 for report and fix.
+- **http4k-contract** : Fix #536 (again) - Path encoding fixed using lens. H/T @usand for the report and sticking with it!
+
+### v3.283.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Fix #536 - Path encoding fixed using lens.
+- **http4k-core** : Support multiple, nested RequestContexts.
+- **http4k-format-moshi** : Add support for (de)serialising Unit.
+- **http4k-security-oauth** : Ability to provide custom `RedirectionUriBuilder` for non-JWT cases.
+- **http4k-testing-chaos** : Ability to name Chaos API in OpenApi document.
+- **http4k-opentelemetry** : **Breaking (dependency change)** Upgrade to new 0.12.0 of OpenTelemetry Java API has caused some API changes.
+- **http4k-format-jackson** : **Breaking (dependency change)** Upgrade to new version of Jackson. PropertyNamingStrategies will need to be replaced as old one could cause deadlock: https://github.com/FasterXML/jackson-databind/issues/2715
+- **http4k-format-jackson-xml** : **Breaking** We recommend that users of this lib **DO NOT UPGRADE** to this release due to open bug with nullable fields. See: https://github.com/FasterXML/jackson-dataformat-xml/issues/435 .  There is a workaround which is to add default values into the nullable fields in your DTO classes. eg.
+ ```kotlin
+data class MyDto(val field: String? = null)
+```
+
+### v3.282.0
+- **http4k-serverless-*** : Tidy implementations to be consistent.
+- **http4k-testing-webdriver-*** : Fixed radio buttons submitting even when not selected.
+
+### v3.281.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Rework build to use refreshSrcVersions. Massive thanks to @jmfayard 
+- **http4k-serverless-lambda*** : Fix cookie handling in V2 Lambda adapter.
+
+### v3.280.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-klaxon** : New format module for the lightweight Kotlin JSON library.
+
+### v3.279.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.20
+- **http4k-core** : Adding routing description to RouterMatch. Simplify Routing logic to remove duplication.
+- **http4k-core** : [Breaking from Java] Improved API for Java clients for `Request` and `Response`. To fix, just replace `Request.Companion.create()` with `Request.create()`
+- **http4k-format-*** : Add ability to override content type for auto-marshalling for JSON .
+- **http4k-aws-*** : Fix AwsSdkClient to correctly pass body.
+
+### v3.278.0
+- **http4k-security-oauth** [Breaking]: extend `OAuthPersisence.assignToken` to receive an optional IdToken.
+
+### v3.277.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Fix routing when it doesn't match both method and path. 
+
+### v3.276.0
+- **http4k-graphql** : New module! Adds integration with `GraphQL-Java` and the ability to serve/consume GQL using the standard routing patterns.
+
+### v3.275.0
+- **http4k-core** : Reimplemented core routing logic to be fully based on `Routers`. It is now possible to nest arbitrary levels of request matching in a mix-and-match way. And it's ace. :) 
+- **http4k-*** : Pulled out a set of core modules for the various module types (format, template). This has shrunk the core module by ~10% in size
 
 ### v3.274.0
 - **http4k-*** : Upgrade some dependency versions.

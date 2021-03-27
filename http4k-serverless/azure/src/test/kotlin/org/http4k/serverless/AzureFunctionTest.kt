@@ -17,7 +17,7 @@ import java.util.Optional
 class AzureFunctionTest {
 
     @Test
-    fun `adapts API Gateway request and response and receives context`() {
+    fun `adapts Azure request and response and receives context`() {
         val context: ExecutionContext = proxy()
         val request: HttpRequestMessage<Optional<String>> = FakeAzureRequest(
             Request(GET, "/path")
@@ -33,7 +33,7 @@ class AzureFunctionTest {
                 assertThat(contexts[it][AZURE_CONTEXT_KEY], sameInstance(context))
                 assertThat(contexts[it][AZURE_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
+                assertThat(it.removeHeader("x-http4k-context-azure"), equalTo(Request(GET, "/path")
                     .header("c", "d")
                     .body("input body")
                     .query("query", "value")))

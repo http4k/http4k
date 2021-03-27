@@ -3,7 +3,6 @@ package org.http4k.routing.experimental
 import org.http4k.core.Uri
 import org.intellij.lang.annotations.Language
 
-
 typealias DirectoryRenderer = (uri: Uri, dir: ResourceSummary, resources: Iterable<ResourceSummary>) -> String
 
 @Language("HTML")

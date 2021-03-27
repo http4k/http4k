@@ -861,7 +861,10 @@
         "parameters": [
           {
             "schema": {
-              "type": "boolean"
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
             },
             "in": "query",
             "name": "b",

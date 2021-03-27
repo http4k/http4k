@@ -2,6 +2,7 @@ package org.http4k.contract.openapi.v3
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import org.http4k.contract.openapi.ApiInfo
@@ -53,10 +54,10 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
         val namingStrategy = clazz.annotations
             .filterIsInstance<JsonNaming>()
             .map { it.value }.getOrNull(0)
-            ?.let { it.createInstance() as PropertyNamingStrategy.PropertyNamingStrategyBase }
+            ?.let { it.createInstance() as PropertyNamingStrategy }
             ?: json.mapper.propertyNamingStrategy
 
-        return if ( namingStrategy is PropertyNamingStrategy.PropertyNamingStrategyBase) {
+        return if (namingStrategy is PropertyNamingStrategies.NamingBase) {
             { name: String -> namingStrategy.translate(name) }
         } else {
             { name -> name }

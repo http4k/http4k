@@ -12,4 +12,3 @@ fun hasStatus(expected: Status): Matcher<Response> = httpMessageHas("Status", Re
 fun hasSetCookie(expected: Cookie): Matcher<Response> = hasSetCookie(expected.name, equalTo(expected))
 
 fun hasSetCookie(name: String, expected: Matcher<Cookie>): Matcher<Response> = httpMessageHas("Cookie '$name'", { r: Response -> r.cookies().find { name == it.name }!! }, expected)
-

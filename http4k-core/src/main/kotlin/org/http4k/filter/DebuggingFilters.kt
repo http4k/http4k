@@ -1,10 +1,13 @@
 package org.http4k.filter
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
+import org.http4k.core.NoOp
 import org.http4k.core.then
 import java.io.PrintStream
+import java.lang.management.ManagementFactory.getRuntimeMXBean
 
 object DebuggingFilters {
     private const val defaultDebugStream = false
@@ -47,4 +50,11 @@ object DebuggingFilters {
     object PrintRequestAndResponse {
         operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream) = PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
     }
+}
+
+fun HttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) = DebuggingFilters.PrintRequestAndResponse(out, debugStream).then(this)
+
+fun Filter.inIntelliJOnly() = when {
+    getRuntimeMXBean().inputArguments.find { it.contains("idea", true) } != null -> this
+    else -> Filter.NoOp
 }

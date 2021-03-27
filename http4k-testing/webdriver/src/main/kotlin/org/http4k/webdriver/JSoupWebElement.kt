@@ -11,14 +11,15 @@ import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.webForm
 import org.jsoup.nodes.Element
-import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 
-data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, private val element: Element) : WebElement {
+data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, val element: Element) : WebElement {
+
+    override fun toString(): String = element.toString()
 
     override fun getTagName(): String = element.tagName()
 
@@ -85,7 +86,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     }
 
     private fun isUncheckedInput(input: WebElement): Boolean =
-        (input.getAttribute("type") == "checkbox") && input.getAttribute("checked") == null
+        (listOf("checkbox", "radio").contains(input.getAttribute("type"))) && input.getAttribute("checked") == null
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
 
@@ -143,9 +144,9 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun hashCode(): Int = element.hashCode()
 
-    override fun findElement(by: By): WebElement? = JSoupElementFinder(navigate, getURL, element).findElement(by)
+    override fun findElement(by: org.openqa.selenium.By): WebElement? = JSoupElementFinder(navigate, getURL, element).findElement(by)
 
-    override fun findElements(by: By) = JSoupElementFinder(navigate, getURL, element).findElements(by)
+    override fun findElements(by: org.openqa.selenium.By) = JSoupElementFinder(navigate, getURL, element).findElements(by)
 
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)
 

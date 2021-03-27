@@ -1,8 +1,8 @@
 package guide.modules.opentelemetry
 
-import io.opentelemetry.OpenTelemetry
-import io.opentelemetry.context.propagation.DefaultContextPropagators
-import io.opentelemetry.extensions.trace.propagation.AwsXRayPropagator
+import io.opentelemetry.context.propagation.ContextPropagators.create
+import io.opentelemetry.extension.aws.AwsXrayPropagator
+import io.opentelemetry.sdk.OpenTelemetrySdk
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -19,10 +19,9 @@ import org.http4k.routing.routes
 
 fun main() {
     // configure OpenTelemetry using the Amazon XRAY tracing scheme
-    OpenTelemetry.setPropagators(
-        DefaultContextPropagators.builder()
-            .addTextMapPropagator(AwsXRayPropagator.getInstance())
-            .build())
+    val openTelemetry = OpenTelemetrySdk.builder()
+        .setPropagators(create(AwsXrayPropagator.getInstance()))
+        .buildAndRegisterGlobal()
 
     // this HttpHandler represents a 3rd party service, and will repeat the request body
     val repeater: HttpHandler = {
@@ -31,10 +30,10 @@ fun main() {
     }
 
     // we will propagate the tracing headers using the tracer instance
-    val repeaterClient = ClientFilters.OpenTelemetryTracing().then(repeater)
+    val repeaterClient = ClientFilters.OpenTelemetryTracing(openTelemetry).then(repeater)
 
     // this is the server app which will add tracing spans to incoming requests
-    val app = ServerFilters.OpenTelemetryTracing()
+    val app = ServerFilters.OpenTelemetryTracing(openTelemetry)
         .then(routes("/echo/{name}" bind GET to {
             val remoteResponse = repeaterClient(
                 Request(POST, "http://aRemoteServer/endpoint")

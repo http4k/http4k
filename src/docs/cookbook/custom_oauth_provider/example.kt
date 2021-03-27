@@ -17,6 +17,7 @@ import org.http4k.security.CrossSiteRequestForgeryToken
 import org.http4k.security.OAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.Nonce
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -85,7 +86,7 @@ class CustomOAuthPersistence : OAuthPersistence {
 
     override fun retrieveToken(request: Request): AccessToken? = accessToken
 
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response {
+    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken, idToken: IdToken?): Response {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }

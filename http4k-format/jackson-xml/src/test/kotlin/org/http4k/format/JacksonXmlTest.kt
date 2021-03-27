@@ -14,7 +14,10 @@ import org.http4k.format.JacksonXml.auto
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.websocket.WsMessage
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+
+data class NullableListContainerBug(val children: List<String>?)
 
 class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
 
@@ -43,5 +46,11 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
         val msg = lens(item)
         assertThat(msg.bodyString(), equalTo("<UriContainer><field>foo.bar</field></UriContainer>"))
         assertThat(lens(msg), equalTo(item))
+    }
+
+    @Test
+    @Disabled // uncomment when https://github.com/FasterXML/jackson-dataformat-xml/issues/435 is fixed
+    fun `nullable fields are supported - jackson bug`() {
+        assertThat(JacksonXml.asA("<NullableListContainerBug/>"), equalTo(NullableListContainerBug(null)))
     }
 }

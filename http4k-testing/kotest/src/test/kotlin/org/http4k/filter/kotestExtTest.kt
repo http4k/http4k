@@ -25,5 +25,4 @@ class ExtensionsTest {
 
         shouldFail { ResponseFilters.Assert(haveHeader("bob")).then { Response(OK) }(Request(GET, "")) }
     }
-
 }

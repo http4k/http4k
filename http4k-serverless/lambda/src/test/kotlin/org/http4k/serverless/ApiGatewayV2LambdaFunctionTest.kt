@@ -1,13 +1,12 @@
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 
 class ApiGatewayV2LambdaFunctionTest {
@@ -16,40 +15,40 @@ class ApiGatewayV2LambdaFunctionTest {
     fun `adapts API Gateway request and response and receives context`() {
         val lambdaContext = LambdaContextMock()
 
-        val request = APIGatewayV2HTTPEvent.builder()
-            .withRawPath("/path")
-            .withQueryStringParameters(mapOf("query" to "value"))
-            .withBody("input body")
-            .withHeaders(mapOf("c" to "d"))
-            .withRequestContext(APIGatewayV2HTTPEvent.RequestContext.builder()
-                .withHttp(
-                    APIGatewayV2HTTPEvent.RequestContext.Http.builder().withMethod("GET").build()
-                ).build()
-            )
-            .build()
+        val request = mapOf(
+            "rawPath" to "/path",
+            "queryStringParameters" to mapOf("query" to "value"),
+            "body" to "input body",
+            "headers" to mapOf("c" to "d"),
+            "requestContext" to mapOf("http" to mapOf("method" to "GET"))
+        )
 
         val lambda = object : ApiGatewayV2LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
                 assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
+                assertThat(it.removeHeader("x-http4k-context-lambda"), equalTo(Request(GET, "/path")
                     .query("query", "value")
                     .header("c", "d")
                     .body("input body")
                 ))
-                Response(Status.OK).header("a", "b").body("hello there")
+                Response(OK).header("a", "b").body("hello there")
             }
         }) {}
 
-        assertThat(lambda.handle(request, lambdaContext),
+        val out = lambda.handle(request, lambdaContext)
+
+        assertThat(out,
             equalTo(
-                APIGatewayV2HTTPResponse.builder()
-                    .withStatusCode(200)
-                    .withBody("hello there")
-                    .withHeaders(mapOf("a" to "b"))
-                    .withMultiValueHeaders(mapOf("a" to listOf("b")))
-                    .build()
+                mapOf(
+                    "statusCode" to 200,
+                    "cookies" to emptyList<String>(),
+                    "body" to "hello there".base64Encode(),
+                    "headers" to mapOf("a" to "b"),
+                    "multiValueHeaders" to mapOf("a" to listOf("b")),
+                    "isBase64Encoded" to true
+                )
             )
         )
     }

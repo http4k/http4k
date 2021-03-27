@@ -45,13 +45,13 @@ class ServirtiumReplayServerTest : TestContract {
     }
 
     @Test
-    @Disabled("fails on travis... need to investigate")
+    @Disabled
     fun `unexpected content`(approver: Approver) {
         approver.assertApproved(createHandler()(Request(GET, "/foo")), NOT_IMPLEMENTED)
     }
 
     @Test
-    @Disabled("fails on travis... need to investigate")
+    @Disabled
     fun `too many requests`(approver: Approver) {
         super.scenario()
         val httpMessage = createHandler()(Request(GET, "/foo")).run {

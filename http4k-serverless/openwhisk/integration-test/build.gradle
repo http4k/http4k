@@ -3,14 +3,14 @@ description = 'Functions to be used for testing of Apache OpenWhisk'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    compile project(":http4k-core")
-    compile project(":http4k-cloudnative")
-    compile project(":http4k-serverless-openwhisk")
-    compile project(":http4k-format-jackson")
-    compile project(":http4k-client-okhttp")
-    compile project(path: ":http4k-core", configuration: 'testArtifacts')
+    api project(":http4k-core")
+    api project(":http4k-cloudnative")
+    api project(":http4k-serverless-openwhisk")
+    api project(":http4k-format-jackson")
+    api project(":http4k-client-okhttp")
+    api project(path: ":http4k-core", configuration: 'testArtifacts')
 
-    testCompile Libs.bunting4k
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile Config.TestDependencies
+    testImplementation Libs.bunting4k
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
 }

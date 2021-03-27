@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 interface TestContract {
     val uri: Uri
 
-    fun createHandler() = ClientFilters.SetBaseUriFrom(uri).then(JavaHttpClient())
+    fun createHandler() = ClientFilters.SetHostFrom(uri).then(JavaHttpClient())
 
     val control: InteractionControl
 

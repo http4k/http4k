@@ -10,7 +10,9 @@ import org.http4k.format.Json
 import org.http4k.util.JsonSchema
 
 /**
- * Converts a API to OpenApi3 format JSON.
+ * Converts a API to OpenApi3 format JSON, using non-reflective JSON marshalling - this is the limited version
+ *
+ * If you are using Jackson, you probably want to use ApiRenderer.Auto()!
  */
 class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>, private val servers: List<ServerObject>) : ApiRenderer<Api<NODE>, NODE> {
     private val jsonToJsonSchema = JsonToJsonSchema(json, "components/schemas")
@@ -190,5 +192,4 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>, private val 
         } catch (e: ClassCastException) {
             jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId)
         }
-
 }

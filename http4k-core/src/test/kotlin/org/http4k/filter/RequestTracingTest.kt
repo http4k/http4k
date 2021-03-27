@@ -47,6 +47,20 @@ class RequestTracingTest {
     }
 
     @Test
+    fun `client should create new span_id even if parent null`() {
+        val cliWithEvents = ClientFilters.RequestTracing()
+            .then {
+                val actual = ZipkinTraces(it)
+                assertThat(actual.parentSpanId, equalTo(TraceId("span_id")))
+                Response(OK)
+            }
+        ZipkinTraces.setForCurrentThread(ZipkinTraces(TraceId("trace_id"), TraceId("span_id"), null))
+        cliWithEvents(Request(GET, "/parentNull"))
+        ZipkinTraces.setForCurrentThread(ZipkinTraces(TraceId("trace_id"), TraceId("span_id"), TraceId("parent_id")))
+        cliWithEvents(Request(GET, "/parentNotNull"))
+    }
+
+    @Test
     fun `request traces may be copied to child threads`() {
         val originalTraceId = TraceId("originalTrace")
         val originalSpanId = TraceId("originalSpan")

@@ -97,5 +97,4 @@ object ResilienceFilters {
             }
         }
     }
-
 }

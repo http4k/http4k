@@ -1,7 +1,9 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
-import io.opentelemetry.common.Labels
+import io.opentelemetry.api.metrics.GlobalMetricsProvider
+import io.opentelemetry.api.metrics.common.Labels
+import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -12,9 +14,18 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
 import org.http4k.util.TickingClock
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 class OpenTelemetryMetricsClientTest {
+
+    companion object {
+        @BeforeAll
+        @JvmStatic
+        fun setup() {
+            GlobalMetricsProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
+        }
+    }
 
     private val clock = TickingClock
     private var requestTimer = ClientFilters.OpenTelemetryMetrics.RequestTimer(clock = clock)

@@ -42,7 +42,6 @@ internal class ClientValidationFilterTest {
                 Failure(InvalidClientId)
             }
         }
-
     }
 
     private val requestValidator = RequestJWTValidator { _, requestJwtContainer ->
@@ -60,7 +59,6 @@ internal class ClientValidationFilterTest {
     private val filter =
         ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, AuthRequestFromQueryParameters)
             .then(loginPage)
-
 
     @Test
     fun `allow accessing the login page`() {
@@ -129,6 +127,4 @@ internal class ClientValidationFilterTest {
         )
         assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri#state=someState&error=unsupported_response_type&error_description=The+specified+response_type+%27something+invalid%27+is+not+supported&error_uri=SomeUri")))
     }
-
 }
-

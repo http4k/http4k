@@ -3,7 +3,7 @@ package org.http4k.client
 import org.eclipse.jetty.client.HttpClient
 import org.eclipse.jetty.client.api.Result
 import org.eclipse.jetty.client.util.BufferingResponseListener
-import org.eclipse.jetty.client.util.InputStreamContentProvider
+import org.eclipse.jetty.client.util.InputStreamRequestContent
 import org.eclipse.jetty.client.util.InputStreamResponseListener
 import org.eclipse.jetty.http.HttpFields
 import org.eclipse.jetty.util.HttpCookieStore
@@ -90,10 +90,10 @@ object JettyClient {
                 }
             }
 
-            private fun HttpClient.newRequest(request: Request): JettyRequest = request.headers.fold(
+            private fun HttpClient.newRequest(request: Request) = request.headers.fold(
                 newRequest(request.uri.toString()).method(request.method.name)) { memo, (key, value) ->
                 memo.header(key, value)
-            }.content(InputStreamContentProvider(request.body.stream)).let(requestModifier)
+            }.body(InputStreamRequestContent(request.body.stream)).let(requestModifier)
 
             private fun JettyRequest.timeoutOrMax() = if (timeout <= 0) Long.MAX_VALUE else timeout
 
@@ -106,7 +106,6 @@ object JettyClient {
                 is TimeoutException -> CLIENT_TIMEOUT
                 else -> SERVICE_UNAVAILABLE
             }.description("Client Error: caused by $localizedMessage"))
-
         }
     }
 

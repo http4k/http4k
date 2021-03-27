@@ -8,9 +8,8 @@ import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Header
 
-
 class JsonResponseErrorRenderer(
-    private val json: AutoMarshallingJson,
+    private val json: AutoMarshallingJson<*>,
     private val documentationUri: String? = null
 ) {
 
@@ -29,4 +28,3 @@ class JsonResponseErrorRenderer(
 
     private data class ErrorResponse(val error: String, val error_description: String, val error_uri: String?)
 }
-

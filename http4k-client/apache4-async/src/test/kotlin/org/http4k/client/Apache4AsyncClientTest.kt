@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Future
 
-class Apache4AsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, Apache4AsyncClient(),
+class Apache4AsyncClientTest : AsyncHttpClientContract(::SunHttp, Apache4AsyncClient(),
     Apache4AsyncClient(HttpAsyncClients.custom()
         .setDefaultIOReactorConfig(IOReactorConfig.custom()
             .setSoTimeout(100)
@@ -38,7 +38,6 @@ class Apache4AsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, Apache4A
             }
 
             override fun close() {}
-
         })(Request(GET, "http://localhost:8000")) {
             assertThat(it, hasStatus(CLIENT_TIMEOUT))
             latch.countDown()
@@ -47,4 +46,3 @@ class Apache4AsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, Apache4A
         latch.await()
     }
 }
-

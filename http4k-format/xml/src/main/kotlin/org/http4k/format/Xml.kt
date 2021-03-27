@@ -4,7 +4,7 @@ import com.google.gson.JsonElement
 import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -13,6 +13,7 @@ import org.http4k.lens.ParamMeta
 import org.http4k.lens.httpBodyRoot
 import org.json.XML
 import org.w3c.dom.Document
+import java.io.InputStream
 import java.io.StringWriter
 import java.nio.ByteBuffer
 import javax.xml.parsers.DocumentBuilderFactory
@@ -26,6 +27,8 @@ object Xml : AutoMarshallingXml() {
     override fun Any.asXmlString(): String = throw UnsupportedOperationException("")
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = Gson.asA(input.asXmlToJsonElement(), target)
+
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = Gson.asA(input.reader().readText().asXmlToJsonElement(), target)
 
     fun String.asXmlToJsonElement(): JsonElement = Gson.parse(XML.toJSONObject(this, true).toString())
 
@@ -47,7 +50,7 @@ object Xml : AutoMarshallingXml() {
 
     fun Body.Companion.xml(description: String? = null,
                            contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Document> =
-        httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+        httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), APPLICATION_XML, contentNegotiation)
             .map(Body::payload) { Body(it) }
             .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlDocument() }, { it.asXmlString() })
 }

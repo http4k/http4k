@@ -10,6 +10,4 @@ import org.http4k.security.oauth.server.TokenRequest
 class ClientCredentialsAccessTokenGenerator(private val accessTokens: AccessTokens) : AccessTokenGenerator {
     override fun generate(request: Request, clientId: ClientId, tokenRequest: TokenRequest) =
         accessTokens.create(clientId, tokenRequest).map { AccessTokenDetails(it) }
-
 }
-

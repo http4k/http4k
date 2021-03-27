@@ -24,7 +24,7 @@ class SecureJetty(
     private val locakKeyManagerPassword: String
 
 ) : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer {
+    override fun toServer(http: HttpHandler): Http4kServer {
         val server = Server().apply {
             val https = HttpConfiguration().apply {
                 addCustomizer(SecureRequestCustomizer())
@@ -42,7 +42,7 @@ class SecureJetty(
                     HttpConnectionFactory(https)).apply { port = sslPort }
             )
 
-            insertHandler(httpHandler.toJettyHandler())
+            insertHandler(http.toJettyHandler())
         }
 
         return object : Http4kServer {

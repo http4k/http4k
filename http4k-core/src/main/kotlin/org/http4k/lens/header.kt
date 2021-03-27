@@ -1,5 +1,6 @@
 package org.http4k.lens
 
+import org.http4k.core.Accept
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Parameters
@@ -21,9 +22,16 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
                 )
             }
         },
-        ContentType::toHeaderValue).optional("content-type")
+        ContentType::toHeaderValue
+    ).optional("content-type")
 
-    val LOCATION = map({ of(it) }, Uri::toString).required("location")
+    val LOCATION = map(::of, Uri::toString).required("location")
+
+    val ACCEPT = map {
+        parseValueAndDirectives(it).let {
+            Accept(it.first.split(",").map { it.trim() }.map(::ContentType), it.second)
+        }
+    }.optional("Accept")
 
     internal fun parseValueAndDirectives(it: String): Pair<String, Parameters> =
         with(it.split(";").mapNotNull { it.trim().takeIf(String::isNotEmpty) }) {

@@ -31,7 +31,6 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
             safeRender {
                 classToTemplate.getOrPut(it.javaClass to it.template()) { handlebars.compile(it.template()) }.apply(it)
             }(viewModel)
-
     }
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer = object : TemplateRenderer {
@@ -41,7 +40,6 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
                 handlebars.compile(it.template()).apply(it)
             }(viewModel)
     }
-
 
     /**
      * Hot-reloads (no-caching) templates from a file path
@@ -66,5 +64,4 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
             throw ViewNotFound(it)
         }
     }
-
 }

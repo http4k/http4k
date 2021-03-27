@@ -3,8 +3,7 @@ set -e
 
 source ./release-functions.sh
 
-git clone https://"${GH_TOKEN}"@github.com/http4k/http4k.git tmp/
+ensure_release_commit
 
-pushd tmp
 create_tag
-popd
+

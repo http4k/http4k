@@ -24,6 +24,7 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.auto
 import org.http4k.hamkrest.hasBody
@@ -38,7 +39,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
+class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
 
     private data class ARandomObject(val field: String)
 
@@ -65,6 +66,27 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     private val header = Header.optional("FILTER")
 
     override val expectedNotFoundBody = "{\"message\":\"No route found on this path. Have you used the correct HTTP verb?\"}"
+
+    override val handler =
+        ServerFilters.CatchAll()
+            .then(
+                contract {
+                    renderer = SimpleJson(Jackson)
+                    routes += contractRoutes.toList()
+                }
+            )
+
+    @Test
+    fun `can bind under a route match`() {
+        val app =
+            routes("/hello" bind routes("/there" bind
+                contract {
+                    renderer = SimpleJson(Jackson)
+                    routes += validPath bindContract GET to { Response(OK) }
+                })
+            )
+        assertThat(app(Request(GET, "/hello/there$validPath")), hasStatus(OK))
+    }
 
     @Test
     fun `by default the description lives at the route`() {

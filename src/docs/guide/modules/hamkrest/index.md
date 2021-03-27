@@ -4,12 +4,12 @@ description: Feature overview of the http4k-testing-hamkrest module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-testing-hamkrest", version: "3.274.0"
+implementation group: "org.http4k", name: "http4k-testing-hamkrest", version: "4.5.0.1"
 ```
 
 ### About
 
-A set of Hamkrest matchers for use when testing [http4k] apps.
+A set of Hamkrest matchers for use when testing http4k apps.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/hamkrest/example.kt)
 

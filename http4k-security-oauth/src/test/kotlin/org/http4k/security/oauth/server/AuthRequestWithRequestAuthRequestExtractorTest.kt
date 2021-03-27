@@ -313,8 +313,6 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
     }
 
-
-
     private fun success(authRequest: AuthRequest): Result<AuthRequest, InvalidAuthorizationRequest> = Success(authRequest)
     private fun failure(error: InvalidAuthorizationRequest): Result<AuthRequest, InvalidAuthorizationRequest> = Failure(error)
 
@@ -352,6 +350,4 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
     private fun underTest(strategy: AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy = Combine) =
         AuthRequestWithRequestAuthRequestExtractor(requestJWTValidator, strategy)
-
-
 }

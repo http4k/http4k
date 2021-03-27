@@ -1,23 +1,33 @@
 dependencies {
-    compile project(":http4k-core")
-    compile project(":http4k-cloudnative")
-    compile project(":http4k-serverless-lambda")
-    compile project(":http4k-aws")
-    compile project(":http4k-format-jackson")
-    compile project(":http4k-client-okhttp")
+    api project(":http4k-core")
+    api project(":http4k-cloudnative")
+    api project(":http4k-serverless-lambda")
+    api project(":http4k-aws")
+    api project(":http4k-format-jackson")
+    api project(":http4k-client-okhttp")
 
-    compile Libs.kotlin_reflect
-    compile Libs.aws_lambda_java_core
-    compile Libs.aws_lambda_java_events
-    compile project(path: ":http4k-core", configuration: 'testArtifacts')
 
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile Config.TestDependencies
+    api Libs.aws_lambda_java_events
+    api Libs.result4k
+    api project(path: ":http4k-core", configuration: 'testArtifacts')
+
+    testImplementation project(path: ":http4k-aws", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
 }
 
 task deployTestFunction(type: JavaExec) {
     classpath = classpath + sourceSets.test.runtimeClasspath
-    mainClass = 'org.http4k.serverless.lambda.DeployServerAsLambdaForClientContractKt'
+    mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContractKt'
+}
+
+task deployHttpApiGateway(type: JavaExec) {
+    classpath = classpath + sourceSets.test.runtimeClasspath
+    mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployHttpApiGatewayKt'
+}
+
+task deployRestApiGateway(type: JavaExec) {
+    classpath = classpath + sourceSets.test.runtimeClasspath
+    mainClass = 'org.http4k.serverless.lambda.testing.setup.DeployRestApiGatewayKt'
 }
 
 deployTestFunction.dependsOn("test-function:buildZip")

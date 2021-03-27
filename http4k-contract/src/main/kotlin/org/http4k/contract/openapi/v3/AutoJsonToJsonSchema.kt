@@ -1,11 +1,12 @@
 package org.http4k.contract.openapi.v3
 
-import org.http4k.format.JsonLibAutoMarshallingJson
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
+import org.http4k.lens.ParamMeta.NullParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -14,7 +15,7 @@ import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 
 class AutoJsonToJsonSchema<NODE : Any>(
-    private val json: JsonLibAutoMarshallingJson<NODE>,
+    private val json: AutoMarshallingJson<NODE>,
     private val fieldRetrieval: FieldRetrieval = FieldRetrieval.compose(SimpleLookup()),
     private val modelNamer: SchemaModelNamer = SchemaModelNamer.Simple,
     private val refPrefix: String = "components/schemas"
@@ -24,12 +25,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val schema = json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true)
         return JsonSchema(
             json.asJsonObject(schema),
-            schema.definitions().map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet())
+            schema.definitions().map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()
+        )
     }
 
     private fun NODE.toSchema(value: Any, objName: String?, topLevel: Boolean) =
         when (val param = json.typeOf(this).toParam()) {
-            ArrayParam -> toArraySchema("", value, false, null)
+            is ArrayParam -> toArraySchema("", value, false, null)
             ObjectParam -> toObjectOrMapSchema(objName, value, false, topLevel, null)
             else -> toSchema("", param, false, null)
         }
@@ -37,7 +39,12 @@ class AutoJsonToJsonSchema<NODE : Any>(
     private fun NODE.toSchema(name: String, paramMeta: ParamMeta, isNullable: Boolean, metadata: FieldMetadata?) =
         SchemaNode.Primitive(name, paramMeta, isNullable, this, metadata)
 
-    private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean, metadata: FieldMetadata?): SchemaNode.Array {
+    private fun NODE.toArraySchema(
+        name: String,
+        obj: Any,
+        isNullable: Boolean,
+        metadata: FieldMetadata?
+    ): SchemaNode.Array {
         val items = Items(
             json.elements(this)
                 .zip(items(obj)) { node: NODE, value: Any ->
@@ -50,61 +57,94 @@ class AutoJsonToJsonSchema<NODE : Any>(
         return SchemaNode.Array(name, isNullable, items, this, metadata)
     }
 
-    private fun NODE.toEnumSchema(fieldName: String, obj: Any, param: ParamMeta,
-                                  enumConstants: Array<Any>, isNullable: Boolean, metadata: FieldMetadata?): SchemaNode =
-        SchemaNode.Reference(fieldName, "#/$refPrefix/${modelNamer(obj)}",
-            SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { it.toString() }, null), metadata)
+    private fun NODE.toEnumSchema(
+        fieldName: String, obj: Any, param: ParamMeta,
+        enumConstants: Array<Any>, isNullable: Boolean, metadata: FieldMetadata?
+    ): SchemaNode =
+        SchemaNode.Reference(
+            fieldName,
+            "#/$refPrefix/${modelNamer(obj)}",
+            SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { it.toString() }, null),
+            metadata
+        )
 
+    private fun NODE.toObjectOrMapSchema(
+        objName: String?,
+        obj: Any,
+        isNullable: Boolean,
+        topLevel: Boolean,
+        metadata: FieldMetadata?
+    ) =
+        if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable, topLevel, metadata) else toObjectSchema(
+            objName,
+            obj,
+            isNullable,
+            topLevel,
+            metadata
+        )
 
-    private fun NODE.toObjectOrMapSchema(objName: String?, obj: Any, isNullable: Boolean, topLevel: Boolean, metadata: FieldMetadata?) =
-        if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable, topLevel, metadata) else toObjectSchema(objName, obj, isNullable, topLevel, metadata)
-
-    private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean, topLevel: Boolean, metadata: FieldMetadata?): SchemaNode.Reference {
+    private fun NODE.toObjectSchema(
+        objName: String?,
+        obj: Any,
+        isNullable: Boolean,
+        topLevel: Boolean,
+        metadata: FieldMetadata?
+    ): SchemaNode.Reference {
         val properties = json.fields(this)
             .map { Triple(it.first, it.second, fieldRetrieval(obj, it.first)) }
             .map { (fieldName, field, kField) ->
-                when (val param = json.typeOf(field).toParam()) {
-                    ArrayParam -> field.toArraySchema(fieldName, kField.value, kField.isNullable, kField.metadata)
-                    ObjectParam -> field.toObjectOrMapSchema(fieldName, kField.value, kField.isNullable, false, kField.metadata)
-                    else -> with(field) {
-                        kField.value.javaClass.enumConstants
-                            ?.let { toEnumSchema(fieldName, kField.value, param, it, kField.isNullable, kField.metadata) }
-                            ?: toSchema(fieldName, param, kField.isNullable, kField.metadata)
-                    }
-                }
+                makePropertySchemaFor(field, fieldName, kField.value, kField.isNullable, kField.metadata)
             }
             .map { it.name() to it }.toMap()
 
         val nameToUseForRef = if (topLevel) objName ?: modelNamer(obj) else modelNamer(obj)
 
-        return SchemaNode.Reference(objName
-            ?: modelNamer(obj), "#/$refPrefix/$nameToUseForRef",
-            SchemaNode.Object(nameToUseForRef, isNullable, properties, this, null), metadata)
+        return SchemaNode.Reference(
+            objName
+                ?: modelNamer(obj), "#/$refPrefix/$nameToUseForRef",
+            SchemaNode.Object(nameToUseForRef, isNullable, properties, this, null), metadata
+        )
     }
 
-    private fun NODE.toMapSchema(objName: String?, obj: Map<*, *>, isNullable: Boolean, topLevel: Boolean, metadata: FieldMetadata?): SchemaNode {
+    private fun NODE.toMapSchema(
+        objName: String?,
+        obj: Map<*, *>,
+        isNullable: Boolean,
+        topLevel: Boolean,
+        metadata: FieldMetadata?
+    ): SchemaNode {
         val objWithStringKeys = obj.mapKeys { it.key?.let(::toJsonKey) }
         val properties = json.fields(this)
             .map { Triple(it.first, it.second, objWithStringKeys[it.first]!!) }
-            .map { (fieldName, field, value) ->
-                when (val param = json.typeOf(field).toParam()) {
-                    ArrayParam -> field.toArraySchema(fieldName, value, false, null)
-                    ObjectParam -> field.toObjectOrMapSchema(fieldName, value, false, false, null)
-                    else -> with(field) {
-                        value.javaClass.enumConstants?.let {
-                            toEnumSchema(fieldName, value, param, it, false, null)
-                        } ?: toSchema(fieldName, param, false, null)
-                    }
-                }
-            }
+            .map { (fieldName, field, value) -> makePropertySchemaFor(field, fieldName, value, false, null) }
             .map { it.name() to it }.toMap()
 
         return if (topLevel && objName != null) {
-            SchemaNode.Reference(objName, "#/$refPrefix/$objName",
-                SchemaNode.Object(objName, isNullable, properties, this, null), metadata)
+            SchemaNode.Reference(
+                objName, "#/$refPrefix/$objName",
+                SchemaNode.Object(objName, isNullable, properties, this, null), metadata
+            )
         } else
-            SchemaNode.MapType(objName ?: modelNamer(obj), isNullable,
-                SchemaNode.Object(modelNamer(obj), isNullable, properties, this, null), metadata)
+            SchemaNode.MapType(
+                objName ?: modelNamer(obj), isNullable,
+                SchemaNode.Object(modelNamer(obj), isNullable, properties, this, null), metadata
+            )
+    }
+
+    private fun makePropertySchemaFor(
+        field: NODE,
+        fieldName: String,
+        value: Any,
+        isNullable: Boolean,
+        metadata: FieldMetadata?
+    ) = when (val param = json.typeOf(field).toParam()) {
+        is ArrayParam -> field.toArraySchema(fieldName, value, isNullable, metadata)
+        ObjectParam -> field.toObjectOrMapSchema(fieldName, value, isNullable, false, metadata)
+        else -> with(field) {
+            value.javaClass.enumConstants
+                ?.let { toEnumSchema(fieldName, value, param, it, isNullable, metadata) }
+                ?: toSchema(fieldName, param, isNullable, metadata)
+        }
     }
 
     private fun toJsonKey(it: Any): String {
@@ -122,7 +162,7 @@ fun interface SchemaModelNamer : (Any) -> String {
 
 private sealed class ArrayItem {
     data class Array(val items: Items) : ArrayItem() {
-        val type = ArrayParam.value
+        val type = ArrayParam(NullParam).value
     }
 
     class NonObject(paramMeta: ParamMeta) : ArrayItem() {
@@ -173,7 +213,14 @@ private sealed class SchemaNode(
         override fun definitions() = emptyList<SchemaNode>()
     }
 
-    class Enum(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?, val enum: List<String>, metadata: FieldMetadata?) :
+    class Enum(
+        name: String,
+        paramMeta: ParamMeta,
+        isNullable: Boolean,
+        example: Any?,
+        val enum: List<String>,
+        metadata: FieldMetadata?
+    ) :
         SchemaNode(name, paramMeta, isNullable, example, metadata) {
         val type = paramMeta().value
         override fun arrayItem() = ArrayItem.Ref(name())
@@ -181,11 +228,11 @@ private sealed class SchemaNode(
     }
 
     class Array(name: String, isNullable: Boolean, val items: Items, example: Any?, metadata: FieldMetadata?) :
-        SchemaNode(name, ArrayParam, isNullable, example, metadata) {
+        SchemaNode(name, ArrayParam(items.definitions().map { it.paramMeta() }.toSet().firstOrNull() ?: NullParam), isNullable, example, metadata) {
         val type = paramMeta().value
 
         override fun arrayItem() = when (paramMeta()) {
-            ArrayParam -> ArrayItem.Array(items)
+            is ArrayParam -> ArrayItem.Array(items)
             ObjectParam -> ArrayItem.Ref(name())
             else -> ArrayItem.NonObject(paramMeta())
         }
@@ -193,23 +240,28 @@ private sealed class SchemaNode(
         override fun definitions() = items.definitions()
     }
 
-    class Object(name: String, isNullable: Boolean, val properties: Map<String, SchemaNode>,
-                 example: Any?, metadata: FieldMetadata?) : SchemaNode(name, ObjectParam, isNullable, example, metadata) {
+    class Object(
+        name: String, isNullable: Boolean, val properties: Map<String, SchemaNode>,
+        example: Any?, metadata: FieldMetadata?
+    ) : SchemaNode(name, ObjectParam, isNullable, example, metadata) {
         val type = paramMeta().value
         val required = properties.filterNot { it.value.isNullable }.keys.sorted()
         override fun arrayItem() = ArrayItem.Ref(name())
         override fun definitions() = properties.values.flatMap { it.definitions() }
     }
 
-    class Reference(name: String,
-                    val `$ref`: String,
-                    private val schemaNode: SchemaNode,
-                    metadata: FieldMetadata?) : SchemaNode(name, ObjectParam, schemaNode.isNullable, null, metadata) {
+    class Reference(
+        name: String,
+        val `$ref`: String,
+        private val schemaNode: SchemaNode,
+        metadata: FieldMetadata?
+    ) : SchemaNode(name, ObjectParam, schemaNode.isNullable, null, metadata) {
         override fun arrayItem() = ArrayItem.Ref(`$ref`)
         override fun definitions() = listOf(schemaNode) + schemaNode.definitions()
     }
 
-    class MapType(name: String, isNullable: Boolean, val additionalProperties: SchemaNode, metadata: FieldMetadata?) : SchemaNode(name, ObjectParam, isNullable, null, metadata) {
+    class MapType(name: String, isNullable: Boolean, val additionalProperties: SchemaNode, metadata: FieldMetadata?) :
+        SchemaNode(name, ObjectParam, isNullable, null, metadata) {
         val type = paramMeta().value
         override fun arrayItem() = ArrayItem.Ref(name())
         override fun definitions() = additionalProperties.definitions()
@@ -227,7 +279,7 @@ private fun JsonType.toParam() = when (this) {
     JsonType.Integer -> IntegerParam
     JsonType.Number -> NumberParam
     JsonType.Boolean -> BooleanParam
-    JsonType.Array -> ArrayParam
+    JsonType.Array -> ArrayParam(NullParam)
     JsonType.Object -> ObjectParam
     JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
 }

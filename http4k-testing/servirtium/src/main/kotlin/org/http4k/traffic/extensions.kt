@@ -26,28 +26,29 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
     return { received: Request ->
         val index = count.getAndIncrement()
 
+        val actual = manipulations(received).toString()
+
         when {
             interactions.hasNext() -> {
                 val (expectedReq, response) = interactions.next()
 
-                val actual = manipulations(received).toString()
                 if (expectedReq.toString() == actual) response
                 else renderMismatch(index, expectedReq.toString(), actual)
             }
-            else -> renderUnexpectedInteration(interactionCount, index + 1)
+            else -> renderUnexpectedInteraction(interactionCount, index + 1, actual)
         }
     }
 }
 
 private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Response(NOT_IMPLEMENTED).body(
     "Unexpected request received for Interaction $index ==> " +
-        "expected:<$expectedReq> but was:<$actual>")
+        "expected: <$expectedReq> but was: <$actual>")
 
 /**
  * Interaction was called more times than there are interactions
  */
-private fun renderUnexpectedInteration(interactions: Int, count: Int) = Response(NOT_IMPLEMENTED).body(
-    "Have $interactions interaction(s) in the script but called $count times. Unexpected interaction"
+private fun renderUnexpectedInteraction(interactions: Int, count: Int, actual: String) = Response(NOT_IMPLEMENTED).body(
+    "Have $interactions interaction(s) in the script but called $count times. Unexpected interaction: <$actual>"
 )
 
 /**
@@ -122,11 +123,13 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
             .map {
                 val sections = it.split("```").map { it.byteInputStream().reader().readLines() }
 
-                val req = Request.parse(listOf(
+                val requestString = listOf(
                     listOf(sections[0][0] + " " + HTTP_1_1),
                     sections[1].dropWhile(String::isBlank) + "\r\n",
-                    sections[3].dropWhile(String::isBlank)
-                ).flatten().joinToString("\r\n"))
+                    listOf(sections[3].dropWhile(String::isBlank).joinToString("\n"))
+                ).flatten().joinToString("\r\n")
+
+                val req = Request.parse(requestString)
 
                 val resp = Response.parse(
                     listOf(
@@ -136,14 +139,13 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
                             " "
                         ),
                         sections[5].dropWhile(String::isBlank) + "\r\n",
-                        sections[7].dropWhile(String::isBlank)
+                        listOf(sections[7].dropWhile(String::isBlank).joinToString("\n"))
                     ).flatten().joinToString("\r\n")
                 )
                 req to resp
             }
             .map(fn)
             .asSequence()
-
 }
 
 private inline fun <reified T : HttpMessage> headerLine() = """### ${T::class.java.simpleName} headers recorded for playback"""

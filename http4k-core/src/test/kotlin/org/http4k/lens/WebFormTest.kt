@@ -93,5 +93,3 @@ class WebFormTest {
         assertThat(intField(populated), equalTo(123))
     }
 }
-
-

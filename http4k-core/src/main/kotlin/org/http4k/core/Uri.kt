@@ -2,8 +2,9 @@ package org.http4k.core
 
 import org.http4k.appendIfNotBlank
 import org.http4k.appendIfPresent
-import java.net.URI
 import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets.UTF_8
 
 data class Uri(val scheme: String, val userInfo: String, val host: String, val port: Int?, val path: String, val query: String, val fragment: String) : Comparable<Uri> {
 
@@ -64,11 +65,12 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 
 fun Uri.removeQuery(name: String) = copy(query = query.toParameters().filterNot { it.first == name }.toUrlFormEncoded())
 
+fun Uri.removeQueries(prefix: String) = copy(query = query.toParameters().filterNot { it.first.startsWith(prefix) }.toUrlFormEncoded())
+
 fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
 
-fun String.toPathEncoded(): String = URI("http", null, "/$this", null).toURL().path.drop(1).replace("/", "%2F")
-
-fun String.fromPathEncoded(): String = URLDecoder.decode(this, "UTF-8")
+fun String.toPathEncoded() = URLEncoder.encode(this, UTF_8)
+fun String.toPathDecoded() = URLDecoder.decode(this, UTF_8)
 
 fun Uri.extend(uri: Uri): Uri =
     appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())

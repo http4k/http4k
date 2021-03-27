@@ -5,6 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
+import org.http4k.sse.SseConsumer
 import org.http4k.websocket.WsConsumer
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
@@ -13,17 +14,27 @@ fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHtt
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 infix fun String.bind(httpHandler: RoutingHttpHandler): RoutingHttpHandler = httpHandler.withBasePath(this)
 infix fun String.bind(action: HttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(TemplateRouter(UriTemplate.from(this), action))
-infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
-infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(and(PassthroughRouter(handler)))
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(and(handler))
 infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
 
+infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
+infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)
+
+infix fun String.bind(consumer: SseConsumer): RoutingSseHandler = TemplateRoutingSseHandler(UriTemplate.from(this), consumer)
+infix fun String.bind(sseHandler: RoutingSseHandler): RoutingSseHandler = sseHandler.withBasePath(this)
+
 /**
- * Matches the Host header to a matching Handler.
+ * Simple Reverse Proxy which will split and direct traffic to the appropriate
+ * HttpHandler based on the content of the Host header
  */
-fun hostDemux(vararg hosts: Pair<String, HttpHandler>) = routes(*hosts.map { header("host", it.first) bind it.second }.toTypedArray())
+fun reverseProxy(vararg hostToHandler: Pair<String, HttpHandler>) = routes(
+    *hostToHandler
+        .map { service ->
+            header("host") { it.contains(service.first) } bind service.second
+        }.toTypedArray()
+)
 
 /**
  * Apply routing predicate to a query
@@ -33,7 +44,7 @@ fun query(name: String, predicate: (String) -> Boolean) = { req: Request -> req.
 /**
  * Apply routing predicate to a query
  */
-fun query(name: String, value: String) = query(name) { it == value}
+fun query(name: String, value: String) = query(name) { it == value }
 
 /**
  * Ensure all queries are present
@@ -48,7 +59,7 @@ fun header(name: String, predicate: (String) -> Boolean) = { req: Request -> req
 /**
  * Apply routing predicate to a header
  */
-fun header(name: String, value: String) = header(name) { it == value}
+fun header(name: String, value: String) = header(name) { it == value }
 
 /**
  * Ensure all headers are present

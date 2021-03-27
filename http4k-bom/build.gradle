@@ -4,7 +4,13 @@ dependencies {
     constraints {
         rootProject.subprojects
             .findAll { it.name != project.name }
+            .findAll { hasAnArtifact(it) }
             .sort { "$it.name" }
             .each { api it }
     }
 }
+
+private boolean hasAnArtifact(Project it) {
+    !it.name.contains("test-function") && !it.name.contains("integration-test")
+}
+

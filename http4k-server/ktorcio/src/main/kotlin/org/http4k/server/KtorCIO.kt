@@ -28,12 +28,12 @@ import java.util.concurrent.TimeUnit.SECONDS
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-data class KtorCIO(val port: Int = 8000) : ServerConfig {
+class KtorCIO(val port: Int = 8000) : ServerConfig {
 
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+    override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine: CIOApplicationEngine = embeddedServer(CIO, port) {
             intercept(Call) {
-                with(context) { response.fromHttp4K(httpHandler(request.asHttp4k())) }
+                with(context) { response.fromHttp4K(http(request.asHttp4k())) }
                 return@intercept finish()
             }
         }

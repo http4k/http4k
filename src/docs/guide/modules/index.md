@@ -7,6 +7,7 @@ description: Details about the various http4k integration libraries
 <a href="https://http4k.org/guide/modules/core"><span class="pill">Core</span></a>
 <a href="https://http4k.org/guide/modules/contracts"><span class="pill">OpenAPI Contracts</span></a>
 <a href="https://http4k.org/guide/modules/multipart"><span class="pill">Multipart Forms</span></a>
+<a href="https://http4k.org/guide/modules/graphql"><span class="pill">GraphQL</span></a>
 
 ### HTTP Server Backends
 <a href="https://http4k.org/guide/modules/servers"><span class="pill">Apache 4 & 5</span></a>
@@ -42,6 +43,7 @@ description: Details about the various http4k integration libraries
 <a href="https://http4k.org/guide/modules/yaml"><span class="pill">Jackson YAML</span></a>
 <a href="https://http4k.org/guide/modules/jsonrpc"><span class="pill">JSON RPC</span></a>
 <a href="https://http4k.org/guide/modules/json"><span class="pill">KotlinX Serialisation
+<a href="https://http4k.org/guide/modules/json"><span class="pill">Klaxon</span></a>
 <a href="https://http4k.org/guide/modules/json"><span class="pill">Moshi</span></a>
 
 ### Templating libraries
@@ -54,7 +56,8 @@ description: Details about the various http4k integration libraries
 
 ### Cloud-Native & Observability
 <a href="https://http4k.org/guide/modules/aws"><span class="pill">AWS</span></a>
-<a href="https://http4k.org/guide/modules/cloud_native"><span class="pill">Cloud Native</span></a>
+<a href="https://http4k.org/guide/modules/cloud_native"><span class="pill">Cloud Native Configuration</span></a>
+<a href="https://http4k.org/guide/modules/cloud_events"><span class="pill">Cloud Events</span></a>
 <a href="https://http4k.org/guide/modules/oauth"><span class="pill">OAuth</span></a>
 <a href="https://http4k.org/guide/modules/micrometer"><span class="pill">Micrometer</span></a>
 <a href="https://http4k.org/guide/modules/opentelemetry"><span class="pill">OpenTelemetry</span></a>

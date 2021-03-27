@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.apache.hc.core5.http.impl.io.EmptyInputStream
+import org.apache.hc.core5.http.io.entity.EmptyInputStream
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.MemoryRequest
 import org.http4k.core.Method.GET
@@ -186,10 +186,9 @@ private class IndeterminateLengthResource : Resource {
 
 private class InMemoryResourceLoader(val resources: Map<String, Resource>) : Router {
     override fun match(request: Request): RouterMatch = resources[request.uri.path]?.let {
-        RouterMatch.MatchingHandler(it)
-    } ?: RouterMatch.Unmatched
+        RouterMatch.MatchingHandler(it, description)
+    } ?: RouterMatch.Unmatched(description)
 }
-
 
 /**
  * Returns a matcher that matches if all of the supplied matchers match.
@@ -200,7 +199,6 @@ fun <T> allOf(matchers: List<Matcher<T>>): Matcher<T> = matchers.reducedWith(Mat
  * Returns a matcher that matches if all of the supplied matchers match.
  */
 fun <T> allOf(vararg matchers: Matcher<T>): Matcher<T> = allOf(matchers.asList())
-
 
 @Suppress("UNCHECKED_CAST")
 private fun <T> List<Matcher<T>>.reducedWith(op: (Matcher<T>, Matcher<T>) -> Matcher<T>): Matcher<T> = when {

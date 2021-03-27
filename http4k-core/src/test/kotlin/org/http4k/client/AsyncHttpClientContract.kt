@@ -45,7 +45,7 @@ abstract class AsyncHttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `socket timeouts are converted into 504`() {
         val response = CompletableFuture<Response>()
-        timeoutClient(Request(GET, "http://localhost:$port/delay/1500")) {
+        timeoutClient(Request(GET, "http://localhost:$port/delay?millis=1500")) {
             response.complete(it)
         }
 

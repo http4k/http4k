@@ -5,31 +5,31 @@ description: Feature overview of the http4k-serverless modules, covering Serverl
 
 ```groovy
 // AWS Lambda: 
-implementation group: "org.http4k", name: "http4k-serverless-lambda", version: "3.274.0"
+implementation group: "org.http4k", name: "http4k-serverless-lambda", version: "4.5.0.1"
 
 // Google Cloud Functions: 
-implementation group: "org.http4k", name: "http4k-serverless-gcf", version: "3.274.0"
+implementation group: "org.http4k", name: "http4k-serverless-gcf", version: "4.5.0.1"
 
 // Apache OpenWhisk (IBM Cloud Functions): 
-implementation group: "org.http4k", name: "http4k-serverless-openwhisk", version: "3.274.0"
+implementation group: "org.http4k", name: "http4k-serverless-openwhisk", version: "4.5.0.1"
 
 // Azure Functions: 
-implementation group: "org.http4k", name: "http4k-serverless-azure", version: "3.274.0"
+implementation group: "org.http4k", name: "http4k-serverless-azure", version: "4.5.0.1"
 
 // Alibaba Function Compute: 
-implementation group: "org.http4k", name: "http4k-serverless-alibaba", version: "3.274.0"
+implementation group: "org.http4k", name: "http4k-serverless-alibaba", version: "4.5.0.1"
 
 // Tencent Serverless Cloud Functions: 
-implementation group: "org.http4k", name: "http4k-serverless-tencent", version: "3.274.0"
+implementation group: "org.http4k", name: "http4k-serverless-tencent", version: "4.5.0.1"
 ```
 
 ### About
 These modules provide integration with Serverless deployment environments, such as AWS Lambda or Google Cloud Functions by implementing a single interface. 
 
 #### AWS Lambda integration
-Since [http4k] is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
+Since http4k is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
 
-In order to achieve this, only a single interface `AppLoader` needs to be implemented and a simple extension of `LambdaFunction` supplied.
+In order to achieve this, only a single interface `AppLoader` needs to be implemented and a simple extension of `AwsLambdaFunction` supplied depending on which invocation type is required - Direct, ApiGateway V1/2 or ApplicationLoadBalancer.
 
 This is far from a complete guide, but configuring AWS Lambda and the API Gateway involves several stages:
 
@@ -52,7 +52,7 @@ We hope to soon provide some tools to automate at least some of the above proces
 #### Google Cloud Functions integration
 Google Cloud Functions are triggered in the cloud by calling an entry point class which implements their `HttpFunction` interface.
 
-In order to achieve this in [http4k], only a single interface `AppLoader` needs to be implemented, and then a simple extension class needs to be written which accepts this interface.
+In order to achieve this in http4k, only a single interface `AppLoader` needs to be implemented, and then a simple extension class needs to be written which accepts this interface.
 
 You can compose filters and handlers as usual and pass them to the constructor of the `GoogleCloudFunction` and make your entry point class extend from it.
 Here is an example:
@@ -98,7 +98,7 @@ Simple example on how to setup `pom.xml` to run functions locally and deploy Mav
 #### Apache OpenWhisk integration
 OpenWhisk has a Java runtime which is triggered by calling an entry point class which contains a static `main()` function receiving a GSON `JsonObject`.
 
-In order to achieve this in [http4k], only a single interface `AppLoader` needs to be implemented, and then a simple class needs to be written which uses the `OpenWhiskFunction` wrapper. Because of the OpenWhisk runtime usage of the library, a `compileOnly` dependency also needs to be added on [GSON](https://mvnrepository.com/artifact/com.google.code.gson/gson) to ensure that your function can build correctly.
+In order to achieve this in http4k, only a single interface `AppLoader` needs to be implemented, and then a simple class needs to be written which uses the `OpenWhiskFunction` wrapper. Because of the OpenWhisk runtime usage of the library, a `compileOnly` dependency also needs to be added on [GSON](https://mvnrepository.com/artifact/com.google.code.gson/gson) to ensure that your function can build correctly.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/openwhisk/example.kt)
 

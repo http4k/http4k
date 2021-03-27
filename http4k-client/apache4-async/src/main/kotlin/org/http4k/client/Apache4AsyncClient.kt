@@ -26,6 +26,9 @@ import java.net.SocketTimeoutException
 import java.net.URI
 
 object Apache4AsyncClient {
+    @JvmStatic
+    @JvmOverloads
+    @JvmName("create")
     operator fun invoke(
         client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient(),
         responseBodyMode: BodyMode = Memory,
@@ -73,7 +76,6 @@ object Apache4AsyncClient {
             private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
             private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
-
         }
     }
 

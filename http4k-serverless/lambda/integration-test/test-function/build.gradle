@@ -1,18 +1,15 @@
 configurations{
-    runtimeClasspath.transitive = false
+    runtimeClasspath.transitive = true
 }
 
 dependencies {
-    compile project(":http4k-core")
-    compile project(":http4k-serverless-lambda")
-    compile project(path: ":http4k-core", configuration: 'testArtifacts')
+    api project(":http4k-core")
+    api project(":http4k-serverless-lambda")
+    api project(path: ":http4k-core", configuration: 'testArtifacts')
 
-    compile Libs.kotlin_stdlib_jdk8
-    compile "org.jetbrains.kotlin:kotlin-stdlib-common:" + Versions.org_jetbrains_kotlin
-    compile "org.jetbrains.kotlin:kotlin-stdlib:" + Versions.org_jetbrains_kotlin
-    compile Libs.aws_lambda_java_core
-    compile Libs.aws_lambda_java_events
-    compile Libs.joda_time
+    api Libs.aws_lambda_java_events
+    api Libs.joda_time
+    testImplementation Config.TestDependencies
 }
 
 task buildZip(type: Zip) {

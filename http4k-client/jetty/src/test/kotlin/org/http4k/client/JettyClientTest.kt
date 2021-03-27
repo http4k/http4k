@@ -1,5 +1,5 @@
 package org.http4k.client
 
-import org.http4k.server.Jetty
+import org.http4k.server.ApacheServer
 
-class JettyClientTest : HttpClientContract({ Jetty(it) }, JettyClient(), JettyClient(requestModifier = timeout))
+class JettyClientTest : HttpClientContract(::ApacheServer, JettyClient(), JettyClient(requestModifier = timeout))

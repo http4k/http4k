@@ -2,18 +2,20 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.MatchResult
 import com.natpryce.hamkrest.Matcher
-import io.opentelemetry.common.Labels
+import io.opentelemetry.api.metrics.GlobalMetricsProvider
+import io.opentelemetry.api.metrics.common.Labels
 import io.opentelemetry.exporters.inmemory.InMemoryMetricExporter.create
-import io.opentelemetry.sdk.OpenTelemetrySdk.getMeterProvider
+import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.core.Method
 import org.http4k.core.Status
+import org.http4k.metrics.Http4kOpenTelemetry
 
 /**
  * Use the InMemory exporter to get the recorded metrics from the global state.
  */
 fun exportMetricsFromOpenTelemetry(): List<MetricData> = create().apply {
-    export(getMeterProvider().metricProducer.collectAllMetrics())
+    export((GlobalMetricsProvider.get() as SdkMeterProvider).collectAllMetrics())
 }.finishedMetricItems
 
 fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "http.server.request.latency") =
@@ -23,8 +25,9 @@ fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "h
         override fun invoke(actual: List<MetricData>): MatchResult {
             val summary = actual
                 .first { it.name == name }
+                .doubleSummaryData
                 .points
-                .first { it.labels == labels } as MetricData.SummaryPoint
+                .first { it.labels == labels }
             return if (
                 summary.count != count.toLong() &&
                 summary.percentileValues.last().value != value
@@ -40,8 +43,9 @@ fun hasRequestCounter(count: Int, labels: Labels, name: String = "http.server.re
         override fun invoke(actual: List<MetricData>): MatchResult {
             val counter = actual
                 .first { it.name == name }
+                .longSumData
                 .points
-                .first { it.labels == labels } as MetricData.LongPoint
+                .first { it.labels == labels }
             return if (counter.value == count.toLong()) MatchResult.Match else MatchResult.Mismatch(actual.toString())
         }
     }
@@ -52,6 +56,16 @@ fun hasNoRequestCounter(method: Method, path: String, status: Status) =
 
         override fun invoke(actual: List<MetricData>): MatchResult =
             if (actual.find { it.name == description }
+                    ?.longSumData
                     ?.points
-                    ?.any { it.labels == Labels.of("path", path, "method", method.name, "status", status.code.toString()) } != true) MatchResult.Match else MatchResult.Mismatch(actual.toString())
+                    ?.any {
+                        it.labels == Labels.of(
+                            "path",
+                            path,
+                            "method",
+                            method.name,
+                            "status",
+                            status.code.toString()
+                        )
+                    } != true) MatchResult.Match else MatchResult.Mismatch(actual.toString())
     }

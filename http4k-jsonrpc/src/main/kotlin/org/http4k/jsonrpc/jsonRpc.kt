@@ -1,12 +1,12 @@
 package org.http4k.jsonrpc
 
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
-import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.jsonrpc.MethodBindings.Companion.Auto
 import org.http4k.jsonrpc.MethodBindings.Companion.Manual
 
 object JsonRpc {
-    fun <NODE : Any> auto(json: JsonLibAutoMarshallingJson<NODE>,
+    fun <NODE : Any> auto(json: AutoMarshallingJson<NODE>,
                           errorHandler: ErrorHandler = defaultErrorHandler,
                           fn: Auto<NODE>.() -> Unit): JsonRpcService<NODE> =
         JsonRpcService(json, errorHandler, Auto(json).apply(fn))

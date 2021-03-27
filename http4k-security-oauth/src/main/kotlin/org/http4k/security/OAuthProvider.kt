@@ -1,6 +1,5 @@
 package org.http4k.security
 
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -26,16 +25,20 @@ class OAuthProvider(
     private val nonceGenerator: NonceGenerator = SECURE_NONCE,
     private val responseType: ResponseType = ResponseType.Code,
     idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
-    accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(providerConfig)
+    accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(providerConfig),
+    private val jwtRedirectionUriBuilder: (RequestJwts) -> RedirectionUriBuilder = ::uriBuilderWithRequestJwt,
+    standardRedirectionUrlBuilder: RedirectionUriBuilder = defaultUriBuilder
 ) {
+
     // pre-configured API client for this provider
     val api = ClientFilters.SetHostFrom(providerConfig.apiBase).then(client)
 
     // use this filter to protect endpoints
-    val authFilter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType)
+    val authFilter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType, standardRedirectionUrlBuilder)
 
     // protect endpoint and provide custom request JWT creation mechanism
-    fun authFilter(requestJwts: RequestJwts): Filter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType, uriBuilderWithRequestJwt(requestJwts))
+    fun authFilter(requestJwts: RequestJwts) =
+        OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType, jwtRedirectionUriBuilder(requestJwts))
 
     private val accessTokenFetcher = AccessTokenFetcher(api, callbackUri, providerConfig, accessTokenFetcherAuthenticator)
 
@@ -47,4 +50,3 @@ class OAuthProvider(
 
     companion object
 }
-

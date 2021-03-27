@@ -58,5 +58,3 @@ class WsMessageLensTest {
         assertThat(customBody(WsMessage("hello world!")), equalTo(MyCustomType("hello world!")))
     }
 }
-
-

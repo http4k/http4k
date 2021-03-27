@@ -6,7 +6,6 @@ import org.http4k.core.Store
 import org.http4k.lens.ParamMeta.ObjectParam
 import java.util.*
 
-
 typealias RequestContextLens<T> = BiDiLens<Request, T>
 
 object RequestContextKey {
@@ -15,7 +14,8 @@ object RequestContextKey {
         val get: (Request) -> T = { target ->
             store[target].let {
                 val value: T? = it[name]
-                value ?: throw LensFailure(Missing(meta), target = it) }
+                value ?: throw LensFailure(Missing(meta), target = it)
+            }
         }
         val setter = { value: T, target: Request -> store[target][name] = value; target }
         return BiDiLens(meta, get, setter)

@@ -33,7 +33,7 @@ class TencentCloudFunctionTest {
                 assertThat(contexts[it][TENCENT_CONTEXT_KEY], sameInstance(context))
                 assertThat(contexts[it][TENCENT_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
+                assertThat(it.removeHeader("x-http4k-context-tencent"), equalTo(Request(GET, "/path")
                     .header("c", "d")
                     .body("input body")
                     .query("query", "value")))

@@ -77,9 +77,9 @@ subValue: "123"
 }
 
 class JacksonYamlAutoTest : AutoMarshallingContract(JacksonYaml) {
-    override val expectedAutoMarshallingResult: String = """string: "hello"
+    override val expectedAutoMarshallingResult: String = """string:"hello"
 child:
-  string: "world"
+  string:"world"
   child: null
   numbers:
   - 1

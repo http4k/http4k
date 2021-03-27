@@ -1,0 +1,12 @@
+GET  HTTP/1.1
+content-type: application/cloudevents+csv
+ce-id: 123
+ce-datacontenttype: application/octet-stream
+ce-schemaurl: http4k
+ce-source: http4k
+ce-specversion: 1.0
+ce-subject: subject
+ce-time: 1970-01-01T00:00:00Z
+ce-type: type
+
+1.0,123,type,http4k,application/octet-stream,http4k,subject,1970-01-01T00:00:00Z,MTIz

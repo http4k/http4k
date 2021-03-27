@@ -79,18 +79,17 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
             .then(descriptionSecurity?.filter ?: Filter.NoOp)
             .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
-
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 
     override fun match(request: Request): RouterMatch {
-        val unmatched: RouterMatch = Unmatched
+        val unmatched: RouterMatch = Unmatched(description)
 
         return if (request.isIn(contractRoot)) {
             routers.fold(unmatched) { memo, (routeFilter, router) ->
                 when (memo) {
                     is MatchingHandler -> memo
                     else -> when (val matchResult = router.match(request)) {
-                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult))
+                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult), description)
                         else -> minOf(memo, matchResult)
                     }
                 }

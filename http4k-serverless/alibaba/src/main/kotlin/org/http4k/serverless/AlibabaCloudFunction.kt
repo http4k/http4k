@@ -6,6 +6,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.RequestContexts
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import org.http4k.servlet.asHttp4kRequest
 import org.http4k.servlet.transferTo
@@ -19,11 +20,12 @@ abstract class AlibabaCloudFunction(appLoader: AppLoaderWithContexts) : HttpRequ
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts()
+    private val contexts = RequestContexts("alibaba")
     private val app = appLoader(System.getenv(), contexts)
 
     override fun handleRequest(request: HttpServletRequest, response: HttpServletResponse, context: Context?) {
-        InitialiseRequestContext(contexts)
+        CatchAll()
+            .then(InitialiseRequestContext(contexts))
             .then(AddAlibabaRequest(request, context, contexts))
             .then(app)(request.asHttp4kRequest())
             .transferTo(response)

@@ -1,9 +1,8 @@
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerRequestEvent
-import com.amazonaws.services.lambda.runtime.events.ApplicationLoadBalancerResponseEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -16,21 +15,21 @@ class ApplicationLoadBalancerLambdaFunctionTest {
     fun `adapts API Gateway request and response and receives context`() {
         val lambdaContext = LambdaContextMock()
 
-        val request = ApplicationLoadBalancerRequestEvent().apply {
-            httpMethod = "GET"
-            body = "input body"
-            headers = mapOf("c" to "d")
-            path = "/path"
-            queryStringParameters = mapOf("query" to "value")
-            requestContext = ApplicationLoadBalancerRequestEvent.RequestContext()
-        }
+        val request = mapOf(
+            "path" to "/path",
+            "queryStringParameters" to mapOf("query" to "value"),
+            "body" to "input body",
+            "headers" to mapOf("c" to "d"),
+            "isBase64Encoded" to false,
+            "httpMethod" to "GET"
+        )
 
         val lambda = object : ApplicationLoadBalancerLambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
                 assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context"), equalTo(Request(GET, "/path")
+                assertThat(it.removeHeader("x-http4k-context-lambda"), equalTo(Request(GET, "/path")
                     .header("c", "d")
                     .body("input body")
                     .query("query", "value")))
@@ -40,11 +39,13 @@ class ApplicationLoadBalancerLambdaFunctionTest {
 
         assertThat(lambda.handle(request, lambdaContext),
             equalTo(
-                ApplicationLoadBalancerResponseEvent().apply {
-                    statusCode = 200
-                    body = "hello there"
-                    headers = mapOf("a" to "b")
-                })
+                mapOf(
+                    "statusCode" to 200,
+                    "body" to "hello there".base64Encode(),
+                    "headers" to mapOf("a" to "b"),
+                    "isBase64Encoded" to true
+                )
+            )
         )
     }
 }

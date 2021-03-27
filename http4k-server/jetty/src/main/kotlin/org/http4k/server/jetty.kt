@@ -12,21 +12,34 @@ import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS
 import org.eclipse.jetty.servlet.ServletHolder
 import org.eclipse.jetty.util.ssl.SslContextFactory
-import org.eclipse.jetty.websocket.server.WebSocketHandler
-import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory
+import org.eclipse.jetty.websocket.core.FrameHandler
+import org.eclipse.jetty.websocket.core.WebSocketComponents
+import org.eclipse.jetty.websocket.core.server.WebSocketNegotiation
+import org.eclipse.jetty.websocket.core.server.WebSocketNegotiator.AbstractNegotiator
+import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler
 import org.http4k.core.HttpHandler
-import org.http4k.servlet.asServlet
+import org.http4k.servlet.jakarta.asHttp4kRequest
+import org.http4k.servlet.jakarta.asServlet
+import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
+import java.lang.UnsupportedOperationException
 
-class Jetty(private val port: Int, private val server: Server) : WsServerConfig {
+class Jetty(private val port: Int, private val server: Server) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, http(port))
     constructor(port: Int, vararg inConnectors: ConnectorBuilder) : this(port, Server().apply {
         inConnectors.forEach { addConnector(it(this)) }
     })
 
-    override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?): Http4kServer {
-        httpHandler?.let { server.insertHandler(httpHandler.toJettyHandler()) }
-        wsHandler?.let { server.insertHandler(it.toJettyHandler()) }
+    override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
+        if (sse != null) throw UnsupportedOperationException("Jetty does not support sse")
+        http?.let { server.insertHandler(http.toJettyHandler()) }
+        ws?.let {
+            server.insertHandler(
+                WebSocketUpgradeHandler(
+                    WebSocketComponents()).apply {
+                    addMapping("/*", it.toJettyNegotiator())
+                })
+        }
 
         return object : Http4kServer {
             override fun start(): Http4kServer = apply {
@@ -40,12 +53,11 @@ class Jetty(private val port: Int, private val server: Server) : WsServerConfig 
     }
 }
 
-fun WsHandler.toJettyHandler() = object : WebSocketHandler() {
-    override fun configure(factory: WebSocketServletFactory) {
-        factory.setCreator { req, _ ->
-            val request = req.asHttp4kRequest()
-            this@toJettyHandler(request)?.let { Http4kWebSocketListener(it, request) }
-        }
+fun WsHandler.toJettyNegotiator() = object : AbstractNegotiator() {
+    override fun negotiate(negotiation: WebSocketNegotiation): FrameHandler {
+        val request = negotiation.request.asHttp4kRequest()
+
+        return this@toJettyNegotiator(request)?.let { Http4kWebSocketFrameHandler(it, request) }!!
     }
 }
 

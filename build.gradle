@@ -1,25 +1,26 @@
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
         classpath Libs.kotlin_gradle_plugin
-        classpath Libs.coveralls_gradle_plugin
-        classpath Libs.dokka_gradle_plugin
-        classpath Libs.com_jfrog_bintray_gradle_plugin
         classpath Libs.openapi_generator_gradle_plugin
         classpath Libs.kotlin_serialization
+        classpath Libs.ktlint_gradle
         classpath Libs.shadow
     }
 }
 
 plugins {
-    id 'com.github.kt3k.coveralls' version "2.10.1"
-    id "com.jfrog.bintray" version "1.8.4"
-    id 'de.fayard.buildSrcVersions' version "0.7.0"
+    id "com.jfrog.bintray"
+    id "io.codearte.nexus-staging" version '0.22.0'
 }
+
+apply plugin: 'io.codearte.nexus-staging'
 
 allprojects {
     repositories {
@@ -28,14 +29,12 @@ allprojects {
         }
 
         mavenCentral()
-        jcenter()
     }
 
     apply plugin: 'java'
     apply plugin: 'kotlin'
-    apply plugin: 'org.jetbrains.dokka'
     apply plugin: 'jacoco'
-    apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: 'org.jlleitschuh.gradle.ktlint'
 
     compileKotlin.kotlinOptions.jvmTarget = "1.8"
     compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
@@ -51,8 +50,29 @@ allprojects {
     }
 
     jacoco {
-        toolVersion = '0.8.3'
+        toolVersion = '0.8.6'
     }
+
+    ktlint {
+        // for details, see description in .editorconfig file
+        enableExperimentalRules = false
+        version = "0.40.0"
+        debug = false
+    }
+
+    jacocoTestReport {
+        reports {
+            html.enabled = true
+            xml.enabled = true
+        }
+    }
+
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+}
+
+subprojects {
 
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
@@ -62,23 +82,13 @@ allprojects {
     jar {
         manifest {
             attributes(
-                'http4k_version': version
+                'http4k_version': archiveVersion
             )
         }
     }
 
-//    task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true, dependsOn: javadoc) {
-//        outputDirectory = javadoc.destinationDir
-//        outputFormat = "javadoc"
-//        processConfigurations = []
-//    }
-//    task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
-//        classifier = 'javadoc'
-//        from dokkaJavadoc.outputDirectory
-//    }
-
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from javadoc.destinationDir
     }
 
@@ -88,18 +98,57 @@ allprojects {
     }
 
     configurations {
-        testArtifacts.extendsFrom testRuntime
+        testArtifacts.extendsFrom testApi
     }
 
     artifacts {
         testArtifacts testJar
+        archives sourcesJar, javadocJar
     }
 
     if (hasAnArtifact(project)) {
+        def enableSigning = project.findProperty('sign') == "true"
+
         apply plugin: 'com.jfrog.bintray'
-        apply plugin: 'maven'
-        apply plugin: 'maven-publish'
+        apply plugin: 'maven-publish' // required to configure bintray
+
+        apply plugin: 'maven' // required to upload to sonatype
+
+        if (enableSigning) { // when added it expects signing keys to be configured
+            apply plugin: 'signing'
+
+            signing {
+                def signingKey = findProperty("signingKey")
+                def signingPassword = findProperty("signingPassword")
+
+                useInMemoryPgpKeys(signingKey, signingPassword)
+                sign publishing.publications
+            }
+        }
+
+        def nexusUsername = project.findProperty('nexusUsername') ?: "notset"
+        def nexusPassword = project.findProperty('nexusPassword') ?: "notset"
+
         publishing {
+            repositories {
+                maven {
+                    name 'SonatypeStaging'
+                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                    credentials {
+                        username nexusUsername
+                        password nexusPassword
+                    }
+                }
+                maven {
+                    name 'SonatypeSnapshot'
+                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                    credentials {
+                        username nexusUsername
+                        password nexusPassword
+                    }
+                }
+            }
+
             publications {
                 mavenJava(MavenPublication) {
                     artifactId = archivesBaseName
@@ -172,22 +221,11 @@ allprojects {
         }
     }
 
-    jacocoTestReport {
-        reports {
-            html.enabled = true
-            xml.enabled = true
-        }
-    }
 }
 
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
     freeCompilerArgs += "-Xjvm-default=enable"
-}
-
-coveralls {
-    sourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs).files.absolutePath
-    jacocoReportPath = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")
 }
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
@@ -212,12 +250,16 @@ dependencies {
             hasAnArtifact(it)
         }
         .forEach {
-            compile project(it.name)
-            testCompile project(path: it.name, configuration: 'testArtifacts')
+            api project(it.name)
+            testImplementation project(path: it.name, configuration: 'testArtifacts')
         }
 
-    testCompile Libs.s3
-    testCompile Config.TestDependencies
+    testImplementation(Libs.s3) {
+        exclude group: "software.amazon.awssdk", module: "netty-nio-client"
+        exclude group: "software.amazon.awssdk", module: "apache-client"
+    }
+    testImplementation Libs.graphql_kotlin_schema_generator
+    testImplementation Config.TestDependencies
 }
 
 private boolean hasAnArtifact(Project it) {
@@ -236,33 +278,10 @@ sourceSets {
     }
 }
 
-dokka {
-    outputFormat = "gfm"
-    outputDirectory = "$buildDir/ddoc"
-
-    subProjects = subprojects.collect { i -> i.name }
-
-    configuration {
-        includes = ['src/packages.md']
-        moduleName = "$rootProject.name"
-        jdkVersion = 9
-    }
-}
-
 tasks.create("listProjects") {
     doLast {
         subprojects
             .findAll { hasAnArtifact(it) }
             .forEach { System.err.println(it.name) }
     }
-}
-
-buildSrcVersions {
-    indent = "    "
-}
-
-// To update Gradle, run `$ ./gradlew :buildSrcVersions && ./gradlew wrapper`
-wrapper {
-    gradleVersion = Versions.gradleLatestVersion
-    distributionType = Wrapper.DistributionType.ALL
 }

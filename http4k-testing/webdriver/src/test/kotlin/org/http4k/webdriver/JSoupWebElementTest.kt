@@ -10,7 +10,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
-import org.openqa.selenium.By
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.WebElement
 
@@ -37,7 +36,11 @@ class JSoupWebElementTest {
     private fun form(method: Method = POST) = JSoupWebElement(navigate, getURL, Jsoup.parse("""
         <form method="${method.name}" action="/posted">
             <input id="text" type="text"/>
-            <textarea id="textarea"/>
+            <input id="checkbox" name="checkedCheckbox" type="checkbox" value="checkedCheckbox" checked/>
+            <input id="checkbox" name="uncheckedCheckbox" type="checkbox" value="uncheckedCheckbox"/>
+            <input id="radio" name="radio" type="radio" value="checkedRadio" checked/>
+            <input id="radio" name="radio" type="radio" value="uncheckedRadio"/>
+            <textarea id="textarea" value="bob"/>
             <p>inner</p>
         </form>
         """)).findElement(By.tagName("form"))!!
@@ -116,7 +119,7 @@ class JSoupWebElementTest {
     @Test
     fun `submit an element inside the form`() {
         form(DELETE).findElement(By.tagName("p"))!!.submit()
-        assertThat(newLocation, equalTo(DELETE to "/posted"))
+        assertThat(newLocation, equalTo(DELETE to "/posted?checkedCheckbox=checkedCheckbox&radio=checkedRadio"))
     }
 
     @Test

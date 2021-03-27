@@ -19,10 +19,11 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
  */
 fun static(resourceLoader: ResourceLoader = Classpath(), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
 
-internal data class StaticRoutingHttpHandler(private val pathSegments: String,
-                                             private val resourceLoader: ResourceLoader,
-                                             private val extraFileExtensionToContentTypes: Map<String, ContentType>,
-                                             private val filter: Filter = Filter.NoOp
+internal data class StaticRoutingHttpHandler(
+    private val pathSegments: String,
+    private val resourceLoader: ResourceLoader,
+    private val extraFileExtensionToContentTypes: Map<String, ContentType>,
+    private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
 
     override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))
@@ -33,15 +34,17 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
     private val handlerWithFilter = filter.then(handlerNoFilter)
 
     override fun match(request: Request): RouterMatch = handlerNoFilter(request).let {
-        if (it.status != Status.NOT_FOUND) RouterMatch.MatchingHandler(filter.then { _: Request -> it }) else null
-    } ?: RouterMatch.Unmatched
+        if (it.status != Status.NOT_FOUND) RouterMatch.MatchingHandler(filter.then { _: Request -> it }, description) else null
+    } ?: RouterMatch.Unmatched(description)
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }
 
-internal class ResourceLoadingHandler(private val pathSegments: String,
-                                      private val resourceLoader: ResourceLoader,
-                                      extraFileExtensionToContentTypes: Map<String, ContentType>) : HttpHandler {
+internal class ResourceLoadingHandler(
+    private val pathSegments: String,
+    private val resourceLoader: ResourceLoader,
+    extraFileExtensionToContentTypes: Map<String, ContentType>
+) : HttpHandler {
     private val extMap = MimeTypes(extraFileExtensionToContentTypes)
 
     override fun invoke(p1: Request): Response = if (p1.uri.path.startsWith(pathSegments)) {

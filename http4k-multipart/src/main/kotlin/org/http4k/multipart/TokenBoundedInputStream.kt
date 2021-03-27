@@ -57,7 +57,6 @@ internal class TokenBoundedInputStream @JvmOverloads constructor(inputStream: In
         return String(buffer, index, length, encoding)
     }
 
-
     private fun matchToken(token: ByteArray, initialCharacter: Int): Boolean {
         var initialChar = initialCharacter
         var eotIndex = 0
@@ -105,7 +104,6 @@ internal class TokenBoundedInputStream @JvmOverloads constructor(inputStream: In
         }
         return b
     }
-
 
     private fun readFromStream(): Int {
         if (maxStreamLength > -1 && cursor >= maxStreamLength) throw StreamTooLongException("Form contents was longer than $maxStreamLength bytes")

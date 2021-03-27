@@ -16,10 +16,10 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.hamkrest.hasStatus
-import org.http4k.server.Jetty
+import org.http4k.server.ApacheServer
 import org.junit.jupiter.api.Test
 
-class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
+class ApacheClientTest : HttpClientContract(::ApacheServer, ApacheClient(),
     ApacheClient(HttpClients.custom()
         .setDefaultRequestConfig(
             RequestConfig.custom()
@@ -40,8 +40,6 @@ class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
 
             override fun close() {
             }
-
         })(Request(GET, "http://localhost:8000")), hasStatus(CLIENT_TIMEOUT))
     }
-
 }

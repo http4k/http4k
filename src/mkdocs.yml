@@ -2,7 +2,7 @@ site_name: http4k
 site_url: https://www.http4k.org/
 site_description: The Functional toolkit for Kotlin HTTP applications
 site_author: David Denton (@daviddenton), Ivan Sanchez (@s4nchez)
-copyright: 'Copyright &copy; 2020 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
+copyright: 'Copyright &copy; 2021 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
 remote_branch: master
 repo_url: https://github.com/http4k/http4k/
 theme:
@@ -33,32 +33,34 @@ nav:
   - Rationale & concepts: rationale/index.md
   - Changelog: changelog/index.md
   - Developer guide:
-    - Modules:
-      - Overview: guide/modules/index.md
-      - Core: guide/modules/core/index.md
-      - Server backend: guide/modules/servers/index.md
-      - Serverless backend: guide/modules/serverless/index.md
-      - HTTP & Websocket clients: guide/modules/clients/index.md
-      - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
-      - JSON handling: guide/modules/json/index.md
-      - Templating: guide/modules/templating/index.md
-      - Multipart forms: guide/modules/multipart/index.md
-      - Cloud native Configuration: guide/modules/cloud_native/index.md
-      - Micrometer: guide/modules/micrometer/index.md
-      - OpenTelemetry: guide/modules/opentelemetry/index.md
-      - Resilience4J: guide/modules/resilience4j/index.md
-      - AWS: guide/modules/aws/index.md
-      - OAuth: guide/modules/oauth/index.md
-      - JSON RPC: guide/modules/jsonrpc/index.md
-      - XML handling: guide/modules/xml/index.md
-      - YAML handling: guide/modules/yaml/index.md
+    - Overview: guide/modules/index.md
+    - Core: guide/modules/core/index.md
+    - Server backend: guide/modules/servers/index.md
+    - Serverless backend: guide/modules/serverless/index.md
+    - HTTP & Websocket clients: guide/modules/clients/index.md
+    - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
+    - JSON handling: guide/modules/json/index.md
+    - Templating: guide/modules/templating/index.md
+    - Multipart forms: guide/modules/multipart/index.md
+    - Cloud Native Configuration: guide/modules/cloud_native/index.md
+    - Cloud Events: guide/modules/cloud_events/index.md
+    - Micrometer: guide/modules/micrometer/index.md
+    - OpenTelemetry: guide/modules/opentelemetry/index.md
+    - Resilience4J: guide/modules/resilience4j/index.md
+    - AWS: guide/modules/aws/index.md
+    - OAuth: guide/modules/oauth/index.md
+    - GraphQL: guide/modules/graphql/index.md
+    - JSON RPC: guide/modules/jsonrpc/index.md
+    - XML handling: guide/modules/xml/index.md
+    - YAML handling: guide/modules/yaml/index.md
+    - Testing:
+      - Overview: guide/modules/testing/index.md
       - Hamkrest: guide/modules/hamkrest/index.md
       - Kotest: guide/modules/kotest/index.md
-      - Approval Testing: guide/modules/approvaltests/index.md
       - WebDriver: guide/modules/webdriver/index.md
+      - Approval Testing: guide/modules/approvaltests/index.md
       - Chaos Testing: guide/modules/chaos/index.md
       - Service Virtualisaion: guide/modules/servicevirtualisation/index.md
-    - Application testing: guide/testing/index.md
   - Cookbook:
     - How to use this guide: cookbook/index.md
     - Server as a function: cookbook/server_as_a_function/index.md
@@ -73,8 +75,9 @@ nav:
     - Custom JSON marshallers: cookbook/custom_json_marshallers/index.md
     - HTML forms: cookbook/html_forms/index.md
     - Multipart forms: cookbook/multipart_forms/index.md
-    - Generating data classes for messages: cookbook/generating_data_classes/index.md
+    - WebJars: cookbook/webjars/index.md
     - Websockets: cookbook/websockets/index.md
+    - Server-Sent Events: cookbook/sse/index.md
     - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
     - Basic OAuth Server configuration: cookbook/basic_oauth_authorization_server/index.md
     - Custom OAuth Provider configuration: cookbook/custom_oauth_provider/index.md
@@ -86,12 +89,17 @@ nav:
     - Test driven apps: cookbook/test_driven_apps/index.md
   - http4k in action: in_action/index.md
   - Blog:
+    - Overview: blog/index.md
     - Meet http4k: blog/meet_http4k/index.md
     - Typesafe Websockets: blog/typesafe_websockets/index.md
     - TDDing http4k: blog/tdding_http4k/index.md
+    - Typesafe 12-factor config: blog/typesafe_configuration/index.md
     - Documenting http4k apps with OpenApi3: blog/documenting_apis_with_openapi/index.md
     - Retrospective on v3: blog/retrospective_v3/index.md
     - Nanoservices: blog/nanoservices/index.md
+    - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
+    - http4k v4 - 17 platforms and counting...: blog/http4k_v4/index.md
+    - JCenter Shutdown: blog/regarding_jcenter/index.md
   - Performance: performance/index.md
   - FAQ: faq/index.md
   - Getting support: support/index.md

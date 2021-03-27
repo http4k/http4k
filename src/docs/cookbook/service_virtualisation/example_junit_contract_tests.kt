@@ -11,7 +11,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters.SetBaseUriFrom
+import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.junit.ServirtiumRecording
 import org.http4k.junit.ServirtiumReplay
 import org.http4k.server.SunHttp
@@ -70,7 +70,7 @@ interface WordCounterContract {
 @Disabled
 class RemoteHttpRecordingWordCounterTest : WordCounterContract {
 
-    private val app = SetBaseUriFrom(Uri.of("http://serverundertest:8080"))
+    private val app = SetHostFrom(Uri.of("http://serverundertest:8080"))
         .then(ApacheClient())
 
     @JvmField
@@ -116,7 +116,7 @@ class PortBoundRecordingWordCounterTest : WordCounterContract {
         WordCounterApp().asServer(SunHttp(8080)).start()
     }
 
-    private val app = SetBaseUriFrom(Uri.of("http://localhost:8080"))
+    private val app = SetHostFrom(Uri.of("http://localhost:8080"))
         .then(ApacheClient())
 
     @JvmField
@@ -142,4 +142,3 @@ class ReplayFromGitHubTest : WordCounterContract {
         )
     )
 }
-

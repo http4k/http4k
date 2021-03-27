@@ -786,17 +786,13 @@ header p {
 }
 
 .intro main .content {
-  max-width: 725px;
+  max-width: 850px;
   margin: auto;
   padding-top: 16px;
 }
 
 .intro main .content h3 {
   margin-bottom: 32px;
-}
-
-.intro main .content h4 {
-  color: #60c0ff;
 }
 
 .intro main .content a {
@@ -822,6 +818,14 @@ header p {
     width: auto;
     transform: translate(0px);
   }
+}
+
+.intro .content li {
+  font-size: 1.2rem;
+}
+
+.intro .content ul {
+  font-size: 1.2rem;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -3,6 +3,8 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import dev.forkhandles.values.IntValue
+import dev.forkhandles.values.IntValueFactory
 import org.http4k.base64Encode
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -22,7 +24,6 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
-
 
 class PathTest {
 
@@ -75,10 +76,25 @@ class PathTest {
 
     @Test
     fun `sets value on request uri with proper encoding`() {
-        val pathParam = Path.string().of("bob")
-        val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of "123 45/6"), UriTemplate.from("/first/{bob}/second") )
-        assertThat(pathParam(updated), equalTo("123 45/6"))
-        assertThat(updated, equalTo(Request(GET, "http://bob.com/first/123%2045%2F6/second")))
+        fun checkEncodeDecode(unencoded: String, encoded: String) {
+            val pathParam = Path.of("bob")
+            val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of unencoded), UriTemplate.from("/first/{bob}/second"))
+            assertThat(updated, equalTo(Request(GET, "http://bob.com/first/$encoded/second")))
+            assertThat(pathParam(updated), equalTo(unencoded))
+        }
+
+        fun checkDecode(encoded: String, unencoded: String) {
+            val pathParam = Path.of("bob")
+            val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/$encoded/second")), UriTemplate.from("/first/{bob}/second"))
+            assertThat(pathParam(updated), equalTo(unencoded))
+        }
+
+        checkEncodeDecode("123 45/6", "123+45%2F6")
+        checkEncodeDecode("Bob Tables%/M", "Bob+Tables%25%2FM")
+        checkEncodeDecode("2020-03-19T19:12:34.567+01:00", "2020-03-19T19%3A12%3A34.567%2B01%3A00")
+        checkEncodeDecode("ÅÄÖ", "%C3%85%C3%84%C3%96")
+        checkDecode("Bob%20Tables%25%2FM", "Bob Tables%/M")
+        checkDecode("ÅÄÖ", "ÅÄÖ")
     }
 
     @Test
@@ -143,6 +159,13 @@ class PathTest {
 
     @Test
     fun `enum`() = checkContract(Path.enum<Method>(), "DELETE", DELETE)
+
+    @Test
+    fun value() = checkContract(Path.value(MyValue), "123", MyValue.of(123))
+
+    class MyValue private constructor(value: Int) : IntValue(value) {
+        companion object : IntValueFactory<MyValue>(::MyValue)
+    }
 
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")

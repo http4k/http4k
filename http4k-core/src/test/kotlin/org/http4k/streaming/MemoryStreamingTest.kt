@@ -10,7 +10,7 @@ class MemoryStreamingTest : StreamingContract(StreamingTestConfiguration(5, 100,
 }
 
 object DummyServerConfig : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+    override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         override fun port() = 0
         override fun start() = this
         override fun stop() = this

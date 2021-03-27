@@ -1,21 +1,42 @@
 package org.http4k.format
 
-import kotlinx.serialization.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveKind.*
+import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN
+import kotlinx.serialization.descriptors.PrimitiveKind.DOUBLE
+import kotlinx.serialization.descriptors.PrimitiveKind.INT
+import kotlinx.serialization.descriptors.PrimitiveKind.LONG
+import kotlinx.serialization.descriptors.PrimitiveKind.STRING
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonBuilder
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
+import kotlinx.serialization.serializer
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.websocket.WsMessage
+import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.jvm.internal.Reflection
@@ -24,7 +45,8 @@ import kotlinx.serialization.json.Json as KotlinxJson
 
 open class ConfigurableKotlinxSerialization(
     json: JsonBuilder.() -> Unit,
-) : JsonLibAutoMarshallingJson<JsonElement>() {
+    val defaultContentType: ContentType = APPLICATION_JSON
+) : AutoMarshallingJson<JsonElement>() {
     val json = KotlinxJson { json() }
     private val prettyJson =
         KotlinxJson {
@@ -102,20 +124,23 @@ open class ConfigurableKotlinxSerialization(
         return json.decodeFromJsonElement(json.serializersModule.serializer(target.java), j) as T
     }
 
-    override fun <T : Any> asA(input: String, target: KClass<T>): T =
-        json.parseToJsonElement(input).asA(target)
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = json.parseToJsonElement(input).asA(target)
+
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = asA(input.reader().readText(), target)
 
     inline fun <reified T : Any> JsonElement.asA(): T = json.decodeFromJsonElement(this)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
+                                                     contentNegotiation: ContentNegotiation = None,
+                                                     contentType: ContentType = defaultContentType) = autoBody<T>(description, contentNegotiation, contentType)
 
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        httpBodyLens(description, contentNegotiation, APPLICATION_JSON).map({ json.decodeFromString<T>(it) }, { json.encodeToString(it) })
-
+    inline fun <reified T : Any> autoBody(description: String? = null,
+                                          contentNegotiation: ContentNegotiation = None,
+                                          contentType: ContentType = defaultContentType) =
+        httpBodyLens(description, contentNegotiation, contentType).map({ json.decodeFromString<T>(it) }, { json.encodeToString(it) })
 }
-
 
 fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {
 
@@ -131,23 +156,16 @@ fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder
         apply {
             @Suppress("UNCHECKED_CAST")
             val serializer = object : KSerializer<Any> {
-                override val descriptor: SerialDescriptor
-                    get() = PrimitiveSerialDescriptor(serialName, kind)
+                override val descriptor = PrimitiveSerialDescriptor(serialName, kind)
 
-                override fun deserialize(decoder: Decoder): Any {
-                    return mapping.invoke(decoder.decode()) as Any
-                }
+                override fun deserialize(decoder: Decoder) = mapping.invoke(decoder.decode()) as Any
 
                 override fun serialize(encoder: Encoder, value: Any) {
                     encoder.encode(mapping(value as OUT))
                 }
-
             }
             this@asConfigurable.serializersModule += (SerializersModule { contextual(Reflection.getOrCreateKotlinClass(mapping.clazz), serializer) })
         }
 
-
     override fun done(): JsonBuilder = this@asConfigurable
-
 }
-

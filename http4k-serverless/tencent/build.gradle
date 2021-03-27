@@ -1,9 +1,9 @@
 description = 'Http4k Serverless support for Tencent Serverless Cloud Functions'
 
 dependencies {
-    compile project(":http4k-core")
-    compile Libs.scf_java_events
+    api project(":http4k-core")
+    api Libs.scf_java_events
 
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile Config.TestDependencies
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
 }

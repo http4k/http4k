@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import org.opentest4j.AssertionFailedError
 import java.io.File
 
-
 /**
  * Base JUnit extension for injecting an Approver into a JUnit5 test-case. Implement this
  * to provide custom approval behaviours, or

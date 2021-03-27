@@ -57,7 +57,6 @@ class MultipartFormParserTest {
         } catch (e: IOException) {
             // general stream exceptions
         }
-
     }
 
     @Test
@@ -174,7 +173,6 @@ class MultipartFormParserTest {
 
         assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[3], "utf8\uD83D\uDCA9.txt", txt)
         assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[1], "starbucks.jpeg", jpeg)
-
     }
 
     private fun assertPartSaved(fileName: String, files: Array<String>?) {

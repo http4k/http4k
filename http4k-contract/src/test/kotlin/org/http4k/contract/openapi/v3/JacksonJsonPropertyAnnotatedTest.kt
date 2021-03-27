@@ -26,4 +26,3 @@ class JacksonJsonPropertyAnnotatedTest {
         assertThat("non existent", { JacksonJsonPropertyAnnotated(Beany(), "non existent") }, throws<NoFieldFound>())
     }
 }
-

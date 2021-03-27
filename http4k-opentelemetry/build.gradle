@@ -1,12 +1,13 @@
 description = 'Http4k OpenTelemetry support'
 
 dependencies {
-    compile project(":http4k-core")
-    compile Libs.opentelemetry_api
+    api project(":http4k-core")
+    api Libs.opentelemetry_sdk
+    api Libs.opentelemetry_sdk_metrics
 
-    testCompile Libs.opentelemetry_sdk
-    testCompile Libs.opentelemetry_extension_trace_propagators
-    testCompile Libs.opentelemetry_exporters_inmemory
-    testCompile Config.TestDependencies
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testApi Libs.opentelemetry_extension_trace_propagators
+    testApi Libs.opentelemetry_extension_aws
+    testApi Libs.opentelemetry_exporters_inmemory
+    testImplementation Config.TestDependencies
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
 }

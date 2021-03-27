@@ -27,7 +27,6 @@ class StreamingMultipartFormSadTests {
         } catch (e: ParseError) {
             assertThat(e.cause!!, has(Throwable::message, present(equalTo("Boundary not found <<-----1234>>"))))
         }
-
     }
 
     @Test
@@ -45,7 +44,6 @@ class StreamingMultipartFormSadTests {
         } catch (e: NoSuchElementException) {
             // pass
         }
-
     }
 
     @Test
@@ -64,7 +62,6 @@ class StreamingMultipartFormSadTests {
         } catch (e: NoSuchElementException) {
             // pass
         }
-
     }
 
     @Test
@@ -126,7 +123,6 @@ class StreamingMultipartFormSadTests {
             "" + CR_LF +
             "value" + CR_LF +
             "-----2345--" + CR_LF).byteInputStream()), "Header didn't include a colon <<value>>")
-
 
         assertParseError(getMultipartFormParts(boundary, ("-----2345" + CR_LF +
             "Content-Disposition: form-data; name=\"name\"" + CR_LF +

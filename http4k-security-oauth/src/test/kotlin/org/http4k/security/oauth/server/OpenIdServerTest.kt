@@ -25,7 +25,6 @@ import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.Nonce
 import org.junit.jupiter.api.Test
 
-
 class OpenIdServerTest {
 
     @Test

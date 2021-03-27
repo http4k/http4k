@@ -30,7 +30,6 @@ import org.http4k.template.renderToResponse
 import java.util.UUID
 import java.util.UUID.randomUUID
 
-
 class FakeOAuthServer(oAuthClientConfig: OAuthProviderConfig, serviceName: String) : HttpHandler {
 
     private val templates = HandlebarsTemplates().CachingClasspath()

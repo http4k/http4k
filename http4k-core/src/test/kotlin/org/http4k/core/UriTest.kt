@@ -90,11 +90,10 @@ class UriTest {
     }
 
     @Test
-    fun `can encode and decode a path segment correctly`() {
+    fun `can encode a path segment correctly`() {
         val original = "123 / 456"
-        val encoded = "123%20%2F%20456"
+        val encoded = "123+%2F+456"
         assertThat(original.toPathEncoded(), equalTo(encoded))
-        assertThat(encoded.fromPathEncoded(), equalTo(original))
     }
 
     @Test

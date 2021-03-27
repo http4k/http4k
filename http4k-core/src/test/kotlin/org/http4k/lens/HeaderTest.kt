@@ -4,7 +4,12 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Accept
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_PDF
+import org.http4k.core.ContentType.Companion.APPLICATION_XML
+import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
+import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method.GET
 import org.http4k.core.Parameter
 import org.http4k.core.Request
@@ -79,7 +84,7 @@ class HeaderTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = Header.map(::MyCustomType, { it.value }).required("bob")
+        val custom = Header.map(::MyCustomType, MyCustomType::value).required("bob")
 
         val instance = MyCustomType("hello world!")
         val reqWithHeader = custom(instance, Request(GET, ""))
@@ -122,6 +127,15 @@ class HeaderTest {
     }
 
     @Test
+    fun `accept header deserialises correctly from message`() {
+        val accept = Header.ACCEPT(Request(GET, "").header("Accept", "text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))!!
+
+        assertThat(accept, equalTo(Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8"))))
+        assertThat(accept.accepts(TEXT_HTML), equalTo(true))
+        assertThat(accept.accepts(MULTIPART_FORM_DATA), equalTo(false))
+    }
+
+    @Test
     fun `multiple directives are parsed correctly`() {
         assertThat(Header.parseValueAndDirectives("some value"), equalTo("some value" to emptyList()))
         assertThat(Header.parseValueAndDirectives("some value ;"), equalTo("some value" to emptyList()))
@@ -130,5 +144,4 @@ class HeaderTest {
             equalTo("some value" to
                 listOf("bob" to null, "bob2" to "anotherValue")))
     }
-
 }

@@ -1,60 +1,48 @@
 package org.http4k.server
 
+import io.undertow.Handlers.predicate
+import io.undertow.Handlers.serverSentEvents
+import io.undertow.Handlers.websocket
 import io.undertow.Undertow
 import io.undertow.UndertowOptions.ENABLE_HTTP2
-import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.BlockingHandler
-import io.undertow.util.HttpString
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.RequestSource
-import org.http4k.core.Response
-import org.http4k.core.Uri
-import org.http4k.core.safeLong
-import org.http4k.core.then
-import org.http4k.core.toParametersMap
-import org.http4k.filter.ServerFilters
+import org.http4k.sse.SseHandler
+import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
 
-/**
- * Exposed to allow for insertion into a customised Undertow server instance
- */
-class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler {
-    private val safeHandler = ServerFilters.CatchAll().then(handler)
-
-    private fun Response.into(exchange: HttpServerExchange) {
-        exchange.statusCode = status.code
-        headers.toParametersMap().forEach { (name, values) ->
-            exchange.responseHeaders.putAll(HttpString(name), values.toList())
-        }
-        body.stream.use { it.copyTo(exchange.outputStream) }
-    }
-
-    private fun HttpServerExchange.asRequest(): Request =
-        Request(Method.valueOf(requestMethod.toString()), Uri.of("$relativePath?$queryString"))
-            .headers(requestHeaders
-                .flatMap { header -> header.map { header.headerName.toString() to it } })
-            .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
-            .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
-
-    override fun handleRequest(exchange: HttpServerExchange) = safeHandler(exchange.asRequest()).into(exchange)
-}
-
-data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : ServerConfig {
+class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, false)
 
-    override fun toServer(httpHandler: HttpHandler): Http4kServer =
-        object : Http4kServer {
+    override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
+        val httpHandler = http?.let(::Http4kUndertowHttpHandler)?.let(::BlockingHandler)
+        val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
+        val sseCallback = sse?.let { serverSentEvents(Http4kSseCallback(sse)) }
+
+        val handlerWithWs = when {
+            httpHandler != null && wsCallback != null -> predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
+            wsCallback != null -> wsCallback
+            else -> httpHandler
+        }
+
+        val handlerWithSse = sseCallback
+            ?.let { predicate(hasEventStreamContentType(), sseCallback, handlerWithWs) }
+            ?: handlerWithWs
+
+        return object : Http4kServer {
             val server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, enableHttp2)
-                .setHandler(BlockingHandler(HttpUndertowHandler(httpHandler))).build()
+                .setHandler(handlerWithSse).build()
 
             override fun start() = apply { server.start() }
 
             override fun stop() = apply { server.stop() }
 
-            override fun port(): Int = if (port > 0) port else (server.listenerInfo[0].address as InetSocketAddress).port
+            override fun port(): Int = when {
+                port > 0 -> port
+                else -> (server.listenerInfo[0].address as InetSocketAddress).port
+            }
         }
+    }
 }

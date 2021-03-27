@@ -7,8 +7,8 @@ import org.http4k.lens.Path
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
 import org.http4k.server.Jetty
+import org.http4k.server.PolyHandler
 import org.http4k.server.asServer
-import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 
@@ -29,4 +29,3 @@ fun main() {
 
     PolyHandler(http, ws).asServer(Jetty(9000)).start()
 }
-
