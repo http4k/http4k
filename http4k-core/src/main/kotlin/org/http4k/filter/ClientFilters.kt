@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import org.http4k.base64Encode
 import org.http4k.core.Body.Companion.EMPTY
+import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -15,11 +16,13 @@ import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.extend
 import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.RoutingHttpHandler
 import java.time.Clock
 import java.time.LocalDateTime
@@ -76,6 +79,18 @@ object ClientFilters {
             )
         }
     }
+
+    /**
+     * Sets the Content Type request header.
+     */
+    object SetContentType {
+        operator fun invoke(contentType: ContentType): Filter = Filter { next ->
+            {
+                next(it.with(CONTENT_TYPE of contentType))
+            }
+        }
+    }
+
 
     fun ApiKeyAuth(set: (Request) -> Request): Filter = Filter { next ->
         { next(set(it)) }

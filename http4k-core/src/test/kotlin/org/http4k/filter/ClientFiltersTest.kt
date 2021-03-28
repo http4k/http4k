@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -8,6 +7,7 @@ import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import org.http4k.core.Body
 import org.http4k.core.Body.Companion.EMPTY
+import org.http4k.core.ContentType.Companion.TEXT_XML
 import org.http4k.core.Credentials
 import org.http4k.core.MemoryRequest
 import org.http4k.core.MemoryResponse
@@ -29,6 +29,7 @@ import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RoutedRequest
@@ -167,6 +168,12 @@ class ClientFiltersTest {
     fun `set host on client`() {
         val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost:123")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
         assertThat(handler(Request(GET, "/loop")), hasBody("http://localhost:123/loop").and(hasHeader("Host", "localhost:123")))
+    }
+
+    @Test
+    fun `set content type on client`() {
+        val handler = ClientFilters.SetContentType(TEXT_XML).then { Response(OK).headers(it.headers) }
+        assertThat(handler(Request(GET, "/")), hasContentType(TEXT_XML))
     }
 
     @Test
