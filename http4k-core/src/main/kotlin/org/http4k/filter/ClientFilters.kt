@@ -91,7 +91,6 @@ object ClientFilters {
         }
     }
 
-
     fun ApiKeyAuth(set: (Request) -> Request): Filter = Filter { next ->
         { next(set(it)) }
     }
