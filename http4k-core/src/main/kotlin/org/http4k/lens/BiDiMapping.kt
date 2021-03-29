@@ -53,7 +53,7 @@ class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, val as
 /**
  * A set of standardised String <-> Type conversions which are used throughout http4k
  */
-object  StringBiDiMappings {
+object StringBiDiMappings {
     fun int() = BiDiMapping(String::toInt, Int::toString)
     fun long() = BiDiMapping(String::toLong, Long::toString)
     fun double() = BiDiMapping(String::toDouble, Double::toString)
