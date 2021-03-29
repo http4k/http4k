@@ -53,7 +53,7 @@ class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, val as
 /**
  * A set of standardised String <-> Type conversions which are used throughout http4k
  */
-object StringBiDiMappings {
+object  StringBiDiMappings {
     fun int() = BiDiMapping(String::toInt, Int::toString)
     fun long() = BiDiMapping(String::toLong, Long::toString)
     fun double() = BiDiMapping(String::toDouble, Double::toString)
@@ -82,7 +82,7 @@ object StringBiDiMappings {
     fun eventCategory() = BiDiMapping(::EventCategory, EventCategory::toString)
     fun traceId() = BiDiMapping(::TraceId, TraceId::value)
     fun samplingDecision() = BiDiMapping(::SamplingDecision, SamplingDecision::value)
-    fun throwable() = BiDiMapping<String, Throwable>({ throw Exception(it) }, Throwable::asString)
+    fun throwable() = BiDiMapping({ throw Exception(it) }, Throwable::asString)
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
 }
 
