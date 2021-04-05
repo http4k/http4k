@@ -3,9 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.6.0.0 (uncut)
-- **http4k-*** : Upgrade some dependency versions
-- **http4k-server-jetty** : [Breaking] The upgrade to Jetty 11.0.1 has resulted in some repackaged classes in the Jetty source, most notably the Servlet dependency is now based on `jakarta.servlet.http.XXX` classes instead of the standard `javax.servlet` package.
+### v4.6.0.0 
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.32 and Jetty to 11.
+- **http4k-server-jetty** : [Breaking] The upgrade to Jetty 11.0.X has resulted in some repackaged classes in the Jetty source, most notably the Servlet dependency is now based on `jakarta.servlet.http.XXX` classes instead of the standard `javax.servlet` package.
 
 ### v4.5.0.1
 - **http4k-core** : Fix `SunHttp` not complaining if the entire request body is not consumed.
