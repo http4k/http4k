@@ -1,7 +1,7 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
-import io.opentelemetry.api.metrics.GlobalMetricsProvider
+import io.opentelemetry.api.metrics.GlobalMeterProvider
 import io.opentelemetry.api.metrics.common.Labels
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import org.http4k.core.HttpHandler
@@ -23,7 +23,7 @@ class OpenTelemetryMetricsClientTest {
         @BeforeAll
         @JvmStatic
         fun setup() {
-            GlobalMetricsProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
+            GlobalMeterProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
         }
     }
 

@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
-import io.opentelemetry.api.metrics.GlobalMetricsProvider
+import io.opentelemetry.api.metrics.GlobalMeterProvider
 import io.opentelemetry.api.metrics.common.Labels
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
@@ -35,7 +35,7 @@ class OpenTelemetryMetricsServerTest {
         @BeforeAll
         @JvmStatic
         fun setup() {
-            GlobalMetricsProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
+            GlobalMeterProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
         }
     }
 

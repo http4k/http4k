@@ -1,7 +1,7 @@
 package org.http4k.metrics
 
 import io.opentelemetry.api.GlobalOpenTelemetry
-import io.opentelemetry.api.metrics.GlobalMetricsProvider
+import io.opentelemetry.api.metrics.GlobalMeterProvider
 import io.opentelemetry.api.metrics.Meter
 import io.opentelemetry.api.trace.Tracer
 
@@ -14,5 +14,5 @@ object Http4kOpenTelemetry {
 
     val tracer: Tracer get() = GlobalOpenTelemetry.get().tracerProvider.get(INSTRUMENTATION_NAME)
 
-    val meter: Meter get() = GlobalMetricsProvider.getMeter(INSTRUMENTATION_NAME)
+    val meter: Meter get() = GlobalMeterProvider.getMeter(INSTRUMENTATION_NAME)
 }
