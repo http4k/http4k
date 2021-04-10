@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.6.0.1 (uncut)
+### v4.6.0.1 (uncut) 
 - **http4k-core** : Fix #606 - SPA routers respond to OPTIONS requests.
 
 ### v4.6.0.0
