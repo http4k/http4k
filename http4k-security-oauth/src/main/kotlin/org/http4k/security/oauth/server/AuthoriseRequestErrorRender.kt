@@ -14,10 +14,12 @@ import org.http4k.security.oauth.server.ResponseRender.Companion.forAuthRequest
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.extractRequestJwtClaimsAsMap
 
-class AuthoriseRequestErrorRender(private val authoriseRequestValidator: AuthoriseRequestValidator,
-                                  private val requestJWTValidator: RequestJWTValidator,
-                                  private val fallBack: JsonResponseErrorRenderer,
-                                  private val documentationUri: String? = null) {
+class AuthoriseRequestErrorRender(
+    private val authoriseRequestValidator: AuthoriseRequestValidator,
+    private val requestJWTValidator: RequestJWTValidator,
+    private val fallBack: JsonResponseErrorRenderer,
+    private val documentationUri: String? = null
+) {
 
     fun errorFor(request: Request, error: OAuthError): Response {
         val requestClientId = extractValueFromRequestOrNull(request) { OAuthServer.clientIdQueryParameter(it) }
@@ -33,12 +35,35 @@ class AuthoriseRequestErrorRender(private val authoriseRequestValidator: Authori
                 }
             }
         val requestJwtClientId = requestObjectMap?.get("client_id")?.let { id -> ClientId(id.toString()) }
-        val requestRedirectUri = extractValue(request, requestObjectMap, "redirect_uri", { OAuthServer.redirectUriQueryParameter(it) }) { Uri.of(it) }
-        val requestResponseMode = extractValue(request, requestObjectMap, "response_mode", { OAuthServer.responseMode(it) }, ResponseMode.Companion::fromQueryParameterValue)
-        val requestResponseType = extractValue(request, requestObjectMap, "response_type", { OAuthServer.responseType(it) }, ResponseType.Companion::fromQueryParameterValue)
+        val requestRedirectUri = extractValue(
+            request,
+            requestObjectMap,
+            "redirect_uri",
+            { OAuthServer.redirectUriQueryParameter(it) }) { Uri.of(it) }
+        val requestResponseMode = extractValue(
+            request,
+            requestObjectMap,
+            "response_mode",
+            { OAuthServer.responseMode(it) },
+            ResponseMode.Companion::fromQueryParameterValue
+        )
+        val requestResponseType = extractValue(
+            request,
+            requestObjectMap,
+            "response_type",
+            { OAuthServer.responseType(it) },
+            ResponseType.Companion::fromQueryParameterValue
+        )
             ?: Code
         val requestState = extractValue(request, requestObjectMap, "state", { OAuthServer.state(it) }) { State(it) }
-        return if (isUnsafeToRedirectBackToRedirectUri(isRequestJwtValid, requestClientId, requestJwtClientId, requestRedirectUri, request)) {
+        return if (isUnsafeToRedirectBackToRedirectUri(
+                isRequestJwtValid,
+                requestClientId,
+                requestJwtClientId,
+                requestRedirectUri,
+                request
+            )
+        ) {
             fallBack.response(error)
         } else {
             forAuthRequest(requestResponseMode, requestResponseType, requestRedirectUri!!)
@@ -50,19 +75,31 @@ class AuthoriseRequestErrorRender(private val authoriseRequestValidator: Authori
         }
     }
 
-    private fun isUnsafeToRedirectBackToRedirectUri(isRequestJwtValid: Boolean?,
-                                                    requestClientId: ClientId?,
-                                                    requestJwtClientId: ClientId?,
-                                                    requestRedirectUri: Uri?,
-                                                    request: Request): Boolean {
+    private fun isUnsafeToRedirectBackToRedirectUri(
+        isRequestJwtValid: Boolean?,
+        requestClientId: ClientId?,
+        requestJwtClientId: ClientId?,
+        requestRedirectUri: Uri?,
+        request: Request
+    ): Boolean {
         return isRequestJwtValid == false ||
             requestClientId == null ||
             (requestJwtClientId != null && requestClientId != requestJwtClientId) ||
             requestRedirectUri == null ||
-            !authoriseRequestValidator.isValidClientAndRedirectUriInCaseOfError(request, requestClientId, requestRedirectUri)
+            !authoriseRequestValidator.isValidClientAndRedirectUriInCaseOfError(
+                request,
+                requestClientId,
+                requestRedirectUri
+            )
     }
 
-    private fun <T> extractValue(request: Request, requestObject: Map<*, *>?, key: String, requestCallback: (Request) -> T?, requestObjectCallback: (String) -> T): T? {
+    private fun <T> extractValue(
+        request: Request,
+        requestObject: Map<*, *>?,
+        key: String,
+        requestCallback: (Request) -> T?,
+        requestObjectCallback: (String) -> T
+    ): T? {
         val requestState = extractValueFromRequestOrNull(request, requestCallback)
         val requestJwtState = requestObject?.let { extractValueFromRequestObjectOrNull(key, it, requestObjectCallback) }
         if (requestJwtState != null && requestState != null && requestState != requestJwtState) return null

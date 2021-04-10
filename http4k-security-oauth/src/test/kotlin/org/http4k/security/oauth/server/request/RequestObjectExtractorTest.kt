@@ -86,13 +86,13 @@ internal class RequestObjectExtractorTest {
             magAge = 86400,
             expiry = expiry,
             claims = Claims(
-                userInfo = mapOf(
+                userinfo = mapOf(
                     "given_name" to Claim(true),
                     "email" to Claim(true),
                     "email_verified" to Claim(true),
                     "someThingCustomer" to Claim(true, value = "someCustomerValue")
                 ),
-                idToken = mapOf(
+                id_token = mapOf(
                     "birthdate" to Claim(true),
                     "acr" to Claim(false, values = listOf("urn:mace:incommon:iap:silver"))
                 )

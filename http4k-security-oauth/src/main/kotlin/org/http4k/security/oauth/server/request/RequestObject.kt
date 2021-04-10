@@ -21,7 +21,7 @@ data class RequestObject(val client: ClientId? = null,
                          val expiry: Long? = null,
                          val claims: Claims = Claims())
 
-data class Claims(@JsonProperty("userinfo") val userInfo: Map<String, Claim>? = null,
-                  @JsonProperty("id_token") val idToken: Map<String, Claim>? = null)
+data class Claims(@JsonProperty("userinfo") val userinfo: Map<String, Claim>? = null,
+                  @JsonProperty("id_token") val id_token: Map<String, Claim>? = null)
 
 data class Claim(val essential: Boolean = false, val value: String? = null, val values: List<String>? = null)
