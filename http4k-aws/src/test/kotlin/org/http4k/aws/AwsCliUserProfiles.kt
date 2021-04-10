@@ -37,10 +37,14 @@ fun Environment.awsCliUserProfiles(): AwsCliUserProfiles {
 
             override val region = get("region")
 
-            override fun get(keyName: String) = EnvironmentKey.required(
-                if (profileName == "default") "default-$keyName"
-                else "profile-$profileName-$keyName"
-            )(env)
+            override fun get(keyName: String): String {
+                val required = EnvironmentKey.optional(
+                    if (profileName == "default") "default-$keyName"
+                    else "profile-$profileName-$keyName"
+                )
+                assumeTrue(required(env) != null, "no profile found")
+                return required(env)!!
+            }
         }
     }
 }
