@@ -1,6 +1,5 @@
 package org.http4k.security.oauth.server.request
 
-import com.fasterxml.jackson.core.JsonParseException
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
@@ -34,15 +33,29 @@ object RequestObjectExtractor {
                     responseType = jsonFromJWT["response_type"]?.let { ResponseType.fromQueryParameterValue(it.toString()) },
                     state = jsonFromJWT["state"]?.let { State(it.toString()) },
                     nonce = jsonFromJWT["nonce"]?.let { Nonce(it.toString()) },
-                    magAge = jsonFromJWT["max_age"]?.toString()?.toLong(),
-                    expiry = jsonFromJWT["exp"]?.toString()?.toLong(),
+                    magAge = jsonFromJWT["max_age"]?.toString()?.toBigDecimal()?.toLong(),
+                    expiry = jsonFromJWT["exp"]?.toString()?.toBigDecimal()?.toLong(),
                     claims = toClaims(jsonFromJWT["claims"])
                 )
             }
 
+    @Suppress("UNCHECKED_CAST")
     private fun toClaims(claims: Any?) = when (claims) {
-        is Map<*, *> -> json.asA(json.asFormatString(claims))
+        is Map<*, *> -> Claims(
+            asClaims(claims["userinfo"] as Map<String, Any>?),
+            asClaims(claims["id_token"] as Map<String, Any>?))
         else -> Claims()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun asClaims(claims: Map<String, Any>?) = claims
+        ?.mapValues {
+            val claim = it.value as Map<String, Any?>
+        Claim(
+            claim["essential"]?.toString()?.toBoolean() ?: false,
+            claim["value"]?.toString(),
+            claim["values"] as List<String>?
+        )
     }
 
     private fun toAudience(audience: Any?): List<String> = when (audience) {
@@ -57,9 +70,7 @@ object RequestObjectExtractor {
             jwtParts.size != 3 -> Failure(InvalidRequestObject)
             else -> Success(json.asA<Map<String, Any>>(String(Base64.getUrlDecoder().decode(jwtParts[1]))))
         }
-    } catch (e: IllegalArgumentException) {
-        Failure(InvalidRequestObject)
-    } catch (e: JsonParseException) {
+    } catch (e: Exception) {
         Failure(InvalidRequestObject)
     }
 }

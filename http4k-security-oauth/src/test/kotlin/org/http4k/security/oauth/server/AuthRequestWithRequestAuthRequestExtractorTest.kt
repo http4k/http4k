@@ -1,11 +1,14 @@
 package org.http4k.security.oauth.server
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory.instance
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
@@ -15,6 +18,9 @@ import org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.format.ConfigurableJackson
+import org.http4k.format.asConfigurable
+import org.http4k.format.text
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
@@ -25,7 +31,6 @@ import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtract
 import org.http4k.security.oauth.server.request.Claims
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObject
-import org.http4k.security.oauth.server.request.RequestObjectExtractorJson.asFormatString
 import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import org.junit.jupiter.api.DisplayName
@@ -536,7 +541,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         )
         return "someHeader.${
             encodeBase64URLSafeString(
-                asFormatString(requestObjectJson).toByteArray()
+                RequestObjectExtractorJson.asFormatString(requestObjectJson).toByteArray()
             ).replace("=", "")
         }.someSignature"
     }
@@ -564,4 +569,22 @@ internal data class RequestObjectJson(
     @JsonProperty("max_age") val magAge: Long? = null,
     @JsonProperty("exp") val expiry: Long? = null,
     @JsonProperty("claims") val claims: Claims = Claims()
+)
+
+internal object RequestObjectExtractorJson : ConfigurableJackson(
+    KotlinModule()
+        .asConfigurable()
+        .text(Uri.Companion::of, Uri::toString)
+        .text(::ClientId, ClientId::value)
+        .text(::State, State::value)
+        .text(::Nonce, Nonce::value)
+        .text(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue)
+        .text(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue)
+        .done()
+        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+        .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
+        .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
+        .configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false)
 )

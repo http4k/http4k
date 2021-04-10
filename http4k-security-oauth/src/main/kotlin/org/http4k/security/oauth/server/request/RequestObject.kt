@@ -1,6 +1,5 @@
 package org.http4k.security.oauth.server.request
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.core.Uri
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
@@ -21,7 +20,7 @@ data class RequestObject(val client: ClientId? = null,
                          val expiry: Long? = null,
                          val claims: Claims = Claims())
 
-data class Claims(@JsonProperty("userinfo") val userinfo: Map<String, Claim>? = null,
-                  @JsonProperty("id_token") val id_token: Map<String, Claim>? = null)
+data class Claims(val userinfo: Map<String, Claim>? = null,
+                 val id_token: Map<String, Claim>? = null)
 
 data class Claim(val essential: Boolean = false, val value: String? = null, val values: List<String>? = null)

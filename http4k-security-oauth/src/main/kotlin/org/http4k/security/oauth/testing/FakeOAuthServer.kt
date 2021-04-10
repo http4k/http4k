@@ -10,7 +10,7 @@ import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.format.Jackson
+import org.http4k.format.Moshi
 import org.http4k.lens.Header.LOCATION
 import org.http4k.lens.LensFailure
 import org.http4k.routing.bind
@@ -48,7 +48,7 @@ object FakeOAuthServer {
             AlwaysOkClientValidator(),
             InMemoryAuthorizationCodes(clock),
             SimpleAccessTokens(accessCodePrefix),
-            Jackson,
+            Moshi,
             clock
         )
 
