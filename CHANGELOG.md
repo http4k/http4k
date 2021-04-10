@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.6.0.1 (uncut) 
+### v4.7.0.0 (uncut)
 - **http4k-core** : Fix #606 - SPA routers respond to OPTIONS requests.
+- **http4k-security-oauth*** :Replace Jackson  with Moshi. This has had the effect of removing any reflection from the module (and thus saving 2.5Mb of Kotlin-Reflection dependency).
 
 ### v4.6.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.32 and Jetty to 11.
