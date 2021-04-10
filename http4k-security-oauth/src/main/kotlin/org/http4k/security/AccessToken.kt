@@ -18,12 +18,12 @@ data class AccessTokenDetails(val accessToken: AccessToken, val idToken: IdToken
 
 @JsonInclude(NON_NULL)
 data class AccessTokenResponse(
-    @JsonProperty("access_token") val accessToken: String,
-    @JsonProperty("token_type") val tokenType: String? = null,
-    @JsonProperty("expires_in") val expiresIn: Long? = null,
-    @JsonProperty("id_token") val idToken: String? = null,
+    @JsonProperty("access_token") val access_token: String,
+    @JsonProperty("token_type") val token_type: String? = null,
+    @JsonProperty("expires_in") val expires_in: Long? = null,
+    @JsonProperty("id_token") val id_token: String? = null,
     @JsonProperty("scope") val scope: String? = null,
-    @JsonProperty("refresh_token") val refreshToken: String? = null
+    @JsonProperty("refresh_token") val refresh_token: String? = null
 )
 
 val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()
