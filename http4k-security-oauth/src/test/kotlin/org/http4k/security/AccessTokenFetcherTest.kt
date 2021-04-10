@@ -40,11 +40,11 @@ internal class AccessTokenFetcherTest {
         )
 
         val response = AccessTokenResponse(
-            accessToken = token.value,
-            tokenType = token.type,
-            expiresIn = token.expiresIn,
+            access_token = token.value,
+            token_type = token.type,
+            expires_in = token.expiresIn,
             scope = token.scope,
-            refreshToken = token.refreshToken?.value,
+            refresh_token = token.refreshToken?.value,
         )
 
         val api = { _: Request -> Response(OK).with(accessTokenResponseBody of response) }

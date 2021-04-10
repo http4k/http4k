@@ -4,7 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
-import org.http4k.format.AutoMarshallingJson
+import org.http4k.format.AutoMarshalling
 import org.http4k.lens.FormField
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
@@ -40,7 +40,7 @@ class OAuthServer(
     accessTokenRequestAuthentication: AccessTokenRequestAuthentication,
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens,
-    json: AutoMarshallingJson<*>,
+    json: AutoMarshalling,
     clock: Clock,
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
@@ -55,7 +55,7 @@ class OAuthServer(
                 clientValidator: ClientValidator,
                 authorizationCodes: AuthorizationCodes,
                 accessTokens: AccessTokens,
-                json: AutoMarshallingJson<*>,
+                json: AutoMarshalling,
                 clock: Clock,
                 authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
                 grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
