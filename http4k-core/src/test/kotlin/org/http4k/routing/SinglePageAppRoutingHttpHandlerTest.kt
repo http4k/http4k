@@ -1,22 +1,29 @@
 package org.http4k.routing
 
 import com.natpryce.hamkrest.Matcher
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
+import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
+import org.http4k.filter.ServerFilters.Cors
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
 class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
-    override val handler: RoutingHttpHandler = SinglePageAppRoutingHandler(validPath,
+    override val handler: RoutingHttpHandler = SinglePageAppRoutingHandler(
+        validPath,
         StaticRoutingHttpHandler(
             pathSegments = validPath,
             resourceLoader = ResourceLoader.Classpath(),
@@ -61,6 +68,45 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
         assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(withBasePath(request), criteria)
+    }
+
+    @Test
+    fun `does not match non-GET requests for valid path`() {
+        assertThat(handler.matchAndInvoke(Request(POST, validPath)), absent())
+        assertThat(handler.matchAndInvoke(Request(GET, validPath)), present(isHomePage()))
+    }
+
+    @Test
+    fun `does not interfere with CORs policy`() {
+        val app = Cors(UnsafeGlobalPermissive)
+            .then(
+                routes(
+                    "/api/{name}" bind GET to { Response(OK).body(it.path("name")!!) },
+                    singlePageApp()
+                )
+            )
+
+        val optionsResponse = hasStatus(OK).and(hasBody(""))
+
+        assertThat(
+            app(Request(OPTIONS, "/api/ken").header("Origin", "foo")),
+            optionsResponse
+        )
+
+        assertThat(
+            app(Request(GET, "/api/ken").header("Origin", "foo")),
+            hasStatus(OK).and(hasBody("ken"))
+        )
+
+        assertThat(
+            app(Request(GET, "/index").header("Origin", "foo")),
+            isHomePage("public")
+        )
+
+        assertThat(
+            app(Request(OPTIONS, "/index").header("Origin", "foo")),
+            optionsResponse
+        )
     }
 
     @Test
