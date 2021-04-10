@@ -63,4 +63,3 @@ object RequestObjectExtractor {
         Failure(InvalidRequestObject)
     }
 }
-
