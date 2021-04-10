@@ -9,7 +9,6 @@ import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
-import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -72,7 +71,7 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
     @Test
     fun `does not match non-GET requests for valid path`() {
-        assertThat(handler.matchAndInvoke(Request(POST, validPath)), absent())
+        assertThat(handler.matchAndInvoke(Request(OPTIONS, validPath)), absent())
         assertThat(handler.matchAndInvoke(Request(GET, validPath)), present(isHomePage()))
     }
 

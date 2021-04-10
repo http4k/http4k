@@ -3,6 +3,7 @@ package org.http4k.routing
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -13,8 +14,14 @@ import org.http4k.routing.RouterMatch.Unmatched
  * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
  * /public package (on the Classpath).
  */
-fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/public"), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler =
-    SinglePageAppRoutingHandler("", StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
+fun singlePageApp(
+    resourceLoader: ResourceLoader = ResourceLoader.Classpath("/public"),
+    vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
+): RoutingHttpHandler =
+    SinglePageAppRoutingHandler(
+        "",
+        StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
+    )
 
 internal data class SinglePageAppRoutingHandler(
     private val pathSegments: String,
@@ -36,11 +43,14 @@ internal data class SinglePageAppRoutingHandler(
         return matchOnStatic ?: fallbackHandler(Request(GET, pathSegments))
     }
 
-    override fun match(request: Request) = if(request.method == GET) {
-        MatchingHandler(this, description)
-    } else Unmatched(RouterDescription("template == '$pathSegments'"))
+    override fun match(request: Request) = when (request.method) {
+        OPTIONS -> Unmatched(RouterDescription("template == '$pathSegments'"))
+        else -> MatchingHandler(this, description)
+    }
 
-    override fun withFilter(new: Filter) = copy(staticHandler = staticHandler.withFilter(new) as StaticRoutingHttpHandler)
+    override fun withFilter(new: Filter) =
+        copy(staticHandler = staticHandler.withFilter(new) as StaticRoutingHttpHandler)
 
-    override fun withBasePath(new: String) = SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
+    override fun withBasePath(new: String) =
+        SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
 }
