@@ -23,40 +23,43 @@ object RequestObjectExtractor {
     internal fun extractRequestObjectFromJwt(value: String): Result<RequestObject, InvalidRequestObject> =
         parseJsonFromJWT(value)
             .map { jsonFromJWT ->
-                RequestObject(
-                    client = jsonFromJWT["client_id"]?.let { ClientId(it.toString()) },
-                    redirectUri = jsonFromJWT["redirect_uri"]?.let { Uri.of(it.toString()) },
-                    audience = toAudience(jsonFromJWT["aud"]),
-                    issuer = jsonFromJWT["iss"]?.toString(),
-                    scope = jsonFromJWT["scope"]?.toString()?.split(" ") ?: emptyList(),
-                    responseMode = jsonFromJWT["response_mode"]?.let { ResponseMode.fromQueryParameterValue(it.toString()) },
-                    responseType = jsonFromJWT["response_type"]?.let { ResponseType.fromQueryParameterValue(it.toString()) },
-                    state = jsonFromJWT["state"]?.let { State(it.toString()) },
-                    nonce = jsonFromJWT["nonce"]?.let { Nonce(it.toString()) },
-                    magAge = jsonFromJWT["max_age"]?.toString()?.toBigDecimal()?.toLong(),
-                    expiry = jsonFromJWT["exp"]?.toString()?.toBigDecimal()?.toLong(),
-                    claims = toClaims(jsonFromJWT["claims"])
-                )
+                with(jsonFromJWT) {
+                    RequestObject(
+                        client = value("client_id", ::ClientId),
+                        redirectUri = value("redirect_uri", Uri::of),
+                        audience = toAudience(this["aud"]),
+                        issuer = string("iss"),
+                        scope = string("scope")?.split(" ") ?: emptyList(),
+                        responseMode = value("response_mode", ResponseMode::fromQueryParameterValue),
+                        responseType = value("response_type", ResponseType::fromQueryParameterValue),
+                        state = value("state", ::State),
+                        nonce = value("nonce", ::Nonce),
+                        magAge = long("max_age"),
+                        expiry = long("exp"),
+                        claims = toClaims(this["claims"])
+                    )
+                }
             }
 
     @Suppress("UNCHECKED_CAST")
     private fun toClaims(claims: Any?) = when (claims) {
         is Map<*, *> -> Claims(
-            asClaims(claims["userinfo"] as Map<String, Any>?),
-            asClaims(claims["id_token"] as Map<String, Any>?))
+            asClaims(claims.map("userinfo")),
+            asClaims(claims.map("id_token"))
+        )
         else -> Claims()
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun asClaims(claims: Map<String, Any>?) = claims
         ?.mapValues {
-            val claim = it.value as Map<String, Any?>
-        Claim(
-            claim["essential"]?.toString()?.toBoolean() ?: false,
-            claim["value"]?.toString(),
-            claim["values"] as List<String>?
-        )
-    }
+            val claim = it.value as Map<String, Any>
+            Claim(
+                claim.boolean("essential") ?: false,
+                claim.string("value"),
+                claim.strings("values")
+            )
+        }
 
     private fun toAudience(audience: Any?): List<String> = when (audience) {
         is List<*> -> audience.map { it.toString() }
