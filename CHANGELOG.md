@@ -3,9 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.7.0.1
+- **http4k-security-oauth** : Added adapter for AccessTokenResponse, meaning you don't need to import Kotlin Reflection JAR when using the OAuthServer
+
 ### v4.7.0.0
 - **http4k-core** : Fix #606 - SPA routers do not respond to OPTIONS requests.
-- **http4k-security-oauth** :Replace Jackson  with Moshi. This has had the effect of removing any reflection from the module (and thus saving 2.5Mb of Kotlin-Reflection dependency). If you still need Jackson, then you need to manually add it as a dependency as it was probably missing from your dependency list! :)
+- **http4k-security-oauth** : Replace Jackson  with Moshi. This has had the effect of removing any reflection from the module (and thus saving 2.5Mb of Kotlin-Reflection dependency). If you still need Jackson, then you need to manually add it as a dependency as it was probably missing from your dependency list! :)
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v4.6.0.0

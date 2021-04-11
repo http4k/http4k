@@ -8,7 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.routing.RouterMatch.MatchingHandler
-import org.http4k.routing.RouterMatch.Unmatched
+import org.http4k.routing.RouterMatch.MethodNotMatched
 
 /**
  * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
@@ -44,7 +44,7 @@ internal data class SinglePageAppRoutingHandler(
     }
 
     override fun match(request: Request) = when (request.method) {
-        OPTIONS -> Unmatched(RouterDescription("template == '$pathSegments'"))
+        OPTIONS -> MethodNotMatched(RouterDescription("template == '$pathSegments'"))
         else -> MatchingHandler(this, description)
     }
 

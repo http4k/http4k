@@ -72,7 +72,9 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `does not match non-GET requests for valid path`() {
         assertThat(handler.matchAndInvoke(Request(OPTIONS, validPath)), absent())
+        assertThat(handler(Request(OPTIONS, validPath)), hasStatus(OK))
         assertThat(handler.matchAndInvoke(Request(GET, validPath)), present(isHomePage()))
+        assertThat(handler(Request(GET, validPath)), hasStatus(OK))
     }
 
     @Test

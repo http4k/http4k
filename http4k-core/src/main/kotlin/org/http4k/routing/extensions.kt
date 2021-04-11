@@ -4,6 +4,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
+import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 
 /**
@@ -21,7 +22,7 @@ fun Request.path(name: String): String? = when (this) {
 
 fun Method.asRouter() = object : Router {
     override fun match(request: Request): RouterMatch =
-        if (this@asRouter == request.method) MatchedWithoutHandler(description) else RouterMatch.MethodNotMatched(
+        if (this@asRouter == request.method) MatchedWithoutHandler(description) else MethodNotMatched(
             description
         )
 
