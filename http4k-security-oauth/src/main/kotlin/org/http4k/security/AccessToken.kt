@@ -23,4 +23,3 @@ data class AccessTokenResponse(
 )
 
 val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()
-
