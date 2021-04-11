@@ -10,7 +10,9 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.body.form
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters
+import org.http4k.filter.ClientFilters.Cookies
+import org.http4k.filter.ClientFilters.FollowRedirects
+import org.http4k.filter.debug
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
@@ -22,11 +24,9 @@ class OAuthServerTest {
         val authenticationServer = customOauthAuthorizationServer()
         val consumerApp = oauthClientApp(authenticationServer)
 
-        val browser = Filter.NoOp
-            .then(ClientFilters.Cookies())
-            .then(authenticationServer + consumerApp)
+        val browser = Cookies().then(authenticationServer + consumerApp).debug()
 
-        val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)
+        val browserWithRedirection = FollowRedirects().then(browser)
 
         val preAuthResponse = browser(Request(GET, "/a-protected-resource"))
         val loginPage = preAuthResponse.header("location")!!
@@ -44,10 +44,10 @@ class OAuthServerTest {
         val consumerApp = oauthClientApp(authenticationServer)
 
         val browser = Filter.NoOp
-            .then(ClientFilters.Cookies())
+            .then(Cookies())
             .then(authenticationServer + consumerApp)
 
-        val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)
+        val browserWithRedirection = FollowRedirects().then(browser)
 
         val preAuthResponse = browser(Request(GET, "/a-protected-resource"))
         val loginPage = preAuthResponse.header("location")!!

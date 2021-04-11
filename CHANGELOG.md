@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.7.0.1
+### v4.7.0.2
 - **http4k-security-oauth** : Added adapter for AccessTokenResponse, meaning you don't need to import Kotlin Reflection JAR when using the OAuthServer
 
 ### v4.7.0.0

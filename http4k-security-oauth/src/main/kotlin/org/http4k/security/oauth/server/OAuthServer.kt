@@ -29,6 +29,9 @@ import java.time.Clock
 /**
  * Provide help creating OAuth Authorization Server with Authorization Code Flow
  *
+ * Note that if you are using your own AutoMarshalling instance, either Kotlin-Reflection or the ability to
+ * unmarshall the AccessTokenResponse is required.
+ *
  * References:
  *  - Authorization Code Grant flow spec: https://tools.ietf.org/html/rfc6749#page-23
  *  - OAuth 2 Security Best Current Practices: https://tools.ietf.org/html/draft-ietf-oauth-security-topics-11
@@ -40,8 +43,8 @@ class OAuthServer(
     accessTokenRequestAuthentication: AccessTokenRequestAuthentication,
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens,
-    json: AutoMarshalling,
     clock: Clock,
+    json: AutoMarshalling = OAuthServerMoshi,
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
     idTokens: IdTokens = IdTokens.Unsupported,
@@ -50,27 +53,31 @@ class OAuthServer(
     documentationUri: String? = null
 ) {
 
-    constructor(tokenPath: String,
-                authRequestTracking: AuthRequestTracking,
-                clientValidator: ClientValidator,
-                authorizationCodes: AuthorizationCodes,
-                accessTokens: AccessTokens,
-                json: AutoMarshalling,
-                clock: Clock,
-                authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
-                grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
-                idTokens: IdTokens = IdTokens.Unsupported,
-                refreshTokens: RefreshTokens = RefreshTokens.unsupported,
-                requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
-                documentationUri: String? = null) : this(
+    constructor(
+        tokenPath: String,
+        authRequestTracking: AuthRequestTracking,
+        clientValidator: ClientValidator,
+        authorizationCodes: AuthorizationCodes,
+        accessTokens: AccessTokens,
+        clock: Clock,
+        json: AutoMarshalling = OAuthServerMoshi,
+        authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
+        grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(
+            ClientSecretAccessTokenRequestAuthentication(clientValidator)
+        ),
+        idTokens: IdTokens = IdTokens.Unsupported,
+        refreshTokens: RefreshTokens = RefreshTokens.unsupported,
+        requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
+        documentationUri: String? = null
+    ) : this(
         tokenPath,
         authRequestTracking,
         SimpleAuthoriseRequestValidator(clientValidator),
         ClientSecretAccessTokenRequestAuthentication(clientValidator),
         authorizationCodes,
         accessTokens,
-        json,
         clock,
+        json,
         authRequestExtractor,
         grantTypes,
         idTokens,
@@ -84,25 +91,40 @@ class OAuthServer(
         authoriseRequestValidator,
         requestJWTValidator,
         errorRenderer,
-        documentationUri)
+        documentationUri
+    )
 
     // endpoint to retrieve access token for a given authorization code
-    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, refreshTokens, errorRenderer, grantTypes))
+    val tokenRoute = routes(
+        tokenPath bind POST to GenerateAccessToken(
+            authorizationCodes,
+            accessTokens,
+            clock,
+            idTokens,
+            refreshTokens,
+            errorRenderer,
+            grantTypes
+        )
+    )
 
     // use this filter to protect your authentication/authorization pages
-    val authenticationStart = ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, authRequestExtractor)
-        .then(AuthRequestTrackingFilter(authRequestTracking, authRequestExtractor, authoriseRequestErrorRender))
+    val authenticationStart =
+        ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, authRequestExtractor)
+            .then(AuthRequestTrackingFilter(authRequestTracking, authRequestExtractor, authoriseRequestErrorRender))
 
     // endpoint to handle authorization code generation and redirection back to client
-    val authenticationComplete = AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
+    val authenticationComplete =
+        AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
 
     companion object {
         val clientIdQueryParameter = Query.map(::ClientId, ClientId::value).required("client_id")
         val scopesQueryParameter = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
         val redirectUriQueryParameter = Query.uri().optional("redirect_uri")
         val state = Query.map(::State, State::value).optional("state")
-        val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue).required("response_type")
-        val responseMode = Query.map(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue).optional("response_mode")
+        val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue)
+            .required("response_type")
+        val responseMode = Query.map(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue)
+            .optional("response_mode")
         val nonce = Query.map(::Nonce, Nonce::value).optional("nonce")
         val request = Query.map(::RequestJwtContainer, RequestJwtContainer::value).optional("request")
 
@@ -123,7 +145,8 @@ class OAuthServer(
             scopesForm,
             clientAssertionType,
             clientAssertion,
-            refreshToken).toLens()
+            refreshToken
+        ).toLens()
     }
 }
 

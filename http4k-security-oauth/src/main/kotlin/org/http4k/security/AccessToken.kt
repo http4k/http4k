@@ -1,7 +1,7 @@
 package org.http4k.security
 
 import org.http4k.core.Body
-import org.http4k.format.Moshi.auto
+import org.http4k.security.oauth.server.OAuthServerMoshi.auto
 import org.http4k.security.oauth.server.refreshtoken.RefreshToken
 import org.http4k.security.openid.IdToken
 
@@ -23,3 +23,4 @@ data class AccessTokenResponse(
 )
 
 val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()
+

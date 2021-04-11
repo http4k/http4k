@@ -10,12 +10,17 @@ import org.http4k.security.ResponseType
 import org.http4k.security.State
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.InvalidRequestObject
+import org.http4k.security.oauth.server.OAuthServerMoshi
+import org.http4k.security.oauth.server.boolean
+import org.http4k.security.oauth.server.long
+import org.http4k.security.oauth.server.map
+import org.http4k.security.oauth.server.string
+import org.http4k.security.oauth.server.strings
+import org.http4k.security.oauth.server.value
 import org.http4k.security.openid.Nonce
 import java.util.Base64
 
 object RequestObjectExtractor {
-
-    private val json = RequestObjectExtractorJson
 
     internal fun extractRequestJwtClaimsAsMap(value: String): Result<Map<*, *>, InvalidRequestObject> =
         parseJsonFromJWT(value)
@@ -71,7 +76,7 @@ object RequestObjectExtractor {
         val jwtParts = value.split(".")
         when {
             jwtParts.size != 3 -> Failure(InvalidRequestObject)
-            else -> Success(json.asA<Map<String, Any>>(String(Base64.getUrlDecoder().decode(jwtParts[1]))))
+            else -> Success(OAuthServerMoshi.asA<Map<String, Any>>(String(Base64.getUrlDecoder().decode(jwtParts[1]))))
         }
     } catch (e: Exception) {
         Failure(InvalidRequestObject)

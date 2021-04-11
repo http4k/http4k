@@ -29,7 +29,7 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
         clientValidator = DummyClientValidator(),
         authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
         accessTokens = DummyAccessTokens(),
-        json = Jackson,
+        json = OAuthServerMoshi,
         clock = FixedClock,
         authRequestExtractor = AuthRequestFromQueryParameters,
         idTokens = DummyIdTokens()
@@ -77,10 +77,12 @@ fun oauthClientApp(
 ): RoutingHttpHandler {
 
     val oauthProvider = OAuthProvider(
-        OAuthProviderConfig(Uri.of("http://irrelevant"),
+        OAuthProviderConfig(
+            Uri.of("http://irrelevant"),
             "/my-login-page", "/oauth2/token",
             Credentials("my-app", "somepassword"),
-            Uri.of("https://irrelevant")),
+            Uri.of("https://irrelevant")
+        ),
         tokenClient,
         Uri.of("/my-callback"),
         scopes,

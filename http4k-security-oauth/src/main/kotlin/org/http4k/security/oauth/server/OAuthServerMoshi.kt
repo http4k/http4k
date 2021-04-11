@@ -1,4 +1,4 @@
-package org.http4k.security.oauth.server.request
+package org.http4k.security.oauth.server
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
@@ -15,10 +15,9 @@ import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
-import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.openid.Nonce
 
-internal object RequestObjectExtractorJson : ConfigurableMoshi(
+internal object OAuthServerMoshi : ConfigurableMoshi(
     Moshi.Builder()
         .add(AccessTokenResponseAdapter)
         .asConfigurable()
@@ -45,16 +44,6 @@ internal fun Map<*, *>.map(name: String) = this[name] as Map<String, Any>?
 internal fun Map<*, *>.strings(name: String) = this[name] as List<String>?
 
 object AccessTokenResponseAdapter : JsonAdapter<AccessTokenResponse>() {
-
-    private val options = JsonReader.Options.of(
-        "access_token",
-        "token_type",
-        "expires_in",
-        "id_token",
-        "scope",
-        "refresh_token",
-    )
-
     @ToJson
     override fun toJson(writer: JsonWriter, value: AccessTokenResponse?) {
         when (value) {
@@ -80,14 +69,19 @@ object AccessTokenResponseAdapter : JsonAdapter<AccessTokenResponse>() {
 
     @FromJson
     override fun fromJson(reader: JsonReader): AccessTokenResponse {
-        val values = mutableMapOf<Int, Any?>()
+        val values = mutableMapOf<String, String>()
         with(reader) {
             beginObject()
-            while (hasNext()) if (peek() != NULL) values[selectName(options)]
+            while (hasNext()) {
+                when {
+                    peek() != NULL -> values[nextName()] = nextSource().readUtf8().trim('"').trimEnd('"')
+                    else -> skipValue()
+                }
+            }
             endObject()
         }
 
-        return with(values.mapKeys { options.strings()[it.key] }) {
+        return with(values) {
             AccessTokenResponse(
                 string("access_token")!!,
                 string("token_type"),
