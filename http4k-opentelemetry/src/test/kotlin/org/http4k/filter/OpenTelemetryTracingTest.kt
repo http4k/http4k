@@ -2,7 +2,6 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanId
@@ -20,7 +19,6 @@ import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.hamkrest.hasHeader
-import org.http4k.metrics.Http4kOpenTelemetry
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.BeforeAll

@@ -3,9 +3,6 @@ package org.http4k.sse
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
-import org.http4k.core.Body
-import org.http4k.core.MemoryBody
-import org.http4k.core.StreamBody
 import org.junit.jupiter.api.Test
 
 class SseMessageTest {

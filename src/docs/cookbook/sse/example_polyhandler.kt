@@ -6,15 +6,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Path
 import org.http4k.routing.bind
 import org.http4k.routing.sse
-import org.http4k.routing.websockets
-import org.http4k.server.Jetty
 import org.http4k.server.PolyHandler
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
-import org.http4k.websocket.Websocket
-import org.http4k.websocket.WsMessage
 
 fun main() {
     val namePath = Path.of("name")

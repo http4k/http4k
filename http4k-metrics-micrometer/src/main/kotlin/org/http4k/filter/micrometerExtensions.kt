@@ -4,10 +4,10 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
 import org.http4k.core.Filter
-import org.http4k.metrics.MetricsDefaults.Companion.client
-import org.http4k.metrics.MetricsDefaults.Companion.server
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.metrics.MetricsDefaults
+import org.http4k.metrics.MetricsDefaults.Companion.client
+import org.http4k.metrics.MetricsDefaults.Companion.server
 import java.time.Clock
 
 class MicrometerMetrics(private val defaults: MetricsDefaults) {

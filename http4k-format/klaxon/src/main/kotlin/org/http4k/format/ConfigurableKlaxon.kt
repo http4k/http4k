@@ -12,7 +12,6 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.io.InputStream
-import java.io.StringReader
 import kotlin.reflect.KClass
 import com.beust.klaxon.Klaxon as KKlaxon
 

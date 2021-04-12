@@ -5,8 +5,6 @@ import org.http4k.core.UriTemplate
 import org.http4k.sse.Sse
 import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseHandler
-import org.http4k.websocket.Websocket
-import org.http4k.websocket.WsConsumer
 
 interface RoutingSseHandler : SseHandler {
     fun withBasePath(new: String): RoutingSseHandler

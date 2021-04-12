@@ -1,6 +1,5 @@
 package cookbook.webjars
 
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response

@@ -4,10 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.websocket.WsStatus
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 
 class PushAdaptingSseTest {
 

@@ -11,7 +11,6 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.Cookies
 import org.http4k.filter.ClientFilters.FollowRedirects
-import org.http4k.filter.debug
 import org.http4k.hamkrest.hasBody
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind

@@ -8,7 +8,7 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.serverless.lambda.testing.setup.aws.kClass
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaJackson.auto
-import java.util.*
+import java.util.Base64
 
 class CreateFunction(private val functionPackage: FunctionPackage) : LambdaAction<FunctionDetailsData>(kClass()) {
     override fun toRequest(): Request {

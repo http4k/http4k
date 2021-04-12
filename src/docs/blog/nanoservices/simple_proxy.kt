@@ -3,9 +3,6 @@ package blog.nanoservices
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.then
-import org.http4k.filter.RequestFilters.ProxyHost
-import org.http4k.filter.RequestFilters.ProxyProtocolMode.Https
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import java.lang.System.setProperty

@@ -11,7 +11,6 @@ import io.undertow.websockets.core.WebSockets.sendClose
 import io.undertow.websockets.core.WebSockets.sendText
 import io.undertow.websockets.spi.WebSocketHttpExchange
 import org.http4k.core.Body
-import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.StreamBody

@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.util.*
+import java.util.UUID
 
 class PageTest {
     private val contents = File("src/test/resources/test.html").readText()

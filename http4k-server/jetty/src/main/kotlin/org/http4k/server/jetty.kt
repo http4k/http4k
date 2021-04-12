@@ -22,7 +22,6 @@ import org.http4k.servlet.jakarta.asHttp4kRequest
 import org.http4k.servlet.jakarta.asServlet
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
-import java.lang.UnsupportedOperationException
 
 class Jetty(private val port: Int, private val server: Server) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, http(port))

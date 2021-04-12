@@ -7,7 +7,6 @@ import org.http4k.lens.Invalid
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
-import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam

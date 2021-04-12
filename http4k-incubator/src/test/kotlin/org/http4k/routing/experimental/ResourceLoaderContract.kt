@@ -2,7 +2,6 @@ package org.http4k.routing.experimental
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.or
 import org.http4k.core.ContentType

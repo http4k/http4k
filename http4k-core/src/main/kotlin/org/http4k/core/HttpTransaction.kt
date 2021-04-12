@@ -2,7 +2,6 @@ package org.http4k.core
 
 import org.http4k.routing.RequestWithRoute
 import org.http4k.routing.ResponseWithRoute
-import org.http4k.routing.RoutedResponse
 import java.time.Duration
 
 data class HttpTransaction(

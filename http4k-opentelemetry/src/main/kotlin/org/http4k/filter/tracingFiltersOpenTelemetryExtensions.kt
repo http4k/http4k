@@ -13,7 +13,6 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.metrics.Http4kOpenTelemetry
 import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
 import org.http4k.routing.RoutedRequest
 import java.util.concurrent.atomic.AtomicReference

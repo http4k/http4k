@@ -10,7 +10,7 @@ import org.http4k.filter.Payload.Mode.Signed
 import org.http4k.lens.LensFailure
 import org.junit.jupiter.api.AfterEach
 import org.opentest4j.TestAbortedException
-import java.util.*
+import java.util.UUID
 
 abstract class AbstractAwsRealS3TestCase {
     val bucketName = UUID.randomUUID().toString()

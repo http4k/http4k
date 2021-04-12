@@ -1,6 +1,5 @@
 package org.http4k.format
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.squareup.moshi.JsonAdapter

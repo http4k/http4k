@@ -2,7 +2,6 @@ package org.http4k.sse
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.present
 import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -24,7 +23,6 @@ import org.http4k.sse.SseMessage.Event
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.concurrent.CountDownLatch
 
 abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer

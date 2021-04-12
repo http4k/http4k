@@ -4,7 +4,6 @@ import io.kotest.matchers.Matcher
 import io.kotest.matchers.be
 import io.kotest.matchers.string.contain
 import org.http4k.core.Body
-import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method.GET

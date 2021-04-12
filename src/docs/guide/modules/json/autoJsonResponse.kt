@@ -1,5 +1,10 @@
-import kotlinx.serialization.Serializable // could use one of many json libraries: Gson, Jackson, Moshi, etc.
-import org.http4k.core.*
+import kotlinx.serialization.Serializable
+import org.http4k.core.Body
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.format.KotlinxSerialization.auto
 import org.http4k.lens.BiDiBodyLens
 
@@ -22,7 +27,7 @@ fun main() {
     val response = app(request)
 
     println(response)
-    /* 
+    /*
     HTTP/1.1 200 OK
     content-type: application/json; charset=utf-8
 

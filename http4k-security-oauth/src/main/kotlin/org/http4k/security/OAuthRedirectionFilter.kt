@@ -5,7 +5,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
-import org.http4k.core.toUrlFormEncoded
 import org.http4k.core.with
 import org.http4k.lens.Header.LOCATION
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
