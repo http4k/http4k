@@ -7,14 +7,14 @@ set -o nounset
 
 NEW_VERSION=$1
 
-BINTRAY_VERSION=$(curl -s https://bintray.com/api/v1/packages/http4k/maven/http4k-core/versions/_latest | tools/jq -r .name)
+LATEST_VERSION=$(aws s3 cp s3://http4k/latest-broadcasted-version.txt -)
 
 git stash
 
-echo Upgrade from "$BINTRAY_VERSION" to "$NEW_VERSION"
+echo Upgrade from "$LATEST_VERSION" to "$NEW_VERSION"
 
-find . -name "*.md" | grep -v "CHANGELOG" | xargs -I '{}' sed -i '' s/"$BINTRAY_VERSION"/"$NEW_VERSION"/g '{}'
-sed -i '' s/"$BINTRAY_VERSION"/"$NEW_VERSION"/g version.json
+find . -name "*.md" | grep -v "CHANGELOG" | xargs -I '{}' sed -i '' s/"$LATEST_VERSION"/"$NEW_VERSION"/g '{}'
+sed -i '' s/"$LATEST_VERSION"/"$NEW_VERSION"/g version.json
 
 git commit -am"Release $NEW_VERSION"
 
