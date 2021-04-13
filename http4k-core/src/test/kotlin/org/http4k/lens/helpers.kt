@@ -8,8 +8,16 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import dev.forkhandles.values.IntValue
+import dev.forkhandles.values.IntValueFactory
+import dev.forkhandles.values.StringValue
+import dev.forkhandles.values.StringValueFactory
+import dev.forkhandles.values.UUIDValue
+import dev.forkhandles.values.UUIDValueFactory
+import dev.forkhandles.values.maxLength
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.StringParam
+import java.util.UUID
 
 object BiDiLensContract {
 
@@ -96,3 +104,15 @@ inline fun <reified T> lensFailureWith(vararg failures: Failure, overallType: Fa
 }.and(targetIsA<T>())
 
 inline fun <reified T> targetIsA() = Matcher<LensFailure>("target is a " + T::class.qualifiedName) { it.target is T }
+
+class MyInt private constructor(value: Int) : IntValue(value) {
+    companion object : IntValueFactory<MyInt>(::MyInt)
+}
+
+class MyString private constructor(value: String) : StringValue(value) {
+    companion object : StringValueFactory<MyString>(::MyString, 1.maxLength)
+}
+
+class MyUUID private constructor(value: UUID) : UUIDValue(value) {
+    companion object : UUIDValueFactory<MyUUID>(::MyUUID)
+}

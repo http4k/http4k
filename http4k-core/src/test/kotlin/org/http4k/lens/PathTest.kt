@@ -158,13 +158,12 @@ class PathTest {
     fun `zoned datetime`() = checkContract(Path.zonedDateTime(), "1970-01-01T00:00:00Z[UTC]", ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))
 
     @Test
-    fun `enum`() = checkContract(Path.enum<Method>(), "DELETE", DELETE)
+    fun `enum`() = checkContract(Path.enum(), "DELETE", DELETE)
 
     @Test
-    fun value() = checkContract(Path.value(MyValue), "123", MyValue.of(123))
-
-    class MyValue private constructor(value: Int) : IntValue(value) {
-        companion object : IntValueFactory<MyValue>(::MyValue)
+    fun value() {
+        checkContract(Path.value(MyInt), "123", MyInt.of(123))
+        checkContract(Path.value(MyUUID), UUID(0, 0).toString(), MyUUID.of(UUID(0, 0)))
     }
 
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {

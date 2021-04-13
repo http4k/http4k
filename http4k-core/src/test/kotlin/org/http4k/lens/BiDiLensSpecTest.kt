@@ -3,8 +3,6 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import dev.forkhandles.values.IntValue
-import dev.forkhandles.values.IntValueFactory
 import org.http4k.base64Encode
 import org.http4k.core.Method
 import org.http4k.core.Uri
@@ -230,10 +228,19 @@ class BiDiLensSpecTest {
     fun enum() = checkContract(spec.enum(), Method.DELETE, "DELETE", "", "invalid", "o", "oDELETE", "oDELETEDELETE")
 
     @Test
-    fun value() = checkContract(spec.value(MyValue), MyValue.of(123), "123", "", "invalid", "o", "o123", "o123123")
-
-    class MyValue private constructor(value: Int) : IntValue(value) {
-        companion object : IntValueFactory<MyValue>(::MyValue)
+    fun value() {
+        checkContract(spec.value(MyInt), MyInt.of(123), "123", "", "invalid", "o", "o123", "o123123")
+        checkContract(
+            spec.value(MyUUID),
+            MyUUID.of(UUID(0, 0)),
+            UUID(0, 0).toString(),
+            "",
+            "invalid",
+            "o",
+            "o" + UUID(0, 0).toString(),
+            "o" + UUID(0, 0).toString() + UUID(0, 0).toString()
+        )
+        checkContract(spec.value(MyString), MyString.of("f"), "f", "", "invalid", "o", "of", "off")
     }
 
     @Test
