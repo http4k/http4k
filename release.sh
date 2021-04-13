@@ -7,7 +7,7 @@ set -o nounset
 
 NEW_VERSION=$1
 
-LATEST_VERSION=$(aws s3 cp s3://http4k/latest-broadcasted-version.txt -)
+LATEST_VERSION=$(aws --profile http4k-release s3 cp s3://http4k/latest-broadcasted-version.txt -)
 
 git stash
 
