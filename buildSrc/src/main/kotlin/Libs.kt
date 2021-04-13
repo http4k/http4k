@@ -45,9 +45,6 @@ public object Libs {
 
     public const val graphql_java: String = "com.graphql-java:graphql-java:_"
 
-    public const val com_jfrog_bintray_gradle_plugin: String =
-            "com.jfrog.bintray:com.jfrog.bintray.gradle.plugin:_"
-
     public const val okhttp_eventsource: String = "com.launchdarkly:okhttp-eventsource:_"
 
     public const val com_microsoft_azure_azurefunctions_gradle_plugin: String =
