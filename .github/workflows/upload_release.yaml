@@ -42,15 +42,3 @@ jobs:
           ./gradlew closeAndReleaseRepository \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
-  ReleaseBintray:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Upload to Bintray
-        run: ./release-ci.sh
-        env:
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
-          SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
-          SONATYPE_KEY: ${{ secrets.SONATYPE_KEY }}
