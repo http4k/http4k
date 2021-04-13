@@ -16,7 +16,6 @@ buildscript {
 }
 
 plugins {
-    id "com.jfrog.bintray"
     id "io.codearte.nexus-staging" version '0.22.0'
 }
 
@@ -109,9 +108,6 @@ subprojects {
     if (hasAnArtifact(project)) {
         def enableSigning = project.findProperty('sign') == "true"
 
-        apply plugin: 'com.jfrog.bintray'
-        apply plugin: 'maven-publish' // required to configure bintray
-
         apply plugin: 'maven' // required to upload to sonatype
 
         if (enableSigning) { // when added it expects signing keys to be configured
@@ -181,41 +177,6 @@ subprojects {
                     }
                     artifact sourcesJar
                     artifact javadocJar
-                }
-            }
-        }
-
-        bintray {
-            user = System.getenv('BINTRAY_USER')
-            key = System.getenv('BINTRAY_KEY')
-
-            publications = ['mavenJava']
-            dryRun = false
-            publish = true
-            pkg {
-                repo = 'maven'
-                userOrg = 'http4k'
-                name = project.name
-
-                desc = description
-                websiteUrl = 'https://github.com/http4k/http4k'
-                issueTrackerUrl = 'https://github.com/http4k/http4k/issues'
-                vcsUrl = 'https://github.com/http4k/http4k.git'
-                licenses = ['Apache-2.0']
-                labels = []
-                publicDownloadNumbers = true
-                version {
-                    name = project.version
-                    vcsTag = project.version
-                    gpg {
-                        sign = true
-                    }
-                    mavenCentralSync {
-                        sync = false
-                        user = System.getenv('SONATYPE_USER')
-                        password = System.getenv('SONATYPE_KEY')
-                        close = '1'
-                    }
                 }
             }
         }
