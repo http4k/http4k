@@ -23,10 +23,6 @@ apply plugin: 'io.codearte.nexus-staging'
 
 allprojects {
     repositories {
-        maven {
-            url "https://dl.bintray.com/fnproject/fnproject"
-        }
-
         mavenCentral()
     }
 
