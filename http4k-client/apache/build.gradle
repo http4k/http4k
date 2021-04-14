@@ -6,6 +6,7 @@ dependencies {
     api Libs.httpclient5 // apache
 
     testImplementation project(path: ":http4k-core", configuration: "testArtifacts")
+    testImplementation project(":http4k-server-jetty")
     testImplementation Config.TestDependencies
 }
 
