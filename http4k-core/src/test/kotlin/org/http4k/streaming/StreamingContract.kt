@@ -87,15 +87,18 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     private fun captureReceivedStream(location: String, streamSource: () -> InputStream) {
         val responseStream = streamSource()
-        if (runningInIdea) println("incoming stream is now available")
+        debug("incoming stream is now available")
 
         responseStream.bufferedReader().forEachLine {
-            if (runningInIdea) println("$location received")
+            debug("$location received")
 
             sharedList.add('r')
             countdown.countDown()
         }
     }
+
+    private fun debug(message: String) = if (runningInIdea) println(message) else Unit
+
 
     private fun beeper(location: String): InputStream {
         val input = PipedInputStream()
@@ -105,7 +108,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
         thread {
             for (it in 1..5) {
-                if (runningInIdea) println("$location sent")
+                debug("$location sent")
 
                 output.write(line.toByteArray())
                 sharedList.add('s')
