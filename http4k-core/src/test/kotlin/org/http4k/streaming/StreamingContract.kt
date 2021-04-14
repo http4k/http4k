@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 abstract class StreamingContract(private val config: StreamingTestConfiguration = StreamingTestConfiguration()) {
-    private val runningInIdea = ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
+    private val runningInIdea = config.debug || ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
 
     private lateinit var server: Http4kServer
 
@@ -123,6 +123,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 data class StreamingTestConfiguration(val beeps: Int = 5,
                                       val beepSize: Int = 20000,
                                       val sleepTimeBetweenBeepsInMillis: Long = 500,
-                                      val multiplier: Int = 2) {
+                                      val multiplier: Int = 2,
+                                      val debug: Boolean = false) {
     val maxTotalWaitInMillis = beeps * sleepTimeBetweenBeepsInMillis * multiplier
 }

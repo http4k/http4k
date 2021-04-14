@@ -8,3 +8,9 @@ dependencies {
     testImplementation project(path: ":http4k-core", configuration: "testArtifacts")
     testImplementation Config.TestDependencies
 }
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}
