@@ -16,6 +16,7 @@ jobs:
           fetch-depth: 2
           # required by release-tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-java@v1
         with:
           java-version: 11
