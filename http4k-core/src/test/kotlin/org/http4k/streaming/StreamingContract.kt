@@ -31,7 +31,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     private lateinit var server: Http4kServer
 
-    private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
+     val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val sharedList = CopyOnWriteArrayList<Char>()
 
@@ -45,7 +45,8 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
         "/stream-request" bind POST to {
             debug("received client request")
             captureReceivedStream("server") { it.body.stream }; Response(OK)
-        }
+        },
+        "/ping" bind GET to { debug("got ping"); Response(OK).body("pong") }
     )
 
     @BeforeEach
