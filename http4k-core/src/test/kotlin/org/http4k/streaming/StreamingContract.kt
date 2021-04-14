@@ -41,8 +41,9 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     private var countdown = CountDownLatch(config.beeps * 2)
 
     val app = routes(
-        "/stream-response" bind GET to { Response(OK).body(beeper("server")) },
+        "/stream-response" bind GET to { debug("received client request"); Response(OK).body(beeper("server")) },
         "/stream-request" bind POST to {
+            debug("received client request")
             captureReceivedStream("server") { it.body.stream }; Response(OK)
         }
     )
