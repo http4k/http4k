@@ -5,7 +5,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.streaming.StreamingContract
+import org.junit.jupiter.api.Disabled
 
+@Disabled
 class JettyClientStreamingContractTest : StreamingContract() {
     override fun serverConfig(): ServerConfig = SunHttp(0)
 
