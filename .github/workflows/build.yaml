@@ -6,6 +6,8 @@ on:
   pull_request:
     branches:
       - '*'
+env:
+  RUN_STREAMING_TEST: false
 jobs:
   build:
     runs-on: ubuntu-latest
