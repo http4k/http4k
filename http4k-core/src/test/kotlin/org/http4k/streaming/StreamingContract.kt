@@ -14,6 +14,7 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -27,11 +28,16 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 abstract class StreamingContract(private val config: StreamingTestConfiguration = StreamingTestConfiguration()) {
-    private val runningInIdea = config.debug || ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
+    init {
+        assumeTrue((System.getenv("RUN_STREAMING_TEST") ?: "true") == "true", "streaming test disabled")
+    }
+
+    private val runningInIdea =
+        config.debug || ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
 
     private lateinit var server: Http4kServer
 
-     val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
+    val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val sharedList = CopyOnWriteArrayList<Char>()
 
@@ -125,10 +131,12 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     }
 }
 
-data class StreamingTestConfiguration(val beeps: Int = 5,
-                                      val beepSize: Int = 20000,
-                                      val sleepTimeBetweenBeepsInMillis: Long = 500,
-                                      val multiplier: Int = 2,
-                                      val debug: Boolean = false) {
+data class StreamingTestConfiguration(
+    val beeps: Int = 5,
+    val beepSize: Int = 20000,
+    val sleepTimeBetweenBeepsInMillis: Long = 500,
+    val multiplier: Int = 2,
+    val debug: Boolean = false
+) {
     val maxTotalWaitInMillis = beeps * sleepTimeBetweenBeepsInMillis * multiplier
 }

@@ -11,10 +11,8 @@ import org.http4k.server.Jetty
 import org.http4k.server.ServerConfig
 import org.http4k.streaming.StreamingContract
 import org.http4k.streaming.StreamingTestConfiguration
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled
 class ApacheClientStreamingContractTest : StreamingContract(StreamingTestConfiguration(multiplier = 5, debug = true)) {
     override fun serverConfig(): ServerConfig = Jetty(0)
 

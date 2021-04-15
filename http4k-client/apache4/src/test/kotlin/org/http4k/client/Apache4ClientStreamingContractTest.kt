@@ -6,9 +6,7 @@ import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.streaming.StreamingContract
 import org.http4k.streaming.StreamingTestConfiguration
-import org.junit.jupiter.api.Disabled
 
-@Disabled
 class Apache4ClientStreamingContractTest : StreamingContract(StreamingTestConfiguration(multiplier = 5)) {
     override fun serverConfig(): ServerConfig = SunHttp(0)
 
