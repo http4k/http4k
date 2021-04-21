@@ -107,7 +107,6 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     private fun debug(message: String) = if (runningInIdea) println(message) else Unit
 
-
     private fun beeper(location: String): InputStream {
         val input = PipedInputStream()
         val output = PipedOutputStream(input)
