@@ -1,7 +1,7 @@
 package guide.modules.graphql
 
-import com.expediagroup.graphql.SchemaGeneratorConfig
-import com.expediagroup.graphql.toSchema
+import com.expediagroup.graphql.generator.SchemaGeneratorConfig
+import com.expediagroup.graphql.generator.toSchema
 import graphql.GraphQL.newGraphQL
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.asGraphQLHandler

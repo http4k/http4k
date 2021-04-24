@@ -1,8 +1,8 @@
 package cookbook.graphql
 
-import com.expediagroup.graphql.SchemaGeneratorConfig
-import com.expediagroup.graphql.TopLevelObject
-import com.expediagroup.graphql.toSchema
+import com.expediagroup.graphql.generator.SchemaGeneratorConfig
+import com.expediagroup.graphql.generator.TopLevelObject
+import com.expediagroup.graphql.generator.toSchema
 import graphql.ExecutionInput.Builder
 import graphql.GraphQL.newGraphQL
 import org.dataloader.DataLoader
@@ -59,7 +59,8 @@ class UserDbHandler : GraphQLWithContextHandler<String> {
             SchemaGeneratorConfig(supportedPackages = listOf("cookbook.graphql")),
             listOf(TopLevelObject(UserQueries())),
             listOf(TopLevelObject(UserMutations()))
-        )).build()
+        )
+    ).build()
 
     private val dataLoaderRegistry = DataLoaderRegistry().apply {
         register("USER_LOADER", DataLoader { ids: List<Long> ->
@@ -76,7 +77,8 @@ class UserDbHandler : GraphQLWithContextHandler<String> {
                 .variables(payload.variables)
                 .dataLoaderRegistry(dataLoaderRegistry)
                 .context(context)
-        ))
+        )
+    )
 }
 
 fun App(): HttpHandler {
@@ -103,22 +105,28 @@ fun main() {
         println(graphQLClient(GraphQLRequest(query)).data)
     }
 
-    runAndDisplay("""{
+    runAndDisplay(
+        """{
         search(params: { ids: [1]}) {
             id
             name
         }
-}""")
-    runAndDisplay("""
+}"""
+    )
+    runAndDisplay(
+        """
         mutation {
             delete(params: { ids: [1]})
         }
-""")
+"""
+    )
 
-    runAndDisplay("""{
+    runAndDisplay(
+        """{
         search(params: { ids: [1]}) {
             id
             name
         }
-}""")
+}"""
+    )
 }
