@@ -91,11 +91,16 @@ data class SecondChild(val somethingElse: String) : PolymorphicParent()
 
 class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerialization) {
     @Test
-    override fun `roundtrip arbitary object to and from string`() {
+    override fun `roundtrip arbitrary object to and from string`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = KotlinxSerialization.asFormatString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResult))
         assertThat(KotlinxSerialization.asA(out, ArbObject::class), equalTo(obj))
+    }
+
+    override fun `roundtrip arbitrary object through convert`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        assertThat(KotlinxSerialization.convert(obj), equalTo(obj))
     }
 
     @Test

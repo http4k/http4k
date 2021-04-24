@@ -71,14 +71,19 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
     @Test
-    open fun `roundtrip arbitary object to and from string`() {
+    open fun `roundtrip arbitrary object to and from string`() {
         val out = marshaller.asFormatString(obj)
         assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult.normaliseJson()))
         assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
     }
 
     @Test
-    open fun `roundtrip arbitary object to and from inputstream`() {
+    open fun `roundtrip arbitrary object through convert`() {
+        assertThat(marshaller.convert(obj), equalTo(obj))
+    }
+
+    @Test
+    open fun `roundtrip arbitrary object to and from inputstream`() {
         val out = marshaller.asFormatString(obj)
         assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult.normaliseJson()))
         assertThat(marshaller.asA(out.byteInputStream(), ArbObject::class), equalTo(obj))
@@ -158,7 +163,10 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     open fun `throwable is marshalled`() {
-        assertThat(marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))).normaliseJson(), startsWith(expectedThrowable.normaliseJson()))
+        assertThat(
+            marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))).normaliseJson(),
+            startsWith(expectedThrowable.normaliseJson())
+        )
     }
 
     @Test
