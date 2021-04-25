@@ -1,5 +1,6 @@
 package org.http4k.serverless
 
+import com.amazonaws.services.lambda.runtime.Context
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.POST
@@ -7,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
+import java.io.InputStream
 
 class InvocationLambdaFunctionTest {
 
@@ -27,10 +29,12 @@ class InvocationLambdaFunctionTest {
                         .body(request)))
                 Response(OK).body(request + request)
             }
-        }) {}
+        }) {
+            fun handleIt(input: InputStream, context: Context) = handle(input, context)
+        }
 
         assertThat(
-            lambda.handle(request.byteInputStream(), lambdaContext).reader().readText(),
+            lambda.handleIt(request.byteInputStream(), lambdaContext).reader().readText(),
             equalTo(request + request))
     }
 }

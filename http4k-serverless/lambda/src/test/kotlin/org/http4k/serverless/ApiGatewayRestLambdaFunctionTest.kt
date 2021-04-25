@@ -36,7 +36,7 @@ class ApiGatewayRestLambdaFunctionTest {
             }
         }) {}
 
-        assertThat(lambda.handle(request, lambdaContext),
+        assertThat(lambda.handleRequest(request, lambdaContext),
             equalTo(
                 mapOf(
                     "statusCode" to 200,

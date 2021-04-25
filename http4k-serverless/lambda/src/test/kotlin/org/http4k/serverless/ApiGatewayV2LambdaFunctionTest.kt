@@ -37,7 +37,7 @@ class ApiGatewayV2LambdaFunctionTest {
             }
         }) {}
 
-        val out = lambda.handle(request, lambdaContext)
+        val out = lambda.handleRequest(request, lambdaContext)
 
         assertThat(out,
             equalTo(
