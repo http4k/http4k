@@ -12,16 +12,18 @@ const val LAMBDA_REQUEST_KEY = "HTTP4K_LAMBDA_REQUEST"
 
 abstract class AwsLambdaFunction<Req : Any, Resp> protected constructor(
     private val adapter: AwsHttpAdapter<Req, Resp>,
-    appLoader: AppLoaderWithContexts
+    appLoader: AppLoaderWithContexts,
+    env: Map<String, String> = System.getenv()
 ) {
     private val contexts = RequestContexts("lambda")
-    private val app = appLoader(System.getenv(), contexts)
+    private val app = appLoader(env, contexts)
 
     protected fun handle(req: Req, ctx: Context): Resp = adapter(
         CatchAll()
             .then(InitialiseRequestContext(contexts))
             .then(AddLambdaContextAndRequest(ctx, req, contexts))
-            .then(app)(adapter(req, ctx)))
+            .then(app)(adapter(req, ctx))
+    )
 }
 
 internal fun AddLambdaContextAndRequest(ctx: Context?, request: Any, contexts: RequestContexts) = Filter { next ->
