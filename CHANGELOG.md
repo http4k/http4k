@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.7.2.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v4.7.1.0
 - **http4k-*** : Upgrade some dependency versions.
 
