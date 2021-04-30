@@ -8,6 +8,7 @@ import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.int
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.Reader
 import java.util.Properties
 
@@ -34,7 +35,8 @@ interface Environment {
      * Used to chain: eg. Local File -> System Properties -> Env Properties -> Defaults
      */
     infix fun overrides(that: Environment): Environment = MapEnvironment.from(
-        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties(), separator = separator
+        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties(),
+        separator = separator
     )
 
     companion object {
@@ -53,8 +55,9 @@ interface Environment {
         /**
          * Load configuration from standard Properties file format on classpath
          */
-        fun fromResource(resource: String): Environment =
-            MapEnvironment.from(Companion::class.java.getResourceAsStream("/${resource.removePrefix("/")}").reader())
+        fun fromResource(resource: String) =
+            Companion::class.java.getResourceAsStream("/${resource.removePrefix("/")}")
+                ?.let { MapEnvironment.from(it.reader()) } ?: throw FileNotFoundException(resource)
 
         /**
          * Load configuration from standard Properties file format on disk
@@ -72,18 +75,25 @@ interface Environment {
     }
 }
 
-class MapEnvironment private constructor(private val contents: Map<String, String>, override val separator: String = ",") : Environment {
+class MapEnvironment private constructor(
+    private val contents: Map<String, String>,
+    override val separator: String = ","
+) : Environment {
     override operator fun <T> get(key: Lens<Environment, T>) = key(this)
     override operator fun get(key: String): String? = contents[key.convertFromKey()]
-    override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value), separator)
+    override operator fun set(key: String, value: String) =
+        MapEnvironment(contents + (key.convertFromKey() to value), separator)
+
     override fun minus(key: String): Environment = MapEnvironment(contents - key.convertFromKey(), separator)
     override fun keys() = contents.keys
 
     companion object {
         fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(properties.entries
-            .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator)
+            .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator
+        )
 
-        fun from(reader: Reader, separator: String = ","): Environment = from(Properties().apply { load(reader) }, separator)
+        fun from(reader: Reader, separator: String = ","): Environment =
+            from(Properties().apply { load(reader) }, separator)
     }
 }
 

@@ -2,8 +2,10 @@ package org.http4k.cloudnative.env
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.io.FileNotFoundException
 
 class EnvironmentTest {
 
@@ -12,6 +14,8 @@ class EnvironmentTest {
         val finalEnv = Environment.fromResource("local.properties") overrides Environment.from("FIRST" to "bill")
 
         assertThat(finalEnv["first"], equalTo("bob"))
+
+        assertThat({ Environment.fromResource("notthere.properties") }, throws<FileNotFoundException>())
     }
 
     @Test
@@ -20,6 +24,8 @@ class EnvironmentTest {
         val finalEnv = Environment.from(file) overrides Environment.from("FOO" to "bill")
 
         assertThat(finalEnv["first"], equalTo("bob"))
+
+        assertThat({ Environment.from(File("foobar")) }, throws<FileNotFoundException>())
     }
 
     @Test
