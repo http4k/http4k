@@ -50,7 +50,7 @@ class WsFilterTest {
         val svc = first.then(second).then(ws)
         val request = Request(GET, Uri.of("/path"))
 
-        svc(request).invoke(object : Websocket {
+        svc(request)(object : Websocket {
             override val upgradeRequest: Request = request
 
             override fun send(message: WsMessage) {

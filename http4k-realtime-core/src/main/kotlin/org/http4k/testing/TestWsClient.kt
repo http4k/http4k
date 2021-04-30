@@ -19,9 +19,15 @@ data class ClosedWebsocket(val status: WsStatus = NORMAL) : RuntimeException()
  */
 class TestWsClient internal constructor(consumer: WsConsumer, request: Request) : WsClient {
 
-    private val queue = ArrayDeque<() -> WsMessage?>()
+    private val queue = ArrayDeque<() -> WsMessage>()
 
-    override fun received() = generateSequence { queue.remove()()!! }
+    override fun received() = generateSequence {
+        try {
+            queue.remove()()
+        } catch (e: ClosedWebsocket) {
+            if (e.status == NORMAL) null else throw e
+        }
+    }
 
     private val socket = object : PushPullAdaptingWebSocket(request) {
         init {

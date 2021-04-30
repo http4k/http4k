@@ -50,7 +50,7 @@ class SseFilterTest {
         val svc = first.then(second).then(sse)
         val request = Request(GET, Uri.of("/path"))
 
-        svc(request).invoke(object : Sse {
+        svc(request)(object : Sse {
             override val connectRequest: Request = request
 
             override fun send(message: SseMessage) {

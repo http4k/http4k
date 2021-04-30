@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.testing.ClosedWebsocket
 import org.http4k.testing.testWsClient
 import org.http4k.websocket.WsStatus.Companion.NEVER_CONNECTED
+import org.http4k.websocket.WsStatus.Companion.NORMAL
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicReference
 
@@ -63,12 +64,13 @@ class WsClientTest {
         val client = { _: Request ->
             { ws: Websocket ->
                 ws.send(message)
+                ws.send(message)
                 ws.close(NEVER_CONNECTED)
             }
         }.testWsClient(Request(GET, "/"))
 
         val received = client.received()
-        assertThat(received.take(1).first(), equalTo(message))
+        assertThat(received.take(2).toList(), equalTo(listOf(message, message)))
     }
 
     @Test
@@ -89,5 +91,16 @@ class WsClientTest {
         }.testWsClient(Request(GET, "/"))
 
         assertThat({ actual.received().toList() }, throws<ClosedWebsocket>())
+    }
+
+    @Test
+    fun `when no messages`() {
+        val client = { _: Request ->
+            { ws: Websocket ->
+                ws.close(NORMAL)
+            }
+        }.testWsClient(Request(GET, "/"))
+
+        assertThat(client.received().none(), equalTo(true))
     }
 }
