@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 ### v4.8.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Repackaging of non-core classes for SSE/WebSockets into new `http4k-realtime-core` module. No action required unless these classes are needed without an implementation.
+- **http4k-core** : Repackaging of non-core classes for Serverless into new `http4k-serverless-core` module. No action required unless these classes are needed without an implementation.
 - **http4k-format-moshi** :[Breaking] Add mappings for Map-type and List-like classes to use default serialisers. To get around this, create your own Moshi configuration, omitting the `CollectionEdgeCasesAdapter`
 
 ### v4.7.1.0
