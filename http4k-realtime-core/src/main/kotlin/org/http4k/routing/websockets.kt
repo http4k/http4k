@@ -10,6 +10,11 @@ interface RoutingWsHandler : WsHandler {
     fun withBasePath(new: String): RoutingWsHandler
 }
 
+infix fun String.bind(consumer: WsConsumer): RoutingWsHandler =
+    TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
+
+infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)
+
 fun websockets(ws: WsConsumer): WsHandler = { ws }
 
 fun websockets(vararg list: RoutingWsHandler): RoutingWsHandler = object : RoutingWsHandler {

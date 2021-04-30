@@ -10,6 +10,11 @@ interface RoutingSseHandler : SseHandler {
     fun withBasePath(new: String): RoutingSseHandler
 }
 
+infix fun String.bind(consumer: SseConsumer): RoutingSseHandler =
+    TemplateRoutingSseHandler(UriTemplate.from(this), consumer)
+
+infix fun String.bind(sseHandler: RoutingSseHandler): RoutingSseHandler = sseHandler.withBasePath(this)
+
 fun sse(sse: SseConsumer): SseHandler = { sse }
 
 fun sse(vararg list: RoutingSseHandler): RoutingSseHandler = object : RoutingSseHandler {

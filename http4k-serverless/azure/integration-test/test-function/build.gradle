@@ -9,6 +9,7 @@ apply plugin: "com.microsoft.azure.azurefunctions"
 dependencies {
     api project(":http4k-serverless-azure")
     api project(path: ":http4k-core", configuration: 'testArtifacts')
+    api project(path: ":http4k-serverless-core", configuration: 'testArtifacts')
     testImplementation Config.TestDependencies
 }
 

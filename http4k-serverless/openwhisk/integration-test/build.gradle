@@ -9,6 +9,7 @@ dependencies {
     api project(":http4k-format-jackson")
     api project(":http4k-client-okhttp")
     api project(path: ":http4k-core", configuration: 'testArtifacts')
+    api project(path: ":http4k-serverless-core", configuration: 'testArtifacts')
 
     testImplementation Libs.bunting4k
     testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')

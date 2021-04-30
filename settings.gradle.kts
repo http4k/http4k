@@ -75,6 +75,7 @@ include("http4k-multipart")
 include("http4k-resilience4j")
 include("http4k-opentelemetry")
 include("http4k-security-oauth")
+include("http4k-realtime-core")
 
 "http4k-server".apply {
     includeModule("apache")
@@ -88,6 +89,7 @@ include("http4k-security-oauth")
 }
 
 "http4k-serverless".apply {
+    includeModule("core")
     includeModule("alibaba")
     includeModule("alibaba:integration-test:test-function")
     includeModule("azure")
