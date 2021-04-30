@@ -29,4 +29,4 @@ fun SseHandler.asServer(config: PolyServerConfig): Http4kServer = config.toSseSe
 @JvmName("wsHandlerAsServer")
 fun WsHandler.asServer(config: PolyServerConfig): Http4kServer = config.toWsServer(this)
 
-fun org.http4k.server.PolyHandler.asServer(config: PolyServerConfig): Http4kServer = config.toServer(http, ws, sse)
+fun PolyHandler.asServer(config: PolyServerConfig): Http4kServer = config.toServer(http, ws, sse)

@@ -13,4 +13,3 @@ infix fun String.bind(consumer: SseConsumer): RoutingSseHandler =
     TemplateRoutingSseHandler(UriTemplate.from(this), consumer)
 
 infix fun String.bind(sseHandler: RoutingSseHandler): RoutingSseHandler = sseHandler.withBasePath(this)
-
