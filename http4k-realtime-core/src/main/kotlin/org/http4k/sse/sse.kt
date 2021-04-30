@@ -14,7 +14,7 @@ interface Sse {
 
 typealias SseConsumer = (Sse) -> Unit
 
-typealias SseHandler = (Request) -> SseConsumer?
+typealias SseHandler = (Request) -> SseConsumer
 
 sealed class SseMessage {
     data class Data(val data: String) : SseMessage() {

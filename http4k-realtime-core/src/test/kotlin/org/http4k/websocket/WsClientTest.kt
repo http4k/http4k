@@ -1,6 +1,5 @@
 package org.http4k.websocket
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -41,7 +40,7 @@ class WsClientTest {
     fun `when match, passes a consumer with the matching request`() {
         val consumer = TestConsumer();
 
-        { _: Request -> consumer }.testWsClient(Request(GET, "/"))!!
+        { _: Request -> consumer }.testWsClient(Request(GET, "/"))
 
         assertThat(consumer.websocket.upgradeRequest, equalTo(Request(GET, "/")))
     }
@@ -49,7 +48,7 @@ class WsClientTest {
     @Test
     fun `sends outbound messages to the websocket`() {
         val consumer = TestConsumer()
-        val client = { _: Request -> consumer }.testWsClient(Request(GET, "/"))!!
+        val client = { _: Request -> consumer }.testWsClient(Request(GET, "/"))
 
         client.send(message)
         assertThat(consumer.messages, equalTo(listOf(message)))
@@ -66,7 +65,7 @@ class WsClientTest {
                 ws.send(message)
                 ws.close(NEVER_CONNECTED)
             }
-        }.testWsClient(Request(GET, "/"))!!
+        }.testWsClient(Request(GET, "/"))
 
         val received = client.received()
         assertThat(received.take(1).first(), equalTo(message))
@@ -78,17 +77,17 @@ class WsClientTest {
             { ws: Websocket ->
                 ws.close(NEVER_CONNECTED)
             }
-        }.testWsClient(Request(GET, "/"))!!
+        }.testWsClient(Request(GET, "/"))
 
         assertThat({ client.received().take(2).toList() }, throws(equalTo(ClosedWebsocket(NEVER_CONNECTED))))
     }
 
     @Test
     fun `throws for no match`() {
-        assertThat(
-            object : WsHandler {
-                override fun invoke(request: Request): WsConsumer? = null
-            }.testWsClient(Request(GET, "/"))
-            , absent())
+        val actual = object : WsHandler {
+            override fun invoke(request: Request): WsConsumer = { it.close(NEVER_CONNECTED) }
+        }.testWsClient(Request(GET, "/"))
+
+        assertThat({ actual.received().toList() }, throws<ClosedWebsocket>())
     }
 }

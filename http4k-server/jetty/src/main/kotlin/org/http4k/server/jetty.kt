@@ -55,8 +55,7 @@ class Jetty(private val port: Int, private val server: Server) : PolyServerConfi
 fun WsHandler.toJettyNegotiator() = object : AbstractNegotiator() {
     override fun negotiate(negotiation: WebSocketNegotiation): FrameHandler {
         val request = negotiation.request.asHttp4kRequest()
-
-        return this@toJettyNegotiator(request)?.let { Http4kWebSocketFrameHandler(it, request) }!!
+        return Http4kWebSocketFrameHandler(this@toJettyNegotiator(request), request)
     }
 }
 

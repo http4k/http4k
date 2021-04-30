@@ -20,7 +20,7 @@ interface Websocket {
 
 typealias WsConsumer = (Websocket) -> Unit
 
-typealias WsHandler = (Request) -> WsConsumer?
+typealias WsHandler = (Request) -> WsConsumer
 
 data class WsMessage(val body: Body) {
     constructor(value: String) : this(Body(value))
