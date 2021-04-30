@@ -4,7 +4,7 @@ description: Feature overview of the http4k-testing-approval module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-testing-approval", version: "4.7.1.0"
+implementation group: "org.http4k", name: "http4k-testing-approval", version: "4.8.0.0"
 ```
 
 ### About
