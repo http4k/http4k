@@ -10,18 +10,31 @@ import org.http4k.server.PolyHandler
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
+import org.http4k.sse.SseFilter
 import org.http4k.sse.SseMessage
+import org.http4k.sse.then
 
 fun main() {
     val namePath = Path.of("name")
 
-    val sse = sse(
-        "/{name}" bind { sse: Sse ->
-            val name = namePath(sse.connectRequest)
-            sse.send(SseMessage.Data("hello"))
-            sse.onClose { println("$name is closing") }
+    // a filter allows us to intercept the call to the sse and do logging etc...
+    val sayHello = SseFilter { next ->
+        {
+            println("Hello from the sse!")
+            next(it)
         }
+    }
+
+    val sse = sayHello.then(
+        sse(
+            "/{name}" bind { sse: Sse ->
+                val name = namePath(sse.connectRequest)
+                sse.send(SseMessage.Data("hello"))
+                sse.onClose { println("$name is closing") }
+            }
+        )
     )
+
     val http = { _: Request -> Response(OK).body("hiya world") }
 
     PolyHandler(http, sse = sse).asServer(Undertow(9000)).start()
