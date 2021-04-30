@@ -12,7 +12,7 @@ import org.http4k.websocket.then
 sealed class WsRouterMatch(private val priority: Int) :
     Comparable<WsRouterMatch> {
 
-    data class MatchingHandler(private val wsHandler: WsConsumer) : WsRouterMatch(0), WsConsumer by wsHandler
+    data class MatchingHandler(val wsConsumer: WsConsumer) : WsRouterMatch(0)
 
     object Unmatched : WsRouterMatch(1)
 
@@ -24,7 +24,7 @@ internal class RouterWsHandler(private val list: List<WsRouter>) : RoutingWsHand
         list.map { next -> next.match(request) }.minOrNull() ?: Unmatched
 
     override operator fun invoke(request: Request): WsConsumer = when (val match = match(request)) {
-        is MatchingHandler -> match
+        is MatchingHandler -> match.wsConsumer
         is Unmatched -> { it: Websocket -> it.close(REFUSE) }
     }
 
@@ -48,7 +48,7 @@ internal class TemplateRoutingWsHandler(
     }
 
     override operator fun invoke(request: Request): WsConsumer = when (val match = match(request)) {
-        is MatchingHandler -> match
+        is MatchingHandler -> match.wsConsumer
         is Unmatched -> { it: Websocket -> it.close(REFUSE) }
     }
 
