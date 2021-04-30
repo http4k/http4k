@@ -40,12 +40,10 @@ class WsFilterTest {
         }
     }
 
-
     private val ws = websockets("/{foobar}" bind inner.then {
         messages += it.upgradeRequest.path("foobar")!!
         messages += it.upgradeRequest.header("foo")!!
     })
-
 
     @Test
     fun `can manipulate value on way in and out of service`() {
