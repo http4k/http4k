@@ -75,7 +75,7 @@ include("http4k-multipart")
 include("http4k-resilience4j")
 include("http4k-opentelemetry")
 include("http4k-security-oauth")
-include("http4k-websocket-core")
+include("http4k-realtime-core")
 
 "http4k-server".apply {
     includeModule("apache")

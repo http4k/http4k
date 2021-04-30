@@ -2,7 +2,7 @@ description = 'HTTP Websocket Client'
 
 dependencies {
     api project(":http4k-core")
-    api project(":http4k-websocket-core")
+    api project(":http4k-realtime-core")
 
     api Libs.java_websocket
 
