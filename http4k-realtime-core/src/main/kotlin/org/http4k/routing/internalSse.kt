@@ -6,6 +6,8 @@ import org.http4k.routing.SseRouterMatch.MatchingHandler
 import org.http4k.routing.SseRouterMatch.Unmatched
 import org.http4k.sse.Sse
 import org.http4k.sse.SseConsumer
+import org.http4k.sse.SseFilter
+import org.http4k.sse.then
 
 sealed class SseRouterMatch(private val priority: Int) : Comparable<SseRouterMatch> {
 
@@ -26,6 +28,8 @@ internal class RouterSseHandler(private val list: List<SseRouter>) : RoutingSseH
 
     override fun withBasePath(new: String): RoutingSseHandler =
         sse(*list.map { it.withBasePath(new) }.toTypedArray())
+
+    override fun withFilter(new: SseFilter) = RouterSseHandler(list.map { it.withFilter(new) })
 }
 
 internal class TemplateRoutingSseHandler(
@@ -47,4 +51,6 @@ internal class TemplateRoutingSseHandler(
     }
 
     override fun withBasePath(new: String) = TemplateRoutingSseHandler(UriTemplate.from("$new/$template"), consumer)
+
+    override fun withFilter(new: SseFilter) = TemplateRoutingSseHandler(template, new.then(consumer))
 }

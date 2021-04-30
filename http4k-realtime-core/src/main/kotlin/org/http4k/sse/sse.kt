@@ -1,6 +1,7 @@
 package org.http4k.sse
 
 import org.http4k.core.Request
+import org.http4k.routing.RoutingSseHandler
 import java.io.InputStream
 import java.time.Duration
 import java.util.Base64.getEncoder
@@ -36,3 +37,15 @@ sealed class SseMessage {
 
     companion object
 }
+
+fun interface SseFilter : (SseConsumer) -> SseConsumer {
+    companion object
+}
+
+val SseFilter.Companion.NoOp: SseFilter get() = SseFilter { next -> { next(it) } }
+
+fun SseFilter.then(next: SseFilter): SseFilter = SseFilter { this(next(it)) }
+
+fun SseFilter.then(next: SseConsumer): SseConsumer = { this(next)(it) }
+
+fun SseFilter.then(routingSseHandler: RoutingSseHandler): RoutingSseHandler = routingSseHandler.withFilter(this)
