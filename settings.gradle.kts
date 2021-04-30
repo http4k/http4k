@@ -43,6 +43,7 @@ fun includeWithDirectory(projectName: String, name: String) {
 include("http4k-core")
 include("http4k-aws")
 include("http4k-bom")
+
 "http4k-client".apply {
     includeModule("apache")
     includeModule("apache4")
@@ -52,9 +53,11 @@ include("http4k-bom")
     includeModule("okhttp")
     includeModule("websocket")
 }
+
 include("http4k-cloudevents")
 include("http4k-cloudnative")
 include("http4k-contract")
+
 "http4k-format".apply {
     includeModule("core")
     includeModule("argo")
@@ -67,6 +70,7 @@ include("http4k-contract")
     includeModule("moshi")
     includeModule("xml")
 }
+
 include("http4k-graphql")
 include("http4k-incubator")
 include("http4k-jsonrpc")
