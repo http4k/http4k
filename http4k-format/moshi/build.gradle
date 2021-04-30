@@ -2,6 +2,7 @@ description = 'Http4k Moshi JSON support'
 
 dependencies {
     api project(":http4k-format-core")
+    compileOnly project(":http4k-websocket-core")
 
     api Libs.moshi
     api Libs.moshi_kotlin

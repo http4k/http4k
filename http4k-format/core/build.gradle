@@ -2,6 +2,8 @@ description = 'Http4k Format supporting code'
 
 dependencies {
     api project(":http4k-core")
+    compileOnly project(":http4k-websocket-core")
+
     implementation Libs.values4k
 
     testImplementation project(":http4k-core")

@@ -18,7 +18,6 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.routing.websockets
 import org.http4k.server.Http4kServer
-import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.java_websocket.exceptions.WebsocketNotConnectedException
@@ -59,7 +58,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolySe
                 ws.onError { ws.send(WsMessage(it.localizedMessage)) }
             })
 
-        server = PolyHandler(routes, ws).asServer(serverConfig(0)).start()
+        server = org.http4k.server.PolyHandler(routes, ws).asServer(serverConfig(0)).start()
     }
 
     @AfterEach

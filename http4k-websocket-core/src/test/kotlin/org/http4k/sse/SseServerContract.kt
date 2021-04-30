@@ -15,7 +15,6 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.server.Http4kServer
-import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.sse.SseMessage.Data
@@ -43,7 +42,7 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
             )
         )
 
-        server = PolyHandler(http, sse = sse).asServer(serverConfig(0)).start()
+        server = org.http4k.server.PolyHandler(http, sse = sse).asServer(serverConfig(0)).start()
     }
 
     @AfterEach

@@ -4,6 +4,7 @@ apply plugin: 'kotlinx-serialization'
 
 dependencies {
     api project(":http4k-format-core")
+    compileOnly project(":http4k-websocket-core")
 
     api Libs.kotlinx_serialization_json
 

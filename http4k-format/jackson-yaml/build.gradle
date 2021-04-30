@@ -2,6 +2,7 @@ description = 'Http4k YAML support using Jackson as an underlying engine'
 
 dependencies {
     api project(":http4k-format-core")
+    compileOnly project(":http4k-websocket-core")
     api project(":http4k-format-jackson")
     api Libs.jackson_dataformat_yaml
 
