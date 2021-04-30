@@ -88,6 +88,7 @@ include("http4k-security-oauth")
 }
 
 "http4k-serverless".apply {
+    includeModule("core")
     includeModule("alibaba")
     includeModule("alibaba:integration-test:test-function")
     includeModule("azure")

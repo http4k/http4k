@@ -1,7 +1,7 @@
 description = 'Http4k Serverless support for AWS Lambda'
 
 dependencies {
-    api project(":http4k-core")
+    api project(":http4k-serverless-core")
     api Libs.aws_lambda_java_core
 
     testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')

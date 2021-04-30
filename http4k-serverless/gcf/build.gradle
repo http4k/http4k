@@ -1,7 +1,7 @@
 description = 'Http4k Serverless support for Google Cloud Functions'
 
 dependencies {
-    api project(":http4k-core")
+    api project(":http4k-serverless-core")
 
     api Libs.functions_framework_api
 
