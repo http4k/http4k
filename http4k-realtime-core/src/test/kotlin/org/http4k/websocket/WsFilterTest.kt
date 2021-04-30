@@ -2,7 +2,7 @@ package org.http4k.websocket
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.routing.bind
@@ -40,7 +40,7 @@ class WsFilterTest {
     @Test
     fun `can manipulate value on way in and out of service`() {
         val svc = addRequestHeader.then(printResult).then(ws)
-        val request = Request(Method.GET, Uri.of("/path"))
+        val request = Request(GET, Uri.of("/path"))
 
         svc(request).invoke(object : Websocket {
             override val upgradeRequest: Request = request
