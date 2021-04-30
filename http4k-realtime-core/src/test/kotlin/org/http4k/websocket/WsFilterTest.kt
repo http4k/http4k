@@ -14,12 +14,15 @@ class WsFilterTest {
 
     private val messages = mutableListOf<String>()
 
-    private val ws = websockets("/{foobar}" bind { it: Websocket ->
-        messages += it.upgradeRequest.path("foobar")!!
-        messages += it.upgradeRequest.header("foo")!!
-    })
+    private val inner = WsFilter { next ->
+        {
+            messages += "inner filter in"
+            next(it)
+            messages += "inner filter out"
+        }
+    }
 
-    private val addRequestHeader = WsFilter { next ->
+    private val first = WsFilter { next ->
         {
             messages += "first filter in"
             next(object : Websocket by it {
@@ -29,7 +32,7 @@ class WsFilterTest {
         }
     }
 
-    private val printResult = WsFilter { next ->
+    private val second = WsFilter { next ->
         {
             messages += "second filter in"
             next(it)
@@ -37,9 +40,16 @@ class WsFilterTest {
         }
     }
 
+
+    private val ws = websockets("/{foobar}" bind inner.then {
+        messages += it.upgradeRequest.path("foobar")!!
+        messages += it.upgradeRequest.header("foo")!!
+    })
+
+
     @Test
     fun `can manipulate value on way in and out of service`() {
-        val svc = addRequestHeader.then(printResult).then(ws)
+        val svc = first.then(second).then(ws)
         val request = Request(GET, Uri.of("/path"))
 
         svc(request).invoke(object : Websocket {
@@ -67,8 +77,10 @@ class WsFilterTest {
                 listOf(
                     "first filter in",
                     "second filter in",
+                    "inner filter in",
                     "path",
                     "newHeader",
+                    "inner filter out",
                     "second filter out",
                     "first filter out"
                 )
