@@ -62,11 +62,13 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val expectedAutoMarshallingResult: String
     protected abstract val expectedAutoMarshallingResultPrimitives: String
     protected abstract val expectedWrappedMap: String
+    protected abstract val expectedMap: String
     protected abstract val expectedConvertToInputStream: String
     protected abstract val expectedThrowable: String
     protected abstract val inputUnknownValue: String
     protected abstract val inputEmptyObject: String
     protected abstract val expectedRegexSpecial: String
+
 
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
@@ -125,7 +127,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     open fun `roundtrip map`() {
         val wrapper = mapOf("key" to "value", "key2" to "123")
         val asString = marshaller.asFormatString(wrapper)
-        assertThat(asString.normaliseJson(), equalTo("""{"key":"value","key2":"123"}"""))
+        assertThat(asString.normaliseJson(), equalTo(expectedMap))
         assertThat(marshaller.asA(asString), equalTo(wrapper))
     }
 

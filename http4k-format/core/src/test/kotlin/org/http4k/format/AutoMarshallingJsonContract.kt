@@ -17,6 +17,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
 
     val expectedCustomWrappedNumber = """{"value":"1.01"}"""
     val expectedInOutOnly = """{"value":"foobar"}"""
+    override val expectedMap = """{"key":"value","key2":"123"}"""
 
     @Test
     open fun `out only string`() {

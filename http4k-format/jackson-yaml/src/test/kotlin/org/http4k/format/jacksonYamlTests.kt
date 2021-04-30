@@ -114,6 +114,9 @@ unknown: "2000-01-01"
     override val inputEmptyObject: String = """"""
     override val expectedRegexSpecial: String = """regex: ".*"
 """
+    override val expectedMap = """key:"value"
+key2:"123"
+"""
 
     override fun customMarshaller() = object : ConfigurableJacksonYaml(KotlinModule().asConfigurable().customise()) {}
 }
