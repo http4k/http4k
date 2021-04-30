@@ -26,37 +26,33 @@ class WebSocketServerHandler(private val wsHandler: WsHandler) : ChannelInboundH
                 val upgradeRequest = msg.asRequest(address)
                 val wsConsumer = wsHandler(upgradeRequest)
 
-                if (wsConsumer != null) {
-                    val config = WebSocketServerProtocolConfig.newBuilder()
-                        .handleCloseFrames(false)
-                        .websocketPath(upgradeRequest.uri.toString())
-                        .checkStartsWith(true)
-                        .build()
+                val config = WebSocketServerProtocolConfig.newBuilder()
+                    .handleCloseFrames(false)
+                    .websocketPath(upgradeRequest.uri.toString())
+                    .checkStartsWith(true)
+                    .build()
 
-                    ctx.pipeline().addAfter(
-                        ctx.name(),
-                        "handshakeListener",
-                        object : ChannelInboundHandlerAdapter() {
-                            override fun userEventTriggered(ctx: ChannelHandlerContext, evt: Any) {
-                                if (evt is WebSocketServerProtocolHandler.HandshakeComplete) {
-                                    ctx.pipeline().addAfter(
-                                        ctx.name(),
-                                        Http4kWsChannelHandler::class.java.name,
-                                        Http4kWsChannelHandler(wsConsumer, upgradeRequest)
-                                    )
-                                }
+                ctx.pipeline().addAfter(
+                    ctx.name(),
+                    "handshakeListener",
+                    object : ChannelInboundHandlerAdapter() {
+                        override fun userEventTriggered(ctx: ChannelHandlerContext, evt: Any) {
+                            if (evt is WebSocketServerProtocolHandler.HandshakeComplete) {
+                                ctx.pipeline().addAfter(
+                                    ctx.name(),
+                                    Http4kWsChannelHandler::class.java.name,
+                                    Http4kWsChannelHandler(wsConsumer, upgradeRequest)
+                                )
                             }
                         }
-                    )
+                    }
+                )
 
-                    ctx.pipeline().addAfter(
-                        ctx.name(),
-                        WebSocketServerProtocolHandler::class.java.name,
-                        WebSocketServerProtocolHandler(config)
-                    )
-                } else {
-                    ctx.write(DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.SERVICE_UNAVAILABLE))
-                }
+                ctx.pipeline().addAfter(
+                    ctx.name(),
+                    WebSocketServerProtocolHandler::class.java.name,
+                    WebSocketServerProtocolHandler(config)
+                )
 
                 ctx.fireChannelRead(msg)
             } else {

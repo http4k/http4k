@@ -1,6 +1,7 @@
 package org.http4k.testing
 
 import org.http4k.core.Request
+import org.http4k.server.PolyHandler
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsConsumer
@@ -18,9 +19,15 @@ data class ClosedWebsocket(val status: WsStatus = NORMAL) : RuntimeException()
  */
 class TestWsClient internal constructor(consumer: WsConsumer, request: Request) : WsClient {
 
-    private val queue = ArrayDeque<() -> WsMessage?>()
+    private val queue = ArrayDeque<() -> WsMessage>()
 
-    override fun received() = generateSequence { queue.remove()()!! }
+    override fun received() = generateSequence {
+        try {
+            queue.remove()()
+        } catch (e: ClosedWebsocket) {
+            if (e.status == NORMAL) null else throw e
+        }
+    }
 
     private val socket = object : PushPullAdaptingWebSocket(request) {
         init {
@@ -49,5 +56,5 @@ class TestWsClient internal constructor(consumer: WsConsumer, request: Request) 
     override fun send(message: WsMessage) = socket.triggerMessage(message)
 }
 
-fun WsHandler.testWsClient(request: Request): TestWsClient? = invoke(request)?.let { TestWsClient(it, request) }
-fun org.http4k.server.PolyHandler.testWsClient(request: Request): TestWsClient? = ws?.testWsClient(request) ?: error("No WS handler set.")
+fun WsHandler.testWsClient(request: Request): TestWsClient = TestWsClient(invoke(request), request)
+fun PolyHandler.testWsClient(request: Request): TestWsClient = ws?.testWsClient(request) ?: error("No WS handler set.")

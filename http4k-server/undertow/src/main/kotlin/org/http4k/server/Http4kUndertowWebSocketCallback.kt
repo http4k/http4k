@@ -25,40 +25,38 @@ class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCa
     override fun onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel) {
         val upgradeRequest = exchange.asRequest()
 
-        ws(upgradeRequest)?.also {
-            val socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
-                override fun send(message: WsMessage) =
-                    if (message.body is StreamBody) sendBinary(message.body.payload, channel, null)
-                    else sendText(message.bodyString(), channel, null)
+        val socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
+            override fun send(message: WsMessage) =
+                if (message.body is StreamBody) sendBinary(message.body.payload, channel, null)
+                else sendText(message.bodyString(), channel, null)
 
-                override fun close(status: WsStatus) {
-                    sendClose(status.code, status.description, channel, null)
+            override fun close(status: WsStatus) {
+                sendClose(status.code, status.description, channel, null)
+            }
+        }.apply(ws(upgradeRequest))
+
+        channel.addCloseTask {
+            socket.triggerClose(WsStatus(it.closeCode, it.closeReason ?: "unknown"))
+        }
+
+        channel.receiveSetter.set(object : AbstractReceiveListener() {
+            override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
+                try {
+                    socket.triggerMessage(WsMessage(Body(message.data)))
+                } catch (e: IOException) {
+                    throw e
+                } catch (e: Exception) {
+                    socket.triggerError(e)
+                    throw e
                 }
-            }.apply(it)
-
-            channel.addCloseTask {
-                socket.triggerClose(WsStatus(it.closeCode, it.closeReason ?: "unknown"))
             }
 
-            channel.receiveSetter.set(object : AbstractReceiveListener() {
-                override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
-                    try {
-                        socket.triggerMessage(WsMessage(Body(message.data)))
-                    } catch (e: IOException) {
-                        throw e
-                    } catch (e: Exception) {
-                        socket.triggerError(e)
-                        throw e
-                    }
-                }
+            override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) =
+                message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }
 
-                override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) =
-                    message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }
-
-                override fun onError(channel: WebSocketChannel, error: Throwable) = socket.triggerError(error)
-            })
-            channel.resumeReceives()
-        } ?: exchange.close()
+            override fun onError(channel: WebSocketChannel, error: Throwable) = socket.triggerError(error)
+        })
+        channel.resumeReceives()
     }
 }
 

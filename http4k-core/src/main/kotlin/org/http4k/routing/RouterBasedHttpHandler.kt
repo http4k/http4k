@@ -22,10 +22,10 @@ internal data class RouterBasedHttpHandler(
         else -> notFoundHandler
     }(request)
 
-    override fun withFilter(new: Filter): RoutingHttpHandler = copy(
+    override fun withFilter(new: Filter): RoutingHttpHandler = RouterBasedHttpHandler(
         router.withFilter(new),
-        notFoundHandler = new.then(notFoundHandler),
-        methodNotAllowedHandler = new.then(methodNotAllowedHandler)
+        new.then(notFoundHandler),
+        new.then(methodNotAllowedHandler)
     )
 
     override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new))
