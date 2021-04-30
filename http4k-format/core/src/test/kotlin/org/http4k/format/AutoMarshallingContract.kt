@@ -122,6 +122,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
+    open fun `roundtrip map`() {
+        val wrapper = mapOf("key" to "value", "key2" to "123")
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo("""{"key":"value","key2":"123"}"""))
+        assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
     open fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
         assertThat(marshaller.asFormatString(wrapper).normaliseJson(), equalTo(expectedWrappedMap.normaliseJson()))

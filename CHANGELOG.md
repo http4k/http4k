@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.7.2.0 (uncut)
+### v4.8.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi** :[Breaking] Add mappings for Map-type and List-like classes to use default serialisers. To get around this, create your own Moshi configuration, omitting the `CollectionEdgeCasesAdapter`
 
 ### v4.7.1.0
 - **http4k-*** : Upgrade some dependency versions.

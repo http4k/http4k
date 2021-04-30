@@ -166,6 +166,12 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
+    @Disabled("kotlinx.serialization does not support default serialization of LinkedHashMap")
+    override fun `roundtrip map`() {
+        super.`roundtrip map`()
+    }
+
+    @Test
     override fun `fails decoding when a required value is null`() {
         assertThat({ KotlinxSerialization.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
     }
