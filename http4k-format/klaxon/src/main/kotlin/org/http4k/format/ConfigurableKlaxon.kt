@@ -20,6 +20,7 @@ open class ConfigurableKlaxon(private val klaxon: KKlaxon,
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> asA(input: String, target: KClass<T>) = asA<T>(input.byteInputStream(), target)
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T =
         when (val json = klaxon.parser(target).parse(input.reader()) as JsonBase) {
             is JsonObject -> klaxon.fromJsonObject(json, target.java, target) as T
