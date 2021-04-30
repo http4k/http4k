@@ -69,7 +69,6 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val inputEmptyObject: String
     protected abstract val expectedRegexSpecial: String
 
-
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
     @Test
