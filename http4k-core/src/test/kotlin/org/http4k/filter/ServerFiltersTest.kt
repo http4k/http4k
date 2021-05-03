@@ -11,6 +11,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Headers
+import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -430,5 +431,33 @@ class ServerFiltersTest {
         val handler = ServerFilters.SetContentType(OCTET_STREAM).then { Response(OK) }
 
         assertThat(handler(Request(GET, "/")), hasContentType(OCTET_STREAM))
+    }
+
+
+    @Test
+    fun `get flash attributes are null if not set`() {
+
+        val handler = FlashAttributesFilter.then { request -> Response(Status.OK).body(request.flash().orEmpty()) }
+
+        val response = handler(Request(Method.GET, "/"))
+        assertThat(response, hasBody(""))
+    }
+
+    @Test
+    fun `retrieve flash attributes if set`() {
+        val handler = FlashAttributesFilter.then { request -> Response(Status.OK).body("abc").withFlash("Error 123") }
+
+        val response = handler(Request(Method.GET, "/"))
+        assertThat(response.flash(), equalTo("Error 123"))
+    }
+
+    @Test
+    fun `remove flash attributes after usage`() {
+
+        val handler = FlashAttributesFilter.then { request -> Response(Status.OK).body("abc") }
+
+        val request = Request(Method.GET, "/").withFlash("input flash")
+        val response = handler(request)
+        assertThat(response.flash(), equalTo(""))
     }
 }
