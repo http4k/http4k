@@ -433,7 +433,6 @@ class ServerFiltersTest {
         assertThat(handler(Request(GET, "/")), hasContentType(OCTET_STREAM))
     }
 
-
     @Test
     fun `get flash attributes are null if not set`() {
 
