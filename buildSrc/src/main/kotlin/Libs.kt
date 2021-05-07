@@ -148,19 +148,19 @@ object Libs {
 
     const val java_websocket: String = "org.java-websocket:Java-WebSocket:1.5.2"
 
-    const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0"
+    const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32"
 
-    const val kotlin_reflect: String = "org.jetbrains.kotlin:kotlin-reflect:1.5.0"
+    const val kotlin_reflect: String = "org.jetbrains.kotlin:kotlin-reflect:1.4.32"
 
     const val kotlin_scripting_compiler_embeddable: String =
-        "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.5.0"
+        "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.4.32"
 
-    const val kotlin_serialization: String = "org.jetbrains.kotlin:kotlin-serialization:1.5.0"
+    const val kotlin_serialization: String = "org.jetbrains.kotlin:kotlin-serialization:1.4.32"
 
     const val kotlin_serialization_unshaded: String =
-        "org.jetbrains.kotlin:kotlin-serialization-unshaded:1.5.0"
+        "org.jetbrains.kotlin:kotlin-serialization-unshaded:1.4.32"
 
-    const val kotlin_stdlib_jdk8: String = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.0"
+    const val kotlin_stdlib_jdk8: String = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32"
 
     const val kotlinx_serialization_json: String =
         "org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0"
