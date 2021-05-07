@@ -1,35 +1,5 @@
 rootProject.name = "http4k"
 
-// TODO: remove pluginManagement bloc once a stable version of refreshVersions is released
-pluginManagement {
-    val version = "0.9.8-dev-004" // O.9.7 0.9.8:PR 0.9.8-SNAPSHOT
-    repositories {
-        gradlePluginPortal()
-        when {
-            version.contains(":PR") -> maven("https://jitpack.io")
-            version.contains("-dev-") -> maven("https://dl.bintray.com/jmfayard/maven")
-            version.contains("-SNAPSHOT") -> mavenLocal()
-        }
-    }
-    resolutionStrategy {
-        fun module(module: String) = when {
-            version.contains(":PR") -> "com.github.jmfayard:refreshVersions:$version"
-            else -> "de.fayard.refreshVersions:$module:$version"
-        }
-        eachPlugin {
-            when (requested.id.id) {
-                "de.fayard.refreshVersions" -> useModule(module("refreshVersions"))
-                "de.fayard.buildSrcLibs" -> useModule(module("buildSrcLibs"))
-            }
-        }
-    }
-}
-
-plugins {
-    id("de.fayard.buildSrcLibs")
-    id("de.fayard.refreshVersions")
-}
-
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")
