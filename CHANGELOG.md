@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.8.1.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v4.8.0.0
 - **http4k-format-moshi** : [Breaking] Add mappings for Map-type and List-like classes to use default serialisers. To get around this, create your own Moshi configuration, omitting the `CollectionEdgeCasesAdapter`
 - **http4k-websocket-*** : [Breaking] Added support for filters with `WsFilter`, which can be wrapped around a `WsHandler` or `WsConsumer` to decorate them with behaviour. This has involved changing `WsHandler` to always return a `WsConsumer` even if it doesn't match - in the case of a non-match, the socket is closed immediately.

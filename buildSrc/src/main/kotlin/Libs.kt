@@ -8,7 +8,7 @@ object Libs {
     const val klaxon: String = "com.beust:klaxon:5.5"
 
     const val graphql_kotlin_schema_generator: String =
-        "com.expediagroup:graphql-kotlin-schema-generator:4.1.0"
+        "com.expediagroup:graphql-kotlin-schema-generator:4.1.1"
 
     const val jackson_databind: String = "com.fasterxml.jackson.core:jackson-databind:2.12.3"
 
@@ -21,7 +21,7 @@ object Libs {
     const val jackson_module_kotlin: String =
         "com.fasterxml.jackson.module:jackson-module-kotlin:2.12.3"
 
-    const val underscore: String = "com.github.javadev:underscore:1.65"
+    const val underscore: String = "com.github.javadev:underscore:1.66"
 
     const val shadow: String = "com.github.jengelman.gradle.plugins:shadow:6.1.0"
 
@@ -62,9 +62,9 @@ object Libs {
 
     const val values4k: String = "dev.forkhandles:values4k:1.9.1.0"
 
-    const val cloudevents_core: String = "io.cloudevents:cloudevents-core:2.1.0"
+    const val cloudevents_core: String = "io.cloudevents:cloudevents-core:2.1.1"
 
-    const val cloudevents_json_jackson: String = "io.cloudevents:cloudevents-json-jackson:2.1.0"
+    const val cloudevents_json_jackson: String = "io.cloudevents:cloudevents-json-jackson:2.1.1"
 
     const val io_codearte_nexus_staging_gradle_plugin: String =
         "io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_"
@@ -82,9 +82,9 @@ object Libs {
 
     const val kotest_assertions_core_jvm: String = "io.kotest:kotest-assertions-core-jvm:4.4.3"
 
-    const val ktor_server_cio: String = "io.ktor:ktor-server-cio:1.5.2"
+    const val ktor_server_cio: String = "io.ktor:ktor-server-cio:1.5.4"
 
-    const val ktor_server_netty: String = "io.ktor:ktor-server-netty:1.5.2"
+    const val ktor_server_netty: String = "io.ktor:ktor-server-netty:1.5.4"
 
     const val micrometer_core: String = "io.micrometer:micrometer-core:1.6.6"
 
@@ -94,7 +94,7 @@ object Libs {
         "io.opentelemetry:opentelemetry-exporters-inmemory:0.9.1"
 
     const val opentelemetry_extension_aws: String =
-        "io.opentelemetry:opentelemetry-extension-aws:1.1.0"
+        "io.opentelemetry:opentelemetry-extension-aws:1.2.0"
 
     const val opentelemetry_extension_trace_propagators: String =
         "io.opentelemetry:opentelemetry-extension-trace-propagators:1.1.0"
@@ -102,7 +102,7 @@ object Libs {
     const val opentelemetry_sdk: String = "io.opentelemetry:opentelemetry-sdk:1.1.0"
 
     const val opentelemetry_sdk_metrics: String =
-        "io.opentelemetry:opentelemetry-sdk-metrics:1.1.0-alpha"
+        "io.opentelemetry:opentelemetry-sdk-metrics:1.2.0-alpha"
 
     const val pebble: String = "io.pebbletemplates:pebble:3.1.5"
 
@@ -122,7 +122,7 @@ object Libs {
 
     const val httpclient5: String = "org.apache.httpcomponents.client5:httpclient5:5.0.3"
 
-    const val httpcore5: String = "org.apache.httpcomponents.core5:httpcore5:5.1"
+    const val httpcore5: String = "org.apache.httpcomponents.core5:httpcore5:5.1.1"
 
     const val httpasyncclient: String = "org.apache.httpcomponents:httpasyncclient:4.1.4"
 
@@ -178,7 +178,7 @@ object Libs {
     const val alpn_boot: String = "org.mortbay.jetty.alpn:alpn-boot:8.1.13.v20181017"
 
     const val openapi_generator_gradle_plugin: String =
-        "org.openapitools:openapi-generator-gradle-plugin:5.1.0"
+        "org.openapitools:openapi-generator-gradle-plugin:5.1.1"
 
     const val selenium_api: String = "org.seleniumhq.selenium:selenium-api:3.141.59"
 
@@ -186,7 +186,7 @@ object Libs {
 
     const val thymeleaf: String = "org.thymeleaf:thymeleaf:3.0.12.RELEASE"
 
-    const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:2.16.51"
+    const val http_client_spi: String = "software.amazon.awssdk:http-client-spi:2.16.59"
 
     const val s3: String = "software.amazon.awssdk:s3:2.16.51"
 }
