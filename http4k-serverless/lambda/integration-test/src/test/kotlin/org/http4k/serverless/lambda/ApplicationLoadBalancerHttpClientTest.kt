@@ -21,7 +21,7 @@ private fun client(): (Request) -> Response {
 }
 
 @Disabled
-class AppLoadBalancerHttpClientTest :
+class ApplicationLoadBalancerHttpClientTest :
     HttpClientContract({ NoOpServerConfig }, client(), client()) {
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")

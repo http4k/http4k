@@ -10,3 +10,8 @@ import org.http4k.core.then
 fun interface AppLoader : (Map<String, String>) -> HttpHandler
 
 fun Filter.then(appLoader: AppLoader): AppLoader = AppLoader { then(appLoader(it)) }
+
+/**
+ * Launch an AppLoader into a Serverless runtime.
+ */
+fun AppLoader.asServer(config: ServerlessConfig) = config.asServer(this)
