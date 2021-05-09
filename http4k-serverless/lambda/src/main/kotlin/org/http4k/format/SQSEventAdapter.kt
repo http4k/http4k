@@ -32,6 +32,7 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                                         "eventSource" -> eventSource = nextString()
                                         "awsRegion" -> awsRegion = nextString()
 //                                        "attributes" -> attributes = ""
+//                                        "messageAttributes" -> messageAttributes = ""
                                         else -> skipValue()
                                     }
                                 }
