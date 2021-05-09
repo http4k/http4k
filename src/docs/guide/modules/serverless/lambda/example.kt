@@ -41,15 +41,17 @@ fun main() {
     fun runLambdaAsAwsWould() {
         println("RUNNING AS LAMBDA:")
 
-        val response = FunctionsExampleEntryClass().handleRequest(mapOf(
-            "path" to "/",
-            "queryStringParameters" to emptyMap<String, String>(),
-            "body" to "hello hello hello, i suppose this isn't 140 characters anymore..",
-            "headers" to emptyMap<String, String>(),
-            "isBase64Encoded" to false,
-            "httpMethod" to "GET"
-        ), proxy())
-        println(response)
+//        val response = FunctionsExampleEntryClass().handleRequest(ServerlessMoshi.asInputStream(
+//            mapOf(
+//                "path" to "/",
+//                "queryStringParameters" to emptyMap<String, String>(),
+//                "body" to "hello hello hello, i suppose this isn't 140 characters anymore..",
+//                "headers" to emptyMap<String, String>(),
+//                "isBase64Encoded" to false,
+//                "httpMethod" to "GET"
+//            )
+//        ), proxy())
+//        println(response)
     }
 
     runLambdaLocally()

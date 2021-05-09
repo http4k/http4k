@@ -19,15 +19,16 @@ class AdaptingFunctionHandler<In, Ctx, Out : Any>(
  */
 fun <In, Ctx, Out : Any> FunctionLoader(
     autoMarshalling: AutoMarshalling = ServerlessMoshi,
-    makeHandler: (Map<String, String>) -> AdaptingFunctionHandler<In, Ctx, Out>
-) = object : FunctionLoader<Ctx> {
-    override fun invoke(env: Map<String, String>) = with(makeHandler(env)) {
-        StreamHandler { inputStream, ctx: Ctx ->
-            autoMarshalling
-                .asFormatString(convert(ServerlessMoshi.asA(inputStream), ctx))
-                .trimStart('"')
-                .trimEnd('"')
-                .byteInputStream()
-        }
-    }
+    makeHandler: (Map<String, String>) -> FunctionHandler<In, Ctx, Out>
+): FunctionLoader<Ctx> = FunctionLoader<Ctx> { env ->
+    TODO()
+//    with(makeHandler(env)) {
+//        StreamHandler { inputStream, ctx: Ctx ->
+//            autoMarshalling
+//                .asFormatString(convert(ServerlessMoshi.asA(inputStream), ctx))
+//                .trimStart('"')
+//                .trimEnd('"')
+//                .byteInputStream()
+//        }
+//    }
 }
