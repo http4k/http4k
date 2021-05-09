@@ -1,0 +1,17 @@
+{
+  "records": [
+    {
+      "messageId": "messageId",
+      "receiptHandle": "receiptHandle",
+      "body": "body",
+      "md5OfBody": "md5OfBody",
+      "md5OfMessageAttributes": "md5OfMessageAttributes",
+      "eventSourceArn": "eventSourceArn",
+      "eventSource": "eventSource",
+      "awsRegion": "awsRegion",
+      "attributes": {
+        "attr": "attrvalue"
+      }
+    }
+  ]
+}
