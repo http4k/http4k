@@ -6,20 +6,28 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import org.joda.time.DateTime
 
 object ScheduledEventAdapter : JsonAdapter<ScheduledEvent>() {
     @FromJson
     override fun fromJson(reader: JsonReader) = ScheduledEvent().apply {
-        reader.beginObject()
-        reader.endObject()
-//            id = it["id"]?.toString()
-//            detailType = it["detail-type"]?.toString()
-//            source = it["source"]?.toString()
-//            account = it["account"]?.toString()
-//            time = it["time"]?.toString()?.let(DateTime::parse)
-//            region = it["region"]?.toString()
+        with(reader) {
+            beginObject()
+            while (hasNext()) {
+                when (nextName()) {
+                    "id" -> id = nextString()
+                    "detail-type" -> detailType = nextString()
+                    "source" -> source = nextString()
+                    "account" -> account = nextString()
+                    "time" -> time = nextString()?.let(DateTime::parse)
+                    "region" -> region = nextString()
 //            resources = it["resources"] as List<String>?
 //            detail = it["detail"] as Map<String, Any>?
+                    else -> skipValue()
+                }
+            }
+            endObject()
+        }
     }
 
     @ToJson
