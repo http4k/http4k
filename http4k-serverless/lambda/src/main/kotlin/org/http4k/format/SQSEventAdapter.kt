@@ -19,22 +19,24 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                         val recs = mutableListOf<SQSEvent.SQSMessage>()
                         beginArray()
                         while (hasNext()) {
-                            beginObject()
-                            while (hasNext()) {
-                                when (nextName()) {
-//                                        "messageId" -> messageId = ""
-//                                        "receiptHandle" -> receiptHandle = ""
-//                                        "body" -> body = ""
-//                                        "md5OfBody" -> md5OfBody = ""
-//                                        "md5OfMessageAttributes" -> md5OfMessageAttributes = ""
-//                                        "eventSourceArn" -> eventSourceArn = ""
-//                                        "eventSource" -> eventSource = ""
-//                                        "awsRegion" -> awsRegion = ""
+                            recs += SQSEvent.SQSMessage().apply {
+                                beginObject()
+                                while (hasNext()) {
+                                    when (nextName()) {
+                                        "messageId" -> messageId = nextString()
+                                        "receiptHandle" -> receiptHandle = nextString()
+                                        "body" -> body = nextString()
+                                        "md5OfBody" -> md5OfBody = nextString()
+                                        "md5OfMessageAttributes" -> md5OfMessageAttributes = nextString()
+                                        "eventSourceArn" -> eventSourceArn = nextString()
+                                        "eventSource" -> eventSource = nextString()
+                                        "awsRegion" -> awsRegion = nextString()
 //                                        "attributes" -> attributes = ""
-                                    else -> skipValue()
+                                        else -> skipValue()
+                                    }
                                 }
+                                endObject()
                             }
-                            endObject()
                         }
                         endArray()
                         recs
