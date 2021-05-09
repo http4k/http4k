@@ -1,27 +1,46 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
-import com.amazonaws.services.lambda.runtime.RequestStreamHandler
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.RequestContexts
 import org.http4k.core.Response
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchAll
+import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import java.io.InputStream
-import java.io.OutputStream
+
+/**
+ * Function loader for Invocation Lambdas
+ */
+class InvocationFunctionLoader(private val appLoader: AppLoaderWithContexts) : FunctionLoader<Context> {
+    private val contexts = RequestContexts("lambda")
+
+    override operator fun invoke(env: Map<String, String>): StreamHandler<Context> {
+        val app = appLoader(env, contexts)
+        return StreamHandler { inputStream, ctx ->
+            val request = Request(POST, "/2015-03-31/functions/${ctx.functionName}/invocations")
+                .header("X-Amz-Invocation-Type", "RequestResponse")
+                .header("X-Amz-Log-Type", "Tail").body(inputStream)
+            CatchAll()
+                .then(InitialiseRequestContext(contexts))
+                .then(AddLambdaContextAndRequest(ctx, request, contexts))
+                .then(app)(request)
+                .body.stream
+        }
+    }
+}
 
 /**
  * This is the main entry point for lambda invocations using the direct invocations.
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
  */
-abstract class InvocationLambdaFunction(appLoader: AppLoaderWithContexts)
-    : AwsLambdaFunction<InputStream, InputStream>(InvocationLambdaAwsHttpAdapter, appLoader), RequestStreamHandler {
+abstract class InvocationLambdaFunction(appLoader: AppLoaderWithContexts) :
+    Http4kRequestHandler(InvocationFunctionLoader(appLoader)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
-
-    override fun handleRequest(input: InputStream, output: OutputStream, context: Context) {
-        handle(input, context).copyTo(output)
-    }
 }
 
 object InvocationLambdaAwsHttpAdapter : AwsHttpAdapter<InputStream, InputStream> {
