@@ -6,6 +6,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import java.util.Base64.getEncoder
 
 object SQSEventAdapter : JsonAdapter<SQSEvent>() {
     @FromJson
@@ -62,13 +63,23 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                     write("eventSource", it.eventSource)
                     write("awsRegion", it.awsRegion)
                     write("attributes", it.attributes)
-//                messageAttributes = mapOf("msgAttrName" to SQSEvent.MessageAttribute().apply {
-//                    stringListValues = listOf("stringListValues")
-//                    stringValue = "stringValue"
-//                    dataType = "datatype"
-//                    binaryValue = "binary".asByteBuffer()
-//                    binaryListValues = listOf("binaryListValues".asByteBuffer())
-//                })
+                    name("messageAttributes")
+                    beginObject()
+                    it.messageAttributes?.forEach {
+                        name(it.key)
+                        beginObject()
+                        write(
+                            "binaryListValues",
+                            it.value.binaryListValues?.map { getEncoder().encodeToString(it.array()) })
+                        write(
+                            "binaryValue",
+                            it.value.binaryValue?.let { getEncoder().encodeToString(it.array()) })
+                        write("dataType", it.value.dataType)
+                        write("stringListValues", it.value.stringListValues)
+                        write("stringValue", it.value.stringValue)
+                        endObject()
+                    }
+                    endObject()
                     endObject()
                 }
                 endArray()

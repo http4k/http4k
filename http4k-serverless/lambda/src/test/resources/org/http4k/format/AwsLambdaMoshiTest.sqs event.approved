@@ -11,6 +11,19 @@
       "awsRegion": "awsRegion",
       "attributes": {
         "attr": "attrvalue"
+      },
+      "messageAttributes": {
+        "msgAttrName": {
+          "binaryListValues": [
+            "YmluYXJ5TGlzdFZhbHVlcw=="
+          ],
+          "binaryValue": "YmluYXJ5",
+          "dataType": "datatype",
+          "stringListValues": [
+            "stringListValues"
+          ],
+          "stringValue": "stringValue"
+        }
       }
     }
   ]

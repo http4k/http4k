@@ -65,6 +65,7 @@ class AwsLambdaMoshiTest {
 
 private inline fun <reified T : Any> Approver.assertRoundtrips(input: T) {
     val asString = asFormatString(input)
+    println(asString)
     assertApproved(
         Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
