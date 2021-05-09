@@ -33,14 +33,14 @@ class AwsLambdaMoshiTest {
             detail = mapOf("detailName" to "detailValue")
         })
     }
+}
 
-    private inline fun <reified T : Any> Approver.assertRoundtrips(input: T) {
-        val asString = asFormatString(input)
-        assertApproved(
-            Response(Status.OK)
-                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-                .body(asString)
-        )
-        assertThat(asA<T>(asString).toString(), equalTo(input.toString()))
-    }
+private inline fun <reified T : Any> Approver.assertRoundtrips(input: T) {
+    val asString = asFormatString(input)
+    assertApproved(
+        Response(Status.OK)
+            .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
+            .body(asString)
+    )
+    assertThat(asA<T>(asString).toString(), equalTo(input.toString()))
 }
