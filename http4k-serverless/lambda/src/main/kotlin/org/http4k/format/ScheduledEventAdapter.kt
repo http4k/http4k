@@ -7,6 +7,7 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
 
 object ScheduledEventAdapter : JsonAdapter<ScheduledEvent>() {
     @FromJson
@@ -21,8 +22,8 @@ object ScheduledEventAdapter : JsonAdapter<ScheduledEvent>() {
                     "account" -> account = nextString()
                     "time" -> time = nextString()?.let(DateTime::parse)
                     "region" -> region = nextString()
-//            resources = it["resources"] as List<String>?
-//            detail = it["detail"] as Map<String, Any>?
+                    "resources" -> resources = readStringList()
+                    "detail" -> detail = readMap()
                     else -> skipValue()
                 }
             }
@@ -40,7 +41,7 @@ object ScheduledEventAdapter : JsonAdapter<ScheduledEvent>() {
                 write("detail-type", event.detailType)
                 write("source", event.source)
                 write("account", event.account)
-                write("time", event.time?.toString())
+                write("time", event.time?.let { ISODateTimeFormat.dateTime().print(it) })
                 write("region", event.region)
                 write("resources", event.resources)
                 write("detail", event.detail)
