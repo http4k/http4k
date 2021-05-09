@@ -5,12 +5,12 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.junit.jupiter.api.Test
 
 // is this needed any more?
-class ApiGatewayV2FunctionTest {
+class ApiGatewayV2FunctionLoaderTest {
 
     @Test
     fun `can process request`() {
         assertOutput(
-            ApiGatewayV2Function { Response(NOT_FOUND).body("helloworld") },
+            ApiGatewayV2FunctionLoader { Response(NOT_FOUND).body("helloworld") },
             mapOf(
                 "rawPath" to "/path",
                 "queryStringParameters" to mapOf("query" to "value"),

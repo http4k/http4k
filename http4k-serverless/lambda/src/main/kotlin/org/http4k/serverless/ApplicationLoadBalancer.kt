@@ -12,7 +12,7 @@ import org.http4k.core.toUrlFormEncoded
 /**
  * Function loader for ApplicationLoadBalancer Lambdas
  */
-class ApplicationLoadBalancerFunction(input: AppLoaderWithContexts) :
+class ApplicationLoadBalancerFunctionLoader(input: AppLoaderWithContexts) :
     ApiGatewayFunctionLoader(ApplicationLoadBalancerAwsHttpAdapter, input) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
@@ -24,7 +24,7 @@ class ApplicationLoadBalancerFunction(input: AppLoaderWithContexts) :
  * for further invocations.
  */
 abstract class ApplicationLoadBalancerLambdaFunction(input: AppLoaderWithContexts) :
-    Http4kRequestHandler(ApplicationLoadBalancerFunction(input)) {
+    Http4kRequestHandler(ApplicationLoadBalancerFunctionLoader(input)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }

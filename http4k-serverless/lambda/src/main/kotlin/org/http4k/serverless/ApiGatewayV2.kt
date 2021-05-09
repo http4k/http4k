@@ -15,7 +15,7 @@ import org.http4k.core.toUrlFormEncoded
 /**
  * Function loader for ApiGatewayV2 Lambdas
  */
-class ApiGatewayV2Function(input: AppLoaderWithContexts) : ApiGatewayFunctionLoader(ApiGatewayV2AwsHttpAdapter, input) {
+class ApiGatewayV2FunctionLoader(input: AppLoaderWithContexts) : ApiGatewayFunctionLoader(ApiGatewayV2AwsHttpAdapter, input) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
@@ -26,7 +26,7 @@ class ApiGatewayV2Function(input: AppLoaderWithContexts) : ApiGatewayFunctionLoa
  * for further invocations.
  */
 abstract class ApiGatewayV2LambdaFunction(input: AppLoaderWithContexts) :
-    Http4kRequestHandler(ApiGatewayV2Function(input)) {
+    Http4kRequestHandler(ApiGatewayV2FunctionLoader(input)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }

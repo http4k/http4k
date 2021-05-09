@@ -12,7 +12,7 @@ import org.http4k.core.toUrlFormEncoded
 /**
  * Function loader for ApiGatewayV1 Lambdas
  */
-class ApiGatewayV1Function(input: AppLoaderWithContexts) : ApiGatewayFunctionLoader(ApiGatewayV1AwsHttpAdapter, input) {
+class ApiGatewayV1FunctionLoader(input: AppLoaderWithContexts) : ApiGatewayFunctionLoader(ApiGatewayV1AwsHttpAdapter, input) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
@@ -23,7 +23,7 @@ class ApiGatewayV1Function(input: AppLoaderWithContexts) : ApiGatewayFunctionLoa
  * for further invocations.
  */
 abstract class ApiGatewayV1LambdaFunction(input: AppLoaderWithContexts)
-    :   Http4kRequestHandler(ApiGatewayV1Function(input)) {
+    :   Http4kRequestHandler(ApiGatewayV1FunctionLoader(input)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }

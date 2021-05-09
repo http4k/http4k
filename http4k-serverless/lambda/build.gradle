@@ -5,6 +5,10 @@ dependencies {
     api Libs.aws_lambda_java_core
     compileOnly Libs.aws_lambda_java_events
 
+    api(project(":http4k-format-moshi")) {
+        exclude group: "org.jetbrains.kotlin", module: "kotlin-reflect"
+    }
+
     testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
     testImplementation project(":http4k-format-jackson")
     testImplementation Config.TestDependencies
