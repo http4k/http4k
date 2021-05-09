@@ -17,6 +17,7 @@ class LambdaCoreExtensionsTest {
         val functions = functions(
             "function1" bind FunctionLoader {
                 FunctionHandler { e: ScheduledEvent, _: Context ->
+                    println(e)
                     "function1"
                 }
             },

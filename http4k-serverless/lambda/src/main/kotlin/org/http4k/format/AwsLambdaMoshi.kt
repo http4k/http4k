@@ -4,7 +4,8 @@ import com.squareup.moshi.Moshi
 
 object AwsLambdaMoshi : ConfigurableMoshi(
     Moshi.Builder()
-        .add(CollectionEdgeCasesAdapter)
+        .add(ScheduledEventAdapter)
+        .addLast(CollectionEdgeCasesAdapter)
         .asConfigurable()
         .withStandardMappings()
         .done()
