@@ -33,7 +33,7 @@ object FakeAwsLambda {
                 })
             )
 
-    operator inline fun <reified In, Out : Any> invoke(
+    inline operator fun <reified In, Out : Any> invoke(
         fh: AdaptingFunctionHandler<In, Context, Out>, env: Map<String, String> = System.getenv()
     ): HttpHandler =
         FakeAwsLambda(FunctionLoader(AwsLambdaMoshi) { fh }, env)

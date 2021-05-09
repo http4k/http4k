@@ -19,6 +19,7 @@ import org.http4k.serverless.FunctionLoader
 import org.junit.jupiter.api.Test
 
 class FakeAwsLambdaTest {
+
     @Test
     fun `can launch function with FakeLambda and call it as if directly in lambda`() {
         val functions = functions(
