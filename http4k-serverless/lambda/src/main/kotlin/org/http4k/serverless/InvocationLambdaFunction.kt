@@ -15,6 +15,9 @@ import java.io.InputStream
  * Function loader for Invocation Lambdas
  */
 class InvocationFunctionLoader(private val appLoader: AppLoaderWithContexts) : FunctionLoader<Context> {
+    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+    constructor(input: HttpHandler) : this(AppLoader { input })
+
     private val contexts = RequestContexts("lambda")
 
     override operator fun invoke(env: Map<String, String>): StreamHandler<Context> {
