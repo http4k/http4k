@@ -20,7 +20,8 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                         beginArray()
                         while (hasNext()) {
                             beginObject()
-                            when (nextName()) {
+                            while (hasNext()) {
+                                when (nextName()) {
 //                                        "messageId" -> messageId = ""
 //                                        "receiptHandle" -> receiptHandle = ""
 //                                        "body" -> body = ""
@@ -30,7 +31,8 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
 //                                        "eventSource" -> eventSource = ""
 //                                        "awsRegion" -> awsRegion = ""
 //                                        "attributes" -> attributes = ""
-                                else -> skipValue()
+                                    else -> skipValue()
+                                }
                             }
                             endObject()
                         }
