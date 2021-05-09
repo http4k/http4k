@@ -2,12 +2,18 @@ package org.http4k.serverless.lambda
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
-import org.http4k.serverless.StreamHandler
+import org.http4k.format.AutoMarshalling
+import org.http4k.format.AwsLambdaMoshi
+import org.http4k.serverless.FunctionHandler
 
 /**
  * FunctionHandler for AWS Lambda ScheduledEvent
  */
-fun <Out : Any> FunctionLoader(fn: (ScheduledEvent, Context) -> Out): StreamHandler<Context> = TODO()
+@JvmName("bob")
+fun <Out : Any> FunctionLoader(
+    autoMarshalling: AutoMarshalling = AwsLambdaMoshi,
+    fn: FunctionHandler<ScheduledEvent, Context, Out>):
+        (Map<String, String>) -> FunctionHandler<Map<String, String>, Context, Out> = TODO()
 //    AdaptingFunctionHandler(fn) {
 //        @Suppress("UNCHECKED_CAST")
 //        ScheduledEvent().apply {

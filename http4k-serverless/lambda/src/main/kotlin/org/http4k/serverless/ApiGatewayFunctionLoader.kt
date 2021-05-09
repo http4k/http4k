@@ -5,8 +5,8 @@ import org.http4k.core.RequestContexts
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
-import org.http4k.format.ServerlessMoshi.asA
-import org.http4k.format.ServerlessMoshi.asInputStream
+import org.http4k.format.AwsLambdaMoshi.asA
+import org.http4k.format.AwsLambdaMoshi.asInputStream
 
 abstract class ApiGatewayFunctionLoader protected constructor(
     private val adapter: AwsHttpAdapter<Map<String, Any>, Map<String, Any>>,

@@ -10,7 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
-import org.http4k.format.ServerlessMoshi
+import org.http4k.format.AwsLambdaMoshi
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -33,10 +33,10 @@ object FakeAwsLambda {
                 })
             )
 
-    operator fun <In, Out : Any> invoke(
+    operator inline fun <reified In, Out : Any> invoke(
         fh: AdaptingFunctionHandler<In, Context, Out>, env: Map<String, String> = System.getenv()
     ): HttpHandler =
-        FakeAwsLambda(FunctionLoader(ServerlessMoshi) { fh }, env)
+        FakeAwsLambda(FunctionLoader(AwsLambdaMoshi) { fh }, env)
 
     private fun FakeContext(name: String) = object : Context {
         override fun getAwsRequestId() = UUID.randomUUID().toString()

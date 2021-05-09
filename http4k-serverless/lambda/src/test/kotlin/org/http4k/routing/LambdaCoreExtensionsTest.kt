@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.serverless.FunctionHandler
 import org.http4k.serverless.FunctionLoader
 import org.http4k.serverless.lambda.AwsEnvironment.AWS_LAMBDA_FUNCTION_NAME
 import org.http4k.util.proxy
@@ -15,12 +16,12 @@ class LambdaCoreExtensionsTest {
     fun `can compose many functions into a single function and routes according to environment`() {
         val functions = functions(
             "function1" bind FunctionLoader {
-                { e: ScheduledEvent, _: Context ->
+                FunctionHandler { e: ScheduledEvent, _: Context ->
                     "function1"
                 }
             },
             "function2" bind FunctionLoader {
-                { e: ScheduledEvent, _: Context ->
+                FunctionHandler { e: ScheduledEvent, _: Context ->
                     "function2"
                 }
             }

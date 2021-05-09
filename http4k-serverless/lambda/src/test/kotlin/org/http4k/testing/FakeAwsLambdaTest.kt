@@ -14,6 +14,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.functions
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.serverless.FunctionHandler
 import org.http4k.serverless.FunctionLoader
 import org.junit.jupiter.api.Test
 
@@ -22,11 +23,12 @@ class FakeAwsLambdaTest {
     fun `can launch function with FakeLambda and call it as if directly in lambda`() {
         val functions = functions(
             "function1" bind FunctionLoader {
-                { e: ScheduledEvent, _: Context ->
+                FunctionHandler { e: ScheduledEvent, _: Context ->
                     "function1"
-                }            },
+                }
+            },
             "function2" bind FunctionLoader {
-                { e: ScheduledEvent, _: Context ->
+                FunctionHandler { e: ScheduledEvent, _: Context ->
                     "function2"
                 }
             }
