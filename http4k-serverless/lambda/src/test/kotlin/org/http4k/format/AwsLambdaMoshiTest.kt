@@ -1,5 +1,10 @@
 package org.http4k.format
 
+import com.amazonaws.services.lambda.runtime.events.DynamodbEvent
+import com.amazonaws.services.lambda.runtime.events.KinesisEvent
+import com.amazonaws.services.lambda.runtime.events.KinesisFirehoseEvent
+import com.amazonaws.services.lambda.runtime.events.S3Event
+import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import com.amazonaws.services.lambda.runtime.events.SQSEvent
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.MessageAttribute
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage
@@ -25,6 +30,30 @@ import org.junit.jupiter.api.extension.ExtendWith
 class AwsLambdaMoshiTest {
 
     @Test
+    fun `Dynamodb event`(approver: Approver) {
+        approver.assertRoundtrips(DynamodbEvent().apply {
+        })
+    }
+
+    @Test
+    fun `Kinesis event`(approver: Approver) {
+        approver.assertRoundtrips(KinesisEvent().apply {
+        })
+    }
+
+    @Test
+    fun `KinesisFirehose event`(approver: Approver) {
+        approver.assertRoundtrips(KinesisFirehoseEvent().apply {
+        })
+    }
+
+    @Test
+    fun `S3 event`(approver: Approver) {
+        approver.assertRoundtrips(S3Event().apply {
+        })
+    }
+
+    @Test
     fun `scheduled event`(approver: Approver) {
         approver.assertRoundtrips(ScheduledEvent().apply {
             id = "id"
@@ -37,6 +66,12 @@ class AwsLambdaMoshiTest {
             detail = mapOf("detailName" to "detailValue")
         })
     }
+    @Test
+    fun `SNS event`(approver: Approver) {
+        approver.assertRoundtrips(SNSEvent().apply {
+        })
+    }
+
 
     @Test
     fun `sqs event`(approver: Approver) {
