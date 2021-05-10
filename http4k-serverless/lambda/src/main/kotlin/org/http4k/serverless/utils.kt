@@ -16,10 +16,12 @@ internal fun Map<*, *>.getStringList(name: String): List<String>? = get(name) as
 
 internal fun Map<String, Any>.toBody() = (getString("body")
     ?.let {
-        MemoryBody(when {
-            getBoolean("isBase64Encoded") == true -> Base64.getDecoder().decode(it.toByteArray())
-            else -> it.toByteArray()
-        })
+        MemoryBody(
+            when {
+                getBoolean("isBase64Encoded") == true -> Base64.getDecoder().decode(it.toByteArray())
+                else -> it.toByteArray()
+            }
+        )
     }
     ?: Body.EMPTY)
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 
 private class MyFunction : Http4kRequestHandler(FunctionLoader {
-    FunctionHandler { e: ScheduledEvent, _: Context ->
+    FnHandler { e: ScheduledEvent, _: Context ->
         "hello"
     }
 })

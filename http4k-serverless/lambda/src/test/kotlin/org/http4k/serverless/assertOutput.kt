@@ -11,7 +11,7 @@ import java.io.ByteArrayOutputStream
 import java.lang.reflect.Proxy
 
 fun assertOutput(
-    app: ApiGatewayFunctionLoader,
+    app: ApiGatewayFnLoader,
     request: Map<String, Any>,
     response: Map<String, Any>
 ) {

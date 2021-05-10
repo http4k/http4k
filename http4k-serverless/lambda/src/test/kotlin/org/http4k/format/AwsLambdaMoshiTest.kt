@@ -1,6 +1,8 @@
 package org.http4k.format
 
 import com.amazonaws.services.lambda.runtime.events.SQSEvent
+import com.amazonaws.services.lambda.runtime.events.SQSEvent.MessageAttribute
+import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -40,7 +42,7 @@ class AwsLambdaMoshiTest {
     fun `sqs event`(approver: Approver) {
         approver.assertRoundtrips(SQSEvent().apply {
             records = listOf(
-                SQSEvent.SQSMessage().apply {
+                SQSMessage().apply {
                     messageId = "messageId"
                     receiptHandle = "receiptHandle"
                     body = "body"
@@ -50,7 +52,7 @@ class AwsLambdaMoshiTest {
                     eventSource = "eventSource"
                     awsRegion = "awsRegion"
                     attributes = mapOf("attr" to "attrvalue")
-                    messageAttributes = mapOf("msgAttrName" to SQSEvent.MessageAttribute().apply {
+                    messageAttributes = mapOf("msgAttrName" to MessageAttribute().apply {
                         stringListValues = listOf("stringListValues")
                         stringValue = "stringValue"
                         dataType = "datatype"
@@ -65,11 +67,12 @@ class AwsLambdaMoshiTest {
 
 private inline fun <reified T : Any> Approver.assertRoundtrips(input: T) {
     val asString = asFormatString(input)
-    println(asString)
     assertApproved(
         Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body(asString)
     )
+//    println(input.toString())
+//    println(asA<T>(asString).toString())
     assertThat(asA<T>(asString).toString(), equalTo(input.toString()))
 }

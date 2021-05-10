@@ -11,8 +11,8 @@ import org.http4k.core.toUrlFormEncoded
 /**
  * Function loader for ApiGatewayRest Lambdas
  */
-class ApiGatewayRestFunctionLoader(input: AppLoaderWithContexts) :
-    ApiGatewayFunctionLoader(ApiGatewayRestAwsHttpAdapter, input) {
+class ApiGatewayRestFnLoader(input: AppLoaderWithContexts) :
+    ApiGatewayFnLoader(ApiGatewayRestAwsHttpAdapter, input) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
@@ -23,7 +23,7 @@ class ApiGatewayRestFunctionLoader(input: AppLoaderWithContexts) :
  * for further invocations.
  */
 abstract class ApiGatewayRestLambdaFunction(appLoader: AppLoaderWithContexts) :
-    Http4kRequestHandler(ApiGatewayRestFunctionLoader(appLoader)) {
+    Http4kRequestHandler(ApiGatewayRestFnLoader(appLoader)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }

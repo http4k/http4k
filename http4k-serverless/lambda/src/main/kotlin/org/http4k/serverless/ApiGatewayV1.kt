@@ -12,7 +12,7 @@ import org.http4k.core.toUrlFormEncoded
 /**
  * Function loader for ApiGatewayV1 Lambdas
  */
-class ApiGatewayV1FunctionLoader(input: AppLoaderWithContexts) : ApiGatewayFunctionLoader(ApiGatewayV1AwsHttpAdapter, input) {
+class ApiGatewayV1FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(ApiGatewayV1AwsHttpAdapter, input) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
@@ -22,8 +22,8 @@ class ApiGatewayV1FunctionLoader(input: AppLoaderWithContexts) : ApiGatewayFunct
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
  */
-abstract class ApiGatewayV1LambdaFunction(input: AppLoaderWithContexts)
-    :   Http4kRequestHandler(ApiGatewayV1FunctionLoader(input)) {
+abstract class ApiGatewayV1LambdaFunction(input: AppLoaderWithContexts) :
+    Http4kRequestHandler(ApiGatewayV1FnLoader(input)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
@@ -33,7 +33,8 @@ object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
         Request(
             Method.valueOf(getString("httpMethod") ?: error("method is invalid")),
             Uri.of(getString("path").orEmpty())
-                .query((getStringMap("queryStringParameters")?.toList() ?: emptyList()).toUrlFormEncoded()))
+                .query((getStringMap("queryStringParameters")?.toList() ?: emptyList()).toUrlFormEncoded())
+        )
             .headers(toHeaders())
             .body(toBody())
 

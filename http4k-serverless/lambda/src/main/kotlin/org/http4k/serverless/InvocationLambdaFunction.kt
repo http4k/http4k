@@ -14,15 +14,15 @@ import java.io.InputStream
 /**
  * Function loader for Invocation Lambdas
  */
-class InvocationFunctionLoader(private val appLoader: AppLoaderWithContexts) : FunctionLoader<Context> {
+class InvocationFnLoader(private val appLoader: AppLoaderWithContexts) : FnLoader<Context> {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 
     private val contexts = RequestContexts("lambda")
 
-    override operator fun invoke(env: Map<String, String>): StreamHandler<Context> {
+    override operator fun invoke(env: Map<String, String>): FnHandler<InputStream, Context, InputStream> {
         val app = appLoader(env, contexts)
-        return StreamHandler { inputStream, ctx ->
+        return FnHandler { inputStream, ctx ->
             val request = Request(POST, "/2015-03-31/functions/${ctx.functionName}/invocations")
                 .header("X-Amz-Invocation-Type", "RequestResponse")
                 .header("X-Amz-Log-Type", "Tail").body(inputStream)
@@ -41,7 +41,7 @@ class InvocationFunctionLoader(private val appLoader: AppLoaderWithContexts) : F
  * for further invocations.
  */
 abstract class InvocationLambdaFunction(appLoader: AppLoaderWithContexts) :
-    Http4kRequestHandler(InvocationFunctionLoader(appLoader)) {
+    Http4kRequestHandler(InvocationFnLoader(appLoader)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }

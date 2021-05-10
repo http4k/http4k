@@ -11,41 +11,35 @@ import org.joda.time.format.ISODateTimeFormat
 
 object ScheduledEventAdapter : JsonAdapter<ScheduledEvent>() {
     @FromJson
-    override fun fromJson(reader: JsonReader) = ScheduledEvent().apply {
+    override fun fromJson(reader: JsonReader) =
         with(reader) {
-            beginObject()
-            while (hasNext()) {
-                when (nextName()) {
+            obj(::ScheduledEvent) {
+                when (it) {
                     "id" -> id = nextString()
                     "detail-type" -> detailType = nextString()
                     "source" -> source = nextString()
                     "account" -> account = nextString()
-                    "time" -> time = nextString()?.let(DateTime::parse)
+                    "time" -> time = DateTime.parse(nextString())
                     "region" -> region = nextString()
-                    "resources" -> resources = readStringList()
-                    "detail" -> detail = readMap()
+                    "resources" -> resources = stringList()
+                    "detail" -> detail = stringMap()
                     else -> skipValue()
                 }
             }
-            endObject()
         }
-    }
 
     @ToJson
     override fun toJson(writer: JsonWriter, event: ScheduledEvent?) {
-        when (event) {
-            null -> writer.nullValue()
-            else -> with(writer) {
-                beginObject()
-                write("id", event.id)
-                write("detail-type", event.detailType)
-                write("source", event.source)
-                write("account", event.account)
-                write("time", event.time?.let { ISODateTimeFormat.dateTime().print(it) })
-                write("region", event.region)
-                write("resources", event.resources)
-                write("detail", event.detail)
-                endObject()
+        with(writer) {
+            obj(event) {
+                string("id", id)
+                string("detail-type", detailType)
+                string("source", source)
+                string("account", account)
+                string("time", time?.let { ISODateTimeFormat.dateTime().print(it) })
+                string("region", region)
+                list("resources", resources)
+                obj("detail", detail)
             }
         }
     }

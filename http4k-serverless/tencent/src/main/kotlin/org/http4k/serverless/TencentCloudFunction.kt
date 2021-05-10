@@ -51,7 +51,7 @@ private fun APIGatewayProxyRequestEvent.asHttp4kRequest(): Request {
         memo.header(first, second)
     }
 
-    return queryStringParameters.entries.fold(withHeaders, { acc, (first, second) -> acc.query(first, second) })
+    return queryStringParameters.entries.fold(withHeaders) { acc, (first, second) -> acc.query(first, second) }
 }
 
 private fun APIGatewayProxyRequestEvent.buildUri() =

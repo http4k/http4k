@@ -8,7 +8,7 @@ import java.io.OutputStream
 /**
  * Adapts between http4k and AWS Lambda APIs..
  */
-abstract class Http4kRequestHandler(loader: FunctionLoader<Context>) : RequestStreamHandler {
+abstract class Http4kRequestHandler(loader: FnLoader<Context>) : RequestStreamHandler {
     private val function = loader(System.getenv())
 
     override fun handleRequest(input: InputStream, output: OutputStream, context: Context) {
