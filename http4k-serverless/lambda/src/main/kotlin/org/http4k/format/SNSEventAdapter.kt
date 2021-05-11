@@ -9,6 +9,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 
 object SNSEventAdapter : JsonAdapter<SNSEvent>() {
@@ -32,6 +33,7 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
                                     "type" -> type = nextString()
                                     "signatureVersion" -> signatureVersion = nextString()
                                     "signature" -> signature = nextString()
+                                    "timestamp" -> timestamp = DateTime.parse(nextString())
                                     "topicArn" -> topicArn = nextString()
                                     "messageAttributes" -> messageAttributes = map {
                                         obj(::MessageAttribute) {

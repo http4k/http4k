@@ -1,0 +1,21 @@
+{
+  "records": [
+    {
+      "eventSource": "eventSource",
+      "eventID": "eventID",
+      "invokeIdentityArn": "invokeIdentityArn",
+      "eventName": "eventName",
+      "eventVersion": "eventVersion",
+      "eventSourceARN": "eventSourceARN",
+      "awsRegion": "awsRegion",
+      "kinesis": {
+        "kinesisSchemaVersion": "kinesisSchemaVersion",
+        "encryptionType": "encryptionType",
+        "partitionKey": "partitionKey",
+        "sequenceNumber": "sequenceNumber",
+        "approximateArrivalTimestamp": 0,
+        "data": "YUdWc2JHOD0="
+      }
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "records": [
+    {
+      "eventSourceARN": "eventSourceARN",
+      "eventID": "eventID",
+      "eventName": "eventName",
+      "eventVersion": "eventVersion",
+      "eventSource": "eventSource",
+      "awsRegion": "awsRegion",
+      "userIdentity": {
+        "principalId": "principalId",
+        "type": "type"
+      },
+      "dynamodb": {
+        "approximateCreationDateTime": 0,
+        "sequenceNumber": "sequenceNumber",
+        "sizeBytes": 123,
+        "streamViewType": "KEYS_ONLY",
+        "keys": {
+          "name": {
+            "B": "120=",
+            "BS": [
+              "120="
+            ],
+            "BOOL": true,
+            "L": [
+              {
+                "S": "123"
+              }
+            ],
+            "M": {
+            },
+            "N": "123",
+            "NS": [
+              "123"
+            ],
+            "S": "123",
+            "SS": [
+              "123"
+            ]
+          }
+        },
+        "newImage": {
+          "name": {
+            "B": "120=",
+            "BS": [
+              "120="
+            ],
+            "BOOL": true,
+            "L": [
+              {
+                "S": "123"
+              }
+            ],
+            "M": {
+            },
+            "N": "123",
+            "NS": [
+              "123"
+            ],
+            "S": "123",
+            "SS": [
+              "123"
+            ]
+          }
+        },
+        "oldImage": {
+          "name": {
+            "B": "120=",
+            "BS": [
+              "120="
+            ],
+            "BOOL": true,
+            "L": [
+              {
+                "S": "123"
+              }
+            ],
+            "M": {
+            },
+            "N": "123",
+            "NS": [
+              "123"
+            ],
+            "S": "123",
+            "SS": [
+              "123"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

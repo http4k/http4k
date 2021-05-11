@@ -1,0 +1,27 @@
+{
+  "records": [
+    {
+      "eventSource": "eventSource",
+      "eventSubscriptionArn": "eventSubscriptionArn",
+      "eventVersion": "eventVersion",
+      "sns": {
+        "signingCertUrl": "signingCertUrl",
+        "messageId": "messageId",
+        "message": "message",
+        "subject": "subject",
+        "unsubscribeUrl": "unsubscribeUrl",
+        "type": "type",
+        "signatureVersion": "type",
+        "signature": "signature",
+        "topicArn": "topicArn",
+        "timestamp": "1970-01-01T00:00:00.000Z",
+        "messageAttributes": {
+          "msgAttrName": {
+            "type": "type",
+            "value": "value"
+          }
+        }
+      }
+    }
+  ]
+}

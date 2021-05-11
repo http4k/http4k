@@ -9,6 +9,12 @@ import com.amazonaws.services.lambda.runtime.events.SQSEvent
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.MessageAttribute
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
+import com.amazonaws.services.lambda.runtime.events.models.dynamodb.AttributeValue
+import com.amazonaws.services.lambda.runtime.events.models.dynamodb.Identity
+import com.amazonaws.services.lambda.runtime.events.models.dynamodb.StreamRecord
+import com.amazonaws.services.lambda.runtime.events.models.dynamodb.StreamViewType.KEYS_ONLY
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.RequestParametersEntity
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.asByteBuffer
@@ -23,58 +29,165 @@ import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import org.joda.time.DateTimeZone.UTC
+import org.joda.time.format.ISODateTimeFormat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.nio.ByteBuffer.wrap
+import java.util.Base64
+import java.util.Date
 
 @ExtendWith(JsonApprovalTest::class)
 class AwsLambdaMoshiTest {
-
     @Test
     fun `Dynamodb event`(approver: Approver) {
         approver.assertRoundtrips(DynamodbEvent().apply {
+            records = listOf(DynamodbEvent.DynamodbStreamRecord().apply {
+                eventSourceARN = "eventSourceARN"
+                eventID = "eventID"
+                eventName = "eventName"
+                eventVersion = "eventVersion"
+                eventSource = "eventSource"
+                awsRegion = "awsRegion"
+                userIdentity = Identity().apply {
+                    principalId = "principalId"
+                    type = "type"
+                }
+                dynamodb = StreamRecord().apply {
+                    approximateCreationDateTime = Date(0)
+                    sequenceNumber = "sequenceNumber"
+                    sizeBytes = 123
+                    setStreamViewType(KEYS_ONLY)
+                    keys = item()
+                    oldImage = item()
+                    newImage = item()
+                }
+            })
         })
     }
+
+    private fun item(): Map<String, AttributeValue> = mapOf("name" to AttributeValue().apply {
+        val attributeValue = this
+        attributeValue.b = wrap(Base64.getDecoder().decode("123"))
+        attributeValue.setBS(listOf(wrap(Base64.getDecoder().decode("123"))))
+        attributeValue.bool = true
+        attributeValue.setL(listOf(AttributeValue().apply { s = "123" }))
+        attributeValue.m = mapOf()
+        attributeValue.n = "123"
+        attributeValue.setNS(listOf("123"))
+        attributeValue.s = "123"
+        attributeValue.setSS(listOf("123"))
+    })
 
     @Test
     fun `Kinesis event`(approver: Approver) {
         approver.assertRoundtrips(KinesisEvent().apply {
+            records = listOf(
+                KinesisEvent.KinesisEventRecord().apply {
+                    eventSource = "eventSource"
+                    eventID = "eventID"
+                    invokeIdentityArn = "invokeIdentityArn"
+                    eventName = "eventName"
+                    eventVersion = "eventVersion"
+                    eventSourceARN = "eventSourceARN"
+                    awsRegion = "awsRegion"
+                    kinesis = KinesisEvent.Record().apply {
+                        kinesisSchemaVersion = "kinesisSchemaVersion"
+                        encryptionType = "encryptionType"
+                        partitionKey = "partitionKey"
+                        sequenceNumber = "sequenceNumber"
+                        approximateArrivalTimestamp = Date(0)
+                        data = wrap(Base64.getEncoder().encode("hello".toByteArray()))
+                    }
+                })
         })
     }
 
     @Test
     fun `KinesisFirehose event`(approver: Approver) {
         approver.assertRoundtrips(KinesisFirehoseEvent().apply {
+            invocationId = "invocationId"
+            deliveryStreamArn = "deliveryStreamArn"
+            region = "region"
+            records = listOf(
+                KinesisFirehoseEvent.Record().apply {
+                    data = wrap(Base64.getEncoder().encode("hello".toByteArray()))
+                    recordId = "recordId"
+                    approximateArrivalEpoch = 0
+                    approximateArrivalTimestamp = 0
+                    kinesisRecordMetadata = mapOf("hello" to "world")
+                })
         })
     }
 
     @Test
     fun `S3 event`(approver: Approver) {
-        approver.assertRoundtrips(S3Event().apply {
-        })
+        approver.assertRoundtrips(S3Event(
+            listOf(S3EventNotification.S3EventNotificationRecord(
+                "awsRegion",
+                "eventName",
+                "eventSource",
+                ISODateTimeFormat.dateTime().print(DateTime(0, UTC)),
+                "eventVersion",
+                RequestParametersEntity("sourceIp"),
+                S3EventNotification.ResponseElementsEntity("xAmzId2", "xAmzRequestId"),
+                S3EventNotification.S3Entity("configurationId",
+                S3EventNotification.S3BucketEntity(
+                    "name",
+                    S3EventNotification.UserIdentityEntity("principalId"), "arn"),
+                    S3EventNotification.S3ObjectEntity("key", 123, "eTag", "versiondId", "sequence"),
+                    "s3SchemaVersion"
+                ),
+                S3EventNotification.UserIdentityEntity("principalId")
+            ))
+        ))
     }
 
     @Test
-    fun `scheduled event`(approver: Approver) {
+    fun `Scheduled event`(approver: Approver) {
         approver.assertRoundtrips(ScheduledEvent().apply {
             id = "id"
             detailType = "detail"
             source = "source"
             account = "account"
-            time = DateTime(0, DateTimeZone.UTC)
+            time = DateTime(0, UTC)
             region = "region"
             resources = listOf("resources")
             detail = mapOf("detailName" to "detailValue")
         })
     }
+
     @Test
     fun `SNS event`(approver: Approver) {
         approver.assertRoundtrips(SNSEvent().apply {
+            records = listOf(
+                SNSEvent.SNSRecord().apply {
+                    eventSource = "eventSource"
+                    eventSubscriptionArn = "eventSubscriptionArn"
+                    eventVersion = "eventVersion"
+                    setSns(SNSEvent.SNS().apply {
+                        signingCertUrl = "signingCertUrl"
+                        messageId = "messageId"
+                        message = "message"
+                        subject = "subject"
+                        unsubscribeUrl = "unsubscribeUrl"
+                        type = "type"
+                        signatureVersion = "type"
+                        signature = "signature"
+                        topicArn = "topicArn"
+                        timestamp = DateTime(0, UTC)
+                        messageAttributes = mapOf("msgAttrName" to SNSEvent.MessageAttribute().apply {
+                            type = "type"
+                            value = "value"
+                        })
+                    })
+                }
+            )
         })
     }
 
-
     @Test
-    fun `sqs event`(approver: Approver) {
+    fun `SQS event`(approver: Approver) {
         approver.assertRoundtrips(SQSEvent().apply {
             records = listOf(
                 SQSMessage().apply {
@@ -107,7 +220,8 @@ private inline fun <reified T : Any> Approver.assertRoundtrips(input: T) {
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body(asString)
     )
-//    println(input.toString())
-//    println(asA<T>(asString).toString())
+//    println(asString)
+    println(input.toString())
+    println(asA<T>(asString).toString())
     assertThat(asA<T>(asString).toString(), equalTo(input.toString()))
 }

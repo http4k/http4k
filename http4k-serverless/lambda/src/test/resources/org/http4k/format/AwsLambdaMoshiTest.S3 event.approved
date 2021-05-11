@@ -1,0 +1,38 @@
+{
+  "records": [
+    {
+      "awsRegion": "awsRegion",
+      "eventName": "eventName",
+      "eventSource": "eventSource",
+      "eventVersion": "eventVersion",
+      "requestParameters": {
+        "sourceIPAddress": "sourceIp"
+      },
+      "responseElements": {
+        "xAmzId2": "xAmzId2",
+        "xAmzRequestId": "xAmzRequestId"
+      },
+      "userIdentity": {
+        "principalId": "principalId"
+      },
+      "s3": {
+        "configurationId": "configurationId",
+        "s3SchemaVersion": "s3SchemaVersion",
+        "bucket": {
+          "arn": "arn",
+          "name": "name",
+          "ownerIdentity": {
+            "principalId": "principalId"
+          }
+        },
+        "object": {
+          "key": "key",
+          "size": 123,
+          "eTag": "eTag",
+          "versionId": "versiondId",
+          "sequencer": "sequence"
+        }
+      }
+    }
+  ]
+}

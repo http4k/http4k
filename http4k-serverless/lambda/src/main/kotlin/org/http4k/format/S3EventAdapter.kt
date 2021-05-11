@@ -3,10 +3,8 @@ package org.http4k.format
 import com.amazonaws.services.lambda.runtime.events.S3Event
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.RequestParametersEntity
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.ResponseElementsEntity
-import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3BucketEntity
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3Entity
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3EventNotificationRecord
-import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3ObjectEntity
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.UserIdentityEntity
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
@@ -23,26 +21,48 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
             while (hasNext()) {
                 when (nextName()) {
                     "records" -> {
-                        beginObject()
-                        S3EventNotificationRecord(
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            RequestParametersEntity(""),
-                            ResponseElementsEntity("", ""),
-                            S3Entity(
-                                "",
-                                S3BucketEntity(
-                                    "", UserIdentityEntity(""), ""
-                                ),
-                                S3ObjectEntity("", 1, "", "", ""),
-                                ""
-                            ),
-                            UserIdentityEntity("")
-                        )
-                        endObject()
+                        beginArray()
+                        val recordMap = mutableMapOf<String, Any>()
+                        while (hasNext()) {
+                            beginObject()
+                            val name = nextName()
+                            recordMap[name] = when (name) {
+                                "awsRegion" -> nextString()
+                                "eventName" -> nextString()
+                                "eventSource" -> nextString()
+                                "eventTime" -> nextString()
+                                "eventVersion" -> nextString()
+                                "requestParameters" -> {
+                                    beginObject()
+                                    nextName()
+                                    RequestParametersEntity(nextString()).also { endObject() }
+                                }
+                                "responseElements" -> {
+                                    val recordMap = mutableMapOf<String, Any>()
+                                    val name = nextName()
+                                    recordMap[name] = when (name) {
+                                        else -> error("unknown key")
+                                    }
+                                    nextString()
+                                }
+                                "s3" -> nextString()
+                                "userIdentity" -> nextString()
+                                else -> error("unknown key")
+                            }
+                            records += S3EventNotificationRecord(
+                                recordMap["awsRegion"] as? String,
+                                recordMap["eventName"] as? String,
+                                recordMap["eventSource"] as? String,
+                                recordMap["eventTime"] as? String,
+                                recordMap["eventVersion"] as? String,
+                                recordMap["requestParameters"] as? RequestParametersEntity,
+                                recordMap["responseElements"] as? ResponseElementsEntity,
+                                recordMap["s3"] as? S3Entity,
+                                recordMap["userIdentity"] as? UserIdentityEntity,
+                            )
+                            endObject()
+                        }
+                        endArray()
                     }
                     else -> skipName()
                 }
@@ -56,13 +76,14 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
         with(writer) {
             obj(event) {
                 list("records", records) {
-                    string("awsRegion", awsRegion)
-                    string("eventName", eventName)
-                    string("eventSource", eventSource)
-                    string("eventVersion", eventVersion)
-                    obj("requestParameters", requestParameters) {
-                        string("sourceIPAddress", sourceIPAddress)
-                    }
+                    obj(this) {
+                        string("awsRegion", awsRegion)
+                        string("eventName", eventName)
+                        string("eventSource", eventSource)
+                        string("eventVersion", eventVersion)
+                        obj("requestParameters", requestParameters) {
+                            string("sourceIPAddress", sourceIPAddress)
+                        }
                     obj("responseElements", responseElements) {
                         string("xAmzId2", getxAmzId2())
                         string("xAmzRequestId", getxAmzRequestId())
@@ -87,6 +108,7 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
                             string("versionId", versionId)
                             string("sequencer", sequencer)
                         }
+                    }
                     }
                 }
             }

@@ -79,6 +79,8 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
                             number("sizeBytes", sizeBytes)
                             string("streamViewType", streamViewType)
                             obj("keys", keys) { entries.forEach { item(it) } }
+                            obj("newImage", newImage) { entries.forEach { item(it) } }
+                            obj("oldImage", oldImage) { entries.forEach { item(it) } }
                         }
                     }
                 }
@@ -94,7 +96,11 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
         string("B", attributeValue.b?.let { getEncoder().encodeToString(it.array()) })
         list("BS", attributeValue.bs?.map { getEncoder().encodeToString(it.array()) })
         boolean("BOOL", attributeValue.bool)
-        list("L", attributeValue.l?.map { it.toString() })
+        list("L", attributeValue.l) {
+            beginObject()
+            attributeValue(this)
+            endObject()
+        }
         obj("M", attributeValue.m) { forEach { item(it) } }
         string("N", attributeValue.n)
         list("NS", attributeValue.ns)
