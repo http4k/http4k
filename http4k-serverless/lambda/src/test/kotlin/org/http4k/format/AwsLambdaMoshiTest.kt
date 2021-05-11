@@ -13,8 +13,13 @@ import com.amazonaws.services.lambda.runtime.events.models.dynamodb.AttributeVal
 import com.amazonaws.services.lambda.runtime.events.models.dynamodb.Identity
 import com.amazonaws.services.lambda.runtime.events.models.dynamodb.StreamRecord
 import com.amazonaws.services.lambda.runtime.events.models.dynamodb.StreamViewType.KEYS_ONLY
-import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.RequestParametersEntity
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.ResponseElementsEntity
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3BucketEntity
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3Entity
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3EventNotificationRecord
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3ObjectEntity
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.UserIdentityEntity
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.asByteBuffer
@@ -28,7 +33,6 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.format.ISODateTimeFormat
 import org.junit.jupiter.api.Test
@@ -122,25 +126,31 @@ class AwsLambdaMoshiTest {
 
     @Test
     fun `S3 event`(approver: Approver) {
-        approver.assertRoundtrips(S3Event(
-            listOf(S3EventNotification.S3EventNotificationRecord(
-                "awsRegion",
-                "eventName",
-                "eventSource",
-                ISODateTimeFormat.dateTime().print(DateTime(0, UTC)),
-                "eventVersion",
-                RequestParametersEntity("sourceIp"),
-                S3EventNotification.ResponseElementsEntity("xAmzId2", "xAmzRequestId"),
-                S3EventNotification.S3Entity("configurationId",
-                S3EventNotification.S3BucketEntity(
-                    "name",
-                    S3EventNotification.UserIdentityEntity("principalId"), "arn"),
-                    S3EventNotification.S3ObjectEntity("key", 123, "eTag", "versionId", "sequence"),
-                    "s3SchemaVersion"
-                ),
-                S3EventNotification.UserIdentityEntity("principalId")
-            ))
-        ))
+        approver.assertRoundtrips(
+            S3Event(
+                listOf(
+                    S3EventNotificationRecord(
+                        "awsRegion",
+                        "eventName",
+                        "eventSource",
+                        ISODateTimeFormat.dateTime().print(DateTime(0, UTC)),
+                        "eventVersion",
+                        RequestParametersEntity("sourceIp"),
+                        ResponseElementsEntity("xAmzId2", "xAmzRequestId"),
+                        S3Entity(
+                            "configurationId",
+                            S3BucketEntity(
+                                "name",
+                                UserIdentityEntity("principalId"), "arn"
+                            ),
+                            S3ObjectEntity("key", 123, "eTag", "versionId", "sequence"),
+                            "s3SchemaVersion"
+                        ),
+                        UserIdentityEntity("principalId")
+                    )
+                )
+            )
+        )
     }
 
     @Test
