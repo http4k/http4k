@@ -10,6 +10,6 @@ fun interface ServerlessConfig<Ctx> {
     fun asServer(fn: FnLoader<Ctx>): Http4kServer
 }
 
-fun <Ctx> FnHandler<InputStream, Ctx, InputStream>.toServer(config: ServerlessConfig<Ctx>) = config.asServer { this }
+fun <Ctx> FnHandler<InputStream, Ctx, InputStream>.asServer(config: ServerlessConfig<Ctx>) = config.asServer { this }
 
-fun <Ctx> FnLoader<Ctx>.toServer(config: ServerlessConfig<Ctx>) = config.asServer(this)
+fun <Ctx> FnLoader<Ctx>.asServer(config: ServerlessConfig<Ctx>) = config.asServer(this)

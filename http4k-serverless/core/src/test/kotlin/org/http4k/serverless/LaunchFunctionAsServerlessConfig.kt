@@ -5,7 +5,7 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -21,9 +21,9 @@ class ServerlessConfigTest {
             (input + c + input.reversed()).byteInputStream()
         }
 
-        val server = fnHandler.toServer {
+        val server = fnHandler.asServer {
             { req: Request ->
-                Response(Status.OK).body(it(emptyMap())(req.body.stream, "!!"))
+                Response(OK).body(it(emptyMap())(req.body.stream, "!!"))
             }.asServer(SunHttp())
         }
 
@@ -31,7 +31,8 @@ class ServerlessConfigTest {
             val http = JavaHttpClient()
             assertThat(
                 http(Request(GET, "http://localhost:${it.port()}").body("helloworld")),
-                hasBody("helloworld!!dlrowolleh"))
+                hasBody("helloworld!!dlrowolleh")
+            )
         }
     }
 }
