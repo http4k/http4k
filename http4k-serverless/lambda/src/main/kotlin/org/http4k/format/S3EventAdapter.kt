@@ -39,11 +39,18 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
                                 }
                                 "responseElements" -> {
                                     val recordMap = mutableMapOf<String, Any>()
-                                    val name = nextName()
-                                    recordMap[name] = when (name) {
-                                        else -> error("unknown key")
+                                    beginObject()
+                                    while (hasNext()) {
+                                        recordMap[name] = when (name) {
+                                            "xAmzId2" -> nextString()
+                                            "xAmzRequestId" -> nextString()
+                                            else -> error("unknown key")
+                                        }
                                     }
-                                    nextString()
+                                    ResponseElementsEntity(
+                                        recordMap["xAmzId2"] as? String,
+                                        recordMap["xAmzRequestId"] as? String
+                                    ).also { endObject() }
                                 }
                                 "s3" -> nextString()
                                 "userIdentity" -> nextString()
