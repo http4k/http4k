@@ -84,31 +84,31 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
                         obj("requestParameters", requestParameters) {
                             string("sourceIPAddress", sourceIPAddress)
                         }
-                    obj("responseElements", responseElements) {
-                        string("xAmzId2", getxAmzId2())
-                        string("xAmzRequestId", getxAmzRequestId())
-                    }
-                    obj("userIdentity", userIdentity) {
-                        string("principalId", principalId)
-                    }
-                    obj("s3", s3) {
-                        string("configurationId", configurationId)
-                        string("s3SchemaVersion", s3SchemaVersion)
-                        obj("bucket", bucket) {
-                            string("arn", arn)
-                            string("name", name)
-                            obj("ownerIdentity", ownerIdentity) {
-                                string("principalId", principalId)
+                        obj("responseElements", responseElements) {
+                            string("xAmzId2", getxAmzId2())
+                            string("xAmzRequestId", getxAmzRequestId())
+                        }
+                        obj("userIdentity", userIdentity) {
+                            string("principalId", principalId)
+                        }
+                        obj("s3", s3) {
+                            string("configurationId", configurationId)
+                            string("s3SchemaVersion", s3SchemaVersion)
+                            obj("bucket", bucket) {
+                                string("arn", arn)
+                                string("name", name)
+                                obj("ownerIdentity", ownerIdentity) {
+                                    string("principalId", principalId)
+                                }
+                            }
+                            obj("object", `object`) {
+                                string("key", key)
+                                number("size", sizeAsLong)
+                                string("eTag", geteTag())
+                                string("versionId", versionId)
+                                string("sequencer", sequencer)
                             }
                         }
-                        obj("object", `object`) {
-                            string("key", key)
-                            number("size", sizeAsLong)
-                            string("eTag", geteTag())
-                            string("versionId", versionId)
-                            string("sequencer", sequencer)
-                        }
-                    }
                     }
                 }
             }
