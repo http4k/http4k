@@ -13,7 +13,10 @@ fun <T> JsonReader.obj(mk: () -> T, fn: T.(String) -> Unit): T {
 fun <T> JsonReader.obj(build: (Map<String, Any>) -> T, item: (String) -> Any): T {
     beginObject()
     val map = mutableMapOf<String, Any>()
-    while (hasNext()) map[nextName()] = item(nextName())
+    while (hasNext()) {
+        val nextName = nextName()
+        map[nextName] = item(nextName)
+    }
     return build(map).also { endObject() }
 }
 
