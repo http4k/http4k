@@ -230,8 +230,5 @@ private inline fun <reified T : Any> Approver.assertRoundtrips(input: T) {
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body(asString)
     )
-    println(asString)
-    println(input.toString())
-    println(asA<T>(asString).toString())
-    assertThat(asA<T>(asString).toString(), equalTo(input.toString()))
+    assertThat(asFormatString(asA<T>(asString)), equalTo(asString))
 }
