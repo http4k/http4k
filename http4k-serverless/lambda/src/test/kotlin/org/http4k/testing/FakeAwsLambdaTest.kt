@@ -15,8 +15,8 @@ import org.http4k.routing.functions
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.FnHandler
-import org.http4k.serverless.FunctionLoader
 import org.http4k.serverless.InvocationFnLoader
+import org.http4k.serverless.lambda.FnLoader
 import org.junit.jupiter.api.Test
 
 class FakeAwsLambdaTest {
@@ -24,7 +24,7 @@ class FakeAwsLambdaTest {
     @Test
     fun `can launch function with FakeLambda and call it as if directly in lambda`() {
         val functions = functions(
-            "aFunction" bind FunctionLoader {
+            "aFunction" bind FnLoader {
                 FnHandler { e: ScheduledEvent, _ ->
                     "aFunction"
                 }
