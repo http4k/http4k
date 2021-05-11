@@ -42,7 +42,7 @@ interface Body : Closeable {
         operator fun invoke(body: InputStream, length: Long? = null): Body = StreamBody(body, length)
 
         @JvmField
-        val EMPTY: Body = MemoryBody(ByteArray(0))
+        val EMPTY: Body = MemoryBody(ByteBuffer.allocate(0))
     }
 }
 
