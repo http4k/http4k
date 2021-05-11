@@ -1,12 +1,15 @@
 package org.http4k.serverless
 
 import org.http4k.server.Http4kServer
+import java.io.InputStream
 
 /**
  * Launching point for custom Serverless runtimes.
  */
-interface ServerlessConfig {
-    fun <Ctx> asServer(app: FnLoader<Ctx>): Http4kServer
+fun interface ServerlessConfig<Ctx> {
+    fun asServer(fn: FnLoader<Ctx>): Http4kServer
 }
 
-fun <Ctx> FnLoader<Ctx>.toServer(config: ServerlessConfig) = config.asServer(this)
+fun <Ctx> FnHandler<InputStream, Ctx, InputStream>.toServer(config: ServerlessConfig<Ctx>) = config.asServer { this }
+
+fun <Ctx> FnLoader<Ctx>.toServer(config: ServerlessConfig<Ctx>) = config.asServer(this)
