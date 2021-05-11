@@ -86,4 +86,3 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
         }
     }
 }
-
