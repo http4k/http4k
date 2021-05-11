@@ -10,6 +10,14 @@ fun <T> JsonReader.obj(mk: () -> T, fn: T.(String) -> Unit): T {
     return item
 }
 
+fun <T> JsonReader.obj(build: (Map<String, Any>) -> T, item: (String) -> Any): T {
+    beginObject()
+    val map = mutableMapOf<String, Any>()
+    while (hasNext()) map[nextName()] = item(nextName())
+    return build(map).also { endObject() }
+}
+
+
 fun <T> JsonReader.list(mk: () -> T, item: T.(String) -> Unit): List<T> {
     val items = mutableListOf<T>()
     beginArray()

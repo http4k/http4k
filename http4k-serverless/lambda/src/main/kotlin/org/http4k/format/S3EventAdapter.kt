@@ -25,7 +25,7 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
                     "records" -> {
                         beginArray()
                         while (hasNext()) {
-                            records += obj({
+                            records += obj({ it ->
                                 S3EventNotificationRecord(
                                     it["awsRegion"] as? String,
                                     it["eventName"] as? String,
@@ -60,93 +60,6 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
             endObject()
             S3Event(records)
         }
-
-    private fun JsonReader.userIdentity() = obj({ UserIdentityEntity(it["principalId"] as? String) }) {
-        when (it) {
-            "principalId" -> nextString()
-            else -> error("unknown key")
-        }
-    }
-
-    private fun JsonReader.s3() = obj(
-        {
-            S3Entity(
-                it["configurationId"] as? String,
-                it["bucket"] as? S3BucketEntity,
-                it["object"] as? S3ObjectEntity,
-                it["s3SchemaVersion"] as? String
-            )
-        }
-    ) {
-        when (it) {
-            "configurationId" -> nextString()
-            "bucket" -> bucket()
-            "object" -> `object`()
-            "s3SchemaVersion" -> nextString()
-            else -> error("unknown key")
-        }
-    }
-
-    private fun JsonReader.`object`() =
-        obj({
-            S3ObjectEntity(
-                it["key"] as? String,
-                it["size"] as? Long,
-                it["eTag"] as? String,
-                it["versionId"] as? String,
-                it["sequencer"] as? String,
-            )
-        }) {
-            when (it) {
-                "key" -> nextString()
-                "size" -> nextLong()
-                "eTag" -> nextString()
-                "versionId" -> nextString()
-                "sequencer" -> nextString()
-                else -> error("unknown key")
-            }
-        }
-
-    private fun JsonReader.bucket() =
-        obj({
-            S3BucketEntity(
-                it["name"] as? String,
-                it["ownerIdentity"] as? UserIdentityEntity,
-                it["arn"] as? String,
-            )
-        }) {
-            when (it) {
-                "name" -> nextString()
-                "ownerIdentity" -> userIdentity()
-                "arn" -> nextString()
-                else -> error("unknown key")
-            }
-        }
-
-
-    private fun JsonReader.requestParameters() =
-        obj({ RequestParametersEntity(it["sourceIPAddress"] as? String) }) {
-            when (it) {
-                "sourceIPAddress" -> nextString()
-                else -> error("unknown key")
-            }
-        }
-
-    private fun JsonReader.responseElements() =
-        obj({ ResponseElementsEntity(it["xAmzId2"] as? String, it["xAmzRequestId"] as? String) }) {
-            when (it) {
-                "xAmzId2" -> nextString()
-                "xAmzRequestId" -> nextString()
-                else -> error("unknown key")
-            }
-        }
-
-    fun <T> JsonReader.obj(build: (Map<String, Any>) -> T, item: (String) -> Any): T {
-        beginObject()
-        val map = mutableMapOf<String, Any>()
-        while (hasNext()) map[nextName()] = item(nextName())
-        return build(map).also { endObject() }
-    }
 
     @ToJson
     override fun toJson(writer: JsonWriter, event: S3Event?) {
@@ -192,3 +105,82 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
         }
     }
 }
+
+private fun JsonReader.userIdentity() = obj({ it -> UserIdentityEntity(it["principalId"] as? String) }) {
+    when (it) {
+        "principalId" -> nextString()
+        else -> error("unknown key")
+    }
+}
+
+private fun JsonReader.s3() = obj(
+    { it ->
+        S3Entity(
+            it["configurationId"] as? String,
+            it["bucket"] as? S3BucketEntity,
+            it["object"] as? S3ObjectEntity,
+            it["s3SchemaVersion"] as? String
+        )
+    }
+) {
+    when (it) {
+        "configurationId" -> nextString()
+        "bucket" -> bucket()
+        "object" -> `object`()
+        "s3SchemaVersion" -> nextString()
+        else -> error("unknown key")
+    }
+}
+
+private fun JsonReader.`object`() =
+    obj({ it ->
+        S3ObjectEntity(
+            it["key"] as? String,
+            it["size"] as? Long,
+            it["eTag"] as? String,
+            it["versionId"] as? String,
+            it["sequencer"] as? String,
+        )
+    }) {
+        when (it) {
+            "key" -> nextString()
+            "size" -> nextLong()
+            "eTag" -> nextString()
+            "versionId" -> nextString()
+            "sequencer" -> nextString()
+            else -> error("unknown key")
+        }
+    }
+
+private fun JsonReader.bucket() =
+    obj({ it ->
+        S3BucketEntity(
+            it["name"] as? String,
+            it["ownerIdentity"] as? UserIdentityEntity,
+            it["arn"] as? String,
+        )
+    }) {
+        when (it) {
+            "name" -> nextString()
+            "ownerIdentity" -> userIdentity()
+            "arn" -> nextString()
+            else -> error("unknown key")
+        }
+    }
+
+private fun JsonReader.requestParameters() =
+    obj({ it -> RequestParametersEntity(it["sourceIPAddress"] as? String) }) {
+        when (it) {
+            "sourceIPAddress" -> nextString()
+            else -> error("unknown key")
+        }
+    }
+
+private fun JsonReader.responseElements() =
+    obj({ it -> ResponseElementsEntity(it["xAmzId2"] as? String, it["xAmzRequestId"] as? String) }) {
+        when (it) {
+            "xAmzId2" -> nextString()
+            "xAmzRequestId" -> nextString()
+            else -> error("unknown key")
+        }
+    }
