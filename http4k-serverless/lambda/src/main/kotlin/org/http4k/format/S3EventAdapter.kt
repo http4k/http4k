@@ -24,34 +24,33 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
                 when (nextName()) {
                     "records" -> {
                         beginArray()
-                        val map = mutableMapOf<String, Any>()
                         while (hasNext()) {
-                            beginObject()
-                            val name = nextName()
-                            map[name] = when (name) {
-                                "awsRegion" -> nextString()
-                                "eventName" -> nextString()
-                                "eventSource" -> nextString()
-                                "eventTime" -> nextString()
-                                "eventVersion" -> nextString()
-                                "requestParameters" -> requestParameters()
-                                "responseElements" -> responseElements()
-                                "s3" -> s3()
-                                "userIdentity" -> userIdentity()
-                                else -> error("unknown key")
+                            records += obj({
+                                S3EventNotificationRecord(
+                                    it["awsRegion"] as? String,
+                                    it["eventName"] as? String,
+                                    it["eventSource"] as? String,
+                                    it["eventTime"] as? String,
+                                    it["eventVersion"] as? String,
+                                    it["requestParameters"] as? RequestParametersEntity,
+                                    it["responseElements"] as? ResponseElementsEntity,
+                                    it["s3"] as? S3Entity,
+                                    it["userIdentity"] as? UserIdentityEntity,
+                                )
+                            }) {
+                                when (it) {
+                                    "awsRegion" -> nextString()
+                                    "eventName" -> nextString()
+                                    "eventSource" -> nextString()
+                                    "eventTime" -> nextString()
+                                    "eventVersion" -> nextString()
+                                    "requestParameters" -> requestParameters()
+                                    "responseElements" -> responseElements()
+                                    "s3" -> s3()
+                                    "userIdentity" -> userIdentity()
+                                    else -> error("unknown key")
+                                }
                             }
-                            records += S3EventNotificationRecord(
-                                map["awsRegion"] as? String,
-                                map["eventName"] as? String,
-                                map["eventSource"] as? String,
-                                map["eventTime"] as? String,
-                                map["eventVersion"] as? String,
-                                map["requestParameters"] as? RequestParametersEntity,
-                                map["responseElements"] as? ResponseElementsEntity,
-                                map["s3"] as? S3Entity,
-                                map["userIdentity"] as? UserIdentityEntity,
-                            )
-                            endObject()
                         }
                         endArray()
                     }

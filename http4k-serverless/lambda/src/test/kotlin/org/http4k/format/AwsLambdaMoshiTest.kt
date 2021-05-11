@@ -135,7 +135,7 @@ class AwsLambdaMoshiTest {
                 S3EventNotification.S3BucketEntity(
                     "name",
                     S3EventNotification.UserIdentityEntity("principalId"), "arn"),
-                    S3EventNotification.S3ObjectEntity("key", 123, "eTag", "versiondId", "sequence"),
+                    S3EventNotification.S3ObjectEntity("key", 123, "eTag", "versionId", "sequence"),
                     "s3SchemaVersion"
                 ),
                 S3EventNotification.UserIdentityEntity("principalId")

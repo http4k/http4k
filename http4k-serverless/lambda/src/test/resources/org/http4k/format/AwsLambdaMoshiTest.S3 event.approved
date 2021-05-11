@@ -29,7 +29,7 @@
           "key": "key",
           "size": 123,
           "eTag": "eTag",
-          "versionId": "versiondId",
+          "versionId": "versionId",
           "sequencer": "sequence"
         }
       }
