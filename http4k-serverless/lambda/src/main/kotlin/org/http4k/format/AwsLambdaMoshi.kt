@@ -11,6 +11,7 @@ object AwsLambdaMoshi : ConfigurableMoshi(
         .addTyped(ScheduledEventAdapter)
         .addTyped(SNSEventAdapter)
         .addTyped(SQSEventAdapter)
+        .addLast(CollectionEdgeCasesAdapter)
         .asConfigurable()
         .withStandardMappings()
         .done()
