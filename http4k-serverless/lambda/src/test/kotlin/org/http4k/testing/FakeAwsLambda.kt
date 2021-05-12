@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.serverless.FnLoader
-import org.http4k.serverless.lambda.AwsEnvironment.AWS_LAMBDA_FUNCTION_NAME
+import org.http4k.serverless.AwsEnvironment.AWS_LAMBDA_FUNCTION_NAME
 import java.util.UUID
 
 /**

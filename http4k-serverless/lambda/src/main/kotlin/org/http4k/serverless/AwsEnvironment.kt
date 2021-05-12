@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda
+package org.http4k.serverless
 
 /**
  * Constants from the AWS Lambda Runtime environment
