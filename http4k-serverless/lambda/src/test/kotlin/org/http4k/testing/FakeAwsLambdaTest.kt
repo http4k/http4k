@@ -16,7 +16,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.FnHandler
 import org.http4k.serverless.InvocationFnLoader
-import org.http4k.serverless.lambda.FnLoader
+import org.http4k.serverless.FnLoader
 import org.junit.jupiter.api.Test
 
 class FakeAwsLambdaTest {

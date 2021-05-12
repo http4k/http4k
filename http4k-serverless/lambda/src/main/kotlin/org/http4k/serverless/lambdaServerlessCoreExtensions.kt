@@ -1,9 +1,10 @@
-package org.http4k.serverless.lambda
+package org.http4k.serverless
 
 import org.http4k.format.AutoMarshalling
 import org.http4k.format.AwsLambdaMoshi
 import org.http4k.serverless.FnHandler
 import org.http4k.serverless.FnLoader
+import java.io.InputStream
 
 /**
  * Convenience DSL for constructing a converting polymorphic FunctionHandler
@@ -11,11 +12,12 @@ import org.http4k.serverless.FnLoader
 inline fun <reified In, Ctx, Out : Any> FnLoader(
     autoMarshalling: AutoMarshalling = AwsLambdaMoshi,
     crossinline makeHandler: (Map<String, String>) -> FnHandler<In, Ctx, Out>
-): FnLoader<Ctx> = FnLoader<Ctx> { env ->
-    with(makeHandler(env)) {
-        FnHandler { inputStream, ctx: Ctx ->
+): FnLoader<Ctx> = object : FnLoader<Ctx> {
+    override fun invoke(env: Map<String, String>): FnHandler<InputStream, Ctx, InputStream> {
+        val receiver = makeHandler(env)
+        return FnHandler { inputStream, ctx: Ctx ->
             autoMarshalling
-                .asFormatString(this(AwsLambdaMoshi.asA(inputStream), ctx))
+                .asFormatString(receiver(autoMarshalling.asA(inputStream), ctx))
                 .trimStart('"')
                 .trimEnd('"')
                 .byteInputStream()
