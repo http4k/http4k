@@ -8,7 +8,8 @@ import java.lang.reflect.Type
 /**
  * Convenience class to create Moshi Adapter Factory
  */
-open class SimpleMoshiAdapterFactory(vararg typesToAdapters: Pair<String, (Moshi) -> JsonAdapter<*>>) : JsonAdapter.Factory {
+open class SimpleMoshiAdapterFactory(vararg typesToAdapters: Pair<String, (Moshi) -> JsonAdapter<*>>) :
+    JsonAdapter.Factory {
     private val mappings = typesToAdapters.toMap()
 
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
@@ -24,3 +25,9 @@ inline fun <reified T : JsonAdapter<K>, reified K> adapter(noinline fn: (Moshi) 
  * Convenience function to create Moshi Adapter Factory for a simple Moshi Adapter
  */
 inline fun <reified K> JsonAdapter<K>.asFactory() = SimpleMoshiAdapterFactory(K::class.java.name to { this })
+
+/**
+ * Convenience function to add a custom adapter.
+ */
+inline fun <reified T : JsonAdapter<K>, reified K> Moshi.Builder.addTyped(fn: T): Moshi.Builder =
+    add(K::class.java, fn)
