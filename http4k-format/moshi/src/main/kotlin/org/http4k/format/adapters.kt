@@ -23,4 +23,4 @@ inline fun <reified T : JsonAdapter<K>, reified K> adapter(noinline fn: (Moshi) 
 /**
  * Convenience function to create Moshi Adapter Factory for a simple Moshi Adapter
  */
-inline fun <reified T : JsonAdapter<K>, reified K> JsonAdapter<K>.asFactory() = SimpleMoshiAdapterFactory(K::class.java.name to { this })
+inline fun <reified K> JsonAdapter<K>.asFactory() = SimpleMoshiAdapterFactory(K::class.java.name to { this })
