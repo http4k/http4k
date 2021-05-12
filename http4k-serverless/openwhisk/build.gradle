@@ -2,8 +2,7 @@ description = 'Http4k Serverless support for Apache OpenWhisk'
 
 dependencies {
     api project(":http4k-serverless-core")
-    implementation Libs.gson
+    api project(":http4k-format-gson")
 
-    testImplementation project(":http4k-format-gson")
     testImplementation Config.TestDependencies
 }
