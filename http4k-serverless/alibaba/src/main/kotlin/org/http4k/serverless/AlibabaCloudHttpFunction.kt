@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse
 const val ALIBABA_REQUEST_KEY = "HTTP4K_ALIBABA_REQUEST"
 const val ALIBABA_CONTEXT_KEY = "HTTP4K_ALIBABA_CONTEXT"
 
-abstract class AlibabaCloudFunction(appLoader: AppLoaderWithContexts) : HttpRequestHandler {
+abstract class AlibabaCloudHttpFunction(appLoader: AppLoaderWithContexts) : HttpRequestHandler {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 

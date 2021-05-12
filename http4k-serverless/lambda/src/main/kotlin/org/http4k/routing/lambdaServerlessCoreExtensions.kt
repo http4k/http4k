@@ -1,9 +1,9 @@
 package org.http4k.routing
 
 import com.amazonaws.services.lambda.runtime.Context
+import org.http4k.serverless.AwsEnvironment.AWS_LAMBDA_FUNCTION_NAME
 import org.http4k.serverless.FnHandler
 import org.http4k.serverless.FnLoader
-import org.http4k.serverless.AwsEnvironment.AWS_LAMBDA_FUNCTION_NAME
 import java.io.InputStream
 
 /**

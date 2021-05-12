@@ -8,7 +8,7 @@ class FnFilterTest {
 
     private val messages = mutableListOf<String>()
 
-    private val inner = FnHandler { msg: String, ctx: String ->
+    private val inner = FnHandler { msg: String, _: String ->
         messages += "first filter in"
         msg + msg
     }

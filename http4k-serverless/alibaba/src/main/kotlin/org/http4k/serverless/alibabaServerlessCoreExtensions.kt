@@ -3,7 +3,7 @@ package org.http4k.serverless
 import org.http4k.format.Moshi
 
 /**
- * Convenience DSL for constructing polymorphic AWS FnHandlers
+ * Convenience DSL for constructing polymorphic Alibaba FnHandlers
  */
 inline fun <reified In : Any, Ctx, Out : Any> FnLoader(
     noinline makeHandler: (Map<String, String>) -> FnHandler<In, Ctx, Out>

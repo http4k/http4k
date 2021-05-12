@@ -25,7 +25,7 @@ class FakeAwsLambdaTest {
     fun `can launch function with FakeLambda and call it as if directly in lambda`() {
         val functions = functions(
             "aFunction" bind FnLoader {
-                FnHandler { e: ScheduledEvent, _ ->
+                FnHandler { _: ScheduledEvent, _ ->
                     "aFunction"
                 }
             },

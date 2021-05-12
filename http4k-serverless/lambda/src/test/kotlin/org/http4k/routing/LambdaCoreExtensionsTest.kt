@@ -16,13 +16,12 @@ class LambdaCoreExtensionsTest {
     fun `can compose many functions into a single function and routes according to environment`() {
         val functions = functions(
             "function1" bind FnLoader {
-                FnHandler { e: ScheduledEvent, _: Context ->
-                    println(e)
+                FnHandler { _: ScheduledEvent, _: Context ->
                     "function1"
                 }
             },
             "function2" bind FnLoader {
-                FnHandler { e: ScheduledEvent, _: Context ->
+                FnHandler { _: ScheduledEvent, _: Context ->
                     "function2"
                 }
             }
