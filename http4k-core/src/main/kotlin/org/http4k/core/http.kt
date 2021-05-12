@@ -52,7 +52,7 @@ interface Body : Closeable {
 data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
     constructor(payload: ByteArray) : this(ByteBuffer.wrap(payload))
-    
+
     override val length get() = payload.length().toLong()
     override fun close() {}
     override val stream get() = payload.array().inputStream(payload.position(), payload.length())
