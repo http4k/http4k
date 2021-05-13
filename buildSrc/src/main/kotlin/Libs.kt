@@ -12,7 +12,7 @@ import kotlin.String
  * See https://github.com/jmfayard/refreshVersions
  */
 object Libs {
-    const val fc_java_common: String = "com.aliyun.fc.runtime:fc-java-common:_"
+    const val fc_java_core: String = "com.aliyun.fc.runtime:fc-java-core:_"
 
     const val aws_lambda_java_core: String = "com.amazonaws:aws-lambda-java-core:_"
 
