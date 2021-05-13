@@ -3,6 +3,7 @@ package org.http4k.core
 import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
+import org.http4k.length
 import org.http4k.lens.WebForm
 import org.http4k.routing.RoutedRequest
 import java.io.Closeable
@@ -41,7 +42,7 @@ interface Body : Closeable {
         operator fun invoke(body: InputStream, length: Long? = null): Body = StreamBody(body, length)
 
         @JvmField
-        val EMPTY: Body = MemoryBody("")
+        val EMPTY: Body = MemoryBody(ByteBuffer.allocate(0))
     }
 }
 
@@ -52,9 +53,9 @@ data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
     constructor(payload: ByteArray) : this(ByteBuffer.wrap(payload))
 
-    override val length by lazy { payload.array().size.toLong() }
+    override val length get() = payload.length().toLong()
     override fun close() {}
-    override val stream get() = payload.array().inputStream()
+    override val stream get() = payload.array().inputStream(payload.position(), payload.length())
     override fun toString() = payload.asString()
 }
 
