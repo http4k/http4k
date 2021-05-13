@@ -1,5 +1,13 @@
 rootProject.name = "http4k"
 
+plugins {
+    id("de.fayard.refreshVersions").version("0.10.0")
+}
+
+refreshVersions {
+    enableBuildSrcLibs()
+}
+
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")
