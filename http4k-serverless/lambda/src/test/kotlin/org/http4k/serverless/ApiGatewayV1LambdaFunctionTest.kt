@@ -6,7 +6,8 @@ import org.http4k.base64Encode
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
+import org.http4k.format.Jackson.asFormatString
 import org.junit.jupiter.api.Test
 
 class ApiGatewayV1LambdaFunctionTest {
@@ -27,23 +28,29 @@ class ApiGatewayV1LambdaFunctionTest {
         val lambda = object : ApiGatewayV1LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
-                assertThat(contexts[it][LAMBDA_REQUEST_KEY], equalTo(request))
+                assertThat(
+                    contexts[it][LAMBDA_REQUEST_KEY], equalTo(
+                        Request(GET, "/path")
+                            .header("c", "d")
+                            .body("input body")
+                            .query("query", "value")
+                    )
+                )
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context-lambda"), equalTo(Request(GET, "/path")
-                    .header("c", "d")
-                    .body("input body")
-                    .query("query", "value")))
-                Response(Status.OK).header("a", "b").body("hello there")
+                Response(OK).header("a", "b").body("hello there")
             }
         }) {}
 
-        assertThat(lambda.handleRequest(request, lambdaContext),
+        assertThat(
+            asFormatString(lambda.handleRequest(request, lambdaContext)),
             equalTo(
-                mapOf(
-                    "statusCode" to 200,
-                    "body" to "hello there".base64Encode(),
-                    "headers" to mapOf("a" to "b"),
-                    "isBase64Encoded" to true
+                asFormatString(
+                    mapOf(
+                        "statusCode" to 200,
+                        "headers" to mapOf("a" to "b"),
+                        "body" to "hello there".base64Encode(),
+                        "isBase64Encoded" to true
+                    )
                 )
             )
         )

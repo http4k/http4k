@@ -1,7 +1,6 @@
 package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
-import com.amazonaws.services.lambda.runtime.RequestHandler
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -10,23 +9,32 @@ import org.http4k.core.Uri
 import org.http4k.core.toUrlFormEncoded
 
 /**
+ * Function loader for ApiGatewayRest Lambdas
+ */
+class ApiGatewayRestFnLoader(input: AppLoaderWithContexts) :
+    ApiGatewayFnLoader(ApiGatewayRestAwsHttpAdapter, input) {
+    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+    constructor(input: HttpHandler) : this(AppLoader { input })
+}
+
+/**
  * This is the main entry point for lambda invocations using the REST payload format.
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
  */
-abstract class ApiGatewayRestLambdaFunction(appLoader: AppLoaderWithContexts)
-    : AwsLambdaFunction<Map<String, Any>, Map<String, Any>>(ApiGatewayRestAwsHttpAdapter, appLoader), RequestHandler<Map<String, Any>, Map<String, Any>> {
+abstract class ApiGatewayRestLambdaFunction(appLoader: AppLoaderWithContexts) :
+    Http4kRequestHandler(ApiGatewayRestFnLoader(appLoader)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
-
-    override fun handleRequest(req: Map<String, Any>, ctx: Context) = handle(req, ctx)
 }
 
 object ApiGatewayRestAwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String, Any>> {
     private fun Map<String, Any>.toHttp4kRequest() =
-        Request(Method.valueOf(getString("httpMethod") ?: error("method is invalid")),
+        Request(
+            Method.valueOf(getString("httpMethod") ?: error("method is invalid")),
             Uri.of(getString("path").orEmpty())
-                .query((getStringMap("queryStringParameters")?.toList() ?: emptyList()).toUrlFormEncoded()))
+                .query((getStringMap("queryStringParameters")?.toList() ?: emptyList()).toUrlFormEncoded())
+        )
             .headers(toHeaders())
             .body(toBody())
 

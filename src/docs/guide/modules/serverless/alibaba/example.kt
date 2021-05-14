@@ -12,7 +12,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.serverless.AlibabaCloudFunction
+import org.http4k.serverless.AlibabaCloudHttpFunction
 import org.http4k.serverless.AppLoader
 import org.http4k.servlet.FakeHttpServletRequest
 import org.http4k.servlet.FakeHttpServletResponse
@@ -41,7 +41,7 @@ object TweetEchoLambda : AppLoader {
 }
 
 // This class is the entry-point for the function call - configure it when deploying
-class FunctionsExampleEntryClass : AlibabaCloudFunction(TweetEchoLambda)
+class FunctionsExampleEntryClass : AlibabaCloudHttpFunction(TweetEchoLambda)
 
 fun main() {
 

@@ -1,0 +1,16 @@
+{
+  "invocationId": "invocationId",
+  "deliveryStreamArn": "deliveryStreamArn",
+  "region": "region",
+  "records": [
+    {
+      "data": "YUdWc2JHOD0=",
+      "recordId": "recordId",
+      "approximateArrivalEpoch": 0,
+      "approximateArrivalTimestamp": 0,
+      "kinesisRecordMetadata": {
+        "hello": "world"
+      }
+    }
+  ]
+}
