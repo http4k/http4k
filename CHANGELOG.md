@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.9.0.1
+- **http4k-core** : Revert body buffer "fix".
+
 ### v4.9.0.0
 - **http4k-serverless-** : Reworking of Serverless infrastructure to support calling Serverless Functions using automarshalled event classes. New concepts of FnHandler and FnLoader (analogues to existing HttpHandler and AppLoader). Docs and examples coming soon!
 - **http4k-serverless-lambda*** : Support for FnHandlers, with super lightweight unmarshalling of event classes via Moshi. Conversion of all AWS functions to use RequestStreamHandlers under the covers instead of slow marshalling via Jackson. New FnHandlers should extend `AwsLambdaEventFunction` for events, or the existing `ApiGateway*Function` classes for HTTP functions. Automarshalling support for the following AWS event types, extensible by providing own Moshi adapter:
