@@ -10,13 +10,13 @@ import java.util.concurrent.atomic.AtomicReference
 
 data class MyEvent(val value: String)
 
-class GoogleBackgroundFunctionTest {
+class GoogleCloudEventFunctionTest {
 
     @Test
     fun `can build function and call it`() {
         val captured = AtomicReference<MyEvent>()
         val input = MyEvent("hello")
-        val function = object : GoogleBackgroundFunction(FnLoader {
+        val function = object : GoogleCloudEventFunction(FnLoader {
             FnHandler { e: MyEvent, _: Context ->
                 captured.set(e)
             }

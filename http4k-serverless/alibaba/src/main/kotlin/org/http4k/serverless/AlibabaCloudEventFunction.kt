@@ -8,7 +8,7 @@ import java.io.OutputStream
 /**
  * Adapts between http4k and Alibaba Function Compute APIs..
  */
-abstract class AlibabaCloudFnFunction(loader: FnLoader<Context>) : StreamRequestHandler {
+abstract class AlibabaCloudEventFunction(loader: FnLoader<Context>) : StreamRequestHandler {
     private val function = loader(System.getenv())
 
     override fun handleRequest(input: InputStream, output: OutputStream, context: Context) {

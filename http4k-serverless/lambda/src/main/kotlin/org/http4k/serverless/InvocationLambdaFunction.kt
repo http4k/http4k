@@ -41,7 +41,7 @@ class InvocationFnLoader(private val appLoader: AppLoaderWithContexts) : FnLoade
  * for further invocations.
  */
 abstract class InvocationLambdaFunction(appLoader: AppLoaderWithContexts) :
-    Http4kRequestHandler(InvocationFnLoader(appLoader)) {
+    AwsLambdaEventFunction(InvocationFnLoader(appLoader)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }

@@ -15,7 +15,7 @@ import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
 import org.http4k.serverless.FakeGCFRequest
 import org.http4k.serverless.FakeGCFResponse
-import org.http4k.serverless.GoogleCloudFunction
+import org.http4k.serverless.GoogleCloudHttpFunction
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to GCF
 // Along with the extension class below, is the only actual piece of code that needs to be written.
@@ -40,7 +40,7 @@ object TweetEchoLambda : AppLoader {
 }
 
 // This class is the entry-point for the function call - configure it when deploying
-class FunctionsExampleEntryClass : GoogleCloudFunction(TweetEchoLambda)
+class FunctionsExampleEntryClass : GoogleCloudHttpFunction(TweetEchoLambda)
 
 fun main() {
 

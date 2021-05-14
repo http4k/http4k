@@ -15,7 +15,7 @@ import org.http4k.filter.ServerFilters.InitialiseRequestContext
 
 const val GCF_REQUEST_KEY = "HTTP4K_GCF_REQUEST"
 
-abstract class GoogleCloudFunction(appLoader: AppLoaderWithContexts) : HttpFunction {
+abstract class GoogleCloudHttpFunction(appLoader: AppLoaderWithContexts) : HttpFunction {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 

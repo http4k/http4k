@@ -24,7 +24,7 @@ class ApplicationLoadBalancerFnLoader(input: AppLoaderWithContexts) :
  * for further invocations.
  */
 abstract class ApplicationLoadBalancerLambdaFunction(input: AppLoaderWithContexts) :
-    Http4kRequestHandler(ApplicationLoadBalancerFnLoader(input)) {
+    AwsLambdaEventFunction(ApplicationLoadBalancerFnLoader(input)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }

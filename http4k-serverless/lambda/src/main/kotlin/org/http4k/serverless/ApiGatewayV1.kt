@@ -23,7 +23,7 @@ class ApiGatewayV1FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(Ap
  * for further invocations.
  */
 abstract class ApiGatewayV1LambdaFunction(input: AppLoaderWithContexts) :
-    Http4kRequestHandler(ApiGatewayV1FnLoader(input)) {
+    AwsLambdaEventFunction(ApiGatewayV1FnLoader(input)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }

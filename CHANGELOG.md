@@ -3,6 +3,19 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.9.0.0
+- **http4k-serverless-** : Reworking of Serverless infrastructure to support calling Serverless Functions using automarshalled event classes. New concepts of FnHandler and FnLoader (analogues to existing HttpHandler and AppLoader). Docs and examples coming soon!
+- **http4k-serverless-lambda*** : Support for FnHandlers, with super lightweight unmarshalling of event classes via Moshi. Conversion of all AWS functions to use RequestStreamHandlers under the covers instead of slow marshalling via Jackson. New FnHandlers should extend `AwsLambdaEventFunction` for events, or the existing `ApiGateway*Function` classes for HTTP functions. Automarshalling support for the following AWS event types, extensible by providing own Moshi adapter:
+    - DynamodbEvent
+    - KinesisEvent
+    - KinesisFirehoseEvent
+    - S3Event
+    - ScheduledEvent
+    - SNSEvent
+    - SQSEvent
+- **http4k-serverless-alibaba** : [Breaking] Support for FnHandlers. Old style HTTP Handlers should now extend `AlibabaCloudHttpFunction`. Event functions should extend `AlibabaCloudEventFunction`. Extensible automarshalling support for event types using Moshi.
+- **http4k-serverless-gcf*** : Support for FnHandlers. Old style HTTP Handlers should now extend `GoogleCloudHttpFunction`. Event functions should extend `GoogleCloudEventFunction`. Extensible automarshalling support for event types using Moshi.
+
 ### v4.8.2.0
 - **http4k-*** : Upgrade some dependency versions. Remove excess dependency on alibaba libraries which depend on vulnerable libs.
 

@@ -7,13 +7,13 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 
-private class MyFunction : Http4kRequestHandler(FnLoader {
+private class MyFunction : AwsLambdaEventFunction(FnLoader {
     FnHandler { _: ScheduledEvent, _: Context ->
         "hello"
     }
 })
 
-class Http4kRequestHandlerTest {
+class AwsLambdaEventFunctionTest {
     @Test
     fun `can implement function and call it`() {
         val input = "{}"

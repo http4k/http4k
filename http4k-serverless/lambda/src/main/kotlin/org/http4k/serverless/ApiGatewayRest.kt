@@ -23,7 +23,7 @@ class ApiGatewayRestFnLoader(input: AppLoaderWithContexts) :
  * for further invocations.
  */
 abstract class ApiGatewayRestLambdaFunction(appLoader: AppLoaderWithContexts) :
-    Http4kRequestHandler(ApiGatewayRestFnLoader(appLoader)) {
+    AwsLambdaEventFunction(ApiGatewayRestFnLoader(appLoader)) {
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
