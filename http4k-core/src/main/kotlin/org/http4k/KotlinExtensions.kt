@@ -4,9 +4,7 @@ import java.net.URLEncoder
 import java.nio.ByteBuffer
 import java.util.Base64
 
-fun ByteBuffer.length() = limit() - position()
-
-fun ByteBuffer.asString(): String = String(array(), position(), length())
+fun ByteBuffer.asString(): String = String(array())
 
 fun String.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(toByteArray())
 
