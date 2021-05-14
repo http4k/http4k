@@ -2,6 +2,7 @@ package org.http4k.aws
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -10,6 +11,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
+import org.http4k.server.SunHttp
+import org.http4k.server.asServer
 import org.junit.jupiter.api.Test
 import java.time.Clock.fixed
 import java.time.LocalDateTime
@@ -32,8 +35,10 @@ class AwsClientFilterTest {
     fun `adds authorization header`() {
         client(Request(GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
-        assertThat(audit.captured?.header("Authorization"),
-            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date, Signature=80641a5d87dd9aad7a993b341c98a04cdefa58ecf09f1df4af93cec0268a8eca"))
+        assertThat(
+            audit.captured?.header("Authorization"),
+            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date, Signature=80641a5d87dd9aad7a993b341c98a04cdefa58ecf09f1df4af93cec0268a8eca")
+        )
     }
 
     @Test
@@ -42,8 +47,10 @@ class AwsClientFilterTest {
 
         client(Request(GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
-        assertThat(audit.captured?.header("Authorization"),
-            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=f0522e59ba6c8d851970a1d4fb510cc37bb18330b66958992f653fc8966a2137"))
+        assertThat(
+            audit.captured?.header("Authorization"),
+            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=f0522e59ba6c8d851970a1d4fb510cc37bb18330b66958992f653fc8966a2137")
+        )
     }
 
     @Test
@@ -54,11 +61,36 @@ class AwsClientFilterTest {
     }
 
     @Test
+    fun `stream body is send correctly after signing`() {
+        val client = ClientFilters.AwsAuth(scope, credentials, clock)
+            .then { Response(OK).body(it.body.stream) }
+
+        val response = client(Request(GET, "http://amazon/test").body("foobar".byteInputStream()))
+
+        assertThat(response.bodyString(), equalTo("foobar"))
+    }
+
+    @Test
+    fun `stream body is send correctly after signing - over socket`() {
+        val http = { req: Request -> Response(OK).body(req.bodyString()) }
+
+        http.asServer(SunHttp(0)).start().use {
+            val client = ClientFilters.AwsAuth(scope, credentials, clock)
+                .then(JavaHttpClient())
+            val response = client(Request(GET, "http://localhost:${it.port()}").body("foobar".byteInputStream()))
+
+            assertThat(response.bodyString(), equalTo("foobar"))
+        }
+    }
+
+    @Test
     fun adds_content_sha256() {
         client(Request(GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
-        assertThat(audit.captured?.header("x-amz-content-sha256"),
-            equalTo("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"))
+        assertThat(
+            audit.captured?.header("x-amz-content-sha256"),
+            equalTo("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+        )
     }
 }
 
