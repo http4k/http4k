@@ -52,7 +52,7 @@ open class ConfigurableJackson(val mapper: ObjectMapper,
     override fun JsonNode.asPrettyJsonString(): String = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this)
     override fun JsonNode.asCompactJsonString(): String = mapper.writeValueAsString(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
-        mapper.createObjectNode().also { it.setAll<JsonNode>(mapOf(*toList().toTypedArray())) }
+        mapper.createObjectNode().also { it.setAll<JsonNode>(toList().toMap()) }
 
     override fun fields(node: JsonNode) = node.fields().asSequence().map { (key, value) -> key to value }.toList()
 

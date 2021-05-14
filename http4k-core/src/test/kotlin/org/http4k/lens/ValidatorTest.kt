@@ -13,16 +13,16 @@ class ValidatorTest {
 
     @Test
     fun strict() {
-        assertThat({ Strict(WebForm(), formFields) }, throws<LensFailure>())
+        assertThat({ Strict(WebForm(), listOf(formFields)) }, throws<LensFailure>())
     }
 
     @Test
     fun feedback() {
-        assertThat(Feedback(WebForm(), formFields), equalTo(listOf<Failure>(Missing(formFields.meta))))
+        assertThat(Feedback(WebForm(), listOf(formFields)), equalTo(listOf<Failure>(Missing(formFields.meta))))
     }
 
     @Test
     fun ignore() {
-        assertThat(Ignore(WebForm(), formFields), equalTo(emptyList()))
+        assertThat(Ignore(WebForm(), listOf(formFields)), equalTo(emptyList()))
     }
 }

@@ -59,7 +59,7 @@ class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
         }
     }
 
-    private fun Array<Header>.toHttp4kHeaders(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
+    private fun Array<Header>.toHttp4kHeaders(): Headers = map { it.name to it.value }
 }
 
 class Apache4Server(val port: Int = 8000, val address: InetAddress?) : ServerConfig {

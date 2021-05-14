@@ -57,7 +57,7 @@ fun Body.Companion.multipartForm(
             }
         })
         .map({ it.toMultipartForm() }, { it.toMultipartFormBody(defaultBoundary) })
-        .map({ it.copy(errors = validator(it, *parts)) }, { it.copy(errors = validator(it, *parts)) })
+        .map({ it.copy(errors = validator(it, parts.toList())) }, { it.copy(errors = validator(it, parts.toList())) })
 
 internal fun Body.toMultipartForm(): MultipartForm = (this as MultipartFormBody).let {
     it.formParts.fold(MultipartForm()) { memo, next ->

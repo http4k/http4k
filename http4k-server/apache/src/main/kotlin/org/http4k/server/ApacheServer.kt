@@ -80,7 +80,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
         }
     }
 
-    private fun Array<Header>.toHttp4kHeaders(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
+    private fun Array<Header>.toHttp4kHeaders(): Headers = map { it.name to it.value }
 }
 
 class ApacheServer(

@@ -59,7 +59,7 @@ object ApacheAsyncClient {
 
             private fun HttpResponse.toTargetStatus() = Status(code, reasonPhrase)
 
-            private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
+            private fun Array<Header>.toTarget(): Headers = map { it.name to it.value }
 
             private fun Body.payloadAsByteArray(): ByteArray = if (payload.hasArray()) {
                 payload.array()

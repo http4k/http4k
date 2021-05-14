@@ -8,7 +8,7 @@ enum class Validator(private val actOn: (LensFailure) -> List<Failure>) {
     Feedback({ it.failures }),
     Ignore({ emptyList<Failure>() });
 
-    operator fun <T : Any> invoke(entity: T, vararg lenses: LensExtractor<T, *>): List<Failure> =
+    operator fun <T : Any> invoke(entity: T, lenses: List<LensExtractor<T, *>>): List<Failure> =
         collectErrors(lenses, entity).run {
             actOn(when (size) {
                 0 -> LensFailure()
@@ -17,7 +17,7 @@ enum class Validator(private val actOn: (LensFailure) -> List<Failure>) {
             })
         }
 
-    private fun <T : Any> collectErrors(lenses: Array<out LensExtractor<T, *>>, entity: T): List<LensFailure> =
+    private fun <T : Any> collectErrors(lenses: List<LensExtractor<T, *>>, entity: T): List<LensFailure> =
         lenses.fold(emptyList()) { memo, next ->
             try {
                 next(entity)

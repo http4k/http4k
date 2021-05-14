@@ -75,7 +75,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     fun `get fields`() {
         j {
             val fields = listOf("hello" to string("world"), "hello2" to string("world2"))
-            assertThat(fields(obj(*fields.toTypedArray())).toList(), equalTo(fields))
+            assertThat(fields(obj(fields)).toList(), equalTo(fields))
         }
     }
 

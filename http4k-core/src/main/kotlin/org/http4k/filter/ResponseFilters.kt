@@ -211,6 +211,3 @@ object ResponseFilters {
 }
 
 typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction
-
-fun HttpTransactionLabeler.labels(tx: HttpTransaction) =
-    this(tx).labels.map { listOf(it.key, it.value) }.flatten().toTypedArray()

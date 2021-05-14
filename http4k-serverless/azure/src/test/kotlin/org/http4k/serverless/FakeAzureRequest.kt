@@ -18,9 +18,7 @@ class FakeAzureRequest(val request: Request) : HttpRequestMessage<Optional<Strin
 
     override fun getHttpMethod() = HttpMethod.value(request.method.name)
 
-    override fun getHeaders() = mutableMapOf(
-        *request.headers.map { it.first to (it.second ?: "") }.toTypedArray()
-    )
+    override fun getHeaders() = request.headers.associate { it.first to (it.second ?: "") }.toMutableMap()
 
     override fun getQueryParameters() = mutableMapOf(
         *request.uri.queries().map { it.first to (it.second ?: "") }.toTypedArray()

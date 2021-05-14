@@ -86,7 +86,7 @@ object Apache4Client {
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
-    private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
+    private fun Array<Header>.toTarget(): Headers = map { it.name to it.value }
 
     private fun CloseableHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
         entity?.let { body(responseBodyMode(it.content)) } ?: this

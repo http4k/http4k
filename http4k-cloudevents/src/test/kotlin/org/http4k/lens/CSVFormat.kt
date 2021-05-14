@@ -31,7 +31,7 @@ class CSVFormat : EventFormat {
     ).toByteArray()
 
     override fun deserialize(bytes: ByteArray, mapper: CloudEventDataMapper<*>): CloudEvent {
-        val splitted = String(bytes, UTF_8).split(Pattern.quote(",").toRegex()).toTypedArray()
+        val splitted = String(bytes, UTF_8).split(Pattern.quote(",").toRegex())
         val sv = SpecVersion.parse(splitted[0])
         val id = splitted[1]
         val type = splitted[2]

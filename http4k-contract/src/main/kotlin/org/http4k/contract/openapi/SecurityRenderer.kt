@@ -29,7 +29,7 @@ interface SecurityRenderer {
                 mapNotNull(transform).takeIf { it.isNotEmpty() }
 
             private fun <NODE> List<Render<NODE>>.toObj(): Render<NODE> = {
-                obj(*flatMap { fields(it(this)) }.toTypedArray())
+                obj(flatMap { fields(it(this)) })
             }
 
             private fun <NODE> List<Render<NODE>>.toArray(): Render<NODE> = {
