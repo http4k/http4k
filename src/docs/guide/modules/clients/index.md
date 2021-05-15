@@ -5,28 +5,28 @@ description: Feature overview of the http4k-client modules
 
 ```groovy
 // Java (for development only):
-implementation group: "org.http4k", name: "http4k-core", version: "4.9.0.1"
+implementation group: "org.http4k", name: "http4k-core", version: "4.9.0.2"
 
 // Apache v5 (Sync): 
-implementation group: "org.http4k", name: "http4k-client-apache", version: "4.9.0.1"
+implementation group: "org.http4k", name: "http4k-client-apache", version: "4.9.0.2"
 
 // Apache v4 (Sync): 
-implementation group: "org.http4k", name: "http4k-client-apache4", version: "4.9.0.1"
+implementation group: "org.http4k", name: "http4k-client-apache4", version: "4.9.0.2"
 
 // Apache v5 (Async): 
-implementation group: "org.http4k", name: "http4k-client-apache-async", version: "4.9.0.1"
+implementation group: "org.http4k", name: "http4k-client-apache-async", version: "4.9.0.2"
 
 // Apache v4 (Async): 
-implementation group: "org.http4k", name: "http4k-client-apache4-async", version: "4.9.0.1"
+implementation group: "org.http4k", name: "http4k-client-apache4-async", version: "4.9.0.2"
 
 // Jetty (Sync + Async): 
-implementation group: "org.http4k", name: "http4k-client-jetty", version: "4.9.0.1"
+implementation group: "org.http4k", name: "http4k-client-jetty", version: "4.9.0.2"
 
 // OkHttp (Sync + Async): 
-implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.9.0.1"
+implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.9.0.2"
 
 // Websocket: 
-implementation group: "org.http4k", name: "http4k-client-websocket", version: "4.9.0.1"
+implementation group: "org.http4k", name: "http4k-client-websocket", version: "4.9.0.2"
 ```
 
 ### HTTP
