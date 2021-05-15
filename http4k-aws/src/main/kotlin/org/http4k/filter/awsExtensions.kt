@@ -6,6 +6,7 @@ import org.http4k.aws.AwsCredentials
 import org.http4k.aws.AwsHmacSha256
 import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
+import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -60,7 +61,7 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
             val signedRequest = fullRequest
                 .replaceHeader("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
 
-            next(signedRequest)
+            next(signedRequest.body(Body(it.body.payload)))
         }
     }
 
