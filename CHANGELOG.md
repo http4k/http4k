@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.9.0.2
+- **http4k-aws** : Fix AWS request signing when using stream body.
+
 ### v4.9.0.1
 - **http4k-core** : Revert body buffer "fix".
 
