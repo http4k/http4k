@@ -25,7 +25,7 @@ fun Server(http: HttpHandler): RoutingHttpHandler {
 
     return ServerFilters.HandleRemoteRequestFailed()
         .then(
-            routes("/api/books" bind GET to {
+            routes("/reference/api/books" bind GET to {
                 Response(OK).body(library.titles().joinToString(","))
             })
         )

@@ -31,24 +31,70 @@ nav:
   - Introduction: documentation/index.md
   - Quickstart: quickstart/index.md
   - Explanation:
-      - Rationals: gtod/explanation/rationale.md
-      - Http: gtod/explanation/http.md
-      - Serverless: gtod/explanation/sse.md
-      - WebSockets: gtod/explanation/websockets.md
-      - Server-Sent Events: gtod/explanation/sse.md
-  - How-to guides:
-      - How-to 1: gtod/how-to/howto1/index.md
-      - How-to 2: gtod/how-to/howto2/index.md
+      - Rationale: explanation/rationale.md
+      - HTTP: explanation/http.md
+      - Serverless: explanation/serverless.md
+      - WebSockets: explanation/websockets.md
+      - Server-Sent Events: explanation/server-sent-events.md
   - Tutorials:
-      - ABC: gtod/how-to/abc/index.md
-      - XYZ: gtod/how-to/xyz/index.md
+      - ABC: how-to/abc/index.md
+      - XYZ: how-to/xyz/index.md
+  - How-to guides:
+      - How to use this guide: howto/index.md
+      - Server as a function: howto/server_as_a_function/index.md
+      - Client as a function: howto/client_as_a_function/index.md
+      - Container integration: howto/container_integration/index.md
+      - Simple routing: howto/simple_routing/index.md
+      - Nestable routes: howto/nestable_routes/index.md
+      - OpenAPI contracts/routing: howto/typesafe_http_contracts/index.md
+      - Templating engines: howto/using_templates/index.md
+      - Typesafe RequestContexts: howto/request_context/index.md
+      - Typesafe HTTP requests with lenses: howto/typesafe_http_requests_with_lenses/index.md
+      - Custom JSON marshallers: howto/custom_json_marshallers/index.md
+      - HTML forms: howto/html_forms/index.md
+      - Multipart forms: howto/multipart_forms/index.md
+      - WebJars: howto/webjars/index.md
+      - Websockets: howto/websockets/index.md
+      - Server-Sent Events: howto/sse/index.md
+      - Structured Logging with Events: howto/structured_logging_with_events/index.md
+      - Basic OAuth Server configuration: howto/basic_oauth_authorization_server/index.md
+      - Custom OAuth Provider configuration: howto/custom_oauth_provider/index.md
+      - Custom Server (SSL): howto/customised_servers/index.md
+      - Service Virtualisation with Servirtium: howto/service_virtualisation/index.md
+      - Principal lookup: howto/principal_lookup/index.md
+      - Monitoring http4k: howto/monitoring/index.md
+      - Recording/replaying HTTP traffic: howto/record_and_replay/index.md
+      - Test driven apps: howto/test_driven_apps/index.md
   - Reference:
-      - Overview: gtod/reference/index.md
-      - Core: gtod/reference/core/index.md
-      - Contracts: gtod/reference/contract/index.md
-      - API docs: gtod/reference/api.md
-  - Changelog: changelog/index.md
-  - http4k in action: in_action/index.md
+    - Overview: reference/index.md
+    - API docs: reference/api/index.md
+    - Core: reference/core/index.md
+    - Server backend: reference/servers/index.md
+    - Serverless backend: reference/serverless/index.md
+    - HTTP & Websocket clients: reference/clients/index.md
+    - Typesafe contracts (OpenAPI3): reference/contracts/index.md
+    - JSON handling: reference/json/index.md
+    - Templating: reference/templating/index.md
+    - Multipart forms: reference/multipart/index.md
+    - Cloud Native Configuration: reference/cloud_native/index.md
+    - Cloud Events: reference/cloud_events/index.md
+    - Micrometer: reference/micrometer/index.md
+    - OpenTelemetry: reference/opentelemetry/index.md
+    - Resilience4J: reference/resilience4j/index.md
+    - AWS: reference/aws/index.md
+    - OAuth: reference/oauth/index.md
+    - GraphQL: reference/graphql/index.md
+    - JSON RPC: reference/jsonrpc/index.md
+    - XML handling: reference/xml/index.md
+    - YAML handling: reference/yaml/index.md
+    - Testing:
+      - Overview: reference/testing/index.md
+      - Hamkrest: reference/hamkrest/index.md
+      - Kotest: reference/kotest/index.md
+      - WebDriver: reference/webdriver/index.md
+      - Approval Testing: reference/approvaltests/index.md
+      - Chaos Testing: reference/chaos/index.md
+      - Service Virtualisaion: reference/servicevirtualisation/index.md
   - Blog:
       - Overview: blog/index.md
       - Meet http4k: blog/meet_http4k/index.md
@@ -61,58 +107,11 @@ nav:
       - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
       - http4k v4 - 17 platforms and counting...: blog/http4k_v4/index.md
       - JCenter Shutdown: blog/regarding_jcenter/index.md
-  - Developer guide:
-    - Overview: guide/modules/index.md
-    - Core: guide/modules/core/index.md
-    - Server backend: guide/modules/servers/index.md
-    - Serverless backend: guide/modules/serverless/index.md
-    - HTTP & Websocket clients: guide/modules/clients/index.md
-    - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
-    - JSON handling: guide/modules/json/index.md
-    - Templating: guide/modules/templating/index.md
-    - Multipart forms: guide/modules/multipart/index.md
-    - Cloud Native Configuration: guide/modules/cloud_native/index.md
-    - Cloud Events: guide/modules/cloud_events/index.md
-    - Micrometer: guide/modules/micrometer/index.md
-    - OpenTelemetry: guide/modules/opentelemetry/index.md
-    - Resilience4J: guide/modules/resilience4j/index.md
-    - AWS: guide/modules/aws/index.md
-    - OAuth: guide/modules/oauth/index.md
-    - GraphQL: guide/modules/graphql/index.md
-    - JSON RPC: guide/modules/jsonrpc/index.md
-    - XML handling: guide/modules/xml/index.md
-    - YAML handling: guide/modules/yaml/index.md
-    - Testing:
-      - Overview: guide/modules/testing/index.md
-      - Hamkrest: guide/modules/hamkrest/index.md
-      - Kotest: guide/modules/kotest/index.md
-      - WebDriver: guide/modules/webdriver/index.md
-      - Approval Testing: guide/modules/approvaltests/index.md
-      - Chaos Testing: guide/modules/chaos/index.md
-      - Service Virtualisaion: guide/modules/servicevirtualisation/index.md
-  - Cookbook:
-    - How to use this guide: cookbook/index.md
-    - Server as a function: cookbook/server_as_a_function/index.md
-    - Client as a function: cookbook/client_as_a_function/index.md
-    - Container integration: cookbook/container_integration/index.md
-    - Simple routing: cookbook/simple_routing/index.md
-    - Nestable routes: cookbook/nestable_routes/index.md
-    - OpenAPI contracts/routing: cookbook/typesafe_http_contracts/index.md
-    - Templating engines: cookbook/using_templates/index.md
-    - Typesafe RequestContexts: cookbook/request_context/index.md
-    - Typesafe HTTP requests with lenses: cookbook/typesafe_http_requests_with_lenses/index.md
-    - Custom JSON marshallers: cookbook/custom_json_marshallers/index.md
-    - HTML forms: cookbook/html_forms/index.md
-    - Multipart forms: cookbook/multipart_forms/index.md
-    - WebJars: cookbook/webjars/index.md
-    - Websockets: cookbook/websockets/index.md
-    - Server-Sent Events: cookbook/sse/index.md
-    - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
-    - Basic OAuth Server configuration: cookbook/basic_oauth_authorization_server/index.md
-    - Custom OAuth Provider configuration: cookbook/custom_oauth_provider/index.md
-    - Custom Server (SSL): cookbook/customised_servers/index.md
-    - Service Virtualisation with Servirtium: cookbook/service_virtualisation/index.md
-    - Principal lookup: cookbook/principal_lookup/index.md
-    - Monitoring http4k: cookbook/monitoring/index.md
-    - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
-    - Test driven apps: cookbook/test_driven_apps/index.md
+  - Changelog: changelog/index.md
+  - http4k in action: in_action/index.md
+  - Performance: performance/index.md
+  - FAQ: faq/index.md
+  - Getting support: support/index.md
+  - Contribute/support http4k: contributing/index.md
+  - Code of Conduct: code-of-conduct/index.md
+  - API docs: api/index.md
