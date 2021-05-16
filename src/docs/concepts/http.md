@@ -1,13 +1,13 @@
 title: http4k HTTP
 description: An explanation of the core function types for dealing with HTTP applications
 
-## HttpHandler
+### HttpHandler
 
-## Filter
+### Filter
 
-## Router
+### Router
 
-## HttpMessage
+### HttpMessage
 
 * All incoming and outgoing HTTP services are modelled as `HttpHandler`, which is modelled as `(Request) -> Response`:
 ```kotlin

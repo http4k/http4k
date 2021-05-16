@@ -16,7 +16,7 @@ This makes the http4k model especially powerful as applications can be built, ru
 
 There is a single extra interface introduced for deploying HTTP apps:
 
-## AppLoader
+### AppLoader
 > `fun interface AppLoader : (Map<String, String>) -> HttpHandler`
 
 As per [12-factor configuration](https://12factor.net/) principles, the AppLoader is responsible for converting a set of Environment properties (aka `System.getEnv()`) into the application HttpHandler instance.
@@ -24,19 +24,19 @@ As per [12-factor configuration](https://12factor.net/) principles, the AppLoade
 # Event-based applications
 Serverless platforms also generally provide the facility to write arbitrary functions which react to events generated within the vendor cloud - e.g on a schedule or when a message is sent to a queue. Whilst the type of events vary by platform, http4k provides a lightweight, easily testable and, most importantly, vendor-neutral API.
 
-## FnHandler
+### FnHandler
 > `fun interface FnHandler<In, Ctx, Out> : (In, Ctx) -> Out`
 
 The polymorphic interface representing the Serverless function signature for receiving an Event. The `Ctx` parameter is custom to the vendor platform, but generally encapsulates contextual state regarding the function invocation.
 
-## FnLoader
+### FnLoader
 > `typealias FnLoader<Ctx> = (Map<String, String>) -> FnHandler<InputStream, Ctx, InputStream>`
 
 As per [12-factor configuration](https://12factor.net/) principles, the FnLoader is responsible for converting a set of Environment properties (aka `System.getEnv()`) into the application FnHandler instance. Note that the result of this call is generified by InputStream request and response types.
 
 The various http4k Serverless modules also provide a custom converter function to auto-marshall event object in and out of the InputStream, which makes the conversion invisible to the API user.
 
-## FnFilter
+### FnFilter
 > `fun interface FnFilter<In, Ctx, Out> : (FnHandler<In, Ctx, Out>) -> FnHandler<In, Ctx, Out>`
 
 Applies decoration to a matched FnHandler before it is invoked. FnFilters can be used to apply tangental effects to the matched FnHandler such as logging, or to modify the incoming event.
