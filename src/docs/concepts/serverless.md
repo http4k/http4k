@@ -1,7 +1,8 @@
 title: http4k Serverless
 description: An explanation of the core function types for dealing with Serverless applications
 
-**http4k** provides Serverless support using a simple, consistent, typesafe, and testable API on supported Serverless platforms.
+# Serverless
+**http4k** provides Serverless support using a simple, consistent, typesafe, and testable API on multiple supported Serverless platforms.
 
 There are two main types of API that can be served using the http4k infrastructure, although they are backed by the same lightweight system. As with the http4k ethos, there is a primary focus on simplicity, testability and portability - http4k simply acts as a shim layer over the top of the underlying platform.
 
@@ -9,7 +10,7 @@ Because of the way in which Serverless functions are bound in the runtime, is it
 
 http4k Serverless modules are named: `http4k-serverless-<vendor>`.
 
-# HTTP-based applications
+## HTTP-based applications
 Any standard HttpHandler can be mounted and served in a Serverless context - the underlying platform can be thought of as just another supported backend for http4k applications, with HTTP traffic routed to it via a custom vendor cloud technology (eg. AWS APIGateway).
 
 This makes the http4k model especially powerful as applications can be built, run, and tested locally by using any supported Server-backend, then transparently deployed to the Serverless platform with zero modification. 
@@ -23,7 +24,7 @@ fun interface AppLoader : (Map<String, String>) -> HttpHandler
 
 As per [12-factor configuration](https://12factor.net/) principles, the AppLoader is responsible for converting a set of Environment properties (aka `System.getEnv()`) into the application HttpHandler instance.
 
-# Event-based applications
+## Event-based applications
 Serverless platforms also generally provide the facility to write arbitrary functions which react to events generated within the vendor cloud - e.g on a schedule or when a message is sent to a queue. Whilst the type of events vary by platform, http4k provides a lightweight, easily testable and, most importantly, vendor-neutral API.
 
 ### FnHandler

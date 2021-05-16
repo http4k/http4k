@@ -1,6 +1,15 @@
 title: http4k HTTP description: An explanation of the core function types for dealing with HTTP applications
 
+HTTP application use-cases are the original and primary focus of **http4k**. Based on the [Server as a Function](https://monkey.org/~marius/funsrv.pdf) concept, http4k provides a set of function types which can be used to write, test and deploy HTTP applications with simplicity and ease.
+
+Make no mistake - this model is deceptively simple but exceptionally powerful. These core concepts are repeated and combined in many different ways over the various functionalities provided by the toolkit.
+
 ### HttpMessage
+In http4k, an HttpMessage is an immutable entity representing either a `Request` or a `Response`. 
+
+This immutability is a powerful alternative to the mutable versions found in other web libraries, as it provides a exact record of the state of the messages as they travel through an HTTP application, so for debugging purposes you can time-travel through an application inspecting the exact state at any point in the stack. 
+
+Data class semantics for comparison also make HttpMessages incredibly simple to assert against in testing scenarios, and this ease of testing is one of the most important parts of the [http4k ethos](/concepts/rationale).
 
 ### HttpHandler
 
