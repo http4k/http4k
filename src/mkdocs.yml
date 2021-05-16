@@ -29,15 +29,15 @@ edit_uri: edit/master/src/docs/
 strict: false
 nav:
   - Introduction: documentation/index.md
-  - Quickstart: quickstart/index.md
-  - How these docs are organised: index.md
-  - Explanation:
-      - Rationale: explanation/rationale.md
-      - HTTP: explanation/http.md
-      - Serverless: explanation/serverless.md
-      - WebSockets: explanation/websockets.md
-      - Server-Sent Events: explanation/server-sent-events.md
+  - About the docs: index.md
+  - Concepts:
+      - Rationale: concepts/rationale.md
+      - HTTP: concepts/http.md
+      - Serverless: concepts/serverless.md
+      - WebSockets: concepts/websockets.md
+      - Server-Sent Events: concepts/server-sent-events.md
   - Tutorials:
+      - Quckstart: tutorials/tutorials.quickstart/index.md
       - TDDing http4k: tutorials/tdding_http4k/index.md
   - How-to guides:
       - Server as a function: howto/server_as_a_function/index.md
