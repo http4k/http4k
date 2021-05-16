@@ -1,22 +1,19 @@
-title: http4k Rationale & Concepts
+title: Rationale: The why of http4k
 description: Overview of why we created http4k, the problems it solves, and the core concepts
 
-**http4k** is the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - 
-the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the "Server as a function" and filter model is stolen from 
-[Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io). With the growing 
-adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch.
+**http4k** was created as the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the "Server as a function" and filter model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io). With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch.
 
-For our purposes, we needed something that:
+For our purposes, we wanted something that:
 
-1. Starts/stops ultra quickly.
-1. Easily testable outside of an HTTP container, and testing should require little to no custom infrastructure.
-1. Provides typesafe HTTP message deconstruction/construction (in this case via Lenses).
-1. Automatically deals with contract breaches (missing/invalid params etc) to remove boilerplate.
+1. Was based on simple functional concepts and embraced immutability.
+1. Embraced the "Server as a Function" model a uniform server/client API.
 1. Absolutely no magic involved: No reflection. No annotations.
-1. Minimal dependencies (apart from the Kotlin StdLib, `http4k-core` has zero).
+1. Lightweight with minimal dependencies (apart from the Kotlin StdLib, `http4k-core` has zero).
+1. Embraced Test-Driven approaches, was testable outside of an HTTP container, and testing should require no custom infrastructure.
+1. Starts/stops ultra quickly.
+1. Provides typesafe HTTP message deconstruction/construction.
+1. Automatically dealt with contract breaches to remove boilerplate.
 1. Automatic generation of OpenApi/Swagger documentation (including JSON Schema models).
-1. Has a symmetric server/client API (`HttpHandler` should just be `Request -> Response`).
-1. Has immutable Request/Response objects.
 
 **http4k** ticks all of these boxes. 
 

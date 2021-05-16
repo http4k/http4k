@@ -16,10 +16,10 @@ http4k is a simple framework based around several function types, and hopefully 
 
 We recommend that all new users familiarise themselves with at least the [rationale](/concepts/rationale) and [HTTP](/concepts/http) pages of this section.
 
-### Tutorials
+### [Tutorials](https://diataxis.fr/tutorials/)
 Getting started with a new library can be quite daunting, and sometimes everyone needs a little hand holding to get comfortable with how things fit together. This section contains step-by-step guides to get you started with each of http4k's main conceptual areas. The [Quickstart](/tutorials/quickstart) will get you out of the gate and up and running in no time.
 
-### How-to guides
+### [How-to guides](https://diataxis.fr/how-to-guides/)
 The meat of the http4k documentation is in this section, in which you'll find ready made solutions to many common problems. Because if you've got something to achieve - it's pretty much guaranteed that we've probably already come across. 
 
 The format for the recipes contains:
@@ -31,7 +31,7 @@ Think of it like a mini StackOverflow. :) But better because you've got the enti
 
 As a community-driven project, we would welcome new or updated recipes to make http4k easier to use. The format of the new and updated recipes should follow [this Markdown template](https://github.com/http4k/http4k/blob/master/.github/RECIPE_TEMPLATE.md).
 
-### Reference
+### [Reference](https://diataxis.fr/reference/)
 In order to "fly like a butterfly and sting like a bee", http4k is heavily modularised. This section contains more detailed technical notes on the capabilities present each of the http4k modules. It's more of a "what" than a "why".
 
 [http4k]: https://http4k.org
