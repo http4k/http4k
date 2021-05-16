@@ -36,6 +36,7 @@ nav:
       - Serverless: concepts/serverless.md
       - WebSockets: concepts/websockets.md
       - Server-Sent Events: concepts/server-sent-events.md
+      - Lens: concepts/lens.md
   - Tutorials:
       - Quckstart: tutorials/tutorials.quickstart/index.md
       - TDDing http4k: tutorials/tdding_http4k/index.md
