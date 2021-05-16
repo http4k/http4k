@@ -30,8 +30,37 @@ strict: false
 nav:
   - Introduction: documentation/index.md
   - Quickstart: quickstart/index.md
-  - Rationale & concepts: rationale/index.md
+  - Explanation:
+      - Rationals: gtod/explanation/rationale.md
+      - Http: gtod/explanation/http.md
+      - Serverless: gtod/explanation/sse.md
+      - WebSockets: gtod/explanation/websockets.md
+      - Server-Sent Events: gtod/explanation/sse.md
+  - How-to guides:
+      - How-to 1: gtod/how-to/howto1/index.md
+      - How-to 2: gtod/how-to/howto2/index.md
+  - Tutorials:
+      - ABC: gtod/how-to/abc/index.md
+      - XYZ: gtod/how-to/xyz/index.md
+  - Reference:
+      - Overview: gtod/reference/index.md
+      - Core: gtod/reference/core/index.md
+      - Contracts: gtod/reference/contract/index.md
+      - API docs: gtod/reference/api.md
   - Changelog: changelog/index.md
+  - http4k in action: in_action/index.md
+  - Blog:
+      - Overview: blog/index.md
+      - Meet http4k: blog/meet_http4k/index.md
+      - Typesafe Websockets: blog/typesafe_websockets/index.md
+      - TDDing http4k: blog/tdding_http4k/index.md
+      - Typesafe 12-factor config: blog/typesafe_configuration/index.md
+      - Documenting http4k apps with OpenApi3: blog/documenting_apis_with_openapi/index.md
+      - Retrospective on v3: blog/retrospective_v3/index.md
+      - Nanoservices: blog/nanoservices/index.md
+      - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
+      - http4k v4 - 17 platforms and counting...: blog/http4k_v4/index.md
+      - JCenter Shutdown: blog/regarding_jcenter/index.md
   - Developer guide:
     - Overview: guide/modules/index.md
     - Core: guide/modules/core/index.md
@@ -87,22 +116,3 @@ nav:
     - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md
-  - http4k in action: in_action/index.md
-  - Blog:
-    - Overview: blog/index.md
-    - Meet http4k: blog/meet_http4k/index.md
-    - Typesafe Websockets: blog/typesafe_websockets/index.md
-    - TDDing http4k: blog/tdding_http4k/index.md
-    - Typesafe 12-factor config: blog/typesafe_configuration/index.md
-    - Documenting http4k apps with OpenApi3: blog/documenting_apis_with_openapi/index.md
-    - Retrospective on v3: blog/retrospective_v3/index.md
-    - Nanoservices: blog/nanoservices/index.md
-    - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
-    - http4k v4 - 17 platforms and counting...: blog/http4k_v4/index.md
-    - JCenter Shutdown: blog/regarding_jcenter/index.md
-  - Performance: performance/index.md
-  - FAQ: faq/index.md
-  - Getting support: support/index.md
-  - Contribute/support http4k: contributing/index.md
-  - Code of Conduct: code-of-conduct/index.md
-  - API docs: api/index.md
