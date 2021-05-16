@@ -11,4 +11,4 @@ implementation group: "org.http4k", name: "http4k-multipart", version: "4.9.1.0"
 
 Multipart form support for fields and files, including a set of lens extensions for fields/files.
 
-See the [cookbook](/cookbook/multipart_forms/) for example use.
+See the [how-to guides](/howto/multipart_forms/) for example use.
