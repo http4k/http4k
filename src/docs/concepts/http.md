@@ -1,4 +1,5 @@
-title: http4k HTTP description: An explanation of the core function types for dealing with HTTP applications
+title: http4k HTTP 
+description: An explanation of the core function types for dealing with HTTP applications
 
 HTTP application use-cases are the original and primary focus of **http4k**. Based on the [Server as a Function](https://monkey.org/~marius/funsrv.pdf) concept, http4k provides a set of function types which can be used to write, test and deploy HTTP applications with simplicity and ease.
 
