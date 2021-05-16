@@ -30,6 +30,7 @@ strict: false
 nav:
   - Introduction: documentation/index.md
   - Quickstart: quickstart/index.md
+  - How these docs are organised: index.md
   - Explanation:
       - Rationale: explanation/rationale.md
       - HTTP: explanation/http.md
