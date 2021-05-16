@@ -1,6 +1,5 @@
-package blog.tdding_http4k._3
+package tutorials.tdding_http4k._3
 
-import blog.tdding_http4k._3.Matchers.answerShouldBe
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.client.OkHttp
@@ -14,6 +13,7 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tutorials.tdding_http4k._3.Matchers.answerShouldBe
 
 object Matchers {
     fun Response.answerShouldBe(expected: Int) {

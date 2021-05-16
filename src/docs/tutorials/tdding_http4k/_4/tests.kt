@@ -1,6 +1,5 @@
-package blog.tdding_http4k._4
+package tutorials.tdding_http4k._4
 
-import blog.tdding_http4k._4.Matchers.answerShouldBe
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -29,6 +28,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import tutorials.tdding_http4k._4.Matchers.answerShouldBe
 import java.util.Random
 
 object Matchers {

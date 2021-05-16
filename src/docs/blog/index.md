@@ -21,7 +21,7 @@ description: List of articles published on the http4k library
     - Overview of the OpenApi3 support available in the http4k library.
 * 2018/11: [Add typesafe 12-factor configuration to http4k apps with Environments](./typesafe_configuration)
     - Overview of how to configure http4k applications using the http4k-cloudnative module.
-* 2018/02: [TDDing http4k](./tdding_http4k)
+* 2018/02: [TDDing http4k](../tutorials/tdding_http4k)
     - Step-by-step guide to TDDing a simple http4k application.
 * 2017/12: [Websockets. But typesafe. And testable. Without the Server](./typesafe_websockets)
     - Overview of typesafe Websocket support in http4k.

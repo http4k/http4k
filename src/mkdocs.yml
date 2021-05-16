@@ -38,8 +38,7 @@ nav:
       - WebSockets: explanation/websockets.md
       - Server-Sent Events: explanation/server-sent-events.md
   - Tutorials:
-      - ABC: how-to/abc/index.md
-      - XYZ: how-to/xyz/index.md
+      - TDDing http4k: tutorials/tdding_http4k/index.md
   - How-to guides:
       - Server as a function: howto/server_as_a_function/index.md
       - Client as a function: howto/client_as_a_function/index.md
@@ -99,7 +98,6 @@ nav:
       - Overview: blog/index.md
       - Meet http4k: blog/meet_http4k/index.md
       - Typesafe Websockets: blog/typesafe_websockets/index.md
-      - TDDing http4k: blog/tdding_http4k/index.md
       - Typesafe 12-factor config: blog/typesafe_configuration/index.md
       - Documenting http4k apps with OpenApi3: blog/documenting_apis_with_openapi/index.md
       - Retrospective on v3: blog/retrospective_v3/index.md

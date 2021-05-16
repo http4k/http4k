@@ -1,4 +1,4 @@
-title: http4k blog: TDDing http4k
+title: http4k Tutorial: TDDing http4k
 description: A step-by-step guide to TDDing a simple http4k application
 
 # TDDing http4k
