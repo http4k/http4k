@@ -18,6 +18,6 @@ A specialised ErrorHandler can also be assigned to the RPC contract.
 
 Note that in order to activate JSON RPC, you need to import one of the supported JSON modules.
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/jsonrpc/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/reference/jsonrpc/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/jsonrpc/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/reference/jsonrpc/example.kt"></script>

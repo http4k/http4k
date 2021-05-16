@@ -17,9 +17,9 @@ to declare server-side `Routes` in a completely typesafe way, leveraging the Len
  models for messages.
 - **Security:** to secure the `Routes` against unauthorised access. Current implementations include `ApiKey`, `BasicAuth`, `BearerAuth` and `OAuth`.
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/reference/contracts/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/reference/contracts/example.kt"></script>
 
 When launched, OpenApi/Swagger format documentation (including JSON schema models) can be found at the route of the module.
 

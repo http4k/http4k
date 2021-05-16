@@ -38,7 +38,7 @@ fun main() {
     println(appUsingLens(Request(GET, "/someUrl")))
 
     // overwrite the content - this will prove the hot reload works!
-    File("src/test/resources/guide/modules/templating/Person.hbs").writer()
+    File("src/test/resources/reference/templating/Person.hbs").writer()
         .use { it.write("{{name}} is not {{age}} years old") }
 
     println(appUsingLens(Request(GET, "/someUrl")))
