@@ -11,7 +11,7 @@ You can read more about the theory [here](https://documentation.divio.com/), but
 
 Regardless of which section you are reading, as much of the code as possible exists in the repository and is built with the rest of http4k in our CI. This has the effect of a making the code more verbose (including import statements and similar), but at the same time we can guarantee that the code compiles and you can navigate around it to find where everything is coming from. We hope you agree that this tradeoff is worth it.
 
-### Concepts
+### [Concepts](https://documentation.divio.com/explanation/)
 http4k is a simple framework based around several function types, and hopefully the ideas behind it are not difficult to grasp. This section conveys the mindset and rationale behind http4k, and lays out each of the main function types used in the toolkit and how they relate to each other.
 
 We recommend that all new users familiarise themselves with at least the [rationale](/concepts/rationale) and [HTTP](/concepts/http) pages of this section.
