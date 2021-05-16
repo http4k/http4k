@@ -13,14 +13,17 @@ An interface representing the available server callback API to the Server-Sent E
 
 ## SseConsumer
 > `typealias SseConsumer = (Sse) -> Unit`
+
 The primary callback received when an Sse server is connected to a client. API user behaviour is configured here.
 
 ## SseHandler
 > `typelias SseHandler =  (Request) -> SseConsumer`
+
 Provides the route mapping of an [HTTP Request](/concepts/HTTP#HttpMessage) to a particular SseConsumer.
 
 ## SseFilter
 > `fun interface SseFilter : (SseConsumer) -> SseConsumer`
+
 Applies decoration to a matched SseConsumer before it is invoked. SseFilters can be used to apply tangental effects to the matched SseConsumer such as logging/security, or to modify the incoming [HTTP Request](/concepts/HTTP#HttpMessage).
 
 ## SseRouter

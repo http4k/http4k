@@ -13,14 +13,17 @@ An interface representing the available server callback API to the WebSocket cha
 
 ## WsConsumer
 > `typealias WsConsumer = (WebSocket) -> Unit`
+
 The primary callback received when an WebSocket server is connected to a client. API user behaviour is configured here.
 
 ## WsHandler
 > `typelias WsHandler =  (Request) -> WsConsumer`
+
 Provides the route mapping of an [HTTP Request](/concepts/HTTP#HttpMessage) to a particular WsConsumer.
 
 ## WsFilter
 > `fun interface WsFilter : (WsConsumer) -> WsConsumer`
+
 Applies decoration to a matched WsConsumer before it is invoked. WsFilters can be used to apply tangental effects to the matched WsConsumer such as logging/security, or to modify the incoming [HTTP Request](/concepts/HTTP#HttpMessage).
 
 ## WsRouter
