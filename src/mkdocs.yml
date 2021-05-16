@@ -41,7 +41,6 @@ nav:
       - ABC: how-to/abc/index.md
       - XYZ: how-to/xyz/index.md
   - How-to guides:
-      - How to use this guide: howto/index.md
       - Server as a function: howto/server_as_a_function/index.md
       - Client as a function: howto/client_as_a_function/index.md
       - Container integration: howto/container_integration/index.md
