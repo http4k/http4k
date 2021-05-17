@@ -1,4 +1,4 @@
-package blog.typesafe_websockets
+package guide.howto.websockets
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -14,20 +14,32 @@ import org.http4k.server.asServer
 import org.http4k.testing.testWsClient
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsClient
+import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.then
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 val namePath = Path.of("name")
 
-// here is our websocket app - it uses dynamic path binding and lenses
-val testApp: WsHandler = websockets(
-    "/{name}" bind { ws: Websocket ->
-        val name = namePath(ws.upgradeRequest)
-        ws.send(WsMessage("hello $name"))
+// a filter allows us to intercept the call to the websocket and do logging etc...
+val sayHello = WsFilter { next ->
+    {
+        println("Hello from the websocket!")
+        next(it)
     }
+}
+
+// here is our websocket app - it uses dynamic path binding and lenses
+val testApp: WsHandler = sayHello.then(
+    websockets(
+        "/{name}" bind { ws: Websocket ->
+            val name = namePath(ws.upgradeRequest)
+            ws.send(WsMessage("hello $name"))
+        }
+    )
 )
 
 // this is the abstract contract that defines the behaviour to be tested

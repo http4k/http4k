@@ -44,14 +44,14 @@ abstract class WebsocketContract {
 
 // a unit test version of the contract - it connects to the websocket in memory with no network
 class WebsocketUnitTest : WebsocketContract() {
-    override fun client() = howto.websockets.testApp.testWsClient(Request(GET, "/bob"))
+    override fun client() = guide.howto.websockets.testApp.testWsClient(Request(GET, "/bob"))
 }
 
 // a integration test version of the contract - it starts a server and connects to the websocket over the network
 class WebsocketServerTest : WebsocketContract() {
     override fun client() = WebsocketClient.blocking(Uri.of("ws://localhost:8000/bob"))
 
-    private val server = howto.websockets.testApp.asServer(Jetty(8000))
+    private val server = guide.howto.websockets.testApp.asServer(Jetty(8000))
 
     @BeforeEach
     fun before() {

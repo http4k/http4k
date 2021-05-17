@@ -41,31 +41,31 @@ nav:
     - Quickstart: tutorials/quickstart/index.md
     - TDDing http4k: tutorials/tdding_http4k/index.md
   - How-to guides:
-    - Server as a function: howto/server_as_a_function/index.md
-    - Client as a function: howto/client_as_a_function/index.md
-    - Container integration: howto/container_integration/index.md
-    - Simple routing: howto/simple_routing/index.md
-    - Nestable routes: howto/nestable_routes/index.md
-    - OpenAPI contracts/routing: howto/typesafe_http_contracts/index.md
-    - Templating engines: howto/using_templates/index.md
-    - Typesafe RequestContexts: howto/request_context/index.md
-    - Typesafe HTTP requests with lenses: howto/typesafe_http_requests_with_lenses/index.md
-    - Custom JSON marshallers: howto/custom_json_marshallers/index.md
-    - GraphQL: howto/graphql/index.md
-    - HTML forms: howto/html_forms/index.md
-    - Multipart forms: howto/multipart_forms/index.md
-    - WebJars: howto/webjars/index.md
-    - Websockets: howto/websockets/index.md
-    - Server-Sent Events: howto/sse/index.md
-    - Structured Logging with Events: howto/structured_logging_with_events/index.md
-    - Basic OAuth Server configuration: howto/basic_oauth_authorization_server/index.md
-    - Custom OAuth Provider configuration: howto/custom_oauth_provider/index.md
-    - Custom Server (SSL): howto/customised_servers/index.md
-    - Service Virtualisation with Servirtium: howto/service_virtualisation/index.md
-    - Principal lookup: howto/principal_lookup/index.md
-    - Monitoring http4k: howto/monitoring/index.md
-    - Recording/replaying HTTP traffic: howto/record_and_replay/index.md
-    - Test driven apps: howto/test_driven_apps/index.md
+    - Server as a function: guide/howto/server_as_a_function/index.md
+    - Client as a function: guide/howto/client_as_a_function/index.md
+    - Container integration: guide/howto/container_integration/index.md
+    - Simple routing: guide/howto/simple_routing/index.md
+    - Nestable routes: guide/howto/nestable_routes/index.md
+    - OpenAPI contracts/routing: guide/howto/typesafe_http_contracts/index.md
+    - Templating engines: guide/howto/using_templates/index.md
+    - Typesafe RequestContexts: guide/howto/request_context/index.md
+    - Typesafe HTTP requests with lenses: guide/howto/typesafe_http_requests_with_lenses/index.md
+    - Custom JSON marshallers: guide/howto/custom_json_marshallers/index.md
+    - GraphQL: guide/howto/graphql/index.md
+    - HTML forms: guide/howto/html_forms/index.md
+    - Multipart forms: guide/howto/multipart_forms/index.md
+    - WebJars: guide/howto/webjars/index.md
+    - Websockets: guide/howto/websockets/index.md
+    - Server-Sent Events: guide/howto/sse/index.md
+    - Structured Logging with Events: guide/howto/structured_logging_with_events/index.md
+    - Basic OAuth Server configuration: guide/howto/basic_oauth_authorization_server/index.md
+    - Custom OAuth Provider configuration: guide/howto/custom_oauth_provider/index.md
+    - Custom Server (SSL): guide/howto/customised_servers/index.md
+    - Service Virtualisation with Servirtium: guide/howto/service_virtualisation/index.md
+    - Principal lookup: guide/howto/principal_lookup/index.md
+    - Monitoring http4k: guide/howto/monitoring/index.md
+    - Recording/replaying HTTP traffic: guide/howto/record_and_replay/index.md
+    - Test driven apps: guide/howto/test_driven_apps/index.md
   - Module reference:
     - Overview: reference/index.md
     - API docs: reference/api/index.md
