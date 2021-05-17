@@ -67,35 +67,35 @@ nav:
     - Recording/replaying HTTP traffic: guide/howto/record_and_replay/index.md
     - Test driven apps: guide/howto/test_driven_apps/index.md
   - Module reference:
-    - Overview: reference/index.md
-    - API docs: reference/api/index.md
-    - Core: reference/core/index.md
-    - Server backend: reference/servers/index.md
-    - Serverless backend: reference/serverless/index.md
-    - HTTP & Websocket clients: reference/clients/index.md
-    - Typesafe contracts (OpenAPI3): reference/contracts/index.md
-    - JSON handling: reference/json/index.md
-    - Templating: reference/templating/index.md
-    - Multipart forms: reference/multipart/index.md
-    - Cloud Native Configuration: reference/cloud_native/index.md
-    - Cloud Events: reference/cloud_events/index.md
-    - Micrometer: reference/micrometer/index.md
-    - OpenTelemetry: reference/opentelemetry/index.md
-    - Resilience4J: reference/resilience4j/index.md
-    - AWS: reference/aws/index.md
-    - OAuth: reference/oauth/index.md
-    - GraphQL: reference/graphql/index.md
-    - JSON RPC: reference/jsonrpc/index.md
-    - XML handling: reference/xml/index.md
-    - YAML handling: reference/yaml/index.md
+    - Overview: guide/reference/index.md
+    - API docs: guide/reference/api/index.md
+    - Core: guide/reference/core/index.md
+    - Server backend: guide/reference/servers/index.md
+    - Serverless backend: guide/reference/serverless/index.md
+    - HTTP & Websocket clients: guide/reference/clients/index.md
+    - Typesafe contracts (OpenAPI3): guide/reference/contracts/index.md
+    - JSON handling: guide/reference/json/index.md
+    - Templating: guide/reference/templating/index.md
+    - Multipart forms: guide/reference/multipart/index.md
+    - Cloud Native Configuration: guide/reference/cloud_native/index.md
+    - Cloud Events: guide/reference/cloud_events/index.md
+    - Micrometer: guide/reference/micrometer/index.md
+    - OpenTelemetry: guide/reference/opentelemetry/index.md
+    - Resilience4J: guide/reference/resilience4j/index.md
+    - AWS: guide/reference/aws/index.md
+    - OAuth: guide/reference/oauth/index.md
+    - GraphQL: guide/reference/graphql/index.md
+    - JSON RPC: guide/reference/jsonrpc/index.md
+    - XML handling: guide/reference/xml/index.md
+    - YAML handling: guide/reference/yaml/index.md
     - Testing:
-      - Overview: reference/testing/index.md
-      - Hamkrest: reference/hamkrest/index.md
-      - Kotest: reference/kotest/index.md
-      - WebDriver: reference/webdriver/index.md
-      - Approval Testing: reference/approvaltests/index.md
-      - Chaos Testing: reference/chaos/index.md
-      - Service Virtualisaion: reference/servicevirtualisation/index.md
+      - Overview: guide/reference/testing/index.md
+      - Hamkrest: guide/reference/hamkrest/index.md
+      - Kotest: guide/reference/kotest/index.md
+      - WebDriver: guide/reference/webdriver/index.md
+      - Approval Testing: guide/reference/approvaltests/index.md
+      - Chaos Testing: guide/reference/chaos/index.md
+      - Service Virtualisaion: guide/reference/servicevirtualisation/index.md
   - Blog:
     - Overview: blog/index.md
     - Meet http4k: blog/meet_http4k/index.md

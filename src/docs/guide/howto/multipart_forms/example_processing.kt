@@ -27,7 +27,7 @@ data class AName(val value: String)
 fun main() {
 
     val server = ServerFilters.ProcessFiles { multipartFile: MultipartEntity.File ->
-        // do something with the file right here... like stream it to another server and return the reference
+        // do something with the file right here... like stream it to another server and return the guide.reference
         println(String(multipartFile.file.content.readBytes()))
         multipartFile.file.filename
     }
