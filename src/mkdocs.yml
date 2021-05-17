@@ -38,8 +38,8 @@ nav:
     - WebSockets: concepts/websockets.md
     - Server-Sent Events: concepts/server-sent-events.md
   - Tutorials:
-    - Quickstart: tutorials/quickstart/index.md
-    - TDDing http4k: tutorials/tdding_http4k/index.md
+    - Quickstart: guide/tutorials/quickstart/index.md
+    - TDDing http4k: guide/tutorials/tdding_http4k/index.md
   - How-to guides:
     - Server as a function: guide/howto/server_as_a_function/index.md
     - Client as a function: guide/howto/client_as_a_function/index.md

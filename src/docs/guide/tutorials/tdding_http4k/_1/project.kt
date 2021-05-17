@@ -1,4 +1,4 @@
-package tutorials.tdding_http4k._1
+package guide.tutorials.tdding_http4k._1
 
 import org.http4k.core.Request
 import org.http4k.core.Response

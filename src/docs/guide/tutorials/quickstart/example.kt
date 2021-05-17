@@ -1,4 +1,4 @@
-package tutorials.quickstart
+package guide.tutorials.quickstart
 
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method

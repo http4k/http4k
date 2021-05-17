@@ -1,4 +1,4 @@
-package tutorials.tdding_http4k._2
+package guide.tutorials.tdding_http4k._3
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -20,9 +20,17 @@ fun MyMathServer(port: Int): Http4kServer = MyMathsApp().asServer(Jetty(port))
 fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
     routes(
         "/ping" bind GET to { _: Request -> Response(OK) },
-        "/add" bind GET to { request: Request ->
-            val valuesToAdd = Query.int().multi.defaulted("value", listOf())(request)
-            Response(OK).body(valuesToAdd.sum().toString())
-        }
+        "/add" bind GET to calculate { it.sum() },
+        "/multiply" bind GET to calculate { it.fold(1) { memo, next -> memo * next } }
     )
 )
+
+private fun calculate(fn: (List<Int>) -> Int): (Request) -> Response {
+    val values = Query.int().multi.defaulted("value", listOf())
+
+    return { request: Request ->
+        val valuesToCalc = values(request)
+        val answer = if (valuesToCalc.isEmpty()) 0 else fn(valuesToCalc)
+        Response(OK).body(answer.toString())
+    }
+}
