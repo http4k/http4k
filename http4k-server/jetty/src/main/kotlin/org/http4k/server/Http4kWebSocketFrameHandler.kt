@@ -1,11 +1,13 @@
 package org.http4k.server
 
 import org.eclipse.jetty.util.Callback
+import org.eclipse.jetty.util.Utf8StringBuilder
 import org.eclipse.jetty.websocket.core.CloseStatus
 import org.eclipse.jetty.websocket.core.CoreSession
 import org.eclipse.jetty.websocket.core.Frame
 import org.eclipse.jetty.websocket.core.FrameHandler
 import org.eclipse.jetty.websocket.core.OpCode.BINARY
+import org.eclipse.jetty.websocket.core.OpCode.CONTINUATION
 import org.eclipse.jetty.websocket.core.OpCode.TEXT
 import org.http4k.core.Body
 import org.http4k.core.Request
@@ -19,11 +21,19 @@ class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
                                   private val upgradeRequest: Request) : FrameHandler {
 
     private var websocket: PushPullAdaptingWebSocket? = null
+    private val textBuffer = Utf8StringBuilder()
 
     override fun onFrame(frame: Frame, callback: Callback) {
         try {
             when (frame.opCode) {
-                TEXT, BINARY -> websocket?.triggerMessage(WsMessage(Body(frame.payloadAsUTF8)))
+                TEXT, BINARY, CONTINUATION -> {
+                    textBuffer.append(frame.payload)
+
+                    if (frame.isFin) {
+                        websocket?.triggerMessage(WsMessage(Body(textBuffer.toString())))
+                        textBuffer.reset()
+                    }
+                }
             }
             callback.succeeded()
         } catch (e: Throwable) {

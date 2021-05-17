@@ -57,6 +57,9 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolySe
             "/queries" bind { ws: Websocket ->
                 ws.onMessage { ws.send(WsMessage(ws.upgradeRequest.query("query") ?: "not set")) }
                 ws.onError { ws.send(WsMessage(it.localizedMessage)) }
+            },
+            "/echo" bind { ws: Websocket ->
+                ws.onMessage { ws.send(it) }
             })
 
         server = PolyHandler(routes, ws).asServer(serverConfig(0)).start()
@@ -176,5 +179,18 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolySe
         assertThat({
             client.send(WsMessage("hello"))
         }, throws<WebsocketNotConnectedException>())
+    }
+
+    @Test
+    fun `can send and receive multi-frame messages from socket`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/echo"))
+
+        val longMessage = WsMessage((1..10000).joinToString("") { "a" })
+        client.send(longMessage)
+
+        val anotherMessage = WsMessage("another message")
+        client.send(anotherMessage)
+
+        assertThat(client.received().take(2).toList(), equalTo(listOf(longMessage, anotherMessage)))
     }
 }
