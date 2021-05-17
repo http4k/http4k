@@ -14,7 +14,7 @@ Regardless of which section you are reading, as much of the code as possible exi
 ### [Concepts](https://documentation.divio.com/explanation/)
 http4k is a simple framework based around several function types, and hopefully the ideas behind it are not difficult to grasp. This section conveys the mindset and rationale behind http4k, and lays out each of the main function types used in the toolkit and how they relate to each other.
 
-We recommend that all new users familiarise themselves with at least the [rationale](/concepts/rationale) and [HTTP](/concepts/http) pages of this section.
+We recommend that all new users familiarise themselves with at least the [rationale](/guide/concepts/rationale) and [HTTP](/guide/concepts/http) pages of this section.
 
 ### [Tutorials](https://diataxis.fr/tutorials/)
 Getting started with a new library can be quite daunting, and sometimes everyone needs a little hand holding to get comfortable with how things fit together. This section contains step-by-step guides to get you started with each of http4k's main conceptual areas. The [Quickstart](/guide/tutorials/quickstart) will get you out of the gate and up and running in no time.

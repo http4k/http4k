@@ -10,7 +10,7 @@ In http4k, an HttpMessage is an immutable entity representing either a `Request`
 
 This immutability is a powerful alternative to the mutable versions found in other web libraries, as it provides a exact record of the state of the messages as they travel through an HTTP application, so for debugging purposes you can time-travel through an application inspecting the exact state at any point in the stack. 
 
-Data class semantics for comparison also make HttpMessages incredibly simple to assert against in testing scenarios, and this ease of testing is one of the most important parts of the [http4k ethos](/concepts/rationale).
+Data class semantics for comparison also make HttpMessages incredibly simple to assert against in testing scenarios, and this ease of testing is one of the most important parts of the [http4k ethos](/guide/concepts/rationale).
 
 ### HttpHandler
 

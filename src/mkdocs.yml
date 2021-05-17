@@ -31,12 +31,12 @@ nav:
   - Introduction: documentation/index.md
   - About the docs: index.md
   - Concepts:
-    - Rationale: concepts/rationale.md
-    - HTTP: concepts/http.md
-    - Serverless: concepts/serverless.md
-    - Lens: concepts/lens.md
-    - WebSockets: concepts/websockets.md
-    - Server-Sent Events: concepts/server-sent-events.md
+    - Rationale: guide/concepts/rationale.md
+    - HTTP: guide/concepts/http.md
+    - Serverless: guide/concepts/serverless.md
+    - Lens: guide/concepts/lens.md
+    - WebSockets: guide/concepts/websockets.md
+    - Server-Sent Events: guide/concepts/server-sent-events.md
   - Tutorials:
     - Quickstart: guide/tutorials/quickstart/index.md
     - TDDing http4k: guide/tutorials/tdding_http4k/index.md
