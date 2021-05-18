@@ -11,7 +11,11 @@ Welcome to the world of http4k! In this guide, we'll run you through the steps r
 <hr/>
 
 #### Step 1
-First, we'll generate and download a project template from the http4k Toolbox. Point your browser at [toolbox.http4k.org](https://toolbox.http4k.org) and select the **Project Wizard** from the menu. The Toolbox is designed as a questionnaire which will help you configure a working project from all of the available http4k modules. There are several stages, but for this guide we're just going to generate the project using the defaults. We explain each of the parts in the remainder of this step, but if you just want to skip to the end, just keep hitting **Next** until the progress bar hits 100% then go to **step 2**:
+First, we'll generate and download a project template from the http4k Toolbox. Point your browser at [toolbox.http4k.org](https://toolbox.http4k.org) and select the **Project Wizard** from the menu.
+
+The Toolbox is designed as a questionnaire which will help you configure a working project from all of the available http4k modules. There are several stages, but for this guide we're just going to generate the project using the defaults. 
+
+We explain each of the parts in the remainder of this step, but if you just want to skip to the end, just keep hitting **Next** until the progress bar hits 100% then go to **step 2**:
 
 <img class="blogImage" src="step1.png" alt="toolbox"/>
 
@@ -48,7 +52,7 @@ First, let's take a tour of the `/src/main/kotlin/HelloWorld.kt` file which cont
 
 <img class="blogImage" src="step4.png" alt="app code"/>
 
-- **Lines 14-18** defines our production application. It consists of a single HTTP endpoint binding all HTTP `GET` requests on the path `/ping` to an `HttpHandler` function. This function takes an implicit `Request` parameter `it` (which it ignores), and just constructs and returns a `Response` object with status and a static body string. The return type of the call to `routes()` is also an `HttpHandler`.
+- **Lines 14-18** defines our production application. It consists of a single HTTP endpoint binding all HTTP `GET` requests on the path `/ping` to an `HttpHandler` function. This   function takes an implicit `Request` parameter `it` (which it ignores), and just constructs and returns a `Response` object with status and a static body string. The return type of the call to `routes()` is also an `HttpHandler`.
 - **Lines 20-26** form a runnable program which starts our application.
 - **Lines 21** decorates our app with a `Request` printing `Filter`. This returns another `HttpHandler`. 
 - **Lines 23**  binds the app onto an instance of the `SunHttp` Server backend and starts it on port `9000`.
