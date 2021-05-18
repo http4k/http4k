@@ -4,8 +4,10 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.9.1.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-*** : Allow custom automarshallers to be used for marshalling events in `FnLoader`, `FnHandler` construction.
 - **http4k-core** : (re)fix Body behaviour for ByteBuffers shorter than the array they wrap. This was taken out due to: H/T (again) @npryce
+- **http4k-server-jetty** - Multi-frame websocket messages are handled in Jetty. H/T @endofhome.
 
 ### v4.9.0.2
 - **http4k-aws** : Fix AWS request signing when using stream body.
