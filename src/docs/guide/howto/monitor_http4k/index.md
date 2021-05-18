@@ -1,4 +1,4 @@
-title: Monitoring http4k applications
+title: http4k How-to: Monitor http4k
 description: How to monitor http4k endpoints and applications
 
 Measuring performance of application estate is crucial in today's microservice world - it is crucial that dev-ops enabled teams can monitor, react and scale dynamically to changes in the runtime environment. However, because of the plethora of monitoring tools on the market, and because [**http4k**](https://github.com/http4k/http4k) is a toolkit and not a complete "batteries included" framework, it provides a number of integration points to enable monitoring systems to be plugged in as required. Additionally, it is envisaged that users will probably want to provide their own implementations of the [**http4k**](https://github.com/http4k/http4k) `ServerConfig` classes (`Jetty`, `Undertow` etc..) so that tweaking and tuning to their exact requirements is accessible, instead of [**http4k**](https://github.com/http4k/http4k) attempting to provide some generic configuration API to achieve it.

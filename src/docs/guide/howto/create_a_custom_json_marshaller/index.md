@@ -1,4 +1,4 @@
-title: http4k How-to: JSON APIs
+title: http4k How-to: Create a custom JSON marshaller
 description: Recipes for using JSON in http4k applications with a variety of popular JSON APIS
 
 ### Gradle setup

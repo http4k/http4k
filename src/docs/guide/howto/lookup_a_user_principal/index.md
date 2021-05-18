@@ -1,4 +1,4 @@
-title: http4k How-to: Authorising requests
+title: http4k How-to: Lookup a user principal
 description: Recipes for looking up and populating a user principal from a request
 
 

@@ -1,4 +1,4 @@
-title: http4k How-to: Structured Logging with Events
+title: http4k How-to: Structure your logs with Events
 description: Recipe for using http4k Events to send structured logs to external log sinks
 
 ### Gradle setup

@@ -1,4 +1,4 @@
-title: http4k How-to: Typesafe, Documented Applications
+title: http4k How-to: Integrate with OpenAPI
 description: Recipes for using the http4k-contract module to provide typesafe endpoints with automatically generated OpenAPI documentation
 
 This contract example shows:

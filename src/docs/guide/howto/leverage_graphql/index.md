@@ -1,4 +1,4 @@
-title: http4k How-to: How-to: Leverage GraphQL
+title: http4k How-to: Leverage GraphQL
 description: Recipe for using GraphQL plugins 
 
 ### Gradle setup

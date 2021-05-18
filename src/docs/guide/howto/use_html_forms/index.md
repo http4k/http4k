@@ -1,4 +1,4 @@
-title: http4k How-to: HTML Forms
+title: http4k How-to: Use HTML Forms
 description: Recipes for using http4k with HTML forms
 
 HTML form support is provided on 2 levels:

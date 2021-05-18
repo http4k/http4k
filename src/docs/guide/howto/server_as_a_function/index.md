@@ -1,4 +1,4 @@
-title: http4k How-to: Server-As-A-Function
+title: http4k How-to: Server-as-a-Function
 description: The simplest example of an http4k application 
 
 This example is the simplest possible "server" implementation. Note that we are not spinning up a server-backend here - but the entire application(!) is testable by firing HTTP requests at it as if it were.

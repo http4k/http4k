@@ -1,4 +1,4 @@
-title: http4k How-to: WebJars support
+title: http4k How-to: Deploy WebJars
 description: Recipe for using WebJars with http4k 
 
 ### Gradle setup

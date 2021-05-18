@@ -1,4 +1,4 @@
-title: http4k How-to: Container Integration
+title: http4k How-to: Use a Server backend
 description: Recipes for using http4k with the various Server backends
 
 This example shows how to both how to serve an application HttpHandler using an embedded an HTTP server and to query it using an HTTP client. All server-backend implementations are launched in an identical manner (in 1LOC) using implementations of the `ServerConfig` interface - and a base implementation of this interface is provided for each server backend.

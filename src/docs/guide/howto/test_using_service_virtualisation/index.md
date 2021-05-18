@@ -1,4 +1,4 @@
-title: http4k How-to: Servirtium 
+title: http4k How-to: Test using Service Virtualisation 
 description: Implementing Service Virtualisation using Servirtium contracts
 
 #### Using the JUnit Extensions [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/service_virtualisation/example_junit_contract_tests.kt)
