@@ -78,7 +78,8 @@ A test for our app is found in `/src/main/kotlin/HelloWorldTest.kt`. Run it with
 
 <img class="blogImage" src="step7.png" alt="client code"/>
 
-Things to notice about the test:
+Cool things to notice about the test:
+
 1. As our `app` is just an `HttpHandler` function, it runs entirely in-memory. It is therefore super-fast and completely threadsafe.
 2. There is no custom core or other setup required for the test to run.
 3. `Request` and `Response` objects are immutable data classes, and can therefore be compared safely in tests.
