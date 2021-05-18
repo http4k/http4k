@@ -13,8 +13,12 @@ documentation, and checking in a high-level way that the business endpoints are 
 
 ### Tests:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/tdding_http4k/_1/tests.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/tutorials/tdding_http4k/_1/tests.kt"></script>
 
 ### Production:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/tdding_http4k/_1/project.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/tutorials/tdding_http4k/_1/project.kt"></script>
+
+- [Part 2: Adding an endpoint](../_2)
+- [Part 3: Adding another endpoint](../_3)
+- [Part 4: Adding an external dependency](../_4)

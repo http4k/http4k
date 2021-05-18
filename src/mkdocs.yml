@@ -29,6 +29,7 @@ edit_uri: edit/master/src/docs/
 strict: false
 nav:
   - Introduction: documentation/index.md
+  - Quickstart: quickstart/index.md
   - About the docs: index.md
   - Concepts:
     - Rationale: guide/concepts/rationale.md
@@ -38,7 +39,6 @@ nav:
     - WebSockets: guide/concepts/websockets.md
     - Server-Sent Events: guide/concepts/server-sent-events.md
   - Tutorials:
-    - Quickstart: guide/tutorials/quickstart/index.md
     - TDDing http4k: guide/tutorials/tdding_http4k/index.md
   - How-to guides:
     - "Basic: Server as a function": guide/howto/server_as_a_function/index.md

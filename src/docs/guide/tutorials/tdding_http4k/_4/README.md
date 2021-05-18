@@ -2,6 +2,10 @@ title:Part 4: Adding an external dependency
 
 description: A step-by-step guide to TDDing a simple http4k application
 
+- [Part 1: Building a walking skeleton](../_1)
+- [Part 2: Adding an endpoint](../_2)
+- [Part 3: Adding another endpoint](../_3)
+
 At this point, the separation of the layers starts to become clear:
 - The server layer is responsible for taking external configuration and instantiating the app layer.
 - The application layer API is only in terms of HTTP transports - it constructs business level abstractions
@@ -29,8 +33,8 @@ The following process is followed to us to the final state, whilst always allowi
 
 ### Tests:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/tdding_http4k/_4/tests.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/tutorials/tdding_http4k/_4/tests.kt"></script>
 
 ### Production:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/tdding_http4k/_4/project.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/tutorials/tdding_http4k/_4/project.kt"></script>
