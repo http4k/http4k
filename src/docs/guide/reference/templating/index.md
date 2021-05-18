@@ -32,8 +32,8 @@ The http4k templating API provides a standard mechanism for rendering using comm
 
 The examples below are for Handlebars, but the others have the same APIs:
 
-#### Code  [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/reference/templating/example.kt)
+#### Code  [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/templating/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/reference/templating/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/templating/example.kt"></script>
 
 [http4k]: https://http4k.org

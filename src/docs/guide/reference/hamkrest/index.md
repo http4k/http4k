@@ -11,8 +11,8 @@ implementation group: "org.http4k", name: "http4k-testing-hamkrest", version: "4
 
 A set of Hamkrest matchers for use when testing http4k apps.
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/reference/hamkrest/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/hamkrest/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/reference/hamkrest/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/hamkrest/example.kt"></script>
 
 [http4k]: https://http4k.org
