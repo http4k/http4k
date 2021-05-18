@@ -4,7 +4,7 @@ description: Feature overview of the http4k-security-oauth form module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-security-oauth", version: "4.9.0.2"
+implementation group: "org.http4k", name: "http4k-security-oauth", version: "4.9.1.0"
 ```
 
 ### About
