@@ -1,4 +1,4 @@
-title: http4k Multipart Forms
+title: http4k How-to: Multipart Forms
 description: Recipes for using http4k with Multipart forms
 
 Multipart form support is provided on 2 levels:

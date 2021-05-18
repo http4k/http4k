@@ -1,4 +1,4 @@
-title: http4k Custom OAuth Authorization Server
+title: http4k How-to: Custom OAuth Authorization Server
 description: Recipe for using http4k to create an authorization server that provides an *authorization code* access flow
 
 ### Gradle setup

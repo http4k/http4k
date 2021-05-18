@@ -1,4 +1,4 @@
-title: http4k SSE APIs
+title: http4k How-to: SSE APIs
 description: Recipes for using http4k with Server-Sent Events
 
 ### Gradle setup

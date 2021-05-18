@@ -1,4 +1,4 @@
-title: http4k Custom OAuth Provider
+title: http4k How-to: Custom OAuth Provider
 description: Recipe for using http4k with custom OAuth provider
 
 It is very easy to configure http4k to integrate with any OAuth2 provider who supports the Authorisation Code Grant.

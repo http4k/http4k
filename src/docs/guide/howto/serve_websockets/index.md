@@ -1,4 +1,4 @@
-title: http4k Websocket APIs
+title: http4k How-to: Websocket APIs
 description: Recipes for using http4k with websockets
 
 ### Gradle setup

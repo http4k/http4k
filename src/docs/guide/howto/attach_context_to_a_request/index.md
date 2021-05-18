@@ -1,4 +1,4 @@
-title: http4k Request Contexts
+title: http4k How-to: Request Contexts
 description: Recipes for using http4k with per-request context objects
 
 A `RequestContext` makes it possible to attach objects to a request whilst it is being passed down through the layers of an application.
