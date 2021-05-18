@@ -88,7 +88,7 @@ fun main() {
 
     val handler = routes(
         "/context" bind filter.then(contract),
-        "/static" bind NoCache().then(static(Classpath("cookbook/nestable_routes"))),
+        "/static" bind NoCache().then(static(Classpath("guide/howto/nestable_routes"))),
         "/" bind contract {
             renderer = OpenApi3(ApiInfo("my great super api", "v1.0"), Jackson)
             routes += "/echo" / Path.of("name") meta {

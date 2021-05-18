@@ -10,6 +10,6 @@ implementation group: "org.http4k", name: "http4k-security-oauth", version: "4.9
 
 For this example, you need to configure `OAuthServer` instance with the correct implementations of your login pages, generation of authentication codes and access tokens.
 
-### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/basic_oauth_authorization_server/example.kt)
+### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/configure_an_oauth_server/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/basic_oauth_authorization_server/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/configure_an_oauth_server/example.kt"></script>

@@ -10,6 +10,6 @@ implementation group: "org.http4k", name: "http4k-core", version: "4.9.1.0"
 implementation group: "org.http4k", name: "http4k-template-handlebars", version: "4.9.1.0"
 ```
 
-### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_templates/example.kt)
+### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/use_a_templating_engine/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_templates/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/use_a_templating_engine/example.kt"></script>

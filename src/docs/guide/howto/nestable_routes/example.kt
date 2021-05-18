@@ -29,7 +29,7 @@ fun main() {
         )
     println(routesWithFilter(Request(GET, "/get/value")))
 
-    val staticWithFilter = PrintRequestAndResponse().then(static(Classpath("cookbook/nestable_routes")))
+    val staticWithFilter = PrintRequestAndResponse().then(static(Classpath("guide/howto/nestable_routes")))
     val app = routes(
         "/bob" bind routesWithFilter,
         "/static" bind staticWithFilter,
@@ -42,7 +42,7 @@ fun main() {
             header("requiredheader", "somevalue").and(queries("requiredquery")) bind { Response(OK).body("matched 2 parameters") },
             headers("requiredheader") bind { Response(OK).body("matched 1 parameters") }
         ),
-        singlePageApp(Classpath("cookbook/nestable_routes"))
+        singlePageApp(Classpath("guide/howto/nestable_routes"))
     )
 
     println(app(Request(GET, "/bob/get/value")))

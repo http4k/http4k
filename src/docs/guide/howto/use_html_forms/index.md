@@ -12,10 +12,10 @@ HTML form support is provided on 2 levels:
 implementation group: "org.http4k", name: "http4k-core", version: "4.9.1.0"
 ```
 
-### Standard (non-typesafe) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_standard.kt)
+### Standard (non-typesafe) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/use_html_forms/example_standard.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_standard.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/use_html_forms/example_standard.kt"></script>
 
-### Lens (typesafe, validating) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_lens.kt)
+### Lens (typesafe, validating) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/use_html_forms/example_lens.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_lens.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/use_html_forms/example_lens.kt"></script>

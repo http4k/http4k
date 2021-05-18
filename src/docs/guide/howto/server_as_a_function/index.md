@@ -9,6 +9,6 @@ This example is the simplest possible "server" implementation. Note that we are 
 implementation group: "org.http4k", name: "http4k-core", version: "4.9.1.0"
 ```
 
-### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/server_as_a_function/example.kt)
+### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/server_as_a_function/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/server_as_a_function/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/server_as_a_function/example.kt"></script>

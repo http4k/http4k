@@ -34,7 +34,7 @@ and plugged into the endpoint.
 In Kubernetes, this set of endpoints is generally hosted on a second port to avoid the API clashes, so http4k provides the machinery to 
 easily start these services on a different port to the main application API via the `Http4kK8sServer` object.
  
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/reference/cloud_native/example_k8s.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/reference/cloud_native/example_k8s.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/reference/cloud_native/example_k8s.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/reference/cloud_native/example_k8s.kt"></script>
 

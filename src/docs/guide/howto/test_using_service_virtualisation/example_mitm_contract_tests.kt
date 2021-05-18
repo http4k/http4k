@@ -155,7 +155,7 @@ class GitHubReplayingWordCounterTest : WordCounterContract {
         servirtium = ServirtiumServer.Replay("WordCounter." + info.displayName.removeSuffix("()"),
             GitHub("http4k", "http4k",
                 Credentials("<github user>", "<personal access token>"),
-                Paths.get("src/test/resources/cookbook/service_virtualisation")
+                Paths.get("src/test/resources/guide/howto/service_virtualisation")
             ),
             object : InteractionOptions {
                 override fun modify(request: Request) = request

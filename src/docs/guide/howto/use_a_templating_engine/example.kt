@@ -12,7 +12,7 @@ import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
 import org.http4k.template.viewModel
 
-// this view has the default template path of: cookbook/using_templates/Person.hbs, although that is overridable by
+// this view has the default template path of: guide/howto/using_templates/Person.hbs, although that is overridable by
 // setting the template property from ViewModel
 data class Person(val name: String, val age: Int) : ViewModel
 

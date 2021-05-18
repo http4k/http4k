@@ -39,6 +39,6 @@ In harmony with the ethos of **http4k** there is no need to bring in a custom lo
 
 The example below shows a simple application that outputs structured logs to StdOut which can be analysed by an aggregator, along with the attachment of extra `Event` metadata via a custom `EventFilter`.
  
-### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/structured_logging_with_events/example.kt)
+### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/structure_your_logs_with_events/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/structured_logging_with_events/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/structure_your_logs_with_events/example.kt"></script>

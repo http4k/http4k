@@ -10,8 +10,8 @@ also been converted to reusable extension methods on Response.
 
 ### Tests:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/tdding_http4k/_2/tests.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/tdding_http4k/_2/tests.kt"></script>
 
 ### Production:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/tdding_http4k/_2/project.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/tdding_http4k/_2/project.kt"></script>

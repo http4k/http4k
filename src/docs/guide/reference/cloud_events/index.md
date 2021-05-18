@@ -21,7 +21,7 @@ implementation group: "org.http4k", name: "http4k-format-jackson", version: "4.9
 
 ```
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/reference/cloud_events/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/reference/cloud_events/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/reference/cloud_events/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/reference/cloud_events/example.kt"></script>
 

@@ -10,29 +10,29 @@ implementation group: "org.http4k", name: "http4k-core", version: "4.9.1.0"
 implementation group: "org.http4k", name: "http4k-metrics-micrometer", version: "4.9.1.0"
 ```
  
-### Metrics (Micrometer) [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_micrometer.kt)
+### Metrics (Micrometer) [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_micrometer.kt)
 
 [**http4k**](https://github.com/http4k/http4k) provides module support for monitoring application endpoints using the [**micrometer**](http://micrometer.io/) metrics abstraction library, which currently enables support for libraries such as Graphite, StatsD, Prometheus and Netflix Atlas. This also provides drop-in classes to record stats such as JVM performance, GC and thread usage.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_micrometer.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_micrometer.kt"></script>
 
-### Metrics (other APIs) [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_metrics.kt)
+### Metrics (other APIs) [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_metrics.kt)
 
 Alternatively, it's very easy to use a standard `Filter` to report on stats:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_metrics.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_metrics.kt"></script>
 
-### Logging [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_logging.kt)
+### Logging [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_logging.kt)
 This is trivial to achieve by using a Filter:
  
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_logging.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_logging.kt"></script>
 
-### Distributed tracing [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_tracing.kt)
+### Distributed tracing [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_tracing.kt)
 This allows a chain of application calls to be tied together and is generally done through the setting of HTTP headers on each call. [**http4k**](https://github.com/http4k/http4k) supports the [OpenZipkin](https://zipkin.io/) standard for achieving this and provides both Server-side and Client-side `Filters` for this purpose. This example shows a chain of two proxies and an endpoint - run it to observe the changes to the tracing headers as the request flows through the system:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_tracing.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_tracing.kt"></script>
 
-### Debugging [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_debugging.kt)
+### Debugging [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_debugging.kt)
 Easily wrap an `HttpHandler` in a debugging filter to check out what is going on under the covers:
  
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_debugging.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/monitor_http4k/example_debugging.kt"></script>

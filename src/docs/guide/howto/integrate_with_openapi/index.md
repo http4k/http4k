@@ -18,6 +18,6 @@ implementation group: "org.http4k", name: "http4k-format-argo", version: "4.9.1.
 
 Note: although we use Argo here as our JSON API, you could also switch in any of the `http4k-format-xxx` JSON modules. 
 
-### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_contracts/example.kt)
+### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/integrate_with_openapi/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_contracts/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/integrate_with_openapi/example.kt"></script>

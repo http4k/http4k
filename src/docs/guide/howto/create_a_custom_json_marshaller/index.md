@@ -16,6 +16,6 @@ You can declare your own custom marshaller by reimplementing the Json instance a
 
 This ability to render custom types through different JSON marshallers allows API users to provide different "views" for different purposes - for example we may wish to hide the values of some fields in the output, as below:
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/custom_json_marshallers/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/create_a_custom_json_marshaller/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/custom_json_marshallers/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/create_a_custom_json_marshaller/example.kt"></script>
