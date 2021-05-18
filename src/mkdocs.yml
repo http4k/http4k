@@ -41,31 +41,31 @@ nav:
     - Quickstart: guide/tutorials/quickstart/index.md
     - TDDing http4k: guide/tutorials/tdding_http4k/index.md
   - How-to guides:
-    - Server as a function: guide/howto/server_as_a_function/index.md
-    - Client as a function: guide/howto/client_as_a_function/index.md
-    - Container integration: guide/howto/container_integration/index.md
-    - Simple routing: guide/howto/simple_routing/index.md
-    - Nestable routes: guide/howto/nestable_routes/index.md
-    - OpenAPI contracts/routing: guide/howto/typesafe_http_contracts/index.md
-    - Templating engines: guide/howto/using_templates/index.md
-    - Typesafe RequestContexts: guide/howto/request_context/index.md
-    - Typesafe HTTP requests with lenses: guide/howto/typesafe_http_requests_with_lenses/index.md
-    - Custom JSON marshallers: guide/howto/custom_json_marshallers/index.md
-    - GraphQL: guide/howto/graphql/index.md
-    - HTML forms: guide/howto/html_forms/index.md
-    - Multipart forms: guide/howto/multipart_forms/index.md
-    - WebJars: guide/howto/webjars/index.md
-    - Websockets: guide/howto/websockets/index.md
-    - Server-Sent Events: guide/howto/sse/index.md
-    - Structured Logging with Events: guide/howto/structured_logging_with_events/index.md
-    - Basic OAuth Server configuration: guide/howto/basic_oauth_authorization_server/index.md
-    - Custom OAuth Provider configuration: guide/howto/custom_oauth_provider/index.md
-    - Custom Server (SSL): guide/howto/customised_servers/index.md
-    - Service Virtualisation with Servirtium: guide/howto/service_virtualisation/index.md
-    - Principal lookup: guide/howto/principal_lookup/index.md
-    - Monitoring http4k: guide/howto/monitoring/index.md
-    - Recording/replaying HTTP traffic: guide/howto/record_and_replay/index.md
-    - Test driven apps: guide/howto/test_driven_apps/index.md
+    - "Basic: Server as a function": guide/howto/server_as_a_function/index.md
+    - "Basic: Client as a function": guide/howto/client_as_a_function/index.md
+    - "Basic: Use a Server backend": guide/howto/use_a_server_backend/index.md
+    - "Basic: Different test-types": guide/howto/different_test_types/index.md
+    - "Basic: Simple routing": guide/howto/simple_routing/index.md
+    - "Basic: Nestable routes": guide/howto/nestable_routes/index.md
+    - Attach context to a request: guide/howto/attach_context_to_a_request/index.md
+    - Configure an OAuth Server: guide/howto/configure_an_oauth_server/index.md
+    - Create a custom JSON marshaller: guide/howto/create_a_custom_json_marshaller/index.md
+    - Customise a Server backend: guide/howto/customise_a_server_backend/index.md
+    - Deploy WebJars: guide/howto/deploy_webjars/index.md
+    - Integrate with OpenAPI: guide/howto/integrate_with_openapi/index.md
+    - Leverage GraphQL: guide/howto/leverage_graphql/index.md
+    - Lookup a User Principal: guide/howto/lookup_a_user_principal/index.md
+    - Monitor http4k: guide/howto/monitor_http4k/index.md
+    - Record & replay HTTP traffic: guide/howto/record_and_replay_http_traffic/index.md
+    - Serve Server-Sent Events: guide/howto/serve_sse/index.md
+    - Serve Websockets: guide/howto/serve_websockets/index.md
+    - Structure your logs with Events: guide/howto/structure_your_logs_with_events/index.md
+    - Test using Service Virtualisation: guide/howto/test_using_service_virtualisation/index.md
+    - Typesafe your API with lenses: guide/howto/typesafe_your_api_with_lenses/index.md
+    - Use a custom OAuth Provider: guide/howto/use_a_custom_oauth_provider/index.md
+    - Use a templating engines: guide/howto/use_a_templating_engine/index.md
+    - Use HTML forms: guide/howto/use_html_forms/index.md
+    - Use Multipart forms: guide/howto/use_multipart_forms/index.md
   - Reference:
     - Overview: guide/reference/index.md
     - API docs: guide/reference/api/index.md
