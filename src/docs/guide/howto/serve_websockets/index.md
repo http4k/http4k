@@ -28,7 +28,7 @@ Both Websockets and Http handlers in **http4k** are routed using a similar path-
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/serve_websockets/example_polyhandler.kt"></script>
 
-### Auto-marshalling Websockets messages [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/serve_websockets/example_auto-marshalling.kt)
+### Auto-marshalling Websockets messages [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/serve_websockets/example_automarshalling.kt)
 Using the standard Lens API, we can auto-convert Websocket messages on and off the wire. This example uses the Jackson for the marshalling:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/serve_websockets/example_automarshalling.kt"></script>

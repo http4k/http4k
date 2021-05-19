@@ -57,7 +57,7 @@ First, let's take a tour of the `/src/main/kotlin/HelloWorld.kt` file which cont
 - **Lines 21** decorates our app with a `Request` printing `Filter`. This returns another `HttpHandler`. 
 - **Lines 23**  binds the app onto an instance of the `SunHttp` Server backend and starts it on port `9000`.
 
-Hit the little green arrow and the application will run and start. Point your browser at [localhost:9000/ping](http://localhost:9000/ping) to check that it's working. Note that the `Filter` is printing each incoming request to the console.
+Hit the little green arrow and the application will run and start. Point your browser at `http://localhost:9000/ping` to check that it's working. Note that the `Filter` is printing each incoming request to the console.
 
 #### Step 5
 In `/src/main/kotlin/HelloWorldClient.kt` there is an example of an HTTP client which we can use to call our running app.

@@ -18,8 +18,8 @@ Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the
 - Abstractions for Servers, Clients, JSON Message formats, Templating, Websockets etc.
 - `SunHttp` Ultra-fast single-LOC development server-backend
 - Static file-serving capability with **Caching** and **Hot-Reload**
-- Single Page App routing for React and co. See [how-to guides](/howto/nestable_routes/) for an example.
-- Bundled [WebJars](https://www.webjars.org/) routing - activate in single-LOC. See the [how-to guides](/howto/webjars/) for an example.
+- Single Page App routing for React and co. See [how-to guides](/guide//howto/nestable_routes/) for an example.
+- Bundled [WebJars](https://www.webjars.org/) routing - activate in single-LOC. See the [how-to guides](/guide/howto/deploy_webjars/) for an example.
 - APIs to **record and replay** HTTP traffic to disk or memory
 
 #### HttpHandlers 
