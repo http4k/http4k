@@ -62,7 +62,7 @@ The even better news is that testing your http4k apps locally (regardless of pla
 
 <img class="blogImage" src="./toolbox.png" alt="toolbox"/>
 
-As documented in the [Toolbox announcement post](/blog/toolbox), we've been busy consolidating a bunch of handy tools for generating code to work with http4k projects, and we christened this the **http4k Toolbox** and it's available in both [online](https://toolbox.http4k.org) and a CLI flavours (available from Brew and SDKMan!). From [Project Generation](https://toolbox.httpk.org/project) to our own more sophisticated [OpenAPI3 Generator](https://toolbox.httpk.org/openapi), we hope that this become an essential tool in every **http4k** developer's pocket.
+As documented in the [Toolbox announcement post](/blog/toolbox), we've been busy consolidating a bunch of handy tools for generating code to work with http4k projects, and we christened this the **http4k Toolbox** and it's available in both [online](https://toolbox.http4k.org) and a CLI flavours (available from Brew and SDKMan!). From [Project Generation](https://toolbox.http4k.org/project) to our own more sophisticated [OpenAPI3 Generator](https://toolbox.http4k.org/openapi), we hope that this become an essential tool in every **http4k** developer's pocket.
 
 <hr/>
 #### Infinirouting
@@ -102,7 +102,7 @@ The [OpenTelemetry](https://opentelemetry.io/) project describes itself as...
 
 It's a great project run by the CNCF and very well fits in with the ethos that the http4k team believes in. As with all http4k integration modules, we want to enable http4k developers to be able to plug in their apps as simply as possible - in this case, just configure the OpenTelemetry API or Java-agent, then just add some simple `Filters` to your code to start collecting Distributed Traces or Metrics. Several tracing schemes are supported, including Amazon XRay, Jaeger and Zipkin.
 
-For more docs on how to get it all working, head over to the [docs](/guide/modules/opentelemetry).
+For more docs on how to get it all working, head over to the [docs](/guide/reference/opentelemetry).
 
 <hr/>
 #### Upgrading & library API changes
@@ -112,8 +112,8 @@ Like the neat little worker bunnies we are, we've also taken the opportunity to 
 #### http4k.org
 One of the things that our users feedback about was that the structure of the docs in [http4k.org](https://http4k.org) could be improved, so we've begun overhauling the site to simplify the content. Expect this to be a continual improvement thing, but on the whole the content will be organised as follows:
 
-- The [Developer guide](/guide/modules) will contain descriptions of the underlying concepts in and around the libraries. Code in the guide will be snippet-based.
-- The [Cookbook](/cookbook) will contain extended examples of how to accomplish particular tasks. eg. provide a custom `ServerConfig` implementation. Code here will generally be complete and contain runnable examples.
+- The [Developer guide](/guide/reference) will contain descriptions of the underlying concepts in and around the libraries. Code in the guide will be snippet-based.
+- The [Cookbook](/guide/howto) will contain extended examples of how to accomplish particular tasks. eg. provide a custom `ServerConfig` implementation. Code here will generally be complete and contain runnable examples.
 - The [Examples repo](https://github.com/http4k/examples) hosts fully self-contained, runnable projects that can be used as a baseline for particular features - eg. how to write and run an [app on Quarkus](https://github.com/http4k/examples/tree/master/quarkus) or use the cloudnative module to enable [typesafe configuration](https://github.com/http4k/examples/tree/master/typesafe-configuration)
 
 <hr/>
