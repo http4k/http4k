@@ -3,7 +3,7 @@ description: An overview of the OpenApi3 support available in the http4k library
 
 # Documenting http4k APIs with OpenApi3
 
-##### may 2019 / [@daviddenton](github)
+##### may 2019 / [@daviddenton][github]
 
 This post describes **http4k** support for fully describing and securing HTTP endpoints using version 3 of the **[OpenApi]** specification, providing typesafe JSON-schema documentation for messages and automatically validating incoming HTTP traffic.
 
@@ -19,7 +19,7 @@ There have been various efforts to standardise these aspects, and one of the mos
 ### Typesafe HTTP contracts with http4k-contract
 http4k has supported generating version 2 of **[OpenApi]** docs since all the way back in 2017 (v1.16) via it's `http4k-contract` module, and after a couple of releases ironing out the niggles (and some amazing help from the community), the team is now happy to announce OpenApi3 support with the release of http4k version 3.179.0.
 
-In line with the overall **[ethos of the project](/rationale)**, http4k OpenApi support is done entirely through code and in a typesafe and refactorable way. This is somewhat of a departure from how most other libraries have implemented OpenApi (where often annotations and other compile-time magic are used) and means that in http4k the spec defined in code is the same one that is used to generate the API documentation and the same one used to validate incoming HTTP messages, meaning that it can never go stale. This focus on runtime code also allows for dynamic behaviours which would be very difficult to replicate at compile-time.
+In line with the overall **[ethos of the project](/guide/concepts/rationale)**, http4k OpenApi support is done entirely through code and in a typesafe and refactorable way. This is somewhat of a departure from how most other libraries have implemented OpenApi (where often annotations and other compile-time magic are used) and means that in http4k the spec defined in code is the same one that is used to generate the API documentation and the same one used to validate incoming HTTP messages, meaning that it can never go stale. This focus on runtime code also allows for dynamic behaviours which would be very difficult to replicate at compile-time.
 
 Out of the box, `http4k-contract` the module now provides the following features when configured for OpenApi3:
 

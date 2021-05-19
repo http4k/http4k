@@ -30,69 +30,77 @@ strict: false
 nav:
   - Introduction: documentation/index.md
   - Quickstart: quickstart/index.md
-  - Rationale & concepts: rationale/index.md
-  - Changelog: changelog/index.md
-  - Developer guide:
-    - Overview: guide/modules/index.md
-    - Core: guide/modules/core/index.md
-    - Server backend: guide/modules/servers/index.md
-    - Serverless backend: guide/modules/serverless/index.md
-    - HTTP & Websocket clients: guide/modules/clients/index.md
-    - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
-    - JSON handling: guide/modules/json/index.md
-    - Templating: guide/modules/templating/index.md
-    - Multipart forms: guide/modules/multipart/index.md
-    - Cloud Native Configuration: guide/modules/cloud_native/index.md
-    - Cloud Events: guide/modules/cloud_events/index.md
-    - Micrometer: guide/modules/micrometer/index.md
-    - OpenTelemetry: guide/modules/opentelemetry/index.md
-    - Resilience4J: guide/modules/resilience4j/index.md
-    - AWS: guide/modules/aws/index.md
-    - OAuth: guide/modules/oauth/index.md
-    - GraphQL: guide/modules/graphql/index.md
-    - JSON RPC: guide/modules/jsonrpc/index.md
-    - XML handling: guide/modules/xml/index.md
-    - YAML handling: guide/modules/yaml/index.md
+  - About the docs: index.md
+  - Concepts:
+    - Rationale: guide/concepts/rationale.md
+    - HTTP: guide/concepts/http.md
+    - Serverless: guide/concepts/serverless.md
+    - Lens: guide/concepts/lens.md
+    - WebSockets: guide/concepts/websockets.md
+    - Server-Sent Events: guide/concepts/server-sent-events.md
+  - Tutorials:
+    - Your first http4k app: guide/tutorials/your_first_http4k_app/index.md
+    - TDDing http4k: guide/tutorials/tdding_http4k/index.md
+  - How-to guides:
+    - "Basic: Server as a function": guide/howto/server_as_a_function/index.md
+    - "Basic: Client as a function": guide/howto/client_as_a_function/index.md
+    - "Basic: Use a Server backend": guide/howto/use_a_server_backend/index.md
+    - "Basic: Different test-types": guide/howto/different_test_types/index.md
+    - "Basic: Simple routing": guide/howto/simple_routing/index.md
+    - "Basic: Nestable routes": guide/howto/nestable_routes/index.md
+    - Attach context to a request: guide/howto/attach_context_to_a_request/index.md
+    - Configure an OAuth Server: guide/howto/configure_an_oauth_server/index.md
+    - Create a custom JSON marshaller: guide/howto/create_a_custom_json_marshaller/index.md
+    - Customise a Server backend: guide/howto/customise_a_server_backend/index.md
+    - Deploy WebJars: guide/howto/deploy_webjars/index.md
+    - Integrate with OpenAPI: guide/howto/integrate_with_openapi/index.md
+    - Leverage GraphQL: guide/howto/leverage_graphql/index.md
+    - Lookup a User Principal: guide/howto/lookup_a_user_principal/index.md
+    - Monitor http4k: guide/howto/monitor_http4k/index.md
+    - Record & replay HTTP traffic: guide/howto/record_and_replay_http_traffic/index.md
+    - Serve Server-Sent Events: guide/howto/serve_sse/index.md
+    - Serve Websockets: guide/howto/serve_websockets/index.md
+    - Structure your logs with Events: guide/howto/structure_your_logs_with_events/index.md
+    - Test using Service Virtualisation: guide/howto/test_using_service_virtualisation/index.md
+    - Typesafe your API with lenses: guide/howto/typesafe_your_api_with_lenses/index.md
+    - Use a custom OAuth Provider: guide/howto/use_a_custom_oauth_provider/index.md
+    - Use a templating engines: guide/howto/use_a_templating_engine/index.md
+    - Use HTML forms: guide/howto/use_html_forms/index.md
+    - Use Multipart forms: guide/howto/use_multipart_forms/index.md
+  - Reference:
+    - Overview: guide/reference/index.md
+    - API docs: guide/reference/api/index.md
+    - Core: guide/reference/core/index.md
+    - Server backend: guide/reference/servers/index.md
+    - Serverless backend: guide/reference/serverless/index.md
+    - HTTP & Websocket clients: guide/reference/clients/index.md
+    - Typesafe contracts (OpenAPI3): guide/reference/contracts/index.md
+    - JSON handling: guide/reference/json/index.md
+    - Templating: guide/reference/templating/index.md
+    - Multipart forms: guide/reference/multipart/index.md
+    - Cloud Native Configuration: guide/reference/cloud_native/index.md
+    - Cloud Events: guide/reference/cloud_events/index.md
+    - Micrometer: guide/reference/micrometer/index.md
+    - OpenTelemetry: guide/reference/opentelemetry/index.md
+    - Resilience4J: guide/reference/resilience4j/index.md
+    - AWS: guide/reference/aws/index.md
+    - OAuth: guide/reference/oauth/index.md
+    - GraphQL: guide/reference/graphql/index.md
+    - JSON RPC: guide/reference/jsonrpc/index.md
+    - XML handling: guide/reference/xml/index.md
+    - YAML handling: guide/reference/yaml/index.md
     - Testing:
-      - Overview: guide/modules/testing/index.md
-      - Hamkrest: guide/modules/hamkrest/index.md
-      - Kotest: guide/modules/kotest/index.md
-      - WebDriver: guide/modules/webdriver/index.md
-      - Approval Testing: guide/modules/approvaltests/index.md
-      - Chaos Testing: guide/modules/chaos/index.md
-      - Service Virtualisaion: guide/modules/servicevirtualisation/index.md
-  - Cookbook:
-    - How to use this guide: cookbook/index.md
-    - Server as a function: cookbook/server_as_a_function/index.md
-    - Client as a function: cookbook/client_as_a_function/index.md
-    - Container integration: cookbook/container_integration/index.md
-    - Simple routing: cookbook/simple_routing/index.md
-    - Nestable routes: cookbook/nestable_routes/index.md
-    - OpenAPI contracts/routing: cookbook/typesafe_http_contracts/index.md
-    - Templating engines: cookbook/using_templates/index.md
-    - Typesafe RequestContexts: cookbook/request_context/index.md
-    - Typesafe HTTP requests with lenses: cookbook/typesafe_http_requests_with_lenses/index.md
-    - Custom JSON marshallers: cookbook/custom_json_marshallers/index.md
-    - HTML forms: cookbook/html_forms/index.md
-    - Multipart forms: cookbook/multipart_forms/index.md
-    - WebJars: cookbook/webjars/index.md
-    - Websockets: cookbook/websockets/index.md
-    - Server-Sent Events: cookbook/sse/index.md
-    - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
-    - Basic OAuth Server configuration: cookbook/basic_oauth_authorization_server/index.md
-    - Custom OAuth Provider configuration: cookbook/custom_oauth_provider/index.md
-    - Custom Server (SSL): cookbook/customised_servers/index.md
-    - Service Virtualisation with Servirtium: cookbook/service_virtualisation/index.md
-    - Principal lookup: cookbook/principal_lookup/index.md
-    - Monitoring http4k: cookbook/monitoring/index.md
-    - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
-    - Test driven apps: cookbook/test_driven_apps/index.md
-  - http4k in action: in_action/index.md
+      - Overview: guide/reference/testing/index.md
+      - Hamkrest: guide/reference/hamkrest/index.md
+      - Kotest: guide/reference/kotest/index.md
+      - WebDriver: guide/reference/webdriver/index.md
+      - Approval Testing: guide/reference/approvaltests/index.md
+      - Chaos Testing: guide/reference/chaos/index.md
+      - Service Virtualisaion: guide/reference/servicevirtualisation/index.md
   - Blog:
     - Overview: blog/index.md
     - Meet http4k: blog/meet_http4k/index.md
     - Typesafe Websockets: blog/typesafe_websockets/index.md
-    - TDDing http4k: blog/tdding_http4k/index.md
     - Typesafe 12-factor config: blog/typesafe_configuration/index.md
     - Documenting http4k apps with OpenApi3: blog/documenting_apis_with_openapi/index.md
     - Retrospective on v3: blog/retrospective_v3/index.md
@@ -100,9 +108,10 @@ nav:
     - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
     - http4k v4 - 17 platforms and counting...: blog/http4k_v4/index.md
     - JCenter Shutdown: blog/regarding_jcenter/index.md
+  - Changelog: changelog/index.md
+  - http4k in action: in_action/index.md
   - Performance: performance/index.md
   - FAQ: faq/index.md
   - Getting support: support/index.md
   - Contribute/support http4k: contributing/index.md
   - Code of Conduct: code-of-conduct/index.md
-  - API docs: api/index.md

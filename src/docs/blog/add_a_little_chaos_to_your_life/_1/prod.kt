@@ -23,7 +23,7 @@ class Library(private val rawHttp: HttpHandler) {
 fun Server(http: HttpHandler): RoutingHttpHandler {
     val library = Library(http)
 
-    return routes("/api/books" bind GET to {
+    return routes("/reference/api/books" bind GET to {
         try {
             Response(OK).body(library.titles().joinToString(","))
         } catch (e: Exception) {
