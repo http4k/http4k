@@ -20,7 +20,7 @@ interface Websocket {
 }
 ```
 
-An interface representing the available server callback API to the WebSocket channel. WebSocket objects can `send()` WsMessages to the client, or react to incoming events by binding behaviour with `onMessage()`, `onError()` or  `onClose()`. The WebSocket has a reference to the incoming [HTTP Request](/guide/concepts/HTTP#HttpMessage) which was used during connection.
+An interface representing the available server callback API to the WebSocket channel. WebSocket objects can `send()` WsMessages to the client, or react to incoming events by binding behaviour with `onMessage()`, `onError()` or  `onClose()`. The WebSocket has a reference to the incoming [HTTP Request](/guide/concepts/http#HttpMessage) which was used during connection.
 
 ### WsConsumer
 ```kotlin
@@ -34,14 +34,14 @@ The primary callback received when an WebSocket server is connected to a client.
 typealias WsHandler = (Request) -> WsConsumer
 ```
 
-Provides the route mapping of an [HTTP Request](/guide/concepts/HTTP#HttpMessage) to a particular WsConsumer.
+Provides the route mapping of an [HTTP Request](/guide/concepts/http#HttpMessage) to a particular WsConsumer.
 
 ### WsFilter
 ```kotlin
 fun interface WsFilter : (WsConsumer) -> WsConsumer
 ```
 
-Applies decoration to a matched WsConsumer before it is invoked. WsFilters can be used to apply tangental effects to the matched WsConsumer such as logging/security, or to modify the incoming [HTTP Request](/guide/concepts/HTTP#HttpMessage).
+Applies decoration to a matched WsConsumer before it is invoked. WsFilters can be used to apply tangental effects to the matched WsConsumer such as logging/security, or to modify the incoming [HTTP Request](/guide/concepts/http#HttpMessage).
 
 ### WsRouter
 ```kotlin

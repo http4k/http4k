@@ -17,7 +17,7 @@ interface Sse {
     fun onClose(fn: () -> Unit)
 }
 ```
-An interface representing the available server callback API to the Server-Sent Event channel. Sse objects can `send()` SseMessages to the client, or `close()` the connection. The Sse has a reference to the incoming [HTTP Request](/guide/concepts/HTTP#HttpMessage) which was used during connection.
+An interface representing the available server callback API to the Server-Sent Event channel. Sse objects can `send()` SseMessages to the client, or `close()` the connection. The Sse has a reference to the incoming [HTTP Request](/guide/concepts/http#HttpMessage) which was used during connection.
 
 ### SseConsumer
 ```kotlin
@@ -31,14 +31,14 @@ The primary callback received when an Sse server is connected to a client. API u
 typelias SseHandler =  (Request) -> SseConsumer
 ```
 
-Provides the route mapping of an [HTTP Request](/guide/concepts/HTTP#HttpMessage) to a particular SseConsumer.
+Provides the route mapping of an [HTTP Request](/guide/concepts/http#HttpMessage) to a particular SseConsumer.
 
 ### SseFilter
 ```kotlin
 fun interface SseFilter : (SseConsumer) -> SseConsumer
 ```
 
-Applies decoration to a matched SseConsumer before it is invoked. SseFilters can be used to apply tangental effects to the matched SseConsumer such as logging/security, or to modify the incoming [HTTP Request](/guide/concepts/HTTP#HttpMessage).
+Applies decoration to a matched SseConsumer before it is invoked. SseFilters can be used to apply tangental effects to the matched SseConsumer such as logging/security, or to modify the incoming [HTTP Request](/guide/concepts/http#HttpMessage).
 
 ### SseRouter
 ```kotlin
