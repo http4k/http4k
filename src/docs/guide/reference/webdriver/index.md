@@ -28,8 +28,8 @@ Use the API like any other WebDriver implementation, by simply passing your app 
 http4k ships with a custom set of JSoup `By` implementations, so be sure to import `org.http4k.webdriver.By` instead of the old `org.openqa.selenium.By` ones (which will fail with a `ClassCastException` 
 when used).
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/webdriver/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/webdriver/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/webdriver/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/webdriver/example.kt"></script>
 
 [http4k]: https://http4k.org

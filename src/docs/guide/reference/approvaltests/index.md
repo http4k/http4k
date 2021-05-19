@@ -37,9 +37,9 @@ will inject the `Approver` automatically into test methods.
 ### Standard Approval tests
 By using the `ApprovalTest` extension, an instance of an `Approver` is injected into each test.
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/approvaltests/example_standard.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/approvaltests/example_standard.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/approvaltests/example_standard.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/approvaltests/example_standard.kt"></script>
 
 ### Content-type specific Approval tests
 Because so many APIs are based around messages with a particular content type, the 
@@ -55,9 +55,9 @@ The module also provides the following built-in extensions:
 - `JsonApprovalTest`
 - `XmlApprovalTest`
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/approvaltests/example_json.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/approvaltests/example_json.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/approvaltests/example_json.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/approvaltests/example_json.kt"></script>
 
 ### Implementing custom JUnit Extensions
 As with the rest of http4k, a base implementation, `BaseApprovalTest` of the Junit5 Extension is 

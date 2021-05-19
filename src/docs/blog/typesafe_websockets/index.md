@@ -24,23 +24,23 @@ Just as with HttpHandlers, the here are 2 basic function types which make up the
 
 Additionally, `WsMessage` objects are used for actual communication - ie. a message which is sent or received on a Websocket. This message can take advantage of the typesafety accorded to other entities in http4k by using the Lens API. And just like the http4k HTTP message model, WsMessages are **immutable data classes**.
 
-#### An example server [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/typesafe_websockets/example.kt)
+#### An example server [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example.kt)
 The example below shows how:
  
 - Websockets can be dynamically routed
 - Lens-based marshalling of Websocket message objects using Jackson. 
 - `WsHandler` can be combined with an `HttpHandler` to make a `PolyHandler` - an application which can serve many protocols. Conversion of the `PolyHandler` to a supporting Server can be done via the standard `asServer()` mechanism, or it can be kept offline for ultra-fast in-memory testing:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/typesafe_websockets/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example.kt"></script>
 
 Alternatively, you can check out the Websocket enabled http4k demo: [IRC clone in 30 lines of Kotlin](https://github.com/daviddenton/http4k-demo-irc).
 
-#### Testability [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/typesafe_websockets/example_testing.kt)
+#### Testability [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example_testing.kt)
 As well as API simplicity, the http4k team are very passionate about testing, and it was very important that this could be done in an out-of-container fashion - ie. in memory and with no server being started. As such, it is possible to call `testWsClient()` on an `WsHandler` to provide a synchronous API for testing. Messages and other events can be "sent" to a connected websocket and responses will be received back in a completely predictable way from the application under test.
 
 In the below example, we have gone one step further - defining a contract test case and then providing 2 implementations of it - one for unit-testing (in memory), one using a server. http4k provides clients with an identical interface for both cases, meaning it's possible reuse the same test logic:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/typesafe_websockets/example_testing.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example_testing.kt"></script>
 
 #### Fin
 

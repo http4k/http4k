@@ -29,9 +29,9 @@ implementation adds a set of standard methods and extension methods for converti
 objects, including custom Lens methods for each library so that JSON node objects can be written and read directly from
  HTTP messages:
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/json/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/json/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/example.kt"></script>
 
 ### Auto-marshalling capabilities
 
@@ -40,12 +40,12 @@ to/from JSON and XML using reflection.
 
 We can use this facility in http4k to automatically marshall objects to/from HTTP message bodies using **Lenses**:
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/json/autoJson.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/autoJson.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/json/autoJson.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/autoJson.kt"></script>
 
 serializing an object/class for a Response via `Lens.inject()` - this properly sets the `Content-Type` header to `application/json`:
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/json/autoJsonResponse.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/autoJsonResponse.kt"></script>
 
 There is a utility to generate Kotlin data class code for JSON documents [here](http://toolbox.http4k.org/dataclasses). 
 These data classes are compatible with using the `Body.auto<T>()` functionality. 
@@ -83,8 +83,8 @@ the same as a native Kotlin list of objects. This can make tests break as the un
 As shown, a workaround to this is to use `Body.auto<Array<MyIntWrapper>>().toLens()` instead, and then compare using 
 `Arrays.equal()`
 
-[<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/json/list_gotcha.kt)
+[<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/list_gotcha.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/json/list_gotcha.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/list_gotcha.kt"></script>
 
 [http4k]: https://http4k.org

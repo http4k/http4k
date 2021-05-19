@@ -16,9 +16,9 @@ This module provides http4k integration for the excellent [GraphQL-java](https:/
 
 As with the ethos of http4k, the uniform Server/Client GraphQLHandler model means that you can test applications entirely in-memory without binding to a port.
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/graphql/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/graphql/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/graphql/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/graphql/example.kt"></script>
 
 [http4k]: https://http4k.org
 [GraphQL]: https://graphql.org

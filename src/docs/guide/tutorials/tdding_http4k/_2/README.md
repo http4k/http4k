@@ -12,11 +12,11 @@ also been converted to reusable extension methods on Response.
 
 ### Tests:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/tutorials/tdding_http4k/_2/tests.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/tdding_http4k/_2/tests.kt"></script>
 
 ### Production:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/tutorials/tdding_http4k/_2/project.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/tdding_http4k/_2/project.kt"></script>
 
 - [Part 3: Adding another endpoint](../_3)
 - [Part 4: Adding an external dependency](../_4)

@@ -37,11 +37,11 @@ In this simple example, we're going to use a path with two dynamic parameters; `
 
 Once the values have been extracted, they are passed as arguments to a function which will return a pre-configured `HttpHandler` for that call:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/documenting_apis_with_openapi/1_route.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/documenting_apis_with_openapi/1_route.kt"></script>
 
 And here's a unit test for that endpoint - the good news is that it's no more complex than a standard http4k unit test because `ContractRoute` is also an `HttpHandler` so can just be invoked as a function. Here, we're also leveraging the `http4k-testing-hamkrest` module to supply **[Hamkrest]** Matchers for validating the response message:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/documenting_apis_with_openapi/1_test.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/documenting_apis_with_openapi/1_test.kt"></script>
 
 ### 2. Defining an HTTP contract
 Now that we've got our endpoint, we want to be able to actually serve it with the **[OpenApi]** documentation. For contract-based routing, we use the `contract {}` routing DSL which allows us to specify a richer set of details about the API definition, but exposes exactly the same API semantics as the standard `routes()` block - it is also an `HttpHandler` and can therefore be composed together to form standard route-matching trees.
@@ -50,7 +50,7 @@ For rendering the API documentation, we configure an `OpenApi` object, supplying
 
 Whilst all of the settings used in this DSL above are optional (and default to sensible values if not overridden), here we are updating the URL where the OpenApi spec is served and supplying an instance of `Security` that we will use to protect our routes (more about that later). 
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/documenting_apis_with_openapi/2_app.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/documenting_apis_with_openapi/2_app.kt"></script>
 
 Now we've got a complete contract, we can simply start the server and browse to `http://localhost:9000/api/swagger.json` to see the basic API spec in the OpenApi UI (or see the online version **<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fdocumenting_apis_with_openapi%2F2_openapi.json">here</a>**) to see how the endpoint contract looks and how the process of supplying credentials is done through the UI by clicking `Authorize`. 
 
@@ -67,7 +67,7 @@ Metadata for endpoints can be supplied via inserting a `meta {}` DSL block, whic
 
 Let's demonstrate by writing a slightly different version of the same endpoint, but move `age` to be a required query parameter, and also add the option to override the `drink` we offer:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/documenting_apis_with_openapi/3_route.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/documenting_apis_with_openapi/3_route.kt"></script>
 
 If we then add the `Greetings` endpoint to the contract and make a call omitting `age`...
 
@@ -75,7 +75,7 @@ If we then add the `Greetings` endpoint to the contract and make a call omitting
 
 ... the contract validation will fail and a HTTP Bad Request (400) returned to the client with a JSON body describing the error:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/documenting_apis_with_openapi/3_failure-response.http"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/documenting_apis_with_openapi/3_failure-response.http"></script>
 
 We can see the updated OpenApi UI **<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fdocumenting_apis_with_openapi%2F3_openapi.json">here</a>**. Note that because request parameters are validated before sending, we cannot replicate the above invalid request in the UI.
 
@@ -86,7 +86,7 @@ Lets add another route to the mix which returns a JSON body object modelled with
 
 For JSON bodies, the lens is created with `Body.auto<>().toLens()` (`auto()` is an extension function imported from `Jackson`) which provides the typed injection and extraction functions. Notice here that for injection we are using the more fluent API  `with()` and `of()` extension functions, as opposed to the standard lens injection function`(X, HttpMessage) -> HttpMessage`:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/blog/documenting_apis_with_openapi/4_route.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/documenting_apis_with_openapi/4_route.kt"></script>
 
 Taking a final look at the OpenApi UI **<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fdocumenting_apis_with_openapi%2F4_openapi.json">here</a>** shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
 

@@ -12,7 +12,7 @@ import org.http4k.lens.BiDiBodyLens
 data class Car(val brand: String, val model: String, val year: Int, val miles: Int)
 
 // 'auto' is an extension function of each org.http4k.format.[serialization library]
-// example: https://github.com/http4k/http4k/blob/docs_reorg/http4k-format/kotlinx-serialization/src/main/kotlin/org/http4k/format/ConfigurableKotlinxSerialization.kt
+// example: https://github.com/http4k/http4k/blob/master/http4k-format/kotlinx-serialization/src/main/kotlin/org/http4k/format/ConfigurableKotlinxSerialization.kt
 val lensCarResponse : BiDiBodyLens<Car> = Body.auto<Car>().toLens() // BiDi allows for outgoing + incoming
 
 fun main() {

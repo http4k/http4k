@@ -13,6 +13,6 @@ implementation group: "org.http4k", name: "http4k-client-apache", version: "4.9.
 implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.9.1.0"
 ```
 
-### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/use_a_server_backend/example.kt)
+### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_a_server_backend/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/use_a_server_backend/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_a_server_backend/example.kt"></script>

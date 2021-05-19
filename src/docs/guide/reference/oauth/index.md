@@ -30,10 +30,10 @@ To enable OAuth integration, construct a configured instance of `OAuthProvider`.
 1. A fully configured API client (which populated the Host on the URI) - this allows different
 implementations of the provider to be used across environments.
 
-### Example provider [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/oauth/example_provider_oauth.kt)
+### Example provider [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/oauth/example_provider_oauth.kt)
 
 Out of the box, http4k provides implementations for several OAuth providers.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/reference/oauth/example_provider_oauth.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/oauth/example_provider_oauth.kt"></script>
 
 See the [how-to guides](/guide/howto/use_a_custom_oauth_provider/) for a custom implementation.

@@ -9,10 +9,10 @@ description: A step-by-step guide to TDDing a simple http4k application
 
 ### Tests:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/tutorials/tdding_http4k/_3/tests.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/tdding_http4k/_3/tests.kt"></script>
 
 ### Production:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/tutorials/tdding_http4k/_3/project.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/tdding_http4k/_3/project.kt"></script>
 
 - [Part 4: Adding an external dependency](../_4)

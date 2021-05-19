@@ -43,8 +43,8 @@ Note that paths, not strings, will match by default. `"/news/{date}"` will match
 implementation group: "org.http4k", name: "http4k-core", version: "4.9.1.0"
 ```
 
-### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/nestable_routes/example.kt)
+### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/nestable_routes/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/guide/howto/nestable_routes/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/nestable_routes/example.kt"></script>
 
 For the typesafe contract-style routing, refer to [this](/guide/howto/integrate_with_openapi/) recipe instead,

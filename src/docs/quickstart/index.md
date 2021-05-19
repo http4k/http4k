@@ -24,7 +24,7 @@ dependencies {
 
 The following creates a simple endpoint, binds it to a Netty server then starts, queries, and stops it.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/docs_reorg/src/docs/quickstart/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/quickstart/example.kt"></script>
 
 #  See how it's done in the Examples Repo
 For fully self-contained examples demonstrates the standout features of **http4k**, there is a GitHub repository at [http4k/examples](https://github.com/http4k/examples).
