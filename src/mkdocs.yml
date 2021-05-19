@@ -35,7 +35,6 @@ nav:
     - Rationale: guide/concepts/rationale.md
     - HTTP: guide/concepts/http.md
     - Serverless: guide/concepts/serverless.md
-    - Lens: guide/concepts/lens.md
     - WebSockets: guide/concepts/websockets.md
     - Server-Sent Events: guide/concepts/server-sent-events.md
   - Tutorials:
