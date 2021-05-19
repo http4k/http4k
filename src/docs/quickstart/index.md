@@ -4,7 +4,7 @@ description: Easy ways to get started using http4k
 Depending on your learning style, there are a number of options to get started with **http4k**...
 
 # Follow a tutorial
-**I'm starting from scratch**: There is a step-by-step [beginner tutorial](/tutorials/your_first_http4k_app). This will get you up and running with a basic buildable project.
+**I'm starting from scratch**: There is a step-by-step [beginner tutorial](/guide/tutorials/your_first_http4k_app). This will get you up and running with a basic buildable project.
 
 # Generate a new project with the http4k Toolbox
 **I'd like a helping hand**: We have developed a set of useful tools for Developers working with the **http4k** toolset to turbo-charge app development. Collectively, this is known as the <a href="https://toolbox.http4k.org">http4k Toolbox</a>. These tools include:
