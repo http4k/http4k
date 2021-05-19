@@ -45,7 +45,7 @@ nav:
     - "Basic: Server as a function": guide/howto/server_as_a_function/index.md
     - "Basic: Client as a function": guide/howto/client_as_a_function/index.md
     - "Basic: Use a Server backend": guide/howto/use_a_server_backend/index.md
-    - "Basic: Different test-types": guide/howto/different_test_types/index.md
+    - "Basic: Different test-types": guide/howto/write_different_test_types/index.md
     - "Basic: Simple routing": guide/howto/simple_routing/index.md
     - "Basic: Nestable routes": guide/howto/nestable_routes/index.md
     - Attach context to a request: guide/howto/attach_context_to_a_request/index.md

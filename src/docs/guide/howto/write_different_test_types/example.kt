@@ -1,4 +1,4 @@
-package guide.howto.different_test_types
+package guide.howto.write_different_test_types
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
