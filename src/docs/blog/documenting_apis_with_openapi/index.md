@@ -106,4 +106,4 @@ The full source for this tutorial can be found **[here](https://github.com/http4
 [AWS API Gateway]: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions.html
 [Google Cloud Endpoints]: https://cloud.google.com/endpoints/docs/openapi/
 [http4k-by-example]: https://github.com/http4k/http4k-by-example
-[http4k Lens API]:  https://www.http4k.org/guide/modules/core/#typesafe-parameter-destructuringconstruction-of-http-messages-with-lenses
+[http4k Lens API]:  https://www.http4k.org/guide/reference/core/#typesafe-parameter-destructuringconstruction-of-http-messages-with-lenses
