@@ -11,7 +11,7 @@ Brief overview of the recipe.
 
 Longer recipe description.
 
-### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/<folder>/example.kt)
+### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/howto/<folder>/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/<folder>/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/howto/<folder>/example.kt"></script>
 ```

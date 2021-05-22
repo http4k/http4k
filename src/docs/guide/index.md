@@ -20,14 +20,14 @@ We recommend that all new users familiarise themselves with at least the [ration
 Getting started with a new library can be quite daunting, and sometimes everyone needs a little hand holding to get comfortable with how things fit together. This section contains step-by-step guides to get you started with each of http4k's main conceptual areas. The [first tutorial](./tutorials/your_first_http4k_app) will get you out of the gate and up and running in no time.
 
 ### [How-to guides](https://diataxis.fr/how-to-guides/)
-The meat of the http4k documentation is in this section, in which you'll find ready made solutions to many common problems. Because if you've got something to achieve - it's pretty much guaranteed that we've probably already come across. 
+The meat of the http4k documentation is in this section, in which you'll find ready made solutions to many common use-cases. Because if you've got something to achieve - it's pretty likely that we've probably come across it already 😉.
 
 The format for the recipes contains:
 - Required Gradle dependencies
 - A brief description of the problem
 - Fully runnable code example displaying the solution.
 
-Think of it like a mini StackOverflow. :) But better because you've got the entire solution available to adapt to your particular use-case.
+Think of it like a mini StackOverflow - but better because you've got the entire solution available to adapt to your particular use-case - 😃.
 
 As a community-driven project, we would welcome new or updated recipes to make http4k easier to use. The format of the new and updated recipes should follow [this Markdown template](https://github.com/http4k/http4k/blob/master/.github/RECIPE_TEMPLATE.md).
 

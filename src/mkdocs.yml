@@ -41,6 +41,7 @@ nav:
     - Your first http4k app: guide/tutorials/your_first_http4k_app/index.md
     - TDDing http4k: guide/tutorials/tdding_http4k/index.md
   - How-to guides:
+    - Overview: guide/howto/index.md
     - "Basic: Server as a function": guide/howto/server_as_a_function/index.md
     - "Basic: Client as a function": guide/howto/client_as_a_function/index.md
     - "Basic: Use a Server backend": guide/howto/use_a_server_backend/index.md

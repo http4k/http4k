@@ -2,7 +2,7 @@ title: http4k Support/Training
 description: How to look for help using http4k
 
 ### General Support
-- In the first instance, try and see if there is a relevant example in the cookbook or [FAQ](/faq) - more and more are being added all the time!
+- In the first instance, try and see if there is a relevant example in the [How-To Guides](/guide/howto) or [FAQ](/faq) - more and more are being added all the time!
 - For issues, please describe giving as much detail as you can - including version and steps to recreate.
 - **Slack room:** #http4k @ <a href="http://slack.kotlinlang.org/">slack.kotlinlang.org</a>
 - **Gitter channel:** http4k/http4k @ <a href="https://gitter.im/http4k/http4k">gitter.im</a> 

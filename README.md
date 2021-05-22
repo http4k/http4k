@@ -162,7 +162,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
 * [Service Virtualisation:](https://http4k.org/guide/reference/servicevirtualisation) 
     * Record and replay versioned HTTP contracts to/from `Servirtium` Markdown format. Includes Servirtium MiTM server and simple JUnit extensions.
     
-## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/readme/example.kt)
+## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/howz/readme/example.kt)
 
 This quick example is designed to convey the simplicity & features of [http4k] . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point and demonstrates how to serve and consume HTTP services with dynamic routing.
 
@@ -177,7 +177,7 @@ dependencies {
 ```
 
 ```kotlin
-package cookbook
+package guide.howto.readme
 
 import org.http4k.client.OkHttp
 import org.http4k.core.Filter

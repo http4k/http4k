@@ -56,7 +56,7 @@ data class Params(val ids: List<Long>)
 class UserDbHandler : GraphQLWithContextHandler<String> {
     private val graphQL = newGraphQL(
         toSchema(
-            SchemaGeneratorConfig(supportedPackages = listOf("cookbook.graphql")),
+            SchemaGeneratorConfig(supportedPackages = listOf("guide.howto.leverage_graphql")),
             listOf(TopLevelObject(UserQueries())),
             listOf(TopLevelObject(UserMutations()))
         )

@@ -1110,7 +1110,7 @@ e.g. `RetryConfig.custom()` -> `RetryConfig.custom<RetryConfig>()`
 - Fix `withChaosControls` URL pattern so that it matches sub-routes ok on original handler
 
 ### v3.38.0
-- Added `BearerAuth` and `BasicAuth` implementations which populate `RequestContexts`. Plus cookbook example :)
+- Added `BearerAuth` and `BasicAuth` implementations which populate `RequestContexts`. Plus howto example :)
 
 ### v3.37.1
 - Fix #177 - Make RequestContexts thread-safe.
