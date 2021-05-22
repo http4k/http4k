@@ -284,7 +284,7 @@ allow us to revisit this decision.
 [http4k]: https://http4k.org
 ["Your Server as a Function"]: https://monkey.org/~marius/funsrv.pdf
 [Finagle]: https://twitter.github.io/finagle/
-[Fintrospect]: http://fintrospect.io/
+[Fintrospect]: http://fintrospect.github.io/
 [UtterlyIdle]: https://github.com/bodar/utterlyidle
 [Typealias]: https://kotlinlang.org/docs/reference/type-aliases.html
 [extension methods]: https://kotlinlang.org/docs/reference/extensions.html
