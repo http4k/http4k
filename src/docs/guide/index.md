@@ -11,15 +11,19 @@ You can read more about the theory [here](https://documentation.divio.com/), but
 
 Regardless of which section you are reading, as much of the code as possible exists in the repository and is built with the rest of http4k in our CI. This has the effect of a making the code more verbose (including import statements and similar), but at the same time we can guarantee that the code compiles and you can navigate around it to find where everything is coming from. We hope you agree that this tradeoff is worth it.
 
-### [Concepts](https://documentation.divio.com/explanation/)
+### Concepts
 http4k is a simple framework based around several function types, and hopefully the ideas behind it are not difficult to grasp. This section conveys the mindset and rationale behind http4k, and lays out each of the main function types used in the toolkit and how they relate to each other.
 
 We recommend that all new users familiarise themselves with at least the [rationale](/guide/concepts/rationale) and [HTTP](/guide/concepts/http) pages of this section.
 
-### [Tutorials](https://diataxis.fr/tutorials/)
+Read more about the theory behind Concepts [here](https://diataxis.fr/explanation/).
+
+### Tutorials
 Getting started with a new library can be quite daunting, and sometimes everyone needs a little hand holding to get comfortable with how things fit together. This section contains step-by-step guides to get you started with each of http4k's main conceptual areas. The [first tutorial](./tutorials/your_first_http4k_app) will get you out of the gate and up and running in no time.
 
-### [How-to guides](https://diataxis.fr/how-to-guides/)
+Read more about the theory behind Tutorials [here](https://diataxis.fr/tutorials/).
+
+### How-to guides
 The meat of the http4k documentation is in this section, in which you'll find ready made solutions to many common use-cases. Because if you've got something to achieve - it's pretty likely that we've probably come across it already 😉.
 
 The format for the recipes contains:
@@ -31,7 +35,11 @@ Think of it like a mini StackOverflow - but better because you've got the entire
 
 As a community-driven project, we would welcome new or updated recipes to make http4k easier to use. The format of the new and updated recipes should follow [this Markdown template](https://github.com/http4k/http4k/blob/master/.github/RECIPE_TEMPLATE.md).
 
-### [Reference](https://diataxis.fr/reference/)
+Read more about the theory behind How-to guides [here](https://diataxis.fr/how-to-guides/).
+
+### Reference
 In order to "fly like a butterfly and sting like a bee", http4k is heavily modularised. This section contains more detailed technical notes on the capabilities present each of the http4k modules. It's more of a "what" than a "why".
+
+Read more about the theory behind Reference guides [here](https://diataxis.fr/reference/).
 
 [http4k]: https://http4k.org
