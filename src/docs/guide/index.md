@@ -17,7 +17,7 @@ http4k is a simple framework based around several function types, and hopefully 
 We recommend that all new users familiarise themselves with at least the [rationale](/guide/concepts/rationale) and [HTTP](/guide/concepts/http) pages of this section.
 
 ### [Tutorials](https://diataxis.fr/tutorials/)
-Getting started with a new library can be quite daunting, and sometimes everyone needs a little hand holding to get comfortable with how things fit together. This section contains step-by-step guides to get you started with each of http4k's main conceptual areas. The [Quickstart](/quickstart) will get you out of the gate and up and running in no time.
+Getting started with a new library can be quite daunting, and sometimes everyone needs a little hand holding to get comfortable with how things fit together. This section contains step-by-step guides to get you started with each of http4k's main conceptual areas. The [first tutorial](./tutorials/your_first_http4k_app) will get you out of the gate and up and running in no time.
 
 ### [How-to guides](https://diataxis.fr/how-to-guides/)
 The meat of the http4k documentation is in this section, in which you'll find ready made solutions to many common problems. Because if you've got something to achieve - it's pretty much guaranteed that we've probably already come across. 
