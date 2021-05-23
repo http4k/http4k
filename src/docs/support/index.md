@@ -34,5 +34,5 @@ The **http4k** project is a culmination of work on real-world projects in many d
 These materials can be delivered both remotely and in on-site sessions. If you are interested in taking advantage of our mistakes, please get in touch at: **[support@http4k.org](mailto:support@http4k.org)**
 
 ## Logo Usage
-The **http4k** logo design and branding are copyright 2020 to the owners of http4k.org. If you'd like to use the **http4k** logo in a presentation or for other purposes, it's probably fine, but please reach out to let know first on the channels above. We can then look at providing the relevant high-quality asset files.
+The **http4k** logo design and branding are copyright 2021 to the owners of http4k.org. If you'd like to use the **http4k** logo in a presentation or for other purposes, it's probably fine, but please reach out to let us know first on the channels above. We can then look at providing the relevant high-quality asset files.
 
