@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.9.3.0 (uncut)
-- **http4k-serverless-lambda** : Move initialisation of Moshi into loading stage for lambda functions.
+- **http4k-serverless-lambda** : Move initialisation of Moshi into loading stage for AWS Lambda functions.
 
 ### v4.9.2.0
 - **http4k-contract** : Fix #622. DELETE requests not rendered with Body in OpenApi
