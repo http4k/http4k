@@ -14,6 +14,8 @@ abstract class ApiGatewayFnLoader protected constructor(
 ) : FnLoader<Context> {
     private val moshi = Moshi
     private val contexts = RequestContexts("lambda")
+    private val coreFilter = CatchAll()
+        .then(InitialiseRequestContext(contexts))
 
     override operator fun invoke(env: Map<String, String>): FnHandler<InputStream, Context, InputStream> {
         val app = appLoader(env, contexts)
@@ -21,8 +23,7 @@ abstract class ApiGatewayFnLoader protected constructor(
             val newRequest = adapter(moshi.asA(inputStream), ctx)
             moshi.asInputStream(
                 adapter(
-                    CatchAll()
-                        .then(InitialiseRequestContext(contexts))
+                    coreFilter
                         .then(AddLambdaContextAndRequest(ctx, newRequest, contexts))
                         .then(app)(newRequest)
                 )
