@@ -5,8 +5,8 @@ import org.http4k.core.RequestContexts
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
-import org.http4k.format.AwsLambdaMoshi.asA
-import org.http4k.format.AwsLambdaMoshi.asInputStream
+import org.http4k.format.Moshi.asA
+import org.http4k.format.Moshi.asInputStream
 import java.io.InputStream
 
 abstract class ApiGatewayFnLoader protected constructor(
