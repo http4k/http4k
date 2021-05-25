@@ -1,5 +1,6 @@
 package org.http4k.contract.openapi.v3
 
+import org.http4k.client.JavaHttpClient
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.ErrorResponseRenderer
@@ -25,11 +26,12 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
-import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.HEAD
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
@@ -40,6 +42,8 @@ import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.server.SunHttp
+import org.http4k.server.asServer
 import org.http4k.util.JsonSchema
 
 /**
@@ -99,7 +103,7 @@ class OpenApi3<NODE : Any>(
         val security = json(listOfNotNull(meta.security ?: contractSecurity).combineRef())
         val body = meta.requestBody()?.takeIf { it.required }
 
-        return if (method in setOf(GET, DELETE, HEAD) || body == null) {
+        return if (method in setOf(GET, HEAD) || body == null) {
             ApiPath.NoBody(
                 meta.summary,
                 meta.description,
