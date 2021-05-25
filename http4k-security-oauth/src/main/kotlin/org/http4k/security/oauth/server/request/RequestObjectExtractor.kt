@@ -72,11 +72,13 @@ object RequestObjectExtractor {
         else -> emptyList()
     }
 
+    private val moshi = OAuthServerMoshi
+
     private fun parseJsonFromJWT(value: String) = try {
         val jwtParts = value.split(".")
         when {
             jwtParts.size != 3 -> Failure(InvalidRequestObject)
-            else -> Success(OAuthServerMoshi.asA<Map<String, Any>>(String(Base64.getUrlDecoder().decode(jwtParts[1]))))
+            else -> Success(moshi.asA<Map<String, Any>>(String(Base64.getUrlDecoder().decode(jwtParts[1]))))
         }
     } catch (e: Exception) {
         Failure(InvalidRequestObject)
