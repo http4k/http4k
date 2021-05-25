@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.9.2.0 (uncut)
+- **http4k-contract** : Fix #622. DELETE requests not rendered with Body in OpenApi
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v4.9.1.0
