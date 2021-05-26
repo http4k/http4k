@@ -64,6 +64,7 @@ class MyValue(value: String) : StringValue(value) {
 }
 
 data class MyValueHolder(val value: MyValue?)
+data class MyValueHolderHolder(val value: MyValueHolder?)
 
 abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) {
 
@@ -171,6 +172,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         assertThat(marshaller.asFormatString(wrapper), equalTo("{\"value\":\"foobar\"}"))
         assertThat(marshaller.asA("{\"value\":\"foobar\"}", MyValueHolder::class), equalTo(wrapper))
         assertThat(marshaller.asA("{\"value\":null}", MyValueHolder::class), equalTo(MyValueHolder(null)))
+        assertThat(marshaller.asA("{\"value\":null}", MyValueHolderHolder::class), equalTo(MyValueHolderHolder(null)))
     }
 
     @Test
