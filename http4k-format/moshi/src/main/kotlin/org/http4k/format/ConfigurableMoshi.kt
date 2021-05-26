@@ -90,7 +90,7 @@ fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Bui
                 override fun toJson(writer: JsonWriter, value: OUT?) {
                     value?.let { writer.write(mapping(it)) } ?: writer.nullValue()
                 }
-            })
+            }.nullSafe())
         }
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
