@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.9.4.0 (uncut)
+- **http4k-serverless-lambda-runtime** : New module! Sidestep the AWS Lambda Runtime with the super lightweight http4k version!
+
 ### v4.9.3.1
 - **http4k-format-moshi** : Fix Moshi to use nullsafe value adapters.
 
