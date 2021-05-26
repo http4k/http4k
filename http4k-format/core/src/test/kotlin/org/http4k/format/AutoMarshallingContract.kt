@@ -4,6 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
+import dev.forkhandles.values.StringValue
+import dev.forkhandles.values.StringValueFactory
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.lens.StringBiDiMappings
@@ -56,6 +58,12 @@ data class InOnlyHolder(val value: InOnly)
 data class InOnly(val value: String)
 data class ExceptionHolder(val value: Throwable)
 class CustomException(m: String) : RuntimeException(m)
+
+class MyValue(value: String) : StringValue(value) {
+    companion object : StringValueFactory<MyValue>(::MyValue)
+}
+
+data class MyValueHolder(val value: MyValue?)
 
 abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) {
 
@@ -156,6 +164,16 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
+    open fun `roundtrip custom value`() {
+        val marshaller = customMarshaller()
+
+        val wrapper = MyValueHolder(MyValue("foobar"))
+        assertThat(marshaller.asFormatString(wrapper), equalTo("{\"value\":\"foobar\"}"))
+        assertThat(marshaller.asA("{\"value\":\"foobar\"}", MyValueHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asA("{\"value\":null}", MyValueHolder::class), equalTo(MyValueHolder(null)))
+    }
+
+    @Test
     open fun `roundtrip custom boolean`() {
         val marshaller = customMarshaller()
 
@@ -208,6 +226,7 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
     .offsetTime({ it }, { it })
     .yearMonth({ it }, { it })
     .zonedDateTime({ it }, { it })
+    .value(MyValue)
     .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
     .done()
 

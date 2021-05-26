@@ -159,16 +159,18 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         assertThat(KotlinxSerialization.asInputStream(StringHolder("hello")).reader().use { it.readText() }, equalTo(expectedConvertToInputStream))
     }
 
+    @Disabled()
+    override fun `roundtrip custom value`() {
+    }
+
     @Test
     @Disabled("kotlinx.serialization does not support serialization auto-fallback to parent class")
     override fun `throwable is marshalled`() {
-        super.`throwable is marshalled`()
     }
 
     @Test
     @Disabled("kotlinx.serialization does not support default serialization of LinkedHashMap")
     override fun `roundtrip map`() {
-        super.`roundtrip map`()
     }
 
     @Test
