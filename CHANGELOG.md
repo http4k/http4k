@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.9.3.1
+- **http4k-format-moshi** : Fix Moshi to use nullsafe value adapters.
+
 ### v4.9.3.0
 - **http4k-serverless-lambda** : Move initialisation of Moshi into loading stage for AWS Lambda functions.
 
