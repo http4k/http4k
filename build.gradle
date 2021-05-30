@@ -12,11 +12,8 @@ buildscript {
         classpath Libs.kotlin_serialization
         classpath Libs.ktlint_gradle
         classpath Libs.shadow
+        classpath Libs.io_codearte_nexus_staging_gradle_plugin
     }
-}
-
-plugins {
-    id "io.codearte.nexus-staging" version '0.22.0'
 }
 
 apply plugin: 'io.codearte.nexus-staging'
