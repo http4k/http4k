@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.9.5.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-serverless-lambda*** : Functions can now be matched on a pattern instead of an exact match.
+- **http4k-serverless-lambda** : Functions can now be matched on a pattern instead of an exact match.
 
 ### v4.9.4.0
 - **http4k-serverless-lambda-runtime** : New module! Sidestep the AWS Lambda Runtime with the super lightweight http4k version!
