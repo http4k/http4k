@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+
+### v4.9.6.0 (uncut)
+- **http4k-core** : no longer exposing `UriTemplate.trimSlashes()` . H/T @PaulienVa 
+
 ### v4.9.5.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-lambda** : Functions can now be matched on a pattern instead of an exact match.
