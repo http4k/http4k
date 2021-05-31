@@ -50,6 +50,7 @@ allprojects {
         enableExperimentalRules = false
         version = "0.41.0"
         debug = false
+        ignoreFailures = true
     }
 
     jacocoTestReport {
