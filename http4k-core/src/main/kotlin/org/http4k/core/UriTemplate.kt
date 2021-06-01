@@ -18,7 +18,6 @@ data class UriTemplate private constructor(private val template: String) {
         private fun String.trimSlashes() = "^(/)?(.*?)(/)?$".toRegex().replace(this) { result -> result.groupValues[2] }
     }
 
-
     fun matches(uri: String): Boolean = templateRegex.matches(uri.trimSlashes())
 
     fun extract(uri: String): Map<String, String> =
