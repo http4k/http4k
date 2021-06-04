@@ -30,6 +30,10 @@ fun Environment.awsCliUserProfiles(): AwsCliUserProfiles {
         override fun profile(profileName: String) = object : AwsProfile {
             override fun scopeFor(service: String) = AwsCredentialScope(region, service)
 
+            init {
+                assumeTrue(EnvironmentKey.optional("${profileName}-aws-access-key-id")(env) != null, "no profile found")
+            }
+
             override val credentials = AwsCredentials(
                 EnvironmentKey.required("${profileName}-aws-access-key-id")(env),
                 EnvironmentKey.required("${profileName}-aws-secret-access-key")(env)
