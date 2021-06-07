@@ -1,0 +1,12 @@
+description = 'A set of Strikt matchers for common http4k types'
+
+dependencies {
+    api project(":http4k-core")
+    implementation project(":http4k-format-core")
+
+    api Libs.hamkrest
+    api("io.strikt:strikt-core:0.31.0")
+
+    testImplementation project(":http4k-format-jackson")
+    testImplementation Config.TestDependencies
+}
