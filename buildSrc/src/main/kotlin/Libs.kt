@@ -119,6 +119,8 @@ object Libs {
 
     const val ratpack_core: String = "io.ratpack:ratpack-core:_"
 
+    const val strikt_core: String = "io.strikt:strikt-core:_"
+
     const val undertow_core: String = "io.undertow:undertow-core:_"
 
     const val undertow_servlet: String = "io.undertow:undertow-servlet:_"

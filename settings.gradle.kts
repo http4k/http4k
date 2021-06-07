@@ -104,6 +104,7 @@ include("http4k-realtime-core")
     includeModule("chaos")
     includeModule("hamkrest")
     includeModule("kotest")
+    includeModule("strikt")
     includeModule("servirtium")
     includeModule("webdriver")
 }

@@ -5,7 +5,7 @@ dependencies {
     implementation project(":http4k-format-core")
 
     api Libs.hamkrest
-    api("io.strikt:strikt-core:0.31.0")
+    api Libs.strikt_core
 
     testImplementation project(":http4k-format-jackson")
     testImplementation Config.TestDependencies
