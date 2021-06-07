@@ -56,8 +56,6 @@ object Libs {
 
     const val hamkrest: String = "com.natpryce:hamkrest:_"
 
-    const val ktlint: String = "com.pinterest:ktlint:_"
-
     const val moshi: String = "com.squareup.moshi:moshi:_"
 
     const val moshi_kotlin: String = "com.squareup.moshi:moshi-kotlin:_"
@@ -176,8 +174,6 @@ object Libs {
 
     const val kotlinx_serialization_json: String =
             "org.jetbrains.kotlinx:kotlinx-serialization-json:_"
-
-    const val ktlint_gradle: String = "org.jlleitschuh.gradle:ktlint-gradle:_"
 
     const val json: String = "org.json:json:_"
 
