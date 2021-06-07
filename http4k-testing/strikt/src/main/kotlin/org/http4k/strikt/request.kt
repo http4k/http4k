@@ -9,8 +9,8 @@ import org.http4k.lens.QueryLens
 import org.http4k.lens.WebForm
 import strikt.api.Assertion
 
-val Assertion.Builder<Request>.uri get() = get { uri }
-val Assertion.Builder<Request>.method get() = get { method }
+val Assertion.Builder<Request>.uri get() = get(Request::uri)
+val Assertion.Builder<Request>.method get() = get(Request::method)
 
 fun <T> Assertion.Builder<Request>.query(lens: QueryLens<T>) = get { lens(this) }
 fun Assertion.Builder<Request>.query(name: String) = get { query(name) }

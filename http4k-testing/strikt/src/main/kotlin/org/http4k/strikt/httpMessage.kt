@@ -11,7 +11,7 @@ fun <M : HttpMessage> Assertion.Builder<M>.header(name: String) = get { header(n
 fun <M : HttpMessage> Assertion.Builder<M>.headerValues(name: String) = get { headerValues(name) }
 
 val <M : HttpMessage> Assertion.Builder<M>.contentType get() = get { CONTENT_TYPE(this) }
-val <M : HttpMessage> Assertion.Builder<M>.body get() = get { body }
+val <M : HttpMessage> Assertion.Builder<M>.body get() = get(HttpMessage::body)
 val <M : HttpMessage> Assertion.Builder<M>.bodyString get() = get { bodyString() }
 
 fun <NODE, M : HttpMessage> Assertion.Builder<M>.jsonBody(json: Json<NODE>) = get { json.parse(bodyString()) }
