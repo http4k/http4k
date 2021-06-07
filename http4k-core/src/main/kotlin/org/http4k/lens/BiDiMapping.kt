@@ -34,7 +34,7 @@ import java.util.UUID
  * A BiDiMapping defines a reusable bidirectional transformation between an input and output type
  */
 
-class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, val asIn: (OUT) -> IN) {
+open class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, val asIn: (OUT) -> IN) {
 
     inline fun <reified NEXT> map(crossinline nextOut: (OUT) -> NEXT, crossinline nextIn: (NEXT) -> OUT): BiDiMapping<IN, NEXT> =
         BiDiMapping(NEXT::class.java, { nextOut(asOut(it)) }, { asIn(nextIn(it)) })
