@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 
-### v4.9.6.0 (uncut)
+### v4.9.6.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-strikt** : New module! Matchers for Strikt assertion library.
 - **http4k-core** : no longer exposing `UriTemplate.trimSlashes()` . H/T @PaulienVa 
