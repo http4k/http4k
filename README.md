@@ -26,14 +26,14 @@
 
 </div>
 
- [http4k] is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [http4k] applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:
+ [http4k] is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [http4k] applications are *just* Kotlin functions. For example, here's a simple echo server:
  
 ```kotlin
  val app: HttpHandler = { request: Request -> Response(OK).body(request.body) }
  val server = app.asServer(SunHttp(8000)).start()
 ```
 
-[http4k] consists of a lightweight core library, `http4k-core`, providing a base HTTP implementation and Server/Client implementations based on the JDK classes. Further servers, clients, serverless, templating, websockets capabilities are then implemented in add-on modules.
+[http4k] consists of a lightweight core library, `http4k-core`, providing a base HTTP implementation and Server/Client implementations based on the JDK classes. Further servers, clients, serverless, templating, websockets capabilities are then implemented in add-on modules. [http4k] apps can be simply mounted into a running Server, Serverless platform, or compiled to GraalVM and run as a super-lightweight binary.
 
 The principles of [http4k] are:
 
@@ -46,11 +46,12 @@ of 2 types of simple function:
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as 
 plugging together of services without HTTP container being required.
 * **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has **ZERO** dependencies and weighs in at ~1mb. Add-on modules only have dependencies required for specific implementation.
-* **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
+* **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both in-memory and port-based testing of:
     * individual endpoints
     * applications
     * websockets/sse
     * full suites of microservices
+* **Portable** Apps are completely portable across deployment platform in either a Server-based, Serverless or Native binaries.
     
 ## Quickstart
 Bored with reading already and just want to get coding? For the impatient, visit the [http4k toolbox](https://toolbox.http4k.org) to generate a complete project from the wide variety of http4k modules.
@@ -62,13 +63,13 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
     * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
     * **Path-based routing**, including nestable contexts
-    * **Typesafe HTTP message construction/desconstruction and Request Contexts** using Lenses
+    * **Typesafe HTTP message construction/deconstruction and Request Contexts** using Lenses
     * Servlet implementation to allow **plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
+    * Lightweight **JavaHttpClient** implementation - perfect for Serverless contexts where binary size is a factor.
     * **Path-based WebSockets** including typesafe message marshalling using Lenses, which are **testable without a running container**
     * **Path-based Server-Sent Events** which are **testable without a running container**
     * APIs to **record and replay** HTTP traffic to disk or memory
-    * Core **abstraction APIs** implemented by the other modules 
     * **Static file-serving** capability with **Caching and Hot-Reload**
     * **Single Page Application** support with **Caching and Hot-Reload**
     * **WebJars** support in **1LOC**`
