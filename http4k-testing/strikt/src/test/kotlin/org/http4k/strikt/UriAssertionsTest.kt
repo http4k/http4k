@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-class UriMatchersTest {
+class UriAssertionsTest {
 
     @Test
-    fun matchers() {
+    fun assertions() {
         val uri = Uri.of("http://bob:80?query=bob")
 
         expectThat(uri) {

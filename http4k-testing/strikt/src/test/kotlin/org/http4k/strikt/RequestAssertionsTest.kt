@@ -20,10 +20,10 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-class RequestMatchersTest {
+class RequestAssertionsTest {
 
     @Test
-    fun matchers() {
+    fun assertions() {
         val req = Request(GET, "foo")
             .query("q1", "q2")
             .query("q3", "q4")

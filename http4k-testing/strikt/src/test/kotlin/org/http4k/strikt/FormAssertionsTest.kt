@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-class FormMatchersTest {
+class FormAssertionsTest {
 
     @Test
-    fun matchers() {
+    fun assertions() {
         val form = WebForm(mapOf("foo" to listOf("bar")))
 
         expectThat(form) {

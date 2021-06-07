@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-class ResponseMatchersTest {
+class ResponseAssertionsTest {
 
     @Test
-    fun matchers() {
+    fun assertions() {
         val resp = Response(OK)
             .header("h1", "h2")
             .header("h3", "h4")

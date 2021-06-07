@@ -13,10 +13,10 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.time.Duration
 
-class HttpTransactionMatchersTest {
+class HttpTransactionAssertionsTest {
 
     @Test
-    fun matchers() {
+    fun assertions() {
         val tx = HttpTransaction(Request(Method.GET, ""), Response(OK), Duration.ZERO)
 
         expectThat(tx) {

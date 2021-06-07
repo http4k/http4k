@@ -15,10 +15,10 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.time.LocalDateTime
 
-class CookieMatchersTest {
+class CookieAssertionsTest {
 
     @Test
-    fun matchers() {
+    fun assertions() {
         val cookie = Cookie(
             name = "bob",
             value = "value",
