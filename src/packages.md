@@ -45,6 +45,9 @@ Common code relevant to HTTP serverless implementations.
 # Package org.http4k.servlet
 Code for mounting http4k applications into Servlet containers.
 
+# Package org.http4k.strikt
+Matchers for use with the strikt matching library.
+
 # Package org.http4k.template
 Common code relevant to templating implementations.
 

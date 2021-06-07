@@ -91,12 +91,13 @@ nav:
     - YAML handling: guide/reference/yaml/index.md
     - Testing:
       - Overview: guide/reference/testing/index.md
-      - Hamkrest: guide/reference/hamkrest/index.md
-      - Kotest: guide/reference/kotest/index.md
-      - WebDriver: guide/reference/webdriver/index.md
       - Approval Testing: guide/reference/approvaltests/index.md
       - Chaos Testing: guide/reference/chaos/index.md
+      - Hamkrest: guide/reference/hamkrest/index.md
+      - Kotest: guide/reference/kotest/index.md
       - Service Virtualisaion: guide/reference/servicevirtualisation/index.md
+      - Strikt: guide/reference/strikt/index.md
+      - WebDriver: guide/reference/webdriver/index.md
   - Blog:
     - Overview: blog/index.md
     - Meet http4k: blog/meet_http4k/index.md

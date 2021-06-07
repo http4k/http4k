@@ -149,18 +149,20 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **Soundcloud**
 * [Cloud Native:](https://http4k.org/guide/reference/cloud_native)
     * Tooling to support operating [http4k] applications in orchestrated cloud environments such as Kubernetes and CloudFoundry. 12-factor configuration, dual-port servers and health checks such as liveness and readiness checking. 
-* [WebDriver:](https://http4k.org/guide/reference/webdriver) 
-    * Ultra-lightweight Selenium WebDriver implementation for [http4k] application.
+* [Approval Testing:](https://http4k.org/guide/reference/approvaltests)
+    * JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of [http4k] Request and Response messages.
+* [Chaos:](https://http4k.org/guide/reference/chaos)
+    * API for declaring and injecting failure modes into [http4k] applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
 * [Hamkrest:](https://http4k.org/guide/reference/hamkrest) 
     * A set of Hamkrest matchers for testing [http4k] Request and Response messages.
-* [Kotest:](https://http4k.org/guide/reference/kotest) 
+* [Kotest:](https://http4k.org/guide/reference/kotest)
     * A set of Kotest matchers for testing [http4k] Request and Response messages.
-* [Approval Testing:](https://http4k.org/guide/reference/approvaltests) 
-    * JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of [http4k] Request and Response messages.
-* [Chaos:](https://http4k.org/guide/reference/chaos) 
-    * API for declaring and injecting failure modes into [http4k] applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
-* [Service Virtualisation:](https://http4k.org/guide/reference/servicevirtualisation) 
+* [Service Virtualisation:](https://http4k.org/guide/reference/servicevirtualisation)
     * Record and replay versioned HTTP contracts to/from `Servirtium` Markdown format. Includes Servirtium MiTM server and simple JUnit extensions.
+* [Strikt:](https://http4k.org/guide/reference/strikt) 
+    * A set of Strikt matchers for testing [http4k] Request and Response messages.
+* [WebDriver:](https://http4k.org/guide/reference/webdriver)
+    * Ultra-lightweight Selenium WebDriver implementation for [http4k] application.
     
 ## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/howz/readme/example.kt)
 
