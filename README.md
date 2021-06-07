@@ -33,7 +33,7 @@
  val server = app.asServer(SunHttp(8000)).start()
 ```
 
-[http4k] consists of a core library, `http4k-core`, providing a base HTTP implementation + a number of capability abstractions (such as servers, clients, templating, websockets etc). These capabilities are then implemented in add-on modules.
+[http4k] consists of a lightweight core library, `http4k-core`, providing a base HTTP implementation and Server/Client implementations based on the JDK classes. Further servers, clients, serverless, templating, websockets capabilities are then implemented in add-on modules.
 
 The principles of [http4k] are:
 
@@ -53,7 +53,7 @@ plugging together of services without HTTP container being required.
     * full suites of microservices
     
 ## Quickstart
-Bored with reading already and just want to get coding? For the impatient, visit the [http4k toolbox](https://toolbox.http4k.org) to generate a complete project from whe wide variety of http4k modules.
+Bored with reading already and just want to get coding? For the impatient, visit the [http4k toolbox](https://toolbox.http4k.org) to generate a complete project from the wide variety of http4k modules.
 
 Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take a look at the [examples repo](https://github.com/http4k/examples), which showcases a variety of [http4k] use-cases and features.
 
@@ -91,12 +91,14 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * API design allows for simple customization of underying backend.
     * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/reference/serverless)
-    * **AWS Lambda** Implement a single Factory method, then upload your [http4k] applications to AWS Lambda to be called directly or via API Gateway/AppLoadBalancer. 
-    * **Google Cloud Functions** Implement a single Factory method, then upload your [http4k] applications to Google Cloud Functions with `GCloud`. 
-    * **Apache OpenWhisk** Implement a single Factory method, then upload your [http4k] applications to IBM Cloud/OpenWhisk installations.
-    * **Azure Functions** Implement a single Factory method, then upload your [http4k] applications to the MS Cloud. 
-    * **Alibaba Function Compute** Implement a single Factory method, then upload your [http4k] applications to Alibaba. 
-    * **Tencent Serverless Cloud Functions** Implement a single Factory method, then upload your [http4k] applications to SCF. 
+    * **Function-based support for both HTTP and Event-based applications** via adapters, using the simple and testable `HttpHandler` and `FnHandler` types.
+    * **AWS Lambda** Extend custom adapters to serve HTTP apps from APIGateway or use react to AWS events (without using the heavyweight AWS serialisation).
+    * **Custom AWS Lambda Runtime** Avoid the heavyweight AWS runtime, or simply compile your [http4k] app to GraalVM and get cold-starts in a few milliseconds! 
+    * **Google Cloud Functions** Extend custom adapters to serve HTTP apps from Google Cloud Functions or use react to GCloud events. 
+    * **Apache OpenWhisk** Extend custom adapters to serve HTTP apps or react to JSON events in IBM Cloud/OpenWhisk installations.
+    * **Azure Functions** Extend custom adapters to serve HTTP apps from AzureCloud. 
+    * **Alibaba Function Compute** Extend custom adapters to serve HTTP apps from Alibaba.
+    * **Tencent Serverless Cloud Functions** Extend custom adapters to serve HTTP apps from SCF.
 * [Contracts:](https://http4k.org/guide/reference/contracts) 
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
