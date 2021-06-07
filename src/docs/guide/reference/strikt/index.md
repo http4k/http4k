@@ -1,5 +1,5 @@
-title: http4k Hamkrest Module
-description: Feature overview of the http4k-testing-hamkrest module
+title: http4k Strikt Module
+description: Feature overview of the http4k-testing-strikt module
 
 ### Installation (Gradle)
 

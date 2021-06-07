@@ -18,11 +18,12 @@ That said, possibly the most useful thing is to demonstrate the process that we 
 ### Testing modules
 We have developed the following modules to help with testing:
 
-- [http4k-testing-hamkrest](/guide/reference/hamkrest): a set of composable Hamkrest matchers for matching http4k message objects against.
-- [http4k-testing-kotest](/guide/reference/kotest): a set of composable Kotest matchers for matching http4k message objects against.
-- [http4k-testing-webdriver](/guide/reference/webdriver): an ultra-lightweight Selenium WebDriver implementation which can be used to test-drive http4k apps (ie. HttpHandlers).
 - [http4k-testing-approval](/guide/reference/approvaltests): JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of http4k Request and Response messages.
 - [http4k-testing-chaos](/guide/reference/chaos): API for declaring and injecting failure modes into http4k applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
+- [http4k-testing-hamkrest](/guide/reference/hamkrest): a set of composable Hamkrest matchers for matching http4k objects against.
+- [http4k-testing-kotest](/guide/reference/kotest): a set of composable Kotest matchers for matching http4k objects against.
 - [http4k-testing-servitium](/guide/reference/servicevirtualisation): a fully featured implementation of the [Servirtium] solution for Service Virtualization testing approach.
+- [http4k-testing-strikt](/guide/reference/strikt): a set of custom Strikt assertions for matching http4k objects against.
+- [http4k-testing-webdriver](/guide/reference/webdriver): an ultra-lightweight Selenium WebDriver implementation which can be used to test-drive http4k apps (ie. HttpHandlers).
 
 [Servirtium]: https://servirtium.dev
