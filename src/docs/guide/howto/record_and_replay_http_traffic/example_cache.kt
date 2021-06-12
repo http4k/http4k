@@ -14,9 +14,14 @@ fun main() {
     val storage = ReadWriteCache.Disk()
 
     // wrap any HTTP Handler in a Recording Filter and play traffic through it
-    val withCachedContent = TrafficFilters.ServeCachedFrom(storage).then { Response(OK).body("hello world") }
+    val withCachedContent =
+        TrafficFilters.ServeCachedFrom(storage)
+            .then(TrafficFilters.RecordTo(storage))
+            .then {
+                Response(OK).body("hello world")
+            }
     val aRequest = Request(GET, "http://localhost:8000/")
-    withCachedContent(aRequest)
+    println(withCachedContent(aRequest))
 
     // repeated requests are intercepted by the cache and the responses provided without hitting the original handler
     println(withCachedContent(Request(GET, "http://localhost:8000/")))
