@@ -25,7 +25,7 @@ The AWS Lambda runtime works by implementing an AWS supplied interface `Request/
 
 http4k supplies pre-built StreamHandler adapters (they are faster) using the lightweight Moshi library to convert the invocations to standard http4k Request/Responses. We need to decide which version of the [ApiGateway](https://aws.amazon.com/api-gateway/) binding to use and then use the correct http4k class. For this example we're going to use ApiGateway HTTP Version 1, so we simply create a class `HelloServerlessHttp4k` extending the relevant http4k class and pass our app `HttpHandler` to it's constructor:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http_with_aws_lambda/HelloServerlessHttp4k.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http4k_with_aws_lambda/HelloServerlessHttp4k.kt"></script>
 
 #### Step 3
 To build the Lambda code into a ZIP file, we need to add a task to our `build.gradle`:
