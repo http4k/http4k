@@ -98,4 +98,4 @@ You have successfully:
 
 To see a similar application, you can check out the complete [Hello World](https://github.com/http4k/examples/tree/master/hello-world) app from the [http4k Examples repo](https://github.com/http4k/examples/)
 
-[comment]: <> (&#40;Ready for more? Let's move on to [deploying your http4k app as a Serverless Lambda to AWS]&#40;/guide/tutorials/serverless_http4k_with_aws_lambda&#41;&#41;)
+**(Ready for more? Let's move on to [deploying your http4k app as a Serverless Lambda to AWS](/guide/tutorials/serverless_http4k_with_aws_lambda))**

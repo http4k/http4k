@@ -97,7 +97,7 @@ pulumi destroy --stack dev --yes
 ```
 
 #### Congratulations!
-You have successfully deployed and invoked a Native http4k Lambda to AWS!
+You have successfully compiled an http4k application with GraalVM, then deployed and invoked it as a Lambda in AWS!
 
 [Your first http4k app]: /guide/tutorials/your_first_http4k_app
 [Serverless http4k with AWS Lambda]: /guide/tutorials/serverless_http4k_with_aws_lambda
