@@ -6,6 +6,7 @@ description: Introduction to the http4k How-tos
 The meat of the http4k documentation is in this section, in which you'll find ready made solutions to many common use-cases. Because if you've got something to achieve - it's pretty likely that we've probably come across it already 😉. Check out the nav on the left for the list of recipes.
 
 The format for the recipes contains:
+
 - Required Gradle dependencies
 - A brief description of the problem
 - Fully runnable code example displaying the solution.
