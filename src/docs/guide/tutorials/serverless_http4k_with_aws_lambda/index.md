@@ -59,7 +59,7 @@ pulumi new --name hello-http4k --force
 #### Step 5
 Pulumi creates a few files in the directory, but the most interesting one is `index.ts`, which is where we will configure our AWS resources for exposing the Lambda. Overwrite the content of `index.ts` with:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http_with_aws_lambda/index.ts"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http4k_with_aws_lambda/index.ts"></script>
 
 The most important things to note in the above file are:
 
