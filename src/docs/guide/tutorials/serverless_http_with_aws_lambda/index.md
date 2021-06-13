@@ -24,7 +24,7 @@ implementation("org.http4k:http4k-serverless-lambda:4.9.7.0")
 #### Step 2
 The AWS Lambda runtime works by implementing an AWS supplied interface `Request/StreamHandler` and configuring that class to be loaded on an invocation on the lambda. The invocation requests themselves are transmitted as JSON which normally is unmarshalled by Jackson in the AWS runtime into the relevant AWS Event class.
 
-http4k supplies pre-built StreamHandler adapters (they are faster) using the lightweight Moshi library to convert the invocations to standard http4k Request/Responses. We need to decide which version of the [ApiGateway](https://aws.amazon.com/api-gateway/) binding to use and then use the correct http4k class. For this example we're going to use ApiGateway HTTP Version 1, so we simply create a class extending the relevant http4k class and pass our app `HttpHandler` to it's constructor:
+http4k supplies pre-built StreamHandler adapters (they are faster) using the lightweight Moshi library to convert the invocations to standard http4k Request/Responses. We need to decide which version of the [ApiGateway](https://aws.amazon.com/api-gateway/) binding to use and then use the correct http4k class. For this example we're going to use ApiGateway HTTP Version 1, so we simply create a class `HelloServerlessHttp4k` extending the relevant http4k class and pass our app `HttpHandler` to it's constructor:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http_with_aws_lambda/HelloServerlessHttp4k.kt"></script>
 
@@ -61,9 +61,6 @@ The most important things to note in the above file are:
 
 - (line 30) - the name of the input ZIP file - ensure this is correct from the last step.
 - (line 70) - the `publishedUrl` - this latter value in used by Pulumi to bind the URL of our Lambda to once it has been deployed and will be displayed upon deployment.
-
-#### Step 4
-If you haven't already done so, run `npm install` to read
 
 #### Step 5
 Deploy your ZIP file to AWS with `pulumi up --stack dev`. Pulumi will churn for a bit and all being well will display the URL at the end of the process.
