@@ -1,0 +1,3 @@
+config:
+  aws:profile: serverless-http4k
+  aws:region: us-east-1

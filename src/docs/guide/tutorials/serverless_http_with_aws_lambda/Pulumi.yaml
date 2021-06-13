@@ -1,0 +1,3 @@
+name: serverless-http4k
+runtime: nodejs
+description: http4k tutorial for deploying HTTP apps to AWS lambda
