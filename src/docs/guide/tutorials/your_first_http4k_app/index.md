@@ -85,7 +85,7 @@ Cool things to notice about the test:
 3. `Request` and `Response` objects are immutable data classes, and can therefore be compared safely in tests.
 
 #### Step 8
-Let's package our app into a runnable Application. From the IDE or command line, run `./gradlew distZip`. This will create an standard application ZIP file with scripts to run the app and deposit it in the `build/distributions` directory.
+Let's package our app into a runnable Application. From the IDE run  the `distZip` task. This will create an standard application ZIP file with scripts to run the app and deposit it in the `build/distributions` directory. You'll find the task in the `Gradle` tab under: `HelloWorld -> Tasks -> Dstribution -> distZip`.
 
 #### Congratulations!
 You have successfully:
@@ -93,7 +93,9 @@ You have successfully:
 1. Created an working http4k project using the http4k Toolbox. 
 2. Bound a simple `HttpHandler` function to particular HTTP endpoint.
 3. Seen how the http4k `HttpHandler` and `Filter` model provide a simple set of composable building blocks to construct HTTP applications.  
-4. Tested the application entirely in-meory with no custom libraries or code.
+4. Tested the application entirely in-memory with no custom libraries or code.
 5. Packaged your http4k app into a ZIP file.
 
-[comment]: <> (Ready for more? Let's move on to [the second stage]&#40;./the_second_stage&#41;,)
+To see a similar application, you can check out the complete [Hello World](https://github.com/http4k/examples/tree/master/hello-world) app from the [http4k Examples repo](https://github.com/http4k/examples/)
+
+[comment]: <> (&#40;Ready for more? Let's move on to [deploying your http4k app as a Serverless Lambda to AWS]&#40;/guide/tutorials/serverless_http_with_aws_lambda&#41;&#41;)

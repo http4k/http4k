@@ -8,8 +8,7 @@ We'll take an existing http4k application built with Gradle, add the bits that a
 ## Pre-requisites:
 - All the pre-requisites from the [Your first http4k app] tutorial.
 - The AWS CLI installed and an AWS profile set up to use. See [here](https://docs.aws.amazon.com/cli/index.html).
-- Pulumi CLI installed and configured for your system and AWS profile. See [here][pulumi].
-- Pulumi dependencies installed by running `npm install`.
+- Pulumi CLI installed and configured for your system. See [here][pulumi].
 - A working http4k application, built with Gradle. You can generate one from the [http4k Toolbox](https://toolbox.http4k.org) if required. For this example, we're going to assume a simple "echo" HttpHandler which responds to `GET /echo/{message:.*}"`.
 
 <hr/>
@@ -31,7 +30,7 @@ http4k supplies pre-built StreamHandler adapters (they are faster) using the lig
 #### Step 3
 To build the Lambda code into a ZIP file, we need to add a task to our `build.gradle`:
 ```groovy
-task buildZip(type: Zip) {
+task buildLambdaZip(type: Zip) {
     from compileKotlin
     from processResources
     into('lib') {
@@ -40,20 +39,16 @@ task buildZip(type: Zip) {
 }
 ```
 
-Run the new task with `./gradlew buildZip` and then take a note of the ZIP file that appears in `build/distributions`.
+Run the new task with `./gradlew buildLambdaZip` and then take a note of the ZIP file that appears in `build/distributions`.
 
 #### Step 4
 The next step is to configure the AWS resources to send requests to our Lambda function. This is quite involved as far as setup is concerned, but for this we're using [Pulumi][pulumi] as it provides a simple way to get started. The concept here is that you configure a "stack" in your chosen language (we're choosing TypeScript).
 
-We need to configure the credentials which Pulumi will use in `Pulumi.yaml`:
+On the command line, generate a new Pulumi configuration by running `pulumi new --name hello-http4k --force` followed by selecting `aws-typescript` and then all the default options until Pulumi has completed.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http_with_aws_lambda/Pulumi.yaml"></script>
 
-... and the definition for our "dev" stack `Pulumi-dev.yaml`:
-
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http_with_aws_lambda/Pulumi-dev.yaml"></script>
-
-... and the AWS resources to expose our Lambda in our stack `index.ts`:
+#### Step 5
+Pulumi creates a few files in the directory, but the most interesting one is `index.ts`, which is where we will configure our AWS resources for exposing the Lambda. Overwrite the content of `index.ts` with:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http_with_aws_lambda/index.ts"></script>
 
@@ -62,8 +57,8 @@ The most important things to note in the above file are:
 - (line 30) - the name of the input ZIP file - ensure this is correct from the last step.
 - (line 70) - the `publishedUrl` - this latter value in used by Pulumi to bind the URL of our Lambda to once it has been deployed and will be displayed upon deployment.
 
-#### Step 5
-Deploy your ZIP file to AWS with `pulumi up --stack dev`. Pulumi will churn for a bit and all being well will display the URL at the end of the process.
+#### Step 6
+Deploy your ZIP file to AWS with `pulumi up --stack dev --yes`. Pulumi will churn for a bit and all being well will display the URL at the end of the process.
 
 #### Step 6
 You can now call your deployed lambda with `curl https://{publishedUrl}/echo/helloHttp4k`. You should see `helloHttp4k` in the response body.
