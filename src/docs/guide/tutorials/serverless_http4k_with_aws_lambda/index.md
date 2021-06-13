@@ -1,7 +1,7 @@
-title: http4k Tutorial: Developing for Serverless platforms: AWS Lambda
+title: http4k Tutorial: Serverless http4k with AWS Lambda
 description: A step-by-step guide to deploying an HTTP app to AWS Lambda
 
-In this guide, we'll run you through the steps required to get an http4k application deployed and running on AWS Lambda and available to call over the internet using AWS ApiGateway. If you're not familiar with the http4k concepts for HTTP apps, then we advise you read them [here](/guide/concepts/http/), or to follow the [Your first http4k app] tutorial before tackling this guide.
+In this guide, we'll run you through the steps required to get an http4k application deployed and running on AWS Lambda and available to call over the internet using AWS ApiGateway. If you're not familiar with the http4k concepts for HTTP and Serverless apps, then we advise you read them [here](/guide/concepts/http/) and [here](/guide/concepts/serverless/). To make an app you can follow the [Your first http4k app] tutorial before tackling this guide.
 
 We'll take an existing http4k application built with Gradle, add the bits that are important to Serverless HTTP apps then deploy it to AWS Lambda and API Gateway using Pulumi.
 
@@ -45,7 +45,7 @@ Run the new task with:
 ./gradlew buildLambdaZip
 ``` 
 
-and then take a note of the ZIP file that appears in `build/distributions`.
+... and then take a note of the ZIP file that appears in `build/distributions`.
 
 #### Step 4
 The next step is to configure the AWS resources to send requests to our Lambda function. This is quite involved as far as setup is concerned, but for this we're using [Pulumi][pulumi] as it provides a simple way to get started. The concept here is that you configure a "stack" in your chosen language (we're choosing TypeScript).
@@ -73,11 +73,13 @@ pulumi up --stack dev --yes
 ```
 Pulumi will churn for a bit and all being well will display the URL at the end of the process.
 
+<img class="blogImage" src="step6.png" alt="pulumi output"/>
+
 #### Step 7
 You can now call your deployed lambda by visiting: `https://{publishedUrl}/echo/helloHttp4k`. You should see `helloHttp4k` in the response body.
 
 #### Step 8
-To avoid any unwanted AWS charges, don't forget to delete all of the resources in your stack when you've finished y running:
+To avoid any unwanted AWS charges, don't forget to delete all of the resources in your stack when you've finished by running:
 ```shell
 pulumi destroy --stack dev --yes
 ```
@@ -87,7 +89,7 @@ You have successfully deployed and invoked an http4k Lambda to AWS!
 
 To see a complete example of a similar setup, you can check out the complete [AWS Lambda](https://github.com/http4k/examples/tree/master/aws-lambda) app from the [http4k Examples repo](https://github.com/http4k/examples/)
 
-[comment]: <> (&#40;Ready for more? Let's move on to [deploying a native http4k GraalVM Lambda to AWS]&#40;/guide/tutorials/serverless_http4k_with_graal&#41;&#41;)
+(Ready for more? Let's move on to [deploying a native http4k GraalVM Lambda to AWS](/guide/tutorials/going_native_with_graal_on_aws_lambda))
 
 [Your first http4k app]: /guide/tutorials/your_first_http4k_app
 [pulumi]: https://www.pulumi.com/docs/get-started/install/

@@ -39,7 +39,8 @@ nav:
     - Server-Sent Events: guide/concepts/server-sent-events.md
   - Tutorials:
     - Your first http4k app: guide/tutorials/your_first_http4k_app/index.md
-    - Deploying an http4k app to AWS Lambda: guide/tutorials/serverless_http_with_aws_lambda/index.md
+    - Deploying an http4k app to AWS Lambda: guide/tutorials/serverless_http4k_with_aws_lambda/index.md
+    - Going native with Graal on AWS Lambda: guide/tutorials/going_native_with_graal_on_aws_lambda/index.md
     - TDDing http4k: guide/tutorials/tdding_http4k/index.md
   - How-to guides:
     - Overview: guide/howto/index.md

@@ -1,4 +1,4 @@
-package guide.tutorials.serverless_http_with_aws_lambda
+package guide.tutorials.serverless_http4k_with_aws_lambda
 
 import org.http4k.core.Method.GET
 import org.http4k.core.Response

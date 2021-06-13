@@ -27,7 +27,7 @@ new RolePolicyAttachment("hello-http4k-default-role-policy",
 
 const lambdaFunction = new aws.lambda.Function("hello-http4k", {
     code: new pulumi.asset.FileArchive("build/distributions/HelloWorld.zip"),
-    handler: "guide.tutorials.serverless_http_with_aws_lambda.HelloServerlessHttp4k",
+    handler: "guide.tutorials.serverless_http4k_with_aws_lambda.HelloServerlessHttp4k",
     role: defaultRole.arn,
     runtime: "java11",
     timeout: 15
