@@ -17,8 +17,9 @@ There is a repository of helpful examples at [http4k/examples](https://github.co
 ### Standalone projects...
 Each project is tagged with the http4k features it demonstrates:
 
-#### ["Hello World"](https://start.http4k.org)
-<span class="pill">CD pipeline</span>
+[comment]: <> (#### ["Hello World"]&#40;https://start.http4k.org&#41;)
+
+[comment]: <> (<span class="pill">CD pipeline</span>)
 #### [TDD'd example application](https://github.com/http4k/http4k-by-example)
 <span class="pill">Templates</span> 
 <span class="pill">Testing</span> 

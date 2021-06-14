@@ -33,5 +33,6 @@ The following creates a simple endpoint, binds it to a Netty server then starts,
 # I want to see what http4k can do!
 **See how it's done in the Examples Repo**: For fully self-contained examples demonstrates the standout features of **http4k**, there is a GitHub repository at [http4k/examples](https://github.com/http4k/examples).
 
-# I want to get something deployed ASAP
-**Single-line CD Bootstrap**: Run the single command in the readme of [this repo](https://github.com/http4k/http4k-bootstrap) to create a HelloWorld **http4k** app with a full CD pipeline using Github -> TravisCI -> Heroku.
+[comment]: <> (# I want to get something deployed ASAP)
+
+[comment]: <> (**Single-line CD Bootstrap**: Run the single command in the readme of [this repo]&#40;https://github.com/http4k/http4k-bootstrap&#41; to create a HelloWorld **http4k** app with a full CD pipeline using Github -> TravisCI -> Heroku.)
