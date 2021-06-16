@@ -1,6 +1,7 @@
 package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
@@ -195,6 +196,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         assertThat(
             marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))).normaliseJson(),
             startsWith(expectedThrowable.normaliseJson())
+        )
+    }
+
+    @Test
+    open fun `exception is marshalled`() {
+        assertThat(
+            marshaller.asFormatString(RuntimeException("foobar")).normaliseJson(),
+            containsSubstring("foobar")
         )
     }
 

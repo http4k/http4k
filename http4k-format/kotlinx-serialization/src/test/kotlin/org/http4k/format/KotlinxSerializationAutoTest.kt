@@ -169,6 +169,11 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
+    @Disabled("kotlinx.serialization does not support serialization auto-fallback to parent class")
+    override fun `exception is marshalled`() {
+    }
+
+    @Test
     @Disabled("kotlinx.serialization does not support default serialization of LinkedHashMap")
     override fun `roundtrip map`() {
     }

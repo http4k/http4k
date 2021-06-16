@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.9.8.0
+- **http4k-testing-chaos*** : Added `ChaoticHttpHandler` to allow easy creation of HttpHandlers which have a Kotlin API for creating chaos.
+- **http4k-format-moshi*** : Fix to support marshalling of exceptions and added IsAnInstanceOfAdapter to capture
+
 ### v4.9.7.0
 - **http4k-*** : Upgrade some dependency versions.
 
