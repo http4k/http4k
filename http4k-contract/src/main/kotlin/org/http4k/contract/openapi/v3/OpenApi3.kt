@@ -176,8 +176,9 @@ class OpenApi3<NODE : Any>(
                     APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
                         (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
                     null -> null
-                    else -> this.value to NoSchema(
-                        json { obj("type" to string(StringParam.value)) }, it.example?.toString())
+                    else -> value to NoSchema(
+                        json { obj("type" to string(StringParam.value)) }, it.example?.toString()
+                    )
                 }
             }
         }
