@@ -1,6 +1,5 @@
 package org.http4k.contract.openapi.v3
 
-import org.http4k.client.JavaHttpClient
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.ErrorResponseRenderer
@@ -28,10 +27,8 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.HEAD
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
@@ -42,8 +39,6 @@ import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
-import org.http4k.server.SunHttp
-import org.http4k.server.asServer
 import org.http4k.util.JsonSchema
 
 /**
@@ -151,8 +146,7 @@ class OpenApi3<NODE : Any>(
         .toMap()
 
     private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
-        val paramMeta: ParamMeta = it.paramMeta
-        when (paramMeta) {
+        when (val paramMeta: ParamMeta = it.paramMeta) {
             ObjectParam -> SchemaParameter(it, "{}".toSchema())
             FileParam -> PrimitiveParameter(it, json {
                 obj("type" to string(FileParam.value), "format" to string("binary"))
@@ -199,10 +193,10 @@ class OpenApi3<NODE : Any>(
 
     private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): BodyContent {
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
-            if (example is Array<*>
-                || example is Iterable<*>
-            ) !json.fields(schema.node).toMap().containsKey("\$ref")
-            else apiRenderer.toSchema(object {}) != schema
+            when (example) {
+                is Array<*>, is Iterable<*> -> !json.fields(schema.node).toMap().containsKey("\$ref")
+                else -> apiRenderer.toSchema(object {}) != schema
+            }
 
         val jsonSchema = example
             ?.let { apiRenderer.toSchema(it, definitionId) }
