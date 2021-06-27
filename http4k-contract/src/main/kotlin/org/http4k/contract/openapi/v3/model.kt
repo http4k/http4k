@@ -67,7 +67,7 @@ fun interface HasSchema<NODE> {
 
 sealed class BodyContent {
 
-    data class NoSchema<NODE : Any>(val schema: NODE) : BodyContent()
+    data class NoSchema<NODE : Any>(val schema: NODE, val example: String? = null) : BodyContent()
 
     class SchemaContent<NODE : Any>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(), HasSchema<NODE> {
         val schema = jsonSchema?.node

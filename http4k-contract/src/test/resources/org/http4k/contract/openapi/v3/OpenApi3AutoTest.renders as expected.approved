@@ -623,7 +623,8 @@
             "text/plain": {
               "schema": {
                 "type": "string"
-              }
+              },
+              "example": "hello from the land of plaintext"
             }
           },
           "required": true
