@@ -436,7 +436,7 @@ class ServerFiltersTest {
     @Test
     fun `get flash attributes are null if not set`() {
 
-        val handler = FlashAttributesFilter.then { request -> Response(Status.OK).body(request.flash().orEmpty()) }
+        val handler = FlashAttributesFilter.then { request -> Response(OK).body(request.flash().orEmpty()) }
 
         val response = handler(Request(Method.GET, "/"))
         assertThat(response, hasBody(""))
@@ -444,7 +444,7 @@ class ServerFiltersTest {
 
     @Test
     fun `retrieve flash attributes if set`() {
-        val handler = FlashAttributesFilter.then { request -> Response(Status.OK).body("abc").withFlash("Error 123") }
+        val handler = FlashAttributesFilter.then { _ -> Response(OK).body("abc").withFlash("Error 123") }
 
         val response = handler(Request(Method.GET, "/"))
         assertThat(response.flash(), equalTo("Error 123"))
@@ -452,8 +452,7 @@ class ServerFiltersTest {
 
     @Test
     fun `remove flash attributes after usage`() {
-
-        val handler = FlashAttributesFilter.then { request -> Response(Status.OK).body("abc") }
+        val handler = FlashAttributesFilter.then { _ -> Response(OK).body("abc") }
 
         val request = Request(Method.GET, "/").withFlash("input flash")
         val response = handler(request)
