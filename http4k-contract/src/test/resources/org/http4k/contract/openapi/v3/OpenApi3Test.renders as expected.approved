@@ -531,6 +531,34 @@
       }
     },
     "/basepath/body_string": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "getBasepathBody_string",
+        "deprecated": false
+      },
       "post": {
         "summary": "<unknown>",
         "description": null,

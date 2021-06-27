@@ -109,6 +109,9 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
             routes += "/body_string" meta {
                 receiving(Body.string(TEXT_PLAIN).toLens())
             } bindContract POST to { Response(OK) }
+            routes += "/body_string" meta {
+                returning(OK, Body.string(TEXT_PLAIN).toLens() to "hello from the land of plaintext")
+            } bindContract GET to { Response(OK) }
             routes += "/body_json_noschema" meta {
                 receiving(json.body("json").toLens())
             } bindContract POST to { Response(OK) }

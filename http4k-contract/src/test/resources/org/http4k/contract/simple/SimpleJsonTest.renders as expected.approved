@@ -7,6 +7,7 @@
     "POST:/basepath/cookies": "<unknown>",
     "POST:/basepath/headers": "<unknown>",
     "POST:/basepath/body_string": "<unknown>",
+    "GET:/basepath/body_string": "<unknown>",
     "POST:/basepath/body_json_noschema": "<unknown>",
     "POST:/basepath/body_json_response": "<unknown>",
     "POST:/basepath/body_json_schema": "<unknown>",

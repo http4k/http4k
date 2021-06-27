@@ -16,6 +16,7 @@ import org.http4k.contract.openapi.operationId
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
+import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
 import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
@@ -135,11 +136,10 @@ class OpenApi3<NODE : Any>(
         }.toMap()
 
     private fun List<HttpMessageMeta<Response>>.collectSchemas() = groupBy { CONTENT_TYPE(it.message) }
-        .filterKeys { it == APPLICATION_JSON }
         .mapValues {
             when (it.value.size) {
                 1 -> it.value.first().toSchemaContent()
-                else -> BodyContent.OneOfSchemaContent<NODE>(it.value.map { it.toSchemaContent() })
+                else -> OneOfSchemaContent<NODE>(it.value.map { it.toSchemaContent() })
             }
         }
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
@@ -182,7 +182,7 @@ class OpenApi3<NODE : Any>(
             .mapValues {
                 when (it.value.size) {
                     1 -> it.value.first().second
-                    else -> BodyContent.OneOfSchemaContent<NODE>(it.value.map { it.second })
+                    else -> OneOfSchemaContent<NODE>(it.value.map { it.second })
                 }
             }.toList()
 

@@ -566,6 +566,33 @@
             ]
           }
         ]
+      },
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "getBasepathBody_string",
+        "produces": [
+          "text/plain"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
       }
     },
     "/basepath/cookies": {
