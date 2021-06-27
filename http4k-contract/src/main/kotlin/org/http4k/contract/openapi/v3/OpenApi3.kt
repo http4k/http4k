@@ -164,10 +164,7 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
-        val noSchema = consumes.map {
-            it.value to NoSchema(
-                json { obj("type" to string(StringParam.value)) })
-        }
+        val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
 
         val withSchema = requests.mapNotNull {
             with(CONTENT_TYPE(it.message)) {
