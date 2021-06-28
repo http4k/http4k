@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.9.9.0 (uncut)
+### v4.9.9.0
 - **http4k-contract** : Fix #626 - Non JSON bodies do not display examples.
 - **http4k-*** : Upgrade some dependency versions.
 
