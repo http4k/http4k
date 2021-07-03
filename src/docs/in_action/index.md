@@ -3,7 +3,7 @@ description: Example applications and usages of http4k, including TDD approach
 
 ### Presentations: 
 
-- *"Talking Kotlin ep. 99: HTTP as a function with http4k"* ([video](https://www.youtube.com/watch?v=mPmUjJhdYME&t=6s) / [podcast](https://overcast.fm/+QCXbEUw4Q))
+- *"Talking Kotlin ep. 99: HTTP as a function with http4k"* ([video](https://www.youtube.com/watch?v=mPmUjJhdYME) / [podcast](https://overcast.fm/+QCXbEUw4Q))
 - *"http4k: Server as a Function"* ([video](https://www.youtube.com/watch?v=NjoCjupV8HE)), part of JetBrain's [Webinar series](https://blog.jetbrains.com/kotlin/2021/05/server-side-with-kotlin-webinar-series-vol-3/)   
 - *"Server as a Function. In Kotlin. _______________"* ([video](http://bit.ly/serverasafunction) / [slides](https://speakerdeck.com/daviddenton/server-as-a-function-in-kotlin)), by [David Denton](https://twitter.com/tarkaTheRotter) and [Ivan Sanchez](https://twitter.com/s4nchez), presented at KotlinConf 2018.
 - *"Writing Test Driven Apps with http4k"* ([video](https://bit.ly/tdd-http4k-kotliners)), by [David Denton](https://twitter.com/tarkaTheRotter) and [Ivan Sanchez](https://twitter.com/s4nchez), presented at Kotliners 2020. 
