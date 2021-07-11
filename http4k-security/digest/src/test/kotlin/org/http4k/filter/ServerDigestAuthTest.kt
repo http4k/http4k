@@ -2,14 +2,14 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.isNullOrBlank
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
+import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.Nonce
 import org.http4k.security.NonceVerifier
@@ -46,7 +46,7 @@ class ServerDigestAuthTest {
             nonceGenerator = nonceGenerator,
             nonceVerifier = nonceVerifier
         )
-        .then { Response(Status.OK) }
+        .then { Response(OK) }
 
     @Test
     fun `no credentials - returns challenge`() {
@@ -54,8 +54,11 @@ class ServerDigestAuthTest {
 
         assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(
-            response.header("WWW-Authenticate"),
-            equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+            response,
+            hasHeader(
+                "WWW-Authenticate",
+                equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+            )
         )
     }
 
@@ -68,8 +71,11 @@ class ServerDigestAuthTest {
 
         assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(
-            response.header("WWW-Authenticate"),
-            equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+            response,
+            hasHeader(
+                "WWW-Authenticate",
+                equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+            )
         )
     }
 
@@ -94,7 +100,7 @@ class ServerDigestAuthTest {
         val response = handler(request)
 
         assertThat(response, hasStatus(UNAUTHORIZED))
-        assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
+        assertThat(response, !hasHeader("WWW-Authenticate"))
     }
 
     @Test
@@ -118,7 +124,7 @@ class ServerDigestAuthTest {
         val response = handler(request)
 
         assertThat(response, hasStatus(UNAUTHORIZED))
-        assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
+        assertThat(response, !hasHeader("WWW-Authenticate"))
     }
 
     @Test
@@ -142,7 +148,7 @@ class ServerDigestAuthTest {
         val response = handler(request)
 
         assertThat(response, hasStatus(UNAUTHORIZED))
-        assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
+        assertThat(response, !hasHeader("WWW-Authenticate"))
     }
 
     @Test
@@ -178,7 +184,7 @@ class ServerDigestAuthTest {
         val response = handler(request)
 
         assertThat(response, hasStatus(UNAUTHORIZED))
-        assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
+        assertThat(response, !hasHeader("WWW-Authenticate"))
     }
 
     @Test
@@ -248,6 +254,6 @@ class ServerDigestAuthTest {
 
         val response = handler(request)
 
-        assertThat(response.status, equalTo(Status.OK))
+        assertThat(response, hasStatus(OK))
     }
 }

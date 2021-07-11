@@ -10,6 +10,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
 import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.digest.Qop
 import org.junit.jupiter.api.Test
@@ -27,8 +30,8 @@ class DigestAuthTest {
             .then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "hunter2")).then(handler)(Request(GET, "/"))
 
-        assertThat(response.status, equalTo(UNAUTHORIZED))
-        assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
+        assertThat(response, hasStatus(UNAUTHORIZED))
+        assertThat(response, !hasHeader("WWW-Authenticate", ""))
     }
 
     @Test
@@ -37,8 +40,9 @@ class DigestAuthTest {
             ServerFilters.DigestAuth(realm, passwordLookup, qop = listOf(Qop.Auth)).then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(Request(GET, "/"))
 
-        assertThat(response.status, equalTo(OK))
-        assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
+
+        assertThat(response, hasStatus(OK))
+        assertThat(response, !hasHeader("WWW-Authenticate", ""))
     }
 
 //    @Test TODO not fully implemented
@@ -57,7 +61,7 @@ class DigestAuthTest {
             Request(GET, "/")
         )
 
-        assertThat(response.status, equalTo(OK))
-        assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
+        assertThat(response, hasStatus(OK))
+        assertThat(response, !hasHeader("WWW-Authenticate"))
     }
 }

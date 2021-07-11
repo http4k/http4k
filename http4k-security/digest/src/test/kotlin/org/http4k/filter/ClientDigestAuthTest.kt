@@ -2,7 +2,6 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.isNullOrBlank
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -11,8 +10,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
+import org.http4k.hamkrest.hasBody
 import org.http4k.security.Nonce
-import org.http4k.security.NonceVerifier
 import org.http4k.security.digest.DigestChallenge
 import org.http4k.security.digest.Qop.Auth
 import org.junit.jupiter.api.Test
@@ -32,7 +31,7 @@ class ClientDigestAuthTest {
             .then(handler)(Request(Method.GET, "/"))
 
         // ensure no Authorization header was send by the client filter
-        assertThat(response.bodyString(), isNullOrBlank)
+        assertThat(response, hasBody(""))
     }
 
     @Test
@@ -44,7 +43,7 @@ class ClientDigestAuthTest {
             .then(handler)(Request(Method.GET, "/"))
 
         // ensure no Authorization header was send by the client filter
-        assertThat(response.bodyString(), isNullOrBlank)
+        assertThat(response, hasBody(""))
     }
 
     @Test
@@ -72,8 +71,8 @@ class ClientDigestAuthTest {
         assertThat(response.status, equalTo(OK))
         // ensure the client sent an Authorization digest, and verify it is consistent given a consistent nonce and cnonce
         assertThat(
-            response.bodyString(),
-            equalTo("Digest realm=\"http4k\", username=\"user\", uri=\"/\", nonce=\"1234abcd\", response=\"92582b92a7eacede09d20533466616e8\", nc=00000001, algorithm=MD5, cnonce=\"c1234\", qop=\"auth\"")
+            response,
+            hasBody("Digest realm=\"http4k\", username=\"user\", uri=\"/\", nonce=\"1234abcd\", response=\"92582b92a7eacede09d20533466616e8\", nc=00000001, algorithm=MD5, cnonce=\"c1234\", qop=\"auth\"")
         )
     }
 }
