@@ -154,7 +154,7 @@ data class ClientId(val value: String)
 
 data class AuthorizationCode(val value: String)
 
-internal fun Request.authorizationRequest() =
+fun Request.authorizationRequest() =
     AuthRequest(
         OAuthServer.clientIdQueryParameter(this),
         OAuthServer.scopesQueryParameter(this) ?: listOf(),
