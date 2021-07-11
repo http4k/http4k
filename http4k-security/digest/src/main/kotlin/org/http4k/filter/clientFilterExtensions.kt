@@ -3,13 +3,13 @@ package org.http4k.filter
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.NonceGenerator
-import org.http4k.security.SimpleNonceGenerator
 import org.http4k.security.digest.DigestAuthReceiver
 
 fun ClientFilters.DigestAuth(
     credentials: Credentials,
-    nonceGenerator: NonceGenerator = SimpleNonceGenerator
+    nonceGenerator: NonceGenerator = SECURE_NONCE
 ) =
     DigestAuth({ credentials }, nonceGenerator)
 

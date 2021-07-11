@@ -5,9 +5,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
 import org.http4k.lens.RequestContextLens
+import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.NonceGenerator
 import org.http4k.security.NonceVerifier
-import org.http4k.security.SimpleNonceGenerator
 import org.http4k.security.digest.DigestAuthProvider
 import org.http4k.security.digest.Qop
 
@@ -16,7 +16,7 @@ fun ServerFilters.DigestAuth(
     passwordLookup: (String) -> String?,
     qop: List<Qop> = listOf(Qop.Auth),
     proxy: Boolean = false,
-    nonceGenerator: NonceGenerator = SimpleNonceGenerator,
+    nonceGenerator: NonceGenerator = SECURE_NONCE,
     nonceVerifier: NonceVerifier = { true },
     algorithm: String = "MD5",
     usernameKey: RequestContextLens<String>? = null,

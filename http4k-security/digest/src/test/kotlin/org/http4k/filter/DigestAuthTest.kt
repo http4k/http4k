@@ -7,10 +7,10 @@ import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
-import org.http4k.security.SimpleNonceGenerator
+import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.digest.Qop
 import org.junit.jupiter.api.Test
 
@@ -23,11 +23,11 @@ class DigestAuthTest {
 
     @Test
     fun `invalid credentials`() {
-        val handler = ServerFilters.DigestAuth(realm, passwordLookup, nonceGenerator = SimpleNonceGenerator)
+        val handler = ServerFilters.DigestAuth(realm, passwordLookup, nonceGenerator = SECURE_NONCE)
             .then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "hunter2")).then(handler)(Request(GET, "/"))
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
         assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
     }
 
