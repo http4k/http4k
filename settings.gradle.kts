@@ -56,7 +56,6 @@ include("http4k-metrics-micrometer")
 include("http4k-multipart")
 include("http4k-resilience4j")
 include("http4k-opentelemetry")
-include("http4k-security-oauth")
 include("http4k-realtime-core")
 
 "http4k-server".apply {
@@ -97,6 +96,10 @@ include("http4k-realtime-core")
     includeModule("pebble")
     includeModule("thymeleaf")
     includeModule("jade4j")
+}
+
+"http4k-security".apply {
+    includeModule("oauth")
 }
 
 "http4k-testing".apply {
