@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.9.10.0 (uncut)
+### v4.9.10.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-security-digest*** : New module! H/T @oharaandrew314 for the contribution!
 
