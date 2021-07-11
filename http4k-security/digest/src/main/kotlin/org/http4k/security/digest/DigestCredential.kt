@@ -28,8 +28,9 @@ data class DigestCredential(
         .toString()
 
     companion object {
-        fun fromHeader(header: ParameterizedHeader): DigestCredential? {
-            val (prefix, parameters) = header
+
+        fun fromHeader(headerValue: String): DigestCredential? {
+            val (prefix, parameters) = ParameterizedHeader.parse(headerValue)
             if (!prefix.equals("digest", ignoreCase = true)) return null
 
             return DigestCredential(

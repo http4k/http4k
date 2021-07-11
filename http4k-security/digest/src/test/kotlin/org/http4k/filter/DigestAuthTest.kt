@@ -10,6 +10,7 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.security.digest.DigestMode
 import org.http4k.security.digest.Qop.Auth
 import org.junit.jupiter.api.Test
 
@@ -58,5 +59,14 @@ class DigestAuthTest {
 
         assertThat(response, hasStatus(OK))
         assertThat(response, !hasHeader("WWW-Authenticate"))
+    }
+
+    @Test
+    fun `valid credentials in proxy mode`() {
+        val handler = ServerFilters.DigestAuth(realm, passwordLookup, digestMode = DigestMode.Proxy).then { Response(OK) }
+        val response = ClientFilters.DigestAuth(Credentials("admin", "password"), digestMode = DigestMode.Proxy)
+            .then(handler)(Request(GET, "/"))
+
+        assertThat(response, hasStatus(OK))
     }
 }

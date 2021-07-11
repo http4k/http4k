@@ -6,7 +6,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.security.NonceGenerator
 import org.http4k.security.NonceVerifier
-import org.http4k.security.digest.ParameterizedHeader.Companion.toParameterizedHeader
 import java.security.MessageDigest
 
 /**
@@ -32,8 +31,9 @@ class DigestAuthProvider(
 ) {
 
     fun digestCredentials(request: Request): DigestCredential? {
-        val header = request.header(digestMode.authHeaderName)?.toParameterizedHeader() ?: return null
-        return DigestCredential.fromHeader(header)
+        return request
+            .header(digestMode.authHeaderName)
+            ?.let { DigestCredential.fromHeader(it) }
     }
 
     fun verify(credentials: DigestCredential, method: Method): Boolean {
