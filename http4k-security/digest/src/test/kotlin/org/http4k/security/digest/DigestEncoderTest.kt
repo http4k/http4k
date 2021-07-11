@@ -49,7 +49,7 @@ class DigestEncoderTest {
     }
 
     @Test
-    fun `calculate no-qop response 2`() {
+    fun `calculate no-qop response`() {
         val response = encoder(
             realm = "insecure-server",
             qop = null,
