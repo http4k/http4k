@@ -12,7 +12,6 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
-import org.http4k.security.openid.Nonce
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.time.Clock
@@ -49,7 +48,8 @@ class InsecureCookieBasedOAuthPersistenceTest {
     @Test
     fun `nonce retrieval based on cookie`() {
         assertThat(persistence.retrieveNonce(Request(GET, "")), absent())
-        assertThat(persistence.retrieveNonce(Request(GET, "").cookie(Cookie("prefixNonce", "nonceValue"))), equalTo(Nonce("nonceValue")))
+        assertThat(persistence.retrieveNonce(Request(GET, "").cookie(Cookie("prefixNonce", "nonceValue"))),
+            equalTo(Nonce("nonceValue")))
     }
 
     @Test

@@ -102,7 +102,9 @@ object ClientFilters {
     }
 
     object ProxyBasicAuth {
-        operator fun invoke(provider: () -> Credentials): Filter = CustomBasicAuth.invoke("Proxy-Authorization", provider)
+        operator fun invoke(provider: () -> Credentials): Filter =
+            CustomBasicAuth.invoke("Proxy-Authorization", provider)
+
         operator fun invoke(user: String, password: String): Filter = ProxyBasicAuth(Credentials(user, password))
         operator fun invoke(credentials: Credentials): Filter = ProxyBasicAuth { credentials }
     }
@@ -112,7 +114,9 @@ object ClientFilters {
             { next(it.header(header, "Basic ${provider().base64Encoded()}")) }
         }
 
-        operator fun invoke(header: String, user: String, password: String): Filter = CustomBasicAuth(header, Credentials(user, password))
+        operator fun invoke(header: String, user: String, password: String): Filter =
+            CustomBasicAuth(header, Credentials(user, password))
+
         operator fun invoke(header: String, credentials: Credentials): Filter = CustomBasicAuth(header) { credentials }
 
         private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
@@ -146,7 +150,8 @@ object ClientFilters {
 
         private fun Response.assureBodyIsConsumed() = body.close()
 
-        private fun Response.isRedirection(): Boolean = status.redirection && header("location")?.let(String::isNotBlank) == true
+        private fun Response.isRedirection(): Boolean =
+            status.redirection && header("location")?.let(String::isNotBlank) == true
 
         private fun Request.ensureValidMethodForRedirect(): Request =
             if (method == GET || method == HEAD) this else method(GET)
@@ -185,7 +190,8 @@ object ClientFilters {
             .map { it.cookie }
             .fold(this) { r, cookie -> r.cookie(cookie.name, cookie.value) }
 
-        private fun removeExpired(now: LocalDateTime, storage: CookieStorage) = storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
+        private fun removeExpired(now: LocalDateTime, storage: CookieStorage) =
+            storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
 
         private fun Clock.now() = LocalDateTime.ofInstant(instant(), ZoneOffset.UTC)
     }
@@ -210,7 +216,9 @@ object ClientFilters {
      */
     fun CleanProxy() = Filter { next ->
         {
-            next(it.run { Request(method, uri).body(body).headers(headers) }).run { Response(status).body(body).headers(headers) }
+            next(it.run { Request(method, uri).body(body).headers(headers) }).run {
+                Response(status).body(body).headers(headers)
+            }
         }
     }
 }

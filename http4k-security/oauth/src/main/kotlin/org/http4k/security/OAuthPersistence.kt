@@ -5,7 +5,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Uri
 import org.http4k.security.openid.IdToken
-import org.http4k.security.openid.Nonce
 
 /**
  * Provides persistence for OAuth lifecycle values:

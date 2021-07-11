@@ -12,10 +12,10 @@ import org.http4k.format.asConfigurable
 import org.http4k.format.text
 import org.http4k.format.withStandardMappings
 import org.http4k.security.AccessTokenResponse
+import org.http4k.security.Nonce
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
-import org.http4k.security.openid.Nonce
 
 internal object OAuthServerMoshi : ConfigurableMoshi(
     Moshi.Builder()

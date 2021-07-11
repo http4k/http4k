@@ -7,12 +7,12 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessToken
+import org.http4k.security.Nonce
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 import org.http4k.security.oauth.server.refreshtoken.RefreshToken
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
-import org.http4k.security.openid.Nonce
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
@@ -26,7 +26,8 @@ class DummyAuthorizationCodes(private val request: AuthRequest, private val shou
 
 class DummyIdTokens(private val username: String? = null) : IdTokens {
 
-    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, nonce: Nonce?, code: AuthorizationCode) =
+    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response,
+                                        nonce: Nonce?, code: AuthorizationCode) =
         IdToken("dummy-id-token-for-" + (username ?: "unknown") + "-nonce:" + (nonce?.value ?: "unknown"))
 
     override fun createForAccessToken(authorizationCodeDetails: AuthorizationCodeDetails, code: AuthorizationCode, accessToken: AccessToken): IdToken =

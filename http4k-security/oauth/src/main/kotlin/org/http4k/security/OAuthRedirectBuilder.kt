@@ -3,7 +3,6 @@ package org.http4k.security
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.oauth.server.AuthRequest
-import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwts
 
 typealias RedirectionUriBuilder = (Uri, AuthRequest, state: State, nonce: Nonce?) -> Uri

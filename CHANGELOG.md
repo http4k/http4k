@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.9.10.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-digest*** : New module! H/T @oharaandrew314 for the contribution!
 
 ### v4.9.9.0
 - **http4k-contract** : Fix #626 - Non JSON bodies do not display examples.

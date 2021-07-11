@@ -19,7 +19,6 @@ import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import org.http4k.security.openid.RequestJwts
 import org.junit.jupiter.api.Test

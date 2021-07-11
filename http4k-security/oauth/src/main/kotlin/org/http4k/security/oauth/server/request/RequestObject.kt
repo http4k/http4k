@@ -1,11 +1,11 @@
 package org.http4k.security.oauth.server.request
 
 import org.http4k.core.Uri
+import org.http4k.security.Nonce
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
 import org.http4k.security.oauth.server.ClientId
-import org.http4k.security.openid.Nonce
 
 data class RequestObject(val client: ClientId? = null,
                          val redirectUri: Uri? = null,

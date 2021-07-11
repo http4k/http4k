@@ -6,9 +6,8 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.routing.bind
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
+import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.openid.IdTokenConsumer
-import org.http4k.security.openid.Nonce.Companion.SECURE_NONCE
-import org.http4k.security.openid.NonceGenerator
 import org.http4k.security.openid.RequestJwts
 
 /**

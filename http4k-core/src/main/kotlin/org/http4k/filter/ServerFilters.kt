@@ -38,7 +38,8 @@ data class CorsPolicy(
     val credentials: Boolean = false
 ) {
     companion object {
-        val UnsafeGlobalPermissive = CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.values().toList(), true)
+        val UnsafeGlobalPermissive =
+            CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.values().toList(), true)
     }
 }
 
@@ -64,7 +65,8 @@ object ServerFilters {
                 response.with(
                     Header.required("access-control-allow-origin") of allowedOrigin,
                     Header.required("access-control-allow-headers") of policy.headers.joined(),
-                    Header.required("access-control-allow-methods") of policy.methods.map { method -> method.name }.joined(),
+                    Header.required("access-control-allow-methods") of policy.methods.map { method -> method.name }
+                        .joined(),
                     { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res }
                 )
             }
@@ -124,14 +126,15 @@ object ServerFilters {
         /**
          * Population of a RequestContext with custom principal object
          */
-        operator fun <T> invoke(realm: String, key: RequestContextLens<T>, lookup: (Credentials) -> T?) = Filter { next ->
-            {
-                it.basicAuthenticationCredentials()
-                    ?.let(lookup)
-                    ?.let { found -> next(it.with(key of found)) }
-                    ?: Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
+        operator fun <T> invoke(realm: String, key: RequestContextLens<T>, lookup: (Credentials) -> T?) =
+            Filter { next ->
+                {
+                    it.basicAuthenticationCredentials()
+                        ?.let(lookup)
+                        ?.let { found -> next(it.with(key of found)) }
+                        ?: Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
+                }
             }
-        }
 
         private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")
             ?.trim()

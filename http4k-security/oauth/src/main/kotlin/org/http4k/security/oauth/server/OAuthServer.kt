@@ -12,6 +12,7 @@ import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.Nonce
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
@@ -22,7 +23,6 @@ import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
 import org.http4k.security.oauth.server.refreshtoken.RefreshToken
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.oauth.server.request.RequestJWTValidator
-import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import java.time.Clock
 
@@ -154,7 +154,7 @@ data class ClientId(val value: String)
 
 data class AuthorizationCode(val value: String)
 
-internal fun Request.authorizationRequest() =
+fun Request.authorizationRequest() =
     AuthRequest(
         OAuthServer.clientIdQueryParameter(this),
         OAuthServer.scopesQueryParameter(this) ?: listOf(),

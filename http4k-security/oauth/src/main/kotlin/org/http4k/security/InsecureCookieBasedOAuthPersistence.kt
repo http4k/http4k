@@ -8,7 +8,6 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
 import org.http4k.security.openid.IdToken
-import org.http4k.security.openid.Nonce
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
@@ -33,7 +32,8 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     override fun retrieveToken(request: Request): AccessToken? = request.cookie(accessTokenCookieName)?.value?.let { AccessToken(it) }
 
-    override fun retrieveNonce(request: Request): Nonce? = request.cookie(nonceName)?.value?.let { Nonce(it) }
+    override fun retrieveNonce(request: Request): Nonce? =
+        request.cookie(nonceName)?.value?.let { Nonce(it) }
 
     override fun retrieveOriginalUri(request: Request): Uri? = request.cookie(originalUriName)?.value?.let { Uri.of(it) }
 

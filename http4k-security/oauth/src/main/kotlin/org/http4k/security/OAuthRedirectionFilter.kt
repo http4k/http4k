@@ -8,11 +8,9 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.Header.LOCATION
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
+import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.oauth.server.AuthRequest
 import org.http4k.security.oauth.server.ClientId
-import org.http4k.security.openid.Nonce
-import org.http4k.security.openid.Nonce.Companion.SECURE_NONCE
-import org.http4k.security.openid.NonceGenerator
 
 class OAuthRedirectionFilter(
     private val providerConfig: OAuthProviderConfig,
@@ -43,16 +41,18 @@ class OAuthRedirectionFilter(
 
             val redirect = Response(TEMPORARY_REDIRECT)
                 .with(LOCATION of modifyState(redirectionBuilder(providerConfig.authUri, authRequest, state, nonce)))
-            assignNonceIfRequired(oAuthPersistence.assignOriginalUri(oAuthPersistence.assignCsrf(redirect, csrf), it.uri), nonce)
+            assignNonceIfRequired(
+                oAuthPersistence.assignOriginalUri(
+                    oAuthPersistence.assignCsrf(redirect, csrf),
+                    it.uri
+                ), nonce
+            )
         }
     }
 
-    private fun generateNonceIfRequired() = if (responseType == ResponseType.CodeIdToken) nonceGenerator.invoke() else null
+    private fun generateNonceIfRequired() =
+        if (responseType == ResponseType.CodeIdToken) nonceGenerator.invoke() else null
 
     private fun assignNonceIfRequired(redirect: Response, nonce: Nonce?): Response =
-        if (nonce != null) {
-            oAuthPersistence.assignNonce(redirect, nonce)
-        } else {
-            redirect
-        }
+        if (nonce != null) oAuthPersistence.assignNonce(redirect, nonce) else redirect
 }
