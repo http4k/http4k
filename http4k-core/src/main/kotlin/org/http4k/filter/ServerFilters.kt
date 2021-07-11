@@ -20,6 +20,10 @@ import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
+import org.http4k.filter.auth.digest.DigestAuthProvider
+import org.http4k.filter.auth.digest.GenerateOnlyNonceGenerator
+import org.http4k.filter.auth.digest.NonceGenerator
+import org.http4k.filter.auth.digest.Qop
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -210,6 +214,32 @@ object ServerFilters {
                 when {
                     validate(it) -> next(it)
                     else -> Response(UNAUTHORIZED)
+                }
+            }
+        }
+    }
+
+    object DigestAuth {
+        operator fun invoke(
+            realm: String,
+            passwordLookup: (String) -> String?,
+            qop: List<Qop> = listOf(Qop.Auth),
+            proxy: Boolean = false,
+            nonceGenerator: NonceGenerator = GenerateOnlyNonceGenerator(),
+            algorithm: String = "MD5",
+            usernameKey: RequestContextLens<String>? = null,
+        ): Filter {
+            val provider = DigestAuthProvider(realm, passwordLookup, qop, proxy, nonceGenerator, algorithm)
+            return Filter { next ->
+                filter@{ request ->
+                    val credentials = provider.getDigestCredentials(request) ?: return@filter provider.generateChallenge()
+                    if (!provider.verify(credentials, request.method)) return@filter Response(UNAUTHORIZED)
+
+                    if (usernameKey != null) {
+                        next(request.with(usernameKey of credentials.username))
+                    } else {
+                        next(request)
+                    }
                 }
             }
         }

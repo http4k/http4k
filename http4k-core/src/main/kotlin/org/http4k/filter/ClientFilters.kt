@@ -10,6 +10,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.HEAD
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
@@ -19,6 +20,9 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
+import org.http4k.filter.auth.digest.DigestAuthReceiver
+import org.http4k.filter.auth.digest.NonceGenerator
+import org.http4k.filter.auth.digest.GenerateOnlyNonceGenerator
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
@@ -124,6 +128,26 @@ object ClientFilters {
         }
 
         operator fun invoke(token: String): Filter = BearerAuth { token }
+    }
+
+    object DigestAuth {
+        operator fun invoke(credentials: Credentials, nonceGenerator: NonceGenerator = GenerateOnlyNonceGenerator()) = DigestAuth({ credentials }, nonceGenerator)
+
+        operator fun invoke(credentials: () -> Credentials, nonceGenerator: NonceGenerator = GenerateOnlyNonceGenerator()): Filter {
+            val receiver = DigestAuthReceiver(nonceGenerator, proxy = false)
+
+            return Filter { next ->
+                op@{ request ->
+                    // TODO cache header for pre-emptive authorization?
+                    val response = next(request)
+                    if (response.status != Status.UNAUTHORIZED) return@op response
+
+                    val challenge = receiver.getChallengeHeader(response) ?: return@op response
+                    val withDigest = receiver.authorizeRequest(request, challenge, credentials())
+                    next(withDigest)
+                }
+            }
+        }
     }
 
     class FollowRedirects : Filter {
