@@ -15,20 +15,24 @@ import java.security.MessageDigest
  * TODO add support for opaque in challenge.  Unknown if it needs to be verified, or how it should be generated (i.e. static, user-specific, etc.)
  * The IOT device I used for testing constantly returned the same opaque
  */
+
+enum class DigestMode(val authHeaderName: String, val challengeHeaderName: String) {
+    Standard("Authorization", "WWW-Authenticate"),
+    Proxy("Proxy-Authorization", "Proxy-Authenticate")
+}
+
 class DigestAuthProvider(
     private val realm: String,
     private val passwordLookup: (String) -> String?,
     private val qop: List<Qop>,
-    proxy: Boolean,
     private val algorithm: String,
     private val nonceGenerator: NonceGenerator,
-    private val nonceVerifier: NonceVerifier = { true }
+    private val nonceVerifier: NonceVerifier = { true },
+    private val digestMode: DigestMode = DigestMode.Standard
 ) {
-    private val authHeaderName = if (proxy) "Proxy-Authorization" else "Authorization"
-    private val challengeHeaderName = if (proxy) "Proxy-Authenticate" else "WWW-Authenticate"
 
     fun digestCredentials(request: Request): DigestCredential? {
-        val header = request.header(authHeaderName)?.toParameterizedHeader() ?: return null
+        val header = request.header(digestMode.authHeaderName)?.toParameterizedHeader() ?: return null
         return DigestCredential.fromHeader(header)
     }
 
@@ -69,6 +73,6 @@ class DigestAuthProvider(
             opaque = null
         )
 
-        return Response(UNAUTHORIZED).header(challengeHeaderName, header.toHeaderValue())
+        return Response(UNAUTHORIZED).header(digestMode.challengeHeaderName, header.toHeaderValue())
     }
 }
