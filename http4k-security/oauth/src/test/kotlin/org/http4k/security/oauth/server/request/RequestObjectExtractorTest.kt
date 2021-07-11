@@ -14,7 +14,6 @@ import org.http4k.security.State
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.InvalidRequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.extractRequestJwtClaimsAsMap
-import org.http4k.security.openid.Nonce
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -82,7 +81,7 @@ internal class RequestObjectExtractorTest {
             redirectUri = Uri.of("https://client.example.org/cb"),
             scope = listOf("openid"),
             state = State("af0ifjsldkj"),
-            nonce = Nonce("n-0S6_WzA2Mj"),
+            nonce = org.http4k.security.Nonce("n-0S6_WzA2Mj"),
             magAge = 86400,
             expiry = expiry,
             claims = Claims(

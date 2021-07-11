@@ -12,7 +12,7 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.Nonce
-import org.http4k.security.NonceGeneratorVerifier
+import org.http4k.security.NonceVerifier
 import org.http4k.security.digest.DigestCalculator
 import org.http4k.security.digest.DigestCredential
 import org.http4k.security.digest.Qop
@@ -28,11 +28,8 @@ class ServerDigestAuthTest {
 
     private var nextNonce = Nonce("abcdefgh")
 
-    private val nonceGeneratorVerifier = object : NonceGeneratorVerifier {
-        override fun invoke(nonce: Nonce) = nonce == nextNonce
-
-        override fun invoke(): Nonce = nextNonce
-    }
+    private val nonceGenerator = { nextNonce }
+    private val nonceVerifier: NonceVerifier = { it == nextNonce }
 
     private val credentials = mapOf(
         "admin" to "password",
@@ -42,7 +39,13 @@ class ServerDigestAuthTest {
     val digestCalculator = DigestCalculator(MessageDigest.getInstance("MD5"))
 
     private val handler = ServerFilters
-        .DigestAuth(realm, { credentials[it] }, listOf(Qop.Auth), nonceGenerator = nonceGeneratorVerifier)
+        .DigestAuth(
+            realm,
+            { credentials[it] },
+            listOf(Qop.Auth),
+            nonceGenerator = nonceGenerator,
+            nonceVerifier = nonceVerifier
+        )
         .then { Response(Status.OK) }
 
     @Test

@@ -12,7 +12,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 import org.http4k.security.Nonce
-import org.http4k.security.NonceGeneratorVerifier
+import org.http4k.security.NonceVerifier
 import org.http4k.security.digest.DigestChallenge
 import org.http4k.security.digest.Qop.Auth
 import org.junit.jupiter.api.Test
@@ -21,11 +21,7 @@ class ClientDigestAuthTest {
 
     private var nextNonce = Nonce("c1234")
 
-    private val nonceGeneratorVerifier = object : NonceGeneratorVerifier {
-        override fun invoke(nonce: Nonce) = nonce == nextNonce
-
-        override fun invoke(): Nonce = nextNonce
-    }
+    private val nonceGenerator = { nextNonce }
 
     @Test
     fun `ignore if no challenge`() {
@@ -70,7 +66,7 @@ class ClientDigestAuthTest {
             }
         }
 
-        val response = ClientFilters.DigestAuth(Credentials("user", "password"), nonceGeneratorVerifier)
+        val response = ClientFilters.DigestAuth(Credentials("user", "password"), nonceGenerator)
             .then(handler)(Request(Method.GET, "/"))
 
         assertThat(response.status, equalTo(OK))

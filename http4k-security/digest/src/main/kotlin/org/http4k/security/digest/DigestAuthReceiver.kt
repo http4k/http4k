@@ -5,22 +5,21 @@ import org.http4k.core.Credentials
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.security.Nonce
-import org.http4k.security.NonceGeneratorVerifier
-import org.http4k.util.Hex
+import org.http4k.security.NonceGenerator
 import org.http4k.util.Hex.hex
 import java.security.MessageDigest
 
 /**
  * For use in clients.  Generates responses to Digest Auth challenges
  */
-class DigestAuthReceiver(private val nonceGeneratorVerifier: NonceGeneratorVerifier, proxy: Boolean) {
+class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, proxy: Boolean) {
 
     private val authHeader = if (proxy) "Proxy-Authorization" else "Authorization"
     private val challengeHeader = if (proxy) "Proxy-Authenticate" else "WWW-Authenticate"
 
     private var lastNonce: Nonce? = null
     private var nonceCount: Long = 0
-    private var cnonce: Nonce = nonceGeneratorVerifier()
+    private var cnonce = nonceGenerator()
 
     fun getChallengeHeader(response: Response): DigestChallenge? {
         val headerValue = response.header(challengeHeader) ?: return null
@@ -35,7 +34,7 @@ class DigestAuthReceiver(private val nonceGeneratorVerifier: NonceGeneratorVerif
             nonceCount++
         } else {
             nonceCount = 1
-            cnonce = nonceGeneratorVerifier()
+            cnonce = nonceGenerator()
             lastNonce = challenge.nonce
         }
 

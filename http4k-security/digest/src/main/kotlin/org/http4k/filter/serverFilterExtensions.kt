@@ -5,8 +5,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
 import org.http4k.lens.RequestContextLens
-import org.http4k.security.GenerateOnlyNonceGeneratorVerifier
-import org.http4k.security.NonceGeneratorVerifier
+import org.http4k.security.NonceGenerator
+import org.http4k.security.NonceVerifier
+import org.http4k.security.SimpleNonceGenerator
 import org.http4k.security.digest.DigestAuthProvider
 import org.http4k.security.digest.Qop
 
@@ -15,11 +16,12 @@ fun ServerFilters.DigestAuth(
     passwordLookup: (String) -> String?,
     qop: List<Qop> = listOf(Qop.Auth),
     proxy: Boolean = false,
-    nonceGenerator: NonceGeneratorVerifier = GenerateOnlyNonceGeneratorVerifier(),
+    nonceGenerator: NonceGenerator = SimpleNonceGenerator,
+    nonceVerifier: NonceVerifier = { true },
     algorithm: String = "MD5",
     usernameKey: RequestContextLens<String>? = null,
 ): Filter {
-    val provider = DigestAuthProvider(realm, passwordLookup, qop, proxy, nonceGenerator, algorithm)
+    val provider = DigestAuthProvider(realm, passwordLookup, qop, proxy, algorithm, nonceGenerator, nonceVerifier)
     return Filter { next ->
         filter@{ request ->
             val credentials = provider.digestCredentials(request) ?: return@filter provider.generateChallenge()

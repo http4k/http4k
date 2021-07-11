@@ -1,5 +1,7 @@
 package org.http4k.security.openid
 
+import org.http4k.security.Nonce
+
 interface IdTokenConsumer {
     fun nonceFromIdToken(idToken: IdToken): Nonce?
     fun consumeFromAuthorizationResponse(idToken: IdToken)

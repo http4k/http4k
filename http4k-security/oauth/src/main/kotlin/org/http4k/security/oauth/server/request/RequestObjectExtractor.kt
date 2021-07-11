@@ -17,15 +17,14 @@ import org.http4k.security.oauth.server.map
 import org.http4k.security.oauth.server.string
 import org.http4k.security.oauth.server.strings
 import org.http4k.security.oauth.server.value
-import org.http4k.security.openid.Nonce
 import java.util.Base64
 
 object RequestObjectExtractor {
 
-    internal fun extractRequestJwtClaimsAsMap(value: String): Result<Map<*, *>, InvalidRequestObject> =
+    fun extractRequestJwtClaimsAsMap(value: String): Result<Map<*, *>, InvalidRequestObject> =
         parseJsonFromJWT(value)
 
-    internal fun extractRequestObjectFromJwt(value: String): Result<RequestObject, InvalidRequestObject> =
+    fun extractRequestObjectFromJwt(value: String): Result<RequestObject, InvalidRequestObject> =
         parseJsonFromJWT(value)
             .map { jsonFromJWT ->
                 with(jsonFromJWT) {
@@ -38,7 +37,7 @@ object RequestObjectExtractor {
                         responseMode = value("response_mode", ResponseMode::fromQueryParameterValue),
                         responseType = value("response_type", ResponseType::fromQueryParameterValue),
                         state = value("state", ::State),
-                        nonce = value("nonce", ::Nonce),
+                        nonce = value("nonce") { org.http4k.security.Nonce(it) },
                         magAge = long("max_age"),
                         expiry = long("exp"),
                         claims = toClaims(this["claims"])

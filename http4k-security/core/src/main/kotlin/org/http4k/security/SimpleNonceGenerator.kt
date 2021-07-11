@@ -3,10 +3,8 @@ package org.http4k.security
 import org.http4k.util.Hex
 import java.security.SecureRandom
 
-class GenerateOnlyNonceGeneratorVerifier : NonceGeneratorVerifier {
+object SimpleNonceGenerator : NonceGenerator {
     private val random = SecureRandom()
-
-    override fun invoke(nonce: Nonce): Boolean = true
 
     override fun invoke(): Nonce {
         val tmp = ByteArray(length)
@@ -14,9 +12,7 @@ class GenerateOnlyNonceGeneratorVerifier : NonceGeneratorVerifier {
         return Nonce(Hex.hex(tmp))
     }
 
-    companion object {
-        private const val length = 8
-    }
+    private const val length = 8
 }
 
 /**
