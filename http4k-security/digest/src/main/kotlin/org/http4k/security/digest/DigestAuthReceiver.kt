@@ -12,17 +12,14 @@ import java.security.MessageDigest
 /**
  * For use in clients.  Generates responses to Digest Auth challenges
  */
-class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, proxy: Boolean) {
-
-    private val authHeader = if (proxy) "Proxy-Authorization" else "Authorization"
-    private val challengeHeader = if (proxy) "Proxy-Authenticate" else "WWW-Authenticate"
+class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, private val digestMode: DigestMode) {
 
     private var lastNonce: Nonce? = null
     private var nonceCount: Long = 0
     private var cnonce = nonceGenerator()
 
     fun getChallengeHeader(response: Response): DigestChallenge? {
-        val headerValue = response.header(challengeHeader) ?: return null
+        val headerValue = response.header(digestMode.challengeHeaderName) ?: return null
         return DigestChallenge.parse(headerValue)
     }
 
@@ -81,7 +78,7 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, proxy: Bool
             qop = qop
         )
 
-        return request.header(authHeader, digestCredentials.toHeaderValue())
+        return request.header(digestMode.authHeaderName, digestCredentials.toHeaderValue())
     }
 
     companion object {

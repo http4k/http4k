@@ -6,18 +6,21 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.NonceGenerator
 import org.http4k.security.digest.DigestAuthReceiver
+import org.http4k.security.digest.DigestMode
 
 fun ClientFilters.DigestAuth(
     credentials: Credentials,
-    nonceGenerator: NonceGenerator = SECURE_NONCE
+    nonceGenerator: NonceGenerator = SECURE_NONCE,
+    digestMode: DigestMode = DigestMode.Standard
 ) =
-    DigestAuth({ credentials }, nonceGenerator)
+    DigestAuth({ credentials }, nonceGenerator, digestMode)
 
 fun ClientFilters.DigestAuth(
     credentials: () -> Credentials,
-    nonceGenerator: NonceGenerator
+    nonceGenerator: NonceGenerator,
+    digestMode: DigestMode = DigestMode.Standard
 ): Filter {
-    val receiver = DigestAuthReceiver(nonceGenerator, proxy = false)
+    val receiver = DigestAuthReceiver(nonceGenerator, digestMode)
 
     return Filter { next ->
         op@{ request ->
