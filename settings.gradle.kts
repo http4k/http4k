@@ -99,6 +99,7 @@ include("http4k-realtime-core")
 }
 
 "http4k-security".apply {
+    includeModule("digest")
     includeModule("oauth")
 }
 
