@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.security.digest
 
 data class ParameterizedHeader(
     val prefix: String,

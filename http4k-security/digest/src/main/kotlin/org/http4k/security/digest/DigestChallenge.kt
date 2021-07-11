@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.security.digest
 
 import org.http4k.appendIf
 import org.http4k.appendIfPresent
@@ -35,7 +35,7 @@ data class DigestChallenge(
                 algorithm = parameters["algorithm"],
                 qop = (parameters["qop"] ?: "")
                     .split(",")
-                    .mapNotNull { Qop.parse(it.trim()) },
+                    .mapNotNull { Qop.from(it.trim()) },
                 opaque = parameters["opaque"]
             )
         }

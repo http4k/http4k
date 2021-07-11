@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.security.digest
 
 import org.http4k.appendIfPresent
 import org.http4k.util.Hex
@@ -41,7 +41,7 @@ data class DigestCredential(
                 algorithm = parameters["algorithm"],
                 response = parameters["response"] ?: return null,
                 cnonce = parameters["cnonce"],
-                qop = parameters["qop"]?.let { Qop.parse(it) }
+                qop = parameters["qop"]?.let { Qop.from(it) }
             )
         }
     }

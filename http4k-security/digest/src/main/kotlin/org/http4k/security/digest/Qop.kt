@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.security.digest
 
 /**
  * Quality-of-Protection describes the security level of the Authorization challenge
@@ -8,7 +8,6 @@ enum class Qop(val value: String) {
     Auth("auth");
 
     companion object {
-        fun parse(value: String) = values()
-            .firstOrNull { it.value == value }
+        fun from(value: String) = values().firstOrNull { it.value == value }
     }
 }

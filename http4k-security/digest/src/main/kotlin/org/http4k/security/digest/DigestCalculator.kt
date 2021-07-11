@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.security.digest
 
 import org.http4k.core.Method
 import org.http4k.util.Hex

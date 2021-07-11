@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -10,7 +10,9 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters
+import org.http4k.security.digest.DigestChallenge
+import org.http4k.security.digest.NonceGenerator
+import org.http4k.security.digest.Qop
 import org.junit.jupiter.api.Test
 
 class ClientDigestAuthTest {
@@ -69,6 +71,9 @@ class ClientDigestAuthTest {
 
         assertThat(response.status, equalTo(Status.OK))
         // ensure the client sent an Authorization digest, and verify it is consistent given a consistent nonce and cnonce
-        assertThat(response.bodyString(), equalTo("Digest realm=\"http4k\", username=\"user\", uri=\"/\", nonce=\"1234abcd\", response=\"92582b92a7eacede09d20533466616e8\", nc=00000001, algorithm=MD5, cnonce=\"c1234\", qop=\"auth\""))
+        assertThat(
+            response.bodyString(),
+            equalTo("Digest realm=\"http4k\", username=\"user\", uri=\"/\", nonce=\"1234abcd\", response=\"92582b92a7eacede09d20533466616e8\", nc=00000001, algorithm=MD5, cnonce=\"c1234\", qop=\"auth\"")
+        )
     }
 }

@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -9,8 +9,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters
-import org.http4k.filter.ServerFilters
+import org.http4k.security.digest.Qop
 import org.junit.jupiter.api.Test
 
 class DigestAuthTest {
@@ -32,7 +31,12 @@ class DigestAuthTest {
     @Test
     fun `valid credentials with Auth Qop`() {
         val handler = ServerFilters.DigestAuth(realm, passwordLookup, qop = listOf(Qop.Auth)).then { Response(Status.OK) }
-        val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(Request(Method.GET, "/"))
+        val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(
+            Request(
+                Method.GET,
+                "/"
+            )
+        )
 
         assertThat(response.status, equalTo(Status.OK))
         assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
@@ -50,7 +54,12 @@ class DigestAuthTest {
     @Test
     fun `valid credentials with no qop`() {
         val handler = ServerFilters.DigestAuth(realm, passwordLookup, qop = emptyList()).then { Response(Status.OK) }
-        val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(Request(Method.GET, "/"))
+        val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(
+            Request(
+                Method.GET,
+                "/"
+            )
+        )
 
         assertThat(response.status, equalTo(Status.OK))
         assertThat(response.header("WWW-Authenticate"), isNullOrBlank)

@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -8,7 +8,10 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
-import org.http4k.filter.ServerFilters
+import org.http4k.security.digest.DigestCalculator
+import org.http4k.security.digest.DigestCredential
+import org.http4k.security.digest.NonceGenerator
+import org.http4k.security.digest.Qop
 import org.http4k.util.Hex
 import org.junit.jupiter.api.Test
 import java.security.MessageDigest
@@ -41,7 +44,10 @@ class ServerDigestAuthTest {
         val response = handler(Request(Method.GET, "/"))
 
         assertThat(response.status, equalTo(Status.UNAUTHORIZED))
-        assertThat(response.header("WWW-Authenticate"), equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth""""))
+        assertThat(
+            response.header("WWW-Authenticate"),
+            equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+        )
     }
 
     @Test
@@ -52,7 +58,10 @@ class ServerDigestAuthTest {
         val response = handler(request)
 
         assertThat(response.status, equalTo(Status.UNAUTHORIZED))
-        assertThat(response.header("WWW-Authenticate"), equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth""""))
+        assertThat(
+            response.header("WWW-Authenticate"),
+            equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+        )
     }
 
     @Test
@@ -134,7 +143,19 @@ class ServerDigestAuthTest {
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
-            response = Hex.hex(digestCalculator.encode(method = Method.POST, realm = realm, qop = Qop.Auth, username = "admin", password = "password", nonce = nextNonce, cnonce="c123", nonceCount = 1, digestUri = "/")),
+            response = Hex.hex(
+                digestCalculator.encode(
+                    method = Method.POST,
+                    realm = realm,
+                    qop = Qop.Auth,
+                    username = "admin",
+                    password = "password",
+                    nonce = nextNonce,
+                    cnonce = "c123",
+                    nonceCount = 1,
+                    digestUri = "/"
+                )
+            ),
             username = "admin",
             cnonce = "c123",
             qop = Qop.Auth,
@@ -158,7 +179,19 @@ class ServerDigestAuthTest {
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
-            response = Hex.hex(digestCalculator.encode(method = Method.GET, realm = realm, qop = Qop.Auth, username = "admin", password = "letmein", nonce = nextNonce, cnonce="c123", nonceCount = 1, digestUri = "/")),
+            response = Hex.hex(
+                digestCalculator.encode(
+                    method = Method.GET,
+                    realm = realm,
+                    qop = Qop.Auth,
+                    username = "admin",
+                    password = "letmein",
+                    nonce = nextNonce,
+                    cnonce = "c123",
+                    nonceCount = 1,
+                    digestUri = "/"
+                )
+            ),
             username = "admin",
             cnonce = "c123",
             qop = Qop.Auth,
@@ -181,7 +214,19 @@ class ServerDigestAuthTest {
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
-            response = Hex.hex(digestCalculator.encode(method = Method.GET, realm = realm, qop = Qop.Auth, username = "admin", password = "password", nonce = nextNonce, cnonce="c123", nonceCount = 1, digestUri = "/")),
+            response = Hex.hex(
+                digestCalculator.encode(
+                    method = Method.GET,
+                    realm = realm,
+                    qop = Qop.Auth,
+                    username = "admin",
+                    password = "password",
+                    nonce = nextNonce,
+                    cnonce = "c123",
+                    nonceCount = 1,
+                    digestUri = "/"
+                )
+            ),
             username = "admin",
             cnonce = "c123",
             qop = Qop.Auth,

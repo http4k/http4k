@@ -1,4 +1,4 @@
-package org.http4k.filter.auth.digest
+package org.http4k.security.digest
 
 import org.http4k.util.Hex
 import java.security.SecureRandom
@@ -12,7 +12,7 @@ interface NonceGenerator {
     fun verify(nonce: String): Boolean
 }
 
-class GenerateOnlyNonceGenerator: NonceGenerator {
+class GenerateOnlyNonceGenerator : NonceGenerator {
 
     companion object {
         private const val length = 8
@@ -26,9 +26,7 @@ class GenerateOnlyNonceGenerator: NonceGenerator {
         return Hex.hex(tmp)
     }
 
-    override fun verify(nonce: String): Boolean {
-        return true
-    }
+    override fun verify(nonce: String) = true
 }
 
 /**
