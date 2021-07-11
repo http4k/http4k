@@ -18,7 +18,5 @@ data class ParameterizedHeader(
 
             return ParameterizedHeader(prefix, parameters)
         }
-
-        fun String.toParameterizedHeader() = parse(this)
     }
 }
