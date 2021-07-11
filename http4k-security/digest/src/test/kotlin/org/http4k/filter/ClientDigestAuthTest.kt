@@ -8,25 +8,29 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
+import org.http4k.security.Nonce
+import org.http4k.security.NonceGeneratorVerifier
 import org.http4k.security.digest.DigestChallenge
-import org.http4k.security.digest.NonceGenerator
-import org.http4k.security.digest.Qop
+import org.http4k.security.digest.Qop.Auth
 import org.junit.jupiter.api.Test
 
 class ClientDigestAuthTest {
 
-    private var nextNonce = "c1234"
-    private val nonceManager = object: NonceGenerator {
-        override fun generate() = nextNonce
-        override fun verify(nonce: String) = nonce == nextNonce
+    private var nextNonce = Nonce("c1234")
+
+    private val nonceGeneratorVerifier = object : NonceGeneratorVerifier {
+        override fun invoke(nonce: Nonce) = nonce == nextNonce
+
+        override fun invoke(): Nonce = nextNonce
     }
 
     @Test
     fun `ignore if no challenge`() {
-       // handler returns Authorization header as body
-        val handler: HttpHandler = { Response(Status.OK).body(it.header("Authorization") ?: "") }
+        // handler returns Authorization header as body
+        val handler: HttpHandler = { Response(OK).body(it.header("Authorization") ?: "") }
 
         val response = ClientFilters.DigestAuth(Credentials("user", "password"))
             .then(handler)(Request(Method.GET, "/"))
@@ -38,7 +42,7 @@ class ClientDigestAuthTest {
     @Test
     fun `ignore if 401 with no challenge`() {
         // handler returns Authorization header as body
-        val handler: HttpHandler = { Response(Status.UNAUTHORIZED).body(it.header("Authorization") ?: "") }
+        val handler: HttpHandler = { Response(UNAUTHORIZED).body(it.header("Authorization") ?: "") }
 
         val response = ClientFilters.DigestAuth(Credentials("user", "password"))
             .then(handler)(Request(Method.GET, "/"))
@@ -54,22 +58,22 @@ class ClientDigestAuthTest {
                 // if no authorization given, present challenge
                 val challenge = DigestChallenge(
                     realm = "http4k",
-                    nonce = "1234abcd",
+                    nonce = Nonce("1234abcd"),
                     algorithm = "MD5",
-                    qop = listOf(Qop.Auth),
+                    qop = listOf(Auth),
                     opaque = null
                 )
-                Response(Status.UNAUTHORIZED).header("WWW-Authenticate", challenge.toHeaderValue())
+                Response(UNAUTHORIZED).header("WWW-Authenticate", challenge.toHeaderValue())
             } else {
                 // if authorization given, return it in body
-                Response(Status.OK).body(request.header("Authorization") ?: "")
+                Response(OK).body(request.header("Authorization") ?: "")
             }
         }
 
-        val response = ClientFilters.DigestAuth(Credentials("user", "password"), nonceManager)
+        val response = ClientFilters.DigestAuth(Credentials("user", "password"), nonceGeneratorVerifier)
             .then(handler)(Request(Method.GET, "/"))
 
-        assertThat(response.status, equalTo(Status.OK))
+        assertThat(response.status, equalTo(OK))
         // ensure the client sent an Authorization digest, and verify it is consistent given a consistent nonce and cnonce
         assertThat(
             response.bodyString(),

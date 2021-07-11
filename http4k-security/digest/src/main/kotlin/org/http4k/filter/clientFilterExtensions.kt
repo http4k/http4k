@@ -3,16 +3,19 @@ package org.http4k.filter
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.Status
+import org.http4k.security.GenerateOnlyNonceGeneratorVerifier
+import org.http4k.security.NonceGeneratorVerifier
 import org.http4k.security.digest.DigestAuthReceiver
-import org.http4k.security.digest.GenerateOnlyNonceGenerator
-import org.http4k.security.digest.NonceGenerator
 
-fun ClientFilters.DigestAuth(credentials: Credentials, nonceGenerator: NonceGenerator = GenerateOnlyNonceGenerator()) =
+fun ClientFilters.DigestAuth(
+    credentials: Credentials,
+    nonceGenerator: NonceGeneratorVerifier = GenerateOnlyNonceGeneratorVerifier()
+) =
     DigestAuth({ credentials }, nonceGenerator)
 
 fun ClientFilters.DigestAuth(
     credentials: () -> Credentials,
-    nonceGenerator: NonceGenerator = GenerateOnlyNonceGenerator()
+    nonceGenerator: NonceGeneratorVerifier = GenerateOnlyNonceGeneratorVerifier()
 ): Filter {
     val receiver = DigestAuthReceiver(nonceGenerator, proxy = false)
 

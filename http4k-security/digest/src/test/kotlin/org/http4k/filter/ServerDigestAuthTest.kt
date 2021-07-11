@@ -4,13 +4,17 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isNullOrBlank
 import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
+import org.http4k.hamkrest.hasStatus
+import org.http4k.security.Nonce
+import org.http4k.security.NonceGeneratorVerifier
 import org.http4k.security.digest.DigestCalculator
 import org.http4k.security.digest.DigestCredential
-import org.http4k.security.digest.NonceGenerator
 import org.http4k.security.digest.Qop
 import org.http4k.util.Hex
 import org.junit.jupiter.api.Test
@@ -22,10 +26,12 @@ class ServerDigestAuthTest {
         private const val realm = "http4k"
     }
 
-    private var nextNonce = "abcdefgh"
-    private val nonceGenerator = object: NonceGenerator {
-        override fun generate() = nextNonce
-        override fun verify(nonce: String) = nonce == nextNonce
+    private var nextNonce = Nonce("abcdefgh")
+
+    private val nonceGeneratorVerifier = object : NonceGeneratorVerifier {
+        override fun invoke(nonce: Nonce) = nonce == nextNonce
+
+        override fun invoke(): Nonce = nextNonce
     }
 
     private val credentials = mapOf(
@@ -36,14 +42,14 @@ class ServerDigestAuthTest {
     val digestCalculator = DigestCalculator(MessageDigest.getInstance("MD5"))
 
     private val handler = ServerFilters
-        .DigestAuth(realm, { credentials[it] }, listOf(Qop.Auth), nonceGenerator = nonceGenerator)
+        .DigestAuth(realm, { credentials[it] }, listOf(Qop.Auth), nonceGenerator = nonceGeneratorVerifier)
         .then { Response(Status.OK) }
 
     @Test
     fun `no credentials - returns challenge`() {
-        val response = handler(Request(Method.GET, "/"))
+        val response = handler(Request(GET, "/"))
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(
             response.header("WWW-Authenticate"),
             equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
@@ -52,12 +58,12 @@ class ServerDigestAuthTest {
 
     @Test
     fun `basic credentials - returns challenge`() {
-        val request = Request(Method.GET, "/")
+        val request = Request(GET, "/")
             .header("Authorization", "Basic hunter2")
 
         val response = handler(request)
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(
             response.header("WWW-Authenticate"),
             equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
@@ -73,18 +79,18 @@ class ServerDigestAuthTest {
             nonceCount = 1,
             response = "abcdefgh",
             username = "admin",
-            cnonce = "c123",
+            cnonce = Nonce("c123"),
             qop = Qop.Auth,
             algorithm = "MD5",
             opaque = null
         )
 
-        val request = Request(Method.GET, "/")
+        val request = Request(GET, "/")
             .header("Authorization", credentials.toHeaderValue())
 
         val response = handler(request)
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
     }
 
@@ -97,18 +103,18 @@ class ServerDigestAuthTest {
             nonceCount = 1,
             response = "abcdefgh",  // TODO valid response for another user
             username = "missingUser",
-            cnonce = "c123",
+            cnonce = Nonce("c123"),
             qop = Qop.Auth,
             algorithm = "MD5",
             opaque = null
         )
 
-        val request = Request(Method.GET, "/")
+        val request = Request(GET, "/")
             .header("Authorization", credentials.toHeaderValue())
 
         val response = handler(request)
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
     }
 
@@ -121,18 +127,18 @@ class ServerDigestAuthTest {
             nonceCount = 1,
             response = "abcdefgh",  // TODO valid response
             username = "admin",
-            cnonce = "c123",
+            cnonce = Nonce("c123"),
             qop = Qop.Auth,
             algorithm = "MD5",
             opaque = null
         )
 
-        val request = Request(Method.GET, "/")
+        val request = Request(GET, "/")
             .header("Authorization", credentials.toHeaderValue())
 
         val response = handler(request)
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
     }
 
@@ -151,24 +157,24 @@ class ServerDigestAuthTest {
                     username = "admin",
                     password = "password",
                     nonce = nextNonce,
-                    cnonce = "c123",
+                    cnonce = Nonce("c123"),
                     nonceCount = 1,
                     digestUri = "/"
                 )
             ),
             username = "admin",
-            cnonce = "c123",
+            cnonce = Nonce("c123"),
             qop = Qop.Auth,
             algorithm = "MD5",
             opaque = null
         )
 
-        val request = Request(Method.GET, "/")
+        val request = Request(GET, "/")
             .header("Authorization", credentials.toHeaderValue())
 
         val response = handler(request)
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
     }
 
@@ -181,30 +187,30 @@ class ServerDigestAuthTest {
             nonceCount = 1,
             response = Hex.hex(
                 digestCalculator.encode(
-                    method = Method.GET,
+                    method = GET,
                     realm = realm,
                     qop = Qop.Auth,
                     username = "admin",
                     password = "letmein",
                     nonce = nextNonce,
-                    cnonce = "c123",
+                    cnonce = Nonce("c123"),
                     nonceCount = 1,
                     digestUri = "/"
                 )
             ),
             username = "admin",
-            cnonce = "c123",
+            cnonce = Nonce("c123"),
             qop = Qop.Auth,
             algorithm = "MD5",
             opaque = null
         )
 
-        val request = Request(Method.GET, "/")
+        val request = Request(GET, "/")
             .header("Authorization", credentials.toHeaderValue())
 
         val response = handler(request)
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response, hasStatus(UNAUTHORIZED))
     }
 
     @Test
@@ -216,25 +222,25 @@ class ServerDigestAuthTest {
             nonceCount = 1,
             response = Hex.hex(
                 digestCalculator.encode(
-                    method = Method.GET,
+                    method = GET,
                     realm = realm,
                     qop = Qop.Auth,
                     username = "admin",
                     password = "password",
                     nonce = nextNonce,
-                    cnonce = "c123",
+                    cnonce = Nonce("c123"),
                     nonceCount = 1,
                     digestUri = "/"
                 )
             ),
             username = "admin",
-            cnonce = "c123",
+            cnonce = Nonce("c123"),
             qop = Qop.Auth,
             algorithm = "MD5",
             opaque = null
         )
 
-        val request = Request(Method.GET, "/")
+        val request = Request(GET, "/")
             .header("Authorization", credentials.toHeaderValue())
 
         val response = handler(request)

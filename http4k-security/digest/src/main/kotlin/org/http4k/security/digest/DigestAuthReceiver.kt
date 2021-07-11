@@ -4,20 +4,23 @@ import org.http4k.appendIfNotBlank
 import org.http4k.core.Credentials
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.security.Nonce
+import org.http4k.security.NonceGeneratorVerifier
 import org.http4k.util.Hex
+import org.http4k.util.Hex.hex
 import java.security.MessageDigest
 
 /**
  * For use in clients.  Generates responses to Digest Auth challenges
  */
-class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, proxy: Boolean) {
+class DigestAuthReceiver(private val nonceGeneratorVerifier: NonceGeneratorVerifier, proxy: Boolean) {
 
     private val authHeader = if (proxy) "Proxy-Authorization" else "Authorization"
     private val challengeHeader = if (proxy) "Proxy-Authenticate" else "WWW-Authenticate"
 
-    private var lastNonce: String? = null
+    private var lastNonce: Nonce? = null
     private var nonceCount: Long = 0
-    private var cnonce: String = nonceGenerator.generate()
+    private var cnonce: Nonce = nonceGeneratorVerifier()
 
     fun getChallengeHeader(response: Response): DigestChallenge? {
         val headerValue = response.header(challengeHeader) ?: return null
@@ -32,7 +35,7 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, proxy: Bool
             nonceCount++
         } else {
             nonceCount = 1
-            cnonce = nonceGenerator.generate()
+            cnonce = nonceGeneratorVerifier()
             lastNonce = challenge.nonce
         }
 
@@ -41,7 +44,7 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, proxy: Bool
             .appendIfNotBlank(request.uri.query, "?", request.uri.query)
             .toString()
 
-        val digester = when(challenge.algorithm?.toLowerCase()) {
+        val digester = when (challenge.algorithm?.toLowerCase()) {
             null, "md5-sess" -> MessageDigest.getInstance("MD5")
             else -> MessageDigest.getInstance(challenge.algorithm)
         }
@@ -71,14 +74,13 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, proxy: Bool
             username = credentials.user,
             digestUri = uri,
             nonce = challenge.nonce,
-            response = Hex.hex(digest),
+            response = hex(digest),
             opaque = challenge.opaque,
             nonceCount = nonceCount,
             algorithm = challenge.algorithm ?: digester.algorithm,
             cnonce = cnonce,
             qop = qop
         )
-        println(digestCredentials.toHeaderValue())
 
         return request.header(authHeader, digestCredentials.toHeaderValue())
     }

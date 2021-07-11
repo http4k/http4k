@@ -1,6 +1,9 @@
 package org.http4k.security.digest
 
 import org.http4k.core.Method
+import org.http4k.security.Nonce
+import org.http4k.security.digest.Qop.Auth
+import org.http4k.security.digest.Qop.AuthInt
 import org.http4k.util.Hex
 import java.nio.charset.Charset
 import java.security.MessageDigest
@@ -16,8 +19,8 @@ class DigestCalculator(private val digester: MessageDigest, private val charset:
         method: Method,
         username: String,
         password: String,
-        nonce: String,
-        cnonce: String?,
+        nonce: Nonce,
+        cnonce: Nonce?,
         nonceCount: Long?,
         digestUri: String
     ): ByteArray {
@@ -39,7 +42,7 @@ class DigestCalculator(private val digester: MessageDigest, private val charset:
 
         val response = when (qop) {
             null -> "$ha1:$nonce:$ha2"
-            Qop.Auth, Qop.AuthInt -> "$ha1:$nonce:$nc:$cnonce:${qop.value}:$ha2"
+            Auth, AuthInt -> "$ha1:$nonce:$nc:$cnonce:${qop.value}:$ha2"
         }
         return digest(response)
     }

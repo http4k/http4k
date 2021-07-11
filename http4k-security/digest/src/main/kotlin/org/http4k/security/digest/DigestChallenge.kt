@@ -2,6 +2,7 @@ package org.http4k.security.digest
 
 import org.http4k.appendIf
 import org.http4k.appendIfPresent
+import org.http4k.security.Nonce
 import java.lang.StringBuilder
 
 /**
@@ -9,7 +10,7 @@ import java.lang.StringBuilder
  */
 data class DigestChallenge(
     val realm: String,
-    val nonce: String,
+    val nonce: Nonce,
     val algorithm: String?,
     val qop: List<Qop>,
     val opaque: String?
@@ -31,7 +32,7 @@ data class DigestChallenge(
 
             return DigestChallenge(
                 realm = parameters["realm"]!!,
-                nonce = parameters["nonce"]!!,
+                nonce = Nonce(parameters["nonce"]!!),
                 algorithm = parameters["algorithm"],
                 qop = (parameters["qop"] ?: "")
                     .split(",")
