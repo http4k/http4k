@@ -28,11 +28,7 @@ fun ServerFilters.DigestAuth(
             val credentials = provider.digestCredentials(request) ?: return@filter provider.generateChallenge()
             if (!provider.verify(credentials, request.method)) return@filter Response(UNAUTHORIZED)
 
-            if (usernameKey != null) {
-                next(request.with(usernameKey of credentials.username))
-            } else {
-                next(request)
-            }
+            next(usernameKey?.let { request.with(it of credentials.username) } ?: request)
         }
     }
 }
