@@ -13,7 +13,7 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.Nonce
 import org.http4k.security.NonceVerifier
-import org.http4k.security.digest.DigestCalculator
+import org.http4k.security.digest.DigestEncoder
 import org.http4k.security.digest.DigestCredential
 import org.http4k.security.digest.Qop
 import org.http4k.util.Hex
@@ -36,7 +36,7 @@ class ServerDigestAuthTest {
         "user" to "hunter2"
     )
 
-    val digestCalculator = DigestCalculator(MessageDigest.getInstance("MD5"))
+    val digestEncoder = DigestEncoder(MessageDigest.getInstance("MD5"))
 
     private val handler = ServerFilters
         .DigestAuth(
@@ -159,7 +159,7 @@ class ServerDigestAuthTest {
             nonce = nextNonce,
             nonceCount = 1,
             response = Hex.hex(
-                digestCalculator.encode(
+                digestEncoder(
                     method = Method.POST,
                     realm = realm,
                     qop = Qop.Auth,
@@ -195,7 +195,7 @@ class ServerDigestAuthTest {
             nonce = nextNonce,
             nonceCount = 1,
             response = Hex.hex(
-                digestCalculator.encode(
+                digestEncoder(
                     method = GET,
                     realm = realm,
                     qop = Qop.Auth,
@@ -230,7 +230,7 @@ class ServerDigestAuthTest {
             nonce = nextNonce,
             nonceCount = 1,
             response = Hex.hex(
-                digestCalculator.encode(
+                digestEncoder(
                     method = GET,
                     realm = realm,
                     qop = Qop.Auth,

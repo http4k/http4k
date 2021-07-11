@@ -52,11 +52,11 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, proxy: Bool
             ?.let { charset(it) }
             ?: Charsets.ISO_8859_1
 
-        val digestEncoder = DigestCalculator(digester, charset)
+        val digestEncoder = DigestEncoder(digester, charset)
 
         val qop = challenge.qop.firstOrNull()
 
-        val digest = digestEncoder.encode(
+        val digest = digestEncoder(
             method = request.method,
             realm = challenge.realm,
             qop = qop,

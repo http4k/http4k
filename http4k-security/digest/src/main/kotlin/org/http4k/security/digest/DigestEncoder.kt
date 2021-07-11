@@ -7,13 +7,14 @@ import org.http4k.security.digest.Qop.AuthInt
 import org.http4k.util.Hex
 import java.nio.charset.Charset
 import java.security.MessageDigest
+import kotlin.text.Charsets.ISO_8859_1
 
-class DigestCalculator(private val digester: MessageDigest, private val charset: Charset = Charsets.ISO_8859_1) {
+class DigestEncoder(private val digester: MessageDigest, private val charset: Charset = ISO_8859_1) {
 
     private fun hexDigest(value: String) = Hex.hex(digest(value))
     private fun digest(value: String) = digester.digest(value.toByteArray(charset))
 
-    fun encode(
+    operator fun invoke(
         realm: String,
         qop: Qop?,
         method: Method,

@@ -37,7 +37,7 @@ class DigestAuthProvider(
     }
 
     fun verify(credentials: DigestCredential, method: Method): Boolean {
-        val digestEncoder = DigestCalculator(MessageDigest.getInstance("MD5"))
+        val digestEncoder = DigestEncoder(MessageDigest.getInstance("MD5"))
 
         // verify credentials pertain to this provider
         if (credentials.algorithm != null && credentials.algorithm != algorithm) return false
@@ -48,7 +48,7 @@ class DigestAuthProvider(
 
         // verify credentials digest matches expected digest
         val password = passwordLookup(credentials.username) ?: return false
-        val expectedDigest = digestEncoder.encode(
+        val expectedDigest = digestEncoder(
             method = method,
             realm = realm,
             qop = credentials.qop,
