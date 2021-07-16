@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.9.11.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract*** : Spec Fix: OpenAPI2 cannot contain oneOf responses as is illegal in spec.
 
 ### v4.9.10.0
 - **http4k-*** : Upgrade some dependency versions.
