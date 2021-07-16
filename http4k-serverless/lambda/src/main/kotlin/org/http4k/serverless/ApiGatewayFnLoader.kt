@@ -3,6 +3,8 @@ package org.http4k.serverless
 import com.amazonaws.services.lambda.runtime.Context
 import com.squareup.moshi.Moshi
 import okio.Okio
+import okio.buffer
+import okio.source
 import org.http4k.core.RequestContexts
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
@@ -33,7 +35,7 @@ abstract class ApiGatewayFnLoader protected constructor(
 }
 
 private inline fun <reified T : Any> Moshi.asA(input: InputStream): T =
-    adapter(T::class.java).fromJson(Okio.buffer(Okio.source(input)))!!
+    adapter(T::class.java).fromJson(input.source().buffer())!!
 
 private inline fun <reified T> Moshi.asInputStream(a: T) =
     adapter(T::class.java).toJson(a).byteInputStream()

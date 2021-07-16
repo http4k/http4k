@@ -6,6 +6,8 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okio.Okio
+import okio.buffer
+import okio.source
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -35,7 +37,7 @@ open class ConfigurableMoshi(
     override fun <T : Any> asA(input: String, target: KClass<T>): T = moshi.adapter(target.java).fromJson(input)!!
 
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = moshi.adapter(target.java).fromJson(
-        Okio.buffer(Okio.source(input))
+        input.source().buffer()
     )!!
 
     inline fun <reified T : Any> Body.Companion.auto(
