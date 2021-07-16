@@ -1,8 +1,10 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.AttributeKey.*
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.metrics.GlobalMeterProvider
-import io.opentelemetry.api.metrics.common.Labels
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -49,15 +51,54 @@ class OpenTelemetryMetricsClientTest {
         }
 
         val data = exportMetricsFromOpenTelemetry()
-        assertThat(data,
-            hasRequestTimer(1, 1000.0, Labels.of("host", "test_server_com", "method", "GET", "status", "200"),
-                "http.client.request.latency"))
-        assertThat(data,
-            hasRequestTimer(1, 1000.0, Labels.of("host", "test_server_com", "method", "GET", "status", "200"),
-                "http.client.request.latency"))
-        assertThat(data,
-            hasRequestTimer(2, 2000.0, Labels.of("host", "another_server_com", "method", "POST", "status", "404"),
-                "http.client.request.latency"))
+        assertThat(
+            data,
+            hasRequestTimer(
+                1,
+                1000.0,
+                Attributes.of(
+                    stringKey("host"),
+                    "test_server_com",
+                    stringKey("method"),
+                    "GET",
+                    stringKey("status"),
+                    "200"
+                ),
+                "http.client.request.latency"
+            )
+        )
+        assertThat(
+            data,
+            hasRequestTimer(
+                1,
+                1000.0,
+                Attributes.of(
+                    stringKey("host"),
+                    "test_server_com",
+                    stringKey("method"),
+                    "GET",
+                    stringKey("status"),
+                    "200"
+                ),
+                "http.client.request.latency"
+            )
+        )
+        assertThat(
+            data,
+            hasRequestTimer(
+                2,
+                2000.0,
+                Attributes.of(
+                    stringKey("host"),
+                    "another_server_com",
+                    stringKey("method"),
+                    "POST",
+                    stringKey("status"),
+                    "404"
+                ),
+                "http.client.request.latency"
+            )
+        )
     }
 
     @Test
@@ -67,35 +108,53 @@ class OpenTelemetryMetricsClientTest {
             assertThat(countedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
         }
 
-        assertThat(exportMetricsFromOpenTelemetry(),
-            hasRequestCounter(1, Labels.of("host", "test_server_com", "method", "GET", "status", "200"), "http.client.request.count")
+        assertThat(
+            exportMetricsFromOpenTelemetry(),
+            hasRequestCounter(
+                1,
+                Attributes.of(stringKey("host"), "test_server_com", stringKey("method"), "GET", stringKey("status"), "200"),
+                "http.client.request.count"
+            )
         )
-        assertThat(exportMetricsFromOpenTelemetry(),
-            hasRequestCounter(2, Labels.of("host", "another_server_com", "method", "POST", "status", "404"), "http.client.request.count")
+        assertThat(
+            exportMetricsFromOpenTelemetry(),
+            hasRequestCounter(
+                2,
+                Attributes.of(stringKey("host"), "another_server_com", stringKey("method"), "POST", stringKey("status"), "404"),
+                "http.client.request.count"
+            )
         )
     }
 
     @Test
     fun `request timer meter names and transaction labelling can be configured`() {
-        requestTimer = ClientFilters.OpenTelemetryMetrics.RequestTimer(name = "timer.requests", description = "custom.description", labeler =
-        { it.label("foo", "bar") }, clock = clock)
+        requestTimer = ClientFilters.OpenTelemetryMetrics.RequestTimer(name = "timer.requests",
+            description = "custom.description",
+            labeler =
+            { it.label("foo", "bar") },
+            clock = clock
+        )
 
         assertThat(timedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
 
-        assertThat(exportMetricsFromOpenTelemetry(),
-            hasRequestTimer(1, 1000.0, Labels.of("foo", "bar"), "timer.requests")
+        assertThat(
+            exportMetricsFromOpenTelemetry(),
+            hasRequestTimer(1, 1000.0, Attributes.of(stringKey("foo"), "bar"), "timer.requests")
         )
     }
 
     @Test
     fun `request counter meter names and transaction labelling can be configured`() {
-        requestCounter = ClientFilters.OpenTelemetryMetrics.RequestCounter(name = "counter.requests", description = "custom.description", labeler =
-        { it.label("foo", "bar") })
+        requestCounter = ClientFilters.OpenTelemetryMetrics.RequestCounter(name = "counter.requests",
+            description = "custom.description",
+            labeler =
+            { it.label("foo", "bar") })
 
         assertThat(countedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
 
-        assertThat(exportMetricsFromOpenTelemetry(),
-            hasRequestCounter(1, Labels.of("foo", "bar"), "counter.requests")
+        assertThat(
+            exportMetricsFromOpenTelemetry(),
+            hasRequestCounter(1, Attributes.of(stringKey("foo"), "bar"), "counter.requests")
         )
     }
 }

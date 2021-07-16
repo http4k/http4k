@@ -2,8 +2,9 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.MatchResult
 import com.natpryce.hamkrest.Matcher
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.metrics.GlobalMeterProvider
-import io.opentelemetry.api.metrics.common.Labels
 import io.opentelemetry.exporters.inmemory.InMemoryMetricExporter.create
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
@@ -17,7 +18,7 @@ fun exportMetricsFromOpenTelemetry(): List<MetricData> = create().apply {
     export((GlobalMeterProvider.get() as SdkMeterProvider).collectAllMetrics())
 }.finishedMetricItems
 
-fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "http.server.request.latency") =
+fun hasRequestTimer(count: Int, value: Double, attributes: Attributes, name: String = "http.server.request.latency") =
     object : Matcher<List<MetricData>> {
         override val description = name
 
@@ -26,7 +27,7 @@ fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "h
                 .first { it.name == name }
                 .doubleSummaryData
                 .points
-                .first { it.labels == labels }
+                .first { it.attributes == attributes }
             return if (
                 summary.count != count.toLong() &&
                 summary.percentileValues.last().value != value
@@ -35,7 +36,7 @@ fun hasRequestTimer(count: Int, value: Double, labels: Labels, name: String = "h
         }
     }
 
-fun hasRequestCounter(count: Int, labels: Labels, name: String = "http.server.request.count") =
+fun hasRequestCounter(count: Int, attributes: Attributes, name: String = "http.server.request.count") =
     object : Matcher<List<MetricData>> {
         override val description = name
 
@@ -44,7 +45,9 @@ fun hasRequestCounter(count: Int, labels: Labels, name: String = "http.server.re
                 .first { it.name == name }
                 .longSumData
                 .points
-                .first { it.labels == labels }
+                .first {
+                    it.attributes == attributes
+                }
             return if (counter.value == count.toLong()) MatchResult.Match else MatchResult.Mismatch(actual.toString())
         }
     }
@@ -58,12 +61,12 @@ fun hasNoRequestCounter(method: Method, path: String, status: Status) =
                     ?.longSumData
                     ?.points
                     ?.any {
-                        it.labels == Labels.of(
-                            "path",
+                        it.attributes == Attributes.of(
+                            AttributeKey.stringKey("path"),
                             path,
-                            "method",
+                            AttributeKey.stringKey("method"),
                             method.name,
-                            "status",
+                            AttributeKey.stringKey("status"),
                             status.code.toString()
                         )
                     } != true) MatchResult.Match else MatchResult.Mismatch(actual.toString())
