@@ -70,14 +70,19 @@ open class OpenApi2<out NODE>(
     private fun List<Security>.combine() =
         json { obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) }) }
 
-    private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security?): FieldsAndDefinitions<NODE> = routes
+    private fun renderPaths(
+        routes: List<ContractRoute>,
+        contractRoot: PathSegments,
+        security: Security?
+    ): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
         .fold(FieldsAndDefinitions()) { memo, (path, routes) ->
             val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>()) { memoFields, route ->
                 memoFields + render(contractRoot, security, route)
             }
             memo + FieldAndDefinitions(
-                normalisePath(path) to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions
+                normalisePath(path) to json { obj(routeFieldsAndDefinitions.fields) },
+                routeFieldsAndDefinitions.definitions
             )
         }
 
@@ -153,7 +158,8 @@ open class OpenApi2<out NODE>(
 
             FieldAndDefinitions(
                 route.method.toString().toLowerCase() to obj(fields),
-                ((route.meta.requests.flatMap { it.asSchema().definitions }) + responseDefinitions).toSet())
+                ((route.meta.requests.flatMap { it.asSchema().definitions }) + responseDefinitions).toSet()
+            )
         }
     }
 
@@ -170,16 +176,7 @@ open class OpenApi2<out NODE>(
 
         val collected: Map<Status, Pair<String, JsonSchema<NODE>>> = all.groupBy { it.message.status }
             .mapValues { (_, responses) ->
-                when (responses.size) {
-                    1 -> {
-                        responses.first().run { description to asSchema() }
-                    }
-                    else -> {
-                        val description = responses.map { it.description }.toSortedSet().joinToString(",")
-                        val allSchemas = responses.map { it.asSchema() }
-                        description to JsonSchema(obj("oneOf" to array(allSchemas.map { it.node })), allSchemas.flatMap { it.definitions }.toSet())
-                    }
-                }
+                responses.first().run { description to asSchema() }
             }
         collected.entries.fold(FieldsAndDefinitions<NODE>()) { memo, entry ->
             val (status, descriptionSchema) = entry
@@ -188,8 +185,10 @@ open class OpenApi2<out NODE>(
             memo + FieldAndDefinitions(
                 status.code.toString() to obj(
                     listOf("description" to string(description)) +
-                        if (schema.node == nullNode()) emptyList() else listOf("schema" to schema.node)),
-                schema.definitions)
+                        if (schema.node == nullNode()) emptyList() else listOf("schema" to schema.node)
+                ),
+                schema.definitions
+            )
         }
     }
 
@@ -208,11 +207,19 @@ open class OpenApi2<out NODE>(
         }
 }
 
-private data class FieldsAndDefinitions<NODE>(val fields: List<Pair<String, NODE>> = emptyList(), val definitions: Set<Pair<String, NODE>> = emptySet()) {
-    operator fun plus(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(fields + fieldAndDefinitions.field,
-        fieldAndDefinitions.definitions + definitions)
+private data class FieldsAndDefinitions<NODE>(
+    val fields: List<Pair<String, NODE>> = emptyList(),
+    val definitions: Set<Pair<String, NODE>> = emptySet()
+) {
+    operator fun plus(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(
+        fields + fieldAndDefinitions.field,
+        fieldAndDefinitions.definitions + definitions
+    )
 }
 
-private data class FieldAndDefinitions<out NODE>(val field: Pair<String, NODE>, val definitions: Set<Pair<String, NODE>>)
+private data class FieldAndDefinitions<out NODE>(
+    val field: Pair<String, NODE>,
+    val definitions: Set<Pair<String, NODE>>
+)
 
 private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()

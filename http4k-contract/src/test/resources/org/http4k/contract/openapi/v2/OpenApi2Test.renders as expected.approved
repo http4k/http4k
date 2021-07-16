@@ -272,14 +272,7 @@
           "201": {
             "description": "Created",
             "schema": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/object1547825812"
-                },
-                {
-                  "$ref": "#/definitions/object1366892779"
-                }
-              ]
+              "$ref": "#/definitions/object1547825812"
             }
           }
         },
@@ -309,14 +302,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/impl1"
-                },
-                {
-                  "$ref": "#/definitions/impl2"
-                }
-              ]
+              "$ref": "#/definitions/impl1"
             }
           }
         },
@@ -1060,23 +1046,6 @@
       "properties": {
         "obj": {
           "$ref": "#/definitions/object1506938668"
-        }
-      }
-    },
-    "object-336243684": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "integer",
-          "example": 123
-        }
-      }
-    },
-    "impl2": {
-      "type": "object",
-      "properties": {
-        "obj": {
-          "$ref": "#/definitions/object-336243684"
         }
       }
     },
