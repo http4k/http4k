@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.10.0.1
+- Mistakenly released version with wrong number of digits. Re-release for clatiry
+
 ### v4.10.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract*** : Spec Fix: OpenAPI2 cannot contain oneOf responses as is illegal in spec.
