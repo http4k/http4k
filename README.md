@@ -143,13 +143,17 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
 * [AWS:](https://http4k.org/guide/reference/aws) 
     * Plug a standard `HttpHandler` into the AWS v2 SDKs. This massively simplifies testing and allows for sniffing of the exact traffic going to AWS - brilliant for debugging and building fakes.
     * Client filter to allow super-simple interaction with AWS services (via request signing)
-* [OAuth Security](https://http4k.org/guide/reference/oauth) 
+* [OAuth Security:](https://http4k.org/guide/reference/oauth) 
     * Implement OAuth Authorisation Code Grant flow with a single Interface
     * **Pre-configured** OAuth for following providers:
         * **Auth0** 
         * **Dropbox** 
         * **Google** 
         * **Soundcloud**
+* [Digest Security:](https://http4k.org/guide/reference/digest)
+    * Implement the [Digest Authentication](https://datatracker.ietf.org/doc/html/rfc2617) flow for clients and servers
+    * Supports the null and Auth QoPs
+    * Supports Proxy Authentication
 * [Cloud Native:](https://http4k.org/guide/reference/cloud_native)
     * Tooling to support operating [http4k] applications in orchestrated cloud environments such as Kubernetes and CloudFoundry. 12-factor configuration, dual-port servers and health checks such as liveness and readiness checking. 
 * [Approval Testing:](https://http4k.org/guide/reference/approvaltests)
