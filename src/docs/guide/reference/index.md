@@ -58,6 +58,7 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/aws"><span class="pill">AWS</span></a>
 <a href="/guide/reference/cloud_native"><span class="pill">Cloud Native Configuration</span></a>
 <a href="/guide/reference/cloud_events"><span class="pill">Cloud Events</span></a>
+<a href="/guide/reference/digest"><span class="pill">Digest Auth</span></a>
 <a href="/guide/reference/oauth"><span class="pill">OAuth</span></a>
 <a href="/guide/reference/micrometer"><span class="pill">Micrometer</span></a>
 <a href="/guide/reference/opentelemetry"><span class="pill">OpenTelemetry</span></a>
