@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import io.opentelemetry.api.common.AttributeKey.longKey
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanId
@@ -67,7 +68,6 @@ class OpenTelemetryTracingTest {
             assertThat(traceId, equalTo(sentTraceId))
             assertThat(spanId, !equalTo(parentSpanId))
             assertThat(this.parentSpanId, equalTo(parentSpanId))
-//            assertThat(this.status, equalTo(true))
         }
     }
 
@@ -95,6 +95,110 @@ class OpenTelemetryTracingTest {
             assertThat(traceId, !equalTo(TraceId.getInvalid()))
             assertThat(spanId, !equalTo(SpanId.getInvalid()))
             assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
+        }
+    }
+
+    @Test
+    fun `a server span can be mutated during creation`() {
+        val sentTraceId = "11111111111111111111111111111111"
+        val parentSpanId = "2222222222222222"
+        val creationValue = stringKey("test-attribute")
+
+        var createdContext: SpanData? = null
+
+        val app = ServerFilters.OpenTelemetryTracing(spanCreationMutator = {
+            it.setAttribute(creationValue, "test-value")
+        })
+            .then(routes("/foo/{id}" bind GET to {
+                createdContext = (Span.current() as ReadableSpan).toSpanData()
+                Response(OK)
+            }))
+
+        app(
+            Request(GET, "http://localhost:8080/foo/bar?a=b")
+                .header("x-b3-traceid", sentTraceId)
+                .header("x-b3-spanid", parentSpanId)
+                .header("x-b3-sampled", "1")
+        )
+
+        with(createdContext!!) {
+            assertThat(attributes.get(creationValue), equalTo("test-value"))
+        }
+    }
+
+    @Test
+    fun `a server span can be mutated before completion`() {
+        val sentTraceId = "11111111111111111111111111111111"
+        val parentSpanId = "2222222222222222"
+        val postStatus = longKey("post-status")
+        val postUri = stringKey("post-uri")
+
+        var currentSpan: SpanData? = null
+
+        val app = ServerFilters.OpenTelemetryTracing(spanCompletionMutator = { span, request, response ->
+            span.setAttribute(postStatus, response.status.code)
+            span.setAttribute(postUri, request.uri.toString())
+
+            currentSpan = (span as ReadableSpan).toSpanData()
+        })
+            .then(routes("/foo/{id}" bind GET to {
+                Response(I_M_A_TEAPOT)
+            }))
+
+        app(
+            Request(GET, "http://localhost:8080/foo/bar?a=b")
+                .header("x-b3-traceid", sentTraceId)
+                .header("x-b3-spanid", parentSpanId)
+                .header("x-b3-sampled", "1")
+        )
+
+        with(currentSpan!!) {
+            assertThat(attributes.get(postStatus), equalTo(I_M_A_TEAPOT.code.toLong()))
+            assertThat(attributes.get(postUri), equalTo("http://localhost:8080/foo/bar?a=b"))
+        }
+    }
+
+    @Test
+    fun `a client span can be mutated during creation`() {
+        var createdContext: SpanData? = null
+        val creationValue = stringKey("test-attribute")
+
+        val app = ClientFilters.OpenTelemetryTracing(spanCreationMutator = {
+            it.setAttribute(creationValue, "test-value")
+        })
+            .then {
+                createdContext = (Span.current() as ReadableSpan).toSpanData()
+                Response(I_M_A_TEAPOT)
+            }
+
+        app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
+
+        with(createdContext!!) {
+            assertThat(attributes.get(creationValue), equalTo("test-value"))
+        }
+    }
+
+    @Test
+    fun `a client span can be mutated before completion`() {
+        var createdContext: SpanData? = null
+        val postStatus = longKey("post-status")
+        val postUri = stringKey("post-uri")
+
+        val app = ClientFilters.OpenTelemetryTracing(spanCompletionMutator = { span, request, response ->
+            span.setAttribute(postStatus, response.status.code)
+            span.setAttribute(postUri, request.uri.toString())
+
+            createdContext = (Span.current() as ReadableSpan).toSpanData()
+        })
+            .then {
+                Response(I_M_A_TEAPOT)
+            }
+
+        app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
+
+        with(createdContext!!) {
+            assertThat(attributes.get(postStatus), equalTo(I_M_A_TEAPOT.code.toLong()))
+            assertThat(attributes.get(postUri), equalTo("http://localhost:8080/foo/bar?a=b"))
         }
     }
 
