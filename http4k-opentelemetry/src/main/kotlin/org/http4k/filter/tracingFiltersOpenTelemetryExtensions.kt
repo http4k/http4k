@@ -2,6 +2,8 @@ package org.http4k.filter
 
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanBuilder
 import io.opentelemetry.api.trace.SpanKind.CLIENT
 import io.opentelemetry.api.trace.SpanKind.SERVER
 import io.opentelemetry.api.trace.StatusCode.ERROR
@@ -21,6 +23,8 @@ fun ClientFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = { it.uri.toString() },
     error: (Request, Throwable) -> String = { _, t -> t.localizedMessage },
+    spanCreationMutator: (SpanBuilder) -> SpanBuilder = { it },
+    spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
 ): Filter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
@@ -28,7 +32,10 @@ fun ClientFilters.OpenTelemetryTracing(
 
     return Filter { next ->
         { req ->
-            with(tracer.spanBuilder(spanNamer(req)).setSpanKind(CLIENT).startSpan()) {
+            with(tracer.spanBuilder(spanNamer(req))
+                .setSpanKind(CLIENT)
+                .let { spanCreationMutator(it) }
+                .startSpan()) {
                 try {
                     setAttribute("http.method", req.method.name)
                     setAttribute("http.url", req.uri.toString())
@@ -37,6 +44,7 @@ fun ClientFilters.OpenTelemetryTracing(
                         textMapPropagator.inject(Context.current(), ref, setter)
                         next(ref.get()).apply {
                             setAttribute("http.status_code", status.code.toString())
+                            spanCompletionMutator(this@with, req, this)
                         }
                     }
                 } catch (t: Throwable) {
@@ -54,6 +62,8 @@ fun ServerFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = { it.uri.toString() },
     error: (Request, Throwable) -> String = { _, t -> t.localizedMessage },
+    spanCreationMutator: (SpanBuilder) -> SpanBuilder = { it },
+    spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
 ): Filter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
@@ -65,6 +75,7 @@ fun ServerFilters.OpenTelemetryTracing(
             with(tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)
+                .let { spanCreationMutator(it) }
                 .startSpan()) {
                 makeCurrent().use {
                     try {
@@ -74,7 +85,10 @@ fun ServerFilters.OpenTelemetryTracing(
                         val ref = AtomicReference(next(req))
 
                         textMapPropagator.inject(Context.current(), ref, setter)
-                        ref.get().also { setAttribute("http.status_code", it.status.code.toString()) }
+                        ref.get().also {
+                            spanCompletionMutator(this, req, it)
+                            setAttribute("http.status_code", it.status.code.toString())
+                        }
                     } catch (t: Throwable) {
                         setStatus(ERROR, error(req, t))
                         throw t
