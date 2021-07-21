@@ -5,10 +5,10 @@ description: Feature overview of the modules providing XML support, including an
 
 ```groovy
 // json.org XML:
-implementation group: "org.http4k", name: "http4k-format-xml", version: "4.10.0.1"
+implementation group: "org.http4k", name: "http4k-format-xml", version: "4.10.1.0"
 
 // Jackson XML:
-implementation group: "org.http4k", name: "http4k-format-jackson-xml", version: "4.10.0.1"
+implementation group: "org.http4k", name: "http4k-format-jackson-xml", version: "4.10.1.0"
 ```
 
 ### About
