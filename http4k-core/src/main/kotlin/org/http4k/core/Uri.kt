@@ -69,6 +69,8 @@ fun Uri.removeQueries(prefix: String) = copy(query = query.toParameters().filter
 
 fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
 
+// Use the older encode/decode methods here - this maintains compatibility
+// with JDK-8
 fun String.toPathEncoded() = URLEncoder.encode(this, "UTF-8")
 fun String.toPathDecoded() = URLDecoder.decode(this, "UTF-8")
 
