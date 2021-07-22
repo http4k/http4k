@@ -62,7 +62,7 @@ fun ServerFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = { it.uri.toString() },
     error: (Request, Throwable) -> String = { _, t -> t.localizedMessage },
-    spanCreationMutator: (SpanBuilder) -> SpanBuilder = { it },
+    spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
 ): Filter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
@@ -75,7 +75,7 @@ fun ServerFilters.OpenTelemetryTracing(
             with(tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)
-                .let { spanCreationMutator(it) }
+                .let { spanCreationMutator(it, req) }
                 .startSpan()) {
                 makeCurrent().use {
                     try {
