@@ -106,8 +106,8 @@ class OpenTelemetryTracingTest {
 
         var createdContext: SpanData? = null
 
-        val app = ServerFilters.OpenTelemetryTracing(spanCreationMutator = {
-            it.setAttribute(creationValue, "test-value")
+        val app = ServerFilters.OpenTelemetryTracing(spanCreationMutator = { spanBuilder, request ->
+            spanBuilder.setAttribute(creationValue, request.header("x-its-a-me") ?: "no-its-a-not")
         })
             .then(routes("/foo/{id}" bind GET to {
                 createdContext = (Span.current() as ReadableSpan).toSpanData()
@@ -119,10 +119,11 @@ class OpenTelemetryTracingTest {
                 .header("x-b3-traceid", sentTraceId)
                 .header("x-b3-spanid", parentSpanId)
                 .header("x-b3-sampled", "1")
+                .header("x-its-a-me", "mario")
         )
 
         with(createdContext!!) {
-            assertThat(attributes.get(creationValue), equalTo("test-value"))
+            assertThat(attributes.get(creationValue), equalTo("mario"))
         }
     }
 
