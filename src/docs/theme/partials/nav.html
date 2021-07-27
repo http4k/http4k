@@ -4,6 +4,7 @@
         <div class="logo"><img src="/img/logo-intro.png" width="185" alt="logo" srcset=""/></div>
     </a>
     <ul class="nav flex-column">
+        <input id="search" type="text"/>
         {% for nav_item in nav %}
         {% set path = "nav-" + loop.index | string %}
         {% set level = 1 %}

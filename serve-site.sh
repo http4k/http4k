@@ -5,7 +5,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 cd src
 mkdocs serve
