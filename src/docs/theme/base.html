@@ -6,6 +6,7 @@
 <html lang="{{ lang.t('language') }}" class="no-js">
 <head>
     {% block site_meta %}
+    {% include "partials/include.html" %}
     {% include "partials/meta.html" %}
     {% endblock %}
     {% block htmltitle %}
@@ -40,6 +41,7 @@
     <link rel="stylesheet" href="{{ path | url }}">
     {% endfor %}
     {% block extrahead %}{% endblock %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
 </head>
 {% if palette.primary or palette.accent %}
 {% set primary = palette.primary | replace(" ", "-") | lower %}
@@ -58,7 +60,11 @@
     <div class="row no-gutters justify-content-center">
         {% include "partials/nav.html" %}
         <main class="col">
-            <div class="container">
+          <div class="container">
+                <div class="searchBox">
+                  <img src="/img/search-icon.svg" width="20" alt="" srcset=""/>
+                  <input id="search" type="text" />
+                </div>
                 <div class="content">
                     <img class="mb-3 sideToggle" src="/img/exchange-icon.svg" width="20" alt="" srcset=""/>
                     {% block content %}
@@ -106,5 +112,13 @@
 {% include "partials/integrations/analytics.html" %}
 {% endif %}
 {% endblock %}
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+<script type="text/javascript"> docsearch({
+  apiKey: atob(ak),
+  indexName: 'http4k',
+  inputSelector: '#search',
+  debug: false // Set debug to true if you want to inspect the dropdown
+});
+</script>
 </body>
 </html>
