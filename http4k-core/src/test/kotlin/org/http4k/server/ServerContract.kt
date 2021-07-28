@@ -2,6 +2,7 @@ package org.http4k.server
 
 import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.anyOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
@@ -193,7 +194,10 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             ))
     }
 
-    open fun clientAddress() = equalTo(InetAddress.getLocalHost().hostAddress)
+    open fun clientAddress() = anyOf(
+        equalTo(InetAddress.getLoopbackAddress().hostAddress),
+        equalTo(InetAddress.getLocalHost().hostAddress),
+    )
 
     open fun requestScheme() = equalTo("unsupported")
 
