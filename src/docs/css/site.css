@@ -73,9 +73,13 @@ h1:hover .headerlink, h2:hover .headerlink, h3:hover .headerlink, h4:hover .head
 }
 
 .searchBox {
-    float: right
+    float: right;
+    position: relative;
 }
 
-img.searchBox {
-
+.searchBoxIcon {
+    position: absolute;
+    right: 6px;
+    z-index: 10;
+    top: 5px;
 }
