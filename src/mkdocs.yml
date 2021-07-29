@@ -97,7 +97,7 @@ nav:
       - Chaos Testing: guide/reference/chaos/index.md
       - Hamkrest: guide/reference/hamkrest/index.md
       - Kotest: guide/reference/kotest/index.md
-      - Service Virtualisaion: guide/reference/servicevirtualisation/index.md
+      - Service Virtualisation: guide/reference/servicevirtualisation/index.md
       - Strikt: guide/reference/strikt/index.md
       - WebDriver: guide/reference/webdriver/index.md
   - Blog:
