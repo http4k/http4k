@@ -11,11 +11,7 @@
         "properties": {
           "children": {
             "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.RecursiveObject"
-                }
-              ]
+              "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.RecursiveObject"
             },
             "example": [
               {

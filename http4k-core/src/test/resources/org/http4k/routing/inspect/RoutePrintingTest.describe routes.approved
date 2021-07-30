@@ -1,4 +1,3 @@
-
 (([cyan]method == GET[cyan] and [cyan]template == 'a'[cyan])
  or 
   (([cyan]method == GET[cyan] and [cyan]template == 'b/c/d'[cyan])

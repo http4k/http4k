@@ -213,11 +213,7 @@
                 ],
                 "schema": {
                   "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/ArbObject1"
-                      }
-                    ]
+                    "$ref": "#/components/schemas/ArbObject1"
                   },
                   "example": [
                     {
@@ -1074,11 +1070,7 @@
           },
           "numbers": {
             "items": {
-              "oneOf": [
-                {
-                  "type": "number"
-                }
-              ]
+              "type": "number"
             },
             "example": [
               1

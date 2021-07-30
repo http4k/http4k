@@ -73,11 +73,7 @@
           },
           "list": {
             "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
-                }
-              ]
+              "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
             },
             "example": [
               {
@@ -92,18 +88,10 @@
           },
           "nestedList": {
             "items": {
-              "oneOf": [
-                {
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
-                      }
-                    ]
-                  },
-                  "type": "array"
-                }
-              ]
+              "items": {
+                "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
+              },
+              "type": "array"
             },
             "example": [
               [
@@ -125,11 +113,7 @@
           },
           "stringList": {
             "items": {
-              "oneOf": [
-                {
-                  "type": "string"
-                }
-              ]
+              "type": "string"
             },
             "example": [
               "hello",
@@ -143,11 +127,7 @@
               "oneOf": [
                 {
                   "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
-                      }
-                    ]
+                    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
                   },
                   "type": "array"
                 },

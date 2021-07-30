@@ -1,11 +1,7 @@
 {
   "node": {
     "items": {
-      "oneOf": [
-        {
-          "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo"
-        }
-      ]
+      "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo"
     },
     "example": [
       "value1",
