@@ -27,6 +27,18 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
 
     @Test
+    fun `creates canonical version of request with null parameter`() {
+        val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com/a/b").query("foo", null), canonicalPayload)
+        assertThat(canonical.value, equalTo("""GET
+/a/b
+foo=
+
+
+
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
+    }
+
+    @Test
     fun `normalises path`() {
         val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com/a:b:c/d e/f"), canonicalPayload)
         assertThat(canonical.value, equalTo("""GET
