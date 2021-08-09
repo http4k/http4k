@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v4.10.2.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-format-jackson** : Fix #646 - Boolean field can escape lens check without throwing MissingKotlinParameterException.
+- **http4k-aws** : Set the query parameter to empty string if it's value is null, instead of "null". H/T @raelg for the PR.
 
 ### v4.10.1.0
 - **http4k-*** : Upgrade some dependency versions.
