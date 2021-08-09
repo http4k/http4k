@@ -19,7 +19,7 @@ import org.http4k.server.asServer
 object MyGraphQLHandler : GraphQLHandler {
     private val graphQL = newGraphQL(
         toSchema(
-            SchemaGeneratorConfig(supportedPackages = listOf("guide.modules.graphql")),
+            SchemaGeneratorConfig(supportedPackages = listOf("guide.reference.graphql")),
             listOf(),
             listOf()
         )).build()
