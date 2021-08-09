@@ -36,7 +36,7 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(
         val router = "/" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
-            routes += "/" bindContract GET to { Response(OK) }
+            routes += "/" bindContract GET to { _ -> Response(OK) }
             descriptionPath = "/docs"
         }
 
@@ -57,7 +57,7 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(
                 ),
                 filter = Filter.NoOp
             )
-            routes += "/example" bindContract GET to { Response(OK) }
+            routes += "/example" bindContract GET to { _ -> Response(OK) }
         }
 
         approver.assertApproved(router(Request(GET, "/")))

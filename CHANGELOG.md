@@ -3,10 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.10.2.0 (uncut)
+### v4.11.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-format-jackson** : Fix #646 - Boolean field can escape lens check without throwing MissingKotlinParameterException.
 - **http4k-aws** : Set the query parameter to empty string if it's value is null, instead of "null". H/T @raelg for the PR.
+- **http4k-contract** : [Possible (small) Break] Fix #644 - Lazy init contract without path params: Type mismatch. Contract routes with 0 parameters are now able to be constructed lazily - which has added (for consistency) a secondary `to(fn: () -> HttpHandler)` function to the construction DSL. This may cause overload ambiguity when routes are defined withtout the request input parameter. To fix, un-ambiguate you bindings! (eg. `to { Response(OK) }` becomes `to { _ -> Response(OK) }`). H/T @dbacinski for the investigation.
 
 ### v4.10.1.0
 - **http4k-*** : Upgrade some dependency versions.

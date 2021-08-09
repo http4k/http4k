@@ -65,7 +65,7 @@ fun main() {
             summary = "add"
             description = "Adds 2 numbers together"
             returning(OK to "The result")
-        } bindContract GET to { Response(OK).body("pong") }
+        } bindContract GET to { _ -> Response(OK).body("pong") }
 
         routes += "/add" / Path.int().of("value1") / Path.int().of("value2") meta {
             summary = "add"

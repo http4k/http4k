@@ -47,25 +47,26 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
     private val requiredBody = Body.auto<ARandomObject>().toLens()
 
     val contractRoutes = listOf(
-        validPath bindContract GET to { Response(OK).with(header of header(it)) },
-        "/bad-request" bindContract GET to { requiredQuery(it); Response(OK) },
-        "/bad-request-query-via-meta" meta { queries += requiredQuery } bindContract GET to { Response(OK) },
-        "/bad-request-body" bindContract GET to { requiredBody(it); Response(OK) },
-        "/bad-request-body-via-meta" meta { receiving(requiredBody) } bindContract GET to { Response(OK) },
+        validPath bindContract GET to { it -> Response(OK).with(header of header(it)) },
+        "/bad-request" bindContract GET to { it -> requiredQuery(it); Response(OK) },
+        "/bad-request-query-via-meta" meta { queries += requiredQuery } bindContract GET to { _ -> Response(OK) },
+        "/bad-request-body" bindContract GET to { it -> requiredBody(it); Response(OK) },
+        "/bad-request-body-via-meta" meta { receiving(requiredBody) } bindContract GET to { _ -> Response(OK) },
         "/bad-request-body-ignore-body" meta {
             receiving(requiredBody)
             preFlightExtraction = IgnoreBody
-        } bindContract GET to { Response(OK) },
+        } bindContract GET to { _ -> Response(OK) },
         "/bad-request-body-ignore-all" meta {
             queries += Query.required("myHeader")
             receiving(requiredBody)
             preFlightExtraction = None
-        } bindContract GET to { Response(OK) }
+        } bindContract GET to { _ -> Response(OK) }
     )
 
     private val header = Header.optional("FILTER")
 
-    override val expectedNotFoundBody = "{\"message\":\"No route found on this path. Have you used the correct HTTP verb?\"}"
+    override val expectedNotFoundBody =
+        "{\"message\":\"No route found on this path. Have you used the correct HTTP verb?\"}"
 
     override val handler =
         ServerFilters.CatchAll()
@@ -79,11 +80,12 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
     @Test
     fun `can bind under a route match`() {
         val app =
-            routes("/hello" bind routes("/there" bind
-                contract {
-                    renderer = SimpleJson(Jackson)
-                    routes += validPath bindContract GET to { Response(OK) }
-                })
+            routes(
+                "/hello" bind routes("/there" bind
+                    contract {
+                        renderer = SimpleJson(Jackson)
+                        routes += validPath bindContract GET to { _ -> Response(OK) }
+                    })
             )
         assertThat(app(Request(GET, "/hello/there$validPath")), hasStatus(OK))
     }
@@ -107,7 +109,7 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
 
         val root = "/root" bind contract {
             descriptionPath = "/docs"
-            routes += "/" bindContract GET to { Response(OK).with(header of header(it)) }
+            routes += "/" bindContract GET to { it -> Response(OK).with(header of header(it)) }
         }
         val withRoute = filter.then(root)
 
@@ -133,7 +135,7 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
     fun `OPTIONS traffic goes to the path specified but is intercepted by the default response if the route does NOT response to OPTIONS`() {
         val root = routes(
             "/root/bar" bind contract {
-                routes += "/foo/bar" bindContract GET to { Response(NOT_IMPLEMENTED) }
+                routes += "/foo/bar" bindContract GET to { _ -> Response(NOT_IMPLEMENTED) }
             }
         )
         val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
@@ -147,7 +149,7 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
             "/root/bar" bind contract {
                 routes += "/foo/bar" meta {
                     receiving(requiredBody)
-                } bindContract POST to { Response(NOT_IMPLEMENTED) }
+                } bindContract POST to { _ -> Response(NOT_IMPLEMENTED) }
             }
         )
 
@@ -184,7 +186,7 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
     fun `applies security and responds with a 401 to unauthorized requests`() {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to { Response(OK) }
+            routes += "/bob" bindContract GET to { _ -> Response(OK) }
         }
         val response = root(Request(GET, "/root/bob?key=sue"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
@@ -196,10 +198,10 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "valid" })
             routes += "/bob" meta {
-            } bindContract GET to { Response(OK) }
+            } bindContract GET to { _ -> Response(OK) }
             routes += "/bill" meta {
                 security = BasicAuthSecurity("realm", credentials)
-            } bindContract GET to { Response(OK) }
+            } bindContract GET to { _ -> Response(OK) }
         }
 
         // non overridden security
@@ -212,15 +214,17 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
         assertThat(root(Request(GET, "/root/bill?key=valid")).status, equalTo(UNAUTHORIZED))
 
         // basic auth is invoked
-        assertThat(ClientFilters.BasicAuth(credentials)
-            .then(root)(Request(GET, "/root/bill?key=invalid")).status, equalTo(OK))
+        assertThat(
+            ClientFilters.BasicAuth(credentials)
+                .then(root)(Request(GET, "/root/bill?key=invalid")).status, equalTo(OK)
+        )
     }
 
     @Test
     fun `pre-security filter is applied before security`() {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to { Response(OK) }
+            routes += "/bob" bindContract GET to { _ -> Response(OK) }
         }.withFilter { next ->
             {
                 next(it.query("key", "bob"))
@@ -234,7 +238,7 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
     fun `post-security filter is applied after security`() {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to { Response(OK).body(it.body) }
+            routes += "/bob" bindContract GET to { it -> Response(OK).body(it.body) }
         }.withPostSecurityFilter { next ->
             {
                 next(it.body("body"))
@@ -248,7 +252,7 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
     fun `applies security and responds with a 200 to authorized requests`() {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to { Response(OK) }
+            routes += "/bob" bindContract GET to { it -> Response(OK) }
         }
 
         val response = root(Request(GET, "/root/bob?key=bob"))
@@ -294,7 +298,7 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
         }
         val contract = contract {
             routes += "/test" bindContract GET to
-                { Response(OK).body(it.headerValues("foo").toString()) }
+                { it -> Response(OK).body(it.headerValues("foo").toString()) }
         }
 
         val response = (filter.then(contract))(Request(GET, "/test"))
@@ -304,30 +308,38 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
 
     @Test
     fun `handles bad request from handler - parameter`() {
-        assertThat(handler(Request(GET, "/bad-request")),
+        assertThat(
+            handler(Request(GET, "/bad-request")),
             hasStatus(BAD_REQUEST) and
-                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"foo","type":"query","datatype":"integer","required":true,"reason":"Missing"}]}"""))
+                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"foo","type":"query","datatype":"integer","required":true,"reason":"Missing"}]}""")
+        )
     }
 
     @Test
     fun `handles bad request from handler - body`() {
-        assertThat(handler(Request(GET, "/bad-request-body")),
+        assertThat(
+            handler(Request(GET, "/bad-request-body")),
             hasStatus(BAD_REQUEST) and
-                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"body","type":"body","datatype":"object","required":true,"reason":"Invalid"}]}"""))
+                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"body","type":"body","datatype":"object","required":true,"reason":"Invalid"}]}""")
+        )
     }
 
     @Test
     fun `handles bad request via contract violation - parameter`() {
-        assertThat(handler(Request(GET, "/bad-request-query-via-meta")),
+        assertThat(
+            handler(Request(GET, "/bad-request-query-via-meta")),
             hasStatus(BAD_REQUEST) and
-                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"foo","type":"query","datatype":"integer","required":true,"reason":"Missing"}]}"""))
+                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"foo","type":"query","datatype":"integer","required":true,"reason":"Missing"}]}""")
+        )
     }
 
     @Test
     fun `handles bad request via contract-violation - body`() {
-        assertThat(handler(Request(GET, "/bad-request-body-via-meta")),
+        assertThat(
+            handler(Request(GET, "/bad-request-body-via-meta")),
             hasStatus(BAD_REQUEST) and
-                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"body","type":"body","datatype":"object","required":true,"reason":"Invalid"}]}"""))
+                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"body","type":"body","datatype":"object","required":true,"reason":"Invalid"}]}""")
+        )
     }
 
     @Test

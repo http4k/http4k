@@ -62,8 +62,8 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
         .let {
-            val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { Response(OK) } else null)
-            it bindContract GET to { renderer.description(contractRoot, security, routes + extra) }
+            val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { _ -> Response(OK) } else null)
+            it bindContract GET to { _ -> renderer.description(contractRoot, security, routes + extra) }
         }
 
     private val routers = routes

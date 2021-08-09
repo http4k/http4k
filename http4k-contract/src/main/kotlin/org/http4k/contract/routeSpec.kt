@@ -30,6 +30,7 @@ class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegm
 
     inner class Binder(method: Method) : ContractRequestBuilder(method) {
         infix fun to(fn: HttpHandler) = with(this@ContractRouteSpec0) { ContractRoute(method, this, routeMeta) { fn } }
+        infix fun to(fn: () -> HttpHandler) = with(this@ContractRouteSpec0) { ContractRoute(method, this, routeMeta) { fn() } }
     }
 
     override infix fun bindContract(method: Method) = Binder(method)
