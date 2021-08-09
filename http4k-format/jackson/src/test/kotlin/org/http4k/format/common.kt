@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonView
 open class Public
 class Private : Public()
 
-data class ArbObjectWithView(@JsonView(Private::class) @JvmField val priv: Int, @JsonView(Public::class) @JvmField val pub: Int)
+data class ArbObjectWithView(@JsonView(Private::class) @JvmField val priv: Int = 0, @JsonView(Public::class) @JvmField val pub: Int)
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@class")
 @JsonSubTypes(
