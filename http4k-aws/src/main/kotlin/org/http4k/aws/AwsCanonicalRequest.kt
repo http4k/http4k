@@ -35,7 +35,7 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
 
         private fun Request.canonicalQueryString(): String =
             uri.query.toParameters()
-                .map { (first, second) -> first.urlEncoded() + "=" + second?.urlEncoded() }
+                .map { (first, second) -> first.urlEncoded() + "=" + second?.urlEncoded().orEmpty() }
                 .sorted()
                 .joinToString("&")
 
