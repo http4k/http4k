@@ -7,7 +7,7 @@ description: Feature overview of the http4k-graphql module.
 implementation group: "org.http4k", name: "http4k-graphql", version: "4.11.0.0"
 
 // for the example below you will also need this dependency...
-implementation group: "com.expediagroup", name: "graphql-kotlin-schema-generator", version: "3.7.0"
+implementation group: "com.expediagroup", name: "graphql-kotlin-schema-generator", version: "4.1.1"
 ```
 
 
