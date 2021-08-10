@@ -1,6 +1,7 @@
 package guide.reference.graphql
 
 import com.expediagroup.graphql.generator.SchemaGeneratorConfig
+import com.expediagroup.graphql.generator.TopLevelObject
 import com.expediagroup.graphql.generator.toSchema
 import graphql.GraphQL.newGraphQL
 import org.http4k.client.JavaHttpClient
@@ -20,11 +21,23 @@ object MyGraphQLHandler : GraphQLHandler {
     private val graphQL = newGraphQL(
         toSchema(
             SchemaGeneratorConfig(supportedPackages = listOf("guide.reference.graphql")),
-            listOf(),
+            listOf(TopLevelObject(UserQueries())),
             listOf()
         )).build()
 
     override fun invoke(request: GraphQLRequest) = GraphQLResponse.from(graphQL.execute(request.query))
+}
+
+data class User(val id: Long, val name: String)
+data class Params(val ids: List<Long>)
+
+class UserQueries {
+    private val userDb = listOf(
+        User(id = 1, name = "Jim"),
+        User(id = 2, name = "Bob"),
+    )
+
+    fun search(params: Params) = userDb.firstOrNull { it.id in params.ids }
 }
 
 fun main() {
@@ -37,5 +50,11 @@ fun main() {
 
     // for clients, just convert any app into a GQL handler
     val gql: GraphQLHandler = JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:8000/graphql"))
-    val response: GraphQLResponse = gql(GraphQLRequest("some query goes here.."))
+    val response: GraphQLResponse = gql(GraphQLRequest("""{
+        search(params: { ids: [1]}) {
+            id
+            name
+        }
+    }"""))
+    println(response)
 }
