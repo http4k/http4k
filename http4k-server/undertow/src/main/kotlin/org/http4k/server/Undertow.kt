@@ -10,9 +10,10 @@ import org.http4k.core.HttpHandler
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
+import java.net.InetAddress
 
-class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : PolyServerConfig {
-    constructor(port: Int = 8000) : this(port, false)
+class Undertow(val port: Int = 8000, val enableHttp2: Boolean, val address: InetAddress?) : PolyServerConfig {
+    constructor(port: Int = 8000) : this(port, false, null)
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
         val httpHandler = http?.let(::Http4kUndertowHttpHandler)?.let(::BlockingHandler)
@@ -30,8 +31,13 @@ class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : PolyServerConfi
             ?: handlerWithWs
 
         return object : Http4kServer {
+            val ipString = when (address) {
+                null -> "0.0.0.0"
+                else -> address.hostAddress
+            }
+
             val server = Undertow.builder()
-                .addHttpListener(port, "0.0.0.0")
+                .addHttpListener(port, ipString)
                 .setServerOption(ENABLE_HTTP2, enableHttp2)
                 .setHandler(handlerWithSse).build()
 
