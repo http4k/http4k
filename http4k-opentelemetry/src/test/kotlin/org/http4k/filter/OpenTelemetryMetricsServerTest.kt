@@ -6,11 +6,9 @@ import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
-import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.AttributeKey.*
+import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.metrics.GlobalMeterProvider
-import io.opentelemetry.api.metrics.common.Labels
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.core.Method
@@ -72,10 +70,28 @@ class OpenTelemetryMetricsServerTest {
         }
 
         val data = exportMetricsFromOpenTelemetry()
-        assertThat(data, hasRequestTimer(1, 1000.0, Attributes.of(stringKey("path"), "timed_one", stringKey("method"), "GET", stringKey("status"), "200")))
         assertThat(
             data,
-            hasRequestTimer(2, 2000.0, Attributes.of(stringKey("path"), "timed_two_name", stringKey("method"), "POST", stringKey("status"), "200"))
+            hasRequestTimer(
+                1,
+                1000.0,
+                Attributes.of(stringKey("path"), "timed_one", stringKey("method"), "GET", stringKey("status"), "200")
+            )
+        )
+        assertThat(
+            data,
+            hasRequestTimer(
+                2,
+                2000.0,
+                Attributes.of(
+                    stringKey("path"),
+                    "timed_two_name",
+                    stringKey("method"),
+                    "POST",
+                    stringKey("status"),
+                    "200"
+                )
+            )
         )
     }
 
@@ -87,8 +103,27 @@ class OpenTelemetryMetricsServerTest {
         }
 
         val data = exportMetricsFromOpenTelemetry()
-        assertThat(data, hasRequestCounter(1, Attributes.of(stringKey("path"), "counted_one", stringKey("method"), "GET", stringKey("status"), "200")))
-        assertThat(data, hasRequestCounter(2, Attributes.of(stringKey("path"), "counted_two_name", stringKey("method"), "POST", stringKey("status"), "200")))
+        assertThat(
+            data,
+            hasRequestCounter(
+                1,
+                Attributes.of(stringKey("path"), "counted_one", stringKey("method"), "GET", stringKey("status"), "200")
+            )
+        )
+        assertThat(
+            data,
+            hasRequestCounter(
+                2,
+                Attributes.of(
+                    stringKey("path"),
+                    "counted_two_name",
+                    stringKey("method"),
+                    "POST",
+                    stringKey("status"),
+                    "200"
+                )
+            )
+        )
     }
 
     @Test
@@ -116,7 +151,12 @@ class OpenTelemetryMetricsServerTest {
         val data = exportMetricsFromOpenTelemetry()
         assertThat(
             data,
-            hasRequestTimer(1, 1000.0, Attributes.of(stringKey("foo"), "bar", stringKey("routingGroup"), "timed/one"), "custom.requests")
+            hasRequestTimer(
+                1,
+                1000.0,
+                Attributes.of(stringKey("foo"), "bar", stringKey("routingGroup"), "timed/one"),
+                "custom.requests"
+            )
         )
     }
 
@@ -131,7 +171,11 @@ class OpenTelemetryMetricsServerTest {
 
         assertThat(
             exportMetricsFromOpenTelemetry(),
-            hasRequestCounter(1, Attributes.of(stringKey("foo"), "bar", stringKey("routingGroup"), "counted/one"), "custom.requests2")
+            hasRequestCounter(
+                1,
+                Attributes.of(stringKey("foo"), "bar", stringKey("routingGroup"), "counted/one"),
+                "custom.requests2"
+            )
         )
     }
 
@@ -141,7 +185,11 @@ class OpenTelemetryMetricsServerTest {
 
         assertThat(
             exportMetricsFromOpenTelemetry(),
-            hasRequestTimer(1, 1000.0, Attributes.of(stringKey("path"), "UNMAPPED", stringKey("method"), "GET", stringKey("status"), "200"))
+            hasRequestTimer(
+                1,
+                1000.0,
+                Attributes.of(stringKey("path"), "UNMAPPED", stringKey("method"), "GET", stringKey("status"), "200")
+            )
         )
     }
 
@@ -150,7 +198,10 @@ class OpenTelemetryMetricsServerTest {
         assertThat(server(Request(GET, "/otherCounted/test.json")), hasStatus(OK))
         assertThat(
             exportMetricsFromOpenTelemetry(),
-            hasRequestCounter(1, Attributes.of(stringKey("path"), "UNMAPPED", stringKey("method"), "GET", stringKey("status"), "200"))
+            hasRequestCounter(
+                1,
+                Attributes.of(stringKey("path"), "UNMAPPED", stringKey("method"), "GET", stringKey("status"), "200")
+            )
         )
     }
 

@@ -14,5 +14,5 @@ object Http4kOpenTelemetry {
 
     val tracer: Tracer get() = GlobalOpenTelemetry.get().tracerProvider.get(INSTRUMENTATION_NAME)
 
-    val meter: Meter get() = GlobalMeterProvider.getMeter(INSTRUMENTATION_NAME)
+    val meter: Meter get() = GlobalMeterProvider.get()[INSTRUMENTATION_NAME]
 }

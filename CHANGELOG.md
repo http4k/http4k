@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.11.1.0
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v4.11.0.1
 - **http4k-graphql** : Fix - Downgrade graphql-java and fix Graphql reference example. 4.11.0.0 contained an incompatible version of graphql-java for generate use. H/T @razvn for spotting and fixing. :)
 

@@ -1,7 +1,8 @@
 package org.http4k.filter
 
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.metrics.Meter
-import io.opentelemetry.api.metrics.common.Labels
 import org.http4k.core.Filter
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.metrics.Http4kOpenTelemetry
@@ -13,31 +14,51 @@ import java.time.Clock.systemUTC
 
 class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
 
-    fun RequestTimer(meter: Meter = Http4kOpenTelemetry.meter,
-                     name: String = defaults.timerDescription.first,
-                     description: String = defaults.timerDescription.second,
-                     labeler: HttpTransactionLabeler = defaults.labeler,
-                     clock: Clock = systemUTC()): Filter {
-        val meterInstance = meter.longValueRecorderBuilder(name)
+    fun RequestTimer(
+        meter: Meter = Http4kOpenTelemetry.meter,
+        name: String = defaults.timerDescription.first,
+        description: String = defaults.timerDescription.second,
+        labeler: HttpTransactionLabeler = defaults.labeler,
+        clock: Clock = systemUTC()
+    ): Filter {
+        val meterInstance = meter.histogramBuilder(name)
             .setDescription(description).setUnit("ms").build()
 
         return ReportHttpTransaction(clock) { tx ->
-            val labels = labeler(tx).labels.flatMap { listOf(it.key, it.value) }.toTypedArray()
-            meterInstance.record(tx.duration.toMillis(), Labels.of(*labels))
+            meterInstance
+                .record(
+                    tx.duration.toMillis().toDouble(), Attributes.builder()
+                        .apply {
+                            labeler(tx)
+                                .labels
+                                .forEach {
+                                    put(AttributeKey.stringKey(it.key), it.value)
+                                }
+                        }.build()
+                )
         }
     }
 
-    fun RequestCounter(meter: Meter = Http4kOpenTelemetry.meter,
-                       name: String = defaults.counterDescription.first,
-                       description: String = defaults.counterDescription.second,
-                       labeler: HttpTransactionLabeler = defaults.labeler,
-                       clock: Clock = systemUTC()): Filter {
-        val counterInstance = meter.longCounterBuilder(name)
+    fun RequestCounter(
+        meter: Meter = Http4kOpenTelemetry.meter,
+        name: String = defaults.counterDescription.first,
+        description: String = defaults.counterDescription.second,
+        labeler: HttpTransactionLabeler = defaults.labeler,
+        clock: Clock = systemUTC()
+    ): Filter {
+        val counterInstance = meter.counterBuilder(name)
             .setDescription(description).setUnit("1").build()
 
         return ReportHttpTransaction(clock) { tx ->
-            val labels = labeler(tx).labels.flatMap { listOf(it.key, it.value) }.toTypedArray()
-            counterInstance.add(1, Labels.of(*labels))
+            counterInstance.add(1, Attributes.builder()
+                .apply {
+                    labeler(tx)
+                        .labels
+                        .forEach {
+                            put(AttributeKey.stringKey(it.key), it.value)
+                        }
+                }.build()
+            )
         }
     }
 }

@@ -27,6 +27,7 @@ fun hasRequestTimer(count: Int, value: Double, attributes: Attributes, name: Str
                 .first { it.name == name }
                 .doubleSummaryData
                 .points
+                .also { println(it) }
                 .first { it.attributes == attributes }
             return if (
                 summary.count != count.toLong() &&
