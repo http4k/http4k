@@ -1,8 +1,8 @@
 {
   "node": {
     "$ref": "#/components/schemas/ArbObjectHolder",
-    "description": null,
-    "example": null
+    "example": null,
+    "description": null
   },
   "definitions": [
     {

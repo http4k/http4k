@@ -17,8 +17,8 @@
             "properties": {
               "inner": {
                 "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
-                "description": null,
-                "example": null
+                "example": null,
+                "description": null
               }
             },
             "example": {
@@ -32,14 +32,14 @@
               "inner"
             ]
           },
-          "description": null,
           "example": null,
+          "description": null,
           "type": "object"
         },
         "key4": {
           "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
-          "description": null,
-          "example": null
+          "example": null,
+          "description": null
         },
         "key5": {
           "items": {
@@ -105,8 +105,8 @@
         },
         "key6": {
           "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericListHolder",
-          "description": null,
-          "example": null
+          "example": null,
+          "description": null
         }
       },
       "example": {
@@ -230,8 +230,8 @@
         "key6"
       ]
     },
-    "description": null,
     "example": null,
+    "description": null,
     "type": "object"
   },
   "definitions": [
@@ -261,8 +261,8 @@
         "properties": {
           "child": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           },
           "list": {
             "items": {
@@ -301,8 +301,8 @@
           },
           "nullableChild": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           },
           "stringList": {
             "items": {
@@ -352,8 +352,8 @@
           },
           "enumVal": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           }
         },
         "example": {
