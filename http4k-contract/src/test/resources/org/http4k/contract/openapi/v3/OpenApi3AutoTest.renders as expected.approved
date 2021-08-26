@@ -113,8 +113,8 @@
                     "foo"
                   ]
                 },
-                "description": null,
                 "example": null,
+                "description": null,
                 "type": "object"
               }
             }
@@ -157,8 +157,8 @@
               },
               "schema": {
                 "$ref": "#/components/schemas/someOtherId",
-                "description": null,
-                "example": null
+                "example": null,
+                "description": null
               }
             }
           },
@@ -194,8 +194,8 @@
               },
               "schema": {
                 "$ref": "#/components/schemas/ArbObject3",
-                "description": null,
-                "example": null
+                "example": null,
+                "description": null
               }
             }
           },
@@ -253,13 +253,13 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/ArbObject1",
-                    "description": null,
-                    "example": null
+                    "example": null,
+                    "description": null
                   },
                   {
                     "$ref": "#/components/schemas/ArbObject3",
-                    "description": null,
-                    "example": null
+                    "example": null,
+                    "description": null
                   }
                 ]
               }
@@ -298,8 +298,8 @@
                 },
                 "schema": {
                   "$ref": "#/components/schemas/ArbObject1",
-                  "description": null,
-                  "example": null
+                  "example": null,
+                  "description": null
                 }
               }
             }
@@ -312,13 +312,13 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/ArbObject1",
-                      "description": null,
-                      "example": null
+                      "example": null,
+                      "description": null
                     },
                     {
                       "$ref": "#/components/schemas/ArbObject3",
-                      "description": null,
-                      "example": null
+                      "example": null,
+                      "description": null
                     }
                   ]
                 }
@@ -354,13 +354,13 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/impl1",
-                      "description": null,
-                      "example": null
+                      "example": null,
+                      "description": null
                     },
                     {
                       "$ref": "#/components/schemas/impl2",
-                      "description": null,
-                      "example": null
+                      "example": null,
+                      "description": null
                     }
                   ]
                 }
@@ -1065,8 +1065,8 @@
           },
           "child": {
             "$ref": "#/components/schemas/ArbObject1",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           },
           "numbers": {
             "items": {
@@ -1106,8 +1106,8 @@
         "properties": {
           "anotherString": {
             "$ref": "#/components/schemas/Foo",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           }
         },
         "example": {
@@ -1153,8 +1153,8 @@
                 "foo"
               ]
             },
-            "description": null,
             "example": null,
+            "description": null,
             "type": "object"
           }
         },
@@ -1175,8 +1175,8 @@
         "properties": {
           "obj": {
             "$ref": "#/components/schemas/Impl1",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           }
         },
         "example": {
@@ -1211,8 +1211,8 @@
         "properties": {
           "obj": {
             "$ref": "#/components/schemas/Impl2",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           }
         },
         "example": {

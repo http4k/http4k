@@ -1,8 +1,8 @@
 {
   "node": {
     "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericListHolder",
-    "description": null,
-    "example": null
+    "example": null,
+    "description": null
   },
   "definitions": [
     {
@@ -135,8 +135,8 @@
         "properties": {
           "child": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           },
           "list": {
             "items": {
@@ -175,8 +175,8 @@
           },
           "nullableChild": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           },
           "stringList": {
             "items": {
@@ -226,8 +226,8 @@
           },
           "enumVal": {
             "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo",
-            "description": null,
-            "example": null
+            "example": null,
+            "description": null
           }
         },
         "example": {

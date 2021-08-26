@@ -1,8 +1,8 @@
 {
   "node": {
     "$ref": "#/customPrefix/foobar",
-    "description": null,
-    "example": null
+    "example": null,
+    "description": null
   },
   "definitions": [
     {
@@ -27,8 +27,8 @@
                     "properties": {
                       "inner": {
                         "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
-                        "description": null,
-                        "example": null
+                        "example": null,
+                        "description": null
                       }
                     },
                     "example": {
@@ -42,8 +42,8 @@
                       "inner"
                     ]
                   },
-                  "description": null,
                   "example": null,
+                  "description": null,
                   "type": "object"
                 }
               },
@@ -64,8 +64,8 @@
                 "key3"
               ]
             },
-            "description": null,
             "example": null,
+            "description": null,
             "type": "object"
           }
         },
