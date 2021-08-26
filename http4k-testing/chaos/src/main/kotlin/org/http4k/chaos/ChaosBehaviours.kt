@@ -34,7 +34,7 @@ import kotlin.system.exitProcess
 /**
  * Encapsulates the type of bad behaviour to apply to the response.
  */
-typealias Behaviour = Filter
+abstract class Behaviour : Filter
 
 fun Behaviour.appliedWhen(trigger: Trigger) = object : Stage {
     override fun invoke(req: Request) = if (trigger(req)) this@appliedWhen else null
@@ -46,7 +46,7 @@ object ChaosBehaviours {
      * Blocks the thread for a random amount of time within the allocated range.
      */
     object Latency {
-        operator fun invoke(min: Duration = ofMillis(100), max: Duration = ofMillis(500)) = object : Behaviour {
+        operator fun invoke(min: Duration = ofMillis(100), max: Duration = ofMillis(500)) = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 val delay = ThreadLocalRandom.current()
                     .nextInt(min.toMillis().toInt(), max.toMillis().toInt())
@@ -61,11 +61,12 @@ object ChaosBehaviours {
          * Get a latency range from the environment.
          * Defaults to CHAOS_LATENCY_MS_MIN/MAX and a value of 100ms -> 500ms
          */
-        fun fromEnv(env: (String) -> String? = System::getenv,
-                    defaultMin: Duration = ofMillis(100),
-                    defaultMax: Duration = ofMillis(500),
-                    minName: String = "CHAOS_LATENCY_MS_MIN",
-                    maxName: String = "CHAOS_LATENCY_MS_MAX"
+        fun fromEnv(
+            env: (String) -> String? = System::getenv,
+            defaultMin: Duration = ofMillis(100),
+            defaultMax: Duration = ofMillis(500),
+            minName: String = "CHAOS_LATENCY_MS_MIN",
+            maxName: String = "CHAOS_LATENCY_MS_MAX"
         ) = Latency(env(minName)?.let { ofMillis(it.toLong()) } ?: defaultMin,
             env(maxName)?.let { ofMillis(it.toLong()) } ?: defaultMax)
     }
@@ -74,7 +75,7 @@ object ChaosBehaviours {
      * Throws the appropriate exception.
      */
     object ThrowException {
-        operator fun invoke(e: Throwable = RuntimeException("Chaos behaviour injected!")) = object : Behaviour {
+        operator fun invoke(e: Throwable = RuntimeException("Chaos behaviour injected!")) = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = { throw e }
             override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
         }
@@ -84,7 +85,7 @@ object ChaosBehaviours {
      * Returns an empty response with the appropriate status.
      */
     object ReturnStatus {
-        operator fun invoke(status: Status = INTERNAL_SERVER_ERROR) = object : Behaviour {
+        operator fun invoke(status: Status = INTERNAL_SERVER_ERROR) = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 Response(status).with(Header.CHAOS of "Status ${status.code}")
             }
@@ -104,7 +105,7 @@ object ChaosBehaviours {
      * Strips the body from a response to a particular length.
      */
     object SnipBody {
-        operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour {
+        operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 with(next(it)) {
                     val max = limitFn(body.length ?: 0)
@@ -121,7 +122,7 @@ object ChaosBehaviours {
      * Strips the body from a request to a particular length.
      */
     object SnipRequestBody {
-        operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour {
+        operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 next(with(it) {
                     val max = limitFn(body.length ?: 0)
@@ -138,7 +139,7 @@ object ChaosBehaviours {
      * Allocates memory in a busy loop until an OOM occurs.
      */
     object EatMemory {
-        operator fun invoke() = object : Behaviour {
+        operator fun invoke() = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 mutableListOf<ByteArray>().run { while (true) this += ByteArray(1024 * 1024) }
                 next(it)
@@ -152,7 +153,7 @@ object ChaosBehaviours {
      * Allocates memory in a busy loop until an OOM occurs.
      */
     object StackOverflow {
-        operator fun invoke() = object : Behaviour {
+        operator fun invoke() = object : Behaviour() {
             fun overflow(): Nothing = overflow()
 
             override fun invoke(next: HttpHandler): HttpHandler = {
@@ -167,7 +168,7 @@ object ChaosBehaviours {
      * System exits from the process.
      */
     object KillProcess {
-        operator fun invoke() = object : Behaviour {
+        operator fun invoke() = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 exitProcess(1)
                 throw NotImplementedError()
@@ -181,7 +182,7 @@ object ChaosBehaviours {
      * Blocks the current thread.
      */
     object BlockThread {
-        operator fun invoke() = object : Behaviour {
+        operator fun invoke() = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 next(it).apply { Thread.currentThread().join() }
             }
@@ -194,7 +195,7 @@ object ChaosBehaviours {
      * Does absolutely nothing.
      */
     object None {
-        operator fun invoke() = object : Behaviour {
+        operator fun invoke() = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = { next(it) }
             override fun toString() = "None"
         }
@@ -203,7 +204,7 @@ object ChaosBehaviours {
     /**
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
-    class Variable(var current: Behaviour = None()) : Behaviour {
+    class Variable(var current: Behaviour = None()) : Behaviour() {
         override fun invoke(next: HttpHandler): HttpHandler = {
             current.then(next)(it)
         }

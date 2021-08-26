@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.12.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.5.30.
+- **http4k-testing-chaos** : [Break] Behaviour is now an abstract class instead of a typealias. Super simple to fix. :) 
 
 ### v4.11.0.1
 - **http4k-graphql** : Fix - Downgrade graphql-java and fix Graphql reference example. 4.11.0.0 contained an incompatible version of graphql-java for generate use. H/T @razvn for spotting and fixing. :)
