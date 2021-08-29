@@ -60,7 +60,7 @@ Similarly to HttpHandler, for event processing in a functional style, the main b
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/http4k-serverless/lambda/src/examples/kotlin/example_event_handling.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/http4k-serverless/lambda/src/examples/kotlin/example_event_handling.kt></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/http4k-serverless/lambda/src/examples/kotlin/example_event_handling.kt"></script>
 
 #### Google Cloud Functions integration
 Google Cloud Functions are triggered in the cloud by calling an entry point class which implements their `HttpFunction` interface.
