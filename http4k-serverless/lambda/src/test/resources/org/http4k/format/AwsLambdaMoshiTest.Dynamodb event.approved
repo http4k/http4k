@@ -1,5 +1,5 @@
 {
-  "records": [
+  "Records": [
     {
       "eventSourceARN": "eventSourceARN",
       "eventID": "eventID",
@@ -12,11 +12,11 @@
         "type": "type"
       },
       "dynamodb": {
-        "approximateCreationDateTime": 0,
-        "sequenceNumber": "sequenceNumber",
-        "sizeBytes": 123,
-        "streamViewType": "KEYS_ONLY",
-        "keys": {
+        "ApproximateCreationDateTime": 0,
+        "SequenceNumber": "sequenceNumber",
+        "SizeBytes": 123,
+        "StreamViewType": "KEYS_ONLY",
+        "Keys": {
           "name": {
             "B": "120=",
             "BS": [
@@ -40,7 +40,7 @@
             ]
           }
         },
-        "newImage": {
+        "NewImage": {
           "name": {
             "B": "120=",
             "BS": [
@@ -64,7 +64,7 @@
             ]
           }
         },
-        "oldImage": {
+        "OldImage": {
           "name": {
             "B": "120=",
             "BS": [

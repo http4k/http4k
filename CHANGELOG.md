@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.12.0.1
+- **http4k-*** : Fix #652 - AWS event format adapters have fields with wrong cases.
+
 ### v4.12.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.5.30.
 - **http4k-testing-chaos** : [Break] Behaviour is now an abstract class instead of a typealias. Super simple to fix. :) 

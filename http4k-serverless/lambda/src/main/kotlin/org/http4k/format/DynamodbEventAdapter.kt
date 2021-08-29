@@ -22,7 +22,7 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
         with(reader) {
             obj(::DynamodbEvent) {
                 when (it) {
-                    "records" -> records = list(::DynamodbStreamRecord) {
+                    "Records" -> records = list(::DynamodbStreamRecord) {
                         when (it) {
                             "eventSourceARN" -> eventSourceARN = nextString()
                             "eventID" -> eventID = nextString()
@@ -39,13 +39,13 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
                             }
                             "dynamodb" -> dynamodb = obj(::StreamRecord) {
                                 when (it) {
-                                    "approximateCreationDateTime" -> approximateCreationDateTime = Date(nextLong())
-                                    "sequenceNumber" -> sequenceNumber = nextString()
-                                    "sizeBytes" -> sizeBytes = nextLong()
-                                    "streamViewType" -> setStreamViewType(StreamViewType.valueOf(nextString()))
-                                    "keys" -> keys = item()
-                                    "newImage" -> newImage = item()
-                                    "oldImage" -> oldImage = item()
+                                    "ApproximateCreationDateTime" -> approximateCreationDateTime = Date(nextLong())
+                                    "SequenceNumber" -> sequenceNumber = nextString()
+                                    "SizeBytes" -> sizeBytes = nextLong()
+                                    "StreamViewType" -> setStreamViewType(StreamViewType.valueOf(nextString()))
+                                    "Keys" -> keys = item()
+                                    "NewImage" -> newImage = item()
+                                    "OldImage" -> oldImage = item()
                                     else -> skipValue()
                                 }
                             }
@@ -61,7 +61,7 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
     override fun toJson(writer: JsonWriter, event: DynamodbEvent?) {
         with(writer) {
             obj(event) {
-                list("records", records) {
+                list("Records", records) {
                     obj(this) {
                         string("eventSourceARN", eventSourceARN)
                         string("eventID", eventID)
@@ -74,13 +74,13 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
                             string("type", type)
                         }
                         obj("dynamodb", dynamodb) {
-                            number("approximateCreationDateTime", approximateCreationDateTime?.time)
-                            string("sequenceNumber", sequenceNumber)
-                            number("sizeBytes", sizeBytes)
-                            string("streamViewType", streamViewType)
-                            obj("keys", keys) { entries.forEach { item(it) } }
-                            obj("newImage", newImage) { entries.forEach { item(it) } }
-                            obj("oldImage", oldImage) { entries.forEach { item(it) } }
+                            number("ApproximateCreationDateTime", approximateCreationDateTime?.time)
+                            string("SequenceNumber", sequenceNumber)
+                            number("SizeBytes", sizeBytes)
+                            string("StreamViewType", streamViewType)
+                            obj("Keys", keys) { entries.forEach { item(it) } }
+                            obj("NewImage", newImage) { entries.forEach { item(it) } }
+                            obj("OldImage", oldImage) { entries.forEach { item(it) } }
                         }
                     }
                 }

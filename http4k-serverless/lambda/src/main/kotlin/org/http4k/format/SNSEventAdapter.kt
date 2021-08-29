@@ -18,7 +18,7 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
         with(reader) {
             obj(::SNSEvent) {
                 when (it) {
-                    "records" -> records = list(::SNSRecord) {
+                    "Records" -> records = list(::SNSRecord) {
                         when (it) {
                             "eventSource" -> eventSource = nextString()
                             "eventSubscriptionArn" -> eventSubscriptionArn = nextString()
@@ -59,7 +59,7 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
     override fun toJson(writer: JsonWriter, event: SNSEvent?) {
         with(writer) {
             obj(event) {
-                list("records", records) {
+                list("Records", records) {
                     obj(this) {
                         string("eventSource", eventSource)
                         string("eventSubscriptionArn", eventSubscriptionArn)

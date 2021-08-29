@@ -1,5 +1,5 @@
 {
-  "records": [
+  "Records": [
     {
       "awsRegion": "awsRegion",
       "eventName": "eventName",

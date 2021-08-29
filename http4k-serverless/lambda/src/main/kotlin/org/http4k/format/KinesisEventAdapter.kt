@@ -18,7 +18,7 @@ object KinesisEventAdapter : JsonAdapter<KinesisEvent>() {
         with(reader) {
             obj(::KinesisEvent) {
                 when (it) {
-                    "records" -> records = list(::KinesisEventRecord) {
+                    "Records" -> records = list(::KinesisEventRecord) {
                         when (it) {
                             "eventSource" -> eventSource = nextString()
                             "eventID" -> eventID = nextString()
@@ -50,7 +50,7 @@ object KinesisEventAdapter : JsonAdapter<KinesisEvent>() {
     override fun toJson(writer: JsonWriter, event: KinesisEvent?) {
         with(writer) {
             obj(event) {
-                list("records", records) {
+                list("Records", records) {
                     obj(this) {
                         string("eventSource", eventSource)
                         string("eventID", eventID)
