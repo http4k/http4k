@@ -18,7 +18,7 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
         with(reader) {
             obj(::SQSEvent) {
                 when (it) {
-                    "records" -> records = list(::SQSMessage) {
+                    "Records" -> records = list(::SQSMessage) {
                         when (it) {
                             "messageId" -> messageId = nextString()
                             "receiptHandle" -> receiptHandle = nextString()
@@ -54,7 +54,7 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
     override fun toJson(writer: JsonWriter, event: SQSEvent?) {
         with(writer) {
             obj(event) {
-                list("records", records) {
+                list("Records", records) {
                     obj(this) {
                         string("messageId", messageId)
                         string("receiptHandle", receiptHandle)

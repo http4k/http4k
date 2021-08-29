@@ -22,7 +22,7 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
             val records = mutableListOf<S3EventNotificationRecord>()
             while (hasNext()) {
                 when (nextName()) {
-                    "records" -> {
+                    "Records" -> {
                         beginArray()
                         while (hasNext()) {
                             records += obj({ it ->
@@ -65,7 +65,7 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
     override fun toJson(writer: JsonWriter, event: S3Event?) {
         with(writer) {
             obj(event) {
-                list("records", records) {
+                list("Records", records) {
                     obj(this) {
                         string("awsRegion", awsRegion)
                         string("eventName", eventName)
