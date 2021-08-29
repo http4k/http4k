@@ -167,6 +167,14 @@ subprojects {
         }
     }
 
+    sourceSets {
+        test {
+            kotlin {
+                srcDirs 'src/test/kotlin'
+                srcDirs 'src/examples/kotlin'
+            }
+        }
+    }
 }
 
 compileTestKotlin.kotlinOptions {
@@ -205,6 +213,7 @@ dependencies {
         exclude group: "software.amazon.awssdk", module: "apache-client"
     }
     testImplementation Libs.graphql_kotlin_schema_generator
+    testImplementation Libs.aws_lambda_java_events
     testImplementation Config.TestDependencies
 }
 
