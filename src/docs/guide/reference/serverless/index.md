@@ -39,7 +39,6 @@ This is far from a complete guide, but configuring AWS Lambda and the API Gatewa
 1. Optionally using Proguard to minify the JAR.
 1. Package up the (minified) JAR into a standard Zip distribution.
 1. Create and configure the Lambda function, and at the same time:
-
     1. Upload the standard Zip file to S3.
     1. Set the function execution to call the main http4k entry point: `guide.modules.serverless.lambda.FunctionsExampleEntryClass`
 
