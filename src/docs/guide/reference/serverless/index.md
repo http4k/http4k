@@ -34,13 +34,13 @@ In order to achieve this, only a single interface `AppLoader` needs to be implem
 This is far from a complete guide, but configuring AWS Lambda and the API Gateway involves several stages:
 
 1. Users, Roles and Policies for the API Gateway and Lambda.
-1. API Gateway to proxy all requests to your Lambda.
-1. Building your http4k application into a standard UberJar.
-1. Optionally using Proguard to minify the JAR.
-1. Package up the (minified) JAR into a standard Zip distribution.
-1. Create and configure the Lambda function, and at the same time:
-    1. Upload the standard Zip file to S3.
-    1. Set the function execution to call the main http4k entry point: `guide.modules.serverless.lambda.FunctionsExampleEntryClass`
+2. API Gateway to proxy all requests to your Lambda.
+3. Building your http4k application into a standard UberJar.
+4. Optionally using Proguard to minify the JAR.
+5. Package up the (minified) JAR into a standard Zip distribution.
+6. Create and configure the Lambda function, and at the same time:
+    - Upload the standard Zip file to S3.
+    - Set the function execution to call the main http4k entry point: `guide.modules.serverless.lambda.FunctionsExampleEntryClass`
 
 We hope to soon provide some tools to automate at least some of the above process, or at least document it somewhat. However, AWS is a complicated beast and many people have a preferred way to set it up: CloudFormation templates, Serverless framework, Terraform, etc. In the meantime, here is an example of how the `AppLoader` is created and how to launch the app locally:
 
