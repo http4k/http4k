@@ -57,6 +57,8 @@ implementation "com.amazonaws:aws-lambda-java-events:3.8.0"
 
 Similarly to HttpHandler, for event processing in a functional style, the main body of the Lambda function is encapsulated in a single interface `FnHandler`. This typesafe class is created by an `FnLoader` function and simply passed into an extension of `AwsLambdaEventFunction` - which is the class configured as the entry point of your AWS lambda.
 
+The process of configuration is the same as for HTTP apps above.
+
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/http4k-serverless/lambda/src/examples/kotlin/example_event_handling.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/http4k-serverless/lambda/src/examples/kotlin/example_event_handling.kt"></script>
