@@ -6,6 +6,10 @@ plugins {
 
 refreshVersions {
     enableBuildSrcLibs()
+
+    rejectVersionIf {
+        candidate.stabilityLevel.isLessStableThan(current.stabilityLevel)
+    }
 }
 
 fun String.includeModule(name: String) {
