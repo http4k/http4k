@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.12.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Fix TrafficFilters.RecordTo eating body stream when used on a server.
 
 ### v4.12.0.1
 - **http4k-*** : Fix #652 - AWS event format adapters have fields with wrong cases.

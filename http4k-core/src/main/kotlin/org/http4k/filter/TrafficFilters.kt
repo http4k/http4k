@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -23,10 +24,10 @@ object TrafficFilters {
     object RecordTo {
         operator fun invoke(sink: Sink): Filter = Filter { next ->
             {
-                next(it).run {
-                    body(bodyString()).apply {
-                        sink[it] = this
-                    }
+                val copy = it.body(Body(it.body.payload))
+                next(copy).run {
+                    val response = body(Body(body.payload))
+                    response.apply { sink[copy] = this }
                 }
             }
         }

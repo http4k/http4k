@@ -3,8 +3,8 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -42,8 +42,8 @@ class TrafficFiltersTest {
     fun `RecordTo stores traffic in underlying storage on server`() {
         val stream = ReadWriteStream.Memory()
 
-        val request1 = Request(Method.POST, "").body("helloworld")
-        val request2 = Request(Method.POST, "").body("goodbyeworld")
+        val request1 = Request(POST, "").body("helloworld")
+        val request2 = Request(POST, "").body("goodbyeworld")
 
         RecordTo(stream)
             .then { responseFor(it) }
@@ -61,7 +61,8 @@ class TrafficFiltersTest {
         assertThat(stream.responses().toList()[1], hasBody(responseFor(request2).bodyString()))
     }
 
-    private fun responseFor(req: Request) = Response(OK).body(req.bodyString().reversed().byteInputStream())
+    private fun responseFor(req: Request) =
+        Response(OK).body(req.body.stream.reader().readText().reversed().byteInputStream())
 
     @Test
     fun `ServeCachedFrom serves stored requests later or falls back`() {
