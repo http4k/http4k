@@ -14,7 +14,7 @@ We'll take an existing http4k application built with Gradle and deployed with Pu
 We need to add the AWS Lambda Serverless Runtime module to our project. Install it into your `build.gradle` file with:
 
 ```groovy
-implementation("org.http4k:http4k-serverless-lambda-runtime:4.12.0.1")
+implementation("org.http4k:http4k-serverless-lambda-runtime:4.12.1.0")
 ```
 
 This custom runtime is a lightweight, zero-reflection module which allows you to deploy both Java and GraalVN based binaries to AWS.
