@@ -150,9 +150,9 @@ class OAuthServer(
     }
 }
 
-data class AuthorizationCode(val value: String)
-
 data class ClientId(val value: String)
+
+data class AuthorizationCode(val value: String)
 
 fun Request.authorizationRequest() =
     AuthRequest(
