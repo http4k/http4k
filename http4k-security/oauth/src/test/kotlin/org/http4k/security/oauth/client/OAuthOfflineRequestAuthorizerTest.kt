@@ -85,6 +85,27 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
+    fun `multiple calls without access token cache will request new access token each time`() {
+        val client = client("so_refreshing")
+
+        // make first call
+        var response = client(request)
+        assertThat(response, hasStatus(OK))
+        val accessToken = response.bodyString()
+
+
+        // make second call (should be same access token as before)
+        response = client(request)
+        assertThat(response, hasStatus(OK))
+        val accessToken2 = response.bodyString()
+
+        assertThat(authServer.refreshHistory, equalTo(listOf(
+            "so_refreshing" to accessToken,
+            "so_refreshing" to accessToken2
+        )))
+    }
+
+    @Test
     fun `call with invalid refresh token`() {
         val client = client("not_refreshing")
 
@@ -94,8 +115,8 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `call with expired access token - should be refreshed`() {
-        val client = client("so_refreshing")
+    fun `call with expired cached access token - should be refreshed`() {
+        val client = client("so_refreshing", accessTokenCache = AccessTokenCache.inMemory())
 
         val response = client(request)
         assertThat(response, hasStatus(OK))
