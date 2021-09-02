@@ -26,7 +26,6 @@ import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.State
-import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.AuthRequestOnly
 import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.Combine
 import org.http4k.security.oauth.server.AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy.RequestObjectOnly

@@ -16,7 +16,6 @@ import org.http4k.security.Nonce
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
-import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
@@ -152,6 +151,8 @@ class OAuthServer(
 }
 
 data class AuthorizationCode(val value: String)
+
+data class ClientId(val value: String)
 
 fun Request.authorizationRequest() =
     AuthRequest(

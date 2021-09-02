@@ -23,7 +23,6 @@ import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.State
 import org.http4k.security.accessTokenResponseBody
-import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration

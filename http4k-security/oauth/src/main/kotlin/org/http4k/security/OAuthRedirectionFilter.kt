@@ -10,7 +10,7 @@ import org.http4k.lens.Header.LOCATION
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.oauth.server.AuthRequest
-import org.http4k.security.oauth.core.ClientId
+import org.http4k.security.oauth.server.ClientId
 
 class OAuthRedirectionFilter(
     private val providerConfig: OAuthProviderConfig,

@@ -18,7 +18,6 @@ import org.http4k.format.Jackson
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.ResponseType.Code
-import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.junit.jupiter.api.Test
 

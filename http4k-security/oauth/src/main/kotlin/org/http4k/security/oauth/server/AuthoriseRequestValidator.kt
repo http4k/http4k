@@ -4,7 +4,6 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.security.oauth.core.ClientId
 
 interface AuthoriseRequestValidator {
 

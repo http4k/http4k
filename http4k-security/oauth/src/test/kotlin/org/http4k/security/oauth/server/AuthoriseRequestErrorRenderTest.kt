@@ -16,7 +16,6 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.security.ResponseMode.Query
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
-import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.junit.jupiter.api.Test
 import java.util.Base64

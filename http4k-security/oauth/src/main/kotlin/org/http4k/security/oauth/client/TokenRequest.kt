@@ -1,7 +1,7 @@
 package org.http4k.security.oauth.client
 
 import org.http4k.core.Uri
-import org.http4k.security.oauth.core.ClientId
+import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.core.RefreshToken
 
 data class TokenRequest(

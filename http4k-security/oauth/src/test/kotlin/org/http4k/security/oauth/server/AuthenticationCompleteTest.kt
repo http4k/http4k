@@ -18,7 +18,6 @@ import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.State
 import org.http4k.security.fragmentParameter
-import org.http4k.security.oauth.core.ClientId
 import org.junit.jupiter.api.Test
 
 class AuthenticationCompleteTest {

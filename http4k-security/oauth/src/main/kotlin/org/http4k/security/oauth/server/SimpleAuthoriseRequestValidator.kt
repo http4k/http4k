@@ -5,7 +5,6 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.security.oauth.core.ClientId
 
 class SimpleAuthoriseRequestValidator(private val clientValidator: ClientValidator) : AuthoriseRequestValidator {
 

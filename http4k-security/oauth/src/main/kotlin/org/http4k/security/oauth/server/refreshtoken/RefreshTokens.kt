@@ -4,7 +4,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import org.http4k.security.AccessToken
 import org.http4k.security.oauth.server.AccessTokenError
-import org.http4k.security.oauth.core.ClientId
+import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.oauth.server.TokenRequest
 import org.http4k.security.oauth.server.UnsupportedGrantType

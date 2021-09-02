@@ -6,7 +6,7 @@ import dev.forkhandles.result4k.get
 import org.http4k.core.Uri
 import org.http4k.security.oauth.server.AccessTokenError
 import org.http4k.security.oauth.server.AuthorizationCode
-import org.http4k.security.oauth.core.ClientId
+import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.MissingAuthorizationCode
 import org.http4k.security.oauth.server.MissingRedirectUri
 import org.http4k.security.oauth.server.TokenRequest

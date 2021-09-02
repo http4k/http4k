@@ -2,7 +2,6 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.security.oauth.core.ClientId
 
 /**
  * Provides a consistent way to retrieve clients attempting to use an authorization code flow
