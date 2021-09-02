@@ -21,7 +21,15 @@ object TrafficFilters {
      * Intercepts and Writes Request/Response traffic
      */
     object RecordTo {
-        operator fun invoke(sink: Sink): Filter = Filter { next -> { next(it).apply { sink[it] = this } } }
+        operator fun invoke(sink: Sink): Filter = Filter { next ->
+            {
+                next(it).run {
+                    body(bodyString()).apply {
+                        sink[it] = this
+                    }
+                }
+            }
+        }
     }
 
     /**
