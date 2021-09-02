@@ -29,18 +29,16 @@ class OAuthOfflineRequestAuthorizerTest {
         private val accessTokenDuration = Duration.ofSeconds(30)
         private val clientCredentials = Credentials("foo", "bar")
         private const val validRefreshToken = "so_refreshing"
+        private val providerConfig = OAuthProviderConfig(
+            authBase = Uri.of(""),
+            authPath = "/oauth2/authorize",
+            tokenPath = "/oauth2/token",
+            credentials = clientCredentials
+        )
     }
 
-    private var time = Instant.ofEpochSecond(9000)
-    val refreshHistory = mutableListOf<Pair<String, String>>()
-
-
-    private val providerConfig = OAuthProviderConfig(
-        authBase = Uri.of(""),
-        authPath = "/oauth2/authorize",
-        tokenPath = "/oauth2/token",
-        credentials = clientCredentials
-    )
+    private var time = Instant.ofEpochSecond(9001)
+    private val refreshHistory = mutableListOf<Pair<String, String>>()
 
     private val authServer = let {
         fun tokenHandler(request: Request): Response {
@@ -86,26 +84,25 @@ class OAuthOfflineRequestAuthorizerTest {
 
     @Test
     fun `call with valid refresh token`() {
-        val client = client("so_refreshing")
+        val client = client(validRefreshToken)
 
-        // make first call
         val response = client(request)
         assertThat(response, hasStatus(OK))
         val accessToken = response.bodyString()
 
-        assertThat(refreshHistory, equalTo(listOf("so_refreshing" to accessToken)))
+        assertThat(refreshHistory, equalTo(listOf(validRefreshToken to accessToken)))
     }
 
     @Test
-    fun `cached access token will be reused if caching is provided`() {
-        val client = client("so_refreshing", accessTokenCache = AccessTokenCache.inMemory())
+    fun `access token will be reused if caching enabled`() {
+        val client = client(validRefreshToken, accessTokenCache = AccessTokenCache.inMemory())
 
         // make first call
         var response = client(request)
         assertThat(response, hasStatus(OK))
         val accessToken = response.bodyString()
 
-        assertThat(refreshHistory, equalTo(listOf("so_refreshing" to accessToken)))
+        assertThat(refreshHistory, equalTo(listOf(validRefreshToken to accessToken)))
 
         // make second call (should be same access token as before)
         response = client(request)
@@ -115,28 +112,26 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `multiple calls without access token cache will request new access token each time`() {
-        val client = client("so_refreshing")
+    fun `subsequent calls without access token cache will request new access token each time`() {
+        val client = client(validRefreshToken)
 
         // make first call
-        var response = client(request)
-        assertThat(response, hasStatus(OK))
-        val accessToken = response.bodyString()
+        val response1 = client(request)
+        assertThat(response1, hasStatus(OK))
 
 
-        // make second call (should be same access token as before)
-        response = client(request)
-        assertThat(response, hasStatus(OK))
-        val accessToken2 = response.bodyString()
+        // make second call (should be new access token)
+        val response2 = client(request)
+        assertThat(response2, hasStatus(OK))
 
         assertThat(refreshHistory, equalTo(listOf(
-            "so_refreshing" to accessToken,
-            "so_refreshing" to accessToken2
+            validRefreshToken to response1.bodyString(),
+            validRefreshToken to response2.bodyString()
         )))
     }
 
     @Test
-    fun `call with invalid refresh token`() {
+    fun `call with invalid refresh token - unauthorized`() {
         val client = client("not_refreshing")
 
         val response = client(request)
@@ -145,9 +140,9 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `call with invalid client credentials`() {
+    fun `call with invalid client credentials - unauthorized`() {
         val config = providerConfig.copy(credentials = Credentials("wrong", "credentials"))
-        val client = client("so_refreshing", config = config)
+        val client = client(validRefreshToken, config = config)
 
         val response = client(request)
         assertThat(response, hasStatus(UNAUTHORIZED))
@@ -155,7 +150,7 @@ class OAuthOfflineRequestAuthorizerTest {
 
     @Test
     fun `call with expired cached access token - should be refreshed`() {
-        val client = client("so_refreshing", accessTokenCache = AccessTokenCache.inMemory())
+        val client = client(validRefreshToken, accessTokenCache = AccessTokenCache.inMemory())
 
         val response = client(request)
         assertThat(response, hasStatus(OK))
@@ -167,8 +162,8 @@ class OAuthOfflineRequestAuthorizerTest {
         assertThat(response2, hasStatus(OK))
 
         assertThat(refreshHistory, equalTo(listOf(
-            "so_refreshing" to response.bodyString(),
-            "so_refreshing" to response2.bodyString()
+            validRefreshToken to response.bodyString(),
+            validRefreshToken to response2.bodyString()
         )))
     }
 }
