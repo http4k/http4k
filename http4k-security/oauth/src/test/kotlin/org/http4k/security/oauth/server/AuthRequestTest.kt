@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Uri
 import org.http4k.security.ResponseType
 import org.http4k.security.State
+import org.http4k.security.oauth.core.ClientId
 import org.junit.jupiter.api.Test
 import java.util.UUID
 

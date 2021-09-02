@@ -5,7 +5,7 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Request
 import org.http4k.security.oauth.server.AccessTokenError
-import org.http4k.security.oauth.server.ClientId
+import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.ClientValidator
 import org.http4k.security.oauth.server.InvalidClientCredentials
 import org.http4k.security.oauth.server.TokenRequest

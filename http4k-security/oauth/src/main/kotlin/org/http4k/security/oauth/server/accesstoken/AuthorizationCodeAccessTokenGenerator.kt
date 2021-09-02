@@ -13,7 +13,7 @@ import org.http4k.security.oauth.server.AccessTokens
 import org.http4k.security.oauth.server.AuthorizationCode
 import org.http4k.security.oauth.server.AuthorizationCodeExpired
 import org.http4k.security.oauth.server.AuthorizationCodes
-import org.http4k.security.oauth.server.ClientId
+import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.ClientIdMismatch
 import org.http4k.security.oauth.server.IdTokens
 import org.http4k.security.oauth.server.MissingAuthorizationCode

@@ -1,6 +1,6 @@
 package org.http4k.security.oauth.server.request
 
-import org.http4k.security.oauth.server.ClientId
+import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.InvalidAuthorizationRequest
 import org.http4k.security.openid.RequestJwtContainer
 

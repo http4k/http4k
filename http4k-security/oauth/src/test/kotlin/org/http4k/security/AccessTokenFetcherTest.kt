@@ -11,7 +11,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.security.AccessTokenFetcher.Companion.Forms.responseForm
-import org.http4k.security.oauth.server.refreshtoken.RefreshToken
+import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.openid.IdToken
 import org.junit.jupiter.api.Test
 

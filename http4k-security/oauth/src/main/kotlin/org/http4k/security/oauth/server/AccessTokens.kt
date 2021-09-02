@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server
 
 import dev.forkhandles.result4k.Result
 import org.http4k.security.AccessToken
+import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 
 /**

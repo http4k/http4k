@@ -21,7 +21,7 @@ import org.http4k.security.oauth.server.AuthRequestTracking
 import org.http4k.security.oauth.server.AuthorizationCode
 import org.http4k.security.oauth.server.AuthorizationCodeDetails
 import org.http4k.security.oauth.server.AuthorizationCodes
-import org.http4k.security.oauth.server.ClientId
+import org.http4k.security.oauth.core.ClientId
 import org.http4k.security.oauth.server.ClientValidator
 import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.security.oauth.server.TokenRequest
