@@ -9,9 +9,11 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.security.ResponseType
 
-class ClientValidationFilter(private val authoriseRequestValidator: AuthoriseRequestValidator,
-                             private val errorRenderer: AuthoriseRequestErrorRender,
-                             private val extractor: AuthRequestExtractor) : Filter {
+class ClientValidationFilter(
+    private val authoriseRequestValidator: AuthoriseRequestValidator,
+    private val errorRenderer: AuthoriseRequestErrorRender,
+    private val extractor: AuthRequestExtractor
+) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =
         {
@@ -19,7 +21,8 @@ class ClientValidationFilter(private val authoriseRequestValidator: AuthoriseReq
                 errorRenderer.errorFor(it, UnsupportedResponseType(it.query("response_type").orEmpty()))
             } else {
                 extractor.extract(it).map { authorizationRequest ->
-                    when (val result = MustHaveRedirectUri(authoriseRequestValidator).validate(it, authorizationRequest)) {
+                    when (val result =
+                        MustHaveRedirectUri(authoriseRequestValidator).validate(it, authorizationRequest)) {
                         is Success -> next(result.value)
                         is Failure -> errorRenderer.errorFor(it, result.reason)
                     }

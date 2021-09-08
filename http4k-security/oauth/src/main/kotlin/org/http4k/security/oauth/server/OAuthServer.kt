@@ -16,11 +16,11 @@ import org.http4k.security.Nonce
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
+import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
-import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.openid.RequestJwtContainer

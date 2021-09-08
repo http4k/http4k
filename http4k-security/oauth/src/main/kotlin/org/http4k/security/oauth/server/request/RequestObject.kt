@@ -7,20 +7,24 @@ import org.http4k.security.ResponseType
 import org.http4k.security.State
 import org.http4k.security.oauth.server.ClientId
 
-data class RequestObject(val client: ClientId? = null,
-                         val redirectUri: Uri? = null,
-                         val audience: List<String> = emptyList(),
-                         val issuer: String? = null,
-                         val scope: List<String> = emptyList(),
-                         val responseMode: ResponseMode? = null,
-                         val responseType: ResponseType? = null,
-                         val state: State? = null,
-                         val nonce: Nonce? = null,
-                         val magAge: Long? = null,
-                         val expiry: Long? = null,
-                         val claims: Claims = Claims())
+data class RequestObject(
+    val client: ClientId? = null,
+    val redirectUri: Uri? = null,
+    val audience: List<String> = emptyList(),
+    val issuer: String? = null,
+    val scope: List<String> = emptyList(),
+    val responseMode: ResponseMode? = null,
+    val responseType: ResponseType? = null,
+    val state: State? = null,
+    val nonce: Nonce? = null,
+    val magAge: Long? = null,
+    val expiry: Long? = null,
+    val claims: Claims = Claims()
+)
 
-data class Claims(val userinfo: Map<String, Claim>? = null,
-                 val id_token: Map<String, Claim>? = null)
+data class Claims(
+    val userinfo: Map<String, Claim>? = null,
+    val id_token: Map<String, Claim>? = null
+)
 
 data class Claim(val essential: Boolean = false, val value: String? = null, val values: List<String>? = null)

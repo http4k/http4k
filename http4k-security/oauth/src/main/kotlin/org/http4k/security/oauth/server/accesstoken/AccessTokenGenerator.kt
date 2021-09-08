@@ -8,5 +8,9 @@ import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.TokenRequest
 
 fun interface AccessTokenGenerator {
-    fun generate(request: Request, clientId: ClientId, tokenRequest: TokenRequest): Result<AccessTokenDetails, AccessTokenError>
+    fun generate(
+        request: Request,
+        clientId: ClientId,
+        tokenRequest: TokenRequest
+    ): Result<AccessTokenDetails, AccessTokenError>
 }

@@ -13,6 +13,7 @@ import org.http4k.core.then
 import org.http4k.filter.ServerFilters.BearerAuth
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import org.http4k.lens.RequestContextKey
+import org.http4k.security.CredentialsProvider
 import org.junit.jupiter.api.Test
 
 class BearerAuthenticationTest {
@@ -35,7 +36,7 @@ class BearerAuthenticationTest {
     @Test
     fun authenticate_using_client_extension() {
         val handler = ServerFilters.BearerAuth("token").then { Response(OK) }
-        val response = ClientFilters.BearerAuth("token").then(handler)(Request(GET, "/"))
+        val response = ClientFilters.BearerAuth(CredentialsProvider { "token" }).then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(OK))
     }
 
@@ -49,7 +50,7 @@ class BearerAuthenticationTest {
     @Test
     fun fails_to_authenticate_if_credentials_do_not_match() {
         val handler = ServerFilters.BearerAuth("token").then { Response(OK) }
-        val response = ClientFilters.BearerAuth("not token").then(handler)(Request(GET, "/"))
+        val response = ClientFilters.BearerAuth(CredentialsProvider { "not token" }).then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 

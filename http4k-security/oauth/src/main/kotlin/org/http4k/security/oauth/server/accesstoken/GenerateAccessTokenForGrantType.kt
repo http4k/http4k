@@ -32,7 +32,8 @@ class GenerateAccessTokenForGrantType(
     refreshTokens: RefreshTokens,
     private val grantTypes: GrantTypesConfiguration
 ) {
-    private val authorizationCode = AuthorizationCodeAccessTokenGenerator(authorizationCodes, accessTokens, clock, idTokens)
+    private val authorizationCode =
+        AuthorizationCodeAccessTokenGenerator(authorizationCodes, accessTokens, clock, idTokens)
     private val clientCredentials = ClientCredentialsAccessTokenGenerator(accessTokens)
     private val refreshTokens = RefreshTokenAccessTokenGenerator(refreshTokens)
 

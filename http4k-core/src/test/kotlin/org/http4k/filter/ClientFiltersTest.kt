@@ -36,6 +36,7 @@ import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.CredentialsProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -391,7 +392,7 @@ class ClientFiltersTest {
     @Test
     fun `can do proxy basic auth`() {
         val captured = AtomicReference<Request>()
-        val handler = ClientFilters.ProxyBasicAuth(Credentials("bob", "password")).then { req ->
+        val handler = ClientFilters.ProxyBasicAuth(CredentialsProvider { Credentials("bob", "password") }).then { req ->
             captured.set(req)
             Response(OK).body("hello")
         }

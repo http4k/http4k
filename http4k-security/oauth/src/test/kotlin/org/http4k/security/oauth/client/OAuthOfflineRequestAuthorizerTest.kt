@@ -7,6 +7,7 @@ import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.filter.ClientFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
@@ -14,6 +15,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.lang.UnsupportedOperationException
 import java.time.Clock
@@ -68,11 +70,8 @@ class OAuthOfflineRequestAuthorizerTest {
             config,
             accessTokenCache,
             authServer,
-            object: Clock() {
-                override fun getZone() = throw UnsupportedOperationException()
-                override fun withZone(zone: ZoneId?) = throw UnsupportedOperationException()
-                override fun instant() = time
-            }
+            ClientFilters.BasicAuth(config.credentials),
+            FixedClock
         )
 
         return security.toFilter(refreshToken).then { request ->

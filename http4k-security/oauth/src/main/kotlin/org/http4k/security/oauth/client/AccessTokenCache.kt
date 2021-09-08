@@ -7,12 +7,12 @@ interface AccessTokenCache {
     operator fun set(refreshToken: RefreshToken, accessToken: TokenData)
 
     companion object {
-        fun none() = object: AccessTokenCache {
+        fun none() = object : AccessTokenCache {
             override fun get(refreshToken: RefreshToken): Nothing? = null
             override fun set(refreshToken: RefreshToken, accessToken: TokenData) {}
         }
 
-        fun inMemory() = object: AccessTokenCache {
+        fun inMemory() = object : AccessTokenCache {
             var tokens = mutableMapOf<RefreshToken, TokenData>()
 
             override fun get(refreshToken: RefreshToken) = tokens[refreshToken]

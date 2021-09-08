@@ -11,9 +11,11 @@ import org.http4k.security.fragmentParameter
 
 interface ResponseRender {
 
-    fun withState(state: State?) = if (state == null || state.value.isBlank()) this else addParameter("state", state.value)
+    fun withState(state: State?) =
+        if (state == null || state.value.isBlank()) this else addParameter("state", state.value)
 
-    fun withDocumentationUri(documentationUri: String?) = if (documentationUri.isNullOrEmpty()) this else addParameter("error_uri", documentationUri)
+    fun withDocumentationUri(documentationUri: String?) =
+        if (documentationUri.isNullOrEmpty()) this else addParameter("error_uri", documentationUri)
 
     fun addParameter(key: String, value: String?): ResponseRender
 
@@ -21,7 +23,11 @@ interface ResponseRender {
 
     companion object {
         fun forAuthRequest(authorizationRequest: AuthRequest) =
-            forAuthRequest(authorizationRequest.responseMode, authorizationRequest.responseType, authorizationRequest.redirectUri!!)
+            forAuthRequest(
+                authorizationRequest.responseMode,
+                authorizationRequest.responseType,
+                authorizationRequest.redirectUri!!
+            )
 
         fun forAuthRequest(responseMode: ResponseMode?, responseType: ResponseType, redirectUri: Uri) =
             when (responseMode) {
@@ -45,7 +51,8 @@ class QueryResponseRender(private val uri: Uri) : ResponseRender {
 
 class FragmentResponseRender(private val uri: Uri) : ResponseRender {
 
-    override fun addParameter(key: String, value: String?): ResponseRender = FragmentResponseRender(uri.fragmentParameter(key, value))
+    override fun addParameter(key: String, value: String?): ResponseRender =
+        FragmentResponseRender(uri.fragmentParameter(key, value))
 
     override fun complete(): Response = Response(SEE_OTHER).header("Location", uri.toString())
 }

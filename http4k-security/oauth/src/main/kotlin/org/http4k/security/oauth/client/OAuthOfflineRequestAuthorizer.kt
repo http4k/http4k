@@ -1,10 +1,16 @@
 package org.http4k.security.oauth.client
 
-import org.http4k.core.*
-import org.http4k.filter.ClientFilters
-import org.http4k.security.OAuthProviderConfig
+import org.http4k.core.Body
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.then
+import org.http4k.core.with
+import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.format.Moshi.auto
 import org.http4k.security.AccessTokenResponse
+import org.http4k.security.OAuthProviderConfig
 import org.http4k.security.oauth.core.RefreshToken
 import java.time.Clock
 import java.time.Duration
@@ -13,16 +19,17 @@ class OAuthOfflineRequestAuthorizer(
     private val config: OAuthProviderConfig,
     private val accessTokenCache: AccessTokenCache,
     backend: HttpHandler,
+    authRequestFilter: Filter,
     private val clock: Clock = Clock.systemUTC(),
-    private val expiryMargin: Duration = Duration.ofSeconds(10)
+    private val expiryMargin: Duration = Duration.ofSeconds(10),
 ) {
     companion object {
         val tokenRequestLens = Body.auto<TokenRequest>().toLens()
         val tokenResponseLens = Body.auto<AccessTokenResponse>().toLens()
     }
 
-    private val authClient = ClientFilters.SetHostFrom(config.apiBase)
-        .then(ClientFilters.BasicAuth(config.credentials))
+    private val authClient = SetHostFrom(config.apiBase)
+        .then(authRequestFilter)
         .then(backend)
 
     private fun refresh(refreshToken: RefreshToken): TokenData? {
@@ -56,4 +63,4 @@ class OAuthOfflineRequestAuthorizer(
     }
 
     fun toFilter(refreshToken: String) = toFilter(RefreshToken(refreshToken))
- }
+}

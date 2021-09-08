@@ -34,14 +34,22 @@ enum class RfcError {
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
 sealed class AccessTokenError(rfcError: RfcError, description: String) : OAuthError(rfcError, description)
 
-data class UnsupportedGrantType(val requestedGrantType: String) : AccessTokenError(RfcError.UnsupportedGrantType, "$requestedGrantType is not supported")
+data class UnsupportedGrantType(val requestedGrantType: String) :
+    AccessTokenError(RfcError.UnsupportedGrantType, "$requestedGrantType is not supported")
+
 object InvalidClientAssertionType : AccessTokenError(InvalidGrant, "The 'client_assertion_type' is invalid")
 object InvalidClientAssertion : AccessTokenError(InvalidGrant, "The 'client_assertion' is invalid")
-object InvalidClientCredentials : AccessTokenError(InvalidClient, "The 'client_id' parameter does not match the authorization request")
+object InvalidClientCredentials :
+    AccessTokenError(InvalidClient, "The 'client_id' parameter does not match the authorization request")
+
 object AuthorizationCodeExpired : AccessTokenError(InvalidGrant, "The authorization code has expired")
-object ClientIdMismatch : AccessTokenError(InvalidGrant, "The 'client_id' parameter does not match the authorization request")
+object ClientIdMismatch :
+    AccessTokenError(InvalidGrant, "The 'client_id' parameter does not match the authorization request")
+
 object RedirectUriMismatch : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter is required")
-object MissingRedirectUri : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
+object MissingRedirectUri :
+    AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
+
 object AuthorizationCodeAlreadyUsed : AccessTokenError(InvalidGrant, "The authorization code has already been used")
 object MissingAuthorizationCode : AccessTokenError(InvalidGrant, "The authorization code is required")
 data class InvalidRequest(val message: String) : AccessTokenError(InvalidRequest, message)
@@ -54,5 +62,9 @@ object InvalidClientId : AuthorizationError(InvalidClient, "The specified client
 object InvalidRedirectUri : AuthorizationError(InvalidClient, "The specified redirect uri is not registered")
 object InvalidScopes : AuthorizationError(InvalidScope, "The specified scopes are invalid")
 object InvalidRequestObject : AuthorizationError(InvalidRequestObject, "The specified request is invalid")
-data class UnsupportedResponseType(val requestedResponseType: String) : AuthorizationError(RfcError.UnsupportedResponseType, "The specified response_type '$requestedResponseType' is not supported")
+data class UnsupportedResponseType(val requestedResponseType: String) : AuthorizationError(
+    RfcError.UnsupportedResponseType,
+    "The specified response_type '$requestedResponseType' is not supported"
+)
+
 data class InvalidAuthorizationRequest(val reason: String) : AuthorizationError(InvalidRequest, reason)

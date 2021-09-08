@@ -11,6 +11,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 import org.http4k.lens.RequestContextKey
+import org.http4k.security.CredentialsProvider
 import org.junit.jupiter.api.Test
 
 class BasicAuthenticationTest {
@@ -49,7 +50,7 @@ class BasicAuthenticationTest {
     @Test
     fun fails_to_authenticate_with_non_basic_token() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
-        val response = ClientFilters.BearerAuth("token").then(handler)(Request(GET, "/"))
+        val response = ClientFilters.BearerAuth(CredentialsProvider { "token" }).then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
@@ -70,7 +71,7 @@ class BasicAuthenticationTest {
     @Test
     fun allow_injecting_credential_provider() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
-        val response = ClientFilters.BasicAuth { Credentials("user", "password") }.then(handler)(Request(GET, "/"))
+        val response = ClientFilters.BasicAuth(CredentialsProvider { Credentials("user", "password") }).then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(OK))
     }
 

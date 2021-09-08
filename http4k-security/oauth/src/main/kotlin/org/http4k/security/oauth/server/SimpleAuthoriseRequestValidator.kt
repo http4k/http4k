@@ -8,12 +8,21 @@ import org.http4k.core.Uri
 
 class SimpleAuthoriseRequestValidator(private val clientValidator: ClientValidator) : AuthoriseRequestValidator {
 
-    override fun isValidClientAndRedirectUriInCaseOfError(request: Request, clientId: ClientId, redirectUri: Uri): Boolean = clientValidator.validateRedirection(request, clientId, redirectUri)
+    override fun isValidClientAndRedirectUriInCaseOfError(
+        request: Request,
+        clientId: ClientId,
+        redirectUri: Uri
+    ): Boolean = clientValidator.validateRedirection(request, clientId, redirectUri)
 
     override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
         return if (!clientValidator.validateClientId(request, authorizationRequest.client)) {
             Failure(InvalidClientId)
-        } else if (!clientValidator.validateRedirection(request, authorizationRequest.client, authorizationRequest.redirectUri!!)) {
+        } else if (!clientValidator.validateRedirection(
+                request,
+                authorizationRequest.client,
+                authorizationRequest.redirectUri!!
+            )
+        ) {
             Failure(InvalidRedirectUri)
         } else if (!clientValidator.validateScopes(request, authorizationRequest.client, authorizationRequest.scopes)) {
             Failure(InvalidScopes)

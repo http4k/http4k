@@ -1,8 +1,8 @@
 package org.http4k.security.oauth.client
 
 import org.http4k.core.Uri
-import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.core.RefreshToken
+import org.http4k.security.oauth.server.ClientId
 
 data class TokenRequest(
     val grant_type: String,
@@ -10,7 +10,7 @@ data class TokenRequest(
     val client_id: String?,
     val code: String?,
     val redirect_uri: String?
-    ) {
+) {
     companion object {
         fun refreshToken(refreshToken: RefreshToken) = TokenRequest(
             grant_type = "refresh_token",
@@ -19,6 +19,7 @@ data class TokenRequest(
             code = null,
             redirect_uri = null
         )
+
         fun authorizationCode(code: String, redirectUri: Uri?, clientId: ClientId?) = TokenRequest(
             grant_type = "authorization_code",
             refresh_token = null,
