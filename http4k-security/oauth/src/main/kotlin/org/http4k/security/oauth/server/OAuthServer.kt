@@ -20,7 +20,7 @@ import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentica
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
-import org.http4k.security.oauth.server.refreshtoken.RefreshToken
+import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.openid.RequestJwtContainer

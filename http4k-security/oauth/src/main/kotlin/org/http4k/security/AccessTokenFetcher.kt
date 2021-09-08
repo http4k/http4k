@@ -23,7 +23,7 @@ import org.http4k.security.AccessTokenFetcher.Companion.Forms.grantType
 import org.http4k.security.AccessTokenFetcher.Companion.Forms.redirectUri
 import org.http4k.security.AccessTokenFetcher.Companion.Forms.requestForm
 import org.http4k.security.AccessTokenFetcher.Companion.Forms.responseForm
-import org.http4k.security.oauth.server.refreshtoken.RefreshToken
+import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.openid.IdToken
 
 class AccessTokenFetcher(
