@@ -23,6 +23,7 @@ import org.http4k.routing.routes
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.OAuthProviderConfig
 import org.http4k.security.accessTokenResponseBody
+import org.http4k.security.oauth.core.RefreshToken
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
@@ -89,7 +90,7 @@ class OAuthOfflineRequestAuthorizerTest {
             }
         )
 
-        return security.toFilter(refreshToken).then { request ->
+        return security.toFilter(RefreshToken(refreshToken)).then { request ->
             val token = request.header("Authorization")?.replace("Bearer ", "")
             println(token)
             val status = if (token == null) UNAUTHORIZED else OK

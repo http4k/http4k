@@ -57,6 +57,4 @@ class OAuthOfflineRequestAuthorizer(
             next(withToken)
         }
     }
-
-    fun toFilter(refreshToken: String) = toFilter(RefreshToken(refreshToken))
 }
