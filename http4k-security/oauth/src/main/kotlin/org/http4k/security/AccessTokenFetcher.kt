@@ -62,15 +62,6 @@ class AccessTokenFetcher(
     private fun Request.authenticate(accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator): Request =
         accessTokenFetcherAuthenticator.authenticate(this)
 
-    private fun AccessTokenResponse.toAccessToken(): AccessToken =
-        AccessToken(
-            access_token,
-            type = token_type ?: "Bearer",
-            expiresIn = expires_in,
-            scope = scope,
-            refreshToken = refresh_token?.let(::RefreshToken)
-        )
-
     companion object {
         object Forms {
             // response

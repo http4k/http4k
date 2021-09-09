@@ -13,7 +13,8 @@ class AuthenticationComplete(
     private val authorizationCodes: AuthorizationCodes,
     private val requestTracking: AuthRequestTracking,
     private val idTokens: IdTokens,
-    private val documentationUri: String? = null) : HttpHandler {
+    private val documentationUri: String? = null
+) : HttpHandler {
 
     override fun invoke(request: Request): Response {
         val authorizationRequest = requestTracking.resolveAuthRequest(request)
@@ -25,13 +26,26 @@ class AuthenticationComplete(
             .complete()
     }
 
-    private fun ResponseRender.addResponseTypeValues(authorizationRequest: AuthRequest, request: Request, response: Response = this.complete()): ResponseRender =
+    private fun ResponseRender.addResponseTypeValues(
+        authorizationRequest: AuthRequest,
+        request: Request,
+        response: Response = this.complete()
+    ): ResponseRender =
         with(authorizationCodes.create(request, authorizationRequest, response)) {
             map {
                 when (authorizationRequest.responseType) {
                     Code -> addParameter("code", it.value)
                     CodeIdToken -> addParameter("code", it.value)
-                        .addParameter("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, authorizationRequest.nonce, it).value)
+                        .addParameter(
+                            "id_token",
+                            idTokens.createForAuthorization(
+                                request,
+                                authorizationRequest,
+                                response,
+                                authorizationRequest.nonce,
+                                it
+                            ).value
+                        )
                 }
             }
                 .mapFailure {
@@ -42,5 +56,6 @@ class AuthenticationComplete(
                 .get()
         }
 
-    private fun String.addTo(responseRender: ResponseRender): ResponseRender = responseRender.addParameter("error_uri", this)
+    private fun String.addTo(responseRender: ResponseRender): ResponseRender =
+        responseRender.addParameter("error_uri", this)
 }

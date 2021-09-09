@@ -11,7 +11,11 @@ interface AccessTokens {
     /**
      * Creates a new access token for a valid authorization code.
      */
-    fun create(clientId: ClientId, tokenRequest: AuthorizationCodeAccessTokenRequest, authorizationCode: AuthorizationCode): Result<AccessToken, AuthorizationCodeAlreadyUsed>
+    fun create(
+        clientId: ClientId,
+        tokenRequest: AuthorizationCodeAccessTokenRequest,
+        authorizationCode: AuthorizationCode
+    ): Result<AccessToken, AuthorizationCodeAlreadyUsed>
 
     /**
      * creates a new access token for a given client.

@@ -25,16 +25,20 @@ class GenerateAccessToken(
     grantTypes: GrantTypesConfiguration
 ) : HttpHandler {
 
-    private val generator = GenerateAccessTokenForGrantType(authorizationCodes, accessTokens, clock, idTokens, refreshTokens, grantTypes)
+    private val generator =
+        GenerateAccessTokenForGrantType(authorizationCodes, accessTokens, clock, idTokens, refreshTokens, grantTypes)
 
     override fun invoke(request: Request) = generator.generate(request)
         .map { token ->
-            Response(OK).with(accessTokenResponseBody of AccessTokenResponse(
-                token.accessToken.value,
-                token.accessToken.type,
-                token.accessToken.expiresIn,
-                token.idToken?.value,
-                token.accessToken.scope,
-                token.accessToken.refreshToken?.value))
+            Response(OK).with(
+                accessTokenResponseBody of AccessTokenResponse(
+                    token.accessToken.value,
+                    token.accessToken.type,
+                    token.accessToken.expiresIn,
+                    token.idToken?.value,
+                    token.accessToken.scope,
+                    token.accessToken.refreshToken?.value
+                )
+            )
         }.mapFailure(errorRenderer::response).get()
 }

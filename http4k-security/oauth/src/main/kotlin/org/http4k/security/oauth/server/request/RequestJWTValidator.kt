@@ -9,6 +9,7 @@ fun interface RequestJWTValidator {
     fun validate(clientId: ClientId, requestJwtContainer: RequestJwtContainer): InvalidAuthorizationRequest?
 
     companion object {
-        val Unsupported = RequestJWTValidator { _, _ -> throw UnsupportedOperationException("Request JWTs are not supported by this server") }
+        val Unsupported =
+            RequestJWTValidator { _, _ -> throw UnsupportedOperationException("Request JWTs are not supported by this server") }
     }
 }

@@ -42,7 +42,10 @@ class AuthorizationCodeAccessTokenGenerator(
             else -> accessTokens.create(codeDetails.clientId, request, code)
                 .map { token ->
                     when {
-                        codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(codeDetails, code, token))
+                        codeDetails.isOIDC -> AccessTokenDetails(
+                            token,
+                            idTokens.createForAccessToken(codeDetails, code, token)
+                        )
                         else -> AccessTokenDetails(token)
                     }
                 }
@@ -50,14 +53,19 @@ class AuthorizationCodeAccessTokenGenerator(
     }
 
     companion object {
-        fun extract(clientId: ClientId, tokenRequest: TokenRequest): Result<AuthorizationCodeAccessTokenRequest, AccessTokenError> {
-            return Success(AuthorizationCodeAccessTokenRequest(
-                clientId = clientId,
-                clientSecret = tokenRequest.clientSecret ?: "",
-                redirectUri = tokenRequest.redirectUri ?: return Failure(MissingRedirectUri),
-                scopes = tokenRequest.scopes,
-                authorizationCode = AuthorizationCode(tokenRequest.code ?: return Failure(MissingAuthorizationCode))
-            ))
+        fun extract(
+            clientId: ClientId,
+            tokenRequest: TokenRequest
+        ): Result<AuthorizationCodeAccessTokenRequest, AccessTokenError> {
+            return Success(
+                AuthorizationCodeAccessTokenRequest(
+                    clientId = clientId,
+                    clientSecret = tokenRequest.clientSecret ?: "",
+                    redirectUri = tokenRequest.redirectUri ?: return Failure(MissingRedirectUri),
+                    scopes = tokenRequest.scopes,
+                    authorizationCode = AuthorizationCode(tokenRequest.code ?: return Failure(MissingAuthorizationCode))
+                )
+            )
         }
     }
 }

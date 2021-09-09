@@ -17,7 +17,7 @@ import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
 
-internal object OAuthServerMoshi : ConfigurableMoshi(
+object OAuthServerMoshi : ConfigurableMoshi(
     Moshi.Builder()
         .add(AccessTokenResponseAdapter)
         .asConfigurable()
