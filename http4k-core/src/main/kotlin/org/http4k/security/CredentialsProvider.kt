@@ -6,7 +6,7 @@ import java.time.Duration.ZERO
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
 
-fun interface CredentialsProvider<T> : () -> T {
+fun interface CredentialsProvider<T> : () -> T? {
     companion object
 }
 
@@ -19,9 +19,9 @@ fun <T> CredentialsProvider.Companion.Refreshing(
 ) = object : CredentialsProvider<T> {
     private val stored = AtomicReference<ExpiringCredentials<T>>(null)
 
-    override fun invoke(): T = (stored.get()?.takeIf { !it.expiresWithin(gracePeriod) } ?: refresh()).credentials
+    override fun invoke() = (stored.get()?.takeIf { !it.expiresWithin(gracePeriod) } ?: refresh())?.credentials
 
-    private fun refresh(): ExpiringCredentials<T> =
+    private fun refresh(): ExpiringCredentials<T>? =
         synchronized(stored) {
             val current = stored.get()
             when {

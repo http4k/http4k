@@ -11,6 +11,7 @@ import org.http4k.core.Method.HEAD
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SEE_OTHER
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
@@ -97,22 +98,30 @@ object ClientFilters {
     }
 
     object BasicAuth {
-        operator fun invoke(provider: () -> Credentials): Filter = CustomBasicAuth("Authorization", provider)
-        operator fun invoke(provider: CredentialsProvider<Credentials>) = CustomBasicAuth("Authorization", provider::invoke)
+        operator fun invoke(provider: () -> Credentials?): Filter = CustomBasicAuth("Authorization", provider)
+        operator fun invoke(provider: CredentialsProvider<Credentials>) =
+            CustomBasicAuth("Authorization", provider::invoke)
+
         operator fun invoke(user: String, password: String): Filter = BasicAuth(Credentials(user, password))
         operator fun invoke(credentials: Credentials): Filter = BasicAuth { credentials }
     }
 
     object ProxyBasicAuth {
-        operator fun invoke(provider: () -> Credentials) = CustomBasicAuth("Proxy-Authorization", provider)
+        operator fun invoke(provider: () -> Credentials?) = CustomBasicAuth("Proxy-Authorization", provider)
         operator fun invoke(provider: CredentialsProvider<Credentials>) = ProxyBasicAuth(provider::invoke)
         operator fun invoke(user: String, password: String): Filter = ProxyBasicAuth(Credentials(user, password))
         operator fun invoke(credentials: Credentials): Filter = ProxyBasicAuth { credentials }
     }
 
     object CustomBasicAuth {
-        operator fun invoke(header: String, provider: () -> Credentials): Filter = Filter { next ->
-            { next(it.header(header, "Basic ${provider().base64Encoded()}")) }
+        operator fun invoke(header: String, provider: () -> Credentials?): Filter = Filter { next ->
+            { req ->
+                provider()
+                    ?.let {
+                        next(req.header(header, "Basic ${it.base64Encoded()}"))
+                    }
+                    ?: Response(UNAUTHORIZED)
+            }
         }
 
         operator fun invoke(header: String, provider: CredentialsProvider<Credentials>) =
@@ -127,8 +136,14 @@ object ClientFilters {
     }
 
     object BearerAuth {
-        operator fun invoke(provider: () -> String): Filter = Filter { next ->
-            { next(it.header("Authorization", "Bearer ${provider()}")) }
+        operator fun invoke(provider: () -> String?): Filter = Filter { next ->
+            { req ->
+                provider()
+                    ?.let {
+                        next(req.header("Authorization", "Bearer $it"))
+                    }
+                    ?: Response(UNAUTHORIZED)
+            }
         }
 
         operator fun invoke(provider: CredentialsProvider<String>): Filter = BearerAuth(provider::invoke)
