@@ -10,6 +10,7 @@ import org.http4k.lens.ParamMeta.NullParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.unquoted
 import org.http4k.util.IllegalSchemaException
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
@@ -68,7 +69,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
         SchemaNode.Reference(
             fieldName,
             "#/$refPrefix/${modelNamer(obj)}",
-            SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { it.toString() }, null),
+            SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { json.asFormatString(it).unquoted() }, null),
             metadata
         )
 
