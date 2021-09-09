@@ -19,10 +19,10 @@ class RefreshingCredentialsProviderTest {
 
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
 
-        val provider = CredentialsProvider.Refreshing({
+        val provider = CredentialsProvider.Refreshing(Duration.ofSeconds(60), clock) {
             calls++
             firstCreds
-        }, Duration.ofSeconds(60), clock)
+        }
 
         assertThat(provider(), equalTo(firstCreds.credentials))
         clock.tickBy(Duration.ofSeconds(1))
@@ -38,10 +38,10 @@ class RefreshingCredentialsProviderTest {
 
         var toReturn = firstCreds
 
-        val provider = CredentialsProvider.Refreshing({
+        val provider = CredentialsProvider.Refreshing(Duration.ofSeconds(60), clock) {
             calls++
             toReturn
-        }, Duration.ofSeconds(60), clock)
+        }
 
         assertThat(provider(), equalTo(firstCreds.credentials))
         assertThat(calls, equalTo(1))

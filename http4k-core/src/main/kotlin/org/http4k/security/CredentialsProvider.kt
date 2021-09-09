@@ -12,9 +12,9 @@ fun interface CredentialsProvider<T> : () -> T {
 data class ExpiringCredentials<T>(val credentials: T, val expiry: Instant)
 
 fun <T> CredentialsProvider.Companion.Refreshing(
-    refreshFn: CredentialsProvider<ExpiringCredentials<T>>,
     gracePeriod: Duration = Duration.ofSeconds(10),
-    clock: Clock = Clock.systemUTC()
+    clock: Clock = Clock.systemUTC(),
+    refreshFn: CredentialsProvider<ExpiringCredentials<T>>
 ) = object : CredentialsProvider<T> {
     private val stored = AtomicReference<ExpiringCredentials<T>>(null)
 
