@@ -19,7 +19,7 @@ fun <T> CredentialsProvider.Companion.Refreshing(
 ) = object : CredentialsProvider<T> {
     private val stored = AtomicReference<ExpiringCredentials<T>>(null)
 
-    override fun invoke() = (stored.get()?.takeIf { !it.expiresWithin(gracePeriod) } ?: refresh())?.credentials
+    override fun invoke() = (stored.get()?.takeUnless { it.expiresWithin(gracePeriod) } ?: refresh())?.credentials
 
     private fun refresh(): ExpiringCredentials<T>? =
         synchronized(stored) {
