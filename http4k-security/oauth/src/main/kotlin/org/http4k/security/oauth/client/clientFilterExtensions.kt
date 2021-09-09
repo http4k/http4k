@@ -7,7 +7,7 @@ import org.http4k.filter.ClientFilters.BasicAuth
 import org.http4k.security.OAuthProviderConfig
 import org.http4k.security.oauth.core.RefreshToken
 
-fun ClientFilters.oAuthOffline(
+fun ClientFilters.OAuthOffline(
     config: OAuthProviderConfig,
     refreshToken: RefreshToken,
     backend: HttpHandler,

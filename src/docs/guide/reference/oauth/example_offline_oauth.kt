@@ -8,7 +8,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.security.OAuthProviderConfig
-import org.http4k.security.oauth.client.oAuthOffline
+import org.http4k.security.oauth.client.OAuthOffline
 import org.http4k.security.oauth.core.RefreshToken
 
 fun main() {
@@ -28,7 +28,7 @@ fun main() {
 
     // construct a client with a filter to authorize our requests to the OAuth Resource server
     val client = ClientFilters.SetHostFrom(resourceServerHost)
-        .then(ClientFilters.oAuthOffline(config, refreshToken, JavaHttpClient()))
+        .then(ClientFilters.OAuthOffline(config, refreshToken, JavaHttpClient()))
         .then(JavaHttpClient())
 
     // Make a request to the OAuth Resource server
