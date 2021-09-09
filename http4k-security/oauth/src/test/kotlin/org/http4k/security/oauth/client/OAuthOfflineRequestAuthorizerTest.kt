@@ -3,10 +3,17 @@ package org.http4k.security.oauth.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isEmpty
-import org.http4k.core.*
+import org.http4k.core.Credentials
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.hamkrest.hasBody
@@ -15,14 +22,13 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.OAuthProviderConfig
-import org.http4k.util.FixedClock
+import org.http4k.security.accessTokenResponseBody
 import org.junit.jupiter.api.Test
-import java.lang.UnsupportedOperationException
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
-import java.util.*
+import java.util.UUID
 
 class OAuthOfflineRequestAuthorizerTest {
 
@@ -44,7 +50,7 @@ class OAuthOfflineRequestAuthorizerTest {
 
     private val authServer = let {
         fun tokenHandler(request: Request): Response {
-            val data = OAuthOfflineRequestAuthorizer.tokenRequestLens(request)
+            val data = tokenRequestLens(request)
 
             val refreshToken = data.refresh_token ?: return Response(UNAUTHORIZED)
             if (refreshToken != validRefreshToken) return Response(UNAUTHORIZED)
@@ -53,29 +59,39 @@ class OAuthOfflineRequestAuthorizerTest {
                 access_token = UUID.randomUUID().toString(),
                 expires_in = accessTokenDuration.seconds,
                 refresh_token = data.refresh_token,
-                token_type = "access_token"
+                token_type = "Bearer"
             )
             refreshHistory += refreshToken to responseData.access_token
 
             return Response(OK)
-                .with(OAuthOfflineRequestAuthorizer.tokenResponseLens of responseData)
+                .with(accessTokenResponseBody of responseData)
         }
 
         ServerFilters.BasicAuth("oauth", clientCredentials)
             .then(routes(providerConfig.tokenPath bind Method.POST to ::tokenHandler))
     }
 
-    private fun client(refreshToken: String, config: OAuthProviderConfig = providerConfig, accessTokenCache: AccessTokenCache = AccessTokenCache.none()): HttpHandler {
+    private fun client(
+        refreshToken: String,
+        config: OAuthProviderConfig = providerConfig,
+        accessTokens: AccessTokens = AccessTokens.None()
+    ): HttpHandler {
         val security = OAuthOfflineRequestAuthorizer(
             config,
-            accessTokenCache,
+            accessTokens,
             authServer,
             ClientFilters.BasicAuth(config.credentials),
-            FixedClock
+            Duration.ofSeconds(10),
+            object : Clock() {
+                override fun getZone() = throw UnsupportedOperationException()
+                override fun withZone(zone: ZoneId?) = throw UnsupportedOperationException()
+                override fun instant() = time
+            }
         )
 
         return security.toFilter(refreshToken).then { request ->
             val token = request.header("Authorization")?.replace("Bearer ", "")
+            println(token)
             val status = if (token == null) UNAUTHORIZED else OK
             Response(status).body(token ?: "")
         }
@@ -94,13 +110,14 @@ class OAuthOfflineRequestAuthorizerTest {
 
     @Test
     fun `access token will be reused if caching enabled`() {
-        val client = client(validRefreshToken, accessTokenCache = AccessTokenCache.inMemory())
+        val client = client(validRefreshToken, accessTokens = AccessTokens.InMemory())
 
         // make first call
         var response = client(request)
         assertThat(response, hasStatus(OK))
         val accessToken = response.bodyString()
 
+        assertThat(refreshHistory, equalTo(listOf(validRefreshToken to accessToken)))
         assertThat(refreshHistory, equalTo(listOf(validRefreshToken to accessToken)))
 
         // make second call (should be same access token as before)
@@ -123,10 +140,14 @@ class OAuthOfflineRequestAuthorizerTest {
         val response2 = client(request)
         assertThat(response2, hasStatus(OK))
 
-        assertThat(refreshHistory, equalTo(listOf(
-            validRefreshToken to response1.bodyString(),
-            validRefreshToken to response2.bodyString()
-        )))
+        assertThat(
+            refreshHistory, equalTo(
+                listOf(
+                    validRefreshToken to response1.bodyString(),
+                    validRefreshToken to response2.bodyString()
+                )
+            )
+        )
     }
 
     @Test
@@ -149,7 +170,7 @@ class OAuthOfflineRequestAuthorizerTest {
 
     @Test
     fun `call with expired cached access token - should be refreshed`() {
-        val client = client(validRefreshToken, accessTokenCache = AccessTokenCache.inMemory())
+        val client = client(validRefreshToken, accessTokens = AccessTokens.InMemory())
 
         val response = client(request)
         assertThat(response, hasStatus(OK))
@@ -160,10 +181,14 @@ class OAuthOfflineRequestAuthorizerTest {
         val response2 = client(request)
         assertThat(response2, hasStatus(OK))
 
-        assertThat(refreshHistory, equalTo(listOf(
-            validRefreshToken to response.bodyString(),
-            validRefreshToken to response2.bodyString()
-        )))
+        assertThat(
+            refreshHistory, equalTo(
+                listOf(
+                    validRefreshToken to response.bodyString(),
+                    validRefreshToken to response2.bodyString()
+                )
+            )
+        )
     }
 }
 

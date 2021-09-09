@@ -9,10 +9,11 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.security.OAuthProviderConfig
 import org.http4k.security.oauth.client.oAuthOffline
+import org.http4k.security.oauth.core.RefreshToken
 
 fun main() {
     // set these before running example
-    val refreshToken = System.getenv("REFRESH_TOKEN")
+    val refreshToken = RefreshToken(System.getenv("REFRESH_TOKEN"))
     val clientCredentials = Credentials(System.getenv("CLIENT_ID"), System.getenv("CLIENT_SECRET"))
     val authServerBase = Uri.of(System.getenv("OAUTH_AUTH_SERVER_HOST"))
     val resourceServerHost = Uri.of(System.getenv("OAUTH_RESOURCE_SERVER_HOST"))
