@@ -2,6 +2,7 @@ package org.http4k.security
 
 import java.time.Clock
 import java.time.Duration
+import java.time.Duration.ZERO
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
 
@@ -20,17 +21,18 @@ fun <T> CredentialsProvider.Companion.Refreshing(
 
     override fun invoke(): T = (stored.get()?.takeIf { !it.expiresWithin(gracePeriod) } ?: refresh()).credentials
 
-    private fun refresh() =
+    private fun refresh(): ExpiringCredentials<T> =
         synchronized(stored) {
             val current = stored.get()
             when {
                 current != null && !current.expiresWithin(gracePeriod) -> current
                 else -> try {
-                    stored.set(refreshFn())
-                    stored.get()
+                    val newCreds = refreshFn()
+                    stored.set(newCreds)
+                    newCreds
                 } catch (e: Exception) {
-                    if (current.expiresWithin(Duration.ZERO)) throw e
-                    stored.get()
+                    if (current == null || current.expiresWithin(ZERO)) throw e
+                    current
                 }
             }
         }

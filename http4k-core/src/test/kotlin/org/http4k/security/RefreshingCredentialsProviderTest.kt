@@ -2,6 +2,7 @@ package org.http4k.security
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
@@ -60,6 +61,30 @@ class RefreshingCredentialsProviderTest {
         assertThat(provider(), equalTo(secondCreds.credentials))
 
         assertThat(calls, equalTo(2))
+    }
+
+    @Test
+    fun `on failure to refresh returns previous creds and then throws`() {
+        var calls = 0
+
+        val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
+
+        val e = Exception()
+        val provider = CredentialsProvider.Refreshing(Duration.ofSeconds(60), clock) {
+            when {
+                calls++ == 0 -> firstCreds
+                else -> throw e
+            }
+        }
+        assertThat(provider(), equalTo(firstCreds.credentials))
+
+        clock.tickBy(Duration.ofSeconds(61))
+
+        assertThat(provider(), equalTo(firstCreds.credentials))
+
+        clock.tickBy(Duration.ofSeconds(60))
+
+        assertThat({provider() }, throws(equalTo(e)))
     }
 
     private fun credentialsExpiringAt(expiry: Instant, counter: Int) = ExpiringCredentials(
