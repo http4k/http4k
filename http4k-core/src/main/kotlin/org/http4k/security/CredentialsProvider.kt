@@ -10,12 +10,14 @@ fun interface CredentialsProvider<T> : () -> T? {
     companion object
 }
 
+fun interface RefreshCredentials<T> : (T?) -> ExpiringCredentials<T>?
+
 data class ExpiringCredentials<T>(val credentials: T, val expiry: Instant)
 
 fun <T> CredentialsProvider.Companion.Refreshing(
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
-    refreshFn: CredentialsProvider<ExpiringCredentials<T>>
+    refreshFn: RefreshCredentials<T>
 ) = object : CredentialsProvider<T> {
     private val stored = AtomicReference<ExpiringCredentials<T>>(null)
 

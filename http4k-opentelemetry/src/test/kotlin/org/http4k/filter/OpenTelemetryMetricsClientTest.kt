@@ -29,7 +29,7 @@ class OpenTelemetryMetricsClientTest {
         }
     }
 
-    private val clock = TickingClock
+    private val clock = TickingClock()
     private var requestTimer = ClientFilters.OpenTelemetryMetrics.RequestTimer(clock = clock)
     private var requestCounter = ClientFilters.OpenTelemetryMetrics.RequestCounter(clock = clock)
 

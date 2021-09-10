@@ -58,7 +58,7 @@ class ResponseFiltersTest {
         val request = Request(GET, "")
         val response = Response(OK)
 
-        ReportHttpTransaction(TickingClock) { (req, resp, duration) ->
+        ReportHttpTransaction(TickingClock()) { (req, resp, duration) ->
             called = true
             assertThat(req, equalTo(request))
             assertThat(resp, equalTo(response))
@@ -74,7 +74,7 @@ class ResponseFiltersTest {
         val request = RoutedRequest(Request(GET, ""), UriTemplate.from("foo"))
         val response = RoutedResponse(Response(OK), UriTemplate.from("bar"))
 
-        ReportHttpTransaction(TickingClock) { tx ->
+        ReportHttpTransaction(TickingClock()) { tx ->
             called = true
             assertThat(tx.request, equalTo(request as Request))
             assertThat(tx.response, equalTo(response as Response))

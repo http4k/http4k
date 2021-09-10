@@ -23,7 +23,6 @@ class OAuthOfflineRequestAuthorizer(
     private val gracePeriod: Duration = Duration.ofSeconds(10),
     private val clock: Clock = Clock.systemUTC(),
 ) {
-
     private val authClient = SetHostFrom(config.apiBase)
         .then(authRequestFilter)
         .then(backend)
@@ -31,7 +30,7 @@ class OAuthOfflineRequestAuthorizer(
     private fun refresh(refreshToken: RefreshToken): ExpiringCredentials<AccessToken>? {
         val body = TokenRequest.refreshToken(refreshToken)
 
-        val request = Request(POST, config.tokenUri)
+        val request = Request(POST, config.tokenPath)
             .with(tokenRequestLens of body)
 
         val response = authClient(request)

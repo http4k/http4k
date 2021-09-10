@@ -40,7 +40,7 @@ class OpenTelemetryMetricsServerTest {
         }
     }
 
-    private val clock = TickingClock
+    private val clock = TickingClock()
     private var requestTimer = ServerFilters.OpenTelemetryMetrics.RequestTimer(clock = clock)
     private var requestCounter = ServerFilters.OpenTelemetryMetrics.RequestCounter(clock = clock)
     private val server by lazy {
