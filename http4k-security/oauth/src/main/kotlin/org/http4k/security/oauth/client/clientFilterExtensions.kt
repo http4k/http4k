@@ -4,6 +4,7 @@ import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.core.with
@@ -27,6 +28,7 @@ import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.core.RefreshToken
 import java.time.Clock
 import java.time.Duration
+import kotlin.Long.Companion.MAX_VALUE
 
 /**
  * Filter to authenticate and refresh against a OAuth server. Use the correct OAuth filter for your flow.
@@ -43,10 +45,10 @@ fun ClientFilters.RefreshingOAuthToken(
         val filter = it?.refreshToken?.let { ClientFilters.OAuthRefreshToken(config, it) } ?: oAuthFlowFilter
 
         filter
-            .then(backend)(Request(Method.POST, config.tokenUri))
+            .then(backend)(Request(POST, config.tokenUri))
             .takeIf { it.status.successful }
             ?.let { accessTokenResponseBody(it).toAccessToken() }
-            ?.let { ExpiringCredentials(it, clock.instant().plusSeconds(it.expiresIn ?: Long.MAX_VALUE)) }
+            ?.let { ExpiringCredentials(it, clock.instant().plusSeconds(it.expiresIn ?: MAX_VALUE)) }
     }
 
     return ClientFilters.BearerAuth(CredentialsProvider { refresher()?.value })
