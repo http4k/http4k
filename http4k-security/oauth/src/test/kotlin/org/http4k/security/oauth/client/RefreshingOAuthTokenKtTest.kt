@@ -10,6 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.OAuthProviderConfig
@@ -38,7 +39,7 @@ class RefreshingOAuthTokenTest {
 
         val clock = TickingClock()
 
-        val app = RefreshingOAuthToken(
+        val app = ClientFilters.RefreshingOAuthToken(
             config,
             backend,
             { next -> { next(it.body("auth")) } },
@@ -77,7 +78,7 @@ class RefreshingOAuthTokenTest {
 
         val clock = TickingClock()
 
-        val app = RefreshingOAuthToken(
+        val app = ClientFilters.RefreshingOAuthToken(
             config,
             backend,
             { next -> { next(it.body("auth")) } },
