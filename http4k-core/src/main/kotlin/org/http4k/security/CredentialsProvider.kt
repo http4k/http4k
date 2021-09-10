@@ -27,7 +27,7 @@ fun <T> CredentialsProvider.Companion.Refreshing(
             when {
                 current != null && !current.expiresWithin(gracePeriod) -> current
                 else -> try {
-                    val newCreds = refreshFn()
+                    val newCreds = refreshFn(current?.credentials)
                     stored.set(newCreds)
                     newCreds
                 } catch (e: Exception) {

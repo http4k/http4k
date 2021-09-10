@@ -20,7 +20,7 @@ class RefreshingCredentialsProviderTest {
 
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
 
-        val provider = CredentialsProvider.Refreshing(Duration.ofSeconds(60), clock) {
+        val provider = CredentialsProvider.Refreshing<String>(Duration.ofSeconds(60), clock) {
             calls++
             firstCreds
         }
@@ -39,7 +39,7 @@ class RefreshingCredentialsProviderTest {
 
         var toReturn = firstCreds
 
-        val provider = CredentialsProvider.Refreshing(Duration.ofSeconds(60), clock) {
+        val provider = CredentialsProvider.Refreshing<String>(Duration.ofSeconds(60), clock) {
             calls++
             toReturn
         }
@@ -70,7 +70,7 @@ class RefreshingCredentialsProviderTest {
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
 
         val e = Exception()
-        val provider = CredentialsProvider.Refreshing(Duration.ofSeconds(60), clock) {
+        val provider = CredentialsProvider.Refreshing<String>(Duration.ofSeconds(60), clock) {
             when {
                 calls++ == 0 -> firstCreds
                 else -> throw e
