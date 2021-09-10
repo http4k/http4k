@@ -52,19 +52,6 @@ fun ClientFilters.RefreshingOAuthToken(
     return ClientFilters.BearerAuth(CredentialsProvider { refresher()?.value })
 }
 
-fun ClientFilters.OAuthOffline(
-    config: OAuthProviderConfig,
-    refreshToken: RefreshToken,
-    backend: HttpHandler,
-    accessTokens: AccessTokens = AccessTokens.None(),
-    authRequestFilter: Filter = BasicAuth(config.credentials)
-) = OAuthOfflineRequestAuthorizer(
-    config,
-    accessTokens,
-    backend,
-    authRequestFilter
-).toFilter(refreshToken)
-
 fun ClientFilters.OAuthUserCredentials(config: OAuthProviderConfig, userCredentials: Credentials) = Filter { next ->
     {
         next(
@@ -112,3 +99,16 @@ fun ClientFilters.OAuthRefreshToken(config: OAuthProviderConfig, token: RefreshT
         )
     }
 }
+
+fun ClientFilters.OAuthOffline(
+    config: OAuthProviderConfig,
+    refreshToken: RefreshToken,
+    backend: HttpHandler,
+    accessTokens: AccessTokens = AccessTokens.None(),
+    authRequestFilter: Filter = BasicAuth(config.credentials)
+) = OAuthOfflineRequestAuthorizer(
+    config,
+    accessTokens,
+    backend,
+    authRequestFilter
+).toFilter(refreshToken)
