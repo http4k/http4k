@@ -6,7 +6,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.security.AccessToken
 import org.http4k.security.ExpiringCredentials
 import org.http4k.security.OAuthProviderConfig
@@ -23,14 +22,12 @@ class OAuthOfflineRequestAuthorizer(
     private val gracePeriod: Duration = Duration.ofSeconds(10),
     private val clock: Clock = Clock.systemUTC(),
 ) {
-    private val authClient = SetHostFrom(config.apiBase)
-        .then(authRequestFilter)
-        .then(backend)
+    private val authClient = authRequestFilter.then(backend)
 
     private fun refresh(refreshToken: RefreshToken): ExpiringCredentials<AccessToken>? {
         val body = TokenRequest.refreshToken(refreshToken)
 
-        val request = Request(POST, config.tokenPath)
+        val request = Request(POST, config.tokenUri)
             .with(tokenRequestLens of body)
 
         val response = authClient(request)

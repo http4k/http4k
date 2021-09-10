@@ -92,7 +92,6 @@ class OAuthOfflineRequestAuthorizerTest {
 
         return security.toFilter(RefreshToken(refreshToken)).then { request ->
             val token = request.header("Authorization")?.replace("Bearer ", "")
-            println(token)
             val status = if (token == null) UNAUTHORIZED else OK
             Response(status).body(token ?: "")
         }
