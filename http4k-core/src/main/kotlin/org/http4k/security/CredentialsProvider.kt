@@ -23,19 +23,18 @@ fun <T> CredentialsProvider.Companion.Refreshing(
 
     override fun invoke() = (stored.get()?.takeUnless { it.expiresWithin(gracePeriod) } ?: refresh())?.credentials
 
-    private fun refresh(): ExpiringCredentials<T>? =
-        synchronized(stored) {
-            val current = stored.get()
-            when {
-                current != null && !current.expiresWithin(gracePeriod) -> current
-                else -> try {
-                    refreshFn(current?.credentials).also(stored::set)
-                } catch (e: Exception) {
-                    if (current == null || current.expiresWithin(ZERO)) throw e
-                    current
-                }
+    private fun refresh(): ExpiringCredentials<T>? = synchronized(stored) {
+        val current = stored.get()
+        when {
+            current != null && !current.expiresWithin(gracePeriod) -> current
+            else -> try {
+                refreshFn(current?.credentials).also(stored::set)
+            } catch (e: Exception) {
+                if (current == null || current.expiresWithin(ZERO)) throw e
+                current
             }
         }
+    }
 
     private fun ExpiringCredentials<T>.expiresWithin(duration: Duration): Boolean =
         expiry
