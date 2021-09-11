@@ -16,11 +16,9 @@ import org.junit.jupiter.api.Test
 
 class OAuthRefreshTokenTest {
 
-    private val config = OAuthProviderConfig(Uri.of("http://auth"), "/authorize", "/", Credentials("hello", "world"))
-
     @Test
     fun `auths with correct form`() {
-        val app = ClientFilters.OAuthRefreshToken(config, RefreshToken("goodbye"))
+        val app = ClientFilters.OAuthRefreshToken(Credentials("hello", "world"), RefreshToken("goodbye"))
             .then { req: Request -> Response(Status.OK).body(req.bodyString()) }
         assertThat(
             app(Request(Method.POST, "")).bodyString(),

@@ -1,21 +1,28 @@
 package guide.howto.secure_and_auth_http
 
 import org.http4k.client.OkHttp
+import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.AccessTokenResponse
 import org.http4k.security.CredentialsProvider
 import org.http4k.security.ExpiringCredentials
 import org.http4k.security.RefreshCredentials
 import org.http4k.security.Refreshing
+import org.http4k.security.accessTokenResponseBody
+import org.http4k.security.oauth.client.OAuthClientCredentials
+import org.http4k.security.oauth.client.RefreshingOAuthToken
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -62,19 +69,46 @@ fun main() {
         Thread.sleep(2000)
     }
 
+    /**
+     * auth against OAuth ClientCredentials flow using refreshing credentials
+     */
+    val clientCredentials = Credentials("id", "secret")
+
+    val refreshingOAuthClient = ClientFilters.RefreshingOAuthToken(
+        clientCredentials, Uri.of("/oauth"), baseHttp,
+        ClientFilters.OAuthClientCredentials(clientCredentials), Duration.ofSeconds(1)
+    ).then(baseHttp)
+
+    repeat(10) {
+        println(refreshingOAuthClient(Request(GET, "/bearer")).bodyString())
+        Thread.sleep(2000)
+    }
+
     server.stop()
 }
 
 private fun AuthServer(): Http4kServer {
-    val endpoint: HttpHandler = { Response(OK).body(it.uri.toString()) }
+    val endpoint: HttpHandler = { Response(OK).body(it.header("Authorization").toString()) }
 
     return routes(
+        // statically check the user creds
         "basic" bind GET to
-            // statically check the user creds
             ServerFilters.BasicAuth("realm", "username", "password").then(endpoint),
+        // dynamically check the token
         "bearer" bind GET to
-            // dynamically check the token
-            ServerFilters.BearerAuth { it.startsWith("bearerToken") }.then(endpoint)
+            ServerFilters.BearerAuth { it.startsWith("bearerToken") }.then(endpoint),
+        // fake oauth token endpoint
+        "oauth" bind POST to {
+            println("refreshing oauth token (was " + it.bodyString() + ")")
+
+            Response(OK).with(
+                accessTokenResponseBody of AccessTokenResponse(
+                    access_token = "bearerTokenOAuth" + System.currentTimeMillis(),
+                    expires_in = 5,
+                    refresh_token = "refreshToken" + System.currentTimeMillis(),
+                )
+            )
+        }
     ).asServer(SunHttp(8000))
 }
 

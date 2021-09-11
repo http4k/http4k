@@ -15,11 +15,9 @@ import org.junit.jupiter.api.Test
 
 class OAuthClientCredentialsTest {
 
-    private val config = OAuthProviderConfig(Uri.of("http://auth"), "/authorize", "/", Credentials("hello", "world"))
-
     @Test
     fun `auths with correct form`() {
-        val app = ClientFilters.OAuthClientCredentials(config)
+        val app = ClientFilters.OAuthClientCredentials(Credentials("hello", "world"))
             .then { req: Request -> Response(Status.OK).body(req.bodyString()) }
         assertThat(
             app(Request(Method.POST, "")).bodyString(),
