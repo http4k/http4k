@@ -69,15 +69,17 @@ fun ClientFilters.RefreshingOAuthToken(
     clock
 )
 
-fun ClientFilters.OAuthUserCredentials(config: OAuthProviderConfig, userCredentials: Credentials) = Filter { next ->
+fun ClientFilters.OAuthUserCredentials(config: OAuthProviderConfig, userCredentials: Credentials) = OAuthUserCredentials(config.credentials, userCredentials)
+
+fun ClientFilters.OAuthUserCredentials(clientCredentials: Credentials, userCredentials: Credentials) = Filter { next ->
     {
         next(
             it.with(
                 requestForm of WebForm()
                     .with(
                         grantType of "password",
-                        clientId of config.credentials.user,
-                        clientSecret of config.credentials.password,
+                        clientId of clientCredentials.user,
+                        clientSecret of clientCredentials.password,
                         username of userCredentials.user,
                         password of userCredentials.password,
                     )
@@ -85,6 +87,8 @@ fun ClientFilters.OAuthUserCredentials(config: OAuthProviderConfig, userCredenti
         )
     }
 }
+
+fun ClientFilters.OAuthClientCredentials(config: OAuthProviderConfig) = OAuthClientCredentials(config.credentials)
 
 fun ClientFilters.OAuthClientCredentials(clientCredentials: Credentials) = Filter { next ->
     {
@@ -100,6 +104,7 @@ fun ClientFilters.OAuthClientCredentials(clientCredentials: Credentials) = Filte
         )
     }
 }
+fun ClientFilters.OAuthRefreshToken(config: OAuthProviderConfig, token: RefreshToken) = OAuthRefreshToken(config.credentials, token)
 
 fun ClientFilters.OAuthRefreshToken(clientCredentials: Credentials, token: RefreshToken) = Filter { next ->
     {

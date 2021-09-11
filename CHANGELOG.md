@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.12.3.0
-- **http4k-security-oauth** : [Break] Changes to OAuth client filters.
+- **http4k-security-oauth** : Nicer OAuth client filters.
 
 ### v4.12.2.0
 - **http4k-*** : Upgrade some dependency versions.
