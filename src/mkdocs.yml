@@ -65,6 +65,7 @@ nav:
     - Structure your logs with Events: guide/howto/structure_your_logs_with_events/index.md
     - Test using Service Virtualisation: guide/howto/test_using_service_virtualisation/index.md
     - Typesafe your API with lenses: guide/howto/typesafe_your_api_with_lenses/index.md
+    - Secure and auth HTTP services: guide/howto/secure_and_auth_http/index.md
     - Use a custom OAuth Provider: guide/howto/use_a_custom_oauth_provider/index.md
     - Use a templating engines: guide/howto/use_a_templating_engine/index.md
     - Use HTML forms: guide/howto/use_html_forms/index.md

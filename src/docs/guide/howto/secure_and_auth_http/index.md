@@ -1,5 +1,5 @@
-title: http4k How-to: Authentication types for HTTP
-description: Recipes for how to secure and authenticate into HTTP services
+title: http4k How-to: Authentication for HTTP services
+description: Recipes for how to secure and authenticate HTTP services
 
 ### Gradle setup
 
