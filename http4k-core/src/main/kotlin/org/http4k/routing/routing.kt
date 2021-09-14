@@ -24,9 +24,14 @@ infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
 fun reverseProxy(vararg hostToHandler: Pair<String, HttpHandler>) = routes(
     *hostToHandler
         .map { service ->
-            header("host") { it.contains(service.first) } bind service.second
+            hostHeaderOrUri { it.contains(service.first) } bind service.second
         }.toTypedArray()
 )
+
+private fun hostHeaderOrUri(predicate: (String) -> Boolean) =
+    { req: Request ->
+        (req.headerValues("host").firstOrNull() ?: req.uri.host).let(predicate)
+    }.asRouter()
 
 /**
  * Apply routing predicate to a query

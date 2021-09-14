@@ -27,7 +27,9 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `matching handler`() {
         assertThat(otherHandler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
+        assertThat(otherHandler(requestWithHost("host1", "http://host2/foo")), hasBody("host1host1"))
         assertThat(otherHandler(requestWithHost("host2", "/foo")), hasBody("host2host2"))
+        assertThat(otherHandler(Request(GET, "http://host2/foo")), hasBody("host2null"))
         assertThat(otherHandler(Request(GET, "")), hasStatus(NOT_FOUND))
     }
 

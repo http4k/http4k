@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.12.3.1
+- **http4k-core** : Reverse Proxy router now falls back to URI host when Host header missing.
+
 ### v4.12.3.0
 - **http4k-security-oauth** : Nicer OAuth client filters.
 
