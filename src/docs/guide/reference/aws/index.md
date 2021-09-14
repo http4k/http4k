@@ -9,7 +9,7 @@ implementation group: "org.http4k", name: "http4k-aws", version: "4.12.3.0"
 
 ### About
 This module provides 2 things:
-1. a http4k compatible `SdkHttpClient`. This is so you can puse the standard Amazon SDKs libraries by plugging in a standard `HttpHandler`. This simplifies fault testingm and means that you can print out the exact traffic which is going to AWS - which is brilliant for both debugging and writing Fakes. :)
+1. a http4k compatible `SdkHttpClient`. This is so you can use the standard Amazon SDKs libraries by plugging in a standard `HttpHandler`. This simplifies fault testing and means that you can print out the exact traffic which is going to AWS - which is brilliant for both debugging and writing Fakes. :)
  
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/aws/example_sdk.kt)
 
