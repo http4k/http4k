@@ -6,14 +6,19 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
 
-fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
+fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler =
+    routes(*list.map { "" bind it.first to it.second }.toTypedArray())
+
 fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(OrRouter.from(list.toList()))
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 infix fun String.bind(httpHandler: RoutingHttpHandler): RoutingHttpHandler = httpHandler.withBasePath(this)
-infix fun String.bind(action: HttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(TemplateRouter(UriTemplate.from(this), action))
+infix fun String.bind(action: HttpHandler): RoutingHttpHandler =
+    RouterBasedHttpHandler(TemplateRouter(UriTemplate.from(this), action))
 
-infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(and(PassthroughRouter(handler)))
+infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler =
+    RouterBasedHttpHandler(and(PassthroughRouter(handler)))
+
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(and(handler))
 infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
 
@@ -21,7 +26,12 @@ infix fun Router.and(that: Router): Router = AndRouter.from(listOf(this, that))
  * Simple Reverse Proxy which will split and direct traffic to the appropriate
  * HttpHandler based on the content of the Host header
  */
-fun reverseProxy(vararg hostToHandler: Pair<String, HttpHandler>) = routes(
+fun reverseProxy(vararg hostToHandler: Pair<String, HttpHandler>): HttpHandler = reverseProxyRouting(*hostToHandler)
+
+/**
+ * Simple Reverse Proxy. Exposes routing.
+ */
+fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>) = routes(
     *hostToHandler
         .map { service ->
             hostHeaderOrUri { it.contains(service.first) } bind service.second
@@ -36,7 +46,8 @@ private fun hostHeaderOrUri(predicate: (String) -> Boolean) =
 /**
  * Apply routing predicate to a query
  */
-fun query(name: String, predicate: (String) -> Boolean) = { req: Request -> req.queries(name).filterNotNull().any(predicate) }.asRouter()
+fun query(name: String, predicate: (String) -> Boolean) =
+    { req: Request -> req.queries(name).filterNotNull().any(predicate) }.asRouter()
 
 /**
  * Apply routing predicate to a query
@@ -51,7 +62,8 @@ fun queries(vararg names: String) = { req: Request -> names.all { req.query(it) 
 /**
  * Apply routing predicate to a header
  */
-fun header(name: String, predicate: (String) -> Boolean) = { req: Request -> req.headerValues(name).filterNotNull().any(predicate) }.asRouter()
+fun header(name: String, predicate: (String) -> Boolean) =
+    { req: Request -> req.headerValues(name).filterNotNull().any(predicate) }.asRouter()
 
 /**
  * Apply routing predicate to a header
