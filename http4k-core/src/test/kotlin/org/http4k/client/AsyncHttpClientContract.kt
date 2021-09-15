@@ -2,6 +2,7 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -51,4 +52,14 @@ abstract class AsyncHttpClientContract(serverConfig: (Int) -> ServerConfig,
 
         assertThat(response.get(1500, MILLISECONDS), hasStatus(CLIENT_TIMEOUT))
     }
+
+    @Test
+    fun `fails with no protocol`() {
+        assertThat(
+            { client(Request(GET, "/boom").header("host", "localhost:$port")) {
+                println(it)
+            } }, throws<Exception>()
+        )
+    }
+
 }

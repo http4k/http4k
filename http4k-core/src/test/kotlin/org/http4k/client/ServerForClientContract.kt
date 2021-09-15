@@ -59,6 +59,7 @@ object ServerForClientContract : HttpHandler {
             POST to { request: Request -> Response(OK).body(request.bodyString()) }
         ),
         "/headers" bind { request: Request -> Response(OK).body(request.headers.joinToString(",") { it.first }) },
+        "/hostheaders" bind { request: Request -> Response(OK).body(request.headerValues("host").joinToString(",")) },
         "/check-image" bind POST to { request: Request ->
             if (Arrays.equals(testImageBytes(), request.body.payload.array()))
                 Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
@@ -78,7 +79,9 @@ object ServerForClientContract : HttpHandler {
             Response(status)
         },
         "/multiRequestHeader" bind POST to { r: Request ->
-            Response(OK).body(r.headers.filter { it.first == "echo" }.map { it.first + ": " + it.second }.sorted().joinToString("\n"))
+            Response(OK).body(
+                r.headers.filter { it.first == "echo" }.map { it.first + ": " + it.second }.sorted().joinToString("\n")
+            )
         },
         "/multiResponseHeader" bind POST to { _: Request ->
             Response(OK).header("serverHeader", "foo").header("serverHeader", "bar")

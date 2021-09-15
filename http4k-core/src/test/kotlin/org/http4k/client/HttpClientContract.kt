@@ -1,9 +1,11 @@
 package org.http4k.client
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -245,5 +247,18 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
         val response = client(Request(GET, "http://localhost:$port/boom"))
 
         assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
+    }
+
+    @Test
+    fun `fails with no protocol`() {
+        assertThat(
+            { client(Request(GET, "/boom").header("host", "localhost:$port")) }, throws<Exception>()
+        )
+    }
+
+    @Test
+    fun `host header not abusable`() {
+        val response = client(Request(GET, "http://localhost:$port/hostheaders").header("host", "foobar:$port"))
+        assertThat(response.bodyString(), !containsSubstring("foobar").and(containsSubstring(",")))
     }
 }
