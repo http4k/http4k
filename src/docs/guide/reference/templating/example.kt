@@ -10,7 +10,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
-import org.http4k.template.viewModel
 import java.io.File
 
 data class Person(val name: String, val age: Int) : ViewModel
