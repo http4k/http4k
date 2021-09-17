@@ -1,9 +1,0 @@
-description = 'Http4k HTTP Server built on top of Ktor Netty engine'
-
-dependencies {
-    api project(":http4k-core")
-    api Libs.ktor_server_netty
-
-    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
-    testImplementation Config.TestDependencies
-}

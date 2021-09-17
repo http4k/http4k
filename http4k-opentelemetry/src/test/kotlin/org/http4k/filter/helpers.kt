@@ -25,13 +25,12 @@ fun hasRequestTimer(count: Int, value: Double, attributes: Attributes, name: Str
         override fun invoke(actual: List<MetricData>): MatchResult {
             val summary = actual
                 .first { it.name == name }
-                .doubleSummaryData
+                .doubleHistogramData
                 .points
-                .also { println(it) }
                 .first { it.attributes == attributes }
             return if (
                 summary.count != count.toLong() &&
-                summary.percentileValues.last().value != value
+                summary.epochNanos - summary.startEpochNanos == value.toLong()
             ) MatchResult.Mismatch(actual.toString())
             else MatchResult.Match
         }
