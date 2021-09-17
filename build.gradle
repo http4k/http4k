@@ -5,42 +5,38 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
     }
-
     dependencies {
-        classpath Libs.kotlin_gradle_plugin
-        classpath Libs.openapi_generator_gradle_plugin
-        classpath Libs.kotlin_serialization
-        classpath Libs.shadow
-        classpath Libs.io_codearte_nexus_staging_gradle_plugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:_"
+        classpath "org.openapitools:openapi-generator-gradle-plugin:_"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:_"
+        classpath "com.github.jengelman.gradle.plugins:shadow:_"
+        classpath "io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_"
     }
 }
 
-apply plugin: 'io.codearte.nexus-staging'
+apply plugin: "io.codearte.nexus-staging"
 
 allprojects {
     repositories {
         mavenCentral()
     }
-
-    apply plugin: 'java'
-    apply plugin: 'kotlin'
-    apply plugin: 'jacoco'
+    apply plugin: "java"
+    apply plugin: "kotlin"
+    apply plugin: "jacoco"
 
     compileKotlin.kotlinOptions.jvmTarget = "1.8"
     compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
-
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-
-    version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
-    group = 'org.http4k'
+    version = project.hasProperty("releaseVersion") ? project.releaseVersion : "LOCAL"
+    group = "org.http4k"
 
     test {
         useJUnitPlatform()
     }
 
     jacoco {
-        toolVersion = '0.8.7'
+        toolVersion = "0.8.7"
     }
 
     jacocoTestReport {
@@ -53,25 +49,31 @@ allprojects {
     tasks.withType(GenerateModuleMetadata) {
         enabled = false
     }
+
+    dependencies {
+        testImplementation("org.junit.jupiter:junit-jupiter-api:_")
+        testImplementation("org.junit.jupiter:junit-jupiter-engine:_")
+        testImplementation("org.jetbrains.kotlin:kotlin-reflect:_")
+        testImplementation("com.natpryce:hamkrest:_")
+    }
 }
 
 subprojects {
-
     task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
+        classifier = "sources"
         from sourceSets.main.allSource
     }
 
     jar {
         manifest {
             attributes(
-                'http4k_version': archiveVersion
+                "http4k_version": archiveVersion
             )
         }
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        archiveClassifier = 'javadoc'
+        archiveClassifier = "javadoc"
         from javadoc.destinationDir
     }
 
@@ -90,74 +92,69 @@ subprojects {
     }
 
     if (hasAnArtifact(project)) {
-        def enableSigning = project.findProperty('sign') == "true"
+        def enableSigning = project.findProperty("sign") == "true"
 
-        apply plugin: 'maven-publish' // required to upload to sonatype
-        apply plugin: 'maven' // required to upload to sonatype
+        apply plugin: "maven-publish" // required to upload to sonatype
+        apply plugin: "maven" // required to upload to sonatype
 
         if (enableSigning) { // when added it expects signing keys to be configured
-            apply plugin: 'signing'
-
+            apply plugin: "signing"
             signing {
                 def signingKey = findProperty("signingKey")
                 def signingPassword = findProperty("signingPassword")
-
                 useInMemoryPgpKeys(signingKey, signingPassword)
                 sign publishing.publications
             }
         }
 
-        def nexusUsername = project.findProperty('nexusUsername') ?: "notset"
-        def nexusPassword = project.findProperty('nexusPassword') ?: "notset"
+        def nexusUsername = project.findProperty("nexusUsername") ?: "notset"
+        def nexusPassword = project.findProperty("nexusPassword") ?: "notset"
 
         publishing {
             repositories {
                 maven {
-                    name 'SonatypeStaging'
-                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                    name "SonatypeStaging"
+                    url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
                     credentials {
                         username nexusUsername
                         password nexusPassword
                     }
                 }
                 maven {
-                    name 'SonatypeSnapshot'
-                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                    name "SonatypeSnapshot"
+                    url "https://oss.sonatype.org/content/repositories/snapshots/"
                     credentials {
                         username nexusUsername
                         password nexusPassword
                     }
                 }
             }
-
             publications {
                 mavenJava(MavenPublication) {
                     artifactId = archivesBaseName
-
                     pom.withXml {
-                        asNode().appendNode('name', archivesBaseName)
-                        asNode().appendNode('description', description)
-                        asNode().appendNode('url', 'https://http4k.org')
-                        asNode().appendNode('developers')
-                            .appendNode('developer').appendNode('name', 'Ivan Sanchez').parent().appendNode('email', 'ivan@http4k.org')
+                        asNode().appendNode("name", archivesBaseName)
+                        asNode().appendNode("description", description)
+                        asNode().appendNode("url", "https://http4k.org")
+                        asNode().appendNode("developers")
+                            .appendNode("developer").appendNode("name", "Ivan Sanchez").parent().appendNode("email", "ivan@http4k.org")
                             .parent().parent()
-                            .appendNode('developer').appendNode('name', 'David Denton').parent().appendNode('email', 'david@http4k.org')
-                        asNode().appendNode('scm').
-                            appendNode('url', 'git@github.com:http4k/' + archivesBaseName + '.git').parent().
-                            appendNode('connection', 'scm:git:git@github.com:http4k/http4k.git').parent().
-                            appendNode('developerConnection', 'scm:git:git@github.com:http4k/http4k.git')
-                        asNode().appendNode('licenses').appendNode('license').
-                            appendNode('name', 'Apache License, Version 2.0').parent().
-                            appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
+                            .appendNode("developer").appendNode("name", "David Denton").parent().appendNode("email", "david@http4k.org")
+                        asNode().appendNode("scm").
+                            appendNode("url", "git@github.com:http4k/" + archivesBaseName + ".git").parent().
+                            appendNode("connection", "scm:git:git@github.com:http4k/http4k.git").parent().
+                            appendNode("developerConnection", "scm:git:git@github.com:http4k/http4k.git")
+                        asNode().appendNode("licenses").appendNode("license").
+                            appendNode("name", "Apache License, Version 2.0").parent().
+                            appendNode("url", "http://www.apache.org/licenses/LICENSE-2.0.html")
                     }
                     from components.java
-
                     // replace all runtime dependencies with provided
                     pom.withXml {
-                        asNode().dependencies.'*'.findAll() {
-                            it.scope.text() == 'runtime'
+                        asNode().dependencies."*".findAll() {
+                            it.scope.text() == "runtime"
                         }.each() {
-                            it.scope*.value = 'provided'
+                            it.scope*.value = "provided"
                         }
                     }
                     artifact sourcesJar
@@ -170,8 +167,8 @@ subprojects {
     sourceSets {
         test {
             kotlin {
-                srcDirs 'src/test/kotlin'
-                srcDirs 'src/examples/kotlin'
+                srcDirs "src/test/kotlin"
+                srcDirs "src/examples/kotlin"
             }
         }
     }
@@ -184,10 +181,11 @@ compileTestKotlin.kotlinOptions {
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
     dependsOn = subprojects.test
+
     getSourceDirectories().from(subprojects.sourceSets.main.allSource.srcDirs)
     getClassDirectories().from(subprojects.sourceSets.main.output)
     getExecutionData().from(subprojects
-        .findAll { it.name != 'http4k-bom' && hasAnArtifact(it) }
+        .findAll { it.name != "http4k-bom" && hasAnArtifact(it) }
         .jacocoTestReport.executionData)
 
     reports {
@@ -204,31 +202,30 @@ dependencies {
             hasAnArtifact(it)
         }
         .forEach {
-            api project(it.name)
-            testImplementation project(path: it.name, configuration: 'testArtifacts')
+            api(project(it.name))
+            testImplementation(project(path: it.name, configuration: "testArtifacts"))
         }
 
-    testImplementation(Libs.s3) {
+    testImplementation("software.amazon.awssdk:s3:_") {
         exclude group: "software.amazon.awssdk", module: "netty-nio-client"
         exclude group: "software.amazon.awssdk", module: "apache-client"
     }
-    testImplementation Libs.graphql_kotlin_schema_generator
-    testImplementation Libs.aws_lambda_java_events
-    testImplementation Config.TestDependencies
+    testImplementation("com.expediagroup:graphql-kotlin-schema-generator:_")
+    testImplementation("com.amazonaws:aws-lambda-java-events:_")
 }
 
-private boolean hasAnArtifact(Project it) {
+private static boolean hasAnArtifact(Project it) {
     !it.name.contains("test-function") && !it.name.contains("integration-test")
 }
 
 sourceSets {
     test {
         kotlin {
-            srcDirs 'src/test/kotlin'
-            srcDirs 'src/docs'
+            srcDirs "src/test/kotlin"
+            srcDirs "src/docs"
         }
         resources {
-            srcDir 'src/docs'
+            srcDir "src/docs"
         }
     }
 }
