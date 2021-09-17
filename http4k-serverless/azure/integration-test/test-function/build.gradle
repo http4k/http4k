@@ -1,5 +1,5 @@
 plugins {
-    id "com.microsoft.azure.azurefunctions" version "1.5.0"
+    id "com.microsoft.azure.azurefunctions"
 }
 
 description = 'Testing against a functions deployed to Azure Functions'
