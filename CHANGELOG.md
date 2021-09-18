@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.13.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Rename AsyncHttpClient to AsyncHttpHandler (deprecation).
 
 ### v4.13.0.0
 - **http4k-core** : Reverse Proxy available in both routing and non-routing version. Use reverseProxy() or reverseProxyRouting() accordingly
