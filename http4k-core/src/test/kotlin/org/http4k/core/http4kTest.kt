@@ -8,7 +8,7 @@ import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-class AsyncHttpClientTest {
+class AsyncHttpHandlerTest {
     @Test
     fun `can convert a synchronous HttpHandler to mimic the AsyncHttpClient API`() {
 

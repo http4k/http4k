@@ -33,10 +33,10 @@ object Apache4AsyncClient {
         client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient(),
         responseBodyMode: BodyMode = Memory,
         requestBodyMode: BodyMode = Memory
-    ): AsyncHttpClient {
+    ): AsyncHttpHandler {
         if (!client.isRunning) client.start()
 
-        return object : AsyncHttpClient {
+        return object : AsyncHttpHandler {
             override fun close() = client.close()
 
             override fun invoke(request: Request, fn: (Response) -> Unit) {
