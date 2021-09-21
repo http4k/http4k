@@ -1,0 +1,5 @@
+jsonRoot:
+  child:
+  - "hello"
+  - "there"
+  num: 123

@@ -1,5 +1,6 @@
 package org.http4k.testing
 
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.MarkedYAMLException
 import com.github.underscore.lodash.Json
 import com.github.underscore.lodash.Json.JsonStringBuilder.Step.TWO_SPACES
 import com.github.underscore.lodash.U.formatJson
@@ -7,8 +8,10 @@ import com.github.underscore.lodash.U.formatXml
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
+import org.http4k.core.ContentType.Companion.APPLICATION_YAML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.HttpMessage
+import org.http4k.format.JacksonYaml
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.ApprovalContent.Companion.HttpBodyOnly
 import org.http4k.testing.TestNamer.Companion.ClassAndMethod
@@ -63,8 +66,8 @@ abstract class ContentTypeAwareApprovalTest(
 ) : BaseApprovalTest {
     override fun approverFor(context: ExtensionContext) = object : Approver {
         override fun <T : HttpMessage> assertApproved(httpMessage: T) {
-            delegate.assertApproved(httpMessage)
             assertEquals(contentType, CONTENT_TYPE(httpMessage))
+            delegate.assertApproved(httpMessage)
         }
 
         private val delegate = NamedResourceApprover(
@@ -117,5 +120,19 @@ class XmlApprovalTest(
         formatXml(input)
     } catch (e: IllegalArgumentException) {
         throw AssertionFailedError("Invalid XML generated", "<valid XML>", input)
+    }
+}
+
+/**
+ * Approval JUnit5 extension configured to compare prettified-YAML messages.
+ */
+class YamlApprovalTest(
+    testNamer: TestNamer = ClassAndMethod,
+    approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
+) : ContentTypeAwareApprovalTest(APPLICATION_YAML, testNamer, approvalSource) {
+    override fun format(input: String): String = try {
+        JacksonYaml.asFormatString(JacksonYaml.asA<Map<String, Any>>(input))
+    } catch (e: MarkedYAMLException) {
+        throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input)
     }
 }
