@@ -1,5 +1,5 @@
 yamlRoot:
   child:
-  - "hello"
-  - "there"
+  - hello
+  - there
   num: 123

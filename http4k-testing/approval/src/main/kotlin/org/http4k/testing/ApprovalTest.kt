@@ -131,7 +131,8 @@ class YamlApprovalTest(
     approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
 ) : ContentTypeAwareApprovalTest(APPLICATION_YAML, testNamer, approvalSource) {
     override fun format(input: String): String = try {
-        JacksonYaml.asFormatString(JacksonYaml.asA<Map<String, Any>>(input))
+        JacksonYaml.asA<Map<String, Any>>(input)
+        input
     } catch (e: MarkedYAMLException) {
         throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input)
     }
