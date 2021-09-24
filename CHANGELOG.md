@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.13.1.0 (uncut)
+### v4.13.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Rename AsyncHttpClient to AsyncHttpHandler (deprecation).
 - **http4k-contract** : Fix #664 - Introduce OpenAPIJackson to not serialize nulls by default into OpenAPI specs. If you use your own Jackson instance, you can replicate this behaviour by using `.setSerializationInclusion(NON_NULL)` on your custom `ObjectMapper` implementation.
