@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.OpenAPIJackson
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
@@ -16,7 +17,7 @@ import kotlin.reflect.full.createInstance
 /**
  * Defaults for configuring OpenApi3 with Jackson
  */
-fun OpenApi3(apiInfo: ApiInfo, json: Jackson = Jackson, extensions: List<OpenApiExtension> = emptyList()) = OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
+fun OpenApi3(apiInfo: ApiInfo, json: ConfigurableJackson = OpenAPIJackson, extensions: List<OpenApiExtension> = emptyList()) = OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
 
 fun AutoJsonToJsonSchema(json: Jackson) = AutoJsonToJsonSchema(
     json,
