@@ -6,7 +6,7 @@ changes with their rationale when appropriate:
 ### v4.13.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Rename AsyncHttpClient to AsyncHttpHandler (deprecation).
-- **http4k-contract** : Fix #644 - Introduce OpenAPIJackson to not serialize nulls by default into OpenAPI specs. If you use your own Jackson instance, you can replicate this behaviour by using `.setSerializationInclusion(NON_NULL)` on your custom `ObjectMapper` implementation.
+- **http4k-contract** : Fix #664 - Introduce OpenAPIJackson to not serialize nulls by default into OpenAPI specs. If you use your own Jackson instance, you can replicate this behaviour by using `.setSerializationInclusion(NON_NULL)` on your custom `ObjectMapper` implementation.
 
 ### v4.13.0.0
 - **http4k-core** : Reverse Proxy available in both routing and non-routing version. Use reverseProxy() or reverseProxyRouting() accordingly
