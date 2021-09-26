@@ -39,24 +39,4 @@ operator fun Event.plus(that: Pair<String, Any>): Event = when (this) {
     else -> MetadataEvent(this, mapOf(that))
 }
 
-class MetadataEvent(val event: Event, val metadata: Map<String, Any> = emptyMap()) : Event by event {
-    override fun toString() = "MetadataEvent(event=$event, metadata=$metadata)"
-
-    override fun hashCode(): Int {
-        var result = event.hashCode()
-        result = 31 * result + metadata.hashCode()
-        return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MetadataEvent
-
-        if (event != other.event) return false
-        if (metadata != other.metadata) return false
-
-        return true
-    }
-}
+data class MetadataEvent(val event: Event, val metadata: Map<String, Any> = emptyMap()) : Event by event
