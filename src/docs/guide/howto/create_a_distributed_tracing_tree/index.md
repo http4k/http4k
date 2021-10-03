@@ -11,6 +11,6 @@ When composing several http4k services together and talking to Fakes representin
 
 This tree can then be used to show the flow of traffic through the various services and to be used for things like documentation.
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_tracing_tree/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_distributed_tracing_tree/example.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_tracing_tree/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_distributed_tracing_tree/example.kt"></script>
