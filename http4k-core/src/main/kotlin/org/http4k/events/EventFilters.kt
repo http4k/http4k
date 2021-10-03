@@ -18,6 +18,16 @@ object EventFilters {
             }))
         }
     }
+
+    /**
+     * Adds a service name to the event.
+     */
+    fun AddServiceName(name: String) = EventFilter { next ->
+        {
+            next(it + ("service" to name))
+        }
+    }
+
     /**
      * Adds timestamp metadata to the event.
      */

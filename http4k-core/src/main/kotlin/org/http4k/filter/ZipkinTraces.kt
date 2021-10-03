@@ -11,10 +11,11 @@ import kotlin.random.Random
 
 data class TraceId(val value: String) {
     companion object {
+        var c = 0
         fun new(random: Random = Random): TraceId {
             val randomBytes = ByteArray(8)
             random.nextBytes(randomBytes)
-            return TraceId(Hex.hex(randomBytes))
+            return TraceId(c++.toString())
         }
     }
 }

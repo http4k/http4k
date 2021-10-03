@@ -22,6 +22,16 @@ class EventFiltersTests {
     }
 
     @Test
+    fun `AddServiceName captures name of event`() {
+        val events = EventFilters.AddServiceName("bob").then(recording)
+        val event = MyEvent()
+
+        events(event)
+
+        assertThat(recording.toList(), equalTo(listOf<Event>(MetadataEvent(event, mapOf("service" to "bob")))))
+    }
+
+    @Test
     fun `AddEventName captures name of metadata wrapped event`() {
         val events = EventFilters.AddEventName().then(recording)
         val event = MyEvent()
