@@ -55,7 +55,7 @@ fun Internal1(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
 
     return ServerStack(events)
         .then(
-            routes("int1" bind { _: Request ->
+            routes("/int1" bind { _: Request ->
                 http(Request(GET, "http://external1/ext1"))
                 http(Request(GET, "http://internal2/int2"))
             })
@@ -69,7 +69,7 @@ fun Internal2(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
 
     return ServerStack(events)
         .then(
-            routes("int2" bind { _: Request ->
+            routes("/int2" bind { _: Request ->
                 http(Request(GET, "http://external2/ext2"))
             })
         )
