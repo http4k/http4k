@@ -76,6 +76,22 @@ class ServerFiltersTest {
         assertThat(received, equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null, SAMPLE)))
     }
 
+
+    @Test
+    fun `uses a new request trace every time`() {
+        val traces = mutableListOf<ZipkinTraces>()
+
+        val svc = ServerFilters.RequestTracing().then {
+            traces += ZipkinTraces(it)
+            Response(OK)
+        }
+
+        svc(Request(GET, ""))
+        svc(Request(GET, ""))
+
+        assertThat(traces[0], !equalTo(traces[1]))
+    }
+
     @Test
     fun `uses existing request tracing from request and sets on outgoing response`() {
         val originalTraceId = TraceId("originalTrace")
