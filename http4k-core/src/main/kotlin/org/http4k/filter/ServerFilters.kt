@@ -20,6 +20,7 @@ import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
+import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -82,16 +83,18 @@ object ServerFilters {
             endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }
         ): Filter = Filter { next ->
             {
+                val previous = THREAD_LOCAL.get()
+
                 val fromRequest = ZipkinTraces(it)
                 startReportFn(it, fromRequest)
-                ZipkinTraces.THREAD_LOCAL.set(fromRequest)
+                THREAD_LOCAL.set(fromRequest)
 
                 try {
                     val response = ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, it)))
                     endReportFn(it, response, fromRequest)
                     response
                 } finally {
-                    ZipkinTraces.THREAD_LOCAL.remove()
+                    THREAD_LOCAL.set(previous)
                 }
             }
         }
