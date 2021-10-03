@@ -1,4 +1,3 @@
-
 package guide.howto.create_a_distributed_tracing_tree
 
 import com.natpryce.hamkrest.assertion.assertThat
@@ -29,26 +28,32 @@ import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
 import org.http4k.testing.RecordingEvents
 
+// standardised events stack which records the service name and adds tracing
 fun TraceEvents(actorName: String) = AddZipkinTraces().then(AddServiceName(actorName))
 
+// standardised client filter stack which adds tracing and records traffic events
+fun ClientStack(events: Events) = ReportHttpTransaction { events(Outgoing(it)) }
+    .then(ClientFilters.RequestTracing())
+
+// standardised server filter stack which adds tracing and records traffic events
+fun ServerStack(events: Events) = ReportHttpTransaction { events(Incoming(it)) }
+    .then(RequestTracing())
+
+// Our "User" object who will send a request to our system
 class User(rawEvents: Events, rawHttp: HttpHandler) {
     private val events = TraceEvents("user").then(rawEvents)
 
-    private val http = ClientFilters.RequestTracing()
-        .then(ReportHttpTransaction { events(Outgoing(it)) })
-        .then(rawHttp)
+    private val http = ClientStack(events).then(rawHttp)
 
     fun initiateCall() = http(Request(GET, "http://internal1/int1"))
 }
 
+// the first internal app
 fun Internal1(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
     val events = TraceEvents("internal1").then(rawEvents).then(rawEvents)
-    val http = ReportHttpTransaction { events(Outgoing(it)) }
-        .then(ClientFilters.RequestTracing())
-        .then(rawHttp)
+    val http = ClientStack(events).then(rawHttp)
 
-    return ReportHttpTransaction { events(Incoming(it)) }
-        .then(RequestTracing())
+    return ServerStack(events)
         .then(
             routes("int1" bind { _: Request ->
                 http(Request(GET, "http://external1/ext1"))
@@ -57,14 +62,12 @@ fun Internal1(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
         )
 }
 
+// the second internal app
 fun Internal2(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
     val events = TraceEvents("internal2").then(rawEvents).then(rawEvents)
-    val http = ReportHttpTransaction { events(Outgoing(it)) }
-        .then(ClientFilters.RequestTracing())
-        .then(rawHttp)
+    val http = ClientStack(events).then(rawHttp)
 
-    return ReportHttpTransaction { events(Incoming(it)) }
-        .then(RequestTracing())
+    return ServerStack(events)
         .then(
             routes("int2" bind { _: Request ->
                 http(Request(GET, "http://external2/ext2"))
@@ -72,13 +75,16 @@ fun Internal2(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
         )
 }
 
+// an external fake system
 fun FakeExternal1() = RequestTracing().then { Response(OK) }
 
+// another external fake system
 fun FakeExternal2() = RequestTracing().then { Response(OK) }
 
 fun main() {
     val events = RecordingEvents()
 
+    // compose our application(s) together
     val internalApp = Internal1(
         events,
         reverseProxy(
@@ -86,36 +92,39 @@ fun main() {
             "internal2" to Internal2(events, FakeExternal2())
         )
     )
+
+    // make a request to the composed stack
     User(events, internalApp).initiateCall()
 
-    val outbound = events.filterIsInstance<MetadataEvent>().filter { it.event is Outgoing }
-
-    val callTree = outbound
-        .filter { it.traces().parentSpanId == null }
-        .map { it.toCallTree(outbound - it) }
+    // convert the recorded events into a tree of HTTP calls
+    val callTree = events.createCallTree()
 
     println(callTree)
 
-    assertThat(
-        callTree,
-        equalTo(
-            listOf(
-                HttpCallTree(
-                    "user", Uri.of("http://internal1/int1"), GET, OK,
-                    listOf(
-                        HttpCallTree("internal1", Uri.of("http://external1/ext1"), GET, OK, emptyList()),
-                        HttpCallTree(
-                            "internal1", Uri.of("http://internal2/int2"), GET, OK, listOf(
-                                HttpCallTree("internal2", Uri.of("http://external2/ext2"), GET, OK, emptyList()),
-                            )
-                        )
-                    )
-                )
+    // check that we created the correct thing
+    assertThat(callTree, equalTo(listOf(expectedCallTree())))
+}
+
+private fun RecordingEvents.createCallTree(): List<HttpCallTree> {
+    val outbound = filterIsInstance<MetadataEvent>().filter { it.event is Outgoing }
+    return outbound
+        .filter { it.traces().parentSpanId == null }
+        .map { it.toCallTree(outbound - it) }
+}
+
+private fun expectedCallTree() = HttpCallTree(
+    "user", Uri.of("http://internal1/int1"), GET, OK,
+    listOf(
+        HttpCallTree("internal1", Uri.of("http://external1/ext1"), GET, OK, emptyList()),
+        HttpCallTree(
+            "internal1", Uri.of("http://internal2/int2"), GET, OK, listOf(
+                HttpCallTree("internal2", Uri.of("http://external2/ext2"), GET, OK, emptyList()),
             )
         )
     )
-}
+)
 
+// recursively create the call tree from the event list
 private fun MetadataEvent.toCallTree(calls: List<MetadataEvent>): HttpCallTree {
     val httpEvent = event as HttpEvent
     return HttpCallTree(
