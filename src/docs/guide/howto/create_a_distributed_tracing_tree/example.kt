@@ -76,10 +76,10 @@ fun Internal2(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
 }
 
 // an external fake system
-fun FakeExternal1() = RequestTracing().then { Response(OK) }
+fun FakeExternal1(): HttpHandler = { Response(OK) }
 
 // another external fake system
-fun FakeExternal2() = RequestTracing().then { Response(OK) }
+fun FakeExternal2(): HttpHandler = { Response(OK) }
 
 fun main() {
     val events = RecordingEvents()
@@ -102,7 +102,7 @@ fun main() {
     println(callTree)
 
     // check that we created the correct thing
-    assertThat(callTree, equalTo(listOf(expectedCallTree())))
+    assertThat(callTree, equalTo(listOf(expectedCallTree)))
 }
 
 private fun RecordingEvents.createCallTree(): List<HttpCallTree> {
@@ -111,18 +111,6 @@ private fun RecordingEvents.createCallTree(): List<HttpCallTree> {
         .filter { it.traces().parentSpanId == null }
         .map { it.toCallTree(outbound - it) }
 }
-
-private fun expectedCallTree() = HttpCallTree(
-    "user", Uri.of("http://internal1/int1"), GET, OK,
-    listOf(
-        HttpCallTree("internal1", Uri.of("http://external1/ext1"), GET, OK, emptyList()),
-        HttpCallTree(
-            "internal1", Uri.of("http://internal2/int2"), GET, OK, listOf(
-                HttpCallTree("internal2", Uri.of("http://external2/ext2"), GET, OK, emptyList()),
-            )
-        )
-    )
-)
 
 // recursively create the call tree from the event list
 private fun MetadataEvent.toCallTree(calls: List<MetadataEvent>): HttpCallTree {
@@ -144,4 +132,16 @@ data class HttpCallTree(
     val method: Method,
     val status: Status,
     val children: List<HttpCallTree>
+)
+
+val expectedCallTree = HttpCallTree(
+    "user", Uri.of("http://internal1/int1"), GET, OK,
+    listOf(
+        HttpCallTree("internal1", Uri.of("http://external1/ext1"), GET, OK, emptyList()),
+        HttpCallTree(
+            "internal1", Uri.of("http://internal2/int2"), GET, OK, listOf(
+                HttpCallTree("internal2", Uri.of("http://external2/ext2"), GET, OK, emptyList()),
+            )
+        )
+    )
 )
