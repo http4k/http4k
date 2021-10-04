@@ -11,6 +11,8 @@ sealed class HttpEvent(
     val status: Status,
     val latency: Long,
 ) : Event {
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -45,6 +47,8 @@ sealed class HttpEvent(
             tx.response.status,
             tx.duration.toMillis()
         )
+
+        override fun toString() = "Incoming(uri=$uri, method=$method, status=$status, latency=$latency)"
     }
 
     class Outgoing(
@@ -59,5 +63,7 @@ sealed class HttpEvent(
             tx.response.status,
             tx.duration.toMillis()
         )
+
+        override fun toString() = "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency)"
     }
 }

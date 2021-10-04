@@ -13,7 +13,10 @@ typealias GraphQLWithContextHandler<T> = (GraphQLRequest, T) -> GraphQLResponse
 
 data class GraphQLRequest(val query: String = "",
                           val operationName: String? = null,
-                          val variables: Map<String, Any> = emptyMap()) {
+                          private val variables: Map<String, Any>? = emptyMap()) {
+
+    fun variables() = variables ?: emptyMap()
+
     companion object {
         val requestLens = Body.auto<GraphQLRequest>().toLens()
     }
