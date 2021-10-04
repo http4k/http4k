@@ -20,9 +20,11 @@ import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.events.MetadataEvent
 import org.http4k.events.then
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.ClientFilters.ResetRequestTracing
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.filter.ServerFilters.RequestTracing
 import org.http4k.filter.ZipkinTraces
+import org.http4k.filter.debug
 import org.http4k.routing.bind
 import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
@@ -43,7 +45,8 @@ fun ServerStack(events: Events) = ReportHttpTransaction { events(Incoming(it)) }
 class User(rawEvents: Events, rawHttp: HttpHandler) {
     private val events = TraceEvents("user").then(rawEvents)
 
-    private val http = ClientStack(events).then(rawHttp)
+    // as the user is the initiator of requests, we need to reset the tracing for each call.
+    private val http = ResetRequestTracing().then(ClientStack(events)).then(rawHttp)
 
     fun initiateCall() = http(Request(GET, "http://internal1/int1"))
 }

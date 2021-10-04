@@ -51,6 +51,16 @@ object ClientFilters {
     }
 
     /**
+     * Reset Zipkin request tracing. Use this to provide a new TraceId for every outbound call.
+     */
+    fun ResetRequestTracing() = Filter { next ->
+        {
+            ZipkinTraces.setForCurrentThread(ZipkinTraces(TraceId.new(), TraceId.new(), null))
+            next(it)
+        }
+    }
+
+    /**
      * Sets the host on an outbound request. This is useful to separate configuration of remote endpoints
      * from the logic required to construct the rest of the request.
      */
