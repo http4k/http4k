@@ -7,6 +7,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
@@ -32,9 +33,15 @@ abstract class ChaoticHttpHandler : HttpHandler {
 
     fun returnStatus(status: Status) = misbehave(ReturnStatus(status))
 
-    override fun invoke(request: Request) = chaosEngine
-        .then(CatchAll())
-        .then(app.withChaosApi(chaosEngine))(request)
+
+    override fun invoke(request: Request) = (
+        CatchAll()
+            .then(
+                if (chaosEngine.isEnabled() || request.uri.path.startsWith("/chaos"))
+                    app.withChaosApi(chaosEngine)
+                else app
+            )
+        )(request)
 }
 
 /**
@@ -44,7 +51,7 @@ fun ChaoticHttpHandler.start(
     port: Int = this::class.defaultPort, serverConfig: (Int) -> ServerConfig = ::SunHttp
 ) =
     asServer(serverConfig(port)).start().also {
-        println("Started ${this::class.simpleName} on $port")
+        println("Started ${this::class.simpleName ?: "server"} on $port")
     }
 
 /**
