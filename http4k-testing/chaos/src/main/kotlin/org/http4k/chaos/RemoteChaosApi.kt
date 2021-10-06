@@ -54,10 +54,12 @@ fun HttpHandler.withChaosApi(
     apiName: String = "http4k"
 ) = routes(
     RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy, clock, apiName),
-    when (this) {
-        is RoutingHttpHandler -> this
-        else -> routes("/{path:.*}" bind this)
-    }
+    engine.then(
+        when (this) {
+            is RoutingHttpHandler -> this
+            else -> routes("/{path:.*}" bind this)
+        }
+    )
 )
 
 /**
