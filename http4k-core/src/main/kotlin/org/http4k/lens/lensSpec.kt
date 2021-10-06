@@ -104,21 +104,21 @@ open class LensSpec<IN : Any, OUT>(
 
     open val multi = object : MultiLensSpec<IN, OUT> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): Lens<IN, List<OUT>> =
-            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
+            defaulted(name, Lens(Meta(false, location, ArrayParam(paramMeta), name, description)) { default }, description)
 
         override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): Lens<IN, List<OUT>> {
             val getLens = get(name)
-            return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).run { if (isEmpty()) default(it) else this } }
+            return Lens(Meta(false, location, ArrayParam(paramMeta), name, description)) { getLens(it).run { if (isEmpty()) default(it) else this } }
         }
 
         override fun optional(name: String, description: String?): Lens<IN, List<OUT>?> {
             val getLens = get(name)
-            return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).run { if (isEmpty()) null else this } }
+            return Lens(Meta(false, location, ArrayParam(paramMeta), name, description)) { getLens(it).run { if (isEmpty()) null else this } }
         }
 
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
             val getLens = get(name)
-            return Lens(Meta(true, location, paramMeta, name, description)) {
+            return Lens(Meta(true, location, ArrayParam(paramMeta), name, description)) {
                 getLens(it).run {
                     if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)), target = it) else this
                 }
