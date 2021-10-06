@@ -33,15 +33,9 @@ abstract class ChaoticHttpHandler : HttpHandler {
 
     fun returnStatus(status: Status) = misbehave(ReturnStatus(status))
 
-
-    override fun invoke(request: Request) = (
-        CatchAll()
-            .then(
-                if (chaosEngine.isEnabled() || request.uri.path.startsWith("/chaos"))
-                    app.withChaosApi(chaosEngine)
-                else app
-            )
-        )(request)
+    override fun invoke(request: Request) = chaosEngine
+        .then(CatchAll())
+        .then(app.withChaosApi(chaosEngine))(request)
 }
 
 /**
