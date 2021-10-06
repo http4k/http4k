@@ -7,6 +7,11 @@ import io.undertow.Undertow
 import io.undertow.UndertowOptions.ENABLE_HTTP2
 import io.undertow.server.handlers.BlockingHandler
 import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
@@ -15,15 +20,12 @@ class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : PolyServerConfi
     constructor(port: Int = 8000) : this(port, false)
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
-        val httpHandler = http?.let(::Http4kUndertowHttpHandler)?.let(::BlockingHandler)
+        val httpHandler =
+            (http ?: { Response(BAD_REQUEST) }).let (::Http4kUndertowHttpHandler).let(::BlockingHandler)
         val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
         val sseCallback = sse?.let { serverSentEvents(Http4kSseCallback(sse)) }
 
-        val handlerWithWs = when {
-            httpHandler != null && wsCallback != null -> predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
-            wsCallback != null -> wsCallback
-            else -> httpHandler
-        }
+        val handlerWithWs = predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
 
         val handlerWithSse = sseCallback
             ?.let { predicate(hasEventStreamContentType(), sseCallback, handlerWithWs) }
