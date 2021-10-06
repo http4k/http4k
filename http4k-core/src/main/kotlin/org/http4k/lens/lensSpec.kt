@@ -193,7 +193,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
         override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
-            return BiDiLens(Meta(false, location, paramMeta, name, description),
+            return BiDiLens(Meta(false, location, ArrayParam(paramMeta), name, description),
                 { getLens(it).run { if (isEmpty()) default(it) else this } },
                 { out: List<OUT>, target: IN -> setLens(out, target) }
             )

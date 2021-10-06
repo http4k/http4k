@@ -4,7 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.14.1.1
-- **http4k-core** : [Fix] ChaoticHttpHandler is now event better behaved when chaos is not enabled and respects routing templates when applying.
+- **http4k-core** : ChaoticHttpHandler is now event better behaved when chaos is not enabled and respects routing templates when applying.
+- **http4k-core** : Fix #665 - OpenAPI json is incorrect when multi string query lens with defaulted values is used. H/T @suyash192
 
 ### v4.14.1.0
 - **http4k-core** : ChaoticHttpHandler is now better behaved when chaos is not enabled.
