@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.14.1.2 (uncut)
+### v4.14.1.2
+- **http4k-contract** : Fix #667 - Jackson annotations being missed in FieldRetrieval.
 - **http4k-undertow** : Server now handles HTTP requests gracefully when there is no HTTP handler set.
 
 ### v4.14.1.1
