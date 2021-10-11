@@ -19,7 +19,7 @@ import kotlin.reflect.full.createInstance
  */
 fun OpenApi3(apiInfo: ApiInfo, json: ConfigurableJackson = OpenAPIJackson, extensions: List<OpenApiExtension> = emptyList()) = OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
 
-fun AutoJsonToJsonSchema(json: Jackson) = AutoJsonToJsonSchema(
+fun AutoJsonToJsonSchema(json: ConfigurableJackson) = AutoJsonToJsonSchema(
     json,
     FieldRetrieval.compose(
         SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy),
