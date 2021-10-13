@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.14.1.4
+- **http4k-serverless-lambda** : More fixing of deserialisation of SNS events.
+
 ### v4.14.1.3
 - **http4k-serverless-lambda** : Fix deserialisation of SNS events.
 
