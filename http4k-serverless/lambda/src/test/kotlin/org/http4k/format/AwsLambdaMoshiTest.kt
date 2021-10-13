@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import com.amazonaws.services.lambda.runtime.events.CloudWatchLogsEvent
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisFirehoseEvent
@@ -43,6 +44,15 @@ import java.util.Date
 
 @ExtendWith(JsonApprovalTest::class)
 class AwsLambdaMoshiTest {
+    @Test
+    fun `CloudWatchLogs event`(approver: Approver) {
+        approver.assertRoundtrips(CloudWatchLogsEvent().apply {
+            awsLogs = CloudWatchLogsEvent.AWSLogs().apply {
+                data = "logsData"
+            }
+        })
+    }
+
     @Test
     fun `Dynamodb event`(approver: Approver) {
         approver.assertRoundtrips(DynamodbEvent().apply {

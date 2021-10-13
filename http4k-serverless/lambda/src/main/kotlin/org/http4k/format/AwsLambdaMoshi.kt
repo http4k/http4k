@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 
 object AwsLambdaMoshi : ConfigurableMoshi(
     Moshi.Builder()
+        .addTyped(CloudWatchLogsEventAdapter)
         .addTyped(DynamodbEventAdapter)
         .addTyped(KinesisEventAdapter)
         .addTyped(KinesisFirehoseEventAdapter)
