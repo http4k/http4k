@@ -19,7 +19,7 @@ Depending on your learning style, there are a number of options to get started w
 
 ```groovy
 dependencies {
-    implementation platform("org.http4k:http4k-bom:4.14.1.3")
+    implementation platform("org.http4k:http4k-bom:4.14.1.4")
     implementation "org.http4k:http4k-core"
     implementation "org.http4k:http4k-server-netty"
     implementation "org.http4k:http4k-client-apache"

@@ -4,7 +4,7 @@ description: Feature overview of the http4k-testing-kotest module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-testing-kotest", version: "4.14.1.3"
+implementation group: "org.http4k", name: "http4k-testing-kotest", version: "4.14.1.4"
 ```
 
 ### About
