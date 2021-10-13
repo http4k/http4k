@@ -23,7 +23,7 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
                             "eventSource" -> eventSource = nextString()
                             "eventSubscriptionArn" -> eventSubscriptionArn = nextString()
                             "eventVersion" -> eventVersion = nextString()
-                            "sns" -> setSns(obj(::SNS) {
+                            "Sns" -> setSns(obj(::SNS) {
                                 when (it) {
                                     "signingCertUrl" -> signingCertUrl = nextString()
                                     "messageId" -> messageId = nextString()
@@ -64,7 +64,7 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
                         string("eventSource", eventSource)
                         string("eventSubscriptionArn", eventSubscriptionArn)
                         string("eventVersion", eventVersion)
-                        obj("sns", sns) {
+                        obj("Sns", sns) {
                             string("signingCertUrl", signingCertUrl)
                             string("messageId", messageId)
                             string("message", message)

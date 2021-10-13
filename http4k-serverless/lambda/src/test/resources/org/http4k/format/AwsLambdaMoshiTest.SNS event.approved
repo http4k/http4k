@@ -4,7 +4,7 @@
       "eventSource": "eventSource",
       "eventSubscriptionArn": "eventSubscriptionArn",
       "eventVersion": "eventVersion",
-      "sns": {
+      "Sns": {
         "signingCertUrl": "signingCertUrl",
         "messageId": "messageId",
         "message": "message",
