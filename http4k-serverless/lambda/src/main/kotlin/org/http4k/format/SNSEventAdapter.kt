@@ -20,26 +20,26 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
                 when (it) {
                     "Records" -> records = list(::SNSRecord) {
                         when (it) {
-                            "eventSource" -> eventSource = nextString()
-                            "eventSubscriptionArn" -> eventSubscriptionArn = nextString()
-                            "eventVersion" -> eventVersion = nextString()
+                            "EventSource" -> eventSource = nextString()
+                            "EventSubscriptionArn" -> eventSubscriptionArn = nextString()
+                            "EventVersion" -> eventVersion = nextString()
                             "Sns" -> setSns(obj(::SNS) {
                                 when (it) {
-                                    "signingCertUrl" -> signingCertUrl = nextString()
-                                    "messageId" -> messageId = nextString()
-                                    "message" -> message = nextString()
-                                    "subject" -> subject = nextString()
-                                    "unsubscribeUrl" -> unsubscribeUrl = nextString()
-                                    "type" -> type = nextString()
-                                    "signatureVersion" -> signatureVersion = nextString()
-                                    "signature" -> signature = nextString()
-                                    "timestamp" -> timestamp = DateTime.parse(nextString())
-                                    "topicArn" -> topicArn = nextString()
-                                    "messageAttributes" -> messageAttributes = map {
+                                    "SigningCertUrl" -> signingCertUrl = nextString()
+                                    "MessageId" -> messageId = nextString()
+                                    "Message" -> message = nextString()
+                                    "Subject" -> subject = nextString()
+                                    "UnsubscribeUrl" -> unsubscribeUrl = nextString()
+                                    "Type" -> type = nextString()
+                                    "SignatureVersion" -> signatureVersion = nextString()
+                                    "Signature" -> signature = nextString()
+                                    "Timestamp" -> timestamp = DateTime.parse(nextString())
+                                    "TopicArn" -> topicArn = nextString()
+                                    "MessageAttributes" -> messageAttributes = map {
                                         obj(::MessageAttribute) {
                                             when (it) {
-                                                "type" -> type = nextString()
-                                                "value" -> value = nextString()
+                                                "Type" -> type = nextString()
+                                                "Value" -> value = nextString()
                                                 else -> skipValue()
                                             }
                                         }
@@ -61,25 +61,25 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
             obj(event) {
                 list("Records", records) {
                     obj(this) {
-                        string("eventSource", eventSource)
-                        string("eventSubscriptionArn", eventSubscriptionArn)
-                        string("eventVersion", eventVersion)
+                        string("EventSource", eventSource)
+                        string("EventSubscriptionArn", eventSubscriptionArn)
+                        string("EventVersion", eventVersion)
                         obj("Sns", sns) {
-                            string("signingCertUrl", signingCertUrl)
-                            string("messageId", messageId)
-                            string("message", message)
-                            string("subject", subject)
-                            string("unsubscribeUrl", unsubscribeUrl)
-                            string("type", type)
-                            string("signatureVersion", signatureVersion)
-                            string("signature", signature)
-                            string("topicArn", topicArn)
-                            string("timestamp", timestamp?.let { ISODateTimeFormat.dateTime().print(it) })
-                            obj("messageAttributes", messageAttributes) {
+                            string("SigningCertUrl", signingCertUrl)
+                            string("MessageId", messageId)
+                            string("Message", message)
+                            string("Subject", subject)
+                            string("UnsubscribeUrl", unsubscribeUrl)
+                            string("Type", type)
+                            string("SignatureVersion", signatureVersion)
+                            string("Signature", signature)
+                            string("TopicArn", topicArn)
+                            string("Timestamp", timestamp?.let { ISODateTimeFormat.dateTime().print(it) })
+                            obj("MessageAttributes", messageAttributes) {
                                 forEach {
                                     obj(it.key, it.value) {
-                                        string("type", type)
-                                        string("value", value)
+                                        string("Type", type)
+                                        string("Value", value)
                                     }
                                 }
                             }
