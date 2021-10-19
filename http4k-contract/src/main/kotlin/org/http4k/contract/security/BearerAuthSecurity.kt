@@ -10,7 +10,9 @@ import org.http4k.lens.RequestContextLens
 class BearerAuthSecurity private constructor(override val filter: Filter, val name: String = "bearerAuth") : Security {
     constructor(token: String, name: String = "bearerAuth") : this(ServerFilters.BearerAuth(token), name)
     constructor(token: (String) -> Boolean, name: String = "bearerAuth") : this(ServerFilters.BearerAuth(token), name)
-    constructor(key: RequestContextLens<Any>, lookup: (String) -> Any?, name: String = "bearerAuth") : this(ServerFilters.BearerAuth(key, lookup), name)
 
-    companion object
+    companion object {
+        operator fun <T> invoke(key: RequestContextLens<T>, lookup: (String) -> T?, name: String = "bearerAuth") =
+            BearerAuthSecurity(ServerFilters.BearerAuth(key, lookup), name)
+    }
 }
