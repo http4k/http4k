@@ -8,6 +8,8 @@ fun ByteBuffer.length() = limit() - position()
 
 fun ByteBuffer.asString(): String = String(array(), position(), length())
 
+fun ByteBuffer.base64Encode() : String = Base64.getEncoder().encodeToString(array())
+
 fun String.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(toByteArray())
 
 fun String.quoted() = "\"${replace("\"", "\\\"")}\""
