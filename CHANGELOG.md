@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.15.0.1
+- **http4k-serverless-lambda** : Fix encoding of body to work with gzip filter 
+
 ### v4.15.0.0
 - **http4k-contract** : [Break] BearerAuthSecurity is now more typesafe when taking a lens.
 
