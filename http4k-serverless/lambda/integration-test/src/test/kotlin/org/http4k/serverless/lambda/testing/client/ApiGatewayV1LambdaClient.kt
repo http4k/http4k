@@ -22,7 +22,7 @@ class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpC
         .withHeaders(headers.toMap())
         .withPath(uri.path)
         .withQueryStringParameters(uri.query.toParameters().toMap())
-        .withBody(bodyString().base64Encode())
+        .withBody(body.payload.base64Encode())
         .withIsBase64Encoded(true)
 
     override fun Response.fromLambdaFormat(): Response {

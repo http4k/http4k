@@ -44,7 +44,7 @@ object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, 
     override fun invoke(resp: Response) = mapOf(
         "statusCode" to resp.status.code,
         "headers" to resp.headers.toMap(),
-        "body" to resp.bodyString().base64Encode(),
+        "body" to resp.body.payload.base64Encode(),
         "isBase64Encoded" to true
     )
 }

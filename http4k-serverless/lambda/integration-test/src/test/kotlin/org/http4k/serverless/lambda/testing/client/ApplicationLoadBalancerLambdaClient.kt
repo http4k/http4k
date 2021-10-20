@@ -16,7 +16,7 @@ import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 class ApplicationLoadBalancerLambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
     override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of ApplicationLoadBalancerRequestEvent().apply {
         httpMethod = method.name
-        body = bodyString().base64Encode()
+        body = this@toLambdaFormat.body.payload.base64Encode()
         isBase64Encoded = true
         headers = this@toLambdaFormat.headers.toMap()
         path = uri.path

@@ -59,7 +59,7 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
             "headers" to nonCookies.toMap(),
             "multiValueHeaders" to nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap(),
             "cookies" to resp.cookies().map(Cookie::fullCookieString),
-            "body" to resp.bodyString().base64Encode(),
+            "body" to resp.body.payload.base64Encode(),
             "isBase64Encoded" to true
         )
     }

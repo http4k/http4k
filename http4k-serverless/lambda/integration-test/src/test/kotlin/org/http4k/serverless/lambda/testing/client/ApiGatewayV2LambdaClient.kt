@@ -19,7 +19,7 @@ class ApiGatewayV2LambdaClient(function: Function, region: Region) : LambdaHttpC
     ).apply {
         rawPath = uri.path
         queryStringParameters = uri.queries().filterNot { it.second == null }.map { it.first to it.second!! }.toMap()
-        body = bodyString().base64Encode()
+        body = this@toLambdaFormat.body.payload.base64Encode()
         isBase64Encoded = true
         headers = this@toLambdaFormat.headers.groupBy { it.first }.mapValues { (_, v) -> v.map { it.second }.joinToString(",") }
     }
