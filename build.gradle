@@ -2,27 +2,27 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            url "https://plugins.gradle.org/m2/"
+            url("https://plugins.gradle.org/m2/")
         }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:_"
-        classpath "org.openapitools:openapi-generator-gradle-plugin:_"
-        classpath "org.jetbrains.kotlin:kotlin-serialization:_"
-        classpath "com.github.jengelman.gradle.plugins:shadow:_"
-        classpath "io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_"
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
+        classpath("org.openapitools:openapi-generator-gradle-plugin:_")
+        classpath("org.jetbrains.kotlin:kotlin-serialization:_")
+        classpath("com.github.jengelman.gradle.plugins:shadow:_")
+        classpath("io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_")
     }
 }
 
-apply plugin: "io.codearte.nexus-staging"
+apply(plugin: "io.codearte.nexus-staging")
 
 allprojects {
     repositories {
         mavenCentral()
     }
-    apply plugin: "java"
-    apply plugin: "kotlin"
-    apply plugin: "jacoco"
+    apply(plugin: "java")
+    apply(plugin: "kotlin")
+    apply(plugin: "jacoco")
 
     compileKotlin.kotlinOptions.jvmTarget = "1.8"
     compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
@@ -74,36 +74,36 @@ subprojects {
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
         archiveClassifier = "javadoc"
-        from javadoc.destinationDir
+        from(javadoc.destinationDir)
     }
 
     task testJar(type: Jar) {
         classifier "test"
-        from sourceSets.test.output
+        from(sourceSets.test.output)
     }
 
     configurations {
-        testArtifacts.extendsFrom testApi
+        testArtifacts.extendsFrom(testApi)
     }
 
     artifacts {
-        testArtifacts testJar
-        archives sourcesJar, javadocJar
+        testArtifacts(testJar)
+        archives(sourcesJar, javadocJar)
     }
 
     if (hasAnArtifact(project)) {
         def enableSigning = project.findProperty("sign") == "true"
 
-        apply plugin: "maven-publish" // required to upload to sonatype
-        apply plugin: "maven" // required to upload to sonatype
+        apply(plugin: "maven-publish") // required to upload to sonatype
+        apply(plugin: "maven") // required to upload to sonatype
 
         if (enableSigning) { // when added it expects signing keys to be configured
-            apply plugin: "signing"
+            apply(plugin: "signing")
             signing {
                 def signingKey = findProperty("signingKey")
                 def signingPassword = findProperty("signingPassword")
                 useInMemoryPgpKeys(signingKey, signingPassword)
-                sign publishing.publications
+                sign(publishing.publications)
             }
         }
 
@@ -116,16 +116,16 @@ subprojects {
                     name "SonatypeStaging"
                     url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
                     credentials {
-                        username nexusUsername
-                        password nexusPassword
+                        username(nexusUsername)
+                        password(nexusPassword)
                     }
                 }
                 maven {
                     name "SonatypeSnapshot"
                     url "https://oss.sonatype.org/content/repositories/snapshots/"
                     credentials {
-                        username nexusUsername
-                        password nexusPassword
+                        username(nexusUsername)
+                        password(nexusPassword)
                     }
                 }
             }
@@ -157,8 +157,8 @@ subprojects {
                             it.scope*.value = "provided"
                         }
                     }
-                    artifact sourcesJar
-                    artifact javadocJar
+                    artifact(sourcesJar)
+                    artifact(javadocJar)
                 }
             }
         }
@@ -167,8 +167,8 @@ subprojects {
     sourceSets {
         test {
             kotlin {
-                srcDirs "src/test/kotlin"
-                srcDirs "src/examples/kotlin"
+                srcDirs += "src/test/kotlin"
+                srcDirs += "src/examples/kotlin"
             }
         }
     }
@@ -221,11 +221,11 @@ private static boolean hasAnArtifact(Project it) {
 sourceSets {
     test {
         kotlin {
-            srcDirs "src/test/kotlin"
-            srcDirs "src/docs"
+            srcDirs += "src/test/kotlin"
+            srcDirs += "src/docs"
         }
         resources {
-            srcDir "src/docs"
+            srcDirs += "src/docs"
         }
     }
 }
