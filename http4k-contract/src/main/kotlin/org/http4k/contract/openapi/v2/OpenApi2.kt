@@ -46,7 +46,7 @@ open class OpenApi2<out NODE>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>) =
+    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, tags: Set<Tag>) =
         with(renderPaths(routes, contractRoot, security)) {
             Response(OK)
                 .with(Header.CONTENT_TYPE of APPLICATION_JSON)
@@ -55,7 +55,7 @@ open class OpenApi2<out NODE>(
                         "swagger" to string("2.0"),
                         "info" to apiInfo.asJson(),
                         "basePath" to string("/"),
-                        "tags" to array(routes.renderTags()),
+                        "tags" to array(routes.renderTags(tags)),
                         "paths" to obj(fields.sortedBy { it.first }),
                         "securityDefinitions" to (listOfNotNull(security) + routes.mapNotNull { it.meta.security }).combine(),
                         "definitions" to obj(definitions),
@@ -198,7 +198,7 @@ open class OpenApi2<out NODE>(
         obj("title" to string(title), "version" to string(version), "description" to string(description ?: ""))
     }
 
-    private fun List<ContractRoute>.renderTags() = flatMap(ContractRoute::tags).toSet()
+    private fun List<ContractRoute>.renderTags(globalTags : Set<Tag>) = (flatMap(ContractRoute::tags) + globalTags).toSet()
         .sortedBy { it.name }
         .map {
             json {

@@ -25,6 +25,7 @@ import org.http4k.routing.RoutingHttpHandler
 
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                                       private val security: Security?,
+                                      private val tags: Set<Tag>,
                                       private val descriptionSecurity: Security?,
                                       private val descriptionPath: String,
                                       private val preFlightExtraction: PreFlightExtraction,
@@ -63,7 +64,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
         .let {
             val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { _ -> Response(OK) } else null)
-            it bindContract GET to { _ -> renderer.description(contractRoot, security, routes + extra) }
+            it bindContract GET to { _ -> renderer.description(contractRoot, security, routes + extra, tags) }
         }
 
     private val routers = routes
@@ -101,7 +102,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
         route.describeFor(contractRoot).let { routeIdentity ->
             Filter { next ->
                 {
-                    val xUriTemplate = UriTemplate.from(if (routeIdentity.isEmpty()) "/" else routeIdentity)
+                    val xUriTemplate = UriTemplate.from(routeIdentity.ifEmpty { "/" })
                     RoutedResponse(next(RoutedRequest(it, xUriTemplate)), xUriTemplate)
                 }
             }

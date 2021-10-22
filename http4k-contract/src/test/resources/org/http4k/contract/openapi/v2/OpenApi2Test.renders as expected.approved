@@ -8,10 +8,15 @@
   "basePath": "/",
   "tags": [
     {
+      "name": "hello",
+      "description": "world"
+    },
+    {
       "name": "tag1"
     },
     {
-      "name": "tag3"
+      "name": "tag3",
+      "description": "tag3 description"
     }
   ],
   "paths": {

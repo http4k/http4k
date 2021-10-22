@@ -6,12 +6,16 @@
   },
   "tags": [
     {
+      "name": "hello",
+      "description": "world"
+    },
+    {
       "name": "tag1",
       "description": null
     },
     {
       "name": "tag3",
-      "description": null
+      "description": "tag3 description"
     }
   ],
   "paths": {

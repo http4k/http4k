@@ -7,6 +7,7 @@ import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
 import org.http4k.contract.RouteMeta
+import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
@@ -65,14 +66,14 @@ class OpenApi3<NODE : Any>(
         extensions: List<OpenApiExtension> = emptyList()
     ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json))
 
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>): Response {
+    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, tags: Set<Tag>): Response {
         val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         val unextended = apiRenderer.api(
             Api(
                 apiInfo,
-                routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
+                (routes.map(ContractRoute::tags).flatten() + tags).toSet() .sortedBy { it.name },
                 paths
                     .groupBy { it.path }
                     .mapValues {

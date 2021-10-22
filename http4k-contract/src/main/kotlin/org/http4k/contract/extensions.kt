@@ -10,7 +10,11 @@ import org.http4k.lens.PathLens
 import org.http4k.util.Appendable
 
 fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
-    ContractRoutingHttpHandler(renderer, security, descriptionSecurity, descriptionPath, preFlightExtraction, routes.all,
+    ContractRoutingHttpHandler(renderer, security, tags.all.toSet(),
+        descriptionSecurity,
+        descriptionPath,
+        preFlightExtraction,
+        routes.all,
         preSecurityFilter = preSecurityFilter,
         postSecurityFilter = postSecurityFilter,
         includeDescriptionRoute = includeDescriptionRoute)
@@ -19,6 +23,7 @@ fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
 class ContractBuilder internal constructor() {
     var renderer: ContractRenderer = NoRenderer
     var security: Security? = null
+    val tags = Appendable<Tag>()
     var descriptionSecurity: Security? = null
     var descriptionPath = ""
     var preFlightExtraction: PreFlightExtraction = All

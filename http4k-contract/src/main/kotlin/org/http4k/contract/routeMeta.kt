@@ -122,8 +122,6 @@ fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).ru
     )
 }
 
-data class Tag(val name: String, val description: String? = null)
-
 data class RouteMeta(val summary: String = "<unknown>",
                      val description: String? = null,
                      val tags: Set<Tag> = emptySet(),

@@ -91,13 +91,14 @@ abstract class ContractRendererContract<NODE>(
 
         val router = "/basepath" bind contract {
             renderer = rendererToUse
+            tags += Tag("hello", "world")
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
             routes += "/nometa" bindContract GET to { _ -> Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
                 description = "some rambling description of what this thing actually does"
                 operationId = "echoMessage"
-                tags += Tag("tag3")
+                tags += Tag("tag3", "tag3 description")
                 tags += Tag("tag1")
                 markAsDeprecated()
             } bindContract GET to { _ -> Response(OK) }
