@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.16.0.1
-- Upgrade build process to Kotlin
+### v4.16.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Upgrade build process to Kotlin. H/T @franckrasolo
 
 ### v4.16.0.0
 - **http4k-contract** : [Breaking] Added API-level tags to the contract rendering.

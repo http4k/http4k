@@ -159,7 +159,7 @@ subprojects {
             }
             publications {
                 val archivesBaseName = tasks.jar.get().archiveBaseName.get()
-                create<MavenPublication>("maven") {
+                create<MavenPublication>("mavenJava") {
                     artifactId = archivesBaseName
                     pom.withXml {
                         asNode().appendNode("name", archivesBaseName)
