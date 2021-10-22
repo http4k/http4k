@@ -1,3 +1,5 @@
+import static org.gradle.api.JavaVersion.VERSION_1_8
+
 buildscript {
     repositories {
         mavenCentral()
@@ -26,8 +28,8 @@ allprojects {
 
     compileKotlin.kotlinOptions.jvmTarget = "1.8"
     compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = VERSION_1_8
+    targetCompatibility = VERSION_1_8
     version = project.hasProperty("releaseVersion") ? project.releaseVersion : "LOCAL"
     group = "org.http4k"
 
@@ -61,7 +63,7 @@ allprojects {
 subprojects {
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = "sources"
-        from sourceSets.main.allSource
+        from(sourceSets.main.allSource)
     }
 
     jar {
@@ -78,7 +80,7 @@ subprojects {
     }
 
     task testJar(type: Jar) {
-        classifier "test"
+        classifier("test")
         from(sourceSets.test.output)
     }
 
@@ -113,16 +115,16 @@ subprojects {
         publishing {
             repositories {
                 maven {
-                    name "SonatypeStaging"
-                    url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    name("SonatypeStaging")
+                    url("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
                     credentials {
                         username(nexusUsername)
                         password(nexusPassword)
                     }
                 }
                 maven {
-                    name "SonatypeSnapshot"
-                    url "https://oss.sonatype.org/content/repositories/snapshots/"
+                    name("SonatypeSnapshot")
+                    url("https://oss.sonatype.org/content/repositories/snapshots/")
                     credentials {
                         username(nexusUsername)
                         password(nexusPassword)
@@ -148,7 +150,7 @@ subprojects {
                             appendNode("name", "Apache License, Version 2.0").parent().
                             appendNode("url", "http://www.apache.org/licenses/LICENSE-2.0.html")
                     }
-                    from components.java
+                    from(components.java)
                     // replace all runtime dependencies with provided
                     pom.withXml {
                         asNode().dependencies."*".findAll() {
@@ -198,17 +200,15 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 
 dependencies {
     subprojects
-        .findAll {
-            hasAnArtifact(it)
-        }
+        .findAll { hasAnArtifact(it) }
         .forEach {
             api(project(it.name))
             testImplementation(project(path: it.name, configuration: "testArtifacts"))
         }
 
     testImplementation("software.amazon.awssdk:s3:_") {
-        exclude group: "software.amazon.awssdk", module: "netty-nio-client"
-        exclude group: "software.amazon.awssdk", module: "apache-client"
+        exclude(group: "software.amazon.awssdk", module: "netty-nio-client")
+        exclude(group: "software.amazon.awssdk", module: "apache-client")
     }
     testImplementation("com.expediagroup:graphql-kotlin-schema-generator:_")
     testImplementation("com.amazonaws:aws-lambda-java-events:_")
