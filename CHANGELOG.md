@@ -5,8 +5,6 @@ changes with their rationale when appropriate:
 
 ### v4.16.0.0
 - **http4k-contract** : [Breaking] Added API-level tags to the contract rendering.
-
-### v4.15.0.1
 - **http4k-serverless-lambda** : Fix encoding of body to work with gzip filter 
 
 ### v4.15.0.0
