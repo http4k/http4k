@@ -57,4 +57,6 @@ fun main() {
         }
     }"""))
     println(response)
+
+    server.stop()
 }

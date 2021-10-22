@@ -12,9 +12,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.Payload
-import org.http4k.filter.inIntelliJOnly
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -27,7 +25,6 @@ class AwsRealTest : AbstractAwsRealS3TestCase() {
     @Test
     fun `default usage`() {
         val client = awsClientFilter(Payload.Mode.Signed)
-            .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
             .then(JavaHttpClient())
         bucketLifecycle((client))
     }
