@@ -572,7 +572,7 @@ internal data class RequestObjectJson(
 )
 
 internal object RequestObjectExtractorJson : ConfigurableJackson(
-    KotlinModule()
+    KotlinModule.Builder().build()
         .asConfigurable()
         .text(Uri.Companion::of, Uri::toString)
         .text(::ClientId, ClientId::value)

@@ -68,7 +68,7 @@ data class ListApiResponse(val items: List<ApiDetails>)
 
 enum class ApiIntegrationVersion { v1, v2 }
 
-object ApiGatewayJackson : ConfigurableJackson(KotlinModule()
+object ApiGatewayJackson : ConfigurableJackson(KotlinModule.Builder().build()
     .asConfigurable()
     .withStandardMappings()
     .text(BiDiMapping(::ApiName, ApiName::value))

@@ -12,7 +12,7 @@ import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 
 object OpenAPIJackson : ConfigurableJackson(
-    KotlinModule()
+    KotlinModule.Builder().build()
         .asConfigurable()
         .withStandardMappings()
         .done()

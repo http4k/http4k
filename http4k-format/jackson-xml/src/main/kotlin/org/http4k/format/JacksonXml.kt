@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 /**
  * To implement custom XML configuration, create your own object singleton. Extra mappings can be added before done() is called.
  */
-object JacksonXml : ConfigurableJacksonXml(KotlinModule().asConfigurableXml()
+object JacksonXml : ConfigurableJacksonXml(KotlinModule.Builder().build().asConfigurableXml()
     .withStandardMappings()
     .done().apply {
         deactivateDefaultTyping()

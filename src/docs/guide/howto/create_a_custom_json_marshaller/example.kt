@@ -13,7 +13,7 @@ import org.http4k.format.asConfigurable
 import org.http4k.format.text
 import org.http4k.format.withStandardMappings
 
-object MyJackson : ConfigurableJackson(KotlinModule()
+object MyJackson : ConfigurableJackson(KotlinModule.Builder().build()
     .asConfigurable()
     .withStandardMappings()
     // declare custom mapping for our own types - this one represents our type as a simple String

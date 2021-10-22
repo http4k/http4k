@@ -55,7 +55,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }
 
-    override fun customMarshaller() = object : ConfigurableJackson(KotlinModule().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise()) {}
 
     @Test
     fun `roundtrip list of arbitary objects to and from body`() {

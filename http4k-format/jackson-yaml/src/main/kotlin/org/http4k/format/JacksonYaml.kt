@@ -9,7 +9,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.WRITE_DOC_START_MARKER
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 
-object JacksonYaml : ConfigurableJacksonYaml(KotlinModule()
+object JacksonYaml : ConfigurableJacksonYaml(KotlinModule.Builder().build()
     .asConfigurable(ObjectMapper(YAMLFactory().disable(WRITE_DOC_START_MARKER)))
     .withStandardMappings()
     .done()

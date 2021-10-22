@@ -200,7 +200,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for custom json mapping`(approver: Approver) {
-        val json = ConfigurableJackson(KotlinModule()
+        val json = ConfigurableJackson(KotlinModule.Builder().build()
             .asConfigurable()
             .text(BiDiMapping({ i: String -> ArbObject2(Uri.of(i)) }, { i: ArbObject2 -> i.uri.toString() }))
             .done()

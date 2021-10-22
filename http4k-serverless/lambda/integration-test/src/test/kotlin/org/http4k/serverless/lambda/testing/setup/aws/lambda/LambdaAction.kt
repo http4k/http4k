@@ -28,7 +28,7 @@ fun Response.toActionResult(originalRequest: Request) = with(this) {
     }
 }
 
-object LambdaJackson : ConfigurableJackson(KotlinModule()
+object LambdaJackson : ConfigurableJackson(KotlinModule.Builder().build()
     .asConfigurable()
     .withStandardMappings()
     .done()

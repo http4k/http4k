@@ -11,7 +11,7 @@ import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 
 object OpenWhiskJson : ConfigurableJackson(
-    KotlinModule()
+    KotlinModule.Builder().build()
         .asConfigurable()
         .withStandardMappings()
         .done()

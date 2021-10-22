@@ -22,7 +22,7 @@ abstract class AwsApiGatewayAction<R : Any>(private val clazz: KClass<R>) : Acti
     }
 }
 
-object ApiGatewayJackson : ConfigurableJackson(KotlinModule()
+object ApiGatewayJackson : ConfigurableJackson(KotlinModule.Builder().build()
     .asConfigurable()
     .withStandardMappings()
     .done()

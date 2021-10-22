@@ -1,7 +1,6 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
-import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.AttributeKey.*
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.metrics.GlobalMeterProvider
@@ -50,9 +49,8 @@ class OpenTelemetryMetricsClientTest {
             assertThat(timedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
         }
 
-        val data = exportMetricsFromOpenTelemetry()
         assertThat(
-            data,
+            exportMetricsFromOpenTelemetry(),
             hasRequestTimer(
                 1,
                 1000.0,
@@ -68,7 +66,7 @@ class OpenTelemetryMetricsClientTest {
             )
         )
         assertThat(
-            data,
+            exportMetricsFromOpenTelemetry(),
             hasRequestTimer(
                 1,
                 1000.0,
@@ -84,7 +82,7 @@ class OpenTelemetryMetricsClientTest {
             )
         )
         assertThat(
-            data,
+            exportMetricsFromOpenTelemetry(),
             hasRequestTimer(
                 2,
                 2000.0,

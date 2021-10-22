@@ -10,7 +10,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 /**
  * To implement custom JSON configuration, create your own object singleton. Extra mappings can be added before done() is called.
  */
-object Jackson : ConfigurableJackson(KotlinModule()
+object Jackson : ConfigurableJackson(KotlinModule.Builder().build()
     .asConfigurable()
     .withStandardMappings()
     .done()

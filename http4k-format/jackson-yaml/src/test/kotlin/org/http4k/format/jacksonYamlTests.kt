@@ -118,5 +118,5 @@ unknown: "2000-01-01"
 key2:"123"
 """
 
-    override fun customMarshaller() = object : ConfigurableJacksonYaml(KotlinModule().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
 }
