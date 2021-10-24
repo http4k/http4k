@@ -21,7 +21,7 @@ object Argo : Json<JsonNode> {
             JsonNodeType.ARRAY -> JsonType.Array
             JsonNodeType.OBJECT -> Object
             JsonNodeType.NULL -> JsonType.Null
-            else -> throw IllegalArgumentException("Don't know now to translate $value")
+            else -> throw IllegalArgumentException("Don't know how to translate $value")
         }
 
     private val pretty = PrettyJsonFormatter()
@@ -69,7 +69,7 @@ object Argo : Json<JsonNode> {
             JsonNodeType.TRUE -> "true"
             JsonNodeType.FALSE -> "false"
             JsonNodeType.NUMBER -> text
-            else -> throw IllegalArgumentException("Don't know now to translate $node")
+            else -> throw IllegalArgumentException("Don't know how to translate $node")
         }
     }
 
