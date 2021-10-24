@@ -37,7 +37,7 @@ open class ConfigurableJackson(val mapper: ObjectMapper,
         is ArrayNode -> JsonType.Array
         is ObjectNode -> JsonType.Object
         is NullNode -> JsonType.Null
-        else -> throw IllegalArgumentException("Don't know now to translate $value")
+        else -> throw IllegalArgumentException("Don't know how to translate $value")
     }
 
     override fun String.asJsonObject(): JsonNode = mapper.readValue(this, JsonNode::class.java)

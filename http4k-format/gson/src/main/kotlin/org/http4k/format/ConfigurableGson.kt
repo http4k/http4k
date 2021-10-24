@@ -43,10 +43,10 @@ open class ConfigurableGson(builder: GsonBuilder,
                     isBoolean -> JsonType.Boolean
                     isNumber -> JsonType.Number
                     isString -> JsonType.String
-                    else -> throw IllegalArgumentException("Don't know now to translate $value")
+                    else -> throw IllegalArgumentException("Don't know how to translate $value")
                 }
             }
-            else -> throw IllegalArgumentException("Don't know now to translate $value")
+            else -> throw IllegalArgumentException("Don't know how to translate $value")
         }
 
     override fun String.asJsonObject(): JsonElement = JsonParser.parseString(this).let {
