@@ -194,6 +194,11 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `renders schema for enum`(approver: Approver) {
+        approver.assertApproved(Foo.value1)
+    }
+
+    @Test
     fun `renders schema for when cannot find entry`(approver: Approver) {
         approver.assertApproved(JacksonFieldAnnotated())
     }

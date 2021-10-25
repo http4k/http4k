@@ -34,7 +34,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
         when (val param = json.typeOf(this).toParam()) {
             is ArrayParam -> toArraySchema("", value, false, null)
             ObjectParam -> toObjectOrMapSchema(objName, value, false, topLevel, null)
-            else -> toSchema("", param, false, null)
+            else -> value.javaClass.enumConstants?.let {
+                toEnumSchema("", it[0], json.typeOf(this).toParam(), it, false, null)
+            } ?: toSchema("", param, false, null)
         }
 
     private fun NODE.toSchema(name: String, paramMeta: ParamMeta, isNullable: Boolean, metadata: FieldMetadata?) =
@@ -51,9 +53,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
                 value.javaClass.enumConstants?.let {
                     node.toEnumSchema("", it[0], json.typeOf(node).toParam(), it, false, null)
                 } ?: node.toSchema(value, null, false)
-            }.map {it.arrayItem()}.toSet()
+            }.map { it.arrayItem() }.toSet()
 
-        val arrayItems = when(items.size) {
+        val arrayItems = when (items.size) {
             0 -> EmptyArray
             1 -> items.first()
             else -> OneOfArray(items)
@@ -69,7 +71,14 @@ class AutoJsonToJsonSchema<NODE : Any>(
         SchemaNode.Reference(
             fieldName,
             "#/$refPrefix/${modelNamer(obj)}",
-            SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { json.asFormatString(it).unquoted() }, null),
+            SchemaNode.Enum(
+                modelNamer(obj),
+                param,
+                isNullable,
+                this,
+                enumConstants.map { json.asFormatString(it).unquoted() },
+                null
+            ),
             metadata
         )
 

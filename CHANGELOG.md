@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.16.2.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Support for top-level enums in schema.
 
 ### v4.16.1.0
 - **http4k-*** : Upgrade some dependency versions.
