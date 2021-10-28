@@ -2,7 +2,7 @@
   "resources": {
     "GET:/basepath/nometa": "<unknown>",
     "GET:/basepath/descriptions": "endpoint",
-    "POST:/basepath/paths/{firstName}/bertrand/{age}": "<unknown>",
+    "POST:/basepath/paths/{firstName}/bertrand/{age}/{foo}": "<unknown>",
     "POST:/basepath/queries": "<unknown>",
     "POST:/basepath/cookies": "<unknown>",
     "POST:/basepath/headers": "<unknown>",

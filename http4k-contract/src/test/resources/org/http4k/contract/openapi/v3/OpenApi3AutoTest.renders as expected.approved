@@ -409,6 +409,10 @@
                     "type": "string",
                     "description": "stringField"
                   },
+                  "e": {
+                    "type": "string",
+                    "description": "enumField"
+                  },
                   "j": {
                     "type": "string",
                     "description": "jsonField"
@@ -738,6 +742,17 @@
             "description": "intHeader"
           },
           {
+            "in": "header",
+            "name": "e",
+            "required": false,
+            "description": "enumHeader",
+            "schema": {
+              "$ref": "#/components/schemas/Foo",
+              "example": null,
+              "description": null
+            }
+          },
+          {
             "schema": {
               "type": "string"
             },
@@ -871,7 +886,7 @@
         "deprecated": false
       }
     },
-    "/basepath/paths/{firstName}/bertrand/{age}": {
+    "/basepath/paths/{firstName}/bertrand/{age}/{foo}": {
       "post": {
         "summary": "<unknown>",
         "description": null,
@@ -896,6 +911,17 @@
             "name": "age",
             "required": true,
             "description": null
+          },
+          {
+            "in": "path",
+            "name": "foo",
+            "required": true,
+            "description": null,
+            "schema": {
+              "$ref": "#/components/schemas/Foo",
+              "example": null,
+              "description": null
+            }
           }
         ],
         "responses": {
@@ -906,7 +932,7 @@
             ]
           }
         ],
-        "operationId": "postBasepathPaths_firstName_Bertrand_age",
+        "operationId": "postBasepathPaths_firstName_Bertrand_age__foo",
         "deprecated": false
       }
     },
@@ -970,6 +996,17 @@
             "description": "intQuery"
           },
           {
+            "in": "query",
+            "name": "e",
+            "required": false,
+            "description": "enumQuery",
+            "schema": {
+              "$ref": "#/components/schemas/Foo",
+              "example": null,
+              "description": null
+            }
+          },
+          {
             "schema": {
               "type": "string"
             },
@@ -1028,6 +1065,15 @@
   },
   "components": {
     "schemas": {
+      "Foo": {
+        "example": "bing",
+        "enum": [
+          "bar",
+          "bing"
+        ],
+        "description": null,
+        "type": "string"
+      },
       "object1089648089": {
         "type": "object",
         "required": [
@@ -1122,15 +1168,6 @@
         "required": [
           "anotherString"
         ]
-      },
-      "Foo": {
-        "example": "bing",
-        "enum": [
-          "bar",
-          "bing"
-        ],
-        "description": null,
-        "type": "string"
       },
       "ArbObject3": {
         "properties": {

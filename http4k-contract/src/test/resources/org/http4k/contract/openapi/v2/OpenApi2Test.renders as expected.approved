@@ -355,6 +355,13 @@
           },
           {
             "in": "formData",
+            "name": "e",
+            "required": false,
+            "type": "string",
+            "description": "enumField"
+          },
+          {
+            "in": "formData",
             "name": "j",
             "required": true,
             "type": "string",
@@ -693,6 +700,13 @@
           },
           {
             "in": "header",
+            "name": "e",
+            "required": false,
+            "type": "string",
+            "description": "enumHeader"
+          },
+          {
+            "in": "header",
             "name": "j",
             "required": false,
             "type": "string",
@@ -843,13 +857,13 @@
         ]
       }
     },
-    "/basepath/paths/{firstName}/bertrand/{age}": {
+    "/basepath/paths/{firstName}/bertrand/{age}/{foo}": {
       "post": {
         "tags": [
           "/basepath"
         ],
         "summary": "<unknown>",
-        "operationId": "postBasepathPaths_firstName_Bertrand_age",
+        "operationId": "postBasepathPaths_firstName_Bertrand_age__foo",
         "produces": [
         ],
         "consumes": [
@@ -866,6 +880,12 @@
             "name": "age",
             "required": true,
             "type": "boolean"
+          },
+          {
+            "in": "path",
+            "name": "foo",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
@@ -950,6 +970,13 @@
             "required": false,
             "type": "integer",
             "description": "intQuery"
+          },
+          {
+            "in": "query",
+            "name": "e",
+            "required": false,
+            "type": "string",
+            "description": "enumQuery"
           },
           {
             "in": "query",
