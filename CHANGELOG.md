@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.16.2.0 (uncut)
+### v4.16.2.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract** : Support for top-level enums in schema.
+- **http4k-contract** : Support for enums in Header/Query/Paths. Finally!
 
 ### v4.16.1.0
 - **http4k-*** : Upgrade some dependency versions.
