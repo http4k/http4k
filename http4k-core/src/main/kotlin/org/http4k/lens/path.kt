@@ -3,6 +3,7 @@ package org.http4k.lens
 import org.http4k.core.Request
 import org.http4k.core.toPathEncoded
 import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -62,9 +63,14 @@ open class BiDiPathLensSpec<OUT>(
      * Create another BiDiPathLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
      * used to extract or insert the final type from/into a path segment.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiPathLensSpec(paramMeta, get.map(nextIn), set.map(nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) =
+        BiDiPathLensSpec(paramMeta, get.map(nextIn), set.map(nextOut))
 
-    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, newMeta: ParamMeta): BiDiPathLensSpec<NEXT> = BiDiPathLensSpec(newMeta, get.map(nextIn), set.map(nextOut))
+    internal fun <NEXT> mapWithNewMeta(
+        nextIn: (OUT) -> NEXT,
+        nextOut: (NEXT) -> OUT,
+        newMeta: ParamMeta
+    ): BiDiPathLensSpec<NEXT> = BiDiPathLensSpec(newMeta, get.map(nextIn), set.map(nextOut))
 
     /**
      * Create a lens for this Spec
@@ -82,7 +88,16 @@ open class BiDiPathLensSpec<OUT>(
 
 object Path : BiDiPathLensSpec<String>(StringParam,
     LensGet { _, target -> listOf(target) },
-    LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().toPathEncoded()))) }) {
+    LensSet { name, values, target ->
+        target.uri(
+            target.uri.path(
+                target.uri.path.replaceFirst(
+                    "{$name}",
+                    values.first().toPathEncoded()
+                )
+            )
+        )
+    }) {
 
     fun fixed(name: String): PathLens<String> {
         if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
@@ -115,13 +130,17 @@ fun Path.duration() = map(StringBiDiMappings.duration())
 fun Path.yearMonth() = map(StringBiDiMappings.yearMonth())
 fun Path.instant() = map(StringBiDiMappings.instant())
 fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map(StringBiDiMappings.localDateTime(formatter))
-fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map(StringBiDiMappings.zonedDateTime(formatter))
+fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) =
+    map(StringBiDiMappings.zonedDateTime(formatter))
+
 fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map(StringBiDiMappings.localDate(formatter))
 fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(StringBiDiMappings.localTime(formatter))
-inline fun <reified T : Enum<T>> Path.enum() = map(StringBiDiMappings.enum<T>())
+inline fun <reified T : Enum<T>> Path.enum() = mapWithNewMeta(StringBiDiMappings.enum<T>(), EnumParam(T::class))
 
 @PublishedApi
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
-internal fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
-    mapping::invoke, mapping::invoke, paramMeta)
+fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) =
+    mapWithNewMeta(
+        mapping::invoke, mapping::invoke, paramMeta
+    )

@@ -2,6 +2,7 @@ package org.http4k.lens
 
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
 import java.time.format.DateTimeFormatter
@@ -61,7 +62,7 @@ interface MultiLensSpec<IN : Any, OUT> {
  * Represents a uni-directional extraction of an entity from a target.
  */
 open class LensSpec<IN : Any, OUT>(
-    protected val location: String,
+    val location: String,
     protected val paramMeta: ParamMeta,
     internal val get: LensGet<IN, OUT>
 ) {
@@ -152,7 +153,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
      */
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = mapWithNewMeta(nextIn, nextOut, paramMeta)
 
-    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) = BiDiLensSpec(location, paramMeta, get.map(nextIn), set.map(nextOut))
+    fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) = BiDiLensSpec(location, paramMeta, get.map(nextIn), set.map(nextOut))
 
     override fun defaulted(name: String, default: OUT, description: String?) =
         defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
@@ -242,9 +243,9 @@ fun <IN : Any> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter =
 fun <IN : Any> BiDiLensSpec<IN, String>.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(StringBiDiMappings.localTime(formatter))
 fun <IN : Any> BiDiLensSpec<IN, String>.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = map(StringBiDiMappings.offsetTime(formatter))
 fun <IN : Any> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = map(StringBiDiMappings.offsetDateTime(formatter))
-inline fun <IN : Any, reified T : Enum<T>> BiDiLensSpec<IN, String>.enum() = map(StringBiDiMappings.enum<T>())
+inline fun <IN : Any, reified T : Enum<T>> BiDiLensSpec<IN, String>.enum() = mapWithNewMeta(StringBiDiMappings.enum<T>(), EnumParam(T::class))
 
-internal fun <NEXT, IN : Any, OUT> BiDiLensSpec<IN, OUT>.mapWithNewMeta(mapping: BiDiMapping<OUT, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
+fun <NEXT, IN : Any, OUT> BiDiLensSpec<IN, OUT>.mapWithNewMeta(mapping: BiDiMapping<OUT, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
     mapping::invoke, mapping::invoke, paramMeta)
 
 fun <NEXT, IN : Any, OUT> BiDiLensSpec<IN, OUT>.map(mapping: BiDiMapping<OUT, NEXT>) = map(mapping::invoke, mapping::invoke)

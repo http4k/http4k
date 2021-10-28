@@ -367,6 +367,10 @@
                     "type": "string",
                     "description": "stringField"
                   },
+                  "e": {
+                    "type": "string",
+                    "description": "enumField"
+                  },
                   "j": {
                     "type": "string",
                     "description": "jsonField"
@@ -664,6 +668,15 @@
         "parameters": [
           {
             "schema": {
+              "$ref": "#/components/schemas/e"
+            },
+            "in": "header",
+            "name": "e",
+            "required": false,
+            "description": "enumHeader"
+          },
+          {
+            "schema": {
               "type": "boolean"
             },
             "in": "header",
@@ -823,7 +836,7 @@
         "deprecated": false
       }
     },
-    "/basepath/paths/{firstName}/bertrand/{age}": {
+    "/basepath/paths/{firstName}/bertrand/{age}/{foo}": {
       "post": {
         "summary": "<unknown>",
         "description": null,
@@ -831,6 +844,15 @@
           "/basepath"
         ],
         "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/foo"
+            },
+            "in": "path",
+            "name": "foo",
+            "required": true,
+            "description": null
+          },
           {
             "schema": {
               "type": "string"
@@ -858,7 +880,7 @@
             ]
           }
         ],
-        "operationId": "postBasepathPaths_firstName_Bertrand_age",
+        "operationId": "postBasepathPaths_firstName_Bertrand_age__foo",
         "deprecated": false
       }
     },
@@ -891,6 +913,15 @@
           "/basepath"
         ],
         "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/e"
+            },
+            "in": "query",
+            "name": "e",
+            "required": false,
+            "description": "enumQuery"
+          },
           {
             "schema": {
               "type": "array",
@@ -980,6 +1011,20 @@
   },
   "components": {
     "schemas": {
+      "foo": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+        }
+      },
+      "e": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+        }
+      },
       "object540438179": {
         "type": "object",
         "required": [

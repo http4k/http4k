@@ -15,6 +15,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Credentials
+import org.http4k.core.HttpMessage
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
@@ -42,6 +43,7 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
 import org.http4k.lens.boolean
+import org.http4k.lens.enum
 import org.http4k.lens.int
 import org.http4k.lens.multipartForm
 import org.http4k.lens.string
@@ -102,12 +104,12 @@ abstract class ContractRendererContract<NODE>(
                 tags += Tag("tag1")
                 markAsDeprecated()
             } bindContract GET to { _ -> Response(OK) }
-            routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean()
-                .of("age") bindContract POST to { a, _, _ -> { Response(OK).body(a) } }
+            routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age")  / Path.enum<Foo>().of("foo") bindContract POST to { a, _, _, _ -> { Response(OK).body(a) } }
             routes += "/queries" meta {
                 queries += Query.boolean().multi.required("b", "booleanQuery")
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
+                queries += Query.enum<Foo>().optional("e", "enumQuery")
                 queries += json.lens(Query).optional("j", "jsonQuery")
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/cookies" meta {
@@ -118,6 +120,7 @@ abstract class ContractRendererContract<NODE>(
                 headers += Header.boolean().required("b", "booleanHeader")
                 headers += Header.string().optional("s", "stringHeader")
                 headers += Header.int().optional("i", "intHeader")
+                headers += Header.enum<HttpMessage, Foo>().optional("e", "enumHeader")
                 headers += json.lens(Header).optional("j", "jsonHeader")
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/body_string" meta {
@@ -172,6 +175,7 @@ abstract class ContractRendererContract<NODE>(
                         FormField.boolean().required("b", "booleanField"),
                         FormField.int().optional("i", "intField"),
                         FormField.string().optional("s", "stringField"),
+                        FormField.enum<Foo>().optional("e", "enumField"),
                         json.lens(FormField).required("j", "jsonField")
                     ).toLens()
                 )

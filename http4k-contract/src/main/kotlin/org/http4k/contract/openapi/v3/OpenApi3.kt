@@ -146,7 +146,7 @@ class OpenApi3<NODE : Any>(
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
         .toMap()
 
-    private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
+    private fun ContractRoute.asOpenApiParameters(): List<RequestParameter<NODE>> = nonBodyParams.map {
         when (val paramMeta: ParamMeta = it.paramMeta) {
             ObjectParam -> SchemaParameter(it, "{}".toSchema())
             FileParam -> PrimitiveParameter(it, json {
@@ -158,6 +158,7 @@ class OpenApi3<NODE : Any>(
                     "items" to obj("type" to string(paramMeta.itemType().value))
                 )
             })
+            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(paramMeta.clz.java.enumConstants[0], it.name))
             else -> PrimitiveParameter(it, json {
                 obj("type" to string(paramMeta.value))
             })
