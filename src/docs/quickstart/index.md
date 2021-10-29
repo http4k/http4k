@@ -21,12 +21,12 @@ Depending on your learning style, there are a number of options to get started w
 dependencies {
     implementation platform("org.http4k:http4k-bom:4.16.2.0")
     implementation "org.http4k:http4k-core"
-    implementation "org.http4k:http4k-server-netty"
+    implementation "org.http4k:http4k-server-undertow"
     implementation "org.http4k:http4k-client-apache"
 }
 ```
 
-The following creates a simple endpoint, binds it to a Netty server then starts, queries, and stops it.
+The following creates a simple endpoint, binds it to a Undertow server then starts, queries, and stops it.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/quickstart/example.kt"></script>
 
