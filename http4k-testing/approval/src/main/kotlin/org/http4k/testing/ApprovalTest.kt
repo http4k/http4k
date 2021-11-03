@@ -66,8 +66,8 @@ abstract class ContentTypeAwareApprovalTest(
 ) : BaseApprovalTest {
     override fun approverFor(context: ExtensionContext) = object : Approver {
         override fun <T : HttpMessage> assertApproved(httpMessage: T) {
-            assertEquals(contentType, CONTENT_TYPE(httpMessage))
             delegate.assertApproved(httpMessage)
+            assertEquals(contentType, CONTENT_TYPE(httpMessage))
         }
 
         private val delegate = NamedResourceApprover(
