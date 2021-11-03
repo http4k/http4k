@@ -133,7 +133,7 @@ class YamlApprovalTest(
     override fun format(input: String): String = try {
         JacksonYaml.asA<Map<String, Any>>(input)
         input
-    } catch (e: MarkedYAMLException) {
+    } catch (e: Exception) {
         throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input)
     }
 }
