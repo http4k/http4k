@@ -16,6 +16,7 @@ import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.CachingFilters.Response.NoCache
@@ -58,7 +59,7 @@ fun main() {
     val mySecurity = ApiKeySecurity(Query.int().required("apiKey"), { it == 42 })
 
     val contract = contract {
-        renderer = OpenApi3(ApiInfo("my great api", "v1.0"), Argo, servers = listOf(ApiServer("http://localhost:8000", "the greatest server")))
+        renderer = OpenApi3(ApiInfo("my great api", "v1.0"), Argo, servers = listOf(ApiServer(Uri.of("http://localhost:8000"), "the greatest server")))
         descriptionPath = "/docs/swagger.json"
         security = mySecurity
 
