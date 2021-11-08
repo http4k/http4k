@@ -36,7 +36,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
 
     private fun ApiServer.asJson() = json {
         obj(
-            "url" to string(url),
+            "url" to string(url.toString()),
             "description" to string(description ?: "")
         )
     }
