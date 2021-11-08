@@ -9,6 +9,7 @@ import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
 import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
+import org.http4k.core.Uri
 import org.http4k.format.Json
 import org.http4k.util.JsonSchema
 
@@ -29,7 +30,8 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
                     "tags" to array(tags.map { it.asJson() }),
                     "paths" to paths.asJson(),
                     "components" to components.asJson(),
-                    "servers" to array(servers.map { it.asJson() })
+                    "servers" to array(servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) }.map { it.asJson() }
+                    )
                 )
             }
         }
