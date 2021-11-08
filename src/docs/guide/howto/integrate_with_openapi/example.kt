@@ -59,7 +59,11 @@ fun main() {
     val mySecurity = ApiKeySecurity(Query.int().required("apiKey"), { it == 42 })
 
     val contract = contract {
-        renderer = OpenApi3(ApiInfo("my great api", "v1.0"), Argo, servers = listOf(ApiServer(Uri.of("http://localhost:8000"), "the greatest server")))
+        renderer = OpenApi3(
+            ApiInfo("my great api", "v1.0"),
+            Argo,
+            servers = listOf(ApiServer(Uri.of("http://localhost:8000"), "the greatest server"))
+        )
         descriptionPath = "/docs/swagger.json"
         security = mySecurity
 
