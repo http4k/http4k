@@ -62,6 +62,12 @@
       }
     }
   },
+  "servers": [
+    {
+      "url": "localhost:8000",
+      "description": ""
+    }
+  ],
   "x-extension": [
     "extensionField"
   ]

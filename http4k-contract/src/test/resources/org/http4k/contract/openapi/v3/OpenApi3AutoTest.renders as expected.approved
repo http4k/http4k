@@ -1329,6 +1329,12 @@
       }
     }
   },
+  "servers": [
+    {
+      "url": "localhost:8000",
+      "description": "a very simple API"
+    }
+  ],
   "openapi": "3.0.0",
   "x-extension": [
     "extensionField"

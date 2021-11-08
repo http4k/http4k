@@ -10,7 +10,8 @@ data class Api<NODE>(
     val info: ApiInfo,
     val tags: List<Tag>,
     val paths: Map<String, Map<String, ApiPath<NODE>>>,
-    val components: Components<NODE>
+    val components: Components<NODE>,
+    val servers: List<ApiServer>
 ) {
     val openapi = "3.0.0"
 }
@@ -18,6 +19,11 @@ data class Api<NODE>(
 data class Components<NODE>(
     val schemas: NODE,
     val securitySchemes: NODE
+)
+
+data class ApiServer(
+    val url: String,
+    val description: String? = null
 )
 
 sealed class ApiPath<NODE>(
