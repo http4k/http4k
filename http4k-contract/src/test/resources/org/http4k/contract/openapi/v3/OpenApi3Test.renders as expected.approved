@@ -1161,7 +1161,7 @@
   },
   "servers": [
     {
-      "url": "localhost:8000",
+      "url": "https://localhost:8000",
       "description": ""
     }
   ],

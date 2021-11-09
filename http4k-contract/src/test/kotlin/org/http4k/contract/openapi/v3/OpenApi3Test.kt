@@ -11,5 +11,5 @@ class OpenApi3Test : ContractRendererContract<JsonNode>(Argo, OpenApi3(
     ApiInfo("title", "1.2", "module description"),
     Argo,
     listOf(AddSimpleFieldToRootNode),
-    servers = listOf(ApiServer(Uri.of("localhost:8000")))
+    servers = listOf(ApiServer(Uri.of("https://localhost:8000")))
 ))

@@ -13,6 +13,6 @@ class OpenApi3AutoTest : ContractRendererContract<JsonNode>(
         ApiInfo("title", "1.2", "module description"),
         Jackson,
         listOf(AddSimpleFieldToRootNode),
-        listOf(ApiServer(Uri.of("localhost:8000"), "a very simple API"))
+        listOf(ApiServer(Uri.of("http://localhost:8000"), "a very simple API"))
     )
 )
