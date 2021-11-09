@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.17.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-approval** : [Breaking] Dependency upgrade means that formatting for XML and HTML approval tests has different whitespace.
+
 ### v4.16.3.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** : Check the content type after the content is checked.
