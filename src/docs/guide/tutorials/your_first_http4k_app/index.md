@@ -11,7 +11,7 @@ Welcome to the world of http4k! In this guide, we'll run you through the steps r
 <hr/>
 
 #### Step 1
-First, we'll generate and download a project template from the http4k Toolbox. Point your browser at [toolbox.http4k.org](https://toolbox.http4k.org) and select the **Project Wizard** from the menu.
+First, we'll generate and download a project template from the http4k Toolbox. Point your browser at [toolbox.http4k.org](https://toolbox.http4k.org) and select the **Project Wizard** from the menu (alternatively, you can use the CLI to run through the same process using the command `http4k generate project`).
 
 The Toolbox is designed as a questionnaire which will help you configure a working project from all of the available http4k modules. There are several stages, but for this guide we're just going to generate the project using the defaults. 
 
@@ -71,10 +71,18 @@ In `/src/main/kotlin/HelloWorldClient.kt` there is an example of an HTTP client 
 Try running the client by hitting the little green arrow on **line 11**. You'll see the `Response` printed to the console by the `Filter`, followed by a repeat of the body content, which is printed by **line 18**.
 
 #### Step 6
-Modify the request in `/src/main/kotlin/HelloWorldClient.kt` to point at `http://localhost:9000/pong` instead. Run the client program again and note that a 404 is printed. This happens because we have not bound an `HttpHandler` to that endpoint.
+Modify the request in `/src/test/kotlin/HelloWorldClient.kt` to point at `http://localhost:9000/pong` instead. Run the client program again and note that a 404 is printed. This happens because we have not bound an `HttpHandler` to that endpoint.
+
+To bind an `HttpHandler` to the `pong` endpoint, modify `/src/main/kotlin/HelloWorld.kt` by adding lines 18-20 below:
+
+<img class="blogImage" src="step6.png" alt="client code"/>
+
+- **Lines 18-20** add an HTTP endpoint binding all HTTP `GET` requests on the path `/pong` to an `HttpHandler` function.
+
+To see this update in action, first rerun the main application by hitting the green arrow now on **line 23** in `/src/main/kotlin/HelloWorld.kt`, and then running the client again using the green arrow on **line 11** in `/src/test/kotlin/HelloWorldClient.kt`. You should see the new "ping" response printed to the console.
 
 #### Step 7
-A test for our app is found in `/src/main/kotlin/HelloWorldTest.kt`. Run it with the green arrow on **line 10** and it should pass.
+A test for our app is found in `/src/test/kotlin/HelloWorldTest.kt`. Run it with the green arrow on **line 10** and it should pass.
 
 <img class="blogImage" src="step7.png" alt="client code"/>
 
