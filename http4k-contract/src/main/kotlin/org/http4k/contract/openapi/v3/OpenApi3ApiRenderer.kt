@@ -30,7 +30,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
                     "tags" to array(tags.map { it.asJson() }),
                     "paths" to paths.asJson(),
                     "components" to components.asJson(),
-                    "servers" to array(servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) }.map { it.asJson() })
+                    "servers" to array(servers.map { it.asJson() })
                 )
             }
         }

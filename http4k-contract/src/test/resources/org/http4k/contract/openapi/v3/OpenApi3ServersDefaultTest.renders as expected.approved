@@ -1,4 +1,5 @@
 {
+  "openapi": "3.0.0",
   "info": {
     "title": "title",
     "version": "1.2",
@@ -16,12 +17,6 @@
     {
       "name": "tag3",
       "description": "tag3 description"
-    }
-  ],
-  "servers": [
-    {
-      "url": "http://localhost:8000",
-      "description": "a very simple API"
     }
   ],
   "paths": {
@@ -106,26 +101,7 @@
                 "foo": 123
               },
               "schema": {
-                "additionalProperties": {
-                  "properties": {
-                    "foo": {
-                      "example": 123,
-                      "description": null,
-                      "type": "number"
-                    }
-                  },
-                  "example": {
-                    "foo": 123
-                  },
-                  "description": null,
-                  "type": "object",
-                  "required": [
-                    "foo"
-                  ]
-                },
-                "example": null,
-                "description": null,
-                "type": "object"
+                "$ref": "#/components/schemas/object-1898199891"
               }
             }
           },
@@ -166,9 +142,7 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schemas/someOtherId",
-                "example": null,
-                "description": null
+                "$ref": "#/components/schemas/someOtherId"
               }
             }
           },
@@ -203,9 +177,7 @@
                 }
               },
               "schema": {
-                "$ref": "#/components/schemas/ArbObject3",
-                "example": null,
-                "description": null
+                "$ref": "#/components/schemas/object-444827817"
               }
             }
           },
@@ -222,16 +194,10 @@
                   }
                 ],
                 "schema": {
+                  "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ArbObject1"
-                  },
-                  "example": [
-                    {
-                      "anotherString": "bing"
-                    }
-                  ],
-                  "description": null,
-                  "type": "array"
+                    "$ref": "#/components/schemas/object-841092134"
+                  }
                 }
               }
             }
@@ -262,14 +228,10 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/ArbObject1",
-                    "example": null,
-                    "description": null
+                    "$ref": "#/components/schemas/object-841092134"
                   },
                   {
-                    "$ref": "#/components/schemas/ArbObject3",
-                    "example": null,
-                    "description": null
+                    "$ref": "#/components/schemas/object-444827817"
                   }
                 ]
               }
@@ -307,9 +269,7 @@
                   "anotherString": "bing"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/ArbObject1",
-                  "example": null,
-                  "description": null
+                  "$ref": "#/components/schemas/object-841092134"
                 }
               }
             }
@@ -321,14 +281,10 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ArbObject1",
-                      "example": null,
-                      "description": null
+                      "$ref": "#/components/schemas/object-841092134"
                     },
                     {
-                      "$ref": "#/components/schemas/ArbObject3",
-                      "example": null,
-                      "description": null
+                      "$ref": "#/components/schemas/object-444827817"
                     }
                   ]
                 }
@@ -363,14 +319,10 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/impl1",
-                      "example": null,
-                      "description": null
+                      "$ref": "#/components/schemas/impl1"
                     },
                     {
-                      "$ref": "#/components/schemas/impl2",
-                      "example": null,
-                      "description": null
+                      "$ref": "#/components/schemas/impl2"
                     }
                   ]
                 }
@@ -465,7 +417,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object1089648089"
+                  "$ref": "#/components/schemas/object540438179"
                 }
               }
             }
@@ -496,7 +448,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "example": null,
               "schema": {
               }
             }
@@ -534,7 +485,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object1089648089"
+                  "$ref": "#/components/schemas/object540438179"
                 }
               }
             }
@@ -601,11 +552,7 @@
             "description": "OK",
             "content": {
               "text/plain": {
-                "example": null,
                 "schema": {
-                  "example": "hello from the land of plaintext",
-                  "description": null,
-                  "type": "string"
                 }
               }
             }
@@ -633,8 +580,7 @@
             "text/plain": {
               "schema": {
                 "type": "string"
-              },
-              "example": "hello from the land of plaintext"
+              }
             }
           },
           "required": true
@@ -722,6 +668,15 @@
         "parameters": [
           {
             "schema": {
+              "$ref": "#/components/schemas/e"
+            },
+            "in": "header",
+            "name": "e",
+            "required": false,
+            "description": "enumHeader"
+          },
+          {
+            "schema": {
               "type": "boolean"
             },
             "in": "header",
@@ -746,17 +701,6 @@
             "name": "i",
             "required": false,
             "description": "intHeader"
-          },
-          {
-            "in": "header",
-            "name": "e",
-            "required": false,
-            "description": "enumHeader",
-            "schema": {
-              "$ref": "#/components/schemas/Foo",
-              "example": null,
-              "description": null
-            }
           },
           {
             "schema": {
@@ -902,6 +846,15 @@
         "parameters": [
           {
             "schema": {
+              "$ref": "#/components/schemas/foo"
+            },
+            "in": "path",
+            "name": "foo",
+            "required": true,
+            "description": null
+          },
+          {
+            "schema": {
               "type": "string"
             },
             "in": "path",
@@ -917,17 +870,6 @@
             "name": "age",
             "required": true,
             "description": null
-          },
-          {
-            "in": "path",
-            "name": "foo",
-            "required": true,
-            "description": null,
-            "schema": {
-              "$ref": "#/components/schemas/Foo",
-              "example": null,
-              "description": null
-            }
           }
         ],
         "responses": {
@@ -973,6 +915,15 @@
         "parameters": [
           {
             "schema": {
+              "$ref": "#/components/schemas/e"
+            },
+            "in": "query",
+            "name": "e",
+            "required": false,
+            "description": "enumQuery"
+          },
+          {
+            "schema": {
               "type": "array",
               "items": {
                 "type": "boolean"
@@ -1000,17 +951,6 @@
             "name": "i",
             "required": false,
             "description": "intQuery"
-          },
-          {
-            "in": "query",
-            "name": "e",
-            "required": false,
-            "description": "enumQuery",
-            "schema": {
-              "$ref": "#/components/schemas/Foo",
-              "example": null,
-              "description": null
-            }
           },
           {
             "schema": {
@@ -1052,7 +992,7 @@
                   "aString": "a message of some kind"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-2055192556"
+                  "$ref": "#/components/schemas/object-1104991605"
                 }
               }
             }
@@ -1071,16 +1011,21 @@
   },
   "components": {
     "schemas": {
-      "Foo": {
-        "example": "bing",
-        "enum": [
-          "bar",
-          "bing"
+      "foo": {
+        "type": "object",
+        "required": [
         ],
-        "description": null,
-        "type": "string"
+        "properties": {
+        }
       },
-      "object1089648089": {
+      "e": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+        }
+      },
+      "object540438179": {
         "type": "object",
         "required": [
         ],
@@ -1097,11 +1042,11 @@
         ],
         "properties": {
           "anAnotherObject": {
-            "$ref": "#/components/schemas/object1089648089"
+            "$ref": "#/components/schemas/object540438179"
           }
         }
       },
-      "object-2055192556": {
+      "object-1104991605": {
         "type": "object",
         "required": [
         ],
@@ -1113,182 +1058,61 @@
         }
       },
       "someOtherId": {
-        "properties": {
-          "string": {
-            "example": "s",
-            "description": null,
-            "type": "string"
-          },
-          "child": {
-            "$ref": "#/components/schemas/ArbObject1",
-            "example": null,
-            "description": null
-          },
-          "numbers": {
-            "items": {
-              "type": "number"
-            },
-            "example": [
-              1
-            ],
-            "description": null,
-            "type": "array"
-          },
-          "bool": {
-            "example": true,
-            "description": null,
-            "type": "boolean"
-          }
-        },
-        "example": {
-          "string": "s",
-          "child": {
-            "anotherString": "bar"
-          },
-          "numbers": [
-            1
-          ],
-          "bool": true
-        },
-        "description": null,
         "type": "object",
         "required": [
-          "bool",
-          "numbers",
-          "string"
-        ]
+        ],
+        "properties": {
+        }
       },
-      "ArbObject1": {
+      "object-841092134": {
+        "type": "object",
+        "required": [
+        ],
         "properties": {
           "anotherString": {
-            "$ref": "#/components/schemas/Foo",
-            "example": null,
-            "description": null
+            "type": "string",
+            "example": "bing"
           }
-        },
-        "example": {
-          "anotherString": "bing"
-        },
-        "description": null,
+        }
+      },
+      "object-1898199891": {
         "type": "object",
         "required": [
-          "anotherString"
-        ]
+        ],
+        "properties": {
+          "foo": {
+            "type": "integer",
+            "example": 123
+          }
+        }
       },
-      "ArbObject3": {
+      "object-444827817": {
+        "type": "object",
+        "required": [
+        ],
         "properties": {
           "uri": {
-            "example": "http://foowang",
-            "description": null,
-            "type": "string"
+            "type": "string",
+            "example": "http://foowang"
           },
           "additional": {
-            "additionalProperties": {
-              "properties": {
-                "foo": {
-                  "example": 123,
-                  "description": null,
-                  "type": "number"
-                }
-              },
-              "example": {
-                "foo": 123
-              },
-              "description": null,
-              "type": "object",
-              "required": [
-                "foo"
-              ]
-            },
-            "example": null,
-            "description": null,
-            "type": "object"
+            "$ref": "#/components/schemas/object-1898199891"
           }
-        },
-        "example": {
-          "uri": "http://foowang",
-          "additional": {
-            "foo": 123
-          }
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "additional",
-          "uri"
-        ]
+        }
       },
       "impl1": {
-        "properties": {
-          "obj": {
-            "$ref": "#/components/schemas/Impl1",
-            "example": null,
-            "description": null
-          }
-        },
-        "example": {
-          "obj": {
-            "value": "bob"
-          }
-        },
-        "description": null,
         "type": "object",
         "required": [
-          "obj"
-        ]
-      },
-      "Impl1": {
+        ],
         "properties": {
-          "value": {
-            "example": "bob",
-            "description": null,
-            "type": "string"
-          }
-        },
-        "example": {
-          "value": "bob"
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "value"
-        ]
+        }
       },
       "impl2": {
-        "properties": {
-          "obj": {
-            "$ref": "#/components/schemas/Impl2",
-            "example": null,
-            "description": null
-          }
-        },
-        "example": {
-          "obj": {
-            "value": 123
-          }
-        },
-        "description": null,
         "type": "object",
         "required": [
-          "obj"
-        ]
-      },
-      "Impl2": {
+        ],
         "properties": {
-          "value": {
-            "example": 123,
-            "description": null,
-            "type": "number"
-          }
-        },
-        "example": {
-          "value": 123
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "value"
-        ]
+        }
       }
     },
     "securitySchemes": {
@@ -1335,7 +1159,12 @@
       }
     }
   },
-  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "/",
+      "description": ""
+    }
+  ],
   "x-extension": [
     "extensionField"
   ]
