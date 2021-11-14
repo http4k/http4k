@@ -68,3 +68,12 @@ fun OAuthProvider.Companion.gitHub(client: HttpHandler, credentials: Credentials
         scopes,
         oAuthPersistence
     )
+
+fun OAuthProvider.Companion.gitLab(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf()): OAuthProvider =
+    OAuthProvider(
+        OAuthProviderConfig(Uri.of("https://gitlab.com"), "/oauth/authorize", "/oauth/token", credentials, Uri.of("https://gitlab.com")),
+        client,
+        callbackUri,
+        scopes,
+        oAuthPersistence
+    )
