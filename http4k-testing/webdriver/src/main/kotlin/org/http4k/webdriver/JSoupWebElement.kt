@@ -49,7 +49,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     override fun submit() {
         current("form")?.let {
             val method =
-                it.element.attr("method")?.let { it.uppercase(getDefault()) }?.let(Method::valueOf) ?: POST
+                Method.valueOf(it.element.attr("method").uppercase(getDefault()))
             val inputs = it
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
