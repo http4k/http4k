@@ -10,6 +10,7 @@ import org.http4k.lens.int
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.Reader
+import java.util.Locale.getDefault
 import java.util.Properties
 
 /**
@@ -118,8 +119,8 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
         val HEALTH_PORT = int().required("HEALTH_PORT")
 
         fun serviceUriFor(serviceName: String, isHttps: Boolean = false) = int()
-            .map(serviceName.toUriFor(isHttps), { it.port ?: 80 })
-            .required("${serviceName.convertFromKey().toUpperCase()}_SERVICE_PORT")
+            .map(serviceName.toUriFor(isHttps)) { it.port ?: 80 }
+            .required("${serviceName.convertFromKey().uppercase(getDefault())}_SERVICE_PORT")
 
         private fun String.toUriFor(https: Boolean): (Int) -> Uri = {
             Uri.of("/")
@@ -129,4 +130,4 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
     }
 }
 
-internal fun String.convertFromKey() = replace("_", "-").replace(".", "-").toLowerCase()
+internal fun String.convertFromKey() = replace("_", "-").replace(".", "-").lowercase(getDefault())

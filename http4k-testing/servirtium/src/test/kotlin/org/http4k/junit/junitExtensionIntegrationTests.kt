@@ -27,7 +27,6 @@ import java.io.File
 interface TestContract {
 
     @Test
-    @JvmDefault
     fun scenario(handler: HttpHandler, control: InteractionControl) {
         control.addNote("this is a note")
 

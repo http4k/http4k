@@ -6,6 +6,7 @@ import org.http4k.core.Status
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
 import java.io.File
+import java.util.Locale.getDefault
 
 data class Template(val name: String, val description: String, val value: String, val variables: List<String> = emptyList()) : ViewModel
 
@@ -29,13 +30,15 @@ fun File.writeLiveTemplates() {
 
     val methods = TemplateSet("Request",
         Method.values().map {
-            Template(it.name.toLowerCase(), "http4k ${it.name} Request",
+            Template(
+                it.name.lowercase(getDefault()), "http4k ${it.name} Request",
                 """org.http4k.core.Request(org.http4k.core.Method.${it.name}, &quot;${"$"}path${"$"}&quot;)""",
                 listOf("path"))
         }
     )
 
-    fun Status.statusTemplate(): Template = Template(code.toString(), "http4k $code Response", "org.http4k.core.Response(org.http4k.core.Status.Companion.${description.toUpperCase().replace(' ', '_')})")
+    fun Status.statusTemplate(): Template = Template(code.toString(), "http4k $code Response", "org.http4k.core.Response(org.http4k.core.Status.Companion.${
+        description.uppercase(getDefault()).replace(' ', '_')})")
 
     val statii = TemplateSet("Response", listOf(
         Status.CONTINUE,

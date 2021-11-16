@@ -8,6 +8,7 @@ import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.util.Locale.getDefault
 
 class MimeTypesTest {
 
@@ -38,6 +39,6 @@ class MimeTypesTest {
 
     private fun assertCorrectContentTypeFoundFor(mimeTypes: MimeTypes, ext: String, expected: ContentType) {
         assertThat("checking $ext", mimeTypes.forFile(ext), equalTo(expected))
-        assertThat("checking ${ext.toUpperCase()}", mimeTypes.forFile(ext.toUpperCase()), equalTo(expected))
+        assertThat("checking ${ext.uppercase(getDefault())}", mimeTypes.forFile(ext.uppercase(getDefault())), equalTo(expected))
     }
 }

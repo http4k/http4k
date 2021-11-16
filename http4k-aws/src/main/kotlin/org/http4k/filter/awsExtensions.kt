@@ -3,7 +3,6 @@ package org.http4k.filter
 import org.http4k.aws.AwsCanonicalRequest
 import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
-import org.http4k.aws.AwsHmacSha256
 import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
 import org.http4k.core.Body
@@ -16,6 +15,7 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.TRACE
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.security.HmacSha256.hash
 import java.time.Clock
 
 /**
@@ -87,7 +87,7 @@ object Payload {
         object Signed : Mode() {
             override operator fun invoke(request: Request) =
                 request.body.payload.array().let {
-                    CanonicalPayload(AwsHmacSha256.hash(it), it.size.toLong())
+                    CanonicalPayload(hash(it), it.size.toLong())
                 }
         }
 

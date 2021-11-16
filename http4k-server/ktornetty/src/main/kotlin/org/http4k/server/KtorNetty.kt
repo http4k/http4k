@@ -12,6 +12,7 @@ import io.ktor.request.uri
 import io.ktor.response.ApplicationResponse
 import io.ktor.response.header
 import io.ktor.response.respondOutputStream
+import io.ktor.server.engine.EngineAPI
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.stop
 import io.ktor.server.netty.Netty
@@ -32,6 +33,7 @@ import io.ktor.http.Headers as KHeaders
 @Suppress("EXPERIMENTAL_API_USAGE")
 class KtorNetty(val port: Int = 8000) : ServerConfig {
 
+    @OptIn(EngineAPI::class)
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine: NettyApplicationEngine = embeddedServer(Netty, port) {
             intercept(Call) {

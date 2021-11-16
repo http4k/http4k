@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.16.4.0 (uncut)
-- **http4k-*** : Upgrade some dependency versions.
+### v4.17.0.0 (uncut)
+- **http4k-*** : [Careful] Upgrade some dependency versions, including Kotlin to 1.6.0.
+- **http4k-*** : [Breaking] Removal of all previously deprecated methods and types. To ensure you get the smoothest experience, please upgrade to v4.16.3.0 first, deal with the replacements and then upgrade to 4.17.0.0
 
 ### v4.16.3.0
 - **http4k-*** : Upgrade some dependency versions.

@@ -21,6 +21,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
 import java.nio.ByteBuffer
+import java.util.Locale.getDefault
 
 /**
  * Basic JDK-based Client.
@@ -65,7 +66,7 @@ private fun Request.toJavaHttpRequest(bodyMode: BodyMode) =
         .uri(URI.create(uri.toString()))
         .apply {
             headers
-                .filterNot { disallowedHeaders.contains(it.first.toLowerCase()) }
+                .filterNot { disallowedHeaders.contains(it.first.lowercase(getDefault())) }
                 .fold(this) { acc, next -> acc.header(next.first, next.second) }
         }.method(method.name, body.toRequestPublisher(bodyMode)).build()
 

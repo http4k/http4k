@@ -114,11 +114,9 @@ open class ConfigurableKotlinxSerialization(
     }
 
     // auto
-    @ExperimentalSerializationApi
     override fun asJsonObject(input: Any): JsonElement =
         json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
 
-    @ExperimentalSerializationApi
     override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T {
         @Suppress("UNCHECKED_CAST")
         return json.decodeFromJsonElement(json.serializersModule.serializer(target.java), j) as T

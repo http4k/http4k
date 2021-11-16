@@ -51,13 +51,11 @@ class WordCounterApp : HttpHandler {
 interface WordCounterContract {
 
     @Test
-    @JvmDefault
     fun `count the number of words`(handler: HttpHandler) {
         assertThat(WordCounterClient(handler).wordCount("A random string with 6 words"), equalTo(6))
     }
 
     @Test
-    @JvmDefault
     fun `empty string has zero words`(handler: HttpHandler) {
         assertThat(WordCounterClient(handler).wordCount(""), equalTo(0))
     }

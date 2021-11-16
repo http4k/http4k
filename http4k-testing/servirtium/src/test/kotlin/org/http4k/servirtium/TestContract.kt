@@ -18,7 +18,6 @@ interface TestContract {
     val control: InteractionControl
 
     @Test
-    @JvmDefault
     fun scenario() {
         val handler = createHandler()
 

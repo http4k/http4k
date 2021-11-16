@@ -1,5 +1,6 @@
 package org.http4k.serverless
 
+import com.amazonaws.services.lambda.runtime.Context
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
@@ -26,9 +27,9 @@ class ApiGatewayV2LambdaFunctionTest {
 
         val lambda = object : ApiGatewayV2LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
-                assertThat(contexts[it][LAMBDA_CONTEXT_KEY], equalTo(lambdaContext))
+                assertThat(contexts[it].get<Context>(LAMBDA_CONTEXT_KEY), equalTo(lambdaContext))
                 assertThat(
-                    contexts[it][LAMBDA_REQUEST_KEY], equalTo(
+                    contexts[it].get<Request>(LAMBDA_REQUEST_KEY), equalTo(
                         Request(GET, "/path")
                             .query("query", "value")
                             .header("c", "d")

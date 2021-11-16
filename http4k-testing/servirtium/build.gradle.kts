@@ -18,7 +18,7 @@ dependencies {
 tasks {
     withType<KotlinCompile> {
         kotlinOptions {
-            freeCompilerArgs += listOf("-Xjvm-default=enable")
+            freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
         }
     }
 }

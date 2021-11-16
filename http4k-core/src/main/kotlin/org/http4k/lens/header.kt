@@ -7,6 +7,7 @@ import org.http4k.core.Parameters
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
 import org.http4k.lens.ParamMeta.StringParam
+import java.util.Locale.getDefault
 
 typealias HeaderLens<T> = Lens<HttpMessage, T>
 
@@ -18,7 +19,7 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
         {
             parseValueAndDirectives(it).let {
                 ContentType(it.first, it.second
-                    .filter { it.first.toLowerCase() in setOf("boundary", "charset", "media-type") }
+                    .filter { it.first.lowercase(getDefault()) in setOf("boundary", "charset", "media-type") }
                 )
             }
         },

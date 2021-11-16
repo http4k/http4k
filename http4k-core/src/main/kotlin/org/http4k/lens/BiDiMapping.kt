@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
+import java.util.Locale.getDefault
 import java.util.UUID
 
 /**
@@ -90,7 +91,7 @@ internal fun Throwable.asString() = StringWriter().use { output -> PrintWriter(o
 
 internal fun String.asSafeBoolean(): Boolean =
     when {
-        toUpperCase() == "TRUE" -> true
-        toUpperCase() == "FALSE" -> false
+        uppercase(getDefault()) == "TRUE" -> true
+        uppercase(getDefault()) == "FALSE" -> false
         else -> throw IllegalArgumentException("illegal boolean: $this}")
     }
