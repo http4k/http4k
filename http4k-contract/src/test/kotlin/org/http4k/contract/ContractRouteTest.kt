@@ -78,7 +78,7 @@ class ContractRouteTest {
     fun `0 parts - matches route`() {
         val handler: (Request) -> Response = { Response(OK) }
         val route = "/" bindContract GET to handler
-        val route2 = "/" bindContract GET to { -> handler }
+        "/" bindContract GET to { -> handler }
         val router = route.toRouter(Root)
         assertThat(router.match(Request(GET, "/")), equalTo(MatchingHandler(handler, router.description) as RouterMatch))
         assertThat(router.match(Request(POST, "/")), equalTo(Unmatched(router.description) as RouterMatch))

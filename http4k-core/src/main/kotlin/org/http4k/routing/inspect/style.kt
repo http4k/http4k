@@ -1,9 +1,12 @@
 package org.http4k.routing.inspect
 
+import org.http4k.routing.inspect.ForegroundColour.Default
+import java.util.Locale.getDefault
+
 fun String.styled(style: TextStyle, escapeMode: EscapeMode = EscapeMode.Ansi) = escapeMode(this, style)
 
 data class TextStyle(
-    val foregroundColour: ForegroundColour = ForegroundColour.Default,
+    val foregroundColour: ForegroundColour = Default,
     val backgroundColour: BackgroundColour = BackgroundColour.Default,
     val variation: Variation = Variation.Default,
 )
@@ -32,7 +35,7 @@ enum class EscapeMode(private val converter: (String, TextStyle) -> String) {
 
 internal const val reset = "\u001B[0m"
 
-private fun ForegroundColour.pseudo() = if (this == ForegroundColour.Default) "" else "[${name.toLowerCase()}]"
+private fun ForegroundColour.pseudo() = if (this == Default) "" else "[${name.lowercase(getDefault())}]"
 
 private fun Variation.pseudo(): String = when (this) {
     Variation.Bold -> "*"

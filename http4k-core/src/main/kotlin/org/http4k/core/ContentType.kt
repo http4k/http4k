@@ -1,6 +1,8 @@
 package org.http4k.core
 
 import java.nio.charset.Charset
+import java.util.Locale.getDefault
+import kotlin.text.Charsets.UTF_8
 
 data class ContentType(val value: String, val directives: Parameters = emptyList()) {
 
@@ -15,7 +17,9 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
     fun equalsIgnoringDirectives(that: ContentType): Boolean = withNoDirectives() == that.withNoDirectives()
 
     companion object {
-        fun Text(value: String, charset: Charset? = Charsets.UTF_8) = ContentType(value, listOfNotNull(charset?.let { "charset" to charset.name().toLowerCase() }))
+        fun Text(value: String, charset: Charset? = UTF_8) = ContentType(value, listOfNotNull(charset?.let {
+            "charset" to charset.name().lowercase(getDefault())
+        }))
         fun MultipartFormWithBoundary(boundary: String): ContentType = ContentType("multipart/form-data", listOf("boundary" to boundary))
         fun MultipartMixedWithBoundary(boundary: String): ContentType = ContentType("multipart/mixed", listOf("boundary" to boundary))
 

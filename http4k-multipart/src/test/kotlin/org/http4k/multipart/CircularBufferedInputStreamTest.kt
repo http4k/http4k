@@ -32,24 +32,24 @@ class CircularBufferedInputStreamTest {
         var read = inputStream.read(buffer, 0, 2)
 
         assertThat(read, equalTo(2))
-        assertThat(buffer[0].toChar(), equalTo('h'))
-        assertThat(buffer[1].toChar(), equalTo('e'))
+        assertThat(buffer[0].toInt().toChar(), equalTo('h'))
+        assertThat(buffer[1].toInt().toChar(), equalTo('e'))
 
         buffer = ByteArray(5)
         read = inputStream.read(buffer, 0, 5)
 
         assertThat(read, equalTo(5))
-        assertThat(buffer[0].toChar(), equalTo('l'))
-        assertThat(buffer[1].toChar(), equalTo('l'))
-        assertThat(buffer[2].toChar(), equalTo('o'))
-        assertThat(buffer[3].toChar(), equalTo(' '))
-        assertThat(buffer[4].toChar(), equalTo('m'))
+        assertThat(buffer[0].toInt().toChar(), equalTo('l'))
+        assertThat(buffer[1].toInt().toChar(), equalTo('l'))
+        assertThat(buffer[2].toInt().toChar(), equalTo('o'))
+        assertThat(buffer[3].toInt().toChar(), equalTo(' '))
+        assertThat(buffer[4].toInt().toChar(), equalTo('m'))
 
         buffer = ByteArray(50)
         read = inputStream.read(buffer, 10, 40)
         assertThat(read, equalTo(15))
-        assertThat(buffer[10].toChar(), equalTo('y'))
-        assertThat(buffer[24].toChar(), equalTo('t'))
+        assertThat(buffer[10].toInt().toChar(), equalTo('y'))
+        assertThat(buffer[24].toInt().toChar(), equalTo('t'))
 
         read = inputStream.read(buffer, 10, 40)
         assertThat(read, equalTo(-1))

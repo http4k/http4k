@@ -5,6 +5,7 @@ import org.http4k.core.Uri
 import org.http4k.core.toParameters
 import org.http4k.filter.CanonicalPayload
 import org.http4k.urlEncoded
+import java.util.Locale.getDefault
 
 internal data class AwsCanonicalRequest(val value: String, val signedHeaders: String, val payloadHash: String) {
     companion object {
@@ -25,10 +26,10 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
         }
 
         private fun Request.signedHeaders(): String =
-            headers.map { it.first.toLowerCase() }.sorted().joinToString(";")
+            headers.map { it.first.lowercase(getDefault()) }.sorted().joinToString(";")
 
         private fun Request.canonicalHeaders(): String = headers
-            .map { it.first.toLowerCase() to it.second?.replace("\\s+", " ")?.trim() }
+            .map { it.first.lowercase(getDefault()) to it.second?.replace("\\s+", " ")?.trim() }
             .map { it.first + ":" + it.second }
             .sorted()
             .joinToString("\n")

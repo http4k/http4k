@@ -11,7 +11,7 @@ object HmacSha256 {
 
     fun hash(payload: ByteArray): String = Hex.hex(MessageDigest.getInstance("SHA-256").digest(payload))
 
-    fun hmacSHA256(key: ByteArray, data: String) = Mac.getInstance("HmacSHA256").run {
+    fun hmacSHA256(key: ByteArray, data: String): ByteArray = Mac.getInstance("HmacSHA256").run {
         init(SecretKeySpec(key, "HmacSHA256"))
         doFinal(data.toByteArray(charset("UTF8")))
     }

@@ -30,8 +30,8 @@ class AzureFunctionTest {
 
         val function = object : AzureFunction(AppLoaderWithContexts { env, contexts ->
             {
-                assertThat(contexts[it][AZURE_CONTEXT_KEY], sameInstance(context))
-                assertThat(contexts[it][AZURE_REQUEST_KEY], equalTo(request))
+                assertThat(contexts[it].get<ExecutionContext>(AZURE_CONTEXT_KEY), sameInstance(context))
+                assertThat(contexts[it].get<Request>(AZURE_REQUEST_KEY), equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
                 assertThat(it.removeHeader("x-http4k-context-azure"), equalTo(Request(GET, "/path")
                     .header("c", "d")

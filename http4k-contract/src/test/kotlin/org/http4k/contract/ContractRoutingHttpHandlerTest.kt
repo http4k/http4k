@@ -252,7 +252,7 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
     fun `applies security and responds with a 200 to authorized requests`() {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to { it -> Response(OK) }
+            routes += "/bob" bindContract GET to { _ -> Response(OK) }
         }
 
         val response = root(Request(GET, "/root/bob?key=bob"))

@@ -2,7 +2,8 @@ package org.http4k.webdriver
 
 import org.http4k.core.Body
 import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
@@ -16,8 +17,10 @@ import org.openqa.selenium.OutputType
 import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
+import java.util.Locale.getDefault
 
-data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, val element: Element) : WebElement {
+data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, val element: Element) :
+    WebElement {
 
     override fun toString(): String = element.toString()
 
@@ -45,7 +48,8 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun submit() {
         current("form")?.let {
-            val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: POST
+            val method =
+                it.element.attr("method")?.let { it.uppercase(getDefault()) }?.let(Method::valueOf) ?: POST
             val inputs = it
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
@@ -68,8 +72,10 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 .groupBy { it.first }
                 .mapValues { it.value.map { it.second }.flatten() })
 
-            val body = Body.webForm(Validator.Strict,
-                *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
+            val body = Body.webForm(
+                Validator.Strict,
+                *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())
+            ).toLens()
 
             val formtarget = Uri.of(it.element.attr("action") ?: "")
             val current = getURL()
@@ -93,25 +99,26 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = throw FeatureNotImplementedYet
 
     override fun click() {
-        if (isA("a")) {
-            element.attr("href")?.let { navigate(Request(GET, it)) }
-        } else if (isCheckable()) {
-            if (isSelected) clear()
+        when {
+            isA("a") -> navigate(Request(GET, element.attr("href")))
+            isCheckable() -> if (isSelected) clear()
             else element.attr("checked", "checked")
-        } else if (isA("option")) {
-            val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") == true
+            isA("option") -> {
+                val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") == true
 
-            val oldValue = isSelected
+                val oldValue = isSelected
 
-            if (currentSelectIsMultiple) element.attr("selected", "selected")
-            else current("select")?.findElements(By.tagName("option"))?.forEach { it.clear() }
+                if (currentSelectIsMultiple) element.attr("selected", "selected")
+                else current("select")?.findElements(By.tagName("option"))?.forEach { it.clear() }
 
-            if (oldValue && !currentSelectIsMultiple) clear()
-            else element.attr("selected", "selected")
-        } else if (isA("button")) {
-            val t = element.attr("type")
-            if (t == "" || t.toLowerCase() == "submit")
-                submit()
+                if (oldValue && !currentSelectIsMultiple) clear()
+                else element.attr("selected", "selected")
+            }
+            isA("button") -> {
+                val t = element.attr("type")
+                if (t == "" || t.lowercase(getDefault()) == "submit")
+                    submit()
+            }
         }
     }
 
@@ -144,15 +151,17 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun hashCode(): Int = element.hashCode()
 
-    override fun findElement(by: org.openqa.selenium.By): WebElement? = JSoupElementFinder(navigate, getURL, element).findElement(by)
+    override fun findElement(by: org.openqa.selenium.By): WebElement? =
+        JSoupElementFinder(navigate, getURL, element).findElement(by)
 
-    override fun findElements(by: org.openqa.selenium.By) = JSoupElementFinder(navigate, getURL, element).findElements(by)
+    override fun findElements(by: org.openqa.selenium.By) =
+        JSoupElementFinder(navigate, getURL, element).findElements(by)
 
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)
 
     private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it) }
 
-    private fun isA(tag: String) = tagName.toLowerCase() == tag.toLowerCase()
+    private fun isA(tag: String) = tagName.lowercase(getDefault()) == tag.lowercase(getDefault())
 
     companion object {
         private val booleanAttributes = listOf(

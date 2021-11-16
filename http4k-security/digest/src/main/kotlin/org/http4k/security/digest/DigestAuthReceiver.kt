@@ -8,6 +8,7 @@ import org.http4k.security.Nonce
 import org.http4k.security.NonceGenerator
 import org.http4k.util.Hex.hex
 import java.security.MessageDigest
+import java.util.Locale.getDefault
 
 /**
  * For use in clients.  Generates responses to Digest Auth challenges
@@ -40,7 +41,7 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, private val
             .appendIfNotBlank(request.uri.query, "?", request.uri.query)
             .toString()
 
-        val digester = when (challenge.algorithm?.toLowerCase()) {
+        val digester = when (challenge.algorithm?.lowercase(getDefault())) {
             null, "md5-sess" -> MessageDigest.getInstance("MD5")
             else -> MessageDigest.getInstance(challenge.algorithm)
         }

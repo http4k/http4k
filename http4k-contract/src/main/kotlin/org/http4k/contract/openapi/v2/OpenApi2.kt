@@ -28,6 +28,7 @@ import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
+import java.util.Locale.getDefault
 
 /**
  * Contract renderer for OpenApi2 format JSON. Note that for the JSON schema generation, auto-naming of
@@ -157,7 +158,7 @@ open class OpenApi2<out NODE>(
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(
-                route.method.toString().toLowerCase() to obj(fields),
+                route.method.toString().lowercase(getDefault()) to obj(fields),
                 ((route.meta.requests.flatMap { it.asSchema().definitions }) + responseDefinitions).toSet()
             )
         }

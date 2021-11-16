@@ -80,7 +80,7 @@ class Base64DecoderTestCase {
     @Throws(Exception::class)
     fun truncatedString() {
         try {
-            val x = byteArrayOf('n'.toByte())
+            val x = byteArrayOf('n'.code.toByte())
             Base64Decoder.decode(x, ByteArrayOutputStream())
         } catch (e: IOException) {
         }

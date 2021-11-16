@@ -42,6 +42,7 @@ import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.JsonSchema
+import java.util.Locale
 
 /**
  * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of
@@ -77,7 +78,7 @@ class OpenApi3<NODE : Any>(
                 paths
                     .groupBy { it.path }
                     .mapValues {
-                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
+                        it.value.map { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }.toMap().toSortedMap()
                     }
                     .toSortedMap(),
                 Components(

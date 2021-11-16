@@ -14,6 +14,7 @@ import io.ktor.response.header
 import io.ktor.response.respondOutputStream
 import io.ktor.server.cio.CIO
 import io.ktor.server.cio.CIOApplicationEngine
+import io.ktor.server.engine.EngineAPI
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.stop
 import io.ktor.utils.io.jvm.javaio.toInputStream
@@ -30,6 +31,7 @@ import io.ktor.http.Headers as KHeaders
 @Suppress("EXPERIMENTAL_API_USAGE")
 class KtorCIO(val port: Int = 8000) : ServerConfig {
 
+    @OptIn(EngineAPI::class)
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine: CIOApplicationEngine = embeddedServer(CIO, port) {
             intercept(Call) {

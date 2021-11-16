@@ -61,13 +61,11 @@ interface WordCounterContract {
     val uri: Uri
 
     @Test
-    @JvmDefault
     fun `count the number of words`() {
         assertThat(WordCounterClient(uri).wordCount("A random string with 6 words"), equalTo(6))
     }
 
     @Test
-    @JvmDefault
     fun `empty string has zero words`() {
         assertThat(WordCounterClient(uri).wordCount(""), equalTo(0))
     }

@@ -15,6 +15,7 @@ import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import java.nio.ByteBuffer
 import java.util.Base64.getDecoder
 import java.util.Base64.getEncoder
+import java.util.Locale.getDefault
 
 const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
 
@@ -53,7 +54,7 @@ class OpenWhiskFunction(
 
     private fun JsonObject.asHttp4k(): Request {
         val baseRequest = Request(
-            Method.valueOf(getAsJsonPrimitive("__ow_method").asString.toUpperCase()),
+            Method.valueOf(getAsJsonPrimitive("__ow_method").asString.uppercase(getDefault())),
             stringOrEmpty("__ow_path") + if (has("__ow_query")) "?" + get("__ow_query").asJsonPrimitive.asString else ""
         ).body(stringOrEmpty("__ow_body"))
 

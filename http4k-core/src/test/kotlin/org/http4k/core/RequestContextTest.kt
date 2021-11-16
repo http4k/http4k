@@ -12,7 +12,7 @@ class RequestContextTest {
     fun `can set and get a typed value from a RequestContext`() {
         val requestContext = RequestContext(UUID.randomUUID())
         requestContext["foo"] = 123
-        assertThat(requestContext["foo"], equalTo(123))
+        assertThat(requestContext.get<Int>("foo"), equalTo(123))
     }
 
     @Test
