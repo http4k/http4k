@@ -1,7 +1,6 @@
 package org.http4k.server
 
 import org.http4k.core.HttpHandler
-import java.lang.IllegalArgumentException
 import java.time.Duration
 
 interface Http4kServer : AutoCloseable {
@@ -24,11 +23,11 @@ interface ServerConfig {
         data class Graceful(val timeout: Duration): StopMode()
         data class Delayed(val timeout: Duration) :StopMode()
     }
+
     class UnsupportedStopMode(stopMode: StopMode)
         : IllegalArgumentException("Server does not support stop mode $stopMode")
 
-    val stopMode: StopMode
-        get() = StopMode.Immediate
+    val stopMode: StopMode get() = StopMode.Immediate
 
     fun toServer(httpHandler: HttpHandler): Http4kServer
 }
