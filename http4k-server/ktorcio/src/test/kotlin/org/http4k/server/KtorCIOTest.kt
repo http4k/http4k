@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.present
 import org.http4k.client.ApacheClient
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.Random
+import java.util.*
 
 class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, ApacheClient()) {
 
@@ -29,10 +29,8 @@ class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, A
 }
 
 class KtorCIOStopTest : ServerStopContract(
-    { stopMode -> KtorCIO(Random().nextInt(1000) + 8745, stopMode) },
+    { stopMode -> KtorCIO(Random().nextInt(1000) + 8745) },
     ApacheClient(),
     {
         enableImmediateStop()
-        enableGracefulStop()
-        enableDelayedStop()
     })
