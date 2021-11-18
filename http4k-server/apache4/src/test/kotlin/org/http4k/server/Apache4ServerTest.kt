@@ -11,5 +11,4 @@ class Apache4ServerStopTest : ServerStopContract(
     ApacheClient(),
     {
         enableImmediateStop()
-        enableDelayedStop()
     })
