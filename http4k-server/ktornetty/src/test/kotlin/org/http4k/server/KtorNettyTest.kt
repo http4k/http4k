@@ -15,7 +15,7 @@ class KtorNettyTest : ServerContract({ KtorNetty(Random().nextInt(1000) + 7456) 
 }
 
 class KtorNettyStopTest : ServerStopContract(
-    { KtorNetty(Random().nextInt(1000) + 7456) },
+    { stopMode -> KtorNetty(Random().nextInt(1000) + 7456, stopMode) },
     ApacheClient(),
     {
         enableImmediateStop()

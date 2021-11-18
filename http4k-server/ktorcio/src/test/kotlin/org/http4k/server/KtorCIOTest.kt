@@ -29,7 +29,7 @@ class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, A
 }
 
 class KtorCIOStopTest : ServerStopContract(
-    { KtorCIO(Random().nextInt(1000) + 8745) },
+    { stopMode -> KtorCIO(Random().nextInt(1000) + 8745, stopMode) },
     ApacheClient(),
     {
         enableImmediateStop()
