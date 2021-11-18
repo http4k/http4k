@@ -34,9 +34,10 @@ import org.junit.jupiter.api.assertTimeout
 import org.opentest4j.TestAbortedException
 import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.lang.AssertionError
 import java.time.Duration
-import java.time.Duration.*
+import java.time.Duration.between
+import java.time.Duration.ofMillis
+import java.time.Duration.ofSeconds
 import java.time.Instant
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CountDownLatch
@@ -67,7 +68,7 @@ abstract class ServerStopContract(
         fun enableDelayedStop() { enabledModes.add(defaultDelayedStopMode) }
     }
 
-    private val Http4kServer.baseUrl: String get() = "http://0.0.0.0:${port()}"
+    private val Http4kServer.baseUrl: String get() = "http://localhost:${port()}"
 
     private fun Http4kServer.waitUntilHealthy(): Http4kServer {
         val startTime = System.currentTimeMillis()
