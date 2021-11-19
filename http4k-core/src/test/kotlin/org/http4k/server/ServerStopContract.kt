@@ -50,9 +50,9 @@ abstract class ServerStopContract(
     enableStopModes: ConfigureServerStopContract.() -> Unit
 ) {
 
-    private val defaultGracefulStopMode = Graceful(ofSeconds(3))
-    private val defaultDelayedStopMode = Delayed(ofSeconds(3))
-    private val timeoutTolerance = ofMillis(200)
+    private val defaultGracefulStopMode = Graceful(ofSeconds(10))
+    private val defaultDelayedStopMode = Delayed(ofSeconds(10))
+    private val timeoutTolerance = ofMillis(1000)
 
     private val supportedStopModes: Set<StopMode>
 
