@@ -5,14 +5,18 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.io.ByteArrayInputStream
 import java.net.ConnectException
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
 import java.net.UnknownHostException
 import java.nio.ByteBuffer
+import java.time.Duration
+import java.time.Duration.ZERO
 
 /**
  * Use this legacy Java client when you're not yet on Java 11.
@@ -20,9 +24,18 @@ import java.nio.ByteBuffer
 object Java8HttpClient {
     @JvmStatic
     @JvmName("create")
-    operator fun invoke(): HttpHandler = { request: Request ->
+    operator fun invoke(): HttpHandler = invoke(ZERO)
+
+    @JvmStatic
+    @JvmName("createWithTimeouts")
+    operator fun invoke(
+        readTimeout: Duration = ZERO,
+        connectionTimeout: Duration = ZERO
+    ): HttpHandler = { request: Request ->
         try {
             val connection = (URL(request.uri.toString()).openConnection() as HttpURLConnection).apply {
+                this.readTimeout = readTimeout.toMillis().toInt()
+                this.connectTimeout = connectionTimeout.toMillis().toInt()
                 instanceFollowRedirects = false
                 requestMethod = request.method.name
                 doOutput = true
@@ -49,6 +62,8 @@ object Java8HttpClient {
             Response(UNKNOWN_HOST.toClientStatus(e))
         } catch (e: ConnectException) {
             Response(CONNECTION_REFUSED.toClientStatus(e))
+        } catch (e: SocketTimeoutException) {
+            Response(CLIENT_TIMEOUT.toClientStatus(e))
         }
     }
 
