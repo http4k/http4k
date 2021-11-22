@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.17.1.0
+- **http4k-core* : Make timeouts configurable for `Java8HttpClient`.
+
 ### v4.17.0.0
 - **http4k-*** : [Careful] Upgrade some dependency versions, including Kotlin to 1.6.0.
 - **http4k-*** : [Breaking] Removal of all previously deprecated methods and types. To ensure you get the smoothest experience, please upgrade to v4.16.3.0 first, deal with the replacements and then upgrade to 4.17.0.0
