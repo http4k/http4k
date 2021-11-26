@@ -7,7 +7,13 @@ import java.util.regex.Pattern
 data class UriTemplate private constructor(private val template: String) {
     private val templateRegex = template.replace(URI_TEMPLATE_FORMAT,
         { notMatched -> Pattern.quote(notMatched) },
-        { matched -> if (matched.groupValues[2].isBlank()) "([^/]+)" else "(${matched.groupValues[2]})" }).toRegex()
+        { matched ->
+            when {
+                matched.groupValues[2].isBlank() -> "([^/]+)"
+                else -> "(${matched.groupValues[2]})"
+            }
+        }).toRegex()
+
     private val matches = URI_TEMPLATE_FORMAT.findAll(template)
     private val parameterNames = matches.map { it.groupValues[1] }.toList()
 
