@@ -18,6 +18,12 @@
       "description": "tag3 description"
     }
   ],
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "a very simple API"
+    }
+  ],
   "paths": {
     "/basepath/and_auth": {
       "post": {

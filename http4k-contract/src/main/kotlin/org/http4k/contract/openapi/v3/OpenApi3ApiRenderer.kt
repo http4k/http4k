@@ -9,6 +9,7 @@ import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
 import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
+import org.http4k.core.Uri
 import org.http4k.format.Json
 import org.http4k.util.JsonSchema
 
@@ -28,10 +29,18 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
                     "info" to info.asJson(),
                     "tags" to array(tags.map { it.asJson() }),
                     "paths" to paths.asJson(),
-                    "components" to components.asJson()
+                    "components" to components.asJson(),
+                    "servers" to array(servers.map { it.asJson() })
                 )
             }
         }
+
+    private fun ApiServer.asJson() = json {
+        obj(
+            "url" to string(url.toString()),
+            "description" to string(description ?: "")
+        )
+    }
 
     private fun Tag.asJson(): NODE =
         json {
@@ -140,7 +149,8 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
             it.key to
                 obj(
                     "description" to it.value.description.asJson(),
-                    "content" to it.value.content.asJson())
+                    "content" to it.value.content.asJson()
+                )
         })
     }
 
