@@ -4,7 +4,7 @@ description: Feature overview of the http4k-testing-strikt module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-testing-strikt", version: "4.17.1.0"
+implementation group: "org.http4k", name: "http4k-testing-strikt", version: "4.17.2.0"
 ```
 
 ### About
