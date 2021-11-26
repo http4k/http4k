@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.17.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Added Servers to OpenApi renderer. H/T @zsambek and @MarcusDunn for making it happen.
+
 ### v4.17.1.0
 - **http4k-core** : Make timeouts configurable for `Java8HttpClient`.
 
