@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.UriTemplate.Companion.from
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class UriTemplateTest {
 
@@ -137,11 +136,8 @@ class UriTemplateTest {
     @Test
     @Disabled
     fun greedyQualifiersAreNotReplaced() {
-         val COMPACT_UUID_REGEX = "[a-fA-F0-9]{32}"
-         val PRETTY_UUID_REGEX = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
-         val UUID_REGEX = "(?:${COMPACT_UUID_REGEX}|${PRETTY_UUID_REGEX})"
-
-        assertThat(from("/foo/{bar:$UUID_REGEX}").matches("/foo/${UUID.randomUUID()}"), equalTo(true))
+         val patternWithGreedyQualifier = "[a-z]{3}"
+        assertThat(from("/foo/{bar:$patternWithGreedyQualifier}").matches("/foo/abc"), equalTo(true))
     }
 
     private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)
