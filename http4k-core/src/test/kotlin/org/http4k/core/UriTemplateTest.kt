@@ -3,7 +3,6 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.UriTemplate.Companion.from
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class UriTemplateTest {
@@ -14,11 +13,13 @@ class UriTemplateTest {
 
         assertThat(
             template.generate(pathParameters(pair("name", "a name with spaces"))),
-            equalTo("properties/a+name+with+spaces"))
+            equalTo("properties/a+name+with+spaces")
+        )
 
         assertThat(
             template.generate(pathParameters(pair("name", "a/name/with/slashes"))),
-            equalTo("properties/a/name/with/slashes"))
+            equalTo("properties/a/name/with/slashes")
+        )
     }
 
     @Test
@@ -28,7 +29,10 @@ class UriTemplateTest {
         val parameters = template.extract("properties/123/bob")
         assertThat(parameters.getValue("id"), equalTo("123"))
         assertThat(parameters.getValue("name"), equalTo("bob"))
-        assertThat(template.generate(pathParameters(pair("id", "123"), pair("name", "bob"))), equalTo("properties/123/bob"))
+        assertThat(
+            template.generate(pathParameters(pair("id", "123"), pair("name", "bob"))),
+            equalTo("properties/123/bob")
+        )
     }
 
     @Test
@@ -134,10 +138,11 @@ class UriTemplateTest {
     }
 
     @Test
-    @Disabled
     fun greedyQualifiersAreNotReplaced() {
-         val patternWithGreedyQualifier = "[a-z]{3}"
-        assertThat(from("/foo/{bar:$patternWithGreedyQualifier}").matches("/foo/abc"), equalTo(true))
+        val patternWithGreedyQualifier = "[a-z]{3}"
+        val template = from("/foo/{bar:$patternWithGreedyQualifier}")
+        assertThat(template.matches("/foo/abc"), equalTo(true))
+        assertThat(template.extract("/foo/abc").getValue("bar"), equalTo("abc"))
     }
 
     private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)
