@@ -10,6 +10,7 @@ import org.http4k.core.Status
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.opentest4j.AssertionFailedError
 import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * Coordinates the comparison of the content for a test.
@@ -41,6 +42,7 @@ class NamedResourceApprover(private val name: String,
                 }
                 else -> try {
                     assertEquals(approvalContent(this).reader().use { it.readText() }, approvalContent(httpMessage).reader().readText())
+                    actual.output()
                 } catch (e: AssertionError) {
                     approvalContent(httpMessage).copyTo(actual.output())
                     throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)
