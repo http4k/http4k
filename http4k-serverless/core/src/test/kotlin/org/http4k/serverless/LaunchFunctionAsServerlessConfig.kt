@@ -24,7 +24,7 @@ class ServerlessConfigTest {
         val server = fnHandler.asServer {
             { req: Request ->
                 Response(OK).body(it(emptyMap())(req.body.stream, "!!"))
-            }.asServer(SunHttp())
+            }.asServer(SunHttp(0))
         }
 
         server.start().use {
