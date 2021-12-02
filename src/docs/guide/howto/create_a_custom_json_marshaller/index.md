@@ -21,9 +21,9 @@ either uni or bi-directional.
 This ability to render custom types through different JSON marshallers allows API users to provide different "views" for
 different purposes - for example we may wish to hide the values of some fields in the output, as below:
 
-### Example - Representing MicroTypes as Strings in JSON
+### Example - Representing MicroTypes/TinyTypes as Strings in JSON
 
-MicroTypes are popular in Kotlin providing type-safety throughout a codebase, ensuring amongst other things that method 
+MicroTypes (aka Tiny Types) are popular in Kotlin providing type-safety throughout a codebase, ensuring amongst other things that method 
 parameters are not accidentally permuted. An example of a simple microtype might be:
 
 ```kotlin
