@@ -123,5 +123,4 @@ A full worked example is shown below.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_custom_json_marshaller/example.kt"></script>
 
-### Using Values4k
 
