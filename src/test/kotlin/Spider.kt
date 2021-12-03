@@ -11,7 +11,7 @@ sealed class SpiderReport
 data class Ok(val original: String, val sublinks: List<SpiderReport>) : SpiderReport()
 data class Unreachable(val original: String) : SpiderReport()
 
-fun main(args: Array<String>) {
+fun main() {
     val handler = ClientFilters.SetHostFrom(Uri.of("https://www.http4k.org"))
         .then(RequestFilters.Tap { println(it.uri) })
         .then(ClientFilters.FollowRedirects())
@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
 
     fun spider(url: String, visited: List<String> = emptyList()): SpiderReport = try {
         val actualUrl = "/${url.trimStart('/')}"
-        println("visiting: " + actualUrl)
+        println("visiting: $actualUrl")
         driver.get(actualUrl)
         val nowVisited = visited.plus(actualUrl)
 

@@ -25,26 +25,36 @@ class FormFieldTest {
     fun `value missing`() {
         assertThat(FormField.optional("world")(form), absent())
         val requiredFormField = FormField.required("world")
-        assertThat({ requiredFormField(form) }, throws(lensFailureWith(Missing(requiredFormField.meta), overallType = Failure.Type.Missing)))
+        assertThat({ requiredFormField(form) }, throws(lensFailureWith<WebForm>(Missing(requiredFormField.meta), overallType = Failure.Type.Missing)))
 
         assertThat(FormField.multi.optional("world")(form), absent())
         val optionalMultiFormField = FormField.multi.required("world")
-        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(Missing(optionalMultiFormField.meta), overallType = Failure.Type.Missing)))
+        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith<WebForm>(Missing(optionalMultiFormField.meta), overallType = Failure.Type.Missing)))
+    }
+
+    @Test
+    fun `value replaced`() {
+        val single = FormField.required("world")
+        assertThat(single("value2", single("value1", form)), equalTo(form + ("world" to "value2")))
+
+        val multi = FormField.multi.required("world")
+        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), form)),
+            equalTo(form + ("world" to "value3") + ("world" to "value4")))
     }
 
     @Test
     fun `invalid value`() {
         val requiredFormField = FormField.map(String::toInt).required("hello")
-        assertThat({ requiredFormField(form) }, throws(lensFailureWith(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredFormField(form) }, throws(lensFailureWith<WebForm>(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))
 
         val optionalFormField = FormField.map(String::toInt).optional("hello")
-        assertThat({ optionalFormField(form) }, throws(lensFailureWith(Invalid(optionalFormField.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalFormField(form) }, throws(lensFailureWith<WebForm>(Invalid(optionalFormField.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMultiFormField = FormField.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiFormField(form) }, throws(lensFailureWith(Invalid(requiredMultiFormField.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredMultiFormField(form) }, throws(lensFailureWith<WebForm>(Invalid(requiredMultiFormField.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMultiFormField = FormField.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(Invalid(optionalMultiFormField.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith<WebForm>(Invalid(optionalMultiFormField.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
@@ -56,21 +66,21 @@ class FormFieldTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = FormField.map(::MyCustomBodyType, { it.value }).required("bob")
+        val custom = FormField.map(::MyCustomType, { it.value }).required("bob")
 
-        val instance = MyCustomBodyType("hello world!")
+        val instance = MyCustomType("hello world!")
         val formWithField = custom(instance, WebForm())
 
         assertThat(formWithField.fields["bob"], equalTo(listOf("hello world!")))
 
-        assertThat(custom(formWithField), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(custom(formWithField), equalTo(MyCustomType("hello world!")))
     }
 
     @Test
     fun `toString is ok`() {
-        assertThat(FormField.required("hello").toString(), equalTo("Required form 'hello'"))
-        assertThat(FormField.optional("hello").toString(), equalTo("Optional form 'hello'"))
-        assertThat(FormField.multi.required("hello").toString(), equalTo("Required form 'hello'"))
-        assertThat(FormField.multi.optional("hello").toString(), equalTo("Optional form 'hello'"))
+        assertThat(FormField.required("hello").toString(), equalTo("Required formData 'hello'"))
+        assertThat(FormField.optional("hello").toString(), equalTo("Optional formData 'hello'"))
+        assertThat(FormField.multi.required("hello").toString(), equalTo("Required formData 'hello'"))
+        assertThat(FormField.multi.optional("hello").toString(), equalTo("Optional formData 'hello'"))
     }
 }

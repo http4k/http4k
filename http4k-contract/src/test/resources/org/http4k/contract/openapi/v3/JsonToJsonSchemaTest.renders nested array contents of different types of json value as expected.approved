@@ -1,0 +1,27 @@
+{
+  "node": {
+    "type": "array",
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/components/schemas/bob"
+      }
+    }
+  },
+  "definitions": [
+    {
+      "first": "bob",
+      "second": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "anotherString": {
+            "type": "string",
+            "example": "yetAnotherString"
+          }
+        }
+      }
+    }
+  ]
+}

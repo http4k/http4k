@@ -18,11 +18,12 @@ package org.apache.commons.fileupload.util.mime;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * @since 1.3
  */
-final class Base64Decoder {
+public final class Base64Decoder {
 
     /**
      * Decoding table value for invalid bytes.
@@ -48,17 +49,17 @@ final class Base64Decoder {
      * Set up the encoding table.
      */
     private static final byte[] ENCODING_TABLE = {
-            (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', (byte) 'G',
-            (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L', (byte) 'M', (byte) 'N',
-            (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R', (byte) 'S', (byte) 'T', (byte) 'U',
-            (byte) 'V', (byte) 'W', (byte) 'X', (byte) 'Y', (byte) 'Z',
-            (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f', (byte) 'g',
-            (byte) 'h', (byte) 'i', (byte) 'j', (byte) 'k', (byte) 'l', (byte) 'm', (byte) 'n',
-            (byte) 'o', (byte) 'p', (byte) 'q', (byte) 'r', (byte) 's', (byte) 't', (byte) 'u',
-            (byte) 'v', (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z',
-            (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6',
-            (byte) '7', (byte) '8', (byte) '9',
-            (byte) '+', (byte) '/'
+        (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', (byte) 'G',
+        (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L', (byte) 'M', (byte) 'N',
+        (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R', (byte) 'S', (byte) 'T', (byte) 'U',
+        (byte) 'V', (byte) 'W', (byte) 'X', (byte) 'Y', (byte) 'Z',
+        (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f', (byte) 'g',
+        (byte) 'h', (byte) 'i', (byte) 'j', (byte) 'k', (byte) 'l', (byte) 'm', (byte) 'n',
+        (byte) 'o', (byte) 'p', (byte) 'q', (byte) 'r', (byte) 's', (byte) 't', (byte) 'u',
+        (byte) 'v', (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z',
+        (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6',
+        (byte) '7', (byte) '8', (byte) '9',
+        (byte) '+', (byte) '/'
     };
 
     /**
@@ -75,9 +76,7 @@ final class Base64Decoder {
 
     static {
         // Initialise as all invalid characters
-        for (int i = 0; i < DECODING_TABLE.length; i++) {
-            DECODING_TABLE[i] = INVALID_BYTE;
-        }
+        Arrays.fill(DECODING_TABLE, (byte) INVALID_BYTE);
         // set up valid characters
         for (int i = 0; i < ENCODING_TABLE.length; i++) {
             DECODING_TABLE[ENCODING_TABLE[i]] = (byte) i;
@@ -99,10 +98,9 @@ final class Base64Decoder {
      *
      * @param data the buffer containing the Base64-encoded data
      * @param out  the output stream to hold the decoded bytes
-     * @return the number of bytes produced.
      * @throws IOException thrown when the padding is incorrect or the input is truncated.
      */
-    static void decode(byte[] data, OutputStream out) throws IOException {
+    public static void decode(byte[] data, OutputStream out) throws IOException {
         byte[] cache = new byte[INPUT_BYTES_PER_CHUNK];
         int cachedBytes = 0;
 
@@ -133,7 +131,7 @@ final class Base64Decoder {
                     }
                 } else if (b4 != PAD_BYTE) { // if byte 3 is pad, byte 4 must be pad too
                     throw new // line wrap to avoid 120 char limit
-                            IOException("Invalid Base64 input: incorrect padding, 4th byte must be padding if 3rd byte is");
+                        IOException("Invalid Base64 input: incorrect padding, 4th byte must be padding if 3rd byte is");
                 }
                 cachedBytes = 0;
             }

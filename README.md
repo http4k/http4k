@@ -1,28 +1,43 @@
-<a href="https://http4k.org"><img src="https://www.http4k.org/img/logo_1100x200_blue_on_white.png"/></a>
+<div class="github">
 
-<span class="github">
-<a href="https://bintray.com/http4k/maven/http4k-core/_latestVersion"><img alt="Download" src="https://api.bintray.com/packages/http4k/maven/http4k-core/images/download.svg"></a>
-<a href="https://travis-ci.org/http4k/http4k"><img alt="build status" src="https://travis-ci.org/http4k/http4k.svg?branch=master"/></a>
-<a href="https://coveralls.io/github/http4k/http4k?branch=master"><img alt="coverage" src="https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master"></a>
+<hr/>
+    
+
+<picture>
+  <source 
+    srcset="https://www.http4k.org/img/logo-readme-dark-mode.png" 
+    media="(prefers-color-scheme: dark)">
+  <img src="https://www.http4k.org/img/logo-readme.png" alt="http4k logo">
+</picture>
+
+<hr/>
+
+<a href="https://github.com/http4k/http4k/actions?query=workflow%3A.github%2Fworkflows%2Fbuild.yaml"><img alt="build" src="https://github.com/http4k/http4k-connect/workflows/.github/workflows/build.yaml/badge.svg"></a>
+<a href="https://mvnrepository.com/artifact/org.http4k"><img alt="download" src="https://img.shields.io/maven-central/v/org.http4k/http4k-core"></a>
+<img alt="jcenter free" src="https://img.shields.io/badge/JCenter%20free-%3Ev4.3.0.0-success">
+<a href="https://codecov.io/gh/http4k/http4k"><img src="https://codecov.io/gh/http4k/http4k/branch/master/graph/badge.svg" /></a>
 <a href="http//www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub license" src="https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat"></a>
-<a href="http://kotlinlang.org"><img alt="kotlin" src="https://img.shields.io/badge/kotlin-1.2-blue.svg"></a>
-<a href="https://codebeat.co/projects/github-com-http4k-http4k-master"><img alt="codebeat badge" src="https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e"></a>
-<a href="https://kotlin.link"><img alt="Awesome Kotlin Badge" src="https://kotlin.link/awesome-kotlin.svg"></a>
-<br/>
-<a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/backers/badge.svg"></a>
-<a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
-</span>
+<a href="http://kotlinlang.org"><img alt="kotlin version" src="https://img.shields.io/badge/kotlin-1.5-blue.svg"></a>
+<a href="https://codebeat.co/projects/github-com-http4k-http4k-master"><img alt="codebeat" src="https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e"></a>
+<a href="https://kotlin.link"><img alt="awesome kotlin" src="https://kotlin.link/awesome-kotlin.svg"></a>
+<a href="https://opencollective.com/http4k"><img alt="Kotlin Slack" src="https://img.shields.io/badge/chat-kotlin%20slack-orange.svg"></a>
+<a href="https://opencollective.com/http4k"><img alt="back us!" src="https://opencollective.com/http4k/backers/badge.svg"></a>
+<a href="https://opencollective.com/http4k"><img alt="sponsor us!" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
 
- [**http4k**](https://github.com/http4k/http4k) is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [**http4k**](https://github.com/http4k/http4k) applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:
+<hr/>
+
+</div>
+
+ [http4k] is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [http4k] applications are *just* Kotlin functions. For example, here's a simple echo server:
  
 ```kotlin
  val app: HttpHandler = { request: Request -> Response(OK).body(request.body) }
  val server = app.asServer(SunHttp(8000)).start()
 ```
 
-[**http4k**](https://github.com/http4k/http4k) consists of a core library, `http4k-core`, providing a base HTTP implementation + a number of capability abstractions (such as servers, clients, templating, websockets etc). These capabilities are then implemented in add-on modules.
+[http4k] consists of a lightweight core library, `http4k-core`, providing a base HTTP implementation and Server/Client implementations based on the JDK classes. Further servers, clients, serverless, templating, websockets capabilities are then implemented in add-on modules. [http4k] apps can be simply mounted into a running Server, Serverless platform, or compiled to GraalVM and run as a super-lightweight binary.
 
-The principles of [**http4k**](https://github.com/http4k/http4k) are:
+The principles of [http4k] are:
 
 * **Application as a Function:** Based on the Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed 
 of 2 types of simple function:
@@ -32,114 +47,148 @@ of 2 types of simple function:
 * **Immutability:** All entities in the library are immutable unless their function explicitly disallows this.
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as 
 plugging together of services without HTTP container being required.
-* **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has ZERO dependencies and weighs in at ~700kb. Add-on modules only have dependencies required for specific implementation.
-* **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
+* **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has **ZERO** dependencies and weighs in at ~1mb. Add-on modules only have dependencies required for specific implementation.
+* **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both in-memory and port-based testing of:
     * individual endpoints
     * applications
-    * websockets
+    * websockets/sse
     * full suites of microservices
-* **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-on modules provide:
-    * Pluggable HTTP client adapters for Apache, Jetty, OkHttp and Websockets
-    * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow, Apache (Httpcore) and SunHttp. 
-     * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
-    * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
-    * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON, Moshi JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
-    * Typesafe, auto-validating, self-documenting (via OpenApi/Swagger) contracts for HTTP services
-    * AWS request signing: super-simple interactions with AWS services.
-    * Metrics gathering for performance analysis.
-    * Multipart form handling, including stream processing for uploaded files.
-    * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
-    * Security: Simple, pluggable support for OAuth Auth Code Grant flow and ready made configurations to integrate with popular OAuth providers.
-    * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k) apps
-    * Testing: Hamkrest Matchers for [**http4k**](https://github.com/http4k/http4k) objects.
-    * Testing: Chaos Injection mechanism, allowing simple, dynamic injection of failure modes into  [**http4k**](https://github.com/http4k/http4k) applications.
+* **Portable** Apps are completely portable across deployment platform in either a Server-based, Serverless or Native binaries.
+    
+## Quickstart
+Bored with reading already and just want to get coding? For the impatient, visit the [http4k toolbox](https://toolbox.http4k.org) to generate a complete project from the wide variety of http4k modules.
+
+Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take a look at the [examples repo](https://github.com/http4k/examples), which showcases a variety of [http4k] use-cases and features.
 
 ## Module feature overview
-* [Core:](https://http4k.org/guide/modules/core) 
+* [Core:](https://http4k.org/guide/reference/core) 
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
     * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
     * **Path-based routing**, including nestable contexts
-    * **Typesafe HTTP message construction/desconstruction and Request Contexts** using Lenses
-    * **Static file-serving** capability with **Caching and Hot-Reload** 
+    * **Typesafe HTTP message construction/deconstruction and Request Contexts** using Lenses
     * Servlet implementation to allow **plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
-    * **Path-based websockets** including typesafe message marshalling using Lenses
+    * Lightweight **JavaHttpClient** implementation - perfect for Serverless contexts where binary size is a factor.
+    * **Path-based WebSockets** including typesafe message marshalling using Lenses, which are **testable without a running container**
+    * **Path-based Server-Sent Events** which are **testable without a running container**
     * APIs to **record and replay** HTTP traffic to disk or memory
-    * Core **abstraction APIs** implemented by the other modules 
-* [Client:](https://http4k.org/guide/modules/clients) 
+    * **Static file-serving** capability with **Caching and Hot-Reload**
+    * **Single Page Application** support with **Caching and Hot-Reload**
+    * **WebJars** support in **1LOC**`
+* [Client:](https://http4k.org/guide/reference/clients) 
     * **1LOC** client adapters 
         * **Apache** sync + async HTTP
+        * **Java** (bundled with `http4k-core`)
         * **Jetty** HTTP (supports sync and async HTTP)
         * **OkHttp** HTTP (supports sync and async HTTP)
-        * **Java** (bundled with `http4k-core`)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
-* [Server:](https://http4k.org/guide/modules/servers)
-    * **1LOC** server backend spinup for:
-        * **Jetty** (including websocket support)
-        * **Netty**
-        * **Undertow**
-        * **Apache** (from httpcore)
+    * **GraphQL** client (bundled with GraphQL module)
+* [Server:](https://http4k.org/guide/reference/servers)
+    * **1LOC** server backend spin-up for:
+        * **Apache v4 & v5** (from httpcore)
+        * **Jetty** (including WebSocket support)
+        * **Ktor CIO & Netty**
+        * **Netty** (including WebSocket support)
         * **SunHttp** (bundled with `http4k-core`)
-    * API design allows for plugging into configurable instances of each
-* [Serverless:](https://http4k.org/guide/modules/serverless)
-    * Implement a single Factory method, then upload your[http4k](https://github.com/http4k/http4k)applications to AWS Lambda to be called from API Gateway. 
-* [Contracts:](https://http4k.org/guide/modules/contracts) 
+        * **Undertow** (including SSE and WebSocket support)
+    * API design allows for simple customization of underying backend.
+    * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
+* [Serverless:](https://http4k.org/guide/reference/serverless)
+    * **Function-based support for both HTTP and Event-based applications** via adapters, using the simple and testable `HttpHandler` and `FnHandler` types.
+    * **AWS Lambda** Extend custom adapters to serve HTTP apps from APIGateway or use react to AWS events (without using the heavyweight AWS serialisation).
+    * **Custom AWS Lambda Runtime** Avoid the heavyweight AWS runtime, or simply compile your [http4k] app to GraalVM and get cold-starts in a few milliseconds! 
+    * **Google Cloud Functions** Extend custom adapters to serve HTTP apps from Google Cloud Functions or use react to GCloud events. 
+    * **Apache OpenWhisk** Extend custom adapters to serve HTTP apps or react to JSON events in IBM Cloud/OpenWhisk installations.
+    * **Azure Functions** Extend custom adapters to serve HTTP apps from AzureCloud. 
+    * **Alibaba Function Compute** Extend custom adapters to serve HTTP apps from Alibaba.
+    * **Tencent Serverless Cloud Functions** Extend custom adapters to serve HTTP apps from SCF.
+* [Contracts:](https://http4k.org/guide/reference/contracts) 
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
     * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-    * Self-documenting for all routes - eg. Built in support for live **OpenApi/Swagger** description endpoints including **JSON Schema** model breakdown. 
-* [Templating:](https://http4k.org/guide/modules/templating) 
+    * Self-documenting for all routes - eg. Built in support for live **OpenApi v2 and v3** description endpoints including **JSON Schema** model breakdown. 
+* [Templating:](https://http4k.org/guide/reference/templating) 
     * **Pluggable** templating system support for:
         * **Dust** 
+        * **Freemarker**
         * **Handlebars** 
         * **Pebble**
         * **Thymeleaf**
+        * **Jade4j**
     * Caching and **Hot-Reload** template support
-* [Message formats:](https://http4k.org/guide/modules/message_formats) 
-    * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
-        * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
-        * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
-        * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
-        * **Argo** - lightweight Java JSON API with zero dependencies.
-        * **Xml** - includes support for **one way [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
-* [Resilience:](https://http4k.org/guide/modules/resilience) 
-    * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration.
-* [Metrics:](https://http4k.org/guide/modules/metrics) 
-    * Support for plugging http4k apps into micrometer
-* [Multipart:](https://http4k.org/guide/modules/multipart) 
+* **Message formats:** 
+    * Consistent API provides first class support for marshalling formats to/from HTTP messages for:
+        * **[JSON](https://www.http4k.org/guide/reference/json/)** - with support for: 
+            * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
+            * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
+            * **Klaxon** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
+            * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
+            * **KotlinX Serialization** - official Kotlin JSON API. 
+            * **Argo** - lightweight Java JSON API with zero dependencies.            
+        * **[XML](https://www.http4k.org/guide/reference/xml/)** - includes support for:
+            * **Jackson** - includes support for **fully automatic marshalling of Data classes**
+            * **Xml** - includes support for **one way automatic marshalling of Data classes**
+        * **[YAML](https://www.http4k.org/guide/reference/yaml/)** - includes support for:
+            * **Jackson** - includes support for **fully automatic marshalling of Data classes**
+* [Resilience4J:](https://http4k.org/guide/reference/resilience4j) 
+    * Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
+* [Micrometer:](https://http4k.org/guide/reference/micrometer) 
+    * Support for plugging http4k apps into Micrometer.
+* [Cloud Events:](https://http4k.org/guide/reference/cloud_events) 
+    * Consume and produce CloudEvents using typesafe lenses.
+* [OpenTelemetry:](https://http4k.org/guide/reference/opentelemetry) 
+    * Instrument http4k apps with OpenTelemetry tooling.
+* [Multipart:](https://http4k.org/guide/reference/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
-* [AWS:](https://http4k.org/guide/modules/aws) 
+* [GraphQL:](https://http4k.org/guide/reference/graphql) 
+    * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
+* [AWS:](https://http4k.org/guide/reference/aws) 
+    * Plug a standard `HttpHandler` into the AWS v2 SDKs. This massively simplifies testing and allows for sniffing of the exact traffic going to AWS - brilliant for debugging and building fakes.
     * Client filter to allow super-simple interaction with AWS services (via request signing)
-* [OAuth Security](https://http4k.org/guide/modules/oauth) 
+* [OAuth Security:](https://http4k.org/guide/reference/oauth) 
     * Implement OAuth Authorisation Code Grant flow with a single Interface
     * **Pre-configured** OAuth for following providers:
         * **Auth0** 
         * **Dropbox** 
         * **Google** 
         * **Soundcloud**
-* [WebDriver:](https://http4k.org/guide/modules/webdriver) 
-    * Ultra-lightweight Selenium WebDriver implementation for [**http4k**](https://github.com/http4k/http4k)  application.
-* [Hamkrest:](https://http4k.org/guide/modules/hamkrest) 
-    * A set of Hamkrest matchers for testing [**http4k**](https://github.com/http4k/http4k)  Request and Response messages.
-* [Chaos:](https://http4k.org/guide/modules/chaos) 
-    * API for declaring and injecting failure modes into [**http4k**](https://github.com/http4k/http4k) applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
+* [Digest Security:](https://http4k.org/guide/reference/digest)
+    * Implement the [Digest Authentication](https://datatracker.ietf.org/doc/html/rfc2617) flow for clients and servers
+    * Supports the null and Auth QoPs
+    * Supports Proxy Authentication
+* [Cloud Native:](https://http4k.org/guide/reference/cloud_native)
+    * Tooling to support operating [http4k] applications in orchestrated cloud environments such as Kubernetes and CloudFoundry. 12-factor configuration, dual-port servers and health checks such as liveness and readiness checking. 
+* [Approval Testing:](https://http4k.org/guide/reference/approvaltests)
+    * JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of [http4k] Request and Response messages.
+* [Chaos:](https://http4k.org/guide/reference/chaos)
+    * API for declaring and injecting failure modes into [http4k] applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
+* [Hamkrest:](https://http4k.org/guide/reference/hamkrest) 
+    * A set of Hamkrest matchers for testing [http4k] Request and Response messages.
+* [Kotest:](https://http4k.org/guide/reference/kotest)
+    * A set of Kotest matchers for testing [http4k] Request and Response messages.
+* [Service Virtualisation:](https://http4k.org/guide/reference/servicevirtualisation)
+    * Record and replay versioned HTTP contracts to/from `Servirtium` Markdown format. Includes Servirtium MiTM server and simple JUnit extensions.
+* [Strikt:](https://http4k.org/guide/reference/strikt) 
+    * A set of Strikt matchers for testing [http4k] Request and Response messages.
+* [WebDriver:](https://http4k.org/guide/reference/webdriver)
+    * Ultra-lightweight Selenium WebDriver implementation for [http4k] application.
     
-## Example
-This quick example is designed to convey the simplicity & features of [**http4k**](https://github.com/http4k/http4k) . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.
+## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/howz/readme/example.kt)
+
+This quick example is designed to convey the simplicity & features of [http4k] . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point and demonstrates how to serve and consume HTTP services with dynamic routing.
 
 To install, add these dependencies to your **Gradle** file:
+
 ```groovy
 dependencies {
-    compile group: "org.http4k", name: "http4k-core", version: "3.37.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.37.0"
-    compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.37.0"
+    implementation group: "org.http4k", name: "http4k-core", version: "4.17.2.0"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.17.2.0"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.17.2.0"
 }
 ```
 
-This "Hello World" style example ([<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/readme/example.kt)) demonstrates how to serve and consume HTTP services with dynamic routing:
-
 ```kotlin
-package cookbook
+package guide.howto.readme
 
 import org.http4k.client.OkHttp
 import org.http4k.core.Filter
@@ -156,14 +205,14 @@ import org.http4k.routing.routes
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
-fun main(args: Array<String>) {
+fun main() {
     // we can bind HttpHandlers (which are just functions from  Request -> Response) to paths/methods to create a Route,
     // then combine many Routes together to make another HttpHandler
     val app: HttpHandler = routes(
         "/ping" bind GET to { _: Request -> Response(OK).body("pong!") },
         "/greet/{name}" bind GET to { req: Request ->
-            val path: String? = req.path("name")
-            Response(OK).body("hello ${path ?: "anon!"}")
+            val name: String? = req.path("name")
+            Response(OK).body("hello ${name ?: "anon!"}")
         }
     )
 
@@ -208,9 +257,9 @@ fun main(args: Array<String>) {
 //    HTTP/1.1 200
 //    cache-control: private, must-revalidate
 //    content-length: 9
-//    date: Thu, 08 Jun 3.37.03:01:13 GMT
+//    date: Thu, 08 Jun 2017 13:01:13 GMT
 //    expires: 0
-//    server: Jetty(9.3.16.v3.37.020)
+//    server: Jetty(9.3.16.v20170120)
 //
 //    hello Bob
 }
@@ -231,9 +280,8 @@ This project exists thanks to all the people who [contribute](https://www.http4k
 
 ## Backers & Sponsors
 
-If you use [http4k](https://github.com/http4k/http4k) in your project or enterprise and would like to support ongoing development, please consider becoming a backer or a sponsor. Sponsor logos will show up here with a link to your website.
+If you use [http4k] in your project or enterprise and would like to support ongoing development, please consider becoming a backer or a sponsor. Sponsor logos will show up here with a link to your website.
 
-<a href="https://opencollective.com/http4k/sponsor/1/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/1/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/2/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/2/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/3/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/3/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/4/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/4/avatar.svg"></a>
@@ -243,6 +291,7 @@ If you use [http4k](https://github.com/http4k/http4k) in your project or enterpr
 <a href="https://opencollective.com/http4k/sponsor/8/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/9/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/9/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/0/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/http4k#backers" target="_blank"><img src="https://opencollective.com/http4k/backers.svg?width=500"></a>
 
 </span>
+
+[http4k]: https://http4k.org 

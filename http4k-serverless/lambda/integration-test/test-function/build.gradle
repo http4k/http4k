@@ -1,0 +1,20 @@
+configurations{
+    runtimeClasspath.transitive = true
+}
+
+dependencies {
+    api(project(":http4k-core"))
+    api(project(":http4k-serverless-lambda"))
+    api(project(path: ":http4k-core", configuration: "testArtifacts"))
+    api(project(path: ":http4k-serverless-core", configuration: "testArtifacts"))
+    api("com.amazonaws:aws-lambda-java-events:_")
+    api("joda-time:joda-time:_")
+}
+
+task buildZip(type: Zip) {
+    from compileKotlin
+    from processResources
+    into("lib") {
+        from configurations.runtimeClasspath
+    }
+}

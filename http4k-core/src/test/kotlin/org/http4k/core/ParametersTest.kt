@@ -30,12 +30,11 @@ class ParametersTest {
         val map: Map<String, List<String?>> = listOf("a" to "A", "b" to "B", "a" to null).toParametersMap()
 
         assertThat(map["a"], equalTo(listOf("A", null)))
-        assertThat(map["b"], equalTo<List<String?>>(listOf("B")))
+        assertThat(map["b"], equalTo(listOf("B")))
         assertThat(map["c"], absent())
 
         assertThat(map.getFirst("a"), equalTo("A"))
         assertThat(map.getFirst("b"), equalTo("B"))
         assertThat(map.getFirst("c"), absent())
     }
-
 }

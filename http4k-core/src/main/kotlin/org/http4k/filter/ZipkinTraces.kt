@@ -5,24 +5,16 @@ import org.http4k.core.with
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.Header
-import org.http4k.lens.LensGet
-import org.http4k.lens.LensSet
-import org.http4k.lens.ParamMeta.StringParam
-import java.util.Random
-
-import kotlin.experimental.and
+import org.http4k.lens.composite
+import org.http4k.util.Hex
+import kotlin.random.Random
 
 data class TraceId(val value: String) {
     companion object {
-        private val TraceRandom = Random()
-        fun new(random: Random = TraceRandom): TraceId {
+        fun new(random: Random = Random): TraceId {
             val randomBytes = ByteArray(8)
             random.nextBytes(randomBytes)
-            val sb = StringBuilder(randomBytes.size * 2)
-            for (b in randomBytes) {
-                sb.append(String.format("%02x", b and 0xff.toByte()))
-            }
-            return TraceId(sb.toString())
+            return TraceId(Hex.hex(randomBytes))
         }
     }
 }
@@ -34,12 +26,8 @@ data class SamplingDecision(val value: String) {
 
         private val VALID_VALUES = listOf("1", "0")
 
-        fun from(sampledHeaderValue: String?): SamplingDecision =
-            if (sampledHeaderValue != null && VALID_VALUES.contains(sampledHeaderValue)) {
-                SamplingDecision(sampledHeaderValue)
-            } else {
-                SamplingDecision.SAMPLE
-            }
+        fun from(sampledHeaderValue: String?) = sampledHeaderValue?.takeIf { it in VALID_VALUES }?.let(::SamplingDecision)
+            ?: SAMPLE
     }
 }
 
@@ -50,28 +38,32 @@ data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpa
         private val X_B3_PARENTSPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-parentspanid")
         private val X_B3_SAMPLED = Header.map(SamplingDecision.Companion::from, SamplingDecision::value).optional("x-b3-sampled")
 
-        private val lens = BiDiLensSpec<HttpMessage, ZipkinTraces>("headers",
-            StringParam,
-            LensGet { _, target ->
-                listOf(ZipkinTraces(
-                    X_B3_TRACEID(target) ?: TraceId.new(),
-                    X_B3_SPANID(target) ?: TraceId.new(),
-                    X_B3_PARENTSPANID(target),
-                    X_B3_SAMPLED(target) ?: SAMPLE
-                ))
-            },
-            LensSet { _, values, target ->
-                values.fold(target) { msg, (traceId, spanId, parentSpanId, samplingDecision) ->
-                    msg.with(X_B3_TRACEID of traceId, X_B3_SPANID of spanId, X_B3_PARENTSPANID of parentSpanId, X_B3_SAMPLED of samplingDecision)
-                }
-            }
-        ).required("traces")
+        private fun set(): ZipkinTraces.(HttpMessage) -> HttpMessage = { it: HttpMessage ->
+            it.with(X_B3_TRACEID of traceId, X_B3_SPANID of spanId, X_B3_PARENTSPANID of parentSpanId, X_B3_SAMPLED of samplingDecision)
+        }
+
+        private fun get(): BiDiLensSpec<HttpMessage, String>.(HttpMessage) -> ZipkinTraces = {
+            ZipkinTraces(
+                X_B3_TRACEID(it) ?: TraceId.new(),
+                X_B3_SPANID(it) ?: TraceId.new(),
+                X_B3_PARENTSPANID(it),
+                X_B3_SAMPLED(it) ?: SAMPLE
+            )
+        }
+
+        private val lens = Header.composite(get(), set())
 
         operator fun invoke(target: HttpMessage): ZipkinTraces = lens(target)
         operator fun <T : HttpMessage> invoke(value: ZipkinTraces, target: T): T = lens(value, target)
 
+        fun setForCurrentThread(zipkinTraces: ZipkinTraces) {
+            THREAD_LOCAL.set(zipkinTraces)
+        }
+
+        fun forCurrentThread(): ZipkinTraces = THREAD_LOCAL.get()
+
         internal val THREAD_LOCAL = object : ThreadLocal<ZipkinTraces>() {
-            override fun initialValue() = ZipkinTraces(TraceId.new(), TraceId.new(), TraceId.new(), SAMPLE)
+            override fun initialValue() = ZipkinTraces(TraceId.new(), TraceId.new(), null, SAMPLE)
         }
     }
 }

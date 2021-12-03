@@ -1,0 +1,25 @@
+name: Update Website
+on:
+  push:
+    branches:
+      - master
+jobs:
+  release-site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6.7'
+          architecture: 'x64'
+      - run: pip install -r requirements.txt
+      - run: ./tools/embed_code.py
+      - uses: actions/checkout@v2
+        with:
+          repository: http4k/http4k.github.io
+          path: tmp
+          token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
+      - run: cp -R build/docs-website/docs tmp/
+      - run: cp -R src/mkdocs.yml tmp/
+      - run: pushd tmp && mkdocs gh-deploy && popd
+

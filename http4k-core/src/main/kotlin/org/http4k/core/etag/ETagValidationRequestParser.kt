@@ -37,7 +37,7 @@ class ETagValidationRequestParser {
             return null
         }
 
-        private fun Matcher.isWeak(): Boolean = this.group(1) == w
-        private fun Matcher.tag(): String = this.group(2)
+        private fun Matcher.isWeak(): Boolean = group(1) == w
+        private fun Matcher.tag(): String = group(2)
     }
 }

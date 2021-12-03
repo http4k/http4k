@@ -1,0 +1,29 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.JacksonFieldAnnotated",
+    "example": null,
+    "description": null
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.openapi.v3.JacksonFieldAnnotated",
+      "second": {
+        "properties": {
+          "OTHERNAME": {
+            "example": "foobar",
+            "description": null,
+            "type": "string"
+          }
+        },
+        "example": {
+          "OTHERNAME": "foobar"
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "OTHERNAME"
+        ]
+      }
+    }
+  ]
+}

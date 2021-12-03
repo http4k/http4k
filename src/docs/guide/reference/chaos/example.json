@@ -1,0 +1,32 @@
+[
+  {
+    "type": "repeat",
+    "stages": [
+      {
+        "type": "wait",
+        "until": {
+          "type": "delay",
+          "period": "PT0.1S"
+        }
+      },
+      {
+        "type": "trigger",
+        "behaviour": {
+          "type": "status",
+          "status": 404
+        },
+        "trigger": {
+          "type": "always"
+        },
+        "until": {
+          "type": "countdown",
+          "count": "10"
+        }
+      }
+    ],
+    "until": {
+      "type": "deadline",
+      "endTime": "2020-01-01T00:00:00Z"
+    }
+  }
+]

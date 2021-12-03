@@ -1,20 +1,20 @@
 package org.http4k.traffic
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
 class ResponderTest {
 
-    private val request = Request(Method.GET, "/bob")
-    private val request2 = Request(Method.GET, "/bob2")
-    private val response = Response(Status.OK)
+    private val request = Request(GET, "/bob")
+    private val request2 = Request(GET, "/bob2")
+    private val response = Response(OK)
 
     @Test
     fun `Responder from Source replays stored responses or falls back to Service Unavailable`() {
@@ -22,8 +22,8 @@ class ResponderTest {
         cache[request] = response
 
         val responder = Responder.from(cache)
-        responder(request) shouldMatch equalTo(response)
-        responder(Request(Method.GET, "/rita")) shouldMatch hasStatus(SERVICE_UNAVAILABLE)
+        assertThat(responder(request), equalTo(response))
+        assertThat(responder(Request(GET, "/rita")), hasStatus(SERVICE_UNAVAILABLE))
     }
 
     @Test
@@ -34,9 +34,8 @@ class ResponderTest {
 
         val responder = Responder.from(stream)
 
-        responder(request) shouldMatch equalTo(response)
-        responder(request2) shouldMatch equalTo(response)
-        responder(Request(Method.GET, "/rita")) shouldMatch hasStatus(SERVICE_UNAVAILABLE)
+        assertThat(responder(request), equalTo(response))
+        assertThat(responder(request2), equalTo(response))
+        assertThat(responder(Request(GET, "/rita")), hasStatus(SERVICE_UNAVAILABLE))
     }
-
 }

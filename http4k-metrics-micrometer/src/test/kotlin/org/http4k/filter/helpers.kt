@@ -10,7 +10,6 @@ import io.micrometer.core.instrument.Meter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Timer
-import java.util.Optional
 import java.util.concurrent.TimeUnit
 
 internal fun assert(registry: MeterRegistry, vararg matcher: Matcher<MeterRegistry>) =
@@ -19,14 +18,14 @@ internal fun assert(registry: MeterRegistry, vararg matcher: Matcher<MeterRegist
 internal fun hasCounter(name: String, tags: List<Tag>, matcher: Matcher<Counter>? = null): Matcher<MeterRegistry> =
     has("a counter named $name with tags ${tags.map { "${it.key}=${it.value}" }}",
         {
-            it.find(name).tags(tags).counter().orNull()
+            it.find(name).tags(tags).counter()
         },
         present(matcher)
     )
 
 internal fun hasTimer(name: String, tags: List<Tag>, matcher: Matcher<Timer>? = null): Matcher<MeterRegistry> =
     has("a timer named $name with tags ${tags.map { "${it.key}=${it.value}" }}",
-        { it.find(name).tags(tags).timer().orNull() },
+        { it.find(name).tags(tags).timer() },
         present(matcher)
     )
 
@@ -35,6 +34,6 @@ internal fun timerCount(value: Long) = has<Timer, Long>("count", { it.count() },
 internal fun timerTotalTime(millis: Long) =
     has<Timer, Long>("total time", { it.totalTime(TimeUnit.MILLISECONDS).toLong() }, equalTo(millis))
 
-internal fun description(value: String) = has<Meter, String>("description", { it.id.description }, equalTo(value))
-
-private fun <T : Meter> Optional<T>.orNull(): T? = orElse(null)
+internal fun description(value: String) = has<Meter, String>("description", {
+    it.id.description ?: "unknown"
+}, equalTo(value))

@@ -11,7 +11,8 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NO_CONTENT
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.query
 import org.http4k.core.then
 import org.http4k.filter.Payload
@@ -36,7 +37,7 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
         assertThat(
             "Put of bucket should succeed",
             client(Request(PUT, bucketUrl)).status,
-            equalTo(Status.OK))
+            equalTo(OK))
         assertThat(
             "Bucket should exist in root listing",
             client(Request(GET, s3Root)).bodyString(),
@@ -48,7 +49,7 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
 
         /* initialise multipart */
         val initialiseUpload = client(Request(POST, keyUrl.query("uploads", "")))
-        assertThat("Initialise of key should succeed", initialiseUpload.status, equalTo(Status.OK))
+        assertThat("Initialise of key should succeed", initialiseUpload.status, equalTo(OK))
         val uploadId = UploadId.from(initialiseUpload)
 
         /* upload a part */
@@ -57,7 +58,7 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
             .query("uploadId", uploadId.value))
             .body(contentOriginal.byteInputStream(), contentOriginal.length.toLong())
         )
-        assertThat("First part upload", firstPart.status, equalTo(Status.OK))
+        assertThat("First part upload", firstPart.status, equalTo(OK))
         val etag1 = firstPart.header("ETag")!!
 
         /* upload another part */
@@ -66,13 +67,13 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
             .query("uploadId", uploadId.value))
             .body(contentOriginal.byteInputStream(), contentOriginal.length.toLong())
         )
-        assertThat("Second part upload", secondPart.status, equalTo(Status.OK))
+        assertThat("Second part upload", secondPart.status, equalTo(OK))
         val etag2 = secondPart.header("ETag")!!
 
         /* finalise multipart */
         val finaliseUpload = client(Request(POST, keyUrl.query("uploadId", uploadId.value))
             .body(listOf(etag1, etag2).asSequence().toCompleteMultipartUploadXml()))
-        assertThat("Finalize of key should succeed", finaliseUpload.status, equalTo(Status.OK))
+        assertThat("Finalize of key should succeed", finaliseUpload.status, equalTo(OK))
 
         assertThat(
             "Key should appear in bucket listing",
@@ -85,7 +86,7 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
         assertThat(
             "Delete of key should succeed",
             client(Request(DELETE, keyUrl)).status,
-            equalTo(Status.NO_CONTENT))
+            equalTo(NO_CONTENT))
         assertThat(
             "Key should no longer appear in bucket listing",
             client(Request(GET, bucketUrl)).bodyString(),
@@ -93,11 +94,10 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
         assertThat(
             "Delete of bucket should succeed",
             client(Request(DELETE, bucketUrl)).status,
-            equalTo(Status.NO_CONTENT))
+            equalTo(NO_CONTENT))
         assertThat(
             "Bucket should no longer exist in root listing",
             client(Request(GET, s3Root)).bodyString(),
             !containsSubstring(bucketName))
     }
-
 }

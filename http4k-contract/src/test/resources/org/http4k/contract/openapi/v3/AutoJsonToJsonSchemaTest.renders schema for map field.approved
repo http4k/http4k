@@ -1,0 +1,123 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.MapHolder",
+    "example": null,
+    "description": null
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.openapi.v3.MapHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "additionalProperties": {
+              "properties": {
+                "key": {
+                  "example": "value",
+                  "description": null,
+                  "type": "string"
+                },
+                "key2": {
+                  "example": 123,
+                  "description": null,
+                  "type": "number"
+                },
+                "key3": {
+                  "additionalProperties": {
+                    "properties": {
+                      "inner": {
+                        "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+                        "example": null,
+                        "description": null
+                      }
+                    },
+                    "example": {
+                      "inner": {
+                        "uri": "foobar"
+                      }
+                    },
+                    "description": null,
+                    "type": "object",
+                    "required": [
+                      "inner"
+                    ]
+                  },
+                  "example": null,
+                  "description": null,
+                  "type": "object"
+                },
+                "key4": {
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+                  "example": null,
+                  "description": null
+                }
+              },
+              "example": {
+                "key": "value",
+                "key2": 123,
+                "key3": {
+                  "inner": {
+                    "uri": "foobar"
+                  }
+                },
+                "key4": {
+                  "uri": "foobar"
+                }
+              },
+              "description": null,
+              "type": "object",
+              "required": [
+                "key",
+                "key2",
+                "key3",
+                "key4"
+              ]
+            },
+            "example": null,
+            "description": null,
+            "type": "object"
+          }
+        },
+        "example": {
+          "value": {
+            "key": "value",
+            "key2": 123,
+            "key3": {
+              "inner": {
+                "uri": "foobar"
+              }
+            },
+            "key4": {
+              "uri": "foobar"
+            }
+          }
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.openapi.v3.ArbObject2",
+      "second": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "description": null,
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "uri"
+        ]
+      }
+    }
+  ]
+}

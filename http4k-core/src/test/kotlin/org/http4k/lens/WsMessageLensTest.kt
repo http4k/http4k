@@ -42,21 +42,19 @@ class WsMessageLensTest {
 
     @Test
     fun `can create a custom wsMessage type and get and set on request`() {
-        val customBody = WsMessage.string().map(::MyCustomBodyType, { it.value }).toLens()
+        val customBody = WsMessage.string().map(::MyCustomType, { it.value }).toLens()
 
-        val custom = MyCustomBodyType("hello world!")
+        val custom = MyCustomType("hello world!")
         val reqWithBody = customBody(custom)
 
         assertThat(reqWithBody.bodyString(), equalTo("hello world!"))
 
-        assertThat(customBody(reqWithBody), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(customBody(reqWithBody), equalTo(MyCustomType("hello world!")))
     }
 
     @Test
     fun `can create a one way custom wsMessage type`() {
-        val customBody = WsMessage.string().map(::MyCustomBodyType).toLens()
-        assertThat(customBody(WsMessage("hello world!")), equalTo(MyCustomBodyType("hello world!")))
+        val customBody = WsMessage.string().map(::MyCustomType).toLens()
+        assertThat(customBody(WsMessage("hello world!")), equalTo(MyCustomType("hello world!")))
     }
 }
-
-

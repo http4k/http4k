@@ -2,7 +2,6 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -31,9 +30,9 @@ class RoutingTest {
             "/path3/{path:.*}" bind { _: Request -> Response(CREATED) }
         )
 
-        routes(Request(GET, "/path1/index.html")) shouldMatch hasStatus(OK)
-        routes(Request(GET, "/path2/index.html")) shouldMatch hasStatus(OK)
-        routes(Request(GET, "/path3/index.html")) shouldMatch hasStatus(CREATED)
+        assertThat(routes(Request(GET, "/path1/index.html")), hasStatus(OK))
+        assertThat(routes(Request(GET, "/path2/index.html")), hasStatus(OK))
+        assertThat(routes(Request(GET, "/path3/index.html")), hasStatus(CREATED))
     }
 
     @Test
@@ -46,7 +45,6 @@ class RoutingTest {
     }
 
     @Test
-    @Disabled
     fun `method not allowed`() {
         val routes = routes(
             "/a/{route}" bind GET to { Response(OK).body("matched") }
@@ -55,6 +53,17 @@ class RoutingTest {
         val response = routes(Request(POST, "/a/something"))
 
         assertThat(response.status, equalTo(METHOD_NOT_ALLOWED))
+    }
+
+    @Test
+    fun `mismatched path with no alternate method should be unmatched`() {
+        val routes = routes(
+            "/search/foo" bind POST to { Response(OK) },
+            "/search/bar" bind GET to { Response(OK) }
+        )
+
+        val responseMismatch = routes(Request(GET, "/serch/foo"))
+        assertThat(responseMismatch, hasStatus(NOT_FOUND))
     }
 
     @Test
@@ -191,7 +200,7 @@ class RoutingTest {
             Request(GET, "/").path("abc")
             fail("Expected exception")
         } catch (e: IllegalStateException) {
-            assertThat(e.message, equalTo("Request was not routed, so no uri-template not present"))
+            assertThat(e.message, equalTo("Request was not routed, so no uri-template present"))
         }
     }
 
@@ -264,7 +273,7 @@ class RoutingTest {
     @Test
     fun `can apply a filter to a RoutingHttpHandler`() {
         val routes = Filter { next -> { next(it.header("name", "value")) } }
-            .then({ Response(OK).body(it.header("name")!!) })
+            .then { Response(OK).body(it.header("name")!!) }
 
         val routingHttpHandler = routes(
             "/a/thing" bind GET to routes
@@ -292,5 +301,4 @@ class RoutingTest {
 
         assertThat(routes(Request(GET, "/a/thing")).bodyString(), equalTo("value"))
     }
-
 }

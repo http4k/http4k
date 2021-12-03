@@ -1,0 +1,12 @@
+ul
+    for item in model.items
+        li
+            | AtRootName:
+            span= item.name
+            | Price:
+            span!= item.price
+            ul
+                for feature in item.features
+                    li
+                        | Feature:
+                        span= feature.description

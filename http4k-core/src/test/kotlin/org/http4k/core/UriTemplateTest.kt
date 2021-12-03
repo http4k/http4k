@@ -3,12 +3,13 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.UriTemplate.Companion.from
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class UriTemplateTest {
 
-     @Test
-fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
+    @Test
+    fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
         val template = from("properties/{name}")
 
         assertThat(
@@ -108,20 +109,38 @@ fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
     }
 
     @Test
-    fun capturingPathVariableWithSlashes(){
+    fun matchedValuesAreUrlDecoded() {
+        val extracted = from("path/{band}").extract("path/Earth%2C%20Wind%20%26%20Fire")
+        assertThat(extracted.getValue("band"), equalTo("Earth, Wind & Fire"))
+    }
+
+    @Test
+    fun capturingPathVariableWithSlashes() {
         val template = from("/{anything:.*}")
         assertThat(template.matches("/foo/bar"), equalTo(true))
         assertThat(template.extract("/foo/bar").getValue("anything"), equalTo("foo/bar"))
     }
 
     @Test
-    fun doesNotMatchPathWithSlashesForUnnamedVariable(){
+    fun doesNotMatchPathWithSlashesForUnnamedVariable() {
         assertThat(from("/{:.*}").matches("/foo/bar"), equalTo(false))
         assertThat(from("/{something:.*}").matches("/foo/bar"), equalTo(true))
+    }
+
+    @Test
+    fun doesNotMatchEmptyPathSegment() {
+        assertThat(from("/foo/{bar:.*}").matches("/foo/bar"), equalTo(true))
+        assertThat(from("/foo/{bar:.*}").matches("/foo"), equalTo(false))
+    }
+
+    @Test
+    @Disabled
+    fun greedyQualifiersAreNotReplaced() {
+         val patternWithGreedyQualifier = "[a-z]{3}"
+        assertThat(from("/foo/{bar:$patternWithGreedyQualifier}").matches("/foo/abc"), equalTo(true))
     }
 
     private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)
 
     private fun pair(v1: String, v2: String) = v1 to v2
 }
-

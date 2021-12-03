@@ -1,0 +1,78 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.JsonPrimitives",
+    "example": null,
+    "description": null
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.openapi.v3.JsonPrimitives",
+      "second": {
+        "properties": {
+          "string": {
+            "example": "string",
+            "description": null,
+            "type": "string"
+          },
+          "boolean": {
+            "example": false,
+            "description": null,
+            "type": "boolean"
+          },
+          "int": {
+            "example": 2147483647,
+            "description": null,
+            "type": "number"
+          },
+          "long": {
+            "example": -9223372036854775808,
+            "description": null,
+            "type": "number"
+          },
+          "double": {
+            "example": 9.9999999999,
+            "description": null,
+            "type": "number"
+          },
+          "float": {
+            "example": -10.0,
+            "description": null,
+            "type": "number"
+          },
+          "bigInt": {
+            "example": 92233720368547758079223372036854775807,
+            "description": null,
+            "type": "number"
+          },
+          "bigDecimal": {
+            "example": 1.7976931348623157E+308111,
+            "description": null,
+            "type": "number"
+          }
+        },
+        "example": {
+          "string": "string",
+          "boolean": false,
+          "int": 2147483647,
+          "long": -9223372036854775808,
+          "double": 9.9999999999,
+          "float": -10.0,
+          "bigInt": 92233720368547758079223372036854775807,
+          "bigDecimal": 1.7976931348623157E+308111
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "bigDecimal",
+          "bigInt",
+          "boolean",
+          "double",
+          "float",
+          "int",
+          "long",
+          "string"
+        ]
+      }
+    }
+  ]
+}

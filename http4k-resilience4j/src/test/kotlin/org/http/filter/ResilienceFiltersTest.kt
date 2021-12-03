@@ -1,7 +1,7 @@
 package org.http.filter
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import io.github.resilience4j.bulkhead.Bulkhead
 import io.github.resilience4j.bulkhead.BulkheadConfig
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.CLOSED
@@ -9,6 +9,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.HALF_OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.of
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.retry.Retry
@@ -36,8 +37,8 @@ class ResilienceFiltersTest {
     fun `circuit break filter`() {
         val minimumOpenStateApparently = Duration.ofSeconds(1)
         val config = CircuitBreakerConfig.custom()
-            .ringBufferSizeInClosedState(2)
-            .ringBufferSizeInHalfOpenState(2)
+            .slidingWindow(2, 2, SlidingWindowType.COUNT_BASED)
+            .permittedNumberOfCallsInHalfOpenState(2)
             .waitDurationInOpenState(minimumOpenStateApparently)
             .build()
 
@@ -50,21 +51,21 @@ class ResilienceFiltersTest {
 
         val circuited = ResilienceFilters.CircuitBreak(circuitBreaker).then { responses.removeFirst() }
 
-        circuitBreaker.state shouldMatch equalTo(CLOSED)
-        circuited(Request(GET, "/")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR)
-        circuitBreaker.state shouldMatch equalTo(OPEN)
-        circuited(Request(GET, "/")) shouldMatch hasStatus(SERVICE_UNAVAILABLE)
+        assertThat(circuitBreaker.state, equalTo(CLOSED))
+        assertThat(circuited(Request(GET, "/")), hasStatus(INTERNAL_SERVER_ERROR))
+        assertThat(circuitBreaker.state, equalTo(OPEN))
+        assertThat(circuited(Request(GET, "/")), hasStatus(SERVICE_UNAVAILABLE))
         Thread.sleep(1100)
-        circuited(Request(GET, "/")) shouldMatch hasStatus(OK)
-        circuitBreaker.state shouldMatch equalTo(HALF_OPEN)
-        circuited(Request(GET, "/")) shouldMatch hasStatus(OK)
-        circuitBreaker.state shouldMatch equalTo(CLOSED)
+        assertThat(circuited(Request(GET, "/")), hasStatus(OK))
+        assertThat(circuitBreaker.state, equalTo(HALF_OPEN))
+        assertThat(circuited(Request(GET, "/")), hasStatus(OK))
+        assertThat(circuitBreaker.state, equalTo(CLOSED))
     }
 
     @Test
     fun `retrying stops when successful result returned`() {
 
-        val config = RetryConfig.custom().intervalFunction { 0 }.build()
+        val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
         val responses = ArrayDeque<Response>()
@@ -75,13 +76,13 @@ class ResilienceFiltersTest {
             responses.removeFirst()
         }
 
-        retrying(Request(GET, "/")).status shouldMatch equalTo(OK)
+        assertThat(retrying(Request(GET, "/")).status, equalTo(OK))
     }
 
     @Test
     fun `retrying eventually runs out and returns the last result`() {
 
-        val config = RetryConfig.custom().intervalFunction { 0 }.build()
+        val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
         val responses = ArrayDeque<Response>()
@@ -92,7 +93,7 @@ class ResilienceFiltersTest {
             responses.removeFirst()
         }
 
-        retrying(Request(GET, "/")).status shouldMatch equalTo(SERVICE_UNAVAILABLE)
+        assertThat(retrying(Request(GET, "/")).status, equalTo(SERVICE_UNAVAILABLE))
     }
 
     @Test
@@ -104,15 +105,15 @@ class ResilienceFiltersTest {
 
         val rateLimits = ResilienceFilters.RateLimit(RateLimiter.of("ratelimiter", config)).then { Response(OK) }
 
-        rateLimits(Request(GET, "/")).status shouldMatch equalTo(OK)
-        rateLimits(Request(GET, "/")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
+        assertThat(rateLimits(Request(GET, "/")).status, equalTo(OK))
+        assertThat(rateLimits(Request(GET, "/")).status, equalTo(TOO_MANY_REQUESTS))
     }
 
     @Test
     fun `bulkhead filter`() {
         val config = BulkheadConfig.custom()
             .maxConcurrentCalls(1)
-            .maxWaitTime(0)
+            .maxWaitDuration(Duration.ZERO)
             .build()
 
         val latch = CountDownLatch(1)
@@ -127,7 +128,6 @@ class ResilienceFiltersTest {
         }
 
         latch.await()
-        bulkheading(Request(GET, "/second")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
+        assertThat(bulkheading(Request(GET, "/second")).status, equalTo(TOO_MANY_REQUESTS))
     }
-
 }

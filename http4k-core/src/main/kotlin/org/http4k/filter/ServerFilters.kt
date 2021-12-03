@@ -19,20 +19,28 @@ import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.GzipCompressionMode.Memory
+import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
+import org.http4k.lens.RequestContextLens
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
 import java.io.StringWriter
 
-data class CorsPolicy(val origins: List<String>,
-                      val headers: List<String>,
-                      val methods: List<Method>) {
-
+data class CorsPolicy(
+    val originPolicy: OriginPolicy,
+    val headers: List<String>,
+    val methods: List<Method>,
+    val credentials: Boolean = false
+) {
     companion object {
-        val UnsafeGlobalPermissive = CorsPolicy(listOf("*"), listOf("content-type"), Method.values().toList())
+        val UnsafeGlobalPermissive =
+            CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.values().toList(), true)
     }
 }
 
@@ -42,15 +50,25 @@ object ServerFilters {
      * Add Cors headers to the Response, according to the passed CorsPolicy
      */
     object Cors {
-        private fun List<String>.joined() = this.joinToString(", ")
+        private fun List<String>.joined() = joinToString(", ")
 
         operator fun invoke(policy: CorsPolicy) = Filter { next ->
             {
                 val response = if (it.method == OPTIONS) Response(OK) else next(it)
+
+                val origin = it.header("Origin")
+                val allowedOrigin = when {
+                    policy.originPolicy is AllowAllOriginPolicy -> "*"
+                    origin != null && policy.originPolicy(origin) -> origin
+                    else -> "null"
+                }
+
                 response.with(
-                        Header.required("access-control-allow-origin") of policy.origins.joined(),
-                        Header.required("access-control-allow-headers") of policy.headers.joined(),
-                        Header.required("access-control-allow-methods") of policy.methods.map { it.name }.joined()
+                    Header.required("access-control-allow-origin") of allowedOrigin,
+                    Header.required("access-control-allow-headers") of policy.headers.joined(),
+                    Header.required("access-control-allow-methods") of policy.methods.map { method -> method.name }
+                        .joined(),
+                    { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res }
                 )
             }
         }
@@ -61,22 +79,24 @@ object ServerFilters {
      */
     object RequestTracing {
         operator fun invoke(
-                startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-                endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
+            startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }
+        ): Filter = Filter { next ->
             {
+                val previous = THREAD_LOCAL.get()
+
                 val fromRequest = ZipkinTraces(it)
                 startReportFn(it, fromRequest)
-                ZipkinTraces.THREAD_LOCAL.set(fromRequest)
+                THREAD_LOCAL.set(fromRequest)
 
                 try {
                     val response = ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, it)))
                     endReportFn(it, response, fromRequest)
                     response
                 } finally {
-                    ZipkinTraces.THREAD_LOCAL.remove()
+                    THREAD_LOCAL.set(previous)
                 }
             }
-
         }
     }
 
@@ -84,7 +104,10 @@ object ServerFilters {
      * Simple Basic Auth credential checking.
      */
     object BasicAuth {
-        operator fun invoke(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter { next ->
+        /**
+         * Credentials validation function
+         */
+        operator fun invoke(realm: String, authorize: (Credentials) -> Boolean) = Filter { next ->
             {
                 val credentials = it.basicAuthenticationCredentials()
                 if (credentials == null || !authorize(credentials)) {
@@ -93,27 +116,109 @@ object ServerFilters {
             }
         }
 
+        /**
+         * Static username/password validation
+         */
+        operator fun invoke(realm: String, user: String, password: String) = this(realm, Credentials(user, password))
 
-        operator fun invoke(realm: String, user: String, password: String): Filter = this(realm, Credentials(user, password))
-        operator fun invoke(realm: String, credentials: Credentials): Filter = this(realm) { it == credentials }
+        /**
+         * Static credentials validation
+         */
+        operator fun invoke(realm: String, credentials: Credentials) = this(realm) { it == credentials }
 
-        private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")?.replace("Basic ", "")?.toCredentials()
+        /**
+         * Population of a RequestContext with custom principal object
+         */
+        operator fun <T> invoke(realm: String, key: RequestContextLens<T>, lookup: (Credentials) -> T?) =
+            Filter { next ->
+                {
+                    it.basicAuthenticationCredentials()
+                        ?.let(lookup)
+                        ?.let { found -> next(it.with(key of found)) }
+                        ?: Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
+                }
+            }
 
-        private fun String.toCredentials(): Credentials? = base64Decoded().split(":").let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
+        private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")
+            ?.trim()
+            ?.takeIf { it.startsWith("Basic") }
+            ?.substringAfter("Basic")
+            ?.trim()
+            ?.toCredentials()
+
+        private fun String.toCredentials(): Credentials? = try {
+            base64Decoded().split(":").let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
+        } catch (e: IllegalArgumentException) {
+            null
+        }
     }
 
     /**
      * Bearer Auth token checking.
      */
     object BearerAuth {
-        operator fun invoke(checkToken: (String) -> Boolean): Filter = Filter { next ->
+        /**
+         * Static token validation
+         */
+        operator fun invoke(token: String) = BearerAuth { it == token }
+
+        /**
+         * Static token validation function
+         */
+        operator fun invoke(checkToken: (String) -> Boolean) = Filter { next ->
             {
                 if (it.bearerToken()?.let(checkToken) == true) next(it) else Response(UNAUTHORIZED)
             }
         }
-        operator fun invoke(token: String): Filter = BearerAuth() { it == token }
 
-        private fun Request.bearerToken(): String? = header("Authorization")?.replace("Bearer ", "")
+        /**
+         * Population of a RequestContext with custom principal object
+         */
+        operator fun <T> invoke(key: RequestContextLens<T>, lookup: (String) -> T?) = Filter { next ->
+            {
+                it.bearerToken()
+                    ?.let(lookup)
+                    ?.let { found -> next(it.with(key of found)) }
+                    ?: Response(UNAUTHORIZED)
+            }
+        }
+
+        private fun Request.bearerToken(): String? = header("Authorization")
+            ?.trim()
+            ?.takeIf { it.startsWith("Bearer") }
+            ?.substringAfter("Bearer")
+            ?.trim()
+    }
+
+    /**
+     * ApiKey token checking.
+     */
+    object ApiKeyAuth {
+        /**
+         * ApiKey token checking using a typed lens.
+         */
+        operator fun <T> invoke(
+            lens: (Lens<Request, T>),
+            validate: (T) -> Boolean
+        ) = ApiKeyAuth { req: Request ->
+            try {
+                validate(lens(req))
+            } catch (e: LensFailure) {
+                false
+            }
+        }
+
+        /**
+         * ApiKey token checking using standard request inspection.
+         */
+        operator fun invoke(validate: (Request) -> Boolean): Filter = Filter { next ->
+            {
+                when {
+                    validate(it) -> next(it)
+                    else -> Response(UNAUTHORIZED)
+                }
+            }
+        }
     }
 
     /**
@@ -130,10 +235,10 @@ object ServerFilters {
      *
      * Pass the failResponseFn param to provide a custom response for the LensFailure case
      */
-    fun CatchLensFailure(failResponseFn: (LensFailure) -> Response = {
-        Response(BAD_REQUEST.description(it.failures.joinToString("; ")))
-    }) = object : Filter {
-        override fun invoke(next: HttpHandler): HttpHandler = {
+    fun CatchLensFailure(
+        failResponseFn: (LensFailure) -> Response = { Response(BAD_REQUEST.description(it.failures.joinToString("; "))) }
+    ) = Filter { next ->
+        {
             try {
                 next(it)
             } catch (lensFailure: LensFailure) {
@@ -178,12 +283,27 @@ object ServerFilters {
     }
 
     /**
-     * Basic GZip and Gunzip support of Request/Response. Does not currently support GZipping streams.
+     * Basic GZip and Gunzip support of Request/Response.
      * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
     object GZip {
-        operator fun invoke(): Filter = RequestFilters.GunZip().then(ResponseFilters.GZip())
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory): Filter =
+            RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
+    }
+
+    /**
+     * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list.
+     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
+     */
+    class GZipContentTypes(
+        private val compressibleContentTypes: Set<ContentType>,
+        private val compressionMode: GzipCompressionMode = Memory
+    ) : Filter {
+        override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode)
+            .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
+            .invoke(next)
     }
 
     /**
@@ -208,7 +328,7 @@ object ServerFilters {
     object SetContentType {
         operator fun invoke(contentType: ContentType): Filter = Filter { next ->
             {
-                next(it).with(Header.Common.CONTENT_TYPE of contentType)
+                next(it).with(CONTENT_TYPE of contentType)
             }
         }
     }
@@ -219,15 +339,16 @@ object ServerFilters {
      * after the status code.
      */
     object ReplaceResponseContentsWithStaticFile {
-        operator fun invoke(loader: ResourceLoader = Classpath(),
-                            toResourceName: (Response) -> String? = { if (it.status.successful) null else it.status.code.toString() }
+        operator fun invoke(
+            loader: ResourceLoader = Classpath(),
+            toResourceName: (Response) -> String? = { if (it.status.successful) null else it.status.code.toString() }
         ): Filter = Filter { next ->
             {
                 val response = next(it)
                 toResourceName(response)
-                        ?.let {
-                            response.body(loader.load(it)?.readText() ?: "")
-                        } ?: response
+                    ?.let {
+                        response.body(loader.load(it)?.readText() ?: "")
+                    } ?: response
             }
         }
     }

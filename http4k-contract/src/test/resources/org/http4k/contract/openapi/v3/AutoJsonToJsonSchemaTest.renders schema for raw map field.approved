@@ -1,0 +1,550 @@
+{
+  "node": {
+    "additionalProperties": {
+      "properties": {
+        "key": {
+          "example": "value",
+          "description": null,
+          "type": "string"
+        },
+        "key2": {
+          "example": 123,
+          "description": null,
+          "type": "number"
+        },
+        "key3": {
+          "additionalProperties": {
+            "properties": {
+              "inner": {
+                "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+                "example": null,
+                "description": null
+              }
+            },
+            "example": {
+              "inner": {
+                "uri": "foobar"
+              }
+            },
+            "description": null,
+            "type": "object",
+            "required": [
+              "inner"
+            ]
+          },
+          "example": null,
+          "description": null,
+          "type": "object"
+        },
+        "key4": {
+          "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+          "example": null,
+          "description": null
+        },
+        "key5": {
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
+              },
+              {
+                "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject"
+              }
+            ]
+          },
+          "example": [
+            {
+              "uri": "foobar"
+            },
+            {
+              "child": {
+                "uri": "foobar"
+              },
+              "list": [
+                {
+                  "uri": "foobar"
+                },
+                {
+                  "uri": "foobar"
+                }
+              ],
+              "nestedList": [
+                [
+                  {
+                    "uri": "foobar"
+                  },
+                  {
+                    "uri": "foobar"
+                  }
+                ]
+              ],
+              "nullableChild": {
+                "uri": "foobar"
+              },
+              "stringList": [
+                "hello",
+                "goodbye"
+              ],
+              "anyList": [
+                "123",
+                {
+                  "uri": "foobar"
+                },
+                true,
+                [
+                  {
+                    "uri": "foobar"
+                  }
+                ]
+              ],
+              "enumVal": "value2"
+            }
+          ],
+          "description": null,
+          "type": "array"
+        },
+        "key6": {
+          "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericListHolder",
+          "example": null,
+          "description": null
+        }
+      },
+      "example": {
+        "key": "value",
+        "key2": 123,
+        "key3": {
+          "inner": {
+            "uri": "foobar"
+          }
+        },
+        "key4": {
+          "uri": "foobar"
+        },
+        "key5": [
+          {
+            "uri": "foobar"
+          },
+          {
+            "child": {
+              "uri": "foobar"
+            },
+            "list": [
+              {
+                "uri": "foobar"
+              },
+              {
+                "uri": "foobar"
+              }
+            ],
+            "nestedList": [
+              [
+                {
+                  "uri": "foobar"
+                },
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "nullableChild": {
+              "uri": "foobar"
+            },
+            "stringList": [
+              "hello",
+              "goodbye"
+            ],
+            "anyList": [
+              "123",
+              {
+                "uri": "foobar"
+              },
+              true,
+              [
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "enumVal": "value2"
+          }
+        ],
+        "key6": {
+          "value": [
+            {
+              "uri": "foobar"
+            },
+            {
+              "child": {
+                "uri": "foobar"
+              },
+              "list": [
+                {
+                  "uri": "foobar"
+                },
+                {
+                  "uri": "foobar"
+                }
+              ],
+              "nestedList": [
+                [
+                  {
+                    "uri": "foobar"
+                  },
+                  {
+                    "uri": "foobar"
+                  }
+                ]
+              ],
+              "nullableChild": {
+                "uri": "foobar"
+              },
+              "stringList": [
+                "hello",
+                "goodbye"
+              ],
+              "anyList": [
+                "123",
+                {
+                  "uri": "foobar"
+                },
+                true,
+                [
+                  {
+                    "uri": "foobar"
+                  }
+                ]
+              ],
+              "enumVal": "value2"
+            }
+          ]
+        }
+      },
+      "description": null,
+      "type": "object",
+      "required": [
+        "key",
+        "key2",
+        "key3",
+        "key4",
+        "key5",
+        "key6"
+      ]
+    },
+    "example": null,
+    "description": null,
+    "type": "object"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.openapi.v3.ArbObject2",
+      "second": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "description": null,
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "uri"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.openapi.v3.ArbObject",
+      "second": {
+        "properties": {
+          "child": {
+            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+            "example": null,
+            "description": null
+          },
+          "list": {
+            "items": {
+              "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
+            },
+            "example": [
+              {
+                "uri": "foobar"
+              },
+              {
+                "uri": "foobar"
+              }
+            ],
+            "description": null,
+            "type": "array"
+          },
+          "nestedList": {
+            "items": {
+              "items": {
+                "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
+              },
+              "type": "array"
+            },
+            "example": [
+              [
+                {
+                  "uri": "foobar"
+                },
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "description": null,
+            "type": "array"
+          },
+          "nullableChild": {
+            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+            "example": null,
+            "description": null
+          },
+          "stringList": {
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "hello",
+              "goodbye"
+            ],
+            "description": null,
+            "type": "array"
+          },
+          "anyList": {
+            "items": {
+              "oneOf": [
+                {
+                  "items": {
+                    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
+                }
+              ]
+            },
+            "example": [
+              "123",
+              {
+                "uri": "foobar"
+              },
+              true,
+              [
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "description": null,
+            "type": "array"
+          },
+          "enumVal": {
+            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo",
+            "example": null,
+            "description": null
+          }
+        },
+        "example": {
+          "child": {
+            "uri": "foobar"
+          },
+          "list": [
+            {
+              "uri": "foobar"
+            },
+            {
+              "uri": "foobar"
+            }
+          ],
+          "nestedList": [
+            [
+              {
+                "uri": "foobar"
+              },
+              {
+                "uri": "foobar"
+              }
+            ]
+          ],
+          "nullableChild": {
+            "uri": "foobar"
+          },
+          "stringList": [
+            "hello",
+            "goodbye"
+          ],
+          "anyList": [
+            "123",
+            {
+              "uri": "foobar"
+            },
+            true,
+            [
+              {
+                "uri": "foobar"
+              }
+            ]
+          ],
+          "enumVal": "value2"
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "anyList",
+          "child",
+          "list",
+          "nestedList",
+          "stringList"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.openapi.v3.Foo",
+      "second": {
+        "example": "value2",
+        "enum": [
+          "value1",
+          "value2"
+        ],
+        "description": null,
+        "type": "string"
+      }
+    },
+    {
+      "first": "org.http4k.contract.openapi.v3.GenericListHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
+                },
+                {
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject"
+                }
+              ]
+            },
+            "example": [
+              {
+                "uri": "foobar"
+              },
+              {
+                "child": {
+                  "uri": "foobar"
+                },
+                "list": [
+                  {
+                    "uri": "foobar"
+                  },
+                  {
+                    "uri": "foobar"
+                  }
+                ],
+                "nestedList": [
+                  [
+                    {
+                      "uri": "foobar"
+                    },
+                    {
+                      "uri": "foobar"
+                    }
+                  ]
+                ],
+                "nullableChild": {
+                  "uri": "foobar"
+                },
+                "stringList": [
+                  "hello",
+                  "goodbye"
+                ],
+                "anyList": [
+                  "123",
+                  {
+                    "uri": "foobar"
+                  },
+                  true,
+                  [
+                    {
+                      "uri": "foobar"
+                    }
+                  ]
+                ],
+                "enumVal": "value2"
+              }
+            ],
+            "description": null,
+            "type": "array"
+          }
+        },
+        "example": {
+          "value": [
+            {
+              "uri": "foobar"
+            },
+            {
+              "child": {
+                "uri": "foobar"
+              },
+              "list": [
+                {
+                  "uri": "foobar"
+                },
+                {
+                  "uri": "foobar"
+                }
+              ],
+              "nestedList": [
+                [
+                  {
+                    "uri": "foobar"
+                  },
+                  {
+                    "uri": "foobar"
+                  }
+                ]
+              ],
+              "nullableChild": {
+                "uri": "foobar"
+              },
+              "stringList": [
+                "hello",
+                "goodbye"
+              ],
+              "anyList": [
+                "123",
+                {
+                  "uri": "foobar"
+                },
+                true,
+                [
+                  {
+                    "uri": "foobar"
+                  }
+                ]
+              ],
+              "enumVal": "value2"
+            }
+          ]
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    }
+  ]
+}

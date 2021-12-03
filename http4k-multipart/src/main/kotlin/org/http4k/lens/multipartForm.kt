@@ -2,62 +2,62 @@ package org.http4k.lens
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.core.FormFile
+import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
+import org.http4k.core.ContentType.Companion.MultipartFormWithBoundary
 import org.http4k.core.HttpMessage
 import org.http4k.core.MultipartEntity
 import org.http4k.core.MultipartFormBody
+import org.http4k.core.MultipartFormBody.Companion.DEFAULT_DISK_THRESHOLD
 import org.http4k.core.with
+import org.http4k.lens.ContentNegotiation.Companion.Strict
+import org.http4k.lens.Header.CONTENT_TYPE
 import java.io.Closeable
 import java.util.UUID
 
-object MultipartFormField : BiDiLensSpec<MultipartForm, String>("form",
-        ParamMeta.StringParam,
-        LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
-        LensSet { name, values, target -> values.fold(target) { m, next -> m.plus(name to next) } }
-)
-
-object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
-        ParamMeta.FileParam,
-        LensGet { name, form ->
-            form.files[name]?.map { FormFile(it.filename, it.contentType, it.content) } ?: emptyList()
-        },
-        LensSet { name, values, target -> values.fold(target) { m, next -> m.plus(name to next) } }
-)
-
-data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
-                         val files: Map<String, List<FormFile>> = emptyMap(),
+data class MultipartForm(val fields: Map<String, List<MultipartFormField>> = emptyMap(),
+                         val files: Map<String, List<MultipartFormFile>> = emptyMap(),
                          val errors: List<Failure> = emptyList()) : Closeable {
 
-    override fun close() {
-        files.values.flatten().forEach(FormFile::close)
-    }
+    override fun close() = files.values.flatten().forEach(MultipartFormFile::close)
+
+    operator fun plus(kv: Pair<String, String>) =
+        copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + MultipartFormField(kv.second)))
 
     @JvmName("plusField")
-    operator fun plus(kv: Pair<String, String>): MultipartForm =
-            copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
+    operator fun plus(kv: Pair<String, MultipartFormField>) =
+        copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + kv.second))
 
     @JvmName("plusFile")
-    operator fun plus(kv: Pair<String, FormFile>): MultipartForm =
-            copy(files = files.plus(kv.first to files.getOrDefault(kv.first, emptyList()).plus(kv.second)))
+    operator fun plus(kv: Pair<String, MultipartFormFile>) =
+        copy(files = files + (kv.first to files.getOrDefault(kv.first, emptyList()) + kv.second))
+
+    fun minusField(name: String) = copy(fields = fields - name)
+    fun minusFile(name: String) = copy(files = files - name)
 }
 
 val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
 
-fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>, defaultBoundary: String = MULTIPART_BOUNDARY, diskThreshold: Int = MultipartFormBody.DEFAULT_DISK_THRESHOLD): BiDiBodyLensSpec<MultipartForm> =
-        BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
-                LensGet { _, target ->
-                    listOf(MultipartFormBody.from(target, diskThreshold).apply {
-                        ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), Header.Common.CONTENT_TYPE(target))
-                    })
-                },
-                LensSet { _: String, values: List<Body>, target: HttpMessage ->
-                    values.fold(target) { a, b ->
-                        a.body(b)
-                                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(defaultBoundary))
-                    }
-                })
-                .map({ it.toMultipartForm() }, { it.toMultipartFormBody(defaultBoundary) })
-                .map({ it.copy(errors = validator(it, *parts)) }, { it.copy(errors = validator(it, *parts)) })
+fun Body.Companion.multipartForm(
+    validator: Validator,
+    vararg parts: Lens<MultipartForm, *>,
+    defaultBoundary: String = MULTIPART_BOUNDARY,
+    diskThreshold: Int = DEFAULT_DISK_THRESHOLD,
+    contentTypeFn: (String) -> ContentType = ::MultipartFormWithBoundary
+): BiDiBodyLensSpec<MultipartForm> =
+    BiDiBodyLensSpec(parts.map { it.meta }, MULTIPART_FORM_DATA,
+        LensGet { _, target ->
+            listOf(MultipartFormBody.from(target, diskThreshold).apply {
+                Strict(contentTypeFn(boundary), CONTENT_TYPE(target))
+            })
+        },
+        LensSet { _: String, values: List<Body>, target: HttpMessage ->
+            values.fold(target) { a, b ->
+                a.body(b)
+                    .with(CONTENT_TYPE of contentTypeFn(defaultBoundary))
+            }
+        })
+        .map({ it.toMultipartForm() }, { it.toMultipartFormBody(defaultBoundary) })
+        .map({ it.copy(errors = validator(it, parts.toList())) }, { it.copy(errors = validator(it, parts.toList())) })
 
 internal fun Body.toMultipartForm(): MultipartForm = (this as MultipartFormBody).let {
     it.formParts.fold(MultipartForm()) { memo, next ->
@@ -70,16 +70,16 @@ internal fun Body.toMultipartForm(): MultipartForm = (this as MultipartFormBody)
 
 internal fun MultipartForm.toMultipartFormBody(boundary: String): MultipartFormBody {
     val withFields = fields.toList()
-            .fold(MultipartFormBody(boundary = boundary)) { body, (name, values) ->
-                values.fold(body) { bodyMemo, fieldValue ->
-                    bodyMemo + (name to fieldValue)
-                }
+        .fold(MultipartFormBody(boundary = boundary)) { body, (name, values) ->
+            values.fold(body) { bodyMemo, fieldValue ->
+                bodyMemo + (name to fieldValue)
             }
+        }
 
     return files.toList()
-            .fold(withFields) { body, (name, values) ->
-                values.fold(body) { bodyMemo, file ->
-                    bodyMemo + (name to file)
-                }
+        .fold(withFields) { body, (name, values) ->
+            values.fold(body) { bodyMemo, file ->
+                bodyMemo + (name to file)
             }
+        }
 }

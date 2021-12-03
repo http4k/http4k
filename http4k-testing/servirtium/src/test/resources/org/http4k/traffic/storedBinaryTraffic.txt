@@ -1,0 +1,25 @@
+## Interaction 0: GET /
+
+### Request headers recorded for playback:
+
+```
+content-type: application/pdf; charset=utf-8
+```
+
+### Request body recorded for playback (application/pdf; charset=utf-8):
+
+```
+Ym9keTE=
+```
+
+### Response headers recorded for playback:
+
+```
+content-type: application/pdf; charset=utf-8
+```
+
+### Response body recorded for playback (200: application/pdf; charset=utf-8):
+
+```
+Ym9keTI=
+```

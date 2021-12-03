@@ -2,8 +2,8 @@ package org.http4k.filter
 
 import io.github.resilience4j.bulkhead.Bulkhead
 import io.github.resilience4j.bulkhead.BulkheadFullException
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
-import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RequestNotPermitted
 import io.github.resilience4j.retry.Retry
@@ -12,6 +12,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 object ResilienceFilters {
 
@@ -20,7 +21,7 @@ object ResilienceFilters {
      * By default, uses a % failure rate of 50% detection and an Circuit Open period of 1minute
      */
     object CircuitBreak {
-        private object CircuitError : Exception()
+        private object CircuitError : RuntimeException()
 
         operator fun invoke(circuitBreaker: CircuitBreaker = CircuitBreaker.ofDefaults("Circuit"),
                             isError: (Response) -> Boolean = { it.status.serverError },
@@ -29,10 +30,10 @@ object ResilienceFilters {
                 try {
                     circuitBreaker.executeCallable {
                         next(it).apply {
-                            if (isError(this)) circuitBreaker.onError(0, CircuitError)
+                            if (isError(this)) circuitBreaker.onError(0, MILLISECONDS, CircuitError)
                         }
                     }
-                } catch (e: CircuitBreakerOpenException) {
+                } catch (e: CallNotPermittedException) {
                     onError()
                 }
             }
@@ -96,5 +97,4 @@ object ResilienceFilters {
             }
         }
     }
-
 }

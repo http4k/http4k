@@ -10,14 +10,13 @@ import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 
-
 open class CacheControlHeaderPart(open val name: String, val value: Duration) {
     fun toHeaderValue(): String = if (value.seconds > 0) "$name=${value.seconds}" else ""
     fun replaceIn(header: String?): String? = header?.let {
         header.split(",")
-                .map { it.trim() }
-                .filterNot { it.startsWith(name)} .plusElement(toHeaderValue())
-                .joinToString(", ")
+            .map { it.trim() }
+            .filterNot { it.startsWith(name) }.plusElement(toHeaderValue())
+            .joinToString(", ")
     } ?: toHeaderValue()
 }
 
@@ -27,10 +26,11 @@ data class StaleIfErrorTtl(private val valueD: Duration) : CacheControlHeaderPar
 
 data class MaxAgeTtl(private val valueD: Duration) : CacheControlHeaderPart("max-age", valueD)
 
-
-data class DefaultCacheTimings(val maxAge: MaxAgeTtl,
-                               val staleIfErrorTtl: StaleIfErrorTtl,
-                               val staleWhenRevalidateTtl: StaleWhenRevalidateTtl)
+data class DefaultCacheTimings(
+    val maxAge: MaxAgeTtl,
+    val staleIfErrorTtl: StaleIfErrorTtl,
+    val staleWhenRevalidateTtl: StaleWhenRevalidateTtl
+)
 
 /**
  * Useful filters for applying Cache-Controls to request/responses
@@ -47,7 +47,6 @@ object CachingFilters {
             }
         }
     }
-
 
     /**
      * These filters operate on Responses (post-flight)
@@ -87,7 +86,8 @@ object CachingFilters {
 
                 private fun now(response: org.http4k.core.Response) =
                     try {
-                        response.header("Date")?.let(RFC_1123_DATE_TIME::parse)?.let(ZonedDateTime::from) ?: ZonedDateTime.now(clock)
+                        response.header("Date")?.let(RFC_1123_DATE_TIME::parse)?.let(ZonedDateTime::from)
+                            ?: ZonedDateTime.now(clock)
                     } catch (e: Exception) {
                         ZonedDateTime.now(clock)
                     }
@@ -118,22 +118,23 @@ object CachingFilters {
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
         object FallbackCacheControl {
-            operator fun invoke(clock: Clock, defaultCacheTimings: DefaultCacheTimings, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : Filter {
-                override fun invoke(next: HttpHandler): HttpHandler =
+            operator fun invoke(clock: Clock, defaultCacheTimings: DefaultCacheTimings, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter {
+
+                fun addDefaultHeaderIfAbsent(response: org.http4k.core.Response, header: String, defaultProducer: () -> String) =
+                    response.replaceHeader(header, response.header(header) ?: defaultProducer())
+
+                fun addDefaultCacheHeadersIfAbsent(response: org.http4k.core.Response) =
+                    addDefaultHeaderIfAbsent(response, "Cache-Control") {
+                        listOf("public", defaultCacheTimings.maxAge.toHeaderValue(), defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(), defaultCacheTimings.staleIfErrorTtl.toHeaderValue()).joinToString(", ")
+                    }
+                        .let { addDefaultHeaderIfAbsent(it, "Expires") { RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(defaultCacheTimings.maxAge.value)) } }
+                        .let { addDefaultHeaderIfAbsent(it, "Vary") { "Accept-Encoding" } }
+                return Filter { next ->
                     {
                         val response = next(it)
                         if (it.method == GET && predicate(response)) addDefaultCacheHeadersIfAbsent(response) else response
                     }
-
-                private fun addDefaultHeaderIfAbsent(response: org.http4k.core.Response, header: String, defaultProducer: () -> String) =
-                    response.header(header, response.header(header) ?: defaultProducer())
-
-                private fun addDefaultCacheHeadersIfAbsent(response: org.http4k.core.Response) =
-                    addDefaultHeaderIfAbsent(response, "Cache-Control") {
-                        listOf("public", defaultCacheTimings.maxAge.toHeaderValue(), defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(), defaultCacheTimings.staleIfErrorTtl.toHeaderValue()).joinToString(", ")
-                    }
-                            .let { addDefaultHeaderIfAbsent(it, "Expires") { RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(defaultCacheTimings.maxAge.value)) } }
-                        .let { addDefaultHeaderIfAbsent(it, "Vary") { "Accept-Encoding" } }
+                }
             }
         }
     }

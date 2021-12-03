@@ -1,0 +1,30 @@
+{
+  "Records": [
+    {
+      "messageId": "messageId",
+      "receiptHandle": "receiptHandle",
+      "body": "body",
+      "md5OfBody": "md5OfBody",
+      "md5OfMessageAttributes": "md5OfMessageAttributes",
+      "eventSourceArn": "eventSourceArn",
+      "eventSource": "eventSource",
+      "awsRegion": "awsRegion",
+      "attributes": {
+        "attr": "attrvalue"
+      },
+      "messageAttributes": {
+        "msgAttrName": {
+          "binaryListValues": [
+            "YmluYXJ5TGlzdFZhbHVlcw=="
+          ],
+          "binaryValue": "YmluYXJ5",
+          "dataType": "datatype",
+          "stringListValues": [
+            "stringListValues"
+          ],
+          "stringValue": "stringValue"
+        }
+      }
+    }
+  ]
+}

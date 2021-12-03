@@ -1,0 +1,26 @@
+## Interaction 0: POST /foo
+
+### Request headers recorded for playback:
+
+```
+toBeRetained: reqHeaderValue1
+```
+
+### Request body recorded for playback ():
+
+```
+helloWorldRequest
+```
+
+### Response headers recorded for playback:
+
+```
+toBeRetained: respHeaderValue1
+```
+
+### Response body recorded for playback (500: ):
+
+```
+goodbyeWorldResponse
+```
+

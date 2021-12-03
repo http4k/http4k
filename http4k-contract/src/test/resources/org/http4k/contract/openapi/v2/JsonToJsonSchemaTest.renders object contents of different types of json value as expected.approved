@@ -1,0 +1,71 @@
+{
+  "node": {
+    "$ref": "#/definitions/bob"
+  },
+  "definitions": [
+    {
+      "first": "object1634459515",
+      "second": {
+        "type": "object",
+        "properties": {
+          "anotherString": {
+            "type": "string",
+            "example": "yetAnotherString"
+          }
+        }
+      }
+    },
+    {
+      "first": "object154078738",
+      "second": {
+        "type": "object",
+        "properties": {
+          "anInteger": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      }
+    },
+    {
+      "first": "bob",
+      "second": {
+        "type": "object",
+        "properties": {
+          "aString": {
+            "type": "string",
+            "example": "aStringValue"
+          },
+          "aNumber": {
+            "type": "number",
+            "example": 1.9
+          },
+          "aDouble": {
+            "type": "number",
+            "example": 1.0100000000000000088817841970012523233890533447265625
+          },
+          "aBooleanTrue": {
+            "type": "boolean",
+            "example": true
+          },
+          "aBooleanFalse": {
+            "type": "boolean",
+            "example": false
+          },
+          "anArray": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/object1634459515"
+            }
+          },
+          "anObject": {
+            "$ref": "#/definitions/object154078738"
+          },
+          "anotherObject": {
+            "$ref": "#/definitions/object154078738"
+          }
+        }
+      }
+    }
+  ]
+}

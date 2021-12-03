@@ -27,15 +27,14 @@ class StreamingMultipartFormSadTests {
         } catch (e: ParseError) {
             assertThat(e.cause!!, has(Throwable::message, present(equalTo("Boundary not found <<-----1234>>"))))
         }
-
     }
 
     @Test
     fun failsWhenGettingNextPastEndOfParts() {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream())
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream()).stream())
+            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
+            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream(), emptyList()).stream())
 
         form.next() // aFile
         form.next() // anotherFile
@@ -45,15 +44,14 @@ class StreamingMultipartFormSadTests {
         } catch (e: NoSuchElementException) {
             // pass
         }
-
     }
 
     @Test
     fun failsWhenGettingNextPastEndOfPartsAfterHasNext() {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream())
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream()).stream())
+            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
+            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream(), emptyList()).stream())
 
         form.next() // aFile
         form.next() // anotherFile
@@ -64,7 +62,6 @@ class StreamingMultipartFormSadTests {
         } catch (e: NoSuchElementException) {
             // pass
         }
-
     }
 
     @Test
@@ -72,9 +69,9 @@ class StreamingMultipartFormSadTests {
     fun partHasNoHeaders() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .field("multi", "value0")
-            .part("" + CR_LF + "value with no headers")
-            .field("multi", "value2")
+            .field("multi", "value0", emptyList())
+            .part("" + CR_LF + "value with no headers", emptyList())
+            .field("multi", "value2", emptyList())
             .stream())
 
         form.next()
@@ -92,8 +89,8 @@ class StreamingMultipartFormSadTests {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .part("contents of StreamingPart",
-                "Content-Disposition" to listOf("form-data" to null, "bit" to "first", "name" to "first-name"),
-                "Content-Disposition" to listOf("form-data" to null, "bot" to "second", "name" to "second-name"))
+                listOf("Content-Disposition" to "form-data; bit=\"first\"; name=\"first-name\"",
+                    "Content-Disposition" to "form-data; bot=\"second\"; name=\"second-name\""))
             .stream())
 
         val StreamingPart = form.next()
@@ -126,7 +123,6 @@ class StreamingMultipartFormSadTests {
             "" + CR_LF +
             "value" + CR_LF +
             "-----2345--" + CR_LF).byteInputStream()), "Header didn't include a colon <<value>>")
-
 
         assertParseError(getMultipartFormParts(boundary, ("-----2345" + CR_LF +
             "Content-Disposition: form-data; name=\"name\"" + CR_LF +
@@ -202,7 +198,7 @@ class StreamingMultipartFormSadTests {
         val chars = CharArray(StreamingMultipartFormParts.HEADER_SIZE_MAX)
         chars.fill('x')
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", String(chars), "application/octet-stream", "File contents here".byteInputStream()).stream())
+            .file("aFile", String(chars), "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Token <<\r\n>> within 10240 bytes")
     }
@@ -215,18 +211,18 @@ class StreamingMultipartFormSadTests {
         chars.fill('x')
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .part("some contents",
-                "Content-Disposition" to listOf("form-data" to null, "name" to "fieldName", "filename" to "filename"),
-                "Content-Type" to listOf("text/plain" to null),
-                "extra-1" to listOf(String(chars) to null),
-                "extra-2" to listOf(String(chars) to null),
-                "extra-3" to listOf(String(chars) to null),
-                "extra-4" to listOf(String(chars) to null),
-                "extra-5" to listOf(String(chars) to null),
-                "extra-6" to listOf(String(chars) to null),
-                "extra-7" to listOf(String(chars) to null),
-                "extra-8" to listOf(String(chars) to null),
-                "extra-9" to listOf(String(chars) to null),
-                "extra-10" to listOf(String(chars, 0, 816) to null) // header section exactly 10240 bytes big!
+                listOf("Content-Disposition" to "form-data; name=\"fieldName\"; filename=\"filename\"",
+                    "Content-Type" to "text/plain",
+                    "extra-1" to String(chars),
+                    "extra-2" to String(chars),
+                    "extra-3" to String(chars),
+                    "extra-4" to String(chars),
+                    "extra-5" to String(chars),
+                    "extra-6" to String(chars),
+                    "extra-7" to String(chars),
+                    "extra-8" to String(chars),
+                    "extra-9" to String(chars),
+                    "extra-10" to String(chars, 0, 816)) // header section exactly 10240 bytes big!
             ).stream())
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Header section within 10240 bytes")

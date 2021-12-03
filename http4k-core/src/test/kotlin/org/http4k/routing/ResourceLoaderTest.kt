@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.ResourceLoader.Companion.Directory
 import org.junit.jupiter.api.Test
+import java.io.File
 
 class ResourceLoaderTest {
 
@@ -32,6 +33,12 @@ class ResourceLoaderTest {
     @Test
     fun `directory loader loads existing child file`() {
         checkContents(Directory("./src/test/resources"), "org/index.html", "hello from the io index.html")
+    }
+
+    @Test
+    fun `directory loader should not load resources above the base directory`() {
+        assertThat(Directory("./src/test/resources").load("../../../../.java-version"), absent())
+        assertThat(Directory(File("./src/test/resources").absolutePath).load("../../../../.java-version"), absent())
     }
 
     @Test

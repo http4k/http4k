@@ -5,7 +5,7 @@ import org.http4k.routing.experimental.StaticRoutingHttpHandler
 
 class NewStaticRoutingHttpHandlerTest : StaticRoutingHttpHandlerTest() {
     override val handler: RoutingHttpHandler = StaticRoutingHttpHandler(
-            pathSegments = validPath,
-            resourceLoader = Classpath()
+        pathSegments = validPath,
+        resourceLoader = Classpath()
     )
 }

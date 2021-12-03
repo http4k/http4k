@@ -1,11 +1,17 @@
 package org.http4k.lens
 
-enum class ParamMeta(val value: String) {
-    StringParam("string"),
-    ObjectParam("object"),
-    BooleanParam("boolean"),
-    IntegerParam("integer"),
-    FileParam("file"),
-    NumberParam("number"),
-    NullParam("null")
+import kotlin.reflect.KClass
+
+sealed class ParamMeta(val description: String) {
+    data class ArrayParam(private val itemType: ParamMeta) : ParamMeta("array") {
+        fun itemType() = itemType
+    }
+    class EnumParam<T : Enum<T>>(val clz: KClass<T>) : ParamMeta("string")
+    object StringParam : ParamMeta("string")
+    object ObjectParam : ParamMeta("object")
+    object BooleanParam : ParamMeta("boolean")
+    object IntegerParam : ParamMeta("integer")
+    object FileParam : ParamMeta("file")
+    object NumberParam : ParamMeta("number")
+    object NullParam : ParamMeta("null")
 }

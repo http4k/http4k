@@ -1,0 +1,77 @@
+{
+  "node": {
+    "$ref": "#/components/schemas/bob"
+  },
+  "definitions": [
+    {
+      "first": "object1241320217",
+      "second": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "anotherString": {
+            "type": "string",
+            "example": "yetAnotherString"
+          }
+        }
+      }
+    },
+    {
+      "first": "object-239060560",
+      "second": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "anInteger": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      }
+    },
+    {
+      "first": "bob",
+      "second": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "aString": {
+            "type": "string",
+            "example": "aStringValue"
+          },
+          "aNumber": {
+            "type": "number",
+            "example": 1.9
+          },
+          "aDouble": {
+            "type": "number",
+            "example": 1.0100000000000000088817841970012523233890533447265625
+          },
+          "aBooleanTrue": {
+            "type": "boolean",
+            "example": true
+          },
+          "aBooleanFalse": {
+            "type": "boolean",
+            "example": false
+          },
+          "anArray": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/object1241320217"
+            }
+          },
+          "anObject": {
+            "$ref": "#/components/schemas/object-239060560"
+          },
+          "anotherObject": {
+            "$ref": "#/components/schemas/object-239060560"
+          }
+        }
+      }
+    }
+  ]
+}

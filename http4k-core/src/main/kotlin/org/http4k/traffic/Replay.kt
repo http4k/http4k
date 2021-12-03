@@ -23,14 +23,15 @@ interface Replay {
             override fun responses() = read(Response.Companion::parse, "response.txt").asSequence()
 
             private fun <T : HttpMessage> read(convert: (String) -> T, file: String) =
-                baseDir.toBaseFolder().listFiles().sortedBy { it.name }
+                (baseDir.toBaseFolder().listFiles() ?: emptyArray<File>())
+                    .sortedBy { it.name }
                     .map { File(it, file).run { convert(String(readBytes())) } }
         }
 
         /**
          * Provides a stream of pre-stored HTTP traffic from Memory.
          */
-        fun MemoryStream(stream: MutableList<Pair<Request, Response>>) = object : Replay {
+        fun MemoryStream(stream: List<Pair<Request, Response>>) = object : Replay {
             override fun requests() = stream.map { it.first }.asSequence()
             override fun responses() = stream.map { it.second }.asSequence()
         }

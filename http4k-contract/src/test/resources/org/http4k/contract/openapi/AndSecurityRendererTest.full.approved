@@ -1,0 +1,17 @@
+{
+  "first": {
+    "type": "apiKey",
+    "in": "query",
+    "name": "first"
+  },
+  "second": {
+    "type": "apiKey",
+    "in": "query",
+    "name": "second"
+  },
+  "third": {
+    "type": "apiKey",
+    "in": "query",
+    "name": "third"
+  }
+}

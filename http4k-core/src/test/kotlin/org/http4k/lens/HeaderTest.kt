@@ -3,11 +3,15 @@ package org.http4k.lens
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Accept
 import org.http4k.core.ContentType
-import org.http4k.core.Method
+import org.http4k.core.ContentType.Companion.APPLICATION_PDF
+import org.http4k.core.ContentType.Companion.APPLICATION_XML
+import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
+import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method.GET
+import org.http4k.core.Parameter
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.with
@@ -32,10 +36,20 @@ class HeaderTest {
     }
 
     @Test
+    fun `value replaced`() {
+        val single = Header.required("world")
+        assertThat(single("value2", single("value1", request)), equalTo(request.header("world", "value2")))
+
+        val multi = Header.multi.required("world")
+        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
+            equalTo(request.header("world", "value3").header("world", "value4")))
+    }
+
+    @Test
     fun `value missing`() {
         assertThat(Header.optional("world")(request), absent())
         val requiredHeader = Header.required("world")
-        assertThat({ requiredHeader(request) }, throws(lensFailureWith(Missing(requiredHeader.meta), overallType = Failure.Type.Missing)))
+        assertThat({ requiredHeader(request) }, throws(lensFailureWith<Request>(Missing(requiredHeader.meta), overallType = Failure.Type.Missing)))
 
         assertThat(Header.defaulted("world", "bob")(request), equalTo("bob"))
         val defaultedHeader = Header.defaulted("world", "bob")
@@ -43,22 +57,22 @@ class HeaderTest {
 
         assertThat(Header.multi.optional("world")(request), absent())
         val optionalMultiHeader = Header.multi.required("world")
-        assertThat({ optionalMultiHeader(request) }, throws(lensFailureWith(Missing(optionalMultiHeader.meta), overallType = Failure.Type.Missing)))
+        assertThat({ optionalMultiHeader(request) }, throws(lensFailureWith<Request>(Missing(optionalMultiHeader.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
     fun `invalid value`() {
         val requiredHeader = Header.map(String::toInt).required("hello")
-        assertThat({ requiredHeader(request) }, throws(lensFailureWith(Invalid(requiredHeader.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredHeader(request) }, throws(lensFailureWith<Request>(Invalid(requiredHeader.meta), overallType = Failure.Type.Invalid)))
 
         val optionalHeader = Header.map(String::toInt).optional("hello")
-        assertThat({ optionalHeader(request) }, throws(lensFailureWith(Invalid(optionalHeader.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalHeader(request) }, throws(lensFailureWith<Request>(Invalid(optionalHeader.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMultiHeader = Header.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiHeader(request) }, throws(lensFailureWith(Invalid(requiredMultiHeader.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredMultiHeader(request) }, throws(lensFailureWith<Request>(Invalid(requiredMultiHeader.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMultiHeader = Header.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiHeader(request) }, throws(lensFailureWith(Invalid(optionalMultiHeader.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalMultiHeader(request) }, throws(lensFailureWith<Request>(Invalid(optionalMultiHeader.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
@@ -70,14 +84,14 @@ class HeaderTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = Header.map(::MyCustomBodyType, { it.value }).required("bob")
+        val custom = Header.map(::MyCustomType, MyCustomType::value).required("bob")
 
-        val instance = MyCustomBodyType("hello world!")
-        val reqWithHeader = custom(instance, Request(Method.GET, ""))
+        val instance = MyCustomType("hello world!")
+        val reqWithHeader = custom(instance, Request(GET, ""))
 
         assertThat(reqWithHeader.header("bob"), equalTo("hello world!"))
 
-        assertThat(custom(reqWithHeader), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(custom(reqWithHeader), equalTo(MyCustomType("hello world!")))
     }
 
     @Test
@@ -90,25 +104,44 @@ class HeaderTest {
 
     @Test
     fun `content type serialises and deserialises correctly to message - with directive`() {
-        val lens = Header.Common.CONTENT_TYPE
+        val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").with(lens of ContentType.TEXT_HTML)
-        reqWithHeader.header("Content-Type") shouldMatch equalTo("text/html; charset=utf-8")
-        lens(reqWithHeader) shouldMatch equalTo(ContentType.TEXT_HTML)
+        assertThat(reqWithHeader.header("Content-Type"), equalTo("text/html; charset=utf-8"))
+        assertThat(lens(reqWithHeader), equalTo(ContentType.TEXT_HTML))
     }
 
     @Test
     fun `content type serialises and deserialises correctly to message - with illegal directive is ignored`() {
-        val lens = Header.Common.CONTENT_TYPE
-        val reqWithHeader = Request(GET, "").header("Content-Type", "bob ; foomanchu")
-        lens(reqWithHeader) shouldMatch equalTo(ContentType("bob"))
+        val lens = Header.CONTENT_TYPE
+        val reqWithHeader = Request(GET, "").header("Content-Type", "bob; charset=UTF-8 ;boundary=asd; foomanchu; media-type=a/b")
+        assertThat(lens(reqWithHeader), equalTo(ContentType("bob",
+            listOf("charset" to "UTF-8", "boundary" to "asd", "media-type" to "a/b"))))
     }
 
     @Test
     fun `content type serialises and deserialises correctly to message - no directive`() {
-        val lens = Header.Common.CONTENT_TYPE
+        val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").with(lens of ContentType("value"))
-        reqWithHeader.header("Content-Type") shouldMatch equalTo("value")
-        lens(reqWithHeader) shouldMatch equalTo(ContentType("value"))
+        assertThat(reqWithHeader.header("Content-Type"), equalTo("value"))
+        assertThat(lens(reqWithHeader), equalTo(ContentType("value")))
     }
 
+    @Test
+    fun `accept header deserialises correctly from message`() {
+        val accept = Header.ACCEPT(Request(GET, "").header("Accept", "text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))!!
+
+        assertThat(accept, equalTo(Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8"))))
+        assertThat(accept.accepts(TEXT_HTML), equalTo(true))
+        assertThat(accept.accepts(MULTIPART_FORM_DATA), equalTo(false))
+    }
+
+    @Test
+    fun `multiple directives are parsed correctly`() {
+        assertThat(Header.parseValueAndDirectives("some value"), equalTo("some value" to emptyList()))
+        assertThat(Header.parseValueAndDirectives("some value ;"), equalTo("some value" to emptyList()))
+        assertThat(Header.parseValueAndDirectives("some value; bob"), equalTo("some value" to listOf<Parameter>("bob" to null)))
+        assertThat(Header.parseValueAndDirectives("some value; bob   ;bob2=anotherValue   "),
+            equalTo("some value" to
+                listOf("bob" to null, "bob2" to "anotherValue")))
+    }
 }

@@ -1,0 +1,74 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "tags": [
+  ],
+  "paths": {
+    "": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          ""
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "get",
+        "deprecated": false
+      }
+    },
+    "/docs": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          ""
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "description",
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "the_api_key"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": ""
+    }
+  ],
+  "x-extension": [
+    "extensionField"
+  ]
+}

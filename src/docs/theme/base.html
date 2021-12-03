@@ -1,251 +1,124 @@
-{% import "partials/language.html" as lang %}
+{% import "partials/language.html" as lang with context %}
+{% set feature = config.theme.feature %}
+{% set palette = config.theme.palette %}
+{% set font = config.theme.font %}
 <!DOCTYPE html>
-<html lang="{{ lang.t('language') }}" class="no-js" itemscope itemtype="http://schema.org/Product">
+<html lang="{{ lang.t('language') }}" class="no-js">
 <head>
     {% block site_meta %}
-    <meta charset="utf-8">
-    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    {% if page and page.meta.title %}
-    <meta itemprop="name" content="{{ page.meta.title | first }}">
-    <meta name="twitter:title" content="{{ page.meta.title | first }}">
-    <meta property="og:title" content="{{ page.meta.title | first }}" />
-    {% else %}
-    <meta itemprop="name" content="http4k - a functional Kotlin HTTP toolkit">
-    <meta name="twitter:title" content="http4k - a functional Kotlin HTTP toolkit">
-    <meta property="og:title" content="http4k - a functional Kotlin HTTP toolkit" />
-    {% endif %}
-    {% if page and page.meta.description %}
-    <meta name="description" content="{{ page.meta.description | first }}">
-    <meta property="og:description" content="{{ page.meta.description | first }}" />
-    <meta name="twitter:description" content="{{ page.meta.description | first }}">
-    {% elif config.site_description %}
-    <meta name="description" content="{{ config.site_description }}">
-    <meta property="og:description" content="{{ config.site_description }}" />
-    <meta name="twitter:description" content="{{ config.site_description }}">
-    {% endif %}
-    {% if page.canonical_url %}
-    <link rel="canonical" href="{{ page.canonical_url }}">
-    {% endif %}
-    {% if page and page.meta.author %}
-    <meta name="author" content="{{ page.meta.author | first }}">
-    <meta name="twitter:creator" content="{{ page.meta.author | first }}">
-    {% elif config.site_author %}
-    <meta name="author" content="{{ config.site_author }}">
-    <meta name="twitter:creator" content="{{ config.site_author }}">
-    {% endif %}
-    <!-- ****** faviconit.com favicons ****** -->
-    <link rel="shortcut icon" href="/img/favicon.ico">
-    <link rel="icon" sizes="16x16 32x32 64x64" href="/img/favicon.ico">
-    <link rel="icon" type="image/png" sizes="196x196" href="/img/favicon-192.png">
-    <link rel="icon" type="image/png" sizes="160x160" href="/img/favicon-160.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96.png">
-    <link rel="icon" type="image/png" sizes="64x64" href="/img/favicon-64.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
-    <link rel="apple-touch-icon" href="/img/favicon-57.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon-114.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/img/favicon-72.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/img/favicon-144.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/img/favicon-60.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/img/favicon-120.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon-76.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/img/favicon-152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180.png">
-    <meta name="msapplication-TileColor" content="#FFFFFF">
-    <meta name="msapplication-TileImage" content="/img/favicon-144.png">
-    <meta name="msapplication-config" content="/img/browserconfig.xml">
-    <!-- ****** faviconit.com favicons ****** -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@http4k">
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://www.http4k.org/" />
-    <meta name="twitter:image" content="https://www.http4k.org/img/logo_card_blue_on_white.png">
-    <meta property="og:image" content="https://www.http4k.org/img/logo_card_blue_on_white.png" />
-    <meta itemprop="image" content="https://www.http4k.org/img/logo_card_blue_on_white.png">
-
-    <meta name="generator" content="mkdocs-{{ mkdocs_version }}, mkdocs-material-1.7.3">
+    {% include "partials/include.html" %}
+    {% include "partials/meta.html" %}
     {% endblock %}
     {% block htmltitle %}
-    {% if page and page.meta.title %}
-    <title>{{ page.meta.title | first }}</title>
+    {% if page and page.meta and page.meta.title %}
+    <title>{{ page.meta.title }}</title>
     {% elif page and page.title and not page.is_homepage %}
     <title>{{ page.title }} - {{ config.site_name }}</title>
     {% else %}
     <title>{{ config.site_name }}</title>
     {% endif %}
     {% endblock %}
-    {% block libs %}
-    <script src="{{ base_url }}/assets/javascripts/modernizr-1df76c4e58.js"></script>
-    {% endblock %}
     {% block styles %}
-    <link rel="stylesheet" href="{{ base_url }}/assets/stylesheets/application-acc56dad49.css">
-    {% if config.extra.palette %}
-    <link rel="stylesheet" href="{{ base_url }}/assets/stylesheets/application-8817cfa535.palette.css">
+    {% if palette.primary %}
+    {% import "partials/palette.html" as map %}
+    {% set primary = map.primary(
+    palette.primary | replace(" ", "-") | lower
+    ) %}
+    <meta name="theme-color" content="{{ primary }}">
     {% endif %}
+    {% endblock %}
+    {% block libs %}
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/codehilite.css"/>
     {% endblock %}
     {% block fonts %}
-    {% if config.extra.font != false and config.extra.font != "none" %}
-    {% set text = config.extra.get("font", {}).text | default("Roboto") %}
-    {% set code = config.extra.get("font", {}).code
-    | default("Roboto Mono") %}
-    {% set font = text + ":300,400,400i,700|" + code | replace(" ", "+") %}
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{ font }}">
-    <style>body, input {
-        font-family: "{{ text }}", "Helvetica Neue", Helvetica, Arial, sans-serif
-    }
-
-    code, kbd, pre {
-        font-family: "{{ code }}", "Courier New", Courier, monospace
-    }</style>
+    {% if font != false %}
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
     {% endif %}
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     {% endblock %}
-    {% for path in extra_css %}
-    <link rel="stylesheet" href="{{ path }}">
+    <link rel="stylesheet" href="/css/main.css"/>
+    {% for path in config["extra_css"] %}
+    <link rel="stylesheet" href="{{ path | url }}">
     {% endfor %}
     {% block extrahead %}{% endblock %}
-    <script type="application/ld+json">
-        {
-          "@context" : "http://schema.org",
-          "@type" : "WebSite",
-    {% if page and page.meta.title %}
-          "name" : "{{ page.meta.title | first }}",
-    {% else %}
-          "name" : "http4k - a functional Kotlin HTTP toolkit",
-    {% endif %}
-    {% if page and page.meta.description %}
-          "alternateName" : "{{ page.meta.description | first }}",
-    {% else %}
-          "alternateName" : "{{ config.site_description }}",
-    {% endif %}
-          "image": "https://www.http4k.org/img/logo_card_blue_on_white.png",
-          "url" : "{{ page.canonical_url }}"
-        }
-        </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
 </head>
-{% set palette = config.extra.get("palette", {}) %}
+{% if palette.primary or palette.accent %}
 {% set primary = palette.primary | replace(" ", "-") | lower %}
-{% set accent = palette.accent | replace(" ", "-") | lower %}
-{% if primary or accent %}
-<body data-md-color-primary="{{ primary }}" data-md-color-accent="{{ accent }}">
+{% set accent  = palette.accent  | replace(" ", "-") | lower %}
+<body dir="{{ lang.t('direction') }}" data-md-color-primary="{{ primary }}" data-md-color-accent="{{ accent }}">
 {% else %}
-<body>
+<body dir="{{ lang.t('direction') }}">
 {% endif %}
-<svg class="md-svg">
-    <defs>
-        {% set platform = config.extra.repo_icon or config.repo_url %}
-        {% if "github" in platform %}
-        {% include "assets/images/icons/github-1da075986e.svg" %}
-        {% elif "gitlab" in platform %}
-        {% include "assets/images/icons/gitlab-5ad3f9f9e5.svg" %}
-        {% elif "bitbucket" in platform %}
-        {% include "assets/images/icons/bitbucket-670608a71a.svg" %}
-        {% endif %}
-    </defs>
-</svg>
-<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
-<input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
-<label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+{% block pre_header %}
+{% include "partials/pre_header.html" %}
+{% endblock %}
 {% block header %}
 {% include "partials/header.html" %}
 {% endblock %}
-<div class="md-container">
-    {% set feature = config.extra.get("feature", {}) %}
-    {% if feature.tabs %}
-    {% include "partials/tabs.html" %}
-    {% endif %}
-    <main class="md-main">
-        <div class="md-main__inner md-grid" data-md-component="container">
-            {% block site_nav %}
-            {% if nav %}
-            <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-                <div class="md-sidebar__scrollwrap">
-                    <div class="md-sidebar__inner">
-                        {% include "partials/nav.html" %}
-                    </div>
+<div class="intro">
+    <div class="row no-gutters justify-content-center">
+        {% include "partials/nav.html" %}
+        <main class="col">
+          <div class="container">
+                <div class="searchBox">
+                  <img class="searchBoxIcon" src="/img/search-icon.svg" width="20" alt="" srcset=""/>
+                  <input id="search" type="text" />
                 </div>
-            </div>
-            {% endif %}
-            {% endblock %}
-            <div class="md-content">
-                <article class="md-content__inner md-typeset">
+                <div class="content">
+                    <img class="mb-3 sideToggle" src="/img/exchange-icon.svg" width="20" alt="" srcset=""/>
                     {% block content %}
-                    {% if config.edit_uri %}
-                    <a href="{{ page.edit_url }}" title="{{ lang.t('edit.link.title') }}" class="md-icon md-content__icon">edit</a>
-                    {% endif %}
                     {% if not "\x3ch1" in page.content %}
                     <h1>{{ page.title | default(config.site_name, true)}}</h1>
                     {% endif %}
                     {{ page.content }}
-                    {% block source %}
-                    {% if page.meta.source %}
-                    <h2 id="__source">{{ lang.t("meta.source") }}</h2>
-                    {% set path = (page.meta.path | default([""]) | first) %}
-                    {% for file in page.meta.source %}
-                    <a href="{{ [config.repo_url, path, file] | join('/') }}" title="{{ file }}" class="md-source-file">
-                        {{ file }}
-                    </a>
-                    {% endfor %}
-                    {% endif %}
                     {% endblock %}
-                    {% endblock %}
-                    {% block disqus %}
-                    {% if config.extra.disqus and not page.is_homepage %}
-                    <h2 id="__comments">{{ lang.t("meta.comments") }}</h2>
-                    {% include "partials/disqus.html" %}
-                    {% endif %}
-                    {% endblock %}
-                </article>
+                </div>
             </div>
-        </div>
-    </main>
-    {% block footer %}
-    {% include "partials/footer.html" %}
-    {% endblock %}
+        </main>
+    </div>
 </div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/index-min.js"></script>
 {% block scripts %}
-<script src="{{ base_url }}/assets/javascripts/application-b30566c560.js"></script>
-{% set languages = lang.t("search.languages").split(",") %}
+      <script src="{{ 'assets/javascripts/application.583bbe55.js' | url }}"></script>
+{% if lang.t("search.language") != "en" %}
+{% set languages = lang.t("search.language").split(",") %}
 {% if languages | length and languages[0] != "" %}
-{% set path = base_url + "/assets/javascripts/lunr" %}
-<script src="{{ path }}/lunr.stemmer.support.js"></script>
+{% set path = "assets/javascripts/lunr/" %}
+<script src="{{ (path ~ 'lunr.stemmer.support.js') | url }}"></script>
 {% for language in languages | map("trim") %}
 {% if language != "en" %}
 {% if language == "jp" %}
-<script src="{{ path }}/tinyseg.js"></script>
+<script src="{{ (path ~ 'tinyseg.js') | url }}"></script>
 {% endif %}
-<script src="{{ path }}/lunr.{{ language }}.js"></script>
+{% if language in ("da", "de", "du", "es", "fi", "fr", "hu", "it", "jp", "no", "pt", "ro", "ru", "sv", "tr") %}
+<script src="{{ (path ~ 'lunr.' ~ language ~ '.js') | url }}"></script>
+{% endif %}
 {% endif %}
 {% endfor %}
 {% if languages | length > 1 %}
-<script src="{{ path }}/lunr.multi.js"></script>
+<script src="{{ (path ~ 'lunr.multi.js') | url }}"></script>
 {% endif %}
 {% endif %}
-<script>app.initialize({url: {base: "{{ base_url }}"}})</script>
-{% for path in extra_javascript %}
-<script src="{{ path }}"></script>
+{% endif %}
+{% for path in config["extra_javascript"] %}
+<script src="{{ path | url }}"></script>
 {% endfor %}
 {% endblock %}
 {% block analytics %}
 {% if config.google_analytics %}
-<script>!function (e, t, a, n, o, c, i) {e.GoogleAnalyticsObject = o, e[o] = e[o] || function () {(e[o].q = e[o].q || []).push(arguments)}, e[o].l = 1 * new Date, c = t.createElement(a), i = t.getElementsByTagName(a)[0], c.async = 1, c.src = n, i.parentNode.insertBefore(c, i)}(window, document, "script", "https://www.google-analytics.com/analytics.js", "ga"), ga("create", "{{ config.google_analytics[0] }}", "{{ config.google_analytics[1] }}"), ga("set", "anonymizeIp", !0), ga("send", "pageview");
-var links = document.getElementsByTagName("a");
-Array.prototype.map.call(links, function (e) {
-    e.host != document.location.host && e.addEventListener("click", function () {
-        var t = e.getAttribute("data-md-action") || "follow";
-        ga("send", "event", "outbound", t, e.href)
-    })
-});
-var query = document.forms.search.query;
-query.addEventListener("blur", function () {
-    if (this.value) {
-        var e = document.location.pathname;
-        ga("send", "pageview", e + "?q=" + this.value)
-    }
-})</script>
+{% include "partials/integrations/analytics.html" %}
 {% endif %}
 {% endblock %}
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+<script type="text/javascript"> docsearch({
+  apiKey: atob(ak),
+  indexName: 'http4k',
+  inputSelector: '#search',
+  debug: false // Set debug to true if you want to inspect the dropdown
+});
+</script>
 </body>
 </html>
-

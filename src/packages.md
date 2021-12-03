@@ -7,7 +7,7 @@ Code for connecting http4k applications to AWS services, including request signi
 Common code relevant to HTTP client implementations.
 
 # Package org.http4k.contract
-Code for defining typesafe contracts which generate OpenAPI documentation.
+Code for defining typesafe HTTP contracts. Contains subpackages for OpenAPI v2 and v3
 
 # Package org.http4k.core
 The core abstractions for the http4k library.
@@ -21,8 +21,14 @@ Common code relevant to the various message format implementations (eg. JSON).
 # Package org.http4k.hamkrest
 Matchers for use with the hamkrest matching library.
 
+# Package org.http4k.kotest
+Matchers for use with the kotest matching library.
+
 # Package org.http4k.lens
 Code relevant to extracting and injecting typesafe values into HTTP messages.
+
+# Package org.http4k.contract.openapi
+Rendering for OpenAPI specifications
 
 # Package org.http4k.routing
 Code for routing HTTP messages inside server implementations.
@@ -38,6 +44,9 @@ Common code relevant to HTTP serverless implementations.
 
 # Package org.http4k.servlet
 Code for mounting http4k applications into Servlet containers.
+
+# Package org.http4k.strikt
+Matchers for use with the strikt matching library.
 
 # Package org.http4k.template
 Common code relevant to templating implementations.

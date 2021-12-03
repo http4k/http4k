@@ -1,0 +1,15 @@
+{
+  "custom": {
+    "type": "oauth2",
+    "flows": {
+      "implicit": {
+        "authorizationUrl": "/auth",
+        "refreshUrl": "/refresh",
+        "scopes": {
+          "name": "value"
+        },
+        "extra1": "value2"
+      }
+    }
+  }
+}

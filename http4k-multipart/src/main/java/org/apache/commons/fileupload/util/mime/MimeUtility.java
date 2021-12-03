@@ -19,6 +19,7 @@ package org.apache.commons.fileupload.util.mime;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -153,7 +154,7 @@ public final class MimeUtility {
 
                         // are any whitespace characters significant?  Append 'em if we've got 'em.
                         if (!previousTokenEncoded && startWhiteSpace != -1) {
-                            decodedText.append(text.substring(startWhiteSpace, endWhiteSpace));
+                            decodedText.append(text, startWhiteSpace, endWhiteSpace);
                             startWhiteSpace = -1;
                         }
                         // this is definitely a decoded token.
@@ -171,7 +172,7 @@ public final class MimeUtility {
                 // this is a normal token, so it doesn't matter what the previous token was.  Add the white space
                 // if we have it.
                 if (startWhiteSpace != -1) {
-                    decodedText.append(text.substring(startWhiteSpace, endWhiteSpace));
+                    decodedText.append(text, startWhiteSpace, endWhiteSpace);
                     startWhiteSpace = -1;
                 }
                 // this is not a decoded token.
@@ -191,8 +192,8 @@ public final class MimeUtility {
      *
      * @param word The possibly encoded word value.
      * @return The decoded word.
-     * @throws ParseException
-     * @throws UnsupportedEncodingException
+     * @throws ParseException               error
+     * @throws UnsupportedEncodingException error
      */
     private static String decodeWord(String word) throws ParseException, UnsupportedEncodingException {
         // encoded words start with the characters "=?".  If this not an encoded word, we throw a
@@ -235,7 +236,7 @@ public final class MimeUtility {
             // the decoder writes directly to an output stream.
             ByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());
 
-            byte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);
+            byte[] encodedData = encodedText.getBytes(StandardCharsets.US_ASCII);
 
             // Base64 encoded?
             switch (encoding) {

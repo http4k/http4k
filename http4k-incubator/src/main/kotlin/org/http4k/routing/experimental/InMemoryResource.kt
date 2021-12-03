@@ -17,7 +17,7 @@ class InMemoryResource(
         contentType: ContentType,
         lastModified: Instant? = null,
         etag: ETag? = null
-    ): this(content.toByteArray(Charsets.UTF_8), contentType, lastModified, etag)
+    ) : this(content.toByteArray(Charsets.UTF_8), contentType, lastModified, etag)
 
     override fun openStream() = ByteArrayInputStream(content)
 

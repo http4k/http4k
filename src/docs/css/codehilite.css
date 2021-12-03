@@ -1,0 +1,298 @@
+.codehilite code, .codehilite pre {
+    padding: 6px 0px 6px 12px;
+    margin-bottom: 16px;
+}
+
+/* source: http://smasue.github.io/pygments-darcula */
+.codehilite {
+    margin-bottom: 1.5em;
+    background-color: #2B2B2B;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.codehilite pre {
+    color: #A9B7C6;
+    position: relative;
+    margin: 0;
+    padding: 1em;
+    overflow-x: auto;
+}
+
+.codehilite pre::-webkit-scrollbar {
+    height: 10px;
+    background-color: #34362e;
+    border-radius: 0 0 4px 4px;
+}
+
+.codehilite pre::-webkit-scrollbar-thumb {
+    background-color: #75715e;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.codehilite ::selection {
+    background-color: #214283;
+    color: #A9B7C6;
+}
+
+.codehilite .hll {
+    background-color: #49483e;
+}
+
+.codehilite .c {
+    color: #75715e;
+}
+
+.codehilite .err {
+    color: #960050;
+    background-color: #1e0010;
+}
+
+.codehilite .k {
+    color: #CB772F;
+}
+
+.codehilite .l {
+    color: #6897BB;
+}
+
+.codehilite .n {
+    color: #A9B7C6;
+}
+
+.codehilite .o {
+    color: #A9B7C6;
+}
+
+.codehilite .p {
+    color: #A9B7C6;
+}
+
+.codehilite .cm {
+    color: #75715e;
+}
+
+.codehilite .cp {
+    color: #75715e;
+}
+
+.codehilite .c1 {
+    color: #75715e;
+}
+
+.codehilite .cs {
+    color: #75715e;
+}
+
+.codehilite .ge {
+    font-style: italic;
+}
+
+.codehilite .gs {
+    font-weight: bold;
+}
+
+.codehilite .kc {
+    color: #CB772F;
+}
+
+.codehilite .kd {
+    color: #CB772F;
+}
+
+.codehilite .kn {
+    color: #A9B7C6;
+}
+
+.codehilite .kp {
+    color: #CB772F;
+}
+
+.codehilite .kr {
+    color: #CB772F;
+}
+
+.codehilite .kt {
+    color: #CB772F;
+}
+
+.codehilite .ld {
+    color: #A5C25C;
+}
+
+.codehilite .m {
+    color: #6897BB;
+}
+
+.codehilite .s {
+    color: #A5C25C;
+}
+
+.codehilite .na {
+    color: #9876AA;
+}
+
+.codehilite .nb {
+    color: #A9B7C6;
+}
+
+.codehilite .nc {
+    color: #88be05;
+}
+
+.codehilite .no {
+    color: #CB772F;
+}
+
+.codehilite .nd {
+    color: #f1c829;
+}
+
+.codehilite .ni {
+    color: #A9B7C6;
+}
+
+.codehilite .ne {
+    color: #88be05;
+}
+
+.codehilite .nf {
+    color: #88be05;
+}
+
+.codehilite .nl {
+    color: #A9B7C6;
+}
+
+.codehilite .nn {
+    color: #A9B7C6;
+}
+
+.codehilite .nx {
+    color: #88be05;
+}
+
+.codehilite .py {
+    color: #A9B7C6;
+}
+
+.codehilite .nt {
+    color: #f1c829;
+}
+
+.codehilite .nv {
+    color: #A9B7C6;
+}
+
+.codehilite .ow {
+    color: #A9B7C6;
+}
+
+.codehilite .w {
+    color: #A9B7C6;
+}
+
+.codehilite .mf {
+    color: #6897BB;
+}
+
+.codehilite .mh {
+    color: #6897BB;
+}
+
+.codehilite .mi {
+    color: #6897BB;
+}
+
+.codehilite .mo {
+    color: #6897BB;
+}
+
+.codehilite .sb {
+    color: #A5C25C;
+}
+
+.codehilite .sc {
+    color: #A5C25C;
+}
+
+.codehilite .sd {
+    color: #A5C25C;
+}
+
+.codehilite .s2 {
+    color: #A5C25C;
+}
+
+.codehilite .se {
+    color: #6897BB;
+}
+
+.codehilite .sh {
+    color: #A5C25C;
+}
+
+.codehilite .si {
+    color: #A5C25C;
+}
+
+.codehilite .sx {
+    color: #A5C25C;
+}
+
+.codehilite .sr {
+    color: #A5C25C;
+}
+
+.codehilite .s1 {
+    color: #A5C25C;
+}
+
+.codehilite .ss {
+    color: #A5C25C;
+}
+
+.codehilite .bp {
+    color: #A9B7C6;
+}
+
+.codehilite .vc {
+    color: #A9B7C6;
+}
+
+.codehilite .vg {
+    color: #A9B7C6;
+}
+
+.codehilite .vi {
+    color: #A9B7C6;
+}
+
+.codehilite .il {
+    color: #6897BB;
+}
+
+.codehilite .gu {
+    color: #75715e;
+}
+
+.codehilite .gd {
+    color: #A9B7C6;
+}
+
+.codehilite .gi {
+    color: #88be05;
+}
+
+.codehilite .l-Scalar-Plain {
+    color: #88be05;
+}
+
+.codehilite .lineno {
+    border-right: solid 1px #A9B7C6;
+    color: #A9B7C6;
+    padding-right: 5px;
+}

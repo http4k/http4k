@@ -37,12 +37,17 @@ class UriTest {
     @Test
     fun `handles no prefixed slash in a path`() {
         val uri = Uri.of("")
-                .scheme("https")
-                .host("example.com")
-                .port(1234)
-                .path("a/b/c")
+            .scheme("https")
+            .host("example.com")
+            .port(1234)
+            .path("a/b/c")
 
         assertThat(uri.toString(), equalTo("https://example.com:1234/a/b/c"))
+    }
+
+    @Test
+    fun `equality for round tripping`() {
+        assertThat(Uri.of("path"), equalTo(Uri.of(Uri.of("path").toString())))
     }
 
     @Test
@@ -71,16 +76,37 @@ class UriTest {
     }
 
     @Test
-    fun parameters_can_be_defined_in_value(){
+    fun can_remove_parameter() {
+        assertThat(Uri.of(value = "http://ignore")
+            .query("a", "b")
+            .query("c", "d")
+            .query("a", "c")
+            .removeQuery("a").toString(), equalTo("http://ignore?c=d"))
+    }
+
+    @Test
+    fun parameters_can_be_defined_in_value() {
         assertThat(Uri.of("http://www.google.com?a=b"), equalTo(Uri.of("http://www.google.com").query("a", "b")))
     }
 
     @Test
-    fun `can encode and decode a path segment correctly`() {
+    fun `can encode a path segment correctly`() {
         val original = "123 / 456"
-        val encoded = "123%20%2F%20456"
+        val encoded = "123+%2F+456"
         assertThat(original.toPathEncoded(), equalTo(encoded))
-        assertThat(encoded.fromPathEncoded(), equalTo(original))
     }
 
+    @Test
+    fun `can extend existing uri path`() {
+        assertThat(Uri.of("http://ignore").extend(Uri.of("/")), equalTo(Uri.of("http://ignore/")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("")), equalTo(Uri.of("http://ignore/a")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("/b")), equalTo(Uri.of("http://ignore/a/b")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("b")), equalTo(Uri.of("http://ignore/a/b")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("b/")), equalTo(Uri.of("http://ignore/a/b/")))
+    }
+
+    @Test
+    fun `can extend existing uri`() {
+        assertThat(Uri.of("http://ignore?foo=bar").extend(Uri.of("/?abc=xyz")), equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz")))
+    }
 }

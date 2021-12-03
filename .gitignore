@@ -2,10 +2,12 @@
 *.iml
 .gradle/
 build/
-gradle.properties
 .DS_Store
 classes/
 /site/
 out/
-src/docs/index.md
 store/
+intellij-settings/
+**/*.actual
+local.properties
+local.properties.bak

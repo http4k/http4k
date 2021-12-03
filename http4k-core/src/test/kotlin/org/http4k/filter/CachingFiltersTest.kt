@@ -2,7 +2,6 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.PUT
@@ -37,17 +36,17 @@ class CachingFiltersTest {
         val maxAge = Duration.ofSeconds(1)
         val response = AddIfModifiedSince(clock, maxAge).then { Response(OK).header("If-modified-since", it.header("If-modified-since")) }(
             request)
-        response shouldMatch hasHeader("If-modified-since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge)))
+        assertThat(response, hasHeader("If-modified-since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
     }
 
     @Test
     fun `Add eTag`() {
-        val response = AddETag({ true }).then { Response(OK).body("bob") }(
+        val response = AddETag { true }.then { Response(OK).body("bob") }(
             request)
-        response shouldMatch hasHeader("etag", "9f9d51bc70ef21ca5c14f307980a29d8")
+        assertThat(response, hasHeader("etag", "9f9d51bc70ef21ca5c14f307980a29d8"))
     }
 
-    fun getResponseWith(cacheTimings: DefaultCacheTimings, response: Response) = FallbackCacheControl(clock, cacheTimings).then { response }(request)
+    private fun getResponseWith(cacheTimings: DefaultCacheTimings, response: Response) = FallbackCacheControl(clock, cacheTimings).then { response }(request)
 
     @Test
     fun `FallbackCacheControl - adds the headers if they are not set`() {
@@ -55,9 +54,9 @@ class CachingFiltersTest {
         val responseWithNoHeaders = Response(OK)
         val response = getResponseWith(timings, responseWithNoHeaders)
 
-        response shouldMatch hasHeader("Cache-Control", "public, max-age=10, stale-while-revalidate=3000, stale-if-error=2000")
-        response shouldMatch hasHeader("Expires", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(maxAge)))
-        response shouldMatch hasHeader("Vary", "Accept-Encoding")
+        assertThat(response, hasHeader("Cache-Control", "public, max-age=10, stale-while-revalidate=3000, stale-if-error=2000"))
+        assertThat(response, hasHeader("Expires", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(maxAge))))
+        assertThat(response, hasHeader("Vary", "Accept-Encoding"))
     }
 
     @Test
@@ -65,48 +64,57 @@ class CachingFiltersTest {
         val responseWithHeaders = Response(OK).header("Cache-Control", "rita").header("Expires", "sue").header("Vary", "bob")
         val response = getResponseWith(timings, responseWithHeaders)
 
-        response shouldMatch hasHeader("Cache-Control", "rita")
-        response shouldMatch hasHeader("Expires", "sue")
-        response shouldMatch hasHeader("Vary", "bob")
+        assertThat(response, hasHeader("Cache-Control", listOf("rita")))
+        assertThat(response, hasHeader("Expires", listOf("sue")))
+        assertThat(response, hasHeader("Vary", listOf("bob")))
     }
 
     @Test
     fun `NoCache - does not cache non-GET requests`() {
-        val response = responseWith(NoCache(), Request(PUT, ""))
+        val response = NoCache().responseFor(Request(PUT, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }
 
     @Test
     fun `NoCache - adds correct headers to GET responses`() {
-        val response = responseWith(NoCache(), Request(GET, ""))
-        response shouldMatch hasHeader("Cache-Control", "private, must-revalidate")
-        response shouldMatch hasHeader("Expires", "0")
+        val response = NoCache().responseFor(Request(GET, ""))
+        assertThat(response, hasHeader("Cache-Control", "private, must-revalidate"))
+        assertThat(response, hasHeader("Expires", "0"))
     }
 
     @Test
     fun `NoCache - does not add headers if response fails predicate`() {
-        val response = responseWith(NoCache { false }, Request(GET, ""))
+        val response = NoCache { false }.responseFor(Request(GET, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }
 
     @Test
     fun `MaxAge - does not cache non-GET requests`() {
-        val response = responseWith(MaxAge(clock, Duration.ofHours(1)), Request(PUT, ""))
+        val response = MaxAge(clock, Duration.ofHours(1)).responseFor(Request(PUT, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }
 
     @Test
     fun `MaxAge - adds correct headers to GET responses`() {
-        val response = responseWith(MaxAge(clock, Duration.ofHours(1)), Request(GET, ""))
-        response shouldMatch hasHeader("Cache-Control", "public, max-age=3600")
-        response shouldMatch hasHeader("Expires", ZonedDateTime.now(clock).plusHours(1).format(RFC_1123_DATE_TIME))
+        val response = MaxAge(clock, Duration.ofHours(1)).responseFor(Request(GET, ""))
+        assertThat(response, hasHeader("Cache-Control", "public, max-age=3600"))
+        assertThat(response, hasHeader("Expires", ZonedDateTime.now(clock).plusHours(1).format(RFC_1123_DATE_TIME)))
+    }
+
+    @Test
+    fun `MaxAge - adds correct headers to GET when illegal header value`() {
+        val responseWithHeaders = Response(OK).header("Date", "foobar")
+
+        val response = (MaxAge(clock, Duration.ofHours(1)).then { responseWithHeaders })(Request(GET, ""))
+        assertThat(response, hasHeader("Cache-Control", "public, max-age=3600"))
+        assertThat(response, hasHeader("Expires", ZonedDateTime.now(clock).plusHours(1).format(RFC_1123_DATE_TIME)))
     }
 
     @Test
     fun `MaxAge - does not add headers if response fails predicate`() {
-        val response = responseWith(MaxAge(clock, Duration.ofHours(1), { false }), Request(GET, ""))
+        val response = MaxAge(clock, Duration.ofHours(1)) { false }.responseFor(Request(GET, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }
 
-    private fun responseWith(CachingFilters: Filter, request: Request) = CachingFilters.then { response }(request)
+    private fun Filter.responseFor(request: Request) = then { response }(request)
 }

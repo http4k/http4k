@@ -8,8 +8,8 @@ sealed class PathSegments {
 
     abstract fun startsWith(other: PathSegments): Boolean
     operator fun div(child: String): PathSegments = Slash(this, child)
-    operator fun div(child: PathSegments): PathSegments = child.toList().fold(this) {
-        memo, next -> memo / next
+    operator fun div(child: PathSegments): PathSegments = child.toList().fold(this) { memo, next ->
+        memo / next
     }
 
     companion object {
@@ -27,7 +27,7 @@ sealed class PathSegments {
 data class Slash(override val parent: PathSegments, private val child: String) : PathSegments() {
     override fun toList(): List<String> = parent.toList().plus(child)
     override fun toString(): String = "$parent/$child"
-    override fun startsWith(other: PathSegments): Boolean = other.toList().let {toList().take(it.size) == it}
+    override fun startsWith(other: PathSegments): Boolean = other.toList().let { toList().take(it.size) == it }
 }
 
 object Root : PathSegments() {
@@ -40,4 +40,4 @@ object Root : PathSegments() {
 internal fun Request.isIn(contractRoot: PathSegments) = pathSegments().startsWith(contractRoot)
 
 internal fun Request.pathSegments() = PathSegments(uri.path)
-internal fun Request.without(pathSegments: PathSegments) = PathSegments(this.uri.path.replace(pathSegments.toString(), ""))
+internal fun Request.without(pathSegments: PathSegments) = PathSegments(uri.path.replace(pathSegments.toString(), ""))

@@ -9,8 +9,8 @@ import org.http4k.lens.Path
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
 import org.http4k.server.Jetty
+import org.http4k.server.PolyHandler
 import org.http4k.server.asServer
-import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
@@ -18,7 +18,7 @@ import org.http4k.websocket.WsMessage
 // in json, this looks like: {"value": 123, "currency: "EUR" }
 data class Money(val value: Int, val currency: String)
 
-fun main(args: Array<String>) {
+fun main() {
 
     // we use the Lens API to convert between the WsMessage and the Money instance, and to
     // dynamically bind the "name" from the path

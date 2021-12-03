@@ -1,3 +1,7 @@
+.codehilite code {
+    padding-left: 0;
+}
+
 .gist-meta {
     display: none;
 }
@@ -30,6 +34,11 @@ ul.statusLink li {
     background-color: rgba(46, 123, 244, 0.96);
 }
 
+.blogImage {
+    width: 100%;
+    height: auto;
+}
+
 .github {
     display: none;
 }
@@ -37,5 +46,40 @@ ul.statusLink li {
 .octocat {
     position: relative;
     top: 1px;
-    width: 16px ;
+    width: 16px;
+    content: url("/img/octocat-32.png");
+}
+
+.pill {
+    background-color: #2e7bf4;
+    border: none;
+    padding: 5px 10px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    border-radius: 5px;
+}
+
+.headerlink {
+    font-size: 1.5rem;
+    display: none;
+    padding-left: .3em;
+}
+
+h1:hover .headerlink, h2:hover .headerlink, h3:hover .headerlink, h4:hover .headerlink, h5:hover .headerlink, h6:hover .headerlink{
+    display:inline-block;
+}
+
+.searchBox {
+    float: right;
+    position: relative;
+}
+
+.searchBoxIcon {
+    position: absolute;
+    right: 6px;
+    z-index: 10;
+    top: 5px;
 }

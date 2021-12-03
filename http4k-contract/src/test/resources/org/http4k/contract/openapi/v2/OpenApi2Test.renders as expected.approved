@@ -1,0 +1,1171 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "hello",
+      "description": "world"
+    },
+    {
+      "name": "tag1"
+    },
+    {
+      "name": "tag3",
+      "description": "tag3 description"
+    }
+  ],
+  "paths": {
+    "/basepath/and_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathAnd_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "and1": [
+            ],
+            "and2": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/basic_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBasic_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/bearer_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBearer_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+        ]
+      }
+    },
+    "/basepath/body_auto_map": {
+      "put": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "putBasepathBody_auto_map",
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/object490718055"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_auto_schema": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_auto_schema",
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/someOtherId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "putBasepathBody_auto_schema",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/object1366892779"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/object1547825812"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_auto_schema_multiple_request_schemas": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_auto_schema_multiple_request_schemas",
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/object1547825812"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_auto_schema_multiple_response_schemas": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/object1547825812"
+            }
+          },
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/object1547825812"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_auto_schema_name_definition_id": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_auto_schema_name_definition_id",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/impl1"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_form": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_form",
+        "produces": [
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "b",
+            "required": true,
+            "type": "boolean",
+            "description": "booleanField"
+          },
+          {
+            "in": "formData",
+            "name": "i",
+            "required": false,
+            "type": "integer",
+            "description": "intField"
+          },
+          {
+            "in": "formData",
+            "name": "s",
+            "required": false,
+            "type": "string",
+            "description": "stringField"
+          },
+          {
+            "in": "formData",
+            "name": "e",
+            "required": false,
+            "type": "string",
+            "description": "enumField"
+          },
+          {
+            "in": "formData",
+            "name": "j",
+            "required": true,
+            "type": "string",
+            "description": "jsonField"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_json_list_schema": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_list_schema",
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/object-1365611171"
+              }
+            },
+            "description": "json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_json_noschema": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_noschema",
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+            },
+            "description": "json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_json_response": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_response",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "normal",
+            "schema": {
+              "$ref": "#/definitions/object-1365611171"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_json_schema": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_schema",
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/someDefinitionId"
+            },
+            "description": "json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_string": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_string",
+        "produces": [
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "getBasepathBody_string",
+        "produces": [
+          "text/plain"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/cookies": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathCookies",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "b",
+            "required": true,
+            "type": "string",
+            "description": "requiredCookie"
+          },
+          {
+            "in": "cookie",
+            "name": "s",
+            "required": false,
+            "type": "string",
+            "description": "optionalCookie"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/descriptions": {
+      "get": {
+        "tags": [
+          "tag1",
+          "tag3"
+        ],
+        "summary": "endpoint",
+        "operationId": "echoMessage",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "description": "some rambling description of what this thing actually does"
+      }
+    },
+    "/basepath/headers": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathHeaders",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "b",
+            "required": true,
+            "type": "boolean",
+            "description": "booleanHeader"
+          },
+          {
+            "in": "header",
+            "name": "s",
+            "required": false,
+            "type": "string",
+            "description": "stringHeader"
+          },
+          {
+            "in": "header",
+            "name": "i",
+            "required": false,
+            "type": "integer",
+            "description": "intHeader"
+          },
+          {
+            "in": "header",
+            "name": "e",
+            "required": false,
+            "type": "string",
+            "description": "enumHeader"
+          },
+          {
+            "in": "header",
+            "name": "j",
+            "required": false,
+            "type": "string",
+            "description": "jsonHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/multipart_fields": {
+      "put": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "putBasepathMultipart_fields",
+        "produces": [
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "in": "form",
+            "name": "stringField",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "form",
+            "name": "fileField",
+            "required": true,
+            "schema": {
+              "type": "file"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/nometa": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "getBasepathNometa",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/oauth2_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathOauth2_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+        ]
+      }
+    },
+    "/basepath/or_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathOr_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "or1": [
+            ]
+          },
+          {
+            "or2": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/paths/{firstName}/bertrand/{age}/{foo}": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathPaths_firstName_Bertrand_age__foo",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "firstName",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "age",
+            "required": true,
+            "type": "boolean"
+          },
+          {
+            "in": "path",
+            "name": "foo",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/produces_and_consumes": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "getBasepathProduces_and_consumes",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "consumes": [
+          "application/octet-stream",
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/queries": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathQueries",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            },
+            "description": "booleanQuery"
+          },
+          {
+            "in": "query",
+            "name": "s",
+            "required": false,
+            "type": "string",
+            "description": "stringQuery"
+          },
+          {
+            "in": "query",
+            "name": "i",
+            "required": false,
+            "type": "integer",
+            "description": "intQuery"
+          },
+          {
+            "in": "query",
+            "name": "e",
+            "required": false,
+            "type": "string",
+            "description": "enumQuery"
+          },
+          {
+            "in": "query",
+            "name": "j",
+            "required": false,
+            "type": "string",
+            "description": "jsonQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/returning": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathReturning",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "403": {
+            "description": "no way jose",
+            "schema": {
+              "$ref": "#/definitions/object1283926341"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "the_api_key"
+    },
+    "basicAuth": {
+      "type": "basic"
+    },
+    "and1": {
+      "type": "basic"
+    },
+    "and2": {
+      "type": "basic"
+    },
+    "or1": {
+      "type": "basic"
+    },
+    "or2": {
+      "type": "basic"
+    }
+  },
+  "definitions": {
+    "object490718055": {
+      "type": "object",
+      "properties": {
+        "foo": {
+          "type": "integer",
+          "example": 123
+        }
+      }
+    },
+    "object1506938668": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "example": "bob"
+        }
+      }
+    },
+    "impl1": {
+      "type": "object",
+      "properties": {
+        "obj": {
+          "$ref": "#/definitions/object1506938668"
+        }
+      }
+    },
+    "object1547825812": {
+      "type": "object",
+      "properties": {
+        "anotherString": {
+          "type": "string",
+          "example": "bing"
+        }
+      }
+    },
+    "object1366892779": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "example": "http://foowang"
+        },
+        "additional": {
+          "$ref": "#/definitions/object490718055"
+        }
+      }
+    },
+    "object1544899175": {
+      "type": "object",
+      "properties": {
+        "anotherString": {
+          "type": "string",
+          "example": "bar"
+        }
+      }
+    },
+    "someOtherId": {
+      "type": "object",
+      "properties": {
+        "string": {
+          "type": "string",
+          "example": "s"
+        },
+        "child": {
+          "$ref": "#/definitions/object1544899175"
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        "bool": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    },
+    "object1283926341": {
+      "type": "object",
+      "properties": {
+        "aString": {
+          "type": "string",
+          "example": "a message of some kind"
+        }
+      }
+    },
+    "object-1365611171": {
+      "type": "object",
+      "properties": {
+        "aNumberField": {
+          "type": "integer",
+          "example": 123
+        }
+      }
+    },
+    "someDefinitionId": {
+      "type": "object",
+      "properties": {
+        "anAnotherObject": {
+          "$ref": "#/definitions/object-1365611171"
+        }
+      }
+    }
+  },
+  "host": "example.org:8000",
+  "schemes": [
+    "http"
+  ],
+  "x-extension": [
+    "extensionField"
+  ]
+}

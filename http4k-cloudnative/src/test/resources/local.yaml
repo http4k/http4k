@@ -1,0 +1,11 @@
+# ignore comment
+string: "hello"
+child:
+  string: "world"
+  child: null
+  numbers:
+    - 1
+    - 2
+  bool: true
+numbers: []
+bool: false

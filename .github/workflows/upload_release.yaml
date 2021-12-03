@@ -1,0 +1,44 @@
+name: Publish Artifacts
+on:
+  push:
+    tags:
+      - '*'
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+jobs:
+  StageMC:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Grab tag name
+        uses: olegtarasov/get-tag@v2
+        id: tagName
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Upload to Sonatype
+        run: |
+          ./gradlew publishMavenJavaPublicationToSonatypeStagingRepository \
+          -Psign=true \
+          -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
+          -PsigningKey="${{ secrets.SIGNING_KEY }}" \
+          -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}" \
+          -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
+          -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
+  ReleaseMC:
+    needs: [StageMC]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Release to Maven Central
+        run: |
+          ./gradlew closeAndReleaseRepository \
+          -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
+          -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"

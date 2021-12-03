@@ -4,12 +4,15 @@ import java.net.URLEncoder
 import java.nio.ByteBuffer
 import java.util.Base64
 
+fun ByteBuffer.length() = limit() - position()
 
-fun ByteBuffer.asString(): String = String(array())
+fun ByteBuffer.asString(): String = String(array(), position(), length())
 
-fun String.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(this.toByteArray())
+fun ByteBuffer.base64Encode() : String = Base64.getEncoder().encodeToString(array())
 
-fun String.quoted() = "\"${this.replace("\"", "\\\"")}\""
+fun String.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(toByteArray())
+
+fun String.quoted() = "\"${replace("\"", "\\\"")}\""
 
 fun String.unquoted(): String = replaceFirst("^\"".toRegex(), "").replaceFirst("\"$".toRegex(), "").replace("\\\"", "\"")
 

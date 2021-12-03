@@ -1,0 +1,40 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.MapHolder",
+    "example": null,
+    "description": null
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.openapi.v3.MapHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "additionalProperties": {
+              "properties": {
+              },
+              "example": {
+              },
+              "description": null,
+              "type": "object",
+              "required": [
+              ]
+            },
+            "example": null,
+            "description": null,
+            "type": "object"
+          }
+        },
+        "example": {
+          "value": {
+          }
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    }
+  ]
+}

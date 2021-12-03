@@ -4,17 +4,17 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.junit.jupiter.api.Test
 
 class HttpMessageTest {
 
-    private val emptyRequest = Request(Method.GET, "")
+    private val emptyRequest = Request(GET, "")
 
     @Test
     fun `can bind many objects to a request`() {
@@ -42,5 +42,3 @@ class HttpMessageTest {
         assertThat(CONTENT_TYPE(populated), equalTo(TEXT_PLAIN))
     }
 }
-
-

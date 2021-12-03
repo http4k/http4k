@@ -1,13 +1,16 @@
 package org.http4k.filter
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
+import org.http4k.core.NoOp
 import org.http4k.core.then
 import java.io.PrintStream
+import java.lang.management.ManagementFactory.getRuntimeMXBean
 
 object DebuggingFilters {
-    private const val defaultDebugStream = true
+    private const val defaultDebugStream = false
 
     /**
      * Print details of the request before it is sent to the next service.
@@ -30,7 +33,7 @@ object DebuggingFilters {
                         response
                     }
                 } catch (e: Exception) {
-                    out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri}  *****")
+                    out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri} *****")
                     e.printStackTrace(out)
                     throw e
                 }
@@ -39,7 +42,7 @@ object DebuggingFilters {
     }
 
     private fun HttpMessage.printable(debugStream: Boolean) =
-            if (debugStream || body is MemoryBody) this else body("<<stream>>")
+        if (debugStream || body is MemoryBody) this else body("<<stream>>")
 
     /**
      * Print details of a request and it's response.
@@ -47,4 +50,11 @@ object DebuggingFilters {
     object PrintRequestAndResponse {
         operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream) = PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
     }
+}
+
+fun HttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) = DebuggingFilters.PrintRequestAndResponse(out, debugStream).then(this)
+
+fun Filter.inIntelliJOnly() = when {
+    getRuntimeMXBean().inputArguments.find { it.contains("idea", true) } != null -> this
+    else -> Filter.NoOp
 }

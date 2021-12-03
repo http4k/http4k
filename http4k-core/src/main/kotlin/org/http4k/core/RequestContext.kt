@@ -1,21 +1,21 @@
 package org.http4k.core
 
 import org.http4k.lens.Header
-import org.http4k.lens.LensExtractor
-import org.http4k.lens.LensInjector
+import org.http4k.lens.LensInjectorExtractor
 import java.util.UUID
 
-
-class RequestContext internal constructor(internal val id: UUID = UUID.randomUUID()) {
+class RequestContext internal constructor(val id: UUID = UUID.randomUUID()) {
     private val objects = mutableMapOf<String, Any>()
 
-    companion object : LensExtractor<Request, UUID>, LensInjector<UUID, Request> {
+    companion object {
+        fun lensForStore(storeId: String?) = object : LensInjectorExtractor<Request, UUID> {
+            private val X_HTTP4K_CONTEXT = Header.map(UUID::fromString, UUID::toString)
+                .required("x-http4k-context" + (storeId?.let { "-$it" } ?: ""))
 
-        private val X_HTTP4K_CONTEXT = Header.map(UUID::fromString, UUID::toString).required("x-http4k-context")
+            override fun <R : Request> invoke(value: UUID, target: R): R = X_HTTP4K_CONTEXT(value, target)
 
-        override fun <R : Request> invoke(value: UUID, target: R): R = X_HTTP4K_CONTEXT(value, target)
-
-        override fun invoke(target: Request): UUID = X_HTTP4K_CONTEXT(target)
+            override fun invoke(target: Request): UUID = X_HTTP4K_CONTEXT(target)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

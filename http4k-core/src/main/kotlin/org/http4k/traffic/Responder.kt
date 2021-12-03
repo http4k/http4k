@@ -5,7 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters
 
@@ -13,7 +13,7 @@ import org.http4k.filter.TrafficFilters
  * Provides HTTP Handlers which respond using pre-stored Requests.
  */
 object Responder {
-    private val fallback: (Request) -> Response = { Response(Status.SERVICE_UNAVAILABLE.description("no more traffic to replay")) }
+    private val fallback: (Request) -> Response = { Response(SERVICE_UNAVAILABLE.description("no more traffic to replay")) }
 
     /**
      * An HTTP Handler which responds to particular requests with the matching cached responses, or a 503.

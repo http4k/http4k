@@ -6,14 +6,13 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-
 class RequestContextTest {
 
     @Test
     fun `can set and get a typed value from a RequestContext`() {
         val requestContext = RequestContext(UUID.randomUUID())
         requestContext["foo"] = 123
-        assertThat(requestContext.get("foo"), equalTo(123))
+        assertThat(requestContext.get<Int>("foo"), equalTo(123))
     }
 
     @Test

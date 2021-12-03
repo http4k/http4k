@@ -1,12 +1,38 @@
-description = 'http4k typesafe HTTP contracts and OpenApi support'
+description = "http4k typesafe HTTP contracts and OpenApi support"
+
+apply plugin: "org.openapi.generator"
 
 dependencies {
-    provided kotlin_lib
-
-    provided project(":http4k-core")
-    testCompile project(":http4k-format-argo")
-    testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-    testCompile testing
+    api(project(":http4k-core"))
+    api("org.jetbrains.kotlin:kotlin-reflect:_")
+    implementation project(":http4k-security-oauth")
+    implementation project(":http4k-format-jackson")
+    testImplementation(project(":http4k-format-jackson"))
+    testImplementation(project(":http4k-format-argo"))
+    testImplementation(project(":http4k-multipart"))
+    testImplementation(project(":http4k-testing-approval"))
+    testImplementation(project(path: ":http4k-core", configuration: "testArtifacts"))
+    testImplementation(project(path: ":http4k-security-oauth", configuration: "testArtifacts"))
 }
 
+task generateOpenApi3AutoClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "kotlin"
+    outputDir = "."
+    inputSpec = "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved".toString()
+}
 
+task generateOpenApi3Client(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "kotlin"
+    outputDir = "."
+    inputSpec = "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3Test.renders as expected.approved".toString()
+}
+
+task generateOpenApi2Client(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "kotlin"
+    outputDir = "."
+    inputSpec = "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved".toString()
+}
+
+check.dependsOn("generateOpenApi3AutoClient")
+check.dependsOn("generateOpenApi3Client")
+check.dependsOn("generateOpenApi2Client")

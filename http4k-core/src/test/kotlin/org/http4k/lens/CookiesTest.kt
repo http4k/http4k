@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
@@ -33,11 +32,23 @@ class CookiesTest {
     fun `value missing`() {
         assertThat(Cookies.optional("world")(request), absent())
         val required = Cookies.required("world")
-        assertThat({ required(request) }, throws(lensFailureWith(Missing(required.meta), overallType = Failure.Type.Missing)))
+        assertThat({ required(request) }, throws(lensFailureWith<Request>(Missing(required.meta), overallType = Failure.Type.Missing)))
 
         assertThat(Cookies.multi.optional("world")(request), absent())
         val optionalMulti = Cookies.multi.required("world")
-        assertThat({ optionalMulti(request) }, throws(lensFailureWith(Missing(optionalMulti.meta), overallType = Failure.Type.Missing)))
+        assertThat({ optionalMulti(request) }, throws(lensFailureWith<Request>(Missing(optionalMulti.meta), overallType = Failure.Type.Missing)))
+    }
+
+    @Test
+    fun `value replaced`() {
+        val single = Cookies.required("world")
+        val target = single(Cookie("world", "value1"), request)
+        val actual = single(Cookie("world", "value2"), target)
+        assertThat(actual, equalTo(request.cookie(Cookie("world", "value2"))))
+
+        val multi = Cookies.multi.required("world")
+        assertThat(multi(listOf(Cookie("world", "value3"), Cookie("world", "value4")), multi(listOf(Cookie("world", "value1"), Cookie("world", "value2")), request)),
+            equalTo(request.cookie(Cookie("world", "value3")).cookie(Cookie("world", "value4"))))
     }
 
     @Test
@@ -45,16 +56,16 @@ class CookiesTest {
         val asInt = Cookies.map { it.value.toInt() }
 
         val required = asInt.required("hello")
-        assertThat({ required(request) }, throws(lensFailureWith(Invalid(required.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ required(request) }, throws(lensFailureWith<Request>(Invalid(required.meta), overallType = Failure.Type.Invalid)))
 
         val optional = asInt.optional("hello")
-        assertThat({ optional(request) }, throws(lensFailureWith(Invalid(optional.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optional(request) }, throws(lensFailureWith<Request>(Invalid(optional.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMulti = asInt.multi.required("hello")
-        assertThat({ requiredMulti(request) }, throws(lensFailureWith(Invalid(requiredMulti.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredMulti(request) }, throws(lensFailureWith<Request>(Invalid(requiredMulti.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMulti = asInt.multi.optional("hello")
-        assertThat({ optionalMulti(request) }, throws(lensFailureWith(Invalid(optionalMulti.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalMulti(request) }, throws(lensFailureWith<Request>(Invalid(optionalMulti.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
@@ -67,14 +78,14 @@ class CookiesTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = Cookies.map({ MyCustomBodyType(it.value) }, { Cookie("bob", it.value) }).required("bob")
+        val custom = Cookies.map({ MyCustomType(it.value) }, { Cookie("bob", it.value) }).required("bob")
 
-        val instance = MyCustomBodyType("hello world!")
-        val reqWithCookies = custom(instance, Request(Method.GET, ""))
+        val instance = MyCustomType("hello world!")
+        val reqWithCookies = custom(instance, Request(GET, ""))
 
         assertThat(reqWithCookies.cookie("bob"), equalTo(Cookie("bob", "hello world!")))
 
-        assertThat(custom(reqWithCookies), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(custom(reqWithCookies), equalTo(MyCustomType("hello world!")))
     }
 
     @Test

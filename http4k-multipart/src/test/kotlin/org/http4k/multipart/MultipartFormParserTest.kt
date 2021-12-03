@@ -57,18 +57,17 @@ class MultipartFormParserTest {
         } catch (e: IOException) {
             // general stream exceptions
         }
-
     }
 
     @Test
     fun uploadMultipleFilesAndFields() {
         val boundary = "-----1234"
         val multipartFormContentsStream = MultipartFormBuilder(boundary)
-            .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream())
-            .field("field", "fieldValue" + CR_LF + "with cr lf")
-            .field("multi", "value1")
-            .file("anotherFile", "BAR.tab", "text/something", "This is another file\n".byteInputStream())
-            .field("multi", "value2")
+            .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream(), emptyList())
+            .field("field", "fieldValue" + CR_LF + "with cr lf", emptyList())
+            .field("multi", "value1", emptyList())
+            .file("anotherFile", "BAR.tab", "text/something", "This is another file\n".byteInputStream(), emptyList())
+            .field("multi", "value2", emptyList())
             .stream()
         val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
 
@@ -174,7 +173,6 @@ class MultipartFormParserTest {
 
         assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[3], "utf8\uD83D\uDCA9.txt", txt)
         assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[1], "starbucks.jpeg", jpeg)
-
     }
 
     private fun assertPartSaved(fileName: String, files: Array<String>?) {
@@ -206,6 +204,6 @@ class MultipartFormParserTest {
 
 private fun List<Part>.close() = forEach(Part::close)
 
-private fun List<Part>.parts(name:String): List<Part> = filter { it.fieldName == name }
+private fun List<Part>.parts(name: String): List<Part> = filter { it.fieldName == name }
 
 internal fun Part.isInMemory(): Boolean = this is Part.InMemory

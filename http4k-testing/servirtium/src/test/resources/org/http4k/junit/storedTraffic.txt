@@ -1,0 +1,31 @@
+## Interaction 0: POST /foo
+
+### Request headers recorded for playback:
+
+## some note
+
+```
+header1: value1
+toBeAdded: value
+```
+
+### Request body recorded for playback ():
+
+```
+body
+```
+
+## some other note
+
+### Response headers recorded for playback:
+
+```
+header3: value3
+```
+
+### Response body recorded for playback (200: ):
+
+```
+body1
+```
+

@@ -1,0 +1,7 @@
+<templateSet group="http4k">
+{{#each templates}}
+    <template name="{{name}}" value="{{{value}}}" description="{{description}}" toReformat="true" toShortenFQNames="true">
+    {{#each variables}} <variable name="{{this}}" expression="" defaultValue="" alwaysStopAt="true"/>{{/each}}<context><option name="KOTLIN" value="true"/></context>
+    </template>
+    {{/each}}
+</templateSet>
