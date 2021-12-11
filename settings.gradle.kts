@@ -1,9 +1,7 @@
 rootProject.name = "http4k"
 
 plugins {
-    id("de.fayard.refreshVersions").version("0.21.0")
-////                            # available:"0.22.0")
-////                            # available:"0.23.0")
+    id("de.fayard.refreshVersions").version("0.23.0")
 }
 
 refreshVersions {

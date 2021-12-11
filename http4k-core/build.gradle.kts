@@ -1,7 +1,7 @@
 description = "Dependency-lite Server as a Function in pure Kotlin"
 
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:_")
+    api(Kotlin.stdlib.jdk8)
     implementation("javax.servlet:javax.servlet-api:_")
     implementation("dev.forkhandles:result4k:_")
     implementation("dev.forkhandles:values4k:_")
