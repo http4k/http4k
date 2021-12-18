@@ -16,7 +16,7 @@ import java.time.Instant.EPOCH
 class TracerBulletTest {
 
     private val recording = RecordingEvents()
-    private val events = recording//.then { println(it) }
+    private val events = recording.then { println(it) }
     private val child1 = Child1(events)
     private val grandchild = Grandchild(events, reverseProxy("Child1" to child1))
 
@@ -32,7 +32,7 @@ class TracerBulletTest {
 
     @Test
     fun `calls are recorded to events`() {
-        expectThat(User(events, stack).call("bob")) {
+        expectThat(Root(events, stack).call("bob")) {
             status.isEqualTo(OK)
             bodyString.isEqualTo("bob")
         }
@@ -46,7 +46,7 @@ class TracerBulletTest {
 }
 
 val expectedCallTree = HttpTraceTree(
-    "User", Uri.of("http://EntryPoint/bob"), GET, OK,
+    "Root", Uri.of("http://EntryPoint/bob"), GET, OK,
     listOf(
         HttpTraceTree(
             "EntryPoint", Uri.of("http://Child1/report"), GET, OK,

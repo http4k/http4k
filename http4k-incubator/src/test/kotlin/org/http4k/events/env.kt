@@ -20,8 +20,8 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import java.time.Instant.EPOCH
 
-class User(rawEvents: Events, http: HttpHandler) {
-    private val events = TraceEvents("User").then(rawEvents)
+class Root(rawEvents: Events, http: HttpHandler) {
+    private val events = TraceEvents("Root").then(rawEvents)
 
     private val http = ResetRequestTracing().then(ClientStack(events)).then(http)
 
