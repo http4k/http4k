@@ -40,7 +40,7 @@ fun EntryPoint(rawEvents: Events, http: HttpHandler): HttpHandler {
     val events = TraceEvents("EntryPoint").then(rawEvents)
     val client = ClientStack(events).then(http)
     return ServerStack(events).then(
-        routes("/{name}" bind GET to { req: Request ->
+        routes("{name}" bind GET to { req: Request ->
             client(Request(GET, "http://Child1/report"))
             events(MyCustomEvent("EntryPoint", EPOCH))
             client(Request(GET, "http://Child2/" + req.path("name")!!))
@@ -51,7 +51,7 @@ fun EntryPoint(rawEvents: Events, http: HttpHandler): HttpHandler {
 fun Child1(rawEvents: Events): HttpHandler {
     val events = TraceEvents("Child1").then(rawEvents)
     return ServerStack(events).then(
-        routes("/report" bind GET to { req: Request ->
+        routes("report" bind GET to { req: Request ->
             events(MyCustomEvent("Child1", EPOCH))
             Response(OK)
         })
@@ -62,7 +62,7 @@ fun Child2(rawEvents: Events, http: HttpHandler): HttpHandler {
     val events = TraceEvents("Child2").then(rawEvents)
     val client = ClientStack(events).then(http)
     return ServerStack(events).then(
-        routes("/{name}" bind GET to { req: Request ->
+        routes("{name}" bind GET to { req: Request ->
             client(Request(POST, "http://Grandchild/echo").body(req.path("name")!!))
         })
     )
@@ -72,7 +72,7 @@ fun Grandchild(rawEvents: Events, child1: HttpHandler): HttpHandler {
     val events = TraceEvents("Grandchild").then(rawEvents)
     val client = ClientStack(events).then(child1)
     return ServerStack(events).then(
-        routes("/echo" bind POST to { req: Request ->
+        routes("echo" bind POST to { req: Request ->
             client(Request(GET, "http://Child1/report"))
             Response(OK).body(req.body)
         })

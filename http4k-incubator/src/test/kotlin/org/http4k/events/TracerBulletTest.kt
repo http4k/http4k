@@ -16,7 +16,7 @@ import java.time.Instant.EPOCH
 class TracerBulletTest {
 
     private val recording = RecordingEvents()
-    private val events = recording.then { println(it) }
+    private val events = recording//.then { println(it) }
     private val child1 = Child1(events)
     private val grandchild = Grandchild(events, reverseProxy("Child1" to child1))
 
@@ -37,16 +37,16 @@ class TracerBulletTest {
             bodyString.isEqualTo("bob")
         }
 
-        expectThat(TracerBullet(HttpTracer(::service), MyCustomTracer)(recording.toList())).isEqualTo(
-            listOf(expectedCallTree)
-        )
+        expectThat(
+            TracerBullet(HttpTracer(::service), MyCustomTracer)(recording.toList()).toString()
+        ).isEqualTo(listOf(expectedCallTree).toString())
     }
 
     private fun service(event: MetadataEvent) = event.metadata["service"].toString()
 }
 
 val expectedCallTree = HttpTraceTree(
-    "Root", Uri.of("http://EntryPoint/bob"), GET, OK,
+    "Root", Uri.of("http://EntryPoint/{name}"), GET, OK,
     listOf(
         HttpTraceTree(
             "EntryPoint", Uri.of("http://Child1/report"), GET, OK,
@@ -54,7 +54,7 @@ val expectedCallTree = HttpTraceTree(
         ),
         MyTraceTree("EntryPoint", EPOCH, emptyList()),
         HttpTraceTree(
-            "EntryPoint", Uri.of("http://Child2/bob"), GET, OK, listOf(
+            "EntryPoint", Uri.of("http://Child2/{name}"), GET, OK, listOf(
                 HttpTraceTree(
                     "Child2", Uri.of("http://Grandchild/echo"), POST, OK, listOf(
                         HttpTraceTree(
