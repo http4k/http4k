@@ -7,7 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-core** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
 
 ### v4.17.4.0
-- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.10
 - **http4k-incubator** : Playing with TracerBullets... a generic interface for building TraceTrees from lists of MetadataEvents.
 
 ### v4.17.3.0
