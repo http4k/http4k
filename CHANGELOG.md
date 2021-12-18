@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.17.4.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-incubator** : Playing with TracerBullets... a generic interface for building TraceTrees from lists of MetadataEvents.
+
 ### v4.17.3.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** : Fix #679. Approval tests delete actual when passing.
