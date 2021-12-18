@@ -38,8 +38,8 @@ class TracerBulletTest {
         }
 
         expectThat(
-            TracerBullet(HttpTracer(::service), MyCustomTracer)(recording.toList()).toString()
-        ).isEqualTo(listOf(expectedCallTree).toString())
+            TracerBullet(HttpTracer(::service), MyCustomTracer)(recording.toList())
+        ).isEqualTo(listOf(expectedCallTree))
     }
 
     private fun service(event: MetadataEvent) = event.metadata["service"].toString()

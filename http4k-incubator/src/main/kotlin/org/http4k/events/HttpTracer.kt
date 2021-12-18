@@ -26,7 +26,7 @@ fun HttpTracer(
         val parentEvent = event as HttpEvent.Outgoing
         return HttpTraceTree(
             childHostName(this),
-            parentEvent.uri.path(parentEvent.xUriTemplate), parentEvent.method, parentEvent.status,
+            parentEvent.uri.path("/" + parentEvent.xUriTemplate), parentEvent.method, parentEvent.status,
             rest
                 .filter { traces().spanId == it.traces().parentSpanId }
                 .filter { parentHostName(this) == childHostName(it) }

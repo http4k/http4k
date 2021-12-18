@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.17.5.0 (uncut)
+- **http4k-core** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
+
 ### v4.17.4.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-incubator** : Playing with TracerBullets... a generic interface for building TraceTrees from lists of MetadataEvents.
