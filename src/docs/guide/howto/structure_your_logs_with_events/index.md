@@ -23,7 +23,8 @@ Attaching metadata to an `Event` results in (compactified) JSON similar to this:
     "duration": 16
   },
   "metadata": {
-    "timestamp": "2019-11-05T17:32:27.297448Z",
+    "timestamp": "2019-11-05T17:32:27.297448Z", 
+    "name":"IncomingHttpRequest",
     "traces": {
       "traceId": "e35304c95b704c7d",
       "spanId": "0e46f7b3cb5bcf2e",
