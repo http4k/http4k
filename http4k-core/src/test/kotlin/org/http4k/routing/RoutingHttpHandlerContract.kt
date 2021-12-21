@@ -60,8 +60,8 @@ abstract class RoutingHttpHandlerContract {
     }
 
     @Test
-    open fun `normal filter application - applies when not found`() {
-        val filtered = filterAppending("foo").then(handler)
+    open fun `stacked filter application - applies when not found`() {
+        val filtered = filterAppending("foo").then(routes(handler))
         val request = Request(GET, "/not-found").header("host", "host")
 
         assertThat(filtered.matchAndInvoke(request), absent())
