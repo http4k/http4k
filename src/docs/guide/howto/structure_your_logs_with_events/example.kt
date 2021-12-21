@@ -21,6 +21,7 @@ fun main() {
     // We use AutoMarshallingEvents (here with Jackson) to handle the final serialisation process.
     val events =
         EventFilters.AddTimestamp()
+            .then(EventFilters.AddEventName())
             .then(EventFilters.AddZipkinTraces())
             .then(AddRequestCount())
             .then(AutoMarshallingEvents(Jackson))
