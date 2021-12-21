@@ -36,6 +36,18 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     private val pkg = javaClass.`package`.name.replace('.', '/')
 
     @Test
+    fun `filters are applied`() {
+
+        val handler = static()
+
+        val request = Request(GET, of("/svc/mybob.xml"))
+        val criteria = hasBody("<xml>content</xml>") and hasHeader("Content-type", APPLICATION_XML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(handler(request), criteria)
+    }
+
+    @Test
     fun `looks up contents of existing root file`() {
         val handler = "/svc" bind static()
 
