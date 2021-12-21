@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.17.6.0 (uncut)
+- **http4k-format-jackson-xml** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
+add autoBody for ConfigurableJacksonXml. H/T @oharaandrew314
+
 ### v4.17.5.0
 - **http4k-*** : Upgrade some dependency versions, including ForkHandles to 2.0.0.0.
 - **http4k-core** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
