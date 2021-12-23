@@ -218,10 +218,10 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     abstract fun customMarshaller(): AutoMarshalling
+    abstract fun customMarshallerProhibitStrings(): AutoMarshalling
 }
 
-fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
-    .bigDecimal(::BigDecimalHolder, BigDecimalHolder::value)
+fun <T> AutoMappingConfiguration<T>.customise(): T = bigDecimal(::BigDecimalHolder, BigDecimalHolder::value)
     .bigInteger(::BigIntegerHolder, BigIntegerHolder::value)
     .boolean(::BooleanHolder, BooleanHolder::value)
     .text(::AnotherString, AnotherString::value)

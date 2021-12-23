@@ -40,7 +40,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
 
     @Test
     open fun `prohibit strings`() {
-        val marshaller = customMarshaller()
+        val marshaller = customMarshallerProhibitStrings()
 
         assertThat(marshaller.asFormatString(StringHolder("hello")).normaliseJson(), equalTo(expectedConvertToInputStream))
         assertThat({ marshaller.asA(expectedConvertToInputStream, StringHolder::class) }, throws<Exception>())

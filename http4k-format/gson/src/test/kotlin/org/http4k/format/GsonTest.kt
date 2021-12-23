@@ -16,21 +16,21 @@ import org.junit.jupiter.api.Test
 class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
 
     @Test
-    fun ` roundtrip arbitary object to and from JSON element`() {
+    fun ` roundtrip arbitrary object to and from JSON element`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = Gson.asJsonObject(obj)
         assertThat(asA(out, ArbObject::class), equalTo(obj))
     }
 
     @Test
-    fun `roundtrip list of arbitary objects to and from node`() {
+    fun `roundtrip list of arbitrary objects to and from node`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(Gson.asJsonObject(listOf(obj)).asA(), equalTo(listOf(obj)))
     }
 
     @Test
-    fun `roundtrip list of arbitary objects to and from body`() {
+    fun `roundtrip list of arbitrary objects to and from body`() {
         val body = Body.auto<List<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -39,7 +39,7 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     }
 
     @Test
-    fun `roundtrip array of arbitary objects to and from body`() {
+    fun `roundtrip array of arbitrary objects to and from body`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -53,6 +53,8 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     }
 
     override fun customMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
+    override fun customMarshallerProhibitStrings() = object : ConfigurableGson(GsonBuilder().asConfigurable().prohibitStrings()
+        .customise()) {}
 }
 
 class GsonTest : JsonContract<JsonElement>(Gson) {

@@ -50,6 +50,7 @@ include("http4k-contract")
     includeModule("klaxon")
     includeModule("kotlinx-serialization")
     includeModule("moshi")
+    includeModule("moshi-yaml")
     includeModule("xml")
 }
 

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 class JacksonYamlBodyTest {
 
     @Test
-    fun `roundtrip list of arbitary objects to and from body`() {
+    fun `roundtrip list of arbitrary objects to and from body`() {
         val body = Body.auto<List<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -22,7 +22,7 @@ class JacksonYamlBodyTest {
     }
 
     @Test
-    fun `roundtrip array of arbitary objects to and from body`() {
+    fun `roundtrip array of arbitrary objects to and from body`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -43,27 +43,39 @@ class JacksonYamlBodyTest {
 
     @Test
     fun `write interface implementation to body`() {
-        assertThat(Response(Status.OK).with(
-            Body.auto<Interface>().toLens() of InterfaceImpl()
-        ).bodyString(), equalTo("""value: "hello"
+        assertThat(
+            Response(Status.OK).with(
+                Body.auto<Interface>().toLens() of InterfaceImpl()
+            ).bodyString(), equalTo(
+                """value: "hello"
 subValue: "123"
-"""))
+"""
+            )
+        )
     }
 
     @Test
     fun `write list of interface implementation to body`() {
-        assertThat(Response(Status.OK).with(
-            Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
-        ).bodyString(), equalTo("""- value: "hello"
+        assertThat(
+            Response(Status.OK).with(
+                Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
+            ).bodyString(), equalTo(
+                """- value: "hello"
   subValue: "123"
-"""))
+"""
+            )
+        )
     }
 
     @Test
     fun `writes using non-sealed parent type`() {
         val nonSealedChild = NonSealedChild("hello")
-        assertThat(Response(Status.OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""something: "hello"
-"""))
+        assertThat(
+            Response(Status.OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo(
+                """something: "hello"
+"""
+            )
+        )
     }
 
     @Test
@@ -118,5 +130,9 @@ unknown: "2000-01-01"
 key2:"123"
 """
 
-    override fun customMarshaller() = object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
+    override fun customMarshaller() =
+        object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
+
+    override fun customMarshallerProhibitStrings() =
+        object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
 }

@@ -139,7 +139,10 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     override fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
         assertThat(KotlinxSerialization.asFormatString(wrapper), equalTo(expectedWrappedMap))
-        assertThat(KotlinxSerialization.asA(KotlinxSerialization.asFormatString(wrapper), MapHolder::class), equalTo(wrapper))
+        assertThat(
+            KotlinxSerialization.asA(KotlinxSerialization.asFormatString(wrapper), MapHolder::class),
+            equalTo(wrapper)
+        )
     }
 
     @Test
@@ -156,7 +159,10 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
 
     @Test
     override fun `convert to inputstream`() {
-        assertThat(KotlinxSerialization.asInputStream(StringHolder("hello")).reader().use { it.readText() }, equalTo(expectedConvertToInputStream))
+        assertThat(
+            KotlinxSerialization.asInputStream(StringHolder("hello")).reader().use { it.readText() },
+            equalTo(expectedConvertToInputStream)
+        )
     }
 
     @Disabled()
@@ -209,7 +215,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
 
     @Test
     override fun `prohibit strings`() {
-        val marshaller = customMarshaller()
+        val marshaller = customMarshallerProhibitStrings()
 
         assertThat(marshaller.asFormatString(StringHolder("hello")), equalTo(expectedConvertToInputStream))
         assertThat({ marshaller.asA(expectedConvertToInputStream, StringHolder::class) }, throws<Exception>())
@@ -226,14 +232,14 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
 
     @ExperimentalSerializationApi
     @Test
-    fun `roundtrip arbitary object to and from JSON element`() {
+    fun `roundtrip arbitrary object to and from JSON element`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = KotlinxSerialization.asJsonObject(obj)
         assertThat(KotlinxSerialization.asA(out, ArbObject::class), equalTo(obj))
     }
 
     @Test
-    fun `roundtrip list of arbitary objects to and from body`() {
+    fun `roundtrip list of arbitrary objects to and from body`() {
         val body = Body.auto<List<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -242,7 +248,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    fun `roundtrip array of arbitary objects to and from body`() {
+    fun `roundtrip array of arbitrary objects to and from body`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -273,7 +279,6 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     override fun customMarshaller(): AutoMarshalling =
         object : ConfigurableKotlinxSerialization({
             asConfigurable()
-                .prohibitStrings()
                 .boolean(::BooleanHolder, BooleanHolder::value)
                 .text(::AnotherString, AnotherString::value)
                 .text(OutOnly::value)
@@ -291,4 +296,25 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
                 .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
                 .done()
         }) {}
+
+    override fun customMarshallerProhibitStrings() = object : ConfigurableKotlinxSerialization({
+        asConfigurable()
+            .prohibitStrings()
+            .boolean(::BooleanHolder, BooleanHolder::value)
+            .text(::AnotherString, AnotherString::value)
+            .text(OutOnly::value)
+            .text(::InOnly)
+            .uuid({ it }, { it })
+            .uri({ it }, { it })
+            .instant({ it }, { it })
+            .localDateTime({ it }, { it })
+            .localDate({ it }, { it })
+            .localTime({ it }, { it })
+            .offsetDateTime({ it }, { it })
+            .offsetTime({ it }, { it })
+            .yearMonth({ it }, { it })
+            .zonedDateTime({ it }, { it })
+            .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
+            .done()
+    }) {}
 }

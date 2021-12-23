@@ -1,6 +1,5 @@
 package org.http4k.testing
 
-import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.MarkedYAMLException
 import com.github.underscore.lodash.Json
 import com.github.underscore.lodash.Json.JsonStringBuilder.Step.TWO_SPACES
 import com.github.underscore.lodash.U.formatJson

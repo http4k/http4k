@@ -1,12 +1,9 @@
 package org.http4k.format
 
-import com.squareup.moshi.Moshi
+import com.squareup.moshi.Moshi.Builder
 
-/**
- * To implement custom JSON configuration, create your own object singleton. Extra mappings can be added before done() is called.
- */
-object Moshi : ConfigurableMoshi(
-    Moshi.Builder()
+object MoshiYaml : ConfigurableMoshiYaml(
+    Builder()
         .addLast(EventAdapter)
         .addLast(ThrowableAdapter)
         .addLast(ListAdapter)
