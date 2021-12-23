@@ -5,9 +5,9 @@ changes with their rationale when appropriate:
 
 ### v4.17.6.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-format-moshi-yaml*** : New module! YAML marshalling with zero-reflection is now possible due to a combination of Moshi and SnakeYaml
-- **http4k-format-jackson-xml** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
-add autoBody for ConfigurableJacksonXml. H/T @oharaandrew314
+- **http4k-format-moshi-yaml** : New module! YAML marshalling with zero-reflection is now possible due to a combination of Moshi and SnakeYaml
+- **http4k-core** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
+- **http4k-format-jackson-xml** : Add autoBody for ConfigurableJacksonXml. H/T @oharaandrew314
 
 ### v4.17.5.0
 - **http4k-*** : Upgrade some dependency versions, including ForkHandles to 2.0.0.0.
