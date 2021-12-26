@@ -34,7 +34,7 @@ object WebsocketClient {
 
     /**
      * Provides a client-side WsClient connected to a remote Websocket. This is a blocking API, so accessing the sequence of "received"
-     * messages will block on iteration until all messages are received (or the socket it closed). This call will also
+     * messages will block on iteration until all messages are received (or the socket is closed). This call will also
      * block while connection happens.
      */
     fun blocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO, autoReconnection: Boolean = false, draft: Draft = Draft_6455()): WsClient {
