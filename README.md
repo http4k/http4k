@@ -1,7 +1,6 @@
 <div class="github">
 
 <hr/>
-    
 
 <picture>
   <source 
