@@ -1,14 +1,23 @@
 package org.http4k.format
 
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
+import java.lang.reflect.Type
 
 object MoshiYaml : ConfigurableMoshiYaml(
     Builder()
-        .addLast(EventAdapter)
-        .addLast(ThrowableAdapter)
         .addLast(ListAdapter)
-        .addLast(MapAdapter)
+        .addLast(NullSafeMapAdapter)
         .asConfigurable()
         .withStandardMappings()
         .done()
 )
+
+/**
+ * A special Adapter to serialise nulls
+ */
+object NullSafeMapAdapter : JsonAdapter.Factory {
+    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi) =
+        MapAdapter.create(type, annotations, moshi)?.serializeNulls()
+}

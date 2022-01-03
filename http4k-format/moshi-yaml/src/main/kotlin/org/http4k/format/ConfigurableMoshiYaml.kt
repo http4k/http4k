@@ -34,7 +34,6 @@ open class ConfigurableMoshiYaml(
         return try {
             yaml.dump(json.asA<Map<String, Any>>(str))
         } catch (e: Exception) {
-            e.printStackTrace()
             yaml.dump(str)
         }
     }

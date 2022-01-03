@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.17.7.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi-yaml** : Fix for serialising Maps with null values (the key should still be rendered!)
+- **http4k-format-moshi-yaml** : Remove accidental stack trace dump.
+
 ### v4.17.6.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-format-moshi-yaml** : New module! YAML marshalling with zero-reflection is now possible due to a combination of Moshi and SnakeYaml

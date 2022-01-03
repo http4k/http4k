@@ -3,6 +3,7 @@ package org.http4k.format
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.squareup.moshi.Moshi.Builder
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class MoshiYamlAutoTest : AutoMarshallingContract(MoshiYaml) {
@@ -45,12 +46,27 @@ unknown: "2000-01-01"
         "key2:'123'\n"
 
     override fun customMarshaller() = ConfigurableMoshiYaml(Builder().asConfigurable().customise()
-        .add(MapAdapter).add(ListAdapter))
+        .add(NullSafeMapAdapter).add(ListAdapter))
 
     override fun customMarshallerProhibitStrings() = ConfigurableMoshiYaml(
         Builder().asConfigurable().prohibitStrings()
             .customise()
     )
+
+    @Test
+    fun `nulls are serialised for map entries`() {
+        val input = mapOf("key" to null)
+        assertThat(MoshiYaml.asFormatString(input), equalTo("""key: null
+"""))
+    }
+
+    @Disabled("not supported")
+    override fun `throwable is marshalled`() {
+    }
+
+    @Disabled("not supported")
+    override fun `exception is marshalled`() {
+    }
 
     @Test
     override fun `roundtrip custom boolean`() {
@@ -88,4 +104,5 @@ unknown: "2000-01-01"
         assertThat(marshaller.asA("value: foobar\n", MyValueHolder::class), equalTo(wrapper))
         assertThat(marshaller.asA("value: \n", MyValueHolder::class), equalTo(MyValueHolder(null)))
     }
+
 }
