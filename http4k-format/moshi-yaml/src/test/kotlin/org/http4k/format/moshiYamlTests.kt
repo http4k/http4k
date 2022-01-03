@@ -53,11 +53,12 @@ unknown: "2000-01-01"
             .customise()
     )
 
+    data class MapHolder(val map: Map<String, MapHolder?>)
+
     @Test
     fun `nulls are serialised for map entries`() {
-        val input = mapOf("key" to null)
-        assertThat(MoshiYaml.asFormatString(input), equalTo("""key: null
-"""))
+        val input = MapHolder(mapOf("key" to null))
+        assertThat(MoshiYaml.asFormatString(input), equalTo("map: {\n  }\n"))
     }
 
     @Disabled("not supported")
