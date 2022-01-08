@@ -66,6 +66,9 @@ data class JacksonFieldWithMetadata(
     val field2: String = "field2"
 )
 
+sealed class Sealed(val string: String)
+object SealedChild : Sealed("child")
+
 @ExtendWith(JsonApprovalTest::class)
 class AutoJsonToJsonSchemaTest {
     private val json = Jackson
@@ -219,6 +222,11 @@ class AutoJsonToJsonSchemaTest {
     @Test
     fun `renders schema for field with description`(approver: Approver) {
         approver.assertApproved(JacksonFieldWithMetadata())
+    }
+
+    @Test
+    fun `renders schema for object from sealed class`(approver: Approver) {
+        approver.assertApproved(SealedChild)
     }
 
     private fun Approver.assertApproved(obj: Any, name: String? = null) {
