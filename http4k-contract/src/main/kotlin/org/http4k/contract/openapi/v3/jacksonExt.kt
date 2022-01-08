@@ -17,7 +17,12 @@ import kotlin.reflect.full.createInstance
 /**
  * Defaults for configuring OpenApi3 with Jackson
  */
-fun OpenApi3(apiInfo: ApiInfo, json: ConfigurableJackson = OpenAPIJackson, extensions: List<OpenApiExtension> = emptyList(), servers: List<ApiServer> = emptyList()) =
+fun OpenApi3(
+    apiInfo: ApiInfo,
+    json: ConfigurableJackson = OpenAPIJackson,
+    extensions: List<OpenApiExtension> = emptyList(),
+    servers: List<ApiServer> = emptyList()
+) =
     OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)), servers = servers)
 
 fun AutoJsonToJsonSchema(json: ConfigurableJackson) = AutoJsonToJsonSchema(
@@ -71,9 +76,11 @@ object JacksonFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
         FieldMetadata(description = target.javaClass.findPropertyDescription(fieldName))
 
     private fun Class<Any>.findPropertyDescription(name: String): String? =
-        kotlin.constructors.first().parameters
-            .firstOrNull { p -> p.kind == KParameter.Kind.VALUE && p.name == name }
-            ?.let { p ->
-                p.annotations.filterIsInstance<JsonPropertyDescription>().firstOrNull()?.value
-            } ?: superclass?.findPropertyDescription(name)
+        kotlin.constructors.firstOrNull()?.let {
+            it.parameters
+                .firstOrNull { p -> p.kind == KParameter.Kind.VALUE && p.name == name }
+                ?.let { p ->
+                    p.annotations.filterIsInstance<JsonPropertyDescription>().firstOrNull()?.value
+                } ?: superclass?.findPropertyDescription(name)
+        } ?: superclass?.findPropertyDescription(name)
 }
