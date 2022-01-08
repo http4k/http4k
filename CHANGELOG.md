@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.17.8.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Fix #687 - OpenApiV3 object serialization. H/T @lawkai 
+
 ### v4.17.7.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-format-moshi-yaml** : Fix for serialising Maps with null values (the key should still be rendered!)
