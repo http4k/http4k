@@ -6,8 +6,8 @@ It is very easy to configure http4k to integrate with any OAuth2 provider who su
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.17.8.0"
-implementation group: "org.http4k", name: "http4k-security-oauth", version: "4.17.8.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.17.9.0"
+implementation group: "org.http4k", name: "http4k-security-oauth", version: "4.17.9.0"
 ```
 
 For this example, simply reconfigure the `OAuthProvider` instance with the correct details, and provide custom logic for persisting and retrieving the CSRF and AccessToken.
