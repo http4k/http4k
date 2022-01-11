@@ -116,3 +116,12 @@ class MyString private constructor(value: String) : StringValue(value) {
 class MyUUID private constructor(value: UUID) : UUIDValue(value) {
     companion object : UUIDValueFactory<MyUUID>(::MyUUID)
 }
+
+enum class MappedEnum {
+    value;
+
+    companion object {
+        fun from(s: String): MappedEnum = valueOf(s.reversed())
+        fun to(v: MappedEnum): String = v.name.reversed()
+    }
+}
