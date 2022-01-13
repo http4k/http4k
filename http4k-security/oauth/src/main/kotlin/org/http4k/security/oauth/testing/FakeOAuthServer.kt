@@ -53,9 +53,9 @@ object FakeOAuthServer {
         return routes(
             server.tokenRoute,
             authPath bind GET to server.authenticationStart.then {
-                Response(FOUND).with(LOCATION of it.uri.path("/complete"))
+                Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
             },
-            "/complete" bind GET to { server.authenticationComplete(it) }
+            "/autologin" bind GET to { server.authenticationComplete(it) }
         )
     }
 }
