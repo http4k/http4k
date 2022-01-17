@@ -64,35 +64,36 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 
 fun Uri.removeQuery(name: String) = copy(query = query.toParameters().filterNot { it.first == name }.toUrlFormEncoded())
 
-fun Uri.removeQueries(prefix: String) = copy(query = query.toParameters().filterNot { it.first.startsWith(prefix) }.toUrlFormEncoded())
+fun Uri.removeQueries(prefix: String) =
+    copy(query = query.toParameters().filterNot { it.first.startsWith(prefix) }.toUrlFormEncoded())
 
-fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
+fun Uri.query(name: String, value: String?): Uri =
+    copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
 
 /**
  * @see [RFC 3986, appendix A](https://www.ietf.org/rfc/rfc3986.txt)
  */
-private val validPathSegmentChars = listOf(
-    // "-", ".", "_"  unreserved but these won't be url encoded, so there is no need to decode them
-    "~",                                              // unreserved
-    "!", "$", "&", "'", "(", ")", "+", ",", ";", "=", // sub-delims
-    ":", "@"                                          // valid
-).map {
-    it to URLEncoder.encode(it, "UTF-8")
-}
+private val validPathSegmentChars = setOf(
+    '~', '-', '.', '_',                                // unreserved
+    '!', '$', '&', '\'', '(', ')', '+', ',', ';', '=', // sub-delims
+    ':', '@'                                           // valid
+)
 
-fun String.toPathSegmentEncoded(): String = URLEncoder.encode(this, "UTF-8")
-        .replace("+", "%20")
-        .let {
-            validPathSegmentChars.fold(it) { acc, ch ->
-                acc.replace(ch.second, ch.first)
-            }
+private fun Char.isAsciiLetter() = this in 'a'..'z' || this in 'A'..'Z'
+
+private fun Char.isValidSpecialPathSegmentChar() = validPathSegmentChars.contains(this)
+
+fun String.toPathSegmentEncoded(): String =
+    this.map {
+        when {
+            it.isAsciiLetter() || it.isDigit() || it.isValidSpecialPathSegmentChar() -> it
+            it.isWhitespace() -> "%20"
+            else -> URLEncoder.encode(it.toString(), "UTF-8")
         }
+    }.joinToString(separator = "")
 
 fun String.toPathSegmentDecoded(): String =
-    this.replace("+", "%2B")
-        .let {
-            URLDecoder.decode(it, "UTF-8")
-        }
+    URLDecoder.decode(this.replace("+", "%2B"), "UTF-8")
 
 fun Uri.extend(uri: Uri): Uri =
     appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())
