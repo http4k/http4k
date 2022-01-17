@@ -92,7 +92,7 @@ class UriTemplateTest {
     @Test
     fun canExtractFromUriWithEncodedSpace() {
         val template = from("path/{id1}")
-        assertThat(template.extract("path/foo+bar").getValue("id1"), equalTo("foo+bar"))
+        assertThat(template.extract("path/foo%20bar").getValue("id1"), equalTo("foo bar"))
     }
 
     @Test
