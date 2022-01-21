@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.17.10.0 (uncut)
+### v4.18.0.0
 - **http4k-*** : Upgrade some dependency versions.
-    
+- **http4k-core** : Fixed URLPathSegment encoding/decoding based on RFC 3986. H/T @jenarros for the thoughtful and through contribution!
+
 ### v4.17.9.0
 - **http4k-core** : Added mapping for enum() in lenses.
 
