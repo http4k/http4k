@@ -17,8 +17,8 @@ import java.time.LocalDateTime
  * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
 class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
-                                          private val cookieValidity: Duration = Duration.ofHours(3),
-                                          private val clock: Clock = Clock.systemDefaultZone()) : OAuthPersistence {
+                                          private val cookieValidity: Duration = Duration.ofDays(1),
+                                          private val clock: Clock = Clock.systemUTC()) : OAuthPersistence {
 
     private val csrfName = "${cookieNamePrefix}Csrf"
 
