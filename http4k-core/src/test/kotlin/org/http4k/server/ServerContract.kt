@@ -194,6 +194,18 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             ))
     }
 
+    @Test
+    fun `sets keep-alive for non-streaming response`() {
+        assertThat(client(Request(GET, "$baseUrl/headers")),
+            allOf(hasStatus(ACCEPTED),
+                hasHeader("connection", "keep-alive")
+            ))
+        assertThat(client(Request(GET, "$baseUrl/stream")),
+            allOf(hasStatus(OK),
+                hasHeader("connection", "close")
+            ))
+    }
+
     open fun clientAddress() = anyOf(
         equalTo(InetAddress.getLoopbackAddress().hostAddress),
         equalTo(InetAddress.getLocalHost().hostAddress),
