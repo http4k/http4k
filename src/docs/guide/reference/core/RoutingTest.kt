@@ -21,7 +21,7 @@ class DynamicPathTest {
     @Test
     fun `echoes body from path`() {
         val route: RoutingHttpHandler = routes(EchoPath)
-        val response: Response = route(Request(GET, "/echo/my+great+message"))
+        val response: Response = route(Request(GET, "/echo/my%20great%20message"))
         assertThat(response, hasStatus(OK).and(hasBody("my great message")))
     }
 }

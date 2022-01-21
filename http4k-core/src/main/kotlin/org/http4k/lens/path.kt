@@ -1,7 +1,7 @@
 package org.http4k.lens
 
 import org.http4k.core.Request
-import org.http4k.core.toPathEncoded
+import org.http4k.core.toPathSegmentEncoded
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.IntegerParam
@@ -93,7 +93,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
             target.uri.path(
                 target.uri.path.replaceFirst(
                     "{$name}",
-                    values.first().toPathEncoded()
+                    values.first().toPathSegmentEncoded()
                 )
             )
         )
