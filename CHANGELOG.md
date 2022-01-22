@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.19.0.0 (uncut)
+- **http4k-core** : [Potential Break] Fix #693 Cookie implementation uses LocalDateTime val which is implicitly turned into GMT time for cookie. Break is that Cookies now run from Instant instead of LocalDateTime. Thanks to @maedjyuk-ghoti for alerting us to chase down this 5y+ standing bug!
+- **http4k-security-oauth** : Fixes to the `InsecureCookieBasedOAuthPersistence` to make it more user-friendly.
+
 ### v4.18.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Fixed URLPathSegment encoding/decoding based on RFC 3986. H/T @jenarros for the thoughtful and through contribution!

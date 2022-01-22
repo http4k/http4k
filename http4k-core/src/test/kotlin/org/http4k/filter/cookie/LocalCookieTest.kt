@@ -6,6 +6,7 @@ import org.http4k.core.cookie.Cookie
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class LocalCookieTest {
     val cookie = Cookie("foo", "bar")
@@ -34,7 +35,7 @@ class LocalCookieTest {
 
     @Test
     fun `expiration for cookies with expires only`() {
-        val created = LocalDateTime.of(2017, 3, 11, 12, 15, 2)
+        val created = LocalDateTime.of(2017, 3, 11, 12, 15, 2).toInstant(ZoneOffset.UTC)
         val expires = created.plusSeconds(5)
         val localCookie = LocalCookie(cookie.expires(expires), created)
 

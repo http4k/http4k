@@ -10,6 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.SameSite.Lax
 import org.junit.jupiter.api.Test
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.Locale
@@ -20,7 +21,7 @@ class CookieTest {
     fun `full cookie creation`() {
         val cookie = Cookie("my-cookie", "my-value")
             .maxAge(37)
-            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21).toInstant(ZoneOffset.UTC))
             .domain("google.com")
             .path("/")
             .secure()
@@ -36,7 +37,7 @@ class CookieTest {
         val currentSystemLocale = Locale.getDefault()
         try {
             Locale.setDefault(Locale.TAIWAN)
-            val cookie = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+            val cookie = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21).toInstant(ZoneOffset.UTC))
 
             assertThat(cookie.toString(), containsSubstring("""Expires=Sat, 11 Mar 2017 12:15:21 GMT"""))
         } finally {
@@ -48,7 +49,7 @@ class CookieTest {
     fun `cookie creation and parsing round trip`() {
         val original = Cookie("my-cookie", "my-value")
             .maxAge(37)
-            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21).toInstant(ZoneOffset.UTC))
             .domain("google.com")
             .path("/")
             .secure()
@@ -192,7 +193,7 @@ class CookieTest {
     @Test
     fun `cookie can be invalidated`() {
         assertThat(Cookie("foo", "bar").invalidate(),
-            equalTo(Cookie("foo", "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC))))
+            equalTo(Cookie("foo", "").maxAge(0).expires(Instant.EPOCH)))
     }
 
     @Test
@@ -209,7 +210,7 @@ class CookieTest {
 
     @Test
     fun `cookie with various expires date formats parsed`() {
-        val expected = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+        val expected = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21).toInstant(ZoneOffset.UTC))
 
         assertThat(Cookie.parse("foo=bar; Expires=Sat, 11 Mar 2017 12:15:21 GMT"), equalTo(expected))
         assertThat(Cookie.parse("foo=bar; Expires=Sat, 11-Mar-2017 12:15:21 GMT"), equalTo(expected))

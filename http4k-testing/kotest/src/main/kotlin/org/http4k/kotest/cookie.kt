@@ -8,6 +8,7 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.SameSite
+import java.time.Instant
 import java.time.LocalDateTime
 
 infix fun Cookie.shouldHaveName(expected: String) = this should haveName(expected)
@@ -78,10 +79,11 @@ fun beHttpOnly(): Matcher<Cookie> = object : Matcher<Cookie> {
     )
 }
 
-infix fun Cookie.shouldHaveExpiry(expected: LocalDateTime) = this should expireOn(expected)
-infix fun Cookie.shouldNotHaveExpiry(expected: LocalDateTime) = this shouldNot expireOn(expected)
-fun expireOn(expected: LocalDateTime): Matcher<Cookie> = expireOn(be(expected))
-fun expireOn(matcher: Matcher<LocalDateTime?>): Matcher<Cookie> = object : Matcher<Cookie> {
+infix fun Cookie.shouldHaveExpiry(expected: Instant) = this should expireOn(expected)
+infix fun Cookie.shouldNotHaveExpiry(expected: Instant) = this shouldNot expireOn(expected)
+
+fun expireOn(expected: Instant): Matcher<Cookie> = expireOn(be(expected))
+fun expireOn(matcher: Matcher<Instant?>): Matcher<Cookie> = object : Matcher<Cookie> {
     override fun test(value: Cookie): MatcherResult {
         val testResult = matcher.test(value.expires)
         return MatcherResult(

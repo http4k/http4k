@@ -10,6 +10,7 @@ import org.http4k.core.cookie.invalidateCookie
 import org.http4k.security.openid.IdToken
 import java.time.Clock
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
 
 /**
@@ -55,5 +56,5 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
         .invalidateCookie(nonceName)
         .invalidateCookie(originalUriName)
 
-    private fun expiring(name: String, value: String) = Cookie(name, value, expires = LocalDateTime.ofInstant(clock.instant().plus(cookieValidity), clock.zone), path = "/")
+    private fun expiring(name: String, value: String) = Cookie(name, value, expires = clock.instant().plus(cookieValidity), path = "/")
 }

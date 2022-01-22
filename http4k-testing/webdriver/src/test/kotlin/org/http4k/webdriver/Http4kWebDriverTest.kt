@@ -14,6 +14,7 @@ import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URL
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.Date
@@ -239,7 +240,7 @@ class Http4kWebDriverTest {
     @Test
     fun `service set cookies are stored in the driver`() {
         val driver = Http4kWebDriver {
-            Response(OK).cookie(HCookie("name", "value", 100, LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC), "domain", "path", true, true))
+            Response(OK).cookie(HCookie("name", "value", 100, Instant.EPOCH, "domain", "path", true, true))
         }
 
         driver.get("/")

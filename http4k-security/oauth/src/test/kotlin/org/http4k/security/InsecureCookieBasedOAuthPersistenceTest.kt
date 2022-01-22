@@ -24,7 +24,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
 
     private val clock: Clock = FixedClock
     private val persistence = InsecureCookieBasedOAuthPersistence("prefix", cookieValidity, clock)
-    private val expectedCookieExpiry = LocalDateTime.ofInstant(clock.instant().plus(cookieValidity), clock.zone)
+    private val expectedCookieExpiry = clock.instant().plus(cookieValidity)
 
     @Test
     fun `failed response has correct cookies`() {
