@@ -34,7 +34,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                               private val requiredMethods: Array<Method> = Method.values()) {
     private lateinit var server: Http4kServer
 
-    private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
+    protected val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val size = 1000 * 1024
     private val random = (0 until size).map { '.' }.joinToString("")
@@ -191,18 +191,6 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                 hasHeader("x-address", clientAddress()),
                 hasHeader("x-port", present()),
                 hasHeader("x-scheme", requestScheme())
-            ))
-    }
-
-    @Test
-    fun `sets keep-alive for non-streaming response`() {
-        assertThat(client(Request(GET, "$baseUrl/headers")),
-            allOf(hasStatus(ACCEPTED),
-                hasHeader("connection", "keep-alive")
-            ))
-        assertThat(client(Request(GET, "$baseUrl/stream")),
-            allOf(hasStatus(OK),
-                hasHeader("connection", "close")
             ))
     }
 
