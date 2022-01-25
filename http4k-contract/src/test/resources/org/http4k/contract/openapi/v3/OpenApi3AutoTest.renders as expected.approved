@@ -90,304 +90,6 @@
         "deprecated": false
       }
     },
-    "/basepath/body_auto_map": {
-      "put": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "foo": 123
-              },
-              "schema": {
-                "additionalProperties": {
-                  "properties": {
-                    "foo": {
-                      "example": 123,
-                      "description": null,
-                      "type": "number"
-                    }
-                  },
-                  "example": {
-                    "foo": 123
-                  },
-                  "description": null,
-                  "type": "object",
-                  "required": [
-                    "foo"
-                  ]
-                },
-                "example": null,
-                "description": null,
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "putBasepathBody_auto_map",
-        "deprecated": false
-      }
-    },
-    "/basepath/body_auto_schema": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "string": "s",
-                "child": {
-                  "anotherString": "bar"
-                },
-                "numbers": [
-                  1
-                ],
-                "bool": true
-              },
-              "schema": {
-                "$ref": "#/components/schemas/someOtherId",
-                "example": null,
-                "description": null
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_auto_schema",
-        "deprecated": false
-      },
-      "put": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "uri": "http://foowang",
-                "additional": {
-                  "foo": 123
-                }
-              },
-              "schema": {
-                "$ref": "#/components/schemas/ArbObject3",
-                "example": null,
-                "description": null
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "example": [
-                  {
-                    "anotherString": "bing"
-                  }
-                ],
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ArbObject1"
-                  },
-                  "example": [
-                    {
-                      "anotherString": "bing"
-                    }
-                  ],
-                  "description": null,
-                  "type": "array"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "putBasepathBody_auto_schema",
-        "deprecated": false
-      }
-    },
-    "/basepath/body_auto_schema_multiple_request_schemas": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/ArbObject1",
-                    "example": null,
-                    "description": null
-                  },
-                  {
-                    "$ref": "#/components/schemas/ArbObject3",
-                    "example": null,
-                    "description": null
-                  }
-                ]
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_auto_schema_multiple_request_schemas",
-        "deprecated": false
-      }
-    },
-    "/basepath/body_auto_schema_multiple_response_schemas": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "anotherString": "bing"
-                },
-                "schema": {
-                  "$ref": "#/components/schemas/ArbObject1",
-                  "example": null,
-                  "description": null
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ArbObject1",
-                      "example": null,
-                      "description": null
-                    },
-                    {
-                      "$ref": "#/components/schemas/ArbObject3",
-                      "example": null,
-                      "description": null
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
-        "deprecated": false
-      }
-    },
-    "/basepath/body_auto_schema_name_definition_id": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/impl1",
-                      "example": null,
-                      "description": null
-                    },
-                    {
-                      "$ref": "#/components/schemas/impl2",
-                      "example": null,
-                      "description": null
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_auto_schema_name_definition_id",
-        "deprecated": false
-      }
-    },
     "/basepath/body_form": {
       "post": {
         "summary": "<unknown>",
@@ -587,6 +289,40 @@
         "deprecated": false
       }
     },
+    "/basepath/body_receiving_string": {
+      "post": {
+        "summary": "body_receiving_string",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": null,
+              "schema": {
+                "example": "hello from the land of receiving plaintext",
+                "description": null,
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_receiving_string",
+        "deprecated": false
+      }
+    },
     "/basepath/body_string": {
       "get": {
         "summary": "<unknown>",
@@ -603,7 +339,7 @@
               "text/plain": {
                 "example": null,
                 "schema": {
-                  "example": "hello from the land of plaintext",
+                  "example": "hello from the land of sending plaintext",
                   "description": null,
                   "type": "string"
                 }
@@ -618,36 +354,6 @@
           }
         ],
         "operationId": "getBasepathBody_string",
-        "deprecated": false
-      },
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "schema": {
-                "type": "string"
-              },
-              "example": "hello from the land of plaintext"
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_string",
         "deprecated": false
       }
     },
@@ -1072,7 +778,7 @@
   "components": {
     "schemas": {
       "Foo": {
-        "example": "bing",
+        "example": "bar",
         "enum": [
           "bar",
           "bing"
@@ -1111,184 +817,6 @@
             "example": "a message of some kind"
           }
         }
-      },
-      "someOtherId": {
-        "properties": {
-          "string": {
-            "example": "s",
-            "description": null,
-            "type": "string"
-          },
-          "child": {
-            "$ref": "#/components/schemas/ArbObject1",
-            "example": null,
-            "description": null
-          },
-          "numbers": {
-            "items": {
-              "type": "number"
-            },
-            "example": [
-              1
-            ],
-            "description": null,
-            "type": "array"
-          },
-          "bool": {
-            "example": true,
-            "description": null,
-            "type": "boolean"
-          }
-        },
-        "example": {
-          "string": "s",
-          "child": {
-            "anotherString": "bar"
-          },
-          "numbers": [
-            1
-          ],
-          "bool": true
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "bool",
-          "numbers",
-          "string"
-        ]
-      },
-      "ArbObject1": {
-        "properties": {
-          "anotherString": {
-            "$ref": "#/components/schemas/Foo",
-            "example": null,
-            "description": null
-          }
-        },
-        "example": {
-          "anotherString": "bing"
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "anotherString"
-        ]
-      },
-      "ArbObject3": {
-        "properties": {
-          "uri": {
-            "example": "http://foowang",
-            "description": null,
-            "type": "string"
-          },
-          "additional": {
-            "additionalProperties": {
-              "properties": {
-                "foo": {
-                  "example": 123,
-                  "description": null,
-                  "type": "number"
-                }
-              },
-              "example": {
-                "foo": 123
-              },
-              "description": null,
-              "type": "object",
-              "required": [
-                "foo"
-              ]
-            },
-            "example": null,
-            "description": null,
-            "type": "object"
-          }
-        },
-        "example": {
-          "uri": "http://foowang",
-          "additional": {
-            "foo": 123
-          }
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "additional",
-          "uri"
-        ]
-      },
-      "impl1": {
-        "properties": {
-          "obj": {
-            "$ref": "#/components/schemas/Impl1",
-            "example": null,
-            "description": null
-          }
-        },
-        "example": {
-          "obj": {
-            "value": "bob"
-          }
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "obj"
-        ]
-      },
-      "Impl1": {
-        "properties": {
-          "value": {
-            "example": "bob",
-            "description": null,
-            "type": "string"
-          }
-        },
-        "example": {
-          "value": "bob"
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "value"
-        ]
-      },
-      "impl2": {
-        "properties": {
-          "obj": {
-            "$ref": "#/components/schemas/Impl2",
-            "example": null,
-            "description": null
-          }
-        },
-        "example": {
-          "obj": {
-            "value": 123
-          }
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "obj"
-        ]
-      },
-      "Impl2": {
-        "properties": {
-          "value": {
-            "example": 123,
-            "description": null,
-            "type": "number"
-          }
-        },
-        "example": {
-          "value": 123
-        },
-        "description": null,
-        "type": "object",
-        "required": [
-          "value"
-        ]
       }
     },
     "securitySchemes": {

@@ -9,11 +9,11 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
 import org.http4k.core.Filter
-import org.http4k.core.Method.GET
+import org.http4k.core.Method
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.format.Argo
 import org.http4k.lens.Query
@@ -30,17 +30,16 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(
         listOf(AddSimpleFieldToRootNode)
     )
 ) {
-
     @Test
     fun `renders root path correctly when bind path and root path match`(approver: Approver) {
         val router = "/" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
-            routes += "/" bindContract GET to { _ -> Response(OK) }
+            routes += "/" bindContract Method.GET to { _ -> Response(Status.OK) }
             descriptionPath = "/docs"
         }
 
-        approver.assertApproved(router(Request(GET, "/docs?the_api_key=somevalue")))
+        approver.assertApproved(router(Request(Method.GET, "/docs?the_api_key=somevalue")))
     }
 
     @Test
@@ -57,9 +56,9 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(
                 ),
                 filter = Filter.NoOp
             )
-            routes += "/example" bindContract GET to { _ -> Response(OK) }
+            routes += "/example" bindContract Method.GET to { _ -> Response(Status.OK) }
         }
 
-        approver.assertApproved(router(Request(GET, "/")))
+        approver.assertApproved(router(Request(Method.GET, "/")))
     }
 }

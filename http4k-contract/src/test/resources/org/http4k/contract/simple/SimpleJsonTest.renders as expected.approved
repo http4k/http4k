@@ -6,7 +6,7 @@
     "POST:/basepath/queries": "<unknown>",
     "POST:/basepath/cookies": "<unknown>",
     "POST:/basepath/headers": "<unknown>",
-    "POST:/basepath/body_string": "<unknown>",
+    "POST:/basepath/body_receiving_string": "body_receiving_string",
     "GET:/basepath/body_string": "<unknown>",
     "POST:/basepath/body_json_noschema": "<unknown>",
     "POST:/basepath/body_json_response": "<unknown>",
@@ -19,12 +19,6 @@
     "POST:/basepath/body_form": "<unknown>",
     "GET:/basepath/produces_and_consumes": "<unknown>",
     "POST:/basepath/returning": "<unknown>",
-    "POST:/basepath/body_auto_schema": "<unknown>",
-    "PUT:/basepath/body_auto_schema": "<unknown>",
-    "POST:/basepath/body_auto_schema_multiple_response_schemas": "<unknown>",
-    "POST:/basepath/body_auto_schema_multiple_request_schemas": "<unknown>",
-    "POST:/basepath/body_auto_schema_name_definition_id": "<unknown>",
-    "PUT:/basepath/body_auto_map": "<unknown>",
     "PUT:/basepath/multipart_fields": "<unknown>",
     "POST:/basepath/bearer_auth": "<unknown>"
   }

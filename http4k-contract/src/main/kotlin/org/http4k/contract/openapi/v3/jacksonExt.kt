@@ -39,15 +39,16 @@ object JacksonJsonPropertyAnnotated : FieldRetrieval {
             metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy
         )(target, target.javaClass.findName(name) ?: throw NoFieldFound(name, this))
 
-    private fun Class<Any>.findName(name: String): String? = kotlin.constructors.first().parameters
-        .mapNotNull { f ->
+    private fun Class<Any>.findName(name: String): String? =
+        kotlin.constructors.first().parameters.firstNotNullOfOrNull { f ->
             f.annotations.filterIsInstance<JsonProperty>().find { it.value == name }
                 ?.let { f.name }
-        }.firstOrNull() ?: try {
-        superclass?.findName(name)
-    } catch (e: IllegalStateException) {
-        throw NoFieldFound(name, this, e)
-    }
+        }
+            ?: try {
+                superclass?.findName(name)
+            } catch (e: IllegalStateException) {
+                throw NoFieldFound(name, this, e)
+            }
 }
 
 class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson) : FieldRetrieval {

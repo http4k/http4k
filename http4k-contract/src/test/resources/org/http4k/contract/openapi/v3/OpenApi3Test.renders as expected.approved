@@ -85,261 +85,6 @@
         "deprecated": false
       }
     },
-    "/basepath/body_auto_map": {
-      "put": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "foo": 123
-              },
-              "schema": {
-                "$ref": "#/components/schemas/object-1898199891"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "putBasepathBody_auto_map",
-        "deprecated": false
-      }
-    },
-    "/basepath/body_auto_schema": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "string": "s",
-                "child": {
-                  "anotherString": "bar"
-                },
-                "numbers": [
-                  1
-                ],
-                "bool": true
-              },
-              "schema": {
-                "$ref": "#/components/schemas/someOtherId"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_auto_schema",
-        "deprecated": false
-      },
-      "put": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "uri": "http://foowang",
-                "additional": {
-                  "foo": 123
-                }
-              },
-              "schema": {
-                "$ref": "#/components/schemas/object-444827817"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "example": [
-                  {
-                    "anotherString": "bing"
-                  }
-                ],
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/object-841092134"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "putBasepathBody_auto_schema",
-        "deprecated": false
-      }
-    },
-    "/basepath/body_auto_schema_multiple_request_schemas": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/object-841092134"
-                  },
-                  {
-                    "$ref": "#/components/schemas/object-444827817"
-                  }
-                ]
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_auto_schema_multiple_request_schemas",
-        "deprecated": false
-      }
-    },
-    "/basepath/body_auto_schema_multiple_response_schemas": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "anotherString": "bing"
-                },
-                "schema": {
-                  "$ref": "#/components/schemas/object-841092134"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/object-841092134"
-                    },
-                    {
-                      "$ref": "#/components/schemas/object-444827817"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
-        "deprecated": false
-      }
-    },
-    "/basepath/body_auto_schema_name_definition_id": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/impl1"
-                    },
-                    {
-                      "$ref": "#/components/schemas/impl2"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_auto_schema_name_definition_id",
-        "deprecated": false
-      }
-    },
     "/basepath/body_form": {
       "post": {
         "summary": "<unknown>",
@@ -538,6 +283,36 @@
         "deprecated": false
       }
     },
+    "/basepath/body_receiving_string": {
+      "post": {
+        "summary": "body_receiving_string",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "schema": {
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_receiving_string",
+        "deprecated": false
+      }
+    },
     "/basepath/body_string": {
       "get": {
         "summary": "<unknown>",
@@ -565,35 +340,6 @@
           }
         ],
         "operationId": "getBasepathBody_string",
-        "deprecated": false
-      },
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathBody_string",
         "deprecated": false
       }
     },
@@ -1055,63 +801,6 @@
             "type": "string",
             "example": "a message of some kind"
           }
-        }
-      },
-      "someOtherId": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-        }
-      },
-      "object-841092134": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-          "anotherString": {
-            "type": "string",
-            "example": "bing"
-          }
-        }
-      },
-      "object-1898199891": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-          "foo": {
-            "type": "integer",
-            "example": 123
-          }
-        }
-      },
-      "object-444827817": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "example": "http://foowang"
-          },
-          "additional": {
-            "$ref": "#/components/schemas/object-1898199891"
-          }
-        }
-      },
-      "impl1": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-        }
-      },
-      "impl2": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
         }
       }
     },

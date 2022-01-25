@@ -89,13 +89,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
         topLevel: Boolean,
         metadata: FieldMetadata?
     ) =
-        if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable, topLevel, metadata) else toObjectSchema(
-            objName,
-            obj,
-            isNullable,
-            topLevel,
-            metadata
-        )
+        if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable, topLevel, metadata)
+        else toObjectSchema(objName, obj, isNullable, topLevel, metadata)
 
     private fun NODE.toObjectSchema(
         objName: String?,
