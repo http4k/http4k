@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.19.1.0
+- **http4k-contract** : Support non-JSON schema types in request definitions.
+
 ### v4.19.0.0
 - **http4k-core** : [Potential Break] Fix #693 Cookie implementation uses LocalDateTime val which is implicitly turned into GMT time for cookie. Break is that Cookies now run from Instant instead of LocalDateTime. Thanks to @maedjyuk-ghoti for alerting us to chase down this 5y+ standing bug!
 - **http4k-security-oauth** : Fixes to the `InsecureCookieBasedOAuthPersistence` to make it more user-friendly.
