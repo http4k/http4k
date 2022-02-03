@@ -334,6 +334,34 @@ object ServerFilters {
     }
 
     /**
+     * Sets the Content-Disposition response header on the Response for the selected path extensions.
+     * By default all extensions are selected, including paths with no extension.
+     * If no path is present, the filename will be set to unnamed.
+     */
+    object ContentDispositionAttachment {
+        private fun Request.extension(): String = this.uri.path.substringAfterLast(".", "")
+        private fun Request.filename() =
+            this.uri.path.split("/").last().let { if(it.isBlank()) "unnamed" else it }
+        private val ALL_EXTENSIONS = setOf("*")
+
+        operator fun invoke(extensions: Set<String> = ALL_EXTENSIONS): Filter = Filter { next ->
+            { request ->
+                next(request).let { response ->
+                    val extensionSelected = extensions == ALL_EXTENSIONS || extensions.contains(request.extension())
+                    when {
+                        response.status.successful && extensionSelected ->
+                            response.header(
+                                "Content-Disposition",
+                                "attachment; filename=${request.filename()}"
+                            )
+                        else -> response
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Intercepts responses and replaces the contents with contents of the statically loaded resource.
      * By default, this Filter replaces the contents of unsuccessful requests with the contents of a file named
      * after the status code.
