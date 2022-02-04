@@ -123,12 +123,18 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
     @Test
     fun `looks up contents of existing subdir file - non-root context`() {
-        val handler = "/svc" bind static()
-        val request = Request(GET, of("/svc/$pkg/StaticRouter.js"))
-        val criteria = hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader("Content-type", "application/javascript")
+        val handlers = listOf(
+            "/svc" bind static(),
+            "/svc/" bind static()
+        )
 
-        assertThat(handler.matchAndInvoke(request), present(criteria))
-        assertThat(handler(request), criteria)
+        handlers.forEach { handler ->
+            val request = Request(GET, of("/svc/$pkg/StaticRouter.js"))
+            val criteria = hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader("Content-type", "application/javascript")
+
+            assertThat(handler.matchAndInvoke(request), present(criteria))
+            assertThat(handler(request), criteria)
+        }
     }
 
     @Test
