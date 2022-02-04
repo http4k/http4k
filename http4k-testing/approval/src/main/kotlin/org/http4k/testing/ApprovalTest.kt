@@ -1,9 +1,9 @@
 package org.http4k.testing
 
-import com.github.underscore.lodash.Json
-import com.github.underscore.lodash.Json.JsonStringBuilder.Step.TWO_SPACES
-import com.github.underscore.lodash.U.formatJson
-import com.github.underscore.lodash.U.formatXml
+import com.github.underscore.Json
+import com.github.underscore.Json.JsonStringBuilder.Step.TWO_SPACES
+import com.github.underscore.Json.formatJson
+import com.github.underscore.Xml.formatXml
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_XML

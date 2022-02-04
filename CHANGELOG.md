@@ -3,8 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.19.1.0 (uncut)
+### v4.19.1.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Added ContentDispositionAttachment server filter. H/T @jenarros
+- **http4k-core** : Fix path conversion for static routing handlers with trailing. H/T @jenarros
 - **http4k-contract** : Support non-JSON schema types in request definitions.
 
 ### v4.19.0.0
