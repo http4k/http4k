@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.19.2.0 (uncut)
+### v4.19.2.0
 - **http4k-server-jetty** : Replace conscrypt with internal java for ALPN server
 
 ### v4.19.1.0
