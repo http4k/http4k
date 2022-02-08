@@ -123,7 +123,6 @@ subprojects {
         val enableSigning = project.findProperty("sign") == "true"
 
         apply(plugin = "maven-publish") // required to upload to sonatype
-        apply(plugin = "maven") // required to upload to sonatype
 
         if (enableSigning) { // when added it expects signing keys to be configured
             apply(plugin = "signing")
