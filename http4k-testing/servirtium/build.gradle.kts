@@ -4,7 +4,7 @@ description = "http4k incubator module"
 
 dependencies {
     api(project(":http4k-core"))
-    implementation(Testing.junit.api)
+    implementation(Testing.junit.jupiter.api)
     api(project(":http4k-cloudnative"))
     api(project(":http4k-format-moshi"))
     api(project(":http4k-client-apache"))

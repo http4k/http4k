@@ -74,8 +74,8 @@ allprojects {
     }
 
     dependencies {
-        testImplementation(Testing.junit.api)
-        testImplementation(Testing.junit.engine)
+        testImplementation(Testing.junit.jupiter.api)
+        testImplementation(Testing.junit.jupiter.engine)
         testImplementation("org.jetbrains.kotlin:kotlin-reflect:_")
         testImplementation("com.natpryce:hamkrest:_")
     }

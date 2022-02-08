@@ -28,7 +28,7 @@ class Java8HttpClientTest : HttpClientContract(::ApacheServer, Java8HttpClient()
     @Test
     fun `allow configuring connect timeout`(){
         val client = Java8HttpClient(connectionTimeout = Duration.ofMillis(10))
-        val response = client(Request(Method.GET, "http://10.0.0.0:81/does-not-exist")) //non-routable host/port
+        val response = client(Request(Method.GET, "http://120.0.0.0:81/does-not-exist")) //non-routable host/port
         assertThat(response.status, equalTo(CLIENT_TIMEOUT))
     }
 }
