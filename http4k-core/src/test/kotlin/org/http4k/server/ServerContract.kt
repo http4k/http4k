@@ -34,7 +34,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                               private val requiredMethods: Array<Method> = Method.values()) {
     private lateinit var server: Http4kServer
 
-    protected val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
+    protected val baseUrl by lazy { "http://localhost:${server.port()}" }
 
     private val size = 1000 * 1024
     private val random = (0 until size).map { '.' }.joinToString("")
