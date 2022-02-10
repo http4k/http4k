@@ -11,3 +11,4 @@ intellij-settings/
 **/*.actual
 local.properties
 local.properties.bak
+bazel-*
