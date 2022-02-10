@@ -15,20 +15,20 @@ import java.time.Duration
 /**
  * Use the InMemory exporter to get the recorded metrics from the global state.
  */
-val inMemoryMetricExporter: InMemoryMetricReader = InMemoryMetricReader.create()
+val inMemoryMetricReader: InMemoryMetricReader = InMemoryMetricReader.create()
 
 fun setupOpenTelemetryMeterProvider() {
-    inMemoryMetricExporter.collectAllMetrics()
+    inMemoryMetricReader.collectAllMetrics()
     OpenTelemetrySdk.builder()
         .setMeterProvider(
             SdkMeterProvider.builder()
-                .registerMetricReader(inMemoryMetricExporter)
+                .registerMetricReader(inMemoryMetricReader)
                 .setMinimumCollectionInterval(Duration.ofMillis(1)).build())
         .buildAndRegisterGlobal()
 }
 
 fun exportMetricsFromOpenTelemetry(): List<MetricData> =
-    inMemoryMetricExporter.collectAllMetrics().toList()
+    inMemoryMetricReader.collectAllMetrics().toList()
 
 fun hasRequestTimer(count: Int, value: Double, attributes: Attributes, name: String = "http.server.request.latency") =
     object : Matcher<List<MetricData>> {

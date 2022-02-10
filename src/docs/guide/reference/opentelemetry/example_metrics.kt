@@ -18,12 +18,12 @@ import java.time.Duration
 
 fun main() {
     // test only: this sets up the metrics provider to something we can read
-    val inMemoryMetricExporter: InMemoryMetricReader = InMemoryMetricReader.create()
+    val inMemoryMetricReader = InMemoryMetricReader.create()
 
     OpenTelemetrySdk.builder()
         .setMeterProvider(
             SdkMeterProvider.builder()
-                .registerMetricReader(inMemoryMetricExporter)
+                .registerMetricReader(inMemoryMetricReader)
                 .setMinimumCollectionInterval(Duration.ofMillis(1)).build()
         )
         .buildAndRegisterGlobal()
@@ -48,7 +48,7 @@ fun main() {
     }
 
     // see some results
-    inMemoryMetricExporter.collectAllMetrics().forEach {
+    inMemoryMetricReader.collectAllMetrics().forEach {
         println("metric: " + it.name + ", value: " +
             (it.longSumData.points.takeIf { it.isNotEmpty() } ?: it.doubleSummaryData.points)
         )
