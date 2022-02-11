@@ -15,3 +15,27 @@ kotlin_repositories()
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 kt_register_toolchains()
+
+RULES_JVM_EXTERNAL_TAG = "2.0.1"
+RULES_JVM_EXTERNAL_SHA = "55e8d3951647ae3dffde22b4f7f8dee11b3f70f3f89424713debd7076197eaca"
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+)
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = [
+        "javax.servlet:javax.servlet-api:4.0.1",
+        "dev.forkhandles:result4k:2.0.0.0",
+        "dev.forkhandles:values4k:2.0.0.0",
+        ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ] )
+
+

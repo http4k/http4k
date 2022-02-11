@@ -1,3 +1,2 @@
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 
-exports_files(["http4k-core"])
