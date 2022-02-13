@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.19.3.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-opentelemetry** : Fixes #697: Upgraded OpenTelemetry version to 1.11.0 H/T @jenarros
+
 ### v4.19.2.0
 - **http4k-server-jetty** : Replace conscrypt with internal java for ALPN server
 
