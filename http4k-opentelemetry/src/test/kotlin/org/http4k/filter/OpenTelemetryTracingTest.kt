@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.common.AttributeKey.longKey
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.trace.Span
@@ -31,6 +32,7 @@ class OpenTelemetryTracingTest {
         @BeforeAll
         @JvmStatic
         fun setup() {
+            GlobalOpenTelemetry.resetForTest()
             OpenTelemetrySdk.builder()
                 .setPropagators(ContextPropagators.create(B3Propagator.injectingMultiHeaders()))
                 .buildAndRegisterGlobal()

@@ -4,19 +4,31 @@ import com.natpryce.hamkrest.MatchResult
 import com.natpryce.hamkrest.Matcher
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.api.metrics.GlobalMeterProvider
-import io.opentelemetry.exporters.inmemory.InMemoryMetricExporter.create
+import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
+import io.opentelemetry.sdk.testing.exporter.InMemoryMetricReader
 import org.http4k.core.Method
 import org.http4k.core.Status
+import java.time.Duration
 
 /**
  * Use the InMemory exporter to get the recorded metrics from the global state.
  */
-fun exportMetricsFromOpenTelemetry(): List<MetricData> = create().apply {
-    export((GlobalMeterProvider.get() as SdkMeterProvider).collectAllMetrics())
-}.finishedMetricItems
+val inMemoryMetricReader: InMemoryMetricReader = InMemoryMetricReader.create()
+
+fun setupOpenTelemetryMeterProvider() {
+    inMemoryMetricReader.collectAllMetrics()
+    OpenTelemetrySdk.builder()
+        .setMeterProvider(
+            SdkMeterProvider.builder()
+                .registerMetricReader(inMemoryMetricReader)
+                .setMinimumCollectionInterval(Duration.ofMillis(1)).build())
+        .buildAndRegisterGlobal()
+}
+
+fun exportMetricsFromOpenTelemetry(): List<MetricData> =
+    inMemoryMetricReader.collectAllMetrics().toList()
 
 fun hasRequestTimer(count: Int, value: Double, attributes: Attributes, name: String = "http.server.request.latency") =
     object : Matcher<List<MetricData>> {
