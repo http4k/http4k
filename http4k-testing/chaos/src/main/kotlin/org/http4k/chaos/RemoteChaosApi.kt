@@ -179,34 +179,34 @@ object RemoteChaosApi {
                     }
                 )
     }
-}
 
-private fun chaosStatus(value: String) = obj("chaos" to string(value))
-
-private val exampleChaos = Jackson {
-    array(
-        listOf(
-            obj(
-                "type" to string("repeat"),
-                "stages" to array(
-                    listOf(
-                        obj(
-                            "type" to string("wait"),
-                            "until" to obj("type" to string("delay"), "period" to string("PT30S"))
-                        ),
-                        obj(
-                            "type" to string("trigger"),
-                            "behaviour" to obj("type" to string("status"), "status" to number(418)),
-                            "trigger" to obj("type" to string("always")),
-                            "until" to obj("type" to string("countdown"), "count" to number(10))
+    private val exampleChaos = Jackson {
+        array(
+            listOf(
+                obj(
+                    "type" to string("repeat"),
+                    "stages" to array(
+                        listOf(
+                            obj(
+                                "type" to string("wait"),
+                                "until" to obj("type" to string("delay"), "period" to string("PT30S"))
+                            ),
+                            obj(
+                                "type" to string("trigger"),
+                                "behaviour" to obj("type" to string("status"), "status" to number(418)),
+                                "trigger" to obj("type" to string("always")),
+                                "until" to obj("type" to string("countdown"), "count" to number(10))
+                            )
                         )
+                    ),
+                    "until" to obj(
+                        "type" to string("deadline"),
+                        "endTime" to string("2030-01-01T00:00:00Z")
                     )
-                ),
-                "until" to obj(
-                    "type" to string("deadline"),
-                    "endTime" to string("2030-01-01T00:00:00Z")
                 )
             )
         )
-    )
+    }
 }
+
+private fun chaosStatus(value: String) = obj("chaos" to string(value))
