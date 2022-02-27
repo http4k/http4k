@@ -20,8 +20,9 @@ import java.net.URL
 import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.Date
-import java.util.UUID
+import java.time.ZoneOffset
+import java.time.ZoneOffset.*
+import java.util.*
 import org.http4k.core.cookie.Cookie as HCookie
 
 typealias Navigate = (Request) -> Unit
@@ -143,7 +144,9 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
 
     override fun manage() = object : WebDriver.Options {
         override fun addCookie(cookie: Cookie) {
-            siteCookies[cookie.name] = StoredCookie(cookie, LocalCookie(HCookie(cookie.name, cookie.value), LocalDateTime.now()))
+            siteCookies[cookie.name] = StoredCookie(cookie,
+                LocalCookie(HCookie(cookie.name, cookie.value), LocalDateTime.now().toInstant(UTC))
+            )
         }
 
         override fun getCookies() = siteCookies.values.map { it.cookie }.toSet()
