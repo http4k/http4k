@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.19.5.0
+- **http4k-client-websocket** : Apply a timeout when creating a blocking client websocket connection
+
 ### v4.19.4.0
 - **http4k-*** : Upgrade some dependency versions.
 
