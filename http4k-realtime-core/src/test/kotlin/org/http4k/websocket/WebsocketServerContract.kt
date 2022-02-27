@@ -25,6 +25,8 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.CountDownLatch
 
 abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
@@ -175,7 +177,8 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolySe
 
     @Test
     fun `should fail on invalid url`() {
-        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/aaa"))
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/aaa"),
+            timeout = Duration.of(15, ChronoUnit.SECONDS))
         assertThat({
             client.send(WsMessage("hello"))
         }, throws<WebsocketNotConnectedException>())
