@@ -65,7 +65,6 @@ class WebsocketClientTest {
     }
 
     @Test
-    @Disabled
     fun `blocking on a unknown host`() {
         assertThrows<WebsocketNotConnectedException> {
             WebsocketClient.blocking(Uri.of("ws://localhost:1212/"), timeout = Duration.of(10, ChronoUnit.MILLIS))
