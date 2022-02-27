@@ -172,7 +172,6 @@ object ChaosBehaviours {
         operator fun invoke() = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 exitProcess(1)
-                throw NotImplementedError()
             }
 
             override fun toString() = "KillProcess"
