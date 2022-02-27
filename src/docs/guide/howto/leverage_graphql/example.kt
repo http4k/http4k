@@ -6,6 +6,8 @@ import com.expediagroup.graphql.generator.toSchema
 import graphql.ExecutionInput.Builder
 import graphql.GraphQL.newGraphQL
 import org.dataloader.DataLoader
+import org.dataloader.DataLoaderFactory
+import org.dataloader.DataLoaderFactory.newDataLoader
 import org.dataloader.DataLoaderRegistry
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.asGraphQLHandler
@@ -63,7 +65,7 @@ class UserDbHandler : GraphQLWithContextHandler<String> {
     ).build()
 
     private val dataLoaderRegistry = DataLoaderRegistry().apply {
-        register("USER_LOADER", DataLoader { ids: List<Long> ->
+        register("USER_LOADER", newDataLoader { ids: List<Long> ->
             supplyAsync {
                 UserQueries().search(Params(ids))
             }
