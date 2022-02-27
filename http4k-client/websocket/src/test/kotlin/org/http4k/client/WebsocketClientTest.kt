@@ -17,8 +17,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.Duration
-import java.time.temporal.ChronoUnit
 import java.util.concurrent.LinkedBlockingQueue
 
 class WebsocketClientTest {
@@ -61,13 +59,6 @@ class WebsocketClientTest {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bob"))
         client.send(WsMessage("hello"))
         assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
-    }
-
-    @Test
-    fun `blocking on a unknown host`() {
-        assertThrows<WebsocketNotConnectedException> {
-            WebsocketClient.blocking(Uri.of("ws://localhost:1212/"), timeout = Duration.of(10, ChronoUnit.MILLIS))
-        }
     }
 
     @Test
