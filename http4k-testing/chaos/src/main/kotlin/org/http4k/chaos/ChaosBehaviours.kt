@@ -140,6 +140,7 @@ object ChaosBehaviours {
      */
     object EatMemory {
         operator fun invoke() = object : Behaviour() {
+            @Suppress("UNREACHABLE_CODE")
             override fun invoke(next: HttpHandler): HttpHandler = {
                 mutableListOf<ByteArray>().run { while (true) this += ByteArray(1024 * 1024) }
                 next(it)
