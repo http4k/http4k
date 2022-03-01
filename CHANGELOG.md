@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.19.6.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-core**: Fix #702: TrafficFilters.ReplayFrom doesn't correctly read from Replay.
 - **http4k-client-apache-async**: Remove usage of deprecated API
 - **http4k-client-jetty**: Remove usage of deprecated API
