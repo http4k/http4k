@@ -26,10 +26,16 @@ class FilterTest {
 
     @Test
     fun `applies in order of chain`() {
-        val minus10 =
-            Filter { next -> { next(it.replaceHeader("hello", (it.header("hello")!!.toInt() - 10).toString())) } }
-        val double =
-            Filter { next -> { next(it.replaceHeader("hello", (it.header("hello")!!.toInt() * 2).toString())) } }
+        val minus10 = Filter { next ->
+            {
+                next(it.replaceHeader("hello", (it.header("hello")!!.toInt() - 10).toString()))
+            }
+        }
+        val double = Filter { next ->
+            {
+                next(it.replaceHeader("hello", (it.header("hello")!!.toInt() * 2).toString()))
+            }
+        }
 
         val final = double.then(minus10).then(echoHeaders)
         val response = final(Request(GET, of("/")).header("hello", "10"))
