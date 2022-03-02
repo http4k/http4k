@@ -48,14 +48,18 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
     override fun channelRead0(ctx: ChannelHandlerContext, request: FullHttpRequest) {
-        val address = ctx.channel().remoteAddress() as InetSocketAddress
+        val address = ctx.channel().remoteAddress() as? InetSocketAddress
         val response = safeHandler(request.asRequest(address))
 
         when (response.body) {
             is MemoryBody -> {
                 val byteBuf = Unpooled.wrappedBuffer(response.body.payload)
                 val httpResponse =
-                    DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(response.status.code, response.status.description), byteBuf)
+                    DefaultFullHttpResponse(
+                        HTTP_1_1,
+                        HttpResponseStatus(response.status.code, response.status.description),
+                        byteBuf
+                    )
                         .apply {
                             response.headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
                             headers().set(HttpHeaderNames.CONTENT_LENGTH, byteBuf.readableBytes())
@@ -65,7 +69,10 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
             }
             else -> {
                 val httpResponse =
-                    DefaultHttpResponse(HTTP_1_1, HttpResponseStatus(response.status.code, response.status.description)).apply {
+                    DefaultHttpResponse(
+                        HTTP_1_1,
+                        HttpResponseStatus(response.status.code, response.status.description)
+                    ).apply {
                         response.headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
                         headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
                     }
@@ -76,11 +83,12 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
         }
     }
 
-    private fun FullHttpRequest.asRequest(address: InetSocketAddress) =
-        Request(valueOf(method().name()), Uri.of(uri()))
+    private fun FullHttpRequest.asRequest(address: InetSocketAddress?): Request {
+        val baseRequest = Request(valueOf(method().name()), Uri.of(uri()))
             .headers(headers().map { it.key to it.value })
             .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
-            .source(RequestSource(address.address.hostAddress, address.port))
+        return address?.let { baseRequest.source(RequestSource(it.address.hostAddress, it.port)) } ?: baseRequest
+    }
 }
 
 class Netty(val port: Int = 8000) : PolyServerConfig {

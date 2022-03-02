@@ -4,11 +4,12 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.19.6.0 (uncut)
-- **http4k-*** : Upgrade some dependency versions.
 - **http4k-core**: Fix #702: TrafficFilters.ReplayFrom doesn't correctly read from Replay.
+- **http4k-server-netty**: Fix #703: Netty: null cannot be cast to non-null type java.net.InetSocketAddress
 - **http4k-client-apache-async**: Remove usage of deprecated API
 - **http4k-client-jetty**: Remove usage of deprecated API
 - **http4k-testing-webdriver**: Remove usage of deprecated (internal) API
+- **http4k-*** : Upgrade some dependency versions.
 
 ### v4.19.5.0
 - **http4k-client-websocket** : Apply a timeout when creating a blocking client websocket connection
