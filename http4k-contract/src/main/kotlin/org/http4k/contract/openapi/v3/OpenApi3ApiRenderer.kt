@@ -9,7 +9,6 @@ import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
 import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
-import org.http4k.core.Uri
 import org.http4k.format.Json
 import org.http4k.util.JsonSchema
 
@@ -135,7 +134,14 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
                 "type" to string("object"),
                 "properties" to obj(
                     schema.properties.map {
-                        it.key to obj(it.value.map { it.key to it.value.asJson() })
+                        it.key to obj(it.value.map { (key, value) ->
+                            key to
+                                when (value) {
+                                    is String -> value.asJson()
+                                    is Map<*, *> -> value.mapAsJson()
+                                    else -> error("")
+                                }
+                        })
                     }
                 ),
                 "required" to array(schema.required.map { it.asJson() })
@@ -188,6 +194,11 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     }
 
     private fun String?.asJson() = this?.let { json.string(it) } ?: json.nullNode()
+
+    private fun Map<*, *>.mapAsJson() = json {
+        obj(map { it.key.toString() to string(it.value.toString()) }.toList())
+    }
+
     private fun NODE?.orNullNode() = this ?: json.nullNode()
 
     @Suppress("UNCHECKED_CAST")

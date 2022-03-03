@@ -126,7 +126,7 @@
             "in": "formData",
             "name": "i",
             "required": false,
-            "type": "integer",
+            "type": "array",
             "description": "intField"
           },
           {
@@ -531,7 +531,7 @@
             "name": "stringField",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "array"
             }
           },
           {
@@ -539,7 +539,7 @@
             "name": "fileField",
             "required": true,
             "schema": {
-              "type": "file"
+              "type": "array"
             }
           }
         ],

@@ -173,7 +173,7 @@ abstract class ContractRendererContract<NODE : Any>(
                     Body.webForm(
                         Strict,
                         FormField.boolean().required("b", "booleanField"),
-                        FormField.int().optional("i", "intField"),
+                        FormField.int().multi.optional("i", "intField"),
                         FormField.string().optional("s", "stringField"),
                         FormField.enum<Foo>().optional("e", "enumField"),
                         json.lens(FormField).required("j", "jsonField")
@@ -190,8 +190,8 @@ abstract class ContractRendererContract<NODE : Any>(
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of json { obj("aString" to string("a message of some kind")) }))
             } bindContract POST to { _ -> Response(OK) }
             routes += "/multipart_fields" meta {
-                val field = MultipartFormField.required("stringField")
-                val pic = MultipartFormFile.required("fileField")
+                val field = MultipartFormField.multi.required("stringField")
+                val pic = MultipartFormFile.multi.required("fileField")
                 receiving(Body.multipartForm(Strict, field, pic).toLens())
             } bindContract PUT to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {
