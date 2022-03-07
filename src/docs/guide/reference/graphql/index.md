@@ -4,7 +4,7 @@ description: Feature overview of the http4k-graphql module.
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-graphql", version: "4.19.5.0"
+implementation group: "org.http4k", name: "http4k-graphql", version: "4.20.1.0"
 
 // for the example below you will also need this dependency...
 implementation group: "com.expediagroup", name: "graphql-kotlin-schema-generator", version: "5.1.1"

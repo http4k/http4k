@@ -3,7 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.19.6.0 (uncut)
+### v4.20.1.0
+- **http4k-contract**: Fix #706: Form "multi" lens's do not render an items field in contracts.
+- **http4k-testing-chaos**: ChaoticHttpHandler disables Chaos API when reflection not available.
+- 
+### v4.20.0.0
+- **http4k-core**: Fix #704: Filters are recreated on every request/ H/T @hektorKS
 - **http4k-core**: Fix #702: TrafficFilters.ReplayFrom doesn't correctly read from Replay.
 - **http4k-server-netty**: Fix #703: Netty: null cannot be cast to non-null type java.net.InetSocketAddress
 - **http4k-client-apache-async**: Remove usage of deprecated API

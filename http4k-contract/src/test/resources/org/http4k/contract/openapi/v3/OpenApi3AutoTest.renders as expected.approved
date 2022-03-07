@@ -110,8 +110,11 @@
                     "description": "booleanField"
                   },
                   "i": {
-                    "type": "integer",
-                    "description": "intField"
+                    "type": "array",
+                    "description": "intField",
+                    "items": {
+                      "type": "integer"
+                    }
                   },
                   "s": {
                     "type": "string",
@@ -502,11 +505,17 @@
                 "type": "object",
                 "properties": {
                   "stringField": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   "fileField": {
-                    "type": "string",
-                    "format": "binary"
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
                   }
                 },
                 "required": [
