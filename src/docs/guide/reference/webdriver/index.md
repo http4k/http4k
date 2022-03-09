@@ -4,7 +4,7 @@ description: Feature overview of the http4k-webdriver module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-testing-webdriver", version: "4.20.1.0"
+implementation group: "org.http4k", name: "http4k-testing-webdriver", version: "4.20.2.0"
 ```
 
 ### About
