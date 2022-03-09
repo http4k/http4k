@@ -17,8 +17,7 @@
               },
               "description": null,
               "type": "object",
-              "required": [
-              ]
+              "required": null
             },
             "example": null,
             "description": null,
