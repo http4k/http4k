@@ -131,20 +131,22 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     private fun FormContent.toJson(): NODE = json {
         obj("schema" to
             obj(
-                "type" to string("object"),
-                "properties" to obj(
-                    schema.properties.map {
-                        it.key to obj(it.value.map { (key, value) ->
-                            key to
-                                when (value) {
-                                    is String -> value.asJson()
-                                    is Map<*, *> -> value.mapAsJson()
-                                    else -> error("")
-                                }
-                        })
-                    }
-                ),
-                "required" to array(schema.required.map { it.asJson() })
+                listOfNotNull(
+                    "type" to string("object"),
+                    "properties" to obj(
+                        schema.properties.map {
+                            it.key to obj(it.value.map { (key, value) ->
+                                key to
+                                    when (value) {
+                                        is String -> value.asJson()
+                                        is Map<*, *> -> value.mapAsJson()
+                                        else -> error("")
+                                    }
+                            })
+                        }
+                    ),
+                    schema.required.takeIf { it.isNotEmpty() }?.let { "required" to array(it.map { it.asJson() }) }
+                )
             )
         )
     }
