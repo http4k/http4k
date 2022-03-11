@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.20.3.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-strikt**: Fix #709 - Strikt assertion builder for Uri.path H/T @michaelbannister
+
 ### v4.20.2.0
 - **http4k-contract**: OpenApi3 - Don't add required field if no fields are required!
 
