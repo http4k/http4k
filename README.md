@@ -181,9 +181,9 @@ To install, add these dependencies to your **Gradle** file:
 
 ```groovy
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "4.20.2.0"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.20.2.0"
-    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.20.2.0"
+    implementation group: "org.http4k", name: "http4k-core", version: "4.21.0.0"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.21.0.0"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.21.0.0"
 }
 ```
 

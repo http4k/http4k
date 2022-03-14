@@ -40,7 +40,7 @@ Note that paths, not strings, will match by default. `"/news/{date}"` will match
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.20.2.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.21.0.0"
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/nestable_routes/example.kt)
