@@ -70,6 +70,7 @@ class OpenTelemetryMetricsServerTest {
         }
 
         val data = exportMetricsFromOpenTelemetry()
+
         assertThat(
             data,
             hasRequestTimer(

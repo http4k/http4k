@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.20.3.0 (uncut)
+### v4.21.0.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core**: [Breaking] All metrics now include `path` when labelled and routed. For consistency, `.` in path names are now convert to underscores as well. Regexes are also removed from paths on both client and server. H/T @hektorKS
 - **http4k-testing-strikt**: Fix #709 - Strikt assertion builder for Uri.path H/T @michaelbannister
 
 ### v4.20.2.0
@@ -13,7 +14,7 @@ changes with their rationale when appropriate:
 ### v4.20.1.0
 - **http4k-contract**: Fix #706: Form "multi" lens's do not render an items field in contracts.
 - **http4k-testing-chaos**: ChaoticHttpHandler disables Chaos API when reflection not available.
-- 
+
 ### v4.20.0.0
 - **http4k-core**: Fix #704: Filters are recreated on every request/ H/T @hektorKS
 - **http4k-core**: Fix #702: TrafficFilters.ReplayFrom doesn't correctly read from Replay.
