@@ -50,9 +50,16 @@ class JsonToJsonSchemaTest {
         }, "bob")
     }
 
-    private fun Approver.assertApproved(obj: JsonNode, name: String) {
+    @Test
+    fun `can provide prefix`(approver: Approver) {
+        approver.assertApproved(json {
+            array(listOf(obj("anotherString" to string("yetAnotherString"))))
+        }, "bob", "prefix")
+    }
+
+        private fun Approver.assertApproved(obj: JsonNode, name: String, prefix: String? = null) {
         assertApproved(Response(OK)
             .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(Jackson.asFormatString(creator.toSchema(obj, name, null))))
+            .body(Jackson.asFormatString(creator.toSchema(obj, name, prefix))))
     }
 }

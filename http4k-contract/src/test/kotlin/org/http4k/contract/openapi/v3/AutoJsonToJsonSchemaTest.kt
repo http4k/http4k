@@ -134,7 +134,7 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(
             Response(OK)
                 .with(CONTENT_TYPE of APPLICATION_JSON)
-                .body(Jackson.asFormatString(creator.toSchema(ArbObject3(), prefix = null)))
+                .body(Jackson.asFormatString(creator.toSchema(ArbObject3(), refModelNamePrefix = null)))
         )
     }
 
@@ -244,7 +244,7 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(
             Response(OK)
                 .with(CONTENT_TYPE of APPLICATION_JSON)
-                .body(Jackson.asFormatString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder(), prefix = null)))
+                .body(Jackson.asFormatString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder(), refModelNamePrefix = null)))
         )
     }
 

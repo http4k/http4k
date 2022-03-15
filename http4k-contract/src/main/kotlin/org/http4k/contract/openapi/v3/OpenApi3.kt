@@ -204,7 +204,7 @@ class OpenApi3<NODE : Any>(
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
             when (example) {
                 is Array<*>, is Iterable<*> -> !json.fields(schema.node).toMap().containsKey("\$ref")
-                else -> apiRenderer.toSchema(object {}, prefix = null) != schema
+                else -> apiRenderer.toSchema(object {}, refModelNamePrefix = null) != schema
             }
 
         val jsonSchema = example

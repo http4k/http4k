@@ -11,7 +11,7 @@ class ApiRendererTest {
         var called = 0
         val delegate = object : ApiRenderer<Any, Any> {
             override fun api(api: Any): Any = apply { called++ }
-            override fun toSchema(obj: Any, overrideDefinitionId: String?, prefix: String?) = TODO("not implemented")
+            override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?) = TODO("not implemented")
         }.cached()
 
         delegate.api(Unit)

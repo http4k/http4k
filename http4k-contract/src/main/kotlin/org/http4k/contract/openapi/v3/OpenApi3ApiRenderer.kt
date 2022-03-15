@@ -204,10 +204,10 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     private fun NODE?.orNullNode() = this ?: json.nullNode()
 
     @Suppress("UNCHECKED_CAST")
-    override fun toSchema(obj: Any, overrideDefinitionId: String?, prefix: String?): JsonSchema<NODE> =
+    override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?): JsonSchema<NODE> =
         try {
-            jsonToJsonSchema.toSchema(obj as NODE, overrideDefinitionId, null)
+            jsonToJsonSchema.toSchema(obj as NODE, overrideDefinitionId, refModelNamePrefix)
         } catch (e: ClassCastException) {
-            jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId, null)
+            jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId, refModelNamePrefix)
         }
 }
