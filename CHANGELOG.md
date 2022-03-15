@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.21.1.0
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract**: OpenApi3 - Ability to provide prefixes for all models in a tree. This allows you to have multiple versions of a single model in the specification (at the cost of duplicated schema models).
 
 ### v4.21.0.0
