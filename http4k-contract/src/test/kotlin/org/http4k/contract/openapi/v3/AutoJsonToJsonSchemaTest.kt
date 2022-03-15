@@ -89,6 +89,11 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `can override definition id and it added to sub definitions`(approver: Approver) {
+        approver.assertApproved(ArbObject(), "foobar")
+    }
+
+    @Test
     fun `can override definition id for a map`(approver: Approver) {
         approver.assertApproved(MapHolder(
             mapOf(
