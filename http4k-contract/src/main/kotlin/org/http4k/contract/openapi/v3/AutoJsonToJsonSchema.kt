@@ -103,8 +103,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             .map { Triple(it.first, it.second, fieldRetrieval(obj, it.first)) }
             .map { (fieldName, field, kField) ->
                 makePropertySchemaFor(field, fieldName, kField.value, kField.isNullable, kField.metadata)
-            }
-            .map { it.name() to it }.toMap()
+            }.associateBy { it.name() }
 
         val nameToUseForRef = if (topLevel) objName ?: modelNamer(obj) else modelNamer(obj)
 
