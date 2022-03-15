@@ -22,12 +22,12 @@ interface ApiRenderer<API, NODE> : JsonSchemaCreator<Any, NODE> {
             schema: JsonSchemaCreator<Any, NODE> = AutoJsonToJsonSchema(json)): ApiRenderer<T, NODE> {
             val fallbackSchema = object : JsonSchemaCreator<Any, NODE> {
                 private val jsonNodes = JsonToJsonSchema(json)
-                override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> =
+                override fun toSchema(obj: Any, overrideDefinitionId: String?, prefix: String?): JsonSchema<NODE> =
                     try {
                         @Suppress("UNCHECKED_CAST")
-                        jsonNodes.toSchema(obj as NODE, overrideDefinitionId)
+                        jsonNodes.toSchema(obj as NODE, overrideDefinitionId, null)
                     } catch (e: ClassCastException) {
-                        schema.toSchema(obj, overrideDefinitionId)
+                        schema.toSchema(obj, overrideDefinitionId, null)
                     }
             }
 

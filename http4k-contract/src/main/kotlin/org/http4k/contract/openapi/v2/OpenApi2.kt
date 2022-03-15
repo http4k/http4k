@@ -165,7 +165,7 @@ open class OpenApi2<out NODE>(
     }
 
     private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
-        schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId)
+        schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId, null)
     } catch (e: Exception) {
         JsonSchema(json.obj(), emptySet())
     }

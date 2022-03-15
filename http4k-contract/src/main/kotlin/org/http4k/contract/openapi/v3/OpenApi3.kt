@@ -161,7 +161,11 @@ class OpenApi3<NODE : Any>(
                     "items" to obj("type" to string(paramMeta.itemType().value))
                 )
             })
-            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(paramMeta.clz.java.enumConstants[0], it.name))
+            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(
+                paramMeta.clz.java.enumConstants[0],
+                it.name,
+                null
+            ))
             else -> PrimitiveParameter(it, json {
                 obj("type" to string(paramMeta.value))
             })
@@ -200,11 +204,11 @@ class OpenApi3<NODE : Any>(
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
             when (example) {
                 is Array<*>, is Iterable<*> -> !json.fields(schema.node).toMap().containsKey("\$ref")
-                else -> apiRenderer.toSchema(object {}) != schema
+                else -> apiRenderer.toSchema(object {}, prefix = null) != schema
             }
 
         val jsonSchema = example
-            ?.let { apiRenderer.toSchema(it, definitionId) }
+            ?.let { apiRenderer.toSchema(it, definitionId, null) }
             ?.takeIf(::exampleSchemaIsValid)
             ?: message.bodyString().toSchema(definitionId)
 
@@ -212,7 +216,7 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()
-        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId) }
+        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId, null) }
         ?: JsonSchema(json.obj(), emptySet())
 
     private fun List<Security>.combineFull(): Render<NODE> = {

@@ -1,0 +1,51 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/prefixorg.http4k.contract.openapi.v3.InterfaceHolder",
+    "example": null,
+    "description": null
+  },
+  "definitions": [
+    {
+      "first": "prefixorg.http4k.contract.openapi.v3.InterfaceHolder",
+      "second": {
+        "properties": {
+          "i": {
+            "$ref": "#/customPrefix/prefixorg.http4k.contract.openapi.v3.InterfaceImpl1",
+            "example": null,
+            "description": null
+          }
+        },
+        "example": {
+          "i": {
+            "a": "a"
+          }
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "i"
+        ]
+      }
+    },
+    {
+      "first": "prefixorg.http4k.contract.openapi.v3.InterfaceImpl1",
+      "second": {
+        "properties": {
+          "a": {
+            "example": "a",
+            "description": null,
+            "type": "string"
+          }
+        },
+        "example": {
+          "a": "a"
+        },
+        "description": null,
+        "type": "object",
+        "required": [
+          "a"
+        ]
+      }
+    }
+  ]
+}
