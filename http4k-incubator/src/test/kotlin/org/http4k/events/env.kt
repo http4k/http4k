@@ -51,7 +51,7 @@ fun EntryPoint(rawEvents: Events, http: HttpHandler): HttpHandler {
 fun Child1(rawEvents: Events): HttpHandler {
     val events = TraceEvents("Child1").then(rawEvents)
     return ServerStack(events).then(
-        routes("report" bind GET to { req: Request ->
+        routes("report" bind GET to { _: Request ->
             events(MyCustomEvent("Child1", EPOCH))
             Response(OK)
         })
