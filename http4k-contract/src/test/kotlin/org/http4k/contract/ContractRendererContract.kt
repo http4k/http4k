@@ -141,7 +141,7 @@ abstract class ContractRendererContract<NODE : Any>(
             routes += "/body_json_schema" meta {
                 receiving(json.body("json").toLens() to json {
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
-                }, "someDefinitionId")
+                }, "someDefinitionId", "prefix_")
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_json_list_schema" meta {
                 receiving(json.body("json").toLens() to json {
