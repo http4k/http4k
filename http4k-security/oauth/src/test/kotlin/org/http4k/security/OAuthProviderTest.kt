@@ -109,7 +109,7 @@ class OAuthProviderTest {
     @Test
     fun `when api returns bad status`() {
         oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
-        assertThat(oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidState), hasStatus(FORBIDDEN) and hasStatusDescription("Failed to fetch access token"))
+        assertThat(oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidState), hasStatus(FORBIDDEN) and hasStatusDescription("Failed to fetch access token (status: 500 Internal Server Error)"))
     }
 
     @Test
