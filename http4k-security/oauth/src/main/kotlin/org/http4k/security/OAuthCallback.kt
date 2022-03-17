@@ -23,9 +23,9 @@ class OAuthCallback(
     override fun invoke(request: Request) = request.callbackParameters()
         .flatMap { parameters -> validateCsrf(parameters, request, oAuthPersistence.retrieveCsrf(request)) }
         .flatMap { parameters -> validateNonce(parameters, oAuthPersistence.retrieveNonce(request)) }
-        .flatMap { parameters -> consumeToken(parameters) }
-        .flatMap { parameters -> fetchToken(parameters) }
-        .flatMap { tokenDetails -> consumeToken(tokenDetails) }
+        .flatMap { parameters -> consumeIdToken(parameters) }
+        .flatMap { parameters -> fetchAccessToken(parameters) }
+        .flatMap { tokenDetails -> consumeIdToken(tokenDetails) }
         .map { tokenDetails ->
             oAuthPersistence.assignToken(
                 request,
@@ -35,11 +35,11 @@ class OAuthCallback(
             )
         }.mapFailure { oAuthPersistence.authFailureResponse(it) }.get()
 
-    private fun consumeToken(tokenDetails: AccessTokenDetails) =
+    private fun consumeIdToken(tokenDetails: AccessTokenDetails) =
         tokenDetails.idToken?.let(idTokenConsumer::consumeFromAccessTokenResponse)?.map { tokenDetails }
             ?: Success(tokenDetails)
 
-    private fun consumeToken(parameters: CallbackParameters) =
+    private fun consumeIdToken(parameters: CallbackParameters) =
         parameters.idToken?.let(idTokenConsumer::consumeFromAuthorizationResponse)?.map { parameters }
             ?: Success(parameters)
 
@@ -71,7 +71,7 @@ class OAuthCallback(
                 Success(parameters) else Failure(OauthCallbackError.InvalidNonce(storedNonce?.value, received?.value))
         } ?: Success(parameters)
 
-    private fun fetchToken(parameters: CallbackParameters) =
+    private fun fetchAccessToken(parameters: CallbackParameters) =
         accessTokenFetcher.fetch(parameters.code.value)?.let(::Success)
             ?: Failure(OauthCallbackError.CouldNotFetchAccessToken)
 
