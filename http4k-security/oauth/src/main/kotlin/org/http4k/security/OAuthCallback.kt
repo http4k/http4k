@@ -6,7 +6,6 @@ import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
-import dev.forkhandles.result4k.peek
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -24,9 +23,9 @@ class OAuthCallback(
     override fun invoke(request: Request) = request.callbackParameters()
         .flatMap { parameters -> validateCsrf(parameters, request, oAuthPersistence.retrieveCsrf(request)) }
         .flatMap { parameters -> validateNonce(parameters, oAuthPersistence.retrieveNonce(request)) }
-        .peek { parameters -> parameters.idToken?.let(idTokenConsumer::consumeFromAuthorizationResponse) }
+        .flatMap { parameters -> consumeToken(parameters) }
         .flatMap { parameters -> fetchToken(parameters) }
-        .peek { tokenDetails -> tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse) }
+        .flatMap { tokenDetails -> consumeToken(tokenDetails) }
         .map { tokenDetails ->
             oAuthPersistence.assignToken(
                 request,
@@ -35,6 +34,14 @@ class OAuthCallback(
                 tokenDetails.idToken
             )
         }.mapFailure { oAuthPersistence.authFailureResponse(it) }.get()
+
+    private fun consumeToken(tokenDetails: AccessTokenDetails) =
+        tokenDetails.idToken?.let(idTokenConsumer::consumeFromAccessTokenResponse)?.map { tokenDetails }
+            ?: Success(tokenDetails)
+
+    private fun consumeToken(parameters: CallbackParameters) =
+        parameters.idToken?.let(idTokenConsumer::consumeFromAuthorizationResponse)?.map { parameters }
+            ?: Success(parameters)
 
     private fun Request.callbackParameters() = authorizationCode().map {
         CallbackParameters(
@@ -84,5 +91,6 @@ sealed class OauthCallbackError {
     object AuthorizationCodeMissing : OauthCallbackError()
     data class InvalidCsrfToken(val expected: String?, val received: String?) : OauthCallbackError()
     data class InvalidNonce(val expected: String?, val received: String?) : OauthCallbackError()
+    data class InvalidAccessToken(val reason: String) : OauthCallbackError()
     object CouldNotFetchAccessToken : OauthCallbackError()
 }

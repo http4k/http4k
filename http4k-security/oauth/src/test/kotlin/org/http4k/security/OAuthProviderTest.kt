@@ -3,6 +3,9 @@ package org.http4k.security
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -20,6 +23,9 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.hamkrest.hasStatusDescription
+import org.http4k.security.ResponseType.CodeIdToken
+import org.http4k.security.openid.IdToken
+import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.RequestJwtContainer
 import org.http4k.security.openid.RequestJwts
 import org.junit.jupiter.api.Test
@@ -35,7 +41,14 @@ class OAuthProviderTest {
 
     private val oAuthPersistence = FakeOAuthPersistence()
 
-    private fun oAuth(persistence: OAuthPersistence, status: Status = OK, responseType: ResponseType = ResponseType.Code): OAuthProvider = OAuthProvider(
+    private fun oAuth(
+        persistence: OAuthPersistence,
+        status: Status = OK,
+        responseType: ResponseType = ResponseType.Code,
+        nonceFromIdToken:Nonce? = null,
+        resultIdTokenFromAuth:  Result<Unit, OauthCallbackError.InvalidAccessToken> = Success(Unit),
+        resultIdTokenFromAccessToken:  Result<Unit, OauthCallbackError.InvalidAccessToken> = Success(Unit)
+    ): OAuthProvider = OAuthProvider(
         providerConfig,
         { Response(status).body("access token goes here").header("request-uri", it.uri.toString()) },
         Uri.of("http://callbackHost/callback"),
@@ -44,7 +57,12 @@ class OAuthProviderTest {
         { it.query("response_mode", "form_post") },
         { CrossSiteRequestForgeryToken("randomCsrf") },
         { Nonce("randomNonce") },
-        responseType
+        responseType,
+        idTokenConsumer = object:IdTokenConsumer{
+            override fun nonceFromIdToken(idToken: IdToken) = nonceFromIdToken
+            override fun consumeFromAuthorizationResponse(idToken: IdToken) = resultIdTokenFromAuth
+            override fun consumeFromAccessTokenResponse(idToken: IdToken) = resultIdTokenFromAccessToken
+        }
     )
 
     @Test
@@ -69,7 +87,7 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - request redirecttion may use other response_type`() {
-        assertThat(oAuth(oAuthPersistence, OK, ResponseType.CodeIdToken)
+        assertThat(oAuth(oAuthPersistence, OK, CodeIdToken)
             .authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", ".*response_type=code\\+id_token.*".toRegex())))
     }
 
@@ -124,5 +142,18 @@ class OAuthProviderTest {
         val response = oAuth(oAuthPersistence).api(Request(GET, "/some-resource"))
 
         assertThat(response, hasHeader("request-uri", equalTo("http://apiHost/api/some-resource")))
+    }
+
+    @Test
+    fun `id token - can fail from id_token from callback request`(){
+        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAuth = Failure(OauthCallbackError.InvalidAccessToken("some reason")))
+
+        assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
+    }
+
+    @Test
+    fun `id token - can fail from id_token from access token response`(){
+        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAccessToken = Failure(OauthCallbackError.InvalidAccessToken("some reason")))
+        assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }
 }

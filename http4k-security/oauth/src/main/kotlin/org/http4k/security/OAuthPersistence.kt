@@ -75,5 +75,6 @@ interface OAuthPersistence {
             is OauthCallbackError.CouldNotFetchAccessToken -> "Failed to fetch access token"
             is OauthCallbackError.InvalidCsrfToken -> "Invalid state (expected: $expected, received: $received)"
             is OauthCallbackError.InvalidNonce -> "Invalid nonce (expected: $expected, received: $received)"
+            is OauthCallbackError.InvalidAccessToken -> "Invalid access token: some reason"
         }
 }
