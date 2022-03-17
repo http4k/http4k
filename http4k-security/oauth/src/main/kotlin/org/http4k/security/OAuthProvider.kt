@@ -30,7 +30,7 @@ class OAuthProvider(
 ) {
 
     // pre-configured API client for this provider
-    val api = ClientFilters.SetHostFrom(providerConfig.apiBase).then(client)
+    val api = ClientFilters.SetBaseUriFrom(providerConfig.apiBase).then(client)
 
     // use this filter to protect endpoints
     val authFilter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType, standardRedirectionUrlBuilder)

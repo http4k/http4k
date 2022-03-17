@@ -25,18 +25,18 @@ import org.junit.jupiter.api.Test
 
 class OAuthProviderTest {
     private val providerConfig = OAuthProviderConfig(
-        Uri.of("http://authHost"),
+        Uri.of("http://authHost/base"),
         "/auth",
         "/token",
         Credentials("user", "password"),
-        Uri.of("http://apiHost")
+        Uri.of("http://apiHost/api/")
     )
 
     private val oAuthPersistence = FakeOAuthPersistence()
 
     private fun oAuth(persistence: OAuthPersistence, status: Status = OK, responseType: ResponseType = ResponseType.Code): OAuthProvider = OAuthProvider(
         providerConfig,
-        { Response(status).body("access token goes here") },
+        { Response(status).body("access token goes here").header("request-uri", it.uri.toString()) },
         Uri.of("http://callbackHost/callback"),
         listOf("scope1", "scope2"),
         persistence,
@@ -54,13 +54,13 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - when no accessToken value present, request is redirected to expected location`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&response_mode=form_post"""
+        val expectedHeader = """http://authHost/base/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&response_mode=form_post"""
         assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
     @Test
     fun `filter - accepts custom request JWT container`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&request=myCustomJwt&response_mode=form_post"""
+        val expectedHeader = """http://authHost/base/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&request=myCustomJwt&response_mode=form_post"""
 
         val jwts = RequestJwts { _, _, _ -> RequestJwtContainer("myCustomJwt") }
         assertThat(oAuth(oAuthPersistence).authFilter(jwts).then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
@@ -119,5 +119,12 @@ class OAuthProviderTest {
             .header("action", "assignToken")
 
         assertThat(oAuth(oAuthPersistence).callback(withCodeAndValidState), equalTo(validRedirectToRoot))
+    }
+
+    @Test
+    fun `api - uses base api uri`(){
+        val response = oAuth(oAuthPersistence).api(Request(GET, "/some-resource"))
+
+        assertThat(response, hasHeader("request-uri", equalTo("http://apiHost/api/some-resource")))
     }
 }
