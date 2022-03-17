@@ -19,6 +19,7 @@ import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.hamkrest.hasStatusDescription
 import org.http4k.security.openid.RequestJwtContainer
 import org.http4k.security.openid.RequestJwts
 import org.junit.jupiter.api.Test
@@ -80,20 +81,17 @@ class OAuthProviderTest {
 
     @Test
     fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {
-        val invalidation = Response(FORBIDDEN)
+        assertThat(oAuth(oAuthPersistence).callback(base), hasStatus(FORBIDDEN) and hasStatusDescription("Authorization code missing"))
 
-        assertThat(oAuth(oAuthPersistence).callback(base), equalTo(invalidation))
+        assertThat(oAuth(oAuthPersistence).callback(withCookie), hasStatus(FORBIDDEN) and hasStatusDescription("Authorization code missing"))
 
-        assertThat(oAuth(oAuthPersistence).callback(withCookie), equalTo(invalidation))
-
-        assertThat(oAuth(oAuthPersistence).callback(withCode), equalTo(invalidation))
-
-        assertThat(oAuth(oAuthPersistence).callback(withCodeAndInvalidState), equalTo(invalidation))
+        assertThat(oAuth(oAuthPersistence).callback(withCodeAndInvalidState), hasStatus(FORBIDDEN) and hasStatusDescription("Invalid state (expected: null, received: notreal)"))
     }
 
     @Test
     fun `when api returns bad status`() {
-        assertThat(oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidState), equalTo(Response(FORBIDDEN)))
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        assertThat(oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidState), hasStatus(FORBIDDEN) and hasStatusDescription("Failed to fetch access token"))
     }
 
     @Test

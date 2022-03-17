@@ -16,7 +16,6 @@ import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
-import java.time.LocalDateTime
 
 class InsecureCookieBasedOAuthPersistenceTest {
 
@@ -28,7 +27,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
 
     @Test
     fun `failed response has correct cookies`() {
-        assertThat(persistence.authFailureResponse(), equalTo(
+        assertThat(persistence.authFailureResponse(OauthCallbackError.AuthorizationCodeMissing), equalTo(
             Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken").invalidateCookie("prefixNonce").invalidateCookie("prefixOriginalUri")
         ))
     }

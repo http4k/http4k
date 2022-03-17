@@ -10,8 +10,6 @@ import org.http4k.core.cookie.invalidateCookie
 import org.http4k.security.openid.IdToken
 import java.time.Clock
 import java.time.Duration
-import java.time.Instant
-import java.time.LocalDateTime
 
 /**
  * This is an example implementation which stores CSRF and AccessToken values in an INSECURE client-side cookie.
@@ -50,7 +48,7 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     override fun assignOriginalUri(redirect: Response, originalUri: Uri): Response = redirect.cookie(expiring(originalUriName, originalUri.toString()))
 
-    override fun authFailureResponse() = Response(FORBIDDEN)
+    override fun authFailureResponse(reason: OauthCallbackError) = Response(FORBIDDEN)
         .invalidateCookie(csrfName)
         .invalidateCookie(accessTokenCookieName)
         .invalidateCookie(nonceName)

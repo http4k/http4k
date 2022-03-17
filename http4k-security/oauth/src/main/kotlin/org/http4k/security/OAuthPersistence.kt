@@ -67,5 +67,13 @@ interface OAuthPersistence {
      * Build the default failure response which occurs when a failure occurs during the callback process (eg. a mismatch/missing
      * CSRF or failure occurring when calling into the end-service for the access-token.
      */
-    fun authFailureResponse() = Response(FORBIDDEN)
+    fun authFailureResponse(reason: OauthCallbackError) = Response(FORBIDDEN.description(reason.description))
+
+    private val OauthCallbackError.description: String
+        get() = when(this){
+            is OauthCallbackError.AuthorizationCodeMissing -> "Authorization code missing"
+            is OauthCallbackError.CouldNotFetchAccessToken -> "Failed to fetch access token"
+            is OauthCallbackError.InvalidCsrfToken -> "Invalid state (expected: $expected, received: $received)"
+            is OauthCallbackError.InvalidNonce -> "Invalid nonce (expected: $expected, received: $received)"
+        }
 }

@@ -34,13 +34,13 @@ class OAuthCallback(
                 tokenDetails.accessToken,
                 tokenDetails.idToken
             )
-        }.mapFailure { oAuthPersistence.authFailureResponse() }.get()
+        }.mapFailure { oAuthPersistence.authFailureResponse(it) }.get()
 
     private fun Request.callbackParameters() = authorizationCode().map {
         CallbackParameters(
             code = it,
             state = queryOrFragmentParameter("state")?.let(::CrossSiteRequestForgeryToken),
-            idToken = queryOrFragmentParameter("idToken")?.let(::IdToken)
+            idToken = queryOrFragmentParameter("id_token")?.let(::IdToken)
         )
     }
 
@@ -52,13 +52,16 @@ class OAuthCallback(
         request: Request,
         persistedToken: CrossSiteRequestForgeryToken?
     ) = request.queryOrFragmentParameter("state")?.let(::CrossSiteRequestForgeryToken)
-        ?.takeIf { it == persistedToken }
-        ?.let { Success(parameters) } ?: Failure(OauthCallbackError.InvalidCsrfToken)
+        .let {
+            if (it == persistedToken) Success(parameters)
+            else Failure(OauthCallbackError.InvalidCsrfToken(persistedToken?.value, it?.value))
+        }
 
     private fun validateNonce(parameters: CallbackParameters, storedNonce: Nonce?) =
         parameters.idToken?.let { idToken ->
-            if (idTokenConsumer.nonceFromIdToken(idToken) == storedNonce)
-                Success(parameters) else Failure(OauthCallbackError.InvalidNonce)
+            val received = idTokenConsumer.nonceFromIdToken(idToken)
+            if (received == storedNonce)
+                Success(parameters) else Failure(OauthCallbackError.InvalidNonce(storedNonce?.value, received?.value))
         } ?: Success(parameters)
 
     private fun fetchToken(parameters: CallbackParameters) =
@@ -77,9 +80,9 @@ class OAuthCallback(
     )
 }
 
-private sealed class OauthCallbackError {
+sealed class OauthCallbackError {
     object AuthorizationCodeMissing : OauthCallbackError()
-    object InvalidCsrfToken : OauthCallbackError()
-    object InvalidNonce : OauthCallbackError()
+    data class InvalidCsrfToken(val expected: String?, val received: String?) : OauthCallbackError()
+    data class InvalidNonce(val expected: String?, val received: String?) : OauthCallbackError()
     object CouldNotFetchAccessToken : OauthCallbackError()
 }
