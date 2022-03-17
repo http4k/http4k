@@ -9,6 +9,7 @@ import dev.forkhandles.result4k.mapFailure
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.security.oauth.server.AuthorizationCode
 import org.http4k.security.openid.IdToken
@@ -72,8 +73,7 @@ class OAuthCallback(
         } ?: Success(parameters)
 
     private fun fetchAccessToken(parameters: CallbackParameters) =
-        accessTokenFetcher.fetch(parameters.code.value)?.let(::Success)
-            ?: Failure(OauthCallbackError.CouldNotFetchAccessToken)
+        accessTokenFetcher.fetch(parameters.code.value)
 
     private fun redirectionResponse(request: Request) = Response(TEMPORARY_REDIRECT)
         .header("Location", oAuthPersistence.retrieveOriginalUri(request)?.toString() ?: "/")
@@ -92,5 +92,5 @@ sealed class OauthCallbackError {
     data class InvalidCsrfToken(val expected: String?, val received: String?) : OauthCallbackError()
     data class InvalidNonce(val expected: String?, val received: String?) : OauthCallbackError()
     data class InvalidAccessToken(val reason: String) : OauthCallbackError()
-    object CouldNotFetchAccessToken : OauthCallbackError()
+    data class CouldNotFetchAccessToken(val status: Status, val reason: String) : OauthCallbackError()
 }
