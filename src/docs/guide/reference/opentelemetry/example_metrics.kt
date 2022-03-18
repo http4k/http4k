@@ -50,7 +50,7 @@ fun main() {
     // see some results
     inMemoryMetricReader.collectAllMetrics().forEach {
         println("metric: " + it.name + ", value: " +
-            (it.longSumData.points.takeIf { it.isNotEmpty() } ?: it.doubleSummaryData.points)
+            (it.longSumData.points.takeIf { it.isNotEmpty() } ?: it.doubleSumData.points)
         )
     }
 }
