@@ -4,14 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.contract.AutoContractRendererContract
 import org.http4k.contract.openapi.AddSimpleFieldToRootNode
 import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.OpenAPIJackson
 import org.http4k.core.Uri
-import org.http4k.format.Jackson
 
 class OpenApi3AutoTest : AutoContractRendererContract<JsonNode>(
-    Jackson,
+    OpenAPIJackson,
     OpenApi3(
         ApiInfo("title", "1.2", "module description"),
-        Jackson,
+        OpenAPIJackson,
         listOf(AddSimpleFieldToRootNode),
         listOf(ApiServer(Uri.of("http://localhost:8000"), "a very simple API"))
     )

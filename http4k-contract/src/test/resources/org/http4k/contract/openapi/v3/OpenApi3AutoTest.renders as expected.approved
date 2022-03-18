@@ -10,8 +10,7 @@
       "description": "world"
     },
     {
-      "name": "tag1",
-      "description": null
+      "name": "tag1"
     },
     {
       "name": "tag3",
@@ -28,7 +27,6 @@
     "/basepath/and_auth": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -51,7 +49,6 @@
     "/basepath/basic_auth": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -72,7 +69,6 @@
     "/basepath/bearer_auth": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -93,7 +89,6 @@
     "/basepath/body_form": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -153,7 +148,6 @@
     "/basepath/body_json_list_schema": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -192,7 +186,6 @@
     "/basepath/body_json_noschema": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -201,7 +194,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "example": null,
               "schema": {
               }
             }
@@ -223,7 +215,6 @@
     "/basepath/body_json_response": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -258,7 +249,6 @@
     "/basepath/body_json_schema": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -295,7 +285,6 @@
     "/basepath/body_receiving_string": {
       "post": {
         "summary": "body_receiving_string",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -304,10 +293,8 @@
         "requestBody": {
           "content": {
             "text/plain": {
-              "example": null,
               "schema": {
                 "example": "hello from the land of receiving plaintext",
-                "description": null,
                 "type": "string"
               }
             }
@@ -329,7 +316,6 @@
     "/basepath/body_string": {
       "get": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -340,10 +326,8 @@
             "description": "OK",
             "content": {
               "text/plain": {
-                "example": null,
                 "schema": {
                   "example": "hello from the land of sending plaintext",
-                  "description": null,
                   "type": "string"
                 }
               }
@@ -363,7 +347,6 @@
     "/basepath/cookies": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -424,7 +407,6 @@
     "/basepath/headers": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -462,9 +444,7 @@
             "required": false,
             "description": "enumHeader",
             "schema": {
-              "$ref": "#/components/schemas/Foo",
-              "example": null,
-              "description": null
+              "$ref": "#/components/schemas/Foo"
             }
           },
           {
@@ -492,7 +472,6 @@
     "/basepath/multipart_fields": {
       "put": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -542,7 +521,6 @@
     "/basepath/nometa": {
       "get": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -563,7 +541,6 @@
     "/basepath/oauth2_auth": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -585,7 +562,6 @@
     "/basepath/or_auth": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -610,7 +586,6 @@
     "/basepath/paths/{firstName}/bertrand/{age}/{foo}": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -621,8 +596,7 @@
             },
             "in": "path",
             "name": "firstName",
-            "required": true,
-            "description": null
+            "required": true
           },
           {
             "schema": {
@@ -630,18 +604,14 @@
             },
             "in": "path",
             "name": "age",
-            "required": true,
-            "description": null
+            "required": true
           },
           {
             "in": "path",
             "name": "foo",
             "required": true,
-            "description": null,
             "schema": {
-              "$ref": "#/components/schemas/Foo",
-              "example": null,
-              "description": null
+              "$ref": "#/components/schemas/Foo"
             }
           }
         ],
@@ -660,7 +630,6 @@
     "/basepath/produces_and_consumes": {
       "get": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -681,7 +650,6 @@
     "/basepath/queries": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -722,9 +690,7 @@
             "required": false,
             "description": "enumQuery",
             "schema": {
-              "$ref": "#/components/schemas/Foo",
-              "example": null,
-              "description": null
+              "$ref": "#/components/schemas/Foo"
             }
           },
           {
@@ -752,7 +718,6 @@
     "/basepath/returning": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -792,7 +757,6 @@
           "bar",
           "bing"
         ],
-        "description": null,
         "type": "string"
       },
       "object1089648089": {

@@ -1,8 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.JacksonFieldWithMetadata",
-    "example": null,
-    "description": null
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.JacksonFieldWithMetadata"
   },
   "definitions": [
     {
@@ -16,7 +14,6 @@
           },
           "field2": {
             "example": "field2",
-            "description": null,
             "type": "string"
           }
         },
@@ -24,7 +21,6 @@
           "field1": "field1",
           "field2": "field2"
         },
-        "description": null,
         "type": "object",
         "required": [
           "field1",

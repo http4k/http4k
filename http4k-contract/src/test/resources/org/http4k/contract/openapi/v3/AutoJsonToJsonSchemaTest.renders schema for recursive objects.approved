@@ -1,8 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.RecursiveObject",
-    "example": null,
-    "description": null
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.RecursiveObject"
   },
   "definitions": [
     {
@@ -19,7 +17,6 @@
                 ]
               }
             ],
-            "description": null,
             "type": "array"
           }
         },
@@ -31,7 +28,6 @@
             }
           ]
         },
-        "description": null,
         "type": "object",
         "required": [
           "children"

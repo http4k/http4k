@@ -20,7 +20,6 @@
     "/basepath/body_auto_map": {
       "put": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -37,21 +36,17 @@
                   "properties": {
                     "foo": {
                       "example": 123,
-                      "description": null,
                       "type": "number"
                     }
                   },
                   "example": {
                     "foo": 123
                   },
-                  "description": null,
                   "type": "object",
                   "required": [
                     "foo"
                   ]
                 },
-                "example": null,
-                "description": null,
                 "type": "object"
               }
             }
@@ -73,7 +68,6 @@
     "/basepath/body_auto_schema": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -93,9 +87,7 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schemas/someOtherId",
-                "example": null,
-                "description": null
+                "$ref": "#/components/schemas/someOtherId"
               }
             }
           },
@@ -114,7 +106,6 @@
       },
       "put": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -130,9 +121,7 @@
                 }
               },
               "schema": {
-                "$ref": "#/components/schemas/ArbObject3",
-                "example": null,
-                "description": null
+                "$ref": "#/components/schemas/ArbObject3"
               }
             }
           },
@@ -157,7 +146,6 @@
                       "anotherString": "bing"
                     }
                   ],
-                  "description": null,
                   "type": "array"
                 }
               }
@@ -177,7 +165,6 @@
     "/basepath/body_auto_schema_custom_content_type": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -192,9 +179,7 @@
                   "anotherString": "bar"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/ArbObject4",
-                  "example": null,
-                  "description": null
+                  "$ref": "#/components/schemas/ArbObject4"
                 }
               }
             }
@@ -213,7 +198,6 @@
     "/basepath/body_auto_schema_custom_request_content_type": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -226,9 +210,7 @@
                 "anotherString": "bar"
               },
               "schema": {
-                "$ref": "#/components/schemas/ArbObject4",
-                "example": null,
-                "description": null
+                "$ref": "#/components/schemas/ArbObject4"
               }
             }
           },
@@ -249,7 +231,6 @@
     "/basepath/body_auto_schema_multiple_request_schemas": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -261,14 +242,10 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/ArbObject1",
-                    "example": null,
-                    "description": null
+                    "$ref": "#/components/schemas/ArbObject1"
                   },
                   {
-                    "$ref": "#/components/schemas/ArbObject3",
-                    "example": null,
-                    "description": null
+                    "$ref": "#/components/schemas/ArbObject3"
                   }
                 ]
               }
@@ -291,7 +268,6 @@
     "/basepath/body_auto_schema_multiple_response_schemas": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -306,9 +282,7 @@
                   "anotherString": "bing"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/ArbObject1",
-                  "example": null,
-                  "description": null
+                  "$ref": "#/components/schemas/ArbObject1"
                 }
               }
             }
@@ -320,14 +294,10 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ArbObject1",
-                      "example": null,
-                      "description": null
+                      "$ref": "#/components/schemas/ArbObject1"
                     },
                     {
-                      "$ref": "#/components/schemas/ArbObject3",
-                      "example": null,
-                      "description": null
+                      "$ref": "#/components/schemas/ArbObject3"
                     }
                   ]
                 }
@@ -348,7 +318,6 @@
     "/basepath/body_auto_schema_name_definition_id": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -362,14 +331,10 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/impl1",
-                      "example": null,
-                      "description": null
+                      "$ref": "#/components/schemas/impl1"
                     },
                     {
-                      "$ref": "#/components/schemas/impl2",
-                      "example": null,
-                      "description": null
+                      "$ref": "#/components/schemas/impl2"
                     }
                   ]
                 }
@@ -394,13 +359,10 @@
         "properties": {
           "string": {
             "example": "s",
-            "description": null,
             "type": "string"
           },
           "child": {
-            "$ref": "#/components/schemas/ArbObject1",
-            "example": null,
-            "description": null
+            "$ref": "#/components/schemas/ArbObject1"
           },
           "numbers": {
             "items": {
@@ -409,12 +371,10 @@
             "example": [
               1
             ],
-            "description": null,
             "type": "array"
           },
           "bool": {
             "example": true,
-            "description": null,
             "type": "boolean"
           }
         },
@@ -428,7 +388,6 @@
           ],
           "bool": true
         },
-        "description": null,
         "type": "object",
         "required": [
           "bool",
@@ -439,15 +398,12 @@
       "ArbObject1": {
         "properties": {
           "anotherString": {
-            "$ref": "#/components/schemas/Foo",
-            "example": null,
-            "description": null
+            "$ref": "#/components/schemas/Foo"
           }
         },
         "example": {
           "anotherString": "bing"
         },
-        "description": null,
         "type": "object",
         "required": [
           "anotherString"
@@ -459,21 +415,17 @@
           "bar",
           "bing"
         ],
-        "description": null,
         "type": "string"
       },
       "ArbObject4": {
         "properties": {
           "anotherString": {
-            "$ref": "#/components/schemas/Foo",
-            "example": null,
-            "description": null
+            "$ref": "#/components/schemas/Foo"
           }
         },
         "example": {
           "anotherString": "bar"
         },
-        "description": null,
         "type": "object",
         "required": [
           "anotherString"
@@ -483,7 +435,6 @@
         "properties": {
           "uri": {
             "example": "http://foowang",
-            "description": null,
             "type": "string"
           },
           "additional": {
@@ -491,21 +442,17 @@
               "properties": {
                 "foo": {
                   "example": 123,
-                  "description": null,
                   "type": "number"
                 }
               },
               "example": {
                 "foo": 123
               },
-              "description": null,
               "type": "object",
               "required": [
                 "foo"
               ]
             },
-            "example": null,
-            "description": null,
             "type": "object"
           }
         },
@@ -515,7 +462,6 @@
             "foo": 123
           }
         },
-        "description": null,
         "type": "object",
         "required": [
           "additional",
@@ -525,9 +471,7 @@
       "impl1": {
         "properties": {
           "obj": {
-            "$ref": "#/components/schemas/Impl1",
-            "example": null,
-            "description": null
+            "$ref": "#/components/schemas/Impl1"
           }
         },
         "example": {
@@ -535,7 +479,6 @@
             "value": "bob"
           }
         },
-        "description": null,
         "type": "object",
         "required": [
           "obj"
@@ -545,14 +488,12 @@
         "properties": {
           "value": {
             "example": "bob",
-            "description": null,
             "type": "string"
           }
         },
         "example": {
           "value": "bob"
         },
-        "description": null,
         "type": "object",
         "required": [
           "value"
@@ -561,9 +502,7 @@
       "impl2": {
         "properties": {
           "obj": {
-            "$ref": "#/components/schemas/Impl2",
-            "example": null,
-            "description": null
+            "$ref": "#/components/schemas/Impl2"
           }
         },
         "example": {
@@ -571,7 +510,6 @@
             "value": 123
           }
         },
-        "description": null,
         "type": "object",
         "required": [
           "obj"
@@ -581,14 +519,12 @@
         "properties": {
           "value": {
             "example": 123,
-            "description": null,
             "type": "number"
           }
         },
         "example": {
           "value": 123
         },
-        "description": null,
         "type": "object",
         "required": [
           "value"

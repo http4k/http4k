@@ -260,9 +260,23 @@ private sealed class SchemaNode(
     fun paramMeta() = _paramMeta
     abstract fun arrayItem(): ArrayItem
 
-    val description = metadata?.description
-
+    val description = metadata?.extra?.get("description")
     val format = metadata?.extra?.get("format")
+    val default = metadata?.extra?.get("default")
+    val title = metadata?.extra?.get("title")
+    val multipleOf = metadata?.extra?.get("multipleOf")
+    val maximum = metadata?.extra?.get("maximum")
+    val exclusiveMaximum = metadata?.extra?.get("exclusiveMaximum")
+    val minimum = metadata?.extra?.get("minimum")
+    val exclusiveMinimum = metadata?.extra?.get("exclusiveMinimum")
+    val maxLength = metadata?.extra?.get("maxLength")
+    val minLength = metadata?.extra?.get("minLength")
+    val pattern = metadata?.extra?.get("pattern")
+    val maxItems = metadata?.extra?.get("maxItems")
+    val minItems = metadata?.extra?.get("minItems")
+    val uniqueItems = metadata?.extra?.get("uniqueItems")
+    val maxProperties = metadata?.extra?.get("maxProperties")
+    val minProperties = metadata?.extra?.get("minProperties")
 
     class Primitive(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?, metadata: FieldMetadata?) :
         SchemaNode(name, paramMeta, isNullable, example, metadata) {

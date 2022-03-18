@@ -2,7 +2,23 @@
   "node": {
     "$ref": "#/components/schemas/ArbObjectHolder",
     "example": null,
-    "description": null
+    "description": null,
+    "format": null,
+    "default": null,
+    "title": null,
+    "multipleOf": null,
+    "maximum": null,
+    "exclusiveMaximum": null,
+    "minimum": null,
+    "exclusiveMinimum": null,
+    "maxLength": null,
+    "minLength": null,
+    "pattern": null,
+    "maxItems": null,
+    "minItems": null,
+    "uniqueItems": null,
+    "maxProperties": null,
+    "minProperties": null
   },
   "definitions": [
     {
@@ -17,6 +33,22 @@
               "foobar"
             ],
             "description": null,
+            "format": null,
+            "default": null,
+            "title": null,
+            "multipleOf": null,
+            "maximum": null,
+            "exclusiveMaximum": null,
+            "minimum": null,
+            "exclusiveMinimum": null,
+            "maxLength": null,
+            "minLength": null,
+            "pattern": null,
+            "maxItems": null,
+            "minItems": null,
+            "uniqueItems": null,
+            "maxProperties": null,
+            "minProperties": null,
             "type": "array"
           }
         },
@@ -26,6 +58,22 @@
           ]
         },
         "description": null,
+        "format": null,
+        "default": null,
+        "title": null,
+        "multipleOf": null,
+        "maximum": null,
+        "exclusiveMaximum": null,
+        "minimum": null,
+        "exclusiveMinimum": null,
+        "maxLength": null,
+        "minLength": null,
+        "pattern": null,
+        "maxItems": null,
+        "minItems": null,
+        "uniqueItems": null,
+        "maxProperties": null,
+        "minProperties": null,
         "type": "object",
         "required": [
           "inner"

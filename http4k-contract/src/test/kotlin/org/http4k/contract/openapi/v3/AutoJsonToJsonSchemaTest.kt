@@ -3,6 +3,7 @@ package org.http4k.contract.openapi.v3
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.http4k.contract.openapi.OpenAPIJackson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -75,7 +76,7 @@ data class InterfaceHolder(val i: Interface)
 
 @ExtendWith(JsonApprovalTest::class)
 class AutoJsonToJsonSchemaTest {
-    private val json = Jackson
+    private val json = OpenAPIJackson
 
     private val creator = AutoJsonToJsonSchema(
         json,
@@ -122,9 +123,17 @@ class AutoJsonToJsonSchemaTest {
             json,
             { _, name ->
                 if (name == "str") {
-                    Field("hello", false, FieldMetadata("string description", mapOf("key" to "string", "format" to "string format")))
+                    Field(
+                        "hello",
+                        false,
+                        FieldMetadata(mapOf("key" to "string", "description" to "string description", "format" to "string format"))
+                    )
                 } else {
-                    Field(123, false, FieldMetadata("int description", mapOf("key" to 123, "format" to "another format")))
+                    Field(
+                        123,
+                        false,
+                        FieldMetadata(mapOf("key" to 123, "description" to "int description", "format" to "another format"))
+                    )
                 }
             },
             SchemaModelNamer.Full,
@@ -244,7 +253,14 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(
             Response(OK)
                 .with(CONTENT_TYPE of APPLICATION_JSON)
-                .body(Jackson.asFormatString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder(), refModelNamePrefix = null)))
+                .body(
+                    Jackson.asFormatString(
+                        AutoJsonToJsonSchema(json).toSchema(
+                            ArbObjectHolder(),
+                            refModelNamePrefix = null
+                        )
+                    )
+                )
         )
     }
 

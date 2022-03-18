@@ -3,10 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.23.0.0 (uncut)
+### v4.23.0.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: Support OA3 meta fields on properties if they are populated by a custom annotation. 
 - **http4k-graphql** : [Possible breaks] Due to upgrade of underlying graphql lib.
-
 
 ### v4.22.0.1
 - **http4k-security-oauth**: Fix error messages for oauth callback failures
