@@ -1,5 +1,6 @@
 package org.http4k.serverless
 
+import com.alibaba.fastjson.JSONObject
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.sameInstance
@@ -46,7 +47,9 @@ class TencentCloudFunctionTest {
                 APIGatewayProxyResponseEvent().apply {
                     statusCode = 200
                     body = "hello there"
-                    headers = mapOf("a" to "b")
+                    headers = JSONObject().apply {
+                        set("a", "b")
+                    }
                 })
         )
     }
