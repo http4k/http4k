@@ -7,9 +7,9 @@ changes with their rationale when appropriate:
 - **http4k-security-oauth**: Fix error messages for oauth callback failures
 
 ### v4.22.0.0
-- **http4k-security-oauth** [Potential Break]: apiBase path is now preserved when building auth and token uris  
-- **http4k-security-oauth** [Potential Break]: provide reason when an oauth callback fails  
-- **http4k-security-oauth** [Potential Break]: allow id token consumer to fail authentication flow  
+- **http4k-security-oauth** [Breaking]: apiBase path is now preserved when building auth and token uris  
+- **http4k-security-oauth** [Breaking]: provide reason when an oauth callback fails  
+- **http4k-security-oauth** [Breaking]: allow id token consumer to fail authentication flow  
 
 ### v4.21.1.1
 - **http4k-contract**: OpenApi3 - Expose new prefix-overriding in OpenApi definitions.
