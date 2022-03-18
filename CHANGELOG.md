@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.23.1.0 (uncut)
+### v4.24.0.0 
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-webdriver*** : [Break[ Upgrade of webdriver to V4 has changed the APIS. The custom `By` implementation is no longer required so you can use the inbuilt Selenium version instead. The disabledCssSelector By implementation has been removed, although you can simply replicate this using the existing CSS selector model.
 
 ### v4.23.0.0
 - **http4k-*** : Upgrade some dependency versions.
