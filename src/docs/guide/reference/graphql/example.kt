@@ -28,8 +28,8 @@ object MyGraphQLHandler : GraphQLHandler {
     override fun invoke(request: GraphQLRequest) = GraphQLResponse.from(graphQL.execute(request.query))
 }
 
-data class User(val id: Long, val name: String)
-data class Params(val ids: List<Long>)
+data class User(val id: Int, val name: String)
+data class Params(val ids: List<Int>)
 
 class UserQueries {
     private val userDb = listOf(
