@@ -23,7 +23,8 @@ fun setupOpenTelemetryMeterProvider() {
         .setMeterProvider(
             SdkMeterProvider.builder()
                 .registerMetricReader(inMemoryMetricReader)
-                .setMinimumCollectionInterval(Duration.ofMillis(1)).build())
+                .setMinimumCollectionInterval(Duration.ofMillis(1)).build()
+        )
         .buildAndRegisterGlobal()
 }
 
@@ -37,7 +38,7 @@ fun hasRequestTimer(count: Int, value: Double, attributes: Attributes, name: Str
         override fun invoke(actual: List<MetricData>): MatchResult {
             val summary = actual
                 .first { it.name == name }
-                .doubleHistogramData
+                .histogramData
                 .points
                 .first { it.attributes == attributes }
             return if (
