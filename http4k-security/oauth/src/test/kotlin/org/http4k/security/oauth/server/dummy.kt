@@ -113,12 +113,12 @@ class InMemoryIdTokenConsumer(var expectedNonce: Nonce? = null) : IdTokenConsume
 
     override fun nonceFromIdToken(idToken: IdToken): Nonce? = expectedNonce
 
-    override fun consumeFromAuthorizationResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidAccessToken> {
+    override fun consumeFromAuthorizationResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidIdToken> {
         consumedFromAuthorizationResponse = idToken
         return Success(Unit)
     }
 
-    override fun consumeFromAccessTokenResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidAccessToken> {
+    override fun consumeFromAccessTokenResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidIdToken> {
         consumedFromAccessTokenResponse = idToken
         return Success(Unit)
     }

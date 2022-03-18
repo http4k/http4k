@@ -7,8 +7,8 @@ import org.http4k.security.OauthCallbackError
 
 interface IdTokenConsumer {
     fun nonceFromIdToken(idToken: IdToken): Nonce?
-    fun consumeFromAuthorizationResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidAccessToken>
-    fun consumeFromAccessTokenResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidAccessToken>
+    fun consumeFromAuthorizationResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidIdToken>
+    fun consumeFromAccessTokenResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidIdToken>
 
     companion object {
         val NoOp = object : IdTokenConsumer {

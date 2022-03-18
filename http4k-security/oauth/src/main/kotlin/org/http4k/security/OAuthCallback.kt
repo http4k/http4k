@@ -92,5 +92,6 @@ sealed class OauthCallbackError {
     data class InvalidCsrfToken(val expected: String?, val received: String?) : OauthCallbackError()
     data class InvalidNonce(val expected: String?, val received: String?) : OauthCallbackError()
     data class InvalidAccessToken(val reason: String) : OauthCallbackError()
+    data class InvalidIdToken(val reason: String) : OauthCallbackError()
     data class CouldNotFetchAccessToken(val status: Status, val reason: String) : OauthCallbackError()
 }

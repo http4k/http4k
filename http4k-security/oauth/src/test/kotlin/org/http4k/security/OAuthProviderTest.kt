@@ -46,8 +46,8 @@ class OAuthProviderTest {
         status: Status = OK,
         responseType: ResponseType = ResponseType.Code,
         nonceFromIdToken:Nonce? = null,
-        resultIdTokenFromAuth:  Result<Unit, OauthCallbackError.InvalidAccessToken> = Success(Unit),
-        resultIdTokenFromAccessToken:  Result<Unit, OauthCallbackError.InvalidAccessToken> = Success(Unit)
+        resultIdTokenFromAuth:  Result<Unit, OauthCallbackError.InvalidIdToken> = Success(Unit),
+        resultIdTokenFromAccessToken:  Result<Unit, OauthCallbackError.InvalidIdToken> = Success(Unit)
     ): OAuthProvider = OAuthProvider(
         providerConfig,
         { Response(status).body("access token goes here").header("request-uri", it.uri.toString()) },
@@ -146,14 +146,14 @@ class OAuthProviderTest {
 
     @Test
     fun `id token - can fail from id_token from callback request`(){
-        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAuth = Failure(OauthCallbackError.InvalidAccessToken("some reason")))
+        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAuth = Failure(OauthCallbackError.InvalidIdToken("some reason")))
 
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }
 
     @Test
     fun `id token - can fail from id_token from access token response`(){
-        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAccessToken = Failure(OauthCallbackError.InvalidAccessToken("some reason")))
+        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAccessToken = Failure(OauthCallbackError.InvalidIdToken("some reason")))
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }
 }

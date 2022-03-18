@@ -70,11 +70,12 @@ interface OAuthPersistence {
     fun authFailureResponse(reason: OauthCallbackError) = Response(FORBIDDEN.description(reason.description))
 
     private val OauthCallbackError.description: String
-        get() = when(this){
+        get() = when (this) {
             is OauthCallbackError.AuthorizationCodeMissing -> "Authorization code missing"
             is OauthCallbackError.CouldNotFetchAccessToken -> "Failed to fetch access token (status: $status)"
             is OauthCallbackError.InvalidCsrfToken -> "Invalid state (expected: $expected, received: $received)"
             is OauthCallbackError.InvalidNonce -> "Invalid nonce (expected: $expected, received: $received)"
-            is OauthCallbackError.InvalidAccessToken -> "Invalid access token: some reason"
+            is OauthCallbackError.InvalidAccessToken -> "Invalid access token: $reason"
+            is OauthCallbackError.InvalidIdToken -> "Invalid id token: $reason"
         }
 }
