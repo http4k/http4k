@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.23.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-graphql** : [Possible breaks] Due to upgrade of underlying graphql lib.
+
+
 ### v4.22.0.1
 - **http4k-security-oauth**: Fix error messages for oauth callback failures
 
