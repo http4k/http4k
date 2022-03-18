@@ -25,7 +25,7 @@ class SimpleLookup(
 ) : FieldRetrieval {
     override fun invoke(target: Any, name: String): Field {
         val fields = try {
-            target::class.memberProperties.map { renamingStrategy(it.name) to it }.toMap()
+            target::class.memberProperties.associateBy { renamingStrategy(it.name) }
         } catch (e: Error) {
             emptyMap<String, KProperty1<out Any, Any?>>()
         }

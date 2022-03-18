@@ -122,9 +122,9 @@ class AutoJsonToJsonSchemaTest {
             json,
             { _, name ->
                 if (name == "str") {
-                    Field("hello", false, FieldMetadata("string description", mapOf("key" to "string")))
+                    Field("hello", false, FieldMetadata("string description", mapOf("key" to "string", "format" to "string format")))
                 } else {
-                    Field(123, false, FieldMetadata("int description", mapOf("key" to 123)))
+                    Field(123, false, FieldMetadata("int description", mapOf("key" to 123, "format" to "another format")))
                 }
             },
             SchemaModelNamer.Full,
