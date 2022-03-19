@@ -53,7 +53,7 @@ class OAuthCallback(
     }
 
     private fun Request.authorizationCode() = queryOrFragmentParameter("code")?.let(::AuthorizationCode)
-        ?.let(::Success) ?: Failure(OauthCallbackError.AuthorizationCodeMissing)
+        ?.let(::Success) ?: Failure(OAuthCallbackError.AuthorizationCodeMissing)
 
     private fun validateCsrf(
         parameters: CallbackParameters,
@@ -62,14 +62,14 @@ class OAuthCallback(
     ) = request.queryOrFragmentParameter("state")?.let(::CrossSiteRequestForgeryToken)
         .let {
             if (it == persistedToken) Success(parameters)
-            else Failure(OauthCallbackError.InvalidCsrfToken(persistedToken?.value, it?.value))
+            else Failure(OAuthCallbackError.InvalidCsrfToken(persistedToken?.value, it?.value))
         }
 
     private fun validateNonce(parameters: CallbackParameters, storedNonce: Nonce?) =
         parameters.idToken?.let { idToken ->
             val received = idTokenConsumer.nonceFromIdToken(idToken)
             if (received == storedNonce)
-                Success(parameters) else Failure(OauthCallbackError.InvalidNonce(storedNonce?.value, received?.value))
+                Success(parameters) else Failure(OAuthCallbackError.InvalidNonce(storedNonce?.value, received?.value))
         } ?: Success(parameters)
 
     private fun fetchAccessToken(parameters: CallbackParameters) =
@@ -87,11 +87,11 @@ class OAuthCallback(
     )
 }
 
-sealed class OauthCallbackError {
-    object AuthorizationCodeMissing : OauthCallbackError()
-    data class InvalidCsrfToken(val expected: String?, val received: String?) : OauthCallbackError()
-    data class InvalidNonce(val expected: String?, val received: String?) : OauthCallbackError()
-    data class InvalidAccessToken(val reason: String) : OauthCallbackError()
-    data class InvalidIdToken(val reason: String) : OauthCallbackError()
-    data class CouldNotFetchAccessToken(val status: Status, val reason: String) : OauthCallbackError()
+sealed class OAuthCallbackError {
+    object AuthorizationCodeMissing : OAuthCallbackError()
+    data class InvalidCsrfToken(val expected: String?, val received: String?) : OAuthCallbackError()
+    data class InvalidNonce(val expected: String?, val received: String?) : OAuthCallbackError()
+    data class InvalidAccessToken(val reason: String) : OAuthCallbackError()
+    data class InvalidIdToken(val reason: String) : OAuthCallbackError()
+    data class CouldNotFetchAccessToken(val status: Status, val reason: String) : OAuthCallbackError()
 }

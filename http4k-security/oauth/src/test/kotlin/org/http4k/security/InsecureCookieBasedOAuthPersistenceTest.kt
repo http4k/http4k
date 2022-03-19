@@ -27,7 +27,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
 
     @Test
     fun `failed response has correct cookies`() {
-        assertThat(persistence.authFailureResponse(OauthCallbackError.AuthorizationCodeMissing), equalTo(
+        assertThat(persistence.authFailureResponse(OAuthCallbackError.AuthorizationCodeMissing), equalTo(
             Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken").invalidateCookie("prefixNonce").invalidateCookie("prefixOriginalUri")
         ))
     }

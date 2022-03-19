@@ -48,7 +48,7 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     override fun assignOriginalUri(redirect: Response, originalUri: Uri): Response = redirect.cookie(expiring(originalUriName, originalUri.toString()))
 
-    override fun authFailureResponse(reason: OauthCallbackError) = Response(FORBIDDEN)
+    override fun authFailureResponse(reason: OAuthCallbackError) = Response(FORBIDDEN)
         .invalidateCookie(csrfName)
         .invalidateCookie(accessTokenCookieName)
         .invalidateCookie(nonceName)

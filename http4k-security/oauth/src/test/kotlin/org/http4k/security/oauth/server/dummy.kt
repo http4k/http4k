@@ -8,7 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessToken
 import org.http4k.security.Nonce
-import org.http4k.security.OauthCallbackError
+import org.http4k.security.OAuthCallbackError
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
@@ -113,12 +113,12 @@ class InMemoryIdTokenConsumer(var expectedNonce: Nonce? = null) : IdTokenConsume
 
     override fun nonceFromIdToken(idToken: IdToken): Nonce? = expectedNonce
 
-    override fun consumeFromAuthorizationResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidIdToken> {
+    override fun consumeFromAuthorizationResponse(idToken: IdToken): Result<Unit, OAuthCallbackError.InvalidIdToken> {
         consumedFromAuthorizationResponse = idToken
         return Success(Unit)
     }
 
-    override fun consumeFromAccessTokenResponse(idToken: IdToken): Result<Unit, OauthCallbackError.InvalidIdToken> {
+    override fun consumeFromAccessTokenResponse(idToken: IdToken): Result<Unit, OAuthCallbackError.InvalidIdToken> {
         consumedFromAccessTokenResponse = idToken
         return Success(Unit)
     }

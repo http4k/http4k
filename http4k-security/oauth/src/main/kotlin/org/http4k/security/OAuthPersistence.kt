@@ -67,15 +67,15 @@ interface OAuthPersistence {
      * Build the default failure response which occurs when a failure occurs during the callback process (eg. a mismatch/missing
      * CSRF or failure occurring when calling into the end-service for the access-token.
      */
-    fun authFailureResponse(reason: OauthCallbackError) = Response(FORBIDDEN.description(reason.description))
+    fun authFailureResponse(reason: OAuthCallbackError) = Response(FORBIDDEN.description(reason.description))
 
-    private val OauthCallbackError.description: String
+    private val OAuthCallbackError.description: String
         get() = when (this) {
-            is OauthCallbackError.AuthorizationCodeMissing -> "Authorization code missing"
-            is OauthCallbackError.CouldNotFetchAccessToken -> "Failed to fetch access token (status: $status)"
-            is OauthCallbackError.InvalidCsrfToken -> "Invalid state (expected: $expected, received: $received)"
-            is OauthCallbackError.InvalidNonce -> "Invalid nonce (expected: $expected, received: $received)"
-            is OauthCallbackError.InvalidAccessToken -> "Invalid access token: $reason"
-            is OauthCallbackError.InvalidIdToken -> "Invalid id token: $reason"
+            is OAuthCallbackError.AuthorizationCodeMissing -> "Authorization code missing"
+            is OAuthCallbackError.CouldNotFetchAccessToken -> "Failed to fetch access token (status: $status)"
+            is OAuthCallbackError.InvalidCsrfToken -> "Invalid state (expected: $expected, received: $received)"
+            is OAuthCallbackError.InvalidNonce -> "Invalid nonce (expected: $expected, received: $received)"
+            is OAuthCallbackError.InvalidAccessToken -> "Invalid access token: $reason"
+            is OAuthCallbackError.InvalidIdToken -> "Invalid id token: $reason"
         }
 }

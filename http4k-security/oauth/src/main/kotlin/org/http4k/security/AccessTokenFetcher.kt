@@ -3,7 +3,6 @@ package org.http4k.security
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -21,7 +20,7 @@ import org.http4k.security.OAuthWebForms.grantType
 import org.http4k.security.OAuthWebForms.redirectUri
 import org.http4k.security.OAuthWebForms.requestForm
 import org.http4k.security.OAuthWebForms.responseForm
-import org.http4k.security.OauthCallbackError.CouldNotFetchAccessToken
+import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.openid.IdToken
 
 class AccessTokenFetcher(
