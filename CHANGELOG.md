@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.25.0.0
-- **http4k-security-oauth** [Breaking]: Rename `OauthCallbackError`
+- **http4k-security-oauth** [Breaking]: Rename `OauthCallbackError` to `OAuthCallbackError`
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v4.24.0.0 
