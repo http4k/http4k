@@ -9,7 +9,7 @@ changes with their rationale when appropriate:
 
 ### v4.24.0.0 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-testing-webdriver*** : [Break[ Upgrade of webdriver to V4 has changed the APIS. The custom `By` implementation is no longer required so you can use the inbuilt Selenium version instead. The disabledCssSelector By implementation has been removed, although you can simply replicate this using the existing CSS selector model.
+- **http4k-testing-webdriver*** : [Breaking] Upgrade of webdriver to V4 has changed the APIS. The custom `By` implementation is no longer required so you can use the inbuilt Selenium version instead. The disabledCssSelector By implementation has been removed, although you can simply replicate this using the existing CSS selector model.
 
 ### v4.23.0.0
 - **http4k-*** : Upgrade some dependency versions.
