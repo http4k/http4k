@@ -136,7 +136,10 @@ fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) =
 fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map(StringBiDiMappings.localDate(formatter))
 fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(StringBiDiMappings.localTime(formatter))
 
-inline fun <reified T : Enum<T>> Path.enum() = mapWithNewMeta(StringBiDiMappings.enum<T>(), EnumParam(T::class))
+inline fun <reified T : Enum<T>> Path.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
+    if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
+    EnumParam(T::class)
+)
 inline fun <reified T : Enum<T>> Path.enum(noinline nextOut: (String) -> T, noinline nextIn: (T) -> String) = mapWithNewMeta(BiDiMapping(nextOut, nextIn), EnumParam(T::class))
 
 @PublishedApi

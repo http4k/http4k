@@ -161,4 +161,10 @@ class HeaderTest {
         val requiredLens = Header.enum(MappedEnum::from, MappedEnum::to).required("whatevs")
         assertThat(requiredLens(Request(GET, "/").header("whatevs", "eulav")), equalTo(MappedEnum.value))
     }
+
+    @Test
+    fun `case-insensitive enum`() {
+        val lens = Header.enum<Method>(caseSensitive = false).required("method")
+        assertThat(lens(Request(GET, "/").header("method", "delete")), equalTo(Method.DELETE))
+    }
 }

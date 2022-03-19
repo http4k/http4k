@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.base64Encode
+import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -161,6 +162,12 @@ class PathTest {
 
     @Test
     fun `enum`() = checkContract(Path.enum(), "DELETE", DELETE)
+
+    @Test
+    fun `case-insensitive enum`() {
+        val lens = Path.enum<Method>(caseSensitive = false).of("method")
+        assertThat(lens("delete"), equalTo(DELETE))
+    }
 
     @Test
     fun `mapped enum`() {
