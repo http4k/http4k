@@ -45,4 +45,7 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
         }
 }
 
-inline fun <reified T : Enum<T>> Header.enum() = mapWithNewMeta(StringBiDiMappings.enum<T>(), EnumParam(T::class))
+inline fun <reified T : Enum<T>> Header.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
+    if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
+    EnumParam(T::class)
+)

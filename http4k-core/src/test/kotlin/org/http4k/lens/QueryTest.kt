@@ -171,4 +171,10 @@ class QueryTest {
         val requiredLens = Query.enum(MappedEnum::from, MappedEnum::to).required("whatevs")
         assertThat(requiredLens(Request(GET, "/?whatevs=eulav")), equalTo(MappedEnum.value))
     }
+
+    @Test
+    fun `case-insensitive enum`() {
+        val lens = Query.enum<Method>(caseSensitive = false).required("method")
+        assertThat(lens(Request(GET,"/?method=delete")), equalTo(Method.DELETE))
+    }
 }

@@ -11,4 +11,7 @@ object Query : BiDiLensSpec<Request, String>("query", StringParam,
     LensSet { name, values, target -> values.fold(target.removeQuery(name)) { m, next -> m.query(name, next) } }
 )
 
-inline fun <reified T : Enum<T>> Query.enum() = mapWithNewMeta(StringBiDiMappings.enum<T>(), EnumParam(T::class))
+inline fun <reified T : Enum<T>> Query.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
+    if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
+    EnumParam(T::class)
+)
