@@ -9,6 +9,7 @@ import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.LocalDateValue
 import dev.forkhandles.values.LongValue
 import dev.forkhandles.values.UUIDValue
+import dev.forkhandles.values.Value
 import org.http4k.core.Uri
 import org.http4k.core.UriValue
 import org.junit.jupiter.api.Test
@@ -18,8 +19,10 @@ import java.util.UUID
 
 class Values4kFieldMetadataRetrievalStrategyTest {
 
+    data class ValueHolder(val v: Value<*>)
+
     @Test
-    fun `extract format from annotated field`() {
+    fun `extract format from value type field`() {
         checkFormat(object : IntValue(1) {}, "int32")
         checkFormat(object : LongValue(1L) {}, "int64")
         checkFormat(object : DoubleValue(1.0) {}, "double")
@@ -30,9 +33,9 @@ class Values4kFieldMetadataRetrievalStrategyTest {
         checkFormat(object : InstantValue(MAX) {}, "date-time")
     }
 
-    private fun checkFormat(target: Any, s: String) {
+    private fun checkFormat(target: Value<*>, s: String) {
         assertThat(
-            Values4kFieldMetadataRetrievalStrategy(target, "someField"),
+            Values4kFieldMetadataRetrievalStrategy(ValueHolder(target), "v"),
             equalTo(FieldMetadata(mapOf("format" to s)))
         )
     }

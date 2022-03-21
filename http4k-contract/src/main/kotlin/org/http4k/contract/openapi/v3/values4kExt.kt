@@ -5,27 +5,32 @@ import org.http4k.core.Uri
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.reflect.full.declaredMembers
 
 /**
  * Set format values for OpenApi descriptions for fields of this type
  */
 object Values4kFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
-    override fun invoke(target: Any, fieldName: String) =
-        when {
-            target.isAValue<Int>() -> FieldMetadata("format" to "int32")
-            target.isAValue<Long>() -> FieldMetadata("format" to "int64")
-            target.isAValue<Double>() -> FieldMetadata("format" to "double")
-            target.isAValue<Float>() -> FieldMetadata("format" to "float")
+    override fun invoke(target: Any, fieldName: String): FieldMetadata {
+        val value = target::class.declaredMembers.find { it.name == fieldName }?.call(target)
 
-            target.isAValue<Instant>() -> FieldMetadata("format" to "date-time")
-            target.isAValue<LocalDate>() -> FieldMetadata("format" to "date")
+        return when {
+            value.isAValue<Int>() -> FieldMetadata("format" to "int32")
+            value.isAValue<Long>() -> FieldMetadata("format" to "int64")
+            value.isAValue<Double>() -> FieldMetadata("format" to "double")
+            value.isAValue<Float>() -> FieldMetadata("format" to "float")
 
-            target.isAValue<UUID>() -> FieldMetadata("format" to "uuid")
-            target.isAValue<Uri>() -> FieldMetadata("format" to "uri")
+            value.isAValue<Instant>() -> FieldMetadata("format" to "date-time")
+            value.isAValue<LocalDate>() -> FieldMetadata("format" to "date")
+
+            value.isAValue<UUID>() -> FieldMetadata("format" to "uuid")
+            value.isAValue<Uri>() -> FieldMetadata("format" to "uri")
 
             else -> FieldMetadata()
         }
+    }
 }
 
-private inline fun <reified T> Any.isAValue() =
-    (this as? Value<*>)?.value?.javaClass == T::class.java
+private inline fun <reified T> Any?.isAValue(): Boolean {
+    return (this as? Value<*>)?.value?.javaClass == T::class.java
+}

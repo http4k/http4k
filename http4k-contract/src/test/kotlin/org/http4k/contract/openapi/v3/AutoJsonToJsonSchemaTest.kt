@@ -1,8 +1,17 @@
 package org.http4k.contract.openapi.v3
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
+import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import dev.forkhandles.values.IntValue
+import dev.forkhandles.values.IntValueFactory
 import org.http4k.contract.openapi.OpenAPIJackson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
@@ -12,6 +21,8 @@ import org.http4k.core.with
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 import org.http4k.format.asConfigurable
+import org.http4k.format.value
+import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
@@ -74,20 +85,15 @@ interface Interface
 data class InterfaceImpl1(val a: String = "a") : Interface
 data class InterfaceHolder(val i: Interface)
 
+class MyInt private constructor(value: Int) : IntValue(value) {
+    companion object : IntValueFactory<MyInt>(::MyInt)
+}
+
+data class MetaDataValueHolder(val i: MyInt, val j: JacksonFieldWithMetadata)
+
 @ExtendWith(JsonApprovalTest::class)
 class AutoJsonToJsonSchemaTest {
     private val json = OpenAPIJackson
-
-    private val creator = AutoJsonToJsonSchema(
-        json,
-        FieldRetrieval.compose(
-            SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy),
-            JacksonJsonPropertyAnnotated,
-            JacksonJsonNamingAnnotated(Jackson)
-        ),
-        SchemaModelNamer.Full,
-        "customPrefix"
-    )
 
     @Test
     fun `can override definition id`(approver: Approver) {
@@ -126,13 +132,25 @@ class AutoJsonToJsonSchemaTest {
                     Field(
                         "hello",
                         false,
-                        FieldMetadata(mapOf("key" to "string", "description" to "string description", "format" to "string format"))
+                        FieldMetadata(
+                            mapOf(
+                                "key" to "string",
+                                "description" to "string description",
+                                "format" to "string format"
+                            )
+                        )
                     )
                 } else {
                     Field(
                         123,
                         false,
-                        FieldMetadata(mapOf("key" to 123, "description" to "int description", "format" to "another format"))
+                        FieldMetadata(
+                            mapOf(
+                                "key" to 123,
+                                "description" to "int description",
+                                "format" to "another format"
+                            )
+                        )
                     )
                 }
             },
@@ -270,15 +288,59 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `renders schema for objects with metadata`(approver: Approver) {
+        val jackson = object : ConfigurableJackson(
+            KotlinModule.Builder().build()
+                .asConfigurable()
+                .withStandardMappings()
+                .value(MyInt)
+                .done()
+                .deactivateDefaultTyping()
+                .setSerializationInclusion(NON_NULL)
+                .configure(FAIL_ON_NULL_FOR_PRIMITIVES, true)
+                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(FAIL_ON_IGNORED_PROPERTIES, false)
+                .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
+                .configure(USE_BIG_INTEGER_FOR_INTS, true)
+        ) {}
+
+        approver.assertApproved(
+            MetaDataValueHolder(MyInt.of(1), JacksonFieldWithMetadata()), creator = autoJsonToJsonSchema(
+                jackson
+            )
+        )
+    }
+
+    @Test
     fun `renders schema for object from sealed class`(approver: Approver) {
         approver.assertApproved(SealedChild)
     }
 
-    private fun Approver.assertApproved(obj: Any, name: String? = null, prefix: String? = null) {
+    private fun Approver.assertApproved(
+        obj: Any,
+        name: String? = null,
+        prefix: String? = null,
+        creator: AutoJsonToJsonSchema<JsonNode> = autoJsonToJsonSchema(json)
+    ) {
         assertApproved(
             Response(OK)
                 .with(CONTENT_TYPE of APPLICATION_JSON)
                 .body(Jackson.asFormatString(creator.toSchema(obj, name, prefix)))
         )
     }
+
+    private fun autoJsonToJsonSchema(jackson: ConfigurableJackson) = AutoJsonToJsonSchema(
+        jackson,
+        FieldRetrieval.compose(
+            SimpleLookup(
+                metadataRetrievalStrategy = Values4kFieldMetadataRetrievalStrategy.then(
+                    JacksonFieldMetadataRetrievalStrategy
+                )
+            ),
+            JacksonJsonPropertyAnnotated,
+            JacksonJsonNamingAnnotated(Jackson)
+        ),
+        SchemaModelNamer.Full,
+        "customPrefix"
+    )
 }
