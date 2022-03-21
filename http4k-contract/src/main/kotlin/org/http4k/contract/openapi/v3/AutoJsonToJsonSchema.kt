@@ -352,15 +352,12 @@ private fun items(obj: Any) = when (obj) {
     else -> listOf(obj)
 }.filterNotNull()
 
-private fun JsonType.toParam(): ParamMeta {
-    println(this)
-    return when (this) {
-        JsonType.String -> StringParam
-        JsonType.Integer -> IntegerParam
-        JsonType.Number -> NumberParam
-        JsonType.Boolean -> BooleanParam
-        JsonType.Array -> ArrayParam(NullParam)
-        JsonType.Object -> ObjectParam
-        JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
-    }
+private fun JsonType.toParam() = when (this) {
+    JsonType.String -> StringParam
+    JsonType.Integer -> IntegerParam
+    JsonType.Number -> NumberParam
+    JsonType.Boolean -> BooleanParam
+    JsonType.Array -> ArrayParam(NullParam)
+    JsonType.Object -> ObjectParam
+    JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
 }
