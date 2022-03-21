@@ -128,7 +128,7 @@ private class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) 
     }
 
     val id: NODE? = fields["id"]?.let {
-        if (!setOf(JsonType.String, JsonType.Number, JsonType.Null).contains(json.typeOf(it))) {
+        if (!setOf(JsonType.String, JsonType.Number, JsonType.Integer, JsonType.Null).contains(json.typeOf(it))) {
             valid = false
             json.nullNode()
         } else it

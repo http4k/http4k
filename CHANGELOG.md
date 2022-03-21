@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.25.4.0
-- **http4k-format-jackson**: Correctly identify integer and number JSON types. This has a knock on effect in OpenApi specifications.
+- **http4k-format-***: Correctly identify integer and number JSON types. This has a knock on effect in OpenApi specifications.
 
 ### v4.25.3.0
 - **http4k-serverless-tencent** : Downgrade events library as is insecure.
