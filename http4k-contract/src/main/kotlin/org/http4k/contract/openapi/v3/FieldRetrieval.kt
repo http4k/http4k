@@ -37,11 +37,15 @@ class SimpleLookup(
                     ?.let { it to field.returnType.isMarkedNullable }
                     ?: fields[name]?.javaField?.takeIf { it.trySetAccessible() }?.get(target)?.let { it to true }
             }
-            ?.let { Field(it.first, it.second, metadataRetrievalStrategy(target, name)) } ?: throw NoFieldFound(name, target)
+            ?.let { Field(it.first, it.second, metadataRetrievalStrategy(target, name)) } ?: throw NoFieldFound(
+            name,
+            target
+        )
     }
 }
 
 data class FieldMetadata(val extra: Map<String, Any?> = emptyMap()) {
+    constructor(vararg pairs: Pair<String, Any?>) : this(pairs.toMap())
 
     operator fun plus(that: FieldMetadata) = FieldMetadata(extra + that.extra)
 
@@ -50,13 +54,7 @@ data class FieldMetadata(val extra: Map<String, Any?> = emptyMap()) {
     }
 }
 
-fun interface FieldMetadataRetrievalStrategy : (Any, String) -> FieldMetadata
-
-class NoOpFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
-    override fun invoke(target: Any, fieldName: String): FieldMetadata =
-        FieldMetadata.empty
-}
-
-class NoFieldFound(name: String, target: Any, cause: Throwable? = null) : RuntimeException("Could not find $name in $target", cause)
+class NoFieldFound(name: String, target: Any, cause: Throwable? = null) :
+    RuntimeException("Could not find $name in $target", cause)
 
 data class Field(val value: Any, val isNullable: Boolean, val metadata: FieldMetadata)

@@ -5,8 +5,12 @@ apply plugin: "org.openapi.generator"
 dependencies {
     api(project(":http4k-core"))
     api("org.jetbrains.kotlin:kotlin-reflect:_")
+
+    implementation("dev.forkhandles:values4k:_")
     implementation project(":http4k-security-oauth")
     implementation project(":http4k-format-jackson")
+
+    testImplementation("dev.forkhandles:values4k:_")
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-format-argo"))
     testImplementation(project(":http4k-multipart"))
