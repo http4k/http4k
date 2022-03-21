@@ -2,7 +2,6 @@
 
 package org.http4k.serverless
 
-import com.alibaba.fastjson.JSONObject
 import com.qcloud.scf.runtime.Context
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyRequestEvent
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyResponseEvent
@@ -60,11 +59,6 @@ private fun APIGatewayProxyRequestEvent.buildUri() =
 
 private fun Response.asTencent() = APIGatewayProxyResponseEvent().also {
     it.statusCode = status.code
-    it.headers = JSONObject().apply {
-        headers.forEach {
-            set(it.first, it.second)
-        }
-    }
-
+    it.headers = headers.toMap()
     it.body = bodyString()
 }

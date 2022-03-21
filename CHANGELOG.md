@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.3.0 (uncut)
+- **http4k-serverless-tencent** : Downgrade events library as is insecure.
+
 ### v4.25.2.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract**: Values4k metadata population for OpenApi3 specifications (via Values4kFieldMetadataRetrievalStrategy).
