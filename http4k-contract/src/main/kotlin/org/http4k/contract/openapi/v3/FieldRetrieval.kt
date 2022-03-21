@@ -42,6 +42,9 @@ class SimpleLookup(
 }
 
 data class FieldMetadata(val extra: Map<String, Any?> = emptyMap()) {
+
+    operator fun plus(that: FieldMetadata) = FieldMetadata(extra + that.extra)
+
     companion object {
         val empty: FieldMetadata = FieldMetadata()
     }
