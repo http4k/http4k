@@ -16,7 +16,7 @@
                 },
                 "key2": {
                   "example": 123,
-                  "type": "number"
+                  "type": "integer"
                 },
                 "key3": {
                   "additionalProperties": {

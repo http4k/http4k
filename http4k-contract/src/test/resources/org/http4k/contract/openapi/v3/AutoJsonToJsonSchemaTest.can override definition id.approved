@@ -17,11 +17,11 @@
           },
           "int": {
             "example": 2147483647,
-            "type": "number"
+            "type": "integer"
           },
           "long": {
             "example": -9223372036854775808,
-            "type": "number"
+            "type": "integer"
           },
           "double": {
             "example": 9.9999999999,
@@ -33,7 +33,7 @@
           },
           "bigInt": {
             "example": 92233720368547758079223372036854775807,
-            "type": "number"
+            "type": "integer"
           },
           "bigDecimal": {
             "example": 1.7976931348623157E+308111,

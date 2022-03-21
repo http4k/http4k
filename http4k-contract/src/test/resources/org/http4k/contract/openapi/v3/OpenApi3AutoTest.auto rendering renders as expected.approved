@@ -36,7 +36,7 @@
                   "properties": {
                     "foo": {
                       "example": 123,
-                      "type": "number"
+                      "type": "integer"
                     }
                   },
                   "example": {
@@ -366,7 +366,7 @@
           },
           "numbers": {
             "items": {
-              "type": "number"
+              "type": "integer"
             },
             "example": [
               1
@@ -442,7 +442,7 @@
               "properties": {
                 "foo": {
                   "example": 123,
-                  "type": "number"
+                  "type": "integer"
                 }
               },
               "example": {
@@ -519,7 +519,7 @@
         "properties": {
           "value": {
             "example": 123,
-            "type": "number"
+            "type": "integer"
           }
         },
         "example": {

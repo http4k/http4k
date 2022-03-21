@@ -17,7 +17,7 @@
             "example": 1,
             "description": "int description",
             "format": "another format",
-            "type": "number"
+            "type": "integer"
           }
         },
         "example": {
