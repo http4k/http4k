@@ -367,7 +367,8 @@
           },
           "numbers": {
             "items": {
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
             },
             "example": [
               1

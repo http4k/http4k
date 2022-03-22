@@ -27,7 +27,8 @@
         "properties": {
           "inner": {
             "items": {
-              "type": "string"
+              "type": "string",
+              "format": null
             },
             "example": [
               "foobar"

@@ -26,20 +26,26 @@ class AutoJsonToJsonSchema<NODE : Any>(
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?): JsonSchema<NODE> {
-        val schema = json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix ?: "")
+        val schema = json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix ?: "", null)
         return JsonSchema(
             json.asJsonObject(schema),
             schema.definitions().map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()
         )
     }
 
-    private fun NODE.toSchema(value: Any, objName: String?, topLevel: Boolean, refModelNamePrefix: String) =
+    private fun NODE.toSchema(
+        value: Any,
+        objName: String?,
+        topLevel: Boolean,
+        refModelNamePrefix: String,
+        metadata: FieldMetadata?
+    ) =
         when (val param = json.typeOf(this).toParam()) {
             is ArrayParam -> toArraySchema("", value, false, null, refModelNamePrefix)
             ObjectParam -> toObjectOrMapSchema(objName, value, false, topLevel, null, refModelNamePrefix)
             else -> value.javaClass.enumConstants?.let {
                 toEnumSchema("", it[0], json.typeOf(this).toParam(), it, false, null)
-            } ?: toSchema("", param, false, null)
+            } ?: toSchema("", param, false, metadata)
         }
 
     private fun NODE.toSchema(name: String, paramMeta: ParamMeta, isNullable: Boolean, metadata: FieldMetadata?) =
@@ -56,7 +62,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
             .zip(items(obj)) { node: NODE, value: Any ->
                 value.javaClass.enumConstants?.let {
                     node.toEnumSchema("", it[0], json.typeOf(node).toParam(), it, false, null)
-                } ?: node.toSchema(value, null, false, refModelNamePrefix)
+                } ?: node.toSchema(
+                    value,
+                    null,
+                    false,
+                    refModelNamePrefix,
+                    fieldRetrieval(Holder(value), "value").metadata
+                )
             }.map { it.arrayItem() }.toSet()
 
         val arrayItems = when (items.size) {
@@ -138,7 +150,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val objWithStringKeys = obj.mapKeys { it.key?.let(::toJsonKey) }
         val properties = json.fields(this)
             .map { Triple(it.first, it.second, objWithStringKeys[it.first]!!) }
-            .map {  (fieldName, field, value) ->
+            .map { (fieldName, field, value) ->
                 makePropertySchemaFor(
                     field,
                     fieldName,
@@ -199,6 +211,7 @@ private interface ArrayItems {
 private sealed class ArrayItem : ArrayItems {
     class Array(val items: ArrayItems, private val schema: SchemaNode) : ArrayItem() {
         val type = ArrayParam(NullParam).value
+        val format = schema.format
 
         override fun definitions(): Iterable<SchemaNode> = schema.definitions()
 
@@ -212,6 +225,8 @@ private sealed class ArrayItem : ArrayItems {
 
     class NonObject(paramMeta: ParamMeta, private val schema: SchemaNode) : ArrayItem() {
         val type = paramMeta.value
+        val format = schema.format
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false

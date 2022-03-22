@@ -214,7 +214,8 @@ class AutoJsonToJsonSchemaTest {
                 "key3" to mapOf("inner" to ArbObject2()),
                 "key4" to ArbObject2(),
                 "key5" to listOf(ArbObject2(), ArbObject()),
-                "key6" to GenericListHolder(listOf(ArbObject2(), ArbObject()))
+                "key6" to listOf(1, 2),
+                "key7" to GenericListHolder(listOf(ArbObject2(), ArbObject()))
             )
         )
     }
