@@ -8,6 +8,7 @@
         },
         "key2": {
           "example": 123,
+          "format": "int32",
           "type": "integer"
         },
         "key3": {

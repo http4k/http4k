@@ -138,13 +138,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val objWithStringKeys = obj.mapKeys { it.key?.let(::toJsonKey) }
         val properties = json.fields(this)
             .map { Triple(it.first, it.second, objWithStringKeys[it.first]!!) }
-            .map { (fieldName, field, value) ->
+            .map {  (fieldName, field, value) ->
                 makePropertySchemaFor(
                     field,
                     fieldName,
                     value,
                     false,
-                    null,
+                    fieldRetrieval(Holder(value), "value").metadata,
                     refModelNamePrefix
                 )
             }
@@ -363,3 +363,5 @@ private fun JsonType.toParam() = when (this) {
     JsonType.Object -> ObjectParam
     JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
 }
+
+private data class Holder(@JvmField val value: Any)

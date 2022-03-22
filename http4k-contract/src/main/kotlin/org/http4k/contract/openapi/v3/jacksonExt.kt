@@ -28,7 +28,8 @@ fun OpenApi3(
 fun AutoJsonToJsonSchema(json: ConfigurableJackson) = AutoJsonToJsonSchema(
     json,
     FieldRetrieval.compose(
-        SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy),
+        SimpleLookup(metadataRetrievalStrategy =
+        JacksonFieldMetadataRetrievalStrategy.then(PrimitivesFieldMetadataRetrievalStrategy)),
         FieldRetrieval.compose(JacksonJsonPropertyAnnotated, JacksonJsonNamingAnnotated(json))
     )
 )

@@ -36,6 +36,7 @@
                   "properties": {
                     "foo": {
                       "example": 123,
+                      "format": "int32",
                       "type": "integer"
                     }
                   },
@@ -435,6 +436,7 @@
         "properties": {
           "uri": {
             "example": "http://foowang",
+            "format": "uri",
             "type": "string"
           },
           "additional": {
@@ -442,6 +444,7 @@
               "properties": {
                 "foo": {
                   "example": 123,
+                  "format": "int32",
                   "type": "integer"
                 }
               },
@@ -519,6 +522,7 @@
         "properties": {
           "value": {
             "example": 123,
+            "format": "int32",
             "type": "integer"
           }
         },
