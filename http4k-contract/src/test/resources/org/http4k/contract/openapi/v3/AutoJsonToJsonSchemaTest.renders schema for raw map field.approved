@@ -226,6 +226,7 @@
         "properties": {
           "uri": {
             "example": "foobar",
+            "format": "uri",
             "type": "string"
           }
         },

@@ -17,18 +17,22 @@
           },
           "int": {
             "example": 2147483647,
+            "format": "int32",
             "type": "integer"
           },
           "long": {
             "example": -9223372036854775808,
+            "format": "int64",
             "type": "integer"
           },
           "double": {
             "example": 9.9999999999,
+            "format": "double",
             "type": "number"
           },
           "float": {
             "example": -10.0,
+            "format": "float",
             "type": "number"
           },
           "bigInt": {

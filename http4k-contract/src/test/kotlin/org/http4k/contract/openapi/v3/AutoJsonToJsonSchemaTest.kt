@@ -333,9 +333,10 @@ class AutoJsonToJsonSchemaTest {
         jackson,
         FieldRetrieval.compose(
             SimpleLookup(
-                metadataRetrievalStrategy = Values4kFieldMetadataRetrievalStrategy.then(
-                    JacksonFieldMetadataRetrievalStrategy
-                )
+                metadataRetrievalStrategy =
+                PrimitivesFieldMetadataRetrievalStrategy
+                    .then(Values4kFieldMetadataRetrievalStrategy)
+                    .then(JacksonFieldMetadataRetrievalStrategy)
             ),
             JacksonJsonPropertyAnnotated,
             JacksonJsonNamingAnnotated(Jackson)
