@@ -67,7 +67,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
                     null,
                     false,
                     refModelNamePrefix,
-                    fieldRetrieval(Holder(value), "value").metadata
+                    fieldRetrieval(FieldHolder(value), "value").metadata
                 )
             }.map { it.arrayItem() }.toSet()
 
@@ -156,7 +156,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
                     fieldName,
                     value,
                     false,
-                    fieldRetrieval(Holder(value), "value").metadata,
+                    fieldRetrieval(FieldHolder(value), "value").metadata,
                     refModelNamePrefix
                 )
             }
@@ -379,4 +379,4 @@ private fun JsonType.toParam() = when (this) {
     JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
 }
 
-private data class Holder(@JvmField val value: Any)
+data class FieldHolder(@JvmField val value: Any)
