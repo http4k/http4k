@@ -29,7 +29,10 @@
           "content": {
             "application/json": {
               "example": {
-                "foo": 123
+                "foo": 123,
+                "arb": {
+                  "anotherString": "bing"
+                }
               },
               "schema": {
                 "additionalProperties": {
@@ -38,13 +41,20 @@
                       "example": 123,
                       "format": "int32",
                       "type": "integer"
+                    },
+                    "arb": {
+                      "$ref": "#/components/schemas/ArbObject1"
                     }
                   },
                   "example": {
-                    "foo": 123
+                    "foo": 123,
+                    "arb": {
+                      "anotherString": "bing"
+                    }
                   },
                   "type": "object",
                   "required": [
+                    "arb",
                     "foo"
                   ]
                 },
@@ -118,7 +128,10 @@
               "example": {
                 "uri": "http://foowang",
                 "additional": {
-                  "foo": 123
+                  "foo": 123,
+                  "arb": {
+                    "anotherString": "bing"
+                  }
                 }
               },
               "schema": {
@@ -447,13 +460,20 @@
                   "example": 123,
                   "format": "int32",
                   "type": "integer"
+                },
+                "arb": {
+                  "$ref": "#/components/schemas/ArbObject1"
                 }
               },
               "example": {
-                "foo": 123
+                "foo": 123,
+                "arb": {
+                  "anotherString": "bing"
+                }
               },
               "type": "object",
               "required": [
+                "arb",
                 "foo"
               ]
             },
@@ -463,7 +483,10 @@
         "example": {
           "uri": "http://foowang",
           "additional": {
-            "foo": 123
+            "foo": 123,
+            "arb": {
+              "anotherString": "bing"
+            }
           }
         },
         "type": "object",
