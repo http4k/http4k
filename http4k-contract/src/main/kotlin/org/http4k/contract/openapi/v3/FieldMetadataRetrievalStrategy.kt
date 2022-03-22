@@ -19,22 +19,16 @@ fun FieldMetadataRetrievalStrategy.then(that: FieldMetadataRetrievalStrategy) =
     FieldMetadataRetrievalStrategy { p1, p2 -> that(p1, p2) + this(p1, p2) }
 
 object PrimitivesFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
-    override fun invoke(target: Any, fieldName: String): FieldMetadata {
-        val value = target::class.declaredMembers.find { it.name == fieldName }?.call(target)
-
-        return when {
-            value is Int -> FieldMetadata("format" to "int32")
-            value is Long -> FieldMetadata("format" to "int64")
-            value is Double -> FieldMetadata("format" to "double")
-            value is Float -> FieldMetadata("format" to "float")
-
-            value is Instant -> FieldMetadata("format" to "date-time")
-            value is LocalDate -> FieldMetadata("format" to "date")
-
-            value is UUID -> FieldMetadata("format" to "uuid")
-            value is Uri -> FieldMetadata("format" to "uri")
-
+    override fun invoke(target: Any, fieldName: String): FieldMetadata =
+        when (target::class.declaredMembers.find { it.name == fieldName }?.call(target)) {
+            is Int -> FieldMetadata("format" to "int32")
+            is Long -> FieldMetadata("format" to "int64")
+            is Double -> FieldMetadata("format" to "double")
+            is Float -> FieldMetadata("format" to "float")
+            is Instant -> FieldMetadata("format" to "date-time")
+            is LocalDate -> FieldMetadata("format" to "date")
+            is UUID -> FieldMetadata("format" to "uuid")
+            is Uri -> FieldMetadata("format" to "uri")
             else -> FieldMetadata()
         }
-    }
 }
