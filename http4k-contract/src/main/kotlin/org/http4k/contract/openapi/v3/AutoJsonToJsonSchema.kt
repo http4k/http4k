@@ -340,7 +340,7 @@ private sealed class SchemaNode(
         example: Any?, metadata: FieldMetadata?
     ) : SchemaNode(name, ObjectParam, isNullable, example, metadata) {
         val type = paramMeta().value
-        val required = properties.takeIf { it.isNotEmpty() }?.let { it.filterNot { it.value.isNullable }.keys.sorted() }
+        val required = properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() }
         override fun arrayItem() = ArrayItem.Ref(name(), this)
         override fun definitions() = properties.values.flatMap { it.definitions() }
     }

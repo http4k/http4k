@@ -67,6 +67,8 @@ enum class Foo {
     value1, value2
 }
 
+data class Nulls(val f1: String? = null, val f2: String? = null)
+
 data class GenericListHolder(val value: List<Generic>)
 data class MapHolder(val value: Map<Any, Any>)
 
@@ -184,6 +186,11 @@ class AutoJsonToJsonSchemaTest {
     @Test
     fun `renders schema for nested arbitrary objects`(approver: Approver) {
         approver.assertApproved(ArbObject())
+    }
+
+    @Test
+    fun `renders schema for objet with all optional fields`(approver: Approver) {
+        approver.assertApproved(Nulls("foo", "bar"))
     }
 
     @Test
