@@ -1,0 +1,24 @@
+{
+  "node": {
+    "type": "array",
+    "items": {
+      "$ref": "#/components/schemas/prefixbob"
+    }
+  },
+  "definitions": [
+    {
+      "first": "prefixbob",
+      "second": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "anotherString": {
+            "type": "string",
+            "example": "yetAnotherString"
+          }
+        }
+      }
+    }
+  ]
+}

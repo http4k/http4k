@@ -1,8 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo",
-    "example": null,
-    "description": null
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo"
   },
   "definitions": [
     {
@@ -13,7 +11,6 @@
           "value1",
           "value2"
         ],
-        "description": null,
         "type": "string"
       }
     }

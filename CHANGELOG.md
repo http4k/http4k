@@ -3,10 +3,72 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.5.2
+- **http4k-contract**: Don't output required fields into OpenAPI if there are none.
+
+### v4.25.5.1
+- **http4k-contract**: Small tweak to internal API
+
+### v4.25.5.0
+- **http4k-contract**: Add format OpenApi hints to Arrays and Maps
+
+### v4.25.4.1
+- **http4k-contract**: Remove println from AutoJsonToJsonSchema. Doh!
+
+### v4.25.4.0
+- **http4k-format-***: Correctly identify integer and number JSON types. This has a knock on effect in OpenApi specifications.
+
+### v4.25.3.0
+- **http4k-serverless-tencent** : Downgrade events library as is insecure.
+
+### v4.25.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: Values4k metadata population for OpenApi3 specifications (via Values4kFieldMetadataRetrievalStrategy).
+
+### v4.25.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: Values4k metadata population for OpenApi3 specifications (via Values4kFieldMetadataRetrievalStrategy).
+
+### v4.25.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** [Breaking]: Rename `OauthCallbackError` to `OAuthCallbackError`
+
+### v4.24.0.0 
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-webdriver*** : [Breaking] Upgrade of webdriver to V4 has changed the APIS. The custom `By` implementation is no longer required so you can use the inbuilt Selenium version instead. The disabledCssSelector By implementation has been removed, although you can simply replicate this using the existing CSS selector model.
+
+### v4.23.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: Support OA3 meta fields on properties if they are populated by a custom annotation. 
+- **http4k-graphql** : [Possible breaks] Due to upgrade of underlying graphql lib.
+
+### v4.22.0.1
+- **http4k-security-oauth**: Fix error messages for oauth callback failures
+
+### v4.22.0.0
+- **http4k-security-oauth** [Breaking]: apiBase path is now preserved when building auth and token uris  
+- **http4k-security-oauth** [Breaking]: provide reason when an oauth callback fails  
+- **http4k-security-oauth** [Breaking]: allow id token consumer to fail authentication flow  
+
+### v4.21.1.1
+- **http4k-contract**: OpenApi3 - Expose new prefix-overriding in OpenApi definitions.
+
+### v4.21.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: OpenApi3 - Ability to provide prefixes for all models in a tree. This allows you to have multiple versions of a single model in the specification (at the cost of duplicated schema models).
+
+### v4.21.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core**: [Breaking] All metrics now include `path` when labelled and routed. For consistency, `.` in path names are now convert to underscores as well. Regexes are also removed from paths on both client and server. H/T @hektorKS
+- **http4k-testing-strikt**: Fix #709 - Strikt assertion builder for Uri.path H/T @michaelbannister
+
+### v4.20.2.0
+- **http4k-contract**: OpenApi3 - Don't add required field if no fields are required!
+
 ### v4.20.1.0
 - **http4k-contract**: Fix #706: Form "multi" lens's do not render an items field in contracts.
 - **http4k-testing-chaos**: ChaoticHttpHandler disables Chaos API when reflection not available.
-- 
+
 ### v4.20.0.0
 - **http4k-core**: Fix #704: Filters are recreated on every request/ H/T @hektorKS
 - **http4k-core**: Fix #702: TrafficFilters.ReplayFrom doesn't correctly read from Replay.

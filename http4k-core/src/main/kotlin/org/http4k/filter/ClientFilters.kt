@@ -129,11 +129,13 @@ object ClientFilters {
             { req ->
                 provider()
                     ?.let {
-                        next(req.header(header, "Basic ${it.base64Encoded()}"))
+                        next(req.withBasicAuth(it, header))
                     }
                     ?: Response(UNAUTHORIZED)
             }
         }
+
+        fun Request.withBasicAuth(it: Credentials, header: String) = header(header, "Basic ${it.base64Encoded()}")
 
         operator fun invoke(header: String, provider: CredentialsProvider<Credentials>) =
             CustomBasicAuth(header, provider::invoke)

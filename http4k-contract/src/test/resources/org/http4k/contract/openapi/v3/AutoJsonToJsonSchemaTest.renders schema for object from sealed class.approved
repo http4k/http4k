@@ -1,8 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.SealedChild",
-    "example": null,
-    "description": null
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.SealedChild"
   },
   "definitions": [
     {
@@ -11,14 +9,12 @@
         "properties": {
           "string": {
             "example": "child",
-            "description": null,
             "type": "string"
           }
         },
         "example": {
           "string": "child"
         },
-        "description": null,
         "type": "object",
         "required": [
           "string"

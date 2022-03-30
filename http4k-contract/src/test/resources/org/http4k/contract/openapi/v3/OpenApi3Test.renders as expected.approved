@@ -268,7 +268,7 @@
                 }
               },
               "schema": {
-                "$ref": "#/components/schemas/someDefinitionId"
+                "$ref": "#/components/schemas/prefix_someDefinitionId"
               }
             }
           },
@@ -791,13 +791,24 @@
           }
         }
       },
-      "someDefinitionId": {
+      "prefix_object540438179": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "aNumberField": {
+            "type": "integer",
+            "example": 123
+          }
+        }
+      },
+      "prefix_someDefinitionId": {
         "type": "object",
         "required": [
         ],
         "properties": {
           "anAnotherObject": {
-            "$ref": "#/components/schemas/object540438179"
+            "$ref": "#/components/schemas/prefix_object540438179"
           }
         }
       },

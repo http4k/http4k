@@ -1,0 +1,22 @@
+{
+  "node": {
+    "type": "array",
+    "items": {
+      "$ref": "#/definitions/prefixbob"
+    }
+  },
+  "definitions": [
+    {
+      "first": "prefixbob",
+      "second": {
+        "type": "object",
+        "properties": {
+          "anotherString": {
+            "type": "string",
+            "example": "yetAnotherString"
+          }
+        }
+      }
+    }
+  ]
+}

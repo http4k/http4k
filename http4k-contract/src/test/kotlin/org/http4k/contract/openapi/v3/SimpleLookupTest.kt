@@ -22,7 +22,7 @@ class SimpleLookupTest {
         assertThat(
             "withMeta",
             SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy)(KotlinBean(), "withMeta"),
-            equalTo(Field("withMeta", false, FieldMetadata(description = "A field description")))
+            equalTo(Field("withMeta", false, FieldMetadata(mapOf("description" to "A field description"))))
         )
     }
 

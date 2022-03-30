@@ -252,14 +252,16 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     @Test
     fun `rpc batch call with mixed invalid and valid normal and notifications returns result`() {
         assertThat(
-            rpcRequestWithBody(listOf(
-                rpcJson("increment", """{"value": 5}""", "1"),
-                rpcJson("increment", "[3]", "2"),
-                rpcJson("increment", "3", "[1]"),
-                rpcJson("increment", """{"value": 2}"""),
-                rpcJson("increment", "[2]"),
-                "1"
-            ).joinToString(",", "[", "]")),
+            rpcRequestWithBody(
+                listOf(
+                    rpcJson("increment", """{"value": 5}""", "1"),
+                    rpcJson("increment", "[3]", "2"),
+                    rpcJson("increment", "3", "[1]"),
+                    rpcJson("increment", """{"value": 2}"""),
+                    rpcJson("increment", "[2]"),
+                    "1"
+                ).joinToString(",", "[", "]")
+            ),
             hasBatchResponse(
                 Success("5", "1"),
                 Success("8", "2"),
@@ -272,10 +274,12 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     @Test
     fun `rpc batch call with only notifications returns no content`() {
         assertThat(
-            rpcRequestWithBody(listOf(
-                rpcJson("increment", """{"value": 5}"""),
-                rpcJson("increment", "[3]")
-            ).joinToString(",", "[", "]")),
+            rpcRequestWithBody(
+                listOf(
+                    rpcJson("increment", """{"value": 5}"""),
+                    rpcJson("increment", "[3]")
+                ).joinToString(",", "[", "]")
+            ),
             hasNoContentResponse()
         )
     }
@@ -284,8 +288,10 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     fun `rpc call that throws user exception returns failure`() {
         assertThat(
             rpcRequest("increment", """{"value": -1}""", "1"),
-            hasErrorResponse(1, "Increment by negative",
-                """"cannot increment counter by negative"""", "1")
+            hasErrorResponse(
+                1, "Increment by negative",
+                """"cannot increment counter by negative"""", "1"
+            )
         )
     }
 
@@ -299,8 +305,10 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
             "}"
 
     private fun rpcRequestWithBody(body: String): Response =
-        rpc(Request(POST, "/rpc")
-            .with(Body.string(APPLICATION_JSON).toLens() of body))
+        rpc(
+            Request(POST, "/rpc")
+                .with(Body.string(APPLICATION_JSON).toLens() of body)
+        )
 
     protected fun hasSuccessResponse(result: String, id: String): Matcher<Response> =
         hasResponse(Success(result, id))
@@ -332,8 +340,10 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
         override fun toString() = """{"jsonrpc":"2.0","result":$result,"id":$id}"""
     }
 
-    private data class Error(private val code: Int, private val message: String,
-                             private val data: String?, private val id: String?) : ExpectedResponse() {
+    private data class Error(
+        private val code: Int, private val message: String,
+        private val data: String?, private val id: String?
+    ) : ExpectedResponse() {
         constructor(code: Int, message: String, id: String?) : this(code, message, null, id)
 
         override fun toString() =
@@ -343,16 +353,18 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     }
 }
 
-abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
-    val incrementParams = Mapping<NODE, Counter.Increment> { Counter.Increment(json.textValueOf(it, "value")!!.toInt()) }
-    val intResult: Mapping<Int, NODE> = Mapping { json.number(it) }
+abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE>) :
+    JsonRpcServiceContract<NODE>({ counter ->
+        val incrementParams =
+            Mapping<NODE, Counter.Increment> { Counter.Increment(json.textValueOf(it, "value")!!.toInt()) }
+        val intResult: Mapping<Int, NODE> = Mapping { json.number(it) }
 
-    JsonRpc.manual(json, CounterErrorHandler) {
-        method("increment", handler(setOf("value"), incrementParams, intResult, counter::increment))
-        method("incrementNoArray", handler(incrementParams, intResult, counter::increment))
-        method("current", handler(intResult, counter::currentValue))
-    }
-}) {
+        JsonRpc.manual(json, CounterErrorHandler) {
+            method("increment", handler(setOf("value"), incrementParams, intResult, counter::increment))
+            method("incrementNoArray", handler(incrementParams, intResult, counter::increment))
+            method("current", handler(intResult, counter::currentValue))
+        }
+    }) {
     @Test
     fun `rpc call with positional parameters when fields not defined returns error`() {
         assertThat(
@@ -362,13 +374,14 @@ abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE>)
     }
 }
 
-abstract class AutoMappingJsonRpcServiceContract<NODE : Any>(json: AutoMarshallingJson<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
-    JsonRpc.auto(json, CounterErrorHandler) {
-        method("increment", handler(counter::increment))
-        method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))
-        method("current", handler(counter::currentValue))
-    }
-}) {
+abstract class AutoMappingJsonRpcServiceContract<NODE : Any>(json: AutoMarshallingJson<NODE>) :
+    JsonRpcServiceContract<NODE>({ counter ->
+        JsonRpc.auto(json, CounterErrorHandler) {
+            method("increment", handler(counter::increment))
+            method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))
+            method("current", handler(counter::currentValue))
+        }
+    }) {
     @Test
     fun `rpc call with positional parameters when fields defined returns result`() {
         assertThat(

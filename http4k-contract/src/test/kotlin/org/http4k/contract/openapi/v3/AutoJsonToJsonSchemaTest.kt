@@ -1,8 +1,18 @@
 package org.http4k.contract.openapi.v3
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
+import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import dev.forkhandles.values.IntValue
+import dev.forkhandles.values.IntValueFactory
+import org.http4k.contract.openapi.OpenAPIJackson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -11,6 +21,8 @@ import org.http4k.core.with
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 import org.http4k.format.asConfigurable
+import org.http4k.format.value
+import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
@@ -55,6 +67,8 @@ enum class Foo {
     value1, value2
 }
 
+data class Nulls(val f1: String? = null, val f2: String? = null)
+
 data class GenericListHolder(val value: List<Generic>)
 data class MapHolder(val value: Map<Any, Any>)
 
@@ -69,19 +83,19 @@ data class JacksonFieldWithMetadata(
 sealed class Sealed(val string: String)
 object SealedChild : Sealed("child")
 
+interface Interface
+data class InterfaceImpl1(val a: String = "a") : Interface
+data class InterfaceHolder(val i: Interface)
+
+class MyInt private constructor(value: Int) : IntValue(value) {
+    companion object : IntValueFactory<MyInt>(::MyInt)
+}
+
+data class MetaDataValueHolder(val i: MyInt, val j: JacksonFieldWithMetadata)
+
 @ExtendWith(JsonApprovalTest::class)
 class AutoJsonToJsonSchemaTest {
-    private val json = Jackson
-
-    private val creator = AutoJsonToJsonSchema(json,
-        FieldRetrieval.compose(
-            SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy),
-            JacksonJsonPropertyAnnotated,
-            JacksonJsonNamingAnnotated(Jackson)
-        ),
-        SchemaModelNamer.Full,
-        "customPrefix"
-    )
+    private val json = OpenAPIJackson
 
     @Test
     fun `can override definition id`(approver: Approver) {
@@ -89,42 +103,79 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `can provide custom prefix`(approver: Approver) {
+        approver.assertApproved(InterfaceHolder(InterfaceImpl1()), null, "prefix")
+    }
+
+    @Test
+    fun `can override definition id and it added to sub definitions`(approver: Approver) {
+        approver.assertApproved(ArbObject(), "foobar")
+    }
+
+    @Test
     fun `can override definition id for a map`(approver: Approver) {
-        approver.assertApproved(MapHolder(
-            mapOf(
-                "key" to "value",
-                "key2" to 123,
-                "key3" to mapOf("inner" to ArbObject2())
-            )
-        ), "foobar")
+        approver.assertApproved(
+            MapHolder(
+                mapOf(
+                    "key" to "value",
+                    "key2" to 123,
+                    "key3" to mapOf("inner" to ArbObject2())
+                )
+            ), "foobar"
+        )
     }
 
     @Test
     fun `can write extra properties to map`(approver: Approver) {
-        val creator = AutoJsonToJsonSchema(json,
+        val creator = AutoJsonToJsonSchema(
+            json,
             { _, name ->
                 if (name == "str") {
-                    Field("hello", false, FieldMetadata("string description", mapOf("key" to "string")))
+                    Field(
+                        "hello",
+                        false,
+                        FieldMetadata(
+                            mapOf(
+                                "key" to "string",
+                                "description" to "string description",
+                                "format" to "string format"
+                            )
+                        )
+                    )
                 } else {
-                    Field(123, false, FieldMetadata("int description", mapOf("key" to 123)))
+                    Field(
+                        123,
+                        false,
+                        FieldMetadata(
+                            mapOf(
+                                "key" to 123,
+                                "description" to "int description",
+                                "format" to "another format"
+                            )
+                        )
+                    )
                 }
             },
             SchemaModelNamer.Full,
             "customPrefix"
         )
 
-        approver.assertApproved(Response(OK)
-            .with(CONTENT_TYPE of APPLICATION_JSON)
-            .body(Jackson.asFormatString(creator.toSchema(ArbObject3()))))
+        approver.assertApproved(
+            Response(OK)
+                .with(CONTENT_TYPE of APPLICATION_JSON)
+                .body(Jackson.asFormatString(creator.toSchema(ArbObject3(), refModelNamePrefix = null)))
+        )
     }
 
     @Test
     fun `can override definition id for a raw map`(approver: Approver) {
-        approver.assertApproved(mapOf(
-            "key" to "value",
-            "key2" to 123,
-            "key3" to mapOf("inner" to ArbObject2())
-        ), "foobar")
+        approver.assertApproved(
+            mapOf(
+                "key" to "value",
+                "key2" to 123,
+                "key3" to mapOf("inner" to ArbObject2())
+            ), "foobar"
+        )
     }
 
     @Test
@@ -138,32 +189,42 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `renders schema for objet with all optional fields`(approver: Approver) {
+        approver.assertApproved(Nulls("foo", "bar"))
+    }
+
+    @Test
     fun `renders schema for recursive objects`(approver: Approver) {
         approver.assertApproved(RecursiveObject(listOf(RecursiveObject())))
     }
 
     @Test
     fun `renders schema for map field`(approver: Approver) {
-        approver.assertApproved(MapHolder(
-            mapOf(
-                "key" to "value",
-                "key2" to 123,
-                "key3" to mapOf("inner" to ArbObject2()),
-                "key4" to ArbObject2()
+        approver.assertApproved(
+            MapHolder(
+                mapOf(
+                    "key" to "value",
+                    "key2" to 123,
+                    "key3" to mapOf("inner" to ArbObject2()),
+                    "key4" to ArbObject2()
+                )
             )
-        ))
+        )
     }
 
     @Test
     fun `renders schema for raw map field`(approver: Approver) {
-        approver.assertApproved(mapOf(
-            "key" to "value",
-            "key2" to 123,
-            "key3" to mapOf("inner" to ArbObject2()),
-            "key4" to ArbObject2(),
-            "key5" to listOf(ArbObject2(), ArbObject()),
-            "key6" to GenericListHolder(listOf(ArbObject2(), ArbObject()))
-        ))
+        approver.assertApproved(
+            mapOf(
+                "key" to "value",
+                "key2" to 123,
+                "key3" to mapOf("inner" to ArbObject2()),
+                "key4" to ArbObject2(),
+                "key5" to listOf(ArbObject2(), ArbObject()),
+                "key6" to listOf(1, 2),
+                "key7" to GenericListHolder(listOf(ArbObject2(), ArbObject()))
+            )
+        )
     }
 
     @Test
@@ -208,15 +269,25 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for custom json mapping`(approver: Approver) {
-        val json = ConfigurableJackson(KotlinModule.Builder().build()
-            .asConfigurable()
-            .text(BiDiMapping({ i: String -> ArbObject2(Uri.of(i)) }, { i: ArbObject2 -> i.uri.toString() }))
-            .done()
+        val json = ConfigurableJackson(
+            KotlinModule.Builder().build()
+                .asConfigurable()
+                .text(BiDiMapping({ i: String -> ArbObject2(Uri.of(i)) }, { i: ArbObject2 -> i.uri.toString() }))
+                .done()
         )
 
-        approver.assertApproved(Response(OK)
-            .with(CONTENT_TYPE of APPLICATION_JSON)
-            .body(Jackson.asFormatString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder()))))
+        approver.assertApproved(
+            Response(OK)
+                .with(CONTENT_TYPE of APPLICATION_JSON)
+                .body(
+                    Jackson.asFormatString(
+                        AutoJsonToJsonSchema(json).toSchema(
+                            ArbObjectHolder(),
+                            refModelNamePrefix = null
+                        )
+                    )
+                )
+        )
     }
 
     @Test
@@ -225,13 +296,60 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `renders schema for objects with metadata`(approver: Approver) {
+        val jackson = object : ConfigurableJackson(
+            KotlinModule.Builder().build()
+                .asConfigurable()
+                .withStandardMappings()
+                .value(MyInt)
+                .done()
+                .deactivateDefaultTyping()
+                .setSerializationInclusion(NON_NULL)
+                .configure(FAIL_ON_NULL_FOR_PRIMITIVES, true)
+                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(FAIL_ON_IGNORED_PROPERTIES, false)
+                .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
+                .configure(USE_BIG_INTEGER_FOR_INTS, true)
+        ) {}
+
+        approver.assertApproved(
+            MetaDataValueHolder(MyInt.of(1), JacksonFieldWithMetadata()), creator = autoJsonToJsonSchema(
+                jackson
+            )
+        )
+    }
+
+    @Test
     fun `renders schema for object from sealed class`(approver: Approver) {
         approver.assertApproved(SealedChild)
     }
 
-    private fun Approver.assertApproved(obj: Any, name: String? = null) {
-        assertApproved(Response(OK)
-            .with(CONTENT_TYPE of APPLICATION_JSON)
-            .body(Jackson.asFormatString(creator.toSchema(obj, name))))
+    private fun Approver.assertApproved(
+        obj: Any,
+        name: String? = null,
+        prefix: String? = null,
+        creator: AutoJsonToJsonSchema<JsonNode> = autoJsonToJsonSchema(json)
+    ) {
+        assertApproved(
+            Response(OK)
+                .with(CONTENT_TYPE of APPLICATION_JSON)
+                .body(Jackson.asFormatString(creator.toSchema(obj, name, prefix)))
+        )
     }
+
+    private fun autoJsonToJsonSchema(jackson: ConfigurableJackson) = AutoJsonToJsonSchema(
+        jackson,
+        FieldRetrieval.compose(
+            SimpleLookup(
+                metadataRetrievalStrategy =
+                PrimitivesFieldMetadataRetrievalStrategy
+                    .then(Values4kFieldMetadataRetrievalStrategy)
+                    .then(JacksonFieldMetadataRetrievalStrategy)
+            ),
+            JacksonJsonPropertyAnnotated,
+            JacksonJsonNamingAnnotated(Jackson)
+        ),
+        SchemaModelNamer.Full,
+        "customPrefix"
+    )
 }
