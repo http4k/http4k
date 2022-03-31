@@ -4,7 +4,7 @@ description: Recipes for creating a Distributed Tracing Tree
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.25.6.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.25.7.0"
 ```
 
 When composing several http4k services together and talking to Fakes representing external systems, we can create a tree of Distributed Trace calls by adding RequestTracing filters to our HTTP services and then tracking these trace calls through Events.
