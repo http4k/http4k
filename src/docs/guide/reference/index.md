@@ -30,6 +30,7 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/clients"><span class="pill">Apache4 Sync & Async</span></a>
 <a href="/guide/reference/clients"><span class="pill">Apache5 Sync & Async</span></a>
 <a href="/guide/reference/clients"><span class="pill">Java</span></a>
+<a href="/guide/reference/clients"><span class="pill">Fuel</span></a>
 <a href="/guide/reference/clients"><span class="pill">Jetty</span></a>
 <a href="/guide/reference/clients"><span class="pill">OkHttp</span></a>
 <a href="/guide/reference/clients"><span class="pill">Websocket</span></a>
