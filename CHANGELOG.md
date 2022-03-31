@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.6.0
+- **http4k-*** : Upgrade some dependency versions, including Jackson to overcome CVE-2020-36518.
+
 ### v4.25.5.2
 - **http4k-contract**: Don't output required fields into OpenAPI if there are none.
 
