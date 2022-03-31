@@ -254,7 +254,8 @@ object ServerFilters {
 
     /**
      * Last gasp filter which catches all exceptions and returns a formatted Internal Server Error. We suggest that
-     * this filter is NOT used in public facing services so that internal error stacks are not exposed.
+     * this filter is NOT used in public facing services so that internal error stacks are not exposed, but to use
+     * this as a template for more appropriate behaviour in those cases.
      */
     object CatchAll {
         operator fun invoke(errorStatus: Status = INTERNAL_SERVER_ERROR): Filter = Filter { next ->
