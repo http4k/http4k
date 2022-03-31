@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.7.0
+- **http4k-client-fuel**: New Module! An http4k client based on [Fuel](https://github.com/kittinunf/Fuel) with both sync and async support. 
+
 ### v4.25.6.0
 - **http4k-*** : Upgrade some dependency versions, including Jackson to overcome CVE-2020-36518.
 
