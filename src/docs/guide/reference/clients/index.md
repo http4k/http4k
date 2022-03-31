@@ -19,6 +19,9 @@ implementation group: "org.http4k", name: "http4k-client-apache-async", version:
 // Apache v4 (Async): 
 implementation group: "org.http4k", name: "http4k-client-apache4-async", version: "4.25.6.0"
 
+// Fuel (Sync + Async): 
+implementation group: "org.http4k", name: "http4k-client-fuel", version: "4.25.6.0"
+
 // Jetty (Sync + Async): 
 implementation group: "org.http4k", name: "http4k-client-jetty", version: "4.25.6.0"
 
