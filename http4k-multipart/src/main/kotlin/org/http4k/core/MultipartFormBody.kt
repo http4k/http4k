@@ -81,13 +81,12 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     companion object {
         const val DEFAULT_DISK_THRESHOLD = 1000 * 1024
 
-        fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
+        fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD, diskDir: File = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directives?.firstOrNull()?.second ?: ""
             val inputStream = httpMessage.body.run { if (stream.available() > 0) stream else ByteArrayInputStream(payload.array()) }
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8)
-            val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
-            val parts = MultipartFormParser(UTF_8, diskThreshold, dir).formParts(form).map {
+            val parts = MultipartFormParser(UTF_8, diskThreshold, diskDir).formParts(form).map {
                 if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(diskThreshold), it.headers.toList())
                 else MultipartEntity.File(it.fieldName!!, MultipartFormFile(it.fileName!!, ContentType(it.contentType!!, TEXT_HTML.directives), it.newInputStream))
             }
