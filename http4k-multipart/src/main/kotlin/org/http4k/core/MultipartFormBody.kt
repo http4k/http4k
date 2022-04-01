@@ -11,6 +11,7 @@ import org.http4k.multipart.Part
 import org.http4k.multipart.StreamingMultipartFormParts
 import java.io.ByteArrayInputStream
 import java.io.Closeable
+import java.io.File
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
