@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.8.0 (uncut)
+- **http4k-multipart**: Add disk cache path to MultipartFormBody.from() parameters. H/T @rny
+
 ### v4.25.7.0
 - **http4k-client-fuel**: New Module! An http4k client based on [Fuel](https://github.com/kittinunf/Fuel) with both sync and async support. 
 
