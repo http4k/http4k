@@ -22,6 +22,7 @@ import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
@@ -33,6 +34,7 @@ import org.http4k.server.ServerConfig
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
+import java.util.Locale.getDefault
 
 abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
                                   val client: HttpHandler,
@@ -247,6 +249,14 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
         val response = client(Request(GET, "http://localhost:$port/boom"))
 
         assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
+    }
+
+    @Test
+    open fun `unknown host is correctly reported`() {
+        val response = client(Request(GET, "http://reallynotarealserver.bob"))
+
+        assertThat(response.status.code, equalTo(SERVICE_UNAVAILABLE.code))
+        assertThat(response.status.toString().lowercase(getDefault()), containsSubstring("unknown") )
     }
 
     @Test

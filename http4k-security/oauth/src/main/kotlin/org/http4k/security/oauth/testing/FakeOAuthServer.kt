@@ -39,23 +39,23 @@ object FakeOAuthServer {
         authPath: String,
         tokenPath: String,
         clock: Clock = Clock.systemDefaultZone(),
-        accessCodePrefix: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() }
+        authCodeToAccessToken: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() }
     ): HttpHandler {
         val server = OAuthServer(
             tokenPath,
             InMemoryAuthRequestTracking(),
             AlwaysOkClientValidator(),
             InMemoryAuthorizationCodes(clock),
-            SimpleAccessTokens(accessCodePrefix),
+            SimpleAccessTokens(authCodeToAccessToken),
             clock
         )
 
         return routes(
             server.tokenRoute,
             authPath bind GET to server.authenticationStart.then {
-                Response(FOUND).with(LOCATION of it.uri.path("/complete"))
+                Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
             },
-            "/complete" bind GET to { server.authenticationComplete(it) }
+            "/autologin" bind GET to { server.authenticationComplete(it) }
         )
     }
 }
@@ -108,7 +108,7 @@ private class InMemoryAuthRequestTracking : AuthRequestTracking {
         }
 }
 
-private class SimpleAccessTokens(private val prefix: (AuthorizationCode) -> String) : AccessTokens {
+private class SimpleAccessTokens(private val authCodeToAccessToken: (AuthorizationCode) -> String) : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest) =
         Failure(UnsupportedGrantType("client_credentials"))
 
@@ -116,5 +116,5 @@ private class SimpleAccessTokens(private val prefix: (AuthorizationCode) -> Stri
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest,
         authorizationCode: AuthorizationCode
-    ) = Success(AccessToken(prefix(authorizationCode)))
+    ) = Success(AccessToken(authCodeToAccessToken(authorizationCode)))
 }

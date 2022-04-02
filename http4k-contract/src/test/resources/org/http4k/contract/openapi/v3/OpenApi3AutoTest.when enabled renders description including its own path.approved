@@ -16,7 +16,6 @@
     "": {
       "get": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           ""
         ],
@@ -37,7 +36,6 @@
     "/docs": {
       "get": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           ""
         ],

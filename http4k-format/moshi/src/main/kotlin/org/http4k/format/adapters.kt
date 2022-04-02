@@ -57,7 +57,9 @@ abstract class IsAnInstanceOfAdapter<T : Any>(private val clazz: KClass<T>): Jso
 
 object ThrowableAdapter : IsAnInstanceOfAdapter<Throwable>(Throwable::class)
 
-object CollectionEdgeCasesAdapter : IsAnInstanceOfAdapter<Map<*, *>>(Map::class)
+object MapAdapter : IsAnInstanceOfAdapter<Map<*, *>>(Map::class)
+
+object ListAdapter : IsAnInstanceOfAdapter<List<*>>(List::class)
 
 object EventAdapter : JsonAdapter.Factory {
     override fun create(p0: Type, p1: MutableSet<out Annotation>, p2: Moshi) =

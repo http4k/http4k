@@ -62,6 +62,6 @@ internal class ResourceLoadingHandler(
     private fun convertPath(path: String): String {
         val newPath = if (pathSegments == "/" || pathSegments == "") path else path.replaceFirst(pathSegments, "")
         val resolved = if (newPath == "/" || newPath.isBlank()) "/index.html" else newPath
-        return resolved.replaceFirst("/", "")
+        return resolved.trimStart('/')
     }
 }

@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
+import org.openqa.selenium.By
 import java.io.File
 
 class JSoupElementFinderTest {

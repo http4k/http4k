@@ -4,16 +4,19 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.junit.jupiter.api.Test
+import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URL
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.Date
@@ -23,7 +26,7 @@ class Http4kWebDriverTest {
     private val driver = Http4kWebDriver { req ->
         val body = File("src/test/resources/test.html").readText()
         Response(OK).body(body
-            .replace("FORMMETHOD", Method.POST.name)
+            .replace("FORMMETHOD", POST.name)
             .replace("THEMETHOD", req.method.name)
             .replace("THEBODY", req.bodyString())
             .replace("THEURL", req.uri.toString())
@@ -67,7 +70,7 @@ class Http4kWebDriverTest {
             loadCount++
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
-                .replace("FORMMETHOD", Method.POST.name)
+                .replace("FORMMETHOD", POST.name)
                 .replace("THEMETHOD", req.method.name)
                 .replace("THEBODY", req.bodyString())
                 .replace("THEURL", req.uri.toString())
@@ -91,7 +94,7 @@ class Http4kWebDriverTest {
             loadCount++
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
-                .replace("FORMMETHOD", Method.POST.name)
+                .replace("FORMMETHOD", POST.name)
                 .replace("THEMETHOD", req.method.name)
                 .replace("THEBODY", req.bodyString())
                 .replace("THEURL", req.uri.toString())
@@ -239,7 +242,7 @@ class Http4kWebDriverTest {
     @Test
     fun `service set cookies are stored in the driver`() {
         val driver = Http4kWebDriver {
-            Response(OK).cookie(HCookie("name", "value", 100, LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC), "domain", "path", true, true))
+            Response(OK).cookie(HCookie("name", "value", 100, Instant.EPOCH, "domain", "path", true, true))
         }
 
         driver.get("/")

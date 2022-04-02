@@ -6,10 +6,9 @@ import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.api.metrics.GlobalMeterProvider
-import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.data.MetricData
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -36,7 +35,8 @@ class OpenTelemetryMetricsServerTest {
         @BeforeAll
         @JvmStatic
         fun setup() {
-            GlobalMeterProvider.set(SdkMeterProvider.builder().buildAndRegisterGlobal())
+            GlobalOpenTelemetry.resetForTest()
+            setupOpenTelemetryMeterProvider()
         }
     }
 
@@ -70,6 +70,7 @@ class OpenTelemetryMetricsServerTest {
         }
 
         val data = exportMetricsFromOpenTelemetry()
+
         assertThat(
             data,
             hasRequestTimer(

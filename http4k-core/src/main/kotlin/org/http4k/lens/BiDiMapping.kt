@@ -85,6 +85,10 @@ object StringBiDiMappings {
     fun samplingDecision() = BiDiMapping(::SamplingDecision, SamplingDecision::value)
     fun throwable() = BiDiMapping({ throw Exception(it) }, Throwable::asString)
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
+    inline fun <reified T : Enum<T>> caseInsensitiveEnum() = BiDiMapping(
+        { text -> enumValues<T>().first { it.name.equals(text, ignoreCase = true) } },
+        Enum<T>::name
+    )
 }
 
 internal fun Throwable.asString() = StringWriter().use { output -> PrintWriter(output).use { printer -> printStackTrace(printer); output.toString() } }

@@ -1,8 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject3",
-    "example": null,
-    "description": null
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject3"
   },
   "definitions": [
     {
@@ -12,19 +10,20 @@
           "str": {
             "example": "stringValue",
             "description": "string description",
+            "format": "string format",
             "type": "string"
           },
           "num": {
             "example": 1,
             "description": "int description",
-            "type": "number"
+            "format": "another format",
+            "type": "integer"
           }
         },
         "example": {
           "str": "stringValue",
           "num": 1
         },
-        "description": null,
         "type": "object",
         "required": [
           "num",

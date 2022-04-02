@@ -41,7 +41,7 @@ open class ConfigurableGson(builder: GsonBuilder,
             value.isJsonPrimitive -> with(value.asJsonPrimitive) {
                 when {
                     isBoolean -> JsonType.Boolean
-                    isNumber -> JsonType.Number
+                    isNumber -> if(value.asString.any { !it.isDigit() }) JsonType.Number else JsonType.Integer
                     isString -> JsonType.String
                     else -> throw IllegalArgumentException("Don't know how to translate $value")
                 }

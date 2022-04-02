@@ -23,7 +23,6 @@ import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
@@ -162,7 +161,11 @@ class OpenApi3<NODE : Any>(
                     "items" to obj("type" to string(paramMeta.itemType().value))
                 )
             })
-            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(paramMeta.clz.java.enumConstants[0], it.name))
+            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(
+                paramMeta.clz.java.enumConstants[0],
+                it.name,
+                null
+            ))
             else -> PrimitiveParameter(it, json {
                 obj("type" to string(paramMeta.value))
             })
@@ -175,13 +178,10 @@ class OpenApi3<NODE : Any>(
         val withSchema = requests.mapNotNull {
             with(CONTENT_TYPE(it.message)) {
                 when (this) {
-                    APPLICATION_JSON -> APPLICATION_JSON.value to it.toSchemaContent()
                     APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
                         (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
                     null -> null
-                    else -> value to NoSchema(
-                        json { obj("type" to string(StringParam.value)) }, it.example?.toString()
-                    )
+                    else -> value to it.toSchemaContent()
                 }
             }
         }
@@ -204,11 +204,11 @@ class OpenApi3<NODE : Any>(
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
             when (example) {
                 is Array<*>, is Iterable<*> -> !json.fields(schema.node).toMap().containsKey("\$ref")
-                else -> apiRenderer.toSchema(object {}) != schema
+                else -> apiRenderer.toSchema(object {}, refModelNamePrefix = schemaPrefix) != schema
             }
 
         val jsonSchema = example
-            ?.let { apiRenderer.toSchema(it, definitionId) }
+            ?.let { apiRenderer.toSchema(it, definitionId, schemaPrefix) }
             ?.takeIf(::exampleSchemaIsValid)
             ?: message.bodyString().toSchema(definitionId)
 
@@ -216,7 +216,7 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()
-        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId) }
+        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId, null) }
         ?: JsonSchema(json.obj(), emptySet())
 
     private fun List<Security>.combineFull(): Render<NODE> = {

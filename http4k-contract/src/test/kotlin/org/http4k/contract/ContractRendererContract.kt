@@ -21,12 +21,10 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.CREATED
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.format.Jackson.auto
 import org.http4k.format.Json
 import org.http4k.lens.Cookies
 import org.http4k.lens.FormField
@@ -58,7 +56,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(JsonApprovalTest::class)
-abstract class ContractRendererContract<NODE>(
+abstract class ContractRendererContract<NODE : Any>(
     private val json: Json<NODE>,
     protected val rendererToUse: ContractRenderer
 ) {
@@ -104,7 +102,8 @@ abstract class ContractRendererContract<NODE>(
                 tags += Tag("tag1")
                 markAsDeprecated()
             } bindContract GET to { _ -> Response(OK) }
-            routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age")  / Path.enum<Foo>().of("foo") bindContract POST to { a, _, _, _ -> { Response(OK).body(a) } }
+            routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") / Path.enum<Foo>()
+                .of("foo") bindContract POST to { a, _, _, _ -> { Response(OK).body(a) } }
             routes += "/queries" meta {
                 queries += Query.boolean().multi.required("b", "booleanQuery")
                 queries += Query.string().optional("s", "stringQuery")
@@ -123,11 +122,12 @@ abstract class ContractRendererContract<NODE>(
                 headers += Header.enum<HttpMessage, Foo>().optional("e", "enumHeader")
                 headers += json.lens(Header).optional("j", "jsonHeader")
             } bindContract POST to { _ -> Response(OK).body("hello") }
-            routes += "/body_string" meta {
-                receiving(Body.string(TEXT_PLAIN).toLens() to "hello from the land of plaintext")
+            routes += "/body_receiving_string" meta {
+                summary = "body_receiving_string"
+                receiving(Body.string(TEXT_PLAIN).toLens() to "hello from the land of receiving plaintext")
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_string" meta {
-                returning(OK, Body.string(TEXT_PLAIN).toLens() to "hello from the land of plaintext")
+                returning(OK, Body.string(TEXT_PLAIN).toLens() to "hello from the land of sending plaintext")
             } bindContract GET to { _ -> Response(OK) }
             routes += "/body_json_noschema" meta {
                 receiving(json.body("json").toLens())
@@ -141,7 +141,7 @@ abstract class ContractRendererContract<NODE>(
             routes += "/body_json_schema" meta {
                 receiving(json.body("json").toLens() to json {
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
-                }, "someDefinitionId")
+                }, "someDefinitionId", "prefix_")
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_json_list_schema" meta {
                 receiving(json.body("json").toLens() to json {
@@ -173,7 +173,7 @@ abstract class ContractRendererContract<NODE>(
                     Body.webForm(
                         Strict,
                         FormField.boolean().required("b", "booleanField"),
-                        FormField.int().optional("i", "intField"),
+                        FormField.int().multi.optional("i", "intField"),
                         FormField.string().optional("s", "stringField"),
                         FormField.enum<Foo>().optional("e", "enumField"),
                         json.lens(FormField).required("j", "jsonField")
@@ -189,46 +189,9 @@ abstract class ContractRendererContract<NODE>(
             routes += "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of json { obj("aString" to string("a message of some kind")) }))
             } bindContract POST to { _ -> Response(OK) }
-            routes += "/body_auto_schema" meta {
-                receiving(
-                    Body.auto<ArbObject2>().toLens() to ArbObject2(
-                        "s",
-                        ArbObject1(Foo.bar),
-                        listOf(1),
-                        true
-                    ), "someOtherId"
-                )
-            } bindContract POST to { _ -> Response(OK) }
-            routes += "/body_auto_schema" meta {
-                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))
-                returning(
-                    status = CREATED,
-                    body = Body.auto<List<ArbObject1>>().toLens() to listOf(ArbObject1(Foo.bing))
-                )
-            } bindContract PUT to { _ -> Response(OK) }
-            routes += "/body_auto_schema_multiple_response_schemas" meta {
-                returning(OK, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
-                returning(CREATED, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
-                returning(
-                    CREATED,
-                    Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123))
-                )
-            } bindContract POST to { _ -> Response(OK) }
-            routes += "/body_auto_schema_multiple_request_schemas" meta {
-                receiving(Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
-                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))
-            } bindContract POST to { _ -> Response(OK) }
-            routes += "/body_auto_schema_name_definition_id" meta {
-                val toLens = Body.auto<InterfaceHolder>().toLens()
-                returning(OK, toLens to InterfaceHolder(Impl1()), definitionId = "impl1")
-                returning(OK, toLens to InterfaceHolder(Impl2()), definitionId = "impl2")
-            } bindContract POST to { _ -> Response(OK) }
-            routes += "/body_auto_map" meta {
-                receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123))
-            } bindContract PUT to { _ -> Response(OK) }
             routes += "/multipart_fields" meta {
-                val field = MultipartFormField.required("stringField")
-                val pic = MultipartFormFile.required("fileField")
+                val field = MultipartFormField.multi.required("stringField")
+                val pic = MultipartFormFile.multi.required("fileField")
                 receiving(Body.multipartForm(Strict, field, pic).toLens())
             } bindContract PUT to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {
@@ -262,6 +225,7 @@ enum class Foo {
 data class ArbObject1(val anotherString: Foo)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
 data class ArbObject3(val uri: Uri, val additional: Map<String, *>)
+data class ArbObject4(val anotherString: Foo)
 
 interface ObjInterface
 data class Impl1(val value: String = "bob") : ObjInterface

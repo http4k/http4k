@@ -1,9 +1,7 @@
 rootProject.name = "http4k"
 
 plugins {
-    id("de.fayard.refreshVersions").version("0.21.0")
-////                            # available:"0.22.0")
-////                            # available:"0.23.0")
+    id("de.fayard.refreshVersions").version("0.40.1")
 }
 
 refreshVersions {
@@ -33,6 +31,7 @@ include("http4k-bom")
     includeModule("apache4")
     includeModule("apache-async")
     includeModule("apache4-async")
+    includeModule("fuel")
     includeModule("jetty")
     includeModule("okhttp")
     includeModule("websocket")
@@ -52,6 +51,7 @@ include("http4k-contract")
     includeModule("klaxon")
     includeModule("kotlinx-serialization")
     includeModule("moshi")
+    includeModule("moshi-yaml")
     includeModule("xml")
 }
 

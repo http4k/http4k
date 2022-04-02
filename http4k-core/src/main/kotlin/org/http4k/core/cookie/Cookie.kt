@@ -3,8 +3,11 @@ package org.http4k.core.cookie
 import org.http4k.core.Parameters
 import org.http4k.quoted
 import org.http4k.unquoted
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ofPattern
 import java.util.Locale.US
@@ -12,7 +15,7 @@ import java.util.Locale.US
 data class Cookie(
     val name: String, val value: String,
     val maxAge: Long? = null,
-    val expires: LocalDateTime? = null,
+    val expires: Instant? = null,
     val domain: String? = null,
     val path: String? = null,
     val secure: Boolean = false,
@@ -25,14 +28,19 @@ data class Cookie(
     fun path(path: String) = copy(path = path)
     fun secure() = copy(secure = true)
     fun httpOnly() = copy(httpOnly = true)
-    fun expires(date: LocalDateTime): Cookie = copy(expires = date)
+    fun expires(date: ZonedDateTime): Cookie = copy(expires = date.toInstant())
+    fun expires(date: Instant): Cookie = copy(expires = date)
+
+    @Deprecated("Use Instant version instead for clarity", ReplaceWith("Instant.ofEpochSecond(date.toEpochSecond(UTC))"))
+    fun expires(date: LocalDateTime): Cookie = copy(expires = Instant.ofEpochSecond(date.toEpochSecond(UTC)))
+
     fun sameSite(sameSite: SameSite) = copy(sameSite = sameSite)
 
     override fun toString(): String = fullCookieString()
 
     private fun attributes(): String = mutableListOf<String>().apply {
         appendIfPresent(maxAge, "Max-Age=$maxAge")
-        appendIfPresent(expires, "Expires=${expires?.let { ZonedDateTime.of(it, ZoneId.of("GMT")).format(RFC822) }}")
+        appendIfPresent(expires, "Expires=${expires?.let { ZonedDateTime.ofInstant(it, ZoneId.of("GMT")).format(RFC822) }}")
         appendIfPresent(domain, "Domain=$domain")
         appendIfPresent(path, "Path=$path")
         appendIfTrue(secure, "secure")
@@ -58,7 +66,7 @@ data class Cookie(
         }
 
         private fun Parameters.maxAge(): Long? = find { it.first.equals("Max-Age", true) }?.second?.toLong()
-        private fun Parameters.expires(): LocalDateTime? = find { it.first.equals("Expires", true) }?.second?.parseDate()
+        private fun Parameters.expires(): Instant? = find { it.first.equals("Expires", true) }?.second?.parseDate()?.let { Instant.ofEpochSecond(it.toEpochSecond(UTC)) }
         private fun Parameters.domain(): String? = find { it.first.equals("Domain", true) }?.second
         private fun Parameters.path(): String? = find { it.first.equals("Path", true) }?.second
         private fun Parameters.secure(): Boolean = find { it.first.equals("secure", true) } != null

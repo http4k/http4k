@@ -13,6 +13,7 @@ import org.http4k.strikt.value
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
+import java.time.Instant
 import java.time.LocalDateTime
 
 class CookieAssertionsTest {
@@ -23,7 +24,7 @@ class CookieAssertionsTest {
             name = "bob",
             value = "value",
             domain = "bob",
-            expires = LocalDateTime.MAX,
+            expires = Instant.MAX,
             httpOnly = true,
             secure = true,
             path = "/",

@@ -40,15 +40,23 @@ object TrafficFilters {
         operator fun invoke(
             replay: Replay,
             matchFn: (Request, Request) -> Boolean = { received, stored -> received.toString() != stored.toString() }
-        ): Filter = Filter {
-            val zipped = replay.requests().zip(replay.responses()).iterator()
+        ): Filter {
+            val pairs = replay.requests().zip(replay.responses())
 
-            val responder = { received: Request ->
-                val (stored, response) = zipped.next()
-                if (matchFn(received, stored)) Response(BAD_REQUEST)
-                else response
+            var count = 0
+
+            return Filter {
+                val responder = { received: Request ->
+                    try {
+                        val (req, resp) = pairs.drop(count).first()
+                        if (matchFn(received, req)) Response(BAD_REQUEST)
+                        else resp.also { count++ }
+                    } catch (e: NoSuchElementException) {
+                        Response(BAD_REQUEST)
+                    }
+                }
+                responder
             }
-            responder
         }
     }
 }

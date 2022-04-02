@@ -22,4 +22,5 @@ fun HttpHandler.withAsyncApi(): AsyncHttpHandler = object : DualSyncAsyncHttpHan
     override fun invoke(request: Request, fn: (Response) -> Unit) = fn(invoke(request))
 }
 
-fun Status.toClientStatus(e: Exception) = description("Client Error: $description caused by ${e.localizedMessage}")
+fun Status.toClientStatus(e: Exception) = description("Client Error: $description" + (
+    e.localizedMessage?.let { " caused by $it" } ?: ""))

@@ -10,15 +10,14 @@ import org.http4k.core.cookie.invalidateCookie
 import org.http4k.security.openid.IdToken
 import java.time.Clock
 import java.time.Duration
-import java.time.LocalDateTime
 
 /**
  * This is an example implementation which stores CSRF and AccessToken values in an INSECURE client-side cookie.
  * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
 class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
-                                          private val cookieValidity: Duration = Duration.ofHours(3),
-                                          private val clock: Clock = Clock.systemDefaultZone()) : OAuthPersistence {
+                                          private val cookieValidity: Duration = Duration.ofDays(1),
+                                          private val clock: Clock = Clock.systemUTC()) : OAuthPersistence {
 
     private val csrfName = "${cookieNamePrefix}Csrf"
 
@@ -49,11 +48,11 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     override fun assignOriginalUri(redirect: Response, originalUri: Uri): Response = redirect.cookie(expiring(originalUriName, originalUri.toString()))
 
-    override fun authFailureResponse() = Response(FORBIDDEN)
+    override fun authFailureResponse(reason: OAuthCallbackError) = Response(FORBIDDEN)
         .invalidateCookie(csrfName)
         .invalidateCookie(accessTokenCookieName)
         .invalidateCookie(nonceName)
         .invalidateCookie(originalUriName)
 
-    private fun expiring(name: String, value: String) = Cookie(name, value, expires = LocalDateTime.ofInstant(clock.instant().plus(cookieValidity), clock.zone), path = "/")
+    private fun expiring(name: String, value: String) = Cookie(name, value, expires = clock.instant().plus(cookieValidity), path = "/")
 }

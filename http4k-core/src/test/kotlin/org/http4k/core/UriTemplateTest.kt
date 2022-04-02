@@ -14,7 +14,7 @@ class UriTemplateTest {
 
         assertThat(
             template.generate(pathParameters(pair("name", "a name with spaces"))),
-            equalTo("properties/a+name+with+spaces"))
+            equalTo("properties/a%20name%20with%20spaces"))
 
         assertThat(
             template.generate(pathParameters(pair("name", "a/name/with/slashes"))),
@@ -92,7 +92,7 @@ class UriTemplateTest {
     @Test
     fun canExtractFromUriWithEncodedSpace() {
         val template = from("path/{id1}")
-        assertThat(template.extract("path/foo+bar").getValue("id1"), equalTo("foo bar"))
+        assertThat(template.extract("path/foo%20bar").getValue("id1"), equalTo("foo bar"))
     }
 
     @Test
@@ -109,7 +109,7 @@ class UriTemplateTest {
     }
 
     @Test
-    fun matchedValuesAreUrlDecoded() {
+    fun matchedValuesArePathDecoded() {
         val extracted = from("path/{band}").extract("path/Earth%2C%20Wind%20%26%20Fire")
         assertThat(extracted.getValue("band"), equalTo("Earth, Wind & Fire"))
     }

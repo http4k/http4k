@@ -507,6 +507,7 @@ application/x-font-snf				snf
 application/x-font-ttf				ttf ttc
 application/x-font-type1			pfa pfb pfm afm
 application/x-font-woff				woff
+application/x-font-woff2			woff2
 application/x-freearc				arc
 application/x-futuresplash			spl
 application/x-gca-compressed			gca

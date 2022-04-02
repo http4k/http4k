@@ -253,7 +253,9 @@ object ServerFilters {
     }
 
     /**
-     * Last gasp filter which catches all exceptions and returns a formatted Internal Server Error.
+     * Last gasp filter which catches all exceptions and returns a formatted Internal Server Error. We suggest that
+     * this filter is NOT used in public facing services so that internal error stacks are not exposed, but to use
+     * this as a template for more appropriate behaviour in those cases.
      */
     object CatchAll {
         operator fun invoke(errorStatus: Status = INTERNAL_SERVER_ERROR): Filter = Filter { next ->
@@ -329,6 +331,34 @@ object ServerFilters {
         operator fun invoke(contentType: ContentType): Filter = Filter { next ->
             {
                 next(it).with(CONTENT_TYPE of contentType)
+            }
+        }
+    }
+
+    /**
+     * Sets the Content-Disposition response header on the Response for the selected path extensions.
+     * By default all extensions are selected, including paths with no extension.
+     * If no path is present, the filename will be set to unnamed.
+     */
+    object ContentDispositionAttachment {
+        private fun Request.extension(): String = this.uri.path.substringAfterLast(".", "")
+        private fun Request.filename() =
+            this.uri.path.split("/").last().let { if(it.isBlank()) "unnamed" else it }
+        private val ALL_EXTENSIONS = setOf("*")
+
+        operator fun invoke(extensions: Set<String> = ALL_EXTENSIONS): Filter = Filter { next ->
+            { request ->
+                next(request).let { response ->
+                    val extensionSelected = extensions == ALL_EXTENSIONS || extensions.contains(request.extension())
+                    when {
+                        response.status.successful && extensionSelected ->
+                            response.header(
+                                "Content-Disposition",
+                                "attachment; filename=${request.filename()}"
+                            )
+                        else -> response
+                    }
+                }
             }
         }
     }

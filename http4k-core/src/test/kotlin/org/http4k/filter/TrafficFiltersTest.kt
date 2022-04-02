@@ -7,6 +7,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -78,12 +79,14 @@ class TrafficFiltersTest {
     @Test
     fun `ReplayFrom serves stored requests later or returns 400`() {
         val cache = ReadWriteStream.Memory()
-        cache[request] = response
-        cache[request] = response
+        cache[Request(GET, "/bob1")] = Response(OK)
+        cache[Request(GET, "/bob2")] = Response(ACCEPTED)
+        cache[Request(GET, "/bob3")] = Response(NOT_FOUND)
         val handler = TrafficFilters.ReplayFrom(cache).then { fail("") }
 
-        assertThat(handler(request), equalTo(response))
-        assertThat(handler(request), equalTo(response))
+        assertThat(handler(Request(GET, "/bob1")), equalTo(Response(OK)))
+        assertThat(handler(Request(GET, "/bob2")), equalTo(Response(ACCEPTED)))
+        assertThat(handler(Request(GET, "/bob3")), equalTo(Response(NOT_FOUND)))
         assertThat(handler(Request(GET, "/bob2")), equalTo(Response(BAD_REQUEST)))
     }
 }

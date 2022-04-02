@@ -27,7 +27,7 @@ sealed class HttpEvent(
             tx.request.method,
             tx.response.status,
             tx.duration.toMillis(),
-            if (tx.request is RoutedRequest) tx.request.xUriTemplate.toString() else tx.request.uri.path
+            if (tx.request is RoutedRequest) tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
         )
 
         override fun toString() = "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
@@ -45,7 +45,7 @@ sealed class HttpEvent(
             tx.request.method,
             tx.response.status,
             tx.duration.toMillis(),
-            if (tx.response is RoutedResponse) tx.response.xUriTemplate.toString() else tx.request.uri.path
+            if (tx.response is RoutedResponse) tx.response.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
         )
 
         override fun toString() = "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"

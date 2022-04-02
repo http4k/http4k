@@ -3,8 +3,6 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import dev.forkhandles.values.IntValue
-import dev.forkhandles.values.IntValueFactory
 import org.http4k.base64Encode
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -23,7 +21,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 class PathTest {
 
@@ -89,9 +87,14 @@ class PathTest {
             assertThat(pathParam(updated), equalTo(unencoded))
         }
 
-        checkEncodeDecode("123 45/6", "123+45%2F6")
-        checkEncodeDecode("Bob Tables%/M", "Bob+Tables%25%2FM")
-        checkEncodeDecode("2020-03-19T19:12:34.567+01:00", "2020-03-19T19%3A12%3A34.567%2B01%3A00")
+        // unreserved
+        checkEncodeDecode("azAZ09-._~", "azAZ09-._~")
+        // subdelimiter
+        checkEncodeDecode("!$&'()*+,;=", "!$&'()*+,;=")
+        // others
+        checkEncodeDecode(":@", ":@")
+        checkEncodeDecode("Bob Tables%/M", "Bob%20Tables%25%2FM")
+        checkEncodeDecode("2020-03-19T19:12:34.567+01:00", "2020-03-19T19:12:34.567+01:00")
         checkEncodeDecode("ÅÄÖ", "%C3%85%C3%84%C3%96")
         checkDecode("Bob%20Tables%25%2FM", "Bob Tables%/M")
         checkDecode("ÅÄÖ", "ÅÄÖ")
@@ -159,6 +162,18 @@ class PathTest {
 
     @Test
     fun `enum`() = checkContract(Path.enum(), "DELETE", DELETE)
+
+    @Test
+    fun `case-insensitive enum`() {
+        val lens = Path.enum<Method>(caseSensitive = false).of("method")
+        assertThat(lens("delete"), equalTo(DELETE))
+    }
+
+    @Test
+    fun `mapped enum`() {
+        val requiredLens = Path.enum(MappedEnum::from, MappedEnum::to).of("whatevs")
+        assertThat(requiredLens("eulav"), equalTo(MappedEnum.value))
+    }
 
     @Test
     fun value() {

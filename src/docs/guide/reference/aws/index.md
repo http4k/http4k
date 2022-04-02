@@ -4,7 +4,7 @@ description: Feature overview of the http4k-aws module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-aws", version: "4.17.2.0"
+implementation group: "org.http4k", name: "http4k-aws", version: "4.25.7.0"
 ```
 
 ### About

@@ -1,0 +1,25 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.SealedChild"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.openapi.v3.SealedChild",
+      "second": {
+        "properties": {
+          "string": {
+            "example": "child",
+            "type": "string"
+          }
+        },
+        "example": {
+          "string": "child"
+        },
+        "type": "object",
+        "required": [
+          "string"
+        ]
+      }
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
+import org.openqa.selenium.By
 import java.io.File
 
 class ByTest {
@@ -16,14 +17,11 @@ class ByTest {
     fun `find by class`() = assertThat(By.className("aClass").findElement(state).text, equalTo("the first text"))
 
     @Test
-    fun `find by id`() = assertThat(By.id("firstId").findElement(state).text, equalTo("the first text"))
+    fun `find by id`() = assertThat(By.id("secondId").findElement(state).text, equalTo("the second text"))
+
+    @Test
+    fun `find by tag name`() = assertThat(By.tagName("themethod").findElement(state).text, equalTo("THEMETHOD"))
 
     @Test
     fun `find by css`() = assertThat(By.cssSelector(".aClass").findElement(state).text, equalTo("the first text"))
-
-    @Test
-    fun `find by disabled css`() = assertThat(By.disabledCssSelector("disabled").findElement(state).text, equalTo("this is a disabled item"))
-
-    @Test
-    fun `find by id using wrong API throws`() = assertThat({ org.openqa.selenium.By.id("firstId").findElement(state) }, throws<ClassCastException>())
 }

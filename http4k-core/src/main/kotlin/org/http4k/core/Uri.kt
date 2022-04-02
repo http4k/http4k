@@ -4,7 +4,6 @@ import org.http4k.appendIfNotBlank
 import org.http4k.appendIfPresent
 import java.net.URLDecoder
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets.UTF_8
 
 data class Uri(val scheme: String, val userInfo: String, val host: String, val port: Int?, val path: String, val query: String, val fragment: String) : Comparable<Uri> {
 
@@ -65,14 +64,36 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 
 fun Uri.removeQuery(name: String) = copy(query = query.toParameters().filterNot { it.first == name }.toUrlFormEncoded())
 
-fun Uri.removeQueries(prefix: String) = copy(query = query.toParameters().filterNot { it.first.startsWith(prefix) }.toUrlFormEncoded())
+fun Uri.removeQueries(prefix: String) =
+    copy(query = query.toParameters().filterNot { it.first.startsWith(prefix) }.toUrlFormEncoded())
 
-fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
+fun Uri.query(name: String, value: String?): Uri =
+    copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
 
-// Use the older encode/decode methods here - this maintains compatibility
-// with JDK-8
-fun String.toPathEncoded() = URLEncoder.encode(this, "UTF-8")
-fun String.toPathDecoded() = URLDecoder.decode(this, "UTF-8")
+/**
+ * @see [RFC 3986, appendix A](https://www.ietf.org/rfc/rfc3986.txt)
+ */
+private val validPathSegmentChars = setOf(
+    '~', '-', '.', '_',                                // unreserved
+    '!', '$', '&', '\'', '(', ')', '+', ',', ';', '=', // sub-delims
+    ':', '@'                                           // valid
+)
+
+private fun Char.isAsciiLetter() = this in 'a'..'z' || this in 'A'..'Z'
+
+private fun Char.isValidSpecialPathSegmentChar() = validPathSegmentChars.contains(this)
+
+fun String.toPathSegmentEncoded(): String =
+    this.map {
+        when {
+            it.isAsciiLetter() || it.isDigit() || it.isValidSpecialPathSegmentChar() -> it
+            it.isWhitespace() -> "%20"
+            else -> URLEncoder.encode(it.toString(), "UTF-8")
+        }
+    }.joinToString(separator = "")
+
+fun String.toPathSegmentDecoded(): String =
+    URLDecoder.decode(this.replace("+", "%2B"), "UTF-8")
 
 fun Uri.extend(uri: Uri): Uri =
     appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())

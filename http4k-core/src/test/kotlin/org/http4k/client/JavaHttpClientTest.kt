@@ -45,4 +45,9 @@ class JavaHttpClientTest : HttpClientContract(
         client(request)
         asServer.stop()
     }
+
+    @Override
+    @Disabled("unsupported - we can't tell the difference between unknown host and connection refused")
+    override fun `unknown host is correctly reported`() {
+    }
 }

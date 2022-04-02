@@ -18,14 +18,15 @@ open class HttpMessageMeta<out T : HttpMessage>(
     val message: T,
     val description: String,
     val definitionId: String?,
-    val example: Any?
+    val example: Any?,
+    val schemaPrefix: String? = null
 )
 
-class RequestMeta(request: Request, definitionId: String? = null, example: Any? = null)
-    : HttpMessageMeta<Request>(request, "request", definitionId, example)
+class RequestMeta(request: Request, definitionId: String? = null, example: Any? = null, schemaPrefix: String? = null)
+    : HttpMessageMeta<Request>(request, "request", definitionId, example, schemaPrefix)
 
-class ResponseMeta(description: String, response: Response, definitionId: String? = null, example: Any? = null)
-    : HttpMessageMeta<Response>(response, description, definitionId, example)
+class ResponseMeta(description: String, response: Response, definitionId: String? = null, example: Any? = null, schemaPrefix: String? = null)
+    : HttpMessageMeta<Response>(response, description, definitionId, example, schemaPrefix)
 
 class RouteMetaDsl internal constructor() {
     var summary: String = "<unknown>"
@@ -80,18 +81,25 @@ class RouteMetaDsl internal constructor() {
      * for this response body which will override the naturally generated one.
      */
     @JvmName("returningStatus")
-    fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>, description: String? = null, definitionId: String? = null) {
+    fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>,
+                      description: String? = null,
+                      definitionId: String? = null,
+                      schemaPrefix: String? = null
+    ) {
         returning(ResponseMeta(description
-            ?: status.description, Response(status).with(body.first of body.second), definitionId, body.second))
+            ?: status.description, Response(status).with(body.first of body.second), definitionId, body.second, schemaPrefix))
     }
 
     /**
      * Add an example request (using a Lens and a value) to this Route. It is also possible to pass in the definitionId
      * for this request body which will override the naturally generated one.
      */
-    fun <T> receiving(body: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
+    fun <T> receiving(body: Pair<BiDiBodyLens<T>, T>,
+                      definitionId: String? = null,
+                      schemaPrefix: String? = null
+    ) {
         requestBody = body.first
-        receiving(RequestMeta(Request(POST, "").with(body.first of body.second), definitionId, body.second))
+        receiving(RequestMeta(Request(POST, "").with(body.first of body.second), definitionId, body.second, schemaPrefix))
     }
 
     /**
