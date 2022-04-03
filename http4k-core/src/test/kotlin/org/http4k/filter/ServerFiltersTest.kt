@@ -42,6 +42,7 @@ import org.http4k.lens.Unsupported
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -224,14 +225,27 @@ class ServerFiltersTest {
     @Test
     fun `catch all exceptions`() {
         val e = RuntimeException("boom!")
-        val handler = ServerFilters.CatchAll(I_M_A_TEAPOT).then { throw e }
+        val handler = ServerFilters.CatchAll().then { throw e }
 
         val response = handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
 
         val sw = StringWriter()
         e.printStackTrace(PrintWriter(sw))
 
-        assertThat(response, hasStatus(I_M_A_TEAPOT).and(hasBody(sw.toString())))
+        assertThat(response, hasStatus(INTERNAL_SERVER_ERROR).and(hasBody(sw.toString())))
+    }
+
+    @Test
+    fun `catch all exceptions but let out just throwables`() {
+        val e = Throwable("boom!")
+        val handler = ServerFilters.CatchAll().then { throw e }
+
+        try {
+            handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
+            fail("Should have leaked throwable")
+        } catch (t: Throwable) {
+            assertThat(t, equalTo(e))
+        }
     }
 
     @Test
