@@ -252,14 +252,17 @@ object ServerFilters {
     }
 
     /**
-     * Last gasp filter which catches all exceptions and invokes `onError`,
-     * which by default returns INTERNAL_SERVER_ERROR.
+     * Last gasp filter which catches all `Throwable`s and invokes `onError`.
+     * The default `onError` is backward compatible with previous implementations,
+     * returning INTERNAL_SERVER_ERROR and a formatted stack trace for `Exception`s,
+     * and leaking other `Throwable`s.
      *
-     * Pass `::originalBehaviour` if you want the old-school dodgy stack trace in the response body.
+     * We suggest that you override this behaviour in public-facing systems to log the
+     * stack trace rather than show it to the world.
      */
     object CatchAll {
         operator fun invoke(
-            onError: (Throwable) -> Response = { Response(INTERNAL_SERVER_ERROR) },
+            onError: (Throwable) -> Response = ::originalBehaviour,
         ): Filter = Filter { next ->
             {
                 try {

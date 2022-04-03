@@ -225,7 +225,7 @@ class ServerFiltersTest {
     @Test
     fun `catch all exceptions`() {
         val e = RuntimeException("boom!")
-        val handler = ServerFilters.CatchAll(ServerFilters.CatchAll::originalBehaviour).then { throw e }
+        val handler = ServerFilters.CatchAll().then { throw e }
 
         val response = handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
 
@@ -238,7 +238,7 @@ class ServerFiltersTest {
     @Test
     fun `catch all exceptions but let out just throwables`() {
         val e = Throwable("boom!")
-        val handler = ServerFilters.CatchAll(ServerFilters.CatchAll::originalBehaviour).then { throw e }
+        val handler = ServerFilters.CatchAll().then { throw e }
 
         try {
             handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
