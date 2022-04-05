@@ -131,6 +131,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **[YAML](https://www.http4k.org/guide/reference/yaml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
             * **Moshi** - includes support for **fully automatic marshalling of Data classes**
+        * **CSV** - includes support for: 
+            * **Jackson** - CSV format for Jackson
 * [Resilience4J:](https://http4k.org/guide/reference/resilience4j) 
     * Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
 * [Micrometer:](https://http4k.org/guide/reference/micrometer) 

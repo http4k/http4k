@@ -53,6 +53,7 @@ include("http4k-contract")
     includeModule("moshi")
     includeModule("moshi-yaml")
     includeModule("xml")
+    includeModule("jackson-csv")
 }
 
 include("http4k-graphql")
