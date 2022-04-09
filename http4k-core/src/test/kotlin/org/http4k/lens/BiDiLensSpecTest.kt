@@ -22,7 +22,7 @@ import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 class BiDiLensSpecTest {
 
@@ -201,6 +201,30 @@ class BiDiLensSpecTest {
         checkContract(spec.duration(), Duration.ofSeconds(35), "PT35S", "", "notathing", "o", "oPT35S", "oPT35SPT35S")
 
     @Test
+    fun zoneId() = checkContract(
+        spec.zoneId(),
+        ZoneId.of("America/Toronto"),
+        "America/Toronto",
+        "",
+        "Nowhere",
+        "o",
+        "oAmerica/Toronto",
+        "oAmerica/TorontoAmerica/Toronto"
+    )
+
+    @Test
+    fun zoneOffset() = checkContract(
+        spec.zoneOffset(),
+        ZoneOffset.of("-04:00"),
+        "-04:00",
+        "",
+        "America/Toronto",
+        "o",
+        "o-04:00",
+        "o-04:00-04:00"
+    )
+
+    @Test
     fun uri() = checkContract(
         spec.uri(),
         Uri.of("http://localhost"),
@@ -252,6 +276,18 @@ class BiDiLensSpecTest {
             throws(lensFailureWith<String>(Missing(requiredLens.meta), overallType = Failure.Type.Missing))
         )
     }
+
+    @Test
+    fun locale() = checkContract(
+        spec.locale(),
+        Locale.CANADA,
+        "en-CA",
+        "",
+        null,
+        "o",
+        "oen-CA",
+        "oen-CAen-CA"
+    )
 
     @Test
     fun `can composite object from several sources and decompose it again`() {
