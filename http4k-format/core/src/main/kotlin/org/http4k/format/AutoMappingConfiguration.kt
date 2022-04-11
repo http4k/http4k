@@ -9,6 +9,7 @@ import org.http4k.lens.StringBiDiMappings.instant
 import org.http4k.lens.StringBiDiMappings.localDate
 import org.http4k.lens.StringBiDiMappings.localDateTime
 import org.http4k.lens.StringBiDiMappings.localTime
+import org.http4k.lens.StringBiDiMappings.locale
 import org.http4k.lens.StringBiDiMappings.offsetDateTime
 import org.http4k.lens.StringBiDiMappings.offsetTime
 import org.http4k.lens.StringBiDiMappings.regexObject
@@ -19,6 +20,8 @@ import org.http4k.lens.StringBiDiMappings.uri
 import org.http4k.lens.StringBiDiMappings.url
 import org.http4k.lens.StringBiDiMappings.uuid
 import org.http4k.lens.StringBiDiMappings.yearMonth
+import org.http4k.lens.StringBiDiMappings.zoneId
+import org.http4k.lens.StringBiDiMappings.zoneOffset
 import org.http4k.lens.StringBiDiMappings.zonedDateTime
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -77,10 +80,13 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(zonedDateTime())
     text(offsetTime())
     text(offsetDateTime())
+    text(zoneId())
+    text(zoneOffset())
     text(eventCategory())
     text(traceId())
     text(samplingDecision())
     text(throwable())
+    text(locale())
     int({ Status(it, "") }, Status::code)
 }
 

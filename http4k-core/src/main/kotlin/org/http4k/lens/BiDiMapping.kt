@@ -19,6 +19,8 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.OffsetTime
 import java.time.YearMonth
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_INSTANT
@@ -28,6 +30,7 @@ import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
+import java.util.Locale
 import java.util.Locale.getDefault
 import java.util.UUID
 
@@ -80,10 +83,13 @@ object StringBiDiMappings {
     fun zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = BiDiMapping({ ZonedDateTime.parse(it, formatter) }, formatter::format)
     fun offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = BiDiMapping({ OffsetTime.parse(it, formatter) }, formatter::format)
     fun offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = BiDiMapping({ OffsetDateTime.parse(it, formatter) }, formatter::format)
+    fun zoneId() = BiDiMapping(ZoneId::of, ZoneId::getId)
+    fun zoneOffset() = BiDiMapping(ZoneOffset::of, ZoneOffset::getId)
     fun eventCategory() = BiDiMapping(::EventCategory, EventCategory::toString)
     fun traceId() = BiDiMapping(::TraceId, TraceId::value)
     fun samplingDecision() = BiDiMapping(::SamplingDecision, SamplingDecision::value)
     fun throwable() = BiDiMapping({ throw Exception(it) }, Throwable::asString)
+    fun locale() = BiDiMapping(Locale::forLanguageTag, Locale::toLanguageTag)
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
     inline fun <reified T : Enum<T>> caseInsensitiveEnum() = BiDiMapping(
         { text -> enumValues<T>().first { it.name.equals(text, ignoreCase = true) } },

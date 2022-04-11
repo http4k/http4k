@@ -24,6 +24,7 @@ import java.time.OffsetTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.util.Locale
 import java.util.UUID
 
 data class CommonJdkPrimitives(
@@ -59,6 +60,7 @@ data class InOnlyHolder(val value: InOnly)
 data class InOnly(val value: String)
 data class ExceptionHolder(val value: Throwable)
 class CustomException(m: String) : RuntimeException(m)
+data class ZonesAndLocale(val zoneId: ZoneId, val zoneOffset: ZoneOffset, val locale: Locale)
 
 class MyValue(value: String) : StringValue(value) {
     companion object : StringValueFactory<MyValue>(::MyValue)
@@ -78,6 +80,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val inputUnknownValue: String
     protected abstract val inputEmptyObject: String
     protected abstract val expectedRegexSpecial: String
+    protected abstract val expectedAutoMarshallingZonesAndLocale: String
 
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
@@ -122,6 +125,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val out = marshaller.asFormatString(obj)
         assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResultPrimitives.normaliseJson()))
         assertThat(marshaller.asA(out, CommonJdkPrimitives::class), equalTo(obj))
+    }
+
+    @Test
+    open fun `roundtrip zones and locale`() {
+        val obj = ZonesAndLocale(zoneId = ZoneId.of("America/Toronto"), zoneOffset = ZoneOffset.of("-04:00"), locale = Locale.CANADA)
+        val out = marshaller.asFormatString(obj)
+        assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingZonesAndLocale.normaliseJson()))
+        assertThat(marshaller.asA(out, ZonesAndLocale::class), equalTo(obj))
     }
 
     @Test
