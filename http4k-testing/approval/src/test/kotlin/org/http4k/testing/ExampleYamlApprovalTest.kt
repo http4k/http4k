@@ -2,7 +2,6 @@ package org.http4k.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_YAML
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET

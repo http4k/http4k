@@ -2,11 +2,9 @@ package org.http4k.routing
 
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
-import org.http4k.sse.Sse
 import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
-import org.http4k.websocket.WsFilter
 
 interface SseRouter {
     fun match(request: Request): SseRouterMatch

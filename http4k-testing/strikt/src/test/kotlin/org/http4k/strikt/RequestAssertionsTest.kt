@@ -6,16 +6,6 @@ import org.http4k.core.body.form
 import org.http4k.format.Jackson
 import org.http4k.lens.Header
 import org.http4k.lens.Query
-import org.http4k.strikt.body
-import org.http4k.strikt.bodyString
-import org.http4k.strikt.form
-import org.http4k.strikt.header
-import org.http4k.strikt.headerValues
-import org.http4k.strikt.jsonBody
-import org.http4k.strikt.method
-import org.http4k.strikt.queries
-import org.http4k.strikt.query
-import org.http4k.strikt.uri
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo

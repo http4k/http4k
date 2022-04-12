@@ -10,7 +10,6 @@ import org.http4k.serverless.FnLoader
 import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.lang.IllegalStateException
 
 class LambdaServerlessCoreExtensionsTest {
 

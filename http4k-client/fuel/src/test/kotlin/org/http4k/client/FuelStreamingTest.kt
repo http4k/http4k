@@ -1,7 +1,6 @@
 package org.http4k.client
 
-import org.http4k.core.BodyMode
-import org.http4k.core.BodyMode.*
+import org.http4k.core.BodyMode.Stream
 import org.http4k.server.ApacheServer
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

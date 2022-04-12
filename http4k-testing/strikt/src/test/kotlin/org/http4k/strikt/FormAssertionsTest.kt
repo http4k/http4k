@@ -2,7 +2,6 @@ package org.http4k.strikt
 
 import org.http4k.lens.FormField
 import org.http4k.lens.WebForm
-import org.http4k.strikt.field
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo

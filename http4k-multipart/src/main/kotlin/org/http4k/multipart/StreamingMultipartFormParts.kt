@@ -11,7 +11,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.lang.String.CASE_INSENSITIVE_ORDER
 import java.nio.charset.Charset
-import java.util.NoSuchElementException
 import java.util.TreeMap
 
 /**

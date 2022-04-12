@@ -31,7 +31,6 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.server.ServerConfig
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.util.Locale.getDefault

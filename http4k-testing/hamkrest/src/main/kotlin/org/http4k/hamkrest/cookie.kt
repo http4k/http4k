@@ -7,7 +7,6 @@ import com.natpryce.hamkrest.present
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.SameSite
 import java.time.Instant
-import java.time.LocalDateTime
 
 fun hasCookieName(expected: CharSequence): Matcher<Cookie> = has(Cookie::name, equalTo(expected))
 

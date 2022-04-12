@@ -22,7 +22,8 @@ import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 
 class BiDiLensSpecTest {
 

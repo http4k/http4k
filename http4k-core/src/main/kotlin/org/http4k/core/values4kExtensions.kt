@@ -4,7 +4,6 @@ import dev.forkhandles.values.AbstractValue
 import dev.forkhandles.values.Validation
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
-import java.util.UUID
 
 /**
  * Custom values4k extensions.

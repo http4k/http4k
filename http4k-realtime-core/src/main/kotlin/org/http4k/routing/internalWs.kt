@@ -2,7 +2,8 @@ package org.http4k.routing
 
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
-import org.http4k.routing.WsRouterMatch.*
+import org.http4k.routing.WsRouterMatch.MatchingHandler
+import org.http4k.routing.WsRouterMatch.Unmatched
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsFilter
