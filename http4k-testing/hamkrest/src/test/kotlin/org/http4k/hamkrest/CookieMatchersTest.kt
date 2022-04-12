@@ -8,8 +8,6 @@ import org.http4k.core.cookie.SameSite.Strict
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 
 class CookieMatchersTest {
     @Test

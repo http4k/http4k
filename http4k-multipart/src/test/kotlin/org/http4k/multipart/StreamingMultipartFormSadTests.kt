@@ -8,7 +8,6 @@ import com.natpryce.hamkrest.present
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import java.util.NoSuchElementException
 
 class StreamingMultipartFormSadTests {
 

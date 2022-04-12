@@ -13,8 +13,8 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.Nonce
 import org.http4k.security.NonceVerifier
-import org.http4k.security.digest.DigestEncoder
 import org.http4k.security.digest.DigestCredential
+import org.http4k.security.digest.DigestEncoder
 import org.http4k.security.digest.Qop
 import org.http4k.util.Hex
 import org.junit.jupiter.api.Test

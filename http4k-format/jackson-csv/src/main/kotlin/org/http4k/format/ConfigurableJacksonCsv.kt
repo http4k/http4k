@@ -5,7 +5,11 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.lens.*
+import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.httpBodyRoot
 import java.io.StringWriter
 import kotlin.reflect.KClass
 

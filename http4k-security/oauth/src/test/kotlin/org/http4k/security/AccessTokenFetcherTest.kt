@@ -11,8 +11,8 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.security.OAuthWebForms.responseForm
 import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
+import org.http4k.security.OAuthWebForms.responseForm
 import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.openid.IdToken
 import org.junit.jupiter.api.Test

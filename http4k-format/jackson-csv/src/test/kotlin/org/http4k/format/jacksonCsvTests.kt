@@ -21,7 +21,7 @@ import java.time.OffsetTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 @JsonPropertyOrder(value = [ "string", "numbers", "bool"])
 data class CsvArbObject(val string: String, val numbers: List<Int>, val bool: Boolean)

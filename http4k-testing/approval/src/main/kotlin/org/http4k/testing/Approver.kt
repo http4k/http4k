@@ -10,7 +10,6 @@ import org.http4k.core.Status
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.opentest4j.AssertionFailedError
 import java.io.InputStream
-import java.io.OutputStream
 
 /**
  * Coordinates the comparison of the content for a test.

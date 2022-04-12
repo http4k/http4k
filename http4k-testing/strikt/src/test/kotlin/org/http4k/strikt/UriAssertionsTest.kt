@@ -1,10 +1,6 @@
 package org.http4k.strikt
 
 import org.http4k.core.Uri
-import org.http4k.strikt.authority
-import org.http4k.strikt.host
-import org.http4k.strikt.port
-import org.http4k.strikt.query
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo

@@ -2,7 +2,6 @@ package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.squareup.moshi.Moshi
-import okio.Okio
 import okio.buffer
 import okio.source
 import org.http4k.core.RequestContexts

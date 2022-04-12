@@ -10,7 +10,7 @@ import org.apache.hc.core5.http.impl.bootstrap.HttpServer
 import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap
 import org.apache.hc.core5.http.io.HttpRequestHandler
 import org.apache.hc.core5.http.io.SocketConfig
-import org.apache.hc.core5.http.io.entity.EmptyInputStream.*
+import org.apache.hc.core5.http.io.entity.EmptyInputStream.INSTANCE
 import org.apache.hc.core5.http.io.entity.InputStreamEntity
 import org.apache.hc.core5.http.protocol.HttpContext
 import org.apache.hc.core5.http.protocol.HttpCoreContext
