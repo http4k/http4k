@@ -18,6 +18,7 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.time.Duration
+import java.time.Duration.ZERO
 import java.time.Duration.ofSeconds
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
@@ -27,6 +28,7 @@ class CachingFiltersTest {
     private val clock = FixedClock
     private val maxAge = ofSeconds(10)
     private val timings = DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(ofSeconds(2000)), StaleWhenRevalidateTtl(ofSeconds(3000)))
+    private val timingsWithZeroValues = DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(ZERO), StaleWhenRevalidateTtl(ZERO))
 
     private val request = org.http4k.core.Request(GET, "")
     private val response = Response(OK)
@@ -67,6 +69,14 @@ class CachingFiltersTest {
         assertThat(response, hasHeader("Cache-Control", listOf("rita")))
         assertThat(response, hasHeader("Expires", listOf("sue")))
         assertThat(response, hasHeader("Vary", listOf("bob")))
+    }
+
+    @Test
+    fun `FallbackCacheControl - renders cache header correctly if some directives have an empty Duration`() {
+        val responseWithHeaders = Response(OK)
+        val response = getResponseWith(timingsWithZeroValues, responseWithHeaders)
+
+        assertThat(response, hasHeader("Cache-Control", listOf("public, max-age=10")))
     }
 
     @Test
