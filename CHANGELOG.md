@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.25.8.0
+### v4.25.9.0
 - **http4k-*** : Upgrade some dependency versions, including Ktor to v2.0.0/
 - **http4k-format-jackson-csv*** : New module! H/T @oharaandrew314 for the contribution.
 - **http4k-core**: New standard mappings for Time primitives.  H/T @oharaandrew314
