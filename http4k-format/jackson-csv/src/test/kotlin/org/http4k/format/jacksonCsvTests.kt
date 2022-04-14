@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.JacksonCsv.auto
@@ -23,7 +23,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.UUID
 
-@JsonPropertyOrder(value = [ "string", "numbers", "bool"])
+@JsonPropertyOrder(value = ["string", "numbers", "bool"])
 data class CsvArbObject(val string: String, val numbers: List<Int>, val bool: Boolean)
 
 class JacksonCsvBodyTest {
@@ -38,7 +38,7 @@ class JacksonCsvBodyTest {
         )
 
         assertThat(
-            lens(Response(Status.OK).with(lens of objects)),
+            lens(Response(OK).with(lens of objects)),
             equalTo(objects)
         )
     }
@@ -53,7 +53,7 @@ class JacksonCsvBodyTest {
         val objects = listOf(InterfaceImpl(), InterfaceImpl())
 
         assertThat(
-            Response(Status.OK).with(lens of objects).bodyString(),
+            Response(OK).with(lens of objects).bodyString(),
             equalTo("value\nhello\nhello\n")
         )
     }
@@ -75,7 +75,7 @@ class JacksonCsvBodyTest {
             UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
             Uri.of("http://uri:8000"),
             URL("http://url:9000"),
-            Status.OK
+            OK
         )
 
         val csv =
@@ -86,7 +86,7 @@ PT1S,1970-01-01T00:00:00Z,2000-01-01,2000-01-01T01:01:01,01:01:01,2000-01-01T01:
         val lens = Body.auto<CommonJdkPrimitives>().toLens()
 
         assertThat(
-            Response(Status.OK).with(lens of listOf(obj)).bodyString(),
+            Response(OK).with(lens of listOf(obj)).bodyString(),
             equalTo(csv)
         )
     }
