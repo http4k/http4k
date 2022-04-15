@@ -284,7 +284,7 @@ class BiDiLensSpecTest {
         Locale.CANADA,
         "en-CA",
         "",
-        null,
+        "en_CA", // java cannot parse ISO language codes
         "o",
         "oen-CA",
         "oen-CAen-CA"
