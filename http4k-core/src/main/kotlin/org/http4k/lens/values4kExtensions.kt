@@ -6,7 +6,7 @@ import dev.forkhandles.values.ValueFactory
 /**
  * Custom lens for mapping Path to values4k Value
  */
-fun <VALUE : Value<T>, T : Any> Path.value(vf: ValueFactory<VALUE, T>) = map(vf::parse, vf::show)
+fun <VALUE : Value<T>, T : Any> BiDiPathLensSpec<String>.value(vf: ValueFactory<VALUE, T>) = map(vf::parse, vf::show)
 
 /**
  * Custom lens for mapping to values4k Value
