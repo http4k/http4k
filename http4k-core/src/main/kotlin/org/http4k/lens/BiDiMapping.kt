@@ -89,7 +89,10 @@ object StringBiDiMappings {
     fun traceId() = BiDiMapping(::TraceId, TraceId::value)
     fun samplingDecision() = BiDiMapping(::SamplingDecision, SamplingDecision::value)
     fun throwable() = BiDiMapping({ throw Exception(it) }, Throwable::asString)
-    fun locale() = BiDiMapping(Locale::forLanguageTag, Locale::toLanguageTag)
+    fun locale() = BiDiMapping(
+        { s -> Locale.forLanguageTag(s).takeIf { it.language.isNotEmpty() } ?: throw IllegalArgumentException("Could not parse IETF locale") },
+        Locale::toLanguageTag
+    )
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
     inline fun <reified T : Enum<T>> caseInsensitiveEnum() = BiDiMapping(
         { text -> enumValues<T>().first { it.name.equals(text, ignoreCase = true) } },
