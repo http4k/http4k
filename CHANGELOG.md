@@ -5,6 +5,9 @@ changes with their rationale when appropriate:
 
 ### v4.25.10.0 (uncut)
 - **http4k-core** : Expand out values4k lens option
+- **http4k-core** : Allow cookie values to be returned unquoted H/T @2x2xplz
+- **http4k-format-*** : Throw a lens failure if a valid locale was not parsed H/T @oharaandrew314
+- **http4k-opentelemetry** : Fix #726 - OpenTelemetry: t.localizedMessage can't be null
 
 ### v4.25.9.0
 - **http4k-*** : Upgrade some dependency versions, including Ktor to v2.0.0
