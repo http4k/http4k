@@ -5,6 +5,7 @@ import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.v3.ApiServer
 import org.http4k.contract.openapi.v3.OpenApi3
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.Body
@@ -15,6 +16,7 @@ import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.CachingFilters.Response.NoCache
@@ -57,7 +59,11 @@ fun main() {
     val mySecurity = ApiKeySecurity(Query.int().required("apiKey"), { it == 42 })
 
     val contract = contract {
-        renderer = OpenApi3(ApiInfo("my great api", "v1.0"), Argo)
+        renderer = OpenApi3(
+            ApiInfo("my great api", "v1.0"),
+            Argo,
+            servers = listOf(ApiServer(Uri.of("http://localhost:8000"), "the greatest server"))
+        )
         descriptionPath = "/docs/swagger.json"
         security = mySecurity
 

@@ -125,7 +125,9 @@ object CachingFilters {
 
                 fun addDefaultCacheHeadersIfAbsent(response: org.http4k.core.Response) =
                     addDefaultHeaderIfAbsent(response, "Cache-Control") {
-                        listOf("public", defaultCacheTimings.maxAge.toHeaderValue(), defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(), defaultCacheTimings.staleIfErrorTtl.toHeaderValue()).joinToString(", ")
+                        listOf("public", defaultCacheTimings.maxAge.toHeaderValue(), defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(), defaultCacheTimings.staleIfErrorTtl.toHeaderValue())
+                            .filter { it != "" }
+                            .joinToString(", ")
                     }
                         .let { addDefaultHeaderIfAbsent(it, "Expires") { RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(defaultCacheTimings.maxAge.value)) } }
                         .let { addDefaultHeaderIfAbsent(it, "Vary") { "Accept-Encoding" } }

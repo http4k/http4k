@@ -14,7 +14,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.core.toPathDecoded
+import org.http4k.core.toPathSegmentDecoded
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
@@ -89,7 +89,7 @@ private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? 
 private fun PathSegments.extract(lenses: List<PathLens<*>>): ExtractedParts? =
     when (toList().size) {
         lenses.size -> ExtractedParts(
-            lenses.mapIndexed { i, lens -> lens to this(i) { lens(it.toPathDecoded()) } }.toMap()
+            lenses.mapIndexed { i, lens -> lens to this(i) { lens(it.toPathSegmentDecoded()) } }.toMap()
         )
         else -> null
     }

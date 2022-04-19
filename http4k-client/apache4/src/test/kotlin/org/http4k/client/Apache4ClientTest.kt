@@ -32,8 +32,10 @@ class Apache4ClientTest : HttpClientContract(
     @Test
     fun `connect timeout is handled`() {
         assertThat(Apache4Client(object : CloseableHttpClient() {
+            @Deprecated("Deprecated in Java", ReplaceWith("TODO(\"not implemented\")"))
             override fun getParams() = TODO("not implemented")
 
+            @Deprecated("Deprecated in Java", ReplaceWith("TODO(\"not implemented\")"))
             override fun getConnectionManager() = TODO("not implemented")
 
             override fun doExecute(

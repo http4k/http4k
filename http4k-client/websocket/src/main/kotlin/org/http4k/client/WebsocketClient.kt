@@ -13,9 +13,13 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.java_websocket.drafts.Draft
 import org.java_websocket.drafts.Draft_6455
+import org.java_websocket.exceptions.WebsocketNotConnectedException
 import java.time.Duration
 import java.time.Duration.ZERO
+import java.time.Duration.of
+import java.time.temporal.ChronoUnit.SECONDS
 import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
 
 object WebsocketClient {
@@ -34,12 +38,17 @@ object WebsocketClient {
 
     /**
      * Provides a client-side WsClient connected to a remote Websocket. This is a blocking API, so accessing the sequence of "received"
-     * messages will block on iteration until all messages are received (or the socket it closed). This call will also
+     * messages will block on iteration until all messages are received (or the socket is closed). This call will also
      * block while connection happens.
      */
-    fun blocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO, autoReconnection: Boolean = false, draft: Draft = Draft_6455()): WsClient {
+    fun blocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = of(5, SECONDS), autoReconnection: Boolean = false, draft: Draft = Draft_6455()): WsClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
-        val client = BlockingQueueClient(uri, headers, timeout, draft, queue).apply { connectBlocking() }
+        val client = BlockingQueueClient(uri, headers, timeout, draft, queue)
+            .apply {
+                if(!connectBlocking(timeout.toMillis(), MILLISECONDS)){
+                    throw WebsocketNotConnectedException()
+                }
+            }
         return BlockingWsClient(queue, client, autoReconnection)
     }
 }

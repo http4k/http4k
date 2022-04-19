@@ -3,6 +3,7 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.UriTemplate.Companion.from
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class UriTemplateTest {
@@ -13,7 +14,7 @@ class UriTemplateTest {
 
         assertThat(
             template.generate(pathParameters(pair("name", "a name with spaces"))),
-            equalTo("properties/a+name+with+spaces"))
+            equalTo("properties/a%20name%20with%20spaces"))
 
         assertThat(
             template.generate(pathParameters(pair("name", "a/name/with/slashes"))),
@@ -91,7 +92,7 @@ class UriTemplateTest {
     @Test
     fun canExtractFromUriWithEncodedSpace() {
         val template = from("path/{id1}")
-        assertThat(template.extract("path/foo+bar").getValue("id1"), equalTo("foo bar"))
+        assertThat(template.extract("path/foo%20bar").getValue("id1"), equalTo("foo bar"))
     }
 
     @Test
@@ -108,7 +109,7 @@ class UriTemplateTest {
     }
 
     @Test
-    fun matchedValuesAreUrlDecoded() {
+    fun matchedValuesArePathDecoded() {
         val extracted = from("path/{band}").extract("path/Earth%2C%20Wind%20%26%20Fire")
         assertThat(extracted.getValue("band"), equalTo("Earth, Wind & Fire"))
     }
@@ -130,6 +131,13 @@ class UriTemplateTest {
     fun doesNotMatchEmptyPathSegment() {
         assertThat(from("/foo/{bar:.*}").matches("/foo/bar"), equalTo(true))
         assertThat(from("/foo/{bar:.*}").matches("/foo"), equalTo(false))
+    }
+
+    @Test
+    @Disabled
+    fun greedyQualifiersAreNotReplaced() {
+         val patternWithGreedyQualifier = "[a-z]{3}"
+        assertThat(from("/foo/{bar:$patternWithGreedyQualifier}").matches("/foo/abc"), equalTo(true))
     }
 
     private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)

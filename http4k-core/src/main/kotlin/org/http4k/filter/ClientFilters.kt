@@ -27,6 +27,7 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.security.CredentialsProvider
 import java.time.Clock
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -128,11 +129,13 @@ object ClientFilters {
             { req ->
                 provider()
                     ?.let {
-                        next(req.header(header, "Basic ${it.base64Encoded()}"))
+                        next(req.withBasicAuth(it, header))
                     }
                     ?: Response(UNAUTHORIZED)
             }
         }
+
+        fun Request.withBasicAuth(it: Credentials, header: String) = header(header, "Basic ${it.base64Encoded()}")
 
         operator fun invoke(header: String, provider: CredentialsProvider<Credentials>) =
             CustomBasicAuth(header, provider::invoke)
@@ -209,7 +212,7 @@ object ClientFilters {
             storage: CookieStorage = BasicCookieStorage()
         ): Filter = Filter { next ->
             { request ->
-                val now = clock.now()
+                val now = clock.instant()
                 removeExpired(now, storage)
                 val response = next(request.withLocalCookies(storage))
                 storage.store(response.cookies().map { LocalCookie(it, now) })
@@ -221,7 +224,7 @@ object ClientFilters {
             .map { it.cookie }
             .fold(this) { r, cookie -> r.cookie(cookie.name, cookie.value) }
 
-        private fun removeExpired(now: LocalDateTime, storage: CookieStorage) =
+        private fun removeExpired(now: Instant, storage: CookieStorage) =
             storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
 
         private fun Clock.now() = LocalDateTime.ofInstant(instant(), ZoneOffset.UTC)

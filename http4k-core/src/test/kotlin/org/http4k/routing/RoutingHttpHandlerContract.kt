@@ -9,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -52,6 +53,15 @@ abstract class RoutingHttpHandlerContract {
     @Test
     open fun `with filter - applies when not found`() {
         val filtered = handler.withFilter(filterAppending("foo"))
+        val request = Request(GET, "/not-found").header("host", "host")
+
+        assertThat(filtered.matchAndInvoke(request), absent())
+        assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody))
+    }
+
+    @Test
+    open fun `stacked filter application - applies when not found`() {
+        val filtered = filterAppending("foo").then(routes(handler))
         val request = Request(GET, "/not-found").header("host", "host")
 
         assertThat(filtered.matchAndInvoke(request), absent())

@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.present
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.SameSite
-import java.time.LocalDateTime
+import java.time.Instant
 
 fun hasCookieName(expected: CharSequence): Matcher<Cookie> = has(Cookie::name, equalTo(expected))
 
@@ -25,8 +25,8 @@ fun isSecureCookie(expected: Boolean = true): Matcher<Cookie> = has("secure", { 
 
 fun isHttpOnlyCookie(expected: Boolean = true): Matcher<Cookie> = has("httpOnly", { c: Cookie -> c.httpOnly }, equalTo(expected))
 
-fun hasCookieExpiry(expected: LocalDateTime): Matcher<Cookie> = hasCookieExpiry(equalTo(expected))
+fun hasCookieExpiry(expected: Instant): Matcher<Cookie> = hasCookieExpiry(equalTo(expected))
 
-fun hasCookieExpiry(matcher: Matcher<LocalDateTime>): Matcher<Cookie> = has("expiry", { c: Cookie -> c.expires!! }, matcher)
+fun hasCookieExpiry(matcher: Matcher<Instant>): Matcher<Cookie> = has("expiry", { c: Cookie -> c.expires!! }, matcher)
 
 fun hasCookieSameSite(expected: SameSite): Matcher<Cookie> = has("sameSite", { c: Cookie -> c.sameSite }, equalTo(expected))

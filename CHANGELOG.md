@@ -3,6 +3,169 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.10.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Expand out values4k lens option
+- **http4k-core** : Allow cookie values to be returned unquoted H/T @2x2xplz
+- **http4k-format-*** : Throw a lens failure if a valid locale was not parsed H/T @oharaandrew314
+- **http4k-opentelemetry** : Fix #726 - OpenTelemetry: t.localizedMessage can't be null
+
+### v4.25.9.0
+- **http4k-*** : Upgrade some dependency versions, including Ktor to v2.0.0
+- **http4k-format-jackson-csv*** : New module! H/T @oharaandrew314 for the contribution.
+- **http4k-core**: New standard mappings for Time primitives.  H/T @oharaandrew314
+
+### v4.25.8.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.20.
+- **http4k-core**: Enable overridable behaviour for CatchAll filter. H/T @dcmg
+- **http4k-multipart**: Add disk cache path to MultipartFormBody.from() parameters. H/T @rny
+
+### v4.25.7.0
+- **http4k-client-fuel**: New Module! An http4k client based on [Fuel](https://github.com/kittinunf/Fuel) with both sync and async support. 
+
+### v4.25.6.0
+- **http4k-*** : Upgrade some dependency versions, including Jackson to overcome CVE-2020-36518.
+
+### v4.25.5.2
+- **http4k-contract**: Don't output required fields into OpenAPI if there are none.
+
+### v4.25.5.1
+- **http4k-contract**: Small tweak to internal API
+
+### v4.25.5.0
+- **http4k-contract**: Add format OpenApi hints to Arrays and Maps
+
+### v4.25.4.1
+- **http4k-contract**: Remove println from AutoJsonToJsonSchema. Doh!
+
+### v4.25.4.0
+- **http4k-format-***: Correctly identify integer and number JSON types. This has a knock on effect in OpenApi specifications.
+
+### v4.25.3.0
+- **http4k-serverless-tencent** : Downgrade events library as is insecure.
+
+### v4.25.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: Values4k metadata population for OpenApi3 specifications (via Values4kFieldMetadataRetrievalStrategy).
+
+### v4.25.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: Values4k metadata population for OpenApi3 specifications (via Values4kFieldMetadataRetrievalStrategy).
+
+### v4.25.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** [Breaking]: Rename `OauthCallbackError` to `OAuthCallbackError`
+
+### v4.24.0.0 
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-webdriver*** : [Breaking] Upgrade of webdriver to V4 has changed the APIS. The custom `By` implementation is no longer required so you can use the inbuilt Selenium version instead. The disabledCssSelector By implementation has been removed, although you can simply replicate this using the existing CSS selector model.
+
+### v4.23.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: Support OA3 meta fields on properties if they are populated by a custom annotation. 
+- **http4k-graphql** : [Possible breaks] Due to upgrade of underlying graphql lib.
+
+### v4.22.0.1
+- **http4k-security-oauth**: Fix error messages for oauth callback failures
+
+### v4.22.0.0
+- **http4k-security-oauth** [Breaking]: apiBase path is now preserved when building auth and token uris  
+- **http4k-security-oauth** [Breaking]: provide reason when an oauth callback fails  
+- **http4k-security-oauth** [Breaking]: allow id token consumer to fail authentication flow  
+
+### v4.21.1.1
+- **http4k-contract**: OpenApi3 - Expose new prefix-overriding in OpenApi definitions.
+
+### v4.21.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract**: OpenApi3 - Ability to provide prefixes for all models in a tree. This allows you to have multiple versions of a single model in the specification (at the cost of duplicated schema models).
+
+### v4.21.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core**: [Breaking] All metrics now include `path` when labelled and routed. For consistency, `.` in path names are now convert to underscores as well. Regexes are also removed from paths on both client and server. H/T @hektorKS
+- **http4k-testing-strikt**: Fix #709 - Strikt assertion builder for Uri.path H/T @michaelbannister
+
+### v4.20.2.0
+- **http4k-contract**: OpenApi3 - Don't add required field if no fields are required!
+
+### v4.20.1.0
+- **http4k-contract**: Fix #706: Form "multi" lens's do not render an items field in contracts.
+- **http4k-testing-chaos**: ChaoticHttpHandler disables Chaos API when reflection not available.
+
+### v4.20.0.0
+- **http4k-core**: Fix #704: Filters are recreated on every request/ H/T @hektorKS
+- **http4k-core**: Fix #702: TrafficFilters.ReplayFrom doesn't correctly read from Replay.
+- **http4k-server-netty**: Fix #703: Netty: null cannot be cast to non-null type java.net.InetSocketAddress
+- **http4k-client-apache-async**: Remove usage of deprecated API
+- **http4k-client-jetty**: Remove usage of deprecated API
+- **http4k-testing-webdriver**: Remove usage of deprecated (internal) API
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.19.5.0
+- **http4k-client-websocket** : Apply a timeout when creating a blocking client websocket connection
+
+### v4.19.4.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.19.3.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-opentelemetry** : Fixes #697: Upgraded OpenTelemetry version to 1.11.0 H/T @jenarros
+
+### v4.19.2.0
+- **http4k-server-jetty** : Replace conscrypt with internal java for ALPN server
+
+### v4.19.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Added ContentDispositionAttachment server filter. H/T @jenarros
+- **http4k-core** : Fix path conversion for static routing handlers with trailing. H/T @jenarros
+- **http4k-contract** : Support non-JSON schema types in request definitions.
+
+### v4.19.0.0
+- **http4k-core** : [Potential Break] Fix #693 Cookie implementation uses LocalDateTime val which is implicitly turned into GMT time for cookie. Break is that Cookies now run from Instant instead of LocalDateTime. Thanks to @maedjyuk-ghoti for alerting us to chase down this 5y+ standing bug!
+- **http4k-security-oauth** : Fixes to the `InsecureCookieBasedOAuthPersistence` to make it more user-friendly.
+- **http4k-server-netty** : Keep-alive for Netty when not streaming. H/T @jakubjanecek for the contrib!
+
+### v4.18.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Fixed URLPathSegment encoding/decoding based on RFC 3986. H/T @jenarros for the thoughtful and through contribution!
+
+### v4.17.9.0
+- **http4k-core** : Added mapping for enum() in lenses.
+
+### v4.17.8.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Fix #687 - OpenApiV3 object serialization. H/T @lawkai 
+
+### v4.17.7.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi-yaml** : Fix for serialising Maps with null values (the key should still be rendered!)
+- **http4k-format-moshi-yaml** : Remove accidental stack trace dump.
+
+### v4.17.6.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi-yaml** : New module! YAML marshalling with zero-reflection is now possible due to a combination of Moshi and SnakeYaml
+- **http4k-core** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
+- **http4k-format-jackson-xml** : Add autoBody for ConfigurableJacksonXml. H/T @oharaandrew314
+
+### v4.17.5.0
+- **http4k-*** : Upgrade some dependency versions, including ForkHandles to 2.0.0.0.
+- **http4k-core** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
+
+### v4.17.4.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.10
+- **http4k-incubator** : Playing with TracerBullets... a generic interface for building TraceTrees from lists of MetadataEvents.
+
+### v4.17.3.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-approval** : Fix #679. Approval tests delete actual when passing.
+
+### v4.17.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Added Servers to OpenApi renderer. H/T @zsambek and @MarcusDunn for making it happen.
+
+### v4.17.1.0
+- **http4k-core** : Make timeouts configurable for `Java8HttpClient`.
+
 ### v4.17.0.0
 - **http4k-*** : [Careful] Upgrade some dependency versions, including Kotlin to 1.6.0.
 - **http4k-*** : [Breaking] Removal of all previously deprecated methods and types. To ensure you get the smoothest experience, please upgrade to v4.16.3.0 first, deal with the replacements and then upgrade to 4.17.0.0
@@ -1764,7 +1927,7 @@ to `RequestContextKey.of()` with `RequestContextKey.required()`
 - Fix for #24 - UriTemplate captures query parameters when the trailing path parameter is a regex.
 
 ### v2.1.0
-- Added GSON full-auto functions to convert arbitary objects to/from JSON.
+- Added GSON full-auto functions to convert arbitrary objects to/from JSON.
 
 ### v2.0.5
 - Fix #23. Contract now supports multi-part URL params (for hardcoded parts)

@@ -2,22 +2,43 @@ package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
+import org.http4k.core.Uri
 import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ArrayParam
+import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.util.JsonSchema
 
-data class Api<NODE>(
+data class Api<NODE> private constructor(
     val info: ApiInfo,
     val tags: List<Tag>,
+    val servers: List<ApiServer>,
     val paths: Map<String, Map<String, ApiPath<NODE>>>,
     val components: Components<NODE>
 ) {
+    init {
+        require(servers.isNotEmpty())
+        { "openAPI spec requires not-null and non-empty servers. See: https://swagger.io/specification/#openapi-object " }
+    }
+
+    constructor(
+        info: ApiInfo,
+        tags: List<Tag>,
+        paths: Map<String, Map<String, ApiPath<NODE>>>,
+        components: Components<NODE>,
+        servers: List<ApiServer>
+    ) : this(info, tags, servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) }, paths, components)
+
     val openapi = "3.0.0"
 }
 
 data class Components<NODE>(
     val schemas: NODE,
     val securitySchemes: NODE
+)
+
+data class ApiServer(
+    val url: Uri,
+    val description: String? = null
 )
 
 sealed class ApiPath<NODE>(
@@ -69,7 +90,8 @@ sealed class BodyContent {
 
     data class NoSchema<NODE : Any>(val schema: NODE, val example: String? = null) : BodyContent()
 
-    class SchemaContent<NODE : Any>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(), HasSchema<NODE> {
+    class SchemaContent<NODE : Any>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(),
+        HasSchema<NODE> {
         val schema = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
     }
@@ -90,13 +112,22 @@ sealed class BodyContent {
     class FormContent(val schema: FormSchema) : BodyContent() {
         class FormSchema(metas: List<Meta>) {
             val type = "object"
-            val properties = metas.map {
-                it.name to mapOf(
-                    "type" to it.paramMeta.value,
-                    "format" to it.paramMeta.takeIf { it == ParamMeta.FileParam }?.let { "binary" },
-                    "description" to it.description
-                ).filter { it.value != null }
-            }.toMap()
+            val properties = metas.associate {
+                val paramMeta = it.paramMeta
+                val listOfNotNull = listOfNotNull(
+                    "type" to paramMeta.value,
+                    paramMeta.takeIf { it == FileParam }?.let { "format" to "binary" },
+                    it.description?.let { "description" to it },
+                    if (paramMeta is ArrayParam) "items" to mapOf(
+                        *listOfNotNull(
+                            "type" to paramMeta.itemType().value,
+                            paramMeta.itemType().takeIf { it == FileParam }
+                                ?.let { "format" to "binary" }).toTypedArray()
+                    )
+                    else null
+                )
+                it.name to listOfNotNull.toMap()
+            }
             val required = metas.filter(Meta::required).map { it.name }
         }
     }
@@ -111,17 +142,25 @@ class RequestContents<NODE>(val content: Map<String, BodyContent>? = null) : Has
     val required = content != null
 }
 
-class ResponseContents<NODE>(val description: String?, val content: Map<String, BodyContent> = emptyMap()) : HasSchema<NODE> {
+class ResponseContents<NODE>(val description: String?, val content: Map<String, BodyContent> = emptyMap()) :
+    HasSchema<NODE> {
     override fun definitions() = content.values
         .filterIsInstance<HasSchema<NODE>>()
         .flatMap { it.definitions() }.toSet()
 }
 
-sealed class RequestParameter<NODE>(val `in`: String, val name: String, val required: Boolean, val description: String?) {
-    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : RequestParameter<NODE>(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
+sealed class RequestParameter<NODE>(
+    val `in`: String,
+    val name: String,
+    val required: Boolean,
+    val description: String?
+) {
+    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) :
+        RequestParameter<NODE>(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
         val schema: NODE? = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
     }
 
-    class PrimitiveParameter<NODE>(meta: Meta, val schema: NODE) : RequestParameter<NODE>(meta.location, meta.name, meta.required, meta.description)
+    class PrimitiveParameter<NODE>(meta: Meta, val schema: NODE) :
+        RequestParameter<NODE>(meta.location, meta.name, meta.required, meta.description)
 }

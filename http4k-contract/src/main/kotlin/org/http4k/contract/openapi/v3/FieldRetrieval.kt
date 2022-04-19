@@ -25,7 +25,7 @@ class SimpleLookup(
 ) : FieldRetrieval {
     override fun invoke(target: Any, name: String): Field {
         val fields = try {
-            target::class.memberProperties.map { renamingStrategy(it.name) to it }.toMap()
+            target::class.memberProperties.associateBy { renamingStrategy(it.name) }
         } catch (e: Error) {
             emptyMap<String, KProperty1<out Any, Any?>>()
         }
@@ -37,23 +37,24 @@ class SimpleLookup(
                     ?.let { it to field.returnType.isMarkedNullable }
                     ?: fields[name]?.javaField?.takeIf { it.trySetAccessible() }?.get(target)?.let { it to true }
             }
-            ?.let { Field(it.first, it.second, metadataRetrievalStrategy(target, name)) } ?: throw NoFieldFound(name, target)
+            ?.let { Field(it.first, it.second, metadataRetrievalStrategy(target, name)) } ?: throw NoFieldFound(
+            name,
+            target
+        )
     }
 }
 
-data class FieldMetadata(val description: String?, val extra: Map<String, Any> = emptyMap()) {
+data class FieldMetadata(val extra: Map<String, Any?> = emptyMap()) {
+    constructor(vararg pairs: Pair<String, Any?>) : this(pairs.toMap())
+
+    operator fun plus(that: FieldMetadata) = FieldMetadata(extra + that.extra)
+
     companion object {
-        val empty: FieldMetadata = FieldMetadata(description = null)
+        val empty: FieldMetadata = FieldMetadata()
     }
 }
 
-fun interface FieldMetadataRetrievalStrategy : (Any, String) -> FieldMetadata
-
-class NoOpFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
-    override fun invoke(target: Any, fieldName: String): FieldMetadata =
-        FieldMetadata.empty
-}
-
-class NoFieldFound(name: String, target: Any, cause: Throwable? = null) : RuntimeException("Could not find $name in $target", cause)
+class NoFieldFound(name: String, target: Any, cause: Throwable? = null) :
+    RuntimeException("Could not find $name in $target", cause)
 
 data class Field(val value: Any, val isNullable: Boolean, val metadata: FieldMetadata)

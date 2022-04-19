@@ -1,8 +1,9 @@
 package org.http4k.security
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.http4k.core.Credentials
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -10,6 +11,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.OAuthWebForms.responseForm
 import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.openid.IdToken
@@ -25,7 +27,7 @@ internal class AccessTokenFetcherTest {
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
-        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessToken("some-access-token"))))
+        assertThat(fetcher.fetch("some-code"), equalTo(Success(AccessTokenDetails(AccessToken("some-access-token")))))
     }
 
     @Test
@@ -51,7 +53,7 @@ internal class AccessTokenFetcherTest {
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
-        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(token)))
+        assertThat(fetcher.fetch("some-code"), equalTo(Success(AccessTokenDetails(token))))
     }
 
     @Test
@@ -67,7 +69,7 @@ internal class AccessTokenFetcherTest {
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
-        assertThat(fetcher.fetch("some-code"), equalTo(accessTokenDetails))
+        assertThat(fetcher.fetch("some-code"), equalTo(Success(accessTokenDetails)))
     }
 
     @Test
@@ -80,7 +82,7 @@ internal class AccessTokenFetcherTest {
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
-        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessToken("some-access-token"))))
+        assertThat(fetcher.fetch("some-code"), equalTo(Success(AccessTokenDetails(AccessToken("some-access-token")))))
     }
 
     @Test
@@ -89,6 +91,6 @@ internal class AccessTokenFetcherTest {
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
-        assertThat(fetcher.fetch("some-code"), absent())
+        assertThat(fetcher.fetch("some-code"), equalTo(Failure(CouldNotFetchAccessToken(BAD_REQUEST, ""))))
     }
 }

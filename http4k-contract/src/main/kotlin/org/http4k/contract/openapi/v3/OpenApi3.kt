@@ -23,7 +23,6 @@ import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
@@ -53,19 +52,21 @@ class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
     private val extensions: List<OpenApiExtension> = emptyList(),
+    private val apiRenderer: ApiRenderer<Api<NODE>, NODE> = OpenApi3ApiRenderer(json),
     // note that this is the basic OpenApi renderer - if you want reflective Schema generation
     // then you want to use ApiRenderer.Auto() instead with a compatible JSON instance
-    private val apiRenderer: ApiRenderer<Api<NODE>, NODE> = OpenApi3ApiRenderer(json),
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
-    private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
+    private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json),
+    private val servers: List<ApiServer> = emptyList()
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
     constructor(
         apiInfo: ApiInfo,
         json: AutoMarshallingJson<NODE>,
-        extensions: List<OpenApiExtension> = emptyList()
-    ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json))
+        extensions: List<OpenApiExtension> = emptyList(),
+        servers: List<ApiServer> = emptyList(),
+    ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json), servers = servers)
 
     override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, tags: Set<Tag>): Response {
         val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)
@@ -84,7 +85,8 @@ class OpenApi3<NODE : Any>(
                 Components(
                     json.obj(paths.flatMap { it.pathSpec.definitions() }),
                     json(allSecurities.filterNotNull().combineFull())
-                )
+                ),
+                servers
             )
         )
 
@@ -159,7 +161,11 @@ class OpenApi3<NODE : Any>(
                     "items" to obj("type" to string(paramMeta.itemType().value))
                 )
             })
-            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(paramMeta.clz.java.enumConstants[0], it.name))
+            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(
+                paramMeta.clz.java.enumConstants[0],
+                it.name,
+                null
+            ))
             else -> PrimitiveParameter(it, json {
                 obj("type" to string(paramMeta.value))
             })
@@ -172,13 +178,10 @@ class OpenApi3<NODE : Any>(
         val withSchema = requests.mapNotNull {
             with(CONTENT_TYPE(it.message)) {
                 when (this) {
-                    APPLICATION_JSON -> APPLICATION_JSON.value to it.toSchemaContent()
                     APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
                         (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
                     null -> null
-                    else -> value to NoSchema(
-                        json { obj("type" to string(StringParam.value)) }, it.example?.toString()
-                    )
+                    else -> value to it.toSchemaContent()
                 }
             }
         }
@@ -201,11 +204,11 @@ class OpenApi3<NODE : Any>(
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
             when (example) {
                 is Array<*>, is Iterable<*> -> !json.fields(schema.node).toMap().containsKey("\$ref")
-                else -> apiRenderer.toSchema(object {}) != schema
+                else -> apiRenderer.toSchema(object {}, refModelNamePrefix = schemaPrefix) != schema
             }
 
         val jsonSchema = example
-            ?.let { apiRenderer.toSchema(it, definitionId) }
+            ?.let { apiRenderer.toSchema(it, definitionId, schemaPrefix) }
             ?.takeIf(::exampleSchemaIsValid)
             ?: message.bodyString().toSchema(definitionId)
 
@@ -213,7 +216,7 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()
-        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId) }
+        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId, null) }
         ?: JsonSchema(json.obj(), emptySet())
 
     private fun List<Security>.combineFull(): Render<NODE> = {

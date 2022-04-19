@@ -3,12 +3,16 @@ package org.http4k.chaos
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.filter.ServerFilters
 import org.http4k.filter.ServerFilters.CatchAll
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -35,7 +39,19 @@ abstract class ChaoticHttpHandler : HttpHandler {
 
     override fun invoke(request: Request) = chaosEngine
         .then(CatchAll())
-        .then(app.withChaosApi(chaosEngine))(request)
+        .then(attachChaosIfSupported())(request)
+
+    private fun attachChaosIfSupported() = try {
+        app.withChaosApi(chaosEngine, controlsPath = "/chaos")
+    } catch (e: NoClassDefFoundError) {
+        routes(
+            routes("/chaos" bind { _: Request -> Response(SERVICE_UNAVAILABLE).body(e.stackTraceToString()) }),
+            when (app) {
+                is RoutingHttpHandler -> app as RoutingHttpHandler
+                else -> routes("/{path:.*}" bind app)
+            }
+        )
+    }
 }
 
 /**

@@ -11,7 +11,6 @@ import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Headers
-import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -43,6 +42,7 @@ import org.http4k.lens.Unsupported
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -225,14 +225,27 @@ class ServerFiltersTest {
     @Test
     fun `catch all exceptions`() {
         val e = RuntimeException("boom!")
-        val handler = ServerFilters.CatchAll(I_M_A_TEAPOT).then { throw e }
+        val handler = ServerFilters.CatchAll().then { throw e }
 
         val response = handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
 
         val sw = StringWriter()
         e.printStackTrace(PrintWriter(sw))
 
-        assertThat(response, hasStatus(I_M_A_TEAPOT).and(hasBody(sw.toString())))
+        assertThat(response, hasStatus(INTERNAL_SERVER_ERROR).and(hasBody(sw.toString())))
+    }
+
+    @Test
+    fun `catch all exceptions but let out just throwables`() {
+        val e = Throwable("boom!")
+        val handler = ServerFilters.CatchAll().then { throw e }
+
+        try {
+            handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
+            fail("Should have leaked throwable")
+        } catch (t: Throwable) {
+            assertThat(t, equalTo(e))
+        }
     }
 
     @Test
@@ -454,7 +467,7 @@ class ServerFiltersTest {
 
         val handler = FlashAttributesFilter.then { request -> Response(OK).body(request.flash().orEmpty()) }
 
-        val response = handler(Request(Method.GET, "/"))
+        val response = handler(Request(GET, "/"))
         assertThat(response, hasBody(""))
     }
 
@@ -462,7 +475,7 @@ class ServerFiltersTest {
     fun `retrieve flash attributes if set`() {
         val handler = FlashAttributesFilter.then { _ -> Response(OK).body("abc").withFlash("Error 123") }
 
-        val response = handler(Request(Method.GET, "/"))
+        val response = handler(Request(GET, "/"))
         assertThat(response.flash(), equalTo("Error 123"))
     }
 
@@ -470,8 +483,38 @@ class ServerFiltersTest {
     fun `remove flash attributes after usage`() {
         val handler = FlashAttributesFilter.then { _ -> Response(OK).body("abc") }
 
-        val request = Request(Method.GET, "/").withFlash("input flash")
+        val request = Request(GET, "/").withFlash("input flash")
         val response = handler(request)
         assertThat(response.flash(), equalTo(""))
+    }
+
+    @Test
+    fun `does not add content disposition if response is not 2xx`() {
+        val handler = ServerFilters.ContentDispositionAttachment().then { _ -> Response(NOT_FOUND) }
+
+        val response = handler(Request(GET, "/"))
+        assertThat(response.header("Content-Disposition"), absent())
+    }
+
+    @Test
+    fun `adds content disposition attachment for all extensions by default`() {
+        val handler = ServerFilters.ContentDispositionAttachment().then { _ -> Response(OK).body("abc") }
+
+        assertThat(handler(Request(GET, "/")).header("Content-Disposition"), equalTo("attachment; filename=unnamed"))
+        assertThat(handler(Request(GET, "/no-extension")).header("Content-Disposition"), equalTo("attachment; filename=no-extension"))
+        assertThat(handler(Request(GET, "/file.pdf")).header("Content-Disposition"), equalTo("attachment; filename=file.pdf"))
+        assertThat(handler(Request(GET, "/dir/file.pdf")).header("Content-Disposition"), equalTo("attachment; filename=file.pdf"))
+    }
+
+    @Test
+    fun `adds content disposition for selected types`() {
+        val handler = ServerFilters.ContentDispositionAttachment(setOf("pdf")).then { _ -> Response(OK).body("abc") }
+
+        assertThat(handler(Request(GET, "/")).header("Content-Disposition"), absent())
+        assertThat(handler(Request(GET, "/no-extension")).header("Content-Disposition"), absent())
+        assertThat(handler(Request(GET, "/not-listed-extension.png")).header("Content-Disposition"), absent())
+        assertThat(handler(Request(GET, "/.pdf")).header("Content-Disposition"), equalTo("attachment; filename=.pdf"))
+        assertThat(handler(Request(GET, "/file.pdf")).header("Content-Disposition"), equalTo("attachment; filename=file.pdf"))
+        assertThat(handler(Request(GET, "/dir/file.pdf")).header("Content-Disposition"), equalTo("attachment; filename=file.pdf"))
     }
 }

@@ -52,7 +52,7 @@ object ApacheAsyncClient {
 
             private fun Request.toApacheRequest(): SimpleHttpRequest = this@toApacheRequest.let { http4kRequest ->
                 val apacheRequest = SimpleHttpRequest(http4kRequest.method.name, http4kRequest.uri.toString())
-                apacheRequest.setBody(http4kRequest.body.payloadAsByteArray(), ContentType.getByMimeType(http4kRequest.header("content-type")))
+                apacheRequest.setBody(http4kRequest.body.payloadAsByteArray(), ContentType.parse(http4kRequest.header("content-type")))
                 headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
                 apacheRequest
             }

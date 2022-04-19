@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -17,6 +18,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
@@ -28,6 +30,7 @@ import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.auto
 import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
 import org.http4k.lens.Path
@@ -36,6 +39,7 @@ import org.http4k.lens.int
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RoutingHttpHandlerContract
 import org.http4k.routing.bind
+import org.http4k.routing.matchAndInvoke
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
@@ -156,6 +160,15 @@ class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
         val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
 
         assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
+    override fun `stacked filter application - applies when not found`() {
+        val filtered = filterAppending("foo").then(routes(handler))
+        val request = Request(GET, "/not-found").header("host", "host")
+
+        assertThat(filtered.matchAndInvoke(request), absent())
+        assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo"))
     }
 
 //    @Test

@@ -2,7 +2,6 @@
 
 <hr/>
 
-    
 <picture>
   <source 
     srcset="https://www.http4k.org/img/logo-readme-dark-mode.png" 
@@ -79,6 +78,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * **1LOC** client adapters 
         * **Apache** sync + async HTTP
         * **Java** (bundled with `http4k-core`)
+        * **Fuel** HTTP (supports sync and async HTTP)
         * **Jetty** HTTP (supports sync and async HTTP)
         * **OkHttp** HTTP (supports sync and async HTTP)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
@@ -130,6 +130,9 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
             * **Xml** - includes support for **one way automatic marshalling of Data classes**
         * **[YAML](https://www.http4k.org/guide/reference/yaml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
+            * **Moshi** - includes support for **fully automatic marshalling of Data classes**
+        * **CSV** - includes support for: 
+            * **Jackson** - CSV format for Jackson
 * [Resilience4J:](https://http4k.org/guide/reference/resilience4j) 
     * Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
 * [Micrometer:](https://http4k.org/guide/reference/micrometer) 
@@ -181,9 +184,9 @@ To install, add these dependencies to your **Gradle** file:
 
 ```groovy
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "4.17.0.0"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.17.0.0"
-    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.17.0.0"
+    implementation group: "org.http4k", name: "http4k-core", version: "4.25.10.0"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.25.10.0"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.25.10.0"
 }
 ```
 
@@ -282,6 +285,8 @@ This project exists thanks to all the people who [contribute](https://www.http4k
 
 If you use [http4k] in your project or enterprise and would like to support ongoing development, please consider becoming a backer or a sponsor. Sponsor logos will show up here with a link to your website.
 
+<a href="https://opencollective.com/http4k/sponsor/0/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/http4k/sponsor/0/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/1/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/2/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/2/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/3/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/3/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/4/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/4/avatar.svg"></a>
@@ -290,7 +295,6 @@ If you use [http4k] in your project or enterprise and would like to support ongo
 <a href="https://opencollective.com/http4k/sponsor/7/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/8/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/9/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/9/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/0/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/0/avatar.svg"></a>
 
 </span>
 

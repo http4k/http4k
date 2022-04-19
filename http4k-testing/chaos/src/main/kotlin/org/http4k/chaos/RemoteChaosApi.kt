@@ -39,7 +39,6 @@ import java.time.Clock
 import java.time.Duration.ofMinutes
 import java.time.Instant.ofEpochSecond
 
-
 /**
  * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
  * Optionally a Security can be passed to limit access to the chaos controls.
@@ -81,15 +80,18 @@ object RemoteChaosApi {
         clock: Clock = Clock.systemUTC(),
         apiName: String = "http4k"
     ): RoutingHttpHandler {
-        val setStages = Body.json().map { node ->
-            (if (node.isArray) node.elements().asSequence() else sequenceOf(node))
-                .map { it.asStage(clock) }
-                .reduce { acc, next -> acc.then(next) }
-        }.toLens()
+        val setStages by lazy {
+            Body.json().map { node ->
+                (if (node.isArray) node.elements().asSequence() else sequenceOf(node))
+                    .map { it.asStage(clock) }
+                    .reduce { acc, next -> acc.then(next) }
+            }.toLens()
+        }
 
-        val jsonLens = Body.json().toLens()
         val showCurrentStatus: HttpHandler = {
-            Response(OK).with(jsonLens of chaosStatus(if (engine.isEnabled()) engine.toString() else "none"))
+            Response(OK).with(
+                Body.json().toLens() of chaosStatus(if (engine.isEnabled()) engine.toString() else "none")
+            )
         }
 
         val activate = Filter { next ->
@@ -135,7 +137,7 @@ object RemoteChaosApi {
         fun RouteMetaDsl.returningExampleChaosDescription() =
             returning(
                 OK,
-                jsonLens to chaosStatus(currentChaosDescription),
+                Body.json().toLens() to chaosStatus(currentChaosDescription),
                 "The current Chaos being applied to requests."
             )
 
@@ -157,7 +159,7 @@ object RemoteChaosApi {
                             summary = "Activate new Chaos on all routes."
                             description =
                                 "Replace the current Chaos being applied to traffic and activates that behaviour."
-                            receiving(jsonLens to exampleChaos)
+                            receiving(Body.json().toLens() to exampleChaos)
                             returning(BAD_REQUEST to "New Chaos could not be deserialised from the request body.")
                             returningExampleChaosDescription()
                         } bindContract POST to activate.then(showCurrentStatus)
@@ -179,34 +181,36 @@ object RemoteChaosApi {
                     }
                 )
     }
+
+    private val exampleChaos by lazy {
+        Jackson {
+            array(
+                listOf(
+                    obj(
+                        "type" to string("repeat"),
+                        "stages" to array(
+                            listOf(
+                                obj(
+                                    "type" to string("wait"),
+                                    "until" to obj("type" to string("delay"), "period" to string("PT30S"))
+                                ),
+                                obj(
+                                    "type" to string("trigger"),
+                                    "behaviour" to obj("type" to string("status"), "status" to number(418)),
+                                    "trigger" to obj("type" to string("always")),
+                                    "until" to obj("type" to string("countdown"), "count" to number(10))
+                                )
+                            )
+                        ),
+                        "until" to obj(
+                            "type" to string("deadline"),
+                            "endTime" to string("2030-01-01T00:00:00Z")
+                        )
+                    )
+                )
+            )
+        }
+    }
 }
 
 private fun chaosStatus(value: String) = obj("chaos" to string(value))
-
-private val exampleChaos = Jackson {
-    array(
-        listOf(
-            obj(
-                "type" to string("repeat"),
-                "stages" to array(
-                    listOf(
-                        obj(
-                            "type" to string("wait"),
-                            "until" to obj("type" to string("delay"), "period" to string("PT30S"))
-                        ),
-                        obj(
-                            "type" to string("trigger"),
-                            "behaviour" to obj("type" to string("status"), "status" to number(418)),
-                            "trigger" to obj("type" to string("always")),
-                            "until" to obj("type" to string("countdown"), "count" to number(10))
-                        )
-                    )
-                ),
-                "until" to obj(
-                    "type" to string("deadline"),
-                    "endTime" to string("2030-01-01T00:00:00Z")
-                )
-            )
-        )
-    )
-}

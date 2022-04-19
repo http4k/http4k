@@ -17,12 +17,19 @@ import kotlin.reflect.full.createInstance
 /**
  * Defaults for configuring OpenApi3 with Jackson
  */
-fun OpenApi3(apiInfo: ApiInfo, json: ConfigurableJackson = OpenAPIJackson, extensions: List<OpenApiExtension> = emptyList()) = OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
+fun OpenApi3(
+    apiInfo: ApiInfo,
+    json: ConfigurableJackson = OpenAPIJackson,
+    extensions: List<OpenApiExtension> = emptyList(),
+    servers: List<ApiServer> = emptyList()
+) =
+    OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)), servers = servers)
 
 fun AutoJsonToJsonSchema(json: ConfigurableJackson) = AutoJsonToJsonSchema(
     json,
     FieldRetrieval.compose(
-        SimpleLookup(metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy),
+        SimpleLookup(metadataRetrievalStrategy =
+        JacksonFieldMetadataRetrievalStrategy.then(PrimitivesFieldMetadataRetrievalStrategy)),
         FieldRetrieval.compose(JacksonJsonPropertyAnnotated, JacksonJsonNamingAnnotated(json))
     )
 )
@@ -33,15 +40,16 @@ object JacksonJsonPropertyAnnotated : FieldRetrieval {
             metadataRetrievalStrategy = JacksonFieldMetadataRetrievalStrategy
         )(target, target.javaClass.findName(name) ?: throw NoFieldFound(name, this))
 
-    private fun Class<Any>.findName(name: String): String? = kotlin.constructors.first().parameters
-        .mapNotNull { f ->
+    private fun Class<Any>.findName(name: String): String? =
+        kotlin.constructors.first().parameters.firstNotNullOfOrNull { f ->
             f.annotations.filterIsInstance<JsonProperty>().find { it.value == name }
                 ?.let { f.name }
-        }.firstOrNull() ?: try {
-        superclass?.findName(name)
-    } catch (e: IllegalStateException) {
-        throw NoFieldFound(name, this, e)
-    }
+        }
+            ?: try {
+                superclass?.findName(name)
+            } catch (e: IllegalStateException) {
+                throw NoFieldFound(name, this, e)
+            }
 }
 
 class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson) : FieldRetrieval {
@@ -67,12 +75,15 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
 
 object JacksonFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
     override fun invoke(target: Any, fieldName: String): FieldMetadata =
-        FieldMetadata(description = target.javaClass.findPropertyDescription(fieldName))
+        FieldMetadata(target.javaClass.findPropertyDescription(fieldName)?.let { mapOf("description" to it) }
+            ?: emptyMap())
 
     private fun Class<Any>.findPropertyDescription(name: String): String? =
-        kotlin.constructors.first().parameters
-            .firstOrNull { p -> p.kind == KParameter.Kind.VALUE && p.name == name }
-            ?.let { p ->
-                p.annotations.filterIsInstance<JsonPropertyDescription>().firstOrNull()?.value
-            } ?: superclass?.findPropertyDescription(name)
+        kotlin.constructors.firstOrNull()?.let {
+            it.parameters
+                .firstOrNull { p -> p.kind == KParameter.Kind.VALUE && p.name == name }
+                ?.let { p ->
+                    p.annotations.filterIsInstance<JsonPropertyDescription>().firstOrNull()?.value
+                } ?: superclass?.findPropertyDescription(name)
+        } ?: superclass?.findPropertyDescription(name)
 }

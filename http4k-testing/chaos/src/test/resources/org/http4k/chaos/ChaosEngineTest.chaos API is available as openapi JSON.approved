@@ -6,6 +6,11 @@
   },
   "tags": [
   ],
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
   "paths": {
     "/chaos/activate": {
       "post": {

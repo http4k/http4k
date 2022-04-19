@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package org.http4k.format
 
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -23,6 +25,7 @@ import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
@@ -59,6 +62,7 @@ open class ConfigurableKotlinxSerialization(
         is JsonPrimitive -> when {
             value.isString -> JsonType.String
             value.booleanOrNull != null -> JsonType.Boolean
+            value.intOrNull != null -> JsonType.Integer
             value.doubleOrNull != null -> JsonType.Number
             else -> throw RuntimeException()
         }
@@ -128,29 +132,55 @@ open class ConfigurableKotlinxSerialization(
 
     inline fun <reified T : Any> JsonElement.asA(): T = json.decodeFromJsonElement(this)
 
-    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+    inline fun <reified T : Any> WsMessage.Companion.auto() =
+        WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
-                                                     contentNegotiation: ContentNegotiation = None,
-                                                     contentType: ContentType = defaultContentType) = autoBody<T>(description, contentNegotiation, contentType)
+    inline fun <reified T : Any> Body.Companion.auto(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = None,
+        contentType: ContentType = defaultContentType
+    ) = autoBody<T>(description, contentNegotiation, contentType)
 
-    inline fun <reified T : Any> autoBody(description: String? = null,
-                                          contentNegotiation: ContentNegotiation = None,
-                                          contentType: ContentType = defaultContentType) =
-        httpBodyLens(description, contentNegotiation, contentType).map({ json.decodeFromString<T>(it) }, { json.encodeToString(it) })
+    inline fun <reified T : Any> autoBody(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = None,
+        contentType: ContentType = defaultContentType
+    ) =
+        httpBodyLens(description, contentNegotiation, contentType).map(
+            { json.decodeFromString<T>(it) },
+            { json.encodeToString(it) })
 }
 
 fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {
 
-    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = adapter(mapping, Decoder::decodeBoolean, Encoder::encodeBoolean, "BooleanSerializer", BOOLEAN)
-    override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, Decoder::decodeInt, Encoder::encodeInt, "IntSerializer", INT)
-    override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = adapter(mapping, Decoder::decodeLong, Encoder::encodeLong, "LongSerializer", LONG)
-    override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) = adapter(mapping, Decoder::decodeDouble, Encoder::encodeDouble, "DoubleSerializer", DOUBLE)
-    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = adapter(mapping, Decoder::decodeString, Encoder::encodeString, "TextSerializer", STRING)
-    override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) = throw UnsupportedOperationException("kotlinx.serialization does not support BigInteger.")
-    override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) = throw UnsupportedOperationException("kotlinx.serialization does not support BigDecimal.")
+    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) =
+        adapter(mapping, Decoder::decodeBoolean, Encoder::encodeBoolean, "BooleanSerializer", BOOLEAN)
 
-    private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, decode: Decoder.() -> IN, encode: Encoder.(IN) -> Unit, serialName: String, kind: PrimitiveKind): AutoMappingConfiguration<JsonBuilder> =
+    override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) =
+        adapter(mapping, Decoder::decodeInt, Encoder::encodeInt, "IntSerializer", INT)
+
+    override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) =
+        adapter(mapping, Decoder::decodeLong, Encoder::encodeLong, "LongSerializer", LONG)
+
+    override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) =
+        adapter(mapping, Decoder::decodeDouble, Encoder::encodeDouble, "DoubleSerializer", DOUBLE)
+
+    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) =
+        adapter(mapping, Decoder::decodeString, Encoder::encodeString, "TextSerializer", STRING)
+
+    override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) =
+        throw UnsupportedOperationException("kotlinx.serialization does not support BigInteger.")
+
+    override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) =
+        throw UnsupportedOperationException("kotlinx.serialization does not support BigDecimal.")
+
+    private fun <IN, OUT> adapter(
+        mapping: BiDiMapping<IN, OUT>,
+        decode: Decoder.() -> IN,
+        encode: Encoder.(IN) -> Unit,
+        serialName: String,
+        kind: PrimitiveKind
+    ): AutoMappingConfiguration<JsonBuilder> =
         apply {
             @Suppress("UNCHECKED_CAST")
             val serializer = object : KSerializer<Any> {
@@ -162,7 +192,13 @@ fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder
                     encoder.encode(mapping(value as OUT))
                 }
             }
-            this@asConfigurable.serializersModule += (SerializersModule { contextual(Reflection.getOrCreateKotlinClass(mapping.clazz), serializer) })
+            this@asConfigurable.serializersModule += (SerializersModule {
+                contextual(
+                    Reflection.getOrCreateKotlinClass(
+                        mapping.clazz
+                    ), serializer
+                )
+            })
         }
 
     override fun done(): JsonBuilder = this@asConfigurable

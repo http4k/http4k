@@ -20,7 +20,7 @@ typealias HttpHandler = (Request) -> Response
 
 A simple function representing all incoming and outgoing HTTP calls.
 
-HttpHandlers can be bound to a container (to create an `Http4kServer`) with 1 LOC. The decouples the server
+HttpHandlers can be bound to a container (to create an `Http4kServer`) with 1 LOC. This decouples the server
 implementation from the business logic:
 
 ```kotlin

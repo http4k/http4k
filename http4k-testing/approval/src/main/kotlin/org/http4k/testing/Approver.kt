@@ -41,6 +41,7 @@ class NamedResourceApprover(private val name: String,
                 }
                 else -> try {
                     assertEquals(approvalContent(this).reader().use { it.readText() }, approvalContent(httpMessage).reader().readText())
+                    actual.output()
                 } catch (e: AssertionError) {
                     approvalContent(httpMessage).copyTo(actual.output())
                     throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)

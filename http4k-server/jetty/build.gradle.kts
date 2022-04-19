@@ -9,7 +9,7 @@ dependencies {
     api("org.eclipse.jetty.websocket:websocket-core-server:_")
     // this list is for reference since http2 support is optional
     implementation("org.eclipse.jetty.http2:http2-server:_")
-    implementation("org.eclipse.jetty:jetty-alpn-conscrypt-server:_")
+    implementation("org.eclipse.jetty:jetty-alpn-java-server:_")
     implementation("org.mortbay.jetty.alpn:alpn-boot:_")
     testImplementation(project(path = ":http4k-core", configuration ="testArtifacts"))
     testImplementation(project(path = ":http4k-realtime-core", configuration ="testArtifacts"))

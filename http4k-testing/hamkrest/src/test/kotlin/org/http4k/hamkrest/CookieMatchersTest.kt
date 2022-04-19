@@ -6,8 +6,8 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.SameSite.None
 import org.http4k.core.cookie.SameSite.Strict
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.Duration
+import java.time.Instant
 
 class CookieMatchersTest {
     @Test
@@ -35,9 +35,9 @@ class CookieMatchersTest {
 
     @Test
     fun expiry() {
-        val expires = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0))
+        val expires = Instant.EPOCH
         assertMatchAndNonMatch(Cookie("name", "value", expires = expires),
-            hasCookieExpiry(expires), hasCookieExpiry(expires.plusDays(1)))
+            hasCookieExpiry(expires), hasCookieExpiry(expires.plus(Duration.ofDays(1))))
     }
 
     @Test

@@ -1,13 +1,17 @@
 package org.http4k.core
 
-import java.net.URLDecoder
-import java.net.URLEncoder
 import java.util.regex.Pattern
 
 data class UriTemplate private constructor(private val template: String) {
     private val templateRegex = template.replace(URI_TEMPLATE_FORMAT,
         { notMatched -> Pattern.quote(notMatched) },
-        { matched -> if (matched.groupValues[2].isBlank()) "([^/]+)" else "(${matched.groupValues[2]})" }).toRegex()
+        { matched ->
+            when {
+                matched.groupValues[2].isBlank() -> "([^/]+)"
+                else -> "(${matched.groupValues[2]})"
+            }
+        }).toRegex()
+
     private val matches = URI_TEMPLATE_FORMAT.findAll(template)
     private val parameterNames = matches.map { it.groupValues[1] }.toList()
 
@@ -26,11 +30,11 @@ data class UriTemplate private constructor(private val template: String) {
     fun generate(parameters: Map<String, String>): String =
         template.replace(URI_TEMPLATE_FORMAT) { matchResult ->
             val paramValue = parameters[matchResult.groupValues[1]] ?: ""
-            if (paramValue.contains("/")) paramValue else URLEncoder.encode(paramValue, "UTF-8")
+            if (paramValue.contains("/")) paramValue else paramValue.toPathSegmentEncoded()
         }
 
     private fun Regex.findParameterValues(uri: String): List<String> =
-        findAll(uri).first().groupValues.drop(1).map { URLDecoder.decode(it, "UTF-8") }
+        findAll(uri).first().groupValues.drop(1).map { it.toPathSegmentDecoded() }
 
     private fun String.replace(regex: Regex, notMatched: (String) -> String, matched: (MatchResult) -> String): String {
         val matches = regex.findAll(this)

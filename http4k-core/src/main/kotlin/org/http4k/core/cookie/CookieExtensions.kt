@@ -3,8 +3,7 @@ package org.http4k.core.cookie
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.unquoted
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.Instant
 
 fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.fullCookieString())
 
@@ -38,6 +37,6 @@ private fun List<Cookie>.toCookieString() = joinToString("; ", transform = Cooki
 
 fun Response.cookies(): List<Cookie> = headerValues("set-cookie").filterNotNull().mapNotNull { Cookie.parse(it) }
 
-fun Cookie.invalidate(): Cookie = copy(value = "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC))
+fun Cookie.invalidate(): Cookie = copy(value = "").maxAge(0).expires(Instant.EPOCH)
 
 fun Response.invalidateCookie(name: String, domain: String? = null): Response = replaceCookie(Cookie(name, "", domain = domain).invalidate())

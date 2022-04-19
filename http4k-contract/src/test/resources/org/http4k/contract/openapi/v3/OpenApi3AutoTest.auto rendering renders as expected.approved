@@ -1,0 +1,574 @@
+{
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "tags": [
+    {
+      "name": "hello",
+      "description": "world"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "a very simple API"
+    }
+  ],
+  "paths": {
+    "/basepath/body_auto_map": {
+      "put": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "foo": 123,
+                "arb": {
+                  "anotherString": "bing"
+                }
+              },
+              "schema": {
+                "additionalProperties": {
+                  "properties": {
+                    "foo": {
+                      "example": 123,
+                      "format": "int32",
+                      "type": "integer"
+                    },
+                    "arb": {
+                      "$ref": "#/components/schemas/ArbObject1"
+                    }
+                  },
+                  "example": {
+                    "foo": 123,
+                    "arb": {
+                      "anotherString": "bing"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "arb",
+                    "foo"
+                  ]
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "putBasepathBody_auto_map",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_auto_schema": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "string": "s",
+                "child": {
+                  "anotherString": "bar"
+                },
+                "numbers": [
+                  1
+                ],
+                "bool": true
+              },
+              "schema": {
+                "$ref": "#/components/schemas/someOtherId"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema",
+        "deprecated": false
+      },
+      "put": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "uri": "http://foowang",
+                "additional": {
+                  "foo": 123,
+                  "arb": {
+                    "anotherString": "bing"
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ArbObject3"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "anotherString": "bing"
+                  }
+                ],
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ArbObject1"
+                  },
+                  "example": [
+                    {
+                      "anotherString": "bing"
+                    }
+                  ],
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "putBasepathBody_auto_schema",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_auto_schema_custom_content_type": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yaml": {
+                "example": {
+                  "anotherString": "bar"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ArbObject4"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_custom_content_type",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_auto_schema_custom_request_content_type": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/yaml": {
+              "example": {
+                "anotherString": "bar"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ArbObject4"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_custom_request_content_type",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_auto_schema_multiple_request_schemas": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ArbObject1"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ArbObject3"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_multiple_request_schemas",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_auto_schema_multiple_response_schemas": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "anotherString": "bing"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ArbObject1"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ArbObject1"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ArbObject3"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_auto_schema_name_definition_id": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/impl1"
+                    },
+                    {
+                      "$ref": "#/components/schemas/impl2"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_name_definition_id",
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "someOtherId": {
+        "properties": {
+          "string": {
+            "example": "s",
+            "type": "string"
+          },
+          "child": {
+            "$ref": "#/components/schemas/ArbObject1"
+          },
+          "numbers": {
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": [
+              1
+            ],
+            "type": "array"
+          },
+          "bool": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "example": {
+          "string": "s",
+          "child": {
+            "anotherString": "bar"
+          },
+          "numbers": [
+            1
+          ],
+          "bool": true
+        },
+        "type": "object",
+        "required": [
+          "bool",
+          "numbers",
+          "string"
+        ]
+      },
+      "ArbObject1": {
+        "properties": {
+          "anotherString": {
+            "$ref": "#/components/schemas/Foo"
+          }
+        },
+        "example": {
+          "anotherString": "bing"
+        },
+        "type": "object",
+        "required": [
+          "anotherString"
+        ]
+      },
+      "Foo": {
+        "example": "bing",
+        "enum": [
+          "bar",
+          "bing"
+        ],
+        "type": "string"
+      },
+      "ArbObject4": {
+        "properties": {
+          "anotherString": {
+            "$ref": "#/components/schemas/Foo"
+          }
+        },
+        "example": {
+          "anotherString": "bar"
+        },
+        "type": "object",
+        "required": [
+          "anotherString"
+        ]
+      },
+      "ArbObject3": {
+        "properties": {
+          "uri": {
+            "example": "http://foowang",
+            "format": "uri",
+            "type": "string"
+          },
+          "additional": {
+            "additionalProperties": {
+              "properties": {
+                "foo": {
+                  "example": 123,
+                  "format": "int32",
+                  "type": "integer"
+                },
+                "arb": {
+                  "$ref": "#/components/schemas/ArbObject1"
+                }
+              },
+              "example": {
+                "foo": 123,
+                "arb": {
+                  "anotherString": "bing"
+                }
+              },
+              "type": "object",
+              "required": [
+                "arb",
+                "foo"
+              ]
+            },
+            "type": "object"
+          }
+        },
+        "example": {
+          "uri": "http://foowang",
+          "additional": {
+            "foo": 123,
+            "arb": {
+              "anotherString": "bing"
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "additional",
+          "uri"
+        ]
+      },
+      "impl1": {
+        "properties": {
+          "obj": {
+            "$ref": "#/components/schemas/Impl1"
+          }
+        },
+        "example": {
+          "obj": {
+            "value": "bob"
+          }
+        },
+        "type": "object",
+        "required": [
+          "obj"
+        ]
+      },
+      "Impl1": {
+        "properties": {
+          "value": {
+            "example": "bob",
+            "type": "string"
+          }
+        },
+        "example": {
+          "value": "bob"
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      },
+      "impl2": {
+        "properties": {
+          "obj": {
+            "$ref": "#/components/schemas/Impl2"
+          }
+        },
+        "example": {
+          "obj": {
+            "value": 123
+          }
+        },
+        "type": "object",
+        "required": [
+          "obj"
+        ]
+      },
+      "Impl2": {
+        "properties": {
+          "value": {
+            "example": 123,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "example": {
+          "value": 123
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "the_api_key"
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "x-extension": [
+    "extensionField"
+  ]
+}

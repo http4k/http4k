@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference
 fun ClientFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = { it.uri.toString() },
-    error: (Request, Throwable) -> String = { _, t -> t.localizedMessage },
+    error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder) -> SpanBuilder = { it },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
 ): Filter {
@@ -61,7 +61,7 @@ fun ClientFilters.OpenTelemetryTracing(
 fun ServerFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = { it.uri.toString() },
-    error: (Request, Throwable) -> String = { _, t -> t.localizedMessage },
+    error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
 ): Filter {

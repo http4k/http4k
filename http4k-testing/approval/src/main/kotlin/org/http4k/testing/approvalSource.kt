@@ -33,7 +33,13 @@ internal class FileReadWriteResource(private val target: File) : ReadWriteResour
         with(target) {
             if (!parentFile.exists() && !parentFile.mkdirs()) throw IllegalAccessException("Could not create dir ${parentFile.absolutePath}")
             if (exists() && !delete()) throw IllegalAccessException("Could not delete $absolutePath")
-            outputStream()
+
+            object : OutputStream() {
+                private val output by lazy { outputStream() }
+                override fun write(b: Int) {
+                    output.write(b)
+                }
+            }
         }
 
     override fun toString(): String = target.absolutePath

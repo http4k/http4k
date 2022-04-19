@@ -18,14 +18,14 @@ import org.junit.jupiter.api.Test
 class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
     @Test
-    fun `roundtrip arbitary object to and from JSON element`() {
+    fun `roundtrip arbitrary object to and from JSON element`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = Jackson.asJsonObject(obj)
         assertThat(Jackson.asA(out, ArbObject::class), equalTo(obj))
     }
 
     @Test
-    fun `roundtrip list of arbitary objects to and from node`() {
+    fun `roundtrip list of arbitrary objects to and from node`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(Jackson.asJsonObject(listOf(obj)).asA(), equalTo(listOf(obj)))
@@ -38,7 +38,10 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val privateLens = Body.autoView<ArbObjectWithView, Private>().toLens()
 
         assertThat(Response(OK).with(publicLens of arbObjectWithView), hasBody(equalTo<String>("""{"pub":5}""")))
-        assertThat(Response(OK).with(privateLens of arbObjectWithView), hasBody(equalTo<String>("""{"priv":3,"pub":5}""")))
+        assertThat(
+            Response(OK).with(privateLens of arbObjectWithView),
+            hasBody(equalTo<String>("""{"priv":3,"pub":5}"""))
+        )
 
         assertThat(publicLens(Response(OK).with(privateLens of arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }
@@ -55,10 +58,16 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }
 
-    override fun customMarshaller() = object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise()) {}
+    override fun customMarshaller() =
+        object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise()) {}
+
+    override fun customMarshallerProhibitStrings() = object : ConfigurableJackson(
+        KotlinModule.Builder().build().asConfigurable().prohibitStrings()
+            .customise()
+    ) {}
 
     @Test
-    fun `roundtrip list of arbitary objects to and from body`() {
+    fun `roundtrip list of arbitrary objects to and from body`() {
         val body = Body.auto<List<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -67,7 +76,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
     }
 
     @Test
-    fun `roundtrip array of arbitary objects to and from body`() {
+    fun `roundtrip array of arbitrary objects to and from body`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -88,22 +97,29 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
     @Test
     fun `write interface implementation to body`() {
-        assertThat(Response(OK).with(
-            Body.auto<Interface>().toLens() of InterfaceImpl()
-        ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}"""))
+        assertThat(
+            Response(OK).with(
+                Body.auto<Interface>().toLens() of InterfaceImpl()
+            ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}""")
+        )
     }
 
     @Test
     fun `write list of interface implementation to body`() {
-        assertThat(Response(OK).with(
-            Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
-        ).bodyString(), equalTo("""[{"value":"hello","subValue":"123"}]"""))
+        assertThat(
+            Response(OK).with(
+                Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
+            ).bodyString(), equalTo("""[{"value":"hello","subValue":"123"}]""")
+        )
     }
 
     @Test
     fun `writes using non-sealed parent type`() {
         val nonSealedChild = NonSealedChild("hello")
-        assertThat(Response(OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""{"something":"hello"}"""))
+        assertThat(
+            Response(OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(),
+            equalTo("""{"something":"hello"}""")
+        )
     }
 
     @Test

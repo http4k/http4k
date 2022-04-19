@@ -40,4 +40,3 @@ operator fun Event.plus(that: Pair<String, Any>): Event = when (this) {
 }
 
 data class MetadataEvent(val event: Event, val metadata: Map<String, Any> = emptyMap()) : Event by event
-

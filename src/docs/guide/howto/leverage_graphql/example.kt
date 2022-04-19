@@ -5,7 +5,7 @@ import com.expediagroup.graphql.generator.TopLevelObject
 import com.expediagroup.graphql.generator.toSchema
 import graphql.ExecutionInput.Builder
 import graphql.GraphQL.newGraphQL
-import org.dataloader.DataLoader
+import org.dataloader.DataLoaderFactory.newDataLoader
 import org.dataloader.DataLoaderRegistry
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.asGraphQLHandler
@@ -37,11 +37,11 @@ object UserDb {
         User(id = 5, name = "Charlie")
     )
 
-    fun search(ids: List<Long>) = userDb.filter { ids.contains(it.id) }
-    fun delete(ids: List<Long>) = userDb.removeIf { ids.contains(it.id) }
+    fun search(ids: List<Int>) = userDb.filter { ids.contains(it.id) }
+    fun delete(ids: List<Int>) = userDb.removeIf { ids.contains(it.id) }
 }
 
-data class User(val id: Long, val name: String)
+data class User(val id: Int, val name: String)
 
 class UserQueries {
     fun search(params: Params) = UserDb.search(params.ids)
@@ -51,7 +51,7 @@ class UserMutations {
     fun delete(params: Params) = UserDb.delete(params.ids)
 }
 
-data class Params(val ids: List<Long>)
+data class Params(val ids: List<Int>)
 
 class UserDbHandler : GraphQLWithContextHandler<String> {
     private val graphQL = newGraphQL(
@@ -63,7 +63,7 @@ class UserDbHandler : GraphQLWithContextHandler<String> {
     ).build()
 
     private val dataLoaderRegistry = DataLoaderRegistry().apply {
-        register("USER_LOADER", DataLoader { ids: List<Long> ->
+        register("USER_LOADER", newDataLoader { ids: List<Int> ->
             supplyAsync {
                 UserQueries().search(Params(ids))
             }

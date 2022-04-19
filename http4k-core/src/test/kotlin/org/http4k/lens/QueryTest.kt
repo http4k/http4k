@@ -33,11 +33,17 @@ class QueryTest {
         assertThat(Query.optional("world")(request), absent())
 
         val requiredQuery = Query.required("world")
-        assertThat({ requiredQuery(request) }, throws(lensFailureWith<Request>(Missing(requiredQuery.meta), overallType = Failure.Type.Missing)))
+        assertThat(
+            { requiredQuery(request) },
+            throws(lensFailureWith<Request>(Missing(requiredQuery.meta), overallType = Failure.Type.Missing))
+        )
 
         assertThat(Query.multi.optional("world")(request), absent())
         val requiredMultiQuery = Query.multi.required("world")
-        assertThat({ requiredMultiQuery(request) }, throws(lensFailureWith<Request>(Missing(requiredMultiQuery.meta), overallType = Failure.Type.Missing)))
+        assertThat(
+            { requiredMultiQuery(request) },
+            throws(lensFailureWith<Request>(Missing(requiredMultiQuery.meta), overallType = Failure.Type.Missing))
+        )
     }
 
     @Test
@@ -46,23 +52,37 @@ class QueryTest {
         assertThat(single("value2", single("value1", request)), equalTo(request.query("world", "value2")))
 
         val multi = Query.multi.required("world")
-        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
-            equalTo(request.query("world", "value3").query("world", "value4")))
+        assertThat(
+            multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
+            equalTo(request.query("world", "value3").query("world", "value4"))
+        )
     }
 
     @Test
     fun `invalid value`() {
         val requiredQuery = Query.map(String::toInt).required("hello")
-        assertThat({ requiredQuery(request) }, throws(lensFailureWith<Request>(Invalid(requiredQuery.meta), overallType = Failure.Type.Invalid)))
+        assertThat(
+            { requiredQuery(request) },
+            throws(lensFailureWith<Request>(Invalid(requiredQuery.meta), overallType = Failure.Type.Invalid))
+        )
 
         val optionalQuery = Query.map(String::toInt).optional("hello")
-        assertThat({ optionalQuery(request) }, throws(lensFailureWith<Request>(Invalid(optionalQuery.meta), overallType = Failure.Type.Invalid)))
+        assertThat(
+            { optionalQuery(request) },
+            throws(lensFailureWith<Request>(Invalid(optionalQuery.meta), overallType = Failure.Type.Invalid))
+        )
 
         val requiredMultiQuery = Query.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiQuery(request) }, throws(lensFailureWith<Request>(Invalid(requiredMultiQuery.meta), overallType = Failure.Type.Invalid)))
+        assertThat(
+            { requiredMultiQuery(request) },
+            throws(lensFailureWith<Request>(Invalid(requiredMultiQuery.meta), overallType = Failure.Type.Invalid))
+        )
 
         val optionalMultiQuery = Query.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiQuery(request) }, throws(lensFailureWith<Request>(Invalid(optionalMultiQuery.meta), overallType = Failure.Type.Invalid)))
+        assertThat(
+            { optionalMultiQuery(request) },
+            throws(lensFailureWith<Request>(Invalid(optionalMultiQuery.meta), overallType = Failure.Type.Invalid))
+        )
     }
 
     @Test
@@ -144,5 +164,17 @@ class QueryTest {
         val optionalLens = Query.enum<Method>().optional("method")
         assertThat(optionalLens(Request(GET, "/?method=DELETE")), equalTo(Method.DELETE))
         assertThat(optionalLens(Request(GET, "/")), absent())
+    }
+
+    @Test
+    fun `mapped enum`() {
+        val requiredLens = Query.enum(MappedEnum::from, MappedEnum::to).required("whatevs")
+        assertThat(requiredLens(Request(GET, "/?whatevs=eulav")), equalTo(MappedEnum.value))
+    }
+
+    @Test
+    fun `case-insensitive enum`() {
+        val lens = Query.enum<Method>(caseSensitive = false).required("method")
+        assertThat(lens(Request(GET,"/?method=delete")), equalTo(Method.DELETE))
     }
 }

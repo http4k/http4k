@@ -6,6 +6,7 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.Parameters
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
+import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.StringParam
 import java.util.Locale.getDefault
 
@@ -43,3 +44,8 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
             }
         }
 }
+
+inline fun <reified T : Enum<T>> Header.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
+    if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
+    EnumParam(T::class)
+)

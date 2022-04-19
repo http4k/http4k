@@ -102,223 +102,6 @@
         ]
       }
     },
-    "/basepath/body_auto_map": {
-      "put": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "operationId": "putBasepathBody_auto_map",
-        "produces": [
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/object490718055"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ]
-      }
-    },
-    "/basepath/body_auto_schema": {
-      "post": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "operationId": "postBasepathBody_auto_schema",
-        "produces": [
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/someOtherId"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "operationId": "putBasepathBody_auto_schema",
-        "produces": [
-          "application/json"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/object1366892779"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/object1547825812"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ]
-      }
-    },
-    "/basepath/body_auto_schema_multiple_request_schemas": {
-      "post": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "operationId": "postBasepathBody_auto_schema_multiple_request_schemas",
-        "produces": [
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/object1547825812"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ]
-      }
-    },
-    "/basepath/body_auto_schema_multiple_response_schemas": {
-      "post": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
-        "produces": [
-          "application/json"
-        ],
-        "consumes": [
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/object1547825812"
-            }
-          },
-          "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/object1547825812"
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ]
-      }
-    },
-    "/basepath/body_auto_schema_name_definition_id": {
-      "post": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "operationId": "postBasepathBody_auto_schema_name_definition_id",
-        "produces": [
-          "application/json"
-        ],
-        "consumes": [
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/impl1"
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ]
-      }
-    },
     "/basepath/body_form": {
       "post": {
         "tags": [
@@ -343,7 +126,7 @@
             "in": "formData",
             "name": "i",
             "required": false,
-            "type": "integer",
+            "type": "array",
             "description": "intField"
           },
           {
@@ -529,13 +312,13 @@
         ]
       }
     },
-    "/basepath/body_string": {
+    "/basepath/body_receiving_string": {
       "post": {
         "tags": [
           "/basepath"
         ],
-        "summary": "<unknown>",
-        "operationId": "postBasepathBody_string",
+        "summary": "body_receiving_string",
+        "operationId": "postBasepathBody_receiving_string",
         "produces": [
         ],
         "consumes": [
@@ -564,7 +347,9 @@
             ]
           }
         ]
-      },
+      }
+    },
+    "/basepath/body_string": {
       "get": {
         "tags": [
           "/basepath"
@@ -746,7 +531,7 @@
             "name": "stringField",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "array"
             }
           },
           {
@@ -754,7 +539,7 @@
             "name": "fileField",
             "required": true,
             "schema": {
-              "type": "file"
+              "type": "array"
             }
           }
         ],
@@ -1055,85 +840,6 @@
     }
   },
   "definitions": {
-    "object490718055": {
-      "type": "object",
-      "properties": {
-        "foo": {
-          "type": "integer",
-          "example": 123
-        }
-      }
-    },
-    "object1506938668": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "string",
-          "example": "bob"
-        }
-      }
-    },
-    "impl1": {
-      "type": "object",
-      "properties": {
-        "obj": {
-          "$ref": "#/definitions/object1506938668"
-        }
-      }
-    },
-    "object1547825812": {
-      "type": "object",
-      "properties": {
-        "anotherString": {
-          "type": "string",
-          "example": "bing"
-        }
-      }
-    },
-    "object1366892779": {
-      "type": "object",
-      "properties": {
-        "uri": {
-          "type": "string",
-          "example": "http://foowang"
-        },
-        "additional": {
-          "$ref": "#/definitions/object490718055"
-        }
-      }
-    },
-    "object1544899175": {
-      "type": "object",
-      "properties": {
-        "anotherString": {
-          "type": "string",
-          "example": "bar"
-        }
-      }
-    },
-    "someOtherId": {
-      "type": "object",
-      "properties": {
-        "string": {
-          "type": "string",
-          "example": "s"
-        },
-        "child": {
-          "$ref": "#/definitions/object1544899175"
-        },
-        "numbers": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "example": 1
-          }
-        },
-        "bool": {
-          "type": "boolean",
-          "example": true
-        }
-      }
-    },
     "object1283926341": {
       "type": "object",
       "properties": {

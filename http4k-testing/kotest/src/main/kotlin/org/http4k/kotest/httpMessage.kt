@@ -92,7 +92,8 @@ fun <T : HttpMessage, R> httpMessageHas(name: String, extractValue: (T) -> R, ma
         val testResult = match.test(extractValue(value))
         return MatcherResult(
             testResult.passed(),
-            "$name: ${testResult.failureMessage()}",
-            "$name: ${testResult.negatedFailureMessage()}")
+            { "$name: ${testResult.failureMessage()}" },
+            { "$name: ${testResult.negatedFailureMessage()}" }
+        )
     }
 }

@@ -16,7 +16,7 @@ class JacksonFieldMetadataRetrievalStrategyTest {
     fun `extract description from annotated field`() {
         assertThat(
             JacksonFieldMetadataRetrievalStrategy(Model(), "someField"),
-            equalTo(FieldMetadata(description = "Some Field Description"))
+            equalTo(FieldMetadata(mapOf("description" to "Some Field Description")))
         )
     }
 
@@ -24,7 +24,7 @@ class JacksonFieldMetadataRetrievalStrategyTest {
     fun `extract description from annotated field in base class`() {
         assertThat(
             JacksonFieldMetadataRetrievalStrategy(Model(), "parentField"),
-            equalTo(FieldMetadata(description = "Parent Field Description"))
+            equalTo(FieldMetadata(mapOf("description" to "Parent Field Description")))
         )
     }
 

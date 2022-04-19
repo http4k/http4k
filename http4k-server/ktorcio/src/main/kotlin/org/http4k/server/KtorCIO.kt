@@ -8,6 +8,27 @@ import io.ktor.response.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.utils.io.jvm.javaio.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.createApplicationPlugin
+import io.ktor.server.application.install
+import io.ktor.server.cio.CIO
+import io.ktor.server.cio.CIOApplicationEngine
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.stop
+import io.ktor.server.plugins.origin
+import io.ktor.server.request.ApplicationRequest
+import io.ktor.server.request.header
+import io.ktor.server.request.httpMethod
+import io.ktor.server.request.uri
+import io.ktor.server.response.ApplicationResponse
+import io.ktor.server.response.header
+import io.ktor.server.response.respondOutputStream
+import io.ktor.utils.io.jvm.javaio.toInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.withContext
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -20,6 +41,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
+@OptIn(EngineAPI::class)
 class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode) : ServerConfig {
     constructor(port: Int = 8000) : this(port, Immediate)
 
@@ -29,13 +51,15 @@ class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode
         }
     }
 
-    @OptIn(EngineAPI::class)
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine: CIOApplicationEngine = embeddedServer(CIO, port) {
-            intercept(Call) {
-                with(context) { response.fromHttp4K(http(request.asHttp4k())) }
-                return@intercept finish()
-            }
+            install(createApplicationPlugin(name = "http4k") {
+                onCall {
+                    withContext(Default) {
+                        it.response.fromHttp4K(http(it.request.asHttp4k()))
+                    }
+                }
+            })
         }
 
         override fun start() = apply {

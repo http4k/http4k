@@ -5,8 +5,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.webdriver.By
 import org.http4k.webdriver.Http4kWebDriver
+import org.openqa.selenium.By
 
 fun main() {
     val app = routes(
@@ -21,7 +21,6 @@ fun main() {
 
     println(driver.title)
 
-    // Note that we are using `org.http4k.webdriver.By`, as opposed to the ones from `org.openqa.selenium.By`
     println(driver.findElement(By.tagName("title")))
 
 // prints:

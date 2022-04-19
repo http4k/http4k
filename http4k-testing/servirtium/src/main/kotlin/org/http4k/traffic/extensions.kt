@@ -73,7 +73,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
         headerLine<Response>() + ":\n" +
         headerBlock() + "\n" +
         bodyLine<Response>() + " (${status.code}: ${(CONTENT_TYPE(this)?.toHeaderValue()
-        ?: "")}):\n\n```\n"
+        .orEmpty())}):\n\n```\n"
         ).toByteArray()
 
     private fun Request.header() = ("## Interaction ${count.getAndIncrement()}: ${method.name} $uri\n\n" +

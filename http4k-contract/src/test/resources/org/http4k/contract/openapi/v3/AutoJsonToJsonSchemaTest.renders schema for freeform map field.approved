@@ -1,8 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.MapHolder",
-    "example": null,
-    "description": null
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.MapHolder"
   },
   "definitions": [
     {
@@ -15,13 +13,8 @@
               },
               "example": {
               },
-              "description": null,
-              "type": "object",
-              "required": [
-              ]
+              "type": "object"
             },
-            "example": null,
-            "description": null,
             "type": "object"
           }
         },
@@ -29,7 +22,6 @@
           "value": {
           }
         },
-        "description": null,
         "type": "object",
         "required": [
           "value"

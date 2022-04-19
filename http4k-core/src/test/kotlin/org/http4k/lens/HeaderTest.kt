@@ -10,6 +10,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Parameter
 import org.http4k.core.Request
@@ -143,5 +144,27 @@ class HeaderTest {
         assertThat(Header.parseValueAndDirectives("some value; bob   ;bob2=anotherValue   "),
             equalTo("some value" to
                 listOf("bob" to null, "bob2" to "anotherValue")))
+    }
+
+    @Test
+    fun `enum`() {
+        val requiredLens = Header.enum<Method>().required("method")
+        assertThat(requiredLens(Request(GET, "/").header("method", "GET")), equalTo(GET))
+
+        val optionalLens = Header.enum<Method>().optional("whatevs")
+        assertThat(optionalLens(Request(GET, "/").header("whatevs", "GET")), equalTo(GET))
+        assertThat(optionalLens(Request(GET, "/")), absent())
+    }
+
+    @Test
+    fun `mapped enum`() {
+        val requiredLens = Header.enum(MappedEnum::from, MappedEnum::to).required("whatevs")
+        assertThat(requiredLens(Request(GET, "/").header("whatevs", "eulav")), equalTo(MappedEnum.value))
+    }
+
+    @Test
+    fun `case-insensitive enum`() {
+        val lens = Header.enum<Method>(caseSensitive = false).required("method")
+        assertThat(lens(Request(GET, "/").header("method", "delete")), equalTo(Method.DELETE))
     }
 }
