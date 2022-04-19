@@ -3,6 +3,7 @@ package org.http4k.util
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
@@ -17,5 +18,11 @@ class HexTest {
     fun `converts hex to byte array`() {
         val expected = ByteBuffer.wrap("http4k".toByteArray(StandardCharsets.UTF_8))
         assertThat(ByteBuffer.wrap(Hex.unhex("68747470346B")), equalTo(expected))
+    }
+
+    @Test
+    fun `checks for even input length`() {
+        val exception = assertThrows<IllegalStateException> { Hex.unhex("4") }
+        assertThat(exception.message, equalTo("Must have an even length"))
     }
 }
