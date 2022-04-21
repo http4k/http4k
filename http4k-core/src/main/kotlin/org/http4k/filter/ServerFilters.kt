@@ -143,13 +143,16 @@ object ServerFilters {
             ?.takeIf { it.startsWith("Basic") }
             ?.substringAfter("Basic")
             ?.trim()
+            ?.safeBase64Decoded()
             ?.toCredentials()
 
-        private fun String.toCredentials(): Credentials? = try {
-            base64Decoded().split(":").let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
-        } catch (e: IllegalArgumentException) {
-            null
-        }
+        private fun String.safeBase64Decoded(): String? = try {
+            base64Decoded()
+        } catch (e: IllegalArgumentException) { null }
+
+        private fun String.toCredentials(): Credentials =
+            split(":", ignoreCase = false, limit = 2)
+            .let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
     }
 
     /**
