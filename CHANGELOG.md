@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.25.11.0 (uncut)
-- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.21.
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-core**: Fix #728 = No way to set the request timeout when using the JavaHttpClient. H/T @gmulders
 
 ### v4.25.10.1
