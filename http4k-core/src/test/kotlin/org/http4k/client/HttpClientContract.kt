@@ -31,7 +31,6 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.server.ServerConfig
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.util.Locale.getDefault
@@ -150,7 +149,6 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    @Disabled
     open fun `socket timeouts are converted into 504`() {
         val response = timeoutClient(Request(GET, "http://localhost:$port/delay?millis=150"))
 

@@ -9,6 +9,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.net.ConnectException
@@ -20,6 +21,7 @@ import java.net.http.HttpClient.Version.HTTP_1_1
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
+import java.net.http.HttpTimeoutException
 import java.nio.ByteBuffer
 import java.util.Locale.getDefault
 
@@ -33,10 +35,11 @@ object JavaHttpClient {
     operator fun invoke(
         httpClient: HttpClient = defaultJavaHttpClient(),
         requestBodyMode: BodyMode = Memory,
-        responseBodyMode: BodyMode = Memory
+        responseBodyMode: BodyMode = Memory,
+        requestModifier: (HttpRequest.Builder) -> HttpRequest.Builder = { it },
     ) = object : HttpHandler {
         override fun invoke(request: Request): Response = try {
-            val javaRequest = request.toJavaHttpRequest(requestBodyMode)
+            val javaRequest = request.toJavaHttpRequest(requestBodyMode, requestModifier)
             when (responseBodyMode) {
                 is Memory -> httpClient.send(javaRequest, BodyHandlers.ofByteArray())
                     .run { coreResponse().body(Body(ByteBuffer.wrap(body()))) }
@@ -47,6 +50,8 @@ object JavaHttpClient {
             Response(UNKNOWN_HOST.toClientStatus(e))
         } catch (e: ConnectException) {
             Response(CONNECTION_REFUSED.toClientStatus(e))
+        } catch (e: HttpTimeoutException) {
+            Response(CLIENT_TIMEOUT.toClientStatus(e))
         }
     }
 }
@@ -61,14 +66,16 @@ object PreCannedJavaHttpClients {
         .build()
 }
 
-private fun Request.toJavaHttpRequest(bodyMode: BodyMode) =
+private fun Request.toJavaHttpRequest(bodyMode: BodyMode, requestModifier: (HttpRequest.Builder) -> HttpRequest.Builder) =
     HttpRequest.newBuilder()
         .uri(URI.create(uri.toString()))
         .apply {
             headers
                 .filterNot { disallowedHeaders.contains(it.first.lowercase(getDefault())) }
                 .fold(this) { acc, next -> acc.header(next.first, next.second) }
-        }.method(method.name, body.toRequestPublisher(bodyMode)).build()
+        }.method(method.name, body.toRequestPublisher(bodyMode))
+        .let(requestModifier)
+        .build()
 
 private fun <T> HttpResponse<T>.coreResponse() =
     Response(Status(statusCode(), "")).headers(headers().map()
