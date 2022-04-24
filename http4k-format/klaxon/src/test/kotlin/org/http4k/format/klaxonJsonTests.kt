@@ -16,6 +16,8 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
 
     override val expectedAutoMarshallingResultPrimitives = """{"duration":"PT1S", "instant":"1970-01-01T00:00:00Z", "localDate":"2000-01-01", "localDateTime":"2000-01-01T01:01:01", "localTime":"01:01:01", "offsetDateTime":"2000-01-01T01:01:01Z", "offsetTime":"01:01:01Z", "status":200, "uri":"http://uri:8000", "url":"http://url:9000", "uuid":"1a448854-1687-4f90-9562-7d527d64383c", "zonedDateTime":"2000-01-01T01:01:01Z[UTC]"}"""
 
+    override val expectedAutoMarshallingZonesAndLocale = """{"locale":"en-CA","zoneId":"America/Toronto","zoneOffset":"-04:00"}"""
+
     override fun customMarshaller() = object : ConfigurableKlaxon(KKlaxon().asConfigurable().customise()) {}
     override fun customMarshallerProhibitStrings()= object : ConfigurableKlaxon(KKlaxon().asConfigurable().prohibitStrings().customise()) {}
 

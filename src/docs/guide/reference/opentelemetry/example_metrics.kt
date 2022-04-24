@@ -14,7 +14,6 @@ import org.http4k.filter.OpenTelemetryMetrics
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import java.time.Duration
 
 fun main() {
     // test only: this sets up the metrics provider to something we can read
@@ -24,7 +23,7 @@ fun main() {
         .setMeterProvider(
             SdkMeterProvider.builder()
                 .registerMetricReader(inMemoryMetricReader)
-                .setMinimumCollectionInterval(Duration.ofMillis(1)).build()
+                .build()
         )
         .buildAndRegisterGlobal()
 

@@ -27,6 +27,7 @@ import java.time.OffsetTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.util.Locale
 import java.util.UUID
 
 @Serializable
@@ -274,6 +275,13 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         val list = listOf(FirstChild("hello"), SecondChild("world"))
 
         assertThat(body(Response(Status.OK).with(body of list)), equalTo(list))
+    }
+
+    override fun `roundtrip zones and locale`() {
+        val obj = ZonesAndLocale(zoneId = ZoneId.of("America/Toronto"), zoneOffset = ZoneOffset.of("-04:00"), locale = Locale.CANADA)
+        val out = KotlinxSerialization.asFormatString(obj)
+        assertThat(out, equalTo(expectedAutoMarshallingZonesAndLocale))
+        assertThat(KotlinxSerialization.asA(out, ZonesAndLocale::class), equalTo(obj))
     }
 
     override fun customMarshaller(): AutoMarshalling =

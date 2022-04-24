@@ -48,6 +48,13 @@ class BasicAuthenticationTest {
     }
 
     @Test
+    fun authenticate_with_colons_in_password() {
+        val handler = ServerFilters.BasicAuth("my realm", "user", "pass:word").then { Response(OK) }
+        val response = ClientFilters.BasicAuth("user", "pass:word").then(handler)(Request(GET, "/"))
+        assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
     fun fails_to_authenticate_with_non_basic_token() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
         val response = ClientFilters.BearerAuth(CredentialsProvider { "token" }).then(handler)(Request(GET, "/"))

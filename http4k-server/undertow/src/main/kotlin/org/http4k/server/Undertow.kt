@@ -7,11 +7,8 @@ import io.undertow.Undertow
 import io.undertow.UndertowOptions.ENABLE_HTTP2
 import io.undertow.server.handlers.BlockingHandler
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress

@@ -17,8 +17,6 @@ import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URL
 import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.Date
 import org.http4k.core.cookie.Cookie as HCookie
 

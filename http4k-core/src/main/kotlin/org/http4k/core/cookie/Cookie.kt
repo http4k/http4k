@@ -98,8 +98,8 @@ data class Cookie(
         if (toCheck) add(toInclude)
     }
 
-    fun fullCookieString(): String = "$name=${value.quoted()}; ${attributes()}"
-    fun keyValueCookieString(): String = "$name=${value.quoted()}"
+    fun fullCookieString(unquotedValue: Boolean = false): String = "$name=${if (unquotedValue) value else value.quoted()}; ${attributes()}"
+    fun keyValueCookieString(unquotedValue: Boolean = false): String = "$name=${if (unquotedValue) value else value.quoted()}"
 }
 
 enum class SameSite {

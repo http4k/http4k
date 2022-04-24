@@ -78,6 +78,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * **1LOC** client adapters 
         * **Apache** sync + async HTTP
         * **Java** (bundled with `http4k-core`)
+        * **Fuel** HTTP (supports sync and async HTTP)
         * **Jetty** HTTP (supports sync and async HTTP)
         * **OkHttp** HTTP (supports sync and async HTTP)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
@@ -130,6 +131,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **[YAML](https://www.http4k.org/guide/reference/yaml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
             * **Moshi** - includes support for **fully automatic marshalling of Data classes**
+        * **CSV** - includes support for: 
+            * **Jackson** - CSV format for Jackson
 * [Resilience4J:](https://http4k.org/guide/reference/resilience4j) 
     * Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
 * [Micrometer:](https://http4k.org/guide/reference/micrometer) 
@@ -181,9 +184,9 @@ To install, add these dependencies to your **Gradle** file:
 
 ```groovy
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "4.25.5.2"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.25.5.2"
-    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.25.5.2"
+    implementation group: "org.http4k", name: "http4k-core", version: "4.25.10.1"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.25.10.1"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.25.10.1"
 }
 ```
 

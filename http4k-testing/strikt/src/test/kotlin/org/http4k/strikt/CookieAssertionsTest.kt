@@ -2,19 +2,10 @@ package org.http4k.strikt
 
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.SameSite
-import org.http4k.strikt.domain
-import org.http4k.strikt.expires
-import org.http4k.strikt.httpOnly
-import org.http4k.strikt.name
-import org.http4k.strikt.path
-import org.http4k.strikt.sameSite
-import org.http4k.strikt.secure
-import org.http4k.strikt.value
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.time.Instant
-import java.time.LocalDateTime
 
 class CookieAssertionsTest {
 

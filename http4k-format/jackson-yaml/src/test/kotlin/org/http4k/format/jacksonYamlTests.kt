@@ -130,6 +130,8 @@ unknown: "2000-01-01"
 key2:"123"
 """
 
+    override val expectedAutoMarshallingZonesAndLocale = "zoneId:\"America/Toronto\"\nzoneOffset:\"-04:00\"\nlocale:\"en-CA\"\n"
+
     override fun customMarshaller() =
         object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
 

@@ -2,13 +2,10 @@ package org.http4k.server
 
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
-import io.netty.handler.codec.http.DefaultFullHttpResponse
 import io.netty.handler.codec.http.HttpHeaderNames.CONNECTION
 import io.netty.handler.codec.http.HttpHeaderValues.UPGRADE
 import io.netty.handler.codec.http.HttpHeaderValues.WEBSOCKET
 import io.netty.handler.codec.http.HttpRequest
-import io.netty.handler.codec.http.HttpResponseStatus
-import io.netty.handler.codec.http.HttpVersion
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolConfig
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler
 import org.http4k.core.Method

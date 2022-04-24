@@ -3,6 +3,36 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.11.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.21.
+- **http4k-core**: Fix #728 = No way to set the request timeout when using the JavaHttpClient. H/T @gmulders
+
+### v4.25.10.1
+- **http4k-core**: Fix ServerFilters.BasicAuth handling of passwords containing colons H/T @robd
+
+### v4.25.10.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Expand out values4k lens option
+- **http4k-core** : Allow cookie values to be returned unquoted H/T @2x2xplz
+- **http4k-format-*** : Throw a lens failure if a valid locale was not parsed H/T @oharaandrew314
+- **http4k-opentelemetry** : Fix #726 - OpenTelemetry: t.localizedMessage can't be null
+
+### v4.25.9.0
+- **http4k-*** : Upgrade some dependency versions, including Ktor to v2.0.0
+- **http4k-format-jackson-csv*** : New module! H/T @oharaandrew314 for the contribution.
+- **http4k-core**: New standard mappings for Time primitives.  H/T @oharaandrew314
+
+### v4.25.8.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.20.
+- **http4k-core**: Enable overridable behaviour for CatchAll filter. H/T @dcmg
+- **http4k-multipart**: Add disk cache path to MultipartFormBody.from() parameters. H/T @rny
+
+### v4.25.7.0
+- **http4k-client-fuel**: New Module! An http4k client based on [Fuel](https://github.com/kittinunf/Fuel) with both sync and async support. 
+
+### v4.25.6.0
+- **http4k-*** : Upgrade some dependency versions, including Jackson to overcome CVE-2020-36518.
+
 ### v4.25.5.2
 - **http4k-contract**: Don't output required fields into OpenAPI if there are none.
 

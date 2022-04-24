@@ -202,7 +202,7 @@ class MultipartFormParserTest {
     }
 }
 
-private fun List<Part>.close() = forEach(Part::close)
+private fun List<Part>.close(): Unit = forEach(Part::close)
 
 private fun List<Part>.parts(name: String): List<Part> = filter { it.fieldName == name }
 

@@ -13,3 +13,11 @@ dependencies {
     testImplementation(project(path = ":http4k-jsonrpc", configuration ="testArtifacts"))
     testImplementation(project(":http4k-testing-approval"))
 }
+
+tasks {
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = freeCompilerArgs + listOf("-opt-in=kotlin.RequiresOptIn")
+        }
+    }
+}

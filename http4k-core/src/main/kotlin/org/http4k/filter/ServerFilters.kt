@@ -10,7 +10,6 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
@@ -144,13 +143,16 @@ object ServerFilters {
             ?.takeIf { it.startsWith("Basic") }
             ?.substringAfter("Basic")
             ?.trim()
+            ?.safeBase64Decoded()
             ?.toCredentials()
 
-        private fun String.toCredentials(): Credentials? = try {
-            base64Decoded().split(":").let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
-        } catch (e: IllegalArgumentException) {
-            null
-        }
+        private fun String.safeBase64Decoded(): String? = try {
+            base64Decoded()
+        } catch (e: IllegalArgumentException) { null }
+
+        private fun String.toCredentials(): Credentials =
+            split(":", ignoreCase = false, limit = 2)
+            .let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
     }
 
     /**
@@ -253,19 +255,33 @@ object ServerFilters {
     }
 
     /**
-     * Last gasp filter which catches all exceptions and returns a formatted Internal Server Error.
+     * Last gasp filter which catches all `Throwable`s and invokes `onError`.
+     * The default `onError` is backward compatible with previous implementations,
+     * returning INTERNAL_SERVER_ERROR and a formatted stack trace for `Exception`s,
+     * and leaking other `Throwable`s.
+     *
+     * We suggest that you override this behaviour in public-facing systems to log the
+     * stack trace rather than show it to the world.
      */
     object CatchAll {
-        operator fun invoke(errorStatus: Status = INTERNAL_SERVER_ERROR): Filter = Filter { next ->
+        operator fun invoke(
+            onError: (Throwable) -> Response = ::originalBehaviour,
+        ): Filter = Filter { next ->
             {
                 try {
                     next(it)
-                } catch (e: Exception) {
-                    val sw = StringWriter()
-                    e.printStackTrace(PrintWriter(sw))
-                    Response(errorStatus).body(sw.toString())
+                } catch (e: Throwable) {
+                    onError(e)
                 }
             }
+        }
+
+        fun originalBehaviour(e: Throwable): Response {
+            if (e !is Exception) throw e
+            val stackTraceAsString = StringWriter().apply {
+                e.printStackTrace(PrintWriter(this))
+            }.toString()
+            return Response(INTERNAL_SERVER_ERROR).body(stackTraceAsString)
         }
     }
 

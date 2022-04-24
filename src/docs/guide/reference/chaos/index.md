@@ -4,7 +4,7 @@ description: Feature overview of the http4k-testing-chaos module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-testing-chaos", version: "4.25.5.2"
+implementation group: "org.http4k", name: "http4k-testing-chaos", version: "4.25.10.1"
 ```
 
 ### About

@@ -14,13 +14,13 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.WebForm
+import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.OAuthWebForms.clientId
 import org.http4k.security.OAuthWebForms.code
 import org.http4k.security.OAuthWebForms.grantType
 import org.http4k.security.OAuthWebForms.redirectUri
 import org.http4k.security.OAuthWebForms.requestForm
 import org.http4k.security.OAuthWebForms.responseForm
-import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.openid.IdToken
 
 class AccessTokenFetcher(

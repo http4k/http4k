@@ -10,7 +10,6 @@ import io.opentelemetry.sdk.metrics.data.MetricData
 import io.opentelemetry.sdk.testing.exporter.InMemoryMetricReader
 import org.http4k.core.Method
 import org.http4k.core.Status
-import java.time.Duration
 
 /**
  * Use the InMemory exporter to get the recorded metrics from the global state.
@@ -23,7 +22,7 @@ fun setupOpenTelemetryMeterProvider() {
         .setMeterProvider(
             SdkMeterProvider.builder()
                 .registerMetricReader(inMemoryMetricReader)
-                .setMinimumCollectionInterval(Duration.ofMillis(1)).build()
+                .build()
         )
         .buildAndRegisterGlobal()
 }
