@@ -42,6 +42,14 @@ data class ArbObject3(val str: String = "stringValue", val num: Int = 1) : Gener
 
 data class ArbObjectHolder(val inner: List<ArbObject2> = listOf(ArbObject2()))
 
+enum class Enum1 {
+     value
+}
+
+enum class Enum2 {
+     value
+}
+
 data class ArbObject(
     val child: ArbObject2 = ArbObject2(),
     val list: List<ArbObject2> = listOf(ArbObject2(), ArbObject2()),
@@ -245,6 +253,11 @@ class AutoJsonToJsonSchemaTest {
     @Test
     fun `renders schema for top level generic list`(approver: Approver) {
         approver.assertApproved(listOf(ArbObject(), ArbObject2()))
+    }
+
+    @Test
+    fun `renders schema for top level generic list of enums`(approver: Approver) {
+        approver.assertApproved(listOf(Enum1.value, Enum2.value))
     }
 
     @Test
