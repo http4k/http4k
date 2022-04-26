@@ -14,8 +14,9 @@
         "example": {
           "value": {
             "value": [
-              "value",
-              "value"
+              "value1_1",
+              "value2_1",
+              "value1_2"
             ]
           }
         },
@@ -41,16 +42,18 @@
               ]
             },
             "example": [
-              "value",
-              "value"
+              "value1_1",
+              "value2_1",
+              "value1_2"
             ],
             "type": "array"
           }
         },
         "example": {
           "value": [
-            "value",
-            "value"
+            "value1_1",
+            "value2_1",
+            "value1_2"
           ]
         },
         "type": "object",
@@ -62,9 +65,10 @@
     {
       "first": "org.http4k.contract.openapi.v3.Enum1",
       "second": {
-        "example": "value",
+        "example": "value1_1",
         "enum": [
-          "value"
+          "value1_1",
+          "value1_2"
         ],
         "type": "string"
       }
@@ -72,9 +76,10 @@
     {
       "first": "org.http4k.contract.openapi.v3.Enum2",
       "second": {
-        "example": "value",
+        "example": "value2_1",
         "enum": [
-          "value"
+          "value2_1",
+          "value2_2"
         ],
         "type": "string"
       }

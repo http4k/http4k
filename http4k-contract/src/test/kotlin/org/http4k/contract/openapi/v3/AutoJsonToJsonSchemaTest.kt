@@ -43,11 +43,11 @@ data class ArbObject3(val str: String = "stringValue", val num: Int = 1) : Gener
 data class ArbObjectHolder(val inner: List<ArbObject2> = listOf(ArbObject2()))
 
 enum class Enum1 : Generic {
-    value
+    value1_1, value1_2
 }
 
 enum class Enum2 : Generic {
-    value
+    value2_1, value2_2
 }
 
 data class ArbObject(
@@ -259,7 +259,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for different enum types`(approver: Approver) {
-        approver.assertApproved(GenericHolder(GenericListHolder(listOf(Enum1.value, Enum2.value))))
+        approver.assertApproved(GenericHolder(GenericListHolder(listOf(Enum1.value1_1, Enum2.value2_1, Enum1.value1_2))))
     }
 
     @Test
