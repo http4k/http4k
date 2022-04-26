@@ -1,0 +1,83 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericHolder"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.openapi.v3.GenericHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericListHolder"
+          }
+        },
+        "example": {
+          "value": {
+            "value": [
+              "value",
+              "value"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.openapi.v3.GenericListHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Enum1"
+                },
+                {
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Enum2"
+                }
+              ]
+            },
+            "example": [
+              "value",
+              "value"
+            ],
+            "type": "array"
+          }
+        },
+        "example": {
+          "value": [
+            "value",
+            "value"
+          ]
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.openapi.v3.Enum1",
+      "second": {
+        "example": "value",
+        "enum": [
+          "value"
+        ],
+        "type": "string"
+      }
+    },
+    {
+      "first": "org.http4k.contract.openapi.v3.Enum2",
+      "second": {
+        "example": "value",
+        "enum": [
+          "value"
+        ],
+        "type": "string"
+      }
+    }
+  ]
+}

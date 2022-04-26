@@ -42,12 +42,12 @@ data class ArbObject3(val str: String = "stringValue", val num: Int = 1) : Gener
 
 data class ArbObjectHolder(val inner: List<ArbObject2> = listOf(ArbObject2()))
 
-enum class Enum1 {
-     value
+enum class Enum1 : Generic {
+    value
 }
 
-enum class Enum2 {
-     value
+enum class Enum2 : Generic {
+    value
 }
 
 data class ArbObject(
@@ -78,6 +78,8 @@ enum class Foo {
 data class Nulls(val f1: String? = null, val f2: String? = null)
 
 data class GenericListHolder(val value: List<Generic>)
+data class GenericHolder<T>(val value: T)
+
 data class MapHolder(val value: Map<Any, Any>)
 
 data class JacksonFieldAnnotated(@JsonProperty("OTHERNAME") val uri: Uri = Uri.of("foobar"))
@@ -256,8 +258,8 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
-    fun `renders schema for top level generic list of enums`(approver: Approver) {
-        approver.assertApproved(listOf(Enum1.value, Enum2.value))
+    fun `renders schema for different enum types`(approver: Approver) {
+        approver.assertApproved(GenericHolder(GenericListHolder(listOf(Enum1.value, Enum2.value))))
     }
 
     @Test
