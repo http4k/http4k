@@ -14,7 +14,6 @@ import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import com.github.dockerjava.transport.DockerHttpClient
 import org.http4k.core.Uri
 import org.http4k.core.extend
-import org.http4k.server.ServerConfig
 import org.http4k.server.ServerConfig.StopMode
 import java.io.File
 import java.nio.file.Files
