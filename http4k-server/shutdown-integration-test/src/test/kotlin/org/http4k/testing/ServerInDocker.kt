@@ -35,7 +35,6 @@ class ServerInDocker {
     private val dockerClient = DockerClientImpl.getInstance(config, http)
 
     fun start(): ContainerId {
-
         dockerWorkspace("/").apply {
             deleteRecursively()
             mkdirs()
@@ -90,22 +89,10 @@ class ServerInDocker {
 
         dockerClient.startContainerCmd(containerId).exec()
 
-        dockerClient.logContainerCmd(containerId)
-            .withStdOut(true)
-            .withStdErr(true)
-            .withTailAll()
-            .withSince(0)
-            .exec(object : ResultCallback.Adapter<Frame>() {
-                override fun onNext(frame: Frame) {
-                    println(frame)
-                }
-            }).awaitCompletion()
-
         return ContainerId(containerId)
     }
 
     fun eventsFor(containerId: ContainerId): List<Event> {
-        println(containerId)
         val list = mutableListOf<Event>()
         dockerClient.logContainerCmd(containerId.value)
             .withStdOut(true)
@@ -114,7 +101,6 @@ class ServerInDocker {
             .withSince(0)
             .exec(object : ResultCallback.Adapter<Frame>() {
                 override fun onNext(frame: Frame) {
-                    println("got $frame")
                     val tokens = String(frame.payload).split("container_event=")
                     if (tokens.size == 2) {
                         list += ContainerEventsJackson.asA<TestServerEvent>(tokens[1])
