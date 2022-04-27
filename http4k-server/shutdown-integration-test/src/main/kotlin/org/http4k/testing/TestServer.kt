@@ -32,7 +32,6 @@ fun main() {
         }
 
     Runtime.getRuntime().addShutdownHook(Thread {
-        println("shutdown requested")
         events(ServerStopRequested())
         server.stop()
         events(ServerStopped())
