@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonReader.Token.NULL
 import com.squareup.moshi.JsonWriter
@@ -20,13 +21,14 @@ import org.http4k.security.State
 object OAuthServerMoshi : ConfigurableMoshi(
     Moshi.Builder()
         .add(AccessTokenResponseAdapter)
+        .add(ErrorResponseJsonAdapter)
         .asConfigurable()
         .withStandardMappings()
         .text(::ClientId, ClientId::value)
         .text(::State, State::value)
         .text(::Nonce, Nonce::value)
-        .text(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue)
-        .text(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue)
+        .text(ResponseMode::fromQueryParameterValue, ResponseMode::queryParameterValue)
+        .text(ResponseType::fromQueryParameterValue, ResponseType::queryParameterValue)
         .done()
 )
 
@@ -91,5 +93,62 @@ object AccessTokenResponseAdapter : JsonAdapter<AccessTokenResponse>() {
                 string("refresh_token")
             )
         }
+    }
+}
+
+object ErrorResponseJsonAdapter : JsonAdapter<ErrorResponse>() {
+    private val options = JsonReader.Options.of(
+        "error",
+        "error_description",
+        "error_uri"
+    )
+
+    override fun toJson(writer: JsonWriter, `value`: ErrorResponse?) {
+        if (`value` == null) {
+            writer.nullValue()
+            return
+        }
+        writer.beginObject()
+        writer.name("error")
+        writer.value(`value`.error)
+        writer.name("error_description")
+        writer.value(`value`.error_description)
+        writer.name("error_uri")
+        writer.value(`value`.error_uri)
+        writer.endObject()
+    }
+
+    override fun fromJson(reader: JsonReader): ErrorResponse? {
+        if (reader.peek() == NULL) return reader.nextNull()
+
+        var error: String? = null
+        var error_description: String? = null
+        var error_uri: String? = null
+
+        reader.beginObject()
+        while (reader.hasNext()) {
+            when (reader.selectName(options)) {
+                0 -> {
+                    if (reader.peek() == NULL) reader.skipValue()
+                    else error = reader.nextString()
+                }
+                1 -> {
+                    if (reader.peek() == NULL) reader.skipValue() else error_description = reader.nextString()
+                }
+                2 -> {
+                    if (reader.peek() == NULL) reader.skipValue() else error_uri = reader.nextString()
+                }
+                -1 -> {
+                    reader.skipName()
+                    reader.skipValue()
+                }
+            }
+        }
+        reader.endObject()
+
+        if (error == null) throw JsonDataException("error was null")
+        if (error_description == null) throw JsonDataException("error_description was null")
+
+        return ErrorResponse(error, error_description, error_uri)
     }
 }
