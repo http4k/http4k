@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit
 
 object ProjectFiles {
     private val basePath = Uri.of("http4k-server/shutdown-integration-test")
-
     private val dockerWorkspace = basePath.extend(Uri.of("build/docker"))
     fun dockerWorkspace(subPath: String) = File(dockerWorkspace.extend(Uri.of(subPath)).path)
     fun project(subPath: String) = File(basePath.extend(Uri.of(subPath)).path)
