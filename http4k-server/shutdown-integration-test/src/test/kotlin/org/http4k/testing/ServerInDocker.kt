@@ -12,9 +12,11 @@ import org.http4k.core.Uri
 import org.http4k.core.extend
 import org.http4k.events.Event
 import org.http4k.server.ServerConfig
+import org.junit.jupiter.api.fail
 import java.io.File
 import java.nio.file.Files
 import java.time.Duration
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class ServerInDocker {
@@ -35,6 +37,8 @@ class ServerInDocker {
     private val dockerClient = DockerClientImpl.getInstance(config, http)
 
     fun start(): ContainerId {
+        val backend = ServerBackend.Undertow
+
         dockerWorkspace("/").apply {
             deleteRecursively()
             mkdirs()
@@ -71,11 +75,12 @@ class ServerInDocker {
             bind(exposedPort, Ports.Binding.bindPort(8000))
         }
 
+
         val containerId = dockerClient.createContainerCmd(imageId)
             .withName("http4k-server-shutdown-integration-test")
             .withEnv(
                 listOf(
-                    "BACKEND=${ServerBackend.Undertow}",
+                    "BACKEND=$backend",
                     "STOP_MODE=${ServerConfig.StopMode.Immediate.javaClass.simpleName}"
                 )
             )
@@ -85,11 +90,12 @@ class ServerInDocker {
                     .withLogConfig(LogConfig(LogConfig.LoggingType.JSON_FILE))
                     .withPortBindings(portBindings)
             )
-            .exec().id
+            .exec().id.let(::ContainerId)
 
-        dockerClient.startContainerCmd(containerId).exec()
+        dockerClient.startContainerCmd(containerId.value).exec()
 
-        return ContainerId(containerId)
+        waitForEvent(containerId, TestServerEvent.ServerStarted(backend))
+        return containerId
     }
 
     fun eventsFor(containerId: ContainerId): List<Event> {
@@ -108,6 +114,19 @@ class ServerInDocker {
                 }
             }).awaitCompletion()
         return list.toImmutableList()
+    }
+
+    private fun waitForEvent(containerId: ContainerId, event: TestServerEvent) {
+        val countdown = CountDownLatch(1)
+        Thread {
+            while (!eventsFor(containerId).contains(event)) {
+                Thread.sleep(1000)
+            }
+            countdown.countDown()
+        }.start()
+        val succeeded = countdown.await(30, TimeUnit.SECONDS)
+        if (!succeeded) fail("Timed out waiting for event: $event")
+
     }
 }
 
