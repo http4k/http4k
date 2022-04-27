@@ -14,6 +14,8 @@ import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import com.github.dockerjava.transport.DockerHttpClient
 import org.http4k.core.Uri
 import org.http4k.core.extend
+import org.http4k.server.ServerConfig
+import org.http4k.server.ServerConfig.StopMode
 import java.io.File
 import java.nio.file.Files
 import java.time.Duration
@@ -78,7 +80,12 @@ fun main() {
 
     val containerId = dockerClient.createContainerCmd(imageId)
         .withName("http4k-server-shutdown-integration-test")
-        .withEnv("BACKEND=${ServerBackend.Undertow}")
+        .withEnv(
+            listOf(
+                "BACKEND=${ServerBackend.Undertow}",
+                "STOP_MODE=${StopMode.Immediate.javaClass.simpleName}"
+            )
+        )
         .withExposedPorts(exposedPort)
         .withHostConfig(
             newHostConfig()
