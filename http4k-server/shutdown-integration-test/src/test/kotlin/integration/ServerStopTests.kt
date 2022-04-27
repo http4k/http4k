@@ -11,3 +11,11 @@ class ApacheServerStopTest : ServerStopContract(
         enableGracefulStop()
     }
 )
+
+class UndertowStopTest : ServerStopContract(
+    ServerBackend.Undertow,
+    ApacheClient(),
+    {
+        enableImmediateStop()
+        enableGracefulStop()
+    })
