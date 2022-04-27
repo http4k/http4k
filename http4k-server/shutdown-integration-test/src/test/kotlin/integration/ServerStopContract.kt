@@ -158,7 +158,6 @@ abstract class ServerStopContract(
     }
 
     @Test
-    @Disabled
     fun `graceful stop mode takes at most the specified timeout to stop`() {
         val modeInTest = defaultGracefulStopMode
         val server = startServerOrSkip(modeInTest)
@@ -169,7 +168,6 @@ abstract class ServerStopContract(
     }
 
     @Test
-    @Disabled
     fun `delayed stop mode takes exactly the specified timeout to stop`() {
         val modeInTest = defaultDelayedStopMode
         val server = startServerOrSkip(modeInTest)
@@ -213,7 +211,6 @@ abstract class ServerStopContract(
     }
 
     @Test
-    @Disabled
     fun `immediate stop mode is cancelling inflight requests`() {
         val server = startServerOrSkip(Immediate)
 
@@ -230,7 +227,6 @@ abstract class ServerStopContract(
     }
 
     @Test
-    @Disabled
     fun `delayed stop mode is waiting for inflight requests to succeed`() {
         startServerOrSkip(defaultDelayedStopMode).testInflightRequestsCompleteDuringServerStop()
     }
