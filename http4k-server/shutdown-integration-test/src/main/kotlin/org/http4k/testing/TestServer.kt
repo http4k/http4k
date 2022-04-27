@@ -11,9 +11,11 @@ import org.http4k.server.ServerConfig
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
+import org.http4k.testing.TestServerEvent.ServerStarted
 import java.time.Duration
 
 fun main() {
+    val events = ContainerEvents()
     val backendKey = EnvironmentKey.enum({ ServerBackend.valueOf(it) }, ServerBackend::name).required("BACKEND")
     val stopModeKey = EnvironmentKey.map({ resolveStopMode(it) }, { it.javaClass.simpleName }).required("STOP_MODE")
 
@@ -21,8 +23,7 @@ fun main() {
     val selectedBackend = backendKey(environment)
     val selectedStopMode = stopModeKey(environment)
 
-    println("Selected $selectedBackend")
-    println("Selected $selectedStopMode")
+    events(ServerStarted(selectedBackend))
 
     val app = { _: Request -> Response(OK).body("hello from http4k") }
 

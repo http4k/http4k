@@ -7,8 +7,10 @@ import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import com.github.dockerjava.transport.DockerHttpClient
+import okhttp3.internal.toImmutableList
 import org.http4k.core.Uri
 import org.http4k.core.extend
+import org.http4k.events.Event
 import org.http4k.server.ServerConfig
 import java.io.File
 import java.nio.file.Files
@@ -21,18 +23,18 @@ class ServerInDocker {
     private fun dockerWorkspace(subPath: String) = File(dockerWorkspace.extend(Uri.of(subPath)).path)
     private fun project(subPath: String) = File(basePath.extend(Uri.of(subPath)).path)
 
+    private val config = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
+    private val http: DockerHttpClient = ApacheDockerHttpClient.Builder()
+        .dockerHost(config.dockerHost)
+        .sslConfig(config.sslConfig)
+        .maxConnections(100)
+        .connectionTimeout(Duration.ofSeconds(30))
+        .responseTimeout(Duration.ofSeconds(45))
+        .build()
+
+    private val dockerClient = DockerClientImpl.getInstance(config, http)
+
     fun start(): ContainerId {
-        val config = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
-
-        val http: DockerHttpClient = ApacheDockerHttpClient.Builder()
-            .dockerHost(config.dockerHost)
-            .sslConfig(config.sslConfig)
-            .maxConnections(100)
-            .connectionTimeout(Duration.ofSeconds(30))
-            .responseTimeout(Duration.ofSeconds(45))
-            .build()
-
-        val dockerClient = DockerClientImpl.getInstance(config, http)
 
         dockerWorkspace("/").apply {
             deleteRecursively()
@@ -100,6 +102,26 @@ class ServerInDocker {
             }).awaitCompletion()
 
         return ContainerId(containerId)
+    }
+
+    fun eventsFor(containerId: ContainerId): List<Event> {
+        println(containerId)
+        val list = mutableListOf<Event>()
+        dockerClient.logContainerCmd(containerId.value)
+            .withStdOut(true)
+            .withStdErr(true)
+            .withTailAll()
+            .withSince(0)
+            .exec(object : ResultCallback.Adapter<Frame>() {
+                override fun onNext(frame: Frame) {
+                    println("got $frame")
+                    val tokens = String(frame.payload).split("container_event=")
+                    if (tokens.size == 2) {
+                        list += ContainerEventsJackson.asA<TestServerEvent>(tokens[1])
+                    }
+                }
+            }).awaitCompletion()
+        return list.toImmutableList()
     }
 }
 
