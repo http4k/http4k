@@ -9,12 +9,13 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.lens.binary
 import org.http4k.routing.bind
+import org.http4k.routing.routes
 import java.io.ByteArrayInputStream
 import java.time.Duration
 
 class TestApp() {
-    val routes =
-        listOf(
+    val allRoutes =
+        routes(
             "/health" bind Method.GET to { Response(Status.OK).body("UP") },
             "/slow-echo" bind Method.POST to slowEchoHandler(Duration.ofMillis(500))
         )

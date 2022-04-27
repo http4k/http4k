@@ -23,7 +23,7 @@ fun main() {
     val selectedBackend = backendKey(environment)
     val selectedStopMode = stopModeKey(environment)
 
-    val app = { _: Request -> Response(OK).body("hello from http4k") }
+    val app = TestApp().allRoutes
 
     val server = app.asServer(selectedBackend(selectedStopMode))
         .apply {

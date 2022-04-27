@@ -225,7 +225,6 @@ abstract class ServerStopContract(
     }
 
     @Test
-    @Disabled
     fun `graceful stop mode is waiting for inflight requests to succeed`() {
         startServerOrSkip(defaultGracefulStopMode).testInflightRequestsCompleteDuringServerStop()
     }
