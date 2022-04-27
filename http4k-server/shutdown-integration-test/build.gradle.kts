@@ -19,3 +19,20 @@ dependencies {
     testImplementation("com.github.docker-java:docker-java-core:_")
     testImplementation("com.github.docker-java:docker-java-transport-httpclient5:_")
 }
+
+tasks.test {
+    filter {
+        exclude("integration/**")
+    }
+}
+
+tasks.register<Test>("integrationTests") {
+    description = "Runs docker-based server shutdown tests."
+    group = "verification"
+
+    useJUnitPlatform()
+
+    filter {
+        include("integration/**")
+    }
+}

@@ -1,4 +1,4 @@
-package org.http4k.testing
+package integration
 
 import com.natpryce.hamkrest.allElements
 import com.natpryce.hamkrest.and
@@ -22,6 +22,8 @@ import org.http4k.server.ServerConfig.StopMode.Delayed
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.server.ServerConfig.UnsupportedStopMode
+import org.http4k.testing.ServerBackend
+import org.http4k.testing.ServerInDocker
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -137,13 +139,11 @@ abstract class ServerStopContract(
     }
 
     @Test
-    @Disabled
     fun `graceful stop mode is blocking on stop`() {
         startServerOrSkip(defaultGracefulStopMode).testBlockingStop()
     }
 
     @Test
-    @Disabled
     fun `delayed stop mode is blocking on stop`() {
         startServerOrSkip(defaultDelayedStopMode).testBlockingStop()
     }

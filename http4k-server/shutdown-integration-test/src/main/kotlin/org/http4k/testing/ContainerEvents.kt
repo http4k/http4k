@@ -29,7 +29,7 @@ class ContainerEvents : Events {
     JsonSubTypes.Type(value = TestServerEvent.ServerStopped::class, name = "ServerStopped")
 )
 sealed class TestServerEvent : Event {
-    data class ServerStarted(val backend: ServerBackend) : TestServerEvent()
+    data class ServerStarted(val backend: ServerBackend, val stopModeName: String) : TestServerEvent()
     data class ServerStopRequested(val ignore: String = "") : TestServerEvent()
     data class ServerStopped(val ignore: String = "") : TestServerEvent()
 }

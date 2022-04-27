@@ -28,7 +28,7 @@ fun main() {
     val server = app.asServer(selectedBackend(selectedStopMode))
         .apply {
             start()
-            events(ServerStarted(selectedBackend))
+            events(ServerStarted(selectedBackend, selectedStopMode::class.java.simpleName))
         }
 
     Runtime.getRuntime().addShutdownHook(Thread {
@@ -41,7 +41,7 @@ fun main() {
 fun resolveStopMode(simpleClassName: String) = when (simpleClassName) {
     StopMode.Immediate::class.java.simpleName -> StopMode.Immediate
     StopMode.Delayed::class.java.simpleName -> StopMode.Delayed(Duration.ofSeconds(10))
-    StopMode.Graceful::class.java.simpleName -> StopMode.Delayed(Duration.ofSeconds(10))
+    StopMode.Graceful::class.java.simpleName -> StopMode.Graceful(Duration.ofSeconds(10))
     else -> error("Unrecognised stop mode: $simpleClassName")
 }
 

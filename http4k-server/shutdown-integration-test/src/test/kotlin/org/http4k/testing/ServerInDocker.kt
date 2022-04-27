@@ -92,7 +92,7 @@ class ServerInDocker {
 
         dockerClient.startContainerCmd(containerId.value).exec()
 
-        waitForEvent(containerId, TestServerEvent.ServerStarted(backend))
+        waitForEvent(containerId, TestServerEvent.ServerStarted(backend, stopMode::class.java.simpleName))
         return containerId
     }
 
