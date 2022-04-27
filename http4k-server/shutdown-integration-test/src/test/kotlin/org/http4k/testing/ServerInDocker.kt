@@ -132,7 +132,6 @@ class ServerInDocker {
 
     fun stop(containerId: ContainerId) {
         dockerClient.stopContainerCmd(containerId.value).exec()
-        waitForEvent(containerId, TestServerEvent.ServerStopped())
     }
 }
 
