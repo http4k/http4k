@@ -4,7 +4,7 @@ import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.enum
 import org.http4k.server.ApacheServer
 import org.http4k.server.ServerConfig
@@ -24,7 +24,7 @@ fun main() {
     println("Selected $selectedBackend")
     println("Selected $selectedStopMode")
 
-    val app = { _: Request -> Response(Status.OK).body("hello from http4k") }
+    val app = { _: Request -> Response(OK).body("hello from http4k") }
 
     val server = app.asServer(selectedBackend(selectedStopMode)).apply { start() }
 
