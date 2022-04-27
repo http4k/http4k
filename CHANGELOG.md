@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v4.25.11.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.21.
 - **http4k-core**: Fix #728 = No way to set the request timeout when using the JavaHttpClient. H/T @gmulders
+- **http4k-oauth-security**: Add missing Moshi adapter
 
 ### v4.25.10.1
 - **http4k-core**: Fix ServerFilters.BasicAuth handling of passwords containing colons H/T @robd
