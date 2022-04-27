@@ -1,7 +1,12 @@
 description = "Integration tests for all servers"
 
-apply(plugin = "application")
+plugins {
+    application
+}
 
+application {
+    mainClass.set("org.http4k.testing.TestServerKt")
+}
 
 dependencies {
     api(project(":http4k-core"))

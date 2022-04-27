@@ -11,6 +11,9 @@ import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import com.github.dockerjava.transport.DockerHttpClient
 import java.io.File
+import java.net.URI
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
@@ -27,9 +30,13 @@ fun main() {
 
     val dockerClient = DockerClientImpl.getInstance(config, http)
 
-    val file = File("http4k-server/shutdown-integration-test/src/main/resources/Dockerfile")
 
-    val imageId = dockerClient.buildImageCmd(file)
+    File("http4k-server/shutdown-integration-test/build/docker").deleteRecursively()
+    File("http4k-server/shutdown-integration-test/build/docker").mkdirs()
+    Files.copy(File("http4k-server/shutdown-integration-test/src/main/resources/Dockerfile").toPath(), File("http4k-server/shutdown-integration-test/build/docker/Dockerfile").toPath())
+    Files.copy(File("http4k-server/shutdown-integration-test/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip").toPath(), File("http4k-server/shutdown-integration-test/build/docker/http4k-server-shutdown-integration-test-LOCAL.zip").toPath())
+
+    val imageId = dockerClient.buildImageCmd(File("http4k-server/shutdown-integration-test/build/docker/Dockerfile"))
         .withTags(setOf("http4k-server-shutdown-integration-test"))
         .exec(BuildImageResultCallback())
         .awaitImageId(10, TimeUnit.SECONDS)
@@ -38,9 +45,15 @@ fun main() {
         .withShowAll(true)
         .exec()
         .find { it.names.contains("/http4k-server-shutdown-integration-test") }
-        ?.let { dockerClient.removeContainerCmd(it.id).exec() }
+        ?.let {
+            if(it.state == "running"){
+                dockerClient.killContainerCmd(it.id).exec()
+            }
+            dockerClient.removeContainerCmd(it.id).exec()
+        }
 
     val containerId = dockerClient.createContainerCmd(imageId)
+        .withPortSpecs("8000:8000")
         .withName("http4k-server-shutdown-integration-test")
         .withHostConfig(HostConfig.newHostConfig().withLogConfig(LogConfig(JSON_FILE)))
         .exec().id
@@ -50,7 +63,7 @@ fun main() {
     dockerClient.logContainerCmd(containerId)
         .withStdOut(true)
         .withStdErr(true)
-        .withTail(4)
+        .withTailAll()
         .withSince(0)
         .exec(object : Adapter<Frame>() {
             override fun onNext(frame: Frame) {
