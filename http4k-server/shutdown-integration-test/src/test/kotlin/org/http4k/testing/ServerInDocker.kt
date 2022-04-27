@@ -73,7 +73,6 @@ class ServerInDocker {
             bind(exposedPort, Ports.Binding.bindPort(8000))
         }
 
-
         val containerId = dockerClient.createContainerCmd(imageId)
             .withName("http4k-server-shutdown-integration-test")
             .withEnv(
