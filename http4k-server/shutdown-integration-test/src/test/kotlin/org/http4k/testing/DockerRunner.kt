@@ -78,10 +78,13 @@ fun main() {
 
     val containerId = dockerClient.createContainerCmd(imageId)
         .withName("http4k-server-shutdown-integration-test")
+        .withEnv("BACKEND=${ServerBackend.Undertow}")
         .withExposedPorts(exposedPort)
-        .withHostConfig(newHostConfig()
-            .withLogConfig(LogConfig(JSON_FILE))
-            .withPortBindings(portBindings))
+        .withHostConfig(
+            newHostConfig()
+                .withLogConfig(LogConfig(JSON_FILE))
+                .withPortBindings(portBindings)
+        )
         .exec().id
 
     dockerClient.startContainerCmd(containerId).exec()
