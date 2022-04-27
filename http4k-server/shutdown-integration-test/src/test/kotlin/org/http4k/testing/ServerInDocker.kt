@@ -17,7 +17,6 @@ import java.io.File
 import java.nio.file.Files
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 
 class ServerInDocker {
@@ -37,9 +36,7 @@ class ServerInDocker {
 
     private val dockerClient = DockerClientImpl.getInstance(config, http)
 
-    fun start(): ContainerId {
-        val backend = ServerBackend.Undertow
-
+    fun start(backend: ServerBackend, stopMode: ServerConfig.StopMode): ContainerId {
         dockerWorkspace("/").apply {
             deleteRecursively()
             mkdirs()
@@ -82,7 +79,7 @@ class ServerInDocker {
             .withEnv(
                 listOf(
                     "BACKEND=$backend",
-                    "STOP_MODE=${ServerConfig.StopMode.Immediate.javaClass.simpleName}"
+                    "STOP_MODE=${stopMode.javaClass.simpleName}"
                 )
             )
             .withExposedPorts(exposedPort)

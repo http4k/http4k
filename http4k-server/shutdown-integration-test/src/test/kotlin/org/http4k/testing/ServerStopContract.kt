@@ -28,9 +28,7 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.assertTimeout
 import org.opentest4j.TestAbortedException
-import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.time.Duration
 import java.time.Duration.between
 import java.time.Duration.ofMillis
 import java.time.Duration.ofSeconds
@@ -89,11 +87,11 @@ abstract class ServerStopContract(
         return this
     }
 
-    private fun serverInDocker() = object : Http4kServer {
+    private fun serverInDocker(stopMode: StopMode) = object : Http4kServer {
         val serverInDocker = ServerInDocker()
         val port = 8000
         override fun start(): Http4kServer {
-            val containerId = serverInDocker.start()
+            val containerId = serverInDocker.start(backend, stopMode)
             return object : Http4kServer {
                 override fun start(): Http4kServer = error("already started")
                 override fun stop(): Http4kServer {
@@ -115,7 +113,7 @@ abstract class ServerStopContract(
 
     }
 
-    private fun prepareServer(stopMode: StopMode) = serverInDocker().start()
+    private fun prepareServer(stopMode: StopMode) = serverInDocker(stopMode).start()
 
     private fun startServerOrSkip(stopMode: StopMode): Http4kServer {
         if (!supportedStopModes.contains(stopMode)) {
