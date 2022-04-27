@@ -21,7 +21,7 @@ class ServerInDocker {
     private fun dockerWorkspace(subPath: String) = File(dockerWorkspace.extend(Uri.of(subPath)).path)
     private fun project(subPath: String) = File(basePath.extend(Uri.of(subPath)).path)
 
-    fun start() {
+    fun start(): ContainerId {
         val config = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
 
         val http: DockerHttpClient = ApacheDockerHttpClient.Builder()
@@ -98,5 +98,9 @@ class ServerInDocker {
                     println(frame)
                 }
             }).awaitCompletion()
+
+        return ContainerId(containerId)
     }
 }
+
+data class ContainerId(val value: String)
