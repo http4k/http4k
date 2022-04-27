@@ -103,6 +103,7 @@ object ErrorResponseJsonAdapter : JsonAdapter<ErrorResponse>() {
         "error_uri"
     )
 
+    @ToJson
     override fun toJson(writer: JsonWriter, `value`: ErrorResponse?) {
         if (`value` == null) {
             writer.nullValue()
@@ -118,6 +119,7 @@ object ErrorResponseJsonAdapter : JsonAdapter<ErrorResponse>() {
         writer.endObject()
     }
 
+    @FromJson
     override fun fromJson(reader: JsonReader): ErrorResponse? {
         if (reader.peek() == NULL) return reader.nextNull()
 
