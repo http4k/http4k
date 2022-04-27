@@ -127,7 +127,6 @@ class ServerInDocker {
         }.start()
         val succeeded = countdown.await(30, SECONDS)
         if (!succeeded) fail("Timed out waiting for event: $event")
-
     }
 }
 
