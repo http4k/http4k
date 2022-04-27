@@ -18,6 +18,7 @@ import java.nio.file.Files
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.SECONDS
 
 class ServerInDocker {
     private val basePath = Uri.of("http4k-server/shutdown-integration-test")
@@ -57,7 +58,7 @@ class ServerInDocker {
         val imageId = dockerClient.buildImageCmd(dockerWorkspace("Dockerfile"))
             .withTags(setOf("http4k-server-shutdown-integration-test"))
             .exec(BuildImageResultCallback())
-            .awaitImageId(10, TimeUnit.SECONDS)
+            .awaitImageId(10, SECONDS)
 
         dockerClient.listContainersCmd()
             .withShowAll(true)
@@ -124,7 +125,7 @@ class ServerInDocker {
             }
             countdown.countDown()
         }.start()
-        val succeeded = countdown.await(30, TimeUnit.SECONDS)
+        val succeeded = countdown.await(30, SECONDS)
         if (!succeeded) fail("Timed out waiting for event: $event")
 
     }
