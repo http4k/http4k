@@ -8,8 +8,8 @@ Whilst the http4k server modules ship with a sensibly configured standard server
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.25.10.1"
-implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.25.10.1"
+implementation group: "org.http4k", name: "http4k-core", version: "4.25.11.0"
+implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.25.11.0"
 ```
 
 The example below shows a customised Jetty setup which enables HTTPS traffic by reimplementing the `ServerConfig` interface. The idea is that this single class will encapsulate the usage of the Server platform API behind the http4k abstraction and provide a simple way to reuse it across different applications.
