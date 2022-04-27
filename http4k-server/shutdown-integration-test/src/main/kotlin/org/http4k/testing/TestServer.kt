@@ -11,7 +11,7 @@ import org.http4k.server.ServerConfig
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
-import org.http4k.testing.TestServerEvent.ServerStarted
+import org.http4k.testing.TestServerEvent.*
 import java.time.Duration
 
 fun main() {
@@ -23,13 +23,20 @@ fun main() {
     val selectedBackend = backendKey(environment)
     val selectedStopMode = stopModeKey(environment)
 
-    events(ServerStarted(selectedBackend))
-
     val app = { _: Request -> Response(OK).body("hello from http4k") }
 
-    val server = app.asServer(selectedBackend(selectedStopMode)).apply { start() }
+    val server = app.asServer(selectedBackend(selectedStopMode))
+        .apply {
+            start()
+            events(ServerStarted(selectedBackend))
+        }
 
-    Runtime.getRuntime().addShutdownHook(Thread { server.stop() })
+    Runtime.getRuntime().addShutdownHook(Thread {
+        println("shutdown requested")
+        events(ServerStopRequested())
+        server.stop()
+        events(ServerStopped())
+    })
 }
 
 fun resolveStopMode(simpleClassName: String) = when (simpleClassName) {

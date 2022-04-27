@@ -108,7 +108,8 @@ class ServerInDocker {
             .withSince(0)
             .exec(object : ResultCallback.Adapter<Frame>() {
                 override fun onNext(frame: Frame) {
-                    val tokens = String(frame.payload).split("container_event=")
+                    val stringPayload = String(frame.payload)
+                    val tokens = stringPayload.split("container_event=")
                     if (tokens.size == 2) {
                         list += ContainerEventsJackson.asA<TestServerEvent>(tokens[1])
                     }
@@ -117,7 +118,7 @@ class ServerInDocker {
         return list.toImmutableList()
     }
 
-    private fun waitForEvent(containerId: ContainerId, event: TestServerEvent) {
+    fun waitForEvent(containerId: ContainerId, event: TestServerEvent) {
         val countdown = CountDownLatch(1)
         Thread {
             while (!eventsFor(containerId).contains(event)) {
@@ -127,6 +128,11 @@ class ServerInDocker {
         }.start()
         val succeeded = countdown.await(30, SECONDS)
         if (!succeeded) fail("Timed out waiting for event: $event")
+    }
+
+    fun stop(containerId: ContainerId) {
+        dockerClient.stopContainerCmd(containerId.value).exec()
+        waitForEvent(containerId, TestServerEvent.ServerStopped())
     }
 }
 
