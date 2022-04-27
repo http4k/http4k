@@ -2,20 +2,31 @@ package org.http4k.testing
 
 import com.github.dockerjava.api.async.ResultCallback.Adapter
 import com.github.dockerjava.api.command.BuildImageResultCallback
+import com.github.dockerjava.api.model.ExposedPort
 import com.github.dockerjava.api.model.Frame
-import com.github.dockerjava.api.model.HostConfig
+import com.github.dockerjava.api.model.HostConfig.newHostConfig
 import com.github.dockerjava.api.model.LogConfig
 import com.github.dockerjava.api.model.LogConfig.LoggingType.JSON_FILE
+import com.github.dockerjava.api.model.Ports
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import com.github.dockerjava.transport.DockerHttpClient
+import org.http4k.core.Uri
+import org.http4k.core.extend
 import java.io.File
-import java.net.URI
 import java.nio.file.Files
-import java.nio.file.Path
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+
+
+object ProjectFiles {
+    private val basePath = Uri.of("http4k-server/shutdown-integration-test")
+
+    private val dockerWorkspace = basePath.extend(Uri.of("build/docker"))
+    fun dockerWorkspace(subPath: String) = File(dockerWorkspace.extend(Uri.of(subPath)).path)
+    fun project(subPath: String) = File(basePath.extend(Uri.of(subPath)).path)
+}
 
 fun main() {
     val config = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
@@ -30,13 +41,22 @@ fun main() {
 
     val dockerClient = DockerClientImpl.getInstance(config, http)
 
+    ProjectFiles.dockerWorkspace("/").apply {
+        deleteRecursively()
+        mkdirs()
+    }
 
-    File("http4k-server/shutdown-integration-test/build/docker").deleteRecursively()
-    File("http4k-server/shutdown-integration-test/build/docker").mkdirs()
-    Files.copy(File("http4k-server/shutdown-integration-test/src/main/resources/Dockerfile").toPath(), File("http4k-server/shutdown-integration-test/build/docker/Dockerfile").toPath())
-    Files.copy(File("http4k-server/shutdown-integration-test/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip").toPath(), File("http4k-server/shutdown-integration-test/build/docker/http4k-server-shutdown-integration-test-LOCAL.zip").toPath())
+    Files.copy(
+        ProjectFiles.project("/src/main/resources/Dockerfile").toPath(),
+        ProjectFiles.dockerWorkspace("Dockerfile").toPath()
+    )
 
-    val imageId = dockerClient.buildImageCmd(File("http4k-server/shutdown-integration-test/build/docker/Dockerfile"))
+    Files.copy(
+        ProjectFiles.project("/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip").toPath(),
+        ProjectFiles.dockerWorkspace("http4k-server-shutdown-integration-test-LOCAL.zip").toPath()
+    )
+
+    val imageId = dockerClient.buildImageCmd(ProjectFiles.dockerWorkspace("Dockerfile"))
         .withTags(setOf("http4k-server-shutdown-integration-test"))
         .exec(BuildImageResultCallback())
         .awaitImageId(10, TimeUnit.SECONDS)
@@ -46,16 +66,23 @@ fun main() {
         .exec()
         .find { it.names.contains("/http4k-server-shutdown-integration-test") }
         ?.let {
-            if(it.state == "running"){
+            if (it.state == "running") {
                 dockerClient.killContainerCmd(it.id).exec()
             }
             dockerClient.removeContainerCmd(it.id).exec()
         }
 
+    val exposedPort = ExposedPort.tcp(8000)
+    val portBindings = Ports().apply {
+        bind(exposedPort, Ports.Binding.bindPort(8000))
+    }
+
     val containerId = dockerClient.createContainerCmd(imageId)
-        .withPortSpecs("8000:8000")
         .withName("http4k-server-shutdown-integration-test")
-        .withHostConfig(HostConfig.newHostConfig().withLogConfig(LogConfig(JSON_FILE)))
+        .withExposedPorts(exposedPort)
+        .withHostConfig(newHostConfig()
+            .withLogConfig(LogConfig(JSON_FILE))
+            .withPortBindings(portBindings))
         .exec().id
 
     dockerClient.startContainerCmd(containerId).exec()

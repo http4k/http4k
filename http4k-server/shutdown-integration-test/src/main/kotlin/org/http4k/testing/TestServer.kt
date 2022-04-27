@@ -7,5 +7,5 @@ import org.http4k.server.ApacheServer
 import org.http4k.server.asServer
 
 fun main() {
-    { req: Request -> Response(Status.OK).body("hello from Apache") }.asServer(ApacheServer(8000)).start()
+    { req: Request -> Response(Status.OK).body("hello from http4k") }.asServer(ApacheServer(8000)).start()
 }
