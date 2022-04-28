@@ -18,6 +18,9 @@ enum class ServerBackend : (ServerConfig.StopMode) -> ServerConfig {
     Apache4 {
         override fun invoke(mode: ServerConfig.StopMode) = Apache4Server(8000, stopMode = mode)
     },
+    Jetty {
+        override fun invoke(mode: ServerConfig.StopMode) = Jetty(port = 8000, stopMode = mode)
+    },
     KtorCIO {
         override fun invoke(mode: ServerConfig.StopMode) = KtorCIO(8000, stopMode = mode)
     },
@@ -27,16 +30,13 @@ enum class ServerBackend : (ServerConfig.StopMode) -> ServerConfig {
     Netty {
         override fun invoke(mode: ServerConfig.StopMode) = Netty(8000, stopMode = mode)
     },
-    Undertow {
-        override fun invoke(mode: ServerConfig.StopMode) = Undertow(port = 8000, enableHttp2 = false, mode)
-    },
     Ratpack {
         override fun invoke(mode: ServerConfig.StopMode) = Ratpack(port = 8000, stopMode = mode)
     },
     SunHttp {
         override fun invoke(mode: ServerConfig.StopMode) = SunHttp(port = 8000, stopMode = mode)
     },
-    Jetty {
-        override fun invoke(mode: ServerConfig.StopMode) = Jetty(port = 8000, stopMode = mode)
+    Undertow {
+        override fun invoke(mode: ServerConfig.StopMode) = Undertow(port = 8000, enableHttp2 = false, mode)
     }
 }
