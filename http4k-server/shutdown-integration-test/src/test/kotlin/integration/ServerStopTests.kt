@@ -20,7 +20,7 @@ class UndertowStopTest : ServerStopContract(
         enableGracefulStop()
     })
 
-class RatpackStopTest : ServerStopContract(ServerBackend.Ratpack, ApacheClient(), { enableGracefulStop() })
+class RatpackStopTest : ServerStopContract(ServerBackend.Ratpack, ApacheClient(), { enableImmediateStop() })
 
 //class JettyStopTest : org.http4k.server.ServerStopContract(
 //    { stopMode -> Jetty(0, stopMode) },

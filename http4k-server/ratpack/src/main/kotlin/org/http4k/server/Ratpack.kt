@@ -15,11 +15,11 @@ import ratpack.server.ServerConfig.builder
 import java.time.Duration.ofSeconds
 
 class Ratpack(port: Int = 8000, stopMode: StopMode) : ServerConfig {
-    constructor(port: Int = 8000) : this(port, StopMode.Graceful(ofSeconds(5)))
+    constructor(port: Int = 8000) : this(port, StopMode.Immediate)
 
     init {
         when (stopMode) {
-            is StopMode.Delayed, is StopMode.Immediate -> throw ServerConfig.UnsupportedStopMode(stopMode)
+            is StopMode.Delayed, is StopMode.Graceful -> throw ServerConfig.UnsupportedStopMode(stopMode)
             else -> {}
         }
     }
