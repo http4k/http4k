@@ -4,6 +4,7 @@ import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.lens.enum
 import org.http4k.server.ApacheServer
+import org.http4k.server.Jetty
 import org.http4k.server.Ratpack
 import org.http4k.server.ServerConfig
 import org.http4k.server.ServerConfig.StopMode
@@ -54,5 +55,8 @@ enum class ServerBackend : (StopMode) -> ServerConfig {
     },
     Ratpack {
         override fun invoke(mode: StopMode) = Ratpack(port = 8000, stopMode = mode)
+    },
+    Jetty {
+        override fun invoke(mode: StopMode) = Jetty(port = 8000, stopMode = mode)
     }
 }
