@@ -65,12 +65,12 @@ class ServerInDocker {
         dockerClient.listContainersCmd()
             .withShowAll(true)
             .exec()
-            .find { it.names.contains("/http4k-server-shutdown-integration-test") }
-            ?.let {
+            .filter { it.names.contains("/http4k-server-shutdown-integration-test") }
+            .map {
                 if (it.state == "running") {
                     dockerClient.killContainerCmd(it.id).exec()
                 }
-                dockerClient.removeContainerCmd(it.id).exec()
+                dockerClient.removeContainerCmd(it.id).withForce(true).exec()
             }
 
         val exposedPort = ExposedPort.tcp(8000)
