@@ -12,6 +12,7 @@ import org.http4k.server.Netty
 import org.http4k.server.Ratpack
 import org.http4k.server.ServerConfig
 import org.http4k.server.ServerConfig.StopMode
+import org.http4k.server.SunHttp
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.http4k.testing.TestServerEvent.ServerStarted
@@ -71,6 +72,9 @@ enum class ServerBackend : (StopMode) -> ServerConfig {
     },
     Ratpack {
         override fun invoke(mode: StopMode) = Ratpack(port = 8000, stopMode = mode)
+    },
+    SunHttp {
+        override fun invoke(mode: StopMode) = SunHttp(port = 8000, stopMode = mode)
     },
     Jetty {
         override fun invoke(mode: StopMode) = Jetty(port = 8000, stopMode = mode)

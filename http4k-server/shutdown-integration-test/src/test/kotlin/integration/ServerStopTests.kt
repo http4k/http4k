@@ -8,6 +8,7 @@ import org.http4k.testing.ServerBackend.KtorCIO
 import org.http4k.testing.ServerBackend.KtorNetty
 import org.http4k.testing.ServerBackend.Netty
 import org.http4k.testing.ServerBackend.Ratpack
+import org.http4k.testing.ServerBackend.SunHttp
 import org.http4k.testing.ServerBackend.Undertow
 
 class ApacheServerStopTest : ServerStopContract(
@@ -27,7 +28,13 @@ class UndertowStopTest : ServerStopContract(
         enableGracefulStop()
     })
 
-class RatpackStopTest : ServerStopContract(Ratpack, ApacheClient(), { enableImmediateStop() })
+class RatpackStopTest : ServerStopContract(
+    Ratpack,
+    ApacheClient(),
+    {
+        enableImmediateStop()
+    }
+)
 
 class JettyStopTest : ServerStopContract(
     Jetty,
@@ -60,7 +67,6 @@ class KtorNettyStopTest : ServerStopContract(
     }
 )
 
-
 class KtorCIOStopTest : ServerStopContract(
     KtorCIO,
     ApacheClient(),
@@ -68,11 +74,11 @@ class KtorCIOStopTest : ServerStopContract(
         enableImmediateStop()
     })
 
-//class SunHttpStopTest : ServerStopContract(
-//    { stopMode -> SunHttp(0, stopMode) },
-//    ApacheClient(),
-//    {
-//        enableImmediateStop()
-//        enableGracefulStop()
-//    }
-//)
+class SunHttpStopTest : ServerStopContract(
+    SunHttp,
+    ApacheClient(),
+    {
+        enableImmediateStop()
+        enableGracefulStop()
+    }
+)
