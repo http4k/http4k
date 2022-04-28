@@ -11,78 +11,41 @@ import org.http4k.testing.ServerBackend.Ratpack
 import org.http4k.testing.ServerBackend.SunHttp
 import org.http4k.testing.ServerBackend.Undertow
 
-class ApacheServerStopTest : ServerStopContract(
-    Apache,
-    ApacheClient(),
-    {
-        enableImmediateStop()
-        enableGracefulStop()
-    }
-)
+class ApacheServerStopTest : ServerStopContract(Apache, ApacheClient(), {
+    enableImmediateStop()
+    enableGracefulStop()
+})
 
-class UndertowStopTest : ServerStopContract(
-    Undertow,
-    ApacheClient(),
-    {
-        enableImmediateStop()
-        enableGracefulStop()
-    }
-)
+class Apache4ServerStopTest : ServerStopContract(Apache4, ApacheClient(), {
+    enableImmediateStop()
+})
 
-class RatpackStopTest : ServerStopContract(
-    Ratpack,
-    ApacheClient(),
-    {
-        enableImmediateStop()
-    }
-)
+class JettyStopTest : ServerStopContract(Jetty, ApacheClient(), {
+    enableGracefulStop()
+})
 
-class JettyStopTest : ServerStopContract(
-    Jetty,
-    ApacheClient(),
-    {
-        enableGracefulStop()
-    }
-)
+class KtorCIOStopTest : ServerStopContract(KtorCIO, ApacheClient(), {
+    enableImmediateStop()
+})
 
-class Apache4ServerStopTest : ServerStopContract(
-    Apache4,
-    ApacheClient(),
-    {
-        enableImmediateStop()
-    }
-)
+class KtorNettyStopTest : ServerStopContract(KtorNetty, ApacheClient(), {
+    enableImmediateStop()
+})
 
+class NettyStopTest : ServerStopContract(Netty, ApacheClient(), {
+    enableGracefulStop()
+})
 
-class NettyStopTest : ServerStopContract(
-    Netty,
-    ApacheClient(),
-    {
-        enableGracefulStop()
-    }
-)
+class RatpackStopTest : ServerStopContract(Ratpack, ApacheClient(), {
+    enableImmediateStop()
+})
 
-class KtorNettyStopTest : ServerStopContract(
-    KtorNetty,
-    ApacheClient(),
-    {
-        enableImmediateStop()
-    }
-)
+class SunHttpStopTest : ServerStopContract(SunHttp, ApacheClient(), {
+    enableImmediateStop()
+    enableGracefulStop()
+})
 
-class KtorCIOStopTest : ServerStopContract(
-    KtorCIO,
-    ApacheClient(),
-    {
-        enableImmediateStop()
-    }
-)
-
-class SunHttpStopTest : ServerStopContract(
-    SunHttp,
-    ApacheClient(),
-    {
-        enableImmediateStop()
-        enableGracefulStop()
-    }
-)
+class UndertowStopTest : ServerStopContract(Undertow, ApacheClient(), {
+    enableImmediateStop()
+    enableGracefulStop()
+})
