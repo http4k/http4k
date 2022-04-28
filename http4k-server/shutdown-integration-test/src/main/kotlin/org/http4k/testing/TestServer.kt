@@ -29,7 +29,7 @@ fun main() {
     val server = app.asServer(selectedBackend(selectedStopMode))
         .apply {
             start()
-            events(ServerStarted(selectedBackend, selectedStopMode::class.java.simpleName))
+            events(ServerStarted(selectedBackend.name, selectedStopMode::class.java.simpleName))
         }
 
     Runtime.getRuntime().addShutdownHook(Thread {

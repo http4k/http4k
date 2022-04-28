@@ -96,12 +96,12 @@ class ServerInDocker {
 
         dockerClient.startContainerCmd(containerId.value).exec()
 
-        waitForEvent(containerId, TestServerEvent.ServerStarted(backend, stopMode::class.java.simpleName))
+        waitForEvent(containerId, TestServerEvent.ServerStarted(backend.name, stopMode::class.java.simpleName))
         return containerId
     }
 
-    fun eventsFor(containerId: ContainerId): List<Event> {
-        val list = mutableListOf<Event>()
+    fun eventsFor(containerId: ContainerId): List<ContainerEvent> {
+        val list = mutableListOf<ContainerEvent>()
         dockerClient.logContainerCmd(containerId.value)
             .withStdOut(true)
             .withStdErr(true)
@@ -112,7 +112,7 @@ class ServerInDocker {
                     val stringPayload = String(frame.payload)
                     val tokens = stringPayload.split("container_event=")
                     if (tokens.size == 2) {
-                        list += ContainerEventsJackson.asA<TestServerEvent>(tokens[1])
+                        list += ContainerEventsJackson.asA<ContainerEvent>(tokens[1])
                     }
                 }
             }).awaitCompletion()
@@ -122,7 +122,7 @@ class ServerInDocker {
     fun waitForEvent(containerId: ContainerId, event: TestServerEvent) {
         val countdown = CountDownLatch(1)
         Thread {
-            while (!eventsFor(containerId).contains(event)) {
+            while (!eventsFor(containerId).map(ContainerEvent::event).contains(event)) {
                 Thread.sleep(1000)
             }
             countdown.countDown()
