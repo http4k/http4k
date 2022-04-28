@@ -52,8 +52,15 @@ class ServerInDocker {
             dockerWorkspace("Dockerfile").toPath()
         )
 
+        val serverPackage = project("/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip")
+
+        if(!serverPackage.exists()){
+            fail("Server package not found. To create run:\n" +
+                "./gradlew :http4k-server-shutdown-integration-test:distZip")
+        }
+
         Files.copy(
-            project("/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip").toPath(),
+            serverPackage.toPath(),
             dockerWorkspace("http4k-server-shutdown-integration-test-LOCAL.zip").toPath()
         )
 
