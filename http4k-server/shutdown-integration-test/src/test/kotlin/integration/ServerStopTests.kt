@@ -4,6 +4,7 @@ import org.http4k.client.ApacheClient
 import org.http4k.testing.ServerBackend.Apache
 import org.http4k.testing.ServerBackend.Apache4
 import org.http4k.testing.ServerBackend.Jetty
+import org.http4k.testing.ServerBackend.KtorNetty
 import org.http4k.testing.ServerBackend.Netty
 import org.http4k.testing.ServerBackend.Ratpack
 import org.http4k.testing.ServerBackend.Undertow
@@ -50,23 +51,23 @@ class NettyStopTest : ServerStopContract(
         enableGracefulStop()
     })
 
-//class KtorNettyStopTest : org.http4k.server.ServerStopContract(
-//    { stopMode -> KtorNetty(Random().nextInt(1000) + 7456, stopMode) },
-//    ApacheClient(),
-//    {
-//        enableImmediateStop()
-//    }
-//)
+class KtorNettyStopTest : ServerStopContract(
+    KtorNetty,
+    ApacheClient(),
+    {
+        enableImmediateStop()
+    }
+)
 
 
-//class KtorCIOStopTest : org.http4k.server.ServerStopContract(
+//class KtorCIOStopTest : ServerStopContract(
 //    { stopMode -> KtorCIO(Random().nextInt(1000) + 8745, stopMode) },
 //    ApacheClient(),
 //    {
 //        enableImmediateStop()
 //    })
 
-//class SunHttpStopTest : org.http4k.server.ServerStopContract(
+//class SunHttpStopTest : ServerStopContract(
 //    { stopMode -> SunHttp(0, stopMode) },
 //    ApacheClient(),
 //    {
