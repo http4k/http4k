@@ -26,7 +26,8 @@ class UndertowStopTest : ServerStopContract(
     {
         enableImmediateStop()
         enableGracefulStop()
-    })
+    }
+)
 
 class RatpackStopTest : ServerStopContract(
     Ratpack,
@@ -49,7 +50,8 @@ class Apache4ServerStopTest : ServerStopContract(
     ApacheClient(),
     {
         enableImmediateStop()
-    })
+    }
+)
 
 
 class NettyStopTest : ServerStopContract(
@@ -57,7 +59,8 @@ class NettyStopTest : ServerStopContract(
     ApacheClient(),
     {
         enableGracefulStop()
-    })
+    }
+)
 
 class KtorNettyStopTest : ServerStopContract(
     KtorNetty,
@@ -72,7 +75,8 @@ class KtorCIOStopTest : ServerStopContract(
     ApacheClient(),
     {
         enableImmediateStop()
-    })
+    }
+)
 
 class SunHttpStopTest : ServerStopContract(
     SunHttp,
