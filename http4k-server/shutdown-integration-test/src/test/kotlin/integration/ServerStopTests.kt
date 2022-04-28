@@ -1,7 +1,18 @@
 package integration
 
+import com.natpryce.hamkrest.allOf
+import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.client.ApacheClient
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Status
+import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
+import org.http4k.server.SunHttp
+import org.http4k.server.Undertow
 import org.http4k.testing.ServerBackend
+import org.junit.jupiter.api.Test
+import java.util.*
 
 class ApacheServerStopTest : ServerStopContract(
     ServerBackend.Apache,
@@ -19,3 +30,62 @@ class UndertowStopTest : ServerStopContract(
         enableImmediateStop()
         enableGracefulStop()
     })
+
+//class RatpackStopTest : ServerStopContract({ Ratpack(0, it) }, ApacheClient(), { enableGracefulStop() })
+
+//class JettyStopTest : org.http4k.server.ServerStopContract(
+//    { stopMode -> Jetty(0, stopMode) },
+//    ApacheClient(),
+//    {
+//        enableImmediateStop()
+//        enableGracefulStop()
+//    }
+//)
+
+//class UndertowStopTest : org.http4k.server.ServerStopContract(
+//    { stopMode -> Undertow(0, false, stopMode) },
+//    ApacheClient(),
+//    {
+//        enableImmediateStop()
+//        enableGracefulStop()
+//    })
+
+//class Apache4ServerStopTest : org.http4k.server.ServerStopContract(
+//    { stopMode -> Apache4Server(0, stopMode) },
+//    ApacheClient(),
+//    {
+//        enableImmediateStop()
+//    })
+
+
+//class NettyStopTest : org.http4k.server.ServerStopContract(
+//    { stopMode -> Netty(0, stopMode) },
+//    ApacheClient(),
+//    {
+//        enableGracefulStop()
+//    })
+
+//class KtorNettyStopTest : org.http4k.server.ServerStopContract(
+//    { stopMode -> KtorNetty(Random().nextInt(1000) + 7456, stopMode) },
+//    ApacheClient(),
+//    {
+//        enableImmediateStop()
+//    }
+//)
+
+
+//class KtorCIOStopTest : org.http4k.server.ServerStopContract(
+//    { stopMode -> KtorCIO(Random().nextInt(1000) + 8745, stopMode) },
+//    ApacheClient(),
+//    {
+//        enableImmediateStop()
+//    })
+
+//class SunHttpStopTest : org.http4k.server.ServerStopContract(
+//    { stopMode -> SunHttp(0, stopMode) },
+//    ApacheClient(),
+//    {
+//        enableImmediateStop()
+//        enableGracefulStop()
+//    }
+//)

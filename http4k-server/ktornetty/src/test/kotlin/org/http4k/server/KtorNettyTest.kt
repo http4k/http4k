@@ -13,11 +13,3 @@ class KtorNettyTest : ServerContract({ KtorNetty(Random().nextInt(1000) + 7456) 
 
     override fun clientAddress(): Matcher<String?> = present()
 }
-
-class KtorNettyStopTest : ServerStopContract(
-    { stopMode -> KtorNetty(Random().nextInt(1000) + 7456, stopMode) },
-    ApacheClient(),
-    {
-        enableImmediateStop()
-    }
-)

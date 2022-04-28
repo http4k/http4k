@@ -8,4 +8,3 @@ class RatpackTest : ServerContract({ Ratpack(it) }, ApacheClient()) {
     }
 }
 
-class RatpackStopTest : ServerStopContract({ Ratpack(0, it) }, ApacheClient(), { enableGracefulStop() })

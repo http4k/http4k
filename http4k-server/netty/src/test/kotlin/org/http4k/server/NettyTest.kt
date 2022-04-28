@@ -10,13 +10,7 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class NettyStopTest : ServerStopContract(
-    { stopMode -> Netty(0, stopMode) },
-    ApacheClient(),
-    {
-        enableGracefulStop()
-    })
- {
+class NettyTest : ServerContract(::Netty, ApacheClient()){
     @Test
     fun `sets keep-alive for non-streaming response`() {
         assertThat(client(Request(Method.GET, "$baseUrl/headers")),
@@ -33,3 +27,4 @@ class NettyStopTest : ServerStopContract(
         )
     }
 }
+

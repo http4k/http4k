@@ -50,11 +50,4 @@ class SunHttpTest : ServerContract(::SunHttp, ApacheClient()) {
     }
 }
 
-class SunHttpStopTest : ServerStopContract(
-    { stopMode -> SunHttp(0, stopMode) },
-    ApacheClient(),
-    {
-        enableImmediateStop()
-        enableGracefulStop()
-    }
-)
+
