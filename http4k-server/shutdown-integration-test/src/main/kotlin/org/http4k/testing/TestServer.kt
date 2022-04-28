@@ -3,6 +3,7 @@ package org.http4k.testing
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.lens.enum
+import org.http4k.server.Apache4Server
 import org.http4k.server.ApacheServer
 import org.http4k.server.Jetty
 import org.http4k.server.Ratpack
@@ -49,6 +50,9 @@ fun resolveStopMode(simpleClassName: String) = when (simpleClassName) {
 enum class ServerBackend : (StopMode) -> ServerConfig {
     Apache {
         override fun invoke(mode: StopMode) = ApacheServer(8000, stopMode = mode)
+    },
+    Apache4 {
+        override fun invoke(mode: StopMode) = Apache4Server(8000, stopMode = mode)
     },
     Undertow {
         override fun invoke(mode: StopMode) = Undertow(port = 8000, enableHttp2 = false, mode)

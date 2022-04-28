@@ -2,6 +2,7 @@ package integration
 
 import org.http4k.client.ApacheClient
 import org.http4k.testing.ServerBackend.Apache
+import org.http4k.testing.ServerBackend.Apache4
 import org.http4k.testing.ServerBackend.Jetty
 import org.http4k.testing.ServerBackend.Ratpack
 import org.http4k.testing.ServerBackend.Undertow
@@ -33,20 +34,12 @@ class JettyStopTest : ServerStopContract(
     }
 )
 
-//class UndertowStopTest : org.http4k.server.ServerStopContract(
-//    { stopMode -> Undertow(0, false, stopMode) },
-//    ApacheClient(),
-//    {
-//        enableImmediateStop()
-//        enableGracefulStop()
-//    })
-
-//class Apache4ServerStopTest : org.http4k.server.ServerStopContract(
-//    { stopMode -> Apache4Server(0, stopMode) },
-//    ApacheClient(),
-//    {
-//        enableImmediateStop()
-//    })
+class Apache4ServerStopTest : ServerStopContract(
+    Apache4,
+    ApacheClient(),
+    {
+        enableImmediateStop()
+    })
 
 
 //class NettyStopTest : org.http4k.server.ServerStopContract(

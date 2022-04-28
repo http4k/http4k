@@ -12,6 +12,7 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
     implementation(project(":http4k-server-apache"))
+    implementation(project(":http4k-server-apache4"))
     implementation(project(":http4k-server-undertow"))
     implementation(project(":http4k-server-ratpack"))
     implementation(project(":http4k-server-jetty"))
