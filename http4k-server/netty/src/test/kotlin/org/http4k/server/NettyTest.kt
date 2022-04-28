@@ -10,7 +10,7 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class NettyTest : ServerContract(::Netty, ApacheClient()){
+class NettyTest : ServerContract(::Netty, ApacheClient()) {
     @Test
     fun `sets keep-alive for non-streaming response`() {
         assertThat(client(Request(Method.GET, "$baseUrl/headers")),
@@ -27,4 +27,3 @@ class NettyTest : ServerContract(::Netty, ApacheClient()){
         )
     }
 }
-
