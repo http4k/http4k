@@ -27,25 +27,25 @@ import org.http4k.servlet.jakarta.asHttp4kRequest
 import org.http4k.servlet.jakarta.asServlet
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
+import java.time.Duration
 
 class Jetty(private val port: Int, override val stopMode: StopMode, private val server: Server) : PolyServerConfig {
-    constructor(port: Int = 8000) : this(port, StopMode.Immediate)
+    constructor(port: Int = 8000) : this(port, StopMode.Graceful(Duration.ofSeconds(5)))
     constructor(port: Int = 8000, stopMode: StopMode) : this(port, stopMode, http(port))
     constructor(port: Int = 8000, server: Server) : this(port, StopMode.Immediate, server)
-    constructor(port: Int, vararg inConnectors: ConnectorBuilder) : this(port, StopMode.Immediate, *inConnectors)
+    constructor(port: Int, vararg inConnectors: ConnectorBuilder) : this(port, StopMode.Graceful(Duration.ofSeconds(5)), *inConnectors)
     constructor(port: Int, stopMode: StopMode, vararg inConnectors: ConnectorBuilder) : this(port, stopMode, Server().apply {
         inConnectors.forEach { addConnector(it(this)) }
     })
 
     init {
         when(stopMode) {
-            is StopMode.Immediate -> {}
             is StopMode.Graceful -> {
                 server.apply {
                     stopTimeout = stopMode.timeout.toMillis()
                 }
             }
-            is StopMode.Delayed -> throw ServerConfig.UnsupportedStopMode(stopMode)
+            is StopMode.Immediate, is StopMode.Delayed -> throw ServerConfig.UnsupportedStopMode(stopMode)
         }
     }
 

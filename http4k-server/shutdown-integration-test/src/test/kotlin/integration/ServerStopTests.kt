@@ -29,7 +29,6 @@ class JettyStopTest : ServerStopContract(
     Jetty,
     ApacheClient(),
     {
-        enableImmediateStop()
         enableGracefulStop()
     }
 )
