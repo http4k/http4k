@@ -29,9 +29,7 @@ fun main() {
     val selectedBackend = backendKey(environment)
     val selectedStopMode = stopModeKey(environment)
 
-    val app = TestApp().allRoutes
-
-    val server = app.asServer(selectedBackend(selectedStopMode))
+    val server = ShutdownTestApp().asServer(selectedBackend(selectedStopMode))
         .apply {
             start()
             events(ServerStarted(selectedBackend.name, selectedStopMode::class.java.simpleName))
