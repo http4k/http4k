@@ -6,6 +6,7 @@ import org.http4k.lens.enum
 import org.http4k.server.Apache4Server
 import org.http4k.server.ApacheServer
 import org.http4k.server.Jetty
+import org.http4k.server.Netty
 import org.http4k.server.Ratpack
 import org.http4k.server.ServerConfig
 import org.http4k.server.ServerConfig.StopMode
@@ -53,6 +54,9 @@ enum class ServerBackend : (StopMode) -> ServerConfig {
     },
     Apache4 {
         override fun invoke(mode: StopMode) = Apache4Server(8000, stopMode = mode)
+    },
+    Netty {
+        override fun invoke(mode: StopMode) = Netty(8000, stopMode = mode)
     },
     Undertow {
         override fun invoke(mode: StopMode) = Undertow(port = 8000, enableHttp2 = false, mode)
