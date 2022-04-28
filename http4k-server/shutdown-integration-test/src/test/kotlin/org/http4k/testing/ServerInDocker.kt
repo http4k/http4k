@@ -128,7 +128,21 @@ class ServerInDocker {
             countdown.countDown()
         }.start()
         val succeeded = countdown.await(30, SECONDS)
-        if (!succeeded) fail("Timed out waiting for event: $event")
+        if (!succeeded){
+            val logs = StringBuilder()
+            dockerClient.logContainerCmd(containerId.value)
+                .withStdOut(true)
+                .withStdErr(true)
+                .withTailAll()
+                .withSince(0)
+                .exec(object : ResultCallback.Adapter<Frame>() {
+                    override fun onNext(frame: Frame) {
+                        val stringPayload = String(frame.payload)
+                        logs.append(stringPayload)
+                    }
+                }).awaitCompletion()
+            fail("Timed out waiting for event: $event. Latest logs: \n\n$logs")
+        }
     }
 
     fun stop(containerId: ContainerId) {
