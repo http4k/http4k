@@ -20,7 +20,12 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 
 class ServerInDocker {
-    private val basePath = Uri.of("http4k-server/shutdown-integration-test")
+    private val basePath  by lazy {
+        val workingDir = File(".").absolutePath
+        val projectDir = workingDir.removeSuffix(workingDir.substringAfter("/http4k/"))
+        val modulePath = "/http4k-server/shutdown-integration-test"
+        Uri.of("$projectDir$modulePath")
+    }
     private val dockerWorkspace = basePath.extend(Uri.of("build/docker"))
     private fun dockerWorkspace(subPath: String) = File(dockerWorkspace.extend(Uri.of(subPath)).path)
     private fun project(subPath: String) = File(basePath.extend(Uri.of(subPath)).path)
