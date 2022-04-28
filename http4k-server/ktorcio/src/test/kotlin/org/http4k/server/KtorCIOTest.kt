@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.present
 import org.http4k.client.ApacheClient
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Random
 
 class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, ApacheClient()) {
 
