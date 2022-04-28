@@ -19,7 +19,7 @@ class Ratpack(port: Int = 8000, stopMode: StopMode) : ServerConfig {
 
     init {
         when (stopMode) {
-            is StopMode.Delayed, is StopMode.Graceful -> throw ServerConfig.UnsupportedStopMode(stopMode)
+            is StopMode.Graceful -> throw ServerConfig.UnsupportedStopMode(stopMode)
             else -> {}
         }
     }

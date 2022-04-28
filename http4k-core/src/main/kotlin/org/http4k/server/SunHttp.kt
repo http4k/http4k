@@ -52,9 +52,6 @@ class HttpExchangeHandler(private val handler: HttpHandler) : SunHttpHandler {
 class SunHttp(val port: Int = 8000, override val stopMode: StopMode = StopMode.Immediate) : ServerConfig {
     constructor(port: Int = 8000): this(port, StopMode.Immediate)
 
-    init {
-        if (stopMode is StopMode.Delayed) throw UnsupportedStopMode(stopMode)
-    }
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         override fun port(): Int = if (port > 0) port else server.address.port
 

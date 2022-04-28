@@ -99,7 +99,7 @@ class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerC
 
     val shutdownTimeoutMillis = when(stopMode) {
         is StopMode.Graceful -> stopMode.timeout.toMillis()
-        is StopMode.Immediate, is StopMode.Delayed -> throw ServerConfig.UnsupportedStopMode(stopMode)
+        is StopMode.Immediate -> throw ServerConfig.UnsupportedStopMode(stopMode)
     }
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer = object : Http4kServer {
         init {

@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
-import com.natpryce.hamkrest.isWithin
 import org.http4k.client.toClientStatus
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -18,23 +17,19 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig.StopMode
-import org.http4k.server.ServerConfig.StopMode.Delayed
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.server.ServerConfig.UnsupportedStopMode
 import org.http4k.testing.ServerBackend
 import org.http4k.testing.ServerInDocker
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.assertTimeout
 import org.opentest4j.TestAbortedException
 import java.io.IOException
-import java.time.Duration.between
 import java.time.Duration.ofMillis
 import java.time.Duration.ofSeconds
-import java.time.Instant
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
@@ -47,7 +42,6 @@ abstract class ServerStopContract(
 ) {
 
     private val defaultGracefulStopMode = Graceful(ofSeconds(10))
-    private val defaultDelayedStopMode = Delayed(ofSeconds(10))
     private val timeoutTolerance = ofMillis(1000)
 
     private val supportedStopModes: Set<StopMode>
@@ -65,10 +59,6 @@ abstract class ServerStopContract(
 
         fun enableGracefulStop() {
             enabledModes.add(defaultGracefulStopMode)
-        }
-
-        fun enableDelayedStop() {
-            enabledModes.add(defaultDelayedStopMode)
         }
     }
 
@@ -144,11 +134,6 @@ abstract class ServerStopContract(
     }
 
     @Test
-    fun `delayed stop mode is blocking on stop`() {
-        startServerOrSkip(defaultDelayedStopMode).testBlockingStop()
-    }
-
-    @Test
     fun `immediate stop mode is quick`() {
         val server = startServerOrSkip(Immediate)
 
@@ -165,24 +150,6 @@ abstract class ServerStopContract(
         assertTimeout(modeInTest.timeout + timeoutTolerance) {
             server.stop()
         }
-    }
-
-    @Test
-    fun `delayed stop mode takes exactly the specified timeout to stop`() {
-        val modeInTest = defaultDelayedStopMode
-        val server = startServerOrSkip(modeInTest)
-
-        val stopTime = assertTimeout(modeInTest.timeout + timeoutTolerance) {
-            val start = Instant.now()
-            server.stop()
-            between(start, Instant.now())
-        }
-        assertThat(
-            "Delayed stop expected but was Graceful stop detected " +
-                "(stop took $stopTime instead of ${modeInTest.timeout})",
-            stopTime,
-            isWithin((modeInTest.timeout - timeoutTolerance)..(modeInTest.timeout + timeoutTolerance))
-        )
     }
 
     fun Http4kServer.testInflightRequestsCompleteDuringServerStop() {
@@ -227,14 +194,9 @@ abstract class ServerStopContract(
     }
 
     @Test
-    fun `delayed stop mode is waiting for inflight requests to succeed`() {
-        startServerOrSkip(defaultDelayedStopMode).testInflightRequestsCompleteDuringServerStop()
-    }
-
-    @Test
     fun `server config throws when invoked with unsupported stop mode`() {
         val illegalConfigurationAttempts: Array<() -> Unit> =
-            listOf(Immediate, defaultDelayedStopMode, defaultGracefulStopMode)
+            listOf(Immediate, defaultGracefulStopMode)
                 .subtract(supportedStopModes)
                 .map { stopMode ->
                     fun() {

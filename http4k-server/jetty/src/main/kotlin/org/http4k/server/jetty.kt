@@ -45,7 +45,7 @@ class Jetty(private val port: Int, override val stopMode: StopMode, private val 
                     stopTimeout = stopMode.timeout.toMillis()
                 }
             }
-            is StopMode.Immediate, is StopMode.Delayed -> throw ServerConfig.UnsupportedStopMode(stopMode)
+            is StopMode.Immediate -> throw ServerConfig.UnsupportedStopMode(stopMode)
         }
     }
 

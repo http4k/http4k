@@ -21,7 +21,6 @@ interface ServerConfig {
     sealed class StopMode {
         object Immediate : StopMode()
         data class Graceful(val timeout: Duration): StopMode()
-        data class Delayed(val timeout: Duration) :StopMode()
     }
 
     class UnsupportedStopMode(stopMode: StopMode)

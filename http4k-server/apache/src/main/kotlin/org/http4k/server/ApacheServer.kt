@@ -94,13 +94,6 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     override val stopMode: StopMode = StopMode.Graceful(Duration.ofSeconds(5))
 ) : ServerConfig {
 
-    init {
-        when(stopMode) {
-            is StopMode.Delayed -> throw ServerConfig.UnsupportedStopMode(stopMode)
-            else -> {}
-        }
-    }
-
     constructor(port: Int = 8000) : this(port, null, null)
     constructor(port: Int = 8000, address: InetAddress? = null, canonicalHostname: String? = null) : this (port, address, canonicalHostname, StopMode.Immediate)
 

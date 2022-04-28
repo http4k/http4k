@@ -22,14 +22,7 @@ class Undertow(
     override val stopMode: StopMode = StopMode.Immediate
 ) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, false)
-    constructor(port: Int = 8000, enableHttp2: Boolean) : this(port, enableHttp2, ServerConfig.StopMode.Immediate)
-
-
-    init {
-        if (stopMode is StopMode.Delayed) {
-            throw ServerConfig.UnsupportedStopMode(stopMode)
-        }
-    }
+    constructor(port: Int = 8000, enableHttp2: Boolean) : this(port, enableHttp2, StopMode.Immediate)
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
         val httpHandler =
