@@ -20,16 +20,6 @@ class ContainerEvents : Events {
     }
 }
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(value = TestServerEvent.ServerStarted::class, name = "ServerStarted"),
-    JsonSubTypes.Type(value = TestServerEvent.ServerStopRequested::class, name = "ServerStopRequested"),
-    JsonSubTypes.Type(value = TestServerEvent.ServerStopped::class, name = "ServerStopped")
-)
 sealed class TestServerEvent : Event {
     data class ServerStarted(val backend: String, val stopModeName: String) : TestServerEvent()
     data class ServerStopRequested(val ignore: String = "") : TestServerEvent()
