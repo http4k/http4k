@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 
 class ServerInDocker {
-    private val basePath  by lazy {
+    private val basePath by lazy {
         val workingDir = File(".").absolutePath
         val projectDir = workingDir.removeSuffix(workingDir.substringAfter("/http4k/"))
         val modulePath = "/http4k-server/shutdown-integration-test"
@@ -41,6 +41,14 @@ class ServerInDocker {
 
     private val dockerClient = DockerClientImpl.getInstance(config, http)
 
+    init {
+        try {
+            dockerClient.pingCmd().exec()
+        } catch (e: Exception) {
+            error("Docker unavailable (${e.message})")
+        }
+    }
+
     fun start(backend: ServerBackend, stopMode: ServerConfig.StopMode): ContainerId {
         dockerWorkspace("/").apply {
             deleteRecursively()
@@ -54,9 +62,11 @@ class ServerInDocker {
 
         val serverPackage = project("/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip")
 
-        if(!serverPackage.exists()){
-            fail("Server package not found. To create run:\n" +
-                "./gradlew :http4k-server-shutdown-integration-test:distZip")
+        if (!serverPackage.exists()) {
+            fail(
+                "Server package not found. To create run:\n" +
+                    "./gradlew :http4k-server-shutdown-integration-test:distZip"
+            )
         }
 
         Files.copy(
@@ -135,7 +145,7 @@ class ServerInDocker {
             countdown.countDown()
         }.start()
         val succeeded = countdown.await(30, SECONDS)
-        if (!succeeded){
+        if (!succeeded) {
             val logs = StringBuilder()
             dockerClient.logContainerCmd(containerId.value)
                 .withStdOut(true)
