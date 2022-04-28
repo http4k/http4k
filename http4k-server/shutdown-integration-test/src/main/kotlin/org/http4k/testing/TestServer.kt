@@ -4,6 +4,7 @@ import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.lens.enum
 import org.http4k.server.ApacheServer
+import org.http4k.server.Ratpack
 import org.http4k.server.ServerConfig
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.Undertow
@@ -49,6 +50,9 @@ enum class ServerBackend : (StopMode) -> ServerConfig {
         override fun invoke(mode: StopMode) = ApacheServer(8000, stopMode = mode)
     },
     Undertow {
-        override fun invoke(mode: StopMode): ServerConfig = Undertow(port = 8000, enableHttp2 = false, mode)
+        override fun invoke(mode: StopMode) = Undertow(port = 8000, enableHttp2 = false, mode)
+    },
+    Ratpack {
+        override fun invoke(mode: StopMode) = Ratpack(port = 8000, stopMode = mode)
     }
 }
