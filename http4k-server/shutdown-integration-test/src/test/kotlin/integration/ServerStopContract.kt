@@ -43,7 +43,6 @@ abstract class ServerStopContract(
 
     private val defaultGracefulStopMode = Graceful(ofSeconds(10))
     private val timeoutTolerance = ofMillis(1000)
-
     private val supportedStopModes: Set<StopMode>
 
     init {
@@ -152,31 +151,6 @@ abstract class ServerStopContract(
         }
     }
 
-    fun Http4kServer.testInflightRequestsCompleteDuringServerStop() {
-        val responses = ConcurrentLinkedQueue<Response>()
-        val numberOfInflightRequests = 5
-        val countDownInflightRequestsStarted = CountDownLatch(numberOfInflightRequests)
-        val inflightRequestThreads = (1..numberOfInflightRequests).map {
-            thread {
-                countDownInflightRequestsStarted.countDown()
-                try {
-                    responses.add(client(Request(POST, "$baseUrl/slow-echo").body("Hello")).also { it.bodyString() })
-                } catch (e: IOException) {
-                    responses.add(Response(Status.CONNECTION_REFUSED.toClientStatus(e)))
-                }
-            }
-        }
-        countDownInflightRequestsStarted.await(1, SECONDS)
-        Thread.sleep(100)
-
-        assertThat(responses.size, equalTo(0))
-        stop()
-        inflightRequestThreads.forEach { it.join() }
-
-        assertThat(responses, hasSize(equalTo(numberOfInflightRequests)))
-        assertThat(responses, allElements(hasStatus(Status.OK).and(hasBody("Hello"))))
-    }
-
     @Test
     fun `immediate stop mode is cancelling inflight requests`() {
         val server = startServerOrSkip(Immediate)
@@ -211,4 +185,28 @@ abstract class ServerStopContract(
         assertAll(*illegalConfigurationAttempts)
     }
 
+    private fun Http4kServer.testInflightRequestsCompleteDuringServerStop() {
+        val responses = ConcurrentLinkedQueue<Response>()
+        val numberOfInflightRequests = 5
+        val countDownInflightRequestsStarted = CountDownLatch(numberOfInflightRequests)
+        val inflightRequestThreads = (1..numberOfInflightRequests).map {
+            thread {
+                countDownInflightRequestsStarted.countDown()
+                try {
+                    responses.add(client(Request(POST, "$baseUrl/slow-echo").body("Hello")).also { it.bodyString() })
+                } catch (e: IOException) {
+                    responses.add(Response(Status.CONNECTION_REFUSED.toClientStatus(e)))
+                }
+            }
+        }
+        countDownInflightRequestsStarted.await(1, SECONDS)
+        Thread.sleep(100)
+
+        assertThat(responses.size, equalTo(0))
+        stop()
+        inflightRequestThreads.forEach { it.join() }
+
+        assertThat(responses, hasSize(equalTo(numberOfInflightRequests)))
+        assertThat(responses, allElements(hasStatus(Status.OK).and(hasBody("Hello"))))
+    }
 }
