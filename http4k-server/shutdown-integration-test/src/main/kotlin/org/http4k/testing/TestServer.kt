@@ -6,6 +6,7 @@ import org.http4k.lens.enum
 import org.http4k.server.Apache4Server
 import org.http4k.server.ApacheServer
 import org.http4k.server.Jetty
+import org.http4k.server.KtorCIO
 import org.http4k.server.KtorNetty
 import org.http4k.server.Netty
 import org.http4k.server.Ratpack
@@ -55,6 +56,9 @@ enum class ServerBackend : (StopMode) -> ServerConfig {
     },
     Apache4 {
         override fun invoke(mode: StopMode) = Apache4Server(8000, stopMode = mode)
+    },
+    KtorCIO {
+        override fun invoke(mode: StopMode) = KtorCIO(8000, stopMode = mode)
     },
     KtorNetty {
         override fun invoke(mode: StopMode) = KtorNetty(8000, stopMode = mode)

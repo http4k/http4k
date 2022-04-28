@@ -1,32 +1,13 @@
 package org.http4k.server
 
-import io.ktor.application.ApplicationCallPipeline.ApplicationPhase.Call
-import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
+import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import io.ktor.server.plugins.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.utils.io.jvm.javaio.*
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.createApplicationPlugin
-import io.ktor.server.application.install
-import io.ktor.server.cio.CIO
-import io.ktor.server.cio.CIOApplicationEngine
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.stop
-import io.ktor.server.plugins.origin
-import io.ktor.server.request.ApplicationRequest
-import io.ktor.server.request.header
-import io.ktor.server.request.httpMethod
-import io.ktor.server.request.uri
-import io.ktor.server.response.ApplicationResponse
-import io.ktor.server.response.header
-import io.ktor.server.response.respondOutputStream
-import io.ktor.utils.io.jvm.javaio.toInputStream
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.withContext
 import org.http4k.core.Headers
@@ -41,7 +22,6 @@ import java.util.concurrent.TimeUnit.SECONDS
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-@OptIn(EngineAPI::class)
 class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode) : ServerConfig {
     constructor(port: Int = 8000) : this(port, Immediate)
 
