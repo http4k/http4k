@@ -21,6 +21,7 @@ class ContainerEvents : Events {
 }
 
 sealed class TestServerEvent : Event {
+    data class ApplicationStarted(val ignored: String = "") : TestServerEvent()
     data class ServerStarted(val backend: String, val stopModeName: String) : TestServerEvent()
     data class ServerStopRequested(val ignore: String = "") : TestServerEvent()
     data class ServerStopped(val ignore: String = "") : TestServerEvent()

@@ -11,7 +11,7 @@ import org.http4k.testing.TestServerEvent.ServerStopped
 import java.time.Duration
 
 fun main() {
-    val events = ContainerEvents()
+    val events = ContainerEvents().apply { this(TestServerEvent.ApplicationStarted()) }
     val backendKey = EnvironmentKey.enum({ ServerBackend.valueOf(it) }, ServerBackend::name).required("BACKEND")
     val stopModeKey = EnvironmentKey.map({ resolveStopMode(it) }, { it.javaClass.simpleName }).required("STOP_MODE")
 
