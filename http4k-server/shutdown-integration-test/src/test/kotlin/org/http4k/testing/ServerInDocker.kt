@@ -11,15 +11,18 @@ import okhttp3.internal.toImmutableList
 import org.http4k.core.Uri
 import org.http4k.core.extend
 import org.http4k.events.Event
+import org.http4k.events.Events
 import org.http4k.server.ServerConfig
+import org.http4k.util.inIntelliJOnly
 import org.junit.jupiter.api.fail
 import java.io.File
 import java.nio.file.Files
 import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 
-class ServerInDocker {
+class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
     private val basePath by lazy {
         val workingDir = File(".").absolutePath
         val projectDir = workingDir.removeSuffix(workingDir.substringAfter("/http4k/"))
@@ -50,6 +53,7 @@ class ServerInDocker {
     }
 
     fun start(backend: ServerBackend, stopMode: ServerConfig.StopMode): ContainerId {
+        events(DockerEvent.ServerStartedRequested)
         dockerWorkspace("/").apply {
             deleteRecursively()
             mkdirs()
@@ -79,15 +83,20 @@ class ServerInDocker {
             .exec(BuildImageResultCallback())
             .awaitImageId(10, SECONDS)
 
+        events(DockerEvent.WorkspacePrepared)
+
         dockerClient.listContainersCmd()
             .withShowAll(true)
             .exec()
             .filter { it.names.contains("/http4k-server-shutdown-integration-test") }
+            .also { events(DockerEvent.RelevantContainersFound(it.map { it.id to it.state })) }
             .map {
                 if (it.state == "running") {
                     dockerClient.killContainerCmd(it.id).exec()
+                    events(DockerEvent.ContainerKilled(it.id))
                 }
                 dockerClient.removeContainerCmd(it.id).withForce(true).exec()
+                events(DockerEvent.ContainerRemoved(it.id))
             }
 
         val exposedPort = ExposedPort.tcp(8000)
@@ -95,6 +104,7 @@ class ServerInDocker {
             bind(exposedPort, Ports.Binding.bindPort(8000))
         }
 
+        events(DockerEvent.StartedCreatingContainer)
         val containerId = dockerClient.createContainerCmd(imageId)
             .withName("http4k-server-shutdown-integration-test")
             .withEnv(
@@ -113,7 +123,9 @@ class ServerInDocker {
 
         dockerClient.startContainerCmd(containerId.value).exec()
 
+        events(DockerEvent.ContainerCreated)
         waitForEvent(containerId, TestServerEvent.ServerStarted(backend.name, stopMode::class.java.simpleName))
+        events(DockerEvent.ServerReady)
         return containerId
     }
 
@@ -163,7 +175,30 @@ class ServerInDocker {
     }
 
     fun stop(containerId: ContainerId) {
+        events(DockerEvent.ServerStopRequested(containerId.value))
         dockerClient.stopContainerCmd(containerId.value).exec()
+        events(DockerEvent.ContainerStopped(containerId.value))
+    }
+
+    sealed class DockerEvent : Event {
+        object ServerStartedRequested : DockerEvent()
+        object WorkspacePrepared : DockerEvent()
+        data class RelevantContainersFound(val ids: List<Pair<String, String>>) : DockerEvent()
+        object StartedCreatingContainer : DockerEvent()
+        object ContainerCreated : DockerEvent()
+        data class ContainerKilled(val id:String) : DockerEvent()
+        data class ServerStopRequested(val id:String) : DockerEvent()
+        data class ContainerStopped(val id:String) : DockerEvent()
+        data class ContainerRemoved(val id:String) : DockerEvent()
+        object ServerReady : DockerEvent()
+    }
+}
+
+class PrintEventsInIntelliJ : Events {
+    data class DebugEvent(val timestamp: Instant, val event: Event)
+
+    override fun invoke(event: Event) {
+        inIntelliJOnly { println(DebugEvent(Instant.now(), event)) }
     }
 }
 
