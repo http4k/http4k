@@ -53,59 +53,24 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
     }
 
     fun start(backend: ServerBackend, stopMode: ServerConfig.StopMode): ContainerId {
-        events(DockerEvent.ServerStartedRequested)
-        dockerWorkspace("/").apply {
-            deleteRecursively()
-            mkdirs()
-        }
+        val imageId = prepareWorkspace()
+        removePreviousContainers()
+        val containerId = createContainer(imageId, backend, stopMode)
+        waitForEvent(containerId, TestServerEvent.ServerStarted(backend.name, stopMode::class.java.simpleName))
+        events(DockerEvent.ServerReady)
+        return containerId
+    }
 
-        Files.copy(
-            project("/src/main/resources/Dockerfile").toPath(),
-            dockerWorkspace("Dockerfile").toPath()
-        )
-
-        val serverPackage = project("/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip")
-
-        if (!serverPackage.exists()) {
-            fail(
-                "Server package not found. To create run:\n" +
-                    "./gradlew :http4k-server-shutdown-integration-test:distZip"
-            )
-        }
-
-        Files.copy(
-            serverPackage.toPath(),
-            dockerWorkspace("http4k-server-shutdown-integration-test-LOCAL.zip").toPath()
-        )
-
-        val imageId = dockerClient.buildImageCmd(dockerWorkspace("Dockerfile"))
-            .withTags(setOf("http4k-server-shutdown-integration-test"))
-            .exec(BuildImageResultCallback())
-            .awaitImageId(10, SECONDS)
-
-        events(DockerEvent.WorkspacePrepared)
-
-        dockerClient.listContainersCmd()
-            .withShowAll(true)
-            .exec()
-            .filter { it.names.contains("/http4k-server-shutdown-integration-test") }
-            .also { events(DockerEvent.RelevantContainersFound(it.map { it.id to it.state })) }
-            .map {
-                if (it.state == "running") {
-                    dockerClient.killContainerCmd(it.id).exec()
-                    events(DockerEvent.ContainerKilled(it.id))
-                }
-                dockerClient.removeContainerCmd(it.id).withForce(true).exec()
-                waitForContainerToDisappear(it.id)
-                events(DockerEvent.ContainerRemoved(it.id))
-            }
-
+    private fun createContainer(
+        imageId: String,
+        backend: ServerBackend,
+        stopMode: ServerConfig.StopMode
+    ): ContainerId {
+        events(DockerEvent.StartedCreatingContainer)
         val exposedPort = ExposedPort.tcp(8000)
         val portBindings = Ports().apply {
             bind(exposedPort, Ports.Binding.bindPort(8000))
         }
-
-        events(DockerEvent.StartedCreatingContainer)
         val containerId = dockerClient.createContainerCmd(imageId)
             .withName("http4k-server-shutdown-integration-test")
             .withEnv(
@@ -125,9 +90,59 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
         dockerClient.startContainerCmd(containerId.value).exec()
 
         events(DockerEvent.ContainerCreated)
-        waitForEvent(containerId, TestServerEvent.ServerStarted(backend.name, stopMode::class.java.simpleName))
-        events(DockerEvent.ServerReady)
         return containerId
+    }
+
+    private fun removePreviousContainers() {
+        dockerClient.listContainersCmd()
+            .withShowAll(true)
+            .exec()
+            .filter { it.names.contains("/http4k-server-shutdown-integration-test") }
+            .also { events(DockerEvent.RelevantContainersFound(it.map { it.id to it.state })) }
+            .map {
+                if (it.state == "running") {
+                    dockerClient.killContainerCmd(it.id).exec()
+                    events(DockerEvent.ContainerKilled(it.id))
+                }
+                dockerClient.removeContainerCmd(it.id).withForce(true).exec()
+                waitForContainerToDisappear(it.id)
+                events(DockerEvent.ContainerRemoved(it.id))
+            }
+    }
+
+    private fun prepareWorkspace(): String {
+        events(DockerEvent.ServerStartedRequested)
+        dockerWorkspace("/").apply {
+            deleteRecursively()
+            mkdirs()
+        }
+
+        Files.copy(
+            project("/src/main/resources/Dockerfile").toPath(),
+            dockerWorkspace("Dockerfile").toPath()
+        )
+
+        val serverPackage = project("/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip")
+
+        if (!serverPackage.exists()) {
+            fail(
+                "Server package not found. To create run:\n" +
+                        "./gradlew :http4k-server-shutdown-integration-test:distZip"
+            )
+        }
+
+        Files.copy(
+            serverPackage.toPath(),
+            dockerWorkspace("http4k-server-shutdown-integration-test-LOCAL.zip").toPath()
+        )
+
+        val imageId = dockerClient.buildImageCmd(dockerWorkspace("Dockerfile"))
+            .withTags(setOf("http4k-server-shutdown-integration-test"))
+            .exec(BuildImageResultCallback())
+            .awaitImageId(10, SECONDS)
+
+        events(DockerEvent.WorkspacePrepared)
+        return imageId
     }
 
     fun eventsFor(containerId: ContainerId): List<ContainerEvent> {
