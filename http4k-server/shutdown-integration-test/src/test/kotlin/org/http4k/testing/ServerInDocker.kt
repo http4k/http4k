@@ -96,6 +96,7 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
                     events(DockerEvent.ContainerKilled(it.id))
                 }
                 dockerClient.removeContainerCmd(it.id).withForce(true).exec()
+                waitForContainerToDisappear(it.id)
                 events(DockerEvent.ContainerRemoved(it.id))
             }
 
@@ -148,7 +149,21 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
         return list.toImmutableList()
     }
 
-    fun waitForEvent(containerId: ContainerId, event: TestServerEvent) {
+    private fun waitForContainerToDisappear(id: String) {
+        val countdown = CountDownLatch(1)
+        Thread {
+            while (dockerClient.listContainersCmd().withShowAll(true).exec()
+                    .any { it.names.contains("/http4k-server-shutdown-integration-test") }
+            ) {
+                Thread.sleep(100)
+            }
+            countdown.countDown()
+        }.start()
+        val succeed = countdown.await(5, SECONDS)
+        if (!succeed) fail("Timed out removing container: $id")
+    }
+
+    private fun waitForEvent(containerId: ContainerId, event: TestServerEvent) {
         val countdown = CountDownLatch(1)
         Thread {
             while (!eventsFor(containerId).map(ContainerEvent::event).contains(event)) {
@@ -186,10 +201,10 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
         data class RelevantContainersFound(val ids: List<Pair<String, String>>) : DockerEvent()
         object StartedCreatingContainer : DockerEvent()
         object ContainerCreated : DockerEvent()
-        data class ContainerKilled(val id:String) : DockerEvent()
-        data class ServerStopRequested(val id:String) : DockerEvent()
-        data class ContainerStopped(val id:String) : DockerEvent()
-        data class ContainerRemoved(val id:String) : DockerEvent()
+        data class ContainerKilled(val id: String) : DockerEvent()
+        data class ServerStopRequested(val id: String) : DockerEvent()
+        data class ContainerStopped(val id: String) : DockerEvent()
+        data class ContainerRemoved(val id: String) : DockerEvent()
         object ServerReady : DockerEvent()
     }
 }
