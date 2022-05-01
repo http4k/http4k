@@ -89,7 +89,7 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
 
         dockerClient.startContainerCmd(containerId.value).exec()
 
-        events(DockerEvent.ContainerCreated)
+        events(DockerEvent.ContainerCreated(containerId.value))
         return containerId
     }
 
@@ -127,7 +127,7 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
         if (!serverPackage.exists()) {
             fail(
                 "Server package not found. To create run:\n" +
-                        "./gradlew :http4k-server-shutdown-integration-test:distZip"
+                    "./gradlew :http4k-server-shutdown-integration-test:distZip"
             )
         }
 
@@ -215,7 +215,7 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
         object WorkspacePrepared : DockerEvent()
         data class RelevantContainersFound(val ids: List<Pair<String, String>>) : DockerEvent()
         object StartedCreatingContainer : DockerEvent()
-        object ContainerCreated : DockerEvent()
+        data class ContainerCreated(val id: String) : DockerEvent()
         data class ContainerKilled(val id: String) : DockerEvent()
         data class ServerStopRequested(val id: String) : DockerEvent()
         data class ContainerStopped(val id: String) : DockerEvent()
