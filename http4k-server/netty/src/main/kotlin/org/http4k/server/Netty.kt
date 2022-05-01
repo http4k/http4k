@@ -43,6 +43,7 @@ import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
 import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
  * Exposed to allow for insertion into a customised Netty server instance
@@ -139,8 +140,9 @@ class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerC
         override fun stop() = apply {
             closeFuture?.cancel(false)
 
-            workerGroup.shutdownGracefully(minOf(2000L, shutdownTimeoutMillis), shutdownTimeoutMillis, TimeUnit.MILLISECONDS)
-            masterGroup.shutdownGracefully(minOf(2000L, shutdownTimeoutMillis), shutdownTimeoutMillis, TimeUnit.MILLISECONDS)
+            val sleepTime = minOf(2000L, shutdownTimeoutMillis)
+            workerGroup.shutdownGracefully(sleepTime, shutdownTimeoutMillis, MILLISECONDS).sync()
+            masterGroup.shutdownGracefully(sleepTime, shutdownTimeoutMillis, MILLISECONDS).sync()
         }
 
         override fun port(): Int = if (port > 0) port else address.port
