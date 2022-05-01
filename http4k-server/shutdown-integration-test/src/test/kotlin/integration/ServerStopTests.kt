@@ -30,6 +30,7 @@ class KtorCIOStopTest : ServerStopContract(KtorCIO, ApacheClient(), {
 
 class KtorNettyStopTest : ServerStopContract(KtorNetty, ApacheClient(), {
     enableImmediateStop()
+    enableGracefulStop()
 })
 
 class NettyStopTest : ServerStopContract(Netty, ApacheClient(), {
