@@ -14,6 +14,8 @@ import org.apache.hc.core5.http.io.entity.EmptyInputStream.INSTANCE
 import org.apache.hc.core5.http.io.entity.InputStreamEntity
 import org.apache.hc.core5.http.protocol.HttpContext
 import org.apache.hc.core5.http.protocol.HttpCoreContext
+import org.apache.hc.core5.io.CloseMode.IMMEDIATE
+import org.apache.hc.core5.util.TimeValue
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -24,9 +26,11 @@ import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.server.ServerConfig.StopMode
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.URI
+import java.time.Duration
 import org.apache.hc.core5.http.HttpRequest as ApacheRequest
 import org.apache.hc.core5.http.HttpResponse as ApacheResponse
 
@@ -83,13 +87,15 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun Array<Header>.toHttp4kHeaders(): Headers = map { it.name to it.value }
 }
 
-class ApacheServer(
+ class ApacheServer(
     val port: Int = 8000,
     val address: InetAddress? = null,
-    private val canonicalHostname: String? = null
+    private val canonicalHostname: String? = null,
+    override val stopMode: StopMode = StopMode.Graceful(Duration.ofSeconds(5))
 ) : ServerConfig {
 
     constructor(port: Int = 8000) : this(port, null, null)
+    constructor(port: Int = 8000, address: InetAddress? = null, canonicalHostname: String? = null) : this (port, address, canonicalHostname, StopMode.Immediate)
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer
@@ -118,7 +124,20 @@ class ApacheServer(
 
         override fun start() = apply { server.start() }
 
-        override fun stop() = apply { server.stop() }
+        override fun stop() = apply {
+            when (stopMode) {
+                is StopMode.Immediate -> server.close(IMMEDIATE)
+                is StopMode.Graceful -> {
+                    server.initiateShutdown()
+                    try {
+                        server.awaitTermination(TimeValue.ofMilliseconds(stopMode.timeout.toMillis()))
+                    } catch (ex: InterruptedException) {
+                        Thread.currentThread().interrupt()
+                    }
+                    server.close(IMMEDIATE)
+                }
+            }
+        }
 
         override fun port(): Int = if (port != 0) port else server.localPort
     }

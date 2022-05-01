@@ -11,4 +11,8 @@ class JettyClientStreamingTest : HttpClientContract(::ApacheServer, JettyClient(
     override fun `can forward response body to another request`() {
         // temporarily remove test
     }
+
+    @Test
+    override fun `socket timeouts are converted into 504`() {
+    }
 }
