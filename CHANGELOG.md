@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.14.0 (uncut)
+- **http4k-metrics-micrometer** - Enable publishPercentileHistogram for Micrometer request timer H/T @jakubjanecek
+
 ### v4.25.13.0
 - **http4k-server-***: Add support for graceful shutdown (available to most server implementations) H/T @nlochschmidt
 - **http4k-core**: Simplify hex decoding H/T @dzappold
