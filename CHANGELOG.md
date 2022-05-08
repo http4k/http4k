@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.25.14.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-metrics-micrometer** - Enable publishPercentileHistogram for Micrometer request timer H/T @jakubjanecek
 
 ### v4.25.13.0
