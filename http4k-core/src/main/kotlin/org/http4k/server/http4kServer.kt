@@ -28,7 +28,7 @@ interface ServerConfig {
 
     val stopMode: StopMode get() = StopMode.Immediate
 
-    fun toServer(httpHandler: HttpHandler): Http4kServer
+    fun toServer(http: HttpHandler): Http4kServer
 }
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)

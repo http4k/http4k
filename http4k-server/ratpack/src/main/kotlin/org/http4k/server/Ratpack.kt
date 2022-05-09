@@ -12,7 +12,6 @@ import ratpack.http.TypedData
 import ratpack.server.RatpackServer
 import ratpack.server.RatpackServerSpec
 import ratpack.server.ServerConfig.builder
-import java.time.Duration.ofSeconds
 
 class Ratpack(port: Int = 8000, stopMode: StopMode) : ServerConfig {
     constructor(port: Int = 8000) : this(port, StopMode.Immediate)

@@ -11,7 +11,6 @@ import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.server.ServerConfig.StopMode
-import org.http4k.server.ServerConfig.UnsupportedStopMode
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors.newWorkStealingPool
 import java.util.concurrent.TimeUnit
