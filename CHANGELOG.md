@@ -3,9 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.25.14.0
+### v4.25.14.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-core** : Refreshing Credentials Provider now does not block if there is more than half of the expiring time left.
 - **http4k-core** : Fix #735 - use whole message body for etag hash. H/T @aSemy
 - **http4k-metrics-micrometer** - Enable publishPercentileHistogram for Micrometer request timer H/T @jakubjanecek
 
