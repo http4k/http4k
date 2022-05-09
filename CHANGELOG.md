@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.25.14.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Refreshing Credentials Provider now does not block if there is more than half of the expiring time left.
 - **http4k-metrics-micrometer** - Enable publishPercentileHistogram for Micrometer request timer H/T @jakubjanecek
 
 ### v4.25.13.0
