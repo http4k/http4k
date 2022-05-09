@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.25.14.0 (uncut)
+### v4.25.14.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Refreshing Credentials Provider now does not block if there is more than half of the expiring time left.
+- **http4k-core** : Fix #735 - use whole message body for etag hash. H/T @aSemy
 - **http4k-metrics-micrometer** - Enable publishPercentileHistogram for Micrometer request timer H/T @jakubjanecek
 
 ### v4.25.13.0
@@ -18,7 +19,7 @@ changes with their rationale when appropriate:
 
 ### v4.25.11.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.21.
-- **http4k-core**: Fix #728 = No way to set the request timeout when using the JavaHttpClient. H/T @gmulders
+- **http4k-core**: Fix #728 - No way to set the request timeout when using the JavaHttpClient. H/T @gmulders
 - **http4k-oauth-security**: Add missing Moshi adapter
 
 ### v4.25.10.1

@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import java.nio.ByteBuffer
 import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
@@ -100,12 +99,11 @@ object CachingFilters {
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
         object AddETag {
-
             operator fun invoke(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = Filter { next ->
                 { request ->
                     val response = next(request)
                     if (predicate(response)) {
-                        val hashedBody = md5().digest(response.body.payload.copyToByteArray()).joinToString("") { "%02x".format(it) }
+                        val hashedBody = md5().digest(response.body.payload.array()).joinToString("") { "%02x".format(it) }
                         response.header("Etag", hashedBody)
                     } else
                         response
@@ -113,17 +111,6 @@ object CachingFilters {
             }
 
             private fun md5() = MessageDigest.getInstance("MD5")
-
-            private fun ByteBuffer.copyToByteArray(): ByteArray {
-                val clone = ByteBuffer.allocate(this.capacity())
-                this.rewind()
-                clone.put(this)
-                this.rewind()
-                clone.flip()
-                val ba = ByteArray(clone.remaining())
-                clone.get(ba)
-                return ba
-            }
         }
 
         /**
