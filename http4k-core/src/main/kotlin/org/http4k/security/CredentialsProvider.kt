@@ -21,18 +21,32 @@ fun <T> CredentialsProvider.Companion.Refreshing(
 ) = object : CredentialsProvider<T> {
     private val stored = AtomicReference<ExpiringCredentials<T>>(null)
 
-    override fun invoke() = (stored.get()?.takeUnless { it.expiresWithin(gracePeriod) } ?: refresh())?.credentials
+    private val isRefreshing = AtomicReference(false)
 
-    private fun refresh(): ExpiringCredentials<T>? = synchronized(stored) {
-        val current = stored.get()
-        when {
-            current != null && !current.expiresWithin(gracePeriod) -> current
-            else -> try {
-                refreshFn(current?.credentials).also(stored::set)
-            } catch (e: Exception) {
-                if (current == null || current.expiresWithin(ZERO)) throw e
-                current
+    override fun invoke() = (stored.get()
+        ?.takeIf {
+            val expiresSoon = it.expiresWithin(gracePeriod)
+            val expiresReallySoon = it.expiresWithin(gracePeriod.dividedBy(2))
+            val isAlreadyRefreshing = isRefreshing.get()
+
+            (!expiresSoon || isAlreadyRefreshing) && !expiresReallySoon
+        } ?: refresh())?.credentials
+
+    private fun refresh() = synchronized(this) {
+        isRefreshing.set(true)
+        try {
+            val current = stored.get()
+            when {
+                current != null && !current.expiresWithin(gracePeriod) -> current
+                else -> try {
+                    refreshFn(current?.credentials).also(stored::set)
+                } catch (e: Exception) {
+                    if (current == null || current.expiresWithin(ZERO)) throw e
+                    current
+                }
             }
+        } finally {
+            isRefreshing.set(false)
         }
     }
 
