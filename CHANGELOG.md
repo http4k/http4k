@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.16.0 (uncut)
+- **http4k-core** : Deprecate eTag filter in favour of ETagSupport.
+
 ### v4.25.15.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Fix #738 - Calculating eTag ate body.
