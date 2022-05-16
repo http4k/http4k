@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v4.25.15.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Fix #738 - Calculating eTag ate body.
+- **http4k-core** : Caching filters now replace headers instead of adding them.
 - **http4k-server-jetty** : Change constructor to use supported shutdown mode. H/T @jshiell
 
 ### v4.25.14.0

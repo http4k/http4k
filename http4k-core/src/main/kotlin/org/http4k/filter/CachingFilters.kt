@@ -44,7 +44,7 @@ object CachingFilters {
     object Request {
         fun AddIfModifiedSince(clock: Clock, maxAge: Duration) = Filter { next ->
             {
-                next(it.header("If-Modified-Since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
+                next(it.replaceHeader("If-Modified-Since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
             }
         }
     }
@@ -61,7 +61,7 @@ object CachingFilters {
                 {
                     val response = next(it)
                     val headers = if (it.method == GET && predicate(response)) headersFor(response) else emptyList()
-                    headers.fold(response) { memo, (first, second) -> memo.header(first, second) }
+                    headers.fold(response) { memo, (first, second) -> memo.replaceHeader(first, second) }
                 }
         }
 
@@ -106,7 +106,7 @@ object CachingFilters {
                     val response = next(request)
                     if (predicate(response)) {
                         val hashedBody = md5().digest(response.body.payload.copyToByteArray()).joinToString("") { "%02x".format(it) }
-                        response.header("Etag", hashedBody)
+                        response.replaceHeader("Etag", hashedBody)
                     } else
                         response
                 }
