@@ -10,8 +10,8 @@
 </picture>
 
 <hr/>
-
-<a href="https://github.com/http4k/http4k/actions?query=workflow%3A.github%2Fworkflows%2Fbuild.yaml"><img alt="build" src="https://github.com/http4k/http4k-connect/workflows/.github/workflows/build.yaml/badge.svg"></a>
+    
+<a href="https://github.com/http4k/http4k/actions/workflows/build.yaml"><img alt="build" src="https://github.com/http4k/http4k/actions/workflows/build.yaml/badge.svg"></a>
 <a href="https://mvnrepository.com/artifact/org.http4k"><img alt="download" src="https://img.shields.io/maven-central/v/org.http4k/http4k-core"></a>
 <a href="https://codecov.io/gh/http4k/http4k"><img src="https://codecov.io/gh/http4k/http4k/branch/master/graph/badge.svg" /></a>
 <a href="http//www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub license" src="https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat"></a>
