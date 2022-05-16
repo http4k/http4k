@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.15.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Fix #738 - Calculating eTag ate body.
+- **http4k-server-jetty** : Change constructor to use supported shutdown mode. H/T @jshiell
+
 ### v4.25.14.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Refreshing Credentials Provider now does not block if there is more than half of the expiring time left.
