@@ -99,6 +99,7 @@ object CachingFilters {
          * Hash algo stolen from http://stackoverflow.com/questions/26423662/scalatra-response-hmac-calulation
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
+        @Deprecated("Deprecated in favour of EtagSupport", ReplaceWith("ResponseFilters.EtagSupport"))
         object AddETag {
 
             operator fun invoke(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = Filter { next ->

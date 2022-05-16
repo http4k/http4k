@@ -18,12 +18,13 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import java.time.Duration
 import java.time.Duration.ZERO
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
-import org.junit.jupiter.params.provider.CsvSource
 
+@Suppress("DEPRECATION")
 class CachingFiltersTest {
 
     private val clock = FixedClock
