@@ -12,7 +12,7 @@ data class ParameterizedHeader(
                 .split(",")
                 .filter { "=" in it }
                 .associate {
-                    val (key, value) = it.trim().split("=")
+                    val (key, value) = it.trim().split("=", limit = 2)
                     key.trim() to value.trim().replace("\"", "")
                 }
 
