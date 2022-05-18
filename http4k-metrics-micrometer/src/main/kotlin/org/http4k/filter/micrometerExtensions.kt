@@ -17,7 +17,7 @@ class MicrometerMetrics(private val defaults: MetricsDefaults) {
                      labeler: HttpTransactionLabeler = defaults.labeler,
                      clock: Clock = Clock.systemUTC()): Filter =
         ReportHttpTransaction(clock) {
-            labeler(it).labels.entries.fold(Timer.builder(name).description(description)) { memo, next ->
+            labeler(it).labels.entries.fold(Timer.builder(name).publishPercentileHistogram().description(description)) { memo, next ->
                 memo.tag(next.key, next.value)
             }.register(meterRegistry).record(it.duration)
         }

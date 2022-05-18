@@ -73,6 +73,7 @@ include("http4k-realtime-core")
     includeModule("ktornetty")
     includeModule("netty")
     includeModule("ratpack")
+    includeModule("shutdown-integration-test")
     includeModule("undertow")
 }
 

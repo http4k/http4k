@@ -8,6 +8,9 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 
 class RefreshingCredentialsProviderTest {
 
@@ -76,6 +79,7 @@ class RefreshingCredentialsProviderTest {
                 else -> throw e
             }
         }
+
         assertThat(provider(), equalTo(firstCreds.credentials))
 
         clock.tickBy(Duration.ofSeconds(61))
@@ -85,6 +89,107 @@ class RefreshingCredentialsProviderTest {
         clock.tickBy(Duration.ofSeconds(60))
 
         assertThat({provider() }, throws(equalTo(e)))
+    }
+
+    @Test
+    fun `uses almost-stale credentials when there is more than half of the grace period left`() {
+        var completedCalls = 0
+
+        val firstCreds = credentialsExpiringAt(now.plusSeconds(11), 1)
+
+        var latestCreds = firstCreds
+
+        var mainRefreshLock = CountDownLatch(1)
+
+        val provider = CredentialsProvider.Refreshing<String>(Duration.ofSeconds(10), clock) {
+            mainRefreshLock.await()
+
+            completedCalls++
+
+            latestCreds
+        }
+
+        mainRefreshLock.countDown()
+
+        // gets first creds when null
+        assertThat(provider(), equalTo(firstCreds.credentials))
+        assertThat(completedCalls, equalTo(1))
+
+        // doesn't refresh
+        assertThat(provider(), equalTo(firstCreds.credentials))
+        assertThat(completedCalls, equalTo(1))
+
+        mainRefreshLock = CountDownLatch(1)
+
+        // we are now into refresh period
+        clock.tickBy(Duration.ofSeconds(1))
+
+        val refreshed = AtomicReference<String>(null)
+
+        val secondCreds = credentialsExpiringAt(now.plusSeconds(11), 1)
+        latestCreds = secondCreds
+
+        val firstRefreshLock = CountDownLatch(1)
+
+        // refresh operation starts
+        thread {
+            refreshed.set(provider())
+            firstRefreshLock.countDown()
+        }
+
+        // whilst we are refreshing, use old credentials
+        assertThat(provider(), equalTo(firstCreds.credentials))
+        assertThat(completedCalls, equalTo(1))
+
+        mainRefreshLock.countDown()
+        firstRefreshLock.await()
+
+        // whilst we now we should have new credentials
+        assertThat(refreshed.get(), equalTo(secondCreds.credentials))
+
+        // get new credentials again as not expired
+        assertThat(provider(), equalTo(secondCreds.credentials))
+        assertThat(completedCalls, equalTo(1))
+
+        // we now are too close to the refresh period
+        clock.tickBy(Duration.ofSeconds(7))
+
+        val thirdCreds = credentialsExpiringAt(now.plusSeconds(11), 1)
+        latestCreds = thirdCreds
+
+        val secondRefreshLock = CountDownLatch(1)
+
+        val secondRefreshed = AtomicReference<String>(null)
+
+        mainRefreshLock = CountDownLatch(1)
+
+        // refresh operation starts
+        thread {
+            secondRefreshed.set(provider())
+            secondRefreshLock.countDown()
+        }
+
+        val chasingRefreshLock = CountDownLatch(1)
+
+        val chasingRefresh = AtomicReference<String>(null)
+
+        // chasing (cached) refresh
+        thread {
+            chasingRefresh.set(provider())
+            chasingRefreshLock.countDown()
+        }
+
+        mainRefreshLock.countDown()
+        secondRefreshLock.await()
+
+        // whilst we now we should have new credentials
+        assertThat(secondRefreshed.get(), equalTo(thirdCreds.credentials))
+        assertThat(completedCalls, equalTo(2))
+
+        // and the chasing one also has that new value as well
+        chasingRefreshLock.await()
+        assertThat(chasingRefresh.get(), equalTo(thirdCreds.credentials))
+        assertThat(completedCalls, equalTo(3))
     }
 
     private fun credentialsExpiringAt(expiry: Instant, counter: Int) = ExpiringCredentials(

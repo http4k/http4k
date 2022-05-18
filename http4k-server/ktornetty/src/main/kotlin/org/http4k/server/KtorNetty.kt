@@ -8,7 +8,6 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.stop
 import io.ktor.server.netty.Netty
-import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.header
@@ -18,6 +17,7 @@ import io.ktor.server.response.ApplicationResponse
 import io.ktor.server.response.header
 import io.ktor.server.response.respondOutputStream
 import io.ktor.utils.io.jvm.javaio.toInputStream
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.withContext
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
@@ -26,12 +26,14 @@ import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.lens.Header
-import java.util.concurrent.TimeUnit.SECONDS
+import org.http4k.server.ServerConfig.StopMode.Graceful
+import org.http4k.server.ServerConfig.StopMode.Immediate
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import io.ktor.http.Headers as KHeaders
-import kotlinx.coroutines.Dispatchers.Default
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class KtorNetty(val port: Int = 8000) : ServerConfig {
+class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMode) : ServerConfig {
+    constructor(port: Int = 8000): this(port, Immediate)
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine = embeddedServer(Netty, port) {
@@ -49,7 +51,10 @@ class KtorNetty(val port: Int = 8000) : ServerConfig {
         }
 
         override fun stop() = apply {
-            engine.stop(0, 2, SECONDS)
+            when(stopMode){
+                is Immediate -> engine.stop(0, 0, MILLISECONDS)
+                is Graceful -> engine.stop(stopMode.timeout.toMillis(), stopMode.timeout.toMillis(), MILLISECONDS)
+            }
         }
 
         override fun port() = engine.environment.connectors[0].port

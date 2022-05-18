@@ -3,9 +3,33 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.25.11.0 (uncut)
+### v4.25.16.0 (uncut)
+- **http4k-core** : Deprecate eTag filter in favour of ETagSupport.
+
+### v4.25.15.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Fix #738 - Calculating eTag ate body.
+- **http4k-core** : Caching filters now replace headers instead of adding them.
+- **http4k-server-jetty** : Change constructor to use supported shutdown mode. H/T @jshiell
+
+### v4.25.14.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Refreshing Credentials Provider now does not block if there is more than half of the expiring time left.
+- **http4k-core** : Fix #735 - use whole message body for etag hash. H/T @aSemy
+- **http4k-metrics-micrometer** - Enable publishPercentileHistogram for Micrometer request timer H/T @jakubjanecek
+
+### v4.25.13.0
+- **http4k-server-***: Add support for graceful shutdown (available to most server implementations) H/T @nlochschmidt
+- **http4k-core**: Simplify hex decoding H/T @dzappold
+
+### v4.25.12.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi-yaml-***: Replace default YAML boolean resolver to be less greedy.
+
+### v4.25.11.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.6.21.
-- **http4k-core**: Fix #728 = No way to set the request timeout when using the JavaHttpClient. H/T @gmulders
+- **http4k-core**: Fix #728 - No way to set the request timeout when using the JavaHttpClient. H/T @gmulders
+- **http4k-oauth-security**: Add missing Moshi adapter
 
 ### v4.25.10.1
 - **http4k-core**: Fix ServerFilters.BasicAuth handling of passwords containing colons H/T @robd

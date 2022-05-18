@@ -14,4 +14,6 @@ dependencies {
     testApi("org.webjars:swagger-ui:3.44.0") // leave hardcoded - tests
     testApi("com.launchdarkly:okhttp-eventsource:_")
     testApi("org.slf4j:slf4j-nop:_")
+
+    testImplementation(Testing.junit.jupiter.params)
 }

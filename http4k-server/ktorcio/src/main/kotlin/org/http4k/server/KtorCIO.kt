@@ -18,7 +18,6 @@ import io.ktor.server.response.ApplicationResponse
 import io.ktor.server.response.header
 import io.ktor.server.response.respondOutputStream
 import io.ktor.utils.io.jvm.javaio.toInputStream
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.withContext
 import org.http4k.core.Headers
@@ -28,11 +27,20 @@ import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.lens.Header
+import org.http4k.server.ServerConfig.StopMode.Immediate
 import java.util.concurrent.TimeUnit.SECONDS
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class KtorCIO(val port: Int = 8000) : ServerConfig {
+class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode) : ServerConfig {
+    constructor(port: Int = 8000) : this(port, Immediate)
+
+    init {
+        if (stopMode != Immediate) {
+            throw ServerConfig.UnsupportedStopMode(stopMode)
+        }
+    }
+
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine: CIOApplicationEngine = embeddedServer(CIO, port) {
             install(createApplicationPlugin(name = "http4k") {

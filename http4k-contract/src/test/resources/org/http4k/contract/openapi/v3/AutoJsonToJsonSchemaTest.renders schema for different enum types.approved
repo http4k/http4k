@@ -1,6 +1,20 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericHolder"
+    "items": {
+      "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericHolder"
+    },
+    "example": [
+      {
+        "value": "value1_1"
+      },
+      {
+        "value": "value2_1"
+      },
+      {
+        "value": "value1_2"
+      }
+    ],
+    "type": "array"
   },
   "definitions": [
     {
@@ -8,53 +22,11 @@
       "second": {
         "properties": {
           "value": {
-            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.GenericListHolder"
+            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Enum1"
           }
         },
         "example": {
-          "value": {
-            "value": [
-              "value1_1",
-              "value2_1",
-              "value1_2"
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "value"
-        ]
-      }
-    },
-    {
-      "first": "org.http4k.contract.openapi.v3.GenericListHolder",
-      "second": {
-        "properties": {
-          "value": {
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Enum1"
-                },
-                {
-                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Enum2"
-                }
-              ]
-            },
-            "example": [
-              "value1_1",
-              "value2_1",
-              "value1_2"
-            ],
-            "type": "array"
-          }
-        },
-        "example": {
-          "value": [
-            "value1_1",
-            "value2_1",
-            "value1_2"
-          ]
+          "value": "value1_1"
         },
         "type": "object",
         "required": [
@@ -69,17 +41,6 @@
         "enum": [
           "value1_1",
           "value1_2"
-        ],
-        "type": "string"
-      }
-    },
-    {
-      "first": "org.http4k.contract.openapi.v3.Enum2",
-      "second": {
-        "example": "value2_1",
-        "enum": [
-          "value2_1",
-          "value2_2"
         ],
         "type": "string"
       }

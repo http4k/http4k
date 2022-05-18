@@ -259,7 +259,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for different enum types`(approver: Approver) {
-        approver.assertApproved(GenericHolder(GenericListHolder(listOf(Enum1.value1_1, Enum2.value2_1, Enum1.value1_2))))
+        approver.assertApproved(listOf(GenericHolder(Enum1.value1_1), GenericHolder(Enum2.value2_1), GenericHolder(Enum1.value1_2)))
     }
 
     @Test

@@ -17,20 +17,22 @@ import org.http4k.filter.CachingFilters.Response.NoCache
 import org.http4k.hamkrest.hasHeader
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import java.time.Duration
 import java.time.Duration.ZERO
-import java.time.Duration.ofSeconds
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 
+@Suppress("DEPRECATION")
 class CachingFiltersTest {
 
     private val clock = FixedClock
-    private val maxAge = ofSeconds(10)
-    private val timings = DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(ofSeconds(2000)), StaleWhenRevalidateTtl(ofSeconds(3000)))
+    private val maxAge = Duration.ofSeconds(10)
+    private val timings = DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(Duration.ofSeconds(2000)), StaleWhenRevalidateTtl(Duration.ofSeconds(3000)))
     private val timingsWithZeroValues = DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(ZERO), StaleWhenRevalidateTtl(ZERO))
 
-    private val request = org.http4k.core.Request(GET, "")
+    private val request = Request(GET, "")
     private val response = Response(OK)
 
     @Test
@@ -41,11 +43,28 @@ class CachingFiltersTest {
         assertThat(response, hasHeader("If-modified-since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
     }
 
-    @Test
-    fun `Add eTag`() {
-        val response = AddETag { true }.then { Response(OK).body("bob") }(
-            request)
-        assertThat(response, hasHeader("etag", "9f9d51bc70ef21ca5c14f307980a29d8"))
+    @ParameterizedTest
+    @CsvSource(
+        """  bob, 9f9d51bc70ef21ca5c14f307980a29d8  """,
+        """  999, b706835de79a2b4e80506f582af3676a  """,
+        """  &*(, f2cd6baf16754f03166b2c846088de53  """,
+    )
+    fun `Add eTag - string body`(actualBody: String, expectedETag: String) {
+        val response = AddETag { true }.then { Response(OK).body(actualBody) }(request)
+        assertThat(response, hasHeader("etag", expectedETag))
+        assertThat(response.bodyString(), equalTo(actualBody))
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        """  bob, 9f9d51bc70ef21ca5c14f307980a29d8  """,
+        """  999, b706835de79a2b4e80506f582af3676a  """,
+        """  &*(, f2cd6baf16754f03166b2c846088de53  """,
+    )
+    fun `Add eTag - input stream body`(actualBody: String, expectedETag: String) {
+        val response = AddETag { true }.then { Response(OK).body(actualBody.byteInputStream()) }(request)
+        assertThat(response, hasHeader("etag", expectedETag))
+        assertThat(response.bodyString(), equalTo(actualBody))
     }
 
     private fun getResponseWith(cacheTimings: DefaultCacheTimings, response: Response) = FallbackCacheControl(clock, cacheTimings).then { response }(request)

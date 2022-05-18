@@ -28,6 +28,6 @@ class JsonResponseErrorRenderer(
                     )
                 )
             )
-
-    private data class ErrorResponse(val error: String, val error_description: String, val error_uri: String?)
 }
+
+data class ErrorResponse(val error: String, val error_description: String, val error_uri: String?)

@@ -11,3 +11,4 @@ class ApacheServerTest : ServerContract({ port -> ApacheServer(port, canonicalHo
 
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 }
+

@@ -49,7 +49,7 @@ class RefreshingOAuthTokenTest {
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
 
-        clock.tick(Duration.ofSeconds(89))
+        clock.tick(Duration.ofSeconds(88))
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
 
@@ -88,7 +88,7 @@ class RefreshingOAuthTokenTest {
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
 
-        clock.tick(Duration.ofSeconds(89))
+        clock.tick(Duration.ofSeconds(88))
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
 

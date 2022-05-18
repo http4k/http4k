@@ -20,8 +20,9 @@ import org.http4k.core.Response
 import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
+import org.http4k.server.ServerConfig.StopMode
 import java.net.InetAddress
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import org.apache.http.HttpRequest as ApacheRequest
 import org.apache.http.HttpResponse as ApacheResponse
 
@@ -62,8 +63,16 @@ class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun Array<Header>.toHttp4kHeaders(): Headers = map { it.name to it.value }
 }
 
-class Apache4Server(val port: Int = 8000, val address: InetAddress?) : ServerConfig {
+class Apache4Server(val port: Int = 8000, override val stopMode: StopMode, val address: InetAddress?) : ServerConfig {
+    constructor(port: Int = 8000, address: InetAddress?) : this(port, StopMode.Immediate, address)
+    constructor(port: Int = 8000, stopMode: StopMode) : this(port, stopMode, null)
     constructor(port: Int = 8000) : this(port, null)
+
+    init {
+        if(stopMode != StopMode.Immediate){
+            throw ServerConfig.UnsupportedStopMode(stopMode)
+        }
+    }
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer
@@ -87,7 +96,9 @@ class Apache4Server(val port: Int = 8000, val address: InetAddress?) : ServerCon
 
         override fun start() = apply { server.start() }
 
-        override fun stop() = apply { server.shutdown(1, SECONDS) }
+        override fun stop() = apply {
+            server.shutdown(0, MILLISECONDS)
+        }
 
         override fun port(): Int = if (port != 0) port else server.localPort
     }

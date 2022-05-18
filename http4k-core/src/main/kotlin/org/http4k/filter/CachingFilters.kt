@@ -4,6 +4,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.time.Clock
 import java.time.Duration
@@ -43,7 +44,7 @@ object CachingFilters {
     object Request {
         fun AddIfModifiedSince(clock: Clock, maxAge: Duration) = Filter { next ->
             {
-                next(it.header("If-Modified-Since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
+                next(it.replaceHeader("If-Modified-Since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
             }
         }
     }
@@ -60,7 +61,7 @@ object CachingFilters {
                 {
                     val response = next(it)
                     val headers = if (it.method == GET && predicate(response)) headersFor(response) else emptyList()
-                    headers.fold(response) { memo, (first, second) -> memo.header(first, second) }
+                    headers.fold(response) { memo, (first, second) -> memo.replaceHeader(first, second) }
                 }
         }
 
@@ -98,17 +99,31 @@ object CachingFilters {
          * Hash algo stolen from http://stackoverflow.com/questions/26423662/scalatra-response-hmac-calulation
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
+        @Deprecated("Deprecated in favour of EtagSupport", ReplaceWith("ResponseFilters.EtagSupport"))
         object AddETag {
+
             operator fun invoke(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = Filter { next ->
-                {
-                    val response = next(it)
+                { request ->
+                    val response = next(request)
                     if (predicate(response)) {
-                        val hashedBody = MessageDigest.getInstance("MD5")
-                            .digest(response.body.toString().toByteArray()).joinToString("") { "%02x".format(it) }
-                        response.header("Etag", hashedBody)
+                        val hashedBody = md5().digest(response.body.payload.copyToByteArray()).joinToString("") { "%02x".format(it) }
+                        response.replaceHeader("Etag", hashedBody)
                     } else
                         response
                 }
+            }
+
+            private fun md5() = MessageDigest.getInstance("MD5")
+
+            private fun ByteBuffer.copyToByteArray(): ByteArray {
+                val clone = ByteBuffer.allocate(capacity())
+                rewind()
+                clone.put(this)
+                rewind()
+                clone.flip()
+                val ba = ByteArray(clone.remaining())
+                clone.get(ba)
+                return ba
             }
         }
 
