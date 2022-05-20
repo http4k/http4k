@@ -495,7 +495,7 @@
                     }
                   },
                   "fileField": {
-                    "type": "string",
+                    "type": "file",
                     "format": "binary"
                   }
                 },

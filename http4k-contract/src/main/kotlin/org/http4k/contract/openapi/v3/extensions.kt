@@ -15,7 +15,7 @@ val ParamMeta.value
         ObjectParam -> "object"
         BooleanParam -> "boolean"
         IntegerParam -> "integer"
-        FileParam -> "string"
+        FileParam -> "file"
         NumberParam -> "number"
         NullParam -> "null"
         else -> "string"
