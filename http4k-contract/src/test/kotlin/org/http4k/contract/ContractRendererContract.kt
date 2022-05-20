@@ -191,7 +191,7 @@ abstract class ContractRendererContract<NODE : Any>(
             } bindContract POST to { _ -> Response(OK) }
             routes += "/multipart_fields" meta {
                 val field = MultipartFormField.multi.required("stringField")
-                val pic = MultipartFormFile.multi.required("fileField")
+                val pic = MultipartFormFile.required("fileField")
                 receiving(Body.multipartForm(Strict, field, pic).toLens())
             } bindContract PUT to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {

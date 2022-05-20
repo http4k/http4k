@@ -539,7 +539,7 @@
             "name": "fileField",
             "required": true,
             "schema": {
-              "type": "array"
+              "type": "file"
             }
           }
         ],
