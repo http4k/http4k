@@ -18,11 +18,12 @@ fun interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *
     companion object {
 
         /**
-         * Check the entire contract, including extracting the body from non-binary bodies, before passing it to the underlying
+         * Check the entire contract, including extracting the body, before passing it to the underlying
          * HttpHandler.
          */
         val All = PreFlightExtraction {
-            it.requestParams + (it.body?.takeUnless { it.contentType.isBinary }?.let { listOf(it) } ?: emptyList<BodyLens<*>>())
+            it.requestParams + (it.body?.let { listOf(it) }
+                ?: emptyList<BodyLens<*>>())
         }
 
         /**
