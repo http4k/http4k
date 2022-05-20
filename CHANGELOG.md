@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.25.16.0 (uncut)
 - **http4k-core** : Deprecate eTag filter in favour of ETagSupport.
+- **http4k-contract** : Don't try and parse binary content types in pre-request extraction.
 
 ### v4.25.15.0
 - **http4k-*** : Upgrade some dependency versions.
