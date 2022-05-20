@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.25.16.0
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Deprecate eTag filter in favour of ETagSupport.
 - **http4k-contract** : [Fix] - File field is described as "string" instead of "file" in OA3 specification.
 
