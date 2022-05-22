@@ -177,7 +177,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest().extract(
                     Request(
                         GET,
-                        "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&scope=openid+email+address&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -208,7 +208,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 ), equalTo(
                     success(
                         AuthRequest(
-                            client = ClientId("12345"),
+                            client = ClientId("12345="),
                             responseType = Code,
                             redirectUri = Uri.of("https://somehost"),
                             scopes = listOf("email", "openid", "address"),
@@ -234,7 +234,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 ), equalTo(
                     success(
                         AuthRequest(
-                            client = ClientId("12345"),
+                            client = ClientId("12345="),
                             responseType = Code,
                             redirectUri = Uri.of("https://somehost"),
                             scopes = listOf("openid", "email", "address"),
@@ -312,7 +312,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest(AuthRequestOnly).extract(
                     Request(
                         GET,
-                        "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&scope=openid+email+address&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -343,7 +343,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 ), equalTo(
                     success(
                         AuthRequest(
-                            client = ClientId("12345"),
+                            client = ClientId("12345="),
                             responseType = Code,
                             redirectUri = Uri.of("https://somehost"),
                             scopes = emptyList(),
@@ -369,7 +369,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 ), equalTo(
                     success(
                         AuthRequest(
-                            client = ClientId("12345"),
+                            client = ClientId("12345="),
                             responseType = Code,
                             redirectUri = Uri.of("https://somehost"),
                             scopes = listOf("openid", "email", "address"),
@@ -447,7 +447,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest(RequestObjectOnly).extract(
                     Request(
                         GET,
-                        "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&scope=openid+email+address&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -478,7 +478,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 ), equalTo(
                     success(
                         AuthRequest(
-                            client = ClientId("12345"),
+                            client = ClientId("12345="),
                             responseType = Code,
                             redirectUri = requestObject.redirectUri,
                             scopes = requestObject.scope,
@@ -504,7 +504,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 ), equalTo(
                     success(
                         AuthRequest(
-                            client = ClientId("12345"),
+                            client = ClientId("12345="),
                             responseType = Code,
                             redirectUri = requestObject.redirectUri,
                             scopes = requestObject.scope,
