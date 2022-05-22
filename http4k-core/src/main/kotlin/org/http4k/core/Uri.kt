@@ -70,6 +70,9 @@ fun Uri.removeQueries(prefix: String) =
 fun Uri.query(name: String, value: String?): Uri =
     copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
 
+fun Uri.queryParametersEncoded(): Uri =
+    copy(query = query.toParameters().toUrlFormEncoded())
+
 /**
  * @see [RFC 3986, appendix A](https://www.ietf.org/rfc/rfc3986.txt)
  */

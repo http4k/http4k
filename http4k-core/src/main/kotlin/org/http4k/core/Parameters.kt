@@ -19,7 +19,7 @@ fun Parameters.findSingle(name: String): String? = find { it.first == name }?.se
 
 fun Parameters.findMultiple(name: String) = filter { it.first == name }.map { it.second }
 
-private fun String.toParameter(): Parameter = split("=").map(String::fromFormEncoded).let { l -> l.elementAt(0) to l.elementAtOrNull(1) }
+private fun String.toParameter(): Parameter = split("=", limit = 2).map(String::fromFormEncoded).let { l -> l.elementAt(0) to l.elementAtOrNull(1) }
 
 internal fun String.fromFormEncoded() = URLDecoder.decode(this, "UTF-8")
 
