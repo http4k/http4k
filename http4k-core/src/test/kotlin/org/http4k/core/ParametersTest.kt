@@ -37,4 +37,9 @@ class ParametersTest {
         assertThat(map.getFirst("b"), equalTo("B"))
         assertThat(map.getFirst("c"), absent())
     }
+
+    @Test
+    fun `should split query param only into 2 strings`() {
+        assertThat("q1=value1=10&q2=value2=10".toParameters(), equalTo(listOf("q1" to "value1=10", "q2" to "value2=10")))
+    }
 }
