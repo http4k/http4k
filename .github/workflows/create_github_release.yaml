@@ -2,8 +2,13 @@ name: New Release - GitHub
 on:
   repository_dispatch:
     types: [http4k-release]
+permissions:
+  contents: read
+
 jobs:
   release:
+    permissions:
+      contents: write  # for actions/create-release to create a release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

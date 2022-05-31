@@ -2,6 +2,9 @@ name: New Release - Slack
 on:
   repository_dispatch:
     types: [http4k-release]
+permissions:
+  contents: read
+
 jobs:
   slackify:
     runs-on: ubuntu-latest
