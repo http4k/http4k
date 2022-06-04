@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.25.16.3 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v4.25.16.2
 - **http4k-core** : Fix query parameter parsing when value contained `=`. H/T @overfullstack
 - **http4k-security-digest** : Fix digest challenge parsing when nonce contained `=`. H/T @oharaandrew314
