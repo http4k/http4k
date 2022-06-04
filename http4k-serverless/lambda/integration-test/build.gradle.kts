@@ -22,10 +22,10 @@ task<JavaExec>("deployTestFunction") {
 
 task<JavaExec>("deployHttpApiGateway") {
     classpath += sourceSets.getByName("test").runtimeClasspath
-    main = "org.http4k.serverless.lambda.testing.setup.DeployHttpApiGatewayKt"
+    mainClass.set("org.http4k.serverless.lambda.testing.setup.DeployHttpApiGatewayKt")
 }
 
 task<JavaExec>("deployRestApiGateway") {
     classpath += sourceSets.getByName("test").runtimeClasspath
-    main = "org.http4k.serverless.lambda.testing.setup.DeployRestApiGatewayKt"
+    mainClass.set("org.http4k.serverless.lambda.testing.setup.DeployRestApiGatewayKt")
 }
