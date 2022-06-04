@@ -2,8 +2,13 @@ name: New Release - Twitter
 on:
   repository_dispatch:
     types: [http4k-release]
+permissions:
+  contents: read
+
 jobs:
   tweet:
+    permissions:
+      contents: none
     runs-on: ubuntu-latest
     steps:
       - uses: ethomson/send-tweet-action@v1
