@@ -1,5 +1,5 @@
 import groovy.util.Node
-import groovy.xml.QName
+import groovy.namespace.QName
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -38,7 +38,7 @@ allprojects {
         mavenCentral()
     }
 
-    version = project.getProperties()["releaseVersion"] ?: "LOCAL"
+    version = project.properties["releaseVersion"] ?: "LOCAL"
     group = "org.http4k"
 
     jacoco {
@@ -186,7 +186,8 @@ subprojects {
                             .childrenCalled("dependencies")
                             .flatMap { it.childrenCalled("dependency") }
                             .flatMap { it.childrenCalled("scope") }
-                            .forEach { if (it.text() == "runtime") it.setValue("provided") }
+                            .forEach {
+                                if (it.text() == "runtime") it.setValue("provided") }
                     }
                     artifact(sourcesJar)
                     artifact(javadocJar)

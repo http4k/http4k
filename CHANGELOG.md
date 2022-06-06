@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.25.16.3 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Fix #744 - Provided dependencies included as runtime in http4k versions > 4.19.1.0.
 
 ### v4.25.16.2
 - **http4k-core** : Fix query parameter parsing when value contained `=`. H/T @overfullstack
