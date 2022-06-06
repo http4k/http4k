@@ -5,7 +5,7 @@ Brief overview of the recipe.
 
 ### Gradle setup
 ```groovy
-    implementation group: "org.http4k", name: "http4k-core", version: "4.25.16.2"
+    implementation group: "org.http4k", name: "http4k-core", version: "4.26.0.0"
     // include here all of the dependencies that are needed to make the code run
 ```
 
