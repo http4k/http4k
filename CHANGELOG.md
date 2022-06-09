@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.27.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.7.0
+
 ### v4.26.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : [Unlikely break] Remove dependency on kotlin stdlib JDK 8 as we don't need it to compile. If this causes a problem, simply re-add `api(Kotlin.stdlib.jdk8)` to your project dependency list.
