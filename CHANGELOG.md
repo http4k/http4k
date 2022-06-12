@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.27.1.0 (uncut
+### v4.27.1.0 (uncut)
 - **http4k-core** : Added support for Web Linking header standard
 
 ### v4.27.0.0
