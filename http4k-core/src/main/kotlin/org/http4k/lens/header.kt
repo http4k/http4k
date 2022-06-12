@@ -27,6 +27,7 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
         ContentType::toHeaderValue
     ).optional("content-type")
 
+
     val LOCATION = map(::of, Uri::toString).required("location")
 
     val ACCEPT = map {
@@ -34,6 +35,21 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
             Accept(it.first.split(",").map { it.trim() }.map(::ContentType), it.second)
         }
     }.optional("Accept")
+
+    val LINK = map(
+        {
+            Regex("""<(.+?)>; rel="(.+?)"""")
+                .findAll(it)
+                .map {
+                    it.destructured.match.groupValues[2] to
+                        of(it.destructured.match.groupValues[1])
+                }.toMap()
+        },
+        {
+            it.map { """<${it.value}>; rel="${it.key}"""" }.joinToString(", ")
+        }
+    )
+        .defaulted("Link", emptyMap())
 
     internal fun parseValueAndDirectives(it: String): Pair<String, Parameters> =
         with(it.split(";").mapNotNull { it.trim().takeIf(String::isNotEmpty) }) {

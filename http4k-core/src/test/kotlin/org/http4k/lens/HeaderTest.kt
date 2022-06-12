@@ -167,4 +167,19 @@ class HeaderTest {
         val lens = Header.enum<Method>(caseSensitive = false).required("method")
         assertThat(lens(Request(GET, "/").header("method", "delete")), equalTo(Method.DELETE))
     }
+
+    @Test
+    fun `link header can get parsed and injected`() {
+        val links = mapOf(
+            "previous" to of("prevLink"),
+            "next" to of("nextLink")
+        )
+
+        val link = Header.LINK
+
+        val reqWithHeader = Request(GET, "").with(link of links)
+        assertThat(reqWithHeader.header("Link"), equalTo("""<prevLink>; rel="previous", <nextLink>; rel="next""""))
+        assertThat(link(reqWithHeader), equalTo(links))
+    }
+
 }

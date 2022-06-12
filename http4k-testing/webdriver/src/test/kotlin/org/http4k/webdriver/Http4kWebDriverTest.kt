@@ -248,6 +248,7 @@ class Http4kWebDriverTest {
         assertThat(driver.manage().cookies, equalTo(setOf(Cookie("name", "value", "domain", "path", Date(0), true, true))))
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun `unsupported features`() {
         driver.get("/bill")
