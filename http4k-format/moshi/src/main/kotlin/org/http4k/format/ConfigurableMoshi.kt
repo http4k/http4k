@@ -25,7 +25,9 @@ import kotlin.reflect.KClass
 open class ConfigurableMoshi(
     builder: Moshi.Builder,
     val defaultContentType: ContentType = APPLICATION_JSON
-) : AutoMarshalling() {
+) : AutoMarshallingJson<MoshiElement>(),
+    Json<MoshiElement> by MoshiJson
+{
 
     private val moshi: Moshi = builder.build()
 
@@ -38,6 +40,16 @@ open class ConfigurableMoshi(
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = moshi.adapter(target.java).fromJson(
         input.source().buffer()
     )!!
+
+    override fun asJsonObject(input: Any): MoshiElement {
+        val string = asFormatString(input)  // TODO read directly to MoshiElement
+        return string.asJsonObject()
+    }
+
+    override fun <T : Any> asA(j: MoshiElement, target: KClass<T>): T {
+        val string = j.asCompactJsonString() // TODO read directly from MoshiElement
+        return asA(string, target)
+    }
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
