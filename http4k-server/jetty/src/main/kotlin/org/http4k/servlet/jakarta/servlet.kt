@@ -11,9 +11,8 @@ import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import java.util.Enumeration
 
-@Suppress("DEPRECATION")
 fun Response.transferTo(destination: HttpServletResponse) {
-    destination.setStatus(status.code, status.description)
+    destination.setStatus(status.code)
     headers.forEach { (key, value) -> destination.addHeader(key, value) }
     body.stream.use { input -> destination.outputStream.use { output -> input.copyTo(output) } }
 }

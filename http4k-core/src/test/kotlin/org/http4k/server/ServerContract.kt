@@ -14,6 +14,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
@@ -66,6 +67,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                     .header("x-address", request.source?.address ?: "")
                     .header("x-port", (request.source?.port ?: 0).toString())
                     .header("x-scheme", (request.source?.scheme ?: "unsupported").toString())
+            },
+            "/status-with-foobar-description" bind GET to {
+                Response(Status(201, "FooBar"))
             }
         )
 
