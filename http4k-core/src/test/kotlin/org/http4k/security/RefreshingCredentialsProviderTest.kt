@@ -2,6 +2,7 @@ package org.http4k.security
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isWithin
 import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
 import java.time.Clock
@@ -184,7 +185,8 @@ class RefreshingCredentialsProviderTest {
 
         // whilst we now we should have new credentials
         assertThat(secondRefreshed.get(), equalTo(thirdCreds.credentials))
-        assertThat(completedCalls, equalTo(2))
+        // 2 or 3 because the chasing call may happen already
+        assertThat(completedCalls, isWithin(2..3))
 
         // and the chasing one also has that new value as well
         chasingRefreshLock.await()
