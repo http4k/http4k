@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.27.1.1 (uncut)
+- **http4k-resilience4j*** : Fix #745: ResilienceFilters.CircuitBreak counts an error twice: once as successful, once as error.
+
 ### v4.27.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Added support for Web Linking header standard
