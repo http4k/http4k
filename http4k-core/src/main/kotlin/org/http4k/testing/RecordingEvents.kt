@@ -16,5 +16,5 @@ class RecordingEvents : Events, Iterable<Event> {
         received += p1
     }
 
-    override fun toString() = "Events:\n" + received.joinToString("\n")
+    override fun toString() = "Events: \n" + received.joinToString("\n")
 }
