@@ -1,5 +1,5 @@
-import groovy.util.Node
 import groovy.namespace.QName
+import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -49,6 +49,7 @@ allprojects {
         withType<KotlinCompile> {
             kotlinOptions {
                 jvmTarget = "1.8"
+//                freeCompilerArgs = freeCompilerArgs + listOf("-Xuse-k2")
             }
         }
 
