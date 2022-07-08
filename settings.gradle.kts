@@ -1,30 +1,7 @@
 rootProject.name = "http4k"
 
 plugins {
-    id("de.fayard.refreshVersions") version "0.40.2"
-    id("com.gradle.enterprise") version "3.10.2"
-    id("com.gradle.common-custom-user-data-gradle-plugin") version "1.7.2"
-}
-
-gradleEnterprise {
-    server = "https://ec2-3-235-21-159.compute-1.amazonaws.com"
-    allowUntrustedServer = true
-
-    buildScan {
-        publishAlways()
-        capture {
-            isTaskInputFiles = true
-        }
-    }
-
-    buildCache {
-        local {
-            isEnabled = true
-        }
-        remote<HttpBuildCache> {
-            isEnabled = false
-        }
-    }
+    id("de.fayard.refreshVersions").version("0.40.2")
 }
 
 refreshVersions {
@@ -38,7 +15,7 @@ refreshVersions {
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")
-    project(":$projectName").projectDir = File("$this/${name.replace(':', '/')}")
+    project(":$projectName").projectDir = File("$this/${name.replace(':','/')}")
 }
 
 fun includeWithDirectory(projectName: String, name: String) {
