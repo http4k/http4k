@@ -20,7 +20,6 @@ buildscript {
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
-        classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
         classpath("com.github.jengelman.gradle.plugins:shadow:_")
         classpath("io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_")
