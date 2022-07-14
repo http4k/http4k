@@ -9,6 +9,7 @@ description: Example applications and usages of http4k, including TDD approach
 - *"Writing Test Driven Apps with http4k"* ([video](https://bit.ly/tdd-http4k-kotliners)), by [David Denton](https://twitter.com/tarkaTheRotter) and [Ivan Sanchez](https://twitter.com/s4nchez), presented at Kotliners 2020. 
 - *"Designing Microservices in Functional Style"* ([video](https://bit.ly/uberto-functional-microservices)) by [Uberto Barbini](https://twitter.com/ramtop), presented at VirtualJUG 2020.
 - *"Introduction to http4k"* ([video](https://www.youtube.com/watch?v=FVvn-aFO--Q)) by [Dmitry Kandalov](https://twitter.com/dmitrykandalov), based on previous conference talks, recorded in 2021.
+- *"Test Driven Gilded Rose in Kotlin"* ([video series](https://www.youtube.com/playlist?list=PL1ssMPpyqocg2D_8mgIbcnQGxCPI2_fpA)) by [Duncan McGregor](https://twitter.com/duncanmcg), recorded in 2021-22.
 
 Also, check out the [YouTube Playlist](https://bit.ly/http4k-talks) for the latest collection of talks featuring http4k.
 
