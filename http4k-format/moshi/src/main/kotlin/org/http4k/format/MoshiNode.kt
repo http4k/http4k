@@ -1,8 +1,5 @@
 package org.http4k.format
 
-import java.math.BigDecimal
-import java.math.BigInteger
-
 sealed interface MoshiNode {
     companion object
 }
@@ -11,8 +8,8 @@ data class MoshiArray(val elements: List<MoshiNode>): MoshiNode
 data class MoshiObject(val attributes: Map<String, MoshiNode>): MoshiNode
 sealed interface MoshiPrimitive: MoshiNode
 data class MoshiString(val value: String): MoshiPrimitive
-data class MoshiInteger(val value: BigInteger): MoshiPrimitive
-data class MoshiDecimal(val value: BigDecimal): MoshiPrimitive
+data class MoshiInteger(val value: Long): MoshiPrimitive
+data class MoshiDecimal(val value: Double): MoshiPrimitive
 data class MoshiBoolean(val value: Boolean): MoshiPrimitive
 object MoshiNull: MoshiPrimitive
 
@@ -39,9 +36,9 @@ fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when(obj) {
     is Number -> {
         val decimalValue = obj.toString().toBigDecimal()
         if (decimalValue.stripTrailingZeros().scale() <= 0) {
-            MoshiInteger(decimalValue.toBigInteger())
+            MoshiInteger(decimalValue.toLong())
         } else {
-            MoshiDecimal(decimalValue)
+            MoshiDecimal(decimalValue.toDouble())
         }
     }
     is String -> MoshiString(obj)

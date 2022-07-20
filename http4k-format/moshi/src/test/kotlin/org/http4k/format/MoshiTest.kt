@@ -52,8 +52,8 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
             "child" to MoshiObject(mapOf(
                 "string" to MoshiString("world"),
                 "numbers" to MoshiArray(listOf(
-                    MoshiInteger("1".toBigInteger()),
-                    MoshiDecimal("1.2".toBigDecimal())
+                    MoshiInteger(1),
+                    MoshiDecimal(1.2)
                 )),
                 "bool" to MoshiBoolean(true)
             )),
@@ -75,8 +75,8 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
             "child" to MoshiObject(mapOf(
                 "string" to MoshiString("world"),
                 "numbers" to MoshiArray(listOf(
-                    MoshiInteger("1".toBigInteger()),
-                    MoshiDecimal("1.2".toBigDecimal())
+                    MoshiInteger(1),
+                    MoshiDecimal(1.2)
                 )),
                 "bool" to MoshiBoolean(true)
             )),
@@ -101,7 +101,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
                     "child" to MoshiObject(mapOf(
                         "string" to MoshiString("world"),
                         "numbers" to MoshiArray(listOf(
-                            MoshiInteger(BigInteger.valueOf(1))
+                            MoshiInteger(1)
                         )),
                         "bool" to MoshiBoolean(true)
                     )),
@@ -119,7 +119,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
             "child" to MoshiObject(mapOf(
                 "string" to MoshiString("world"),
                 "numbers" to MoshiArray(listOf(
-                    MoshiInteger(BigInteger.valueOf(1))
+                    MoshiInteger(1)
                 )),
                 "bool" to MoshiBoolean(true)
             )),
