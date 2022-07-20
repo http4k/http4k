@@ -25,8 +25,10 @@ import kotlin.reflect.KClass
 open class ConfigurableMoshi(
     builder: Moshi.Builder,
     val defaultContentType: ContentType = APPLICATION_JSON
-) : AutoMarshalling() {
-
+) :
+    AutoMarshallingJson<MoshiNode>(),
+    Json<MoshiNode> by MoshiJson(builder.build())
+{
     private val moshi: Moshi = builder.build()
 
     override fun asFormatString(input: Any): String = moshi.adapter(input.javaClass).toJson(input)
@@ -38,6 +40,13 @@ open class ConfigurableMoshi(
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = moshi.adapter(target.java).fromJson(
         input.source().buffer()
     )!!
+
+    override fun asJsonObject(input: Any): MoshiNode {
+        val obj = moshi.adapter(Any::class.java).toJsonValue(input)
+        return MoshiNode.wrap(obj)
+    }
+
+    override fun <T : Any> asA(j: MoshiNode, target: KClass<T>) = moshi.adapter(target.java).fromJsonValue(j.unwrap())!!
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
@@ -95,8 +104,11 @@ fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Bui
         }
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
-    override fun done() =
-        this@asConfigurable.add(KotlinJsonAdapterFactory()).add(Unit::class.java, UnitAdapter)
+    override fun done(): Moshi.Builder {
+        adapter(BiDiMapping(Double::toBigDecimal, BigDecimal::toDouble), { value(it) }, { nextDouble() })
+        adapter(BiDiMapping(Long::toBigInteger, BigInteger::toLong), { value(it) }, { nextLong() })
+        return this@asConfigurable.add(KotlinJsonAdapterFactory()).add(Unit::class.java, UnitAdapter)
+    }
 }
 
 private object UnitAdapter : JsonAdapter<Unit>() {
