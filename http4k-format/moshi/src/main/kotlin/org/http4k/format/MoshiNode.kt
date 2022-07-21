@@ -6,12 +6,11 @@ sealed interface MoshiNode {
 
 data class MoshiArray(val elements: List<MoshiNode>): MoshiNode
 data class MoshiObject(val attributes: Map<String, MoshiNode>): MoshiNode
-sealed interface MoshiPrimitive: MoshiNode
-data class MoshiString(val value: String): MoshiPrimitive
-data class MoshiInteger(val value: Long): MoshiPrimitive
-data class MoshiDecimal(val value: Double): MoshiPrimitive
-data class MoshiBoolean(val value: Boolean): MoshiPrimitive
-object MoshiNull: MoshiPrimitive
+data class MoshiString(val value: String): MoshiNode
+data class MoshiInteger(val value: Long): MoshiNode
+data class MoshiDecimal(val value: Double): MoshiNode
+data class MoshiBoolean(val value: Boolean): MoshiNode
+object MoshiNull: MoshiNode
 
 fun MoshiNode.unwrap(): Any? = when(this) {
     is MoshiArray -> elements.map { it.unwrap() }
@@ -43,5 +42,5 @@ fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when(obj) {
     }
     is String -> MoshiString(obj)
     is Boolean -> MoshiBoolean(obj)
-    else -> throw IllegalArgumentException("Invalid json value")
+    else -> throw IllegalArgumentException("Invalid json value: $obj")
 }
