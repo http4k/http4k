@@ -26,6 +26,8 @@ class TestWsClient internal constructor(consumer: WsConsumer, request: Request) 
             queue.remove()()
         } catch (e: ClosedWebsocket) {
             if (e.status == NORMAL) null else throw e
+        } catch (e: NoSuchElementException) {
+            null
         }
     }
 
