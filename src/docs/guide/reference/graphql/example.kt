@@ -44,7 +44,7 @@ class UserQueries {
 fun main() {
     val app: HttpHandler = routes(
         "/graphql" bind graphQL(MyGraphQLHandler),
-        "/" bind graphQLPlayground(Uri.of("/graphql"))
+        graphQLPlayground(Uri.of("/graphql"))
     )
 
     // serve GQL queries/mutations at /graphql
