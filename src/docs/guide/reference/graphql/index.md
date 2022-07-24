@@ -14,7 +14,7 @@ implementation group: "com.expediagroup", name: "graphql-kotlin-schema-generator
 ### About
 This module provides http4k integration for the excellent [GraphQL-java](https://www.graphql-java.com/) library, allowing you to either serve or consume [GraphQL] services using a simple adapter API.
 
-As with the ethos of http4k, the uniform Server/Client GraphQLHandler model means that you can test applications entirely in-memory without binding to a port.
+As with the ethos of http4k, the uniform Server/Client GraphQLHandler model means that you can test applications entirely in-memory without binding to a port. Http4k also ships with a page serving the GraphQL playground which can be added as a simple route.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/graphql/example.kt)
 

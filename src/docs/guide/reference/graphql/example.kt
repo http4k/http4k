@@ -13,6 +13,7 @@ import org.http4k.graphql.GraphQLRequest
 import org.http4k.graphql.GraphQLResponse
 import org.http4k.routing.bind
 import org.http4k.routing.graphQL
+import org.http4k.routing.graphQLPlayground
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -42,7 +43,8 @@ class UserQueries {
 
 fun main() {
     val app: HttpHandler = routes(
-        "/graphql" bind graphQL(MyGraphQLHandler)
+        "/graphql" bind graphQL(MyGraphQLHandler),
+        "/" bind graphQLPlayground(Uri.of("/graphql"))
     )
 
     // serve GQL queries/mutations at /graphql
@@ -58,5 +60,5 @@ fun main() {
     }"""))
     println(response)
 
-    server.stop()
+    println("You can visit the GraphQL playground at: http://localhost:8000")
 }
