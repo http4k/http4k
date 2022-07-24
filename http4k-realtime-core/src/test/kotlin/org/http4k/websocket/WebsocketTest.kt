@@ -20,15 +20,9 @@ class WebsocketTest {
 
         override fun invoke(p1: Websocket) {
             websocket = p1
-            p1.onMessage {
-                messages += it
-            }
-            p1.onClose {
-                closed.set(it)
-            }
-            p1.onError {
-                throwable.add(it)
-            }
+            websocket.onMessage { messages += it }
+            websocket.onClose { closed.set(it) }
+            websocket.onError { throwable.add(it) }
         }
     }
 

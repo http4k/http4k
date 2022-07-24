@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v4.27.2.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-graphql** : Add GraphQL explorer for http4k-graphql. H/T @arnabkd
+- **http4k-realtime-core** : Add helper for test Websocket. H/T @oharaandrew314
 - **http4k-resilience4j*** : Fix #745: ResilienceFilters.CircuitBreak counts an error twice: once as successful, once as error.
 
 ### v4.27.1.0

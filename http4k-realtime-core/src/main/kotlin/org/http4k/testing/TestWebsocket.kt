@@ -18,4 +18,5 @@ fun WsHandler.testWebsocket(request: Request): Websocket = object: PushPullAdapt
     override fun close(status: WsStatus) = triggerClose(status)
 
 }
+
 fun PolyHandler.testWebsocket(request: Request): Websocket = ws?.testWebsocket(request) ?: error("No WS handler set.")

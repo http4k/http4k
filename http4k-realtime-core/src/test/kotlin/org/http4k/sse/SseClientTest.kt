@@ -36,10 +36,10 @@ class SseClientTest {
     @Test
     fun `sends inbound messages to the client`() {
         val client = { _: Request ->
-            { ws: Sse ->
-                ws.send(message)
-                ws.send(message)
-                ws.close()
+            { sse: Sse ->
+                sse.send(message)
+                sse.send(message)
+                sse.close()
             }
         }.testSseClient(Request(GET, "/"))
 
@@ -50,8 +50,8 @@ class SseClientTest {
     @Test
     fun `closed sse`() {
         val client = { _: Request ->
-            { ws: Sse ->
-                ws.close()
+            { sse: Sse ->
+                sse.close()
             }
         }.testSseClient(Request(GET, "/"))
 
@@ -70,8 +70,8 @@ class SseClientTest {
     @Test
     fun `when no messages`() {
         val client = { _: Request ->
-            { ws: Sse ->
-                ws.close()
+            { sse: Sse ->
+                sse.close()
             }
         }.testSseClient(Request(GET, "/"))
 
