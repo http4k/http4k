@@ -19,7 +19,7 @@
     "POST:/basepath/body_form": "<unknown>",
     "GET:/basepath/produces_and_consumes": "<unknown>",
     "POST:/basepath/returning": "<unknown>",
-    "PUT:/basepath/multipart_fields": "<unknown>",
+    "PUT:/basepath/multipart-fields": "<unknown>",
     "POST:/basepath/bearer_auth": "<unknown>"
   }
 }

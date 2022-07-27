@@ -189,7 +189,7 @@ abstract class ContractRendererContract<NODE : Any>(
             routes += "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of json { obj("aString" to string("a message of some kind")) }))
             } bindContract POST to { _ -> Response(OK) }
-            routes += "/multipart_fields" meta {
+            routes += "/multipart-fields" meta {
                 val field = MultipartFormField.multi.required("stringField")
                 val pic = MultipartFormFile.required("fileField")
                 receiving(Body.multipartForm(Strict, field, pic).toLens())

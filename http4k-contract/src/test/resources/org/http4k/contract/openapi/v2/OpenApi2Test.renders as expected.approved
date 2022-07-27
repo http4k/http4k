@@ -513,7 +513,7 @@
         ]
       }
     },
-    "/basepath/multipart_fields": {
+    "/basepath/multipart-fields": {
       "put": {
         "tags": [
           "/basepath"

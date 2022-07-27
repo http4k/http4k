@@ -473,7 +473,7 @@
         "deprecated": false
       }
     },
-    "/basepath/multipart_fields": {
+    "/basepath/multipart-fields": {
       "put": {
         "summary": "<unknown>",
         "description": null,
