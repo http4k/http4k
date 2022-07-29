@@ -24,7 +24,8 @@ object MyGraphQLHandler : GraphQLHandler {
             SchemaGeneratorConfig(supportedPackages = listOf("guide.reference.graphql")),
             listOf(TopLevelObject(UserQueries())),
             listOf()
-        )).build()
+        )
+    ).build()
 
     override fun invoke(request: GraphQLRequest) = GraphQLResponse.from(graphQL.execute(request.query))
 }
@@ -48,16 +49,20 @@ fun main() {
     )
 
     // serve GQL queries/mutations at /graphql
-    val server = app.asServer(SunHttp(8000)).start()
+    app.asServer(SunHttp(8000)).start()
 
     // for clients, just convert any app into a GQL handler
     val gql: GraphQLHandler = JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:8000/graphql"))
-    val response: GraphQLResponse = gql(GraphQLRequest("""{
+    val response: GraphQLResponse = gql(
+        GraphQLRequest(
+            """{
         search(params: { ids: [1]}) {
             id
             name
         }
-    }"""))
+    }"""
+        )
+    )
     println(response)
 
     println("You can visit the GraphQL playground at: http://localhost:8000")
