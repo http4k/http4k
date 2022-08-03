@@ -3,8 +3,16 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.27.1.1 (uncut)
+### v4.27.4.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+
+### v4.27.3.0
+- **http4k-contract** : OpenApi3 Operation Ids now replace '-' with '_', as '-' interfere with generation of OpenAPI clients.
+
+### v4.27.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-graphql** : Add GraphQL explorer for http4k-graphql. H/T @arnabkd
+- **http4k-realtime-core** : Add helper for test Websocket. H/T @oharaandrew314
 - **http4k-resilience4j*** : Fix #745: ResilienceFilters.CircuitBreak counts an error twice: once as successful, once as error.
 
 ### v4.27.1.0

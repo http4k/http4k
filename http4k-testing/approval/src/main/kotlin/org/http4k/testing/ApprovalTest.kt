@@ -89,7 +89,7 @@ class JsonApprovalTest(
     override fun format(input: String): String = try {
         formatJson(input, TWO_SPACES)
     } catch (e: Json.ParseException) {
-        throw AssertionFailedError("Invalid JSON generated", "<valid JSON>", input)
+        throw AssertionFailedError("Invalid JSON generated", "<valid JSON>", input, e)
     }
 }
 
@@ -104,7 +104,7 @@ class HtmlApprovalTest(
     override fun format(input: String): String = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
-        throw AssertionFailedError("Invalid HTML generated", "<valid HTML>", input)
+        throw AssertionFailedError("Invalid HTML generated", "<valid HTML>", input, e)
     }
 }
 
@@ -118,7 +118,7 @@ class XmlApprovalTest(
     override fun format(input: String): String = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
-        throw AssertionFailedError("Invalid XML generated", "<valid XML>", input)
+        throw AssertionFailedError("Invalid XML generated", "<valid XML>", input, e)
     }
 }
 
@@ -133,6 +133,6 @@ class YamlApprovalTest(
         JacksonYaml.asA<Map<String, Any>>(input)
         input
     } catch (e: Exception) {
-        throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input)
+        throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input, e)
     }
 }

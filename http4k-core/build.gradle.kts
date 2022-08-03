@@ -11,7 +11,7 @@ dependencies {
     testApi(project(":http4k-testing-approval"))
     testApi(project(":http4k-testing-hamkrest"))
     testApi(project(":http4k-server-apache"))
-    testApi("org.webjars:swagger-ui:3.44.0") // leave hardcoded - tests
+    testApi("org.webjars:swagger-ui:4.11.1") // leave hardcoded - tests
     testApi("com.launchdarkly:okhttp-eventsource:_")
     testApi("org.slf4j:slf4j-nop:_")
 
