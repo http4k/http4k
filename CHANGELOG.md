@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.27.4.0 (uncut)
+### v4.27.4.0 
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi*** : Upgrade Moshi to introduce a JSON node model, thus converting Moshi to be an AutoMarshallingJson. This should open the door to us eventually allowing Moshi to be used in http4k-contracts (and OpenAPI). Massive H/T to @oharaandrew314 for the work that went into this.
 
 ### v4.27.3.0
 - **http4k-contract** : OpenApi3 Operation Ids now replace '-' with '_', as '-' interfere with generation of OpenAPI clients.
