@@ -143,9 +143,9 @@ class ServerFiltersTest {
     fun `GET - with exposed headers`() {
         val policy = CorsPolicy(OriginPolicy.AllowAll(), emptyList(), emptyList(), exposedHeaders = listOf("foo", "bar"))
         val handler = ServerFilters.Cors(policy).then { Response(I_M_A_TEAPOT) }
-        val response = handler(Request(OPTIONS, "/"))
+        val response = handler(Request(GET, "/"))
 
-        assertThat(response, hasStatus(OK)
+        assertThat(response, hasStatus(I_M_A_TEAPOT)
             .and(hasHeader("access-control-expose-headers", "foo, bar")))
     }
 
