@@ -18,6 +18,6 @@ fun main() {
     )
 
     println(app(Request(GET, "/bob")))
-    println(app(Request(POST, "/bob")))
+    println(app(Request(POST, "/rita")))
     println(app(Request(DELETE, "/sue")))
 }
