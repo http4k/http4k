@@ -17,7 +17,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.string
 import org.junit.jupiter.api.Test
 
-class ContentNegotiatorTest {
+class AutoContentNegotiatorTest {
 
     private val v1Lens = Body.string(ContentType("v1"))
         .map({ it.replace("v1-", "") }, { "v1-$it" })
@@ -27,10 +27,10 @@ class ContentNegotiatorTest {
         .map({ it.replace("v2-", "") }, { "v2-$it" })
         .toLens()
 
-    private val negotiator = ContentNegotiation.Negotiator(v1Lens, v2Lens)
+    private val negotiator = ContentNegotiation.auto(v1Lens, v2Lens)
 
     private val returnJohn: HttpHandler = {
-        Response(OK).with(negotiator.accepting(it) of "john")
+        Response(OK).with(negotiator.outbound(it) of "john")
     }
 
     private val receiveJohn: HttpHandler = { req ->

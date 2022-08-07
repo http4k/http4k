@@ -9,7 +9,7 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Header
 import org.http4k.lens.LensExtractor
 
-class ContentNegotiator<T>(
+class AutoContentNegotiator<T>(
     private val defaultLens: BiDiBodyLens<T>,
     private val alternateLenses: List<BiDiBodyLens<T>>
 ): Iterable<BiDiBodyLens<T>>, LensExtractor<HttpMessage, T> {
@@ -25,7 +25,7 @@ class ContentNegotiator<T>(
         .let { accept -> invoke(accept) }
         .invoke(target)
 
-    fun accepting(request: Request): BiDiBodyLens<T> = invoke(Header.ACCEPT(request))
+    fun outbound(request: Request): BiDiBodyLens<T> = invoke(Header.ACCEPT(request))
 
     fun toBodyLens() = BodyLens(
         metas = defaultLens.metas + alternateLenses.flatMap { it.metas },
@@ -34,8 +34,8 @@ class ContentNegotiator<T>(
     )
 }
 
-fun <OUT> ContentNegotiation.Companion.Negotiator(
+fun <OUT> ContentNegotiation.Companion.auto(
     defaultLens: BiDiBodyLens<OUT>,
     vararg lenses: BiDiBodyLens<OUT>
-) = ContentNegotiator(defaultLens, lenses.toList())
+) = AutoContentNegotiator(defaultLens, lenses.toList())
 

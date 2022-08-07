@@ -18,7 +18,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.format.Negotiator
+import org.http4k.format.auto
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Path
@@ -260,7 +260,7 @@ class ContractRouteTest {
             .map({ require("v2-" in it); it.replace("v2-", "") }, { "v2-$it" })
             .toLens()
 
-        val negotiator = ContentNegotiation.Negotiator(v1Lens, v2Lens)
+        val negotiator = ContentNegotiation.auto(v1Lens, v2Lens)
 
         val route = "" meta {
             preFlightExtraction = PreFlightExtraction.All

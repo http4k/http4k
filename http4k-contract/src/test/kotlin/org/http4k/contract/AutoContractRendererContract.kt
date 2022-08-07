@@ -13,7 +13,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Jackson.auto
-import org.http4k.format.Negotiator
+import org.http4k.format.auto
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Query
 import org.http4k.lens.string
@@ -31,7 +31,7 @@ abstract class AutoContractRendererContract<NODE : Any>(
 
     @Test
     open fun `auto rendering renders as expected`(approver: Approver) {
-        val negotiator = ContentNegotiation.Negotiator(
+        val negotiator = ContentNegotiation.auto(
             Body.string(ContentType("custom/v1")).toLens(),
             Body.string(ContentType("custom/v2")).toLens()
         )

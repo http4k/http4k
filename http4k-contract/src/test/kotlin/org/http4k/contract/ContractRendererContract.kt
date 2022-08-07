@@ -22,13 +22,12 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Json
-import org.http4k.format.Negotiator
+import org.http4k.format.auto
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Cookies
 import org.http4k.lens.FormField
@@ -92,7 +91,7 @@ abstract class ContractRendererContract<NODE : Any>(
     @Test
     open fun `renders as expected`(approver: Approver) {
         val customBody = json.body("the body of the message").toLens()
-        val negotiator = ContentNegotiation.Negotiator(
+        val negotiator = ContentNegotiation.auto(
             Body.string(ContentType("custom/v1")).toLens(),
             Body.string(ContentType("custom/v2")).toLens()
         )

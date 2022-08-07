@@ -8,7 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
-import org.http4k.format.ContentNegotiator
+import org.http4k.format.AutoContentNegotiator
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Header
@@ -98,7 +98,7 @@ class RouteMetaDsl internal constructor() {
     @JvmName("returningStatusNegotiated")
     fun <T: Any> returning(
         status: Status,
-        negotiated: Pair<ContentNegotiator<T>, T>,
+        negotiated: Pair<AutoContentNegotiator<T>, T>,
         description: String? = null,
         definitionId: String? = null,
         schemaPrefix: String? = null
@@ -126,7 +126,7 @@ class RouteMetaDsl internal constructor() {
      */
     @JvmName("receivingNegotiated")
     fun <T> receiving(
-        negotiated: Pair<ContentNegotiator<T>, T>,
+        negotiated: Pair<AutoContentNegotiator<T>, T>,
         definitionId: String? = null,
         schemaPrefix: String? = null
     ) {

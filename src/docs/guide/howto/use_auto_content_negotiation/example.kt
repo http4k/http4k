@@ -1,7 +1,6 @@
-package guide.howto.use_a_content_negotiatior
+package guide.howto.use_auto_content_negotiation
 
 import org.http4k.contract.ContractRoute
-import org.http4k.contract.PreFlightExtraction
 import org.http4k.contract.contract
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
@@ -15,7 +14,7 @@ import org.http4k.core.with
 import org.http4k.format.JacksonXml
 import org.http4k.format.Moshi
 import org.http4k.format.MoshiYaml
-import org.http4k.format.Negotiator
+import org.http4k.format.auto
 import org.http4k.lens.ContentNegotiation
 import java.util.UUID
 
@@ -31,7 +30,7 @@ fun main() {
      * Create a content negotiator, which will handle lens selection for request and response bodies.
      * Since the json lens is first, it will be the fallback when no accepted lens is found.
      */
-    val negotiator = ContentNegotiation.Negotiator(jsonLens, xmlLens, yamlLens)
+    val negotiator = ContentNegotiation.auto(jsonLens, xmlLens, yamlLens)
 
     // This sample will be used to populate our contract
     val samplePerson = Person(UUID.fromString("7eb9a4b7-2e50-40d7-b4d2-16ce500a0245"), "john")
@@ -42,8 +41,10 @@ fun main() {
         receiving(negotiator to samplePerson) // add request bodies to contract
         returning(OK, negotiator to samplePerson) // add response bodies to contract
     } bindContract POST to { req: Request ->
-        val person = negotiator(req)
-        Response(OK).with(negotiator.accepting(req) of person)
+        val person = negotiator(req) // Unmarshall the body based on the CONTENT-TYPE header
+
+        val outboundLens = negotiator.outbound(req) // select the appropriate outbound lens based on the ACCEPT header
+        Response(OK).with(outboundLens of person)
     }
 
     // Create an HttpHandler
