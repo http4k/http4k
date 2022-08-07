@@ -9,6 +9,7 @@ import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.and
 import org.http4k.contract.security.or
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
@@ -21,11 +22,14 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Json
+import org.http4k.format.Negotiator
+import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Cookies
 import org.http4k.lens.FormField
 import org.http4k.lens.Header
@@ -88,6 +92,10 @@ abstract class ContractRendererContract<NODE : Any>(
     @Test
     open fun `renders as expected`(approver: Approver) {
         val customBody = json.body("the body of the message").toLens()
+        val negotiator = ContentNegotiation.Negotiator(
+            Body.string(ContentType("custom/v1")).toLens(),
+            Body.string(ContentType("custom/v2")).toLens()
+        )
 
         val router = "/basepath" bind contract {
             renderer = rendererToUse
@@ -196,6 +204,10 @@ abstract class ContractRendererContract<NODE : Any>(
             } bindContract PUT to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
+            } bindContract POST to { _ -> Response(OK) }
+            routes += "/body_negotiated" meta {
+                receiving(negotiator to "john")
+                returning(OK, negotiator to "john")
             } bindContract POST to { _ -> Response(OK) }
         }
 

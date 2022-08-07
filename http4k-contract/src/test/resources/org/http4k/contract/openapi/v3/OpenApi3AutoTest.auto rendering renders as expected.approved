@@ -365,6 +365,60 @@
         "operationId": "postBasepathBody_auto_schema_name_definition_id",
         "deprecated": false
       }
+    },
+    "/basepath/body_negotiated": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "custom/v1": {
+              "schema": {
+                "example": "john",
+                "type": "string"
+              }
+            },
+            "custom/v2": {
+              "schema": {
+                "example": "john",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "custom/v1": {
+                "schema": {
+                  "example": "john",
+                  "type": "string"
+                }
+              },
+              "custom/v2": {
+                "schema": {
+                  "example": "john",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_negotiated",
+        "deprecated": false
+      }
     }
   },
   "components": {
