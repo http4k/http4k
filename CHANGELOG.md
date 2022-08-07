@@ -4,7 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.28.0.0 (uncut) 
-- **http4k-contract** : [Unlikely break] Remove direct dependency on kotlin-reflect JAR, as it is brought in my `http4k-format-jackson` anyway. This builds ok but we have bumped the version number just to be sure.
+- **http4k-contract** : [Unlikely break] Remove direct dependency on kotlin-reflect JAR, as it is brought in my `http4k-format-jackson` anyway. This builds ok but we have bumped the version number just to be sure. H/T @oharaandrew314 for the inspiration.
+- **http4k-core**: Add cors exposed headers property. H/T @oharaandrew314
 
 ### v4.27.4.0 
 - **http4k-*** : Upgrade some dependency versions.
