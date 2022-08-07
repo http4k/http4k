@@ -133,6 +133,7 @@ class RouteMetaDsl internal constructor() {
         for (lens in negotiated.first) {
             receiving(lens to negotiated.second, definitionId, schemaPrefix)
         }
+        requestBody = negotiated.first.toBodyLens()
     }
 
     /**

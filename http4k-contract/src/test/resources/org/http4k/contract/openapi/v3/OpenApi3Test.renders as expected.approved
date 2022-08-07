@@ -286,6 +286,53 @@
         "deprecated": false
       }
     },
+    "/basepath/body_negotiated": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "custom/v1": {
+              "schema": {
+              }
+            },
+            "custom/v2": {
+              "schema": {
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "custom/v1": {
+                "schema": {
+                }
+              },
+              "custom/v2": {
+                "schema": {
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_negotiated",
+        "deprecated": false
+      }
+    },
     "/basepath/body_receiving_string": {
       "post": {
         "summary": "body_receiving_string",

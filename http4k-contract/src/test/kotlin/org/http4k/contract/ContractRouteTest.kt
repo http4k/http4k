@@ -4,6 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -16,7 +18,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.format.Negotiator
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
@@ -244,6 +248,34 @@ class ContractRouteTest {
                 Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
                 Path.of("value9") / Path.of("value10") / "value11"
         }, throws<UnsupportedOperationException>())
+    }
+
+    @Test
+    fun `can receive negotiated body with PreFlightExtraction`() {
+        val v1Lens = Body.string(ContentType("custom/v1"))
+            .map({ require("v1-" in it); it.replace("v1-", "") }, { "v1-$it" })
+            .toLens()
+
+        val v2Lens = Body.string(ContentType("custom/v2"))
+            .map({ require("v2-" in it); it.replace("v2-", "") }, { "v2-$it" })
+            .toLens()
+
+        val negotiator = ContentNegotiation.Negotiator(v1Lens, v2Lens)
+
+        val route = "" meta {
+            preFlightExtraction = PreFlightExtraction.All
+            receiving(negotiator to "foo")
+        } bindContract POST to { _ -> Response(OK) }
+
+        assertThat(
+            route.newRequest(Uri.of("")).with(v1Lens of "bar").let(route),
+            hasStatus(OK)
+        )
+
+        assertThat(
+            route.newRequest(Uri.of("")).with(v2Lens of "bar").let(route),
+            hasStatus(OK)
+        )
     }
 
     private fun checkMatching(route: ContractRoute, valid: String, expected: String) {

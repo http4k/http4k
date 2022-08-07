@@ -41,7 +41,6 @@ fun main() {
         summary = "Echo Person"
         receiving(negotiator to samplePerson) // add request bodies to contract
         returning(OK, negotiator to samplePerson) // add response bodies to contract
-        preFlightExtraction = PreFlightExtraction.IgnoreBody // For now, this is required, since http4k doesn't expect more than one receiving body
     } bindContract POST to { req: Request ->
         val person = negotiator(req)
         Response(OK).with(negotiator.accepting(req) of person)
