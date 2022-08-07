@@ -4,7 +4,6 @@ apply plugin: "org.openapi.generator"
 
 dependencies {
     api(project(":http4k-core"))
-    api("org.jetbrains.kotlin:kotlin-reflect:_")
 
     implementation("dev.forkhandles:values4k:_")
     implementation project(":http4k-security-oauth")
