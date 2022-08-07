@@ -35,7 +35,8 @@ data class CorsPolicy(
     val originPolicy: OriginPolicy,
     val headers: List<String>,
     val methods: List<Method>,
-    val credentials: Boolean = false
+    val credentials: Boolean = false,
+    val exposedHeaders: List<String> = emptyList()
 ) {
     companion object {
         val UnsafeGlobalPermissive =
@@ -67,7 +68,12 @@ object ServerFilters {
                     Header.required("access-control-allow-headers") of policy.headers.joined(),
                     Header.required("access-control-allow-methods") of policy.methods.map { method -> method.name }
                         .joined(),
-                    { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res }
+                    { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res },
+                    { res ->
+                        res.takeIf { policy.exposedHeaders.isNotEmpty() }
+                            ?.header("access-control-expose-headers", policy.exposedHeaders.joined())
+                            ?: res
+                    }
                 )
             }
         }

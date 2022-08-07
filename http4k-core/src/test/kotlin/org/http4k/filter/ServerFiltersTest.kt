@@ -135,7 +135,18 @@ class ServerFiltersTest {
             .and(hasHeader("access-control-allow-origin", "*"))
             .and(hasHeader("access-control-allow-headers", "content-type"))
             .and(hasHeader("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD"))
-            .and(hasHeader("access-control-allow-credentials", "true")))
+            .and(hasHeader("access-control-allow-credentials", "true"))
+            .and(hasHeader("access-control-expose-headers").not()))
+    }
+
+    @Test
+    fun `GET - with exposed headers`() {
+        val policy = CorsPolicy(OriginPolicy.AllowAll(), emptyList(), emptyList(), exposedHeaders = listOf("foo", "bar"))
+        val handler = ServerFilters.Cors(policy).then { Response(I_M_A_TEAPOT) }
+        val response = handler(Request(GET, "/"))
+
+        assertThat(response, hasStatus(I_M_A_TEAPOT)
+            .and(hasHeader("access-control-expose-headers", "foo, bar")))
     }
 
     @Test
