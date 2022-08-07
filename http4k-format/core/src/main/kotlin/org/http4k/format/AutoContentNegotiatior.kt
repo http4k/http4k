@@ -34,8 +34,8 @@ class AutoContentNegotiator<T>(
     )
 }
 
-fun <OUT> ContentNegotiation.Companion.auto(
-    defaultLens: BiDiBodyLens<OUT>,
-    vararg lenses: BiDiBodyLens<OUT>
+fun <T> ContentNegotiation.Companion.auto(
+    defaultLens: BiDiBodyLens<T>,
+    vararg lenses: BiDiBodyLens<T>
 ) = AutoContentNegotiator(defaultLens, lenses.toList())
 
