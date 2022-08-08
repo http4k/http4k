@@ -2,6 +2,7 @@ package org.http4k.contract
 
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_YAML
 import org.http4k.core.Method
 import org.http4k.core.Method.POST
@@ -12,7 +13,10 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Jackson.auto
+import org.http4k.format.auto
+import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Query
+import org.http4k.lens.string
 import org.http4k.routing.bind
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -27,6 +31,11 @@ abstract class AutoContractRendererContract<NODE : Any>(
 
     @Test
     open fun `auto rendering renders as expected`(approver: Approver) {
+        val negotiator = ContentNegotiation.auto(
+            Body.string(ContentType("custom/v1")).toLens(),
+            Body.string(ContentType("custom/v2")).toLens()
+        )
+
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             tags += Tag("hello", "world")
@@ -74,6 +83,10 @@ abstract class AutoContractRendererContract<NODE : Any>(
             routes += "/body_auto_map" meta {
                 receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing)))
             } bindContract Method.PUT to { _ -> Response(OK) }
+            routes += "/body_negotiated" meta {
+                receiving(negotiator to "john")
+                returning(OK, negotiator to "john")
+            } bindContract POST to { _ -> Response(OK) }
         }
 
         approver.assertApproved(router(Request(Method.GET, "/basepath?the_api_key=somevalue")))

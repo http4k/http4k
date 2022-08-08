@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
+import org.http4k.format.AutoContentNegotiator
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Header
@@ -91,6 +92,23 @@ class RouteMetaDsl internal constructor() {
     }
 
     /**
+     * Add all negotiated responses, with samples.  It is also possible to pass in the definitionId
+     * for this response body which will override the naturally generated one.
+     */
+    @JvmName("returningStatusNegotiated")
+    fun <T: Any> returning(
+        status: Status,
+        negotiated: Pair<AutoContentNegotiator<T>, T>,
+        description: String? = null,
+        definitionId: String? = null,
+        schemaPrefix: String? = null
+    ) {
+        for (lens in negotiated.first) {
+            returning(status, lens to negotiated.second, description, definitionId, schemaPrefix)
+        }
+    }
+
+    /**
      * Add an example request (using a Lens and a value) to this Route. It is also possible to pass in the definitionId
      * for this request body which will override the naturally generated one.
      */
@@ -100,6 +118,22 @@ class RouteMetaDsl internal constructor() {
     ) {
         requestBody = body.first
         receiving(RequestMeta(Request(POST, "").with(body.first of body.second), definitionId, body.second, schemaPrefix))
+    }
+
+    /**
+     * Add negotiated example requests to this route.  It is also possible to pass in the definitionId
+     * for this request body which will override the naturally generated one.
+     */
+    @JvmName("receivingNegotiated")
+    fun <T> receiving(
+        negotiated: Pair<AutoContentNegotiator<T>, T>,
+        definitionId: String? = null,
+        schemaPrefix: String? = null
+    ) {
+        for (lens in negotiated.first) {
+            receiving(lens to negotiated.second, definitionId, schemaPrefix)
+        }
+        requestBody = negotiated.first.toBodyLens()
     }
 
     /**

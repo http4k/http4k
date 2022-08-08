@@ -312,6 +312,54 @@
         ]
       }
     },
+    "/basepath/body_negotiated": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_negotiated",
+        "produces": [
+          "custom/v1",
+          "custom/v2"
+        ],
+        "consumes": [
+          "custom/v1",
+          "custom/v2"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_receiving_string": {
       "post": {
         "tags": [

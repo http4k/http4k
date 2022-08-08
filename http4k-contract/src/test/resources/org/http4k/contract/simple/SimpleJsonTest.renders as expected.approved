@@ -20,6 +20,7 @@
     "GET:/basepath/produces_and_consumes": "<unknown>",
     "POST:/basepath/returning": "<unknown>",
     "PUT:/basepath/multipart-fields": "<unknown>",
-    "POST:/basepath/bearer_auth": "<unknown>"
+    "POST:/basepath/bearer_auth": "<unknown>",
+    "POST:/basepath/body_negotiated": "<unknown>"
   }
 }
