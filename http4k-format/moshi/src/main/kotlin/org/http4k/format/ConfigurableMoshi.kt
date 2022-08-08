@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.moshix.reflect.MetadataKotlinJsonAdapterFactory
 import okio.buffer
 import okio.source
 import org.http4k.core.Body
@@ -143,7 +143,7 @@ fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Bui
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
     override fun done() =
-        this@asConfigurable.add(KotlinJsonAdapterFactory()).add(Unit::class.java, UnitAdapter)
+        this@asConfigurable.add(MetadataKotlinJsonAdapterFactory()).add(Unit::class.java, UnitAdapter)
 }
 
 private object UnitAdapter : JsonAdapter<Unit>() {
