@@ -13,7 +13,7 @@ For more detail on generating contracts, see:
 - [Http4k Reference: Contracts](/guide/reference/contracts)
 - [http4k How-to: Integrate with OpenAPI](/guide/howto/integrate_with_openapi)
 
-### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/graphql/example.kt)
+### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/example.kt"></script>
 
