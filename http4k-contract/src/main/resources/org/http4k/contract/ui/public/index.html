@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <script src="//unpkg.com/swagger-ui-dist@3/swagger-ui-standalone-preset.js"></script>
+  <script src="//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+  <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@3/swagger-ui.css"/>
+  <title>%%PAGE_TITLE%%</title>
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script>
+      window.onload = function() {
+        SwaggerUIBundle({
+          url: "%%DESCRIPTION_ROUTE%%",
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          displayOperationId: %%DISPLAY_OPERATION_ID%%,
+          displayRequestDuration: %%DISPLAY_REQUEST_DURATION%%,
+          requestSnippetsEnabled: %%REQUEST_SNIPPETS_ENABLED%%,
+          persistAuthorization: %%PERSIST_AUTHORIZATION%%,
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
+          ],
+          layout: "StandaloneLayout"
+        })
+      }
+
+</script>
+</body>
+</html>
