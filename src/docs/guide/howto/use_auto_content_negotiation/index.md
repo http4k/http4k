@@ -26,7 +26,7 @@ the `AutoContentNegotiator` can do this for you.
 
 ### Using Auto Content Negotiation [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/typesafe_your_api_with_lenses/example_result4k.kt)
 
-The `AutoContentNegotiator starts with your selection of body lenses, and wraps them together.
+The `AutoContentNegotiator` starts with your selection of body lenses, and wraps them together.
 It can then be used to:
 - Unmarshall `Request` bodies based on the `CONTENT_TYPE` header
 - Select an outbound `BodyLens`, based on the `ACCEPT` header
@@ -34,5 +34,7 @@ It can then be used to:
 
 If the `CONTENT_TYPE` and `ACCEPT` headers are not present, or if there is no lens for the requested format,
 then a default lens is used.
+
+### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_auto_content_negotiation/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_auto_content_negotiation/example.kt"></script>
