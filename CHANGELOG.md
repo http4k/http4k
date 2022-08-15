@@ -3,8 +3,13 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.28.0.0
+### v4.28.1.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-client-okhttp** : Handle previously escapable HTTP client timeout case.
+- **http4k-contract** : Added Swagger UI helper route.  H/T @oharaandrew314
+
+### v4.28.0.0
+- **http4k-*** : Upgrade some dependency versions, including CVE fix for Undertow backend.
 - **http4k-contract** : [Unlikely break] Remove direct dependency on kotlin-reflect JAR, as it is brought in my `http4k-format-jackson` anyway. This builds ok but we have bumped the version number just to be sure. H/T @oharaandrew314 for the inspiration.
 - **http4k-format-auto** : Add `ContentNegotiator` and auto versions to be plugged into `http4k-format-*` modules. H/T @oharaandrew314
 - **http4k-core**: Add cors exposed headers property. H/T @oharaandrew314

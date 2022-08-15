@@ -10,6 +10,9 @@ import org.http4k.routing.ResourceLoader
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.static
 
+/**
+ * Serve the Swagger UI Content
+ */
 fun swaggerUi(
     descriptionRoute: Uri,
     title: String = "Swagger UI",
