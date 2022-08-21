@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.28.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** : Internal refactoring
+
 ### v4.28.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-client-okhttp** : Handle previously escapable HTTP client timeout case.
