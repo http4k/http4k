@@ -77,3 +77,12 @@ fun OAuthProvider.Companion.gitLab(client: HttpHandler, credentials: Credentials
         scopes,
         oAuthPersistence
     )
+
+fun OAuthProvider.Companion.discord(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf()): OAuthProvider =
+    OAuthProvider(
+        OAuthProviderConfig(Uri.of("https://discord.com"), "/api/oauth2/authorize", "/api/oauth2/token", credentials, Uri.of("https://discord.com")),
+        client,
+        callbackUri,
+        scopes,
+        oAuthPersistence
+    )

@@ -151,7 +151,10 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Implement OAuth Authorisation Code Grant flow with a single Interface
     * **Pre-configured** OAuth for following providers:
         * **Auth0** 
+        * **Discord**
         * **Dropbox** 
+        * **Facebook** 
+        * **GitLab** 
         * **Google** 
         * **Soundcloud**
 * [Digest Security:](https://http4k.org/guide/reference/digest)
