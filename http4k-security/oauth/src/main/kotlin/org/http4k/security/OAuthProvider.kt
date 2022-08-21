@@ -4,6 +4,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.routing.bind
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 import org.http4k.security.Nonce.Companion.SECURE_NONCE
@@ -30,7 +31,7 @@ class OAuthProvider(
 ) {
 
     // pre-configured API client for this provider
-    val api = ClientFilters.SetBaseUriFrom(providerConfig.apiBase).then(client)
+    val api = SetBaseUriFrom(providerConfig.apiBase).then(client)
 
     // use this filter to protect endpoints
     val authFilter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType, standardRedirectionUrlBuilder)
