@@ -2,6 +2,8 @@ package org.http4k.security
 
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
@@ -47,7 +49,7 @@ fun OAuthProvider.Companion.google(client: HttpHandler, credentials: Credentials
         callbackUri,
         scopes,
         oAuthPersistence,
-        { it.query("nonce", SECURE_CSRF().value) },
+        { it.query("nonce", SECURE_CSRF(Request(GET, "")).value) },
         SECURE_CSRF
     )
 
