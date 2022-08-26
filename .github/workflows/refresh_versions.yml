@@ -16,7 +16,7 @@ jobs:
         name: check-out
         uses: actions/checkout@v3
         with:
-          ref: main
+          ref: master
       - id: step-1
         name: setup-java
         uses: actions/setup-java@v3
