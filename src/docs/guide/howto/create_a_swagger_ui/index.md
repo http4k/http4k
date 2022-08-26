@@ -4,7 +4,7 @@ description: Create a Swagger UI for your REST API
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-contract", version: "4.29.0.0"
+implementation group: "org.http4k", name: "http4k-contract", version: "4.29.1.0"
 ```
 
 ### About
