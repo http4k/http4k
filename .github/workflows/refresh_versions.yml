@@ -49,7 +49,7 @@ jobs:
         uses: repo-sync/pull-request@v2
         with:
           source_branch: dependency-update
-          destination_branch: main
+          destination_branch: master
           pr_title: Upgrade gradle dependencies
           pr_body: '[refreshVersions](https://github.com/jmfayard/refreshVersions) has found those library updates!'
           pr_draft: false
