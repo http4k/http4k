@@ -2,7 +2,6 @@ package org.http4k.security.oauth.testing
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,6 +11,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header.LOCATION
 import org.http4k.lens.LensFailure
+import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessToken
@@ -40,7 +40,7 @@ object FakeOAuthServer {
         tokenPath: String,
         clock: Clock = Clock.systemDefaultZone(),
         authCodeToAccessToken: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() }
-    ): HttpHandler {
+    ): RoutingHttpHandler {
         val server = OAuthServer(
             tokenPath,
             InMemoryAuthRequestTracking(),
