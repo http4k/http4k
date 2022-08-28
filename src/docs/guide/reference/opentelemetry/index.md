@@ -4,7 +4,7 @@ description: Feature overview of the http4k-opentelemetry module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-opentelemetry", version: "4.29.1.0"
+implementation group: "org.http4k", name: "http4k-opentelemetry", version: "4.30.0.0"
 ```
 
 ### About
