@@ -46,7 +46,9 @@ open class ConfigurableMoshiYaml(
     }
 
     private fun yaml() = Yaml(
-        Constructor(), Representer(), yamlDumperOptions, LoaderOptions(), resolver)
+        Constructor(), Representer(), yamlDumperOptions, LoaderOptions(), resolver
+    )
+
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map({ }, ::asFormatString)
 
     inline fun <reified T : Any> Body.Companion.auto(
@@ -75,14 +77,16 @@ val defaultDumperOptions = DumperOptions().apply {
  * interprets strings like "on" and "off" as boolean values).
  */
 object MinimalResolver : Resolver() {
-    override fun addImplicitResolver(tag: Tag, regexp: Pattern, first: String?) =
+    override fun addImplicitResolver(tag: Tag, regexp: Pattern, first: String?, limit: Int) =
         when (tag) {
             Tag.BOOL -> super.addImplicitResolver(
                 tag,
                 Pattern.compile("^(?:true|True|TRUE|false|False|FALSE)$"),
-                "tTfF"
+                "tTfF",
+                limit
             )
-            else -> super.addImplicitResolver(tag, regexp, first)
+
+            else -> super.addImplicitResolver(tag, regexp, first, limit)
         }
 }
 

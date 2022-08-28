@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.30.2.1
+- **http4k-format-moshi-yaml** : Re-fix YAML defaults for boolean keys (caused by ugrade to SnakeYaml).
+
 ### v4.30.2.0
 - **http4k-security-oauth** : Make `FakeOAuthServer` more configurable, and removed the need for passing in an auth-code generator.
 

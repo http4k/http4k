@@ -108,4 +108,10 @@ unknown: "2000-01-01"
         assertThat(marshaller.asA("value: \n", MyValueHolder::class), equalTo(MyValueHolder(null)))
     }
 
+    @Test
+    fun `on as a key is not quoted`() {
+        val wrapper = mapOf("on" to "hello")
+        assertThat(MoshiYaml.asFormatString(wrapper), equalTo("on: hello\n"))
+    }
+
 }
