@@ -36,33 +36,30 @@ import java.util.UUID
 /**
  * This Server provides auto-login functionality without the need for user action.
  */
-object FakeOAuthServer {
-    operator fun invoke(
-        authPath: String,
-        tokenPath: String,
-        clock: Clock = Clock.systemDefaultZone(),
-        authCodeToAccessToken: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() },
-        accessTokens: AccessTokens = SimpleAccessTokens(authCodeToAccessToken),
-        tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
-    ): RoutingHttpHandler {
-        val server = OAuthServer(
-            tokenPath,
-            InMemoryAuthRequestTracking(),
-            AlwaysOkClientValidator(),
-            InMemoryAuthorizationCodes(clock),
-            accessTokens,
-            clock,
-            tokenResponseRenderer = tokenResponseRenderer
-        )
+fun FakeOAuthServer(
+    authPath: String,
+    tokenPath: String,
+    clock: Clock = Clock.systemDefaultZone(),
+    accessTokens: AccessTokens = SimpleAccessTokens(),
+    tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
+): RoutingHttpHandler {
+    val server = OAuthServer(
+        tokenPath,
+        InMemoryAuthRequestTracking(),
+        AlwaysOkClientValidator(),
+        InMemoryAuthorizationCodes(clock),
+        accessTokens,
+        clock,
+        tokenResponseRenderer = tokenResponseRenderer
+    )
 
-        return routes(
-            server.tokenRoute,
-            authPath bind GET to server.authenticationStart.then {
-                Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
-            },
-            "/autologin" bind GET to { server.authenticationComplete(it) }
-        )
-    }
+    return routes(
+        server.tokenRoute,
+        authPath bind GET to server.authenticationStart.then {
+            Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
+        },
+        "/autologin" bind GET to { server.authenticationComplete(it) }
+    )
 }
 
 private class AlwaysOkClientValidator : ClientValidator {
@@ -113,7 +110,7 @@ private class InMemoryAuthRequestTracking : AuthRequestTracking {
         }
 }
 
-private class SimpleAccessTokens(private val authCodeToAccessToken: (AuthorizationCode) -> String) : AccessTokens {
+private class SimpleAccessTokens() : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest) =
         Failure(UnsupportedGrantType("client_credentials"))
 
@@ -121,5 +118,5 @@ private class SimpleAccessTokens(private val authCodeToAccessToken: (Authorizati
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest,
         authorizationCode: AuthorizationCode
-    ) = Success(AccessToken(authCodeToAccessToken(authorizationCode)))
+    ) = Success(AccessToken("OAUTH_" + authorizationCode.value.reversed()))
 }

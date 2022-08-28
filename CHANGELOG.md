@@ -3,8 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.30.1.0
-- **http4k-security-oauth** : Make `FakeOAuthServer` more configurable
+### v4.30.2.0
+- **http4k-security-oauth** : Make `FakeOAuthServer` more configurable, and removed the need for passing in an auth-code generator.
 
 ### v4.30.0.0
 - **http4k-*** : Upgrade some dependency versions.
