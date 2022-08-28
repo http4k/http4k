@@ -52,7 +52,8 @@ class OAuthServer(
     idTokens: IdTokens = IdTokens.Unsupported,
     refreshTokens: RefreshTokens = unsupported,
     requestJWTValidator: RequestJWTValidator = Unsupported,
-    documentationUri: String? = null
+    documentationUri: String? = null,
+    tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
 ) {
 
     constructor(
@@ -70,7 +71,8 @@ class OAuthServer(
         idTokens: IdTokens = IdTokens.Unsupported,
         refreshTokens: RefreshTokens = unsupported,
         requestJWTValidator: RequestJWTValidator = Unsupported,
-        documentationUri: String? = null
+        documentationUri: String? = null,
+        tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
     ) : this(
         tokenPath,
         authRequestTracking,
@@ -85,7 +87,8 @@ class OAuthServer(
         idTokens,
         refreshTokens,
         requestJWTValidator,
-        documentationUri
+        documentationUri,
+        tokenResponseRenderer
     )
 
     private val errorRenderer = JsonResponseErrorRenderer(json, documentationUri)
@@ -105,7 +108,8 @@ class OAuthServer(
             idTokens,
             refreshTokens,
             errorRenderer,
-            grantTypes
+            grantTypes,
+            tokenResponseRenderer
         )
     )
 
