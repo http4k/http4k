@@ -39,14 +39,15 @@ object FakeOAuthServer {
         authPath: String,
         tokenPath: String,
         clock: Clock = Clock.systemDefaultZone(),
-        authCodeToAccessToken: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() }
+        authCodeToAccessToken: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() },
+        accessTokens: AccessTokens = SimpleAccessTokens(authCodeToAccessToken)
     ): RoutingHttpHandler {
         val server = OAuthServer(
             tokenPath,
             InMemoryAuthRequestTracking(),
             AlwaysOkClientValidator(),
             InMemoryAuthorizationCodes(clock),
-            SimpleAccessTokens(authCodeToAccessToken),
+            accessTokens,
             clock
         )
 

@@ -1,6 +1,7 @@
 package org.http4k.security.oauth.client
 
 import com.natpryce.hamkrest.assertion.assertThat
+import org.http4k.core.Body
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -14,7 +15,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.OAuthProviderConfig
-import org.http4k.security.accessTokenResponseBody
+import org.http4k.security.oauth.server.OAuthServerMoshi.auto
 import org.http4k.util.TickingClock
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -29,7 +30,7 @@ class RefreshingOAuthTokenTest {
         var counter = 0
         val backend: HttpHandler = {
             Response(OK).with(
-                accessTokenResponseBody of AccessTokenResponse(
+                Body.auto<AccessTokenResponse>().toLens() of AccessTokenResponse(
                     it.bodyString() + counter++,
                     "type",
                     100
@@ -67,7 +68,7 @@ class RefreshingOAuthTokenTest {
 
         val backend: HttpHandler = {
             Response(OK).with(
-                accessTokenResponseBody of AccessTokenResponse(
+                Body.auto<AccessTokenResponse>().toLens() of AccessTokenResponse(
                     it.bodyString() + counter++,
                     "type",
                     100,

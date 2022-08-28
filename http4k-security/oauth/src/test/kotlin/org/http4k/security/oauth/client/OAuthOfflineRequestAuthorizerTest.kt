@@ -3,6 +3,7 @@ package org.http4k.security.oauth.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isEmpty
+import org.http4k.core.Body
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -22,8 +23,8 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.OAuthProviderConfig
-import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.core.RefreshToken
+import org.http4k.security.oauth.server.OAuthServerMoshi.auto
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
@@ -65,7 +66,7 @@ class OAuthOfflineRequestAuthorizerTest {
             refreshHistory += refreshToken to responseData.access_token
 
             return Response(OK)
-                .with(accessTokenResponseBody of responseData)
+                .with(Body.auto<AccessTokenResponse>().toLens() of responseData)
         }
 
         ServerFilters.BasicAuth("oauth", clientCredentials)

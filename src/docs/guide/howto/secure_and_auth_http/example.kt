@@ -1,6 +1,7 @@
 package guide.howto.secure_and_auth_http
 
 import org.http4k.client.OkHttp
+import org.http4k.core.Body
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -20,9 +21,9 @@ import org.http4k.security.CredentialsProvider
 import org.http4k.security.ExpiringCredentials
 import org.http4k.security.RefreshCredentials
 import org.http4k.security.Refreshing
-import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.client.OAuthClientCredentials
 import org.http4k.security.oauth.client.RefreshingOAuthToken
+import org.http4k.security.oauth.server.OAuthServerMoshi.auto
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -102,7 +103,7 @@ private fun AuthServer(): Http4kServer {
             println("refreshing oauth token (was " + it.bodyString() + ")")
 
             Response(OK).with(
-                accessTokenResponseBody of AccessTokenResponse(
+                Body.auto<AccessTokenResponse>().toLens() of AccessTokenResponse(
                     access_token = "bearerTokenOAuth" + System.currentTimeMillis(),
                     expires_in = 5,
                     refresh_token = "refreshToken" + System.currentTimeMillis(),
@@ -111,4 +112,3 @@ private fun AuthServer(): Http4kServer {
         }
     ).asServer(SunHttp(8000))
 }
-

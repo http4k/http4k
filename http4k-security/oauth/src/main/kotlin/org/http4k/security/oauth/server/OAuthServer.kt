@@ -22,7 +22,9 @@ import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenReque
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
+import org.http4k.security.oauth.server.refreshtoken.RefreshTokens.Companion.unsupported
 import org.http4k.security.oauth.server.request.RequestJWTValidator
+import org.http4k.security.oauth.server.request.RequestJWTValidator.Companion.Unsupported
 import org.http4k.security.openid.RequestJwtContainer
 import java.time.Clock
 
@@ -48,8 +50,8 @@ class OAuthServer(
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
     idTokens: IdTokens = IdTokens.Unsupported,
-    refreshTokens: RefreshTokens = RefreshTokens.unsupported,
-    requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
+    refreshTokens: RefreshTokens = unsupported,
+    requestJWTValidator: RequestJWTValidator = Unsupported,
     documentationUri: String? = null
 ) {
 
@@ -66,8 +68,8 @@ class OAuthServer(
             ClientSecretAccessTokenRequestAuthentication(clientValidator)
         ),
         idTokens: IdTokens = IdTokens.Unsupported,
-        refreshTokens: RefreshTokens = RefreshTokens.unsupported,
-        requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
+        refreshTokens: RefreshTokens = unsupported,
+        requestJWTValidator: RequestJWTValidator = Unsupported,
         documentationUri: String? = null
     ) : this(
         tokenPath,
