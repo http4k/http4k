@@ -15,6 +15,7 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessToken
+import org.http4k.security.oauth.server.AccessTokenResponseRenderer
 import org.http4k.security.oauth.server.AccessTokens
 import org.http4k.security.oauth.server.AuthRequest
 import org.http4k.security.oauth.server.AuthRequestTracking
@@ -23,6 +24,7 @@ import org.http4k.security.oauth.server.AuthorizationCodeDetails
 import org.http4k.security.oauth.server.AuthorizationCodes
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.ClientValidator
+import org.http4k.security.oauth.server.DefaultAccessTokenResponseRenderer
 import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.security.oauth.server.TokenRequest
 import org.http4k.security.oauth.server.UnsupportedGrantType
@@ -40,7 +42,8 @@ object FakeOAuthServer {
         tokenPath: String,
         clock: Clock = Clock.systemDefaultZone(),
         authCodeToAccessToken: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() },
-        accessTokens: AccessTokens = SimpleAccessTokens(authCodeToAccessToken)
+        accessTokens: AccessTokens = SimpleAccessTokens(authCodeToAccessToken),
+        tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
     ): RoutingHttpHandler {
         val server = OAuthServer(
             tokenPath,
@@ -48,7 +51,8 @@ object FakeOAuthServer {
             AlwaysOkClientValidator(),
             InMemoryAuthorizationCodes(clock),
             accessTokens,
-            clock
+            clock,
+            tokenResponseRenderer = tokenResponseRenderer
         )
 
         return routes(

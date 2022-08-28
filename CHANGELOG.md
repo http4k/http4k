@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.30.1.0
+- **http4k-security-oauth** : Make `FakeOAuthServer` more configurable
+
 ### v4.30.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-security-oauth** : [Unlikely Break] Converted AccessToken to be an interface, and internalised a lens which shouldn't have been used by anyone. To fix uses of `accessTokenResponseBody`, replace with `Body.auto<AccessTokenResponse>().toLens()`, importing from OAuthServerMoshi.
