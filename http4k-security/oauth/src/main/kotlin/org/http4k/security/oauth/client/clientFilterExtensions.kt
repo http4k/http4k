@@ -30,6 +30,8 @@ import org.http4k.security.Refreshing
 import org.http4k.security.oauth.core.RefreshToken
 import java.time.Clock
 import java.time.Duration
+import java.time.Instant
+import java.time.Instant.MAX
 import kotlin.Long.Companion.MAX_VALUE
 
 /**
@@ -52,7 +54,11 @@ fun ClientFilters.RefreshingOAuthToken(
             .then(backend)(Request(POST, tokenUri))
             .takeIf { it.status.successful }
             ?.let { tokenExtractor(it).map { it.accessToken }.valueOrNull() }
-            ?.let { ExpiringCredentials(it, clock.instant().plusSeconds(it.expiresIn ?: MAX_VALUE)) }
+            ?.let {
+                ExpiringCredentials(
+                    it, it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
+                )
+            }
     }
 
     return ClientFilters.BearerAuth(CredentialsProvider { refresher()?.value })

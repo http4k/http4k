@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.30.3.0 (uncut)
+### v4.30.3.0 
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** : RefreshingOAuthToken does not blow up when no expiry returned by server.
 
 ### v4.30.2.1
 - **http4k-format-moshi-yaml** : [Fix] Re-fix YAML defaults for over greedy boolean values (regression caused by upgrade to SnakeYaml).

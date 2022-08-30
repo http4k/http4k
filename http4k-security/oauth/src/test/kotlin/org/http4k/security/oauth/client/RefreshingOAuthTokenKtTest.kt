@@ -100,4 +100,33 @@ class RefreshingOAuthTokenTest {
             hasBody("Bearer grant_type=refresh_token&client_id=hello&client_secret=world&refresh_token=refresh1")
         )
     }
+
+    @Test
+    fun `when no expiry returned`() {
+        val config =
+            OAuthProviderConfig(Uri.of("http://auth"), "/authorize", "/oauth/token", Credentials("hello", "world"))
+
+        var counter = 0
+        val backend: HttpHandler = {
+            Response(OK).with(
+                Body.auto<AccessTokenResponse>().toLens() of AccessTokenResponse(
+                    it.bodyString() + counter++,
+                    "type",
+                    100
+                )
+            )
+        }
+
+        val clock = TickingClock()
+
+        val app = ClientFilters.RefreshingOAuthToken(
+            config,
+            backend,
+            { next -> { next(it.body("auth")) } },
+            Duration.ofSeconds(10),
+            clock
+        ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
+
+        assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
+    }
 }
