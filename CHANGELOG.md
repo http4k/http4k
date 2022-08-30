@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.30.3.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v4.30.2.1
 - **http4k-format-moshi-yaml** : [Fix] Re-fix YAML defaults for over greedy boolean values (regression caused by upgrade to SnakeYaml).
 
