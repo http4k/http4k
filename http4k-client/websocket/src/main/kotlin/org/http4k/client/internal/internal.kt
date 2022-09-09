@@ -57,6 +57,10 @@ class NonBlockingClient(uri: Uri, headers: Headers, timeout: Duration, private v
 
     override fun onMessage(message: String) = socket.get().triggerMessage(WsMessage(message))
 
+    override fun onMessage(bytes: ByteBuffer) {
+        socket.get().triggerMessage(WsMessage(Body(bytes)))
+    }
+
     override fun onError(e: Exception) = socket.get().triggerError(e)
 }
 

@@ -30,6 +30,14 @@ class WebsocketClientTest {
     @BeforeEach
     fun before() {
         val ws = websockets(
+            "/bin" bind { ws: Websocket ->
+                ws.onMessage {
+                    val content = it.body.stream.readBytes()
+                    ws.send(WsMessage(content.inputStream()))
+                    ws.close(NORMAL)
+                }
+            },
+
             "/{name}" bind { ws: Websocket ->
                 val name = ws.upgradeRequest.path("name")!!
                 ws.send(WsMessage(name))
@@ -134,5 +142,23 @@ class WebsocketClientTest {
 
         assertThat(received.take(4).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
         assertThat(connected, equalTo(true))
+    }
+
+    @Test
+    fun `non-blocking - send and receive in binary mode`() {
+        val queue = LinkedBlockingQueue<() -> WsMessage?>()
+        val received = generateSequence { queue.take()() }
+
+        WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/bin")) { ws ->
+            ws.onMessage { message ->
+                queue.add { message }
+            }
+            ws.send(WsMessage("hello".byteInputStream()))
+            ws.onClose {
+                queue.add { null }
+            }
+        }
+
+        assertThat(received.take(4).toList(), equalTo(listOf(WsMessage("hello"))))
     }
 }
