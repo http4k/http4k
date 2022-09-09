@@ -2,6 +2,8 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
+import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.routing.bind
 import org.http4k.routing.path
@@ -153,12 +155,14 @@ class WebsocketClientTest {
             ws.onMessage { message ->
                 queue.add { message }
             }
-            ws.send(WsMessage("hello".byteInputStream()))
             ws.onClose {
                 queue.add { null }
             }
+            ws.send(WsMessage("hello".byteInputStream()))
         }
 
-        assertThat(received.take(4).toList(), equalTo(listOf(WsMessage("hello"))))
+        val messages = received.take(4).toList()
+        assertThat(messages.all { it.body is StreamBody }, equalTo(true))
+        assertThat(messages, equalTo(listOf(WsMessage("hello"))))
     }
 }
