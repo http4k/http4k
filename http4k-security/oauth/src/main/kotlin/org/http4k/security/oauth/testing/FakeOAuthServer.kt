@@ -25,10 +25,12 @@ import org.http4k.security.oauth.server.AuthorizationCodes
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.ClientValidator
 import org.http4k.security.oauth.server.DefaultAccessTokenResponseRenderer
+import org.http4k.security.oauth.server.IdTokens
 import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.security.oauth.server.TokenRequest
 import org.http4k.security.oauth.server.UnsupportedGrantType
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
+import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import java.time.Clock
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -41,6 +43,8 @@ fun FakeOAuthServer(
     tokenPath: String,
     clock: Clock = Clock.systemDefaultZone(),
     accessTokens: AccessTokens = SimpleAccessTokens(),
+    idTokens: IdTokens = IdTokens.Unsupported,
+    refreshTokens: RefreshTokens = RefreshTokens.Unsupported,
     tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
 ): RoutingHttpHandler {
     val server = OAuthServer(
@@ -50,7 +54,9 @@ fun FakeOAuthServer(
         InMemoryAuthorizationCodes(clock),
         accessTokens,
         clock,
-        tokenResponseRenderer = tokenResponseRenderer
+        tokenResponseRenderer = tokenResponseRenderer,
+        idTokens = idTokens,
+        refreshTokens = refreshTokens,
     )
 
     return routes(

@@ -18,6 +18,6 @@ fun interface RefreshTokens {
     ): Result<AccessToken, AccessTokenError>
 
     companion object {
-        val unsupported = RefreshTokens { _, _, _ -> Failure(UnsupportedGrantType(GrantType.RefreshToken.rfcValue)) }
+        val Unsupported = RefreshTokens { _, _, _ -> Failure(UnsupportedGrantType(GrantType.RefreshToken.rfcValue)) }
     }
 }
