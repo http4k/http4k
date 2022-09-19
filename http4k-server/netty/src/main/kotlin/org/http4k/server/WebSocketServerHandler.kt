@@ -15,7 +15,10 @@ import org.http4k.core.Uri
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
 
-class WebSocketServerHandler(private val wsHandler: WsHandler) : ChannelInboundHandlerAdapter() {
+class WebSocketServerHandler(
+    private val wsHandler: WsHandler,
+    private val customConfig: (WebSocketServerProtocolConfig.Builder) -> WebSocketServerProtocolConfig.Builder = { it }
+) : ChannelInboundHandlerAdapter() {
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         if (msg is HttpRequest) {
             if (requiresWsUpgrade(msg)) {
@@ -27,6 +30,7 @@ class WebSocketServerHandler(private val wsHandler: WsHandler) : ChannelInboundH
                     .handleCloseFrames(false)
                     .websocketPath(upgradeRequest.uri.toString())
                     .checkStartsWith(true)
+                    .let(customConfig)
                     .build()
 
                 ctx.pipeline().addAfter(

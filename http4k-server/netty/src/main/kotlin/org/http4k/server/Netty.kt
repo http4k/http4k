@@ -3,12 +3,10 @@ package org.http4k.server
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBufInputStream
 import io.netty.buffer.Unpooled
-import io.netty.channel.ChannelFactory
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
-import io.netty.channel.ServerChannel
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
@@ -42,7 +40,6 @@ import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
 import java.time.Duration.ofSeconds
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
@@ -95,8 +92,12 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     }
 }
 
-class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerConfig {
-    constructor(port: Int = 8000) : this(port, StopMode.Graceful(ofSeconds(15)))
+class Netty(
+    val port: Int = 8000,
+    override val stopMode: StopMode = StopMode.Graceful(ofSeconds(15)),
+    private val createWebsocketHandler: (WsHandler) -> WebSocketServerHandler = { WebSocketServerHandler(it) }
+) : PolyServerConfig {
+    constructor(port: Int = 8000) : this(port, StopMode.Graceful(ofSeconds(15)), { WebSocketServerHandler(it) })
 
     val shutdownTimeoutMillis = when(stopMode) {
         is StopMode.Graceful -> stopMode.timeout.toMillis()
@@ -116,14 +117,14 @@ class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerC
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
             bootstrap.group(masterGroup, workerGroup)
-                .channelFactory(ChannelFactory<ServerChannel> { NioServerSocketChannel() })
+                .channelFactory { NioServerSocketChannel() }
                 .childHandler(object : ChannelInitializer<SocketChannel>() {
                     public override fun initChannel(ch: SocketChannel) {
                         ch.pipeline().addLast("codec", HttpServerCodec())
                         ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
 
-                        if (ws != null) ch.pipeline().addLast("websocket", WebSocketServerHandler(ws))
+                        if (ws != null) ch.pipeline().addLast("websocket", createWebsocketHandler(ws))
 
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
                         if (http != null) ch.pipeline().addLast("httpHandler", Http4kChannelHandler(http))
