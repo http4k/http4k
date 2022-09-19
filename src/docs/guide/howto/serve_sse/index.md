@@ -4,8 +4,8 @@ description: Recipes for using http4k with Server-Sent Events
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.30.6.0"
-implementation group: "org.http4k", name: "http4k-server-undertow", version: "4.30.6.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.30.7.0"
+implementation group: "org.http4k", name: "http4k-server-undertow", version: "4.30.7.0"
 ```
 
 **http4k** provides SSE (Server Sent Events) support using a simple, consistent, typesafe, and testable API on supported server backends (see above). SSE communication consists of 3 main concepts:
