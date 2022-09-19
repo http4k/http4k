@@ -4,7 +4,7 @@ description: Feature overview of the http4k-cloudevents module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-cloudevents", version: "4.30.7.0"
+implementation group: "org.http4k", name: "http4k-cloudevents", version: "4.30.8.0"
 ```
 
 The [Cloud Events](https://cloudevents.io/) spec defines a common format for Events produced by Cloud services.
@@ -17,7 +17,7 @@ In this example we are using the Jackson JSONFormat which is included by default
 
 ```groovy
 // to access the lenses in the Jackson module
-implementation group: "org.http4k", name: "http4k-format-jackson", version: "4.30.7.0"
+implementation group: "org.http4k", name: "http4k-format-jackson", version: "4.30.8.0"
 
 ```
 
