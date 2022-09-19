@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.30.8.0
+- **http4k-cloudevents** : Add `JacksonFormat()` so we can use custom formats
+
 ### v4.30.7.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Fix #779: SunHttp does not blow up if you add a ll value.

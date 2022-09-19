@@ -18,7 +18,7 @@ data class MyCloudEventData(val value: Int) : CloudEventData {
     }
 }
 
-class JacksonFormatTest {
+class JsonFormatTest {
     @Test
     fun `can roundtrip data into an event`() {
         val data = MyCloudEventData(123)

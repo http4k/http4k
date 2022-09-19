@@ -4,7 +4,7 @@ import io.cloudevents.CloudEventData
 import io.cloudevents.core.builder.CloudEventBuilder
 import io.cloudevents.core.builder.withSource
 import io.cloudevents.core.provider.EventFormatProvider
-import io.cloudevents.jackson.JsonFormat
+import io.cloudevents.http4k.cloudEventsFormat
 import io.cloudevents.with
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
@@ -26,8 +26,8 @@ import java.util.UUID
 
 fun main() {
     // Events formats must be registered into a singleton provided by the CloudEvents SDK.
-    // Here we are using the JSON format.
-    EventFormatProvider.getInstance().registerFormat(JsonFormat())
+    // Here we are using the format with any http4k Jackson mappings.
+    EventFormatProvider.getInstance().registerFormat(Jackson.cloudEventsFormat())
 
     // We use one lens to get the event envelope and another to get the typed data from the Event
     val eventLens = Body.cloudEvent().toLens()
@@ -58,13 +58,13 @@ fun main() {
         .build()
 
     // ...then inject the data into the Event... this sets the content type of the event
-    val with = cloudEvent.with(dataLens of MyCloudEventData(10))
+    val with = cloudEvent.with(dataLens of MyCloudEventData(10, Uri.of("foobar")))
 
     // ...lastly inject the event into the request and send it to the server
     app(Request(POST, "/foo/bar").with(eventLens of with))
 }
 
 // define a custom event which will be sent/received in the "data" field of the CloudEvent
-data class MyCloudEventData(val value: Int) : CloudEventData {
-    override fun toBytes() = value.toString().toByteArray()
+data class MyCloudEventData(val value: Int, val uri: Uri) : CloudEventData {
+    override fun toBytes() = ("$value,$uri").toString().toByteArray()
 }

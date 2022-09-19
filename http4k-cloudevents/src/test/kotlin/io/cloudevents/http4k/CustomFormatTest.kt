@@ -1,4 +1,4 @@
-package org.http4k.lens
+package io.cloudevents.http4k
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -16,6 +16,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.MyCloudEventData
+import org.http4k.lens.cloudEvent
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
