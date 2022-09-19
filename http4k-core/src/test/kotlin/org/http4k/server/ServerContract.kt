@@ -31,8 +31,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
 
-abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
-                              private val requiredMethods: Array<Method> = Method.values()) {
+abstract class ServerContract(
+    private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
+    private val requiredMethods: Array<Method> = Method.values()
+) {
     private lateinit var server: Http4kServer
 
     protected val baseUrl by lazy { "http://localhost:${server.port()}" }
@@ -52,7 +54,11 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             "/stream" bind GET to { Response(OK).with(Body.binary(TEXT_PLAIN).toLens() of "hello".byteInputStream()) },
             "/presetlength" bind GET to { Response(OK).header("Content-Length", "0") },
             "/echo" bind POST to { Response(OK).body(it.bodyString()) },
-            "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+            "/request-headers" bind GET to { request: Request ->
+                Response(OK).body(
+                    request.headerValues("foo").joinToString(", ")
+                )
+            },
             "/length" bind { req: Request ->
                 when (req.body) {
                     is StreamBody -> Response(OK).body(req.body.length.toString())
@@ -70,6 +76,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             },
             "/status-with-foobar-description" bind GET to {
                 Response(Status(201, "FooBar"))
+            },
+            "/null-header-value" bind GET to {
+                Response(OK).header("header", null)
             }
         )
 
@@ -88,6 +97,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             if (method == Method.HEAD) assertThat(response.body, equalTo(Body.EMPTY))
             else assertThat(response.bodyString(), equalTo(method.name))
         }
+    }
+
+    @Test
+    fun `null header`() {
+        val response = client(Request(GET, "$baseUrl/null-header-value"))
+        assertThat(response.status, equalTo(OK))
     }
 
     @Test
@@ -132,8 +147,10 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Test
     fun `length is set on body if it is sent`() {
-        val response = client(Request(POST, "$baseUrl/length")
-            .body("12345").header("Content-Length", "5"))
+        val response = client(
+            Request(POST, "$baseUrl/length")
+                .body("12345").header("Content-Length", "5")
+        )
         assertThat(response, hasStatus(OK).and(hasBody("5")))
     }
 
@@ -160,7 +177,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Test
     fun `can handle multiple request headers`() {
-        val response = client(Request(GET, "$baseUrl/request-headers").header("foo", "one").header("foo", "two").header("foo", "three"))
+        val response = client(
+            Request(GET, "$baseUrl/request-headers").header("foo", "one").header("foo", "two").header("foo", "three")
+        )
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("one, two, three"))
@@ -190,12 +209,15 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Test
     fun `can resolve request source`() {
-        assertThat(client(Request(GET, "$baseUrl/request-source")),
-            allOf(hasStatus(OK),
+        assertThat(
+            client(Request(GET, "$baseUrl/request-source")),
+            allOf(
+                hasStatus(OK),
                 hasHeader("x-address", clientAddress()),
                 hasHeader("x-port", present()),
                 hasHeader("x-scheme", requestScheme())
-            ))
+            )
+        )
     }
 
     open fun clientAddress() = anyOf(

@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.30.6.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-security-oauth** : IdTokens now can be passed to FakeOAuthServer.
+- **http4k-core** : Fix #779: SunHttp does not blow up if you add a ll value.
 
 ### v4.30.5.0
 - **http4k-*** : Upgrade some dependency versions.
