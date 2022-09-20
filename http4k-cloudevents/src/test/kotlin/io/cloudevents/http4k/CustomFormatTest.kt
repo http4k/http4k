@@ -2,6 +2,7 @@ package io.cloudevents.http4k
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import io.cloudevents.CloudEventData
 import io.cloudevents.core.builder.CloudEventBuilder
 import io.cloudevents.core.builder.withDataContentType
 import io.cloudevents.core.builder.withDataSchema
@@ -15,7 +16,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.format.MyCloudEventData
 import org.http4k.lens.cloudEvent
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
@@ -25,6 +25,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
+
+data class MyCloudEventData(val value: Int) : CloudEventData {
+    override fun toBytes() = value.toString().toByteArray()
+
+    companion object {
+        fun fromStringBytes(bytes: ByteArray) = MyCloudEventData(Integer.valueOf(String(bytes)))
+    }
+}
 
 @ExtendWith(ApprovalTest::class)
 class CustomFormatTest {

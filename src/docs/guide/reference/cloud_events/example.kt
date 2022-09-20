@@ -1,11 +1,9 @@
 package guide.reference.cloud_events
 
-import io.cloudevents.CloudEventData
 import io.cloudevents.core.builder.CloudEventBuilder
 import io.cloudevents.core.builder.withSource
 import io.cloudevents.core.provider.EventFormatProvider
 import io.cloudevents.http4k.cloudEventsFormat
-import io.cloudevents.with
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -17,6 +15,7 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.filter.debug
 import org.http4k.format.Jackson
+import org.http4k.format.Jackson.withData
 import org.http4k.format.cloudEventDataLens
 import org.http4k.lens.cloudEvent
 import org.http4k.routing.bind
@@ -50,21 +49,19 @@ fun main() {
         )).debug()
 
     // Create the base CloudEvent without the data...
+    // then inject the data into the Event - this sets the content type of the event
     val cloudEvent = CloudEventBuilder.v1()
         .withId(UUID.randomUUID().toString())
         .withSource(Uri.of("localhost"))
         .withTime(OffsetDateTime.now())
         .withType("myEventType")
+        // this is a custom extension function from Jackson (needs to be imported)
+        .withData(MyCloudEventData(10, Uri.of("foobar")))
         .build()
 
-    // ...then inject the data into the Event... this sets the content type of the event
-    val with = cloudEvent.with(dataLens of MyCloudEventData(10, Uri.of("foobar")))
-
     // ...lastly inject the event into the request and send it to the server
-    app(Request(POST, "/foo/bar").with(eventLens of with))
+    app(Request(POST, "/foo/bar").with(eventLens of cloudEvent))
 }
 
 // define a custom event which will be sent/received in the "data" field of the CloudEvent
-data class MyCloudEventData(val value: Int, val uri: Uri) : CloudEventData {
-    override fun toBytes() = ("$value,$uri").toString().toByteArray()
-}
+data class MyCloudEventData(val value: Int, val uri: Uri)

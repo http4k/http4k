@@ -1,0 +1,13 @@
+{
+  "specversion": "1.0",
+  "id": "123",
+  "source": "http4k",
+  "type": "type",
+  "datacontenttype": "application/json",
+  "dataschema": "http4k",
+  "subject": "subject",
+  "time": "1970-01-01T00:00:00Z",
+  "data": {
+    "uri": "foobar"
+  }
+}

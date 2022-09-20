@@ -17,6 +17,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.cloudevents.core.builder.CloudEventBuilder
+import io.cloudevents.jackson.JsonCloudEventData
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -119,6 +121,8 @@ open class ConfigurableJackson(
 
     inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =
         WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
+
+    fun <T: Any> CloudEventBuilder.withData(t: T) = withData(JsonCloudEventData.wrap(asJsonObject(t)))
 }
 
 fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
