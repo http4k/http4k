@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.30.9.0
-- **http4k-cloudevents** : Add custom lenses to retrieve data from a cloud event
+- **http4k-cloudevents** : Add custom lenses to retrieve data from a cloud event and an extension function to set it.
 
 ### v4.30.8.0
 - **http4k-cloudevents** : Add `Jackson.cloudEventsFormat()` so we can use custom formats in cloud events lenses
