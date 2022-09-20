@@ -41,7 +41,6 @@ class JacksonFormatTest {
         val originalEvent = CloudEventBuilder.v1()
             .withId("123")
             .withType("type")
-            .withDataContentType(APPLICATION_JSON)
             .withDataSchema(Uri.of("http4k"))
             .withSource(Uri.of("http4k"))
             .withSubject("subject")

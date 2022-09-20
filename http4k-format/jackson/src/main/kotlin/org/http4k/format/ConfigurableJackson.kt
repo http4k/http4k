@@ -122,7 +122,7 @@ open class ConfigurableJackson(
     inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =
         WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 
-    fun <T: Any> CloudEventBuilder.withData(t: T) = withData(JsonCloudEventData.wrap(asJsonObject(t)))
+    fun <T: Any> CloudEventBuilder.withData(t: T) = withData(defaultContentType.value, JsonCloudEventData.wrap(asJsonObject(t)))
 }
 
 fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
