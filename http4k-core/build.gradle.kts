@@ -5,6 +5,7 @@ dependencies {
     implementation("javax.servlet:javax.servlet-api:_")
     implementation("dev.forkhandles:result4k:_")
     implementation("dev.forkhandles:values4k:_")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     testApi(project(":http4k-client-apache"))
     testApi(project(":http4k-client-websocket"))

@@ -1,5 +1,7 @@
 package org.http4k.filter
 
+import kotlinx.coroutines.ThreadContextElement
+import kotlinx.coroutines.asContextElement
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
@@ -61,6 +63,10 @@ data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpa
         }
 
         fun forCurrentThread(): ZipkinTraces = THREAD_LOCAL.get()
+
+        fun asContextElement(): ThreadContextElement<ZipkinTraces> {
+            return THREAD_LOCAL.asContextElement()
+        }
 
         internal val THREAD_LOCAL = object : ThreadLocal<ZipkinTraces>() {
             override fun initialValue() = ZipkinTraces(TraceId.new(), TraceId.new(), null, SAMPLE)
