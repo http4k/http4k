@@ -587,6 +587,7 @@ application/xslt+xml				xslt
 application/xspf+xml				xspf
 application/xv+xml				mxml xhvml xvml xvm
 application/yang				yang
+application/yaml                yml yaml
 application/yin+xml				yin
 application/zip					zip
 audio/adpcm					adp
