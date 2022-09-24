@@ -1,6 +1,6 @@
 package org.http4k.contract.ui
 
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.testing.Approver
@@ -19,6 +19,6 @@ class SwaggerUiTest {
             displayOperationId = true,
             requestSnippetsEnabled = true
         )
-        approver.assertApproved(handler(Request(Method.GET, "")))
+        approver.assertApproved(handler(Request(GET, "")))
     }
 }
