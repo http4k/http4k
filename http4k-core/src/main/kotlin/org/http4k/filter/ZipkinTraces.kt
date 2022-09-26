@@ -31,7 +31,12 @@ data class SamplingDecision(val value: String) {
     }
 }
 
-data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpanId: TraceId?, val samplingDecision: SamplingDecision = SAMPLE) {
+data class ZipkinTraces(
+    val traceId: TraceId,
+    val spanId: TraceId,
+    val parentSpanId: TraceId?,
+    val samplingDecision: SamplingDecision = SAMPLE
+) {
     companion object {
         private val X_B3_TRACEID = Header.map(::TraceId, TraceId::value).optional("x-b3-traceid")
         private val X_B3_SPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-spanid")
