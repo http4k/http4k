@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.30.10.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : YAML is now a recognised content type.
+
 ### v4.30.9.0
 - **http4k-cloudevents** : Add custom lenses to retrieve data from a cloud event and an extension function to set it.
 

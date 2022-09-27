@@ -135,7 +135,7 @@ object ClientFilters {
             }
         }
 
-        fun Request.withBasicAuth(credentials: Credentials, header: String) = header(header, "Basic ${credentials.base64Encoded()}")
+        fun Request.withBasicAuth(credentials: Credentials, header: String = "Authorization") = header(header, "Basic ${credentials.base64Encoded()}")
 
         operator fun invoke(header: String, provider: CredentialsProvider<Credentials>) =
             CustomBasicAuth(header, provider::invoke)

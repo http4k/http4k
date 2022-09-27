@@ -18,6 +18,6 @@ class ClientSecretAccessTokenFetcherAuthenticator(private val credentials: Crede
 
 class BasicAuthAccessTokenFetcherAuthenticator(private val providerConfig: OAuthProviderConfig) :
     AccessTokenFetcherAuthenticator {
-    override fun authenticate(request: Request) = request.withBasicAuth(providerConfig.credentials, "Authorization")
+    override fun authenticate(request: Request) = request.withBasicAuth(providerConfig.credentials)
 }
 
