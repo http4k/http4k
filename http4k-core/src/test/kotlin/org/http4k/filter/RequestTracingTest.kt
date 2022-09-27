@@ -18,7 +18,7 @@ class RequestTracingTest {
 
     @BeforeEach
     fun before() {
-        ZipkinTraces.THREAD_LOCAL.remove()
+        ZipkinTracesStorage.INTERNAL_THREAD_LOCAL.remove()
     }
 
     @Test
@@ -54,9 +54,11 @@ class RequestTracingTest {
                 assertThat(actual.parentSpanId, equalTo(TraceId("span_id")))
                 Response(OK)
             }
-        ZipkinTraces.setForCurrentThread(ZipkinTraces(TraceId("trace_id"), TraceId("span_id"), null))
+        ZipkinTracesStorage.THREAD_LOCAL
+            .setForCurrentThread(ZipkinTraces(TraceId("trace_id"), TraceId("span_id"), null))
         cliWithEvents(Request(GET, "/parentNull"))
-        ZipkinTraces.setForCurrentThread(ZipkinTraces(TraceId("trace_id"), TraceId("span_id"), TraceId("parent_id")))
+        ZipkinTracesStorage.THREAD_LOCAL
+            .setForCurrentThread(ZipkinTraces(TraceId("trace_id"), TraceId("span_id"), TraceId("parent_id")))
         cliWithEvents(Request(GET, "/parentNotNull"))
     }
 
@@ -79,10 +81,12 @@ class RequestTracingTest {
         }
 
         val executor = Executors.newSingleThreadExecutor()
+        val storage = ZipkinTracesStorage.THREAD_LOCAL
+
         val simpleProxyServer: HttpHandler = ServerFilters.RequestTracing().then {
-            val traceForOuterThread = ZipkinTraces.forCurrentThread()
+            val traceForOuterThread = storage.forCurrentThread()
             val clientTask = {
-                ZipkinTraces.setForCurrentThread(traceForOuterThread)
+                storage.setForCurrentThread(traceForOuterThread)
                 client(Request(GET, "/somePath"))
             }
             executor.submit(clientTask).get()

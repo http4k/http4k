@@ -26,8 +26,9 @@ data class SamplingDecision(val value: String) {
 
         private val VALID_VALUES = listOf("1", "0")
 
-        fun from(sampledHeaderValue: String?) = sampledHeaderValue?.takeIf { it in VALID_VALUES }?.let(::SamplingDecision)
-            ?: SAMPLE
+        fun from(sampledHeaderValue: String?) =
+            sampledHeaderValue?.takeIf { it in VALID_VALUES }?.let(::SamplingDecision)
+                ?: SAMPLE
     }
 }
 
@@ -41,10 +42,16 @@ data class ZipkinTraces(
         private val X_B3_TRACEID = Header.map(::TraceId, TraceId::value).optional("x-b3-traceid")
         private val X_B3_SPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-spanid")
         private val X_B3_PARENTSPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-parentspanid")
-        private val X_B3_SAMPLED = Header.map(SamplingDecision.Companion::from, SamplingDecision::value).optional("x-b3-sampled")
+        private val X_B3_SAMPLED =
+            Header.map(SamplingDecision.Companion::from, SamplingDecision::value).optional("x-b3-sampled")
 
         private fun set(): ZipkinTraces.(HttpMessage) -> HttpMessage = { it: HttpMessage ->
-            it.with(X_B3_TRACEID of traceId, X_B3_SPANID of spanId, X_B3_PARENTSPANID of parentSpanId, X_B3_SAMPLED of samplingDecision)
+            it.with(
+                X_B3_TRACEID of traceId,
+                X_B3_SPANID of spanId,
+                X_B3_PARENTSPANID of parentSpanId,
+                X_B3_SAMPLED of samplingDecision
+            )
         }
 
         private fun get(): BiDiLensSpec<HttpMessage, String>.(HttpMessage) -> ZipkinTraces = {
@@ -60,15 +67,21 @@ data class ZipkinTraces(
 
         operator fun invoke(target: HttpMessage): ZipkinTraces = lens(target)
         operator fun <T : HttpMessage> invoke(value: ZipkinTraces, target: T): T = lens(value, target)
+    }
+}
 
-        fun setForCurrentThread(zipkinTraces: ZipkinTraces) {
-            THREAD_LOCAL.set(zipkinTraces)
+interface ZipkinTracesStorage {
+    fun setForCurrentThread(zipkinTraces: ZipkinTraces)
+    fun forCurrentThread(): ZipkinTraces
+
+    companion object {
+        internal val INTERNAL_THREAD_LOCAL = object : ThreadLocal<ZipkinTraces>() {
+            override fun initialValue() = ZipkinTraces(TraceId.new(), TraceId.new(), null, SAMPLE)
         }
 
-        fun forCurrentThread(): ZipkinTraces = THREAD_LOCAL.get()
-
-        internal val THREAD_LOCAL = object : ThreadLocal<ZipkinTraces>() {
-            override fun initialValue() = ZipkinTraces(TraceId.new(), TraceId.new(), null, SAMPLE)
+        val THREAD_LOCAL = object : ZipkinTracesStorage {
+            override fun setForCurrentThread(zipkinTraces: ZipkinTraces) = INTERNAL_THREAD_LOCAL.set(zipkinTraces)
+            override fun forCurrentThread(): ZipkinTraces = INTERNAL_THREAD_LOCAL.get()
         }
     }
 }
