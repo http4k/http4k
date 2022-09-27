@@ -50,14 +50,14 @@ class ServerFiltersTest {
 
     @BeforeEach
     fun before() {
-        ZipkinTraces.THREAD_LOCAL.remove()
+        ZipkinTracesStorage.INTERNAL_THREAD_LOCAL.remove()
     }
 
     @Test
     fun `initialises request tracing on request and sets on outgoing response when not present`() {
         var newThreadLocal: ZipkinTraces? = null
         val svc = ServerFilters.RequestTracing().then {
-            newThreadLocal = ZipkinTraces.THREAD_LOCAL.get()!!
+            newThreadLocal = ZipkinTracesStorage.THREAD_LOCAL.forCurrentThread()
             assertThat(newThreadLocal!!.traceId, present())
             assertThat(newThreadLocal!!.spanId, present())
             assertThat(newThreadLocal!!.parentSpanId, absent())
@@ -106,7 +106,7 @@ class ServerFiltersTest {
             { req, trace -> start = req to trace },
             { req, resp, trace -> end = Triple(req, resp, trace) }
         ).then {
-            val actual = ZipkinTraces.THREAD_LOCAL.get()
+            val actual = ZipkinTracesStorage.THREAD_LOCAL.forCurrentThread()
             val setOnRequest = ZipkinTraces(it)
 
             assertThat(actual, equalTo(originalTraces))

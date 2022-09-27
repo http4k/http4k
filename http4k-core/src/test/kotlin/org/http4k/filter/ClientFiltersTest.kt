@@ -127,13 +127,13 @@ class ClientFiltersTest {
 
     @BeforeEach
     fun before() {
-        ZipkinTraces.THREAD_LOCAL.remove()
+        ZipkinTracesStorage.INTERNAL_THREAD_LOCAL.remove()
     }
 
     @Test
     fun `adds request tracing to outgoing request when already present`() {
         val zipkinTraces = ZipkinTraces(TraceId("originalTraceId"), TraceId("originalSpanId"), TraceId("originalParentId"), SAMPLE)
-        ZipkinTraces.THREAD_LOCAL.set(zipkinTraces)
+        ZipkinTracesStorage.THREAD_LOCAL.setForCurrentThread(zipkinTraces)
 
         var start: Pair<Request, ZipkinTraces>? = null
         var end: Triple<Request, Response, ZipkinTraces>? = null

@@ -19,7 +19,6 @@ import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
-import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
@@ -38,10 +37,11 @@ object ClientFilters {
      */
     fun RequestTracing(
         startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-        endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }
+        endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> },
+        storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL
     ): Filter = Filter { next ->
         {
-            THREAD_LOCAL.get().run {
+            storage.forCurrentThread().run {
                 val updated = copy(parentSpanId = spanId, spanId = TraceId.new())
                 startReportFn(it, updated)
                 val response = next(ZipkinTraces(updated, it))
@@ -54,9 +54,9 @@ object ClientFilters {
     /**
      * Reset Zipkin request tracing. Use this to provide a new TraceId for every outbound call.
      */
-    fun ResetRequestTracing() = Filter { next ->
+    fun ResetRequestTracing(storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL) = Filter { next ->
         {
-            ZipkinTraces.setForCurrentThread(ZipkinTraces(TraceId.new(), TraceId.new(), null))
+            storage.setForCurrentThread(ZipkinTraces(TraceId.new(), TraceId.new(), null))
             next(it)
         }
     }
