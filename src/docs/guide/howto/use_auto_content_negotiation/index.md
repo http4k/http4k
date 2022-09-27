@@ -24,7 +24,7 @@ but there are scenarios where you may want to offer the user their choice of for
 While it is possible to use the `ACCEPT` and `CONTENT_TYPE` lenses to manually select the inbound and outbound body lenses,
 the `AutoContentNegotiator` can do this for you.
 
-### Using Auto Content Negotiation [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/typesafe_your_api_with_lenses/example_result4k.kt)
+### Using Auto Content Negotiation
 
 The `AutoContentNegotiator` starts with your selection of body lenses, and wraps them together.
 It can then be used to:
