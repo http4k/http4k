@@ -180,9 +180,6 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
             siteCookies.remove(cookie.name)
         }
 
-        @Deprecated("Removed above")
-        override fun ime() = throw FeatureNotImplementedYet
-
         override fun logs() = throw FeatureNotImplementedYet
 
         override fun timeouts() = throw FeatureNotImplementedYet

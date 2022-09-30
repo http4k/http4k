@@ -255,7 +255,6 @@ class Http4kWebDriverTest {
 
         val windowHandle = driver.windowHandle
 
-        isNotImplemented { driver.manage().ime() }
         isNotImplemented { driver.manage().logs() }
         isNotImplemented { driver.manage().timeouts() }
         isNotImplemented { driver.manage().window() }
