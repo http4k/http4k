@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.32.2.0
+- **http4k-core** : Add `StringBidDiMapping.basicCredentials` to easily convert between `Credentials` and basic auth
+- **http4k-core**: Add `Header.AUTHORIZATION_BASIC` lens to easily get and set basic `Credentials` for a message
+- **http4k-contract**: `BasicAuthSecurity` now supports a `RequestContextLens` to store the principal
+
 ### v4.32.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-format-moshi*** : Added ability to make Automarshallers strictness.

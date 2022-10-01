@@ -246,6 +246,7 @@ fun <IN : Any> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormat
 fun <IN: Any> BiDiLensSpec<IN, String>.zoneId() = map(StringBiDiMappings.zoneId())
 fun <IN: Any> BiDiLensSpec<IN, String>.zoneOffset() = map(StringBiDiMappings.zoneOffset())
 fun <IN: Any> BiDiLensSpec<IN, String>.locale() = map(StringBiDiMappings.locale())
+fun <IN: Any> BiDiLensSpec<IN, String>.basicCredentials() = map(StringBiDiMappings.basicCredentials())
 
 inline fun <IN : Any, reified T : Enum<T>> BiDiLensSpec<IN, String>.enum() = mapWithNewMeta(StringBiDiMappings.enum<T>(), EnumParam(T::class))
 inline fun <IN : Any, reified T : Enum<T>> BiDiLensSpec<IN, String>.enum(noinline nextOut: (String) -> T, noinline nextIn: (T) -> String) = mapWithNewMeta(BiDiMapping(nextOut, nextIn), EnumParam(T::class))

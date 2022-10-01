@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import org.http4k.base64Decoded
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
@@ -114,7 +113,7 @@ object ServerFilters {
          */
         operator fun invoke(realm: String, authorize: (Credentials) -> Boolean) = Filter { next ->
             {
-                val credentials = it.basicAuthenticationCredentials()
+                val credentials = Header.AUTHORIZATION_BASIC(it)
                 if (credentials == null || !authorize(credentials)) {
                     Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
                 } else next(it)
@@ -137,28 +136,12 @@ object ServerFilters {
         operator fun <T> invoke(realm: String, key: RequestContextLens<T>, lookup: (Credentials) -> T?) =
             Filter { next ->
                 {
-                    it.basicAuthenticationCredentials()
+                    Header.AUTHORIZATION_BASIC(it)
                         ?.let(lookup)
                         ?.let { found -> next(it.with(key of found)) }
                         ?: Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
                 }
             }
-
-        private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")
-            ?.trim()
-            ?.takeIf { it.startsWith("Basic") }
-            ?.substringAfter("Basic")
-            ?.trim()
-            ?.safeBase64Decoded()
-            ?.toCredentials()
-
-        private fun String.safeBase64Decoded(): String? = try {
-            base64Decoded()
-        } catch (e: IllegalArgumentException) { null }
-
-        private fun String.toCredentials(): Credentials =
-            split(":", ignoreCase = false, limit = 2)
-            .let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
     }
 
     /**

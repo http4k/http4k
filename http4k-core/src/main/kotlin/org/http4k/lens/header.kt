@@ -51,6 +51,8 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
     )
         .defaulted("Link", emptyMap())
 
+    val AUTHORIZATION_BASIC = basicCredentials().optional("Authorization")
+
     internal fun parseValueAndDirectives(it: String): Pair<String, Parameters> =
         with(it.split(";").mapNotNull { it.trim().takeIf(String::isNotEmpty) }) {
             first() to drop(1).map {
