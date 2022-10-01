@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import org.http4k.base64Decoded
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
@@ -25,6 +24,7 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 import org.http4k.lens.RequestContextLens
+import org.http4k.lens.StringBiDiMappings
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
@@ -109,6 +109,8 @@ object ServerFilters {
      * Simple Basic Auth credential checking.
      */
     object BasicAuth {
+        private val mapping = StringBiDiMappings.basicCredentials()
+
         /**
          * Credentials validation function
          */
@@ -145,20 +147,7 @@ object ServerFilters {
             }
 
         private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")
-            ?.trim()
-            ?.takeIf { it.startsWith("Basic") }
-            ?.substringAfter("Basic")
-            ?.trim()
-            ?.safeBase64Decoded()
-            ?.toCredentials()
-
-        private fun String.safeBase64Decoded(): String? = try {
-            base64Decoded()
-        } catch (e: IllegalArgumentException) { null }
-
-        private fun String.toCredentials(): Credentials =
-            split(":", ignoreCase = false, limit = 2)
-            .let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
+            ?.let(mapping::invoke)
     }
 
     /**

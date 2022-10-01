@@ -23,6 +23,7 @@ import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.StringBiDiMappings
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.security.CredentialsProvider
 import java.time.Clock
@@ -125,6 +126,8 @@ object ClientFilters {
     }
 
     object CustomBasicAuth {
+        private val mapping = StringBiDiMappings.basicCredentials()
+
         operator fun invoke(header: String, provider: () -> Credentials?): Filter = Filter { next ->
             { req ->
                 provider()
@@ -135,7 +138,7 @@ object ClientFilters {
             }
         }
 
-        fun Request.withBasicAuth(credentials: Credentials, header: String = "Authorization") = header(header, "Basic ${credentials.base64Encoded()}")
+        fun Request.withBasicAuth(credentials: Credentials, header: String = "Authorization") = header(header, mapping(credentials))
 
         operator fun invoke(header: String, provider: CredentialsProvider<Credentials>) =
             CustomBasicAuth(header, provider::invoke)
@@ -144,8 +147,6 @@ object ClientFilters {
             CustomBasicAuth(header, Credentials(user, password))
 
         operator fun invoke(header: String, credentials: Credentials): Filter = CustomBasicAuth(header) { credentials }
-
-        private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
     }
 
     object BearerAuth {
