@@ -24,7 +24,6 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 import org.http4k.lens.RequestContextLens
-import org.http4k.lens.StringBiDiMappings
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
@@ -109,8 +108,6 @@ object ServerFilters {
      * Simple Basic Auth credential checking.
      */
     object BasicAuth {
-        private val mapping = StringBiDiMappings.basicCredentials()
-
         /**
          * Credentials validation function
          */
@@ -146,8 +143,7 @@ object ServerFilters {
                 }
             }
 
-        private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")
-            ?.let(mapping::invoke)
+        private fun Request.basicAuthenticationCredentials(): Credentials? = Header.AUTHORIZATION_BASIC(this)
     }
 
     /**
