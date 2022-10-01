@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_YAML
+import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -24,10 +25,11 @@ import kotlin.reflect.KClass
 open class ConfigurableMoshiYaml(
     builder: Moshi.Builder, val defaultContentType: ContentType = APPLICATION_YAML,
     private val yamlDumperOptions: DumperOptions = defaultDumperOptions,
-    private val resolver: Resolver = MinimalResolver
+    private val resolver: Resolver = MinimalResolver,
+    strictness: StrictnessMode = Lenient
 ) :
     AutoMarshalling() {
-    private val json = ConfigurableMoshi(builder, defaultContentType)
+    private val json = ConfigurableMoshi(builder, defaultContentType, strictness)
 
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T =
         json.asA(json.asFormatString(yaml().load<Map<String, Any>>(input)), target)

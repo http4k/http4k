@@ -190,6 +190,10 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         assertThat({ KotlinxSerialization.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
     }
 
+    @Disabled
+    override fun `fails decoding when a extra key found`() {
+    }
+
     @Test
     override fun `does not fail decoding when unknown value is encountered`() {
         assertThat(KotlinxSerialization.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
@@ -283,6 +287,8 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         assertThat(out, equalTo(expectedAutoMarshallingZonesAndLocale))
         assertThat(KotlinxSerialization.asA(out, ZonesAndLocale::class), equalTo(obj))
     }
+
+    override fun strictMarshaller() = KotlinxSerialization
 
     override fun customMarshaller(): AutoMarshalling =
         object : ConfigurableKotlinxSerialization({

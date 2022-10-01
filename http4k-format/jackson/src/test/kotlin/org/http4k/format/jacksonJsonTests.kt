@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
@@ -57,6 +58,13 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
         assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }
+
+    override fun strictMarshaller() =
+        object : ConfigurableJackson(
+            KotlinModule.Builder().build().asConfigurable().customise()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+        ) {}
+
 
     override fun customMarshaller() =
         object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise()) {}
