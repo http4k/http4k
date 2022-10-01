@@ -228,6 +228,12 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
     }
 
+    @Test
+    open fun `fails decoding when a extra key found`() {
+        assertThat({ strictMarshaller().asA(inputUnknownValue, StringHolder::class) }, throws<Exception>())
+    }
+
+    abstract fun strictMarshaller(): AutoMarshalling
     abstract fun customMarshaller(): AutoMarshalling
     abstract fun customMarshallerProhibitStrings(): AutoMarshalling
 }

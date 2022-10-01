@@ -8,6 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Moshi.auto
+import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -46,20 +47,27 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
 
     @Test
     fun `read string to MoshiElement`() {
-        val json = """{"string":"hello", "child":{"string":"world","numbers":[1, 1.2],"bool":true},"numbers":[],"bool":false}"""
-        val expected = MoshiObject(mapOf(
-            "string" to MoshiString("hello"),
-            "child" to MoshiObject(mapOf(
-                "string" to MoshiString("world"),
-                "numbers" to MoshiArray(listOf(
-                    MoshiInteger(1),
-                    MoshiDecimal(1.2)
-                )),
-                "bool" to MoshiBoolean(true)
-            )),
-            "numbers" to MoshiArray(emptyList()),
-            "bool" to MoshiBoolean(false)
-        ))
+        val json =
+            """{"string":"hello", "child":{"string":"world","numbers":[1, 1.2],"bool":true},"numbers":[],"bool":false}"""
+        val expected = MoshiObject(
+            mapOf(
+                "string" to MoshiString("hello"),
+                "child" to MoshiObject(
+                    mapOf(
+                        "string" to MoshiString("world"),
+                        "numbers" to MoshiArray(
+                            listOf(
+                                MoshiInteger(1),
+                                MoshiDecimal(1.2)
+                            )
+                        ),
+                        "bool" to MoshiBoolean(true)
+                    )
+                ),
+                "numbers" to MoshiArray(emptyList()),
+                "bool" to MoshiBoolean(false)
+            )
+        )
 
         val element = with(Moshi) {
             json.asJsonObject()
@@ -70,25 +78,34 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
 
     @Test
     fun `write MoshiElement to string`() {
-        val element = MoshiObject(mapOf(
-            "string" to MoshiString("hello"),
-            "child" to MoshiObject(mapOf(
-                "string" to MoshiString("world"),
-                "numbers" to MoshiArray(listOf(
-                    MoshiInteger(1),
-                    MoshiDecimal(1.2)
-                )),
-                "bool" to MoshiBoolean(true)
-            )),
-            "numbers" to MoshiArray(emptyList()),
-            "bool" to MoshiBoolean(false)
-        ))
+        val element = MoshiObject(
+            mapOf(
+                "string" to MoshiString("hello"),
+                "child" to MoshiObject(
+                    mapOf(
+                        "string" to MoshiString("world"),
+                        "numbers" to MoshiArray(
+                            listOf(
+                                MoshiInteger(1),
+                                MoshiDecimal(1.2)
+                            )
+                        ),
+                        "bool" to MoshiBoolean(true)
+                    )
+                ),
+                "numbers" to MoshiArray(emptyList()),
+                "bool" to MoshiBoolean(false)
+            )
+        )
 
         val json = with(Moshi) {
             element.asCompactJsonString()
         }
 
-        assertThat(json, equalTo("""{"string":"hello","child":{"string":"world","numbers":[1,1.2],"bool":true},"numbers":[],"bool":false}"""))
+        assertThat(
+            json,
+            equalTo("""{"string":"hello","child":{"string":"world","numbers":[1,1.2],"bool":true},"numbers":[],"bool":false}""")
+        )
     }
 
     @Test
@@ -96,42 +113,57 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
         assertThat(
             Moshi.asJsonObject(obj),
             equalTo(
-                MoshiObject(mapOf(
-                    "string" to MoshiString("hello"),
-                    "child" to MoshiObject(mapOf(
-                        "string" to MoshiString("world"),
-                        "numbers" to MoshiArray(listOf(
-                            MoshiInteger(1)
-                        )),
-                        "bool" to MoshiBoolean(true)
-                    )),
-                    "numbers" to MoshiArray(emptyList()),
-                    "bool" to MoshiBoolean(false)
-                ))
+                MoshiObject(
+                    mapOf(
+                        "string" to MoshiString("hello"),
+                        "child" to MoshiObject(
+                            mapOf(
+                                "string" to MoshiString("world"),
+                                "numbers" to MoshiArray(
+                                    listOf(
+                                        MoshiInteger(1)
+                                    )
+                                ),
+                                "bool" to MoshiBoolean(true)
+                            )
+                        ),
+                        "numbers" to MoshiArray(emptyList()),
+                        "bool" to MoshiBoolean(false)
+                    )
+                )
             )
         )
     }
 
     @Test
     fun `convert MoshiElement to arbObject`() {
-        val element = MoshiObject(mapOf(
-            "string" to MoshiString("hello"),
-            "child" to MoshiObject(mapOf(
-                "string" to MoshiString("world"),
-                "numbers" to MoshiArray(listOf(
-                    MoshiInteger(1)
-                )),
-                "bool" to MoshiBoolean(true)
-            )),
-            "numbers" to MoshiArray(emptyList()),
-            "bool" to MoshiBoolean(false)
-        ))
+        val element = MoshiObject(
+            mapOf(
+                "string" to MoshiString("hello"),
+                "child" to MoshiObject(
+                    mapOf(
+                        "string" to MoshiString("world"),
+                        "numbers" to MoshiArray(
+                            listOf(
+                                MoshiInteger(1)
+                            )
+                        ),
+                        "bool" to MoshiBoolean(true)
+                    )
+                ),
+                "numbers" to MoshiArray(emptyList()),
+                "bool" to MoshiBoolean(false)
+            )
+        )
 
         assertThat(
             Moshi.asA(element, ArbObject::class),
             equalTo(obj)
         )
     }
+
+    override fun strictMarshaller() = object : ConfigurableMoshi
+        (Builder().asConfigurable().customise(), strictness = FailOnUnknown) {}
 
     override fun customMarshaller() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
     override fun customMarshallerProhibitStrings() = object : ConfigurableMoshi(
@@ -140,7 +172,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
     ) {}
 }
 
-class MoshiJsonTest: JsonContract<MoshiNode>(Moshi) {
+class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {
     override val prettyString = """{
     "hello": "world"
 }"""
@@ -158,13 +190,16 @@ class MoshiJsonTest: JsonContract<MoshiNode>(Moshi) {
                 "null" to nullNode(),
                 "int" to number(2),
                 "empty" to obj(),
-                "array" to array(listOf(
-                    string(""),
-                    number(123)
-                )),
+                "array" to array(
+                    listOf(
+                        string(""),
+                        number(123)
+                    )
+                ),
                 "singletonArray" to array(obj("number" to number(123)))
             )
-            val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.2,"bigInt":12344,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
+            val expected =
+                """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.2,"bigInt":12344,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
             assertThat(compact(input), equalTo(expected))
         }
     }

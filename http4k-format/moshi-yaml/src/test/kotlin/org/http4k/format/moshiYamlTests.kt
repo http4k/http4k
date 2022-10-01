@@ -3,6 +3,7 @@ package org.http4k.format
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.squareup.moshi.Moshi.Builder
+import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -46,6 +47,10 @@ unknown: "2000-01-01"
         "key2:'123'\n"
 
     override val expectedAutoMarshallingZonesAndLocale = "zoneId:America/Toronto\nzoneOffset:-04:00\nlocale:en-CA\n"
+
+    override fun strictMarshaller() = object : ConfigurableMoshiYaml(
+        Builder().asConfigurable().customise(), strictness = FailOnUnknown
+    ) {}
 
     override fun customMarshaller() = ConfigurableMoshiYaml(Builder().asConfigurable().customise()
         .add(NullSafeMapAdapter).add(ListAdapter))

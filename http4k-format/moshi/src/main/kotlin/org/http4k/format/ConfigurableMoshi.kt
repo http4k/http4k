@@ -10,6 +10,7 @@ import okio.source
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.format.StrictnessMode.*
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
@@ -24,7 +25,8 @@ import kotlin.reflect.KClass
 
 open class ConfigurableMoshi(
     builder: Moshi.Builder,
-    val defaultContentType: ContentType = APPLICATION_JSON
+    val defaultContentType: ContentType = APPLICATION_JSON,
+    private val strictness: StrictnessMode = Lenient
 ) : AutoMarshallingJson<MoshiNode>() {
 
     private val moshi = builder.build()
@@ -33,10 +35,8 @@ open class ConfigurableMoshi(
 
     override fun MoshiNode.asPrettyJsonString(): String = objectAdapter.indent("    ").toJson(unwrap())
     override fun MoshiNode.asCompactJsonString(): String = objectAdapter.toJson(unwrap())
-    override fun String.asJsonObject(): MoshiNode {
-        val map = objectAdapter.fromJson(this)
-        return MoshiNode.wrap(map)
-    }
+
+    override fun String.asJsonObject() = MoshiNode.wrap(objectAdapter.fromJson(this))
 
     override fun <LIST : Iterable<Pair<String, MoshiNode>>> LIST.asJsonObject() = MoshiObject(toMap())
     override fun String?.asJsonValue() = if (this == null) MoshiNull else MoshiString(this)
@@ -76,15 +76,21 @@ open class ConfigurableMoshi(
 
     fun <T : Any> asJsonString(t: T, c: KClass<T>): String = moshi.adapter(c.java).toJson(t)
 
-    override fun <T : Any> asA(input: String, target: KClass<T>): T = moshi.adapter(target.java).fromJson(input)!!
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = adapterFor(target).fromJson(input)!!
 
-    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = moshi.adapter(target.java).fromJson(
+    private fun <T : Any> adapterFor(target: KClass<T>) = when (strictness) {
+        Lenient -> moshi.adapter(target.java)
+        FailOnUnknown -> moshi.adapter(target.java).failOnUnknown()
+    }
+
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = adapterFor(target).fromJson(
         input.source().buffer()
     )!!
 
     override fun asJsonObject(input: Any): MoshiNode = MoshiNode.wrap(objectAdapter.toJsonValue(input))
 
-    override fun <T : Any> asA(j: MoshiNode, target: KClass<T>): T = moshi.adapter(target.java).fromJsonValue(j.unwrap())!!
+    override fun <T : Any> asA(j: MoshiNode, target: KClass<T>): T = adapterFor(target)
+        .fromJsonValue(j.unwrap())!!
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
