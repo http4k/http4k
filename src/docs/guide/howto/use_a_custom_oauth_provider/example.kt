@@ -54,10 +54,15 @@ fun main() {
         .asServer(SunHttp(port)).start().block()
 }
 
-// this interface allows us to provide custom logic for storing and verifying the CSRF and AccessTokens.
-// to be maximally secure, never let the end-user see the access token!
-// also avoid allowing third parties set the original uri as this might allow phishing attacks
-// on strategy is might be to use an enum to map to a set of know uris
+// This interface allows us to provide custom logic for storing and
+// verifying the CSRF and AccessTokens.
+//
+// To be maximally secure, never let the end-user see the access token!
+//
+// Also avoid allowing third parties set the original uri as this might
+// allow phishing attacks.
+//
+// One strategy might be to use an enum to map to a set of know uris
 // e.g. shoppingCart -> /cart
 class CustomOAuthPersistence : OAuthPersistence {
     var nonce: Nonce? = null

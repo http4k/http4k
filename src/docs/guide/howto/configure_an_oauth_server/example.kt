@@ -149,8 +149,10 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
 }
 
 class InsecureAccessTokens : AccessTokens {
-    override fun create(clientId: ClientId, tokenRequest: TokenRequest) =
-        Failure(UnsupportedGrantType("client_credentials"))
+    override fun create(
+        clientId: ClientId,
+        tokenRequest: TokenRequest
+    ) = Failure(UnsupportedGrantType("client_credentials"))
 
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date
@@ -158,6 +160,5 @@ class InsecureAccessTokens : AccessTokens {
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest,
         authorizationCode: AuthorizationCode
-    ) =
-        Success(AccessToken(UUID.randomUUID().toString()))
+    ) = Success(AccessToken(UUID.randomUUID().toString()))
 }
