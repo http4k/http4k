@@ -26,6 +26,9 @@ class EndToEndTest {
 
     @Test
     fun `responds to ping`() {
-        assertThat(client(Request(GET, "http://localhost:${server.port()}/ping")), hasStatus(OK))
+        assertThat(
+            client(Request(GET, "http://localhost:${server.port()}/ping")),
+            hasStatus(OK)
+        )
     }
 }

@@ -23,7 +23,8 @@ fun main() {
     responses.add(Response(OK))
 
     // configure the circuit breaker filter here
-    val circuitBreaker = CircuitBreaker.of("circuit",
+    val circuitBreaker = CircuitBreaker.of(
+        "circuit",
         CircuitBreakerConfig.custom()
             .slidingWindow(2, 2, COUNT_BASED)
             .permittedNumberOfCallsInHalfOpenState(2)
@@ -35,9 +36,37 @@ fun main() {
         isError = { r: Response -> !r.status.successful } // this defaults to >= 500
     ).then { responses.removeFirst() }
 
-    println("Result: " + circuited(Request(GET, "/")).status + " Circuit is: " + circuitBreaker.state)
-    println("Result: " + circuited(Request(GET, "/")).status + " Circuit is: " + circuitBreaker.state)
+    println(
+        "Result: " + circuited(
+            Request(
+                GET,
+                "/"
+            )
+        ).status + " Circuit is: " + circuitBreaker.state
+    )
+    println(
+        "Result: " + circuited(
+            Request(
+                GET,
+                "/"
+            )
+        ).status + " Circuit is: " + circuitBreaker.state
+    )
     Thread.sleep(1100) // wait for reset
-    println("Result: " + circuited(Request(GET, "/")).status + " Circuit is: " + circuitBreaker.state)
-    println("Result: " + circuited(Request(GET, "/")).status + " Circuit is: " + circuitBreaker.state)
+    println(
+        "Result: " + circuited(
+            Request(
+                GET,
+                "/"
+            )
+        ).status + " Circuit is: " + circuitBreaker.state
+    )
+    println(
+        "Result: " + circuited(
+            Request(
+                GET,
+                "/"
+            )
+        ).status + " Circuit is: " + circuitBreaker.state
+    )
 }

@@ -40,7 +40,8 @@ class ExampleJsonApprovalTest {
     @Test
     fun `check request content`(approver: Approver) {
         approver.assertApproved(
-            Request(GET, "/url").with(CONTENT_TYPE of APPLICATION_JSON).body("""{"message":"value"}""")
+            Request(GET, "/url").with(CONTENT_TYPE of APPLICATION_JSON)
+                .body("""{"message":"value"}""")
         )
     }
 

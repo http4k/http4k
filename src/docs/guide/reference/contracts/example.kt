@@ -98,7 +98,11 @@ val handler: HttpHandler = routes("/reference/api/v1" bind contract)
 fun main() {
     println(handler(Request(GET, "/reference/api/v1/swagger.json")))
 
-    println(handler(Request(POST, "/reference/api/v1/echo")
-        .query("reference/api", "42")
-        .body("""{"name":"Bob","message":"Hello"}""")))
+    println(
+        handler(
+            Request(POST, "/reference/api/v1/echo")
+                .query("reference/api", "42")
+                .body("""{"name":"Bob","message":"Hello"}""")
+        )
+    )
 }

@@ -8,7 +8,9 @@ import org.http4k.core.Status
 
 fun main() {
 
-    val app: HttpHandler = { request: Request -> Response(Status.OK).body("Hello, ${request.query("name")}!") }
+    val app: HttpHandler = { request: Request ->
+        Response(Status.OK).body("Hello, ${request.query("name")}!")
+    }
 
     val request = Request(Method.GET, "/").query("name", "John Doe")
 

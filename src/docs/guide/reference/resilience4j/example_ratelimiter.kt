@@ -19,7 +19,8 @@ fun main() {
         .timeoutDuration(Duration.ofMillis(10)).build()
 
     // set up the responses to sleep for a bit
-    val rateLimits = ResilienceFilters.RateLimit(RateLimiter.of("ratelimiter", config)).then { Response(OK) }
+    val rateLimits = ResilienceFilters.RateLimit(RateLimiter.of("ratelimiter", config))
+        .then { Response(OK) }
 
     println(rateLimits(Request(GET, "/")).status)
     println(rateLimits(Request(GET, "/")).status)

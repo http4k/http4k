@@ -37,9 +37,22 @@ class EndToEndTest {
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        assertThat(client(Request(GET, "http://localhost:${server.port()}/ping")), hasStatus(OK))
-        client(Request(GET, "http://localhost:${server.port()}/add?value=1&value=2")).answerShouldBe(3)
-        client(Request(GET, "http://localhost:${server.port()}/multiply?value=2&value=4")).answerShouldBe(8)
+        assertThat(
+            client(Request(GET, "http://localhost:${server.port()}/ping")),
+            hasStatus(OK)
+        )
+        client(
+            Request(
+                GET,
+                "http://localhost:${server.port()}/add?value=1&value=2"
+            )
+        ).answerShouldBe(3)
+        client(
+            Request(
+                GET,
+                "http://localhost:${server.port()}/multiply?value=2&value=4"
+            )
+        ).answerShouldBe(8)
     }
 }
 
@@ -58,7 +71,10 @@ class AddFunctionalTest {
 
     @Test
     fun `bad request when some values are not numbers`() {
-        assertThat(client(Request(GET, "/add?value=1&value=notANumber")), hasStatus(BAD_REQUEST))
+        assertThat(
+            client(Request(GET, "/add?value=1&value=notANumber")),
+            hasStatus(BAD_REQUEST)
+        )
     }
 }
 
@@ -77,6 +93,9 @@ class MultiplyFunctionalTest {
 
     @Test
     fun `bad request when some values are not numbers`() {
-        assertThat(client(Request(GET, "/multiply?value=1&value=notANumber")), hasStatus(BAD_REQUEST))
+        assertThat(
+            client(Request(GET, "/multiply?value=1&value=notANumber")),
+            hasStatus(BAD_REQUEST)
+        )
     }
 }

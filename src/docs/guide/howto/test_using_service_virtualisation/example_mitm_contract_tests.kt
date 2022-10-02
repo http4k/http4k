@@ -50,7 +50,8 @@ class WordCounterClient(baseUri: Uri) {
         .then(ClientFilters.HandleRemoteRequestFailed())
         .then(ApacheClient())
 
-    fun wordCount(name: String): Int = http(Request(POST, "/count").body(name)).bodyString().toInt()
+    fun wordCount(name: String): Int =
+        http(Request(POST, "/count").body(name)).bodyString().toInt()
 }
 
 /**
@@ -62,7 +63,10 @@ interface WordCounterContract {
 
     @Test
     fun `count the number of words`() {
-        assertThat(WordCounterClient(uri).wordCount("A random string with 6 words"), equalTo(6))
+        assertThat(
+            WordCounterClient(uri).wordCount("A random string with 6 words"),
+            equalTo(6)
+        )
     }
 
     @Test
@@ -98,7 +102,9 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
             Uri.of("http://localhost:$appPort"),
             Disk(File(".")),
             object : InteractionOptions {
-                override fun modify(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
+                override fun modify(request: Request) =
+                    request.removeHeader("Host").removeHeader("User-agent")
+
                 override fun modify(response: Response) = response.removeHeader("Date")
             }
         ).start()
@@ -126,7 +132,8 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
         servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"),
             Disk(File(".")),
             object : InteractionOptions {
-                override fun modify(request: Request) = request.header("Date", "some overridden date")
+                override fun modify(request: Request) =
+                    request.header("Date", "some overridden date")
             }
         ).start()
     }
@@ -150,20 +157,23 @@ class GitHubReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        servirtium = ServirtiumServer.Replay("WordCounter." + info.displayName.removeSuffix("()"),
-            GitHub("http4k", "http4k",
-                Credentials("<github user>", "<personal access token>"),
-                Paths.get("src/test/resources/guide/howto/service_virtualisation")
-            ),
-            object : InteractionOptions {
-                override fun modify(request: Request) = request
-                    .removeHeader("Accept-encoding")
-                    .removeHeader("Connection")
-                    .removeHeader("Host")
-                    .removeHeader("User-agent")
-                    .removeHeader("Content-length")
-            }
-        ).start()
+        servirtium =
+            ServirtiumServer.Replay(
+                name = "WordCounter." + info.displayName.removeSuffix("()"),
+                GitHub(
+                    "http4k", "http4k",
+                    Credentials("<github user>", "<personal access token>"),
+                    Paths.get("src/test/resources/guide/howto/service_virtualisation")
+                ),
+                object : InteractionOptions {
+                    override fun modify(request: Request) = request
+                        .removeHeader("Accept-encoding")
+                        .removeHeader("Connection")
+                        .removeHeader("Host")
+                        .removeHeader("User-agent")
+                        .removeHeader("Content-length")
+                }
+            ).start()
     }
 
     @AfterEach

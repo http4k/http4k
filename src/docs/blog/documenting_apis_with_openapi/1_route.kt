@@ -21,4 +21,6 @@ fun basicHandler(name: String, age: Age): HttpHandler = { req: Request ->
     Response(OK).body("Hello $name, would you like some $beverage?")
 }
 
-val basicRoute: ContractRoute = "/greet" / Path.of("name") / Path.int().map(::Age).of("age") bindContract GET to ::basicHandler
+val basicRoute: ContractRoute =
+    "/greet" / Path.of("name") / Path.int().map(::Age).of("age") bindContract
+        GET to ::basicHandler

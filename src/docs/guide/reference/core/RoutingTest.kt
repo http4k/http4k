@@ -14,7 +14,8 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-val EchoPath = "/echo/{message}" bind GET to { r -> Response(OK).body(r.path("message") ?: "nothing!") }
+val EchoPath =
+    "/echo/{message}" bind GET to { r -> Response(OK).body(r.path("message") ?: "nothing!") }
 
 class DynamicPathTest {
 

@@ -53,7 +53,14 @@ fun main() {
         val app: HttpHandler = TweetEchoLambda(System.getenv())
         val localLambda = app.asServer(SunHttp(8000)).start()
 
-        println(ApacheClient()(Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")))
+        println(
+            ApacheClient()(
+                Request(
+                    POST,
+                    "http://localhost:8000/echo"
+                ).body("hello hello hello, i suppose this isn't 140 characters anymore..")
+            )
+        )
         localLambda.stop()
     }
 
@@ -62,8 +69,15 @@ fun main() {
         println("RUNNING AS ALIBABA FUNCTION COMPUTE:")
 
         val response = FakeHttpServletResponse()
-        FunctionsExampleEntryClass().handleRequest(FakeHttpServletRequest
-        (Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")), response, proxy())
+        FunctionsExampleEntryClass().handleRequest(
+            FakeHttpServletRequest
+                (
+                Request(
+                    POST,
+                    "http://localhost:8000/echo"
+                ).body("hello hello hello, i suppose this isn't 140 characters anymore..")
+            ), response, proxy()
+        )
         println(response.http4k.status)
         println(response.http4k.headers)
         println(response.http4k.body)
@@ -74,4 +88,7 @@ fun main() {
 }
 
 // helper method to stub the Lambda Context
-private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, _, _ -> TODO("not implemented") } as T
+private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
+    T::class.java.classLoader,
+    arrayOf(T::class.java)
+) { _, _, _ -> TODO("not implemented") } as T

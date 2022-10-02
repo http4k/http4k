@@ -30,7 +30,10 @@ fun main() {
 
     // body
     assertThat(request, hasBody("http4k is cool"))
-    assertThat(request, hasBody(Body.string(ContentType.TEXT_HTML).toLens(), equalTo("http4k is cool")))
+    assertThat(
+        request,
+        hasBody(Body.string(ContentType.TEXT_HTML).toLens(), equalTo("http4k is cool"))
+    )
 
     // composite
     assertThat(request, hasBody("http4k is cool").and(hasQuery("a", "b")))

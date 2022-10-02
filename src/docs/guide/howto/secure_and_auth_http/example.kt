@@ -33,7 +33,8 @@ import java.time.Instant
 fun main() {
     val server = AuthServer().start()
 
-    val baseHttp = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost:${server.port()}")).then(OkHttp())
+    val baseHttp = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost:${server.port()}"))
+        .then(OkHttp())
 
     /**
      * simplest hard coded basic auth details
@@ -58,11 +59,17 @@ fun main() {
     // this is the refresh function - it is called when the old token is null or expired...
     val refreshFn = RefreshCredentials<String> { oldToken ->
         println("refreshing credentials (was $oldToken)")
-        ExpiringCredentials("bearerToken" + System.currentTimeMillis(), Instant.now().plusSeconds(5))
+        ExpiringCredentials(
+            "bearerToken" + System.currentTimeMillis(),
+            Instant.now().plusSeconds(5)
+        )
     }
 
     val refreshingClient = ClientFilters.BearerAuth(
-        CredentialsProvider.Refreshing(gracePeriod = Duration.ofSeconds(1), refreshFn = refreshFn)
+        CredentialsProvider.Refreshing(
+            gracePeriod = Duration.ofSeconds(1),
+            refreshFn = refreshFn
+        )
     ).then(baseHttp)
 
     repeat(10) {
@@ -89,7 +96,9 @@ fun main() {
 }
 
 private fun AuthServer(): Http4kServer {
-    val endpoint: HttpHandler = { Response(OK).body(it.header("Authorization").toString()) }
+    val endpoint: HttpHandler = {
+        Response(OK).body(it.header("Authorization").toString())
+    }
 
     return routes(
         // statically check the user creds

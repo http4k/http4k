@@ -32,8 +32,10 @@ object CounterErrorHandler : ErrorHandler {
         else -> null
     }
 
-    private class NegativeIncrementExceptionMessage : ErrorMessage(1, "Increment by negative") {
-        override fun <NODE> data(json: Json<NODE>) = json.string("cannot increment counter by negative")
+    private class NegativeIncrementExceptionMessage :
+        ErrorMessage(1, "Increment by negative") {
+        override fun <NODE> data(json: Json<NODE>) =
+            json.string("cannot increment counter by negative")
     }
 }
 
@@ -55,10 +57,12 @@ fun main() {
         )
     }
 
-    val increment = """ {"jsonrpc": "2.0", "method": "increment", "params": {"value": 3}, "id": 1} """
+    val increment =
+        """ {"jsonrpc": "2.0", "method": "increment", "params": {"value": 3}, "id": 1} """
     runRequest(increment)
 
-    val incrementInvalid = """ {"jsonrpc": "2.0", "method": "increment", "params": {"value": -1}, "id": 2} """
+    val incrementInvalid =
+        """ {"jsonrpc": "2.0", "method": "increment", "params": {"value": -1}, "id": 2} """
     runRequest(incrementInvalid)
 
     val current = """ {"jsonrpc": "2.0", "method": "current", "id": 3} """

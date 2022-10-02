@@ -18,7 +18,9 @@ import org.http4k.server.asServer
 fun main() {
 
     fun HttpMessage.logHeader(name: String) = "\n\t\t$name=${header(name)}"
-    fun HttpMessage.traces() = logHeader("x-b3-traceid") + logHeader("x-b3-spanid") + logHeader("x-b3-parentspanid")
+    fun HttpMessage.traces() = logHeader("x-b3-traceid") +
+        logHeader("x-b3-spanid") +
+        logHeader("x-b3-parentspanid")
 
     fun audit(name: String) = ResponseFilters.ReportHttpTransaction { tx ->
         println("$name: ${tx.request.uri}\n\trequest:${tx.request.traces()}\n\tresponse:${tx.response.traces()}")
@@ -31,11 +33,13 @@ fun main() {
             .then(audit("$name-client"))
             .then(ApacheClient())
 
-        return ServerFilters.RequestTracing().then(audit("$name-server")).then { proxyClient(Request(GET, it.uri)) }
+        return ServerFilters.RequestTracing().then(audit("$name-server"))
+            .then { proxyClient(Request(GET, it.uri)) }
     }
 
     // provides a simple ping
-    fun ping(): HttpHandler = ServerFilters.RequestTracing().then(audit("ping-server")).then { Response(OK).body("pong") }
+    fun ping(): HttpHandler = ServerFilters.RequestTracing().then(audit("ping-server"))
+        .then { Response(OK).body("pong") }
 
     val proxy1 = proxy("proxy1", 8001).asServer(SunHttp(8000)).start()
     val proxy2 = proxy("proxy2", 8002).asServer(SunHttp(8001)).start()

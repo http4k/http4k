@@ -7,7 +7,12 @@ import org.http4k.format.Xml.auto
 
 data class XmlWrapper(val mesApacheClientStreamingContractessage: MessageXml?)
 
-data class MessageXml(val subject: String?, val from: String?, val to: String?, val content: String?)
+data class MessageXml(
+    val subject: String?,
+    val from: String?,
+    val to: String?,
+    val content: String?
+)
 
 fun main() {
     // We can use the auto method here from the Xml message format object. Note that the
@@ -16,7 +21,8 @@ fun main() {
     val messageLens = Body.auto<XmlWrapper>().toLens()
 
     // extract the body from the message - this also works with Response
-    val message = """<message subject="hi"><from>david@http4k.org</from><to>ivan@http4k.org</to>hello world</message>"""
+    val message =
+        """<message subject="hi"><from>david@http4k.org</from><to>ivan@http4k.org</to>hello world</message>"""
     val requestWithEmail = Request(GET, "/").body(message)
 
     println(messageLens(requestWithEmail))

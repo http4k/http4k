@@ -120,9 +120,9 @@ private fun MetadataEvent.toCallTree(calls: List<MetadataEvent>): HttpCallTree {
     val httpEvent = event as HttpEvent
     return HttpCallTree(
         service(),
-        httpEvent.uri, httpEvent.method, httpEvent.status, calls
-            .filter { httpEvent.uri.host == it.service() && traces().spanId == it.traces().parentSpanId }
-            .map { it.toCallTree(calls - it) })
+        httpEvent.uri, httpEvent.method, httpEvent.status, calls.filter {
+            httpEvent.uri.host == it.service() && traces().spanId == it.traces().parentSpanId
+        }.map { it.toCallTree(calls - it) })
 }
 
 private fun MetadataEvent.service() = metadata["service"].toString()
@@ -140,10 +140,22 @@ data class HttpCallTree(
 val expectedCallTree = HttpCallTree(
     "user", Uri.of("http://internal1/int1"), GET, OK,
     listOf(
-        HttpCallTree("internal1", Uri.of("http://external1/ext1"), GET, OK, emptyList()),
+        HttpCallTree(
+            origin = "internal1",
+            uri = Uri.of("http://external1/ext1"),
+            method = GET,
+            status = OK,
+            children = emptyList()
+        ),
         HttpCallTree(
             "internal1", Uri.of("http://internal2/int2"), GET, OK, listOf(
-                HttpCallTree("internal2", Uri.of("http://external2/ext2"), GET, OK, emptyList()),
+                HttpCallTree(
+                    origin = "internal2",
+                    uri = Uri.of("http://external2/ext2"),
+                    method = GET,
+                    status = OK,
+                    children = emptyList()
+                ),
             )
         )
     )
