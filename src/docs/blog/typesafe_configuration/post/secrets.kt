@@ -12,10 +12,13 @@ import org.http4k.lens.Lens
 import org.http4k.lens.secret
 
 // export USER_PASSWORD=12345
-val accessToken: Lens<Environment, Secret> = EnvironmentKey.secret().required("USER_PASSWORD")
+val accessToken: Lens<Environment, Secret> =
+    EnvironmentKey.secret().required("USER_PASSWORD")
 
 val secret: Secret = accessToken(Environment.ENV)
 
-val authFilter: Filter = secret.use { value: String -> ServerFilters.BearerAuth(value) }
+val authFilter: Filter = secret.use { value: String ->
+    ServerFilters.BearerAuth(value)
+}
 
 val authedHttp: HttpHandler = authFilter.then(OkHttp())

@@ -14,7 +14,11 @@ class Library(private val rawHttp: HttpHandler) {
     fun titles(): List<String> {
         val response = rawHttp(Request(GET, "/titles"))
         return when (OK) {
-            response.status -> response.bodyString().split(",").map { it.trim() }.sorted()
+            response.status -> response.bodyString()
+                .split(",")
+                .map { it.trim() }
+                .sorted()
+
             else -> throw Exception("Bad times")
         }
     }

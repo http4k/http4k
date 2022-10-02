@@ -17,7 +17,10 @@ class Library(rawHttp: HttpHandler) {
     private val http = ClientFilters.HandleRemoteRequestFailed().then(rawHttp)
 
     fun titles(): List<String> =
-        http(Request(GET, "/titles")).bodyString().split(",").map { it.trim() }.sorted()
+        http(Request(GET, "/titles")).bodyString()
+            .split(",")
+            .map { it.trim() }
+            .sorted()
 }
 
 fun Server(http: HttpHandler): RoutingHttpHandler {

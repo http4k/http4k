@@ -16,6 +16,10 @@ fun `static file server`() =
 fun main() {
     `static file server`().use {
         // by default, static servers will only serve known file types, or those registered on construction
-        println(JavaHttpClient()(Request(GET, "http://localhost:8000/version.json")))
+        println(
+            JavaHttpClient()(
+                Request(GET, "http://localhost:8000/version.json")
+            )
+        )
     }
 }

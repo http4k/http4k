@@ -12,8 +12,12 @@ data class Page(val value: Int) {
     }
 }
 
-val lens: BiDiLens<Request, Page> = Query.int().map(::Page, Page::value).defaulted("pageNumber", Page(1))
+val lens: BiDiLens<Request, Page> = Query.int()
+    .map(::Page, Page::value)
+    .defaulted("pageNumber", Page(1))
 
-val pageNumber: Page = lens(Request(GET, "http://abc/search?pageNumber=55"))
+val pageNumber: Page =
+    lens(Request(GET, "http://abc/search?pageNumber=55"))
 
-val updatedRequest: Request = lens(pageNumber, Request(GET, "http://abc/search"))
+val updatedRequest: Request =
+    lens(pageNumber, Request(GET, "http://abc/search"))
