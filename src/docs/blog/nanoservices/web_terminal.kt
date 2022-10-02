@@ -11,13 +11,12 @@ import java.util.Scanner
 
 fun `websocket terminal`() =
     { ws: Websocket ->
-        ws.onMessage { msg ->
-            val text = getRuntime().exec(msg.bodyString())
-                .inputStream
-                .reader()
-                .readText()
-
-            ws.send(WsMessage(text))
+        ws.onMessage {
+            ws.send(WsMessage(
+                getRuntime()
+                    .exec(it.bodyString())
+                    .inputStream.reader().readText()
+            ))
         }
     }.asServer(Netty()).start()
 

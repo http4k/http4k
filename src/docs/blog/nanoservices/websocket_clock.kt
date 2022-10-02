@@ -18,6 +18,5 @@ fun `ticking websocket clock`() =
 
 fun main() {
     `ticking websocket clock`()
-    WebsocketClient.nonBlocking(Uri.of("http://localhost:8000"))
-        .onMessage { println(it) }
+    WebsocketClient.nonBlocking(Uri.of("http://localhost:8000")).onMessage { println(it) }
 }

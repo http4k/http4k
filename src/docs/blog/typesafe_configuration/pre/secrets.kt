@@ -7,10 +7,9 @@ import java.nio.ByteBuffer
 
 val s3 = OkHttp()
 
-fun readFile(secretKey: String, bucketKey: String): ByteBuffer =
-    s3(Request(GET, "https://mybucket.s3.amazonaws.com/$bucketKey"))
-        .body
-        .payload
+fun readFile(secretKey: String, bucketKey: String): ByteBuffer {
+    return s3(Request(GET, "https://mybucket.s3.amazonaws.com/$bucketKey")).body.payload
+}
 
 // export AWS_SECRET_KEY=someSuperSecretValueThatOpsReallyDoNotWantYouToKnow
 

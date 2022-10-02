@@ -27,15 +27,7 @@ fun main() {
     setProperty("http.nonProxyHosts", "localhost")
 
     `latency injection proxy (between 100ms-500ms)`().use {
-        println(
-            JavaHttpClient()(
-                Request(POST, "http://localhost:8000/chaos/activate")
-            )
-        )
-        println(
-            JavaHttpClient()(
-                Request(GET, "http://github.com/")
-            ).header("X-http4k-chaos")
-        )
+        println(JavaHttpClient()(Request(POST, "http://localhost:8000/chaos/activate")))
+        println(JavaHttpClient()(Request(GET, "http://github.com/")).header("X-http4k-chaos"))
     }
 }

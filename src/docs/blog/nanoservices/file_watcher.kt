@@ -22,6 +22,5 @@ fun `file watcher`() =
 
 fun main() {
     `file watcher`()
-    WebsocketClient.nonBlocking(Uri.of("http://localhost:8000"))
-        .onMessage { println(it) }
+    WebsocketClient.nonBlocking(Uri.of("http://localhost:8000")).onMessage { println(it) }
 }
