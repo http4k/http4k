@@ -47,4 +47,5 @@ fun main() {
     }
 }
 
-fun performA(method: Method) = println(method.name + " got a " + client(Request(method, "http://localhost:9000")).status)
+fun performA(method: Method) =
+    println(method.name + " got a " + client(Request(method, "http://localhost:9000")).status)

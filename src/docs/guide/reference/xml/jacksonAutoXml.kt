@@ -8,7 +8,12 @@ import org.http4k.format.JacksonXml.auto
 
 data class JacksonWrapper(val message: JacksonMsg?)
 
-data class JacksonMsg(val subject: String?, val from: String?, val to: String?, val content: String?)
+data class JacksonMsg(
+    val subject: String?,
+    val from: String?,
+    val to: String?,
+    val content: String?
+)
 
 fun main() {
     // We can use the auto method here from the JacksonXML message format object. Note that the
@@ -17,7 +22,8 @@ fun main() {
 
     // extract the body from the message - this also works with Response
     val wrapper = JacksonWrapper(JacksonMsg("subject", "from", "to", "content"))
-    val message = """<jacksonWrapper><message subject="hi"><from>david@http4k.org</from><to>ivan@http4k.org</to>hello world</message></jacksonWrapper>"""
+    val message =
+        """<jacksonWrapper><message subject="hi"><from>david@http4k.org</from><to>ivan@http4k.org</to>hello world</message></jacksonWrapper>"""
 
     println(messageLens(Request(GET, "/").body(message)))
 

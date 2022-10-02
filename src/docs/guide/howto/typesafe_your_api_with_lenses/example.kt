@@ -23,7 +23,9 @@ fun main() {
 
     val nameHeader = Header.required("name")
     val ageQuery = Query.int().optional("age")
-    val childrenBody = Body.string(TEXT_PLAIN).map({ it.split(",").map(::Child) }, { it.joinToString { it.name } }).toLens()
+    val childrenBody = Body.string(TEXT_PLAIN)
+        .map({ it.split(",").map(::Child) }, { it.joinToString { it.name } })
+        .toLens()
     val pageable = Query.composite {
         Pageable(
             boolean().defaulted("sortAscending", true)(it),
@@ -40,9 +42,9 @@ fun main() {
         val pagination = pageable(request)
 
         val msg = """
-$name is ${age ?: "unknown"} years old and has 
-${children.size} children (${children.joinToString { it.name }})
-Pagination: $pagination
+            $name is ${age ?: "unknown"} years old and has 
+            ${children.size} children (${children.joinToString { it.name }})
+            Pagination: $pagination
             """
         Response(OK).with(
             Body.string(TEXT_PLAIN).toLens() of msg
@@ -54,7 +56,8 @@ Pagination: $pagination
     val goodRequest = Request(GET, "http://localhost:9000").with(
         nameHeader of "Jane Doe",
         ageQuery of 25,
-        childrenBody of listOf(Child("Rita"), Child("Sue")))
+        childrenBody of listOf(Child("Rita"), Child("Sue"))
+    )
 
     println(listOf("", "Request:", goodRequest, app(goodRequest)).joinToString("\n"))
 

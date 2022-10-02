@@ -28,7 +28,13 @@ fun main() {
     val body = MultipartFormBody()
         .plus("field" to "my-value")
         .plus("field2" to MultipartFormField("my-value2", listOf("my-header" to "my-value")))
-        .plus("file" to MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
+        .plus(
+            "file" to MultipartFormFile(
+                "image.txt",
+                ContentType.OCTET_STREAM,
+                "somebinarycontent".byteInputStream()
+            )
+        )
 
     // we need to set both the body AND the correct content type header on the the request
     val request = Request(POST, "http://localhost:8000")

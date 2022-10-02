@@ -56,7 +56,14 @@ fun main() {
         val app: HttpHandler = TweetEchoLambda(System.getenv())
         val localLambda = app.asServer(SunHttp(8000)).start()
 
-        println(ApacheClient()(Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")))
+        println(
+            ApacheClient()(
+                Request(
+                    POST,
+                    "http://localhost:8000/echo"
+                ).body("hello hello hello, i suppose this isn't 140 characters anymore..")
+            )
+        )
         localLambda.stop()
     }
 
@@ -69,7 +76,8 @@ fun main() {
             "hello hello hello, i suppose this isn't 140 characters anymore.."
         )
 
-        val response = FunctionsExampleEntryClass.main(Gson.asJsonObject(fakeOpenWhiskRequest) as JsonObject)
+        val response =
+            FunctionsExampleEntryClass.main(Gson.asJsonObject(fakeOpenWhiskRequest) as JsonObject)
         println(response)
     }
 

@@ -52,15 +52,24 @@ class EndpointUnitTest {
 }
 
 fun MyMathsApp(recorderHttp: HttpHandler) =
-    ServerFilters.CatchAll().then(routes(
-        "/add" bind GET to myMathsEndpoint({ first, second -> first + second }, AnswerRecorder(recorderHttp))
-    ))
+    ServerFilters.CatchAll().then(
+        routes(
+            "/add" bind GET to myMathsEndpoint(
+                { first, second -> first + second },
+                AnswerRecorder(recorderHttp)
+            )
+        )
+    )
 
 class FakeRecorderHttp : HttpHandler {
     val calls = mutableListOf<Int>()
 
     private val app = routes(
-        "/{answer}" bind POST to { request -> calls.add(request.path("answer")!!.toInt()); Response(OK) }
+        "/{answer}" bind POST to { request ->
+            calls.add(
+                request.path("answer")!!.toInt()
+            ); Response(OK)
+        }
     )
 
     override fun invoke(request: Request): Response = app(request)
@@ -73,14 +82,22 @@ class FunctionalTest {
 
     @Test
     fun `adds numbers`() {
-        val response = app(Request(GET, "/add").query("first", "123").query("second", "456"))
+        val response = app(
+            Request(GET, "/add")
+                .query("first", "123")
+                .query("second", "456")
+        )
         assertThat(response, hasStatus(OK).and(hasBody("the answer is 579")))
         assertThat(recorderHttp.calls, equalTo(listOf(579)))
     }
 
     @Test
     fun `not found`() {
-        val response = app(Request(GET, "/nothing").query("first", "123").query("second", "456"))
+        val response = app(
+            Request(GET, "/nothing")
+                .query("first", "123")
+                .query("second", "456")
+        )
         assertThat(response, hasStatus(NOT_FOUND))
     }
 }
@@ -110,7 +127,11 @@ class EndToEndTest {
 
     @Test
     fun `adds numbers`() {
-        val response = client(Request(GET, "http://localhost:8000/add").query("first", "123").query("second", "456"))
+        val response = client(
+            Request(GET, "http://localhost:8000/add")
+                .query("first", "123")
+                .query("second", "456")
+        )
         println(response)
         assertThat(response, hasStatus(OK).and(hasBody("the answer is 579")))
         assertThat(recorderHttp.calls, equalTo(listOf(579)))

@@ -13,16 +13,19 @@ import org.http4k.format.asConfigurable
 import org.http4k.format.text
 import org.http4k.format.withStandardMappings
 
-object MyJackson : ConfigurableJackson(KotlinModule.Builder().build()
-    .asConfigurable()
-    .withStandardMappings()
-    // declare custom mapping for our own types - this one represents our type as a simple String
-    .text(::PublicType, PublicType::value)
-    // ... and this one shows a masked value and cannot be deserialised (as the mapping is only one way)
-    .text(SecretType::toString)
-    .done()
-    .deactivateDefaultTyping()
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+object MyJackson : ConfigurableJackson(
+    KotlinModule.Builder().build()
+        .asConfigurable()
+        .withStandardMappings()
+        // declare custom mapping for our own types - this one represents our type as a
+        // simple String
+        .text(::PublicType, PublicType::value)
+        // ... and this one shows a masked value and cannot be deserialised
+        // (as the mapping is only one way)
+        .text(SecretType::toString)
+        .done()
+        .deactivateDefaultTyping()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 )
 
 data class PublicType(val value: String)
@@ -36,7 +39,12 @@ data class MyType(val public: PublicType, val hidden: SecretType)
 
 fun main() {
     println(
-        Response(OK).with(Body.auto<MyType>().toLens() of MyType(PublicType("hello"), SecretType("secret")))
+        Response(OK).with(
+            Body.auto<MyType>().toLens() of MyType(
+                PublicType("hello"),
+                SecretType("secret")
+            )
+        )
     )
 
     /** Prints:

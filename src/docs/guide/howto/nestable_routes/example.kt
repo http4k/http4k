@@ -23,23 +23,32 @@ fun main() {
     val routesWithFilter =
         PrintRequestAndResponse().then(
             routes(
-                "/get/{name}" bind GET to { req: Request -> Response(OK).body(req.path("name")!!) },
+                "/get/{name}" bind GET to { req: Request ->
+                    Response(OK).body(req.path("name")!!)
+                },
                 "/post/{name}" bind POST to { Response(OK) }
             )
         )
     println(routesWithFilter(Request(GET, "/get/value")))
 
-    val staticWithFilter = PrintRequestAndResponse().then(static(Classpath("guide/howto/nestable_routes")))
+    val staticWithFilter = PrintRequestAndResponse()
+        .then(static(Classpath("guide/howto/nestable_routes")))
+
     val app = routes(
         "/bob" bind routesWithFilter,
         "/static" bind staticWithFilter,
-        "/pattern/{rest:.*}" bind { req: Request -> Response(OK).body(req.path("rest") ?: "") },
+        "/pattern/{rest:.*}" bind { req: Request ->
+            Response(OK).body(req.path("rest") ?: "")
+        },
         "/rita" bind routes(
             "/delete/{name}" bind DELETE to { Response(OK) },
             "/post/{name}" bind POST to { Response(OK) }
         ),
         "/matching" bind GET to routes(
-            header("requiredheader", "somevalue").and(queries("requiredquery")) bind { Response(OK).body("matched 2 parameters") },
+            header("requiredheader", "somevalue")
+                .and(queries("requiredquery")) bind {
+                Response(OK).body("matched 2 parameters")
+            },
             headers("requiredheader") bind { Response(OK).body("matched 1 parameters") }
         ),
         singlePageApp(Classpath("guide/howto/nestable_routes"))
@@ -48,7 +57,13 @@ fun main() {
     println(app(Request(GET, "/bob/get/value")))
     println(app(Request(GET, "/static/someStaticFile.txt")))
     println(app(Request(GET, "/pattern/some/entire/pattern/we/want/to/capture")))
-    println(app(Request(GET, "/matching").header("requiredheader", "somevalue").query("requiredquery", "somevalue")))
+    println(
+        app(
+            Request(GET, "/matching")
+                .header("requiredheader", "somevalue")
+                .query("requiredquery", "somevalue")
+        )
+    )
     println(app(Request(GET, "/matching").header("requiredheader", "somevalue")))
     println(app(Request(GET, "/someSpaResource")))
 }

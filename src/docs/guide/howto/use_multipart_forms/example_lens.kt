@@ -26,12 +26,15 @@ fun main() {
     val imageFile = MultipartFormFile.optional("image")
 
     // add fields to a form definition, along with a validator
-    val strictFormBody = Body.multipartForm(Validator.Strict, nameField, imageFile, diskThreshold = 5).toLens()
+    val strictFormBody =
+        Body.multipartForm(Validator.Strict, nameField, imageFile, diskThreshold = 5).toLens()
 
     val server = ServerFilters.CatchAll().then { r: Request ->
 
-        // to extract the contents, we first extract the form and then extract the fields from it using the lenses
-        // NOTE: we are "using" the form body here because we want to close the underlying file streams
+        // to extract the contents, we first extract the form and then extract the fields from
+        // it using the lenses
+        // NOTE: we are "using" the form body here because we want to close the underlying
+        // file streams
         strictFormBody(r).use {
             println(nameField(it))
             println(imageFile(it))
@@ -40,12 +43,18 @@ fun main() {
         Response(OK)
     }.asServer(SunHttp(8000)).start()
 
-    // creating valid form using "with()" and setting it onto the request. The content type and boundary are
-    // taken care of automatically
+    // creating valid form using "with()" and setting it onto the request. The content type
+    // and boundary are taken care of automatically
     val multipartform = MultipartForm().with(
         nameField of Name("rita"),
-        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
-    val validRequest = Request(POST, "http://localhost:8000").with(strictFormBody of multipartform)
+        imageFile of MultipartFormFile(
+            "image.txt",
+            ContentType.OCTET_STREAM,
+            "somebinarycontent".byteInputStream()
+        )
+    )
+    val validRequest = Request(POST, "http://localhost:8000")
+        .with(strictFormBody of multipartform)
 
     println(ApacheClient()(validRequest))
 

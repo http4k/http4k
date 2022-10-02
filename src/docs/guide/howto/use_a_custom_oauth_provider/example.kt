@@ -31,10 +31,12 @@ fun main() {
 
     // custom OAuth2 provider configuration
     val oauthProvider = OAuthProvider(
-        OAuthProviderConfig(Uri.of("https://auth.chatroulette.com"),
-            "/oauth2/auth", "/oauth2/token",
-            Credentials("username", "somepassword"),
-            Uri.of("https://api.chatroulette.com")),
+        OAuthProviderConfig(
+            authBase = Uri.of("https://auth.chatroulette.com"),
+            authPath = "/oauth2/auth", tokenPath = "/oauth2/token",
+            credentials = Credentials("username", "somepassword"),
+            apiBase = Uri.of("https://api.chatroulette.com")
+        ),
         ApacheClient(),
         callbackUri,
         listOf("emailScope", "nameScope", "familyScope"),
@@ -86,7 +88,12 @@ class CustomOAuthPersistence : OAuthPersistence {
 
     override fun retrieveToken(request: Request): AccessToken? = accessToken
 
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken, idToken: IdToken?): Response {
+    override fun assignToken(
+        request: Request,
+        redirect: Response,
+        accessToken: AccessToken,
+        idToken: IdToken?
+    ): Response {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }

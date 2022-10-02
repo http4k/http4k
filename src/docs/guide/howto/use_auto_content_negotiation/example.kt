@@ -27,7 +27,8 @@ fun main() {
     val yamlLens = MoshiYaml.autoBody<Person>().toLens()
 
     /*
-     * Create a content negotiator, which will handle lens selection for request and response bodies.
+     * Create a content negotiator, which will handle lens selection for request and
+     * response bodies.
      * Since the json lens is first, it will be the fallback when no accepted lens is found.
      */
     val negotiator = ContentNegotiation.auto(jsonLens, xmlLens, yamlLens)
@@ -41,9 +42,12 @@ fun main() {
         receiving(negotiator to samplePerson) // add request bodies to contract
         returning(OK, negotiator to samplePerson) // add response bodies to contract
     } bindContract POST to { req: Request ->
-        val person = negotiator(req) // Unmarshall the body based on the CONTENT-TYPE header
+        // Unmarshall the body based on the CONTENT-TYPE header
+        val person = negotiator(req)
 
-        val outboundLens = negotiator.outbound(req) // select the appropriate outbound lens based on the ACCEPT header
+        // select the appropriate outbound lens based on the ACCEPT header
+        val outboundLens =
+            negotiator.outbound(req)
         Response(OK).with(outboundLens of person)
     }
 
@@ -51,7 +55,7 @@ fun main() {
     val handler: HttpHandler = contract {
         routes += echoPerson
         renderer = OpenApi3(
-            ApiInfo( "Content Negotiator Sample API", "v1.0",)
+            ApiInfo("Content Negotiator Sample API", "v1.0")
         )
     }
 

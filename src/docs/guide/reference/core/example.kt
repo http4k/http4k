@@ -52,7 +52,12 @@ val handler: RoutingHttpHandler = routes(
 )
 
 //With the addition of the `CatchLensFailure` filter, no other validation is required when using Lenses, as http4k will handle invalid requests by returning a BAD_REQUEST (400) response.
-val app = ServerFilters.CatchLensFailure.then(handler)(Request(GET, "/hello/2000-01-01?myCustomType=someValue"))
+val app = ServerFilters.CatchLensFailure.then(handler)(
+    Request(
+        GET,
+        "/hello/2000-01-01?myCustomType=someValue"
+    )
+)
 
 //More conveniently for construction of HTTP messages, multiple lenses can be used at once to modify a message, which is useful for properly building both requests and responses in a typesafe way without resorting to string values (especially in URLs which should never be constructed using String concatenation):
 val modifiedRequest: Request = Request(GET, "http://google.com/{pathLocalDate}").with(

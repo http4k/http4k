@@ -13,15 +13,17 @@ data class Car(val brand: String, val model: String, val year: Int, val miles: I
 
 // 'auto' is an extension function of each org.http4k.format.[serialization library]
 // example: https://github.com/http4k/http4k/blob/master/http4k-format/kotlinx-serialization/src/main/kotlin/org/http4k/format/ConfigurableKotlinxSerialization.kt
-val lensCarResponse : BiDiBodyLens<Car> = Body.auto<Car>().toLens() // BiDi allows for outgoing + incoming
+val lensCarResponse: BiDiBodyLens<Car> =
+    Body.auto<Car>().toLens() // BiDi allows for outgoing + incoming
 
 fun main() {
 
     val sweetride = Car("Porsche", "911 Turbo", 1988, 45000)
 
-      // lens.inject(object, response) serializes the object and sets content-type header to 'application/json'
-      // can be used with any Serializable type (Map, List, etc)
-    val app: HttpHandler = { request: Request -> lensCarResponse.inject(sweetride, Response(Status.OK)) }
+    // lens.inject(object, response) serializes the object and sets content-type header to 'application/json'
+    // can be used with any Serializable type (Map, List, etc)
+    val app: HttpHandler =
+        { request: Request -> lensCarResponse.inject(sweetride, Response(Status.OK)) }
 
     val request: Request = Request(Method.GET, "/")
     val response = app(request)
