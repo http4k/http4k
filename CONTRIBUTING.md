@@ -4,7 +4,7 @@ There are many ways in which you can contribute to the development of the librar
 
 - Give us a Star on Github - you know you want to. ;)
 - Using http4k to build something? Get in touch and tell everyone about it, or even just us!
-- (Sponsor us!](https://github.com/sponsors/http4k) The http4k team build the library out of love for software engineering and the OpenSource community, but running a project of this size is not without it's costs. Please see below for sponsorship options to help us keep the project running.
+- [Sponsor us!](https://github.com/sponsors/http4k) The http4k team build the library out of love for software engineering and the OpenSource community, but running a project of this size is not without it's costs. Please see below for sponsorship options to help us keep the project running.
 - [Get help!](/support) The http4k team have produced a reasonable amount of training materials and are available for onsite or remote consulting engagements to help companies get the most out of the library.
 
 ### Pull requests
