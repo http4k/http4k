@@ -10,7 +10,8 @@ import org.http4k.traffic.ReadWriteCache
 
 fun main() {
 
-    // set up storage to cache a set of HTTP traffic. Disk and Memory implementations are provided.
+    // set up storage to cache a set of HTTP traffic.
+    // Disk and Memory implementations are provided.
     val storage = ReadWriteCache.Disk()
 
     // wrap any HTTP Handler in a Recording Filter and play traffic through it
@@ -23,6 +24,7 @@ fun main() {
     val aRequest = Request(GET, "http://localhost:8000/")
     println(withCachedContent(aRequest))
 
-    // repeated requests are intercepted by the cache and the responses provided without hitting the original handler
+    // repeated requests are intercepted by the cache and
+    // the responses provided without hitting the original handler
     println(withCachedContent(Request(GET, "http://localhost:8000/")))
 }

@@ -46,8 +46,8 @@ class WordCounterApp : HttpHandler {
 }
 
 /**
- * Defines the test contract which will be recorded and replayed later. The injected HttpHandler
- * is provided by the implementations of this interface.
+ * Defines the test contract which will be recorded and replayed later.
+ * The injected HttpHandler is provided by the implementations of this interface.
  */
 interface WordCounterContract {
 
@@ -66,8 +66,8 @@ interface WordCounterContract {
 }
 
 /**
- * For the traditional use-case of a CDC, we use a real Http client to record the traffic against
- * a running version of the producing service.
+ * For the traditional use-case of a CDC, we use a real Http client to
+ * record the traffic against a running version of the producing service.
  */
 @Disabled
 class RemoteHttpRecordingWordCounterTest : WordCounterContract {
