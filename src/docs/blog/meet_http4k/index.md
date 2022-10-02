@@ -85,7 +85,7 @@ val setContentType = Filter { next ->
         { request -> next(request).header("Content-Type", "text/plain") }
     }
 val repeatBody = Filter { next ->
-        { request -> next(request.body(request.bodyString() + request.bodyString() }
+        { request -> next(request.body(request.bodyString() + request.bodyString())) }
     }
 val composedFilter: Filter = repeatBody.then(setContentType)
 val decoratedApp: HttpHandler = composedFilter.then(app)
@@ -101,7 +101,9 @@ val app: HttpHandler = routes(
     "/app" bind GET to decoratedApp,
     "/other" bind routes(
         "/delete" bind DELETE to { _: Request -> Response(OK) },
-        "/post/{name}" bind POST to { request: Request -> Response(OK).body("you POSTed to ${request.path("name")}") }
+        "/post/{name}" bind POST to { request: Request -> 
+            Response(OK).body("you POSTed to ${request.path("name")}") 
+        }
     )
 )
 ```

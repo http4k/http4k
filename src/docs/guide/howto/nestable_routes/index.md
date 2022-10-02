@@ -15,8 +15,12 @@ This is a fairly comprehensive example of the core-routing logic available:
 ### Dynamic Paths / Path Variables
 As you would expect, http4k allows routes to include dynamic or variable elements in the matching path, and allows you to reference the variable in the Handler. For example:
 ```
-"/book/{title}" bind GET to { req -> Response.invoke(Status.OK).body(GetBookDetails(req.path("title")) }
-"/author/{name}/latest" bind GET to { req -> Response.invoke(Status.OK).body(GetAllBooks(author = req.path("name")).last()) }
+"/book/{title}" bind GET to { req -> 
+    Response.invoke(Status.OK).body(GetBookDetails(req.path("title")) 
+}
+"/author/{name}/latest" bind GET to { req -> 
+    Response.invoke(Status.OK).body(GetAllBooks(author = req.path("name")).last()) 
+}
 ```
 
 By default, the variable(s) will match anything. However you can append the variable name with a RegEx expression to limit the matches.
