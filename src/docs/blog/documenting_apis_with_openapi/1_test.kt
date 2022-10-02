@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test
 class BasicGreetingRouteTest {
     @Test
     fun `greets an adult`() {
-        assertThat(basicRoute(Request(GET, "/greet/Bob/21")), hasBody("Hello Bob, would you like some beer?"))
+        assertThat(
+            basicRoute(Request(GET, "/greet/Bob/21")),
+            hasBody("Hello Bob, would you like some beer?")
+        )
     }
 }

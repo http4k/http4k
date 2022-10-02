@@ -26,13 +26,15 @@ fun Greetings(): ContractRoute {
 
     fun handler(name: String): HttpHandler = { req: Request ->
         val drinkToOffer: Drink? = favouriteDrink(req)
-        val beverage: String = drinkToOffer?.name ?: if (age(req).value >= 18) "beer" else "lemonade"
+        val beverage: String = drinkToOffer?.name
+            ?: if (age(req).value >= 18) "beer" else "lemonade"
         Response(OK).body("Hello $name, would you like some $beverage?")
     }
 
     return "/greet" / Path.of("name", "Your name") meta {
         summary = "Send greetings"
-        description = "Greets the stupid human by offering them a beverage suitable for their age"
+        description =
+            "Greets the stupid human by offering them a beverage suitable for their age"
         tags += Tag("query")
         queries += favouriteDrink
         queries += age
