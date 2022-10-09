@@ -3,8 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.32.3.0 (uncut)
-- **http4k-*** : Upgrade some dependency versions.
+### v4.32.3.0
+- **http4k-*** : Upgrade some dependency versions including CVE fix for Undertow backend.
 
 ### v4.32.2.0
 - **http4k-core** : Add `StringBidDiMapping.basicCredentials` to easily convert between `Credentials` and basic auth.  H/T oharaandrew314
