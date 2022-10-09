@@ -16,9 +16,3 @@ class HttpHandlerServlet(handler: HttpHandler) : HttpServlet() {
 
 fun HttpHandler.asServlet() = HttpHandlerServlet(this)
 
-/**
- * Adapts between the Servlet and http4k APIs
- */
-class Http4kJakartaServletAdapter(private val handler: HttpHandler) {
-    fun handle(req: HttpServletRequest, resp: HttpServletResponse) = handler(req.asHttp4kRequest()).transferTo(resp)
-}

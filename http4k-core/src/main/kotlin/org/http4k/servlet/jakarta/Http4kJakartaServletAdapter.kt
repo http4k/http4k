@@ -2,6 +2,7 @@ package org.http4k.servlet.jakarta
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Parameters
 import org.http4k.core.Request
@@ -10,6 +11,13 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import java.util.Enumeration
+
+/**
+ * Adapts between the Servlet and http4k APIs
+ */
+class Http4kJakartaServletAdapter(private val handler: HttpHandler) {
+    fun handle(req: HttpServletRequest, resp: HttpServletResponse) = handler(req.asHttp4kRequest()).transferTo(resp)
+}
 
 fun Response.transferTo(destination: HttpServletResponse) {
     destination.status = status.code
