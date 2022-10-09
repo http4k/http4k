@@ -12,7 +12,7 @@ import org.http4k.core.safeLong
 import java.util.Enumeration
 
 fun Response.transferTo(destination: HttpServletResponse) {
-    destination.setStatus(status.code)
+    destination.status = status.code
     headers.forEach { (key, value) -> destination.addHeader(key, value) }
     body.stream.use { input -> destination.outputStream.use { output -> input.copyTo(output) } }
 }
@@ -27,4 +27,4 @@ private fun HttpServletRequest.headerParameters() =
 
 private fun Enumeration<String>.asPairs(key: String) = asSequence().map { key to it }.toList()
 
-private fun String?.toQueryString(): String = if (this != null && isNotEmpty()) "?$this" else ""
+private fun String?.toQueryString(): String = if (!isNullOrEmpty()) "?$this" else ""
