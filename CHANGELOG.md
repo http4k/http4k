@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.32.4.0 (uncut)
 - **http4k-core** : Move Jakarta Servlet code from Jetty as is now shared.
+- **http4k-contract** : Add `UserCredentialsOAuthSecurity`.  This allows the OpenApi spec to define a Resource Owner Password Credentials grant.  It also includes a shortcut to load the principal into a `RequestContextLens`.  H/T @oharaandrew314
 
 ### v4.32.3.0
 - **http4k-*** : Upgrade some dependency versions including CVE fix for Undertow backend.
