@@ -82,11 +82,7 @@ fun WsHandler.toJettyNegotiator() = object : AbstractNegotiator() {
 fun HttpHandler.toJettyHandler(withStatisticsHandler: Boolean = false): HandlerWrapper = ServletContextHandler(SESSIONS).apply {
     addServlet(ServletHolder(this@toJettyHandler.asServlet()), "/*")
 }.let {
-    if (withStatisticsHandler) {
-        StatisticsHandler().apply { handler = it }
-    } else {
-        it
-    }
+    if (withStatisticsHandler) StatisticsHandler().apply { handler = it } else it
 }
 
 typealias ConnectorBuilder = (Server) -> ServerConnector
