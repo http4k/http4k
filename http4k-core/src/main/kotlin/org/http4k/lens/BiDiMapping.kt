@@ -34,7 +34,6 @@ import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.Locale
 import java.util.Locale.getDefault
 import java.util.UUID
-import java.util.regex.Pattern
 
 /**
  * A BiDiMapping defines a reusable bidirectional transformation between an input and output type
