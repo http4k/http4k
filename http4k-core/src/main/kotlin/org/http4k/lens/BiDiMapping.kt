@@ -110,6 +110,16 @@ object StringBiDiMappings {
         { text -> enumValues<T>().first { it.name.equals(text, ignoreCase = true) } },
         Enum<T>::name
     )
+    fun csv(delimiter: String, escaped: (String)) = BiDiMapping<String, List<String>>(
+        asOut = { text ->
+            if (text.isEmpty()) {
+                emptyList()
+            } else {
+                text.split(delimiter).map { it.replace(escaped, delimiter) }
+            }
+        },
+        asIn = { list -> list.joinToString(delimiter) { it.replace(delimiter, escaped) } }
+    )
 
     private fun String.safeBase64Decoded(): String? = try {
         base64Decoded()

@@ -302,4 +302,28 @@ class BiDiLensSpecTest {
         assertThat(lens("123"), equalTo(expected))
         assertThat(lens(expected, "prefix"), equalTo("prefix123123"))
     }
+
+    @Test
+    fun csv() {
+        checkContract(
+            spec.csv(),
+            listOf("foo\"", "bar\n", "", "baz"),
+            "foo\",bar\n,,baz",
+            "",
+            null,
+            "bang",
+            "bangfoo\",bar\n,,baz",
+            "bangfoo\",bar\n,,bazfoo\",bar\n,,baz"
+        )
+        checkContract(
+            spec.csv("\n", "\\n"),
+            listOf("foo\n", "bar", "baz"),
+            "foo\\n\nbar\nbaz",
+            "",
+            null,
+            "bang",
+            "bangfoo\\n\nbar\nbaz",
+            "bangfoo\\n\nbar\nbazfoo\\n\nbar\nbaz"
+        )
+    }
 }

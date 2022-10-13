@@ -247,6 +247,7 @@ fun <IN: Any> BiDiLensSpec<IN, String>.zoneId() = map(StringBiDiMappings.zoneId(
 fun <IN: Any> BiDiLensSpec<IN, String>.zoneOffset() = map(StringBiDiMappings.zoneOffset())
 fun <IN: Any> BiDiLensSpec<IN, String>.locale() = map(StringBiDiMappings.locale())
 fun <IN: Any> BiDiLensSpec<IN, String>.basicCredentials() = map(StringBiDiMappings.basicCredentials())
+fun <IN: Any> BiDiLensSpec<IN, String>.csv(delimiter: String = ",", escaped: String = "\\$delimiter") = map(StringBiDiMappings.csv(delimiter, escaped))
 
 inline fun <IN : Any, reified T : Enum<T>> BiDiLensSpec<IN, String>.enum() = mapWithNewMeta(StringBiDiMappings.enum<T>(), EnumParam(T::class))
 inline fun <IN : Any, reified T : Enum<T>> BiDiLensSpec<IN, String>.enum(noinline nextOut: (String) -> T, noinline nextIn: (T) -> String) = mapWithNewMeta(BiDiMapping(nextOut, nextIn), EnumParam(T::class))

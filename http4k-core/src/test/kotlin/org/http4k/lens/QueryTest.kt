@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.query
 import org.http4k.core.with
+import org.http4k.hamkrest.hasQuery
 import org.junit.jupiter.api.Test
 
 class QueryTest {
@@ -176,5 +177,22 @@ class QueryTest {
     fun `case-insensitive enum`() {
         val lens = Query.enum<Method>(caseSensitive = false).required("method")
         assertThat(lens(Request(GET,"/?method=delete")), equalTo(Method.DELETE))
+    }
+
+    @Test
+    fun csv() {
+        val lens = Query.csv().required("stuff")
+        assertThat(
+            lens(Request(GET, "/?stuff=foo\",1,,bar")),
+            equalTo(listOf("foo\"","1", "", "bar"))
+        )
+        assertThat(
+            Request(GET, "/").with(lens of listOf("foo\"","1", "", "bar")),
+            hasQuery("stuff", "foo\",1,,bar")
+        )
+        assertThat(
+            lens(Request(GET, "/?stuff=")),
+            equalTo(emptyList())
+        )
     }
 }
