@@ -112,21 +112,6 @@ object StringBiDiMappings {
         Enum<T>::name
     )
 
-//    fun <T> list(
-//        delimiter: String,
-//        escaped: (String),
-//        mapElement: BiDiMapping<String, T>
-//    ) = BiDiMapping<String, List<T>>(
-//        asOut = { text ->
-//            if (text.isEmpty()) {
-//                emptyList()
-//            } else {
-//                text.split(delimiter).map { mapElement(it.replace(escaped, delimiter)) }
-//            }
-//        },
-//        asIn = { list -> list.map { mapElement(it) }.joinToString(delimiter) { it.replace(delimiter, escaped) } }
-//    )
-
     fun <T> csv(
         delimiter: String = ",",
         mapElement: BiDiMapping<String, T>
