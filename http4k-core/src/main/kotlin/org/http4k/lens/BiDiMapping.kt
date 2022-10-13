@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.Locale
 import java.util.Locale.getDefault
 import java.util.UUID
+import java.util.regex.Pattern
 
 /**
  * A BiDiMapping defines a reusable bidirectional transformation between an input and output type
@@ -110,16 +111,31 @@ object StringBiDiMappings {
         { text -> enumValues<T>().first { it.name.equals(text, ignoreCase = true) } },
         Enum<T>::name
     )
-    fun csv(delimiter: String, escaped: (String)) = BiDiMapping<String, List<String>>(
-        asOut = { text ->
-            if (text.isEmpty()) {
-                emptyList()
-            } else {
-                text.split(delimiter).map { it.replace(escaped, delimiter) }
-            }
-        },
-        asIn = { list -> list.joinToString(delimiter) { it.replace(delimiter, escaped) } }
-    )
+
+//    fun <T> list(
+//        delimiter: String,
+//        escaped: (String),
+//        mapElement: BiDiMapping<String, T>
+//    ) = BiDiMapping<String, List<T>>(
+//        asOut = { text ->
+//            if (text.isEmpty()) {
+//                emptyList()
+//            } else {
+//                text.split(delimiter).map { mapElement(it.replace(escaped, delimiter)) }
+//            }
+//        },
+//        asIn = { list -> list.map { mapElement(it) }.joinToString(delimiter) { it.replace(delimiter, escaped) } }
+//    )
+
+    fun <T> csv(
+        delimiter: String = ",",
+        mapElement: BiDiMapping<String, T>
+    ): BiDiMapping<String, List<T>> {
+        return BiDiMapping(
+            asOut = { if (it.isEmpty()) emptyList() else it.split(delimiter).map(mapElement::invoke) },
+            asIn = { it.joinToString(delimiter, transform = mapElement::invoke) }
+        )
+    }
 
     private fun String.safeBase64Decoded(): String? = try {
         base64Decoded()

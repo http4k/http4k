@@ -304,26 +304,26 @@ class BiDiLensSpecTest {
     }
 
     @Test
-    fun csv() {
-        checkContract(
-            spec.csv(),
-            listOf("foo\"", "bar\n", "", "baz"),
-            "foo\",bar\n,,baz",
-            "",
-            null,
-            "bang",
-            "bangfoo\",bar\n,,baz",
-            "bangfoo\",bar\n,,bazfoo\",bar\n,,baz"
-        )
-        checkContract(
-            spec.csv("\n", "\\n"),
-            listOf("foo\n", "bar", "baz"),
-            "foo\\n\nbar\nbaz",
-            "",
-            null,
-            "bang",
-            "bangfoo\\n\nbar\nbaz",
-            "bangfoo\\n\nbar\nbazfoo\\n\nbar\nbaz"
-        )
-    }
+    fun csv() = checkContract(
+        spec.csv(),
+        listOf("foo", "bar", "", "baz"),
+        "foo,bar,,baz",
+        "",
+        null,
+        "bang",
+        "bangfoo,bar,,baz",
+        "bangfoo,bar,,bazfoo,bar,,baz"
+    )
+
+    @Test
+    fun `csv - custom`() = checkContract(
+        spec.csv(";", StringBiDiMappings.int()),
+        listOf(0, 1, 2),
+        "0;1;2",
+        "",
+        "foo;bar;baz",
+        "-1",
+        "-10;1;2",
+        "-10;1;20;1;2"
+    )
 }
