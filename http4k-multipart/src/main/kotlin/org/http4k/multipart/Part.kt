@@ -14,7 +14,7 @@ internal sealed class Part(fieldName: String?, formField: Boolean, contentType: 
 
     abstract val bytes: ByteArray
 
-    class DiskBacked(part: PartMetaData, private val theFile: File) : Part(part.fieldName, part.isFormField, part.contentType, part.fileName, part.headers, theFile.length().toInt()) {
+    class DiskBacked(part: PartMetaData, private val theFile: File, private val deleteOnClose: Boolean = true) : Part(part.fieldName, part.isFormField, part.contentType, part.fileName, part.headers, theFile.length().toInt()) {
         override val newInputStream: InputStream
             get() = FileInputStream(theFile)
 
@@ -22,7 +22,9 @@ internal sealed class Part(fieldName: String?, formField: Boolean, contentType: 
             get() = throw IllegalStateException("Cannot get bytes from a DiskBacked Part")
 
         override fun close() {
-            if (!theFile.delete()) throw FileSystemException("Failed to delete file")
+            if (deleteOnClose) {
+                if (!theFile.delete()) throw FileSystemException("Failed to delete file")
+            }
         }
     }
 

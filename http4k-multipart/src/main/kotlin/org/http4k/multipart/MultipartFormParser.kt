@@ -19,7 +19,12 @@ import java.util.UUID
  * @param temporaryFileDirectory where to write the files for Parts that are too big. Uses the default
  * temporary directory if null.
  */
-internal class MultipartFormParser(private val encoding: Charset, private val writeToDiskThreshold: Int, private val temporaryFileDirectory: File) {
+internal class MultipartFormParser(
+    private val encoding: Charset,
+    private val writeToDiskThreshold: Int,
+    private val temporaryFileDirectory: File,
+    private val deleteTempFilesOnExit: Boolean = true
+) {
 
     /**
      * Returns a list of Parts.
@@ -56,7 +61,8 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
                 part.inputStream.use {
                     return InMemory(
                         part,
-                        storeInMemory(bytes, length), encoding)
+                        storeInMemory(bytes, length), encoding
+                    )
                 }
             }
             length += count
@@ -64,7 +70,9 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
                 part.inputStream.use {
                     return DiskBacked(
                         part,
-                        writeToDisk(part, bytes, length))
+                        writeToDisk(part, bytes, length),
+                        deleteTempFilesOnExit,
+                    )
                 }
             }
         }
@@ -73,9 +81,11 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
     private fun storeInMemory(bytes: ByteArray, length: Int) = ByteArray(length).apply { System.arraycopy(bytes, 0, this, 0, length) }
 
     private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int) =
-        File.createTempFile(part.fileName ?: UUID.randomUUID().toString()
-        + "-", ".tmp", temporaryFileDirectory).apply {
-            deleteOnExit()
+        File.createTempFile(
+            part.fileName ?: (UUID.randomUUID().toString() + "-"),
+            ".tmp", temporaryFileDirectory
+        ).apply {
+            if (deleteTempFilesOnExit) deleteOnExit()
             FileOutputStream(this).apply {
                 write(bytes, 0, length)
                 use { part.inputStream.copyTo(it, writeToDiskThreshold) }

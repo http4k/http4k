@@ -33,7 +33,8 @@ class MultipartFormParserTest {
 
                 val boundary = contentType.substring(contentType.indexOf("boundary=") + "boundary=".length).toByteArray(ISO_8859_1)
                 val streamingParts = StreamingMultipartFormParts.parse(
-                    boundary, body, ISO_8859_1, maxStreamLength)
+                    boundary, body, ISO_8859_1, maxStreamLength
+                )
 
                 val parts = MultipartFormParser(UTF_8, writeToDiskThreshold, temporaryFileDirectory!!).formParts(streamingParts)
                 parts.let {
@@ -138,16 +139,40 @@ class MultipartFormParserTest {
     }
 
     @Test
+    fun shouldKeepSomePartsOnDisk() {
+        try {
+            val form = safariExample()
+
+            val parts = MultipartFormParser(UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY, deleteTempFilesOnExit = false).formParts(form)
+
+            allFieldsAreLoadedCorrectly(parts, false, true, true, false)
+
+            val files = temporaryFileList()
+            assertPartSaved("simple7bit.txt", files)
+            assertPartSaved("starbucks.jpeg", files)
+            assertThat(files!!.size, equalTo(2))
+
+            parts.close()
+            assertThat(temporaryFileList()!!.size, equalTo(2))
+        } finally {
+            temporaryFileList()!!.forEach { TEMPORARY_FILE_DIRECTORY.resolve(it).delete() }
+        }
+    }
+
+    @Test
     fun throwsExceptionIfMultipartMalformed() {
         val form = StreamingMultipartFormParts.parse(
             "---2345".toByteArray(UTF_8),
-            ByteArrayInputStream(("-----2345" + CR_LF +
-                "Content-Disposition: form-data; name=\"name\"" + CR_LF +
-                "" + CR_LF +
-                "value" + // no CR_LF
+            ByteArrayInputStream(
+                ("-----2345" + CR_LF +
+                    "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                    "" + CR_LF +
+                    "value" + // no CR_LF
 
-                "-----2345--" + CR_LF).toByteArray()),
-            UTF_8)
+                    "-----2345--" + CR_LF).toByteArray()
+            ),
+            UTF_8
+        )
 
         try {
             MultipartFormParser(UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY).formParts(form)
@@ -178,7 +203,8 @@ class MultipartFormParserTest {
     private fun assertPartSaved(fileName: String, files: Array<String>?) {
         assertThat(
             "couldn't find " + fileName + " in " + Arrays.toString(files),
-            files!![0].contains(fileName) || files[1].contains(fileName), equalTo(true))
+            files!![0].contains(fileName) || files[1].contains(fileName), equalTo(true)
+        )
     }
 
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inMemory: Boolean) {
