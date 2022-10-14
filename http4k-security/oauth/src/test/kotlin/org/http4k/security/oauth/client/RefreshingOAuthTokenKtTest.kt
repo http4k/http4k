@@ -42,6 +42,7 @@ class RefreshingOAuthTokenTest {
 
         val app = ClientFilters.RefreshingOAuthToken(
             config,
+            emptyList(), //TODO
             backend,
             { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
@@ -81,6 +82,7 @@ class RefreshingOAuthTokenTest {
 
         val app = ClientFilters.RefreshingOAuthToken(
             config,
+            listOf("someactivity.read", "someactivity.write"),
             backend,
             { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
@@ -97,7 +99,11 @@ class RefreshingOAuthTokenTest {
 
         assertThat(
             app(Request(GET, "")),
-            hasBody("Bearer grant_type=refresh_token&client_id=hello&client_secret=world&refresh_token=refresh1")
+            hasBody("Bearer grant_type=refresh_token" +
+                "&client_id=hello" +
+                "&client_secret=world" +
+                "&refresh_token=refresh" +
+                "&scope=someactivity.read+someactivity.write1")
         )
     }
 
@@ -121,6 +127,7 @@ class RefreshingOAuthTokenTest {
 
         val app = ClientFilters.RefreshingOAuthToken(
             config,
+            scopes = emptyList(),
             backend,
             { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),

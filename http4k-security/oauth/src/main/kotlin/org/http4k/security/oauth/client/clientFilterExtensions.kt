@@ -25,14 +25,13 @@ import org.http4k.security.OAuthWebForms.grantType
 import org.http4k.security.OAuthWebForms.password
 import org.http4k.security.OAuthWebForms.refreshToken
 import org.http4k.security.OAuthWebForms.requestForm
+import org.http4k.security.OAuthWebForms.scope
 import org.http4k.security.OAuthWebForms.username
 import org.http4k.security.Refreshing
 import org.http4k.security.oauth.core.RefreshToken
 import java.time.Clock
 import java.time.Duration
-import java.time.Instant
 import java.time.Instant.MAX
-import kotlin.Long.Companion.MAX_VALUE
 
 /**
  * Filter to authenticate and refresh against a OAuth server. Use the correct OAuth filter for your flow.
@@ -41,6 +40,7 @@ import kotlin.Long.Companion.MAX_VALUE
 fun ClientFilters.RefreshingOAuthToken(
     oauthCredentials: Credentials,
     tokenUri: Uri,
+    scopes: List<String> = emptyList(),
     backend: HttpHandler,
     oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials),
     gracePeriod: Duration = Duration.ofSeconds(10),
@@ -48,7 +48,9 @@ fun ClientFilters.RefreshingOAuthToken(
     tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
 ): Filter {
     val refresher = CredentialsProvider.Refreshing<AccessToken>(gracePeriod, clock) {
-        val filter = it?.refreshToken?.let { ClientFilters.OAuthRefreshToken(oauthCredentials, it) } ?: oAuthFlowFilter
+        val filter = it?.refreshToken
+            ?.let { token -> ClientFilters.OAuthRefreshToken(oauthCredentials, token, scopes) }
+            ?: oAuthFlowFilter
 
         filter
             .then(backend)(Request(POST, tokenUri))
@@ -66,6 +68,7 @@ fun ClientFilters.RefreshingOAuthToken(
 
 fun ClientFilters.RefreshingOAuthToken(
     config: OAuthProviderConfig,
+    scopes: List<String> = emptyList(),
     backend: HttpHandler,
     oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials),
     gracePeriod: Duration = Duration.ofSeconds(10),
@@ -73,6 +76,7 @@ fun ClientFilters.RefreshingOAuthToken(
 ) = ClientFilters.RefreshingOAuthToken(
     config.credentials,
     config.tokenUri,
+    scopes,
     backend,
     oAuthFlowFilter,
     gracePeriod,
@@ -116,19 +120,34 @@ fun ClientFilters.OAuthClientCredentials(clientCredentials: Credentials) = Filte
     }
 }
 
-fun ClientFilters.OAuthRefreshToken(config: OAuthProviderConfig, token: RefreshToken) =
-    OAuthRefreshToken(config.credentials, token)
+fun ClientFilters.OAuthRefreshToken(
+    config: OAuthProviderConfig,
+    token: RefreshToken,
+    scopes: List<String> = emptyList(),
+) = OAuthRefreshToken(config.credentials, token, scopes)
 
-fun ClientFilters.OAuthRefreshToken(clientCredentials: Credentials, token: RefreshToken) = Filter { next ->
+fun ClientFilters.OAuthRefreshToken(
+    clientCredentials: Credentials,
+    token: RefreshToken,
+    scopes: List<String> = emptyList(),
+) = Filter { next ->
     {
         next(
             it.with(
-                requestForm of WebForm()
-                    .with(
+                if (scopes.isNotEmpty())
+                    requestForm of WebForm().with(
                         grantType of "refresh_token",
                         clientId of clientCredentials.user,
                         clientSecret of clientCredentials.password,
-                        refreshToken of token
+                        refreshToken of token,
+                        scope of scopes.joinToString(separator = " "),
+                    )
+                else
+                    requestForm of WebForm().with(
+                        grantType of "refresh_token",
+                        clientId of clientCredentials.user,
+                        clientSecret of clientCredentials.password,
+                        refreshToken of token,
                     )
             )
         )
