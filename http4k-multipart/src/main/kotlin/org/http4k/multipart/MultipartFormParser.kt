@@ -2,11 +2,9 @@ package org.http4k.multipart
 
 import org.http4k.multipart.Part.DiskBacked
 import org.http4k.multipart.Part.InMemory
-import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.charset.Charset
-import java.util.UUID
 
 /**
  * Parser for creating serialised form parts using the encoding
@@ -22,8 +20,7 @@ import java.util.UUID
 internal class MultipartFormParser(
     private val encoding: Charset,
     private val writeToDiskThreshold: Int,
-    private val temporaryFileDirectory: File,
-    private val deleteTempFilesOnExit: Boolean = true
+    private val diskLocation: DiskLocation,
 ) {
 
     /**
@@ -70,8 +67,7 @@ internal class MultipartFormParser(
                 part.inputStream.use {
                     return DiskBacked(
                         part,
-                        writeToDisk(part, bytes, length),
-                        deleteTempFilesOnExit,
+                        diskLocation.createFile(part.fileName).writeFile(part, bytes, length),
                     )
                 }
             }
@@ -80,15 +76,13 @@ internal class MultipartFormParser(
 
     private fun storeInMemory(bytes: ByteArray, length: Int) = ByteArray(length).apply { System.arraycopy(bytes, 0, this, 0, length) }
 
-    private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int) =
-        File.createTempFile(
-            part.fileName ?: (UUID.randomUUID().toString() + "-"),
-            ".tmp", temporaryFileDirectory
-        ).apply {
-            if (deleteTempFilesOnExit) deleteOnExit()
-            FileOutputStream(this).apply {
-                write(bytes, 0, length)
-                use { part.inputStream.copyTo(it, writeToDiskThreshold) }
+    private fun MultipartFile.writeFile(part: StreamingPart, bytes: ByteArray, length: Int): MultipartFile =
+        this.also { multipartFile ->
+            multipartFile.file().apply {
+                FileOutputStream(this).apply {
+                    write(bytes, 0, length)
+                    use { part.inputStream.copyTo(it, writeToDiskThreshold) }
+                }
             }
         }
 }

@@ -36,7 +36,7 @@ class MultipartFormParserTest {
                     boundary, body, ISO_8859_1, maxStreamLength
                 )
 
-                val parts = MultipartFormParser(UTF_8, writeToDiskThreshold, temporaryFileDirectory!!).formParts(streamingParts)
+                val parts = MultipartFormParser(UTF_8, writeToDiskThreshold, TempDiskLocation(TEMPORARY_FILE_DIRECTORY)).formParts(streamingParts)
                 parts.let {
                     val articleType = it.parts("articleType")[0]
                     println(articleType.fieldName) // "articleType"
@@ -72,7 +72,7 @@ class MultipartFormParserTest {
             .stream()
         val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
 
-        val parts = MultipartFormParser(UTF_8, 1024, TEMPORARY_FILE_DIRECTORY).formParts(form)
+        val parts = MultipartFormParser(UTF_8, 1024, TempDiskLocation(TEMPORARY_FILE_DIRECTORY)).formParts(form)
 
         assertThat(parts.parts("file")[0].fileName, equalTo("foo.tab"))
         assertThat(parts.parts("anotherFile")[0].fileName, equalTo("BAR.tab"))
@@ -86,7 +86,7 @@ class MultipartFormParserTest {
     fun canLoadComplexRealLifeSafariExample() {
         val form = safariExample()
 
-        val parts = MultipartFormParser(UTF_8, 1024000, TEMPORARY_FILE_DIRECTORY).formParts(form)
+        val parts = MultipartFormParser(UTF_8, 1024000, TempDiskLocation(TEMPORARY_FILE_DIRECTORY)).formParts(form)
         allFieldsAreLoadedCorrectly(parts, true, true, true, true)
         parts.forEach { it.close() }
     }
@@ -101,7 +101,7 @@ class MultipartFormParserTest {
         )
 
         try {
-            MultipartFormParser(UTF_8, 1024, TEMPORARY_FILE_DIRECTORY).formParts(form)
+            MultipartFormParser(UTF_8, 1024, TempDiskLocation(TEMPORARY_FILE_DIRECTORY)).formParts(form)
             fail("should have failed because the form is too big")
         } catch (e: Throwable) {
             assertThat(e.localizedMessage, containsSubstring("Form contents was longer than 1024 bytes"))
@@ -112,7 +112,7 @@ class MultipartFormParserTest {
     fun savesAllPartsToDisk() {
         val form = safariExample()
 
-        val parts = MultipartFormParser(UTF_8, 100, TEMPORARY_FILE_DIRECTORY).formParts(form)
+        val parts = MultipartFormParser(UTF_8, 100, TempDiskLocation(TEMPORARY_FILE_DIRECTORY)).formParts(form)
 
         allFieldsAreLoadedCorrectly(parts, false, false, false, false)
 
@@ -125,7 +125,7 @@ class MultipartFormParserTest {
     fun savesSomePartsToDisk() {
         val form = safariExample()
 
-        val parts = MultipartFormParser(UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY).formParts(form)
+        val parts = MultipartFormParser(UTF_8, 1024 * 4, TempDiskLocation(TEMPORARY_FILE_DIRECTORY)).formParts(form)
 
         allFieldsAreLoadedCorrectly(parts, false, true, true, false)
 
@@ -143,7 +143,7 @@ class MultipartFormParserTest {
         try {
             val form = safariExample()
 
-            val parts = MultipartFormParser(UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY, deleteTempFilesOnExit = false).formParts(form)
+            val parts = MultipartFormParser(UTF_8, 1024 * 4, PermanentDiskLocation(TEMPORARY_FILE_DIRECTORY)).formParts(form)
 
             allFieldsAreLoadedCorrectly(parts, false, true, true, false)
 
@@ -175,7 +175,7 @@ class MultipartFormParserTest {
         )
 
         try {
-            MultipartFormParser(UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY).formParts(form)
+            MultipartFormParser(UTF_8, 1024 * 4, TempDiskLocation(TEMPORARY_FILE_DIRECTORY)).formParts(form)
             fail("Should have thrown an Exception")
         } catch (e: Throwable) {
             assertThat(e.localizedMessage, containsSubstring("Boundary must be proceeded by field separator, but didn't find it"))
