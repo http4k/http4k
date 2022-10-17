@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.32.4.0 (uncut)
+-  **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Move Jakarta Servlet code from Jetty as is now shared.
 - **http4k-contract** : Add `UserCredentialsOAuthSecurity`.  This allows the OpenApi spec to define a Resource Owner Password Credentials grant.  It also includes a shortcut to load the principal into a `RequestContextLens`.  H/T @oharaandrew314
 - **http4k-core**: Add `StringBiDiMappings.csv` to map between string and list, with a configurable delimiter and element mapping.  H/T @oharaandrew314 
