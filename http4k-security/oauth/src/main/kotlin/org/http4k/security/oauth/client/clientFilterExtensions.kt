@@ -40,12 +40,12 @@ import java.time.Instant.MAX
 fun ClientFilters.RefreshingOAuthToken(
     oauthCredentials: Credentials,
     tokenUri: Uri,
-    scopes: List<String> = emptyList(),
     backend: HttpHandler,
     oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials),
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
-    tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
+    tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
+    scopes: List<String> = emptyList(),
 ): Filter {
     val refresher = CredentialsProvider.Refreshing<AccessToken>(gracePeriod, clock) {
         val filter = it?.refreshToken
@@ -68,19 +68,19 @@ fun ClientFilters.RefreshingOAuthToken(
 
 fun ClientFilters.RefreshingOAuthToken(
     config: OAuthProviderConfig,
-    scopes: List<String> = emptyList(),
     backend: HttpHandler,
     oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials),
     gracePeriod: Duration = Duration.ofSeconds(10),
-    clock: Clock = Clock.systemUTC()
+    clock: Clock = Clock.systemUTC(),
+    scopes: List<String> = emptyList(),
 ) = ClientFilters.RefreshingOAuthToken(
-    config.credentials,
-    config.tokenUri,
-    scopes,
-    backend,
-    oAuthFlowFilter,
-    gracePeriod,
-    clock
+    oauthCredentials = config.credentials,
+    tokenUri = config.tokenUri,
+    backend = backend,
+    oAuthFlowFilter = oAuthFlowFilter,
+    gracePeriod = gracePeriod,
+    clock = clock,
+    scopes = scopes,
 )
 
 fun ClientFilters.OAuthUserCredentials(config: OAuthProviderConfig, userCredentials: Credentials) =
