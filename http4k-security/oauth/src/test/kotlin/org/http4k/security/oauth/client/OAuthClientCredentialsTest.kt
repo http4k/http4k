@@ -15,11 +15,13 @@ class OAuthClientCredentialsTest {
 
     @Test
     fun `auths with correct form`() {
-        val app = ClientFilters.OAuthClientCredentials(Credentials("hello", "world"))
-            .then { req: Request -> Response(Status.OK).body(req.bodyString()) }
+        val app = ClientFilters.OAuthClientCredentials(
+            Credentials(user = "hello", password = "world"),
+            scopes = listOf("someactivity.write")
+        ).then { req: Request -> Response(Status.OK).body(req.bodyString()) }
         assertThat(
             app(Request(Method.POST, "")).bodyString(),
-            equalTo("grant_type=client_credentials&client_id=hello&client_secret=world")
+            equalTo("grant_type=client_credentials&client_id=hello&client_secret=world&scope=someactivity.write")
         )
     }
 }

@@ -41,7 +41,7 @@ fun ClientFilters.RefreshingOAuthToken(
     oauthCredentials: Credentials,
     tokenUri: Uri,
     backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials),
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, emptyList()), //TODO feels weird
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
     tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
@@ -58,7 +58,8 @@ fun ClientFilters.RefreshingOAuthToken(
             ?.let { tokenExtractor(it).map { it.accessToken }.valueOrNull() }
             ?.let {
                 ExpiringCredentials(
-                    it, it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
+                    credentials = it,
+                    expiry = it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
                 )
             }
     }
@@ -69,7 +70,7 @@ fun ClientFilters.RefreshingOAuthToken(
 fun ClientFilters.RefreshingOAuthToken(
     config: OAuthProviderConfig,
     backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials),
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials, emptyList()),
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
     scopes: List<String> = emptyList(),
@@ -103,14 +104,27 @@ fun ClientFilters.OAuthUserCredentials(clientCredentials: Credentials, userCrede
     }
 }
 
-fun ClientFilters.OAuthClientCredentials(config: OAuthProviderConfig) = OAuthClientCredentials(config.credentials)
+fun ClientFilters.OAuthClientCredentials(
+    config: OAuthProviderConfig,
+    scopes: List<String>
+) = OAuthClientCredentials(config.credentials, scopes)
 
-fun ClientFilters.OAuthClientCredentials(clientCredentials: Credentials) = Filter { next ->
+fun ClientFilters.OAuthClientCredentials(
+    clientCredentials: Credentials,
+    scopes: List<String>
+) = Filter { next ->
     {
         next(
             it.with(
-                requestForm of WebForm()
-                    .with(
+                if (scopes.isNotEmpty())
+                    requestForm of WebForm().with(
+                        grantType of "client_credentials",
+                        clientId of clientCredentials.user,
+                        clientSecret of clientCredentials.password,
+                        scope of scopes.joinToString(separator = " ")
+                    )
+                else
+                    requestForm of WebForm().with(
                         grantType of "client_credentials",
                         clientId of clientCredentials.user,
                         clientSecret of clientCredentials.password,
