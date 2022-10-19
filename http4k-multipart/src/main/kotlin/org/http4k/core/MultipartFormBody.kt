@@ -10,7 +10,6 @@ import org.http4k.multipart.MultipartFormBuilder
 import org.http4k.multipart.MultipartFormParser
 import org.http4k.multipart.Part
 import org.http4k.multipart.StreamingMultipartFormParts
-import org.http4k.multipart.TempDiskLocation
 import java.io.ByteArrayInputStream
 import java.io.Closeable
 import java.nio.ByteBuffer
@@ -82,7 +81,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     companion object {
         const val DEFAULT_DISK_THRESHOLD = 1000 * 1024
 
-        fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD, diskLocation: DiskLocation = TempDiskLocation()): MultipartFormBody {
+        fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD, diskLocation: DiskLocation = DiskLocation.Temp()): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directives?.firstOrNull{ it.first == "boundary" }?.second ?: ""
             val inputStream = httpMessage.body.run { if (stream.available() > 0) stream else ByteArrayInputStream(payload.array()) }
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8)

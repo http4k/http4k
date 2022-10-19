@@ -14,8 +14,7 @@ import java.nio.charset.Charset
  * @param encoding               encoding of the stream
  * @param writeToDiskThreshold   if a Part is bigger than this threshold it will be purged from memory
  * and written to disk
- * @param temporaryFileDirectory where to write the files for Parts that are too big. Uses the default
- * temporary directory if null.
+ * @param diskLocation           persistence implementation for multipart files which are stored during  processing.
  */
 internal class MultipartFormParser(
     private val encoding: Charset,
