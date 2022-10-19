@@ -41,7 +41,7 @@ fun ClientFilters.RefreshingOAuthToken(
     oauthCredentials: Credentials,
     tokenUri: Uri,
     backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, emptyList()), //TODO feels weird
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials),
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
     tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
@@ -106,12 +106,12 @@ fun ClientFilters.OAuthUserCredentials(clientCredentials: Credentials, userCrede
 
 fun ClientFilters.OAuthClientCredentials(
     config: OAuthProviderConfig,
-    scopes: List<String>
+    scopes: List<String> = emptyList()
 ) = OAuthClientCredentials(config.credentials, scopes)
 
 fun ClientFilters.OAuthClientCredentials(
     clientCredentials: Credentials,
-    scopes: List<String>
+    scopes: List<String> = emptyList()
 ) = Filter { next ->
     {
         next(
