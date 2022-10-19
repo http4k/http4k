@@ -4,7 +4,7 @@ description: Feature overview of the http4k-security-digest module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-security-digest", version: "4.32.4.0"
+implementation group: "org.http4k", name: "http4k-security-digest", version: "4.33.0.0"
 ```
 
 ### About
