@@ -111,6 +111,11 @@ object StringBiDiMappings {
         Enum<T>::name
     )
 
+    fun <T> csv(delimiter: String = ",", mapElement: BiDiMapping<String, T>) = BiDiMapping<String, List<T>>(
+        asOut = { if (it.isEmpty()) emptyList() else it.split(delimiter).map(mapElement::invoke) },
+        asIn = { it.joinToString(delimiter, transform = mapElement::invoke) }
+    )
+
     private fun String.safeBase64Decoded(): String? = try {
         base64Decoded()
     } catch (e: IllegalArgumentException) { null }

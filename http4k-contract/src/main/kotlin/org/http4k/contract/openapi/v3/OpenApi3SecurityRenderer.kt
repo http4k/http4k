@@ -9,6 +9,7 @@ import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
+import org.http4k.contract.security.UserCredentialsOAuthSecurity
 
 /**
  * Compose the supported Security models
@@ -18,7 +19,8 @@ val OpenApi3SecurityRenderer: SecurityRenderer = SecurityRenderer(
     AuthCodeOAuthSecurity.renderer,
     BasicAuthSecurity.renderer,
     BearerAuthSecurity.renderer,
-    ImplicitOAuthSecurity.renderer
+    ImplicitOAuthSecurity.renderer,
+    UserCredentialsOAuthSecurity.renderer
 )
 
 val ApiKeySecurity.Companion.renderer
@@ -99,6 +101,29 @@ val ImplicitOAuthSecurity.Companion.renderer
                             listOfNotNull(
                                 "authorizationUrl" to string(it.authorizationUrl.toString()),
                                 it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
+                                )
+                            ) + it.extraFields.map { it.key to string(it.value) }
+                        )
+                    )
+                ))
+            }
+
+            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
+        }
+    }
+
+val UserCredentialsOAuthSecurity.Companion.renderer
+    get() = rendererFor<UserCredentialsOAuthSecurity> {
+        object : RenderModes {
+            override fun <NODE> full(): Render<NODE> = {
+                obj(it.name to obj(
+                    "type" to string("oauth2"),
+                    "flows" to obj("password" to
+                        obj(
+                            listOfNotNull(
+                                it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
+                                "tokenUrl" to string(it.tokenUrl.toString()),
                                 "scopes" to obj(it.scopes.map { it.name to string(it.description) }
                                 )
                             ) + it.extraFields.map { it.key to string(it.value) }

@@ -36,4 +36,4 @@ private fun HttpServletRequest.headerParameters() =
 
 private fun Enumeration<String>.asPairs(key: String) = asSequence().map { key to it }.toList()
 
-private fun String?.toQueryString(): String = if (this != null && isNotEmpty()) "?$this" else ""
+private fun String?.toQueryString(): String = if (!isNullOrEmpty()) "?$this" else ""
