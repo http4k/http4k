@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import dev.zacsweers.moshix.reflect.MetadataKotlinJsonAdapterFactory
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okio.buffer
 import okio.source
 import org.http4k.core.Body
@@ -112,7 +112,9 @@ open class ConfigurableMoshi(
         WsMessage.string().map({ it.asA(T::class) }, { asFormatString(it) })
 }
 
-fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Builder> {
+fun Moshi.Builder.asConfigurable(
+    kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory()
+) = object : AutoMappingConfiguration<Moshi.Builder> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, { value(it) }, { nextInt() })
     override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) =
         adapter(mapping, { value(it) }, { nextLong() })
@@ -149,7 +151,7 @@ fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Bui
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
     override fun done() =
-        this@asConfigurable.add(MetadataKotlinJsonAdapterFactory()).add(Unit::class.java, UnitAdapter)
+        this@asConfigurable.add(kotlinFactory).add(Unit::class.java, UnitAdapter)
 }
 
 private object UnitAdapter : JsonAdapter<Unit>() {

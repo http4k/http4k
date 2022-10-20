@@ -73,6 +73,7 @@ nav:
     - Create a Distributed Tracing tree: guide/howto/create_a_distributed_tracing_tree/index.md
     - Use Auto Content Negotiation: guide/howto/use_auto_content_negotiation/index.md
     - Create a Swagger UI: guide/howto/create_a_swagger_ui/index.md
+    - Use Moshi with "lite" Reflection: guide/howto/moshi_lite/index.md
   - Reference:
     - Overview: guide/reference/index.md
     - API docs: api/
