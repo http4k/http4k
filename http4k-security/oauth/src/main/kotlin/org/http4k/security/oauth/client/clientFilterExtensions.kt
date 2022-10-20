@@ -41,7 +41,7 @@ fun ClientFilters.RefreshingOAuthToken(
     oauthCredentials: Credentials,
     tokenUri: Uri,
     backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials),
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, scopes = emptyList()),
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
     tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
@@ -84,10 +84,17 @@ fun ClientFilters.RefreshingOAuthToken(
     scopes = scopes,
 )
 
-fun ClientFilters.OAuthUserCredentials(config: OAuthProviderConfig, userCredentials: Credentials) =
-    OAuthUserCredentials(config.credentials, userCredentials)
+fun ClientFilters.OAuthUserCredentials(
+    config: OAuthProviderConfig,
+    userCredentials: Credentials,
+    scopes: List<String>
+) = OAuthUserCredentials(config.credentials, userCredentials, scopes)
 
-fun ClientFilters.OAuthUserCredentials(clientCredentials: Credentials, userCredentials: Credentials) = Filter { next ->
+fun ClientFilters.OAuthUserCredentials(
+    clientCredentials: Credentials,
+    userCredentials: Credentials,
+    scopes: List<String>
+) = Filter { next ->
     {
         next(
             it.with(
@@ -98,6 +105,8 @@ fun ClientFilters.OAuthUserCredentials(clientCredentials: Credentials, userCrede
                         clientSecret of clientCredentials.password,
                         username of userCredentials.user,
                         password of userCredentials.password,
+                        scopes.takeIf { scopes -> scopes.isNotEmpty() }
+                            .let { scopes -> scope of scopes?.joinToString(separator = " ") }
                     )
             )
         )
