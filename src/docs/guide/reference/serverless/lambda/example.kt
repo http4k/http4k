@@ -31,7 +31,12 @@ fun main() {
 
         val app: HttpHandler = TweetEchoLambda(mapOf())
         val localLambda = app.asServer(SunHttp(8000)).start()
-        val response = ApacheClient()(Request(POST, "http://localhost:8000/").body("hello hello hello, i suppose this isn't 140 characters anymore.."))
+        val response = ApacheClient()(
+            Request(
+                POST,
+                "http://localhost:8000/"
+            ).body("hello hello hello, i suppose this isn't 140 characters anymore..")
+        )
 
         println(response)
         localLambda.stop()
@@ -59,4 +64,7 @@ fun main() {
 }
 
 // helper method to stub the Lambda Context
-private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, _, _ -> TODO("not implemented") } as T
+private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
+    T::class.java.classLoader,
+    arrayOf(T::class.java)
+) { _, _, _ -> TODO("not implemented") } as T

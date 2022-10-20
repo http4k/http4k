@@ -12,7 +12,8 @@ import org.http4k.traffic.Responder
 
 fun main() {
 
-    // set up storage to stash a stream of HTTP traffic. Disk and Memory implementations are provided.
+    // set up storage to stash a stream of HTTP traffic.
+    // Disk and Memory implementations are provided.
     val storage = ReadWriteStream.Memory()
 
     // wrap any HTTP Handler in a Recording Filter and play traffic through it

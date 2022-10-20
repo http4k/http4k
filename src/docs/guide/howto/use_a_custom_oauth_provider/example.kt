@@ -31,10 +31,12 @@ fun main() {
 
     // custom OAuth2 provider configuration
     val oauthProvider = OAuthProvider(
-        OAuthProviderConfig(Uri.of("https://auth.chatroulette.com"),
-            "/oauth2/auth", "/oauth2/token",
-            Credentials("username", "somepassword"),
-            Uri.of("https://api.chatroulette.com")),
+        OAuthProviderConfig(
+            authBase = Uri.of("https://auth.chatroulette.com"),
+            authPath = "/oauth2/auth", tokenPath = "/oauth2/token",
+            credentials = Credentials("username", "somepassword"),
+            apiBase = Uri.of("https://api.chatroulette.com")
+        ),
         ApacheClient(),
         callbackUri,
         listOf("emailScope", "nameScope", "familyScope"),
@@ -52,10 +54,15 @@ fun main() {
         .asServer(SunHttp(port)).start().block()
 }
 
-// this interface allows us to provide custom logic for storing and verifying the CSRF and AccessTokens.
-// to be maximally secure, never let the end-user see the access token!
-// also avoid allowing third parties set the original uri as this might allow phishing attacks
-// on strategy is might be to use an enum to map to a set of know uris
+// This interface allows us to provide custom logic for storing and
+// verifying the CSRF and AccessTokens.
+//
+// To be maximally secure, never let the end-user see the access token!
+//
+// Also avoid allowing third parties set the original uri as this might
+// allow phishing attacks.
+//
+// One strategy might be to use an enum to map to a set of know uris
 // e.g. shoppingCart -> /cart
 class CustomOAuthPersistence : OAuthPersistence {
     var nonce: Nonce? = null
@@ -86,7 +93,12 @@ class CustomOAuthPersistence : OAuthPersistence {
 
     override fun retrieveToken(request: Request): AccessToken? = accessToken
 
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken, idToken: IdToken?): Response {
+    override fun assignToken(
+        request: Request,
+        redirect: Response,
+        accessToken: AccessToken,
+        idToken: IdToken?
+    ): Response {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }

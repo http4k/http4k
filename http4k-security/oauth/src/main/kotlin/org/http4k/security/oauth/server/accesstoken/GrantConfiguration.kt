@@ -1,5 +1,7 @@
 package org.http4k.security.oauth.server.accesstoken
 
+import org.http4k.security.oauth.server.accesstoken.GrantType.*
+
 enum class GrantType(val rfcValue: String) {
     AuthorizationCode("authorization_code"),
     ClientCredentials("client_credentials"),
@@ -8,14 +10,13 @@ enum class GrantType(val rfcValue: String) {
 
 data class GrantTypesConfiguration(val supportedGrantTypes: Map<GrantType, AccessTokenRequestAuthentication>) {
     companion object {
-        fun default(requestAuthentication: AccessTokenRequestAuthentication): GrantTypesConfiguration {
-            return GrantTypesConfiguration(
+        fun default(requestAuthentication: AccessTokenRequestAuthentication) =
+            GrantTypesConfiguration(
                 mapOf(
-                    GrantType.AuthorizationCode to requestAuthentication,
-                    GrantType.ClientCredentials to requestAuthentication,
-                    GrantType.RefreshToken to requestAuthentication
+                    AuthorizationCode to requestAuthentication,
+                    ClientCredentials to requestAuthentication,
+                    RefreshToken to requestAuthentication
                 )
             )
-        }
     }
 }

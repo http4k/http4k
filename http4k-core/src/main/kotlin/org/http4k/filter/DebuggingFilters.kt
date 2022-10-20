@@ -6,6 +6,8 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
 import org.http4k.core.NoOp
 import org.http4k.core.then
+import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
+import org.http4k.routing.RoutingHttpHandler
 import java.io.PrintStream
 import java.lang.management.ManagementFactory.getRuntimeMXBean
 
@@ -16,29 +18,41 @@ object DebuggingFilters {
      * Print details of the request before it is sent to the next service.
      */
     object PrintRequest {
-        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter = RequestFilters.Tap { req ->
-            out.println(listOf("***** REQUEST: ${req.method}: ${req.uri} *****", req.printable(debugStream)).joinToString("\n"))
-        }
+        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter =
+            RequestFilters.Tap { req ->
+                out.println(
+                    listOf(
+                        "***** REQUEST: ${req.method}: ${req.uri} *****",
+                        req.printable(debugStream)
+                    ).joinToString("\n")
+                )
+            }
     }
 
     /**
      * Print details of the response before it is returned.
      */
     object PrintResponse {
-        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter = Filter { next ->
-            {
-                try {
-                    next(it).let { response ->
-                        out.println(listOf("***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****", response.printable(debugStream)).joinToString("\n"))
-                        response
+        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter =
+            Filter { next ->
+                {
+                    try {
+                        next(it).let { response ->
+                            out.println(
+                                listOf(
+                                    "***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****",
+                                    response.printable(debugStream)
+                                ).joinToString("\n")
+                            )
+                            response
+                        }
+                    } catch (e: Exception) {
+                        out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri} *****")
+                        e.printStackTrace(out)
+                        throw e
                     }
-                } catch (e: Exception) {
-                    out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri} *****")
-                    e.printStackTrace(out)
-                    throw e
                 }
             }
-        }
     }
 
     private fun HttpMessage.printable(debugStream: Boolean) =
@@ -48,11 +62,16 @@ object DebuggingFilters {
      * Print details of a request and it's response.
      */
     object PrintRequestAndResponse {
-        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream) = PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
+        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream) =
+            PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
     }
 }
 
-fun HttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) = DebuggingFilters.PrintRequestAndResponse(out, debugStream).then(this)
+fun HttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
+    PrintRequestAndResponse(out, debugStream).then(this)
+
+fun RoutingHttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
+    PrintRequestAndResponse(out, debugStream).then(this)
 
 fun Filter.inIntelliJOnly() = when {
     getRuntimeMXBean().inputArguments.find { it.contains("idea", true) } != null -> this

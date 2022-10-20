@@ -18,31 +18,67 @@ import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 
-class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
-    override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username
-        ?: "unknown")))
+class DummyAuthorizationCodes(
+    private val request: AuthRequest,
+    private val shouldFail: (Request) -> Boolean,
+    private val username: String? = null
+) : AuthorizationCodes {
+    override fun create(
+        request: Request,
+        authRequest: AuthRequest,
+        response: Response
+    ): Result<AuthorizationCode, UserRejectedRequest> =
+        if (shouldFail(request)) Failure(UserRejectedRequest) else Success(
+            AuthorizationCode(
+                "dummy-token-for-" + (username
+                    ?: "unknown")
+            )
+        )
 
-    override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri!!, Instant.EPOCH, request.state, request.isOIDC(), request.responseType, request.nonce)
+    override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(
+        request.client,
+        request.redirectUri!!,
+        Instant.EPOCH,
+        request.state,
+        request.isOIDC(),
+        request.responseType,
+        request.nonce
+    )
 }
 
 class DummyIdTokens(private val username: String? = null) : IdTokens {
 
-    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response,
-                                        nonce: Nonce?, code: AuthorizationCode) =
+    override fun createForAuthorization(
+        request: Request, authRequest: AuthRequest, response: Response,
+        nonce: Nonce?, code: AuthorizationCode
+    ) =
         IdToken("dummy-id-token-for-" + (username ?: "unknown") + "-nonce:" + (nonce?.value ?: "unknown"))
 
-    override fun createForAccessToken(authorizationCodeDetails: AuthorizationCodeDetails, code: AuthorizationCode, accessToken: AccessToken): IdToken =
+    override fun createForAccessToken(
+        authorizationCodeDetails: AuthorizationCodeDetails,
+        code: AuthorizationCode,
+        accessToken: AccessToken
+    ): IdToken =
         IdToken("dummy-id-token-for-access-token")
 }
 
 class DummyAccessTokens : AccessTokens {
-    override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> = Success(AccessToken("dummy-access-token"))
+    override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> =
+        Success(AccessToken("dummy-access-token"))
 
-    override fun create(clientId: ClientId, tokenRequest: AuthorizationCodeAccessTokenRequest, authorizationCode: AuthorizationCode) = Success(AccessToken("dummy-access-token"))
+    override fun create(
+        clientId: ClientId,
+        tokenRequest: AuthorizationCodeAccessTokenRequest,
+        authorizationCode: AuthorizationCode
+    ) = Success(AccessToken("dummy-access-token"))
 }
 
 class DummyRefreshTokens : RefreshTokens {
-    override fun refreshAccessToken(clientId: ClientId, tokenRequest: TokenRequest, refreshToken: RefreshToken): Result<AccessToken, AccessTokenError> {
+    override fun refreshAccessToken(
+        clientId: ClientId,
+        tokenRequest: TokenRequest,
+        refreshToken: RefreshToken
+    ): Result<AccessToken, AccessTokenError> {
         return if (refreshToken.value.startsWith("valid")) {
             Success(newAccessToken)
         } else {
@@ -61,9 +97,14 @@ class DummyRefreshTokens : RefreshTokens {
 }
 
 class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {
-    override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> = Failure(error)
+    override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> =
+        Failure(error)
 
-    override fun create(clientId: ClientId, tokenRequest: AuthorizationCodeAccessTokenRequest, authorizationCode: AuthorizationCode) = Failure(error)
+    override fun create(
+        clientId: ClientId,
+        tokenRequest: AuthorizationCodeAccessTokenRequest,
+        authorizationCode: AuthorizationCode
+    ) = Failure(error)
 }
 
 class DummyClientValidator : ClientValidator {
@@ -103,7 +144,15 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
 
     override fun create(request: Request, authRequest: AuthRequest, response: Response) =
         Success(AuthorizationCode(UUID.randomUUID().toString()).also {
-            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri!!, clock.instant(), authRequest.state, authRequest.isOIDC(), authRequest.responseType, authRequest.nonce)
+            codes[it] = AuthorizationCodeDetails(
+                authRequest.client,
+                authRequest.redirectUri!!,
+                clock.instant(),
+                authRequest.state,
+                authRequest.isOIDC(),
+                authRequest.responseType,
+                authRequest.nonce
+            )
         })
 }
 

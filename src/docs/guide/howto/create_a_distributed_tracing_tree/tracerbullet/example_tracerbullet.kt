@@ -115,7 +115,13 @@ val expectedCallTree = HttpTraceTree(
         HttpTraceTree("internal1", Uri.of("http://external1/ext1"), GET, OK, emptyList()),
         HttpTraceTree(
             "internal1", Uri.of("http://internal2/{segment}"), GET, OK, listOf(
-                HttpTraceTree("internal2", Uri.of("http://external2/ext2"), GET, OK, emptyList()),
+                HttpTraceTree(
+                    "internal2",
+                    Uri.of("http://external2/ext2"),
+                    GET,
+                    OK,
+                    emptyList()
+                ),
             )
         )
     )

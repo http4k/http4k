@@ -30,7 +30,10 @@ class LibraryTest {
     @Test
     fun `retrieve sorted list of books`() {
         val remoteApi: HttpHandler = FakeLibrary(succeed = true)
-        assertThat(Library(remoteApi).titles(), equalTo(listOf("1984", "Brave New World", "Fahrenheit 451")))
+        assertThat(
+            Library(remoteApi).titles(),
+            equalTo(listOf("1984", "Brave New World", "Fahrenheit 451"))
+        )
     }
 
     @Test
@@ -44,12 +47,18 @@ class ServerTest {
     @Test
     fun `retrieve sorted list of books`() {
         val remoteApi: HttpHandler = FakeLibrary(succeed = true)
-        assertThat(Server(remoteApi)(Request(GET, "/reference/api/books")), hasStatus(OK).and(hasBody("1984,Brave New World,Fahrenheit 451")))
+        assertThat(
+            Server(remoteApi)(Request(GET, "/reference/api/books")),
+            hasStatus(OK).and(hasBody("1984,Brave New World,Fahrenheit 451"))
+        )
     }
 
     @Test
     fun `library call fails`() {
         val remoteApi: HttpHandler = FakeLibrary(succeed = false)
-        assertThat(Server(remoteApi)(Request(GET, "/reference/api/books")), hasStatus(SERVICE_UNAVAILABLE))
+        assertThat(
+            Server(remoteApi)(Request(GET, "/reference/api/books")),
+            hasStatus(SERVICE_UNAVAILABLE)
+        )
     }
 }

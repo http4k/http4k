@@ -43,7 +43,8 @@ fun main() {
     val webForm = WebForm().with(ageField of 55, nameField of Name("rita"))
     val validRequest = Request(GET, "/").with(strictFormBody of webForm)
 
-    // to extract the contents, we first extract the form and then extract the fields from it using the lenses
+    // to extract the contents, we first extract the form and then extract the fields from it
+    // using the lenses
     val validForm = strictFormBody(validRequest)
     val age = ageField(validForm)
     println(age)

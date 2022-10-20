@@ -51,11 +51,14 @@ object TweetEchoLambda : AppLoader {
 class FunctionsExampleEntryClass : AzureFunction(TweetEchoLambda) {
     @FunctionName("testFunction")
     override fun handleRequest(
-        @HttpTrigger(name = "req",
+        @HttpTrigger(
+            name = "req",
             methods = [HttpMethod.POST],
-            authLevel = ANONYMOUS)
+            authLevel = ANONYMOUS
+        )
         req: HttpRequestMessage<Optional<String>>,
-        ctx: ExecutionContext): HttpResponseMessage = handle(req, ctx)
+        ctx: ExecutionContext
+    ): HttpResponseMessage = handle(req, ctx)
 }
 
 fun main() {
@@ -69,8 +72,10 @@ fun main() {
         val localLambda = app.asServer(SunHttp(8000)).start()
 
         println(
-            ApacheClient()(Request(POST, "http://localhost:8000/echo")
-                .body("hello hello hello, i suppose this isn't 140 characters anymore.."))
+            ApacheClient()(
+                Request(POST, "http://localhost:8000/echo")
+                    .body("hello hello hello, i suppose this isn't 140 characters anymore..")
+            )
         )
         localLambda.stop()
     }
@@ -80,9 +85,11 @@ fun main() {
         println("RUNNING AS AZURE FUNCTIONS:")
 
         val response = FunctionsExampleEntryClass().handleRequest(
-            FakeAzureRequest(Request(POST, "http://localhost:8000/echo")
-                .body("hello hello hello, i suppose this isn't 140 characters anymore..")
-            ), proxy())
+            FakeAzureRequest(
+                Request(POST, "http://localhost:8000/echo")
+                    .body("hello hello hello, i suppose this isn't 140 characters anymore..")
+            ), proxy()
+        )
         println(response.status)
         println(response.body)
     }
@@ -92,4 +99,7 @@ fun main() {
 }
 
 // helper method to stub the Lambda Context
-private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, _, _ -> TODO("not implemented") } as T
+private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
+    T::class.java.classLoader,
+    arrayOf(T::class.java)
+) { _, _, _ -> TODO("not implemented") } as T

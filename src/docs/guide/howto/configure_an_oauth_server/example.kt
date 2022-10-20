@@ -52,8 +52,15 @@ fun main() {
         return routes(
             server.tokenRoute,
             "/my-login-page" bind GET to server.authenticationStart.then {
-                Response(OK)
-                    .body("""<html><form method="POST"><button type="submit">Please authenticate</button></form></html>""")
+                Response(OK).body(
+                    """
+                    <html>
+                        <form method="POST">
+                            <button type="submit">Please authenticate</button>
+                        </form>
+                    </html>
+                    """.trimIndent()
+                )
             },
             "/my-login-page" bind POST to server.authenticationComplete
         )
@@ -64,7 +71,8 @@ fun main() {
         val authorizationServer = Uri.of("http://localhost:9000")
 
         val oauthProvider = OAuthProvider(
-            OAuthProviderConfig(authorizationServer,
+            OAuthProviderConfig(
+                authorizationServer,
                 "/my-login-page", "/oauth2/token",
                 Credentials("my-app", "somepassword")
             ),
@@ -76,7 +84,11 @@ fun main() {
 
         return routes(
             "/my-callback" bind GET to oauthProvider.callback,
-            "/a-protected-resource" bind GET to oauthProvider.authFilter.then { Response(OK).body("user's protected resource") }
+            "/a-protected-resource" bind GET to oauthProvider.authFilter.then {
+                Response(OK).body(
+                    "user's protected resource"
+                )
+            }
         )
     }
 
@@ -92,13 +104,26 @@ class InsecureClientValidator : ClientValidator {
     override fun validateClientId(request: Request, clientId: ClientId): Boolean = true
 
     // one should only redirect to URLs registered against a particular client
-    override fun validateRedirection(request: Request, clientId: ClientId, redirectionUri: Uri): Boolean = true
+    override fun validateRedirection(
+        request: Request,
+        clientId: ClientId,
+        redirectionUri: Uri
+    ): Boolean = true
 
     // one should validate the scopes are correct for that client
-    override fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean = true
+    override fun validateScopes(
+        request: Request,
+        clientId: ClientId,
+        scopes: List<String>
+    ): Boolean = true
 
-    // certain operations can only be performed by fully authenticated clients (e.g. generate access tokens)
-    override fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String): Boolean = true
+    // certain operations can only be performed by fully authenticated clients
+    // e.g. generate access tokens
+    override fun validateCredentials(
+        request: Request,
+        clientId: ClientId,
+        clientSecret: String
+    ): Boolean = true
 }
 
 class InsecureAuthorizationCodes : AuthorizationCodes {
@@ -108,19 +133,32 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
     override fun detailsFor(code: AuthorizationCode) =
         codes[code] ?: error("code not stored")
 
-    // Authorization codes should be associated to a particular user (who can be identified in the Response)
+    // Authorization codes should be associated
+    // to a particular user (who can be identified in the Response)
     // so they can be checked in various stages of the authorization flow
     override fun create(request: Request, authRequest: AuthRequest, response: Response) =
         Success(AuthorizationCode(UUID.randomUUID().toString()).also {
-            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri!!, clock.instant().plus(1, DAYS), authRequest.state, authRequest.isOIDC())
+            codes[it] = AuthorizationCodeDetails(
+                authRequest.client,
+                authRequest.redirectUri!!,
+                clock.instant().plus(1, DAYS),
+                authRequest.state,
+                authRequest.isOIDC()
+            )
         })
 }
 
 class InsecureAccessTokens : AccessTokens {
-    override fun create(clientId: ClientId, tokenRequest: TokenRequest) = Failure(UnsupportedGrantType("client_credentials"))
+    override fun create(
+        clientId: ClientId,
+        tokenRequest: TokenRequest
+    ) = Failure(UnsupportedGrantType("client_credentials"))
 
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date
-    override fun create(clientId: ClientId, tokenRequest: AuthorizationCodeAccessTokenRequest, authorizationCode: AuthorizationCode) =
-        Success(AccessToken(UUID.randomUUID().toString()))
+    override fun create(
+        clientId: ClientId,
+        tokenRequest: AuthorizationCodeAccessTokenRequest,
+        authorizationCode: AuthorizationCode
+    ) = Success(AccessToken(UUID.randomUUID().toString()))
 }

@@ -43,6 +43,26 @@ class FilterTest {
     }
 
     @Test
+    fun `application order equivalence`() {
+        val chained = Filter.NoOp
+            .then(appendHeader("foo"))
+            .then(appendHeader("bar"))
+            .then(echoHeaders)
+
+        val nested = Filter.NoOp
+            .then(
+                appendHeader("foo")
+                    .then(appendHeader("bar"))
+            )
+            .then(echoHeaders)
+
+        val request = Request(GET, of("/"))
+
+        assertThat(chained(request).header("test"), equalTo(nested(request).header("test")))
+        assertThat(nested(request).header("test"), equalTo("foobar"))
+    }
+
+    @Test
     fun `initiates filter only once`() {
         var count = 0
         val countFilter = Filter { next ->
@@ -58,4 +78,7 @@ class FilterTest {
 
         assertThat(count, equalTo(1))
     }
+
+    private fun appendHeader(value: String) =
+        Filter { next -> { next(it.replaceHeader("test", (it.header("test").orEmpty() + value))) } }
 }

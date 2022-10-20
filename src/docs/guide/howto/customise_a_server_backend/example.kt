@@ -37,9 +37,11 @@ class SecureJetty(
             }
 
             connectors = arrayOf(
-                ServerConnector(server,
+                ServerConnector(
+                    server,
                     SslConnectionFactory(sslContextFactory, "http/1.1"),
-                    HttpConnectionFactory(https)).apply { port = sslPort }
+                    HttpConnectionFactory(https)
+                ).apply { port = sslPort }
             )
 
             insertHandler(http.toJettyHandler())
@@ -57,5 +59,12 @@ class SecureJetty(
 
 fun main() {
     PrintRequestAndResponse().then { Response(Status.OK).body("hello from secure jetty!") }
-        .asServer(SecureJetty(9000, "keystore.jks", "password", "password")).start()
+        .asServer(
+            SecureJetty(
+                sslPort = 9000,
+                localKeyStorePath = "keystore.jks",
+                localKeystorePassword = "password",
+                locakKeyManagerPassword = "password"
+            )
+        ).start()
 }

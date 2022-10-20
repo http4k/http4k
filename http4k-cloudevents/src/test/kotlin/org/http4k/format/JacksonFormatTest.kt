@@ -1,41 +1,60 @@
-package org.http4k.format
+package io.cloudevents.http4k
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import io.cloudevents.CloudEventData
-import io.cloudevents.core.builder.CloudEventBuilder.v1
+import io.cloudevents.core.builder.CloudEventBuilder
+import io.cloudevents.core.builder.withDataContentType
+import io.cloudevents.core.builder.withDataSchema
 import io.cloudevents.core.builder.withSource
-import io.cloudevents.jackson.JsonCloudEventData
-import io.cloudevents.with
+import io.cloudevents.core.provider.EventFormatProvider
+import org.http4k.core.Body
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.with
+import org.http4k.format.Jackson
+import org.http4k.format.Jackson.withData
+import org.http4k.format.cloudEventDataLens
+import org.http4k.lens.cloudEvent
+import org.http4k.testing.Approver
+import org.http4k.testing.CloudEventsJsonApprovalTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
 
-data class MyCloudEventData(val value: Int) : CloudEventData {
-    override fun toBytes() = value.toString().toByteArray()
+data class EventData(val uri: Uri)
 
-    companion object {
-        fun fromStringBytes(bytes: ByteArray) = MyCloudEventData(Integer.valueOf(String(bytes)))
-    }
-}
-
+@ExtendWith(CloudEventsJsonApprovalTest::class)
 class JacksonFormatTest {
+
     @Test
-    fun `can roundtrip data into an event`() {
-        val data = MyCloudEventData(123)
-        val empty = v1()
+    fun `can roundtrip custom format`(approver: Approver) {
+        EventFormatProvider.getInstance().registerFormat(Jackson.cloudEventsFormat())
+
+        val lens = Body.cloudEvent().toLens()
+
+        val data = EventData(Uri.of("foobar"))
+
+        val originalEvent = CloudEventBuilder.v1()
             .withId("123")
             .withType("type")
+            .withDataSchema(Uri.of("http4k"))
             .withSource(Uri.of("http4k"))
+            .withSubject("subject")
+            .withTime(OffsetDateTime.ofInstant(Instant.EPOCH, ZoneId.of("UTC")))
+            .withData(data)
             .build()
 
-        val cloudEventDataLens = Jackson.cloudEventDataLens<MyCloudEventData>()
+        val req = Request(GET, "").with(lens of originalEvent)
 
-        val withData = empty.with(cloudEventDataLens of data)
-        assertThat(
-            Jackson.compact((withData.data as JsonCloudEventData).node),
-            equalTo("""{"value":123}""")
-        )
+        approver.assertApproved(req)
 
-        assertThat(cloudEventDataLens(withData), equalTo(data))
+        val dataLens = Jackson.cloudEventDataLens<EventData>()
+
+        assertThat(dataLens(lens(req)), equalTo(data))
     }
+
 }

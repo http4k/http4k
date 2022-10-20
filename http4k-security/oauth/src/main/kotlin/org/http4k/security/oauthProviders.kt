@@ -2,6 +2,8 @@ package org.http4k.security
 
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
@@ -47,7 +49,7 @@ fun OAuthProvider.Companion.google(client: HttpHandler, credentials: Credentials
         callbackUri,
         scopes,
         oAuthPersistence,
-        { it.query("nonce", SECURE_CSRF().value) },
+        { it.query("nonce", SECURE_CSRF(Request(GET, "")).value) },
         SECURE_CSRF
     )
 
@@ -72,6 +74,15 @@ fun OAuthProvider.Companion.gitHub(client: HttpHandler, credentials: Credentials
 fun OAuthProvider.Companion.gitLab(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf()): OAuthProvider =
     OAuthProvider(
         OAuthProviderConfig(Uri.of("https://gitlab.com"), "/oauth/authorize", "/oauth/token", credentials, Uri.of("https://gitlab.com")),
+        client,
+        callbackUri,
+        scopes,
+        oAuthPersistence
+    )
+
+fun OAuthProvider.Companion.discord(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf()): OAuthProvider =
+    OAuthProvider(
+        OAuthProviderConfig(Uri.of("https://discord.com"), "/api/oauth2/authorize", "/api/oauth2/token", credentials, Uri.of("https://discord.com")),
         client,
         callbackUri,
         scopes,

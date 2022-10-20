@@ -8,13 +8,13 @@ Example showing how to combine multiple body Lenses into a single facade that wi
 Auto Content Negotiation is available in the core http4k module.
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-format-core", version: "4.27.4.0"
+implementation group: "org.http4k", name: "http4k-format-core", version: "4.33.0.0"
 ```
 
 But it also integrates with the contract module.
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-contract", version: "4.27.4.0"
+implementation group: "org.http4k", name: "http4k-contract", version: "4.33.0.0"
 ```
 
 ### Rationale
@@ -24,9 +24,9 @@ but there are scenarios where you may want to offer the user their choice of for
 While it is possible to use the `ACCEPT` and `CONTENT_TYPE` lenses to manually select the inbound and outbound body lenses,
 the `AutoContentNegotiator` can do this for you.
 
-### Using Auto Content Negotiation [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/typesafe_your_api_with_lenses/example_result4k.kt)
+### Using Auto Content Negotiation
 
-The `AutoContentNegotiator starts with your selection of body lenses, and wraps them together.
+The `AutoContentNegotiator` starts with your selection of body lenses, and wraps them together.
 It can then be used to:
 - Unmarshall `Request` bodies based on the `CONTENT_TYPE` header
 - Select an outbound `BodyLens`, based on the `ACCEPT` header
@@ -34,5 +34,7 @@ It can then be used to:
 
 If the `CONTENT_TYPE` and `ACCEPT` headers are not present, or if there is no lens for the requested format,
 then a default lens is used.
+
+### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_auto_content_negotiation/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_auto_content_negotiation/example.kt"></script>

@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.get
+import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -22,7 +23,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.State
-import org.http4k.security.accessTokenResponseBody
+import org.http4k.security.oauth.server.OAuthServerMoshi.auto
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
@@ -56,7 +57,10 @@ class GenerateAccessTokenTest {
             .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
-        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))))
+        assertThat(response, hasStatus(OK) and hasBody(
+            Body.auto<AccessTokenResponse>().toLens(),
+            equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))
+        ))
     }
 
     @Test
@@ -74,7 +78,10 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(OK))
 
-        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "Bearer", id_token = "dummy-id-token-for-access-token")))
+        assertThat(
+            Body.auto<AccessTokenResponse>().toLens()(response),
+            equalTo(AccessTokenResponse("dummy-access-token", "Bearer", id_token = "dummy-id-token-for-access-token"))
+        )
     }
 
     @Test
@@ -86,13 +93,17 @@ class GenerateAccessTokenTest {
             .form("client_id", authRequest.client.value)
             .form("client_secret", "a-secret"))
 
-        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse(
-            access_token = DummyRefreshTokens.newAccessToken.value,
-            token_type = DummyRefreshTokens.newAccessToken.type,
-            scope = DummyRefreshTokens.newAccessToken.scope,
-            expires_in = DummyRefreshTokens.newAccessToken.expiresIn,
-            refresh_token = DummyRefreshTokens.newAccessToken.refreshToken?.value
-        ))))
+        assertThat(response, hasStatus(OK) and hasBody(
+            Body.auto<AccessTokenResponse>().toLens(), equalTo(
+                AccessTokenResponse(
+                    access_token = DummyRefreshTokens.newAccessToken.value,
+                    token_type = DummyRefreshTokens.newAccessToken.type,
+                    scope = DummyRefreshTokens.newAccessToken.scope,
+                    expires_in = DummyRefreshTokens.newAccessToken.expiresIn,
+                    refresh_token = DummyRefreshTokens.newAccessToken.refreshToken?.value
+                )
+            )
+        ))
     }
 
     @Test
@@ -145,7 +156,10 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(OK))
 
-        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "Bearer", id_token = "dummy-id-token-for-access-token")))
+        assertThat(
+            Body.auto<AccessTokenResponse>().toLens()(response),
+            equalTo(AccessTokenResponse("dummy-access-token", "Bearer", id_token = "dummy-id-token-for-access-token"))
+        )
     }
 
     @Test
@@ -157,7 +171,10 @@ class GenerateAccessTokenTest {
             .form("client_id", authRequest.client.value)
         )
 
-        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))))
+        assertThat(response, hasStatus(OK) and hasBody(
+            Body.auto<AccessTokenResponse>().toLens(),
+            equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))
+        ))
     }
 
     @Test

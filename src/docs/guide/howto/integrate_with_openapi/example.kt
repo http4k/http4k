@@ -52,9 +52,10 @@ fun main() {
         )
     }
 
-    val filter: Filter = ResponseFilters.ReportHttpTransaction(Clock.systemUTC()) { tx: HttpTransaction ->
-        println(tx.labels.toString() + " took " + tx.duration)
-    }
+    val filter: Filter =
+        ResponseFilters.ReportHttpTransaction(Clock.systemUTC()) { tx: HttpTransaction ->
+            println(tx.labels.toString() + " took " + tx.duration)
+        }
 
     val mySecurity = ApiKeySecurity(Query.int().required("apiKey"), { it == 42 })
 
@@ -84,7 +85,9 @@ fun main() {
             summary = "divide"
             description = "Divides 2 numbers"
             returning(OK to "The result")
-        } bindContract GET to { first, second, _ -> { Response(OK).body((first / second).toString()) } }
+        } bindContract GET to { first, second, _ ->
+            { Response(OK).body((first / second).toString()) }
+        }
 
         routes += "/echo" / Path.of("name") meta {
             summary = "echo"
@@ -104,7 +107,8 @@ fun main() {
         }
     )
 
-    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).asServer(Jetty(8000)).start()
+    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).asServer(Jetty(8000))
+        .start()
 }
 
 // Ping!                    curl -v "http://localhost:8000/context/ping?apiKey=42"

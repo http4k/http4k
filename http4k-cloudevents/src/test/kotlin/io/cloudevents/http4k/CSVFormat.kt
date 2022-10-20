@@ -1,4 +1,4 @@
-package org.http4k.lens
+package io.cloudevents.http4k
 
 import io.cloudevents.CloudEvent
 import io.cloudevents.SpecVersion

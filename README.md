@@ -104,7 +104,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
     * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-    * Self-documenting for all routes - eg. Built in support for live **OpenApi v2 and v3** description endpoints including **JSON Schema** model breakdown. 
+    * Self-documenting for all routes - eg. Built in support for live **OpenApi v2 and v3** description endpoints including **JSON Schema** model breakdown.
+    * [Swagger UI](https://http4k.org/guide/howto/create_a_swagger_ui) for OpenApi descriptions
 * [Templating:](https://http4k.org/guide/reference/templating) 
     * **Pluggable** templating system support for:
         * **Dust** 
@@ -150,7 +151,10 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Implement OAuth Authorisation Code Grant flow with a single Interface
     * **Pre-configured** OAuth for following providers:
         * **Auth0** 
+        * **Discord**
         * **Dropbox** 
+        * **Facebook** 
+        * **GitLab** 
         * **Google** 
         * **Soundcloud**
 * [Digest Security:](https://http4k.org/guide/reference/digest)
@@ -182,9 +186,9 @@ To install, add these dependencies to your **Gradle** file:
 
 ```groovy
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "4.27.4.0"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.27.4.0"
-    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.27.4.0"
+    implementation group: "org.http4k", name: "http4k-core", version: "4.33.0.0"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.33.0.0"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.33.0.0"
 }
 ```
 

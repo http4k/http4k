@@ -27,7 +27,8 @@ object MyGraphQLHandler : GraphQLHandler {
         )
     ).build()
 
-    override fun invoke(request: GraphQLRequest) = GraphQLResponse.from(graphQL.execute(request.query))
+    override fun invoke(request: GraphQLRequest) =
+        GraphQLResponse.from(graphQL.execute(request.query))
 }
 
 data class User(val id: Int, val name: String)
@@ -52,7 +53,8 @@ fun main() {
     app.asServer(SunHttp(8000)).start()
 
     // for clients, just convert any app into a GQL handler
-    val gql: GraphQLHandler = JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:8000/graphql"))
+    val gql: GraphQLHandler =
+        JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:8000/graphql"))
     val response: GraphQLResponse = gql(
         GraphQLRequest(
             """{

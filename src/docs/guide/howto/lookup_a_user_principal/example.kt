@@ -17,9 +17,9 @@ fun main() {
 
     val credentials = RequestContextKey.required<Credentials>(contexts)
 
-    val app = InitialiseRequestContext(contexts)
-        .then(BearerAuth(credentials) { if (it == "42") Credentials("user", "pass") else null })
-        .then { Response(OK).body(credentials(it).toString()) }
+    val app = InitialiseRequestContext(contexts).then(BearerAuth(credentials) {
+        if (it == "42") Credentials("user", "pass") else null
+    }).then { Response(OK).body(credentials(it).toString()) }
 
     println(app(Request(GET, "/").header("Authorization", "Bearer 41")))
     println(app(Request(GET, "/").header("Authorization", "Bearer 42")))

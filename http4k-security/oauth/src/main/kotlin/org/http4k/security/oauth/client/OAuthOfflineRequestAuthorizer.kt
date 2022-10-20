@@ -1,5 +1,6 @@
 package org.http4k.security.oauth.client
 
+import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -7,9 +8,10 @@ import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.security.AccessToken
+import org.http4k.security.AccessTokenExtractor
+import org.http4k.security.ContentTypeJsonOrForm
 import org.http4k.security.ExpiringCredentials
 import org.http4k.security.OAuthProviderConfig
-import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.core.RefreshToken
 import java.time.Clock
 import java.time.Duration
@@ -21,6 +23,7 @@ class OAuthOfflineRequestAuthorizer(
     authRequestFilter: Filter,
     private val gracePeriod: Duration = Duration.ofSeconds(10),
     private val clock: Clock = Clock.systemUTC(),
+    private val accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
 ) {
     private val authClient = authRequestFilter.then(backend)
 
@@ -33,10 +36,10 @@ class OAuthOfflineRequestAuthorizer(
         val response = authClient(request)
         if (!response.status.successful) return null
 
-        val responseBody = accessTokenResponseBody(response)
+        val accessToken = accessTokenExtractor(response).onFailure { return null }.accessToken
         return ExpiringCredentials(
-            responseBody.toAccessToken(),
-            clock.instant().plusSeconds(responseBody.expires_in ?: Long.MAX_VALUE)
+            accessToken,
+            clock.instant().plusSeconds(accessToken.expiresIn ?: Long.MAX_VALUE)
         )
     }
 

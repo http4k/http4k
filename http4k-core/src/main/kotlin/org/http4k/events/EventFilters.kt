@@ -1,6 +1,7 @@
 package org.http4k.events
 
 import org.http4k.filter.ZipkinTraces
+import org.http4k.filter.ZipkinTracesStorage
 import java.time.Clock
 
 /**
@@ -40,9 +41,9 @@ object EventFilters {
     /**
      * Adds Zipkin traces metadata to the event.
      */
-    fun AddZipkinTraces() = EventFilter { next ->
+    fun AddZipkinTraces(storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL) = EventFilter { next ->
         {
-            next(it + ("traces" to ZipkinTraces.THREAD_LOCAL.get()))
+            next(it + ("traces" to storage.forCurrentThread()))
         }
     }
 }

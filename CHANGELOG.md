@@ -3,7 +3,92 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.28.0.0 (uncut) 
+### v4.33.0.0
+-  **http4k-*** : Upgrade some dependency versions, including CVE fix for Handlebars.
+- **http4k-multipart**: [Breaking] Add `DiskLocation` and the ability to keep uploaded files permanently stored on disk. H/T @jippeholwerda
+
+### v4.32.4.0
+-  **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Move Jakarta Servlet code from Jetty as is now shared.
+- **http4k-contract** : Add `UserCredentialsOAuthSecurity`.  This allows the OpenApi spec to define a Resource Owner Password Credentials grant.  It also includes a shortcut to load the principal into a `RequestContextLens`.  H/T @oharaandrew314
+- **http4k-core**: Add `StringBiDiMappings.csv` to map between string and list, with a configurable delimiter and element mapping.  H/T @oharaandrew314 
+- **http4k-multipart**: [Breaking] Add `DiskLocation` and the ability to keep uploaded files permanently stored on disk. H/T @jippeholwerda
+
+### v4.32.3.0
+- **http4k-*** : Upgrade some dependency versions including CVE fix for Undertow backend.
+
+### v4.32.2.0
+- **http4k-core** : Add `StringBidDiMapping.basicCredentials` to easily convert between `Credentials` and basic auth.  H/T oharaandrew314
+- **http4k-core**: Add `Header.AUTHORIZATION_BASIC` lens to easily get and set basic `Credentials` for a message.  H/T oharaandrew314
+- **http4k-contract**: `BasicAuthSecurity` now supports a `RequestContextLens` to store the principal.  H/T oharaandrew314
+
+### v4.32.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi*** : Added ability to make Automarshallers strictness.
+
+### v4.32.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.7.20.
+- **http4k-testing-webdriver** : [Unlikely Break] Upgrade has removed deprecated method.
+
+### v4.31.0.0
+- **http4k-core** : [Unlikely Break] Added `ZipkinTraceStorage`, defaulting to ThreadLocal implementation. This allows centralised storage of trace information in non-standard threading environments (eg. coroutines).
+
+### v4.30.10.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : YAML is now a recognised content type.
+
+### v4.30.9.0
+- **http4k-cloudevents** : Add custom lenses to retrieve data from a cloud event and an extension function to set it.
+
+### v4.30.8.0
+- **http4k-cloudevents** : Add `Jackson.cloudEventsFormat()` so we can use custom formats in cloud events lenses
+
+### v4.30.7.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Fix #779: SunHttp does not blow up if you add a ll value.
+
+### v4.30.6.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.30.5.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-client-websocket**: Fix #775 - WebsocketClient.nonBlocking cannot receive messages in binary mode. H/T oharaandrew314
+
+### v4.30.4.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.30.3.0 
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** : RefreshingOAuthToken does not blow up when no expiry returned by server.
+
+### v4.30.2.1
+- **http4k-format-moshi-yaml** : [Fix] Re-fix YAML defaults for over greedy boolean values (regression caused by upgrade to SnakeYaml).
+
+### v4.30.2.0
+- **http4k-security-oauth** : Make `FakeOAuthServer` more configurable, and removed the need for passing in an auth-code generator.
+
+### v4.30.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** : [Unlikely Break] Converted AccessToken to be an interface, and internalised a lens which shouldn't have been used by anyone. To fix uses of `accessTokenResponseBody`, replace with `Body.auto<AccessTokenResponse>().toLens()`, importing from OAuthServerMoshi.
+
+### v4.29.1.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.29.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** : [Unlikely Break] Slight changes to CSRF generator interface. Should be easy to fix.
+
+### v4.28.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** : Internal refactoring
+
+### v4.28.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-client-okhttp** : Handle previously escapable HTTP client timeout case.
+- **http4k-contract** : Added Swagger UI helper route.  H/T @oharaandrew314
+
+### v4.28.0.0
+- **http4k-*** : Upgrade some dependency versions, including CVE fix for Undertow backend.
 - **http4k-contract** : [Unlikely break] Remove direct dependency on kotlin-reflect JAR, as it is brought in my `http4k-format-jackson` anyway. This builds ok but we have bumped the version number just to be sure. H/T @oharaandrew314 for the inspiration.
 - **http4k-format-auto** : Add `ContentNegotiator` and auto versions to be plugged into `http4k-format-*` modules. H/T @oharaandrew314
 - **http4k-core**: Add cors exposed headers property. H/T @oharaandrew314
