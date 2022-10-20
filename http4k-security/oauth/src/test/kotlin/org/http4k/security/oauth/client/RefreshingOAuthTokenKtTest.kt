@@ -46,7 +46,7 @@ class RefreshingOAuthTokenTest {
             { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
             clock,
-            emptyList(), //TODO
+            scopes = emptyList(),
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
