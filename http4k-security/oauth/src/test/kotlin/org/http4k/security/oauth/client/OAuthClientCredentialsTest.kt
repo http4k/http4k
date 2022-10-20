@@ -24,4 +24,16 @@ class OAuthClientCredentialsTest {
             equalTo("grant_type=client_credentials&client_id=hello&client_secret=world&scope=someactivity.write")
         )
     }
+
+    @Test
+    fun `omits scope if not provided`() {
+        val app = ClientFilters.OAuthClientCredentials(
+            Credentials("hello", "world"),
+            scopes = emptyList()
+        ).then { req: Request -> Response(Status.OK).body(req.bodyString()) }
+        assertThat(
+            app(Request(Method.POST, "")).bodyString(),
+            equalTo("grant_type=client_credentials&client_id=hello&client_secret=world")
+        )
+    }
 }

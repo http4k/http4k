@@ -116,19 +116,13 @@ fun ClientFilters.OAuthClientCredentials(
     {
         next(
             it.with(
-                if (scopes.isNotEmpty())
-                    requestForm of WebForm().with(
-                        grantType of "client_credentials",
-                        clientId of clientCredentials.user,
-                        clientSecret of clientCredentials.password,
-                        scope of scopes.joinToString(separator = " ")
-                    )
-                else
-                    requestForm of WebForm().with(
-                        grantType of "client_credentials",
-                        clientId of clientCredentials.user,
-                        clientSecret of clientCredentials.password,
-                    )
+                requestForm of WebForm().with(
+                    grantType of "client_credentials",
+                    clientId of clientCredentials.user,
+                    clientSecret of clientCredentials.password,
+                    scopes.takeIf { scopes -> scopes.isNotEmpty() }
+                        .let { scopes -> scope of scopes?.joinToString(separator = " ") }
+                )
             )
         )
     }
@@ -148,21 +142,14 @@ fun ClientFilters.OAuthRefreshToken(
     {
         next(
             it.with(
-                if (scopes.isNotEmpty())
-                    requestForm of WebForm().with(
-                        grantType of "refresh_token",
-                        clientId of clientCredentials.user,
-                        clientSecret of clientCredentials.password,
-                        refreshToken of token,
-                        scope of scopes.joinToString(separator = " "),
-                    )
-                else
-                    requestForm of WebForm().with(
-                        grantType of "refresh_token",
-                        clientId of clientCredentials.user,
-                        clientSecret of clientCredentials.password,
-                        refreshToken of token,
-                    )
+                requestForm of WebForm().with(
+                    grantType of "refresh_token",
+                    clientId of clientCredentials.user,
+                    clientSecret of clientCredentials.password,
+                    refreshToken of token,
+                    scopes.takeIf { scopes -> scopes.isNotEmpty() }
+                        .let { scopes -> scope of scopes?.joinToString(separator = " ") }
+                )
             )
         )
     }
