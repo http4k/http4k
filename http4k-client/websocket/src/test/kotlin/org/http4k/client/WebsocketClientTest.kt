@@ -2,7 +2,6 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.hasSize
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.routing.bind
