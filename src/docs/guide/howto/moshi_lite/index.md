@@ -14,10 +14,18 @@ But until then, you can use this recipe to take advantage of the performance gai
 
 This recipe uses the 3rd-party [moshi-metadata-reflect](https://github.com/ZacSweers/MoshiX/tree/main/moshi-metadata-reflect) module.
 
-```groovy
-implementation group: "org.http4k", name: "http4k-format-moshi", version: "4.33.0.0"
-implementation group: "dev.zacsweers.moshix", name: "moshi-metadata-reflect", version: "0.19.0"
+```kotlin
+implementation("org.http4k:http4k-format-moshi") {
+    exclude("com.squareup.moshi", "moshi-kotlin")
+}
+implementation("dev.zacsweers.moshix:moshi-metadata-reflect:0.19.0")
 ```
+
+If you wish to take full advantage of the performance benefits, you need to ensure `kotlin-reflect` isn't bundled into your final jar.
+You must:
+
+1. Exclude the original `moshi-kotlin` module from `http4k-format-moshi`
+2. Ensure you don't have other 3rd-party libraries that depend on `kotlin-reflect`
 
 ### Recipe
 
