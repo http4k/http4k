@@ -6,6 +6,6 @@ import org.http4k.websocket.NonBlockingWebsocketClientContract
 class JettyWebsocketClientNonBlockingTest : NonBlockingWebsocketClientContract(
     serverConfig = Jetty(0),
     websocketFactory = { uri, headers, onError, onConnect ->
-        JettyWebsocketClient.nonBlockingWebsocket(uri, headers = headers, onError = onError, onConnect = onConnect)
+        JettyWebsocketClient.nonBlocking(uri, headers = headers, onError = onError, onConnect = onConnect)
     }
 )

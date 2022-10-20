@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 
 object JettyWebsocketClient {
 
-    fun blockingWebsocket(
+    fun blocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
@@ -50,7 +50,7 @@ object JettyWebsocketClient {
         } ?: listener
     }
 
-    fun nonBlockingWebsocket(
+    fun nonBlocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ZERO,

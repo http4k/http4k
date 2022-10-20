@@ -12,7 +12,7 @@ import java.net.UnknownHostException
 class JettyWebsocketClientBlockingTest : BlockingWebsocketClientContract(
     serverConfig = Jetty(0),
     websocketFactory = { uri, headers, timeout ->
-        JettyWebsocketClient.blockingWebsocket(uri, headers, timeout)
+        JettyWebsocketClient.blocking(uri, headers, timeout)
     }
 ) {
     override fun <T: Throwable> connectErrorMatcher(): Matcher<T> = isA<UnknownHostException>()
