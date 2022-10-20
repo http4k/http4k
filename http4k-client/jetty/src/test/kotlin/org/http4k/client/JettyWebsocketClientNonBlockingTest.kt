@@ -1,7 +1,7 @@
-package org.http4k.websocket
+package org.http4k.client
 
-import org.http4k.client.JettyWebsocketClient
 import org.http4k.server.Jetty
+import org.http4k.websocket.NonBlockingWebsocketClientContract
 
 class JettyWebsocketClientNonBlockingTest : NonBlockingWebsocketClientContract(
     serverConfig = Jetty(0),

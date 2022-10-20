@@ -9,10 +9,12 @@ import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.server.PolyServerConfig
 import org.junit.jupiter.api.Test
+import java.time.Duration
 
 abstract class BlockingWebsocketClientContract(
     serverConfig: PolyServerConfig,
-    private val websocketFactory: (Uri, Headers) -> WsClient,
+    private val websocketFactory: (Uri, Headers, Duration) -> WsClient,
+    private val connectionErrorTimeout: Duration = Duration.ofSeconds(1)
 ) : BaseWebsocketClientContract(serverConfig) {
 
     abstract fun <T: Throwable> connectErrorMatcher(): Matcher<T>
@@ -42,7 +44,8 @@ abstract class BlockingWebsocketClientContract(
 
     @Test
     fun `exception is thrown on connection error`() {
-        assertThat({ websocket(Uri.of("ws://does-not-exist:12345")) }, throws(connectErrorMatcher()))
+        assertThat({ websocket(Uri.of("ws://does-not-exist:12345"), timeout = connectionErrorTimeout) },
+            throws(connectErrorMatcher()))
     }
 
     @Test
@@ -66,6 +69,6 @@ abstract class BlockingWebsocketClientContract(
         assertThat(messages, equalTo(listOf(WsMessage("testOne=1"), WsMessage("testTwo=2"))))
     }
 
-    private fun websocket(uri: Uri, headers: Headers = emptyList()): WsClient =
-        websocketFactory(uri, headers)
+    private fun websocket(uri: Uri, headers: Headers = emptyList(), timeout: Duration = Duration.ofSeconds(3)): WsClient =
+        websocketFactory(uri, headers, timeout)
 }
