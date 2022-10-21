@@ -144,7 +144,7 @@ open class LensSpec<IN : Any, OUT>(
                     name,
                     description
                 )
-            ) { getLens(it).run { if (isEmpty()) null else this } }
+            ) { getLens(it).run { ifEmpty { null } } }
         }
 
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
@@ -239,7 +239,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(false, location, ArrayParam(paramMeta), name, description),
-                { getLens(it).run { if (isEmpty()) default(it) else this } },
+                { getLens(it).run { ifEmpty { default(it) } } },
                 { out: List<OUT>, target: IN -> setLens(out, target) }
             )
         }
@@ -248,7 +248,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(false, location, ArrayParam(paramMeta), name, description),
-                { getLens(it).run { if (isEmpty()) null else this } },
+                { getLens(it).run { ifEmpty { null } } },
                 { out: List<OUT>?, target: IN -> setLens(out ?: emptyList(), target) }
             )
         }
@@ -259,17 +259,19 @@ open class BiDiLensSpec<IN : Any, OUT>(
             return BiDiLens(Meta(true, location, ArrayParam(paramMeta), name, description),
                 {
                     getLens(it).run {
-                        if (isEmpty()) throw LensFailure(
-                            Missing(
-                                Meta(
-                                    true,
-                                    location,
-                                    ArrayParam(paramMeta),
-                                    name,
-                                    description
-                                )
-                            ), target = it
-                        ) else this
+                        ifEmpty {
+                            throw LensFailure(
+                                Missing(
+                                    Meta(
+                                        true,
+                                        location,
+                                        ArrayParam(paramMeta),
+                                        name,
+                                        description
+                                    )
+                                ), target = it
+                            )
+                        }
                     }
                 },
                 { out: List<OUT>, target: IN -> setLens(out, target) })
