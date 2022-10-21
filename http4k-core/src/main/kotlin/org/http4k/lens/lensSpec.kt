@@ -36,33 +36,28 @@ class LensSet<IN, in OUT> private constructor(private val setFn: (String, List<O
 /**
  * Common construction patterns for all lens implementations.
  */
-interface LensBuilder<IN : Any, OUT, Req : Lens<IN, OUT>, Opt : Lens<IN, OUT?>> {
+interface LensBuilder<IN : Any, OUT> {
 
     /**
      * Make a concrete Lens for this spec that looks for an optional value in the target.
      */
-    fun optional(name: String, description: String? = null): Opt
+    fun optional(name: String, description: String? = null): Lens<IN, OUT?>
 
     /**
      * Make a concrete Lens for this spec that looks for a required value in the target.
      */
-    fun required(name: String, description: String? = null): Req
+    fun required(name: String, description: String? = null): Lens<IN, OUT>
 
     /**
      * Make a concrete Lens for this spec that falls back to the default value if no value is found in the target.
      */
-    fun defaulted(name: String, default: OUT, description: String? = null): Req
+    fun defaulted(name: String, default: OUT, description: String? = null): Lens<IN, OUT>
 
     /**
      * Make a concrete Lens for this spec that falls back to another lens if no value is found in the target.
      */
-    fun defaulted(name: String, default: Lens<IN, OUT>, description: String? = null): Req
+    fun defaulted(name: String, default: Lens<IN, OUT>, description: String? = null): Lens<IN, OUT>
 }
-
-/**
- * Represents a uni-directional extraction of a list of entities from a target.
- */
-typealias MultiLensSpec<IN, OUT> = LensBuilder<IN, List<OUT>, Lens<IN, List<OUT>>, Lens<IN, List<OUT>?>>
 
 /**
  * Represents a uni-directional extraction of an entity from a target.
@@ -71,7 +66,7 @@ open class LensSpec<IN : Any, OUT>(
     val location: String,
     protected val paramMeta: ParamMeta,
     internal val get: LensGet<IN, OUT>
-) : LensBuilder<IN, OUT, Lens<IN, OUT>, Lens<IN, OUT?>> {
+) : LensBuilder<IN, OUT> {
     /**
      * Create another LensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a target.
@@ -113,7 +108,7 @@ open class LensSpec<IN : Any, OUT>(
         return Lens(meta) { getLens(it).firstOrNull() ?: throw LensFailure(listOf(Missing(meta)), target = it) }
     }
 
-    open val multi = object : MultiLensSpec<IN, OUT> {
+    open val multi = object : LensBuilder<IN, List<OUT>> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): Lens<IN, List<OUT>> =
             defaulted(
                 name,
@@ -166,7 +161,7 @@ open class LensSpec<IN : Any, OUT>(
 /**
  * Represents a bi-directional extraction of a list of entities from a target, or an insertion into a target.
  */
-interface BiDiMultiLensSpec<IN : Any, OUT> : MultiLensSpec<IN, OUT> {
+interface BiDiMultiLensSpec<IN : Any, OUT> : LensBuilder<IN, List<OUT>> {
     override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>>
     override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?>
     override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>>
