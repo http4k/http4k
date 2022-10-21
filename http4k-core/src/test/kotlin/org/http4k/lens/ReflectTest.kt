@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 class ReflectTest {
     private val qReq by Query.long().named().required()
     private val qOpt by Query.long().named().optional()
+    private val qDef by Query.long().named().defaulted(999)
     private val qListReq by Query.long().multi.named().required()
 
     @Test
@@ -17,6 +18,8 @@ class ReflectTest {
         val base = Request(GET, "")
         assertThat(qReq(base.query("qReq", "123")), equalTo(123L))
         assertThat(base.with(qReq of 123), equalTo(base.query("qReq", "123")))
+
+        assertThat(qDef(base), equalTo(999))
 
         assertThat(qOpt(base.query("qOpt", "123")), equalTo(123L))
         assertThat(base.with(qOpt of 123), equalTo(base.query("qOpt", "123")))
