@@ -8,10 +8,10 @@ import org.http4k.core.with
 import org.junit.jupiter.api.Test
 
 class DelegatedPropertyTest {
-    private val qReq by Query.long().named().required()
-    private val qOpt by Query.long().named().optional()
-    private val qDef by Query.long().named().defaulted(999)
-    private val qListReq by Query.long().multi.named().required()
+    private val qReq by Query.long().by().required()
+    private val qOpt by Query.long().by().optional()
+    private val qDef by Query.long().by().defaulted(999)
+    private val qListReq by Query.long().multi.by().required()
 
     @Test
     fun `extract and inject`() {

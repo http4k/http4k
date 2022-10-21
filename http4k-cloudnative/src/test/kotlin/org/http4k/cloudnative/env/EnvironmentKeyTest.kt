@@ -12,7 +12,7 @@ import org.http4k.core.with
 import org.http4k.lens.LensFailure
 import org.http4k.lens.composite
 import org.http4k.lens.int
-import org.http4k.lens.named
+import org.http4k.lens.by
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.Properties
@@ -78,7 +78,7 @@ class EnvironmentKeyTest {
 
     @Test
     fun `using property method`() {
-        val MY_GREAT_ENV_VARIABLE by EnvironmentKey.int().named().required()
+        val MY_GREAT_ENV_VARIABLE by EnvironmentKey.int().by().required()
         assertThat(MY_GREAT_ENV_VARIABLE(from("MY_GREAT_ENV_VARIABLE" to "123")), equalTo(123))
     }
 
