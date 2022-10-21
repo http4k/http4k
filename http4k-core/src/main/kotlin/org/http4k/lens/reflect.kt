@@ -3,7 +3,7 @@ package org.http4k.lens
 import kotlin.reflect.KProperty
 
 /**
- * Add ability to reflectively create lenses via property delegation.
+ * Create pre-named lenses via property delegation.
  */
 interface PropLens<OUT> {
     operator fun <T> getValue(t: T, property: KProperty<*>): OUT
