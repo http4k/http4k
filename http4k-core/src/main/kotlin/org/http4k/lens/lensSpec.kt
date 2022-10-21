@@ -161,10 +161,18 @@ open class LensSpec<IN : Any, OUT>(
 /**
  * Represents a bi-directional extraction of a list of entities from a target, or an insertion into a target.
  */
-interface BiDiMultiLensSpec<IN : Any, OUT> : LensBuilder<IN, List<OUT>> {
+
+interface BiDiMultiLensSpec<IN : Any, OUT> : BiDiLensBuilder<IN, List<OUT>> {
     override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>>
     override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?>
     override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>>
+}
+
+interface BiDiLensBuilder<IN : Any, OUT> : LensBuilder<IN, OUT> {
+    override fun optional(name: String, description: String?): BiDiLens<IN, OUT?>
+    override fun required(name: String, description: String?): BiDiLens<IN, OUT>
+    override fun defaulted(name: String, default: OUT, description: String?): BiDiLens<IN, OUT>
+    override fun defaulted(name: String, default: Lens<IN, OUT>, description: String?): BiDiLens<IN, OUT>
 }
 
 /**
@@ -175,7 +183,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
     paramMeta: ParamMeta,
     get: LensGet<IN, OUT>,
     private val set: LensSet<IN, OUT>
-) : LensSpec<IN, OUT>(location, paramMeta, get) {
+) : LensSpec<IN, OUT>(location, paramMeta, get), BiDiLensBuilder<IN, OUT> {
 
     /**
      * Create another BiDiLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
