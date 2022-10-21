@@ -7,7 +7,7 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.junit.jupiter.api.Test
 
-class ReflectTest {
+class DelegatedPropertyTest {
     private val qReq by Query.long().named().required()
     private val qOpt by Query.long().named().optional()
     private val qDef by Query.long().named().defaulted(999)
