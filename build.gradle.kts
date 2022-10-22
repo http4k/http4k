@@ -186,8 +186,7 @@ subprojects {
                             .childrenCalled("dependencies")
                             .flatMap { it.childrenCalled("dependency") }
                             .flatMap { it.childrenCalled("scope") }
-                            .forEach {
-                                if (it.text() == "runtime") it.setValue("provided") }
+                            .forEach { if (it.text() == "runtime") it.setValue("provided") }
                     }
                     artifact(sourcesJar)
                     artifact(javadocJar)
