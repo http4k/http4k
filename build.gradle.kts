@@ -171,7 +171,7 @@ subprojects {
                             .appendNode("developer").appendNode("name", "David Denton").parent()
                             .appendNode("email", "david@http4k.org")
                         asNode().appendNode("scm")
-                            .appendNode("url", "git@github.com:http4k/$archivesBaseName.git").parent()
+                            .appendNode("url", "https://github.com/http4k/http4k").parent()
                             .appendNode("connection", "scm:git:git@github.com:http4k/http4k.git").parent()
                             .appendNode("developerConnection", "scm:git:git@github.com:http4k/http4k.git")
                         asNode().appendNode("licenses").appendNode("license")
