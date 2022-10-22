@@ -112,7 +112,9 @@ open class ConfigurableMoshi(
         WsMessage.string().map({ it.asA(T::class) }, { asFormatString(it) })
 }
 
-fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Builder> {
+fun Moshi.Builder.asConfigurable(
+    kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory()
+) = object : AutoMappingConfiguration<Moshi.Builder> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, { value(it) }, { nextInt() })
     override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) =
         adapter(mapping, { value(it) }, { nextLong() })
@@ -149,7 +151,7 @@ fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Bui
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
     override fun done() =
-        this@asConfigurable.add(KotlinJsonAdapterFactory()).add(Unit::class.java, UnitAdapter)
+        this@asConfigurable.add(kotlinFactory).add(Unit::class.java, UnitAdapter)
 }
 
 private object UnitAdapter : JsonAdapter<Unit>() {
