@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v4.33.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-client-jetty** : Added websocket client. H/T @FredNordin.
+- **http4k-format-moshi** : Add facility to use lightweight metadata adapter insteead of Kotlin reflect. H/T @oharaandrew314
 
 ### v4.33.0.0
 - **http4k-*** : Upgrade some dependency versions, including CVE fix for Handlebars.
@@ -14,8 +15,8 @@ changes with their rationale when appropriate:
 ### v4.32.4.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Move Jakarta Servlet code from Jetty as is now shared.
-- **http4k-contract** : Add `UserCredentialsOAuthSecurity`.  This allows the OpenApi spec to define a Resource Owner Password Credentials grant.  It also includes a shortcut to load the principal into a `RequestContextLens`.  H/T @oharaandrew314
-- **http4k-core**: Add `StringBiDiMappings.csv` to map between string and list, with a configurable delimiter and element mapping.  H/T @oharaandrew314 
+- **http4k-contract** : Add `UserCredentialsOAuthSecurity`.  This allows the OpenApi spec to define a Resource Owner Password Credentials grant.  It also includes a shortcut to load the principal into a `RequestContextLens`. H/T @oharaandrew314
+- **http4k-core**: Add `StringBiDiMappings.csv` to map between string and list, with a configurable delimiter and element mapping. H/T @oharaandrew314 
 - **http4k-multipart**: [Breaking] Add `DiskLocation` and the ability to keep uploaded files permanently stored on disk. H/T @jippeholwerda
 
 ### v4.32.3.0
