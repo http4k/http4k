@@ -233,7 +233,7 @@ dependencies {
             testImplementation(project(path = it.name, configuration = "testArtifacts"))
         }
 
-    implementation("dev.zacsweers.moshix:moshi-metadata-reflect:0.19.0")
+    testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:0.19.0")
 
     testImplementation("software.amazon.awssdk:s3:_") {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
