@@ -36,4 +36,4 @@ This is done by overriding the default `kotlin-reflect` backend with the `kotlin
 
 Then you can use this new `ConfigurableMoshi` instance for auto-marshalling and lens creation, like normal.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/moshi_lite/index.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/moshi_lite/example.kt"></script>
