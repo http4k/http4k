@@ -42,10 +42,11 @@ class ResilienceFiltersTest {
             .waitDurationInOpenState(minimumOpenStateApparently)
             .build()
 
-        val responses = ArrayDeque<Response>()
-        responses.add(Response(INTERNAL_SERVER_ERROR))
-        responses.add(Response(OK))
-        responses.add(Response(OK))
+        val responses = ArrayDeque<Response>().apply {
+            add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(OK))
+            add(Response(OK))
+        }
 
         val circuitBreaker = of("hello", config)
 
@@ -68,9 +69,10 @@ class ResilienceFiltersTest {
         val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
-        val responses = ArrayDeque<Response>()
-        responses.add(Response(INTERNAL_SERVER_ERROR))
-        responses.add(Response(OK))
+        val responses = ArrayDeque<Response>().apply {
+            add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(OK))
+        }
 
         val retrying = ResilienceFilters.RetryFailures(retry).then {
             responses.removeFirst()
@@ -85,10 +87,11 @@ class ResilienceFiltersTest {
         val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
-        val responses = ArrayDeque<Response>()
-        responses.add(Response(INTERNAL_SERVER_ERROR))
-        responses.add(Response(BAD_GATEWAY))
-        responses.add(Response(SERVICE_UNAVAILABLE))
+        val responses = ArrayDeque<Response>().apply {
+            add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(BAD_GATEWAY))
+            add(Response(SERVICE_UNAVAILABLE))
+        }
         val retrying = ResilienceFilters.RetryFailures(retry).then {
             responses.removeFirst()
         }
