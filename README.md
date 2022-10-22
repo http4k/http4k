@@ -77,7 +77,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **Apache** sync + async HTTP
         * **Java** (bundled with `http4k-core`)
         * **Fuel** HTTP (supports sync and async HTTP)
-        * **Jetty** HTTP (supports sync and async HTTP)
+        * **Jetty** HTTP (supports sync and async HTTP and websockets)
         * **OkHttp** HTTP (supports sync and async HTTP)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
     * **GraphQL** client (bundled with GraphQL module)

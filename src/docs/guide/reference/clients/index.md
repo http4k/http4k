@@ -22,7 +22,7 @@ implementation group: "org.http4k", name: "http4k-client-apache4-async", version
 // Fuel (Sync + Async): 
 implementation group: "org.http4k", name: "http4k-client-fuel", version: "4.33.0.0"
 
-// Jetty (Sync + Async): 
+// Jetty (Sync + Async + WebSocket): 
 implementation group: "org.http4k", name: "http4k-client-jetty", version: "4.33.0.0"
 
 // OkHttp (Sync + Async): 
