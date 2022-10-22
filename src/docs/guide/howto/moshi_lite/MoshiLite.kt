@@ -16,7 +16,7 @@ object MoshiLite: ConfigurableMoshi(
         .addLast(ThrowableAdapter)
         .addLast(ListAdapter)
         .addLast(MapAdapter)
-        .asConfigurable(MetadataKotlinJsonAdapterFactory())
+        .asConfigurable(MetadataKotlinJsonAdapterFactory()) // <-- moshi-metadata-reflect
         .withStandardMappings()
         .done()
 )
