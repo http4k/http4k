@@ -32,7 +32,7 @@ object OkHttpWebsocketClient {
         headers: Headers = emptyList(),
         timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
         client: OkHttpClient = defaultOkHttpClient()
-    ): WsClient = BlockingQueueWsClient(uri, headers, timeout, client).awaitConnected()
+    ): WsClient = BlockingWebsocket(uri, headers, timeout, client).awaitConnected()
 
     fun nonBlocking(
         uri: Uri,
@@ -44,7 +44,7 @@ object OkHttpWebsocketClient {
     ): Websocket = NonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
 }
 
-private class BlockingQueueWsClient(
+private class BlockingWebsocket(
     uri: Uri,
     headers: Headers,
     timeout: Duration,
