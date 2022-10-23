@@ -10,6 +10,7 @@ import org.http4k.core.Uri
 import org.http4k.hamkrest.hasUri
 import org.http4k.server.PolyServerConfig
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
@@ -20,6 +21,7 @@ abstract class NonBlockingWebsocketClientContract(
 ) : BaseWebsocketClientContract(serverConfig) {
 
     @Test
+    @Timeout(10, unit = TimeUnit.SECONDS)
     fun `send and receive in text mode`() {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
@@ -41,6 +43,7 @@ abstract class NonBlockingWebsocketClientContract(
     }
 
     @Test
+    @Timeout(10, unit = TimeUnit.SECONDS)
     fun `send and receive in binary mode`() {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }

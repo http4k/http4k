@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import org.http4k.core.Uri
-import org.http4k.server.Jetty
+import org.http4k.server.Undertow
 import org.http4k.websocket.BlockingWebsocketClientContract
 import org.http4k.websocket.WsMessage
 import org.java_websocket.exceptions.WebsocketNotConnectedException
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 
 class WebsocketClientBlockingTest : BlockingWebsocketClientContract(
-    serverConfig = Jetty(0),
+    serverConfig = Undertow(0),
     websocketFactory = { uri, headers, timeout ->
         WebsocketClient.blocking(uri, headers, timeout)
     },
