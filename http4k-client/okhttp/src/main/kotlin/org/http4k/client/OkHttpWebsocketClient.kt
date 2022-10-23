@@ -32,7 +32,7 @@ object OkHttpWebsocketClient {
         headers: Headers = emptyList(),
         timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
         client: OkHttpClient = defaultOkHttpClient()
-    ): WsClient = BlockingWebsocket(uri, headers, timeout, client).awaitConnected()
+    ): WsClient = OkHttpBlockingWebsocket(uri, headers, timeout, client).awaitConnected()
 
     fun nonBlocking(
         uri: Uri,
@@ -41,10 +41,10 @@ object OkHttpWebsocketClient {
         client: OkHttpClient = defaultOkHttpClient(),
         onError: (Throwable) -> Unit = {},
         onConnect: WsConsumer = {}
-    ): Websocket = NonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
+    ): Websocket = OkHttpNonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
 }
 
-private class BlockingWebsocket(
+private class OkHttpBlockingWebsocket(
     uri: Uri,
     headers: Headers,
     timeout: Duration,
@@ -54,7 +54,7 @@ private class BlockingWebsocket(
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
-    private val websocket = NonBlockingWebsocket(uri, headers, timeout, client, connected::completeExceptionally) { ws ->
+    private val websocket = OkHttpNonBlockingWebsocket(uri, headers, timeout, client, connected::completeExceptionally) { ws ->
         ws.onMessage { queue += { it } }
         ws.onError { queue += { throw it } }
         ws.onClose { queue += { null } }
@@ -74,7 +74,7 @@ private class BlockingWebsocket(
     override fun send(message: WsMessage) = websocket.send(message)
 }
 
-private class NonBlockingWebsocket(
+private class OkHttpNonBlockingWebsocket(
     uri: Uri,
     headers: Headers,
     timeout: Duration,
@@ -106,7 +106,7 @@ private class NonBlockingWebsocket(
 
     inner class Listener : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            onConnect(this@NonBlockingWebsocket)
+            onConnect(this@OkHttpNonBlockingWebsocket)
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {

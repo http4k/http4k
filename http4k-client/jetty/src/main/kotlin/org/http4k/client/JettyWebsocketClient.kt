@@ -36,7 +36,7 @@ object JettyWebsocketClient {
     ): WsClient {
         if(!wsClient.isRunning) wsClient.start()
 
-        return BlockingWebsocket(uri, headers, timeout, wsClient).awaitConnected()
+        return JettyBlockingWebsocket(uri, headers, timeout, wsClient).awaitConnected()
     }
 
     fun nonBlocking(
@@ -49,11 +49,11 @@ object JettyWebsocketClient {
     ): Websocket {
         if(!wsClient.isRunning) wsClient.start()
 
-        return NonBlockingWebsocket(uri, headers, timeout, wsClient, onError, onConnect)
+        return JettyNonBlockingWebsocket(uri, headers, timeout, wsClient, onError, onConnect)
     }
 }
 
-private class BlockingWebsocket(
+private class JettyBlockingWebsocket(
     uri: Uri,
     headers: Headers,
     timeout: Duration,
@@ -63,7 +63,7 @@ private class BlockingWebsocket(
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
-    private val websocket = NonBlockingWebsocket(uri, headers, timeout, client, connected::completeExceptionally) { ws ->
+    private val websocket = JettyNonBlockingWebsocket(uri, headers, timeout, client, connected::completeExceptionally) { ws ->
         ws.onMessage { queue += { it } }
         ws.onError { queue += { throw it } }
         ws.onClose { queue += { null } }
@@ -83,7 +83,7 @@ private class BlockingWebsocket(
     override fun send(message: WsMessage) = websocket.send(message)
 }
 
-private class NonBlockingWebsocket(
+private class JettyNonBlockingWebsocket(
     uri: Uri,
     headers: Headers,
     timeout: Duration,
@@ -119,7 +119,7 @@ private class NonBlockingWebsocket(
     inner class Listener : WebSocketAdapter() {
         override fun onWebSocketConnect(session: Session) {
             super.onWebSocketConnect(session)
-            onConnect(this@NonBlockingWebsocket)
+            onConnect(this@JettyNonBlockingWebsocket)
         }
 
         override fun onWebSocketClose(statusCode: Int, reason: String?) {
