@@ -85,7 +85,6 @@ fun main() {
     val refreshingOAuthClient = ClientFilters.RefreshingOAuthToken(
         oauthCredentials = clientCredentials,
         tokenUri = Uri.of("/oauth"),
-        scopes = emptyList(), // TODO include scope example
         backend = baseHttp,
         oAuthFlowFilter = ClientFilters.OAuthClientCredentials(clientCredentials),
         gracePeriod = Duration.ofSeconds(1)
