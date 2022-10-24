@@ -49,6 +49,8 @@ class ResilienceFiltersTest {
 
         val responses = ArrayDeque<Response>().apply {
             add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(OK))
             add(Response(OK))
             add(Response(OK))
         }
@@ -58,6 +60,7 @@ class ResilienceFiltersTest {
         val circuited = CircuitBreak(circuitBreaker).then { responses.removeFirst() }
 
         assertThat(circuitBreaker.state, equalTo(CLOSED))
+        assertThat(circuited(Request(GET, "/")), hasStatus(INTERNAL_SERVER_ERROR))
         assertThat(circuited(Request(GET, "/")), hasStatus(INTERNAL_SERVER_ERROR))
         assertThat(circuitBreaker.state, equalTo(OPEN))
         assertThat(circuited(Request(GET, "/")), hasStatus(SERVICE_UNAVAILABLE))
