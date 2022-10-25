@@ -17,6 +17,6 @@ class JettyWebsocketClientBlockingTest : BlockingWebsocketClientContract(
 ) {
     override fun <T: Throwable> connectErrorMatcher(): Matcher<T> = isA<UnknownHostException>()
     override fun <T: Throwable> connectionClosedErrorMatcher(): Matcher<T> = isA(
-        has(WebSocketException::message, equalTo("not connected"))
+        has(WebSocketException::message, equalTo("Connection to ws://localhost:$port/bob is closed."))
     )
 }

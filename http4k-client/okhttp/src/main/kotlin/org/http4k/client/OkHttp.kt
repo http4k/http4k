@@ -67,7 +67,7 @@ object OkHttp {
     }
 }
 
-private fun Request.asOkHttp(): okhttp3.Request = headers.fold(
+internal fun Request.asOkHttp(): okhttp3.Request = headers.fold(
     okhttp3.Request.Builder()
         .url(uri.toString())
         .method(method.toString(), requestBody())
