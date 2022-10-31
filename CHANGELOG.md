@@ -7,6 +7,8 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-resilience4j-jetty** : Fix #804 - CircuitBreaker counts error twice, once as an error and once as a success
 - **http4k-client-okhttp** : Added websocket client. H/T @FredNordin.
+- **http4k-format-argo** : Fix problem with duplicate keys when creating objects.
+- **http4k-security-oauth** : Ability to add scopes to the OAuth refresh token. H/T @p10r
 
 ### v4.33.1.0
 - **http4k-*** : Upgrade some dependency versions.
