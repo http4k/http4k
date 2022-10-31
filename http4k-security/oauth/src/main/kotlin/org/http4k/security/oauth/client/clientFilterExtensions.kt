@@ -105,8 +105,7 @@ fun ClientFilters.OAuthUserCredentials(
                         clientSecret of clientCredentials.password,
                         username of userCredentials.user,
                         password of userCredentials.password,
-                        scopes.takeIf { scopes -> scopes.isNotEmpty() }
-                            .let { scopes -> scope of scopes?.joinToString(separator = " ") }
+                        scope of scopes.takeIf { scopes -> scopes.isNotEmpty() }?.joinToString(separator = " ")
                     )
             )
         )
@@ -129,8 +128,7 @@ fun ClientFilters.OAuthClientCredentials(
                     grantType of "client_credentials",
                     clientId of clientCredentials.user,
                     clientSecret of clientCredentials.password,
-                    scopes.takeIf { scopes -> scopes.isNotEmpty() }
-                        .let { scopes -> scope of scopes?.joinToString(separator = " ") }
+                    scope of scopes.takeIf { scopes -> scopes.isNotEmpty() }?.joinToString(separator = " ")
                 )
             )
         )
