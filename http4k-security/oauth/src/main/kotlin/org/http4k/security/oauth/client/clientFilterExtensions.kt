@@ -25,14 +25,13 @@ import org.http4k.security.OAuthWebForms.grantType
 import org.http4k.security.OAuthWebForms.password
 import org.http4k.security.OAuthWebForms.refreshToken
 import org.http4k.security.OAuthWebForms.requestForm
+import org.http4k.security.OAuthWebForms.scope
 import org.http4k.security.OAuthWebForms.username
 import org.http4k.security.Refreshing
 import org.http4k.security.oauth.core.RefreshToken
 import java.time.Clock
 import java.time.Duration
-import java.time.Instant
 import java.time.Instant.MAX
-import kotlin.Long.Companion.MAX_VALUE
 
 /**
  * Filter to authenticate and refresh against a OAuth server. Use the correct OAuth filter for your flow.
@@ -42,13 +41,16 @@ fun ClientFilters.RefreshingOAuthToken(
     oauthCredentials: Credentials,
     tokenUri: Uri,
     backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials),
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, scopes = emptyList()),
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
-    tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
+    tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
+    scopes: List<String> = emptyList(),
 ): Filter {
     val refresher = CredentialsProvider.Refreshing<AccessToken>(gracePeriod, clock) {
-        val filter = it?.refreshToken?.let { ClientFilters.OAuthRefreshToken(oauthCredentials, it) } ?: oAuthFlowFilter
+        val filter = it?.refreshToken
+            ?.let { token -> ClientFilters.OAuthRefreshToken(oauthCredentials, token, scopes) }
+            ?: oAuthFlowFilter
 
         filter
             .then(backend)(Request(POST, tokenUri))
@@ -56,7 +58,8 @@ fun ClientFilters.RefreshingOAuthToken(
             ?.let { tokenExtractor(it).map { it.accessToken }.valueOrNull() }
             ?.let {
                 ExpiringCredentials(
-                    it, it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
+                    credentials = it,
+                    expiry = it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
                 )
             }
     }
@@ -67,22 +70,31 @@ fun ClientFilters.RefreshingOAuthToken(
 fun ClientFilters.RefreshingOAuthToken(
     config: OAuthProviderConfig,
     backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials),
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials, emptyList()),
     gracePeriod: Duration = Duration.ofSeconds(10),
-    clock: Clock = Clock.systemUTC()
+    clock: Clock = Clock.systemUTC(),
+    scopes: List<String> = emptyList(),
 ) = ClientFilters.RefreshingOAuthToken(
-    config.credentials,
-    config.tokenUri,
-    backend,
-    oAuthFlowFilter,
-    gracePeriod,
-    clock
+    oauthCredentials = config.credentials,
+    tokenUri = config.tokenUri,
+    backend = backend,
+    oAuthFlowFilter = oAuthFlowFilter,
+    gracePeriod = gracePeriod,
+    clock = clock,
+    scopes = scopes,
 )
 
-fun ClientFilters.OAuthUserCredentials(config: OAuthProviderConfig, userCredentials: Credentials) =
-    OAuthUserCredentials(config.credentials, userCredentials)
+fun ClientFilters.OAuthUserCredentials(
+    config: OAuthProviderConfig,
+    userCredentials: Credentials,
+    scopes: List<String>
+) = OAuthUserCredentials(config.credentials, userCredentials, scopes)
 
-fun ClientFilters.OAuthUserCredentials(clientCredentials: Credentials, userCredentials: Credentials) = Filter { next ->
+fun ClientFilters.OAuthUserCredentials(
+    clientCredentials: Credentials,
+    userCredentials: Credentials,
+    scopes: List<String>
+) = Filter { next ->
     {
         next(
             it.with(
@@ -93,43 +105,60 @@ fun ClientFilters.OAuthUserCredentials(clientCredentials: Credentials, userCrede
                         clientSecret of clientCredentials.password,
                         username of userCredentials.user,
                         password of userCredentials.password,
+                        scopes.takeIf { scopes -> scopes.isNotEmpty() }
+                            .let { scopes -> scope of scopes?.joinToString(separator = " ") }
                     )
             )
         )
     }
 }
 
-fun ClientFilters.OAuthClientCredentials(config: OAuthProviderConfig) = OAuthClientCredentials(config.credentials)
+fun ClientFilters.OAuthClientCredentials(
+    config: OAuthProviderConfig,
+    scopes: List<String> = emptyList()
+) = OAuthClientCredentials(config.credentials, scopes)
 
-fun ClientFilters.OAuthClientCredentials(clientCredentials: Credentials) = Filter { next ->
+fun ClientFilters.OAuthClientCredentials(
+    clientCredentials: Credentials,
+    scopes: List<String> = emptyList()
+) = Filter { next ->
     {
         next(
             it.with(
-                requestForm of WebForm()
-                    .with(
-                        grantType of "client_credentials",
-                        clientId of clientCredentials.user,
-                        clientSecret of clientCredentials.password,
-                    )
+                requestForm of WebForm().with(
+                    grantType of "client_credentials",
+                    clientId of clientCredentials.user,
+                    clientSecret of clientCredentials.password,
+                    scopes.takeIf { scopes -> scopes.isNotEmpty() }
+                        .let { scopes -> scope of scopes?.joinToString(separator = " ") }
+                )
             )
         )
     }
 }
 
-fun ClientFilters.OAuthRefreshToken(config: OAuthProviderConfig, token: RefreshToken) =
-    OAuthRefreshToken(config.credentials, token)
+fun ClientFilters.OAuthRefreshToken(
+    config: OAuthProviderConfig,
+    token: RefreshToken,
+    scopes: List<String> = emptyList(),
+) = OAuthRefreshToken(config.credentials, token, scopes)
 
-fun ClientFilters.OAuthRefreshToken(clientCredentials: Credentials, token: RefreshToken) = Filter { next ->
+fun ClientFilters.OAuthRefreshToken(
+    clientCredentials: Credentials,
+    token: RefreshToken,
+    scopes: List<String> = emptyList(),
+) = Filter { next ->
     {
         next(
             it.with(
-                requestForm of WebForm()
-                    .with(
-                        grantType of "refresh_token",
-                        clientId of clientCredentials.user,
-                        clientSecret of clientCredentials.password,
-                        refreshToken of token
-                    )
+                requestForm of WebForm().with(
+                    grantType of "refresh_token",
+                    clientId of clientCredentials.user,
+                    clientSecret of clientCredentials.password,
+                    refreshToken of token,
+                    scopes.takeIf { scopes -> scopes.isNotEmpty() }
+                        .let { scopes -> scope of scopes?.joinToString(separator = " ") }
+                )
             )
         )
     }
