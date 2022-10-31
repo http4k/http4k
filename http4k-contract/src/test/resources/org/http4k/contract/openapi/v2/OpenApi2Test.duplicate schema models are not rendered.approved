@@ -1,0 +1,82 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "basePath": "/",
+  "tags": [
+  ],
+  "paths": {
+    "/{enum}": {
+      "post": {
+        "tags": [
+          ""
+        ],
+        "summary": "<unknown>",
+        "operationId": "post_enum",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enum",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+        ]
+      },
+      "get": {
+        "tags": [
+          ""
+        ],
+        "summary": "<unknown>",
+        "operationId": "get_enum",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enum",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+  },
+  "definitions": {
+  },
+  "host": "example.org:8000",
+  "schemes": [
+    "http"
+  ],
+  "x-extension": [
+    "extensionField"
+  ]
+}

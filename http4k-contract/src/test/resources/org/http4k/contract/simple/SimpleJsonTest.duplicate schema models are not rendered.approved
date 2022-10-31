@@ -1,0 +1,6 @@
+{
+  "resources": {
+    "POST:/{enum}": "<unknown>",
+    "GET:/{enum}": "<unknown>"
+  }
+}

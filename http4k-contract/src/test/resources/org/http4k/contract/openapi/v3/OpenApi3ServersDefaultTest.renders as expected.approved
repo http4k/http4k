@@ -811,18 +811,20 @@
   "components": {
     "schemas": {
       "foo": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-        }
+        "example": "bar",
+        "type": "string",
+        "enum": [
+          "bar",
+          "bing"
+        ]
       },
       "e": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-        }
+        "example": "bar",
+        "type": "string",
+        "enum": [
+          "bar",
+          "bing"
+        ]
       },
       "object540438179": {
         "type": "object",

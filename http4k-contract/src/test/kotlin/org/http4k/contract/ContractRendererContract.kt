@@ -225,6 +225,20 @@ abstract class ContractRendererContract<NODE : Any>(
 
         approver.assertApproved(router(Request(GET, "/docs?the_api_key=somevalue")))
     }
+
+    @Test
+    fun `duplicate schema models are not rendered`(approver: Approver) {
+        val router = "/" bind contract {
+            renderer = rendererToUse
+            routes += Path.enum<Foo>()
+                .of("enum") bindContract POST to { _ -> { _: Request -> Response(OK) } }
+            routes += Path.enum<Foo>()
+                .of("enum") bindContract GET to { _ -> { _: Request -> Response(OK) } }
+            descriptionPath = "/docs"
+        }
+
+        approver.assertApproved(router(Request(GET, "/docs")))
+    }
 }
 
 private val credentials = Credentials("user", "password")

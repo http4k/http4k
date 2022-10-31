@@ -1,0 +1,85 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "tags": [
+  ],
+  "paths": {
+    "/{enum}": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          ""
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/enum"
+            },
+            "in": "path",
+            "name": "enum",
+            "required": true,
+            "description": null
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+        ],
+        "operationId": "get_enum",
+        "deprecated": false
+      },
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          ""
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/enum"
+            },
+            "in": "path",
+            "name": "enum",
+            "required": true,
+            "description": null
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+        ],
+        "operationId": "post_enum",
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "enum": {
+        "example": "bar",
+        "type": "string",
+        "enum": [
+          "bar",
+          "bing"
+        ]
+      }
+    },
+    "securitySchemes": {
+    }
+  },
+  "servers": [
+    {
+      "url": "https://localhost:8000",
+      "description": ""
+    }
+  ],
+  "x-extension": [
+    "extensionField"
+  ]
+}
