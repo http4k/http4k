@@ -5,6 +5,7 @@ import argo.format.PrettyJsonFormatter
 import argo.jdom.JdomParser
 import argo.jdom.JsonNode
 import argo.jdom.JsonNodeFactories
+import argo.jdom.JsonNodeFactories.field
 import argo.jdom.JsonNodeFactories.`object`
 import argo.jdom.JsonNodeType.ARRAY
 import argo.jdom.JsonNodeType.FALSE
@@ -13,6 +14,7 @@ import argo.jdom.JsonNodeType.NUMBER
 import argo.jdom.JsonNodeType.OBJECT
 import argo.jdom.JsonNodeType.STRING
 import argo.jdom.JsonNodeType.TRUE
+import argo.jdom.JsonStringNode
 import org.http4k.format.JsonType.Object
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -23,7 +25,7 @@ object Argo : Json<JsonNode> {
             STRING -> JsonType.String
             TRUE -> JsonType.Boolean
             FALSE -> JsonType.Boolean
-            NUMBER -> if(value.text.any { !it.isDigit() }) JsonType.Number else JsonType.Integer
+            NUMBER -> if (value.text.any { !it.isDigit() }) JsonType.Number else JsonType.Integer
             ARRAY -> JsonType.Array
             OBJECT -> Object
             NULL -> JsonType.Null
@@ -59,7 +61,10 @@ object Argo : Json<JsonNode> {
     override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = JsonNodeFactories.array(this)
     override fun JsonNode.asPrettyJsonString(): String = pretty.format(this)
     override fun JsonNode.asCompactJsonString(): String = compact.format(this)
-    override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode = `object`(map { field(it.first, it.second) })
+
+    override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
+        `object`(associate { JsonNodeFactories.string(it.first) to it.second })
+
     override fun fields(node: JsonNode) =
         if (typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
 
@@ -78,6 +83,4 @@ object Argo : Json<JsonNode> {
             else -> throw IllegalArgumentException("Don't know how to translate $node")
         }
     }
-
-    private fun field(name: String, value: JsonNode) = JsonNodeFactories.field(name, value)
 }

@@ -1,0 +1,81 @@
+{
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "tags": [
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "a very simple API"
+    }
+  ],
+  "paths": {
+    "/{enum}": {
+      "get": {
+        "summary": "<unknown>",
+        "tags": [
+          ""
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enum",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Foo"
+            }
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+        ],
+        "operationId": "get_enum",
+        "deprecated": false
+      },
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          ""
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enum",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Foo"
+            }
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+        ],
+        "operationId": "post_enum",
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Foo": {
+        "example": "bar",
+        "enum": [
+          "bar",
+          "bing"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+    }
+  },
+  "openapi": "3.0.0",
+  "x-extension": [
+    "extensionField"
+  ]
+}

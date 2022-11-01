@@ -45,7 +45,8 @@ class RefreshingOAuthTokenTest {
             backend,
             { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
-            clock
+            clock,
+            scopes = emptyList(),
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
@@ -84,7 +85,8 @@ class RefreshingOAuthTokenTest {
             backend,
             { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
-            clock
+            clock,
+            listOf("someactivity.read", "someactivity.write"),
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
@@ -97,7 +99,11 @@ class RefreshingOAuthTokenTest {
 
         assertThat(
             app(Request(GET, "")),
-            hasBody("Bearer grant_type=refresh_token&client_id=hello&client_secret=world&refresh_token=refresh1")
+            hasBody("Bearer grant_type=refresh_token" +
+                "&client_id=hello" +
+                "&client_secret=world" +
+                "&refresh_token=refresh" +
+                "&scope=someactivity.read+someactivity.write1")
         )
     }
 
@@ -124,7 +130,8 @@ class RefreshingOAuthTokenTest {
             backend,
             { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
-            clock
+            clock,
+            scopes = emptyList(),
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))

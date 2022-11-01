@@ -77,7 +77,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **Apache** sync + async HTTP
         * **Java** (bundled with `http4k-core`)
         * **Fuel** HTTP (supports sync and async HTTP)
-        * **Jetty** HTTP (supports sync and async HTTP)
+        * **Jetty** HTTP (supports sync and async HTTP and websockets)
         * **OkHttp** HTTP (supports sync and async HTTP)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
     * **GraphQL** client (bundled with GraphQL module)
@@ -186,9 +186,9 @@ To install, add these dependencies to your **Gradle** file:
 
 ```groovy
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "4.33.0.0"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.33.0.0"
-    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.33.0.0"
+    implementation group: "org.http4k", name: "http4k-core", version: "4.33.2.1"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.33.2.1"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.33.2.1"
 }
 ```
 

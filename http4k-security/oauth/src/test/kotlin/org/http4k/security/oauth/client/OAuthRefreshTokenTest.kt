@@ -16,11 +16,38 @@ class OAuthRefreshTokenTest {
 
     @Test
     fun `auths with correct form`() {
-        val app = ClientFilters.OAuthRefreshToken(Credentials("hello", "world"), RefreshToken("goodbye"))
-            .then { req: Request -> Response(Status.OK).body(req.bodyString()) }
+        val app = ClientFilters.OAuthRefreshToken(
+            Credentials("hello", "world"),
+            RefreshToken("goodbye"),
+            scopes = listOf("someactivity.read", "someactivity.write")
+        ).then { req: Request -> Response(Status.OK).body(req.bodyString()) }
         assertThat(
             app(Request(Method.POST, "")).bodyString(),
-            equalTo("grant_type=refresh_token&client_id=hello&client_secret=world&refresh_token=goodbye")
+            equalTo(
+                "grant_type=refresh_token" +
+                    "&client_id=hello" +
+                    "&client_secret=world" +
+                    "&refresh_token=goodbye" +
+                    "&scope=someactivity.read+someactivity.write"
+            )
+        )
+    }
+
+    @Test
+    fun `omits scope if not provided`() {
+        val app = ClientFilters.OAuthRefreshToken(
+            Credentials("hello", "world"),
+            RefreshToken("goodbye"),
+            scopes = emptyList()
+        ).then { req: Request -> Response(Status.OK).body(req.bodyString()) }
+        assertThat(
+            app(Request(Method.POST, "")).bodyString(),
+            equalTo(
+                "grant_type=refresh_token" +
+                    "&client_id=hello" +
+                    "&client_secret=world" +
+                    "&refresh_token=goodbye"
+            )
         )
     }
 }

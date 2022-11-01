@@ -171,7 +171,7 @@ subprojects {
                             .appendNode("developer").appendNode("name", "David Denton").parent()
                             .appendNode("email", "david@http4k.org")
                         asNode().appendNode("scm")
-                            .appendNode("url", "git@github.com:http4k/$archivesBaseName.git").parent()
+                            .appendNode("url", "https://github.com/http4k/http4k").parent()
                             .appendNode("connection", "scm:git:git@github.com:http4k/http4k.git").parent()
                             .appendNode("developerConnection", "scm:git:git@github.com:http4k/http4k.git")
                         asNode().appendNode("licenses").appendNode("license")
@@ -186,8 +186,7 @@ subprojects {
                             .childrenCalled("dependencies")
                             .flatMap { it.childrenCalled("dependency") }
                             .flatMap { it.childrenCalled("scope") }
-                            .forEach {
-                                if (it.text() == "runtime") it.setValue("provided") }
+                            .forEach { if (it.text() == "runtime") it.setValue("provided") }
                     }
                     artifact(sourcesJar)
                     artifact(javadocJar)
@@ -232,6 +231,8 @@ dependencies {
             api(project(it.name))
             testImplementation(project(path = it.name, configuration = "testArtifacts"))
         }
+
+    testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
 
     testImplementation("software.amazon.awssdk:s3:_") {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")

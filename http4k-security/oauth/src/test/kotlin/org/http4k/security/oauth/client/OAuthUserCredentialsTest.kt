@@ -18,8 +18,31 @@ class OAuthUserCredentialsTest {
 
     @Test
     fun `auths with correct form`() {
-        val app = ClientFilters.OAuthUserCredentials(config, Credentials("user", "password"))
-            .then { req: Request -> Response(Status.OK).body(req.bodyString()) }
+        val app = ClientFilters.OAuthUserCredentials(
+            config,
+            Credentials("user", "password"),
+            scopes = listOf("someactivity.write", "someactivity.read")
+        ).then { req: Request -> Response(Status.OK).body(req.bodyString()) }
+        assertThat(
+            app(Request(Method.POST, "")).bodyString(),
+            equalTo(
+                "grant_type=password" +
+                    "&client_id=hello" +
+                    "&client_secret=world" +
+                    "&username=user" +
+                    "&password=password" +
+                    "&scope=someactivity.write+someactivity.read"
+            )
+        )
+    }
+
+    @Test
+    fun `omits scope if not provided`() {
+        val app = ClientFilters.OAuthUserCredentials(
+            config,
+            Credentials("user", "password"),
+            scopes = emptyList()
+        ).then { req: Request -> Response(Status.OK).body(req.bodyString()) }
         assertThat(
             app(Request(Method.POST, "")).bodyString(),
             equalTo("grant_type=password&client_id=hello&client_secret=world&username=user&password=password")

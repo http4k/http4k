@@ -34,7 +34,7 @@ object ResilienceFilters {
                     val start = cb.currentTimestamp
                     next(it).apply {
                         if (isError(this)) cb.onError(0, MILLISECONDS, CircuitError)
-                        cb.onResult(cb.currentTimestamp - start, cb.timestampUnit, this)
+                        else cb.onSuccess(cb.currentTimestamp - start, cb.timestampUnit)
                     }
                 } catch (e: CallNotPermittedException) {
                     onError()

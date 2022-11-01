@@ -18,7 +18,8 @@ import org.http4k.util.JsonSchema
  * If you are using Jackson, you probably want to use ApiRenderer.Auto()!
  */
 class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
-    private val jsonToJsonSchema = JsonToJsonSchema(json, "components/schemas")
+    private val refLocationPrefix = "components/schemas"
+    private val jsonToJsonSchema = JsonToJsonSchema(json, refLocationPrefix)
 
     override fun api(api: Api<NODE>): NODE =
         with(api) {
@@ -208,6 +209,28 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
         try {
             jsonToJsonSchema.toSchema(obj as NODE, overrideDefinitionId, refModelNamePrefix)
         } catch (e: ClassCastException) {
-            jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId, refModelNamePrefix)
+            when (obj) {
+                is Enum<*> -> toEnumSchema(obj, refModelNamePrefix, overrideDefinitionId)
+                else -> jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId, refModelNamePrefix)
+            }
         }
+
+    private fun toEnumSchema(
+        obj: Enum<*>,
+        refModelNamePrefix: String?,
+        overrideDefinitionId: String?
+    ): JsonSchema<NODE> {
+        val newDefinition = json.obj(
+            "example" to json.string(obj.name),
+            "type" to json.string("string"),
+            "enum" to json.array(obj.javaClass.enumConstants.map { json.string(it.name) })
+        )
+        val definitionId =
+            (refModelNamePrefix ?: "") + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
+        return JsonSchema(
+            json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) }, setOf(
+                definitionId to newDefinition
+            )
+        )
+    }
 }

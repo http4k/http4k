@@ -3,15 +3,30 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.33.2.1
+- **http4k-contract** : Fix OpenApi rendering for enums when there isn't reflection.
+- 
+### v4.33.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-resilience4j-jetty** : Fix #804 - CircuitBreaker counts error twice, once as an error and once as a success
+- **http4k-client-okhttp** : Added websocket client. H/T @FredNordin.
+- **http4k-format-argo** : Fix problem with duplicate keys when creating objects.
+- **http4k-security-oauth** : Ability to add scopes to the OAuth refresh token. H/T @p10r
+
+### v4.33.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-client-jetty** : Added websocket client. H/T @FredNordin.
+- **http4k-format-moshi** : Add facility to use lightweight metadata adapter instead of Kotlin reflect. H/T @oharaandrew314
+
 ### v4.33.0.0
--  **http4k-*** : Upgrade some dependency versions, including CVE fix for Handlebars.
+- **http4k-*** : Upgrade some dependency versions, including CVE fix for Handlebars.
 - **http4k-multipart**: [Breaking] Add `DiskLocation` and the ability to keep uploaded files permanently stored on disk. H/T @jippeholwerda
 
 ### v4.32.4.0
--  **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Move Jakarta Servlet code from Jetty as is now shared.
-- **http4k-contract** : Add `UserCredentialsOAuthSecurity`.  This allows the OpenApi spec to define a Resource Owner Password Credentials grant.  It also includes a shortcut to load the principal into a `RequestContextLens`.  H/T @oharaandrew314
-- **http4k-core**: Add `StringBiDiMappings.csv` to map between string and list, with a configurable delimiter and element mapping.  H/T @oharaandrew314 
+- **http4k-contract** : Add `UserCredentialsOAuthSecurity`.  This allows the OpenApi spec to define a Resource Owner Password Credentials grant.  It also includes a shortcut to load the principal into a `RequestContextLens`. H/T @oharaandrew314
+- **http4k-core**: Add `StringBiDiMappings.csv` to map between string and list, with a configurable delimiter and element mapping. H/T @oharaandrew314 
 - **http4k-multipart**: [Breaking] Add `DiskLocation` and the ability to keep uploaded files permanently stored on disk. H/T @jippeholwerda
 
 ### v4.32.3.0

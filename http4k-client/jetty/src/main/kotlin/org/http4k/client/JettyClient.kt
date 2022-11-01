@@ -7,6 +7,7 @@ import org.eclipse.jetty.client.util.InputStreamRequestContent
 import org.eclipse.jetty.client.util.InputStreamResponseListener
 import org.eclipse.jetty.http.HttpFields
 import org.eclipse.jetty.util.HttpCookieStore
+import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.BodyMode
 import org.http4k.core.Headers
 import org.http4k.core.Request
@@ -29,10 +30,10 @@ object JettyClient {
     @JvmStatic
     @JvmOverloads
     @JvmName("create")
-    operator fun invoke(client: HttpClient = defaultHttpClient(),
+    operator fun invoke(client: HttpClient = defaultJettyHttpClient(),
                         bodyMode: BodyMode = BodyMode.Memory,
                         requestModifier: (JettyRequest) -> JettyRequest = { it }): DualSyncAsyncHttpHandler {
-        if (!client.isStarted && !client.isStarting) client.start()
+        if(!client.isRunning) client.start()
 
         return object : DualSyncAsyncHttpHandler {
             override fun close() = client.stop()
@@ -109,8 +110,10 @@ object JettyClient {
             }.description("Client Error: caused by $localizedMessage"))
         }
     }
+}
 
-    private fun defaultHttpClient() = HttpClient().apply {
+object PreCannedJettyHttpClients {
+    fun defaultJettyHttpClient() = HttpClient().apply {
         isFollowRedirects = false
         cookieStore = HttpCookieStore.Empty()
     }
