@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.33.2.2 (uncut)
+### v4.33.3.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-ktor*** : Fix: Remove duplicate content type header.
 
 ### v4.33.2.1
 - **http4k-contract** : Fix OpenApi rendering for enums when there isn't reflection.

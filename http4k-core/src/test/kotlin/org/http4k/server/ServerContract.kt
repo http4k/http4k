@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anyOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -140,8 +141,8 @@ abstract class ServerContract(
     @Test
     fun `returns headers`() {
         val response = client(Request(GET, "$baseUrl/headers"))
-
         assertThat(response.status, equalTo(ACCEPTED))
+        assertThat(response.headerValues("content-type").size, equalTo(1))
         assertThat(response.header("content-type"), equalTo("text/plain"))
     }
 

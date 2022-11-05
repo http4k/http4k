@@ -26,6 +26,7 @@ import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -69,10 +70,10 @@ fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), ur
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))
     response.headers
-        .filterNot { HttpHeaders.isUnsafe(it.first) }
+        .filterNot { HttpHeaders.isUnsafe(it.first) || it.first == CONTENT_TYPE.meta.name }
         .forEach { header(it.first, it.second ?: "") }
     call.respondOutputStream(
-        Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
+        CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
     ) {
         response.body.stream.copyTo(this)
     }
