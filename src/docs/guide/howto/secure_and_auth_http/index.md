@@ -4,10 +4,10 @@ description: Recipes for how to secure and authenticate HTTP services
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.33.2.1"
+implementation group: "org.http4k", name: "http4k-core", version: "4.33.3.0"
 
 // for OAuth examples
-implementation group: "org.http4k", name: "http4k-security-oauth", version: "4.33.2.1"
+implementation group: "org.http4k", name: "http4k-security-oauth", version: "4.33.3.0"
 ```
 
 http4k provides a set of Filters for authenticating into other HTTP services. Usage of these filters is shown below to authenticate into a service. Each authentication type is generally available using both dynamic and static credential provision and checking mechanisms.
