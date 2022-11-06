@@ -116,7 +116,7 @@ class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerC
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
             bootstrap.group(masterGroup, workerGroup)
-                .channelFactory(ChannelFactory<ServerChannel> { NioServerSocketChannel() })
+                .channelFactory { NioServerSocketChannel() }
                 .childHandler(object : ChannelInitializer<SocketChannel>() {
                     public override fun initChannel(ch: SocketChannel) {
                         ch.pipeline().addLast("codec", HttpServerCodec())
