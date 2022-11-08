@@ -147,7 +147,7 @@
             "in": "formData",
             "name": "j",
             "required": true,
-            "type": "object",
+            "type": "string",
             "description": "jsonField"
           }
         ],

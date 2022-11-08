@@ -13,7 +13,9 @@ import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
+import org.http4k.contract.openapi.coerceForSimpleType
 import org.http4k.contract.openapi.operationId
+import org.http4k.contract.openapi.v2.value
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -68,18 +70,24 @@ class OpenApi3<NODE : Any>(
         servers: List<ApiServer> = emptyList(),
     ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json), servers = servers)
 
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, tags: Set<Tag>): Response {
+    override fun description(
+        contractRoot: PathSegments,
+        security: Security?,
+        routes: List<ContractRoute>,
+        tags: Set<Tag>
+    ): Response {
         val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         val unextended = apiRenderer.api(
             Api(
                 apiInfo,
-                (routes.map(ContractRoute::tags).flatten() + tags).toSet() .sortedBy { it.name },
+                (routes.map(ContractRoute::tags).flatten() + tags).toSet().sortedBy { it.name },
                 paths
                     .groupBy { it.path }
                     .mapValues {
-                        it.value.associate { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }.toSortedMap()
+                        it.value.associate { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }
+                            .toSortedMap()
                     }
                     .toSortedMap(),
                 Components(
@@ -151,23 +159,29 @@ class OpenApi3<NODE : Any>(
 
     private fun ContractRoute.asOpenApiParameters(): List<RequestParameter<NODE>> = nonBodyParams.map {
         when (val paramMeta: ParamMeta = it.paramMeta) {
-            ObjectParam -> SchemaParameter(it, "{}".toSchema())
             FileParam -> PrimitiveParameter(it, json {
                 obj("type" to string(FileParam.value), "format" to string("binary"))
             })
+
             is ArrayParam -> PrimitiveParameter(it, json {
                 obj(
                     "type" to string("array"),
-                    "items" to obj("type" to string(paramMeta.itemType().value))
+                    "items" to obj(
+                        "type" to string(paramMeta.itemType().coerceForSimpleType().value)
+                    )
                 )
             })
-            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(
-                paramMeta.clz.java.enumConstants[0],
-                it.name,
-                null
-            ))
+
+            is ParamMeta.EnumParam<*> -> SchemaParameter(
+                it, apiRenderer.toSchema(
+                    paramMeta.clz.java.enumConstants[0],
+                    it.name,
+                    null
+                )
+            )
+
             else -> PrimitiveParameter(it, json {
-                obj("type" to string(paramMeta.value))
+                obj("type" to string(paramMeta.coerceForSimpleType().value))
             })
         }
     }
@@ -180,6 +194,7 @@ class OpenApi3<NODE : Any>(
                 when (this) {
                     APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
                         (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
+
                     null -> null
                     else -> value to it.toSchemaContent()
                 }

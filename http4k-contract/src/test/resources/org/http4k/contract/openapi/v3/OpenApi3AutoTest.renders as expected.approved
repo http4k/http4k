@@ -120,7 +120,7 @@
                     "description": "enumField"
                   },
                   "j": {
-                    "type": "object",
+                    "type": "string",
                     "description": "jsonField"
                   }
                 },
@@ -502,13 +502,13 @@
             }
           },
           {
+            "schema": {
+              "type": "string"
+            },
             "in": "header",
             "name": "j",
             "required": false,
-            "description": "jsonHeader",
-            "schema": {
-              "$ref": "#/components/schemas/object1955914966"
-            }
+            "description": "jsonHeader"
           }
         ],
         "responses": {
@@ -544,11 +544,11 @@
                     }
                   },
                   "fileField": {
-                    "type": "string",
+                    "type": "file",
                     "format": "binary"
                   },
                   "jsonField": {
-                    "type": "object"
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -749,13 +749,13 @@
             }
           },
           {
+            "schema": {
+              "type": "string"
+            },
             "in": "query",
             "name": "j",
             "required": false,
-            "description": "jsonQuery",
-            "schema": {
-              "$ref": "#/components/schemas/object1955914966"
-            }
+            "description": "jsonQuery"
           }
         ],
         "responses": {
@@ -813,13 +813,6 @@
           "bing"
         ],
         "type": "string"
-      },
-      "object1955914966": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-        }
       },
       "object1089648089": {
         "type": "object",
