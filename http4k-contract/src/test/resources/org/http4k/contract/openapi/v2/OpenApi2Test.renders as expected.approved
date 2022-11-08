@@ -542,9 +542,7 @@
             "in": "header",
             "name": "j",
             "required": false,
-            "schema": {
-              "type": "object"
-            },
+            "type": "string",
             "description": "jsonHeader"
           }
         ],
@@ -825,9 +823,7 @@
             "in": "query",
             "name": "j",
             "required": false,
-            "schema": {
-              "type": "object"
-            },
+            "type": "string",
             "description": "jsonQuery"
           }
         ],
