@@ -1,5 +1,8 @@
 package org.http4k.format
 
+import org.http4k.lens.BiDiLensSpec
+import org.http4k.lens.MultipartFormField
+import org.http4k.lens.ParamMeta.ObjectParam
 import java.io.InputStream
 import kotlin.reflect.KClass
 
@@ -28,5 +31,16 @@ abstract class AutoMarshalling {
     /**
      * Conversion happens by converting the base object into JSON and then out again
      */
-    inline fun <IN: Any, reified OUT : Any> convert(input: IN): OUT = asA(asFormatString(input))
+    inline fun <IN : Any, reified OUT : Any> convert(input: IN): OUT = asA(asFormatString(input))
+
+    inline fun <reified IN : Any, reified OUT : Any> BiDiLensSpec<IN, String>.auto() = autoLens<IN, OUT>(this)
+
+    inline fun <reified IN : Any, reified OUT : Any> autoLens(lens: BiDiLensSpec<IN, String>) =
+        lens.mapWithNewMeta({ asA<OUT>(it) }, { asFormatString(it) }, ObjectParam)
+
+    inline fun <reified T : Any> MultipartFormField.Companion.auto() =
+        string().mapWithNewMeta({ asA<T>(it) }, { asFormatString(it) },
+            ObjectParam
+        )
+
 }

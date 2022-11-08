@@ -39,6 +39,7 @@ import org.http4k.lens.Missing
 import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
 import org.http4k.lens.ParamMeta.NumberParam
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.Path
 import org.http4k.lens.Query
@@ -116,7 +117,7 @@ abstract class ContractRendererContract<NODE : Any>(
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += Query.enum<Foo>().optional("e", "enumQuery")
-                queries += json.lens(Query).optional("j", "jsonQuery")
+                queries += json.jsonLens(Query).optional("j", "jsonQuery")
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/cookies" meta {
                 cookies += Cookies.required("b", "requiredCookie")
@@ -127,7 +128,7 @@ abstract class ContractRendererContract<NODE : Any>(
                 headers += Header.string().optional("s", "stringHeader")
                 headers += Header.int().optional("i", "intHeader")
                 headers += Header.enum<HttpMessage, Foo>().optional("e", "enumHeader")
-                headers += json.lens(Header).optional("j", "jsonHeader")
+                headers += json.jsonLens(Header).optional("j", "jsonHeader")
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/body_receiving_string" meta {
                 summary = "body_receiving_string"
@@ -183,7 +184,7 @@ abstract class ContractRendererContract<NODE : Any>(
                         FormField.int().multi.optional("i", "intField"),
                         FormField.string().optional("s", "stringField"),
                         FormField.enum<Foo>().optional("e", "enumField"),
-                        json.lens(FormField).required("j", "jsonField")
+                        json.jsonLens(FormField).required("j", "jsonField")
                     ).toLens()
                 )
             } bindContract POST to { _ -> Response(OK) }
@@ -199,7 +200,8 @@ abstract class ContractRendererContract<NODE : Any>(
             routes += "/multipart-fields" meta {
                 val field = MultipartFormField.multi.required("stringField")
                 val pic = MultipartFormFile.required("fileField")
-                receiving(Body.multipartForm(Strict, field, pic).toLens())
+                val json = MultipartFormField.mapWithNewMeta({it}, {it}, ObjectParam).required("jsonField")
+                receiving(Body.multipartForm(Strict, field, pic, json).toLens())
             } bindContract PUT to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")

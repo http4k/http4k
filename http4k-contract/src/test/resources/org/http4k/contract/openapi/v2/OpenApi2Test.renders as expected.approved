@@ -147,7 +147,7 @@
             "in": "formData",
             "name": "j",
             "required": true,
-            "type": "string",
+            "type": "object",
             "description": "jsonField"
           }
         ],
@@ -542,7 +542,9 @@
             "in": "header",
             "name": "j",
             "required": false,
-            "type": "string",
+            "schema": {
+              "type": "object"
+            },
             "description": "jsonHeader"
           }
         ],
@@ -588,6 +590,14 @@
             "required": true,
             "schema": {
               "type": "file"
+            }
+          },
+          {
+            "in": "form",
+            "name": "jsonField",
+            "required": true,
+            "schema": {
+              "type": "object"
             }
           }
         ],
@@ -815,7 +825,9 @@
             "in": "query",
             "name": "j",
             "required": false,
-            "type": "string",
+            "schema": {
+              "type": "object"
+            },
             "description": "jsonQuery"
           }
         ],

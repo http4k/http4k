@@ -120,7 +120,7 @@
                     "description": "enumField"
                   },
                   "j": {
-                    "type": "string",
+                    "type": "object",
                     "description": "jsonField"
                   }
                 },
@@ -473,6 +473,15 @@
           },
           {
             "schema": {
+              "$ref": "#/components/schemas/object744721296"
+            },
+            "in": "header",
+            "name": "j",
+            "required": false,
+            "description": "jsonHeader"
+          },
+          {
+            "schema": {
               "type": "boolean"
             },
             "in": "header",
@@ -497,15 +506,6 @@
             "name": "i",
             "required": false,
             "description": "intHeader"
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "header",
-            "name": "j",
-            "required": false,
-            "description": "jsonHeader"
           }
         ],
         "responses": {
@@ -544,11 +544,15 @@
                   "fileField": {
                     "type": "string",
                     "format": "binary"
+                  },
+                  "jsonField": {
+                    "type": "object"
                   }
                 },
                 "required": [
                   "stringField",
-                  "fileField"
+                  "fileField",
+                  "jsonField"
                 ]
               }
             }
@@ -723,6 +727,15 @@
           },
           {
             "schema": {
+              "$ref": "#/components/schemas/object744721296"
+            },
+            "in": "query",
+            "name": "j",
+            "required": false,
+            "description": "jsonQuery"
+          },
+          {
+            "schema": {
               "type": "array",
               "items": {
                 "type": "boolean"
@@ -750,15 +763,6 @@
             "name": "i",
             "required": false,
             "description": "intQuery"
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "j",
-            "required": false,
-            "description": "jsonQuery"
           }
         ],
         "responses": {
@@ -825,6 +829,13 @@
           "bar",
           "bing"
         ]
+      },
+      "object744721296": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+        }
       },
       "object540438179": {
         "type": "object",
