@@ -79,7 +79,7 @@ class OpenApi3<NODE : Any>(
                 paths
                     .groupBy { it.path }
                     .mapValues {
-                        it.value.map { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }.toMap().toSortedMap()
+                        it.value.associate { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }.toSortedMap()
                     }
                     .toSortedMap(),
                 Components(
