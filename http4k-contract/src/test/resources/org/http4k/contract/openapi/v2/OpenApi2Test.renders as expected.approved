@@ -589,6 +589,14 @@
             "schema": {
               "type": "file"
             }
+          },
+          {
+            "in": "form",
+            "name": "jsonField",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
           }
         ],
         "responses": {
