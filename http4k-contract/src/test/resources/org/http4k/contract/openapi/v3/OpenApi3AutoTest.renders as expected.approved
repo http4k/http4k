@@ -120,7 +120,7 @@
                     "description": "enumField"
                   },
                   "j": {
-                    "type": "string",
+                    "type": "object",
                     "description": "jsonField"
                   }
                 },
@@ -502,13 +502,13 @@
             }
           },
           {
-            "schema": {
-              "type": "string"
-            },
             "in": "header",
             "name": "j",
             "required": false,
-            "description": "jsonHeader"
+            "description": "jsonHeader",
+            "schema": {
+              "$ref": "#/components/schemas/object1955914966"
+            }
           }
         ],
         "responses": {
@@ -548,7 +548,7 @@
                     "format": "binary"
                   },
                   "jsonField": {
-                    "type": "string"
+                    "type": "object"
                   }
                 },
                 "required": [
@@ -749,13 +749,13 @@
             }
           },
           {
-            "schema": {
-              "type": "string"
-            },
             "in": "query",
             "name": "j",
             "required": false,
-            "description": "jsonQuery"
+            "description": "jsonQuery",
+            "schema": {
+              "$ref": "#/components/schemas/object1955914966"
+            }
           }
         ],
         "responses": {
@@ -813,6 +813,13 @@
           "bing"
         ],
         "type": "string"
+      },
+      "object1955914966": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+        }
       },
       "object1089648089": {
         "type": "object",

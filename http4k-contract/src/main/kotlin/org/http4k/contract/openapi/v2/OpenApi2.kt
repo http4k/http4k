@@ -11,7 +11,6 @@ import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.contract.openapi.coerceForSimpleType
 import org.http4k.contract.openapi.operationId
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -235,3 +234,10 @@ private data class FieldAndDefinitions<out NODE>(
 )
 
 private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()
+
+// we do this to continue to treat complex objects as strings in params
+private fun ParamMeta.coerceForSimpleType() = when (this) {
+    is ParamMeta.ObjectParam -> ParamMeta.StringParam
+    else -> this
+}
+

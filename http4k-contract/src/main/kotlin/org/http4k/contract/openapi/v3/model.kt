@@ -117,10 +117,7 @@ sealed class BodyContent {
             val properties = metas.associate {
                 val paramMeta = it.paramMeta
                 val listOfNotNull = listOfNotNull(
-                    "type" to when (paramMeta) {
-                        is ParamMeta.ObjectParam -> ParamMeta.StringParam
-                        else -> paramMeta
-                    }.value,
+                    "type" to paramMeta.value,
                     paramMeta.takeIf { it == FileParam }?.let { "format" to "binary" },
                     it.description?.let { "description" to it },
                     if (paramMeta is ArrayParam) "items" to mapOf(

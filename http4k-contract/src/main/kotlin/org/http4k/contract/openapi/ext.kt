@@ -10,10 +10,3 @@ fun ContractRoute.operationId(contractRoot: PathSegments) =
         .split('/')
         .joinToString("") { it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() } }
         .replace('{', '_').replace('}', '_').replace('-', '_').trimEnd('_'))
-
-// we do this to continue to treat complex objects as strings in params
-fun ParamMeta.coerceForSimpleType() = when (this) {
-    is ParamMeta.ObjectParam -> ParamMeta.StringParam
-    else -> this
-}
-
