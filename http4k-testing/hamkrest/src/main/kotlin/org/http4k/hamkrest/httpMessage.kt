@@ -58,8 +58,8 @@ fun hasBody(expected: Regex): Matcher<HttpMessage> = hasBody(present(matches(exp
 
 fun <T> hasBody(lens: BodyLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(httpMessageHas("Body", { m: HttpMessage -> lens(m) }, matcher))
 
-fun <NODE> Json<NODE>.hasBody(expected: NODE): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, equalTo(expected))
+fun <NODE : Any> Json<NODE>.hasBody(expected: NODE): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, equalTo(expected))
 
-fun <NODE> Json<NODE>.hasBody(expected: Matcher<NODE>): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
+fun <NODE : Any> Json<NODE>.hasBody(expected: Matcher<NODE>): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
 
-fun <NODE> Json<NODE>.hasBody(expected: String): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compactify(m.bodyString()) }, equalTo(compactify(expected)))
+fun <NODE : Any> Json<NODE>.hasBody(expected: String): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compactify(m.bodyString()) }, equalTo(compactify(expected)))

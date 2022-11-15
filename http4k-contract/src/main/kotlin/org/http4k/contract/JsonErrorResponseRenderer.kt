@@ -9,7 +9,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.ParamMeta.ArrayParam
 
-class JsonErrorResponseRenderer<NODE>(private val json: Json<NODE>) : ErrorResponseRenderer {
+class JsonErrorResponseRenderer<NODE : Any>(private val json: Json<NODE>) : ErrorResponseRenderer {
     override fun badRequest(lensFailure: LensFailure) =
         Response(Status.BAD_REQUEST)
             .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)

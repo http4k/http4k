@@ -75,7 +75,11 @@ open class ConfigurableKotlinxSerialization(
 
     override fun JsonElement.asCompactJsonString() = json.encodeToString(JsonElement.serializer(), this)
 
-    override fun String.asJsonObject() = json.decodeFromString(JsonObject.serializer(), this)
+    override fun String.asJsonObject() = json.parseToJsonElement(this).also {
+        // To achieve functional parity with the other formats, we only allow Object and Array,
+        // even though KotlinxSerialization is fully capable of parsing raw values.
+        require(it is JsonObject || it is JsonArray) { "invalid json"}
+    }
 
     override fun String?.asJsonValue() = JsonPrimitive(this)
 

@@ -34,7 +34,7 @@ import java.util.Locale.getDefault
  * Contract renderer for OpenApi2 format JSON. Note that for the JSON schema generation, auto-naming of
  * object models is used as the input relies on JSON objects and not JVM classees.
  */
-open class OpenApi2<out NODE>(
+open class OpenApi2<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
     private val baseUri: Uri? = null,

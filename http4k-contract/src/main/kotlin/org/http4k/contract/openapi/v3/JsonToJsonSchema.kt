@@ -7,7 +7,7 @@ import org.http4k.util.IllegalSchemaException
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 
-class JsonToJsonSchema<NODE>(
+class JsonToJsonSchema<NODE : Any>(
     private val json: Json<NODE>,
     private val refLocationPrefix: String = "components/schemas"
 ) : JsonSchemaCreator<NODE, NODE> {

@@ -16,7 +16,7 @@ val OpenApi2SecurityRenderer = SecurityRenderer(ApiKeySecurity.renderer, BasicAu
 val ApiKeySecurity.Companion.renderer
     get() = rendererFor<ApiKeySecurity<*>> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("apiKey"),
                     "in" to string(it.param.meta.location),
@@ -24,27 +24,27 @@ val ApiKeySecurity.Companion.renderer
                 ))
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }
 
 val BasicAuthSecurity.Companion.renderer
     get() = rendererFor<BasicAuthSecurity> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("basic")
                 ))
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }
 
 val ImplicitOAuthSecurity.Companion.renderer
     get() = rendererFor<ImplicitOAuthSecurity> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to
                     obj(
                         listOfNotNull(
@@ -56,6 +56,6 @@ val ImplicitOAuthSecurity.Companion.renderer
                 )
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }

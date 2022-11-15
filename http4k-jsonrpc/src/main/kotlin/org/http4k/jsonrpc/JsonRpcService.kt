@@ -110,7 +110,7 @@ typealias ErrorHandler = (Throwable) -> ErrorMessage?
 
 private const val jsonRpcVersion: String = "2.0"
 
-private class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) {
+private class JsonRpcRequest<NODE : Any>(json: Json<NODE>, fields: Map<String, NODE>) {
     private var valid = (fields["jsonrpc"] ?: json.nullNode()).let {
         json.typeOf(it) == JsonType.String && jsonRpcVersion == json.text(it)
     }
