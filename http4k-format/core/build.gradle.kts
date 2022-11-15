@@ -3,6 +3,7 @@ description = "Http4k Format supporting code"
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
+    implementation(project(":http4k-multipart"))
     implementation("dev.forkhandles:values4k:_")
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-jsonrpc"))

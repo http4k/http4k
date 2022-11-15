@@ -14,6 +14,7 @@ import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.operationId
+import org.http4k.contract.openapi.v2.value
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -36,10 +37,7 @@ import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta
-import org.http4k.lens.ParamMeta.ArrayParam
-import org.http4k.lens.ParamMeta.FileParam
-import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.lens.ParamMeta.*
 import org.http4k.util.JsonSchema
 import java.util.Locale
 
@@ -68,18 +66,24 @@ class OpenApi3<NODE : Any>(
         servers: List<ApiServer> = emptyList(),
     ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json), servers = servers)
 
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, tags: Set<Tag>): Response {
+    override fun description(
+        contractRoot: PathSegments,
+        security: Security?,
+        routes: List<ContractRoute>,
+        tags: Set<Tag>
+    ): Response {
         val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         val unextended = apiRenderer.api(
             Api(
                 apiInfo,
-                (routes.map(ContractRoute::tags).flatten() + tags).toSet() .sortedBy { it.name },
+                (routes.map(ContractRoute::tags).flatten() + tags).toSet().sortedBy { it.name },
                 paths
                     .groupBy { it.path }
                     .mapValues {
-                        it.value.map { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }.toMap().toSortedMap()
+                        it.value.associate { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }
+                            .toSortedMap()
                     }
                     .toSortedMap(),
                 Components(
@@ -155,17 +159,22 @@ class OpenApi3<NODE : Any>(
             FileParam -> PrimitiveParameter(it, json {
                 obj("type" to string(FileParam.value), "format" to string("binary"))
             })
+
             is ArrayParam -> PrimitiveParameter(it, json {
                 obj(
                     "type" to string("array"),
                     "items" to obj("type" to string(paramMeta.itemType().value))
                 )
             })
-            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(
-                paramMeta.clz.java.enumConstants[0],
-                it.name,
-                null
-            ))
+
+            is EnumParam<*> -> SchemaParameter(
+                it, apiRenderer.toSchema(
+                    paramMeta.clz.java.enumConstants[0],
+                    it.name,
+                    null
+                )
+            )
+
             else -> PrimitiveParameter(it, json {
                 obj("type" to string(paramMeta.value))
             })

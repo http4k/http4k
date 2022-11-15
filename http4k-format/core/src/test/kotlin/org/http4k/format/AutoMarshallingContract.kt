@@ -7,9 +7,14 @@ import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.core.with
+import org.http4k.lens.Query
 import org.http4k.lens.StringBiDiMappings
+import org.http4k.lens.string
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -225,6 +230,20 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     open fun `does not fail decoding when unknown value is encountered`() {
+        assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
+    }
+
+    @Test
+    fun `marshall a lens to a type`() {
+        val o = StringHolder("foo")
+        val request = Request(GET, "").query("foo", marshaller.asFormatString(o))
+        val lens = marshaller.autoLens<Request, StringHolder>(Query.string()).required("foo")
+        val extracted = lens(request)
+        assertThat(Request(GET, "").with(lens of extracted), equalTo(request))
+    }
+
+    @Test
+    open fun `auto marshall any lens`() {
         assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
     }
 

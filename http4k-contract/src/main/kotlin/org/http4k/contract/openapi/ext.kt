@@ -2,6 +2,7 @@ package org.http4k.contract.openapi
 
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.PathSegments
+import org.http4k.lens.ParamMeta
 import java.util.Locale.getDefault
 
 fun ContractRoute.operationId(contractRoot: PathSegments) =
