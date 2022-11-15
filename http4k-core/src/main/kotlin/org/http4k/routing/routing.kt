@@ -40,7 +40,7 @@ fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>) = route
 
 private fun hostHeaderOrUri(predicate: (String) -> Boolean) =
     { req: Request ->
-        (req.headerValues("host").firstOrNull() ?: req.uri.host).let(predicate)
+        (req.headerValues("host").firstOrNull() ?: req.uri.authority).let(predicate)
     }.asRouter()
 
 /**
