@@ -48,7 +48,7 @@ object CounterErrorHandler : ErrorHandler {
     }
 
     private class NegativeIncrementExceptionMessage : ErrorMessage(1, "Increment by negative") {
-        override fun <NODE> data(json: Json<NODE>): NODE? =
+        override fun <NODE : Any> data(json: Json<NODE>): NODE =
             json.string("cannot increment counter by negative")
     }
 }

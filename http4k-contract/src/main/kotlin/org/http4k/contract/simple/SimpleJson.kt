@@ -12,7 +12,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json
 
-class SimpleJson<out NODE>(private val json: Json<NODE>) : ContractRenderer, ErrorResponseRenderer by JsonErrorResponseRenderer(json) {
+class SimpleJson<out NODE : Any>(private val json: Json<NODE>) : ContractRenderer, ErrorResponseRenderer by JsonErrorResponseRenderer(json) {
     private fun render(pathSegments: PathSegments, route: ContractRoute) =
         route.method.toString() + ":" + route.describeFor(pathSegments) to json.string(route.meta.summary)
 

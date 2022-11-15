@@ -31,7 +31,7 @@ object DefaultReadinessCheckResultRenderer : ReadinessCheckResultRenderer {
  * Reporting of ReadinessCheckResults in a JSON tree
  */
 object JsonReadinessCheckResultRenderer {
-    operator fun <NODE> invoke(json: Json<NODE>): ReadinessCheckResultRenderer {
+    operator fun <NODE : Any> invoke(json: Json<NODE>): ReadinessCheckResultRenderer {
         fun render(result: ReadinessCheckResult) = json {
             val core = listOf(
                 "name" to string(result.name),

@@ -26,7 +26,7 @@ val OpenApi3SecurityRenderer: SecurityRenderer = SecurityRenderer(
 val ApiKeySecurity.Companion.renderer
     get() = rendererFor<ApiKeySecurity<*>> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("apiKey"),
                     "in" to string(it.param.meta.location),
@@ -34,14 +34,14 @@ val ApiKeySecurity.Companion.renderer
                 ))
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }
 
 val AuthCodeOAuthSecurity.Companion.renderer
     get() = rendererFor<AuthCodeOAuthSecurity> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("oauth2"),
                     "flows" to obj("authorizationCode" to
@@ -58,42 +58,42 @@ val AuthCodeOAuthSecurity.Companion.renderer
                 ))
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
         }
     }
 
 val BasicAuthSecurity.Companion.renderer
     get() = rendererFor<BasicAuthSecurity> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "scheme" to string("basic"),
                     "type" to string("http")
                 ))
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }
 
 val BearerAuthSecurity.Companion.renderer
     get() = rendererFor<BearerAuthSecurity> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "scheme" to string("bearer"),
                     "type" to string("http")
                 ))
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }
 
 val ImplicitOAuthSecurity.Companion.renderer
     get() = rendererFor<ImplicitOAuthSecurity> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("oauth2"),
                     "flows" to obj("implicit" to
@@ -109,14 +109,14 @@ val ImplicitOAuthSecurity.Companion.renderer
                 ))
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
         }
     }
 
 val UserCredentialsOAuthSecurity.Companion.renderer
     get() = rendererFor<UserCredentialsOAuthSecurity> {
         object : RenderModes {
-            override fun <NODE> full(): Render<NODE> = {
+            override fun <NODE : Any> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("oauth2"),
                     "flows" to obj("password" to
@@ -132,6 +132,6 @@ val UserCredentialsOAuthSecurity.Companion.renderer
                 ))
             }
 
-            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
+            override fun <NODE : Any> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
         }
     }

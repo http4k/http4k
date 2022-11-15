@@ -7,9 +7,14 @@ import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
+import org.http4k.lens.LensGet
+import org.http4k.lens.LensSet
 import org.http4k.lens.Meta
 import org.http4k.lens.MultipartFormField
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.httpBodyRoot
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
@@ -19,7 +24,7 @@ import java.math.BigInteger
 /**
  * This is the contract for all JSON implementations
  */
-interface Json<NODE> {
+interface Json<NODE : Any> {
     // Contract methods to be implemented
     fun NODE.asPrettyJsonString(): String
     fun NODE.asCompactJsonString(): String
@@ -45,9 +50,8 @@ interface Json<NODE> {
 
     fun prettify(input: String) = parse(input).asPrettyJsonString()
 
-    // Utility methods - used when we don't know which implementation we are using
+    // --- Utility methods for creating JSON - used when we don't know which implementation we are using
     fun string(value: String): NODE = value.asJsonValue()
-
     fun number(value: Int): NODE = value.asJsonValue()
     fun number(value: Double): NODE = value.asJsonValue()
     fun number(value: Long): NODE = value.asJsonValue()
@@ -63,6 +67,7 @@ interface Json<NODE> {
         val i: Int? = null
         return i.asJsonValue()
     }
+    // ---
 
     fun parse(input: String): NODE = input.asJsonObject()
     fun pretty(node: NODE): String = node.asPrettyJsonString()
@@ -88,8 +93,51 @@ interface Json<NODE> {
     fun textValueOf(node: NODE, name: String): String?
 
     operator fun <T> invoke(fn: Json<NODE>.() -> T): T = run(fn)
+
+    // Utility methods for mapping to objects - used when we don't know which implementation we are using
+    fun <T : Any> asA(mapper: (NODE) -> T): (NODE) -> T = { mapper(it.requireObject()) }
+    fun <T : Any> asArray(mapper: (NODE) -> T): (NODE) -> List<T> = { elements(it.requireArray()).map(asA(mapper)) }
+    fun field(): BiDiLensSpec<NODE, String> = fieldLens(StringParam) { name, node -> textValueOf(node, name) }
+    fun <T : Any> obj(mapper: (NODE) -> T): BiDiLensSpec<NODE, T> = fieldLens(ObjectParam) { _, node -> mapper(node) }
+    fun <T : Any> array(itemType: ParamMeta, mapper: (NODE) -> T): BiDiLensSpec<NODE, List<T>> =
+        fieldLens(ArrayParam(itemType)) { _, node -> elements(node).map(mapper) }
+    // ---
+
+    private fun <T : Any> fieldLens(paramMeta: ParamMeta, mapper: (String, NODE) -> T?): BiDiLensSpec<NODE, T> =
+        BiDiLensSpec("field", paramMeta,
+            LensGet { name, node ->
+                listOfNotNull(
+                    fields(node).firstOrNull { it.first == name }?.let { found ->
+                        val nodeToUse = when (paramMeta) {
+                            is ObjectParam -> found.second.requireObject()
+                            is ArrayParam -> found.second.requireArray()
+                            else -> {
+                                found.second.requireValue()
+                                node
+                            }
+                        }
+                        mapper(name, nodeToUse)
+                    }
+                )
+            },
+            LensSet { _, _, _ -> throw UnsupportedOperationException("creating field is not supported") }
+        )
+
+    private fun NODE.requireObject(): NODE = this.apply {
+        require(typeOf(this) == JsonType.Object) { "node is not an object" }
+    }
+
+    private fun NODE.requireArray(): NODE = this.apply {
+        require(typeOf(this) == JsonType.Array) { "node is not an array" }
+    }
+
+    private fun NODE.requireValue(): NODE = this.apply {
+        require(typeOf(this) !in disallowedJsonFieldTypes) { "node is not a value type" }
+    }
 }
 
 enum class JsonType {
     Object, Array, String, Integer, Number, Boolean, Null
 }
+
+private val disallowedJsonFieldTypes = listOf(JsonType.Object, JsonType.Array)

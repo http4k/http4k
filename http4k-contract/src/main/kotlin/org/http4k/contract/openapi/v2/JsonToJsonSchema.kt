@@ -11,7 +11,7 @@ import org.http4k.util.IllegalSchemaException
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 
-class JsonToJsonSchema<NODE>(
+class JsonToJsonSchema<NODE : Any>(
     private val json: Json<NODE>,
     private val refLocationPrefix: String = "definitions"
 ) : JsonSchemaCreator<NODE, NODE> {
@@ -53,7 +53,7 @@ class JsonToJsonSchema<NODE>(
             }
 
         val newDefinition = json { obj("type" to string("object"), "properties" to obj(fields)) }
-        val definitionId = prefix + (overrideDefinitionId ?: ("object" + newDefinition!!.hashCode()))
+        val definitionId = prefix + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
         val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
         return JsonSchema(json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) }, allDefinitions)
     }

@@ -81,11 +81,11 @@ fun <T> HttpMessage.shouldHaveBody(lens: BodyLens<T>, matcher: Matcher<T>) = thi
 fun <T> HttpMessage.shouldNotHaveBody(lens: BodyLens<T>, matcher: Matcher<T>) = this shouldNot haveBody(lens, matcher)
 fun <T : HttpMessage, B> haveBody(lens: BodyLens<B>, matcher: Matcher<B>): Matcher<T> = LensMatcher(httpMessageHas("Body", { m: T -> lens(m) }, matcher))
 
-fun <NODE> Json<NODE>.haveBody(expected: NODE): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compact(parse(m.bodyString())) }, be(compact(expected)))
+fun <NODE : Any> Json<NODE>.haveBody(expected: NODE): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compact(parse(m.bodyString())) }, be(compact(expected)))
 
-fun <NODE> Json<NODE>.haveBody(expected: Matcher<NODE>): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
+fun <NODE : Any> Json<NODE>.haveBody(expected: Matcher<NODE>): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
 
-fun <NODE> Json<NODE>.haveBody(expected: String): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compactify(m.bodyString()) }, be(compactify(expected)))
+fun <NODE : Any> Json<NODE>.haveBody(expected: String): Matcher<HttpMessage> = httpMessageHas("Body", { m: HttpMessage -> compactify(m.bodyString()) }, be(compactify(expected)))
 
 fun <T : HttpMessage, R> httpMessageHas(name: String, extractValue: (T) -> R, match: Matcher<R>): Matcher<T> = object : Matcher<T> {
     override fun test(value: T): MatcherResult {

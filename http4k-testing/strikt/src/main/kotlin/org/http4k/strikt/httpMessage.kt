@@ -14,4 +14,4 @@ val <M : HttpMessage> Assertion.Builder<M>.contentType get() = get { CONTENT_TYP
 val <M : HttpMessage> Assertion.Builder<M>.body get() = get(HttpMessage::body)
 val <M : HttpMessage> Assertion.Builder<M>.bodyString get() = get { bodyString() }
 
-fun <NODE, M : HttpMessage> Assertion.Builder<M>.jsonBody(json: Json<NODE>) = get { json.parse(bodyString()) }
+fun <NODE : Any, M : HttpMessage> Assertion.Builder<M>.jsonBody(json: Json<NODE>) = get { json.parse(bodyString()) }
