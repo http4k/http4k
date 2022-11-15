@@ -289,7 +289,7 @@ object ServerFilters {
 
     /**
      * Basic GZip and Gunzip support of Request/Response.
-     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
     object GZip {
@@ -299,7 +299,7 @@ object ServerFilters {
 
     /**
      * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list.
-     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
      */
     class GZipContentTypes(
