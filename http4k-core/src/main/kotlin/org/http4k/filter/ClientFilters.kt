@@ -238,7 +238,7 @@ object ClientFilters {
 
     /**
      * Basic GZip and Gunzip support of Request/Response.
-     * Only Gunzip responses when the response contains "transfer-encoding" header containing 'gzip'
+     * Only Gunzip responses when the response contains "content-encoding" header containing 'gzip'
      */
     fun GZip(compressionMode: GzipCompressionMode = Memory): Filter =
         RequestFilters.GZip(compressionMode)
