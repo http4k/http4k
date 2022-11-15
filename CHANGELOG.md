@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.34.0.0
-- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.7.21.
 - **http4k-core*** : [Unlikely break] `reverseProxy()` now takes the authority into account instead of just the hostname from the request. This should only impact you if you are doing reverse proxy operational on client side and using localhost without a port as a proxy. To fix - simply add the port to your proxying setup and all should be good.
 - **http4k-contract*** : Fix: Remove duplicate content type header.
 
