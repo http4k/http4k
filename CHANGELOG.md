@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.34.0.1
+- **http4k-format-*** : Remove `Json` extension method on `MultipartFormField.Companion` due to problem in JUnit.
+
 ### v4.34.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.7.21.
 - **http4k-format-*** : Added `auto()` methods to arbitrary lenses (so Query, Header, FormField etc..)

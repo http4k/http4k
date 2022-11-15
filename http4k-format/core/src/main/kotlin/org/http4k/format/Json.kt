@@ -70,7 +70,6 @@ interface Json<NODE> {
 
     fun <IN : Any> jsonLens(spec: BiDiLensSpec<IN, String>) = spec.mapWithNewMeta(::parse, ::compact, ObjectParam)
     fun <IN : Any> BiDiLensSpec<IN, String>.json() = jsonLens(this)
-    fun MultipartFormField.Companion.json() = string().mapWithNewMeta({ parse(it) }, { compact(it) }, ObjectParam)
 
     fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> =
         httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
