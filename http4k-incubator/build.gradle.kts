@@ -5,7 +5,7 @@ dependencies {
 
     testImplementation(project(":http4k-testing-strikt"))
     testImplementation(project(":http4k-client-apache"))
-    testImplementation(project(path = ":http4k-core", configuration ="testArtifacts"))
+    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
     testImplementation(project(path = ":http4k-testing-approval"))
-    testImplementation(project(path = ":http4k-contract", configuration ="testArtifacts"))
+    testImplementation(project(path = ":http4k-contract", configuration = "testArtifacts"))
 }

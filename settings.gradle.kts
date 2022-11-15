@@ -15,7 +15,7 @@ refreshVersions {
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")
-    project(":$projectName").projectDir = File("$this/${name.replace(':','/')}")
+    project(":$projectName").projectDir = File("$this/${name.replace(':', '/')}")
 }
 
 fun includeWithDirectory(projectName: String, name: String) {

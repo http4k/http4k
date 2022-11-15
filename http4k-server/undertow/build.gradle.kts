@@ -6,6 +6,6 @@ dependencies {
     api(project(":http4k-format-jackson"))
     api("io.undertow:undertow-core:_")
     api("io.undertow:undertow-servlet:_")
-    testImplementation(project(path = ":http4k-core", configuration ="testArtifacts"))
-    testImplementation(project(path = ":http4k-realtime-core", configuration ="testArtifacts"))
+    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(project(path = ":http4k-realtime-core", configuration = "testArtifacts"))
 }

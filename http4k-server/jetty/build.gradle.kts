@@ -14,6 +14,6 @@ dependencies {
     implementation("org.eclipse.jetty:jetty-alpn-java-server:_")
     implementation("org.mortbay.jetty.alpn:alpn-boot:_")
 
-    testImplementation(project(path = ":http4k-core", configuration ="testArtifacts"))
-    testImplementation(project(path = ":http4k-realtime-core", configuration ="testArtifacts"))
+    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(project(path = ":http4k-realtime-core", configuration = "testArtifacts"))
 }

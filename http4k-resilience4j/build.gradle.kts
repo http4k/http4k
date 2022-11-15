@@ -6,5 +6,5 @@ dependencies {
     api("io.github.resilience4j:resilience4j-circuitbreaker:_")
     api("io.github.resilience4j:resilience4j-ratelimiter:_")
     api("io.github.resilience4j:resilience4j-retry:_")
-    testImplementation(project(path = ":http4k-core", configuration ="testArtifacts"))
+    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
 }
