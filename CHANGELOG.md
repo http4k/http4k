@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.34.0.4
+- **http4k-contract-** : Fix errant import which broke multipart Openapi V3 spec.
+
 ### v4.34.0.3
 - **http4k-format-*** : Remove `Json` extension method on `MultipartFormField.Companion` due to problem in JUnit. Re-re-fix.
 
