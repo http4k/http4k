@@ -542,7 +542,7 @@
                     }
                   },
                   "fileField": {
-                    "type": "file",
+                    "type": "string",
                     "format": "binary"
                   },
                   "jsonField": {

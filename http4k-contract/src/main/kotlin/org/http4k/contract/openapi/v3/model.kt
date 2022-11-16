@@ -2,10 +2,8 @@ package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
-import org.http4k.contract.openapi.v2.value
 import org.http4k.core.Uri
 import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.util.JsonSchema
