@@ -8,7 +8,6 @@ import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
-import org.http4k.lens.MultipartFormField
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
 import org.http4k.lens.string
