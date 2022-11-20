@@ -6,6 +6,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.testing.testWebsocket
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.util.concurrent.atomic.AtomicReference
 
 class WebsocketTest {
@@ -39,17 +40,24 @@ class WebsocketTest {
     fun `sends outbound messages to the websocket`() {
         val consumer = TestConsumer()
         val client = { _: Request -> consumer }.testWebsocket(Request(Method.GET, "/"))
+        client.onMessage {
+            fail("Client must not receive messages it sends")
+        }
 
         client.send(message)
         assertThat(consumer.messages, equalTo(listOf(message)))
         client.close(WsStatus.NEVER_CONNECTED)
         assertThat(consumer.closed.get(), equalTo(WsStatus.NEVER_CONNECTED))
+
     }
 
     @Test
     fun `sends inbound messages to the client`() {
         val consumer = TestConsumer()
         val client = { _: Request -> consumer }.testWebsocket(Request(Method.GET, "/"))
+        consumer.websocket.onMessage {
+            fail("Server must not receive messages it sends")
+        }
 
         val received = mutableListOf<WsMessage>()
         client.onMessage { received += it }
