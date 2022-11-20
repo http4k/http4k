@@ -48,7 +48,6 @@ class WebsocketTest {
         assertThat(consumer.messages, equalTo(listOf(message)))
         client.close(WsStatus.NEVER_CONNECTED)
         assertThat(consumer.closed.get(), equalTo(WsStatus.NEVER_CONNECTED))
-
     }
 
     @Test
