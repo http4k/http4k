@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.34.1.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-template-rocker-** : New module! Compile-time templating with Rocker!
+- **http4k-template-rocker** : New module! Compile-time templating with Rocker!
 
 ### v4.34.0.4
 - **http4k-contract-** : Fix errant import which broke multipart Openapi V3 spec.
@@ -22,7 +22,7 @@ changes with their rationale when appropriate:
 ### v4.34.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.7.21.
 - **http4k-format-*** : Added `auto()` methods to arbitrary lenses (so Query, Header, FormField etc..)
-- **http4k-core*** : [Unlikely break] `reverseProxy()` now takes the authority into account instead of just the hostname from the request. This should only impact you if you are doing reverse proxy operational on client side and using localhost without a port as a proxy. To fix - simply add the port to your proxying setup and all should be good.
+- **http4k-core** : [Unlikely break] `reverseProxy()` now takes the authority into account instead of just the hostname from the request. This should only impact you if you are doing reverse proxy operational on client side and using localhost without a port as a proxy. To fix - simply add the port to your proxying setup and all should be good.
 - **http4k-contract*** : Fix: Remove duplicate content type header.
 
 ### v4.33.3.0
