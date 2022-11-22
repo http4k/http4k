@@ -1,7 +1,7 @@
 description = "Http4k Thymeleaf templating support"
 
 plugins {
-    id("nu.studer.rocker") version "3.0.4"
+    id("nu.studer.rocker")
 }
 
 apply(plugin = "java")
@@ -9,9 +9,9 @@ apply(plugin = "nu.studer.rocker")
 
 dependencies {
     api(project(":http4k-template-core"))
-    api("com.fizzed:rocker-runtime:1.3.0")
+    api("com.fizzed:rocker-runtime:_")
 
-    testImplementation("com.fizzed:rocker-compiler:1.3.0")
+    testImplementation("com.fizzed:rocker-compiler:_")
     testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
     testImplementation(project(path = ":http4k-template-core", configuration = "testArtifacts"))
 }
