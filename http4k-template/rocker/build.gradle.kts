@@ -1,4 +1,4 @@
-description = "Http4k Thymeleaf templating support"
+description = "Http4k Rocker templating support"
 
 plugins {
     id("nu.studer.rocker")
