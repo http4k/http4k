@@ -112,6 +112,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **Freemarker**
         * **Handlebars** 
         * **Pebble**
+        * **Rocker**
         * **Thymeleaf**
         * **Jade4j**
     * Caching and **Hot-Reload** template support
