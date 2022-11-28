@@ -29,7 +29,7 @@ jobs:
 
           if [[ $S3_VERSION == $LOCAL_VERSION ]]; then
             echo "Version $LOCAL_VERSION has been broadcasted already."
-            echo "::set-output name=requires-broadcast::false"
+            echo "requires-broadcast=false" >> $GITHUB_OUTPUT
             exit 0
           fi;
 
@@ -42,8 +42,8 @@ jobs:
           if [[ $MC_STATUS == "200" ]]; then
             echo "Version $LOCAL_VERSION available in MC. Preparing for broadcast..."
             echo "${LOCAL_VERSION}" | aws s3 cp - s3://http4k/latest-broadcasted-version.txt
-            echo "::set-output name=requires-broadcast::true"
-            echo "::set-output name=version::${LOCAL_VERSION}"
+            echo "requires-broadcast=true" >> $GITHUB_OUTPUT
+            echo "version=${LOCAL_VERSION}" >> $GITHUB_OUTPUT
           fi;
   broadcast-release:
     runs-on: ubuntu-latest
