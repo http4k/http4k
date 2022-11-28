@@ -53,10 +53,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Grab tag name
-        uses: olegtarasov/get-tag@v2
+        uses: olegtarasov/get-tag@v2.1.2
         id: tagName
       - name: Dispatch Release Event
-        uses: peter-evans/repository-dispatch@v1.1.1
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING }}
           repository: http4k/http4k
