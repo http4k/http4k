@@ -9,7 +9,7 @@ jobs:
   slackify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: ./notify-slack.sh ${{ github.event.client_payload.version }}
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
