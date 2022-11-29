@@ -1,5 +1,6 @@
 package org.http4k
 
+import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.ByteBuffer
 import java.util.Base64
@@ -34,3 +35,5 @@ fun String.base64Decoded(): String = String(Base64.getDecoder().decode(this))
 fun String.base64Encode() = String(Base64.getEncoder().encode(toByteArray()))
 
 fun String.urlEncoded(): String = URLEncoder.encode(this, "utf-8")
+
+fun String.urlDecoded(): String = URLDecoder.decode(this, "utf-8")

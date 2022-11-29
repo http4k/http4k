@@ -7,6 +7,8 @@ import org.http4k.core.Uri
 import org.http4k.events.EventCategory
 import org.http4k.filter.SamplingDecision
 import org.http4k.filter.TraceId
+import org.http4k.urlDecoded
+import org.http4k.urlEncoded
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.math.BigDecimal
@@ -69,7 +71,7 @@ object StringBiDiMappings {
     fun nonEmpty() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException("String cannot be empty") else s }, { it })
     fun regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
-
+    fun urlEncoded() = BiDiMapping(String::urlDecoded, String::urlEncoded)
     fun duration() = BiDiMapping(Duration::parse, Duration::toString)
     fun uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
     fun url() = BiDiMapping(::URL, URL::toExternalForm)
