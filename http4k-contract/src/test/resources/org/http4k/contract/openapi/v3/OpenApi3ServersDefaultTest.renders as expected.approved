@@ -768,7 +768,12 @@
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "example": "bar",
+                "type": "string",
+                "enum": [
+                  "bar",
+                  "bing"
+                ]
               }
             },
             "in": "query",
