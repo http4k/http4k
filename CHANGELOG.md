@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.34.3.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Support for arrays of enums in OA3.
 
 ### v4.34.2.0
 - **http4k-*** : Upgrade some dependency versions.

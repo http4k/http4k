@@ -749,6 +749,18 @@
             }
           },
           {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "el",
+            "required": false,
+            "description": "enumQueryList"
+          },
+          {
             "in": "query",
             "name": "j",
             "required": false,

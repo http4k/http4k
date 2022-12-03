@@ -37,7 +37,11 @@ import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta
-import org.http4k.lens.ParamMeta.*
+import org.http4k.lens.ParamMeta.ArrayParam
+import org.http4k.lens.ParamMeta.EnumParam
+import org.http4k.lens.ParamMeta.FileParam
+import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.JsonSchema
 import java.util.Locale
 
@@ -161,9 +165,18 @@ class OpenApi3<NODE : Any>(
             })
 
             is ArrayParam -> PrimitiveParameter(it, json {
+                val itemType = paramMeta.itemType()
                 obj(
                     "type" to string("array"),
-                    "items" to obj("type" to string(paramMeta.itemType().value))
+                    "items" to when (itemType) {
+                        is EnumParam<*> -> apiRenderer.toSchema(
+                            itemType.clz.java.enumConstants[0],
+                            it.name,
+                            null
+                        ).definitions.first().second
+
+                        else -> obj("type" to string(itemType.value))
+                    }
                 )
             })
 
@@ -189,6 +202,7 @@ class OpenApi3<NODE : Any>(
                 when (this) {
                     APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
                         (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
+
                     null -> null
                     else -> value to it.toSchemaContent()
                 }

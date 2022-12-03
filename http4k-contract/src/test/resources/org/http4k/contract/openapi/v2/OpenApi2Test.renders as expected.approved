@@ -821,6 +821,16 @@
           },
           {
             "in": "query",
+            "name": "el",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "enumQueryList"
+          },
+          {
+            "in": "query",
             "name": "j",
             "required": false,
             "type": "string",

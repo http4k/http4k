@@ -117,6 +117,7 @@ abstract class ContractRendererContract<NODE : Any>(
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += Query.enum<Foo>().optional("e", "enumQuery")
+                queries += Query.enum<Foo>().multi.optional("el", "enumQueryList")
                 queries += json.jsonLens(Query).optional("j", "jsonQuery")
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/cookies" meta {

@@ -763,6 +763,23 @@
             "name": "i",
             "required": false,
             "description": "intQuery"
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "example": "bar",
+                "type": "string",
+                "enum": [
+                  "bar",
+                  "bing"
+                ]
+              }
+            },
+            "in": "query",
+            "name": "el",
+            "required": false,
+            "description": "enumQueryList"
           }
         ],
         "responses": {
