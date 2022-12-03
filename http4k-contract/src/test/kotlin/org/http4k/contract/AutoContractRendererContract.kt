@@ -44,7 +44,7 @@ abstract class AutoContractRendererContract<NODE : Any>(
                 receiving(
                     Body.auto<ArbObject2>().toLens() to ArbObject2(
                         "s",
-                        ArbObject1(Foo.bar),
+                        ArbObject1(Foo.bar, listOf(Foo.bar)),
                         listOf(1),
                         true
                     ), "someOtherId"
@@ -57,23 +57,23 @@ abstract class AutoContractRendererContract<NODE : Any>(
                 returning(OK, Body.auto<ArbObject4>(contentType = APPLICATION_YAML).toLens() to ArbObject4(Foo.bar))
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_auto_schema" meta {
-                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing))))
+                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing, listOf(Foo.bing)))))
                 returning(
                     status = Status.CREATED,
-                    body = Body.auto<List<ArbObject1>>().toLens() to listOf(ArbObject1(Foo.bing))
+                    body = Body.auto<List<ArbObject1>>().toLens() to listOf(ArbObject1(Foo.bing, listOf(Foo.bing)))
                 )
             } bindContract Method.PUT to { _ -> Response(OK) }
             routes += "/body_auto_schema_multiple_response_schemas" meta {
-                returning(OK, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
-                returning(Status.CREATED, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
+                returning(OK, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing, listOf(Foo.bing)))
+                returning(Status.CREATED, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing, listOf(Foo.bing)))
                 returning(
                     Status.CREATED,
-                    Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing)))
+                    Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing, listOf(Foo.bing))))
                 )
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_auto_schema_multiple_request_schemas" meta {
-                receiving(Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
-                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing))))
+                receiving(Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing, listOf(Foo.bing)))
+                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing, listOf(Foo.bing)))))
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_auto_schema_name_definition_id" meta {
                 val toLens = Body.auto<InterfaceHolder>().toLens()
@@ -81,7 +81,7 @@ abstract class AutoContractRendererContract<NODE : Any>(
                 returning(OK, toLens to InterfaceHolder(Impl2()), definitionId = "impl2")
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_auto_map" meta {
-                receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing)))
+                receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing, listOf(Foo.bing))))
             } bindContract Method.PUT to { _ -> Response(OK) }
             routes += "/body_negotiated" meta {
                 receiving(negotiator to "john")

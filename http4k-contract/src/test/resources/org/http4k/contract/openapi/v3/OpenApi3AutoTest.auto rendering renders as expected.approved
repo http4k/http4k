@@ -31,7 +31,10 @@
               "example": {
                 "foo": 123,
                 "arb": {
-                  "anotherString": "bing"
+                  "anotherString": "bing",
+                  "listEnum": [
+                    "bing"
+                  ]
                 }
               },
               "schema": {
@@ -49,7 +52,10 @@
                   "example": {
                     "foo": 123,
                     "arb": {
-                      "anotherString": "bing"
+                      "anotherString": "bing",
+                      "listEnum": [
+                        "bing"
+                      ]
                     }
                   },
                   "type": "object",
@@ -90,7 +96,10 @@
               "example": {
                 "string": "s",
                 "child": {
-                  "anotherString": "bar"
+                  "anotherString": "bar",
+                  "listEnum": [
+                    "bar"
+                  ]
                 },
                 "numbers": [
                   1
@@ -130,7 +139,10 @@
                 "additional": {
                   "foo": 123,
                   "arb": {
-                    "anotherString": "bing"
+                    "anotherString": "bing",
+                    "listEnum": [
+                      "bing"
+                    ]
                   }
                 }
               },
@@ -148,7 +160,10 @@
               "application/json": {
                 "example": [
                   {
-                    "anotherString": "bing"
+                    "anotherString": "bing",
+                    "listEnum": [
+                      "bing"
+                    ]
                   }
                 ],
                 "schema": {
@@ -157,7 +172,10 @@
                   },
                   "example": [
                     {
-                      "anotherString": "bing"
+                      "anotherString": "bing",
+                      "listEnum": [
+                        "bing"
+                      ]
                     }
                   ],
                   "type": "array"
@@ -293,7 +311,10 @@
             "content": {
               "application/json": {
                 "example": {
-                  "anotherString": "bing"
+                  "anotherString": "bing",
+                  "listEnum": [
+                    "bing"
+                  ]
                 },
                 "schema": {
                   "$ref": "#/components/schemas/ArbObject1"
@@ -450,7 +471,10 @@
         "example": {
           "string": "s",
           "child": {
-            "anotherString": "bar"
+            "anotherString": "bar",
+            "listEnum": [
+              "bar"
+            ]
           },
           "numbers": [
             1
@@ -468,14 +492,27 @@
         "properties": {
           "anotherString": {
             "$ref": "#/components/schemas/Foo"
+          },
+          "listEnum": {
+            "items": {
+              "$ref": "#/components/schemas/Foo"
+            },
+            "example": [
+              "bing"
+            ],
+            "type": "array"
           }
         },
         "example": {
-          "anotherString": "bing"
+          "anotherString": "bing",
+          "listEnum": [
+            "bing"
+          ]
         },
         "type": "object",
         "required": [
-          "anotherString"
+          "anotherString",
+          "listEnum"
         ]
       },
       "Foo": {
@@ -522,7 +559,10 @@
               "example": {
                 "foo": 123,
                 "arb": {
-                  "anotherString": "bing"
+                  "anotherString": "bing",
+                  "listEnum": [
+                    "bing"
+                  ]
                 }
               },
               "type": "object",
@@ -539,7 +579,10 @@
           "additional": {
             "foo": 123,
             "arb": {
-              "anotherString": "bing"
+              "anotherString": "bing",
+              "listEnum": [
+                "bing"
+              ]
             }
           }
         },
