@@ -7,17 +7,19 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.core.toParametersMap
-import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.CatchAll
 
 /**
  * Exposed to allow for insertion into a customised Undertow server instance
  */
 class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpHandler {
-    private val safeHandler = ServerFilters.CatchAll().then(handler)
+    private val safeHandler = CatchAll().then(handler)
 
     private fun Response.into(exchange: HttpServerExchange) {
         exchange.statusCode = status.code
@@ -27,12 +29,15 @@ class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpH
         body.stream.use { it.copyTo(exchange.outputStream) }
     }
 
-    private fun HttpServerExchange.asRequest(): Request =
-        Request(Method.valueOf(requestMethod.toString()), Uri.of("$relativePath?$queryString"))
-            .headers(requestHeaders
-                .flatMap { header -> header.map { header.headerName.toString() to it } })
-            .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
-            .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
+    private fun HttpServerExchange.asRequest() =
+        runCatching {
+            Request(Method.valueOf(requestMethod.toString()), Uri.of("$relativePath?$queryString"))
+                .headers(requestHeaders
+                    .flatMap { header -> header.map { header.headerName.toString() to it } })
+                .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
+                .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
+        }.getOrNull()
 
-    override fun handleRequest(exchange: HttpServerExchange) = safeHandler(exchange.asRequest()).into(exchange)
+    override fun handleRequest(exchange: HttpServerExchange) =
+        (exchange.asRequest()?.let { safeHandler(it) } ?: Response(NOT_IMPLEMENTED)).into(exchange)
 }

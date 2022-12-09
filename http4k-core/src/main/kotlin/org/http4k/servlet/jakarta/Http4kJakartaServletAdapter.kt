@@ -8,6 +8,7 @@ import org.http4k.core.Parameters
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import java.util.Enumeration
@@ -16,7 +17,9 @@ import java.util.Enumeration
  * Adapts between the Servlet and http4k APIs
  */
 class Http4kJakartaServletAdapter(private val handler: HttpHandler) {
-    fun handle(req: HttpServletRequest, resp: HttpServletResponse) = handler(req.asHttp4kRequest()).transferTo(resp)
+    fun handle(req: HttpServletRequest, resp: HttpServletResponse) {
+        (req.asHttp4kRequest()?.let(handler) ?: Response(NOT_IMPLEMENTED)).transferTo(resp)
+    }
 }
 
 fun Response.transferTo(destination: HttpServletResponse) {
@@ -25,10 +28,11 @@ fun Response.transferTo(destination: HttpServletResponse) {
     body.stream.use { input -> destination.outputStream.use { output -> input.copyTo(output) } }
 }
 
-fun HttpServletRequest.asHttp4kRequest() =
+fun HttpServletRequest.asHttp4kRequest() = runCatching {
     Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
         .body(inputStream, getHeader("Content-Length").safeLong()).headers(headerParameters())
         .source(RequestSource(remoteAddr, remotePort, scheme))
+}.getOrNull()
 
 private fun HttpServletRequest.headerParameters() =
     headerNames.asSequence().fold(listOf()) { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) }
