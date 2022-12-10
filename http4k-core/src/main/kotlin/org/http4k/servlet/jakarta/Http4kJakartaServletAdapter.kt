@@ -11,6 +11,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
+import org.http4k.server.supportedOrNull
 import java.util.Enumeration
 
 /**
@@ -28,11 +29,11 @@ fun Response.transferTo(destination: HttpServletResponse) {
     body.stream.use { input -> destination.outputStream.use { output -> input.copyTo(output) } }
 }
 
-fun HttpServletRequest.asHttp4kRequest() = runCatching {
-    Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
+fun HttpServletRequest.asHttp4kRequest() = Method.supportedOrNull(method)?.let {
+    Request(it, Uri.of(requestURI + queryString.toQueryString()))
         .body(inputStream, getHeader("Content-Length").safeLong()).headers(headerParameters())
         .source(RequestSource(remoteAddr, remotePort, scheme))
-}.getOrNull()
+}
 
 private fun HttpServletRequest.headerParameters() =
     headerNames.asSequence().fold(listOf()) { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) }

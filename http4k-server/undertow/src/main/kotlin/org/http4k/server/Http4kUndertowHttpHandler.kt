@@ -7,7 +7,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
@@ -30,13 +29,13 @@ class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpH
     }
 
     private fun HttpServerExchange.asRequest() =
-        runCatching {
-            Request(Method.valueOf(requestMethod.toString()), Uri.of("$relativePath?$queryString"))
+        Method.supportedOrNull(requestMethod.toString())?.let {
+            Request(it, Uri.of("$relativePath?$queryString"))
                 .headers(requestHeaders
                     .flatMap { header -> header.map { header.headerName.toString() to it } })
                 .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
                 .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
-        }.getOrNull()
+        }
 
     override fun handleRequest(exchange: HttpServerExchange) =
         (exchange.asRequest()?.let { safeHandler(it) } ?: Response(NOT_IMPLEMENTED)).into(exchange)

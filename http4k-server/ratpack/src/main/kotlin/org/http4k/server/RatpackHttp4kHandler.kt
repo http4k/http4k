@@ -5,7 +5,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import ratpack.handling.Context
 import ratpack.handling.Handler
@@ -18,19 +17,20 @@ class RatpackHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
         }
     }
 
-    private fun Context.toHttp4kRequest(data: TypedData) = kotlin.runCatching {
-        Request(Method.valueOf(request.method.name), request.rawUri)
-            .let {
-                request.headers.names.fold(it) { acc, nextHeaderName ->
-                    request.headers.getAll(nextHeaderName)
-                        .fold(acc) { vAcc, nextHeaderValue ->
-                            vAcc.header(nextHeaderName, nextHeaderValue)
-                        }
+    private fun Context.toHttp4kRequest(data: TypedData) = Method.supportedOrNull(request.method.name)
+        ?.let {
+            Request(it, request.rawUri)
+                .let {
+                    request.headers.names.fold(it) { acc, nextHeaderName ->
+                        request.headers.getAll(nextHeaderName)
+                            .fold(acc) { vAcc, nextHeaderValue ->
+                                vAcc.header(nextHeaderName, nextHeaderValue)
+                            }
+                    }
                 }
-            }
-            .body(data.inputStream, request.headers.get("content-length")?.toLongOrNull())
-            .source(RequestSource(request.remoteAddress.host, request.remoteAddress.port))
-    }.getOrNull()
+                .body(data.inputStream, request.headers.get("content-length")?.toLongOrNull())
+                .source(RequestSource(request.remoteAddress.host, request.remoteAddress.port))
+        }
 
     private fun Response.pushTo(context: Context) {
         headers.groupBy { it.first }

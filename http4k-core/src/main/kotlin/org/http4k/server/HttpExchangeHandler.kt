@@ -23,14 +23,15 @@ class HttpExchangeHandler(private val handler: HttpHandler) : com.sun.net.httpse
     }
 
     private fun HttpExchange.toRequest() =
-        runCatching {
-            Request(Method.valueOf(requestMethod),
-                requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) }
-                    ?: Uri.of(requestURI.rawPath))
-                .body(requestBody, requestHeaders.getFirst("Content-Length").safeLong())
-                .headers(requestHeaders.toList().flatMap { (key, values) -> values.map { key to it } })
-                .source(RequestSource(localAddress.address.hostAddress, localAddress.port))
-        }.getOrNull()
+        Method.supportedOrNull(requestMethod)
+            ?.let {
+                Request(it,
+                    requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) }
+                        ?: Uri.of(requestURI.rawPath))
+                    .body(requestBody, requestHeaders.getFirst("Content-Length").safeLong())
+                    .headers(requestHeaders.toList().flatMap { (key, values) -> values.map { key to it } })
+                    .source(RequestSource(localAddress.address.hostAddress, localAddress.port))
+            }
 
     override fun handle(exchange: HttpExchange) {
         with(exchange) {

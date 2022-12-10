@@ -9,13 +9,10 @@ import io.netty.handler.codec.http.DefaultHttpResponse
 import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpHeaderNames
 import io.netty.handler.codec.http.HttpHeaderNames.CONNECTION
-import io.netty.handler.codec.http.HttpHeaderValues
-import io.netty.handler.codec.http.HttpHeaderValues.*
+import io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE
 import io.netty.handler.codec.http.HttpResponseStatus
-import io.netty.handler.codec.http.HttpVersion
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
-import io.netty.handler.codec.http.LastHttpContent
-import io.netty.handler.codec.http.LastHttpContent.*
+import io.netty.handler.codec.http.LastHttpContent.EMPTY_LAST_CONTENT
 import io.netty.handler.stream.ChunkedStream
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -58,6 +55,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
                         }
                 ctx.writeAndFlush(httpResponse)
             }
+
             else -> {
                 val httpResponse =
                     DefaultHttpResponse(
@@ -74,10 +72,11 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
         }
     }
 
-    private fun FullHttpRequest.asRequest(address: InetSocketAddress?) = runCatching {
-        val baseRequest = Request(Method.valueOf(method().name()), Uri.of(uri()))
-            .headers(headers().map { it.key to it.value })
-            .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
-        address?.let { baseRequest.source(RequestSource(it.address.hostAddress, it.port)) } ?: baseRequest
-    }.getOrNull()
+    private fun FullHttpRequest.asRequest(address: InetSocketAddress?) = Method.supportedOrNull(method().name())
+        ?.let {
+            val baseRequest = Request(it, Uri.of(uri()))
+                .headers(headers().map { it.key to it.value })
+                .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
+            address?.let { baseRequest.source(RequestSource(it.address.hostAddress, it.port)) } ?: baseRequest
+        }
 }

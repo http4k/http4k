@@ -17,7 +17,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.safeLong
 import org.http4k.core.then
@@ -40,8 +39,8 @@ class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
 
     private fun ApacheRequest.asHttp4kRequest(context: HttpContext): Request? {
         val connection = context.getAttribute(HTTP_CONNECTION) as HttpInetConnection
-        return runCatching {
-            Request(Method.valueOf(requestLine.method), requestLine.uri)
+        return Method.supportedOrNull(requestLine.method)?.let {
+            Request(it, requestLine.uri)
                 .headers(allHeaders.toHttp4kHeaders()).let {
                     when (this) {
                         is HttpEntityEnclosingRequest -> it.body(
@@ -53,8 +52,7 @@ class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
                     }
                 }
                 .source(RequestSource(connection.remoteAddress.hostAddress, connection.remotePort))
-
-        }.getOrNull()
+        }
     }
 
     private val headersThatApacheInterceptorSets = setOf("Transfer-Encoding", "Content-Length")

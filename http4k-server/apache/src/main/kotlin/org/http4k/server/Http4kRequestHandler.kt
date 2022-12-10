@@ -38,8 +38,8 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
 
     private fun HttpRequest.asHttp4kRequest(context: HttpContext): Request? {
         val connection = context.getAttribute(HttpCoreContext.CONNECTION_ENDPOINT) as EndpointDetails
-        return kotlin.runCatching {
-            Request(Method.valueOf(method), uri.httpUri())
+        return Method.supportedOrNull(method)?.let {
+            Request(it, uri.httpUri())
                 .headers(headers.toHttp4kHeaders()).let {
                     when (this) {
                         is HttpEntityContainer -> entity?.let { httpEntity ->
@@ -59,7 +59,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
                         uri.scheme
                     )
                 })
-        }.getOrNull()
+        }
     }
 
     private fun URI.httpUri(): String = path + if (query.isNullOrBlank()) "" else "?$query"

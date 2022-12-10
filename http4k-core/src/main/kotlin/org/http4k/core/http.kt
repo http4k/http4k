@@ -171,7 +171,11 @@ interface HttpMessage : Closeable {
     override fun close() = body.close()
 }
 
-enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD }
+enum class Method {
+    GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD;
+
+    companion object
+}
 
 interface Request : HttpMessage {
     val method: Method
@@ -236,20 +240,24 @@ interface Request : HttpMessage {
 
     override fun body(body: InputStream, length: Long?): Request
 
-    override fun toMessage() = listOf("$method $uri $version", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
+    override fun toMessage() =
+        listOf("$method $uri $version", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
         @JvmStatic
         @JvmOverloads
         @JvmName("create")
-        operator fun invoke(method: Method, uri: Uri, version: String = HTTP_1_1): Request = MemoryRequest(method, uri, listOf(), EMPTY, version)
+        operator fun invoke(method: Method, uri: Uri, version: String = HTTP_1_1): Request =
+            MemoryRequest(method, uri, listOf(), EMPTY, version)
 
         @JvmStatic
         @JvmOverloads
         @JvmName("create")
-        operator fun invoke(method: Method, uri: String, version: String = HTTP_1_1): Request = Request(method, Uri.of(uri), version)
+        operator fun invoke(method: Method, uri: String, version: String = HTTP_1_1): Request =
+            Request(method, Uri.of(uri), version)
 
-        operator fun invoke(method: Method, template: UriTemplate, version: String = HTTP_1_1): Request = RoutedRequest(Request(method, template.toString(), version), template)
+        operator fun invoke(method: Method, template: UriTemplate, version: String = HTTP_1_1): Request =
+            RoutedRequest(Request(method, template.toString(), version), template)
     }
 }
 
@@ -329,18 +337,25 @@ interface Response : HttpMessage {
 
     fun status(new: Status): Response
 
-    override fun toMessage(): String = listOf("$version $status", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
+    override fun toMessage(): String =
+        listOf("$version $status", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
         @JvmStatic
         @JvmOverloads
         @JvmName("create")
-        operator fun invoke(status: Status, version: String = HTTP_1_1): Response = MemoryResponse(status, listOf(), EMPTY, version)
+        operator fun invoke(status: Status, version: String = HTTP_1_1): Response =
+            MemoryResponse(status, listOf(), EMPTY, version)
     }
 }
 
 @Suppress("EqualsOrHashCode")
-data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body = EMPTY, override val version: String = HTTP_1_1) : Response {
+data class MemoryResponse(
+    override val status: Status,
+    override val headers: Headers = listOf(),
+    override val body: Body = EMPTY,
+    override val version: String = HTTP_1_1
+) : Response {
     override fun header(name: String, value: String?) = copy(headers = headers + (name to value))
 
     override fun headers(headers: Headers) = copy(headers = this.headers + headers)

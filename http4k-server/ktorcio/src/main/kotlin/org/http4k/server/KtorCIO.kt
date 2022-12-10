@@ -65,12 +65,12 @@ class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode
     }
 }
 
-fun ApplicationRequest.asHttp4k() = runCatching {
-    Request(Method.valueOf(httpMethod.value), uri)
+fun ApplicationRequest.asHttp4k() = Method.supportedOrNull(httpMethod.value)?.let {
+    Request(it, uri)
         .headers(headers.toHttp4kHeaders())
         .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
         .source(RequestSource(origin.remoteHost, scheme = origin.scheme)) // origin.remotePort does not exist for Ktor
-}.getOrNull()
+}
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))
