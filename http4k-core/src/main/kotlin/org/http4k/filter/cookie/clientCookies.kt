@@ -8,12 +8,6 @@ import java.time.ZoneOffset
 import java.util.concurrent.ConcurrentHashMap
 
 data class LocalCookie(val cookie: Cookie, private val created: Instant) {
-    @Deprecated("use main constructor", ReplaceWith("LocalCookie(cookie, created.toInstant(java.time.ZoneOffset.UTC))"))
-    constructor(cookie: Cookie, created: LocalDateTime) : this(cookie, created.toInstant(ZoneOffset.UTC))
-
-    @Deprecated("use instant version", ReplaceWith("isExpired(now.toInstant(java.time.ZoneOffset.UTC))"))
-    fun isExpired(now: LocalDateTime) = isExpired(now.toInstant(java.time.ZoneOffset.UTC))
-
     fun isExpired(now: Instant) =
         (cookie.maxAge
             ?.let { maxAge -> Duration.between(created, now).seconds >= maxAge }

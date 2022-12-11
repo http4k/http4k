@@ -21,17 +21,16 @@ import java.io.InputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.lang.management.ManagementFactory
+import java.lang.management.ManagementFactory.getRuntimeMXBean
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 abstract class StreamingContract(private val config: StreamingTestConfiguration = StreamingTestConfiguration()) {
-    private val runningInIdea = ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
+    private val runningInIdea = getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
 
-    private lateinit var server: Http4kServer
-
-    private val baseUrl by lazy { "http://localhost:${server.port()}" }
+    private fun baseUrl() = "http://localhost:${server.port()}"
 
     private val sharedList = CopyOnWriteArrayList<Char>()
 
@@ -47,9 +46,11 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
         }
     )
 
+    private val server by lazy { app.asServer(serverConfig()) }
+
     @BeforeEach
     fun `set up`() {
-        server = app.asServer(serverConfig()).start()
+        server.start()
         countdown = CountDownLatch(config.beeps * 2)
     }
 
@@ -60,7 +61,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     @Test
     fun `can stream response`() {
-        captureReceivedStream("client") { createClient()(Request(GET, "$baseUrl/stream-response")).body.stream }
+        captureReceivedStream("client") { createClient()(Request(GET, "${baseUrl()}/stream-response")).body.stream }
 
         waitForCompletion()
 
@@ -69,7 +70,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     @Test
     open fun `can stream request`() {
-        createClient()(Request(POST, "$baseUrl/stream-request").body(beeper("client")))
+        createClient()(Request(POST, "${baseUrl()}/stream-request").body(beeper("client")))
 
         waitForCompletion()
 
