@@ -52,7 +52,6 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/json"><span class="pill">Moshi</span></a>
 
 ### Templating libraries
-<a href="/guide/reference/templating"><span class="pill">Dust</span></a>
 <a href="/guide/reference/templating"><span class="pill">Freemarker</span></a>
 <a href="/guide/reference/templating"><span class="pill">Handlebars</span></a>
 <a href="/guide/reference/templating"><span class="pill">Jade4j</span></a>
