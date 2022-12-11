@@ -106,7 +106,6 @@ include("http4k-realtime-core")
 
 "http4k-template".apply {
     includeModule("core")
-    includeModule("dust")
     includeModule("freemarker")
     includeModule("handlebars")
     includeModule("rocker")
