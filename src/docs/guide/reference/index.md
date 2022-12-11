@@ -12,11 +12,12 @@ description: Details about the various http4k integration libraries
 ### HTTP Server Backends
 <a href="/guide/reference/servers"><span class="pill">Apache 4 & 5</span></a>
 <a href="/guide/reference/servers"><span class="pill">Java-WebSocket</span></a>
-<a href="/guide/reference/servers"><span class="pill">Jetty</span></a>
+<a href="/guide/reference/servers"><span class="pill">Jetty & JettyLoom</span></a>
+<a href="/guide/reference/servers"><span class="pill">Helidon</span></a>
 <a href="/guide/reference/servers"><span class="pill">Ktor CIO & Netty</span></a>
 <a href="/guide/reference/servers"><span class="pill">Netty</span></a>
 <a href="/guide/reference/servers"><span class="pill">Ratpack</span></a>
-<a href="/guide/reference/servers"><span class="pill">SunHttp</span></a>
+<a href="/guide/reference/servers"><span class="pill">SunHttp & SunHttpLoom</span></a>
 <a href="/guide/reference/servers"><span class="pill">Undertow</span></a>
 
 ### HTTP Serverless Backends
