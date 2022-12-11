@@ -75,6 +75,7 @@ include("http4k-realtime-core")
 "http4k-server".apply {
     includeModule("apache")
     includeModule("apache4")
+    includeModule("helidon")
     includeModule("jetty")
     includeModule("ktorcio")
     includeModule("ktornetty")
