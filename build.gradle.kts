@@ -42,14 +42,13 @@ allprojects {
     group = "org.http4k"
 
     jacoco {
-        toolVersion = "0.8.7"
+        toolVersion = "0.8.8"
     }
 
     tasks {
         withType<KotlinCompile> {
             kotlinOptions {
                 jvmTarget = "1.8"
-//                freeCompilerArgs = freeCompilerArgs + listOf("-Xuse-k2")
             }
         }
 
