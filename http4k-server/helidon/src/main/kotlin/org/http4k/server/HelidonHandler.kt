@@ -16,14 +16,6 @@ fun HelidonHandler(http: HttpHandler) = Handler { req, res ->
     (req.toHttp4k()?.let(http) ?: Response(NOT_IMPLEMENTED)).into(res)
 }
 
-private fun Response.into(res: ServerResponse) = res.apply {
-    status(create(status.code, status.description))
-    this@into.headers.groupBy { it.first }.forEach {
-        header(it.key, *it.value.map { it.second ?: "" }.toTypedArray())
-    }
-    outputStream().use { body.stream.copyTo(it) }
-}
-
 private fun ServerRequest.toHttp4k(): Request? =
     Method.supportedOrNull(prologue().method().text())
         ?.let {
@@ -37,3 +29,11 @@ private fun ServerRequest.toHttp4k(): Request? =
                 )
                 .source(RequestSource(remotePeer().host(), remotePeer().port()))
         }
+
+private fun Response.into(res: ServerResponse) = res.apply {
+    status(create(status.code, status.description))
+    this@into.headers.groupBy { it.first }.forEach {
+        header(it.key, *it.value.map { it.second ?: "" }.toTypedArray())
+    }
+    outputStream().use { body.stream.copyTo(it) }
+}
