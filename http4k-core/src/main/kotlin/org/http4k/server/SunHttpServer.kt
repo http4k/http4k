@@ -4,14 +4,14 @@ import com.sun.net.httpserver.HttpServer
 import org.http4k.core.HttpHandler
 import java.net.InetSocketAddress
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import java.util.concurrent.Executors.newWorkStealingPool
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 internal fun SunHttpServer(
     http: HttpHandler,
     port: Int,
     stopMode: ServerConfig.StopMode,
-    executor: ExecutorService = Executors.newWorkStealingPool()
+    executor: ExecutorService = newWorkStealingPool()
 ) = object : Http4kServer {
     override fun port(): Int = if (port > 0) port else server.address.port
 
