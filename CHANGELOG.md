@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.34.3.1
+- **http4k-*** : Fix #827 - Requests with unknown HTTP method result in uncaught exceptions
+
 ### v4.34.3.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract** : Support for arrays of enums in OA3.
