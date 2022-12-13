@@ -7,9 +7,16 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-console-standalone:1.9.1")
 }
 
-task("runSingleTest", JavaExec::class) {
-    main = "org.junit.platform.console.ConsoleLauncher"
-    classpath = sourceSets["test"].runtimeClasspath
-    args = listOf("--select-class=org.http4k.stream.HelidonStreamingTest")
-    jvmArgs = listOf("--enable-preview")
+tasks {
+    test {
+        dependsOn("runTests")
+        exclude("**/*")
+    }
+
+    task("runTests", JavaExec::class) {
+        main = "org.junit.platform.console.ConsoleLauncher"
+        classpath = sourceSets["test"].runtimeClasspath
+        args = listOf("--scan-class-path")
+        jvmArgs = listOf("--enable-preview")
+    }
 }
