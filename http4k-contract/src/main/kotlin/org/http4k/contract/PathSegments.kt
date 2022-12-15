@@ -40,4 +40,5 @@ object Root : PathSegments() {
 internal fun Request.isIn(contractRoot: PathSegments) = pathSegments().startsWith(contractRoot)
 
 internal fun Request.pathSegments() = PathSegments(uri.path)
-internal fun Request.without(pathSegments: PathSegments) = PathSegments(uri.path.replace(pathSegments.toString(), ""))
+internal fun Request.without(pathSegments: PathSegments) =
+    PathSegments(uri.path.replaceFirst(pathSegments.toString(), ""))
