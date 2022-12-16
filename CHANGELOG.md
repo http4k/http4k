@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+
+### v4.34.3.2 (uncut)
+- **http4k-contract**: fix Path value resolution it starts with same string as the prefix URL segment. H/T @tkint 
+
 ### v4.34.3.1
 - **http4k-*** : Fix #827 - Requests with unknown HTTP method result in uncaught exceptions
 
