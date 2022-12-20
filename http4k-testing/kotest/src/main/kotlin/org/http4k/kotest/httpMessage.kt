@@ -21,7 +21,7 @@ fun <T> HttpMessage.shouldHaveHeader(lens: HeaderLens<T>, matcher: Matcher<T>) =
 fun <T> HttpMessage.shouldNotHaveHeader(lens: HeaderLens<T>, matcher: Matcher<T>) = this shouldNot haveHeader(lens, matcher)
 fun <T> haveHeader(lens: HeaderLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(httpMessageHas("Header \"${lens.meta.name}\"", { req: HttpMessage -> lens(req) }, matcher))
 
-@JvmName("haveBodyNullableString")
+@JvmName("haveHeaderNullableString")
 fun haveHeader(name: String, matcher: Matcher<String?>): Matcher<HttpMessage> = httpMessageHas("Header \"$name\"", { m: HttpMessage -> m.header(name) }, matcher)
 
 fun HttpMessage.shouldHaveHeader(name: String, matcher: Matcher<String>) = this should haveHeader(name, matcher)
