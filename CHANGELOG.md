@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 
 ### v4.34.3.2 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-undertow** : Remove extra dependencies which aren't needed.
 - **http4k-contract**: fix Path value resolution it starts with same string as the prefix URL segment. H/T @tkint 
 
 ### v4.34.3.1
