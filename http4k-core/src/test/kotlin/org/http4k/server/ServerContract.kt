@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
 import org.apache.hc.client5.http.impl.classic.HttpClients.createDefault
+import org.apache.hc.core5.http.ClassicHttpResponse
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
@@ -215,7 +216,7 @@ abstract class ServerContract(
         val client = createDefault()
         client.use {
             assertThat(
-                client.execute(HttpUriRequestBase("FOOBAR", create(baseUrl))).code,
+                client.execute(HttpUriRequestBase("FOOBAR", create(baseUrl)), ClassicHttpResponse::getCode),
                 equalTo(501)
             )
         }
