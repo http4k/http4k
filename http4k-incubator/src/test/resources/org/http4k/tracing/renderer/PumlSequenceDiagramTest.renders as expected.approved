@@ -1,0 +1,31 @@
+@startuml
+title foobar
+participant "user 1"
+participant "user 2"
+participant "system b"
+participant "system c"
+participant "system d"
+participant "events"
+database "db"
+participant "external"
+"user 1" -> "system b": init 1 req
+activate "system b"
+"user 1" -> "events": event a
+"system b" -> "system c": b-to-c req
+activate "system c"
+"system b" <-> "db": bidi-b req-resp
+"system c" -> "external": c-to-external req
+activate "external"
+
+"external" -> "system c": c-to-external resp
+deactivate "external"
+"system c" -> "system b": b-to-c resp
+deactivate "system c"
+"system b" -> "user 1": init 2 resp
+deactivate "system b"
+"user 2" -> "system d": init 2 req
+activate "system d"
+"system d" -> "events": event d
+"system d" -> "user 2": init 2 resp
+deactivate "system d"
+    @enduml

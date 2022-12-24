@@ -1,4 +1,4 @@
-package org.http4k.events
+package org.http4k.tracing
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -9,8 +9,10 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.events.EventFilters.AddServiceName
 import org.http4k.events.EventFilters.AddZipkinTraces
+import org.http4k.events.Events
 import org.http4k.events.HttpEvent.Incoming
 import org.http4k.events.HttpEvent.Outgoing
+import org.http4k.events.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.ResetRequestTracing
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction

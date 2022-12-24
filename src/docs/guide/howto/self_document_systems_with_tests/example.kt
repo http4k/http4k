@@ -1,23 +1,16 @@
-package guide.howto.create_a_distributed_tracing_tree.tracerbullet
+package guide.howto.self_document_systems_with_tests
 
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.events.EventFilters.AddServiceName
 import org.http4k.events.EventFilters.AddZipkinTraces
 import org.http4k.events.Events
 import org.http4k.events.HttpEvent.Incoming
 import org.http4k.events.HttpEvent.Outgoing
-import org.http4k.events.HttpTraceTree
-import org.http4k.events.HttpTracer
-import org.http4k.events.MetadataEvent
-import org.http4k.events.TracerBullet
 import org.http4k.events.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.ResetRequestTracing
@@ -26,7 +19,16 @@ import org.http4k.filter.ServerFilters.RequestTracing
 import org.http4k.routing.bind
 import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
-import org.http4k.testing.RecordingEvents
+import org.http4k.tracing.ActorResolver
+import org.http4k.tracing.Actor
+import org.http4k.tracing.ActorType
+import org.http4k.tracing.TraceRenderPersistence
+import org.http4k.tracing.junit.TracerBulletEvents
+import org.http4k.tracing.persistence.Printing
+import org.http4k.tracing.renderer.MermaidSequenceDiagram
+import org.http4k.tracing.tracer.HttpTracer
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 // standardised events stack which records the service name and adds tracing
 fun TraceEvents(actorName: String) = AddZipkinTraces().then(AddServiceName(actorName))
@@ -56,7 +58,7 @@ fun Internal1(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
 
     return ServerStack(events)
         .then(
-            routes("{segment}" bind { _: Request ->
+            routes("/int1" bind { _: Request ->
                 http(Request(GET, "http://external1/ext1"))
                 http(Request(GET, "http://internal2/int2"))
             })
@@ -70,7 +72,7 @@ fun Internal2(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
 
     return ServerStack(events)
         .then(
-            routes("{segment}" bind { _: Request ->
+            routes("/int2" bind { _: Request ->
                 http(Request(GET, "http://external2/ext2"))
             })
         )
@@ -82,47 +84,34 @@ fun FakeExternal1(): HttpHandler = { Response(OK) }
 // another external fake system
 fun FakeExternal2(): HttpHandler = { Response(OK) }
 
-fun main() {
-    val events = RecordingEvents()
-
-    // compose our application(s) together
-    val internalApp = Internal1(
-        events,
-        reverseProxy(
-            "external1" to FakeExternal1(),
-            "internal2" to Internal2(events, FakeExternal2())
-        )
-    )
-
-    // make a request to the composed stack
-    User(events, internalApp).initiateCall()
-
-    // configure the tracerbullet
-    val tracerBullet = TracerBullet(HttpTracer(::service))
-
-    // convert the recorded events into a tree of HTTP calls
-    val traceTree = tracerBullet(events.toList())
-
-    // check that we created the correct thing
-    assertThat(traceTree, equalTo(listOf(expectedCallTree)))
+private val actor = ActorResolver {
+    Actor(it.metadata["service"].toString(), ActorType.System)
 }
 
-private fun service(event: MetadataEvent) = event.metadata["service"].toString()
+/**
+ * Our test will capture the traffic and render it to the console
+ */
+class RenderingTest {
+    @RegisterExtension
+    // this events implementation will automatically capture the HTTP traffic
+    val events = TracerBulletEvents("App",
+        listOf(HttpTracer(actor)), // A tracer to capture HTTP calls
+        listOf(MermaidSequenceDiagram), // Render the HTTP traffic as a Mermaid diagram
+        TraceRenderPersistence.Printing() // Print the result to the screen
+    )
 
-val expectedCallTree = HttpTraceTree(
-    "user", Uri.of("http://internal1/{segment}"), GET, OK,
-    listOf(
-        HttpTraceTree("internal1", Uri.of("http://external1/ext1"), GET, OK, emptyList()),
-        HttpTraceTree(
-            "internal1", Uri.of("http://internal2/{segment}"), GET, OK, listOf(
-                HttpTraceTree(
-                    "internal2",
-                    Uri.of("http://external2/ext2"),
-                    GET,
-                    OK,
-                    emptyList()
-                ),
+    @Test
+    fun `render diagram`() {
+        // compose our application(s) together
+        val internalApp = Internal1(
+            events,
+            reverseProxy(
+                "external1" to FakeExternal1(),
+                "internal2" to Internal2(events, FakeExternal2())
             )
         )
-    )
-)
+
+        // make a request to the composed stack
+        User(events, internalApp).initiateCall()
+    }
+}

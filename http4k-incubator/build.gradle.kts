@@ -2,6 +2,9 @@ description = "http4k incubator module"
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-format-moshi"))
+    api(Square.moshi.adapters)
+    compileOnly(Testing.junit.jupiter.api)
 
     testImplementation(project(":http4k-testing-strikt"))
     testImplementation(project(":http4k-client-apache"))
