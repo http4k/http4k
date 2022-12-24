@@ -70,7 +70,7 @@ nav:
     - Use a templating engines: guide/howto/use_a_templating_engine/index.md
     - Use HTML forms: guide/howto/use_html_forms/index.md
     - Use Multipart forms: guide/howto/use_multipart_forms/index.md
-    - Create a Distributed Tracing tree: guide/howto/create_a_distributed_tracing_tree/index.md
+    - Self document systems with tests: guide/howto/self_document_systems_with_tests/index.md
     - Use Auto Content Negotiation: guide/howto/use_auto_content_negotiation/index.md
     - Create a Swagger UI: guide/howto/create_a_swagger_ui/index.md
     - Use Moshi with "lite" Reflection: guide/howto/moshi_lite/index.md
