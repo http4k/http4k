@@ -34,7 +34,7 @@ object PumlSequenceDiagram : TraceRenderer {
                     }
                 }
             }
-    @enduml""".trimMargin())
+@enduml""".trimMargin())
     }
 
     private fun Iterable<Actor>.toActor() =

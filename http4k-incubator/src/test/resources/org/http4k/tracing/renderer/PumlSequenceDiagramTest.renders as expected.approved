@@ -28,4 +28,4 @@ activate "system d"
 "system d" -> "events": event d
 "system d" --> "user 2": init 2 resp
 deactivate "system d"
-    @enduml
+@enduml
