@@ -56,7 +56,7 @@ object PumlSequenceDiagram : TraceRenderer {
            |"${origin.name}" -> "${target.name}": $request
            |activate "${target.name}"
            |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
-           |"${target.name}" -> "${origin.name}": $response
+           |"${target.name}" --> "${origin.name}": $response
            |deactivate "${target.name}"
             """.trimMargin()
 

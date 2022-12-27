@@ -17,15 +17,15 @@ activate "system c"
 "system c" -> "external": c-to-external req
 activate "external"
 
-"external" -> "system c": c-to-external resp
+"external" --> "system c": c-to-external resp
 deactivate "external"
-"system c" -> "system b": b-to-c resp
+"system c" --> "system b": b-to-c resp
 deactivate "system c"
-"system b" -> "user 1": init 2 resp
+"system b" --> "user 1": init 2 resp
 deactivate "system b"
 "user 2" -> "system d": init 2 req
 activate "system d"
 "system d" -> "events": event d
-"system d" -> "user 2": init 2 resp
+"system d" --> "user 2": init 2 resp
 deactivate "system d"
     @enduml
