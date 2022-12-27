@@ -101,11 +101,10 @@ class TracerBulletEventsTest {
     }
 
     private fun tracerBulletEvents(recordingMode: RecordingMode) = TracerBulletEvents(
-        "title",
         listOf(MyTracer()),
         listOf(MyTraceRenderer()),
         traceRenderPersistence,
-        "variant",
+        { title },
         tracePersistence,
         recordingMode
     )

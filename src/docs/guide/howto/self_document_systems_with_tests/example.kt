@@ -94,7 +94,7 @@ private val actor = ActorResolver {
 class RenderingTest {
     @RegisterExtension
     // this events implementation will automatically capture the HTTP traffic
-    val events = TracerBulletEvents("App",
+    val events = TracerBulletEvents(
         listOf(HttpTracer(actor)), // A tracer to capture HTTP calls
         listOf(MermaidSequenceDiagram), // Render the HTTP traffic as a Mermaid diagram
         TraceRenderPersistence.Printing() // Print the result to the screen
