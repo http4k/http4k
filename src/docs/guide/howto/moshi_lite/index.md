@@ -15,7 +15,7 @@ But until then, you can use this recipe to take advantage of the performance gai
 This recipe uses the 3rd-party [moshi-metadata-reflect](https://github.com/ZacSweers/MoshiX/tree/main/moshi-metadata-reflect) module.
 
 ```kotlin
-implementation("org.http4k:http4k-format-moshi:4.35.0.0") {
+implementation("org.http4k:http4k-format-moshi:4.35.1.0") {
     exclude("com.squareup.moshi", "moshi-kotlin")
 }
 implementation("dev.zacsweers.moshix:moshi-metadata-reflect:0.19.0")
