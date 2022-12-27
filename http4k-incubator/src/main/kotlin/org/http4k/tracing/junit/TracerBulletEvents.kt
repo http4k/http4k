@@ -22,7 +22,7 @@ import java.util.Locale
 /**
  * JUnit plugin which is also an Events implementation that generates Trace renderings and stores them.
  */
-class TracerBulletEvents(
+open class TracerBulletEvents(
     private val traceTitle: String,
     tracers: List<Tracer>,
     private val renderers: List<TraceRenderer>,
@@ -54,12 +54,13 @@ class TracerBulletEvents(
     }
 
     /**
-     * Enable Trac rendering for just this block.
+     * Enable Trace recording for just this block.
      */
-    fun render(block: () -> Unit) {
+    fun <T> record(block: () -> T): T {
         events(MetadataEvent(StartRendering))
-        block()
-        events(MetadataEvent(StopRendering))
+        return block().also {
+            events(MetadataEvent(StopRendering))
+        }
     }
 
     override fun toString() = events.toString()
