@@ -42,4 +42,5 @@ task generateOpenApi2Client(type: org.openapitools.generator.gradle.plugin.tasks
 }
 
 compileKotlin.dependsOn(["generateOpenApi3AutoClient", "generateOpenApi3Client", "generateOpenApi2Client"])
+processResources.dependsOn(["generateOpenApi3AutoClient", "generateOpenApi3Client", "generateOpenApi2Client"])
 processTestResources.dependsOn(["generateOpenApi3AutoClient", "generateOpenApi3Client", "generateOpenApi2Client"])
