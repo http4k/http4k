@@ -6,8 +6,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
-import java.nio.ByteBuffer.wrap
-import java.util.Base64.getDecoder
+import org.http4k.base64DecodedByteBuffer
+import org.http4k.base64Encode
 
 object KinesisFirehoseEventAdapter : JsonAdapter<KinesisFirehoseEvent>() {
     @FromJson
@@ -20,7 +20,7 @@ object KinesisFirehoseEventAdapter : JsonAdapter<KinesisFirehoseEvent>() {
                     "region" -> region = nextString()
                     "records" -> records = list(KinesisFirehoseEvent::Record) {
                         when (it) {
-                            "data" -> data = wrap(getDecoder().decode(nextString()))
+                            "data" -> data = nextString().base64DecodedByteBuffer()
                             "recordId" -> recordId = nextString()
                             "approximateArrivalEpoch" -> approximateArrivalEpoch = nextLong()
                             "approximateArrivalTimestamp" -> approximateArrivalTimestamp = nextLong()
