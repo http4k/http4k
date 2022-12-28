@@ -7,6 +7,7 @@ import io.cloudevents.core.data.BytesCloudEventData
 import io.cloudevents.core.format.EventFormat
 import io.cloudevents.rw.CloudEventDataMapper
 import io.cloudevents.types.Time
+import org.http4k.base64Encode
 import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.Base64
@@ -24,10 +25,8 @@ class CSVFormat : EventFormat {
         Objects.toString(event.dataSchema),
         Objects.toString(event.subject),
         if (event.time != null) Time.writeTime(event.time) else "null",
-        if (event.data != null) String(
-            Base64.getEncoder().encode(event.data?.toBytes() ?: ByteArray(0)),
-            UTF_8
-        ) else "null"
+        if (event.data != null) event.data?.toBytes()?.base64Encode() ?: ByteArray(0).base64Encode()
+        else "null"
     ).toByteArray()
 
     override fun deserialize(bytes: ByteArray, mapper: CloudEventDataMapper<*>): CloudEvent {

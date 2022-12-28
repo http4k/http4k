@@ -11,7 +11,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
-import java.util.Base64
 
 class ApplicationLoadBalancerHttpAdapterTest {
 
@@ -41,7 +40,7 @@ class ApplicationLoadBalancerHttpAdapterTest {
 
         val request = mapOf(
             "path" to "/",
-            "body" to String(Base64.getEncoder().encode(imageBytes)),
+            "body" to imageBytes.base64Encode(),
             "isBase64Encoded" to true,
             "httpMethod" to "POST"
         )

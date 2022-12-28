@@ -2,6 +2,7 @@ package org.http4k.serverless
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -14,7 +15,6 @@ import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import java.nio.ByteBuffer
 import java.util.Base64.getDecoder
-import java.util.Base64.getEncoder
 import java.util.Locale.getDefault
 
 const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
@@ -43,7 +43,7 @@ class OpenWhiskFunction(
         addProperty("statusCode", status.code)
         addProperty(
             "body",
-            if (detectBinaryBody.isBinary(this@toGson)) getEncoder().encodeToString(body.payload.array()) else bodyString()
+            if (detectBinaryBody.isBinary(this@toGson)) body.payload.base64Encode() else bodyString()
         )
         add("headers", JsonObject().apply {
             headers.forEach {

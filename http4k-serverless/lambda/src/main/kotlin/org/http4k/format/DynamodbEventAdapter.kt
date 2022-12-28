@@ -12,7 +12,7 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import java.nio.ByteBuffer.wrap
-import java.util.Base64
+import org.http4k.base64Encode
 import java.util.Base64.getEncoder
 import java.util.Date
 
@@ -93,8 +93,8 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
     }
 
     private fun JsonWriter.attributeValue(attributeValue: AttributeValue) {
-        string("B", attributeValue.b?.let { getEncoder().encodeToString(it.array()) })
-        list("BS", attributeValue.bs?.map { getEncoder().encodeToString(it.array()) })
+        string("B", attributeValue.b?.base64Encode())
+        list("BS", attributeValue.bs?.map { it.base64Encode() })
         boolean("BOOL", attributeValue.bool)
         list("L", attributeValue.l) {
             beginObject()

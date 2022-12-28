@@ -10,7 +10,6 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import java.nio.ByteBuffer.wrap
 import java.util.Base64.getDecoder
-import java.util.Base64.getEncoder
 
 object SQSEventAdapter : JsonAdapter<SQSEvent>() {
     @FromJson
@@ -70,10 +69,11 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                                 obj(it.key, it.value) {
                                     list(
                                         "binaryListValues",
-                                        binaryListValues?.map { getEncoder().encodeToString(it.array()) })
+                                        binaryListValues?.map { it.base64Encode() })
                                     string(
                                         "binaryValue",
-                                        binaryValue?.let { getEncoder().encodeToString(it.array()) })
+                                        binaryValue?.base64Encode()
+                                    )
                                     string("dataType", dataType)
                                     list("stringListValues", stringListValues)
                                     string("stringValue", stringValue)

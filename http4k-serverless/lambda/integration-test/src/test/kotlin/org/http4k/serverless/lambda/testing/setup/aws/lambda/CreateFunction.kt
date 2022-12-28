@@ -1,6 +1,7 @@
 package org.http4k.serverless.lambda.testing.setup.aws.lambda
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -8,11 +9,10 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.serverless.lambda.testing.setup.aws.kClass
 import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaJackson.auto
-import java.util.Base64
 
 class CreateFunction(private val functionPackage: FunctionPackage) : LambdaAction<FunctionDetailsData>(kClass()) {
     override fun toRequest(): Request {
-        val code = String(Base64.getEncoder().encode(functionPackage.jar.array()))
+        val code = functionPackage.jar.base64Encode()
         return Request(Method.POST, Uri.of("/2015-03-31/functions/"))
             .with(
                 Body.auto<CreateFunction>().toLens() of CreateFunction(
