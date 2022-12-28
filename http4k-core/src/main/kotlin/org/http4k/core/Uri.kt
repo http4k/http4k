@@ -101,6 +101,6 @@ fun String.toPathSegmentDecoded(): String =
 fun Uri.extend(uri: Uri): Uri =
     appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())
 
-private fun Uri.appendToPath(newPath: String): Uri =
-    if (newPath == "") this
-    else copy(path = (path.removeSuffix("/") + "/" + newPath.removePrefix("/")))
+fun Uri.appendToPath(pathToAppend: String?): Uri =
+    if (pathToAppend.isNullOrBlank()) this
+    else copy(path = (path.removeSuffix("/") + "/" + pathToAppend.removePrefix("/")))
