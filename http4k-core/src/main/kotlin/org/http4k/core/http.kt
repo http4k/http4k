@@ -1,5 +1,6 @@
 package org.http4k.core
 
+import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
@@ -50,7 +51,7 @@ interface Body : Closeable {
  * Represents a body that is backed by an in-memory ByteBuffer. Closing this has no effect.
  **/
 data class MemoryBody(override val payload: ByteBuffer) : Body {
-    constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
+    constructor(payload: String) : this(payload.asByteBuffer())
     constructor(payload: ByteArray) : this(ByteBuffer.wrap(payload))
 
     override val length get() = payload.length().toLong()
