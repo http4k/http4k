@@ -1,7 +1,6 @@
 package org.http4k.tracing.junit
 
 import org.http4k.events.Event
-import org.http4k.events.Events
 import org.http4k.events.MetadataEvent
 import org.http4k.testing.RecordingEvents
 import org.http4k.tracing.ScenarioTraces
@@ -12,6 +11,7 @@ import org.http4k.tracing.TraceRenderPersistence
 import org.http4k.tracing.TraceRenderer
 import org.http4k.tracing.Tracer
 import org.http4k.tracing.TracerBullet
+import org.http4k.tracing.VcrEvents
 import org.http4k.tracing.junit.RecordingMode.Auto
 import org.http4k.tracing.junit.RecordingMode.Manual
 import org.http4k.tracing.junit.TraceNamer.Companion.TestNameAndMethod
@@ -29,14 +29,14 @@ open class TracerBulletEvents(
     private val traceNamer: TraceNamer = TestNameAndMethod,
     private val tracePersistence: TracePersistence = TracePersistence.InMemory(),
     private val recordingMode: RecordingMode = Auto
-) : Events, Iterable<Event>, AfterTestExecutionCallback {
+) : VcrEvents, AfterTestExecutionCallback {
 
     private val tracerBullet = TracerBullet(tracers)
 
     private val events = RecordingEvents().apply {
         if (recordingMode == Manual) this(MetadataEvent(StopRendering))
     }
-
+;
     override fun afterTestExecution(context: ExtensionContext) {
         if (context.executionException.isEmpty) {
             val traces = tracerBullet(events.toList())
@@ -48,13 +48,17 @@ open class TracerBulletEvents(
         }
     }
 
-    /**
-     * Enable Trace recording for just this block.
-     */
-    fun <T> record(block: () -> T): T {
+    override fun <T> record(block: () -> T): T {
         events(MetadataEvent(StartRendering))
         return block().also {
             events(MetadataEvent(StopRendering))
+        }
+    }
+
+    override fun <T> pause(block: () -> T): T {
+        events(MetadataEvent(StopRendering))
+        return block().also {
+            events(MetadataEvent(StartRendering))
         }
     }
 
