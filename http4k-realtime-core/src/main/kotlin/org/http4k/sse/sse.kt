@@ -1,10 +1,10 @@
 package org.http4k.sse
 
+import org.http4k.base64Encode
 import org.http4k.core.Request
 import org.http4k.routing.RoutingSseHandler
 import java.io.InputStream
 import java.time.Duration
-import java.util.Base64.getEncoder
 
 interface Sse {
     val connectRequest: Request
@@ -19,14 +19,14 @@ typealias SseHandler = (Request) -> SseConsumer
 
 sealed class SseMessage {
     data class Data(val data: String) : SseMessage() {
-        constructor(data: ByteArray) : this(getEncoder().encodeToString(data))
+        constructor(data: ByteArray) : this(data.base64Encode())
         constructor(data: InputStream) : this(data.readAllBytes())
     }
 
     data class Event(val event: String, val data: String, val id: String? = null) : SseMessage() {
         constructor(event: String, data: ByteArray, id: String? = null) : this(
             event,
-            getEncoder().encodeToString(data),
+            data.base64Encode(),
             id
         )
 

@@ -1,5 +1,6 @@
 package org.http4k.servirtium
 
+import org.http4k.base64DecodedArray
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Body
 import org.http4k.core.Credentials
@@ -17,7 +18,6 @@ import org.http4k.format.Moshi.auto
 import org.http4k.lens.Query
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.Base64
 
 /**
  * Read a file from a repository using the GitHub API.
@@ -47,5 +47,5 @@ class GitHub @JvmOverloads constructor(private val owner: String,
 }
 
 data class GithubFile(val content: String) {
-    val decoded by lazy { Base64.getDecoder().decode(content.replace("\n", "")) }
+    val decoded: ByteArray by lazy { content.replace("\n", "").base64DecodedArray() }
 }

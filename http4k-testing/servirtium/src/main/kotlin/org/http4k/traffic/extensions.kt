@@ -1,5 +1,7 @@
 package org.http4k.traffic
 
+import org.http4k.base64DecodedByteBuffer
+import org.http4k.base64EncodeArray
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
@@ -11,8 +13,6 @@ import org.http4k.core.parse
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionOptions.Companion.Defaults
-import java.nio.ByteBuffer
-import java.util.Base64
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 import java.util.function.Supplier
@@ -91,7 +91,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
     private fun HttpMessage.encodedBody() =
         CONTENT_TYPE(this)
             ?.takeIf { options.isBinary(it) }
-            ?.let { Base64.getEncoder().encode(body.payload.array()) }
+            ?.let { body.payload.array().base64EncodeArray() }
             ?: bodyString().toByteArray()
 }
 
@@ -104,7 +104,7 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
         .map { req ->
             CONTENT_TYPE(req)
                 ?.takeIf { options.isBinary(it) }
-                ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
+                ?.let { req.body(Body(req.bodyString().base64DecodedByteBuffer())) }
                 ?: req
         }
 
@@ -112,7 +112,7 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
         .map { req ->
             CONTENT_TYPE(req)
                 .takeIf { options.isBinary(it) }
-                ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
+                ?.let { req.body(Body(req.bodyString().base64DecodedByteBuffer())) }
                 ?: req
         }
 

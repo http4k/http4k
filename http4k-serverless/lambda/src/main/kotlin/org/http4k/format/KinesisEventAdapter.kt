@@ -8,8 +8,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
-import java.nio.ByteBuffer
-import java.util.Base64
+import org.http4k.base64DecodedByteBuffer
+import org.http4k.base64Encode
 import java.util.Date
 
 object KinesisEventAdapter : JsonAdapter<KinesisEvent>() {
@@ -34,7 +34,7 @@ object KinesisEventAdapter : JsonAdapter<KinesisEvent>() {
                                     "partitionKey" -> partitionKey = nextString()
                                     "sequenceNumber" -> sequenceNumber = nextString()
                                     "approximateArrivalTimestamp" -> approximateArrivalTimestamp = Date(nextLong())
-                                    "data" -> data = ByteBuffer.wrap(Base64.getDecoder().decode(nextString()))
+                                    "data" -> data = nextString().base64DecodedByteBuffer()
                                     else -> skipValue()
                                 }
                             }
@@ -65,7 +65,7 @@ object KinesisEventAdapter : JsonAdapter<KinesisEvent>() {
                             string("partitionKey", partitionKey)
                             string("sequenceNumber", sequenceNumber)
                             number("approximateArrivalTimestamp", approximateArrivalTimestamp?.time)
-                            string("data", Base64.getEncoder().encodeToString(data.array()))
+                            string("data", data.base64Encode())
                         }
                     }
                 }

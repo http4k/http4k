@@ -2,6 +2,7 @@ package org.http4k.serverless
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -10,7 +11,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
-import java.util.Base64
 
 class ApiGatewayRestAwsHttpAdapterTest {
 
@@ -60,7 +60,7 @@ class ApiGatewayRestAwsHttpAdapterTest {
 
         val request = mapOf(
             "path" to "/path",
-            "body" to String(Base64.getEncoder().encode(imageBytes)),
+            "body" to imageBytes.base64Encode(),
             "isBase64Encoded" to true,
             "httpMethod" to "POST"
         )

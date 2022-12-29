@@ -24,6 +24,8 @@ import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotificatio
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.asByteBuffer
+import org.http4k.base64DecodedByteBuffer
+import org.http4k.base64EncodeArray
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -38,8 +40,6 @@ import org.joda.time.DateTimeZone.UTC
 import org.joda.time.format.ISODateTimeFormat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.nio.ByteBuffer.wrap
-import java.util.Base64
 import java.util.Date
 
 @ExtendWith(JsonApprovalTest::class)
@@ -82,8 +82,8 @@ class AwsLambdaMoshiTest {
 
     private fun item(): Map<String, AttributeValue> = mapOf("name" to AttributeValue().apply {
         val attributeValue = this
-        attributeValue.b = wrap(Base64.getDecoder().decode("123"))
-        attributeValue.setBS(listOf(wrap(Base64.getDecoder().decode("123"))))
+        attributeValue.b = "123".base64DecodedByteBuffer()
+        attributeValue.setBS(listOf("123".base64DecodedByteBuffer()))
         attributeValue.bool = true
         attributeValue.setL(listOf(AttributeValue().apply { s = "123" }))
         attributeValue.m = mapOf()
@@ -111,7 +111,7 @@ class AwsLambdaMoshiTest {
                         partitionKey = "partitionKey"
                         sequenceNumber = "sequenceNumber"
                         approximateArrivalTimestamp = Date(0)
-                        data = wrap(Base64.getEncoder().encode("hello".toByteArray()))
+                        data = "hello".toByteArray().base64EncodeArray().asByteBuffer()
                     }
                 })
         })
@@ -125,7 +125,7 @@ class AwsLambdaMoshiTest {
             region = "region"
             records = listOf(
                 KinesisFirehoseEvent.Record().apply {
-                    data = wrap(Base64.getEncoder().encode("hello".toByteArray()))
+                    data = "hello".toByteArray().base64EncodeArray().asByteBuffer()
                     recordId = "recordId"
                     approximateArrivalEpoch = 0
                     approximateArrivalTimestamp = 0

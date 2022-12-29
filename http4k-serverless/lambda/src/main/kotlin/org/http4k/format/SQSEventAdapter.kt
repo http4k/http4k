@@ -8,9 +8,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
-import java.nio.ByteBuffer.wrap
-import java.util.Base64.getDecoder
-import java.util.Base64.getEncoder
+import org.http4k.base64DecodedByteBuffer
+import org.http4k.base64Encode
 
 object SQSEventAdapter : JsonAdapter<SQSEvent>() {
     @FromJson
@@ -32,9 +31,9 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                             "messageAttributes" -> messageAttributes = map {
                                 obj(::MessageAttribute) {
                                     when (it) {
-                                        "binaryValue" -> binaryValue = wrap(getDecoder().decode(nextString()))
+                                        "binaryValue" -> binaryValue = nextString().base64DecodedByteBuffer()
                                         "binaryListValues" -> binaryListValues =
-                                            stringList().map { wrap(getDecoder().decode(it)) }
+                                            stringList().map { it.base64DecodedByteBuffer() }
                                         "dataType" -> dataType = nextString()
                                         "stringValue" -> stringValue = nextString()
                                         "stringListValues" -> stringListValues = stringList()
@@ -70,10 +69,11 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                                 obj(it.key, it.value) {
                                     list(
                                         "binaryListValues",
-                                        binaryListValues?.map { getEncoder().encodeToString(it.array()) })
+                                        binaryListValues?.map { it.base64Encode() })
                                     string(
                                         "binaryValue",
-                                        binaryValue?.let { getEncoder().encodeToString(it.array()) })
+                                        binaryValue?.base64Encode()
+                                    )
                                     string("dataType", dataType)
                                     list("stringListValues", stringListValues)
                                     string("stringValue", stringValue)

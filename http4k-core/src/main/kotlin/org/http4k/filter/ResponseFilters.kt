@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import org.http4k.base64Encode
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -14,7 +15,6 @@ import java.security.MessageDigest
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
-import java.util.Base64
 
 object ResponseFilters {
 
@@ -133,7 +133,7 @@ object ResponseFilters {
      * Some platforms deliver bodies as Base64 encoded strings.
      */
     fun Base64EncodeBody() = Filter { next ->
-        { next(it).run { body(Base64.getEncoder().encodeToString(body.payload.array())) } }
+        { next(it).run { body(body.payload.base64Encode()) } }
     }
 
     class EtagSupport : Filter {
