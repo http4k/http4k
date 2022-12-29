@@ -24,7 +24,6 @@ class MultipartFormParserTest {
 
         val maxStreamLength = 100000 // maximum length of the stream, will throw exception if this is exceeded
         val writeToDiskThreshold = 1024 // maximum length of in memory object - if part is bigger then write to disk
-        val temporaryFileDirectory: File? = null // use default temporary file directory
         val contentType = "multipart/form-data; boundary=------WebKitFormBoundary6LmirFeqsyCQRtbj" // content type from HTTP header
 
         // you are responsible for closing the body InputStream
