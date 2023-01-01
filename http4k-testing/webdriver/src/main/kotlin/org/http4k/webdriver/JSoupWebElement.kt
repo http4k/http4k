@@ -50,7 +50,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     override fun submit() {
         current("form")?.let {
             val method =
-                Method.valueOf(it.element.attr("method").uppercase(getDefault()))
+                runCatching { Method.valueOf(it.element.attr("method").uppercase(getDefault())) }.getOrDefault(POST)
             val inputs = it
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
@@ -104,6 +104,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             isA("a") -> navigate(Request(GET, element.attr("href")))
             isCheckable() -> if (isSelected) clear()
             else element.attr("checked", "checked")
+
             isA("option") -> {
                 val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") == true
 
@@ -115,6 +116,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 if (oldValue && !currentSelectIsMultiple) clear()
                 else element.attr("selected", "selected")
             }
+
             isA("button") -> {
                 val t = element.attr("type")
                 if (t == "" || t.lowercase(getDefault()) == "submit")
