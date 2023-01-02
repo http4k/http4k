@@ -14,7 +14,7 @@ object PumlInteractionFlowDiagram : TraceRenderer {
         val traces = steps.filterIsInstance<Trace>()
 
         val relations = traces
-            .flatMapIndexed { i, it -> it.relations(i + 1) }
+            .flatMapIndexed { i, it -> it.relations("${i + 1}") }
             .toSet()
 
         return TraceRender(
@@ -44,14 +44,14 @@ ${relations.joinToString("\n") { "Rel_D(${it.origin.identifier()}, ${it.target.i
             if (acc.contains(nextVal)) acc else acc + nextVal
         }
 
-    private fun Trace.relations(baseCounter: Int): List<Call> =
+    private fun Trace.relations(prefix: String): List<Call> =
         listOf(
             Call(
                 origin.name,
                 target.name,
-                "$baseCounter. $request"
+                "$prefix $request"
             )
-        ) + children.flatMapIndexed { i, it -> it.relations(baseCounter + i + 1) }
+        ) + children.flatMapIndexed { i, it -> it.relations("$prefix.${i + 1}") }
 
     private data class Call(val origin: String, val target: String, val interaction: String)
 }

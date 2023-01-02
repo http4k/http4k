@@ -1,9 +1,7 @@
 package org.http4k.tracing
 
-interface TracePersistence {
+interface TracePersistence : TraceLoader {
     fun store(trace: ScenarioTraces)
-    fun load(): Iterable<ScenarioTraces>
-
     companion object
 }
 
