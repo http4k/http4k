@@ -1,0 +1,18 @@
+C4Context
+title foobar
+
+Person(user1, "user 1")
+Person(user2, "user 2")
+System(systemb, "system b")
+System(systemc, "system c")
+System(systemd, "system d")
+System(events, "events")
+ContainerDb(db, "db")
+System(external, "external")    
+Rel_D(user1, systemb, " ") 
+Rel_D(user1, events, " ") 
+Rel_D(systemb, systemc, " ") 
+Rel_D(systemb, db, " ") 
+Rel_D(systemc, external, " ") 
+Rel_D(user2, systemd, " ") 
+Rel_D(systemd, events, " ")     
