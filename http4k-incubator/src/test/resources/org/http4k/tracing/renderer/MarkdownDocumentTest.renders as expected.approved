@@ -20,49 +20,49 @@ sequenceDiagram
     title foobar - Sequence
     actor user 1
 	actor user 2
-	participant system.b
-	participant system-c
-	participant system/d
+	participant system_b
+	participant system_c
+	participant system_d
 	participant events
 	participant db
 	participant external
 
-    user 1->>system.b: init 1 req
-    activate system.b
+    user 1->>system_b: init 1 req
+    activate system_b
     
     user 1-)events: event a
     
     
 	
-    system.b->>system-c: b-to-c req
-    activate system-c
+    system_b->>system_c: b-to-c req
+    activate system_c
     
-    system.b->>db: bidi-b req-resp
+    system_b->>db: bidi-b req-resp
     
-    db->>system.b: 
+    db->>system_b: 
     
 	
-    system-c->>external: c-to-external req
+    system_c->>external: c-to-external req
     activate external
     
     external->>system-c: c-to-external resp
     deactivate external
     
-    system-c->>system.b: b-to-c resp
-    deactivate system-c
+    system_c->>system.b: b-to-c resp
+    deactivate system_c
     
-    system.b->>user 1: init 2 resp
-    deactivate system.b
+    system_b->>user 1: init 2 resp
+    deactivate system_b
     
 	
-    user 2->>system/d: init 2 req
-    activate system/d
+    user 2->>system_d: init 2 req
+    activate system_d
     
-    system/d-)events: event d
+    system_d-)events: event d
     
     
-    system/d->>user 2: init 2 resp
-    deactivate system/d
+    system_d->>user 2: init 2 resp
+    deactivate system_d
     
 ```
 
