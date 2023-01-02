@@ -2,7 +2,6 @@ package org.http4k.tracing.persistence
 
 import org.http4k.core.ContentType
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.lens.Header
@@ -19,7 +18,7 @@ import java.io.File
 import java.nio.file.Files
 
 @ExtendWith(JsonApprovalTest::class)
-class DirectoryTreeTraceLoaderKtTest {
+class DirectoryTreeTraceLoaderTest {
     @Test
     fun `can load all traces by walking the directory structure`(approver: Approver) {
 
