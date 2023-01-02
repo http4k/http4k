@@ -1,3 +1,21 @@
+#foobar
+
+## foobar - Maximum Trace Depth
+
+| Origin | Target | Request |  Max Depth  |
+|:------:|:------:|:-------:|:-----------:|
+|	user 1	|	system b	|	init 1 req	|	3	|
+|	user 2	|	system d	|	init 2 req	|	2	|
+
+
+## foobar - Trace Step Counts
+
+| Origin | Target | Request |  Steps  |
+|:------:|:------:|:-------:|:-------:|
+|	user 1	|	system b	|	init 1 req	|	5	|
+|	user 2	|	system d	|	init 2 req	|	2	|
+
+```mermaid
 sequenceDiagram
     title foobar - Sequence
     actor user 1
@@ -46,3 +64,4 @@ sequenceDiagram
     system d->>user 2: init 2 resp
     deactivate system d
     
+```

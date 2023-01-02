@@ -21,7 +21,7 @@ object MermaidSequenceDiagram : TraceRenderer {
             "$scenarioName - Sequence",
             "MMD",
             """sequenceDiagram
-    title $scenarioName
+    title $scenarioName - Sequence
     ${actors.toMermaidActor().joinToString("\n\t")}
 ${
                 steps.joinToString("\n\t") {
