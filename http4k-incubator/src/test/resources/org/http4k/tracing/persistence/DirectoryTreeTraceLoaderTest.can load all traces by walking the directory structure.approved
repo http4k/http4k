@@ -78,74 +78,6 @@
     ]
   },
   {
-    "name": "2",
-    "traces": [
-      {
-        "type": "RequestResponse",
-        "origin": {
-          "name": "user 2",
-          "type": "Human"
-        },
-        "target": {
-          "name": "system d",
-          "type": "System"
-        },
-        "request": "init 2 req",
-        "response": "init 2 resp",
-        "children": [
-          {
-            "type": "FireAndForget",
-            "origin": {
-              "name": "system d",
-              "type": "System"
-            },
-            "target": {
-              "name": "events",
-              "type": "System"
-            },
-            "request": "event d",
-            "children": [
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "12",
-    "traces": [
-      {
-        "type": "RequestResponse",
-        "origin": {
-          "name": "user 2",
-          "type": "Human"
-        },
-        "target": {
-          "name": "system d",
-          "type": "System"
-        },
-        "request": "init 2 req",
-        "response": "init 2 resp",
-        "children": [
-          {
-            "type": "FireAndForget",
-            "origin": {
-              "name": "system d",
-              "type": "System"
-            },
-            "target": {
-              "name": "events",
-              "type": "System"
-            },
-            "request": "event d",
-            "children": [
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
     "name": "11",
     "traces": [
       {
@@ -336,7 +268,41 @@
     ]
   },
   {
-    "name": "22",
+    "name": "12",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 2",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system d",
+          "type": "System"
+        },
+        "request": "init 2 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "system d",
+              "type": "System"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event d",
+            "children": [
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "2",
     "traces": [
       {
         "type": "RequestResponse",
@@ -441,6 +407,40 @@
                 "children": [
                 ]
               }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "22",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 2",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system d",
+          "type": "System"
+        },
+        "request": "init 2 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "system d",
+              "type": "System"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event d",
+            "children": [
             ]
           }
         ]
