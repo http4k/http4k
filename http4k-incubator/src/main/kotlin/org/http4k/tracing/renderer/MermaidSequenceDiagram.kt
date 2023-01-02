@@ -47,26 +47,26 @@ ${
             val nextVal = when (next.type) {
                 Human -> "actor"
                 else -> "participant"
-            } + " ${next.name()}"
+            } + " ${next.safeName()}"
             if (acc.contains(nextVal)) acc else acc + nextVal
         }
 
     private fun RequestResponse.asMermaidSequenceDiagram(): String = """
-    ${origin.name()}->>${target.name()}: $request
-    activate ${target.name()}
+    ${origin.safeName()}->>${target.safeName()}: $request
+    activate ${target.safeName()}
     ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
-    ${target.name()}->>${origin.name}: $response
-    deactivate ${target.name()}
+    ${target.safeName()}->>${origin.safeName()}: $response
+    deactivate ${target.safeName()}
     """
 
     private fun BiDirectional.asMermaidSequenceDiagram(): String = """
-    ${origin.name()}->>${target.name()}: $request
+    ${origin.safeName()}->>${target.safeName()}: $request
     ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
-    ${target.name()}->>${origin.name()}: 
+    ${target.safeName()}->>${origin.safeName()}: 
     """
 
     private fun FireAndForget.asMermaidSequenceDiagram(): String = """
-    ${origin.name()}-)${target.name()}: $request
+    ${origin.safeName()}-)${target.safeName()}: $request
     ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
     """
 
@@ -76,4 +76,4 @@ ${
         """
 }
 
-private fun Actor.name() = name.map { if (it.isWhitespace() || it.isLetterOrDigit()) it else '_' }.joinToString("")
+private fun Actor.safeName() = name.map { if (it.isWhitespace() || it.isLetterOrDigit()) it else '_' }.joinToString("")
