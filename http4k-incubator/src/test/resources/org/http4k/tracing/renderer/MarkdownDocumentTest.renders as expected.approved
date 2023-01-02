@@ -4,65 +4,65 @@
 
 | Origin | Target | Request |  Max Depth  |
 |:------:|:------:|:-------:|:-----------:|
-|	user 1	|	system b	|	init 1 req	|	3	|
-|	user 2	|	system d	|	init 2 req	|	2	|
+|	user 1	|	system.b	|	init 1 req	|	3	|
+|	user 2	|	system/d	|	init 2 req	|	2	|
 
 
 ## foobar - Trace Step Counts
 
 | Origin | Target | Request |  Steps  |
 |:------:|:------:|:-------:|:-------:|
-|	user 1	|	system b	|	init 1 req	|	5	|
-|	user 2	|	system d	|	init 2 req	|	2	|
+|	user 1	|	system.b	|	init 1 req	|	5	|
+|	user 2	|	system/d	|	init 2 req	|	2	|
 
 ```mermaid
 sequenceDiagram
     title foobar - Sequence
     actor user 1
 	actor user 2
-	participant system b
-	participant system c
-	participant system d
+	participant system.b
+	participant system-c
+	participant system/d
 	participant events
 	participant db
 	participant external
 
-    user 1->>system b: init 1 req
-    activate system b
+    user 1->>system.b: init 1 req
+    activate system.b
     
     user 1-)events: event a
     
     
 	
-    system b->>system c: b-to-c req
-    activate system c
+    system.b->>system-c: b-to-c req
+    activate system-c
     
-    system b->>db: bidi-b req-resp
+    system.b->>db: bidi-b req-resp
     
-    db->>system b: 
+    db->>system.b: 
     
 	
-    system c->>external: c-to-external req
+    system-c->>external: c-to-external req
     activate external
     
-    external->>system c: c-to-external resp
+    external->>system-c: c-to-external resp
     deactivate external
     
-    system c->>system b: b-to-c resp
-    deactivate system c
+    system-c->>system.b: b-to-c resp
+    deactivate system-c
     
-    system b->>user 1: init 2 resp
-    deactivate system b
+    system.b->>user 1: init 2 resp
+    deactivate system.b
     
 	
-    user 2->>system d: init 2 req
-    activate system d
+    user 2->>system/d: init 2 req
+    activate system/d
     
-    system d-)events: event d
+    system/d-)events: event d
     
     
-    system d->>user 2: init 2 resp
-    deactivate system d
+    system/d->>user 2: init 2 resp
+    deactivate system/d
     
 ```
 
@@ -72,9 +72,9 @@ title foobar
 
 Person(user1, "user 1")
 Person(user2, "user 2")
-System(systemb, "system b")
-System(systemc, "system c")
-System(systemd, "system d")
+System(systemb, "system.b")
+System(systemc, "system-c")
+System(systemd, "system/d")
 System(events, "events")
 ContainerDb(db, "db")
 System(external, "external")    
@@ -88,6 +88,6 @@ Rel_D(systemd, events, " ")
 ```
 
 ```TXT
-RequestResponse(origin=Actor(name=user 1, type=Human), target=Actor(name=system b, type=System), request=init 1 req, response=init 2 resp, children=[FireAndForget(origin=Actor(name=user 1, type=Human), target=Actor(name=events, type=System), request=event a, children=[]), RequestResponse(origin=Actor(name=system b, type=System), target=Actor(name=system c, type=System), request=b-to-c req, response=b-to-c resp, children=[BiDirectional(origin=Actor(name=system b, type=System), target=Actor(name=db, type=Database), request=bidi-b req-resp, children=[]), RequestResponse(origin=Actor(name=system c, type=System), target=Actor(name=external, type=System), request=c-to-external req, response=c-to-external resp, children=[])])])
-RequestResponse(origin=Actor(name=user 2, type=Human), target=Actor(name=system d, type=System), request=init 2 req, response=init 2 resp, children=[FireAndForget(origin=Actor(name=system d, type=System), target=Actor(name=events, type=System), request=event d, children=[])])
+RequestResponse(origin=Actor(name=user 1, type=Human), target=Actor(name=system.b, type=System), request=init 1 req, response=init 2 resp, children=[FireAndForget(origin=Actor(name=user 1, type=Human), target=Actor(name=events, type=System), request=event a, children=[]), RequestResponse(origin=Actor(name=system.b, type=System), target=Actor(name=system-c, type=System), request=b-to-c req, response=b-to-c resp, children=[BiDirectional(origin=Actor(name=system.b, type=System), target=Actor(name=db, type=Database), request=bidi-b req-resp, children=[]), RequestResponse(origin=Actor(name=system-c, type=System), target=Actor(name=external, type=System), request=c-to-external req, response=c-to-external resp, children=[])])])
+RequestResponse(origin=Actor(name=user 2, type=Human), target=Actor(name=system/d, type=System), request=init 2 req, response=init 2 resp, children=[FireAndForget(origin=Actor(name=system/d, type=System), target=Actor(name=events, type=System), request=event d, children=[])])
 ```

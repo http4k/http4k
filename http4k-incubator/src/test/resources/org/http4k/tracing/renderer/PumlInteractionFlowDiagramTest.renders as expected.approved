@@ -6,9 +6,9 @@ title foobar
 
 Person(user1, "user 1")
 Person(user2, "user 2")
-Container(systemb, "system b")
-Container(systemc, "system c")
-Container(systemd, "system d")
+Container(systemb, "system.b")
+Container(systemc, "system-c")
+Container(systemd, "system/d")
 Container(events, "events")
 ContainerDb(db, "db")
 Container(external, "external")    

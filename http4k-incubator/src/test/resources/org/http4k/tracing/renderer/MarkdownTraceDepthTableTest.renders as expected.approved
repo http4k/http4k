@@ -3,5 +3,5 @@
 
 | Origin | Target | Request |  Max Depth  |
 |:------:|:------:|:-------:|:-----------:|
-|	user 1	|	system b	|	init 1 req	|	3	|
-|	user 2	|	system d	|	init 2 req	|	2	|
+|	user 1	|	system.b	|	init 1 req	|	3	|
+|	user 2	|	system/d	|	init 2 req	|	2	|

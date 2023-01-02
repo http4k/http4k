@@ -6,9 +6,9 @@ title foobar
 
 Person(user1, "user 1")
 Person(user2, "user 2")
-System(systemb, "system b")
-System(systemc, "system c")
-System(systemd, "system d")
+System(systemb, "system.b")
+System(systemc, "system-c")
+System(systemd, "system/d")
 System(events, "events")
 ContainerDb(db, "db")
 System(external, "external")    
