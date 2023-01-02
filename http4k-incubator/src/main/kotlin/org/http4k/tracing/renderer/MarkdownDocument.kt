@@ -22,7 +22,9 @@ ${next.content}
 
                 else ->
                     """
+```${next.format}
 ${next.content}
+```
 """
             }
         }

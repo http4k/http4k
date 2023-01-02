@@ -86,3 +86,8 @@ Rel_D(systemc, external, " ")
 Rel_D(user2, systemd, " ") 
 Rel_D(systemd, events, " ")     
 ```
+
+```TXT
+RequestResponse(origin=Actor(name=user 1, type=Human), target=Actor(name=system b, type=System), request=init 1 req, response=init 2 resp, children=[FireAndForget(origin=Actor(name=user 1, type=Human), target=Actor(name=events, type=System), request=event a, children=[]), RequestResponse(origin=Actor(name=system b, type=System), target=Actor(name=system c, type=System), request=b-to-c req, response=b-to-c resp, children=[BiDirectional(origin=Actor(name=system b, type=System), target=Actor(name=db, type=Database), request=bidi-b req-resp, children=[]), RequestResponse(origin=Actor(name=system c, type=System), target=Actor(name=external, type=System), request=c-to-external req, response=c-to-external resp, children=[])])])
+RequestResponse(origin=Actor(name=user 2, type=Human), target=Actor(name=system d, type=System), request=init 2 req, response=init 2 resp, children=[FireAndForget(origin=Actor(name=system d, type=System), target=Actor(name=events, type=System), request=event d, children=[])])
+```
