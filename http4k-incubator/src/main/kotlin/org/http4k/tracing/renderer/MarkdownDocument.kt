@@ -6,7 +6,7 @@ import org.http4k.tracing.TraceRenderer
 fun MarkdownDocument(vararg renderers: TraceRenderer) = TraceRenderer { scenarioName, steps ->
     val markdownDoc = renderers
         .map { it.render(scenarioName, steps) }
-        .fold("#$scenarioName") { acc, next ->
+        .fold("# $scenarioName") { acc, next ->
             acc + when (next.format) {
                 "MD" ->
                     """
