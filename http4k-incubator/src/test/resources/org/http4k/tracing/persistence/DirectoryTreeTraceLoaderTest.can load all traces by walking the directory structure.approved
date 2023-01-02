@@ -9,7 +9,7 @@
           "type": "Human"
         },
         "target": {
-          "name": "system b",
+          "name": "system.b",
           "type": "System"
         },
         "request": "init 1 req",
@@ -32,11 +32,11 @@
           {
             "type": "RequestResponse",
             "origin": {
-              "name": "system b",
+              "name": "system.b",
               "type": "System"
             },
             "target": {
-              "name": "system c",
+              "name": "system-c",
               "type": "System"
             },
             "request": "b-to-c req",
@@ -45,7 +45,7 @@
               {
                 "type": "BiDirectional",
                 "origin": {
-                  "name": "system b",
+                  "name": "system.b",
                   "type": "System"
                 },
                 "target": {
@@ -59,7 +59,7 @@
               {
                 "type": "RequestResponse",
                 "origin": {
-                  "name": "system c",
+                  "name": "system-c",
                   "type": "System"
                 },
                 "target": {
@@ -87,7 +87,7 @@
           "type": "Human"
         },
         "target": {
-          "name": "system b",
+          "name": "system.b",
           "type": "System"
         },
         "request": "init 1 req",
@@ -110,11 +110,11 @@
           {
             "type": "RequestResponse",
             "origin": {
-              "name": "system b",
+              "name": "system.b",
               "type": "System"
             },
             "target": {
-              "name": "system c",
+              "name": "system-c",
               "type": "System"
             },
             "request": "b-to-c req",
@@ -123,7 +123,7 @@
               {
                 "type": "BiDirectional",
                 "origin": {
-                  "name": "system b",
+                  "name": "system.b",
                   "type": "System"
                 },
                 "target": {
@@ -137,7 +137,7 @@
               {
                 "type": "RequestResponse",
                 "origin": {
-                  "name": "system c",
+                  "name": "system-c",
                   "type": "System"
                 },
                 "target": {
@@ -165,7 +165,7 @@
           "type": "Human"
         },
         "target": {
-          "name": "system b",
+          "name": "system.b",
           "type": "System"
         },
         "request": "init 1 req",
@@ -188,11 +188,11 @@
           {
             "type": "RequestResponse",
             "origin": {
-              "name": "system b",
+              "name": "system.b",
               "type": "System"
             },
             "target": {
-              "name": "system c",
+              "name": "system-c",
               "type": "System"
             },
             "request": "b-to-c req",
@@ -201,7 +201,7 @@
               {
                 "type": "BiDirectional",
                 "origin": {
-                  "name": "system b",
+                  "name": "system.b",
                   "type": "System"
                 },
                 "target": {
@@ -215,7 +215,7 @@
               {
                 "type": "RequestResponse",
                 "origin": {
-                  "name": "system c",
+                  "name": "system-c",
                   "type": "System"
                 },
                 "target": {
@@ -243,7 +243,7 @@
           "type": "Human"
         },
         "target": {
-          "name": "system d",
+          "name": "system/d",
           "type": "System"
         },
         "request": "init 2 req",
@@ -252,7 +252,7 @@
           {
             "type": "FireAndForget",
             "origin": {
-              "name": "system d",
+              "name": "system/d",
               "type": "System"
             },
             "target": {
@@ -277,7 +277,7 @@
           "type": "Human"
         },
         "target": {
-          "name": "system d",
+          "name": "system/d",
           "type": "System"
         },
         "request": "init 2 req",
@@ -286,7 +286,7 @@
           {
             "type": "FireAndForget",
             "origin": {
-              "name": "system d",
+              "name": "system/d",
               "type": "System"
             },
             "target": {
@@ -311,7 +311,7 @@
           "type": "Human"
         },
         "target": {
-          "name": "system d",
+          "name": "system/d",
           "type": "System"
         },
         "request": "init 2 req",
@@ -320,7 +320,7 @@
           {
             "type": "FireAndForget",
             "origin": {
-              "name": "system d",
+              "name": "system/d",
               "type": "System"
             },
             "target": {
@@ -345,7 +345,7 @@
           "type": "Human"
         },
         "target": {
-          "name": "system b",
+          "name": "system.b",
           "type": "System"
         },
         "request": "init 1 req",
@@ -368,11 +368,11 @@
           {
             "type": "RequestResponse",
             "origin": {
-              "name": "system b",
+              "name": "system.b",
               "type": "System"
             },
             "target": {
-              "name": "system c",
+              "name": "system-c",
               "type": "System"
             },
             "request": "b-to-c req",
@@ -381,7 +381,7 @@
               {
                 "type": "BiDirectional",
                 "origin": {
-                  "name": "system b",
+                  "name": "system.b",
                   "type": "System"
                 },
                 "target": {
@@ -395,7 +395,7 @@
               {
                 "type": "RequestResponse",
                 "origin": {
-                  "name": "system c",
+                  "name": "system-c",
                   "type": "System"
                 },
                 "target": {
@@ -423,7 +423,7 @@
           "type": "Human"
         },
         "target": {
-          "name": "system d",
+          "name": "system/d",
           "type": "System"
         },
         "request": "init 2 req",
@@ -432,7 +432,7 @@
           {
             "type": "FireAndForget",
             "origin": {
-              "name": "system d",
+              "name": "system/d",
               "type": "System"
             },
             "target": {
