@@ -31,6 +31,13 @@ interface Router {
     fun withFilter(new: Filter): Router = this
 
     val description: RouterDescription get() = RouterDescription.unavailable
+
+    companion object {
+        /**
+         * Wildcard for matching all inbound traffic.
+         */
+        val orElse = { _: Request -> true }.asRouter()
+    }
 }
 
 data class RouterDescription(val description: String, val children: List<RouterDescription> = listOf()) {
