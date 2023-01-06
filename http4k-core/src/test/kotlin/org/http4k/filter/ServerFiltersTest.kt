@@ -136,7 +136,8 @@ class ServerFiltersTest {
             .and(hasHeader("access-control-allow-headers", "content-type"))
             .and(hasHeader("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD"))
             .and(hasHeader("access-control-allow-credentials", "true"))
-            .and(hasHeader("access-control-expose-headers").not()))
+            .and(hasHeader("access-control-expose-headers").not())
+            .and(hasHeader("access-control-max-age").not()))
     }
 
     @Test
@@ -147,6 +148,16 @@ class ServerFiltersTest {
 
         assertThat(response, hasStatus(I_M_A_TEAPOT)
             .and(hasHeader("access-control-expose-headers", "foo, bar")))
+    }
+
+    @Test
+    fun `GET - with max age`() {
+        val policy = CorsPolicy(OriginPolicy.AllowAll(), emptyList(), emptyList(), maxAge = 86400)
+        val handler = ServerFilters.Cors(policy).then { Response(I_M_A_TEAPOT) }
+        val response = handler(Request(GET, "/"))
+
+        assertThat(response, hasStatus(I_M_A_TEAPOT)
+            .and(hasHeader("access-control-max-age", "86400")))
     }
 
     @Test
