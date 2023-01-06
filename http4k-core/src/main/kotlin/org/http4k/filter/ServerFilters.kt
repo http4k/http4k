@@ -34,7 +34,8 @@ data class CorsPolicy(
     val headers: List<String>,
     val methods: List<Method>,
     val credentials: Boolean = false,
-    val exposedHeaders: List<String> = emptyList()
+    val exposedHeaders: List<String> = emptyList(),
+    val maxAge: Int? = null
 ) {
     companion object {
         val UnsafeGlobalPermissive =
@@ -71,7 +72,8 @@ object ServerFilters {
                         res.takeIf { policy.exposedHeaders.isNotEmpty() }
                             ?.header("access-control-expose-headers", policy.exposedHeaders.joined())
                             ?: res
-                    }
+                    },
+                    { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res }
                 )
             }
         }
