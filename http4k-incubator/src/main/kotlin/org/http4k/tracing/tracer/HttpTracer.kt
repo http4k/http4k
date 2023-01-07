@@ -19,16 +19,15 @@ fun HttpTracer(actorFrom: ActorResolver) = Tracer { parent, rest, tracer ->
 
 private fun MetadataEvent.toTrace(actorFrom: ActorResolver, rest: List<MetadataEvent>, tracer: Tracer): Trace {
     val parentEvent = event as HttpEvent.Outgoing
-    val uri = parentEvent.uri.path(parentEvent.xUriTemplate)
 
     return RequestResponse(
         actorFrom(this),
-        Actor(uri.host, System),
-        parentEvent.method.name + " " + uri.path,
+        Actor(parentEvent.uri.host, System),
+        parentEvent.method.name + " " + parentEvent.xUriTemplate,
         parentEvent.status.toString(),
         rest
             .filter { it.traces() != null && traces()?.spanId == it.traces()?.parentSpanId }
-            .filter { (event as HttpEvent).uri.host == actorFrom(it).name }
+            .filter { parentEvent.uri.host == actorFrom(it).name }
             .flatMap { tracer(it, rest - it, tracer) }
     )
 }
