@@ -11,7 +11,7 @@ import org.http4k.core.with
 import org.http4k.format.AutoContentNegotiator
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
-import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Lens
 import org.http4k.util.Appendable
 
@@ -60,7 +60,7 @@ class RouteMetaDsl internal constructor() {
     fun returning(vararg responseMetas: HttpMessageMeta<Response>) {
         responseMetas.forEach { responses += it }
         responseMetas.forEach {
-            produces += Header.CONTENT_TYPE(it.message)?.let { listOf(it) } ?: emptyList()
+            produces += CONTENT_TYPE(it.message)?.let { listOf(it) } ?: emptyList()
         }
     }
 
@@ -141,7 +141,7 @@ class RouteMetaDsl internal constructor() {
      */
     fun receiving(requestMeta: HttpMessageMeta<Request>) {
         requests += requestMeta
-        consumes += Header.CONTENT_TYPE(requestMeta.message)?.let { listOf(it) } ?: emptyList()
+        consumes += CONTENT_TYPE(requestMeta.message)?.let { listOf(it) } ?: emptyList()
     }
 
     /**
@@ -150,7 +150,7 @@ class RouteMetaDsl internal constructor() {
      */
     fun <T> receiving(bodyLens: BiDiBodyLens<T>) {
         requestBody = bodyLens
-        receiving(RequestMeta(Request(POST, "").with(Header.CONTENT_TYPE of bodyLens.contentType)))
+        receiving(RequestMeta(Request(POST, "").with(CONTENT_TYPE of bodyLens.contentType)))
     }
 
     fun markAsDeprecated() {

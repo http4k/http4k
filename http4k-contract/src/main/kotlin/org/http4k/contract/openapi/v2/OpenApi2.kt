@@ -25,6 +25,9 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ArrayParam
+import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import java.util.Locale.getDefault
@@ -102,7 +105,7 @@ open class OpenApi2<out NODE>(
                 "required" to boolean(required)
             ) +
                 when (meta) {
-                    is ParamMeta.ArrayParam -> listOf(
+                    is ArrayParam -> listOf(
                         "type" to string("array"),
                         "items" to obj(
                             "type" to string(meta.itemType().coerceForSimpleType().value)
@@ -237,7 +240,7 @@ private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()
 
 // we do this to continue to treat complex objects as strings in params
 private fun ParamMeta.coerceForSimpleType() = when (this) {
-    is ParamMeta.ObjectParam -> ParamMeta.StringParam
+    is ObjectParam -> StringParam
     else -> this
 }
 

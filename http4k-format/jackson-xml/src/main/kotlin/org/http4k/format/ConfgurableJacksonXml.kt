@@ -9,7 +9,7 @@ import org.http4k.core.ContentType
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
 import java.io.InputStream
 import kotlin.reflect.KClass
@@ -25,7 +25,7 @@ open class ConfigurableJacksonXml(private val mapper: XmlMapper, val defaultCont
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
         contentType: ContentType = defaultContentType
     ): BiDiBodyLensSpec<T> =
-        httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), contentType, contentNegotiation)
+        httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), contentType, contentNegotiation)
             .map({ it.payload.asString() }, { Body(it) })
             .map({ it.asA<T>() }, { it.asXmlString() })
 }

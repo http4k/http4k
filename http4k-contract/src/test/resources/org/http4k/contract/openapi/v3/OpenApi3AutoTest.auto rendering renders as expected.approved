@@ -440,6 +440,56 @@
         "operationId": "postBasepathBody_negotiated",
         "deprecated": false
       }
+    },
+    "/basepath/multipart-fields": {
+      "put": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "stringField": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "fileField": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "autoJsonField": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "stringField",
+                  "fileField",
+                  "autoJsonField"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "putBasepathMultipart_fields",
+        "deprecated": false
+      }
     }
   },
   "components": {

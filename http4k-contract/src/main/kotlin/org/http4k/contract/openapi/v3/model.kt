@@ -6,6 +6,7 @@ import org.http4k.core.Uri
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.FileParam
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 
 data class Api<NODE> private constructor(
@@ -110,25 +111,28 @@ sealed class BodyContent {
     }
 
     class FormContent(val schema: FormSchema) : BodyContent() {
-        class FormSchema(metas: List<Meta>) {
+        class FormSchema(metas: Map<Meta, List<String>?>) {
             val type = "object"
-            val properties = metas.associate {
+            val properties = metas.keys.associate {
                 val paramMeta = it.paramMeta
-                val listOfNotNull = listOfNotNull(
+                it.name to listOfNotNull(
                     "type" to paramMeta.value,
                     paramMeta.takeIf { it == FileParam }?.let { "format" to "binary" },
                     it.description?.let { "description" to it },
-                    if (paramMeta is ArrayParam) "items" to mapOf(
-                        *listOfNotNull(
-                            "type" to paramMeta.itemType().value,
-                            paramMeta.itemType().takeIf { it == FileParam }
-                                ?.let { "format" to "binary" }).toTypedArray()
-                    )
-                    else null
-                )
-                it.name to listOfNotNull.toMap()
+                    when (paramMeta) {
+                        is ArrayParam -> "items" to mapOf(
+                            *listOfNotNull(
+                                "type" to paramMeta.itemType().value,
+                                paramMeta.itemType().takeIf { it == FileParam }
+                                    ?.let { "format" to "binary" }).toTypedArray()
+                        )
+
+                        is ObjectParam -> null
+                        else -> null
+                    }
+                ).toMap()
             }
-            val required = metas.filter(Meta::required).map { it.name }
+            val required = metas.keys.filter(Meta::required).map { it.name }
         }
     }
 }

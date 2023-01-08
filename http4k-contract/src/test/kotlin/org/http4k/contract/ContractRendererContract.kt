@@ -28,6 +28,7 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.auto
+import org.http4k.format.json
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Cookies
 import org.http4k.lens.FormField
@@ -39,11 +40,11 @@ import org.http4k.lens.Missing
 import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
 import org.http4k.lens.ParamMeta.NumberParam
-import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
+import org.http4k.lens.WebForm
 import org.http4k.lens.boolean
 import org.http4k.lens.enum
 import org.http4k.lens.int
@@ -61,7 +62,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(JsonApprovalTest::class)
 abstract class ContractRendererContract<NODE : Any>(
-    private val json: Json<NODE>,
+    open val json: Json<NODE>,
     protected val rendererToUse: ContractRenderer
 ) {
     @Test
@@ -178,15 +179,18 @@ abstract class ContractRendererContract<NODE : Any>(
                 )
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_form" meta {
+                val booleanField = FormField.boolean().required("b", "booleanField")
+                val jsonField = json.jsonLens(FormField).required("j", "jsonField")
                 receiving(
                     Body.webForm(
                         Strict,
-                        FormField.boolean().required("b", "booleanField"),
+                        booleanField,
                         FormField.int().multi.optional("i", "intField"),
                         FormField.string().optional("s", "stringField"),
                         FormField.enum<Foo>().optional("e", "enumField"),
-                        json.jsonLens(FormField).required("j", "jsonField")
-                    ).toLens()
+                        jsonField
+                    ).toLens() to WebForm().with(booleanField of true,
+                        jsonField of json { obj("foo" to string("bar")) })
                 )
             } bindContract POST to { _ -> Response(OK) }
             routes += "/produces_and_consumes" meta {
@@ -201,7 +205,7 @@ abstract class ContractRendererContract<NODE : Any>(
             routes += "/multipart-fields" meta {
                 val field = MultipartFormField.multi.required("stringField")
                 val pic = MultipartFormFile.required("fileField")
-                val json = MultipartFormField.mapWithNewMeta({it}, {it}, ObjectParam).required("jsonField")
+                val json = MultipartFormField.json(json).required("jsonField")
                 receiving(Body.multipartForm(Strict, field, pic, json).toLens())
             } bindContract PUT to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {

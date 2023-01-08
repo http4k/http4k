@@ -36,12 +36,14 @@ import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.MultipartForm
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.lens.WebForm
 import org.http4k.util.JsonSchema
 import java.util.Locale
 
@@ -197,14 +199,30 @@ class OpenApi3<NODE : Any>(
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
 
-        val withSchema = requests.mapNotNull {
-            with(CONTENT_TYPE(it.message)) {
-                when (this) {
-                    APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
-                        (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
+        val withSchema = requests.mapNotNull { req ->
+            with(CONTENT_TYPE(req.message)) {
+                when (this?.withNoDirectives()) {
+                    APPLICATION_FORM_URLENCODED.withNoDirectives() -> value to
+                        (body?.metas?.let {
+                            FormContent(FormSchema(
+                                it.associateWith {
+                                    (req.example as? WebForm)?.let { form -> form.fields[it.name] }
+                                }
+                            ))
+                        } ?: SchemaContent("".toSchema(), null))
+
+                    MULTIPART_FORM_DATA.withNoDirectives() -> value to
+                        (body?.metas?.let {
+                            FormContent(FormSchema(
+                                it.associateWith {
+                                    (req.example as? MultipartForm)
+                                        ?.let { form -> form.fields[it.name]?.map { it.value } }
+                                }
+                            ))
+                        } ?: SchemaContent("".toSchema(), null))
 
                     null -> null
-                    else -> value to it.toSchemaContent()
+                    else -> value to req.toSchemaContent()
                 }
             }
         }
