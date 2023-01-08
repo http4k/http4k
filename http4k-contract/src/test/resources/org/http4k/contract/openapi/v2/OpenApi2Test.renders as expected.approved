@@ -166,6 +166,49 @@
         ]
       }
     },
+    "/basepath/body_form_example": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_form_example",
+        "produces": [
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "b",
+            "required": true,
+            "type": "boolean",
+            "description": "booleanField"
+          },
+          {
+            "in": "formData",
+            "name": "j",
+            "required": true,
+            "type": "string",
+            "description": "jsonField"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_json_list_schema": {
       "post": {
         "tags": [

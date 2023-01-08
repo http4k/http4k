@@ -145,6 +145,50 @@
         "deprecated": false
       }
     },
+    "/basepath/body_form_example": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "b": {
+                    "type": "boolean",
+                    "description": "booleanField"
+                  },
+                  "j": {
+                    "type": "object",
+                    "description": "jsonField"
+                  }
+                },
+                "required": [
+                  "b",
+                  "j"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_form_example",
+        "deprecated": false
+      }
+    },
     "/basepath/body_json_list_schema": {
       "post": {
         "summary": "<unknown>",

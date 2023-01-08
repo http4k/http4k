@@ -179,15 +179,24 @@ abstract class ContractRendererContract<NODE : Any>(
                 )
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_form" meta {
+                receiving(
+                    Body.webForm(
+                        Strict,
+                        FormField.boolean().required("b", "booleanField"),
+                        FormField.int().multi.optional("i", "intField"),
+                        FormField.string().optional("s", "stringField"),
+                        FormField.enum<Foo>().optional("e", "enumField"),
+                        json.jsonLens(FormField).required("j", "jsonField")
+                    ).toLens()
+                )
+            } bindContract POST to { _ -> Response(OK) }
+            routes += "/body_form_example" meta {
                 val booleanField = FormField.boolean().required("b", "booleanField")
                 val jsonField = json.jsonLens(FormField).required("j", "jsonField")
                 receiving(
                     Body.webForm(
                         Strict,
                         booleanField,
-                        FormField.int().multi.optional("i", "intField"),
-                        FormField.string().optional("s", "stringField"),
-                        FormField.enum<Foo>().optional("e", "enumField"),
                         jsonField
                     ).toLens() to WebForm().with(booleanField of true,
                         jsonField of json { obj("foo" to string("bar")) })

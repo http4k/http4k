@@ -17,6 +17,7 @@
     "POST:/basepath/or_auth": "<unknown>",
     "POST:/basepath/oauth2_auth": "<unknown>",
     "POST:/basepath/body_form": "<unknown>",
+    "POST:/basepath/body_form_example": "<unknown>",
     "GET:/basepath/produces_and_consumes": "<unknown>",
     "POST:/basepath/returning": "<unknown>",
     "PUT:/basepath/multipart-fields": "<unknown>",
