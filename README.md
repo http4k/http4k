@@ -84,7 +84,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
 * [Server:](https://http4k.org/guide/reference/servers)
     * **1LOC** server backend spin-up for:
         * **Apache v4 & v5** (from httpcore)
-        * **Jetty** (including WebSocket support)
+        * **Jetty** (including SSE and WebSocket support)
         * **Ktor CIO & Netty**
         * **Netty** (including WebSocket support)
         * **SunHttp** (bundled with `http4k-core`)

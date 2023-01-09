@@ -6,7 +6,6 @@ description: Recipes for using http4k with Server-Sent Events
 ```groovy
 implementation group: "org.http4k", name: "http4k-core", version: "4.35.4.0"
 implementation group: "org.http4k", name: "http4k-server-undertow", version: "4.35.4.0"
-// Or if you prefer Jetty
 implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.35.4.0"
 ```
 
