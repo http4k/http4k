@@ -15,11 +15,14 @@ import org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS
 import org.eclipse.jetty.servlet.ServletHolder
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.websocket.core.FrameHandler
+import org.eclipse.jetty.websocket.core.WebSocketComponents
 import org.eclipse.jetty.websocket.core.server.WebSocketNegotiation
 import org.eclipse.jetty.websocket.core.server.WebSocketNegotiator
+import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler
 import org.http4k.core.HttpHandler
 import org.http4k.servlet.jakarta.asHttp4kRequest
 import org.http4k.servlet.jakarta.asServlet
+import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 
 fun HttpHandler.toJettyHandler(withStatisticsHandler: Boolean = false): HandlerWrapper = ServletContextHandler(
@@ -28,6 +31,12 @@ fun HttpHandler.toJettyHandler(withStatisticsHandler: Boolean = false): HandlerW
     addServlet(ServletHolder(this@toJettyHandler.asServlet()), "/*")
 }.let {
     if (withStatisticsHandler) StatisticsHandler().apply { handler = it } else it
+}
+
+fun SseHandler.toJettySseHandler() = JettyEventStreamHandler(this)
+
+fun WsHandler.toJettyWsHandler() = WebSocketUpgradeHandler(WebSocketComponents()).apply {
+    addMapping("/*", this@toJettyWsHandler.toJettyNegotiator())
 }
 
 fun WsHandler.toJettyNegotiator() = object : WebSocketNegotiator.AbstractNegotiator() {
