@@ -16,11 +16,11 @@ jobs:
           fetch-depth: 2
           # required by release-tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3.9.0
         with:
           java-version: 11
       - name: Cache Gradle packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3.2.3
         with:
           path: |
             ~/.gradle/caches
@@ -37,7 +37,7 @@ jobs:
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -f ~/.gradle/caches/modules-2/gc.properties
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v2
+        uses: mikepenz/action-junit-report@v3.7.1
         if: always()
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'

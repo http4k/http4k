@@ -19,7 +19,7 @@ jobs:
           ref: master
       - id: step-1
         name: setup-java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v3.9.0
         with:
           java-version: 17
           distribution: adopt
