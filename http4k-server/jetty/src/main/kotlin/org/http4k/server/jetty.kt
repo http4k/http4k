@@ -1,8 +1,6 @@
 package org.http4k.server
 
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.websocket.core.WebSocketComponents
-import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.sse.SseHandler
@@ -31,15 +29,9 @@ class Jetty(private val port: Int, override val stopMode: StopMode, private val 
     }
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
-        if (sse != null) throw UnsupportedOperationException("Jetty does not support sse")
         http?.let { server.insertHandler(http.toJettyHandler(stopMode is StopMode.Graceful)) }
-        ws?.let {
-            server.insertHandler(
-                WebSocketUpgradeHandler(
-                    WebSocketComponents()).apply {
-                    addMapping("/*", it.toJettyNegotiator())
-                })
-        }
+        sse?.let { server.insertHandler(sse.toJettySseHandler()) }
+        ws?.let { server.insertHandler(ws.toJettyWsHandler()) }
 
         return object : Http4kServer {
             override fun start(): Http4kServer = apply {

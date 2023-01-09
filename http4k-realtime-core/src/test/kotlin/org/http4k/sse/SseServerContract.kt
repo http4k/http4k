@@ -2,12 +2,14 @@ package org.http4k.sse
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.or
 import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.hamkrest.hasBody
@@ -38,7 +40,7 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
             "/{name}" bind { sse: Sse ->
                 val name = sse.connectRequest.path("name")!!
                 sse.send(Event("event1", "hello $name", "123"))
-                sse.send(Event("event2", "again $name", "456"))
+                sse.send(Event("event2", "again $name\nHi!", "456"))
                 sse.send(Data("goodbye $name".byteInputStream()))
             }
         )
@@ -68,7 +70,7 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
             equalTo(
                 listOf(
                     Event("event1", "hello bob", "123"),
-                    Event("event2", "again bob", "456"),
+                    Event("event2", "again bob\nHi!", "456"),
                     Data("goodbye bob".base64Encode())
                 )
             )
@@ -76,9 +78,56 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
     }
 
     @Test
+    fun `can receive messages from sse using multiple clients`() {
+        val client1 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/leia"))
+        val client2 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/luke"))
+        val client3 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/anakin"))
+
+        assertThat(
+            client1.received().take(3).toList(),
+            equalTo(
+                listOf(
+                    Event("event1", "hello leia", "123"),
+                    Event("event2", "again leia\nHi!", "456"),
+                    Data("goodbye leia".base64Encode())
+                )
+            )
+        )
+        client1.close()
+
+        assertThat(
+            client2.received().take(3).toList(),
+            equalTo(
+                listOf(
+                    Event("event1", "hello luke", "123"),
+                    Event("event2", "again luke\nHi!", "456"),
+                    Data("goodbye luke".base64Encode())
+                )
+            )
+        )
+
+        assertThat(
+            client3.received().take(3).toList(),
+            equalTo(
+                listOf(
+                    Event("event1", "hello anakin", "123"),
+                    Event("event2", "again anakin\nHi!", "456"),
+                    Data("goodbye anakin".base64Encode())
+                )
+            )
+        )
+
+        client2.close()
+        client3.close()
+    }
+
+    @Test
     fun `when no http handler messages without the event stream header don't blow up`() {
         PolyHandler(sse = sse).asServer(serverConfig(0)).start().use {
-            assertThat(client(Request(GET, "http://localhost:${it.port()}/hello/bob")), hasStatus(BAD_REQUEST))
+            assertThat(
+                client(Request(GET, "http://localhost:${it.port()}/hello/bob")),
+                hasStatus(BAD_REQUEST) or hasStatus(NOT_FOUND)
+            )
         }
     }
 }

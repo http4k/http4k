@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.35.5.0 (uncut)
 - **http4k-multipart** : Add lensing of Multipart form fields using JSON and Automarshalling
+- **http4k-server-jetty** : Add support for serving SSE. H/T @FredNordin
 
 ### v4.35.4.0
 - **http4k-*** : Upgrade some dependency versions.
