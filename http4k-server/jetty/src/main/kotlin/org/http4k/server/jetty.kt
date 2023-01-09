@@ -11,10 +11,18 @@ class Jetty(private val port: Int, override val stopMode: StopMode, private val 
     constructor(port: Int = 8000) : this(port, StopMode.Graceful(Duration.ofSeconds(5)))
     constructor(port: Int = 8000, stopMode: StopMode) : this(port, stopMode, http(port))
     constructor(port: Int = 8000, server: Server) : this(port, StopMode.Graceful(Duration.ofSeconds(5)), server)
-    constructor(port: Int, vararg inConnectors: ConnectorBuilder) : this(port, StopMode.Graceful(Duration.ofSeconds(5)), *inConnectors)
-    constructor(port: Int, stopMode: StopMode, vararg inConnectors: ConnectorBuilder) : this(port, stopMode, Server().apply {
-        inConnectors.forEach { addConnector(it(this)) }
-    })
+    constructor(port: Int, vararg inConnectors: ConnectorBuilder) : this(
+        port,
+        StopMode.Graceful(Duration.ofSeconds(5)),
+        *inConnectors
+    )
+
+    constructor(port: Int, stopMode: StopMode, vararg inConnectors: ConnectorBuilder) : this(
+        port,
+        stopMode,
+        Server().apply {
+            inConnectors.forEach { addConnector(it(this)) }
+        })
 
     init {
         when (stopMode) {
@@ -34,9 +42,7 @@ class Jetty(private val port: Int, override val stopMode: StopMode, private val 
         ws?.let { server.insertHandler(ws.toJettyWsHandler()) }
 
         return object : Http4kServer {
-            override fun start(): Http4kServer = apply {
-                server.start()
-            }
+            override fun start(): Http4kServer = apply { server.start() }
 
             override fun stop(): Http4kServer = apply { server.stop() }
 

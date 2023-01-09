@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test
 class NettyTest : ServerContract({ Netty(it, Immediate) }, ApacheClient()) {
     @Test
     fun `sets keep-alive for non-streaming response`() {
-        assertThat(client(Request(Method.GET, "${baseUrl()}/headers")),
+        assertThat(client(Request(Method.GET, "${baseUrl}/headers")),
             allOf(
                 hasStatus(Status.ACCEPTED),
                 hasHeader("connection", "keep-alive")
             )
         )
-        assertThat(client(Request(Method.GET, "${baseUrl()}/stream")),
+        assertThat(client(Request(Method.GET, "${baseUrl}/stream")),
             allOf(
                 hasStatus(Status.OK),
                 hasHeader("connection", "close")
