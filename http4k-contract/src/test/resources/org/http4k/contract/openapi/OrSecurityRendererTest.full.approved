@@ -1,17 +1,14 @@
 {
   "first": {
-    "type": "apiKey",
-    "in": "query",
-    "name": "first"
+    "scheme": "basic",
+    "type": "http"
   },
   "second": {
-    "type": "apiKey",
-    "in": "query",
-    "name": "second"
+    "scheme": "basic",
+    "type": "http"
   },
   "third": {
-    "type": "apiKey",
-    "in": "query",
-    "name": "third"
+    "scheme": "basic",
+    "type": "http"
   }
 }
