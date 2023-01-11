@@ -23,10 +23,7 @@
                 "uri": "foobar"
               }
             },
-            "type": "object",
-            "required": [
-              "inner"
-            ]
+            "type": "object"
           },
           "type": "object"
         },
@@ -223,16 +220,7 @@
           ]
         }
       },
-      "type": "object",
-      "required": [
-        "key",
-        "key2",
-        "key3",
-        "key4",
-        "key5",
-        "key6",
-        "key7"
-      ]
+      "type": "object"
     },
     "type": "object"
   },

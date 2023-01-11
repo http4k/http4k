@@ -58,11 +58,7 @@
                       ]
                     }
                   },
-                  "type": "object",
-                  "required": [
-                    "arb",
-                    "foo"
-                  ]
+                  "type": "object"
                 },
                 "type": "object"
               }
@@ -615,11 +611,7 @@
                   ]
                 }
               },
-              "type": "object",
-              "required": [
-                "arb",
-                "foo"
-              ]
+              "type": "object"
             },
             "type": "object"
           }
