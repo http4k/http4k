@@ -80,7 +80,7 @@ class ContractRoute internal constructor(val method: Method,
 
     fun meta(meta: RouteMeta) = ContractRoute(method, spec, meta, toHandler)
     fun method(method: Method) = ContractRoute(method, spec, meta, toHandler)
-    fun method(spec: ContractRouteSpec) = ContractRoute(method, spec, meta, toHandler)
+    fun spec(spec: ContractRouteSpec) = ContractRoute(method, spec, meta, toHandler)
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
