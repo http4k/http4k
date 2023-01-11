@@ -77,6 +77,10 @@ class ContractRoute internal constructor(val method: Method,
     }
 
     override fun toString() = "${method.name}: ${spec.describe(Root)}"
+
+    fun meta(meta: RouteMeta) = ContractRoute(method, spec, meta, toHandler)
+    fun method(method: Method) = ContractRoute(method, spec, meta, toHandler)
+    fun method(spec: ContractRouteSpec) = ContractRoute(method, spec, meta, toHandler)
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
