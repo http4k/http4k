@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.35.5.0 (uncut)
+### v4.36.0.0
 - **http4k-multipart** : Add lensing of Multipart form fields using JSON and Automarshalling
 - **http4k-server-jetty** : Add support for serving SSE. H/T @FredNordin
+- **http4k-contract** : [Breaking Fix] Fix #842 - Map OpenAPI implementation adds all properties as required H/T @BBB
 
 ### v4.35.4.0
 - **http4k-*** : Upgrade some dependency versions.
