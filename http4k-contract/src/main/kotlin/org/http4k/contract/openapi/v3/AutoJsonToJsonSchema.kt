@@ -155,7 +155,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
                     field,
                     fieldName,
                     value,
-                    false,
+                    true,
                     fieldRetrieval(FieldHolder(value), "value").metadata,
                     refModelNamePrefix
                 )
