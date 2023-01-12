@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.36.1.0 (Uncut)
+- **http4k-contract** : `swaggerUi` now supports Oauth2 redirects.  H/T @oharaandrew314
+- **http4k-contract** : Add new endpoint security type: `OpenIdConnectSecurity`.  H/T @oharaandrew314
+
 ### v4.36.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : Add lensing of Multipart form fields using JSON and Automarshalling
