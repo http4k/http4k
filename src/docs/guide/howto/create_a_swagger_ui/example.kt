@@ -33,7 +33,7 @@ fun main() {
         Response(OK).with(greetingLens of "HI!")
     }
 
-    // Define an OpenId Connect Security Schema
+    // Define an OpenId Connect Security scheme
     val openIdConnectSecurity = OpenIdConnectSecurity(
         Uri.of("https://accounts.google.com/.well-known/openid-configuration"),
         Filter.NoOp
