@@ -4,10 +4,13 @@ import org.http4k.contract.contract
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v3.OpenApi3
+import org.http4k.contract.security.OpenIdConnectSecurity
 import org.http4k.contract.ui.swaggerUi
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -30,6 +33,12 @@ fun main() {
         Response(OK).with(greetingLens of "HI!")
     }
 
+    // Define an OpenId Connect Security Schema
+    val openIdConnectSecurity = OpenIdConnectSecurity(
+        Uri.of("https://accounts.google.com/.well-known/openid-configuration"),
+        Filter.NoOp
+    )
+
     // Define a contract, and render an OpenApi 3 spec at "/spec"
     val v1Api = contract {
         routes += helloHandler
@@ -37,6 +46,7 @@ fun main() {
             ApiInfo("Hello Server - Developer UI", "99.3.4")
         )
         descriptionPath = "spec"
+        security = openIdConnectSecurity
     }
 
     // Build a Swagger UI based on the OpenApi spec defined at "/spec"
