@@ -73,7 +73,8 @@ class Status internal constructor(val code: Int, val description: String, privat
 
     fun description(newDescription: String) = Status(code, newDescription, clientGenerated)
 
-    override fun hashCode(): Int = code.hashCode()
+    override fun hashCode(): Int = code.hashCode() + clientGenerated.hashCode()
+
     override fun toString(): String = "$code $description"
 
     override fun equals(other: Any?): Boolean {

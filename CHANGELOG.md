@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.36.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Fix #846 - Status.hashCode is inconsistent with Status.equals.
+
 ### v4.36.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : Add lensing of Multipart form fields using JSON and Automarshalling
