@@ -6,5 +6,5 @@ package org.http4k.format
  */
 object KotlinxSerialization : ConfigurableKotlinxSerialization({
     ignoreUnknownKeys = true
-    asConfigurable().withStandardMappings().done()
+    asConfigurable().withStandardMappings().value().done()
 })
