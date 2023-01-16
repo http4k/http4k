@@ -15,7 +15,6 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Fix #846 - Status.hashCode is inconsistent with Status.equals.
 
-
 ### v4.36.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : Add lensing of Multipart form fields using JSON and Automarshalling
