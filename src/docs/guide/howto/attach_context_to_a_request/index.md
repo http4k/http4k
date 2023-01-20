@@ -16,7 +16,7 @@ the shared bag of state for each request, and to remove the state after the requ
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.36.0.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.37.0.0"
 ```
 
 #### String-based keys [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/attach_context_to_a_request/string_key_example.kt)
