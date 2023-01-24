@@ -37,11 +37,16 @@ class HttpMessageAsStringTest {
     @Test
     fun `parses request string`() {
         assertThat(Request.parse("""GET http://www.somewhere.com/path HTTP/1.1
-foo: one
+foo:one
 bar: two
+baz:  three
 
-body""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
-            .header("foo", "one").header("bar", "two").body(Body("body"))
+body1
+body2""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
+            .header("foo", "one")
+            .header("bar", "two")
+            .header("baz", "three")
+            .body(Body("body1\r\nbody2"))
         ))
     }
 
@@ -49,11 +54,16 @@ body""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path
     fun `parses response string`() {
         assertThat(Response.parse("""
 HTTP/1.1 200 OK
-foo: one
+foo:one
 bar: two
+baz:  three
 
-body""".toPayload()), equalTo(Response(OK)
-            .header("foo", "one").header("bar", "two").body("body")
+body1
+body2""".toPayload()), equalTo(Response(OK)
+            .header("foo", "one")
+            .header("bar", "two")
+            .header("baz", "three")
+            .body("body1\r\nbody2")
         ))
     }
 
