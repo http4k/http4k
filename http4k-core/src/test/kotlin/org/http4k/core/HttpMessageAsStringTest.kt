@@ -13,25 +13,27 @@ class HttpMessageAsStringTest {
     @Test
     fun `represents request as string`() {
         val request = Request(GET, Uri.of("http://www.somewhere.com/path"))
-            .header("foo", "one").header("bar", "two").body(Body("body"))
+            .header("foo", "one").header("bar", "two").body(Body("body1\r\nbody2"))
         assertThat(request.toString(), equalTo("""
             GET http://www.somewhere.com/path HTTP/1.1
             foo: one
             bar: two
 
-            body""".toPayload()))
+            body1
+            body2""".toPayload()))
     }
 
     @Test
     fun `represents response as string`() {
         val request = Response(OK)
-            .header("foo", "one").header("bar", "two").body("body")
+            .header("foo", "one").header("bar", "two").body("body1\r\nbody2")
         assertThat(request.toString(), equalTo("""
             HTTP/1.1 200 OK
             foo: one
             bar: two
 
-            body""".toPayload()))
+            body1
+            body2""".toPayload()))
     }
 
     @Test
@@ -41,11 +43,12 @@ foo:one
 bar: two
 baz:  three
 
-body""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
+body1
+body2""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
             .header("foo", "one")
             .header("bar", "two")
             .header("baz", "three")
-            .body(Body("body"))
+            .body(Body("body1\r\nbody2"))
         ))
     }
 
@@ -57,11 +60,12 @@ foo:one
 bar: two
 baz:  three
 
-body""".toPayload()), equalTo(Response(OK)
+body1
+body2""".toPayload()), equalTo(Response(OK)
             .header("foo", "one")
             .header("bar", "two")
             .header("baz", "three")
-            .body("body")
+            .body("body1\r\nbody2")
         ))
     }
 

@@ -1,5 +1,6 @@
 package org.http4k.core
 
+import org.http4k.appendIf
 import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
@@ -9,6 +10,7 @@ import org.http4k.lens.WebForm
 import org.http4k.routing.RoutedRequest
 import java.io.Closeable
 import java.io.InputStream
+import java.lang.StringBuilder
 import java.nio.ByteBuffer
 
 typealias Headers = Parameters
@@ -338,8 +340,12 @@ interface Response : HttpMessage {
 
     fun status(new: Status): Response
 
-    override fun toMessage(): String =
-        listOf("$version $status", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
+    override fun toMessage(): String = StringBuilder()
+        .append("$version $status\r\n")
+        .appendIf({headers.isNotEmpty()}, headers.toHeaderMessage())
+        .append("\r\n")
+        .append(bodyString())
+        .toString()
 
     companion object {
         @JvmStatic
