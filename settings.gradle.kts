@@ -114,6 +114,13 @@ include("http4k-realtime-core")
     includeModule("oauth")
 }
 
+"http4k-storage".apply {
+    includeModule("core")
+    includeModule("http")
+    includeModule("jdbc")
+    includeModule("redis")
+}
+
 "http4k-testing".apply {
     includeModule("approval")
     includeModule("chaos")
