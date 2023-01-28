@@ -48,8 +48,7 @@ object ChaosBehaviours {
     object Latency {
         operator fun invoke(min: Duration = ofMillis(100), max: Duration = ofMillis(500)) = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = {
-                val delay = ThreadLocalRandom.current()
-                    .nextInt(min.toMillis().toInt(), max.toMillis().toInt())
+                val delay = ThreadLocalRandom.current().nextInt(min.toMillis().toInt(), max.toMillis().toInt())
                 sleep(delay.toLong())
                 next(it).with(Header.CHAOS of "Latency (${delay}ms)")
             }
