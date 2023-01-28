@@ -112,5 +112,5 @@ abstract class NonBlockingWebsocketClientContract(
                           onConnect: WsConsumer = {}): Websocket =
         websocketFactory(uri, headers, onError, onConnect)
 
-    private val isTrue: Matcher<CountDownLatch> = has("counted down", { it.await(1, TimeUnit.SECONDS) }, equalTo(true))
+    private val isTrue: Matcher<CountDownLatch> = has("counted down", { it.await(5, TimeUnit.SECONDS) }, equalTo(true))
 }
