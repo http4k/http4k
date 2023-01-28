@@ -3,7 +3,6 @@ package org.http4k.storage
 /**
  * Storage for a set of objects keyed by String
  */
-
 interface Storage<T : Any> {
     operator fun get(key: String): T?
     operator fun set(key: String, data: T)
