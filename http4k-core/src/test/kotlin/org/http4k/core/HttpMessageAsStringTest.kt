@@ -43,12 +43,12 @@ foo:one
 bar: two
 baz:  three
 
-body1
-body2""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
+bodya
+bodyb""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
             .header("foo", "one")
             .header("bar", "two")
             .header("baz", "three")
-            .body(Body("body1\r\nbody2"))
+            .body(Body("bodya\r\nbodyb"))
         ))
     }
 
