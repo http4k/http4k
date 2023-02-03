@@ -2,6 +2,7 @@ package org.http4k.client
 
 import io.helidon.common.http.Http
 import io.helidon.nima.webclient.ClientResponse
+import io.helidon.nima.webclient.RuntimeUnknownHostException
 import io.helidon.nima.webclient.WebClient
 import io.helidon.nima.webclient.http1.Http1Client
 import org.http4k.core.BodyMode
@@ -28,13 +29,12 @@ object HelidonClient {
         override fun invoke(request: Request) = try {
             client.makeHelidonRequest(request).asHttp4k()
         } catch (e: UncheckedIOException) {
-            println(e.cause)
             when (e.cause) {
                 is ConnectException -> Response(UNKNOWN_HOST.toClientStatus(e))
                 is SocketTimeoutException -> Response(CLIENT_TIMEOUT.toClientStatus(e))
                 else -> throw e
             }
-        } catch (e: IllegalArgumentException) {
+        } catch (e: RuntimeUnknownHostException) {
             Response(UNKNOWN_HOST.toClientStatus(e))
         }
 
