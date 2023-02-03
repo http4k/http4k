@@ -181,11 +181,6 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    @Disabled("kotlinx.serialization does not support default serialization of LinkedHashMap")
-    override fun `roundtrip map`() {
-    }
-
-    @Test
     override fun `fails decoding when a required value is null`() {
         assertThat({ KotlinxSerialization.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
     }
@@ -331,4 +326,9 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
             .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
             .done()
     }) {}
+
+    @Test
+    override fun `roundtrip array of string`() {
+        super.`roundtrip array of string`()
+    }
 }
