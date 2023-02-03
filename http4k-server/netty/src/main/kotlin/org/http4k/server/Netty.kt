@@ -13,6 +13,8 @@ import io.netty.handler.codec.http.HttpServerKeepAliveHandler
 import io.netty.handler.stream.ChunkedWriteHandler
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode
+import org.http4k.server.ServerConfig.StopMode.Graceful
+import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
@@ -20,11 +22,11 @@ import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerConfig {
-    constructor(port: Int = 8000) : this(port, StopMode.Graceful(ofSeconds(15)))
+    constructor(port: Int = 8000) : this(port, Graceful(ofSeconds(5)))
 
     val shutdownTimeoutMillis = when(stopMode) {
-        is StopMode.Graceful -> stopMode.timeout.toMillis()
-        is StopMode.Immediate -> 0
+        is Graceful -> stopMode.timeout.toMillis()
+        is Immediate -> 0
     }
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer = object : Http4kServer {
