@@ -69,7 +69,15 @@ object Argo : Json<JsonNode> {
         if (typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
-    override fun text(value: JsonNode): String = value.text
+    override fun text(value: JsonNode): String = when(value.type) {
+        STRING -> value.text
+        NUMBER -> value.getNumberValue().toString()
+        ARRAY -> ""
+        OBJECT -> ""
+        null, NULL -> "null"
+        TRUE -> "true"
+        FALSE -> "false"
+    }
     override fun bool(value: JsonNode): Boolean = value.getBooleanValue()
     override fun integer(value: JsonNode) = value.getNumberValue().toLong()
     override fun decimal(value: JsonNode) = value.getNumberValue().toBigDecimal()

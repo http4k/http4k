@@ -3,6 +3,7 @@ package org.http4k.format
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -89,6 +90,20 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
             assertThat(integer(number(1)), equalTo(1L))
             assertThat(decimal(number(BigDecimal("1.0567"))), equalTo(BigDecimal("1.0567")))
             assertThat(bool(boolean(true)), equalTo(true))
+        }
+    }
+
+    @Test
+    fun `get text for all primitive types`() {
+        j {
+            assertThat(text(string("1.0")), equalTo("1.0"))
+            assertThat(text(number(1)), equalTo("1"))
+            assertThat(text(number(1L)), equalTo("1"))
+            assertThat(text(number(1.1)), present()) // won't depend on platform differences
+            assertThat(text(number(BigInteger("1"))), equalTo("1"))
+            assertThat(text(number(BigDecimal("1.1"))), equalTo("1.1"))
+            assertThat(text(boolean(false)), equalTo("false"))
+            assertThat(text(nullNode()), equalTo("null"))
         }
     }
 
