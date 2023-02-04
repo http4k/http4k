@@ -124,7 +124,8 @@ open class ConfigurableKotlinxSerialization(
                 (it.key as? String ?: return@mapNotNull null) to (it.value?.asJsonObject() ?: nullNode())
             }.toMap(),
         )
-        is Collection<*> -> JsonArray(input.map { it?.asJsonObject() ?: nullNode() })
+        is Iterable<*> -> JsonArray(input.map { it?.asJsonObject() ?: nullNode() })
+        is Array<*> -> JsonArray(input.map { it?.asJsonObject() ?: nullNode() })
         else -> json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
     }
 
