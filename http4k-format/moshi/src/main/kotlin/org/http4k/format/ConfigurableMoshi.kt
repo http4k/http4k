@@ -55,7 +55,15 @@ open class ConfigurableMoshi(
     override fun decimal(value: MoshiNode) = (value as MoshiDecimal).value.toBigDecimal()
     override fun integer(value: MoshiNode) = ((value as MoshiInteger).value)
     override fun bool(value: MoshiNode) = (value as MoshiBoolean).value
-    override fun text(value: MoshiNode) = (value as MoshiString).value
+    override fun text(value: MoshiNode) = when(value) {
+        is MoshiString -> value.value
+        is MoshiBoolean -> value.value.toString()
+        is MoshiInteger -> value.value.toString()
+        is MoshiDecimal -> value.value.toString()
+        is MoshiArray -> ""
+        is MoshiObject -> ""
+        MoshiNull -> "null"
+    }
     override fun elements(value: MoshiNode) = (value as MoshiArray).elements
     override fun fields(node: MoshiNode) = (node as? MoshiObject)
         ?.attributes
