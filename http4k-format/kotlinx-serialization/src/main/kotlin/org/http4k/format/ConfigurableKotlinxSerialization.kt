@@ -150,7 +150,7 @@ open class ConfigurableKotlinxSerialization(
         }
     }
 
-    override fun <T : Any> asA(input: String, target: KClass<T>): T =  json.parseToJsonElement(input).asA(target)
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = json.parseToJsonElement(input).asA(target)
 
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = asA(input.reader().readText(), target)
 
