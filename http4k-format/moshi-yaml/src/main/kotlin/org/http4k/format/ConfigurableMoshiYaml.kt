@@ -40,10 +40,14 @@ open class ConfigurableMoshiYaml(
         val str = json.asFormatString(input)
         val yaml = yaml()
 
-        return try {
-            yaml.dump(json.asA<Map<String, Any>>(str))
-        } catch (e: Exception) {
-            yaml.dump(str)
+        return when(input) {
+            is Iterable<*> -> yaml.dump(json.asA<List<Any>>(str))
+            is Array<*> -> yaml.dump(json.asA<Array<Any>>(str))
+            else -> try {
+                yaml.dump(json.asA<Map<String, Any>>(str))
+            } catch (e: Exception) {
+                yaml.dump(str)
+            }
         }
     }
 

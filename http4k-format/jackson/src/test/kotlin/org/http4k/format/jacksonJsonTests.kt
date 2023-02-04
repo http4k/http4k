@@ -15,6 +15,7 @@ import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
@@ -137,6 +138,34 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val list = listOf(FirstChild("hello"), SecondChild("world"))
 
         assertThat(body(Response(OK).with(body of list)), equalTo(list))
+    }
+
+    @Test
+    override fun `roundtrip arbitrary map`() {
+        val wrapper = mapOf(
+            "str" to "val1",
+            "num" to BigDecimal("123.1"),
+            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "map" to mapOf("foo" to "bar"),
+            "bool" to true
+        )
+        val asString = Jackson.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryMap))
+        assertThat(Jackson.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    override fun `roundtrip arbitrary array`() {
+        val wrapper = listOf(
+            "foo",
+            BigDecimal("123.1"),
+            mapOf("foo" to "bar"),
+            listOf(BigDecimal("1.1"),BigDecimal("2.1")),
+            true
+        )
+        val asString = Jackson.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(Jackson.asA(asString), equalTo(wrapper))
     }
 }
 

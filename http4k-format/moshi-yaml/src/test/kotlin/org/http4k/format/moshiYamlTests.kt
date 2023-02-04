@@ -46,7 +46,23 @@ unknown: "2000-01-01"
     override val expectedMap = "key:value\n" +
         "key2:'123'\n"
 
-    override val expectedArray = "[\"foo\",\"bar\",\"baz\"]\n"
+    override val expectedAbitraryArray = """- foo
+- 123.1
+- foo:bar
+- - 1.1
+  - 2.1
+- true
+"""
+
+    override val expectedArbitraryMap = """str:val1
+num:123.1
+array:
+- 1.1
+- stuff
+map:
+  foo:bar
+bool:true
+"""
 
     override val expectedAutoMarshallingZonesAndLocale = "zoneId:America/Toronto\nzoneOffset:-04:00\nlocale:en-CA\n"
 
@@ -120,5 +136,4 @@ unknown: "2000-01-01"
         val wrapper = mapOf("on" to "hello")
         assertThat(MoshiYaml.asFormatString(wrapper), equalTo("on: hello\n"))
     }
-
 }

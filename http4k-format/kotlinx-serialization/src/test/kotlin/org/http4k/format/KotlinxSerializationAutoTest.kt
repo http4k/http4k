@@ -283,6 +283,32 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         assertThat(KotlinxSerialization.asA(out, ZonesAndLocale::class), equalTo(obj))
     }
 
+    override fun `roundtrip arbitrary map`() {
+        val wrapper = mapOf(
+            "str" to "val1",
+            "num" to BigDecimal("123.1"),
+            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "map" to mapOf("foo" to "bar"),
+            "bool" to true
+        )
+        val asString = KotlinxSerialization.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryMap))
+        assertThat(KotlinxSerialization.asA(asString), equalTo(wrapper))
+    }
+
+    override fun `roundtrip arbitrary array`() {
+        val wrapper = listOf(
+            "foo",
+            BigDecimal("123.1"),
+            mapOf("foo" to "bar"),
+            listOf(BigDecimal("1.1"),BigDecimal("2.1")),
+            true
+        )
+        val asString = KotlinxSerialization.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(KotlinxSerialization.asA(asString), equalTo(wrapper))
+    }
+
     override fun strictMarshaller() = KotlinxSerialization
 
     override fun customMarshaller(): AutoMarshalling =
@@ -326,9 +352,4 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
             .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
             .done()
     }) {}
-
-    @Test
-    override fun `roundtrip array of string`() {
-        super.`roundtrip array of string`()
-    }
 }

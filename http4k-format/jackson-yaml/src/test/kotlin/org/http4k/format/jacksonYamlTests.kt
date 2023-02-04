@@ -9,6 +9,7 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.JacksonYaml.auto
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class JacksonYamlBodyTest {
 
@@ -130,9 +131,53 @@ unknown: "2000-01-01"
 key2:"123"
 """
 
-    override val expectedArray = """foo,bar,baz"""
+    override val expectedAbitraryArray = """- "foo"
+- 123.1
+- foo:"bar"
+- - 1.1
+  - 2.1
+- true
+"""
+
+    override val expectedArbitraryMap = """str: "val1"
+num: 123.1
+array:
+- 1.1
+- "stuff"
+map:
+  foo: "bar"
+bool: true
+"""
 
     override val expectedAutoMarshallingZonesAndLocale = "zoneId:\"America/Toronto\"\nzoneOffset:\"-04:00\"\nlocale:\"en-CA\"\n"
+
+    @Test
+    override fun `roundtrip arbitrary map`() {
+        val wrapper = mapOf(
+            "str" to "val1",
+            "num" to BigDecimal("123.1"),
+            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "map" to mapOf("foo" to "bar"),
+            "bool" to true
+        )
+        val asString = JacksonYaml.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryMap.normaliseJson()))
+        assertThat(JacksonYaml.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    override fun `roundtrip arbitrary array`() {
+        val wrapper = listOf(
+            "foo",
+            BigDecimal("123.1"),
+            mapOf("foo" to "bar"),
+            listOf(BigDecimal("1.1"), BigDecimal("2.1")),
+            true
+        )
+        val asString = JacksonYaml.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(JacksonYaml.asA(asString), equalTo(wrapper))
+    }
 
 
     override fun strictMarshaller() =
