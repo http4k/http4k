@@ -136,4 +136,5 @@ bool:true
         val wrapper = mapOf("on" to "hello")
         assertThat(MoshiYaml.asFormatString(wrapper), equalTo("on: hello\n"))
     }
+
 }
