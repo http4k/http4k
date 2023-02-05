@@ -9,8 +9,8 @@ Multipart form support is provided on 2 levels:
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.37.0.0"
-implementation group: "org.http4k", name: "http4k-multipart", version: "4.37.0.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.38.0.0"
+implementation group: "org.http4k", name: "http4k-multipart", version: "4.38.0.0"
 ```
 
 ### Standard (non-typesafe) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_multipart_forms/example_standard.kt)
