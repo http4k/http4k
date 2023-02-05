@@ -34,7 +34,7 @@ private fun bodyLines(lines: List<String>): List<String> = lines.subList(lines.i
 
 private fun parseHeaders(headerLines: List<String>): Parameters = headerLines.map(::parseHeader)
 
-private fun parseHeader(line: String) = line.substringBefore(":") to line.substringAfter(":").trim()
+private fun parseHeader(line: String) = line.substringBefore(":") to line.substringAfter(":").trimStart()
 
 private fun headerLines(lines: List<String>) = lines.subList(1, lines.indexOf(""))
 
