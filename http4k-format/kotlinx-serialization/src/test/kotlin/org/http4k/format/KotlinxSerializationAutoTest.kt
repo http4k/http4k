@@ -181,11 +181,6 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    @Disabled("kotlinx.serialization does not support default serialization of LinkedHashMap")
-    override fun `roundtrip map`() {
-    }
-
-    @Test
     override fun `fails decoding when a required value is null`() {
         assertThat({ KotlinxSerialization.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
     }
@@ -286,6 +281,32 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         val out = KotlinxSerialization.asFormatString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingZonesAndLocale))
         assertThat(KotlinxSerialization.asA(out, ZonesAndLocale::class), equalTo(obj))
+    }
+
+    override fun `roundtrip arbitrary map`() {
+        val wrapper = mapOf(
+            "str" to "val1",
+            "num" to BigDecimal("123.1"),
+            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "map" to mapOf("foo" to "bar"),
+            "bool" to true
+        )
+        val asString = KotlinxSerialization.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryMap))
+        assertThat(KotlinxSerialization.asA(asString), equalTo(wrapper))
+    }
+
+    override fun `roundtrip arbitrary array`() {
+        val wrapper = listOf(
+            "foo",
+            BigDecimal("123.1"),
+            mapOf("foo" to "bar"),
+            listOf(BigDecimal("1.1"),BigDecimal("2.1")),
+            true
+        )
+        val asString = KotlinxSerialization.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(KotlinxSerialization.asA(asString), equalTo(wrapper))
     }
 
     override fun strictMarshaller() = KotlinxSerialization

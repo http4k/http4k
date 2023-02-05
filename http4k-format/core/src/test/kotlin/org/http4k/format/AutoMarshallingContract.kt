@@ -80,6 +80,8 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val expectedAutoMarshallingResultPrimitives: String
     protected abstract val expectedWrappedMap: String
     protected abstract val expectedMap: String
+    protected abstract val expectedArbitraryMap: String
+    protected abstract val expectedAbitraryArray: String
     protected abstract val expectedConvertToInputStream: String
     protected abstract val expectedThrowable: String
     protected abstract val inputUnknownValue: String
@@ -153,6 +155,34 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val wrapper = mapOf("key" to "value", "key2" to "123")
         val asString = marshaller.asFormatString(wrapper)
         assertThat(asString.normaliseJson(), equalTo(expectedMap))
+        assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    open fun `roundtrip arbitrary map`() {
+        val wrapper = mapOf(
+            "str" to "val1",
+            "num" to 123.1,
+            "array" to listOf(1.1,"stuff"),
+            "map" to mapOf("foo" to "bar"),
+            "bool" to true
+        )
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryMap))
+        assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    open fun `roundtrip arbitrary array`() {
+        val wrapper = listOf(
+            "foo",
+            123.1,
+            mapOf("foo" to "bar"),
+            listOf(1.1,2.1),
+            true
+        )
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
         assertThat(marshaller.asA(asString), equalTo(wrapper))
     }
 
