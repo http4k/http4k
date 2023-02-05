@@ -39,12 +39,12 @@ class HttpMessageAsStringTest {
         assertThat(Request.parse("""GET http://www.somewhere.com/path HTTP/1.1
 foo:one
 bar: two
-baz:  three
+baz:  three:four
 
 body""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
             .header("foo", "one")
             .header("bar", "two")
-            .header("baz", "three")
+            .header("baz", "three:four")
             .body(Body("body"))
         ))
     }
@@ -55,12 +55,12 @@ body""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path
 HTTP/1.1 200 OK
 foo:one
 bar: two
-baz:  three
+baz:  three:four
 
 body""".toPayload()), equalTo(Response(OK)
             .header("foo", "one")
             .header("bar", "two")
-            .header("baz", "three")
+            .header("baz", "three:four")
             .body("body")
         ))
     }
