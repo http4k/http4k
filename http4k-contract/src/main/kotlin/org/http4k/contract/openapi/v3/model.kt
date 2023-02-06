@@ -14,6 +14,7 @@ data class Api<NODE> private constructor(
     val tags: List<Tag>,
     val servers: List<ApiServer>,
     val paths: Map<String, Map<String, ApiPath<NODE>>>,
+    val webhooks: Map<String, Map<String, ApiPath<NODE>>>?,
     val components: Components<NODE>
 ) {
     init {
@@ -26,8 +27,14 @@ data class Api<NODE> private constructor(
         tags: List<Tag>,
         paths: Map<String, Map<String, ApiPath<NODE>>>,
         components: Components<NODE>,
-        servers: List<ApiServer>
-    ) : this(info, tags, servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) }, paths, components)
+        servers: List<ApiServer>,
+        webhooks: Map<String, Map<String, ApiPath<NODE>>>?
+    ) : this(info, tags,
+        servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) },
+        paths,
+        webhooks,
+        components
+    )
 
     val openapi = "3.0.0"
 }
@@ -51,7 +58,7 @@ sealed class ApiPath<NODE>(
     val security: NODE?,
     val operationId: String?,
     val deprecated: Boolean?,
-    val callbacks: Map<String, Map<String, Map<String, ApiPath<NODE>>>>?
+    val callbacks: Map<String, Map<Uri, Map<String, ApiPath<NODE>>>>?
 ) {
     open fun definitions(): List<Pair<String, NODE>> = listOfNotNull(
         responses.flatMap { it.value.definitions() },
@@ -68,7 +75,7 @@ sealed class ApiPath<NODE>(
         security: NODE?,
         operationId: String?,
         deprecated: Boolean?,
-        callbacks: Map<String, Map<String, Map<String, ApiPath<NODE>>>>?
+        callbacks: Map<String, Map<Uri, Map<String, ApiPath<NODE>>>>?
     ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated, callbacks)
 
     class WithBody<NODE>(
@@ -81,7 +88,7 @@ sealed class ApiPath<NODE>(
         security: NODE?,
         operationId: String?,
         deprecated: Boolean?,
-        callbacks: Map<String, Map<String, Map<String, ApiPath<NODE>>>>?
+        callbacks: Map<String, Map<Uri, Map<String, ApiPath<NODE>>>>?
     ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated, callbacks) {
         override fun definitions() = super.definitions() + requestBody.definitions().toList()
     }

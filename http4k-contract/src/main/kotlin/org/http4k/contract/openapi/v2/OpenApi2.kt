@@ -8,10 +8,10 @@ import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
 import org.http4k.contract.ResponseMeta
 import org.http4k.contract.Tag
+import org.http4k.contract.WebCallback
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.contract.openapi.operationId
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
@@ -53,7 +53,8 @@ open class OpenApi2<out NODE>(
         contractRoot: PathSegments,
         security: Security?,
         routes: List<ContractRoute>,
-        tags: Set<Tag>
+        tags: Set<Tag>,
+        webhooks: Map<String, List<WebCallback>>
     ) =
         with(renderPaths(routes, contractRoot, security)) {
             Response(OK)

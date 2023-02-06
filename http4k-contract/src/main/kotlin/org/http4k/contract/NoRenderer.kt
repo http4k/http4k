@@ -5,5 +5,11 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 
 object NoRenderer : ContractRenderer {
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, tags: Set<Tag>) = Response(OK)
+    override fun description(
+        contractRoot: PathSegments,
+        security: Security?,
+        routes: List<ContractRoute>,
+        tags: Set<Tag>,
+        webhooks: Map<String, List<WebCallback>>
+    ): Response = Response(OK)
 }

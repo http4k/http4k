@@ -23,17 +23,19 @@ import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.RoutingHttpHandler
 
-data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
-                                      private val security: Security?,
-                                      private val tags: Set<Tag>,
-                                      private val descriptionSecurity: Security?,
-                                      private val descriptionPath: String,
-                                      private val preFlightExtraction: PreFlightExtraction,
-                                      private val routes: List<ContractRoute> = emptyList(),
-                                      private val rootAsString: String = "",
-                                      private val preSecurityFilter: Filter = Filter.NoOp,
-                                      private val postSecurityFilter: Filter = Filter.NoOp,
-                                      private val includeDescriptionRoute: Boolean = false
+data class ContractRoutingHttpHandler(
+    private val renderer: ContractRenderer,
+    private val security: Security?,
+    private val tags: Set<Tag>,
+    private val descriptionSecurity: Security?,
+    private val descriptionPath: String,
+    private val preFlightExtraction: PreFlightExtraction,
+    private val routes: List<ContractRoute> = emptyList(),
+    private val rootAsString: String = "",
+    private val preSecurityFilter: Filter = Filter.NoOp,
+    private val postSecurityFilter: Filter = Filter.NoOp,
+    private val includeDescriptionRoute: Boolean = false,
+    private val webhooks: Map<String, List<WebCallback>> = emptyMap()
 ) : RoutingHttpHandler {
     private val contractRoot = PathSegments(rootAsString)
 
@@ -47,8 +49,10 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    private val notFound = preSecurityFilter.then(security?.filter
-        ?: Filter.NoOp).then(postSecurityFilter).then { renderer.notFound() }
+    private val notFound = preSecurityFilter.then(
+        security?.filter
+            ?: Filter.NoOp
+    ).then(postSecurityFilter).then { renderer.notFound() }
 
     private val handler: HttpHandler = {
         when (val matchResult = match(it)) {
@@ -61,11 +65,13 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun invoke(request: Request): Response = handler(request)
 
-    private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
-        .let {
-            val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { _ -> Response(OK) } else null)
-            it bindContract GET to { _ -> renderer.description(contractRoot, security, routes + extra, tags) }
-        }
+    private val descriptionRoute =
+        ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
+            .let {
+                val extra =
+                    listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { _ -> Response(OK) } else null)
+                it bindContract GET to { _ -> renderer.description(contractRoot, security, routes + extra, tags, webhooks) }
+            }
 
     private val routers = routes
         .map {
@@ -76,9 +82,9 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                 .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
         } + (identify(descriptionRoute)
-            .then(preSecurityFilter)
-            .then(descriptionSecurity?.filter ?: Filter.NoOp)
-            .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+        .then(preSecurityFilter)
+        .then(descriptionSecurity?.filter ?: Filter.NoOp)
+        .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 

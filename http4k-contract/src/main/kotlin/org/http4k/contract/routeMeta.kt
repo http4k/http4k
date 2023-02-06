@@ -45,7 +45,7 @@ class RouteMetaDsl internal constructor() {
     var security: Security? = null
     var preFlightExtraction: PreFlightExtraction? = null
     internal var deprecated: Boolean = false
-    internal val callbacks = mutableMapOf<String, MutableMap<String, RouteCallback>>()
+    internal val callbacks = mutableMapOf<String, MutableMap<Uri, WebCallback>>()
 
     /**
      * Add possible responses to this Route.
@@ -175,13 +175,15 @@ class RouteMetaDsl internal constructor() {
         deprecated = true
     }
 
-    fun callback(name: String, fn: () -> Pair<String, RouteCallback>) {
-        callbacks.getOrPut(name) { mutableMapOf() } += fn()
+    fun callback(name: String, fn: () -> Pair<String, WebCallback>) {
+        callbacks.getOrPut(name) { mutableMapOf() } += fn().let { Uri.of(it.first) to it.second }
     }
 }
 
-infix fun ContractRouteSpec0.bindCallback(method: Method): Pair<String, RouteCallback> =
-    pathFn(Root).toString() to RouteCallback(method, routeMeta)
+infix fun ContractRouteSpec0.bindCallback(method: Method): Pair<String, WebCallback> =
+    pathFn(Root).toString() to WebCallback(method, routeMeta)
+
+infix fun ContractRouteSpec0.bindWebhook(method: Method) = WebCallback(method, routeMeta)
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
@@ -216,7 +218,7 @@ data class RouteMeta(
     val security: Security? = null,
     val operationId: String? = null,
     val deprecated: Boolean = false,
-    val callbacks: Map<String, Map<String, RouteCallback>>? = null
+    val callbacks: Map<String, Map<Uri, WebCallback>>? = null
 )
 
-data class RouteCallback(val method: Method, val meta: RouteMeta)
+data class WebCallback(val method: Method, val meta: RouteMeta)

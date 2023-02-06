@@ -942,6 +942,51 @@
       }
     }
   },
+  "webhooks": {
+    "foobar": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": [
+                {
+                  "aNumberField": 123
+                }
+              ],
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/object540438179"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "normal",
+            "content": {
+              "application/json": {
+                "example": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object540438179"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
   "components": {
     "schemas": {
       "foo": {

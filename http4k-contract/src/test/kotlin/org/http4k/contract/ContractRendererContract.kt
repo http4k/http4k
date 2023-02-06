@@ -237,6 +237,18 @@ abstract class ContractRendererContract<NODE : Any>(
                 receiving(negotiator to "john")
                 returning(OK, negotiator to "john")
             } bindContract POST to { _ -> Response(OK) }
+
+            webhook("foobar") {
+                "/doo" meta {
+                    receiving(json.body("json").toLens() to json {
+                        array(obj("aNumberField" to number(123)))
+                    })
+                    returning("normal" to json {
+                        val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
+                        Response(OK).with(body("json").toLens() of obj)
+                    })
+                } bindWebhook POST
+            }
         }
 
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))

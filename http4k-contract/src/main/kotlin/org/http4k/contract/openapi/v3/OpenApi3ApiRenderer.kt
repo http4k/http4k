@@ -23,12 +23,23 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
         with(api) {
             json {
                 obj(
-                    "openapi" to string(openapi),
-                    "info" to info.asJson(),
-                    "tags" to array(tags.map { it.asJson() }),
-                    "paths" to paths.asJson(),
-                    "components" to components.asJson(),
-                    "servers" to array(servers.map { it.asJson() })
+                    listOfNotNull(
+                        "openapi" to string(openapi),
+                        "info" to info.asJson(),
+                        "tags" to array(tags.map { it.asJson() }),
+                        "paths" to paths.asJson(),
+                        webhooks?.let {
+                            "webhooks" to obj(
+                                it.map { (path, methodsToPaths) ->
+                                    path to obj(
+                                        methodsToPaths.map { it.key to it.value.toJson() }
+                                    )
+                                }
+                            )
+                        },
+                        "components" to components.asJson(),
+                        "servers" to array(servers.map { it.asJson() })
+                    )
                 )
             }
         }
@@ -86,7 +97,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
                         cb.map {
                             it.key to obj(
                                 it.value.map { (path, methodsToPaths) ->
-                                    path to obj(
+                                    path.toString() to obj(
                                         methodsToPaths.map { it.key to it.value.toJson() }
                                     )
                                 }

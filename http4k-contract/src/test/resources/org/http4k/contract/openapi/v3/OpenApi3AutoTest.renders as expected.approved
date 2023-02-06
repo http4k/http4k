@@ -931,6 +931,50 @@
       }
     }
   },
+  "webhooks": {
+    "foobar": {
+      "post": {
+        "summary": "<unknown>",
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": [
+                {
+                  "aNumberField": 123
+                }
+              ],
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/object1089648089"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "normal",
+            "content": {
+              "application/json": {
+                "example": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object1089648089"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
   "components": {
     "schemas": {
       "Foo": {
