@@ -438,6 +438,74 @@
         "deprecated": false
       }
     },
+    "/basepath/callback_with_body": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathCallback_with_body",
+        "deprecated": false,
+        "callbacks": {
+          "foobar": {
+            "/doo": {
+              "post": {
+                "summary": "<unknown>",
+                "description": null,
+                "parameters": [
+                ],
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "example": [
+                        {
+                          "aNumberField": 123
+                        }
+                      ],
+                      "schema": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/object540438179"
+                        }
+                      }
+                    }
+                  },
+                  "required": true
+                },
+                "responses": {
+                  "200": {
+                    "description": "normal",
+                    "content": {
+                      "application/json": {
+                        "example": {
+                          "aNullField": null,
+                          "aNumberField": 123
+                        },
+                        "schema": {
+                          "$ref": "#/components/schemas/object540438179"
+                        }
+                      }
+                    }
+                  }
+                },
+                "deprecated": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/basepath/cookies": {
       "post": {
         "summary": "<unknown>",

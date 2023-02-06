@@ -1,13 +1,8 @@
 package org.http4k.contract
 
 import org.http4k.contract.security.Security
-import org.http4k.core.ContentType
-import org.http4k.core.HttpMessage
+import org.http4k.core.*
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.core.with
 import org.http4k.format.AutoContentNegotiator
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
@@ -23,11 +18,16 @@ open class HttpMessageMeta<out T : HttpMessage>(
     val schemaPrefix: String? = null
 )
 
-class RequestMeta(request: Request, definitionId: String? = null, example: Any? = null, schemaPrefix: String? = null)
-    : HttpMessageMeta<Request>(request, "request", definitionId, example, schemaPrefix)
+class RequestMeta(request: Request, definitionId: String? = null, example: Any? = null, schemaPrefix: String? = null) :
+    HttpMessageMeta<Request>(request, "request", definitionId, example, schemaPrefix)
 
-class ResponseMeta(description: String, response: Response, definitionId: String? = null, example: Any? = null, schemaPrefix: String? = null)
-    : HttpMessageMeta<Response>(response, description, definitionId, example, schemaPrefix)
+class ResponseMeta(
+    description: String,
+    response: Response,
+    definitionId: String? = null,
+    example: Any? = null,
+    schemaPrefix: String? = null
+) : HttpMessageMeta<Response>(response, description, definitionId, example, schemaPrefix)
 
 class RouteMetaDsl internal constructor() {
     var summary: String = "<unknown>"
@@ -45,6 +45,7 @@ class RouteMetaDsl internal constructor() {
     var security: Security? = null
     var preFlightExtraction: PreFlightExtraction? = null
     internal var deprecated: Boolean = false
+    internal val callbacks = mutableMapOf<String, MutableMap<String, RouteCallback>>()
 
     /**
      * Add possible responses to this Route.
@@ -82,13 +83,22 @@ class RouteMetaDsl internal constructor() {
      * for this response body which will override the naturally generated one.
      */
     @JvmName("returningStatus")
-    fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>,
-                      description: String? = null,
-                      definitionId: String? = null,
-                      schemaPrefix: String? = null
+    fun <T> returning(
+        status: Status, body: Pair<BiDiBodyLens<T>, T>,
+        description: String? = null,
+        definitionId: String? = null,
+        schemaPrefix: String? = null
     ) {
-        returning(ResponseMeta(description
-            ?: status.description, Response(status).with(body.first of body.second), definitionId, body.second, schemaPrefix))
+        returning(
+            ResponseMeta(
+                description
+                    ?: status.description,
+                Response(status).with(body.first of body.second),
+                definitionId,
+                body.second,
+                schemaPrefix
+            )
+        )
     }
 
     /**
@@ -96,7 +106,7 @@ class RouteMetaDsl internal constructor() {
      * for this response body which will override the naturally generated one.
      */
     @JvmName("returningStatusNegotiated")
-    fun <T: Any> returning(
+    fun <T : Any> returning(
         status: Status,
         negotiated: Pair<AutoContentNegotiator<T>, T>,
         description: String? = null,
@@ -112,12 +122,20 @@ class RouteMetaDsl internal constructor() {
      * Add an example request (using a Lens and a value) to this Route. It is also possible to pass in the definitionId
      * for this request body which will override the naturally generated one.
      */
-    fun <T> receiving(body: Pair<BiDiBodyLens<T>, T>,
-                      definitionId: String? = null,
-                      schemaPrefix: String? = null
+    fun <T> receiving(
+        body: Pair<BiDiBodyLens<T>, T>,
+        definitionId: String? = null,
+        schemaPrefix: String? = null
     ) {
         requestBody = body.first
-        receiving(RequestMeta(Request(POST, "").with(body.first of body.second), definitionId, body.second, schemaPrefix))
+        receiving(
+            RequestMeta(
+                Request(POST, "").with(body.first of body.second),
+                definitionId,
+                body.second,
+                schemaPrefix
+            )
+        )
     }
 
     /**
@@ -156,24 +174,49 @@ class RouteMetaDsl internal constructor() {
     fun markAsDeprecated() {
         deprecated = true
     }
+
+    fun callback(name: String, fn: () -> Pair<String, RouteCallback>) {
+        callbacks.getOrPut(name) { mutableMapOf() } += fn()
+    }
 }
+
+infix fun ContractRouteSpec0.bindCallback(method: Method): Pair<String, RouteCallback> =
+    pathFn(Root).toString() to RouteCallback(method, routeMeta)
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
-        summary, description, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all + cookies.all, requests.all, responses.all, preFlightExtraction, security, operationId, deprecated
+        summary,
+        description,
+        tags.all.toSet(),
+        requestBody,
+        produces.all.toSet(),
+        consumes.all.toSet(),
+        queries.all + headers.all + cookies.all,
+        requests.all,
+        responses.all,
+        preFlightExtraction,
+        security,
+        operationId,
+        deprecated,
+        callbacks.takeIf { it.isNotEmpty() }
     )
 }
 
-data class RouteMeta(val summary: String = "<unknown>",
-                     val description: String? = null,
-                     val tags: Set<Tag> = emptySet(),
-                     val body: BodyLens<*>? = null,
-                     val produces: Set<ContentType> = emptySet(),
-                     val consumes: Set<ContentType> = emptySet(),
-                     val requestParams: List<Lens<Request, *>> = emptyList(),
-                     val requests: List<HttpMessageMeta<Request>> = emptyList(),
-                     val responses: List<HttpMessageMeta<Response>> = emptyList(),
-                     val preFlightExtraction: PreFlightExtraction? = null,
-                     val security: Security? = null,
-                     val operationId: String? = null,
-                     val deprecated: Boolean = false)
+data class RouteMeta(
+    val summary: String = "<unknown>",
+    val description: String? = null,
+    val tags: Set<Tag> = emptySet(),
+    val body: BodyLens<*>? = null,
+    val produces: Set<ContentType> = emptySet(),
+    val consumes: Set<ContentType> = emptySet(),
+    val requestParams: List<Lens<Request, *>> = emptyList(),
+    val requests: List<HttpMessageMeta<Request>> = emptyList(),
+    val responses: List<HttpMessageMeta<Response>> = emptyList(),
+    val preFlightExtraction: PreFlightExtraction? = null,
+    val security: Security? = null,
+    val operationId: String? = null,
+    val deprecated: Boolean = false,
+    val callbacks: Map<String, Map<String, RouteCallback>>? = null
+)
+
+data class RouteCallback(val method: Method, val meta: RouteMeta)

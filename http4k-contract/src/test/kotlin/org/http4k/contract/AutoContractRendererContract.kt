@@ -1,27 +1,16 @@
 package org.http4k.contract
 
 import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.core.Body
-import org.http4k.core.ContentType
+import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.APPLICATION_YAML
 import org.http4k.core.Method.*
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.CREATED
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Jackson.auto
 import org.http4k.format.auto
-import org.http4k.lens.ContentNegotiation
-import org.http4k.lens.MultipartForm
-import org.http4k.lens.MultipartFormField
-import org.http4k.lens.MultipartFormFile
-import org.http4k.lens.Query
+import org.http4k.lens.*
 import org.http4k.lens.Validator.Strict
-import org.http4k.lens.multipartForm
-import org.http4k.lens.string
 import org.http4k.routing.bind
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -84,6 +73,28 @@ abstract class AutoContractRendererContract<NODE : Any>(
                     )
                 )
             } bindContract POST to { _ -> Response(OK) }
+            routes += "/callback_with_body" meta {
+                callback("name") {
+                    "/foo" meta {
+                        receiving(
+                            Body.auto<ArbObject5>().toLens() to ArbObject5(
+                                ArbObject3(
+                                    Uri.of("http://foowang"),
+                                    mapOf("foo" to 123, "arb" to ArbObject1(Foo.bing, listOf(Foo.bing)))
+                                )
+                            )
+                        )
+                    } bindCallback POST
+                }
+                callback("name") {
+                    "/bar" meta {
+                        returning(
+                            status = CREATED,
+                            body = Body.auto<ArbObject6>().toLens() to ArbObject6(Foo.bing)
+                        )
+                    } bindCallback PUT
+                }
+            } bindContract POST to { _ -> Response(OK) }
             routes += "/body_auto_schema_multiple_request_schemas" meta {
                 receiving(Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing, listOf(Foo.bing)))
                 receiving(
@@ -116,11 +127,11 @@ abstract class AutoContractRendererContract<NODE : Any>(
                 val autoJson = MultipartFormField.auto<ArbObject1>(json).required("autoJsonField")
                 receiving(
                     Body.multipartForm(Strict, field, pic, autoJson).toLens() to MultipartForm()
-                            .with(
-                                field of listOf(MultipartFormField("hello")),
-                                pic of MultipartFormFile("foo", APPLICATION_YAML, "hello".byteInputStream()),
-                                autoJson of ArbObject1(Foo.bing, listOf(Foo.bing))
-                            )
+                        .with(
+                            field of listOf(MultipartFormField("hello")),
+                            pic of MultipartFormFile("foo", APPLICATION_YAML, "hello".byteInputStream()),
+                            autoJson of ArbObject1(Foo.bing, listOf(Foo.bing))
+                        )
                 )
             } bindContract PUT to { _ -> Response(OK) }
         }
@@ -128,3 +139,5 @@ abstract class AutoContractRendererContract<NODE : Any>(
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
 }
+
+

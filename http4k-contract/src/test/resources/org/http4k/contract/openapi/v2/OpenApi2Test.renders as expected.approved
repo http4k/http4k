@@ -469,6 +469,34 @@
         ]
       }
     },
+    "/basepath/callback_with_body": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathCallback_with_body",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/cookies": {
       "post": {
         "tags": [

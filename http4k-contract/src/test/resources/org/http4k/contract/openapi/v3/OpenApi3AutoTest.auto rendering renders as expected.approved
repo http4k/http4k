@@ -437,6 +437,87 @@
         "deprecated": false
       }
     },
+    "/basepath/callback_with_body": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathCallback_with_body",
+        "deprecated": false,
+        "callbacks": {
+          "name": {
+            "/foo": {
+              "post": {
+                "summary": "<unknown>",
+                "parameters": [
+                ],
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "example": {
+                        "sub": {
+                          "uri": "http://foowang",
+                          "additional": {
+                            "foo": 123,
+                            "arb": {
+                              "anotherString": "bing",
+                              "listEnum": [
+                                "bing"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "schema": {
+                        "$ref": "#/components/schemas/ArbObject5"
+                      }
+                    }
+                  },
+                  "required": true
+                },
+                "responses": {
+                },
+                "deprecated": false
+              }
+            },
+            "/bar": {
+              "put": {
+                "summary": "<unknown>",
+                "parameters": [
+                ],
+                "responses": {
+                  "201": {
+                    "description": "Created",
+                    "content": {
+                      "application/json": {
+                        "example": {
+                          "foo": "bing"
+                        },
+                        "schema": {
+                          "$ref": "#/components/schemas/ArbObject6"
+                        }
+                      }
+                    }
+                  }
+                },
+                "deprecated": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/basepath/multipart-fields": {
       "put": {
         "summary": "<unknown>",
@@ -632,6 +713,45 @@
         "required": [
           "additional",
           "uri"
+        ]
+      },
+      "ArbObject5": {
+        "properties": {
+          "sub": {
+            "$ref": "#/components/schemas/ArbObject3"
+          }
+        },
+        "example": {
+          "sub": {
+            "uri": "http://foowang",
+            "additional": {
+              "foo": 123,
+              "arb": {
+                "anotherString": "bing",
+                "listEnum": [
+                  "bing"
+                ]
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "sub"
+        ]
+      },
+      "ArbObject6": {
+        "properties": {
+          "foo": {
+            "$ref": "#/components/schemas/Foo"
+          }
+        },
+        "example": {
+          "foo": "bing"
+        },
+        "type": "object",
+        "required": [
+          "foo"
         ]
       },
       "impl1": {

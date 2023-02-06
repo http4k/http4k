@@ -45,40 +45,44 @@ data class ApiServer(
 sealed class ApiPath<NODE>(
     val summary: String,
     val description: String?,
-    val tags: List<String>,
+    val tags: List<String>?,
     val parameters: List<RequestParameter<NODE>>,
     val responses: Map<String, ResponseContents<NODE>>,
-    val security: NODE,
-    val operationId: String,
-    val deprecated: Boolean
+    val security: NODE?,
+    val operationId: String?,
+    val deprecated: Boolean?,
+    val callbacks: Map<String, Map<String, Map<String, ApiPath<NODE>>>>?
 ) {
-    open fun definitions() = listOfNotNull(
+    open fun definitions(): List<Pair<String, NODE>> = listOfNotNull(
         responses.flatMap { it.value.definitions() },
-        parameters.filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
+        parameters.filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() },
+        callbacks?.flatMap { it.value.values.flatMap { it.values.flatMap { it.definitions() } } }
     ).flatten()
 
     class NoBody<NODE>(
         summary: String,
         description: String?,
-        tags: List<String>,
+        tags: List<String>?,
         parameters: List<RequestParameter<NODE>>,
         responses: Map<String, ResponseContents<NODE>>,
-        security: NODE,
-        operationId: String,
-        deprecated: Boolean
-    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated)
+        security: NODE?,
+        operationId: String?,
+        deprecated: Boolean?,
+        callbacks: Map<String, Map<String, Map<String, ApiPath<NODE>>>>?
+    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated, callbacks)
 
     class WithBody<NODE>(
         summary: String,
         description: String?,
-        tags: List<String>,
+        tags: List<String>?,
         parameters: List<RequestParameter<NODE>>,
         val requestBody: RequestContents<NODE>,
         responses: Map<String, ResponseContents<NODE>>,
-        security: NODE,
-        operationId: String,
-        deprecated: Boolean
-    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated) {
+        security: NODE?,
+        operationId: String?,
+        deprecated: Boolean?,
+        callbacks: Map<String, Map<String, Map<String, ApiPath<NODE>>>>?
+    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated, callbacks) {
         override fun definitions() = super.definitions() + requestBody.definitions().toList()
     }
 }

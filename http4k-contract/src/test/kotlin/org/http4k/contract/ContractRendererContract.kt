@@ -178,6 +178,19 @@ abstract class ContractRendererContract<NODE : Any>(
                     )
                 )
             } bindContract POST to { _ -> Response(OK) }
+            routes += "/callback_with_body" meta {
+                callback("foobar") {
+                    "/doo" meta {
+                        receiving(json.body("json").toLens() to json {
+                            array(obj("aNumberField" to number(123)))
+                        })
+                        returning("normal" to json {
+                            val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
+                            Response(OK).with(body("json").toLens() of obj)
+                        })
+                    } bindCallback POST
+                }
+            } bindContract POST to { _ -> Response(OK) }
             routes += "/body_form" meta {
                 receiving(
                     Body.webForm(
@@ -267,6 +280,8 @@ data class ArbObject1(val anotherString: Foo, val listEnum: List<Foo>)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
 data class ArbObject3(val uri: Uri, val additional: Map<String, *>)
 data class ArbObject4(val anotherString: Foo)
+data class ArbObject5(val sub: ArbObject3)
+data class ArbObject6(val foo: Foo)
 
 interface ObjInterface
 data class Impl1(val value: String = "bob") : ObjInterface

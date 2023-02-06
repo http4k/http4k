@@ -13,7 +13,6 @@ import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.contract.openapi.operationId
 import org.http4k.contract.openapi.v2.value
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
@@ -36,6 +35,7 @@ import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.Meta
 import org.http4k.lens.MultipartForm
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
@@ -45,7 +45,7 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.WebForm
 import org.http4k.util.JsonSchema
-import java.util.Locale
+import java.util.*
 
 /**
  * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of
@@ -107,37 +107,58 @@ class OpenApi3<NODE : Any>(
     private fun ContractRoute.asPath(contractSecurity: Security?, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method, apiPath(contractRoot, contractSecurity))
 
-    private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security?): ApiPath<NODE> {
-        val tags = if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
+    private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security?) =
+        meta.apiPath(
+            method,
+            nonBodyParams,
+            operationId(contractRoot),
+            json(listOfNotNull(meta.security ?: contractSecurity).combineRef()),
+            if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
+        )
 
-        val security = json(listOfNotNull(meta.security ?: contractSecurity).combineRef())
-        val body = meta.requestBody()?.takeIf { it.required }
+    private fun RouteMeta.apiPath(
+        method: Method,
+        nonBodyParams: List<Meta>,
+        operationId: String? = null,
+        security: NODE? = null,
+        tags: List<String>? = null
+    ): ApiPath<NODE> {
+        val body = requestBody()?.takeIf { it.required }
 
         return if (method in setOf(GET, HEAD) || body == null) {
             ApiPath.NoBody(
-                meta.summary,
-                meta.description,
+                summary,
+                description,
                 tags,
-                asOpenApiParameters(),
-                meta.responses(),
+                nonBodyParams.map(::requestParameter),
+                responses(),
                 security,
-                operationId(contractRoot),
-                meta.deprecated
+                operationId,
+                deprecated,
+                callbacksAsApiPaths(),
             )
         } else {
             ApiPath.WithBody(
-                meta.summary,
-                meta.description,
+                summary,
+                description,
                 tags,
-                asOpenApiParameters(),
+                nonBodyParams.map(::requestParameter),
                 body,
-                meta.responses(),
+                responses(),
                 security,
-                operationId(contractRoot),
-                meta.deprecated
+                operationId,
+                deprecated,
+                callbacksAsApiPaths()
             )
         }
     }
+
+    private fun RouteMeta.callbacksAsApiPaths() =
+        callbacks?.mapValues { (_, callbackRoutes) ->
+            callbackRoutes.mapValues { (_, rcb) ->
+                mapOf(rcb.method.name.lowercase() to rcb.meta.apiPath(rcb.method, rcb.meta.requestParams.map { it.meta }))
+            }
+        }
 
     private fun RouteMeta.responses() = responses
         .groupBy { it.message.status.code.toString() }
@@ -159,41 +180,39 @@ class OpenApi3<NODE : Any>(
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
         .toMap()
 
-    private fun ContractRoute.asOpenApiParameters(): List<RequestParameter<NODE>> = nonBodyParams.map {
-        when (val paramMeta: ParamMeta = it.paramMeta) {
-            ObjectParam -> SchemaParameter(it, "{}".toSchema())
-            FileParam -> PrimitiveParameter(it, json {
-                obj("type" to string(FileParam.value), "format" to string("binary"))
-            })
+    private fun requestParameter(it: Meta) = when (val paramMeta: ParamMeta = it.paramMeta) {
+        ObjectParam -> SchemaParameter(it, "{}".toSchema())
+        FileParam -> PrimitiveParameter(it, json {
+            obj("type" to string(FileParam.value), "format" to string("binary"))
+        })
 
-            is ArrayParam -> PrimitiveParameter(it, json {
-                val itemType = paramMeta.itemType()
-                obj(
-                    "type" to string("array"),
-                    "items" to when (itemType) {
-                        is EnumParam<*> -> apiRenderer.toSchema(
-                            itemType.clz.java.enumConstants[0],
-                            it.name,
-                            null
-                        ).definitions.first().second
+        is ArrayParam -> PrimitiveParameter(it, json {
+            val itemType = paramMeta.itemType()
+            obj(
+                "type" to string("array"),
+                "items" to when (itemType) {
+                    is EnumParam<*> -> apiRenderer.toSchema(
+                        itemType.clz.java.enumConstants[0],
+                        it.name,
+                        null
+                    ).definitions.first().second
 
-                        else -> obj("type" to string(itemType.value))
-                    }
-                )
-            })
-
-            is EnumParam<*> -> SchemaParameter(
-                it, apiRenderer.toSchema(
-                    paramMeta.clz.java.enumConstants[0],
-                    it.name,
-                    null
-                )
+                    else -> obj("type" to string(itemType.value))
+                }
             )
+        })
 
-            else -> PrimitiveParameter(it, json {
-                obj("type" to string(paramMeta.value))
-            })
-        }
+        is EnumParam<*> -> SchemaParameter(
+            it, apiRenderer.toSchema(
+                paramMeta.clz.java.enumConstants[0],
+                it.name,
+                null
+            )
+        )
+
+        else -> PrimitiveParameter(it, json {
+            obj("type" to string(paramMeta.value))
+        })
     }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
