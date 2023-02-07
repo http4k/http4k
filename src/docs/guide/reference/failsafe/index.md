@@ -4,7 +4,7 @@ description: Feature overview of the http4k-failsafe module
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-failsafe", version: "4.38.0.1"
+implementation group: "org.http4k", name: "http4k-failsafe", version: "4.39.0.0"
 ```
 
 ### About
