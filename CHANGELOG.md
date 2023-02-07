@@ -4,8 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.39.0.0
-- **http4k-contract** : [Breaking] Support for HTTP webhooks and callbacks in OpenApi3 models. Note that the Swagger 
-- UIs do not support OA 3.1.0 yet so we have limited the OA version number to 3.0.0.
+- **http4k-contract** : [Breaking] Support for HTTP webhooks and callbacks in OpenApi3 models. Note that the Swagger UIs do not support OA 3.1.0 yet so we have limited the OA version number to 3.0.0.
 
 ### v4.38.0.1
 - **http4k-core** : [Fix] Header parsing to split correctly.
