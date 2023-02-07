@@ -15,7 +15,8 @@ data class Api<NODE> private constructor(
     val servers: List<ApiServer>,
     val paths: Map<String, Map<String, ApiPath<NODE>>>,
     val webhooks: Map<String, Map<String, ApiPath<NODE>>>?,
-    val components: Components<NODE>
+    val components: Components<NODE>,
+    val openapi: String
 ) {
     init {
         require(servers.isNotEmpty())
@@ -28,15 +29,15 @@ data class Api<NODE> private constructor(
         paths: Map<String, Map<String, ApiPath<NODE>>>,
         components: Components<NODE>,
         servers: List<ApiServer>,
-        webhooks: Map<String, Map<String, ApiPath<NODE>>>?
+        webhooks: Map<String, Map<String, ApiPath<NODE>>>?,
+        openapi: String
     ) : this(info, tags,
         servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) },
         paths,
         webhooks,
-        components
+        components,
+        openapi
     )
-
-    val openapi = "3.0.0"
 }
 
 data class Components<NODE>(

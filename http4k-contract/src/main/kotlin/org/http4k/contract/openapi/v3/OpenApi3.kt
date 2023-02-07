@@ -12,6 +12,8 @@ import org.http4k.contract.WebCallback
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
+import org.http4k.contract.openapi.OpenApiVersion
+import org.http4k.contract.openapi.OpenApiVersion._3_0_0
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.v2.value
@@ -62,7 +64,8 @@ class OpenApi3<NODE : Any>(
     // then you want to use ApiRenderer.Auto() instead with a compatible JSON instance
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json),
-    private val servers: List<ApiServer> = emptyList()
+    private val servers: List<ApiServer> = emptyList(),
+    private val version: OpenApiVersion = _3_0_0
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
@@ -71,7 +74,8 @@ class OpenApi3<NODE : Any>(
         json: AutoMarshallingJson<NODE>,
         extensions: List<OpenApiExtension> = emptyList(),
         servers: List<ApiServer> = emptyList(),
-    ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json), servers = servers)
+        version: OpenApiVersion = _3_0_0
+    ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json), servers = servers, version = version)
 
     override fun description(
         contractRoot: PathSegments,
@@ -106,7 +110,8 @@ class OpenApi3<NODE : Any>(
                                 it.method,
                                 it.meta.requestParams.map { it.meta })
                         }
-                    }
+                    },
+                version.toString()
             )
         )
 
