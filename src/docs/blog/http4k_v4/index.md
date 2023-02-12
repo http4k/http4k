@@ -100,7 +100,7 @@ Not wanting our users to miss out on anything, we've added support for simply in
 The [OpenTelemetry](https://opentelemetry.io/) project describes itself as...
 > **"... a collection of tools, APIs, and SDKs. You use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior." - OpenTelemetry.io**
 
-It's a great project run by the CNCF and very well fits in with the ethos that the http4k team believes in. As with all http4k integration modules, we want to enable http4k developers to be able to plug in their apps as simply as possible - in this case, just configure the OpenTelemetry API or Java-agent, then just add some simple `Filters` to your code to start collecting Distributed Traces or Metrics. Several tracing schemes are supported, including Amazon XRay, Jaeger and Zipkin.
+It's a great project run by the CNCF and very well fits in with the [ethos](/guide/concepts/rationale) that the http4k team believes in. As with all http4k integration modules, we want to enable http4k developers to be able to plug in their apps as simply as possible - in this case, just configure the OpenTelemetry API or Java-agent, then just add some simple `Filters` to your code to start collecting Distributed Traces or Metrics. Several tracing schemes are supported, including Amazon XRay, Jaeger and Zipkin.
 
 For more docs on how to get it all working, head over to the [docs](/guide/reference/opentelemetry).
 

@@ -36,7 +36,7 @@ Attaching metadata to an `Event` results in (compactified) JSON similar to this:
 }
 ```
 
-In harmony with the ethos of **http4k** there is no need to bring in a custom logging library such as SL4J, although they would be very simple to integrate if required by implementing a custom `Events` instance.
+In harmony with the [ethos](/guide/concepts/rationale) of **http4k** there is no need to bring in a custom logging library such as SL4J, although they would be very simple to integrate if required by implementing a custom `Events` instance.
 
 The example below shows a simple application that outputs structured logs to StdOut which can be analysed by an aggregator, along with the attachment of extra `Event` metadata via a custom `EventFilter`.
  
