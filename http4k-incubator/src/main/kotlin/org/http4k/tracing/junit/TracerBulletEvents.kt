@@ -36,7 +36,7 @@ open class TracerBulletEvents(
     private val events = RecordingEvents().apply {
         if (recordingMode == Manual) this(MetadataEvent(StopRendering))
     }
-;
+
     override fun afterTestExecution(context: ExtensionContext) {
         if (context.executionException.isEmpty) {
             val traces = tracerBullet(events.toList())
