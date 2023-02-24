@@ -78,7 +78,7 @@ open class ConfigurableGson(builder: GsonBuilder,
         }
 
     override fun elements(value: JsonElement): Iterable<JsonElement> = value.asJsonArray
-    override fun text(value: JsonElement): String = value.asString
+    override fun text(value: JsonElement): String = if (value is JsonNull) "null" else value.asString
     override fun bool(value: JsonElement): Boolean = value.asBoolean
     override fun integer(value: JsonElement) = value.asLong
     override fun decimal(value: JsonElement): BigDecimal = value.asBigDecimal

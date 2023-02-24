@@ -1,0 +1,7 @@
+
+## foobar - Trace Step Counts
+
+| Origin | Target | Request |  Steps  |
+|:------:|:------:|:-------:|:-------:|
+|	user 1	|	system.b	|	init 1 req	|	5	|
+|	user 2	|	system/d	|	init 2 req	|	2	|

@@ -1,0 +1,450 @@
+[
+  {
+    "name": "1",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 1",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system.b",
+          "type": "System"
+        },
+        "request": "init 1 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "user 1",
+              "type": "Human"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event a",
+            "children": [
+            ]
+          },
+          {
+            "type": "RequestResponse",
+            "origin": {
+              "name": "system.b",
+              "type": "System"
+            },
+            "target": {
+              "name": "system-c",
+              "type": "System"
+            },
+            "request": "b-to-c req",
+            "response": "b-to-c resp",
+            "children": [
+              {
+                "type": "BiDirectional",
+                "origin": {
+                  "name": "system.b",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "db",
+                  "type": "Database"
+                },
+                "request": "bidi-b req-resp",
+                "children": [
+                ]
+              },
+              {
+                "type": "RequestResponse",
+                "origin": {
+                  "name": "system-c",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "external",
+                  "type": "System"
+                },
+                "request": "c-to-external req",
+                "response": "c-to-external resp",
+                "children": [
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "11",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 1",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system.b",
+          "type": "System"
+        },
+        "request": "init 1 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "user 1",
+              "type": "Human"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event a",
+            "children": [
+            ]
+          },
+          {
+            "type": "RequestResponse",
+            "origin": {
+              "name": "system.b",
+              "type": "System"
+            },
+            "target": {
+              "name": "system-c",
+              "type": "System"
+            },
+            "request": "b-to-c req",
+            "response": "b-to-c resp",
+            "children": [
+              {
+                "type": "BiDirectional",
+                "origin": {
+                  "name": "system.b",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "db",
+                  "type": "Database"
+                },
+                "request": "bidi-b req-resp",
+                "children": [
+                ]
+              },
+              {
+                "type": "RequestResponse",
+                "origin": {
+                  "name": "system-c",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "external",
+                  "type": "System"
+                },
+                "request": "c-to-external req",
+                "response": "c-to-external resp",
+                "children": [
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "111",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 1",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system.b",
+          "type": "System"
+        },
+        "request": "init 1 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "user 1",
+              "type": "Human"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event a",
+            "children": [
+            ]
+          },
+          {
+            "type": "RequestResponse",
+            "origin": {
+              "name": "system.b",
+              "type": "System"
+            },
+            "target": {
+              "name": "system-c",
+              "type": "System"
+            },
+            "request": "b-to-c req",
+            "response": "b-to-c resp",
+            "children": [
+              {
+                "type": "BiDirectional",
+                "origin": {
+                  "name": "system.b",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "db",
+                  "type": "Database"
+                },
+                "request": "bidi-b req-resp",
+                "children": [
+                ]
+              },
+              {
+                "type": "RequestResponse",
+                "origin": {
+                  "name": "system-c",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "external",
+                  "type": "System"
+                },
+                "request": "c-to-external req",
+                "response": "c-to-external resp",
+                "children": [
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "112",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 2",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system/d",
+          "type": "System"
+        },
+        "request": "init 2 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "system/d",
+              "type": "System"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event d",
+            "children": [
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "12",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 2",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system/d",
+          "type": "System"
+        },
+        "request": "init 2 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "system/d",
+              "type": "System"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event d",
+            "children": [
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "2",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 2",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system/d",
+          "type": "System"
+        },
+        "request": "init 2 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "system/d",
+              "type": "System"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event d",
+            "children": [
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "21",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 1",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system.b",
+          "type": "System"
+        },
+        "request": "init 1 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "user 1",
+              "type": "Human"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event a",
+            "children": [
+            ]
+          },
+          {
+            "type": "RequestResponse",
+            "origin": {
+              "name": "system.b",
+              "type": "System"
+            },
+            "target": {
+              "name": "system-c",
+              "type": "System"
+            },
+            "request": "b-to-c req",
+            "response": "b-to-c resp",
+            "children": [
+              {
+                "type": "BiDirectional",
+                "origin": {
+                  "name": "system.b",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "db",
+                  "type": "Database"
+                },
+                "request": "bidi-b req-resp",
+                "children": [
+                ]
+              },
+              {
+                "type": "RequestResponse",
+                "origin": {
+                  "name": "system-c",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "external",
+                  "type": "System"
+                },
+                "request": "c-to-external req",
+                "response": "c-to-external resp",
+                "children": [
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "22",
+    "traces": [
+      {
+        "type": "RequestResponse",
+        "origin": {
+          "name": "user 2",
+          "type": "Human"
+        },
+        "target": {
+          "name": "system/d",
+          "type": "System"
+        },
+        "request": "init 2 req",
+        "response": "init 2 resp",
+        "children": [
+          {
+            "type": "FireAndForget",
+            "origin": {
+              "name": "system/d",
+              "type": "System"
+            },
+            "target": {
+              "name": "events",
+              "type": "System"
+            },
+            "request": "event d",
+            "children": [
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

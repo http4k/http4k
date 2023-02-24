@@ -82,6 +82,19 @@ class BiDiLensSpecTest {
     }
 
     @Test
+    fun urlEncoded() =
+        checkContract(
+            spec.urlEncoded(),
+            "123/456",
+            "123%2F456",
+            "",
+            null,
+            "123/456",
+            "123/456123%2F456",
+            "123/456123%2F456123%2F456"
+        )
+
+    @Test
     fun bigInteger() = checkContract(spec.bigInteger(), BigInteger("123"), "123", "", "invalid", "o", "o123", "o123123")
 
     @Test

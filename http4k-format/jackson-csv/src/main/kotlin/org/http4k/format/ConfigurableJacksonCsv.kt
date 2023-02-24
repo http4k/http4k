@@ -8,7 +8,7 @@ import org.http4k.core.ContentType
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
 import java.io.StringWriter
 import kotlin.reflect.KClass
@@ -60,7 +60,7 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
         val writer = writerFor(T::class, schema)
 
         return httpBodyRoot(
-            listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)),
+            listOf(Meta(true, "body", ObjectParam, "body", description)),
             contentType,
             contentNegotiation
         )

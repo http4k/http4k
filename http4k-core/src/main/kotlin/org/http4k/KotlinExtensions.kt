@@ -1,16 +1,27 @@
 package org.http4k
 
+import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.ByteBuffer
 import java.util.Base64
+
+fun ByteArray.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(this)
+
+fun ByteArray.base64Encode() : String = Base64.getEncoder().encodeToString(this)
+
+fun ByteArray.base64EncodeArray() : ByteArray = Base64.getEncoder().encode(this)
 
 fun ByteBuffer.length() = limit() - position()
 
 fun ByteBuffer.asString(): String = String(array(), position(), length())
 
-fun ByteBuffer.base64Encode() : String = Base64.getEncoder().encodeToString(array())
+fun ByteBuffer.base64Encode() : String = array().base64Encode()
 
-fun String.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(toByteArray())
+fun ByteBuffer.base64Decoded() : ByteArray = Base64.getDecoder().decode(array())
+
+fun ByteBuffer.base64DecodedByteBuffer() : ByteBuffer = base64Decoded().asByteBuffer()
+
+fun String.asByteBuffer(): ByteBuffer = toByteArray().asByteBuffer()
 
 fun String.quoted() = "\"${replace("\"", "\\\"")}\""
 
@@ -29,8 +40,14 @@ fun StringBuilder.appendIf(condition: () -> Boolean, vararg toAppend: String): S
     if (condition()) toAppend.forEach { append(it) }
 }
 
-fun String.base64Decoded(): String = String(Base64.getDecoder().decode(this))
+fun String.base64Decoded() = base64DecodedArray().decodeToString()
 
-fun String.base64Encode() = String(Base64.getEncoder().encode(toByteArray()))
+fun String.base64DecodedArray(): ByteArray = Base64.getDecoder().decode(this)
+
+fun String.base64DecodedByteBuffer() = base64DecodedArray().asByteBuffer()
+
+fun String.base64Encode() = toByteArray().base64Encode()
 
 fun String.urlEncoded(): String = URLEncoder.encode(this, "utf-8")
+
+fun String.urlDecoded(): String = URLDecoder.decode(this, "utf-8")

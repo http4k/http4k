@@ -3,6 +3,7 @@ package org.http4k.format
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -43,13 +44,16 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
                 "null" to nullNode(),
                 "int" to number(2),
                 "empty" to obj(),
-                "array" to array(listOf(
-                    string(""),
-                    number(123)
-                )),
+                "array" to array(
+                    listOf(
+                        string(""),
+                        number(123)
+                    )
+                ),
                 "singletonArray" to array(obj("number" to number(123)))
             )
-            val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
+            val expected =
+                """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
             assertThat(compact(input), equalTo(expected))
         }
     }
@@ -90,6 +94,20 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
+    fun `get text for all primitive types`() {
+        j {
+            assertThat(text(string("1.0")), equalTo("1.0"))
+            assertThat(text(number(1)), equalTo("1"))
+            assertThat(text(number(1L)), equalTo("1"))
+            assertThat(text(number(1.1)), present()) // won't depend on platform differences
+            assertThat(text(number(BigInteger("1"))), equalTo("1"))
+            assertThat(text(number(BigDecimal("1.1"))), equalTo("1.1"))
+            assertThat(text(boolean(false)), equalTo("false"))
+            assertThat(text(nullNode()), equalTo("null"))
+        }
+    }
+
+    @Test
     fun `get string value`() {
         j {
             assertThat(textValueOf(obj("value" to string("world")), "value"), equalTo("world"))
@@ -111,7 +129,16 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     fun `can write and read spec as json`() {
         j {
             val validValue = """{"hello":"world"}"""
-            checkContract(lens(spec), obj("hello" to string("world")), validValue, "", "hello", "o", "o$validValue", "o$validValue$validValue")
+            checkContract(
+                jsonLens(spec),
+                obj("hello" to string("world")),
+                validValue,
+                "",
+                "hello",
+                "o",
+                "o$validValue",
+                "o$validValue$validValue"
+            )
         }
     }
 

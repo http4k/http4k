@@ -6,6 +6,9 @@ import com.natpryce.hamkrest.anyOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
+import org.apache.hc.client5.http.impl.classic.HttpClients.createDefault
+import org.apache.hc.core5.http.ClassicHttpResponse
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
@@ -30,6 +33,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
+import java.net.URI.create
 
 abstract class ServerContract(
     private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
@@ -140,8 +144,8 @@ abstract class ServerContract(
     @Test
     fun `returns headers`() {
         val response = client(Request(GET, "$baseUrl/headers"))
-
         assertThat(response.status, equalTo(ACCEPTED))
+        assertThat(response.headerValues("content-type").size, equalTo(1))
         assertThat(response.header("content-type"), equalTo("text/plain"))
     }
 
@@ -204,6 +208,17 @@ abstract class ServerContract(
     open fun `can start on port zero and then get the port`() {
         routes(*routes.toTypedArray()).asServer(serverConfig(0)).start().use {
             assertThat(client(Request(GET, "http://localhost:${it.port()}/uri")).status, equalTo(OK))
+        }
+    }
+
+    @Test
+    fun `returns 501 on illegal request`() {
+        val client = createDefault()
+        client.use {
+            assertThat(
+                client.execute(HttpUriRequestBase("FOOBAR", create(baseUrl)), ClassicHttpResponse::getCode),
+                equalTo(501)
+            )
         }
     }
 

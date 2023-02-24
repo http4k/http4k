@@ -9,5 +9,5 @@ dependencies {
     testApi("io.opentelemetry:opentelemetry-extension-aws")
     testApi("io.opentelemetry:opentelemetry-sdk-testing")
 
-    testImplementation(project(path = ":http4k-core", configuration ="testArtifacts"))
+    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
 }

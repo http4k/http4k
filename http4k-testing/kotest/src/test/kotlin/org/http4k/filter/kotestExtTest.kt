@@ -25,4 +25,20 @@ class ExtensionsTest {
 
         shouldFail { ResponseFilters.Assert(haveHeader("bob")).then { Response(OK) }(Request(GET, "")) }
     }
+
+    @Test
+    fun `request not matching as a filter`() {
+        val app = RequestFilters.AssertNot(haveHeader("bob")).then { Response(OK) }
+
+        app(Request(GET, ""))
+
+        shouldFail { app(Request(GET, "").header("bob", "foo")) }
+    }
+
+    @Test
+    fun `response not matching as a filter`() {
+        ResponseFilters.AssertNot(haveHeader("bob")).then { Response(OK) }(Request(GET, ""))
+
+        shouldFail { ResponseFilters.AssertNot(haveHeader("bob").invert()).then { Response(OK) }(Request(GET, "")) }
+    }
 }

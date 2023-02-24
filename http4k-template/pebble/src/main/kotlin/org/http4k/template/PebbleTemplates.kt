@@ -1,9 +1,9 @@
 package org.http4k.template
 
-import com.mitchellbosecke.pebble.PebbleEngine
-import com.mitchellbosecke.pebble.error.LoaderException
-import com.mitchellbosecke.pebble.loader.ClasspathLoader
-import com.mitchellbosecke.pebble.loader.FileLoader
+import io.pebbletemplates.pebble.PebbleEngine
+import io.pebbletemplates.pebble.error.LoaderException
+import io.pebbletemplates.pebble.loader.ClasspathLoader
+import io.pebbletemplates.pebble.loader.FileLoader
 import java.io.StringWriter
 
 class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEngine.Builder = { it },

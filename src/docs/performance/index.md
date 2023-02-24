@@ -22,7 +22,7 @@ Command-line JVM options, however, were tuned for the test to take advantage of 
 The full implementation of the benchmark can be found [here](https://github.com/TechEmpower/FrameworkBenchmarks/tree/master/frameworks/Kotlin/http4k).
 
 ### Results - Round 19
-Overall, http4k did very well in this round of benchmarking, placing 19/104 - especially considering that the ethos of the library is one of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
+Overall, http4k did very well in this round of benchmarking, placing 19/104 - especially considering that the [ethos](/guide/concepts/rationale) of the library is one of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
 
 The big surprise was the high performance of the Apache server backend, which consistently outranked Undertow (which is the most fully featured of all the supported backends and our default option). 
 

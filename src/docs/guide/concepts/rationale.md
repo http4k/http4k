@@ -1,7 +1,7 @@
 title: Rationale: The why of http4k
 description: Overview of why we created http4k, the problems it solves, and the core concepts
 
-**http4k** was created as the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the "Server as a function" and filter model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.github.io). With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch.
+**http4k** was created as the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the "Server as a function" and filter model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi generator is ported from [Fintrospect](http://fintrospect.github.io). With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch.
 
 For our purposes, we wanted something that:
 
@@ -13,7 +13,7 @@ For our purposes, we wanted something that:
 1. Starts/stops ultra quickly.
 1. Provides typesafe HTTP message deconstruction/construction.
 1. Automatically dealt with contract breaches to remove boilerplate.
-1. Automatic generation of OpenApi/Swagger documentation (including JSON Schema models).
+1. Automatic generation of OpenApi documentation (including JSON Schema models).
 
 **http4k** ticks all of these boxes. 
 

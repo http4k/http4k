@@ -1,6 +1,7 @@
 package org.http4k.contract
 
 import org.http4k.contract.PreFlightExtraction.Companion
+import org.http4k.contract.openapi.operationId
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -75,6 +76,9 @@ class ContractRoute internal constructor(val method: Method,
             is MatchedWithoutHandler -> Response(NOT_FOUND)
         }
     }
+
+    internal fun operationId(contractRoot: PathSegments) =
+        operationId(meta, method, describeFor(contractRoot))
 
     override fun toString() = "${method.name}: ${spec.describe(Root)}"
 }

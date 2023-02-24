@@ -8,10 +8,10 @@ import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
 import org.http4k.contract.ResponseMeta
 import org.http4k.contract.Tag
+import org.http4k.contract.WebCallback
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.contract.openapi.operationId
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
@@ -25,7 +25,9 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import java.util.Locale.getDefault
@@ -47,7 +49,13 @@ open class OpenApi2<out NODE>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, tags: Set<Tag>) =
+    override fun description(
+        contractRoot: PathSegments,
+        security: Security?,
+        routes: List<ContractRoute>,
+        tags: Set<Tag>,
+        webhooks: Map<String, List<WebCallback>>
+    ) =
         with(renderPaths(routes, contractRoot, security)) {
             Response(OK)
                 .with(Header.CONTENT_TYPE of APPLICATION_JSON)
@@ -89,7 +97,7 @@ open class OpenApi2<out NODE>(
 
     private fun normalisePath(path: String): String = if (path == "") "/" else path
 
-    private fun Meta.renderMeta(schema: JsonSchema<NODE>? = null) = json {
+    private fun Meta.renderMeta() = json {
         val meta = paramMeta
         obj(
             listOf(
@@ -98,12 +106,16 @@ open class OpenApi2<out NODE>(
                 "required" to boolean(required)
             ) +
                 when (meta) {
-                    ObjectParam -> listOf("schema" to (schema?.node ?: obj("type" to string(meta.value))))
-                    is ParamMeta.ArrayParam -> listOf(
+                    is ArrayParam -> listOf(
                         "type" to string("array"),
-                        "items" to obj("type" to string(meta.itemType().value))
+                        "items" to obj(
+                            "type" to string(meta.itemType().coerceForSimpleType().value)
+                        )
                     )
-                    else -> listOf("type" to string(meta.value))
+
+                    else -> listOf(
+                        "type" to string(meta.coerceForSimpleType().value)
+                    )
                 } +
                 (description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
@@ -117,7 +129,7 @@ open class OpenApi2<out NODE>(
                 "required" to boolean(required),
                 if (location != "formData") {
                     "schema" to (schema?.node ?: obj("type" to string(paramMeta.value)))
-                } else "type" to string(paramMeta.value)
+                } else "type" to string(paramMeta.coerceForSimpleType().value)
             ) + (description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
     }
@@ -199,13 +211,15 @@ open class OpenApi2<out NODE>(
         obj("title" to string(title), "version" to string(version), "description" to string(description ?: ""))
     }
 
-    private fun List<ContractRoute>.renderTags(globalTags : Set<Tag>) = (flatMap(ContractRoute::tags) + globalTags).toSet()
-        .sortedBy { it.name }
-        .map {
-            json {
-                obj(listOf("name" to string(it.name)) + it.description?.let { "description" to string(it) }.asList())
+    private fun List<ContractRoute>.renderTags(globalTags: Set<Tag>) =
+        (flatMap(ContractRoute::tags) + globalTags).toSet()
+            .sortedBy { it.name }
+            .map {
+                json {
+                    obj(listOf("name" to string(it.name)) + it.description?.let { "description" to string(it) }
+                        .asList())
+                }
             }
-        }
 }
 
 private data class FieldsAndDefinitions<NODE>(
@@ -224,3 +238,10 @@ private data class FieldAndDefinitions<out NODE>(
 )
 
 private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()
+
+// we do this to continue to treat complex objects as strings in params
+private fun ParamMeta.coerceForSimpleType() = when (this) {
+    is ObjectParam -> StringParam
+    else -> this
+}
+

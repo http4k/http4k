@@ -1,0 +1,6 @@
+{
+  "customOidc": {
+    "type": "openIdConnect",
+    "openIdConnectUrl": "spec"
+  }
+}

@@ -11,13 +11,13 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
 import org.apache.hc.client5.http.config.RequestConfig
 import org.apache.hc.client5.http.cookie.StandardCookieSpec
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager
 import org.apache.hc.client5.http.socket.ConnectionSocketFactory
 import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
+import org.apache.hc.core5.http.ClassicHttpResponse
 import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.HttpResponse
 import org.apache.hc.core5.http.config.RegistryBuilder
@@ -54,7 +54,13 @@ object ApacheClient {
         requestBodyMode: BodyMode = Memory
     ): HttpHandler = { request ->
         try {
-            client.execute(request.toApacheRequest(requestBodyMode)).toHttp4kResponse(responseBodyMode)
+            when (responseBodyMode) {
+                Memory -> client.execute(request.toApacheRequest(requestBodyMode)) {
+                    it.toHttp4kResponse(responseBodyMode)
+                }
+                Stream -> client.executeOpen(null, request.toApacheRequest(requestBodyMode), null)
+                    .toHttp4kResponse(responseBodyMode)
+            }
         } catch (e: ConnectTimeoutException) {
             Response(CLIENT_TIMEOUT.toClientStatus(e))
         } catch (e: SocketTimeoutException) {
@@ -86,7 +92,7 @@ object ApacheClient {
 
     private fun Array<Header>.toTarget(): Headers = map { it.name to it.value }
 
-    private fun CloseableHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(toTargetStatus()).headers(headers.toTarget())) {
+    private fun ClassicHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(toTargetStatus()).headers(headers.toTarget())) {
         entity?.let { body(responseBodyMode(it.content)) } ?: this
     }
 }

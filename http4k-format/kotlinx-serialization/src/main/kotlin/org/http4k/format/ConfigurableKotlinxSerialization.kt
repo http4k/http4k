@@ -118,12 +118,36 @@ open class ConfigurableKotlinxSerialization(
     }
 
     // auto
-    override fun asJsonObject(input: Any): JsonElement =
-        json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
+    override fun asJsonObject(input: Any): JsonElement = when(input) {
+        is Map<*, *> -> JsonObject(
+            input.mapNotNull {
+                (it.key as? String ?: return@mapNotNull null) to (it.value?.asJsonObject() ?: nullNode())
+            }.toMap(),
+        )
+        is Iterable<*> -> JsonArray(input.map { it?.asJsonObject() ?: nullNode() })
+        is Array<*> -> JsonArray(input.map { it?.asJsonObject() ?: nullNode() })
+        else -> json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
+    }
+
+    private fun JsonElement.toPrimitive(): Any? {
+        return when(this) {
+            is JsonPrimitive -> content
+                .takeIf { isString }
+                ?: content.toBooleanStrictOrNull()
+                ?: content.toBigDecimalOrNull()
+            is JsonArray -> map { it.toPrimitive() }
+            is JsonObject -> map { it.key to it.value.toPrimitive() }.toMap()
+        }
+    }
 
     override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return json.decodeFromJsonElement(json.serializersModule.serializer(target.java), j) as T
+        return when {
+            Map::class.java.isAssignableFrom(target.java) -> j.toPrimitive() as T
+            Collection::class.java.isAssignableFrom(target.java) -> j.toPrimitive() as T
+            Array::class.java.isAssignableFrom(target.java) -> j.toPrimitive() as T
+            else -> json.decodeFromJsonElement(json.serializersModule.serializer(target.java), j) as T
+        }
     }
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = json.parseToJsonElement(input).asA(target)

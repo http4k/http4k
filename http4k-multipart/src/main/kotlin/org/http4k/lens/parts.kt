@@ -3,6 +3,8 @@ package org.http4k.lens
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Headers
+import org.http4k.lens.ParamMeta.FileParam
+import org.http4k.lens.ParamMeta.StringParam
 import java.io.Closeable
 import java.io.InputStream
 import kotlin.Int.Companion.MAX_VALUE
@@ -10,7 +12,7 @@ import kotlin.random.Random.Default.nextInt
 
 data class MultipartFormField(val value: String, val headers: Headers = emptyList()) {
     companion object : BiDiLensSpec<MultipartForm, MultipartFormField>("form",
-        ParamMeta.StringParam,
+        StringParam,
         LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
         LensSet { name, values, target -> values.fold(target.minusField(name)) { m, next -> m + (name to next) } }
     ) {
@@ -38,7 +40,7 @@ data class MultipartFormFile(val filename: String, val contentType: ContentType,
     override fun hashCode(): Int = realised.hashCode()
 
     companion object : BiDiLensSpec<MultipartForm, MultipartFormFile>("form",
-        ParamMeta.FileParam,
+        FileParam,
         LensGet { name, form ->
             form.files[name]?.map { MultipartFormFile(it.filename, it.contentType, it.content) }
                 ?: emptyList()

@@ -6,6 +6,7 @@ import org.http4k.core.Uri
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.FileParam
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 
 data class Api<NODE> private constructor(
@@ -13,7 +14,9 @@ data class Api<NODE> private constructor(
     val tags: List<Tag>,
     val servers: List<ApiServer>,
     val paths: Map<String, Map<String, ApiPath<NODE>>>,
-    val components: Components<NODE>
+    val webhooks: Map<String, Map<String, ApiPath<NODE>>>?,
+    val components: Components<NODE>,
+    val openapi: String
 ) {
     init {
         require(servers.isNotEmpty())
@@ -25,10 +28,16 @@ data class Api<NODE> private constructor(
         tags: List<Tag>,
         paths: Map<String, Map<String, ApiPath<NODE>>>,
         components: Components<NODE>,
-        servers: List<ApiServer>
-    ) : this(info, tags, servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) }, paths, components)
-
-    val openapi = "3.0.0"
+        servers: List<ApiServer>,
+        webhooks: Map<String, Map<String, ApiPath<NODE>>>?,
+        openapi: String
+    ) : this(info, tags,
+        servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) },
+        paths,
+        webhooks,
+        components,
+        openapi
+    )
 }
 
 data class Components<NODE>(
@@ -44,40 +53,44 @@ data class ApiServer(
 sealed class ApiPath<NODE>(
     val summary: String,
     val description: String?,
-    val tags: List<String>,
+    val tags: List<String>?,
     val parameters: List<RequestParameter<NODE>>,
     val responses: Map<String, ResponseContents<NODE>>,
-    val security: NODE,
-    val operationId: String,
-    val deprecated: Boolean
+    val security: NODE?,
+    val operationId: String?,
+    val deprecated: Boolean?,
+    val callbacks: Map<String, Map<Uri, Map<String, ApiPath<NODE>>>>?
 ) {
-    open fun definitions() = listOfNotNull(
+    open fun definitions(): List<Pair<String, NODE>> = listOfNotNull(
         responses.flatMap { it.value.definitions() },
-        parameters.filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
+        parameters.filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() },
+        callbacks?.flatMap { it.value.values.flatMap { it.values.flatMap { it.definitions() } } }
     ).flatten()
 
     class NoBody<NODE>(
         summary: String,
         description: String?,
-        tags: List<String>,
+        tags: List<String>?,
         parameters: List<RequestParameter<NODE>>,
         responses: Map<String, ResponseContents<NODE>>,
-        security: NODE,
-        operationId: String,
-        deprecated: Boolean
-    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated)
+        security: NODE?,
+        operationId: String?,
+        deprecated: Boolean?,
+        callbacks: Map<String, Map<Uri, Map<String, ApiPath<NODE>>>>?
+    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated, callbacks)
 
     class WithBody<NODE>(
         summary: String,
         description: String?,
-        tags: List<String>,
+        tags: List<String>?,
         parameters: List<RequestParameter<NODE>>,
         val requestBody: RequestContents<NODE>,
         responses: Map<String, ResponseContents<NODE>>,
-        security: NODE,
-        operationId: String,
-        deprecated: Boolean
-    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated) {
+        security: NODE?,
+        operationId: String?,
+        deprecated: Boolean?,
+        callbacks: Map<String, Map<Uri, Map<String, ApiPath<NODE>>>>?
+    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated, callbacks) {
         override fun definitions() = super.definitions() + requestBody.definitions().toList()
     }
 }
@@ -110,25 +123,28 @@ sealed class BodyContent {
     }
 
     class FormContent(val schema: FormSchema) : BodyContent() {
-        class FormSchema(metas: List<Meta>) {
+        class FormSchema(metas: Map<Meta, List<String>?>) {
             val type = "object"
-            val properties = metas.associate {
+            val properties = metas.keys.associate {
                 val paramMeta = it.paramMeta
-                val listOfNotNull = listOfNotNull(
+                it.name to listOfNotNull(
                     "type" to paramMeta.value,
                     paramMeta.takeIf { it == FileParam }?.let { "format" to "binary" },
                     it.description?.let { "description" to it },
-                    if (paramMeta is ArrayParam) "items" to mapOf(
-                        *listOfNotNull(
-                            "type" to paramMeta.itemType().value,
-                            paramMeta.itemType().takeIf { it == FileParam }
-                                ?.let { "format" to "binary" }).toTypedArray()
-                    )
-                    else null
-                )
-                it.name to listOfNotNull.toMap()
+                    when (paramMeta) {
+                        is ArrayParam -> "items" to mapOf(
+                            *listOfNotNull(
+                                "type" to paramMeta.itemType().value,
+                                paramMeta.itemType().takeIf { it == FileParam }
+                                    ?.let { "format" to "binary" }).toTypedArray()
+                        )
+
+                        is ObjectParam -> null
+                        else -> null
+                    }
+                ).toMap()
             }
-            val required = metas.filter(Meta::required).map { it.name }
+            val required = metas.keys.filter(Meta::required).map { it.name }
         }
     }
 }

@@ -251,6 +251,13 @@ class ContractRouteTest {
     }
 
     @Test
+    fun `param starting with prefix is not changed`() {
+        val route = "somePrefix" / Path.of("value") bindContract GET to { value -> { Response(OK).body(value) } }
+
+        assertThat(route(Request(GET, "/somePrefix/somePrefixInValue")).bodyString(), equalTo("somePrefixInValue"))
+    }
+
+    @Test
     fun `can receive negotiated body with PreFlightExtraction`() {
         val v1Lens = Body.string(ContentType("custom/v1"))
             .map({ require("v1-" in it); it.replace("v1-", "") }, { "v1-$it" })

@@ -9,6 +9,7 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenAPIJackson
 import org.http4k.contract.openapi.OpenApiExtension
+import org.http4k.contract.openapi.OpenApiVersion
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 import kotlin.reflect.KParameter
@@ -21,9 +22,10 @@ fun OpenApi3(
     apiInfo: ApiInfo,
     json: ConfigurableJackson = OpenAPIJackson,
     extensions: List<OpenApiExtension> = emptyList(),
-    servers: List<ApiServer> = emptyList()
+    servers: List<ApiServer> = emptyList(),
+    version: OpenApiVersion = OpenApiVersion._3_0_0
 ) =
-    OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)), servers = servers)
+    OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)), servers = servers, version = version)
 
 fun AutoJsonToJsonSchema(json: ConfigurableJackson) = AutoJsonToJsonSchema(
     json,

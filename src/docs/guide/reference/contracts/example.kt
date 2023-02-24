@@ -5,6 +5,7 @@ package guide.reference.contracts
 
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.bind
+import org.http4k.contract.bindCallback
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
@@ -19,6 +20,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.auto
@@ -79,6 +81,36 @@ fun echoRoute(): ContractRoute {
     return spec to echo
 }
 
+// this route has a callback registered, so can be used when processes have asynchronous updates
+// they will be POSTed back to callbackUrl received in the request
+fun routeWithCallback(): ContractRoute {
+
+    val body = Body.auto<StartProcess>().toLens()
+
+    val spec = "/callback" meta {
+        summary = "kick off a process with an async callback"
+
+        // register the callback for later updates. The syntax of the callback URL comes
+        // from the OpenApi spec
+        callback("update") {
+            """{${"$"}request.body#/callbackUrl}""" meta {
+                receiving(
+                    body to StartProcess(Uri.of("http://caller"))
+                )
+            } bindCallback POST
+        }
+    } bindContract POST
+
+    val echo: HttpHandler = { request: Request ->
+        println(body(request))
+        Response(OK)
+    }
+
+    return spec to echo
+}
+
+data class StartProcess(val callbackUrl: Uri)
+
 // use another Lens to set up the API-key - the answer is 42!
 val mySecurity = ApiKeySecurity(Query.int().required("reference/api"), { it == 42 })
 
@@ -86,17 +118,18 @@ val mySecurity = ApiKeySecurity(Query.int().required("reference/api"), { it == 4
 // OpenApi/Swagger) and a security model (in this case an API-Key):
 val contract = contract {
     renderer = OpenApi3(ApiInfo("My great API", "v1.0"), Jackson)
-    descriptionPath = "/swagger.json"
+    descriptionPath = "/openapi.json"
     security = mySecurity
     routes += greetRoute()
     routes += echoRoute()
+    routes += routeWithCallback()
 }
 
 val handler: HttpHandler = routes("/reference/api/v1" bind contract)
 
 // by default, the OpenAPI docs live at the root of the contract context, but we can override it..
 fun main() {
-    println(handler(Request(GET, "/reference/api/v1/swagger.json")))
+    println(handler(Request(GET, "/reference/api/v1/openapi.json")))
 
     println(
         handler(

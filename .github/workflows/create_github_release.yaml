@@ -11,7 +11,7 @@ jobs:
       contents: write  # for actions/create-release to create a release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.3.0
       - run: ./build-release-note.sh ${{ github.event.client_payload.version }} > NOTE.md
       - uses: actions/create-release@v1
         env:

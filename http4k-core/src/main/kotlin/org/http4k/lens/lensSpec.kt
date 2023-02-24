@@ -5,6 +5,7 @@ import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
+import org.http4k.lens.ParamMeta.ObjectParam
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -297,6 +298,7 @@ fun <IN : Any> BiDiLensSpec<IN, String>.bytes() = map { s: String -> s.toByteArr
 fun <IN : Any> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1) =
     map(StringBiDiMappings.regex(pattern, group))
 
+fun <IN : Any> BiDiLensSpec<IN, String>.urlEncoded() = map(StringBiDiMappings.urlEncoded())
 fun <IN : Any> BiDiLensSpec<IN, String>.regexObject() = map(StringBiDiMappings.regexObject())
 fun <IN : Any> BiDiLensSpec<IN, String>.duration() = map(StringBiDiMappings.duration())
 fun <IN : Any> BiDiLensSpec<IN, String>.base64() = map(StringBiDiMappings.base64())
@@ -351,14 +353,14 @@ fun <NEXT, IN : Any, OUT> BiDiLensSpec<IN, OUT>.map(mapping: BiDiMapping<OUT, NE
 inline fun <TARGET : Any, reified T> BiDiLensSpec<TARGET, String>.composite(crossinline fn: BiDiLensSpec<TARGET, String>.(TARGET) -> T) =
     LensSpec<TARGET, T>(
         T::class.java.name,
-        ParamMeta.ObjectParam,
+        ObjectParam,
         LensGet { _, target -> listOf(fn(target)) }).required(T::class.java.name)
 
 inline fun <TARGET : Any, reified T> BiDiLensSpec<TARGET, String>.composite(
     crossinline getFn: BiDiLensSpec<TARGET, String>.(TARGET) -> T,
     crossinline setFn: T.(TARGET) -> TARGET
 ) = BiDiLensSpec(
-    T::class.java.name, ParamMeta.ObjectParam,
+    T::class.java.name, ObjectParam,
     LensGet { _, target -> listOf(getFn(target)) },
     LensSet<TARGET, T> { _, values, target -> values.fold(target) { msg, next: T -> next.setFn(msg) } })
     .required(T::class.java.name)

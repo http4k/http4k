@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <script src="//unpkg.com/swagger-ui-dist@3/swagger-ui-standalone-preset.js"></script>
-    <script src="//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
-    <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@3/swagger-ui.css"/>
-    <title>Cat Shelter</title>
-  </head>
-  <body>
-    <div id="swagger-ui"></div>
-    <script>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <script src="//unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
+  <script src="//unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
+  <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css"/>
+  <title>Cat Shelter</title>
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script>
       window.onload = function() {
         SwaggerUIBundle({
           url: "/spec",
@@ -30,5 +30,5 @@
       }
 
 </script>
-  </body>
+</body>
 </html>

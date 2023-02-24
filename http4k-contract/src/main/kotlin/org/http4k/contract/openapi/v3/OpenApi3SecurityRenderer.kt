@@ -9,6 +9,7 @@ import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
+import org.http4k.contract.security.OpenIdConnectSecurity
 import org.http4k.contract.security.UserCredentialsOAuthSecurity
 
 /**
@@ -20,7 +21,8 @@ val OpenApi3SecurityRenderer: SecurityRenderer = SecurityRenderer(
     BasicAuthSecurity.renderer,
     BearerAuthSecurity.renderer,
     ImplicitOAuthSecurity.renderer,
-    UserCredentialsOAuthSecurity.renderer
+    UserCredentialsOAuthSecurity.renderer,
+    OpenIdConnectSecurity.renderer
 )
 
 val ApiKeySecurity.Companion.renderer
@@ -135,3 +137,20 @@ val UserCredentialsOAuthSecurity.Companion.renderer
             override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
         }
     }
+
+val OpenIdConnectSecurity.Companion.renderer get() = rendererFor<OpenIdConnectSecurity> {
+    object : RenderModes {
+        override fun <NODE> full(): Render<NODE> = {
+            obj(it.name to
+                obj(
+                    listOfNotNull(
+                        "type" to string("openIdConnect"),
+                        "openIdConnectUrl" to string(it.discoveryUrl.toString()),
+                    )
+                )
+            )
+        }
+
+        override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+    }
+}
