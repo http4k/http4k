@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.39.1.0 (uncut)
+### v4.40.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi-yaml** : [Possible clash/break] Upgrade to v2.0 of SnakeYaml (CVE fixes etc) may break dependencies which previously used v1.3X.X. It is safe to pin your SnakeYaml version to 1.3X.X if there is a clash with other libraries in your stack.
 
 ### v4.39.0.0
 - **http4k-contract** : [Breaking] Support for HTTP webhooks and callbacks in OpenApi3 models. Note that the Swagger UIs do not support OA 3.1.0 yet so we have limited the OA version number to 3.0.0.
