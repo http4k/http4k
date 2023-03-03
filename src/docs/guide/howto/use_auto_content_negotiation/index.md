@@ -8,13 +8,13 @@ Example showing how to combine multiple body Lenses into a single facade that wi
 Auto Content Negotiation is available in the core http4k module.
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-format-core", version: "4.39.0.0"
+implementation group: "org.http4k", name: "http4k-format-core", version: "4.40.0.0"
 ```
 
 But it also integrates with the contract module.
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-contract", version: "4.39.0.0"
+implementation group: "org.http4k", name: "http4k-contract", version: "4.40.0.0"
 ```
 
 ### Rationale
