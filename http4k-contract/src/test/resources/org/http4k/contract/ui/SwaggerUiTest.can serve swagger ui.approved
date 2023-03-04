@@ -25,7 +25,9 @@
             SwaggerUIBundle.presets.apis,
             SwaggerUIStandalonePreset
           ],
-          layout: "StandaloneLayout"
+          layout: "StandaloneLayout",
+          queryConfigEnabled: false,
+          tryItOutEnabled: false
         })
       }
 
