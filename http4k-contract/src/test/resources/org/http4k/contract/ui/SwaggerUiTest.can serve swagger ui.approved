@@ -4,9 +4,9 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-  <script src="//unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
-  <script src="//unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
-  <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css"/>
+  <script src="//unpkg.com/swagger-ui-dist@4.17.0/swagger-ui-standalone-preset.js"></script>
+  <script src="//unpkg.com/swagger-ui-dist@4.17.0/swagger-ui-bundle.js"></script>
+  <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@4.17.0/swagger-ui.css"/>
   <title>Cat Shelter</title>
 </head>
 <body>
