@@ -1,7 +1,6 @@
 import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -22,7 +21,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
-        classpath("com.github.jengelman.gradle.plugins:shadow:_")
+        classpath("gradle.plugin.com.github.johnrengelman:shadow:_")
         classpath("io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_")
     }
 }
@@ -63,8 +62,9 @@ allprojects {
 
         named<JacocoReport>("jacocoTestReport") {
             reports {
-                html.isEnabled = true
-                xml.isEnabled = true
+                html.required.set(true)
+                xml.required.set(true)
+                csv.required.set(false)
             }
         }
 
@@ -195,10 +195,8 @@ subprojects {
     }
 
     sourceSets {
-        named("test") {
-            withConvention(KotlinSourceSet::class) {
-                kotlin.srcDir("$projectDir/src/examples/kotlin")
-            }
+        test {
+            kotlin.srcDir("$projectDir/src/examples/kotlin")
         }
     }
 }
@@ -216,10 +214,10 @@ tasks.register<JacocoReport>("jacocoRootReport") {
     )
 
     reports {
-        html.isEnabled = true
-        xml.isEnabled = true
-        csv.isEnabled = false
-        xml.destination = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+        xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml"))
     }
 }
 
@@ -244,11 +242,9 @@ dependencies {
 fun hasAnArtifact(it: Project) = !it.name.contains("test-function") && !it.name.contains("integration-test")
 
 sourceSets {
-    named("test") {
-        withConvention(KotlinSourceSet::class) {
-            kotlin.srcDir("$projectDir/src/docs")
-            resources.srcDir("$projectDir/src/docs")
-        }
+    test {
+        kotlin.srcDir("$projectDir/src/docs")
+        resources.srcDir("$projectDir/src/docs")
     }
 }
 
