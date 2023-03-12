@@ -5,7 +5,7 @@ description: Recipes for looking up and populating a user principal from a reque
 ### Gradle setup
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.40.0.0"
+implementation group: "org.http4k", name: "http4k-core", version: "4.40.1.0"
 ```
 
 When authorising requests, it is common to need to store some credentials or a user principal object to be accessible by a further Filter or the eventual HttpHandler.
