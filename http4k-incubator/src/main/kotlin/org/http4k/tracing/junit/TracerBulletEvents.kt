@@ -14,6 +14,7 @@ import org.http4k.tracing.TracerBullet
 import org.http4k.tracing.VcrEvents
 import org.http4k.tracing.junit.RecordingMode.Auto
 import org.http4k.tracing.junit.RecordingMode.Manual
+import org.http4k.tracing.junit.RenderingMode.Always
 import org.http4k.tracing.junit.TraceNamer.Companion.TestNameAndMethod
 import org.http4k.tracing.persistence.InMemory
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
@@ -28,8 +29,9 @@ open class TracerBulletEvents(
     private val traceRenderPersistence: TraceRenderPersistence,
     private val traceNamer: TraceNamer = TestNameAndMethod,
     private val tracePersistence: TracePersistence = TracePersistence.InMemory(),
-    private val recordingMode: RecordingMode = Auto
-) : VcrEvents, AfterTestExecutionCallback {
+    private val recordingMode: RecordingMode = Auto,
+    private val renderingMode: RenderingMode = Always,
+    ) : VcrEvents, AfterTestExecutionCallback {
 
     private val tracerBullet = TracerBullet(tracers)
 
@@ -38,7 +40,7 @@ open class TracerBulletEvents(
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
-        if (context.executionException.isEmpty) {
+        if (renderingMode.shouldRender(context)) {
             val traces = tracerBullet(events.toList())
             if(traces.isNotEmpty()) {
                 val traceName = traceNamer(context)

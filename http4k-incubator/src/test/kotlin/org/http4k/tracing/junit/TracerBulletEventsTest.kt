@@ -18,6 +18,7 @@ import org.http4k.tracing.TraceStep
 import org.http4k.tracing.Tracer
 import org.http4k.tracing.junit.RecordingMode.Auto
 import org.http4k.tracing.junit.RecordingMode.Manual
+import org.http4k.tracing.junit.RenderingMode.Always
 import org.http4k.tracing.persistence.InMemory
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -37,6 +38,26 @@ class TracerBulletEventsTest {
         eventsToSend.forEach(AddZipkinTraces().then(events))
 
         events.afterTestExecution(FakeEC())
+
+        val traces = eventsToSend.map(::toTrace)
+        assertThat(
+            traceRenderPersistence.toList(),
+            equalTo(listOf(TraceRender(title, title, traces.toString())))
+        )
+        assertThat(
+            tracePersistence.load().toList(),
+            equalTo(listOf(ScenarioTraces(title, traces)))
+        )
+    }
+
+    @Test
+    fun `write traces on failure`() {
+        val events = tracerBulletEvents(Auto)
+
+        val eventsToSend = listOf(MyEvent, MyOtherEvent, YetAnotherEvent)
+        eventsToSend.forEach(AddZipkinTraces().then(events))
+
+        events.afterTestExecution(FakeEC(true))
 
         val traces = eventsToSend.map(::toTrace)
         assertThat(
@@ -106,7 +127,8 @@ class TracerBulletEventsTest {
         traceRenderPersistence,
         { title },
         tracePersistence,
-        recordingMode
+        recordingMode,
+        Always,
     )
 }
 
@@ -129,8 +151,8 @@ inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
     arrayOf(T::class.java)
 ) { _, m, _ -> TODO(m.name + " not implemented") } as T
 
-private class FakeEC : ExtensionContext by proxy() {
-    override fun getExecutionException() = Optional.empty<Throwable>()
+private class FakeEC(val exception: Boolean = false) : ExtensionContext by proxy() {
+    override fun getExecutionException() = if(exception) Optional.of<Throwable>(Exception()) else Optional.empty<Throwable>()
     override fun getTestMethod() = Optional.of(String::class.java.getMethod("toString"))
 }
 
