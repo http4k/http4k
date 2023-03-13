@@ -34,14 +34,14 @@ fun reverseProxy(vararg hostToHandler: Pair<String, HttpHandler>): HttpHandler =
 fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>) = routes(
     *hostToHandler
         .map { service ->
-            hostHeaderOrUri { it.contains(service.first) } bind service.second
+            hostHeaderOrUri(service.first) { it.contains(service.first) } bind service.second
         }.toTypedArray()
 )
 
-private fun hostHeaderOrUri(fn: (String) -> Boolean) =
+private fun hostHeaderOrUri(host: String, fn: (String) -> Boolean) =
     { req: Request ->
         (req.headerValues("host").firstOrNull() ?: req.uri.authority).let(fn)
-    }.asRouter("Host header matching $fn")
+    }.asRouter("Host or URI: '$host'")
 
 /**
  * Apply routing predicate to a query
