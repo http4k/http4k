@@ -38,16 +38,16 @@ fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>) = route
         }.toTypedArray()
 )
 
-private fun hostHeaderOrUri(predicate: (String) -> Boolean) =
+private fun hostHeaderOrUri(fn: (String) -> Boolean) =
     { req: Request ->
-        (req.headerValues("host").firstOrNull() ?: req.uri.authority).let(predicate)
-    }.asRouter()
+        (req.headerValues("host").firstOrNull() ?: req.uri.authority).let(fn)
+    }.asRouter("Host header matching $fn")
 
 /**
  * Apply routing predicate to a query
  */
-fun query(name: String, predicate: (String) -> Boolean) =
-    { req: Request -> req.queries(name).filterNotNull().any(predicate) }.asRouter()
+fun query(name: String, fn: (String) -> Boolean) =
+    { req: Request -> req.queries(name).filterNotNull().any(fn) }.asRouter("Query $name matching $fn")
 
 /**
  * Apply routing predicate to a query
@@ -57,13 +57,13 @@ fun query(name: String, value: String) = query(name) { it == value }
 /**
  * Ensure all queries are present
  */
-fun queries(vararg names: String) = { req: Request -> names.all { req.query(it) != null } }.asRouter()
+fun queries(vararg names: String) = { req: Request -> names.all { req.query(it) != null } }.asRouter("Queries ${names.toList()}")
 
 /**
  * Apply routing predicate to a header
  */
-fun header(name: String, predicate: (String) -> Boolean) =
-    { req: Request -> req.headerValues(name).filterNotNull().any(predicate) }.asRouter()
+fun header(name: String, fn: (String) -> Boolean) =
+    { req: Request -> req.headerValues(name).filterNotNull().any(fn) }.asRouter("Header $name matching $fn")
 
 /**
  * Apply routing predicate to a header
@@ -73,15 +73,15 @@ fun header(name: String, value: String) = header(name) { it == value }
 /**
  * Ensure all headers are present
  */
-fun headers(vararg names: String) = { req: Request -> names.all { req.header(it) != null } }.asRouter()
+fun headers(vararg names: String) = { req: Request -> names.all { req.header(it) != null } }.asRouter("Headers ${names.toList()}")
 
 /**
  * Ensure body matches predicate
  */
-fun body(predicate: (Body) -> Boolean) = { req: Request -> predicate(req.body) }.asRouter()
+fun body(fn: (Body) -> Boolean) = { req: Request -> fn(req.body) }.asRouter("Body matching $fn")
 
 /**
  * Ensure body string matches predicate
  */
 @JvmName("bodyMatches")
-fun body(predicate: (String) -> Boolean) = { req: Request -> predicate(req.bodyString()) }.asRouter()
+fun body(fn: (String) -> Boolean) = { req: Request -> fn(req.bodyString()) }.asRouter("Body matching $fn")

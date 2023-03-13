@@ -26,4 +26,4 @@ fun <T> Lens<Request, T>.matches(fn: (T) -> Boolean) = { r: Request ->
     } catch (e: LensFailure) {
         false
     }
-}.asRouter()
+}.asRouter("Matching $fn")

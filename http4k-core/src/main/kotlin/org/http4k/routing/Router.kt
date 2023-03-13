@@ -36,7 +36,7 @@ interface Router {
         /**
          * Wildcard for matching all inbound traffic.
          */
-        val orElse = { _: Request -> true }.asRouter()
+        val orElse = { _: Request -> true }.asRouter("*")
     }
 }
 
@@ -170,4 +170,4 @@ internal data class TemplateRouter(
     override val description = RouterDescription("template == '$template'")
 }
 
-val Fallback = { _: Request -> true }.asRouter()
+val Fallback = { _: Request -> true }.asRouter("*")

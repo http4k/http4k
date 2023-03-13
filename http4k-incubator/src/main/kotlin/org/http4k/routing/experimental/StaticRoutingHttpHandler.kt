@@ -11,6 +11,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
 import org.http4k.routing.Router
+import org.http4k.routing.RouterDescription
 import org.http4k.routing.RouterMatch
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
@@ -25,6 +26,8 @@ internal data class StaticRoutingHttpHandler(
     private val resourceLoader: Router,
     private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
+
+    override val description = RouterDescription(pathSegments)
 
     override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))
 

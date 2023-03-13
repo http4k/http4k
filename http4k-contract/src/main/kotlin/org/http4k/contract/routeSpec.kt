@@ -14,7 +14,7 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
 
-    internal fun describe(contractRoot: PathSegments): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
+    internal fun describe(contractRoot: PathSegments) = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
 
     open inner class ContractRequestBuilder(internal val method: Method) {
         fun newRequest(baseUri: Uri = Uri.of("")) = Request(method, "").uri(baseUri.path(describe(Root)))
