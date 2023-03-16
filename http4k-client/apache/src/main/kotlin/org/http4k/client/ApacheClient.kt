@@ -10,12 +10,14 @@ import org.apache.hc.client5.http.classic.methods.HttpTrace
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
 import org.apache.hc.client5.http.config.RequestConfig
 import org.apache.hc.client5.http.cookie.StandardCookieSpec
+import org.apache.hc.client5.http.cookie.StandardCookieSpec.IGNORE
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager
 import org.apache.hc.client5.http.socket.ConnectionSocketFactory
 import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory.INSTANCE
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
 import org.apache.hc.core5.http.ClassicHttpResponse
 import org.apache.hc.core5.http.Header
@@ -120,7 +122,7 @@ object PreCannedApacheHttpClients {
     fun defaultApacheHttpClient(): CloseableHttpClient = HttpClients.custom()
         .setDefaultRequestConfig(RequestConfig.custom()
             .setRedirectsEnabled(false)
-            .setCookieSpec(StandardCookieSpec.IGNORE)
+            .setCookieSpec(IGNORE)
             .build()).build()
 
     /**
@@ -133,7 +135,7 @@ object PreCannedApacheHttpClients {
                 .setConnectionManager(
                     PoolingHttpClientConnectionManager(
                         RegistryBuilder.create<ConnectionSocketFactory>()
-                            .register("http", PlainConnectionSocketFactory.INSTANCE)
+                            .register("http", INSTANCE)
                             .register("https", SSLConnectionSocketFactory(this) { _, _ -> true })
                             .build()
                     ))
