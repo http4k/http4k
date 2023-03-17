@@ -62,7 +62,6 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
     }
 
     @Test
-    @Disabled // uncomment when https://github.com/FasterXML/jackson-dataformat-xml/issues/435 is fixed
     fun `nullable fields are supported - jackson bug`() {
         assertThat(JacksonXml.asA("<NullableListContainerBug/>"), equalTo(NullableListContainerBug(null)))
     }
