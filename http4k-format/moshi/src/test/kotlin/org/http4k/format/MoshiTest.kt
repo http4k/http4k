@@ -9,6 +9,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Moshi.auto
 import org.http4k.format.StrictnessMode.FailOnUnknown
+import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -160,6 +161,16 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
             Moshi.asA(element, ArbObject::class),
             equalTo(obj)
         )
+    }
+
+    @Test
+    fun `custom moshi`() {
+        val moshi = Moshi.custom {
+            text(BiDiMapping({StringHolder(it)},{it.value}))
+        }
+
+        val value = StringHolder("stuff")
+        assertThat(moshi.asFormatString(value), equalTo("\"stuff\""))
     }
 
     override fun strictMarshaller() = object : ConfigurableMoshi

@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.squareup.moshi.Moshi.Builder
 import org.http4k.format.StrictnessMode.FailOnUnknown
+import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -137,4 +138,13 @@ bool:true
         assertThat(MoshiYaml.asFormatString(wrapper), equalTo("on: hello\n"))
     }
 
+    @Test
+    fun `custom moshi yaml`() {
+        val moshi = MoshiYaml.custom {
+            text(BiDiMapping({StringHolder(it)},{it.value}))
+        }
+
+        val value = StringHolder("stuff")
+        assertThat(moshi.asFormatString(value), equalTo("'\"stuff\"'\n"))
+    }
 }

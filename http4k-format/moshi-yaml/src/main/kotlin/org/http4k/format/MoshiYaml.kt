@@ -12,9 +12,8 @@ private fun standardConfig() = Builder()
     .withStandardMappings()
 
 object MoshiYaml : ConfigurableMoshiYaml(standardConfig().done()) {
-    fun update(
-        configureFn: AutoMappingConfiguration<Builder>.() -> AutoMappingConfiguration<Builder>
-    ) = ConfigurableMoshiYaml(standardConfig().let(configureFn).done())
+    fun custom(configureFn: AutoMappingConfiguration<Builder>.() -> AutoMappingConfiguration<Builder>) =
+        ConfigurableMoshiYaml(standardConfig().let(configureFn).done())
 }
 
 /**

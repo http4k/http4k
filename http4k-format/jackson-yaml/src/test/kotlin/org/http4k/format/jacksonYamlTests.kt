@@ -8,6 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.JacksonYaml.auto
+import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 
@@ -179,6 +180,15 @@ bool: true
         assertThat(JacksonYaml.asA(asString), equalTo(wrapper))
     }
 
+    @Test
+    fun `custom jackson yaml`() {
+        val jackson = JacksonYaml.custom {
+            text(BiDiMapping({StringHolder(it)},{it.value}))
+        }
+
+        val value = StringHolder("stuff")
+        assertThat(jackson.asFormatString(value), equalTo("\"stuff\"\n"))
+    }
 
     override fun strictMarshaller() =
         object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}

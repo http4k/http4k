@@ -10,25 +10,19 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.WRITE_DOC_STA
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 
 private fun standardConfig(
-    extraAutoConfig: AutoMappingConfiguration<ObjectMapper>.() -> AutoMappingConfiguration<ObjectMapper>,
-    extraYamlConfig: YAMLFactory.() -> YAMLFactory,
-    extraConfig: ObjectMapper.() -> ObjectMapper
+    configFn: AutoMappingConfiguration<ObjectMapper>.() -> AutoMappingConfiguration<ObjectMapper>,
 ) = KotlinModule.Builder().build()
-    .asConfigurable(ObjectMapper(YAMLFactory().disable(WRITE_DOC_START_MARKER).let(extraYamlConfig)))
+    .asConfigurable(ObjectMapper(YAMLFactory().disable(WRITE_DOC_START_MARKER)))
     .withStandardMappings()
-    .let(extraAutoConfig)
+    .let(configFn)
     .done()
     .deactivateDefaultTyping()
     .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
     .configure(FAIL_ON_IGNORED_PROPERTIES, false)
     .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
     .configure(USE_BIG_INTEGER_FOR_INTS, true)
-    .let(extraConfig)
 
-object JacksonYaml : ConfigurableJacksonYaml(standardConfig({this},{this},{this})) {
-    fun update(
-        extraAutoConfig: AutoMappingConfiguration<ObjectMapper>.() -> AutoMappingConfiguration<ObjectMapper>,
-        extraYamlConfig: YAMLFactory.() -> YAMLFactory = { this },
-        extraConfig: ObjectMapper.() -> ObjectMapper = { this }
-    ) = ConfigurableJacksonYaml(standardConfig(extraAutoConfig, extraYamlConfig, extraConfig))
+object JacksonYaml : ConfigurableJacksonYaml(standardConfig { this }) {
+    fun custom(configFn: AutoMappingConfiguration<ObjectMapper>.() -> AutoMappingConfiguration<ObjectMapper>) =
+        ConfigurableJacksonYaml(standardConfig(configFn))
 }

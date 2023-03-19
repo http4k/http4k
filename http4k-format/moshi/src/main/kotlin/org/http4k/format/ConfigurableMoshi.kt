@@ -121,7 +121,7 @@ open class ConfigurableMoshi(
 }
 
 fun Moshi.Builder.asConfigurable(
-    kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory()
+    kotlinFactory: JsonAdapter.Factory? = null
 ) = object : AutoMappingConfiguration<Moshi.Builder> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, { value(it) }, { nextInt() })
     override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) =
@@ -158,8 +158,9 @@ fun Moshi.Builder.asConfigurable(
         }
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
-    override fun done() =
-        this@asConfigurable.add(kotlinFactory).add(Unit::class.java, UnitAdapter)
+    override fun done() = this@asConfigurable
+        .add(kotlinFactory ?: KotlinJsonAdapterFactory())
+        .add(Unit::class.java, UnitAdapter)
 }
 
 private object UnitAdapter : JsonAdapter<Unit>() {

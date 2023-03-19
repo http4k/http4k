@@ -13,6 +13,7 @@ import org.http4k.format.Jackson.asA
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
+import org.http4k.lens.BiDiMapping
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -166,6 +167,16 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val asString = Jackson.asFormatString(wrapper)
         assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
         assertThat(Jackson.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    fun `custom jackson`() {
+        val jackson = Jackson.custom {
+            text(BiDiMapping({StringHolder(it)},{it.value}))
+        }
+
+        val value = StringHolder("stuff")
+        assertThat(jackson.asFormatString(value), equalTo("\"stuff\""))
     }
 }
 
