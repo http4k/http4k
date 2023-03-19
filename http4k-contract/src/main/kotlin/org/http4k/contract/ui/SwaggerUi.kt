@@ -16,21 +16,19 @@ fun swaggerUi(
     persistAuthorization: Boolean = false,
     queryConfigEnabled: Boolean = false,
     tryItOutEnabled: Boolean = false,
-) = swaggerUiLite(
-    configFn = {
-        this.pageTitle = title
-        this.url = descriptionRoute.toString()
-        this.displayOperationId = displayOperationId
-        this.displayRequestDuration = displayRequestDuration
-        this.requestSnippetsEnabled = requestSnippetsEnabled
-        this.persistAuthorization = persistAuthorization
-        this.queryConfigEnabled = queryConfigEnabled
-        this.tryItOutEnabled = tryItOutEnabled
-        this.deepLinking = true
-        this.layout = "StandaloneLayout"
-        this.presets += "SwaggerUIStandalonePreset"
-    }
-)
+) = swaggerUiLite {
+    this.pageTitle = title
+    this.url = descriptionRoute.toString()
+    this.displayOperationId = displayOperationId
+    this.displayRequestDuration = displayRequestDuration
+    this.requestSnippetsEnabled = requestSnippetsEnabled
+    this.persistAuthorization = persistAuthorization
+    this.queryConfigEnabled = queryConfigEnabled
+    this.tryItOutEnabled = tryItOutEnabled
+    this.deepLinking = true
+    this.layout = "StandaloneLayout"
+    this.presets += "SwaggerUIStandalonePreset"
+}
 
 /**
  * Serve a "lite" Swagger UI, served by a public CDN
