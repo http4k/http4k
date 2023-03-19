@@ -24,6 +24,18 @@ class SwaggerUiTest {
     }
 
     @Test
+    fun `can server swagger initializer`(approver: Approver) {
+        val handler = swaggerUi(
+            Uri.of("/spec"),
+            title = "Cat Shelter",
+            displayOperationId = true,
+            requestSnippetsEnabled = true
+        )
+
+        approver.assertApproved(handler(Request(GET, "swagger-initializer.js")))
+    }
+
+    @Test
     fun `can serve swagger oauth2 redirect`(approver: Approver) {
         val handler = swaggerUi(
             Uri.of("/spec"),

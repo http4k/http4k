@@ -5,7 +5,7 @@ import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v3.OpenApi3
 import org.http4k.contract.security.OpenIdConnectSecurity
-import org.http4k.contract.ui.swaggerUi
+import org.http4k.contract.ui.swaggerUiLite
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
@@ -49,12 +49,12 @@ fun main() {
         security = openIdConnectSecurity
     }
 
-    // Build a Swagger UI based on the OpenApi spec defined at "/spec"
-    val ui = swaggerUi(
-        Uri.of("spec"),
-        title = "Hello Server",
+    // Build a Swagger UI
+    val ui = swaggerUiLite {
+        url = "spec" // Point to your own OpenApi Spec; defaults to the sample PetStore API
+        pageTitle = "Hello Server"
         displayOperationId = true
-    )
+    }
 
     // Combine our api, spec, and ui; then start a server
     // The Swagger UI is available on the root "/" path

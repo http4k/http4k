@@ -10,27 +10,7 @@
   <title>%%PAGE_TITLE%%</title>
 </head>
 <body>
-<div id="swagger-ui"></div>
-<script>
-      window.onload = function() {
-        SwaggerUIBundle({
-          url: "%%DESCRIPTION_ROUTE%%",
-          dom_id: '#swagger-ui',
-          deepLinking: true,
-          displayOperationId: %%DISPLAY_OPERATION_ID%%,
-          displayRequestDuration: %%DISPLAY_REQUEST_DURATION%%,
-          requestSnippetsEnabled: %%REQUEST_SNIPPETS_ENABLED%%,
-          persistAuthorization: %%PERSIST_AUTHORIZATION%%,
-          presets: [
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIStandalonePreset
-          ],
-          layout: "StandaloneLayout",
-          queryConfigEnabled: %%QUERY_CONFIG_ENABLED%%,
-          tryItOutEnabled: %%TRY_IT_OUT_ENABLED%%
-        })
-      }
-
-</script>
+  <div id="%%DOM_ID%%"></div>
+  <script src="swagger-initializer.js"></script>
 </body>
 </html>
