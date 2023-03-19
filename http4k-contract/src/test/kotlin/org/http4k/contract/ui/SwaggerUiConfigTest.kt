@@ -39,30 +39,3 @@ class SwaggerUiConfigTest {
         approver.assertApproved(handler(Request(Method.GET, "swagger-initializer.js")))
     }
 }
-
-/**
- * var pageTitle: String? = null,
- *
- *     // core
- *     var url: String = "https://petstore.swagger.io/v2/swagger.json",
- *     var domId: String = "swagger-ui",
- *     var queryConfigEnabled: Boolean? = null,
- *
- *     // display
- *     var displayOperationId: Boolean? = null,
- *     var displayRequestDuration: Boolean? = null,
- *     var requestSnippetsEnabled: Boolean? = null,
- *     var tryItOutEnabled: Boolean? = null,
- *     var deepLinking: Boolean? = null,
- *
- *     // Network
- *     var oauth2RedirectUrl: String? = null,
- *     var withCredentials: Boolean? = null,
- *
- *     // Authorization
- *     var persistAuthorization: Boolean? = null,
- *
- *     // plugins
- *     var layout: String = "BaseLayout",
- *     var presets: List<String> = listOf("SwaggerUIBundle.presets.apis")
- */
