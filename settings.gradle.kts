@@ -39,7 +39,11 @@ include("http4k-bom")
 
 include("http4k-cloudevents")
 include("http4k-cloudnative")
+
 include("http4k-contract")
+"http4k-contract-ui".apply {
+    includeModule("swagger")
+}
 
 "http4k-format".apply {
     includeModule("core")
