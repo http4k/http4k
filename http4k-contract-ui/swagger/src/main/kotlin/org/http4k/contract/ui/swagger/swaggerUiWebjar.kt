@@ -7,6 +7,9 @@ import org.http4k.routing.ResourceLoader
 import org.http4k.routing.routes
 import org.http4k.routing.static
 
+/**
+ * Serve locally hosted Swagger UI
+ */
 fun swaggerUiWebjar(configFn: SwaggerUiConfig.() -> Unit = {}) = SwaggerUiConfig()
     .also(configFn)
     .toFilter()
