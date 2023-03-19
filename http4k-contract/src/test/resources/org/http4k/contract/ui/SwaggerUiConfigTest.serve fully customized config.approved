@@ -1,0 +1,17 @@
+window.onload = function() {
+    SwaggerUIBundle({
+        url: "foo",
+        dom_id: "#myUI",
+        deepLinking: true,
+        displayOperationId: true,
+        displayRequestDuration: true,
+        requestSnippetsEnabled: true,
+        persistAuthorization: true,
+        presets: [SwaggerUIBundle.presets.apis,customPreset],
+        layout: "myLayout",
+        queryConfigEnabled: true,
+        tryItOutEnabled: true,
+        oauth2RedirectUrl: sendmethere,
+        withCredentials: true
+    })
+}
