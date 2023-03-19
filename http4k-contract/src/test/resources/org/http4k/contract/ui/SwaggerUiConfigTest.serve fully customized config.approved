@@ -1,4 +1,5 @@
 window.onload = function() {
+    document.title = "Swagger UI";
     SwaggerUIBundle({
         url: "foo",
         dom_id: "#myUI",

@@ -57,7 +57,7 @@ fun main() {
     }
 
     // Combine our api, spec, and ui; then start a server
-    // The Swagger UI is available on the root "/" path
+    // The Swagger UI is will be available at http://localhost:8080
     routes(v1Api, ui)
         .asServer(SunHttp(8080))
         .start()

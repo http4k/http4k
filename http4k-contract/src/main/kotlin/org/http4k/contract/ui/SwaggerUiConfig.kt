@@ -4,7 +4,7 @@ import org.http4k.core.Filter
 
 // See https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
 data class SwaggerUiConfig(
-    var pageTitle: String? = null,
+    var pageTitle: String = "Swagger UI",
 
     // core
     var url: String = "https://petstore.swagger.io/v2/swagger.json",
@@ -36,7 +36,7 @@ fun SwaggerUiConfig.toFilter() = Filter { next ->
             resp.body(
                 resp.bodyString()
                     .replace("%%DESCRIPTION_ROUTE%%", url)
-                    .replace("%%PAGE_TITLE%%", pageTitle.toString())
+                    .replace("%%PAGE_TITLE%%", pageTitle)
                     .replace("%%DISPLAY_OPERATION_ID%%", displayOperationId.toString())
                     .replace("%%DISPLAY_REQUEST_DURATION%%", displayRequestDuration.toString())
                     .replace("%%REQUEST_SNIPPETS_ENABLED%%", requestSnippetsEnabled.toString())

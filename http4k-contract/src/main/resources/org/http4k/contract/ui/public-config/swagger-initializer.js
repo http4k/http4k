@@ -1,4 +1,5 @@
 window.onload = function() {
+    document.title = "%%PAGE_TITLE%%";
     SwaggerUIBundle({
         url: "%%DESCRIPTION_ROUTE%%",
         dom_id: "#%%DOM_ID%%",

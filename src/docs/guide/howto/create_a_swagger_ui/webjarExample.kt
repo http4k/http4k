@@ -12,10 +12,8 @@ fun main() {
         displayOperationId = true
     }
 
-    // Combine our api, spec, and ui; then start a server
-    // The Swagger UI is available on the root "/" path
+    // The Swagger UI will be available at http://localhost:8080
     ui
         .asServer(SunHttp(8080))
-        .start()
-        .block()
+        .start().block()
 }
