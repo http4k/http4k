@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.41.0.0 (uncut)
+### v4.41.0.0
 - **http4k-core*** : [Unlikely break] Fix creation of UriTemplate when it starts/ends with multiple slashes. This shouldn't cause any problems that we know about, but we are bumping the breaking version number just in case.
 
 ### v4.40.2.0
