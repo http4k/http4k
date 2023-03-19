@@ -17,7 +17,7 @@ We'll take an existing http4k application built with Gradle, add the bits that a
 We need to add the AWS Lambda Serverless module to our project. Install it into your `build.gradle` file with:
 
 ```groovy
-implementation("org.http4k:http4k-serverless-lambda:4.33.3.0")
+implementation("org.http4k:http4k-serverless-lambda:4.41.0.0")
 ```
 
 #### Step 2
@@ -87,7 +87,7 @@ pulumi destroy --stack dev --yes
 #### Congratulations!
 You have successfully deployed and invoked an http4k Lambda to AWS!
 
-To see a complete example of a similar setup, you can check out the complete [AWS Lambda](https://github.com/http4k/examples/tree/master/aws-lambda) app from the [http4k Examples repo](https://github.com/http4k/examples/)
+To see a complete example of a similar setup, you can check out the complete [AWS Lambda](https://github.com/http4k/examples/tree/master/aws-lambda-http) app from the [http4k Examples repo](https://github.com/http4k/examples/)
 
 **(Ready for more? Let's move on to [deploying a native http4k GraalVM Lambda to AWS](/guide/tutorials/going_native_with_graal_on_aws_lambda))**
 

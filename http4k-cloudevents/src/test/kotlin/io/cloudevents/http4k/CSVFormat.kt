@@ -7,9 +7,10 @@ import io.cloudevents.core.data.BytesCloudEventData
 import io.cloudevents.core.format.EventFormat
 import io.cloudevents.rw.CloudEventDataMapper
 import io.cloudevents.types.Time
+import org.http4k.base64DecodedArray
+import org.http4k.base64Encode
 import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
-import java.util.Base64
 import java.util.Objects
 import java.util.regex.Pattern
 
@@ -24,10 +25,8 @@ class CSVFormat : EventFormat {
         Objects.toString(event.dataSchema),
         Objects.toString(event.subject),
         if (event.time != null) Time.writeTime(event.time) else "null",
-        if (event.data != null) String(
-            Base64.getEncoder().encode(event.data?.toBytes() ?: ByteArray(0)),
-            UTF_8
-        ) else "null"
+        if (event.data != null) event.data?.toBytes()?.base64Encode() ?: ByteArray(0).base64Encode()
+        else "null"
     ).toByteArray()
 
     override fun deserialize(bytes: ByteArray, mapper: CloudEventDataMapper<*>): CloudEvent {
@@ -40,7 +39,7 @@ class CSVFormat : EventFormat {
         val dataschema = if (splitted[5] == "null") null else URI.create(splitted[5])
         val subject = if (splitted[6] == "null") null else splitted[6]
         val time = if (splitted[7] == "null") null else Time.parseTime(splitted[7])
-        val data = if (splitted[8] == "null") null else Base64.getDecoder().decode(splitted[8].toByteArray())
+        val data = if (splitted[8] == "null") null else splitted[8].base64DecodedArray()
         val builder = CloudEventBuilder.fromSpecVersion(sv)
             .withId(id)
             .withType(type)

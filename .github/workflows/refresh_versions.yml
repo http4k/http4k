@@ -14,15 +14,15 @@ jobs:
     steps:
       - id: step-0
         name: check-out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.3.0
         with:
           ref: master
       - id: step-1
         name: setup-java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v3.9.0
         with:
-          java-version: 17
           distribution: adopt
+          java-version: 17
       - id: step-2
         name: create-branch
         uses: peterjgrainger/action-create-branch@v2.2.0

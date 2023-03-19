@@ -28,6 +28,7 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.auto
+import org.http4k.format.json
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Cookies
 import org.http4k.lens.FormField
@@ -43,6 +44,7 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
+import org.http4k.lens.WebForm
 import org.http4k.lens.boolean
 import org.http4k.lens.enum
 import org.http4k.lens.int
@@ -60,7 +62,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(JsonApprovalTest::class)
 abstract class ContractRendererContract<NODE : Any>(
-    private val json: Json<NODE>,
+    open val json: Json<NODE>,
     protected val rendererToUse: ContractRenderer
 ) {
     @Test
@@ -116,7 +118,8 @@ abstract class ContractRendererContract<NODE : Any>(
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += Query.enum<Foo>().optional("e", "enumQuery")
-                queries += json.lens(Query).optional("j", "jsonQuery")
+                queries += Query.enum<Foo>().multi.optional("el", "enumQueryList")
+                queries += json.jsonLens(Query).optional("j", "jsonQuery")
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/cookies" meta {
                 cookies += Cookies.required("b", "requiredCookie")
@@ -127,7 +130,7 @@ abstract class ContractRendererContract<NODE : Any>(
                 headers += Header.string().optional("s", "stringHeader")
                 headers += Header.int().optional("i", "intHeader")
                 headers += Header.enum<HttpMessage, Foo>().optional("e", "enumHeader")
-                headers += json.lens(Header).optional("j", "jsonHeader")
+                headers += json.jsonLens(Header).optional("j", "jsonHeader")
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/body_receiving_string" meta {
                 summary = "body_receiving_string"
@@ -175,6 +178,19 @@ abstract class ContractRendererContract<NODE : Any>(
                     )
                 )
             } bindContract POST to { _ -> Response(OK) }
+            routes += "/callback_with_body" meta {
+                callback("foobar") {
+                    "/doo" meta {
+                        receiving(json.body("json").toLens() to json {
+                            array(obj("aNumberField" to number(123)))
+                        })
+                        returning("normal" to json {
+                            val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
+                            Response(OK).with(body("json").toLens() of obj)
+                        })
+                    } bindCallback POST
+                }
+            } bindContract POST to { _ -> Response(OK) }
             routes += "/body_form" meta {
                 receiving(
                     Body.webForm(
@@ -183,8 +199,20 @@ abstract class ContractRendererContract<NODE : Any>(
                         FormField.int().multi.optional("i", "intField"),
                         FormField.string().optional("s", "stringField"),
                         FormField.enum<Foo>().optional("e", "enumField"),
-                        json.lens(FormField).required("j", "jsonField")
+                        json.jsonLens(FormField).required("j", "jsonField")
                     ).toLens()
+                )
+            } bindContract POST to { _ -> Response(OK) }
+            routes += "/body_form_example" meta {
+                val booleanField = FormField.boolean().required("b", "booleanField")
+                val jsonField = json.jsonLens(FormField).required("j", "jsonField")
+                receiving(
+                    Body.webForm(
+                        Strict,
+                        booleanField,
+                        jsonField
+                    ).toLens() to WebForm().with(booleanField of true,
+                        jsonField of json { obj("foo" to string("bar")) })
                 )
             } bindContract POST to { _ -> Response(OK) }
             routes += "/produces_and_consumes" meta {
@@ -199,7 +227,8 @@ abstract class ContractRendererContract<NODE : Any>(
             routes += "/multipart-fields" meta {
                 val field = MultipartFormField.multi.required("stringField")
                 val pic = MultipartFormFile.required("fileField")
-                receiving(Body.multipartForm(Strict, field, pic).toLens())
+                val json = MultipartFormField.json(json).required("jsonField")
+                receiving(Body.multipartForm(Strict, field, pic, json).toLens())
             } bindContract PUT to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
@@ -208,6 +237,18 @@ abstract class ContractRendererContract<NODE : Any>(
                 receiving(negotiator to "john")
                 returning(OK, negotiator to "john")
             } bindContract POST to { _ -> Response(OK) }
+
+            webhook("foobar") {
+                "/doo" meta {
+                    receiving(json.body("json").toLens() to json {
+                        array(obj("aNumberField" to number(123)))
+                    })
+                    returning("normal" to json {
+                        val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
+                        Response(OK).with(body("json").toLens() of obj)
+                    })
+                } bindWebhook POST
+            }
         }
 
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
@@ -247,10 +288,12 @@ enum class Foo {
     bar, bing
 }
 
-data class ArbObject1(val anotherString: Foo)
+data class ArbObject1(val anotherString: Foo, val listEnum: List<Foo>)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
 data class ArbObject3(val uri: Uri, val additional: Map<String, *>)
 data class ArbObject4(val anotherString: Foo)
+data class ArbObject5(val sub: ArbObject3)
+data class ArbObject6(val foo: Foo)
 
 interface ObjInterface
 data class Impl1(val value: String = "bob") : ObjInterface

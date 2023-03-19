@@ -65,7 +65,7 @@ fun main() {
             Argo,
             servers = listOf(ApiServer(Uri.of("http://localhost:8000"), "the greatest server"))
         )
-        descriptionPath = "/docs/swagger.json"
+        descriptionPath = "/docs/openapi.json"
         security = mySecurity
 
         routes += "/ping" meta {
@@ -116,5 +116,5 @@ fun main() {
 // Echo (fail):             curl -v "http://localhost:8000/context/echo/myName?age=notANumber&apiKey=42"
 // API Key enforcement:     curl -v "http://localhost:8000/context/add/123/564?apiKey=444"
 // Static content:          curl -v "http://localhost:8000/static/someStaticFile.txt"
-// OpenApi/Swagger documentation:   curl -v "http://localhost:8000/context/docs/swagger.json"
+// OpenApi/Swagger documentation:   curl -v "http://localhost:8000/context/docs/openapi.json"
 // Echo endpoint (at root): curl -v "http://localhost:8000/echo/hello?age=123"

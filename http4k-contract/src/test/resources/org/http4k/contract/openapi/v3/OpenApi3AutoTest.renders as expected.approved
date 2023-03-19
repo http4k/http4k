@@ -120,7 +120,7 @@
                     "description": "enumField"
                   },
                   "j": {
-                    "type": "string",
+                    "type": "object",
                     "description": "jsonField"
                   }
                 },
@@ -142,6 +142,50 @@
           }
         ],
         "operationId": "postBasepathBody_form",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_form_example": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "b": {
+                    "type": "boolean",
+                    "description": "booleanField"
+                  },
+                  "j": {
+                    "type": "object",
+                    "description": "jsonField"
+                  }
+                },
+                "required": [
+                  "b",
+                  "j"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_form_example",
         "deprecated": false
       }
     },
@@ -398,6 +442,72 @@
         "deprecated": false
       }
     },
+    "/basepath/callback_with_body": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathCallback_with_body",
+        "deprecated": false,
+        "callbacks": {
+          "foobar": {
+            "/doo": {
+              "post": {
+                "summary": "<unknown>",
+                "parameters": [
+                ],
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "example": [
+                        {
+                          "aNumberField": 123
+                        }
+                      ],
+                      "schema": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/object1089648089"
+                        }
+                      }
+                    }
+                  },
+                  "required": true
+                },
+                "responses": {
+                  "200": {
+                    "description": "normal",
+                    "content": {
+                      "application/json": {
+                        "example": {
+                          "aNullField": null,
+                          "aNumberField": 123
+                        },
+                        "schema": {
+                          "$ref": "#/components/schemas/object1089648089"
+                        }
+                      }
+                    }
+                  }
+                },
+                "deprecated": false
+              }
+            }
+          }
+        }
+      }
+    },
     "/basepath/cookies": {
       "post": {
         "summary": "<unknown>",
@@ -502,13 +612,13 @@
             }
           },
           {
-            "schema": {
-              "type": "string"
-            },
             "in": "header",
             "name": "j",
             "required": false,
-            "description": "jsonHeader"
+            "description": "jsonHeader",
+            "schema": {
+              "$ref": "#/components/schemas/object1955914966"
+            }
           }
         ],
         "responses": {
@@ -546,11 +656,15 @@
                   "fileField": {
                     "type": "string",
                     "format": "binary"
+                  },
+                  "jsonField": {
+                    "type": "object"
                   }
                 },
                 "required": [
                   "stringField",
-                  "fileField"
+                  "fileField",
+                  "jsonField"
                 ]
               }
             }
@@ -746,12 +860,29 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "example": "bar",
+                "enum": [
+                  "bar",
+                  "bing"
+                ],
+                "type": "string"
+              }
             },
+            "in": "query",
+            "name": "el",
+            "required": false,
+            "description": "enumQueryList"
+          },
+          {
             "in": "query",
             "name": "j",
             "required": false,
-            "description": "jsonQuery"
+            "description": "jsonQuery",
+            "schema": {
+              "$ref": "#/components/schemas/object1955914966"
+            }
           }
         ],
         "responses": {
@@ -800,6 +931,50 @@
       }
     }
   },
+  "webhooks": {
+    "foobar": {
+      "post": {
+        "summary": "<unknown>",
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": [
+                {
+                  "aNumberField": 123
+                }
+              ],
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/object1089648089"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "normal",
+            "content": {
+              "application/json": {
+                "example": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object1089648089"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
   "components": {
     "schemas": {
       "Foo": {
@@ -809,6 +984,13 @@
           "bing"
         ],
         "type": "string"
+      },
+      "object1955914966": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+        }
       },
       "object1089648089": {
         "type": "object",

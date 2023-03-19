@@ -23,11 +23,7 @@
                 "value1": "value",
                 "1970-01-01": "value"
               },
-              "type": "object",
-              "required": [
-                "1970-01-01",
-                "value1"
-              ]
+              "type": "object"
             },
             "type": "object"
           }

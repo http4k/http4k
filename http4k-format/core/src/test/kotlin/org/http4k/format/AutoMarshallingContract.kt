@@ -7,9 +7,14 @@ import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.core.with
+import org.http4k.lens.Query
 import org.http4k.lens.StringBiDiMappings
+import org.http4k.lens.string
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -75,6 +80,8 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val expectedAutoMarshallingResultPrimitives: String
     protected abstract val expectedWrappedMap: String
     protected abstract val expectedMap: String
+    protected abstract val expectedArbitraryMap: String
+    protected abstract val expectedAbitraryArray: String
     protected abstract val expectedConvertToInputStream: String
     protected abstract val expectedThrowable: String
     protected abstract val inputUnknownValue: String
@@ -152,6 +159,34 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
+    open fun `roundtrip arbitrary map`() {
+        val wrapper = mapOf(
+            "str" to "val1",
+            "num" to 123.1,
+            "array" to listOf(1.1,"stuff"),
+            "map" to mapOf("foo" to "bar"),
+            "bool" to true
+        )
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryMap))
+        assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    open fun `roundtrip arbitrary array`() {
+        val wrapper = listOf(
+            "foo",
+            123.1,
+            mapOf("foo" to "bar"),
+            listOf(1.1,2.1),
+            true
+        )
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
     open fun `roundtrip wrapped map`() {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
         assertThat(marshaller.asFormatString(wrapper).normaliseJson(), equalTo(expectedWrappedMap.normaliseJson()))
@@ -225,6 +260,20 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     open fun `does not fail decoding when unknown value is encountered`() {
+        assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
+    }
+
+    @Test
+    fun `marshall a lens to a type`() {
+        val o = StringHolder("foo")
+        val request = Request(GET, "").query("foo", marshaller.asFormatString(o))
+        val lens = marshaller.autoLens<Request, StringHolder>(Query.string()).required("foo")
+        val extracted = lens(request)
+        assertThat(Request(GET, "").with(lens of extracted), equalTo(request))
+    }
+
+    @Test
+    open fun `auto marshall any lens`() {
         assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
     }
 

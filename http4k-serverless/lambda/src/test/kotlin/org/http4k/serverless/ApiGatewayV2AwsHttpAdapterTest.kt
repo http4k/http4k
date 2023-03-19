@@ -19,7 +19,6 @@ import org.http4k.hamkrest.hasMethod
 import org.http4k.hamkrest.hasUri
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
-import java.util.Base64
 
 class ApiGatewayV2AwsHttpAdapterTest {
 
@@ -53,7 +52,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
 
         val request = mapOf(
             "rawPath" to "/",
-            "body" to String(Base64.getEncoder().encode(imageBytes)),
+            "body" to imageBytes.base64Encode(),
             "isBase64Encoded" to true,
             "requestContext" to mapOf("http" to mapOf("method" to "POST"))
         )

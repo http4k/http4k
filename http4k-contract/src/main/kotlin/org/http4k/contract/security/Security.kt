@@ -11,6 +11,10 @@ import org.http4k.core.then
  */
 interface Security {
     val filter: Filter
+
+    companion object {
+        val None: Security? = null
+    }
 }
 
 fun Security.and(that: Security): Security = when (this) {

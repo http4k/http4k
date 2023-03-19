@@ -25,7 +25,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
-import org.http4k.lens.Header
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.StopMode.Immediate
@@ -34,14 +34,14 @@ import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMode) : ServerConfig {
-    constructor(port: Int = 8000): this(port, Immediate)
+    constructor(port: Int = 8000) : this(port, Immediate)
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine = embeddedServer(Netty, port) {
             install(createApplicationPlugin(name = "http4k") {
                 onCall {
                     withContext(Default) {
-                        it.response.fromHttp4K(http(it.request.asHttp4k()))
+                        it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(NOT_IMPLEMENTED))
                     }
                 }
             })
@@ -52,7 +52,7 @@ class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMo
         }
 
         override fun stop() = apply {
-            when(stopMode){
+            when (stopMode) {
                 is Immediate -> engine.stop(0, 0, MILLISECONDS)
                 is Graceful -> engine.stop(stopMode.timeout.toMillis(), stopMode.timeout.toMillis(), MILLISECONDS)
             }
@@ -62,10 +62,12 @@ class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMo
     }
 }
 
-fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
-    .headers(headers.toHttp4kHeaders())
-    .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
-    .source(RequestSource(origin.remoteHost)) // origin.remotePort does not exist for Ktor
+fun ApplicationRequest.asHttp4k() = Method.supportedOrNull(httpMethod.value)?.let {
+    Request(it, uri)
+        .headers(headers.toHttp4kHeaders())
+        .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
+        .source(RequestSource(origin.remoteHost)) // origin.remotePort does not exist for Ktor
+}
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))

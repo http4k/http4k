@@ -9,5 +9,6 @@ out/
 store/
 intellij-settings/
 **/*.actual
+**/generated/**
 local.properties
 local.properties.bak

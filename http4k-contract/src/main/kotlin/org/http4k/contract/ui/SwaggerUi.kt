@@ -20,6 +20,8 @@ fun swaggerUi(
     displayRequestDuration: Boolean = false,
     requestSnippetsEnabled: Boolean = false,
     persistAuthorization: Boolean = false,
+    queryConfigEnabled: Boolean = false,
+    tryItOutEnabled: Boolean = false
 ): RoutingHttpHandler = Filter { next ->
     { req ->
         next(req).let { resp ->
@@ -31,6 +33,8 @@ fun swaggerUi(
                     .replace("%%DISPLAY_REQUEST_DURATION%%", displayRequestDuration.toString())
                     .replace("%%REQUEST_SNIPPETS_ENABLED%%", requestSnippetsEnabled.toString())
                     .replace("%%PERSIST_AUTHORIZATION%%", persistAuthorization.toString())
+                    .replace("%%QUERY_CONFIG_ENABLED%%", queryConfigEnabled.toString())
+                    .replace("%%TRY_IT_OUT_ENABLED%%", tryItOutEnabled.toString())
             ).with(Header.CONTENT_TYPE of ContentType.TEXT_HTML)
         }
     }

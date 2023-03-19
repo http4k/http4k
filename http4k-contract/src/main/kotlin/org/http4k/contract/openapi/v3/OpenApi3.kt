@@ -8,12 +8,15 @@ import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
 import org.http4k.contract.RouteMeta
 import org.http4k.contract.Tag
+import org.http4k.contract.WebCallback
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
+import org.http4k.contract.openapi.OpenApiVersion
+import org.http4k.contract.openapi.OpenApiVersion._3_0_0
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.contract.openapi.operationId
+import org.http4k.contract.openapi.v2.value
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -35,13 +38,17 @@ import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.Meta
+import org.http4k.lens.MultipartForm
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
+import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.lens.WebForm
 import org.http4k.util.JsonSchema
-import java.util.Locale
+import java.util.*
 
 /**
  * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of
@@ -57,7 +64,8 @@ class OpenApi3<NODE : Any>(
     // then you want to use ApiRenderer.Auto() instead with a compatible JSON instance
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json),
-    private val servers: List<ApiServer> = emptyList()
+    private val servers: List<ApiServer> = emptyList(),
+    private val version: OpenApiVersion = _3_0_0
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
@@ -66,27 +74,44 @@ class OpenApi3<NODE : Any>(
         json: AutoMarshallingJson<NODE>,
         extensions: List<OpenApiExtension> = emptyList(),
         servers: List<ApiServer> = emptyList(),
-    ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json), servers = servers)
+        version: OpenApiVersion = _3_0_0
+    ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json), servers = servers, version = version)
 
-    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>, tags: Set<Tag>): Response {
+    override fun description(
+        contractRoot: PathSegments,
+        security: Security?,
+        routes: List<ContractRoute>,
+        tags: Set<Tag>,
+        webhooks: Map<String, List<WebCallback>>
+    ): Response {
         val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         val unextended = apiRenderer.api(
             Api(
                 apiInfo,
-                (routes.map(ContractRoute::tags).flatten() + tags).toSet() .sortedBy { it.name },
+                (routes.map(ContractRoute::tags).flatten() + tags).toSet().sortedBy { it.name },
                 paths
                     .groupBy { it.path }
                     .mapValues {
-                        it.value.map { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }.toMap().toSortedMap()
+                        it.value.associate { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }
+                            .toSortedMap()
                     }
                     .toSortedMap(),
                 Components(
                     json.obj(paths.flatMap { it.pathSpec.definitions() }),
                     json(allSecurities.filterNotNull().combineFull())
                 ),
-                servers
+                servers,
+                webhooks.takeIf { it.isNotEmpty() }
+                    ?.mapValues { (_, webhooks) ->
+                        webhooks.associate {
+                            it.method.name.lowercase() to it.meta.apiPath(
+                                it.method,
+                                it.meta.requestParams.map { it.meta })
+                        }
+                    },
+                version.toString()
             )
         )
 
@@ -97,37 +122,60 @@ class OpenApi3<NODE : Any>(
     private fun ContractRoute.asPath(contractSecurity: Security?, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method, apiPath(contractRoot, contractSecurity))
 
-    private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security?): ApiPath<NODE> {
-        val tags = if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
+    private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security?) =
+        meta.apiPath(
+            method,
+            nonBodyParams,
+            operationId(contractRoot),
+            json(listOfNotNull(meta.security ?: contractSecurity).combineRef()),
+            if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
+        )
 
-        val security = json(listOfNotNull(meta.security ?: contractSecurity).combineRef())
-        val body = meta.requestBody()?.takeIf { it.required }
+    private fun RouteMeta.apiPath(
+        method: Method,
+        nonBodyParams: List<Meta>,
+        operationId: String? = null,
+        security: NODE? = null,
+        tags: List<String>? = null
+    ): ApiPath<NODE> {
+        val body = requestBody()?.takeIf { it.required }
 
         return if (method in setOf(GET, HEAD) || body == null) {
             ApiPath.NoBody(
-                meta.summary,
-                meta.description,
+                summary,
+                description,
                 tags,
-                asOpenApiParameters(),
-                meta.responses(),
+                nonBodyParams.map(::requestParameter),
+                responses(),
                 security,
-                operationId(contractRoot),
-                meta.deprecated
+                operationId,
+                deprecated,
+                callbacksAsApiPaths(),
             )
         } else {
             ApiPath.WithBody(
-                meta.summary,
-                meta.description,
+                summary,
+                description,
                 tags,
-                asOpenApiParameters(),
+                nonBodyParams.map(::requestParameter),
                 body,
-                meta.responses(),
+                responses(),
                 security,
-                operationId(contractRoot),
-                meta.deprecated
+                operationId,
+                deprecated,
+                callbacksAsApiPaths()
             )
         }
     }
+
+    private fun RouteMeta.callbacksAsApiPaths() =
+        callbacks?.mapValues { (_, callbackRoutes) ->
+            callbackRoutes.mapValues { (_, rcb) ->
+                mapOf(
+                    rcb.method.name.lowercase() to rcb.meta.apiPath(rcb.method, rcb.meta.requestParams.map { it.meta })
+                )
+            }
+        }
 
     private fun RouteMeta.responses() = responses
         .groupBy { it.message.status.code.toString() }
@@ -149,39 +197,68 @@ class OpenApi3<NODE : Any>(
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
         .toMap()
 
-    private fun ContractRoute.asOpenApiParameters(): List<RequestParameter<NODE>> = nonBodyParams.map {
-        when (val paramMeta: ParamMeta = it.paramMeta) {
-            ObjectParam -> SchemaParameter(it, "{}".toSchema())
-            FileParam -> PrimitiveParameter(it, json {
-                obj("type" to string(FileParam.value), "format" to string("binary"))
-            })
-            is ArrayParam -> PrimitiveParameter(it, json {
-                obj(
-                    "type" to string("array"),
-                    "items" to obj("type" to string(paramMeta.itemType().value))
-                )
-            })
-            is ParamMeta.EnumParam<*> -> SchemaParameter(it, apiRenderer.toSchema(
+    private fun requestParameter(it: Meta) = when (val paramMeta: ParamMeta = it.paramMeta) {
+        ObjectParam -> SchemaParameter(it, "{}".toSchema())
+        FileParam -> PrimitiveParameter(it, json {
+            obj("type" to string(FileParam.value), "format" to string("binary"))
+        })
+
+        is ArrayParam -> PrimitiveParameter(it, json {
+            val itemType = paramMeta.itemType()
+            obj(
+                "type" to string("array"),
+                "items" to when (itemType) {
+                    is EnumParam<*> -> apiRenderer.toSchema(
+                        itemType.clz.java.enumConstants[0],
+                        it.name,
+                        null
+                    ).definitions.first().second
+
+                    else -> obj("type" to string(itemType.value))
+                }
+            )
+        })
+
+        is EnumParam<*> -> SchemaParameter(
+            it, apiRenderer.toSchema(
                 paramMeta.clz.java.enumConstants[0],
                 it.name,
                 null
-            ))
-            else -> PrimitiveParameter(it, json {
-                obj("type" to string(paramMeta.value))
-            })
-        }
+            )
+        )
+
+        else -> PrimitiveParameter(it, json {
+            obj("type" to string(paramMeta.value))
+        })
     }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
 
-        val withSchema = requests.mapNotNull {
-            with(CONTENT_TYPE(it.message)) {
-                when (this) {
-                    APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
-                        (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
+        val withSchema = requests.mapNotNull { req ->
+            with(CONTENT_TYPE(req.message)) {
+                when (this?.withNoDirectives()) {
+                    APPLICATION_FORM_URLENCODED.withNoDirectives() -> value to
+                        (body?.metas?.let {
+                            FormContent(FormSchema(
+                                it.associateWith {
+                                    (req.example as? WebForm)?.let { form -> form.fields[it.name] }
+                                }
+                            ))
+                        } ?: SchemaContent("".toSchema(), null))
+
+                    MULTIPART_FORM_DATA.withNoDirectives() -> value to
+                        (body?.metas?.let {
+                            FormContent(FormSchema(
+                                it.associateWith {
+                                    (req.example as? MultipartForm)
+                                        ?.let { form -> form.fields[it.name]?.map { it.value } }
+                                }
+                            ))
+                        } ?: SchemaContent("".toSchema(), null))
+
                     null -> null
-                    else -> value to it.toSchemaContent()
+                    else -> value to req.toSchemaContent()
                 }
             }
         }

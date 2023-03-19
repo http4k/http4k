@@ -28,10 +28,7 @@
                   "uri": "foobar"
                 }
               },
-              "type": "object",
-              "required": [
-                "inner"
-              ]
+              "type": "object"
             },
             "type": "object"
           }
@@ -45,12 +42,7 @@
             }
           }
         },
-        "type": "object",
-        "required": [
-          "key",
-          "key2",
-          "key3"
-        ]
+        "type": "object"
       }
     },
     {

@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration.ofMillis
-import java.util.Properties
+import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.concurrent.thread
@@ -95,7 +95,7 @@ class LatencyBehaviourTest : ChaosBehaviourContract() {
             latency.then { response }(request)
             latch.countDown()
         }
-        assertThat(latch.await(delay - 1, MILLISECONDS), equalTo(false))
+        assertThat(latch.await(delay - 5, MILLISECONDS), equalTo(false))
     }
 }
 

@@ -3,6 +3,103 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.41.0.0
+- **http4k-core*** : [Unlikely break] Fix creation of UriTemplate when it starts/ends with multiple slashes. This shouldn't cause any problems that we know about, but we are bumping the breaking version number just in case.
+
+### v4.40.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-client-apache*** : Fix #866 - ApacheClient does not handle SocketException.
+
+### v4.40.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-incubator** : TracerBullet now renders results of tests by default. Use `RenderingMode` to switch off this default behaviour.
+
+### v4.40.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-moshi-yaml** : [Possible clash/break] Upgrade to v2.0 of SnakeYaml (CVE fixes etc) may break dependencies which previously used v1.3X.X. It is safe to pin your SnakeYaml version to 1.3X.X if there is a clash with other libraries in your stack.
+
+### v4.39.0.0
+- **http4k-contract** : [Breaking] Support for HTTP webhooks and callbacks in OpenApi3 models. Note that the Swagger UIs do not support OA 3.1.0 yet so we have limited the OA version number to 3.0.0.
+
+### v4.38.0.1
+- **http4k-core** : [Fix] Header parsing to split correctly.
+
+### v4.38.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.8.10.
+- **http4k-core** : [Unlikely break] Header values now trim leading space (as per RFC)
+- **http4k-incubator**: Added D2 support for tracing diagrams.
+- **http4k-testing-approval**: Make tests line-ending-agnostic. H/T @oharaandrew314
+- **http4k-format-*** : Various tweaks to modules to standardise behaviour. H/T @oharaandrew314
+
+### v4.37.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.8.0.
+- **http4k-core** : [Fix] #846 - Status.hashCode is inconsistent with Status.equals.
+- **http4k-contract** : Add new endpoint security type: `OpenIdConnectSecurity`.  H/T @oharaandrew314
+- **http4k-contract** : `swaggerUi` now supports Oauth2 redirects.  H/T @oharaandrew314
+
+### v4.36.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-multipart** : Add lensing of Multipart form fields using JSON and Automarshalling
+- **http4k-server-jetty** : Add support for serving SSE. H/T @FredNordin
+- **http4k-contract** : [Breaking Fix] Fix #842 - Map OpenAPI implementation adds all properties as required H/T @BBB
+
+### v4.35.4.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Allow access-control-max-age header to be set from cors policy. H/T @moddular
+- **http4k-contract** : [Fix] Or security renderer was not rendering properly when the component parts are themselves composite securities.
+
+### v4.35.3.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-incubator**: Trace diagram improvements for PUML, Mermaid and Markdown.
+
+### v4.35.2.0
+- **http4k-incubator** : More diagram tweaking.
+
+### v4.35.1.0
+- **http4k-incubator** : Tweak of some diagramming.
+
+### v4.35.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-failsafe** : [New Module Alert!] Failsafe is a lightweight, zero-dependency library for handling failures. H/T @FredNordin
+- **http4k-incubator** : [Breaking] Rewrite of infrastructure for generating tracing diagrams, including new interfaces and support for rendering to various formats. Initial support for PUML and Mermaid.
+
+### v4.34.4.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-undertow** : Remove extra dependencies which aren't needed.
+- **http4k-contract**: fix Path value resolution it starts with same string as the prefix URL segment. H/T @tkint 
+
+### v4.34.3.1
+- **http4k-*** : Fix #827 - Requests with unknown HTTP method result in uncaught exceptions
+
+### v4.34.3.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Support for arrays of enums in OA3.
+
+### v4.34.2.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.34.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-template-rocker** : New module! Compile-time templating with Rocker!
+
+### v4.34.0.4
+- **http4k-contract-** : Fix errant import which broke multipart Openapi V3 spec.
+
+### v4.34.0.3
+- **http4k-format-*** : Remove `Json` extension method on `MultipartFormField.Companion` due to problem in JUnit. Re-re-fix.
+
+### v4.34.0.2
+- **http4k-format-*** : Remove `Json` extension method on `MultipartFormField.Companion` due to problem in JUnit. Refix.
+
+### v4.34.0.1
+- **http4k-format-*** : Remove `Json` extension method on `MultipartFormField.Companion` due to problem in JUnit.
+
+### v4.34.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.7.21.
+- **http4k-format-*** : Added `auto()` methods to arbitrary lenses (so Query, Header, FormField etc..)
+- **http4k-core** : [Unlikely break] `reverseProxy()` now takes the authority into account instead of just the hostname from the request. This should only impact you if you are doing reverse proxy operational on client side and using localhost without a port as a proxy. To fix - simply add the port to your proxying setup and all should be good.
+- **http4k-contract*** : Fix: Remove duplicate content type header.
+
 ### v4.33.3.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-server-ktor*** : Fix: Remove duplicate content type header.

@@ -1,0 +1,18 @@
+{
+  "first": {
+    "scheme": "basic",
+    "type": "http"
+  },
+  "second": {
+    "scheme": "basic",
+    "type": "http"
+  },
+  "third": {
+    "scheme": "basic",
+    "type": "http"
+  },
+  "fourth": {
+    "scheme": "basic",
+    "type": "http"
+  }
+}

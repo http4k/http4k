@@ -26,6 +26,9 @@ class NamedResourceApprover(private val name: String,
                             private val approvalContent: ApprovalContent,
                             private val approvalSource: ApprovalSource) : Approver {
 
+    private val matchAllLineEndings = "\\r\\n?".toRegex()
+    private fun String.normalizeLineEndings() = replace(matchAllLineEndings, "\n")
+
     override fun <T : HttpMessage> assertApproved(httpMessage: T) {
         val approved = approvalSource.approvedFor(name)
 
@@ -40,7 +43,10 @@ class NamedResourceApprover(private val name: String,
                     }
                 }
                 else -> try {
-                    assertEquals(approvalContent(this).reader().use { it.readText() }, approvalContent(httpMessage).reader().readText())
+                    assertEquals(
+                        approvalContent(this).reader().use { it.readText().normalizeLineEndings() },
+                        approvalContent(httpMessage).reader().readText().normalizeLineEndings()
+                    )
                     actual.output()
                 } catch (e: AssertionError) {
                     approvalContent(httpMessage).copyTo(actual.output())

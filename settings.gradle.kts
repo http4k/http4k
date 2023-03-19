@@ -15,7 +15,7 @@ refreshVersions {
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")
-    project(":$projectName").projectDir = File("$this/${name.replace(':','/')}")
+    project(":$projectName").projectDir = File("$this/${name.replace(':', '/')}")
 }
 
 fun includeWithDirectory(projectName: String, name: String) {
@@ -61,6 +61,7 @@ include("http4k-incubator")
 include("http4k-jsonrpc")
 include("http4k-metrics-micrometer")
 include("http4k-multipart")
+include("http4k-failsafe")
 include("http4k-resilience4j")
 include("http4k-opentelemetry")
 include("http4k-realtime-core")
@@ -101,6 +102,7 @@ include("http4k-realtime-core")
     includeModule("dust")
     includeModule("freemarker")
     includeModule("handlebars")
+    includeModule("rocker")
     includeModule("pebble")
     includeModule("thymeleaf")
     includeModule("jade4j")

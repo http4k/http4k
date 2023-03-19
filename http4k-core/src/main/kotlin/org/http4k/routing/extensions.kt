@@ -3,6 +3,7 @@ package org.http4k.routing
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
@@ -10,9 +11,10 @@ import org.http4k.routing.RouterMatch.Unmatched
 /**
  * Convert any predicate on a request into a router
  */
-fun ((Request) -> Boolean).asRouter(): Router = object : Router {
+fun ((Request) -> Boolean).asRouter(description: String = unavailable.description): Router = object : Router {
+    override val description = RouterDescription(description)
     override fun match(request: Request): RouterMatch =
-        if (this@asRouter(request)) MatchedWithoutHandler(description) else Unmatched(description)
+        if (this@asRouter(request)) MatchedWithoutHandler(this.description) else Unmatched(this.description)
 }
 
 fun Request.path(name: String): String? = when (this) {

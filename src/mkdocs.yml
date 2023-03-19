@@ -2,7 +2,7 @@ site_name: http4k
 site_url: https://www.http4k.org/
 site_description: The Functional toolkit for Kotlin HTTP applications
 site_author: David Denton (@daviddenton), Ivan Sanchez (@s4nchez)
-copyright: 'Copyright &copy; 2022 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
+copyright: 'Copyright &copy; 2023 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
 remote_branch: master
 repo_url: https://github.com/http4k/http4k/
 theme:
@@ -70,7 +70,7 @@ nav:
     - Use a templating engines: guide/howto/use_a_templating_engine/index.md
     - Use HTML forms: guide/howto/use_html_forms/index.md
     - Use Multipart forms: guide/howto/use_multipart_forms/index.md
-    - Create a Distributed Tracing tree: guide/howto/create_a_distributed_tracing_tree/index.md
+    - Self document systems with tests: guide/howto/self_document_systems_with_tests/index.md
     - Use Auto Content Negotiation: guide/howto/use_auto_content_negotiation/index.md
     - Create a Swagger UI: guide/howto/create_a_swagger_ui/index.md
     - Use Moshi with "lite" Reflection: guide/howto/moshi_lite/index.md
@@ -89,7 +89,9 @@ nav:
     - Cloud Events: guide/reference/cloud_events/index.md
     - Micrometer: guide/reference/micrometer/index.md
     - OpenTelemetry: guide/reference/opentelemetry/index.md
-    - Resilience4J: guide/reference/resilience4j/index.md
+    - Fault Tolerance:
+      - Resilience4J: guide/reference/resilience4j/index.md
+      - Failsafe: guide/reference/failsafe/index.md
     - AWS: guide/reference/aws/index.md
     - OAuth: guide/reference/oauth/index.md
     - GraphQL: guide/reference/graphql/index.md
@@ -123,3 +125,4 @@ nav:
   - Getting support: support/index.md
   - Contribute/support http4k: contributing/index.md
   - Code of Conduct: code-of-conduct/index.md
+

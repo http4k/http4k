@@ -34,7 +34,8 @@ data class CorsPolicy(
     val headers: List<String>,
     val methods: List<Method>,
     val credentials: Boolean = false,
-    val exposedHeaders: List<String> = emptyList()
+    val exposedHeaders: List<String> = emptyList(),
+    val maxAge: Int? = null
 ) {
     companion object {
         val UnsafeGlobalPermissive =
@@ -71,7 +72,8 @@ object ServerFilters {
                         res.takeIf { policy.exposedHeaders.isNotEmpty() }
                             ?.header("access-control-expose-headers", policy.exposedHeaders.joined())
                             ?: res
-                    }
+                    },
+                    { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res }
                 )
             }
         }
@@ -289,7 +291,7 @@ object ServerFilters {
 
     /**
      * Basic GZip and Gunzip support of Request/Response.
-     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
     object GZip {
@@ -299,7 +301,7 @@ object ServerFilters {
 
     /**
      * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list.
-     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
      */
     class GZipContentTypes(

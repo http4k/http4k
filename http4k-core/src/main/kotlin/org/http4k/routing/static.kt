@@ -26,6 +26,8 @@ internal data class StaticRoutingHttpHandler(
     private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
 
+    override val description = RouterDescription("Static files $pathSegments")
+
     override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))
 
     override fun withBasePath(new: String): RoutingHttpHandler = copy(pathSegments = new + pathSegments)

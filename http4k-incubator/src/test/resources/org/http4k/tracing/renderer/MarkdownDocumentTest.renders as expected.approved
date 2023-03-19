@@ -1,0 +1,93 @@
+# foobar
+
+## foobar - Maximum Trace Depth
+
+| Origin | Target | Request |  Max Depth  |
+|:------:|:------:|:-------:|:-----------:|
+|	user 1	|	system.b	|	init 1 req	|	3	|
+|	user 2	|	system/d	|	init 2 req	|	2	|
+
+
+## foobar - Trace Step Counts
+
+| Origin | Target | Request |  Steps  |
+|:------:|:------:|:-------:|:-------:|
+|	user 1	|	system.b	|	init 1 req	|	5	|
+|	user 2	|	system/d	|	init 2 req	|	2	|
+
+```mermaid
+sequenceDiagram
+    title foobar - Sequence
+    actor user 1
+	actor user 2
+	participant system_b
+	participant system_c
+	participant system_d
+	participant events
+	participant db
+	participant external
+
+    user 1->>system_b: init 1 req
+    activate system_b
+    
+    user 1-)events: event a
+    
+    
+	
+    system_b->>system_c: b-to-c req
+    activate system_c
+    
+    system_b->>db: bidi-b req-resp
+    
+    db->>system_b: 
+    
+	
+    system_c->>external: c-to-external req
+    activate external
+    
+    external->>system_c: c-to-external resp
+    deactivate external
+    
+    system_c->>system_b: b-to-c resp
+    deactivate system_c
+    
+    system_b->>user 1: init 2 resp
+    deactivate system_b
+    
+	
+    user 2->>system_d: init 2 req
+    activate system_d
+    
+    system_d-)events: event d
+    
+    
+    system_d->>user 2: init 2 resp
+    deactivate system_d
+    
+```
+
+```mermaid
+C4Context
+title foobar
+
+Person(user1, "user 1")
+Person(user2, "user 2")
+System(systemb, "system.b")
+System(systemc, "system-c")
+System(systemd, "system/d")
+System(events, "events")
+ContainerDb(db, "db")
+System(external, "external")    
+Rel_D(user1, systemb, " ") 
+Rel_D(user1, events, " ") 
+Rel_D(systemb, systemc, " ") 
+Rel_D(systemb, db, " ") 
+Rel_D(systemc, external, " ") 
+Rel_D(user2, systemd, " ") 
+Rel_D(systemd, events, " ")     
+```
+
+```TXT
+RequestResponse(origin=Actor(name=user 1, type=Human), target=Actor(name=system.b, type=System), request=init 1 req, response=init 2 resp, children=[FireAndForget(origin=Actor(name=user 1, type=Human), target=Actor(name=events, type=System), request=event a, children=[]), RequestResponse(origin=Actor(name=system.b, type=System), target=Actor(name=system-c, type=System), request=b-to-c req, response=b-to-c resp, children=[BiDirectional(origin=Actor(name=system.b, type=System), target=Actor(name=db, type=Database), request=bidi-b req-resp, children=[]), RequestResponse(origin=Actor(name=system-c, type=System), target=Actor(name=external, type=System), request=c-to-external req, response=c-to-external resp, children=[])])])
+RequestResponse(origin=Actor(name=user 2, type=Human), target=Actor(name=system/d, type=System), request=init 2 req, response=init 2 resp, children=[FireAndForget(origin=Actor(name=system/d, type=System), target=Actor(name=events, type=System), request=event d, children=[])])
+```
