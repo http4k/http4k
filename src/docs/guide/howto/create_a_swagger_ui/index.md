@@ -16,7 +16,7 @@ However, you have less control over the availability and performance of the dist
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-contract", version: "4.40.2.0"
+implementation group: "org.http4k", name: "http4k-contract", version: "4.41.0.0"
 ```
 
 ### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/example.kt)
