@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.41.1.0 (Uncut)
+- **http4k-contract-ui-swagger** : [New Module] Serve a customized Swagger UI via a bundled WebJar with the new `swaggerUiWebjar` function.  H/T @oharaandrew314
+- **http4k-contract** : Deprecate `swaggerUI` in favor of new `swaggerUiLite` function, which uses a new config format.  H/T @oharaandrew314
+
 ### v4.41.0.0
 - **http4k-core*** : [Unlikely break] Fix creation of UriTemplate when it starts/ends with multiple slashes. This shouldn't cause any problems that we know about, but we are bumping the breaking version number just in case.
 
