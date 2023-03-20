@@ -1,18 +1,12 @@
 package org.http4k.contract.ui
 
-import org.http4k.core.ContentType
-import org.http4k.core.Filter
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.core.with
-import org.http4k.lens.Header
 import org.http4k.routing.ResourceLoader
-import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.routes
 import org.http4k.routing.static
 
-/**
- * Serve the Swagger UI Content
- */
+@Deprecated("use swaggerUiLite")
 fun swaggerUi(
     descriptionRoute: Uri,
     title: String = "Swagger UI",
@@ -21,23 +15,28 @@ fun swaggerUi(
     requestSnippetsEnabled: Boolean = false,
     persistAuthorization: Boolean = false,
     queryConfigEnabled: Boolean = false,
-    tryItOutEnabled: Boolean = false
-): RoutingHttpHandler = Filter { next ->
-    { req ->
-        next(req).let { resp ->
-            resp.body(
-                resp.bodyString()
-                    .replace("%%DESCRIPTION_ROUTE%%", descriptionRoute.toString())
-                    .replace("%%PAGE_TITLE%%", title)
-                    .replace("%%DISPLAY_OPERATION_ID%%", displayOperationId.toString())
-                    .replace("%%DISPLAY_REQUEST_DURATION%%", displayRequestDuration.toString())
-                    .replace("%%REQUEST_SNIPPETS_ENABLED%%", requestSnippetsEnabled.toString())
-                    .replace("%%PERSIST_AUTHORIZATION%%", persistAuthorization.toString())
-                    .replace("%%QUERY_CONFIG_ENABLED%%", queryConfigEnabled.toString())
-                    .replace("%%TRY_IT_OUT_ENABLED%%", tryItOutEnabled.toString())
-            ).with(Header.CONTENT_TYPE of ContentType.TEXT_HTML)
-        }
-    }
-}.then(
-    static(ResourceLoader.Classpath("org/http4k/contract/ui/public"))
-)
+    tryItOutEnabled: Boolean = false,
+) = swaggerUiLite {
+    this.pageTitle = title
+    this.url = descriptionRoute.toString()
+    this.displayOperationId = displayOperationId
+    this.displayRequestDuration = displayRequestDuration
+    this.requestSnippetsEnabled = requestSnippetsEnabled
+    this.persistAuthorization = persistAuthorization
+    this.queryConfigEnabled = queryConfigEnabled
+    this.tryItOutEnabled = tryItOutEnabled
+    this.deepLinking = true
+    this.layout = "StandaloneLayout"
+    this.presets += "SwaggerUIStandalonePreset"
+}
+
+/**
+ * Serve a "lite" Swagger UI, served by a public CDN
+ */
+fun swaggerUiLite(configFn: SwaggerUiConfig.() -> Unit = {}) = SwaggerUiConfig()
+    .also(configFn)
+    .toFilter()
+    .then(routes(
+        static(ResourceLoader.Classpath("org/http4k/contract/ui/public-config/")),
+        static(ResourceLoader.Classpath("org/http4k/contract/ui/public"))
+    ))

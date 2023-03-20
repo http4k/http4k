@@ -1,0 +1,18 @@
+window.onload = function() {
+    document.title = "Swagger UI";
+    SwaggerUIBundle({
+        url: "https://petstore.swagger.io/v2/swagger.json",
+        dom_id: "#swagger-ui",
+        deepLinking: null,
+        displayOperationId: null,
+        displayRequestDuration: null,
+        requestSnippetsEnabled: null,
+        persistAuthorization: null,
+        presets: [SwaggerUIBundle.presets.apis],
+        layout: "BaseLayout",
+        queryConfigEnabled: null,
+        tryItOutEnabled: null,
+        oauth2RedirectUrl: null,
+        withCredentials: null
+    })
+}
