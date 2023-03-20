@@ -4,6 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.41.1.0 (Uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-opentelemetry*** :Fix #867. OpenTelemetry tracing uses bad default span naming. H/T @krissrex for the report.
 - **http4k-contract-ui-swagger** : [New Module] Serve a customized Swagger UI via a bundled WebJar with the new `swaggerUiWebjar` function.  H/T @oharaandrew314
 - **http4k-contract** : Deprecate `swaggerUI` in favor of new `swaggerUiLite` function, which uses a new config format.  H/T @oharaandrew314
 

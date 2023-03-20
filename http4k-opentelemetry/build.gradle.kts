@@ -5,6 +5,7 @@ dependencies {
     api(platform("io.opentelemetry:opentelemetry-bom:_"))
     api("io.opentelemetry:opentelemetry-sdk")
     api("io.opentelemetry:opentelemetry-sdk-metrics")
+    api("io.opentelemetry:opentelemetry-semconv:_")
     testApi("io.opentelemetry:opentelemetry-extension-trace-propagators")
     testApi("io.opentelemetry:opentelemetry-extension-aws")
     testApi("io.opentelemetry:opentelemetry-sdk-testing")
