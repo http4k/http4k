@@ -10,10 +10,10 @@ This contract example shows:
 
 ### Gradle setup
 
-```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.41.0.0"
-implementation group: "org.http4k", name: "http4k-contract", version: "4.41.0.0"
-implementation group: "org.http4k", name: "http4k-format-argo", version: "4.41.0.0"
+```kotlin
+implementation(group = "org.http4k", name = "http4k-core", version = "4.41.0.0")
+implementation(group = "org.http4k", name = "http4k-contract", version = "4.41.0.0")
+implementation(group = "org.http4k", name = "http4k-format-argo", version = "4.41.0.0")
 ```
 
 Note: although we use Argo here as our JSON API, you could also switch in any of the `http4k-format-xxx` JSON modules. 

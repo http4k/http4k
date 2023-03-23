@@ -3,9 +3,9 @@ description: Feature overview of the http4k-contract module
 
 ### Installation (Gradle)
 
-```groovy
-implementation group: "org.http4k", name: "http4k-contract", version: "4.41.0.0"
-implementation group: "org.http4k", name: "http4k-format-<insert json lib>", version: "4.41.0.0"
+```kotlin
+implementation(group = "org.http4k", name = "http4k-contract", version = "4.41.0.0")
+implementation(group = "org.http4k", name = "http4k-format-<insert json lib>", version = "4.41.0.0")
 ```
 
 ### About

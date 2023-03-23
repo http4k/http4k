@@ -3,8 +3,8 @@ description: Feature overview of the http4k-core module, including the Lens syst
 
 ### Installation (Gradle)
 
-```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.41.0.0"
+```kotlin
+implementation(group = "org.http4k", name = "http4k-core", version = "4.41.0.0")
 ```
 
 ### About

@@ -16,7 +16,7 @@ We'll take an existing http4k application built with Gradle, add the bits that a
 #### Step 1
 We need to add the AWS Lambda Serverless module to our project. Install it into your `build.gradle` file with:
 
-```groovy
+```kotlin
 implementation("org.http4k:http4k-serverless-lambda:4.41.0.0")
 ```
 
@@ -29,7 +29,7 @@ http4k supplies pre-built StreamHandler adapters (they are faster) using the lig
 
 #### Step 3
 To build the Lambda code into a ZIP file, we need to add a task to our `build.gradle`:
-```groovy
+```kotlin
 task buildLambdaZip(type: Zip) {
     from compileKotlin
     from processResources

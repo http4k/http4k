@@ -5,8 +5,8 @@ Example showing how to create and apply lenses to requests and responses to both
 
 ### Gradle setup
 
-```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.41.0.0"
+```kotlin
+implementation(group = "org.http4k", name = "http4k-core", version = "4.41.0.0")
 ```
 
 ### Standard (exception based) approach [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/typesafe_your_api_with_lenses/example.kt)

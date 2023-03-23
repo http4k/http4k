@@ -80,7 +80,7 @@ In terms of the performance of the server backends, Apache HttpComponents (versi
 
 When we conceived http4k, it was a simple 40 line shim over the top of another Java-based framework, bashed together on a HackDay. Never did we realise that a few years later it would be a very popular library with over 40 modules! For this reason (and to save on typing), we introduced the `http4k-bom` module (learn more about BOM [here][BOM], allowing users to use a single version of all http4k libraries and then just import the modules they need.
 
-```groovy
+```kotlin
 dependencies {
     implementation platform("org.http4k:http4k-bom:3.259.0")
     implementation "org.http4k:http4k-core"

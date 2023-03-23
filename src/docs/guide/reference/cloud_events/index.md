@@ -3,8 +3,8 @@ description: Feature overview of the http4k-cloudevents module
 
 ### Installation (Gradle)
 
-```groovy
-implementation group: "org.http4k", name: "http4k-cloudevents", version: "4.41.0.0"
+```kotlin
+implementation(group = "org.http4k", name = "http4k-cloudevents", version = "4.41.0.0")
 ```
 
 The [Cloud Events](https://cloudevents.io/) spec defines a common format for Events produced by Cloud services.
@@ -15,9 +15,9 @@ http4k provides simple pluggability into the CloudEvents Java SDKs and custom ev
 
 In this example we are using the Jackson JSONFormat which is included by default with the `http4k-cloudevents` module. If you want to also use the lenses to access typed EventData, you will also need this in your Gradle file:
 
-```groovy
+```kotlin
 // to access the lenses in the Jackson module
-implementation group: "org.http4k", name: "http4k-format-jackson", version: "4.41.0.0"
+implementation(group = "org.http4k", name = "http4k-format-jackson", version = "4.41.0.0")
 
 ```
 

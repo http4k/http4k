@@ -17,7 +17,7 @@ Depending on your learning style, there are a number of options to get started w
 # I'm already set up and just need to integrate!
 **Add http4k into an existing project**: This simple example demonstrates how to serve and consume HTTP services using **http4k**. To install, add these dependencies to your **Gradle** file:
 
-```groovy
+```kotlin
 dependencies {
     implementation platform("org.http4k:http4k-bom:4.41.0.0")
     implementation "org.http4k:http4k-core"

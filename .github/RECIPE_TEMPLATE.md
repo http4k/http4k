@@ -4,8 +4,8 @@ description: <description for search index/page metadata>
 Brief overview of the recipe.
 
 ### Gradle setup
-```groovy
-    implementation group: "org.http4k", name: "http4k-core", version: "4.41.0.0"
+```kotlin
+    implementation(group = "org.http4k", name = "http4k-core", version = "4.41.0.0")
     // include here all of the dependencies that are needed to make the code run
 ```
 
