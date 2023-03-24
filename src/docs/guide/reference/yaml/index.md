@@ -4,8 +4,11 @@ description: Feature overview of the YAML http4k-format modules, several of whic
 ### Installation (Gradle)
 
 ```kotlin
-implementation(group = "org.http4k", name = "http4k-format-jackson-yaml", version = "4.41.0.0")
-implementation(group = "org.http4k", name = "http4k-format-moshi-yaml", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation("org.http4k:http4k-format-jackson-yaml")
+    implementation("org.http4k:http4k-format-moshi-yaml")
+}
 ```
 
 ### About

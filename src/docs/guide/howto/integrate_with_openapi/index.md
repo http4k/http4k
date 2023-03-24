@@ -11,9 +11,12 @@ This contract example shows:
 ### Gradle setup
 
 ```kotlin
-implementation(group = "org.http4k", name = "http4k-core", version = "4.41.0.0")
-implementation(group = "org.http4k", name = "http4k-contract", version = "4.41.0.0")
-implementation(group = "org.http4k", name = "http4k-format-argo", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation("org.http4k:http4k-core")
+    implementation("org.http4k:http4k-contract")
+    implementation("org.http4k:http4k-format-argo")
+}
 ```
 
 Note: although we use Argo here as our JSON API, you could also switch in any of the `http4k-format-xxx` JSON modules. 

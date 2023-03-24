@@ -4,23 +4,27 @@ description: Feature overview of the JSON http4k-format modules, several of whic
 ### Installation (Gradle)
 
 ```kotlin
-// Argo:  
-implementation(group = "org.http4k", name = "http4k-format-argo", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+ 
+    // Argo:  
+    implementation("org.http4k:http4k-format-argo")
 
-// Gson:  
-implementation(group = "org.http4k", name = "http4k-format-gson", version = "4.41.0.0")
+    // Gson:  
+    implementation("org.http4k:http4k-format-gson")
 
-// Jackson: 
-implementation(group = "org.http4k", name = "http4k-format-jackson", version = "4.41.0.0")
+    // Jackson: 
+    implementation("org.http4k:http4k-format-jackson")
 
-// Klaxon: 
-implementation(group = "org.http4k", name = "http4k-format-klaxon", version = "4.41.0.0")
+    // Klaxon: 
+    implementation("org.http4k:http4k-format-klaxon")
 
-// Moshi: 
-implementation(group = "org.http4k", name = "http4k-format-moshi", version = "4.41.0.0")
+    // Moshi: 
+    implementation("org.http4k:http4k-format-moshi")
 
-// KotlinX Serialization: 
-implementation(group = "org.http4k", name = "http4k-format-kotlinx-serialization", version = "4.41.0.0")
+    // KotlinX Serialization: 
+    implementation("org.http4k:http4k-format-kotlinx-serialization")
+}
 ```
 
 ### About

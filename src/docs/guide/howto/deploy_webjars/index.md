@@ -4,10 +4,13 @@ description: Recipe for using WebJars with http4k
 ### Gradle setup
 
 ```kotlin
-implementation(group = "org.http4k", name = "http4k-core", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation("org.http4k:http4k-core")
 
-// for the example...
-implementation(group = "org.webjars", name = "swagger-ui", version = "3.43.0"
+    // for the example...
+    implementation("org.webjars:swagger-ui", version = "3.43.0")
+}
 ```
 
 [WebJars](https://www.webjars.org/) is a library to ship pre-packaged Web assets on your classpath by just adding the dependency. The assets are rehoused under the META-INF directory and end up with URLs such as: 

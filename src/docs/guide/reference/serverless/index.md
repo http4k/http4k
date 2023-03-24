@@ -4,23 +4,27 @@ description: Feature overview of the http4k-serverless modules, covering Serverl
 ### Installation (Gradle)
 
 ```kotlin
-// AWS Lambda: 
-implementation(group = "org.http4k", name = "http4k-serverless-lambda", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
 
-// Google Cloud Functions: 
-implementation(group = "org.http4k", name = "http4k-serverless-gcf", version = "4.41.0.0")
+    // AWS Lambda: 
+    implementation("org.http4k:http4k-serverless-lambda")
 
-// Apache OpenWhisk (IBM Cloud Functions): 
-implementation(group = "org.http4k", name = "http4k-serverless-openwhisk", version = "4.41.0.0")
+    // Google Cloud Functions: 
+    implementation("org.http4k:http4k-serverless-gcf")
 
-// Azure Functions: 
-implementation(group = "org.http4k", name = "http4k-serverless-azure", version = "4.41.0.0")
+    // Apache OpenWhisk (IBM Cloud Functions): 
+    implementation("org.http4k:http4k-serverless-openwhisk")
 
-// Alibaba Function Compute: 
-implementation(group = "org.http4k", name = "http4k-serverless-alibaba", version = "4.41.0.0")
+    // Azure Functions: 
+    implementation("org.http4k:http4k-serverless-azure")
 
-// Tencent Serverless Cloud Functions: 
-implementation(group = "org.http4k", name = "http4k-serverless-tencent", version = "4.41.0.0")
+    // Alibaba Function Compute: 
+    implementation("org.http4k:http4k-serverless-alibaba")
+
+    // Tencent Serverless Cloud Functions: 
+    implementation("org.http4k:http4k-serverless-tencent")
+}
 ```
 
 ### About

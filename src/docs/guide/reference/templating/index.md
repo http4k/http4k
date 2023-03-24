@@ -4,26 +4,30 @@ description: Feature overview of the http4k-templating modules
 ### Installation (Gradle)
 
 ```kotlin
-// Dust: 
-implementation(group = "org.http4k", name = "http4k-template-dust", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
 
-// Freemarker: 
-implementation(group = "org.http4k", name = "http4k-template-freemarker", version = "4.41.0.0")
-
-// Handlebars: 
-implementation(group = "org.http4k", name = "http4k-template-handlebars", version = "4.41.0.0")
-
-// Jade4j: 
-implementation(group = "org.http4k", name = "http4k-template-jade4j", version = "4.41.0.0")
-
-// Pebble: 
-implementation(group = "org.http4k", name = "http4k-template-pebble", version = "4.41.0.0")
-
-// Rocker: 
-implementation(group = "org.http4k", name = "http4k-template-rocker", version = "4.41.0.0")
-
-// Thymeleaf: 
-implementation(group = "org.http4k", name = "http4k-template-thymeleaf", version = "4.41.0.0")
+    // Dust: 
+    implementation("org.http4k:http4k-template-dust")
+    
+    // Freemarker: 
+    implementation("org.http4k:http4k-template-freemarker")
+    
+    // Handlebars: 
+    implementation("org.http4k:http4k-template-handlebars")
+    
+    // Jade4j: 
+    implementation("org.http4k:http4k-template-jade4j")
+    
+    // Pebble: 
+    implementation("org.http4k:http4k-template-pebble")
+    
+    // Rocker: 
+    implementation("org.http4k:http4k-template-rocker")
+    
+    // Thymeleaf: 
+    implementation("org.http4k:http4k-template-thymeleaf")
+}
 ```
 
 ### About

@@ -6,7 +6,10 @@ A set of classes to provide simple recording/replaying of HTTP traffic. This is 
 ### Gradle setup
 
 ```kotlin
-implementation(group = "org.http4k", name = "http4k-core", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation("org.http4k:http4k-core")
+}
 ```
 
 ### Caching HTTP Traffic 

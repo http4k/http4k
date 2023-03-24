@@ -6,8 +6,11 @@ Example showing how to use the Templating modules - in this case Handlebars, bot
 ### Gradle setup
 
 ```kotlin
-implementation(group = "org.http4k", name = "http4k-core", version = "4.41.0.0")
-implementation(group = "org.http4k", name = "http4k-template-handlebars", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation("org.http4k:http4k-core")
+    implementation("org.http4k:http4k-template-handlebars")
+}
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_a_templating_engine/example.kt)

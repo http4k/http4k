@@ -4,10 +4,13 @@ description: Feature overview of the http4k-graphql module.
 ### Installation (Gradle)
 
 ```kotlin
-implementation(group = "org.http4k", name = "http4k-graphql", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation("org.http4k:http4k-graphql")
 
-// for the example below you will also need this dependency...
-implementation(group = "com.expediagroup", name = "graphql-kotlin-schema-generator", version = "5.3.2"
+    // for the example below you will also need this dependency...
+    implementation("com.expediagroup:graphql-kotlin-schema-generator", version = "5.3.2"
+}
 ```
 
 

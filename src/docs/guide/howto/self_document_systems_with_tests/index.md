@@ -4,7 +4,10 @@ description: Recipes for creating a Distributed Tracing Tree
 ### Gradle setup
 
 ```kotlin
-implementation(group = "org.http4k", name = "http4k-incubator", version = "4.41.0.0")
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation("org.http4k:http4k-incubator")
+}
 ```
 
 When composing several http4k services together and talking to Fakes representing external systems, we can use a combination of request tracing filters (utilising distributed tracing headers) and the http4k event stream to capture and record events. This stream can be stored to disk or outputted to various rendered formats such as [PlantUML] or [Mermaid]. 
