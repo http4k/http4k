@@ -17,7 +17,7 @@ However, you have less control over the availability and performance of the dist
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation(platform("org.http4k:http4k-bom:4.41.1.0"))
     implementation("org.http4k:http4k-contract")
 }
 ```
@@ -35,7 +35,7 @@ This option can be more reliable, but will contribute to a larger jar size.
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.0.0"))
+    implementation(platform("org.http4k:http4k-bom:4.41.1.0"))
     implementation("org.http4k:http4k-contract-ui-swagger")
 }
 ```
