@@ -10,7 +10,8 @@ import okio.source
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.format.StrictnessMode.*
+import org.http4k.format.StrictnessMode.FailOnUnknown
+import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
@@ -121,7 +122,7 @@ open class ConfigurableMoshi(
 }
 
 fun Moshi.Builder.asConfigurable(
-    kotlinFactory: JsonAdapter.Factory? = null
+    kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory()
 ) = object : AutoMappingConfiguration<Moshi.Builder> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, { value(it) }, { nextInt() })
     override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) =
@@ -159,7 +160,7 @@ fun Moshi.Builder.asConfigurable(
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
     override fun done() = this@asConfigurable
-        .add(kotlinFactory ?: KotlinJsonAdapterFactory())
+        .add(kotlinFactory)
         .add(Unit::class.java, UnitAdapter)
 }
 

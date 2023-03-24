@@ -2,8 +2,9 @@ package org.http4k.format
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
-private fun standardConfig(kotlinFactory: JsonAdapter.Factory? = null) = Moshi.Builder()
+private fun standardConfig(kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory()) = Moshi.Builder()
     .addLast(EventAdapter)
     .addLast(ThrowableAdapter)
     .addLast(ListAdapter)
