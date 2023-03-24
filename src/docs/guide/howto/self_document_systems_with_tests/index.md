@@ -5,7 +5,7 @@ description: Recipes for creating a Distributed Tracing Tree
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.1.0"))
+    implementation(platform("org.http4k:http4k-bom:4.41.1.1"))
     implementation("org.http4k:http4k-incubator")
 }
 ```
