@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 2
           # required by release-tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
-      - uses: actions/setup-java@v3.9.0
+      - uses: actions/setup-java@v3.10.0
         with:
           distribution: adopt
           java-version: 11
