@@ -12,8 +12,11 @@ dependencies {
     // Apache v4: 
     implementation("org.http4k:http4k-server-apache4")
 
-    // Jetty: 
+    // Jetty & JettyLoom: 
     implementation("org.http4k:http4k-server-jetty")
+
+    // Helidon Nima (Loom): 
+    implementation("org.http4k:http4k-server-helidon")
 
     // Ktor CIO: 
     implementation("org.http4k:http4k-server-ktorcio")
@@ -33,7 +36,7 @@ dependencies {
     // Java WebSocket:
     implementation("org.http4k:http4k-server-websocket")
 
-    // SunHttp (for development only): 
+    // SunHttp & SunHttpLoom (for development only): 
     implementation("org.http4k:http4k-core")
 }
 ```
