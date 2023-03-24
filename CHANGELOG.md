@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.41.1.1
+- **http4k-contract-ui-swagger** Fix dependency from provided -> api
+
 ### v4.41.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-opentelemetry*** :Fix #867. OpenTelemetry tracing uses bad default span naming. H/T @krissrex for the report.
