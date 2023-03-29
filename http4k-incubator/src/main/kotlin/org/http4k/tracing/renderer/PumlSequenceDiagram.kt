@@ -77,7 +77,7 @@ object PumlSequenceDiagram : TraceRenderer {
 
 private fun String.toArrow(): String =
     try {
-        with(Status(split(" ").last().toInt(), "")) {
+        with(Status(split(" ").first().toInt(), split(" ").last())) {
             when {
                 successful -> "-[#DarkGreen]->"
                 redirection -> "-[#DarkBlue]->"

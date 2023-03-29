@@ -45,13 +45,13 @@ sequenceDiagram
     system_c->>external: c-to-external req
     activate external
     
-    external->>system_c: c-to-external 200
+    external->>system_c: 200 c-to-external
     deactivate external
     
-    system_c->>system_b: b-to-c 300
+    system_c->>system_b: 300 b-to-c
     deactivate system_c
     
-    system_b->>user 1: init 2 400
+    system_b->>user 1: 400 init 2
     deactivate system_b
     
 	
@@ -61,7 +61,7 @@ sequenceDiagram
     system_d-)events: event d
     
     
-    system_d->>user 2: init 2 500
+    system_d->>user 2: 500 init 2
     deactivate system_d
     
 ```
@@ -88,6 +88,6 @@ Rel_D(systemd, events, " ")
 ```
 
 ```TXT
-RequestResponse(origin=Actor(name=user 1, type=Human), target=Actor(name=system.b, type=System), request=init 1 req, response=init 2 400, children=[FireAndForget(origin=Actor(name=user 1, type=Human), target=Actor(name=events, type=System), request=event a, children=[]), RequestResponse(origin=Actor(name=system.b, type=System), target=Actor(name=system-c, type=System), request=b-to-c req, response=b-to-c 300, children=[BiDirectional(origin=Actor(name=system.b, type=System), target=Actor(name=db, type=Database), request=bidi-b req-resp, children=[]), RequestResponse(origin=Actor(name=system-c, type=System), target=Actor(name=external, type=System), request=c-to-external req, response=c-to-external 200, children=[])])])
-RequestResponse(origin=Actor(name=user 2, type=Human), target=Actor(name=system/d, type=System), request=init 2 req, response=init 2 500, children=[FireAndForget(origin=Actor(name=system/d, type=System), target=Actor(name=events, type=System), request=event d, children=[])])
+RequestResponse(origin=Actor(name=user 1, type=Human), target=Actor(name=system.b, type=System), request=init 1 req, response=400 init 2, children=[FireAndForget(origin=Actor(name=user 1, type=Human), target=Actor(name=events, type=System), request=event a, children=[]), RequestResponse(origin=Actor(name=system.b, type=System), target=Actor(name=system-c, type=System), request=b-to-c req, response=300 b-to-c, children=[BiDirectional(origin=Actor(name=system.b, type=System), target=Actor(name=db, type=Database), request=bidi-b req-resp, children=[]), RequestResponse(origin=Actor(name=system-c, type=System), target=Actor(name=external, type=System), request=c-to-external req, response=200 c-to-external, children=[])])])
+RequestResponse(origin=Actor(name=user 2, type=Human), target=Actor(name=system/d, type=System), request=init 2 req, response=500 init 2, children=[FireAndForget(origin=Actor(name=system/d, type=System), target=Actor(name=events, type=System), request=event d, children=[])])
 ```

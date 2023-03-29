@@ -27,13 +27,13 @@ sequenceDiagram
     system_c->>external: c-to-external req
     activate external
     
-    external->>system_c: c-to-external 200
+    external->>system_c: 200 c-to-external
     deactivate external
     
-    system_c->>system_b: b-to-c 300
+    system_c->>system_b: 300 b-to-c
     deactivate system_c
     
-    system_b->>user 1: init 2 400
+    system_b->>user 1: 400 init 2
     deactivate system_b
     
 	
@@ -43,6 +43,6 @@ sequenceDiagram
     system_d-)events: event d
     
     
-    system_d->>user 2: init 2 500
+    system_d->>user 2: 500 init 2
     deactivate system_d
     
