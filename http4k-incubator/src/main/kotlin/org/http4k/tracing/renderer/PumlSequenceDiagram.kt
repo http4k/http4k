@@ -1,5 +1,6 @@
 package org.http4k.tracing.renderer
 
+import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.tracing.Actor
 import org.http4k.tracing.ActorType.Database
@@ -57,9 +58,23 @@ object PumlSequenceDiagram : TraceRenderer {
            |"${origin.name}" -> "${target.name}": $request
            |activate "${target.name}"
            |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
-           |"${target.name}" ${response.toArrow()} "${origin.name}": $response
+           |"${target.name}" ${response.toArrow()} "${origin.name}": ${response.toColour()} $response
            |deactivate "${target.name}"
             """.trimMargin()
+
+    private fun String.toColour() =   try {
+        with(Status(split(" ").first().toInt(), split(" ").last())) {
+            when {
+                successful -> "<color:DarkGreen>"
+                redirection -> "<color:DarkBlue>"
+                clientError -> "<color:DarkOrange>"
+                serverError -> "<color:FireBrick>"
+                else -> "<color:Black>"
+            }
+        }
+    } catch (e: Exception) {
+        "<color:Black>>"
+    }
 
     private fun BiDirectional.asPumlSequenceDiagram(): String = """
            |"${origin.name}" <-> "${target.name}": $request
@@ -83,7 +98,7 @@ private fun String.toArrow(): String =
                 redirection -> "-[#DarkBlue]>"
                 clientError -> "X-[#DarkOrange]>"
                 serverError -> "X-[#FireBrick]>"
-                else -> "->"
+                else -> "-[#Black]>"
             }
         }
     } catch (e: Exception) {
