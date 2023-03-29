@@ -79,11 +79,11 @@ private fun String.toArrow(): String =
     try {
         with(Status(split(" ").first().toInt(), split(" ").last())) {
             when {
-                successful -> "-[#DarkGreen]->"
-                redirection -> "-[#DarkBlue]->"
-                clientError -> "X-[#DarkOrange]->"
-                serverError -> "X-[#FireBrick]->"
-                else -> "-->"
+                successful -> "-[#DarkGreen]>"
+                redirection -> "-[#DarkBlue]>"
+                clientError -> "X-[#DarkOrange]>"
+                serverError -> "X-[#FireBrick]>"
+                else -> "->"
             }
         }
     } catch (e: Exception) {
