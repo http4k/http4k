@@ -17,15 +17,15 @@ activate "system-c"
 "system-c" -> "external": c-to-external req
 activate "external"
 
-"external" --> "system-c": c-to-external resp
+"external" -[#DarkGreen]-> "system-c": c-to-external 200
 deactivate "external"
-"system-c" --> "system.b": b-to-c resp
+"system-c" -[#DarkBlue]-> "system.b": b-to-c 300
 deactivate "system-c"
-"system.b" --> "user 1": init 2 resp
+"system.b" X-[#DarkOrange]-> "user 1": init 2 400
 deactivate "system.b"
 "user 2" -> "system/d": init 2 req
 activate "system/d"
 "system/d" -> "events": event d
-"system/d" --> "user 2": init 2 resp
+"system/d" X-[#FireBrick]-> "user 2": init 2 500
 deactivate "system/d"
 @enduml

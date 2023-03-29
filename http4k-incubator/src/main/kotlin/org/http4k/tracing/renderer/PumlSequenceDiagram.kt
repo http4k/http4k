@@ -1,5 +1,6 @@
 package org.http4k.tracing.renderer
 
+import org.http4k.core.Status
 import org.http4k.tracing.Actor
 import org.http4k.tracing.ActorType.Database
 import org.http4k.tracing.BiDirectional
@@ -56,7 +57,7 @@ object PumlSequenceDiagram : TraceRenderer {
            |"${origin.name}" -> "${target.name}": $request
            |activate "${target.name}"
            |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
-           |"${target.name}" --> "${origin.name}": $response
+           |"${target.name}" ${response.toArrow()} "${origin.name}": $response
            |deactivate "${target.name}"
             """.trimMargin()
 
@@ -73,4 +74,19 @@ object PumlSequenceDiagram : TraceRenderer {
         note over "$origin" : "$origin" $interactionName
         """.trimIndent()
 }
+
+private fun String.toArrow(): String =
+    try {
+        with(Status(split(" ").last().toInt(), "")) {
+            when {
+                successful -> "-[#DarkGreen]->"
+                redirection -> "-[#DarkBlue]->"
+                clientError -> "X-[#DarkOrange]->"
+                serverError -> "X-[#FireBrick]->"
+                else -> "-->"
+            }
+        }
+    } catch (e: Exception) {
+        "-->"
+    }
 

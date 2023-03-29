@@ -8,7 +8,7 @@ val c_to_external = RequestResponse(
     Actor("system-c", System),
     Actor("external", System),
     "c-to-external req",
-    "c-to-external resp",
+    "c-to-external 200",
     listOf()
 )
 
@@ -23,7 +23,7 @@ val b_to_c = RequestResponse(
     Actor("system.b", System),
     Actor("system-c", System),
     "b-to-c req",
-    "b-to-c resp",
+    "b-to-c 300",
     listOf(bidi_b, c_to_external)
 )
 
@@ -38,7 +38,7 @@ val entire_trace_1 = RequestResponse(
     Actor("user 1", Human),
     Actor("system.b", System),
     "init 1 req",
-    "init 2 resp",
+    "init 2 400",
     listOf(fireAndForget_user1, b_to_c)
 )
 
@@ -53,6 +53,6 @@ val entire_trace_2 = RequestResponse(
     Actor("user 2", Human),
     Actor("system/d", System),
     "init 2 req",
-    "init 2 resp",
+    "init 2 500",
     listOf(fireAndForget_d)
 )

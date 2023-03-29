@@ -13,7 +13,7 @@
           "type": "System"
         },
         "request": "init 1 req",
-        "response": "init 2 resp",
+        "response": "init 2 400",
         "children": [
           {
             "type": "FireAndForget",
@@ -40,7 +40,7 @@
               "type": "System"
             },
             "request": "b-to-c req",
-            "response": "b-to-c resp",
+            "response": "b-to-c 300",
             "children": [
               {
                 "type": "BiDirectional",
@@ -67,7 +67,7 @@
                   "type": "System"
                 },
                 "request": "c-to-external req",
-                "response": "c-to-external resp",
+                "response": "c-to-external 200",
                 "children": [
                 ]
               }
@@ -91,7 +91,7 @@
           "type": "System"
         },
         "request": "init 1 req",
-        "response": "init 2 resp",
+        "response": "init 2 400",
         "children": [
           {
             "type": "FireAndForget",
@@ -118,7 +118,7 @@
               "type": "System"
             },
             "request": "b-to-c req",
-            "response": "b-to-c resp",
+            "response": "b-to-c 300",
             "children": [
               {
                 "type": "BiDirectional",
@@ -145,7 +145,7 @@
                   "type": "System"
                 },
                 "request": "c-to-external req",
-                "response": "c-to-external resp",
+                "response": "c-to-external 200",
                 "children": [
                 ]
               }
@@ -169,7 +169,7 @@
           "type": "System"
         },
         "request": "init 1 req",
-        "response": "init 2 resp",
+        "response": "init 2 400",
         "children": [
           {
             "type": "FireAndForget",
@@ -196,7 +196,7 @@
               "type": "System"
             },
             "request": "b-to-c req",
-            "response": "b-to-c resp",
+            "response": "b-to-c 300",
             "children": [
               {
                 "type": "BiDirectional",
@@ -223,7 +223,7 @@
                   "type": "System"
                 },
                 "request": "c-to-external req",
-                "response": "c-to-external resp",
+                "response": "c-to-external 200",
                 "children": [
                 ]
               }
@@ -247,7 +247,7 @@
           "type": "System"
         },
         "request": "init 2 req",
-        "response": "init 2 resp",
+        "response": "init 2 500",
         "children": [
           {
             "type": "FireAndForget",
@@ -281,7 +281,7 @@
           "type": "System"
         },
         "request": "init 2 req",
-        "response": "init 2 resp",
+        "response": "init 2 500",
         "children": [
           {
             "type": "FireAndForget",
@@ -315,7 +315,7 @@
           "type": "System"
         },
         "request": "init 2 req",
-        "response": "init 2 resp",
+        "response": "init 2 500",
         "children": [
           {
             "type": "FireAndForget",
@@ -349,7 +349,7 @@
           "type": "System"
         },
         "request": "init 1 req",
-        "response": "init 2 resp",
+        "response": "init 2 400",
         "children": [
           {
             "type": "FireAndForget",
@@ -376,7 +376,7 @@
               "type": "System"
             },
             "request": "b-to-c req",
-            "response": "b-to-c resp",
+            "response": "b-to-c 300",
             "children": [
               {
                 "type": "BiDirectional",
@@ -403,7 +403,7 @@
                   "type": "System"
                 },
                 "request": "c-to-external req",
-                "response": "c-to-external resp",
+                "response": "c-to-external 200",
                 "children": [
                 ]
               }
@@ -427,7 +427,7 @@
           "type": "System"
         },
         "request": "init 2 req",
-        "response": "init 2 resp",
+        "response": "init 2 500",
         "children": [
           {
             "type": "FireAndForget",
