@@ -19,11 +19,11 @@ shape: sequence_diagram
 	
     system-c -> external: c-to-external req
     
-    external -> system-c: c-to-external resp
+    external -> system-c: 200 c-to-external
     
-    system-c -> system.b: b-to-c resp
+    system-c -> system.b: 300 b-to-c
     
-    system.b -> user 1: init 2 resp
+    system.b -> user 1: 400 init 2
     
 	
     user 2 -> system/d: init 2 req
@@ -31,5 +31,5 @@ shape: sequence_diagram
     system/d -> events: event d
     
     
-    system/d -> user 2: init 2 resp
+    system/d -> user 2: 500 init 2
     

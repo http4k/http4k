@@ -5,7 +5,7 @@ description: Feature overview of the http4k-serverless modules, covering Serverl
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.1.1"))
+    implementation(platform("org.http4k:http4k-bom:4.41.2.0"))
 
     // AWS Lambda: 
     implementation("org.http4k:http4k-serverless-lambda")
