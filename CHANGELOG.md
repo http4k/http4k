@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.41.2.0
-- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.8.20.
 - **http4k-incubator** TracerBullet diagrams have added colours.
 
 ### v4.41.1.1
