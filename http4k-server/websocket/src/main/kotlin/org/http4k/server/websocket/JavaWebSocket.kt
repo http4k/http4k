@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 
 class JavaWebSocket(
     private val port: Int = 8000,
-    private val hostName: String = "localhost",
+    private val hostName: String = "0.0.0.0",
     private val drafts: List<Draft>? = null,
     override val stopMode: ServerConfig.StopMode = ServerConfig.StopMode.Immediate,
     private val addShutdownHook: Boolean = true,
