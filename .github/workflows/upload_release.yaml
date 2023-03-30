@@ -17,8 +17,9 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3.10.0
         with:
-          distribution: adopt
-          java-version: 11
+          distribution: temurin
+          java-version: 20
+          cache: gradle
       - name: Upload to Sonatype
         run: |
           ./gradlew publishMavenJavaPublicationToSonatypeStagingRepository \
@@ -37,8 +38,9 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3.10.0
         with:
-          distribution: adopt
-          java-version: 11
+          distribution: temurin
+          java-version: 20
+          cache: gradle
       - name: Release to Maven Central
         run: |
           ./gradlew closeAndReleaseRepository \

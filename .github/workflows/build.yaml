@@ -18,8 +18,8 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-java@v3.10.0
         with:
-          distribution: adopt
-          java-version: 11
+          distribution: temurin
+          java-version: 20
           cache: gradle
       - name: Cache Gradle packages
         uses: actions/cache@v3.2.3
