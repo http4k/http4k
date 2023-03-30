@@ -1,6 +1,5 @@
 package org.http4k.tracing.renderer
 
-import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.tracing.Actor
 import org.http4k.tracing.ActorType.Database
@@ -62,8 +61,8 @@ object PumlSequenceDiagram : TraceRenderer {
            |deactivate "${target.name}"
             """.trimMargin()
 
-    private fun String.toColour() =   try {
-        with(Status(split(" ").first().toInt(), split(" ").last())) {
+    private fun String.toColour() = try {
+        with(toStatus()) {
             when {
                 successful -> "<color:DarkGreen>"
                 redirection -> "<color:DarkBlue>"
@@ -92,7 +91,7 @@ object PumlSequenceDiagram : TraceRenderer {
 
 private fun String.toArrow(): String =
     try {
-        with(Status(split(" ").first().toInt(), split(" ").last())) {
+        with(toStatus()) {
             when {
                 successful -> "-[#DarkGreen]>"
                 redirection -> "-[#DarkBlue]>"
@@ -104,4 +103,10 @@ private fun String.toArrow(): String =
     } catch (e: Exception) {
         "-->"
     }
+
+private fun String.toStatus() = Status(
+    split(" ").first()
+        .filter(Char::isDigit)
+        .toInt(), split(" ").last()
+)
 
