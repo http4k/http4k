@@ -85,8 +85,12 @@ abstract class NonBlockingWebsocketClientContract(
 
     @Test
     fun `uri is passed to the upgrade request`() {
-        val ws = websocket(Uri.of("ws://localhost:$port/bob"))
+        val latch = CountDownLatch(1)
+        val ws = websocket(Uri.of("ws://localhost:$port/bob")) {
+            latch.countDown()
+        }
 
+        latch.await()
         assertThat(ws.upgradeRequest, hasUri("ws://localhost:$port/bob"))
     }
 
