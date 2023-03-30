@@ -5,7 +5,7 @@ description: Feature overview of the http4k-testing-chaos module
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.1.1"))
+    implementation(platform("org.http4k:http4k-bom:4.41.2.0"))
     implementation("org.http4k:http4k-testing-chaos")
 }
 ```

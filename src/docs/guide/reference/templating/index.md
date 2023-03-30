@@ -5,7 +5,7 @@ description: Feature overview of the http4k-templating modules
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.1.1"))
+    implementation(platform("org.http4k:http4k-bom:4.41.2.0"))
 
     // Dust: 
     implementation("org.http4k:http4k-template-dust")
