@@ -5,7 +5,7 @@ description: Recipe for using http4k to create an authorization server that prov
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.2.0"))
+    implementation(platform("org.http4k:http4k-bom:4.41.3.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-security-oauth")
 }
