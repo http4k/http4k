@@ -29,6 +29,9 @@ dependencies {
 
     // Undertow: 
     implementation("org.http4k:http4k-server-undertow")
+    
+    // Java WebSocket:
+    implementation("org.http4k:http4k-server-websocket")
 
     // SunHttp (for development only): 
     implementation("org.http4k:http4k-core")

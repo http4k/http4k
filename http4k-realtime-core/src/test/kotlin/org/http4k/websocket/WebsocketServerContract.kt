@@ -28,7 +28,11 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 
-abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
+abstract class WebsocketServerContract(
+    private val serverConfig: (Int) -> PolyServerConfig,
+    private val client: HttpHandler,
+    private val httpSupported: Boolean = true
+) {
     private lateinit var server: Http4kServer
 
     private val port by lazy { server.port() }
@@ -63,7 +67,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolySe
                 ws.onMessage { ws.send(it) }
             })
 
-        server = PolyHandler(routes, ws).asServer(serverConfig(0)).start()
+        server = PolyHandler(routes.takeIf { httpSupported }, ws).asServer(serverConfig(0)).start()
     }
 
     @AfterEach
@@ -73,6 +77,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> PolySe
 
     @Test
     fun `can do standard http traffic`() {
+        if (!httpSupported) return
         assertThat(client(Request(GET, "http://localhost:$port/hello/bob")), hasBody("bob"))
     }
 

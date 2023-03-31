@@ -89,6 +89,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **Netty** (including Websocket support)
         * **SunHttp** (bundled with `http4k-core`)
         * **Undertow** (including SSE and Websocket support)
+        * **Java-WebSocket** (Websocket support only)
     * API design allows for simple customization of underying backend.
     * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/reference/serverless)
