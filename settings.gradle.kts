@@ -81,6 +81,7 @@ include("http4k-realtime-core")
     includeModule("ratpack")
     includeModule("shutdown-integration-test")
     includeModule("undertow")
+    includeModule("websocket")
 }
 
 "http4k-serverless".apply {
