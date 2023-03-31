@@ -14,11 +14,12 @@ import org.http4k.tracing.TracePersistence
 import org.http4k.tracing.TraceRender
 import org.http4k.tracing.TraceRenderPersistence
 import org.http4k.tracing.TraceRenderer
+import org.http4k.tracing.TraceReporter
 import org.http4k.tracing.TraceStep
 import org.http4k.tracing.Tracer
 import org.http4k.tracing.junit.RecordingMode.Auto
 import org.http4k.tracing.junit.RecordingMode.Manual
-import org.http4k.tracing.junit.RenderingMode.Always
+import org.http4k.tracing.junit.RenderingMode.Companion.Always
 import org.http4k.tracing.persistence.InMemory
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -127,8 +128,10 @@ class TracerBulletEventsTest {
         traceRenderPersistence,
         { title },
         tracePersistence,
+        TraceReporter.NoOp,
         recordingMode,
         Always,
+        ReportingMode.Always,
     )
 }
 
@@ -152,7 +155,9 @@ inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
 ) { _, m, _ -> TODO(m.name + " not implemented") } as T
 
 private class FakeEC(val exception: Boolean = false) : ExtensionContext by proxy() {
-    override fun getExecutionException() = if(exception) Optional.of<Throwable>(Exception()) else Optional.empty<Throwable>()
+    override fun getExecutionException() =
+        if (exception) Optional.of<Throwable>(Exception()) else Optional.empty<Throwable>()
+
     override fun getTestMethod() = Optional.of(String::class.java.getMethod("toString"))
 }
 

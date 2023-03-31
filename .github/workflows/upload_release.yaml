@@ -12,13 +12,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3.5.0
       - name: Grab tag name
-        uses: olegtarasov/get-tag@v2
+        uses: olegtarasov/get-tag@v2.1.2
         id: tagName
       - name: Setup Java
         uses: actions/setup-java@v3.10.0
         with:
-          distribution: adopt
+          distribution: temurin
           java-version: 11
+          cache: gradle
       - name: Upload to Sonatype
         run: |
           ./gradlew publishMavenJavaPublicationToSonatypeStagingRepository \
@@ -37,8 +38,9 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3.10.0
         with:
-          distribution: adopt
+          distribution: temurin
           java-version: 11
+          cache: gradle
       - name: Release to Maven Central
         run: |
           ./gradlew closeAndReleaseRepository \

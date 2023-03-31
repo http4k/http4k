@@ -21,8 +21,9 @@ jobs:
         name: setup-java
         uses: actions/setup-java@v3.10.0
         with:
-          distribution: adopt
-          java-version: 17
+          distribution: temurin
+          java-version: 11
+          cache: gradle
       - id: step-2
         name: create-branch
         uses: peterjgrainger/action-create-branch@v2.2.0
