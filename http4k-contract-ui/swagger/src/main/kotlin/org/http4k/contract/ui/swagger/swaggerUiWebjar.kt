@@ -18,15 +18,12 @@ import org.http4k.routing.static
  * Serve locally hosted Swagger UI
  */
 fun swaggerUiWebjar(configFn: SwaggerUiConfig.() -> Unit = {}) = routes(
-    // fix relative urls when this handler is nested
     "" bind Method.GET to { Response(Status.FOUND).with(Header.LOCATION of it.uri.appendToPath("index.html")) },
 
-    // Custom Initializer
     SwaggerUiConfig()
         .also(configFn)
         .toFilter()
         .then(static(ResourceLoader.Classpath("org/http4k/contract/ui/swagger-config"))),
 
-    // Embdedded Swagger UI resources
     static(ResourceLoader.Classpath( "/META-INF/resources/webjars/swagger-ui/4.18.1"))
 )

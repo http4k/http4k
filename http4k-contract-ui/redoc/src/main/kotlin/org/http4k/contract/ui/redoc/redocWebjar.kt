@@ -14,13 +14,13 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
 
-fun redocWebjar(configFn: RedocConfig.() -> Unit = {}) = RedocConfig()
-    .also(configFn)
-    .toFilter("redoc.standalone.js")
-    .then(routes(
-        // fix relative urls when this handler is nested
-        "" bind GET to { Response(FOUND).with(Header.LOCATION of it.uri.appendToPath("index.html")) },
+fun redocWebjar(configFn: RedocConfig.() -> Unit = {}) = routes(
+    "" bind GET to { Response(FOUND).with(Header.LOCATION of it.uri.appendToPath("index.html")) },
 
-        static(ResourceLoader.Classpath("org/http4k/contract/ui/redoc/")),
-        static(ResourceLoader.Classpath( "/META-INF/resources/webjars/redoc/2.0.0/"))
-    ))
+    RedocConfig()
+        .also(configFn)
+        .toFilter("redoc.standalone.js")
+        .then(static(ResourceLoader.Classpath("org/http4k/contract/ui/redoc/"))),
+
+    static(ResourceLoader.Classpath( "/META-INF/resources/webjars/redoc/2.0.0/"))
+)
