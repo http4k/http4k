@@ -1,7 +1,7 @@
-title: Swagger UI
-description: Create a Swagger UI for your REST API
+title: Redoc and Swagger UI
+description: Create a Redoc or Swagger UI for your REST API
 
-Http4k's contract module has a few built-in options to render a Swagger UI for your **OpenApi** v2 or v3 description.
+Http4k's contract module has a few built-in options to render a Redoc Swagger UI for your **OpenApi** v2 or v3 description.
 For more detail on generating contracts, see:
 
 - [Http4k Reference: Contracts](/guide/reference/contracts)
