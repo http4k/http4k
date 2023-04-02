@@ -23,7 +23,7 @@ fun main() {
         "/redoc" bind redocLite {
             url = "/openapi.json"
             pageTitle = "Hello Server - Redoc"
-            options["minCharacterLengthToInitSearch"] = "3"
+            options["disable-search"] = "true"
         }
     )
 

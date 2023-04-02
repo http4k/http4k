@@ -5,6 +5,9 @@ changes with their rationale when appropriate:
 
 ### v4.41.4.0 (uncut)
 - **http4k-server-websocket**: [New Module] A lightweight Websocket server built on  [TooTallNate/Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). H/T @oharaandrew314
+- **http4k-contract-ui-redoc**: [New Module] Serve Redoc with the `redocUiWebjar` function.
+- **http4k-contract**: [New Feature] Serve Redoc with the `redocUiLite` function.
+- **http4k-contract-ui-swagger**: [Fix] #880.  `swaggerUiWebjar` now works properly with a non-root path
 
 ### v4.41.3.0
 - **http4k-incubator** TracerBullet diagrams have more options for reporting errors.
