@@ -37,6 +37,6 @@ fun swaggerUiLite(configFn: SwaggerUiConfig.() -> Unit = {}) = SwaggerUiConfig()
     .also(configFn)
     .toFilter()
     .then(routes(
-        static(ResourceLoader.Classpath("org/http4k/contract/ui/public-config/")),
-        static(ResourceLoader.Classpath("org/http4k/contract/ui/public"))
+        static(ResourceLoader.Classpath("org/http4k/contract/ui/swagger-config/")),
+        static(ResourceLoader.Classpath("org/http4k/contract/ui/swagger"))
     ))

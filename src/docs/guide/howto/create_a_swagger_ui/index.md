@@ -1,17 +1,31 @@
-title: Swagger UI
-description: Create a Swagger UI for your REST API
+title: Redoc and Swagger UI
+description: Create a Redoc or Swagger UI for your REST API
 
-Http4k's contract module has a few built-in options to render a Swagger UI for your **OpenApi** v2 or v3 description.
-For more detail on generating contracts, see:
+Http4k makes it easy to include Swagger UI or Redoc in your application.
+These UIs can often replace traditional hand-written documentation for API consumers to learn your API,
+and can even serve as useful debugging tools.
+
+## Build the OpenAPI spec
+
+Swagger UI and Redoc both require an **OpenApi** v2 or v3 description to function.
+Http4k can generate a description for your API with the `http4k-contract` module,
+but any hand-crafted or external description can be used as well.
+
+For more detail on generating **OpenAPI** descriptions, see:
 
 - [Http4k Reference: Contracts](/guide/reference/contracts)
 - [http4k How-to: Integrate with OpenAPI](/guide/howto/integrate_with_openapi)
 
-## Thin UI
+### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/exampleContract.kt)
 
-Rather than host the Swagger UI assets locally, a minimal wrapper will load them from a public CDN.
-This is excellent for applications requiring a minimal footprint (such as serverless functions).
-However, you have less control over the availability and performance of the distribution.
+This simple description will be used for all examples in this guide:
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/exampleContract.kt"></script>
+
+## Build the UI
+
+The `http4-contract` module includes functions to configure and serve Swagger UI, Redoc, or both.
+These "lite" UIs are thin; meaning most of the assets are pulled from an external Public CDN.
 
 ### Installation (Gradle)
 
@@ -22,14 +36,14 @@ dependencies {
 }
 ```
 
-### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/example.kt)
+### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/exampleLite.kt)
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/exampleLite.kt"></script>
 
-## Bundled UI
+## Bundle the UI with Webjars
 
-Http4k will bundle the Swagger UI distribution into your server.
-This option can be more reliable, but will contribute to a larger jar size.
+The "lite" UIs included in the `http4k-contract` module are great for serverless APIs, where binary size is a major concern.
+For more control over the assets, http4k has optional modules to bundle the assets into your application.
 
 ### Installation (Gradle)
 
@@ -37,9 +51,12 @@ This option can be more reliable, but will contribute to a larger jar size.
 dependencies {
     implementation(platform("org.http4k:http4k-bom:4.41.3.0"))
     implementation("org.http4k:http4k-contract-ui-swagger")
+    implementation("org.http4k:http4k-contract-ui-redoc")
 }
 ```
 
-### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/webjarExample.kt)
+You can pick and choose whether you want Redoc, Swagger UI, or both bundled with your application.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/webjarExample.kt"></script>
+### Example [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/exampleWebjar.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/create_a_swagger_ui/exampleWebjar.kt"></script>

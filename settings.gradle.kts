@@ -43,6 +43,7 @@ include("http4k-cloudnative")
 include("http4k-contract")
 "http4k-contract-ui".apply {
     includeModule("swagger")
+    includeModule("redoc")
 }
 
 "http4k-format".apply {
