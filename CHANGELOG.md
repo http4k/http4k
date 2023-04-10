@@ -3,6 +3,17 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.0.0.0
+- **http4k-*** : [Breaking] Remove all previous deprecations from all modules for v4. To upgrade cleanly, first upgrade to `v4.41.4.0` and then re-upgrade to `v5.0.0.0`. This will ensure that you only have to deal with Deprecations between the major versions.
+- **http4k-templates-dust**: [Breaking] Nashorn is finally removed, so we are dropping support for this module. If you are on-pre Java 19 you can continue to use the old module version with no breaking changes.
+- **http4k-***: [Breaking] http4k is now built with Java 19+. We are still compiling for older Java versions. New major versions will now be incoming with every major JDK release in order to track new and retired JVM features (6 month cycle).
+- **http4k-server-jetty**: New Server Backend `JettyLoom`, based on Loom VirtualThreads. Requires Java >=19 to use.
+- **http4k-core**: New Server Backend `SunHttpLoom`, based on Loom VirtualThreads. Requires Java >=19 to use.
+- **http4k-server-helidon**: [New Module] Helidon is a Loom-first rewrite of the popular server. Requires Java >= to use.
+- **http4k-server-websocket**: [New Module] A lightweight Websocket server built on  [TooTallNate/Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). H/T @oharaandrew314
+- **http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
+- **http4k-testing-tracerbullet**: [New Module] TracerBullet allows you to hook into the http4k `Events` implementation to visually document your applications. See example in reference guide.
+
 ### v4.48.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.8.22.
 
@@ -60,8 +71,6 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.41.4.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-websocket**: [New Module] A lightweight Websocket server built
-  on  [TooTallNate/Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). H/T @oharaandrew314
 - **http4k-contract-ui-redoc**: [New Module] Serve Redoc with the `redocUiWebjar` function.
 - **http4k-contract**: [New Feature] Serve Redoc with the `redocUiLite` function.
 - **http4k-contract-ui-swagger**: [Fix] #880. `swaggerUiWebjar` now works properly with a non-root path. Plus
