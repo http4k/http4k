@@ -8,10 +8,9 @@ import io.undertow.UndertowOptions.ENABLE_HTTP2
 import io.undertow.server.handlers.BlockingHandler
 import io.undertow.server.handlers.GracefulShutdownHandler
 import org.http4k.core.HttpHandler
-import org.http4k.server.ServerConfig.StopMode
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.server.ServerConfig.StopMode
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
@@ -46,6 +45,7 @@ class Undertow(
             val server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, enableHttp2)
+                .setWorkerThreads(32 * Runtime.getRuntime().availableProcessors())
                 .setHandler(handlerWithSse).build()
 
             override fun start() = apply { server.start() }
