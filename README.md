@@ -178,6 +178,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Record and replay versioned HTTP contracts to/from `Servirtium` Markdown format. Includes Servirtium MiTM server and simple JUnit extensions.
 * [Strikt:](https://http4k.org/guide/reference/strikt) 
     * A set of Strikt matchers for testing [http4k] Request and Response messages.
+* [TracerBullet:](https://http4k.org/guide/reference/tracerbuller)
+    * Visually document your applications using the JUnit plugin.
 * [WebDriver:](https://http4k.org/guide/reference/webdriver)
     * Ultra-lightweight Selenium WebDriver implementation for [http4k] application.
     

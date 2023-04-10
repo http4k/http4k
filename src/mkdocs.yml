@@ -106,6 +106,7 @@ nav:
       - Kotest: guide/reference/kotest/index.md
       - Service Virtualisation: guide/reference/servicevirtualisation/index.md
       - Strikt: guide/reference/strikt/index.md
+      - Tracer Bullet: guide/reference/tracerbullet/index.md
       - WebDriver: guide/reference/webdriver/index.md
   - Blog:
     - Overview: blog/index.md

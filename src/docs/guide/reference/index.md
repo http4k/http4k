@@ -78,3 +78,4 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/strikt"><span class="pill">Strikt</span></a>
 <a href="/guide/reference/servicevirtualisation"><span class="pill">Servirtium</span></a>
 <a href="/guide/reference/webdriver"><span class="pill">WebDriver</span></a>
+<a href="/guide/reference/tracerbullet"><span class="pill">Tracer Bullet</span></a>

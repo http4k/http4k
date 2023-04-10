@@ -1,5 +1,5 @@
 title: http4k How-to: Self Document Systems with Tests
-description: Recipes for creating a Distributed Tracing Tree
+description: Recipe for creating a Distributed Tracing Tree
 
 ### Gradle setup
 
