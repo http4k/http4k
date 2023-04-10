@@ -13,8 +13,8 @@ tasks {
         exclude("**/*")
     }
 
-    task("runTests", JavaExec::class) {
-        main = "org.junit.platform.console.ConsoleLauncher"
+    register<JavaExec>("runTests") {
+        mainClass.set("org.junit.platform.console.ConsoleLauncher")
         classpath = sourceSets["test"].runtimeClasspath
         args = listOf("--scan-class-path")
         jvmArgs = listOf("--enable-preview")
