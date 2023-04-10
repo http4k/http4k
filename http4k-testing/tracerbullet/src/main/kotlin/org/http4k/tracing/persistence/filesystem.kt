@@ -9,7 +9,6 @@ import org.http4k.tracing.persistence.TraceMoshi.asA
 import org.http4k.tracing.persistence.TraceMoshi.asFormatString
 import org.http4k.tracing.persistence.TraceMoshi.prettify
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Files.createTempDirectory
 import java.util.Locale
 

@@ -129,5 +129,6 @@ include("http4k-realtime-core")
     includeModule("kotest")
     includeModule("strikt")
     includeModule("servirtium")
+    includeModule("tracerbullet")
     includeModule("webdriver")
 }

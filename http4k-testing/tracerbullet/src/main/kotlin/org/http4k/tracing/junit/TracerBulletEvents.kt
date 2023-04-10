@@ -3,7 +3,6 @@ package org.http4k.tracing.junit
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.testing.RecordingEvents
-import org.http4k.tracing.TraceReporter
 import org.http4k.tracing.ScenarioTraces
 import org.http4k.tracing.StartRendering
 import org.http4k.tracing.StopRendering
@@ -12,6 +11,7 @@ import org.http4k.tracing.TraceCompletion.incomplete
 import org.http4k.tracing.TracePersistence
 import org.http4k.tracing.TraceRenderPersistence
 import org.http4k.tracing.TraceRenderer
+import org.http4k.tracing.TraceReporter
 import org.http4k.tracing.Tracer
 import org.http4k.tracing.TracerBullet
 import org.http4k.tracing.VcrEvents
