@@ -5,7 +5,7 @@ description: Recipe for using WebJars with http4k
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.3.0"))
+    implementation(platform("org.http4k:http4k-bom:4.41.4.0"))
     implementation("org.http4k:http4k-core")
 
     // for the example...
