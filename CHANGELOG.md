@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.41.4.0 (uncut)
+### v4.41.4.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-server-websocket**: [New Module] A lightweight Websocket server built on  [TooTallNate/Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). H/T @oharaandrew314
 - **http4k-contract-ui-redoc**: [New Module] Serve Redoc with the `redocUiWebjar` function.
