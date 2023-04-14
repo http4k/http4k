@@ -73,5 +73,6 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/chaos"><span class="pill">Chaos Monkey</span></a>
 <a href="/guide/reference/hamkrest"><span class="pill">Hamkrest</span></a>
 <a href="/guide/reference/kotest"><span class="pill">Kotest</span></a>
+<a href="/guide/reference/strikt"><span class="pill">Strikt</span></a>
 <a href="/guide/reference/servicevirtualisation"><span class="pill">Servirtium</span></a>
 <a href="/guide/reference/webdriver"><span class="pill">WebDriver</span></a>
