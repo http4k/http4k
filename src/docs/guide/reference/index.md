@@ -20,12 +20,12 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/servers"><span class="pill">Undertow</span></a>
 
 ### HTTP Serverless Backends
-<a href="/guide/reference/servers"><span class="pill">Alibaba Function Compute</span></a>
-<a href="/guide/reference/servers"><span class="pill">Apache OpenWhisk</span></a>
-<a href="/guide/reference/servers"><span class="pill">AWS Lambda</span></a>
-<a href="/guide/reference/servers"><span class="pill">Azure Functions</span></a>
-<a href="/guide/reference/servers"><span class="pill">Google Cloud Functions</span></a>
-<a href="/guide/reference/servers"><span class="pill">Tencent Serverless Cloud Functions</span></a>
+<a href="/guide/reference/serverless"><span class="pill">Alibaba Function Compute</span></a>
+<a href="/guide/reference/serverless"><span class="pill">Apache OpenWhisk</span></a>
+<a href="/guide/reference/serverless"><span class="pill">AWS Lambda</span></a>
+<a href="/guide/reference/serverless"><span class="pill">Azure Functions</span></a>
+<a href="/guide/reference/serverless"><span class="pill">Google Cloud Functions</span></a>
+<a href="/guide/reference/serverless"><span class="pill">Tencent Serverless Cloud Functions</span></a>
 
 ### HTTP Clients
 <a href="/guide/reference/clients"><span class="pill">Apache4 Sync & Async</span></a>
@@ -66,6 +66,7 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/micrometer"><span class="pill">Micrometer</span></a>
 <a href="/guide/reference/opentelemetry"><span class="pill">OpenTelemetry</span></a>
 <a href="/guide/reference/resilience4j"><span class="pill">Resilience4J</span></a>
+<a href="/guide/reference/failsafe"><span class="pill">FailSafe</span></a>
 
 ### Testing
 <a href="/guide/reference/approvaltests"><span class="pill">Approval Testing</span></a>
