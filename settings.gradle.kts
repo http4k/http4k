@@ -89,7 +89,7 @@ include("http4k-realtime-core")
     includeModule("alibaba")
     includeModule("alibaba:integration-test:test-function")
     includeModule("azure")
-    includeModule("azure:integration-test:test-function")
+//    includeModule("azure:integration-test:test-function")    REMOVED DUE TO: Caused by: org.objectweb.asm.MethodTooLargeException: Method too large: com/azure/resourcemanager/appservice/implementation/WebAppsClientImpl.$deserializeLambda$ (Ljava/lang/invoke/SerializedLambda;)Ljava/lang/Object;
     includeModule("gcf")
     includeModule("gcf:integration-test:test-function")
     includeModule("lambda")
