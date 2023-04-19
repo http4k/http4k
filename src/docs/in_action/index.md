@@ -1,11 +1,12 @@
 title: http4k in Action
 description: Example applications and usages of http4k, including TDD approach 
 
-### Presentations: 
+### Media: 
 
+- *"Exploring the Testing Hyperpyramid with Kotlin & http4k" @ KotlinConf 2023* ([video](https://www.youtube.com/live/hXEY0tD4_lM?feature=share&t=772) / [slides](https://speakerdeck.com/daviddenton/exploring-the-testing-hyperpyramid-with-kotlin-and-http4k) / [repo](https://github.com/http4k/exploring-the-testing-hyperpyramid) / )
 - *"Talking Kotlin ep. 99: HTTP as a function with http4k"* ([video](https://www.youtube.com/watch?v=mPmUjJhdYME) / [podcast](https://overcast.fm/+QCXbEUw4Q))
 - *"http4k: Server as a Function"* ([video](https://www.youtube.com/watch?v=NjoCjupV8HE)), part of JetBrain's [Webinar series](https://blog.jetbrains.com/kotlin/2021/05/server-side-with-kotlin-webinar-series-vol-3/)   
-- *"Server as a Function. In Kotlin. _______________"* ([video](http://bit.ly/serverasafunction) / [slides](https://speakerdeck.com/daviddenton/server-as-a-function-in-kotlin)), by [David Denton](https://twitter.com/tarkaTheRotter) and [Ivan Sanchez](https://twitter.com/s4nchez), presented at KotlinConf 2018.
+- *"Server as a Function. In Kotlin. _______________" @ KotlinConf 2018* ([video](http://bit.ly/serverasafunction) / [slides](https://speakerdeck.com/daviddenton/server-as-a-function-in-kotlin)), by [David Denton](https://twitter.com/tarkaTheRotter) and [Ivan Sanchez](https://twitter.com/s4nchez)
 - *"Writing Test Driven Apps with http4k"* ([video](https://bit.ly/tdd-http4k-kotliners)), by [David Denton](https://twitter.com/tarkaTheRotter) and [Ivan Sanchez](https://twitter.com/s4nchez), presented at Kotliners 2020. 
 - *"Designing Microservices in Functional Style"* ([video](https://bit.ly/uberto-functional-microservices)) by [Uberto Barbini](https://twitter.com/ramtop), presented at VirtualJUG 2020.
 - *"Introduction to http4k"* ([video](https://www.youtube.com/watch?v=FVvn-aFO--Q)) by [Dmitry Kandalov](https://twitter.com/dmitrykandalov), based on previous conference talks, recorded in 2021.
