@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.42.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-kotest** : [Possible break] Fix of [this Kotest issue](https://github.com/kotest/kotest/issues/3130) in new dependency release might lead to some surprising changes in behaviour of matchers for comparing JSON nodes
+
 ### v4.41.4.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-server-websocket**: [New Module] A lightweight Websocket server built on  [TooTallNate/Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). H/T @oharaandrew314
