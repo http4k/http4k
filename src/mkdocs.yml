@@ -94,6 +94,7 @@ nav:
       - Failsafe: guide/reference/failsafe/index.md
     - AWS: guide/reference/aws/index.md
     - OAuth: guide/reference/oauth/index.md
+    - Digest: guide/reference/digest/index.md
     - GraphQL: guide/reference/graphql/index.md
     - JSON RPC: guide/reference/jsonrpc/index.md
     - XML handling: guide/reference/xml/index.md
