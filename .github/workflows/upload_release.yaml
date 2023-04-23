@@ -22,7 +22,7 @@ jobs:
           cache: gradle
       - name: Upload to Sonatype
         run: |
-          ./gradlew publishToSonatype closeSonatypeStagingRepository \
+          ./gradlew publishToSonatype \
           -Psign=true \
           -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
           -PsigningKey="${{ secrets.SIGNING_KEY }}" \
@@ -43,6 +43,6 @@ jobs:
           cache: gradle
       - name: Release to Maven Central
         run: |
-          ./gradlew closeAndReleaseRepository \
+          ./gradlew closeSonatypeStagingRepository \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
