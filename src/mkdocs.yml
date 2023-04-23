@@ -89,9 +89,8 @@ nav:
     - Cloud Events: guide/reference/cloud_events/index.md
     - Micrometer: guide/reference/micrometer/index.md
     - OpenTelemetry: guide/reference/opentelemetry/index.md
-    - Fault Tolerance:
-      - Resilience4J: guide/reference/resilience4j/index.md
-      - Failsafe: guide/reference/failsafe/index.md
+    - Resilience4J: guide/reference/resilience4j/index.md
+    - Failsafe: guide/reference/failsafe/index.md
     - AWS: guide/reference/aws/index.md
     - OAuth: guide/reference/oauth/index.md
     - Digest: guide/reference/digest/index.md
