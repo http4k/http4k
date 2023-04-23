@@ -43,6 +43,6 @@ jobs:
           cache: gradle
       - name: Release to Maven Central
         run: |
-          ./gradlew closeSonatypeStagingRepository \
+          ./gradlew closeAndReleaseSonatypeStagingRepository \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
