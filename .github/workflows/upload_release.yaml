@@ -22,7 +22,7 @@ jobs:
           cache: gradle
       - name: Upload to Sonatype
         run: |
-          ./gradlew publishMavenJavaPublicationToSonatypeStagingRepository \
+          ./gradlew publishToSonatype closeSonatypeStagingRepository \
           -Psign=true \
           -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
           -PsigningKey="${{ secrets.SIGNING_KEY }}" \
