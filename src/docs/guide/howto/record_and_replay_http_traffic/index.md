@@ -7,7 +7,7 @@ A set of classes to provide simple recording/replaying of HTTP traffic. This is 
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.42.0.0"))
+    implementation(platform("org.http4k:http4k-bom:4.42.1.0"))
     implementation("org.http4k:http4k-core")
 }
 ```
