@@ -78,8 +78,14 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     @Test
     fun `get fields`() {
         j {
-            val fields = listOf("hello" to string("world"), "hello2" to string("world2"))
-            assertThat(fields(obj(fields)).toList(), equalTo(fields))
+            val result = fields(obj(listOf("hello" to string("world"), "hello2" to string("world2")))).associate {
+                it.first to (typeOf(it.second) to text(it.second))
+            }
+
+            assertThat(result, equalTo(mapOf(
+                "hello" to (JsonType.String to "world"),
+                "hello2" to (JsonType.String to "world2")
+            )))
         }
     }
 
