@@ -2,14 +2,16 @@ import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.time.Duration
 
 plugins {
     kotlin("jvm")
     idea
     jacoco
-    signing
-    publishing
+    `java-library`
     `maven-publish`
+    signing
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
 }
 
 buildscript {
@@ -22,11 +24,8 @@ buildscript {
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
         classpath("gradle.plugin.com.github.johnrengelman:shadow:_")
-        classpath("io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_")
     }
 }
-
-apply(plugin = "io.codearte.nexus-staging")
 
 allprojects {
     apply(plugin = "java")
@@ -133,28 +132,7 @@ subprojects {
             }
         }
 
-        val nexusUsername: String? by project
-        val nexusPassword: String? by project
-
         publishing {
-            repositories {
-                maven {
-                    name = "SonatypeStaging"
-                    setUrl("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                    credentials {
-                        username = nexusUsername
-                        password = nexusPassword
-                    }
-                }
-                maven {
-                    name = "SonatypeSnapshot"
-                    setUrl("https://oss.sonatype.org/content/repositories/snapshots/")
-                    credentials {
-                        username = nexusUsername
-                        password = nexusPassword
-                    }
-                }
-            }
             publications {
                 val archivesBaseName = tasks.jar.get().archiveBaseName.get()
                 create<MavenPublication>("mavenJava") {
@@ -267,5 +245,21 @@ tasks.named<KotlinCompile>("compileTestKotlin") {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
+    }
+}
+
+val nexusUsername: String? by project
+val nexusPassword: String? by project
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username.set(nexusUsername)
+            password.set(nexusPassword)
+        }
+    }
+    transitionCheckOptions {
+        maxRetries.set(150)
+        delayBetween.set(Duration.ofSeconds(5))
     }
 }

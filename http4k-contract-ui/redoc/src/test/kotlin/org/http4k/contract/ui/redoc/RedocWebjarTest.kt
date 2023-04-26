@@ -18,7 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 class RedocWebjarTest {
 
     @Test // regression test for issue 880
-    fun `base path redirects to index`(approver: Approver) {
+    fun `base path redirects to index`() {
         val handler = routes(
             "ui" bind redocWebjar()
         )

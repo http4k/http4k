@@ -6,7 +6,7 @@ on:
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:
-  StageMC:
+  ReleaseMC:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,27 +22,11 @@ jobs:
           cache: gradle
       - name: Upload to Sonatype
         run: |
-          ./gradlew publishMavenJavaPublicationToSonatypeStagingRepository \
+          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository \
           -Psign=true \
           -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
           -PsigningKey="${{ secrets.SIGNING_KEY }}" \
           -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}" \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
-  ReleaseMC:
-    needs: [StageMC]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.5.0
-      - name: Setup Java
-        uses: actions/setup-java@v3.10.0
-        with:
-          distribution: temurin
-          java-version: 11
-          cache: gradle
-      - name: Release to Maven Central
-        run: |
-          ./gradlew closeAndReleaseRepository \
-          -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
-          -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
+  

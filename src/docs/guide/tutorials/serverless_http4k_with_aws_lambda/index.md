@@ -17,7 +17,7 @@ We'll take an existing http4k application built with Gradle, add the bits that a
 We need to add the AWS Lambda Serverless module to our project. Install it into your `build.gradle` file with:
 
 ```kotlin
-implementation("org.http4k:http4k-serverless-lambda:4.41.4.0")
+implementation("org.http4k:http4k-serverless-lambda:4.42.1.0")
 ```
 
 #### Step 2

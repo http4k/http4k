@@ -3,7 +3,13 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v4.42.0.0 (uncut)
+### v4.42.2.0 (uncut)
+- **http4k-server-undertow** : Upgrade websocket requests based on other common headers. H/T @endofhome
+
+### v4.42.1.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v4.42.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-kotest** : [Possible break] Fix of [this Kotest issue](https://github.com/kotest/kotest/issues/3130) in new dependency release might lead to some surprising changes in behaviour of matchers for comparing JSON nodes
 

@@ -5,7 +5,7 @@ description: Feature overview of the http4k-security-oauth form module
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.41.4.0"))
+    implementation(platform("org.http4k:http4k-bom:4.42.1.0"))
     implementation("org.http4k:http4k-security-oauth")
 }
 ```
