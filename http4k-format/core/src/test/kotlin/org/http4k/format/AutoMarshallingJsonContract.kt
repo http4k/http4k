@@ -16,7 +16,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     override val expectedRegexSpecial = """{"regex":".*"}"""
     override val expectedAutoMarshallingZonesAndLocale = """{"zoneId":"America/Toronto","zoneOffset":"-04:00","locale":"en-CA"}"""
 
-    val expectedCustomWrappedNumber = """{"value":"1.01"}"""
+    open val expectedCustomWrappedNumber = """{"value":"1.01"}"""
     val expectedInOutOnly = """{"value":"foobar"}"""
     override val expectedMap = """{"key":"value","key2":"123"}"""
     override val expectedAbitraryArray = """["foo",123.1,{"foo":"bar"},[1.1,2.1],true]"""

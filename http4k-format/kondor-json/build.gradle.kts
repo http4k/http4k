@@ -6,6 +6,7 @@ dependencies {
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-contract"))
     testImplementation(project(":http4k-jsonrpc"))
+    testImplementation("dev.forkhandles:values4k:_")
     testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
     testImplementation(project(path = ":http4k-format-core", configuration = "testArtifacts"))
     testImplementation(project(path = ":http4k-contract", configuration = "testArtifacts"))
