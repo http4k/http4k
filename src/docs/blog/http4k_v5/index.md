@@ -3,7 +3,7 @@ description:  There's a new major http4k release! Read about all the new stuff t
 
 #  http4k v5: New Servers, More Modules, TracerBullet, and More
 
-##### april 2023 / the http4k team
+##### may 2023 / the http4k team
 
 We’re thrilled to announce the next big version of http4k! Since the last major release, the team has been busy enhancing existing features and adding new capabilities based on the needs of our loved community.
 
@@ -36,7 +36,7 @@ As a side-effect of introducing TracerBullet, http4k can automatically generate 
 
 The http4k-connect library, which offers featherweight zero-reflection adapters based on the "connect pattern," now supports 12 popular AWS services. Additionally, it provides in-memory lightweight fakes for testing and five different storage backends, further enhancing its capabilities and usefulness in your projects.
 
-Removal of deprecated and unsupported features
+### Removal of deprecated and unsupported features
 
 As part of the major release cycle, we’re removing all code marked as deprecated in v4.
 
