@@ -191,11 +191,11 @@ bool: true
     }
 
     override fun strictMarshaller() =
-        object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
+        object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise().done()) {}
 
     override fun customMarshaller() =
-        object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
+        object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise().done()) {}
 
     override fun customMarshallerProhibitStrings() =
-        object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
+        object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise().done()) {}
 }

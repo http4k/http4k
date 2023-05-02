@@ -1,10 +1,7 @@
 package org.http4k.format
 
 import com.ubertob.kondor.json.JInstance
-import com.ubertob.kondor.json.JStringRepresentable
 import com.ubertob.kondor.json.JsonConverter
-import com.ubertob.kondor.json.JsonOutcome
-import com.ubertob.kondor.json.jsonnode.BooleanNode
 import com.ubertob.kondor.json.jsonnode.JsonNode
 import com.ubertob.kondor.json.jsonnode.JsonNodeArray
 import com.ubertob.kondor.json.jsonnode.JsonNodeBoolean
@@ -12,21 +9,25 @@ import com.ubertob.kondor.json.jsonnode.JsonNodeNull
 import com.ubertob.kondor.json.jsonnode.JsonNodeNumber
 import com.ubertob.kondor.json.jsonnode.JsonNodeObject
 import com.ubertob.kondor.json.jsonnode.JsonNodeString
-import com.ubertob.kondor.json.jsonnode.NodeKind
 import com.ubertob.kondor.json.jsonnode.NodePath
 import com.ubertob.kondor.json.jsonnode.NodePathRoot
 import com.ubertob.kondor.json.jsonnode.NodePathSegment
-import com.ubertob.kondor.json.jsonnode.NumberNode
 import com.ubertob.kondor.json.jsonnode.parseJsonNode
 import com.ubertob.kondor.json.parser.pretty
-import com.ubertob.kondor.json.tryFromNode
+import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.lens.BiDiMapping
+import org.http4k.lens.ContentNegotiation
+import org.http4k.websocket.WsMessage
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-open class ConfigurableKondorJson(init: Registry.() -> Registry = { this }) : AutoMarshallingJson<JsonNode>() {
+open class ConfigurableKondorJson(
+    init: Registry.() -> Registry,
+    val defaultContentType: ContentType = ContentType.APPLICATION_JSON
+) : AutoMarshallingJson<JsonNode>() {
 
     private val registry = Registry()
 
@@ -109,7 +110,27 @@ open class ConfigurableKondorJson(init: Registry.() -> Registry = { this }) : Au
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = registry.converterFor(target).fromJsonNode(j)
     override fun asJsonObject(input: Any): JsonNode = registry.converterFor(input).toJsonNode(input)
 
-    class Registry {
+    inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
+
+    inline fun <reified T : Any> WsMessage.Companion.auto() =
+        WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+
+    inline fun <reified T : Any> Body.Companion.auto(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None,
+        contentType: ContentType = defaultContentType
+    ) = autoBody<T>(description, contentNegotiation, contentType)
+
+    inline fun <reified T : Any> autoBody(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None,
+        contentType: ContentType = defaultContentType
+    ) =
+        httpBodyLens(description, contentNegotiation, contentType).map(
+            { asA<T>(it) },
+            { it.asJsonObject().asCompactJsonString() })
+
+    class Registry : JConverterResolver {
         private val converters = mutableListOf<ConverterWrapper<*, *>>()
 
         init {
@@ -119,6 +140,9 @@ open class ConfigurableKondorJson(init: Registry.() -> Registry = { this }) : Au
         internal fun <T, JN : JsonNode> register(target: Class<T>, converter: JsonConverter<T, JN>) {
             converters += ConverterWrapper(target, converter)
         }
+
+        override operator fun <T: Any> get(target: KClass<T>): JsonConverter<T, *> =
+            converterFor(target).converter
 
         @Suppress("UNCHECKED_CAST")
         internal fun <T : Any> converterFor(target: KClass<T>): ConverterWrapper<T, *> =
@@ -133,7 +157,13 @@ open class ConfigurableKondorJson(init: Registry.() -> Registry = { this }) : Au
     }
 }
 
-internal class ConverterWrapper<T, JN: JsonNode>(private val target: Class<T>, private val converter: JsonConverter<T, JN>) {
+inline operator fun <reified T: Any> JConverterResolver.invoke(): JsonConverter<T, *> = get(T::class)
+
+interface JConverterResolver {
+    operator fun <T: Any> get(target: KClass<T>): JsonConverter<T, *>
+}
+
+internal class ConverterWrapper<T, JN: JsonNode>(private val target: Class<T>, internal val converter: JsonConverter<T, JN>) {
     fun canConvert(input: Any) = target.isInstance(input)
     fun canConvert(clazz: KClass<*>) = target == clazz.java
 
@@ -145,70 +175,41 @@ internal class ConverterWrapper<T, JN: JsonNode>(private val target: Class<T>, p
     fun fromJsonNode(node: JsonNode): T = converter.fromJsonNode(node as JN).orThrow()
 }
 
-class KondorJsonAutoMappingConfiguration(private val registry : ConfigurableKondorJson.Registry) : AutoMappingConfiguration<ConfigurableKondorJson.Registry> {
+inline fun <reified T: Any, JN : JsonNode> AutoMappingConfiguration<ConfigurableKondorJson.Registry>.register(converter: JsonConverter<T, JN>) =
+    (this as KondorJsonAutoMappingConfiguration).register(T::class, converter)
 
-    inline fun <reified T: Any, JN : JsonNode> register(converter: JsonConverter<T, JN>) = apply {
-        register(T::class, converter)
-    }
+class KondorJsonAutoMappingConfiguration(private val registry : ConfigurableKondorJson.Registry) : AutoMappingConfiguration<ConfigurableKondorJson.Registry> {
 
     fun <T: Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>) = apply {
         registry.register(target.java, converter)
     }
 
-
     override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = apply {
-        registry.register(mapping.clazz, object : JsonConverter<OUT, JsonNodeBoolean> {
-            override val _nodeType: NodeKind<JsonNodeBoolean> = BooleanNode
-            override fun fromJsonNode(node: JsonNodeBoolean): JsonOutcome<OUT> = tryFromNode(node) { mapping(node.value) }
-            override fun toJsonNode(value: OUT, path: NodePath): JsonNodeBoolean = JsonNodeBoolean(mapping(value), path)
-        })
+        registry.register(mapping.clazz, JBiDiMappingBoolean(mapping))
     }
 
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = apply {
-        registry.register(mapping.clazz, object : JsonConverter<OUT, JsonNodeNumber> {
-            override val _nodeType: NodeKind<JsonNodeNumber> = NumberNode
-            override fun fromJsonNode(node: JsonNodeNumber): JsonOutcome<OUT> = tryFromNode(node) { mapping(node.num.intValueExact()) }
-            override fun toJsonNode(value: OUT, path: NodePath): JsonNodeNumber = JsonNodeNumber(mapping(value).toBigDecimal(), path)
-        })
+        registry.register(mapping.clazz, JBiDiMappingInt(mapping))
     }
 
     override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = apply {
-        registry.register(mapping.clazz, object : JsonConverter<OUT, JsonNodeNumber> {
-            override val _nodeType: NodeKind<JsonNodeNumber> = NumberNode
-            override fun fromJsonNode(node: JsonNodeNumber): JsonOutcome<OUT> = tryFromNode(node) { mapping(node.num.longValueExact()) }
-            override fun toJsonNode(value: OUT, path: NodePath): JsonNodeNumber = JsonNodeNumber(mapping(value).toBigDecimal(), path)
-        })
+        registry.register(mapping.clazz, JBiDiMappingLong(mapping))
     }
 
     override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) = apply {
-        registry.register(mapping.clazz, object : JsonConverter<OUT, JsonNodeNumber> {
-            override val _nodeType: NodeKind<JsonNodeNumber> = NumberNode
-            override fun fromJsonNode(node: JsonNodeNumber): JsonOutcome<OUT> = tryFromNode(node) { mapping(node.num.toDouble()) }
-            override fun toJsonNode(value: OUT, path: NodePath): JsonNodeNumber = JsonNodeNumber(mapping(value).toBigDecimal(), path)
-        })
+        registry.register(mapping.clazz, JBiDiMappingDouble(mapping))
     }
 
     override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) = apply {
-        registry.register(mapping.clazz, object : JsonConverter<OUT, JsonNodeNumber> {
-            override val _nodeType: NodeKind<JsonNodeNumber> = NumberNode
-            override fun fromJsonNode(node: JsonNodeNumber): JsonOutcome<OUT> = tryFromNode(node) { mapping(node.num.toBigIntegerExact()) }
-            override fun toJsonNode(value: OUT, path: NodePath): JsonNodeNumber = JsonNodeNumber(mapping(value).toBigDecimal(), path)
-        })
+        registry.register(mapping.clazz, JBiDiMappingBigInteger(mapping))
     }
 
     override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) = apply {
-        registry.register(mapping.clazz, object : JsonConverter<OUT, JsonNodeNumber> {
-            override val _nodeType: NodeKind<JsonNodeNumber> = NumberNode
-            override fun fromJsonNode(node: JsonNodeNumber): JsonOutcome<OUT> = tryFromNode(node) { mapping(node.num) }
-            override fun toJsonNode(value: OUT, path: NodePath): JsonNodeNumber = JsonNodeNumber(mapping(value), path)
-        })
+        registry.register(mapping.clazz, JBiDiMappingBigDecimal(mapping))
     }
 
     override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = apply {
-        registry.register(mapping.clazz, object : JStringRepresentable<OUT>() {
-            override val cons: (String) -> OUT = mapping::invoke
-            override val render: (OUT) -> String = mapping::invoke
-        })
+        registry.register(mapping.clazz, JBiDiMappingString(mapping))
     }
 
     override fun done(): ConfigurableKondorJson.Registry = registry

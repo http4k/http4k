@@ -287,7 +287,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     abstract fun customMarshallerProhibitStrings(): AutoMarshalling
 }
 
-fun <T> AutoMappingConfiguration<T>.customise(): T = bigDecimal(::BigDecimalHolder, BigDecimalHolder::value)
+fun <T> AutoMappingConfiguration<T>.customise(): AutoMappingConfiguration<T> = bigDecimal(::BigDecimalHolder, BigDecimalHolder::value)
     .bigInteger(::BigIntegerHolder, BigIntegerHolder::value)
     .boolean(::BooleanHolder, BooleanHolder::value)
     .text(::AnotherString, AnotherString::value)
@@ -305,6 +305,5 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = bigDecimal(::BigDecimalHold
     .zonedDateTime({ it }, { it })
     .value(MyValue)
     .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
-    .done()
 
 fun String.normaliseJson() = replace(" : ", ":").replace(": ", ":").replace(", ", ",")

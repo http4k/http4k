@@ -59,9 +59,9 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
 
     override fun strictMarshaller() = throw UnsupportedOperationException()
 
-    override fun customMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
+    override fun customMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise().done()) {}
     override fun customMarshallerProhibitStrings() = object : ConfigurableGson(GsonBuilder().asConfigurable().prohibitStrings()
-        .customise()) {}
+        .customise().done()) {}
 }
 
 class GsonTest : JsonContract<JsonElement>(Gson) {
