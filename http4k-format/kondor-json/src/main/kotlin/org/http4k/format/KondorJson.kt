@@ -5,7 +5,7 @@ object KondorJson : ConfigurableKondorJson({
         .withStandardMappings()
         .done()
 }) {
-    fun custom(configure:AutoMappingConfiguration<Registry>.() -> AutoMappingConfiguration<Registry>) =
+    fun custom(configure:AutoMappingConfiguration<JConverterResolver>.() -> AutoMappingConfiguration<JConverterResolver>) =
         ConfigurableKondorJson({asConfigurable().withStandardMappings().let(configure).done()})
 }
 

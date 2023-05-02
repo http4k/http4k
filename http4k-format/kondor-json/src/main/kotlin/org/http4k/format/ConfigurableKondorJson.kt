@@ -18,6 +18,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.io.InputStream
 import java.math.BigDecimal
@@ -25,7 +26,7 @@ import java.math.BigInteger
 import kotlin.reflect.KClass
 
 open class ConfigurableKondorJson(
-    init: Registry.() -> Registry,
+    init: JConverterResolver.() -> JConverterResolver,
     val defaultContentType: ContentType = ContentType.APPLICATION_JSON
 ) : AutoMarshallingJson<JsonNode>() {
 
@@ -104,16 +105,21 @@ open class ConfigurableKondorJson(
         }
 
     // auto
+    
+    val converterResolver: JConverterResolver = registry
 
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = registry.converterFor(target).fromJson(input)
     override fun <T : Any> asA(input: String, target: KClass<T>): T = registry.converterFor(target).fromJson(input)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = registry.converterFor(target).fromJsonNode(j)
     override fun asJsonObject(input: Any): JsonNode = registry.converterFor(input).toJsonNode(input)
 
-    inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
-
     inline fun <reified T : Any> WsMessage.Companion.auto() =
-        WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+        converterResolver[T::class].let { converter ->
+            WsMessage.string().map(
+                { converter.fromJson(it).orThrow() },
+                { converter.toJsonNode(it, NodePathRoot).asCompactJsonString() }
+            )
+        }
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
@@ -126,11 +132,14 @@ open class ConfigurableKondorJson(
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
         contentType: ContentType = defaultContentType
     ) =
-        httpBodyLens(description, contentNegotiation, contentType).map(
-            { asA<T>(it) },
-            { it.asJsonObject().asCompactJsonString() })
+        converterResolver[T::class].let { converter ->
+            httpBodyLens(description, contentNegotiation, contentType).map(
+                { converter.fromJson(it).orThrow() },
+                { converter.toJsonNode(it, NodePathRoot).asCompactJsonString() }
+            )
+        }
 
-    class Registry : JConverterResolver {
+    internal class Registry : JConverterResolver {
         private val converters = mutableListOf<ConverterWrapper<*, *>>()
 
         init {
@@ -175,10 +184,10 @@ internal class ConverterWrapper<T, JN: JsonNode>(private val target: Class<T>, i
     fun fromJsonNode(node: JsonNode): T = converter.fromJsonNode(node as JN).orThrow()
 }
 
-inline fun <reified T: Any, JN : JsonNode> AutoMappingConfiguration<ConfigurableKondorJson.Registry>.register(converter: JsonConverter<T, JN>) =
+inline fun <reified T: Any, JN : JsonNode> AutoMappingConfiguration<JConverterResolver>.register(converter: JsonConverter<T, JN>) =
     (this as KondorJsonAutoMappingConfiguration).register(T::class, converter)
 
-class KondorJsonAutoMappingConfiguration(private val registry : ConfigurableKondorJson.Registry) : AutoMappingConfiguration<ConfigurableKondorJson.Registry> {
+class KondorJsonAutoMappingConfiguration internal constructor(private val registry: ConfigurableKondorJson.Registry) : AutoMappingConfiguration<JConverterResolver> {
 
     fun <T: Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>) = apply {
         registry.register(target.java, converter)
@@ -212,10 +221,10 @@ class KondorJsonAutoMappingConfiguration(private val registry : ConfigurableKond
         registry.register(mapping.clazz, JBiDiMappingString(mapping))
     }
 
-    override fun done(): ConfigurableKondorJson.Registry = registry
+    override fun done(): JConverterResolver = registry
 }
 
-fun ConfigurableKondorJson.Registry.asConfigurable() = KondorJsonAutoMappingConfiguration(this)
+fun JConverterResolver.asConfigurable() = KondorJsonAutoMappingConfiguration(this as ConfigurableKondorJson.Registry)
 
 // Lifted the render logic from kondor-json, but changed to not output blank spaces between fields and values,
 // so that it is http4k json compliant.
