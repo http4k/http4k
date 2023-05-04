@@ -60,7 +60,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `can register custom mime types`() {
         val handler = "/svc" bind static(Classpath(), "myxml" to APPLICATION_XML)
         val request = Request(GET, of("/svc/mybob.myxml"))
-        val criteria = hasStatus(OK) and hasBody("<myxml>content</myxml>") and hasHeader("Content-type", APPLICATION_XML.value)
+        val criteria = hasStatus(OK) and hasBody("<myxml>content</myxml>") and hasHeader("Content-type", APPLICATION_XML.toHeaderValue())
 
         assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
