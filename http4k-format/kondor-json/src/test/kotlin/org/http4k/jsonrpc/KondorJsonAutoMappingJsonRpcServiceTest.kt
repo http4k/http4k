@@ -5,17 +5,13 @@ import com.ubertob.kondor.json.JInt
 import com.ubertob.kondor.json.jsonnode.JsonNode
 import com.ubertob.kondor.json.jsonnode.JsonNodeObject
 import com.ubertob.kondor.json.num
-import org.http4k.format.ConfigurableKondorJson
-import org.http4k.format.asConfigurable
+import org.http4k.format.KondorJson
 import org.http4k.format.register
 
 class KondorJsonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonNode>(
-    ConfigurableKondorJson({
-        asConfigurable()
-            .register(JCounterIncrement)
-            .register(JInt)
-            .done()
-    })
+    KondorJson()
+        .register(JCounterIncrement)
+        .register(JInt)
 )
 
 private object JCounterIncrement : JAny<Counter.Increment>() {

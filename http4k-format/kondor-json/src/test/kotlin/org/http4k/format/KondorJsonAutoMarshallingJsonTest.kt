@@ -7,33 +7,50 @@ import com.ubertob.kondor.json.jsonnode.JsonNodeObject
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
+import org.http4k.lens.BiDiMapping
+import org.http4k.lens.StringBiDiMappings
+import org.http4k.lens.StringBiDiMappings.bigDecimal
+import org.http4k.lens.StringBiDiMappings.duration
+import org.http4k.lens.StringBiDiMappings.instant
+import org.http4k.lens.StringBiDiMappings.localDate
+import org.http4k.lens.StringBiDiMappings.localDateTime
+import org.http4k.lens.StringBiDiMappings.localTime
+import org.http4k.lens.StringBiDiMappings.locale
+import org.http4k.lens.StringBiDiMappings.offsetDateTime
+import org.http4k.lens.StringBiDiMappings.offsetTime
+import org.http4k.lens.StringBiDiMappings.throwable
+import org.http4k.lens.StringBiDiMappings.uri
+import org.http4k.lens.StringBiDiMappings.url
+import org.http4k.lens.StringBiDiMappings.uuid
+import org.http4k.lens.StringBiDiMappings.zoneId
+import org.http4k.lens.StringBiDiMappings.zoneOffset
+import org.http4k.lens.StringBiDiMappings.zonedDateTime
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.*
 
-class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(ConfigurableKondorJson({
-    asConfigurable()
-        .withStandardMappings()
+class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
+    KondorJson()
         .register(JArbObject)
         .register(JStringHolder)
         .register(JMapHolder)
-        .register(JCommonJdkPrimitives(this))
-        .register(JRegexHolder(this))
-        .register(JZonesAndLocale(this))
-        .register(JExceptionHolder(this))
+        .register(JCommonJdkPrimitives)
+        .register(JRegexHolder)
+        .register(JZonesAndLocale)
+        .register(JExceptionHolder)
+        .register(throwable().asJConverter())
         .register(JMap(JString))
-        .done()
-})) {
-    override fun customMarshaller() = ConfigurableKondorJson({
-        asConfigurable()
-            .customise()
-            .register(JArbObject)
-            .register(JInOnlyHolder(this))
-            .register(JOutOnlyHolder(this))
-            .register(JHolderHolder(this))
-            .register(JMyValueHolder(this))
-            .done()
-    })
+) {
+    override fun customMarshaller() = KondorJson()
+        .register(JArbObject)
+        .register(JInOnlyHolder)
+        .register(JOutOnlyHolder)
+        .register(JHolderHolder)
+        .register(JMyValueHolder)
+        .register(BiDiMapping(::BooleanHolder, BooleanHolder::value).asJConverter())
+        .register(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value).asJConverter(JBigDecimal))
+        .register(bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value).asJConverter())
+        .register(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value).asJConverter(JBigInteger))
 
     override fun strictMarshaller() = throw UnsupportedOperationException()
     override fun customMarshallerProhibitStrings() = throw UnsupportedOperationException()
@@ -82,22 +99,34 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(Configurab
     }
 }
 
-private class JInOnlyHolder(resolve: JConverterResolver) : JAny<InOnlyHolder>() {
-    val value by JField(InOnlyHolder::value, resolve())
+private object JInOnly : JStringRepresentable<InOnly>() {
+    override val cons: (String) -> InOnly = ::InOnly
+    override val render: (InOnly) -> String
+        get() = throw IllegalArgumentException()
+}
+
+private object JInOnlyHolder : JAny<InOnlyHolder>() {
+    val value by str(JInOnly, InOnlyHolder::value)
 
     override fun JsonNodeObject.deserializeOrThrow() = InOnlyHolder(value = +value)
 }
 
-private class JOutOnlyHolder(resolve: JConverterResolver) : JAny<OutOnlyHolder>() {
-    val value by JField(OutOnlyHolder::value, resolve())
+private object JOutOnly : JStringRepresentable<OutOnly>() {
+    override val cons: (String) -> OutOnly
+        get() = throw IllegalArgumentException()
+    override val render: (OutOnly) -> String = OutOnly::value
+}
+
+private object JOutOnlyHolder : JAny<OutOnlyHolder>() {
+    val value by str(JOutOnly, OutOnlyHolder::value)
 
     override fun JsonNodeObject.deserializeOrThrow() = OutOnlyHolder(value = +value)
 }
 
 private object JArbObject : JAny<ArbObject>() {
     val string by str(ArbObject::string)
-    val child by JFieldMaybe(ArbObject::child, JArbObject)
-    val numbers by JField(ArbObject::numbers, JList(JInt))
+    val child by obj(JArbObject, ArbObject::child)
+    val numbers by array(JInt, ArbObject::numbers)
     val bool by bool(ArbObject::bool)
 
     override fun JsonNodeObject.deserializeOrThrow() = ArbObject(
@@ -115,36 +144,41 @@ private object JStringHolder : JAny<StringHolder>() {
 }
 
 private object JMapHolder : JAny<MapHolder>() {
-    val value by JField(MapHolder::value, JMap(JString))
+    val value by obj(JMap(JString), MapHolder::value)
 
     override fun JsonNodeObject.deserializeOrThrow() = MapHolder(value = +value)
 }
 
-private class JHolderHolder(resolve: JConverterResolver) : JAny<HolderHolder>() {
-    val value by JField(HolderHolder::value, resolve())
+private object JHolderHolder : JAny<HolderHolder>() {
+    val value by JField(HolderHolder::value, bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value).asJConverter())
 
     override fun JsonNodeObject.deserializeOrThrow() = HolderHolder(value = +value)
 }
 
-private class JMyValueHolder(resolve: JConverterResolver) : JAny<MyValueHolder>() {
-    val value by JFieldMaybe(MyValueHolder::value, resolve())
+private object JMyValue : JStringRepresentable<MyValue>() {
+    override val cons: (String) -> MyValue = { MyValue.of(it) }
+    override val render: (MyValue) -> String = { MyValue.show(it) }
+}
+
+private object JMyValueHolder : JAny<MyValueHolder>() {
+    val value by str(JMyValue, MyValueHolder::value)
 
     override fun JsonNodeObject.deserializeOrThrow() = MyValueHolder(value = +value)
 }
 
-private class JCommonJdkPrimitives(resolve: JConverterResolver) : JAny<CommonJdkPrimitives>() {
-    val duration by JField(CommonJdkPrimitives::duration, resolve())
-    val localDate by JField(CommonJdkPrimitives::localDate, resolve())
-    val localTime by JField(CommonJdkPrimitives::localTime, resolve())
-    val localDateTime by JField(CommonJdkPrimitives::localDateTime, resolve())
-    val zonedDateTime by JField(CommonJdkPrimitives::zonedDateTime, resolve())
-    val offsetTime by JField(CommonJdkPrimitives::offsetTime, resolve())
-    val offsetDateTime by JField(CommonJdkPrimitives::offsetDateTime, resolve())
-    val instant by JField(CommonJdkPrimitives::instant, resolve())
-    val uuid by JField(CommonJdkPrimitives::uuid, resolve())
-    val uri by JField(CommonJdkPrimitives::uri, resolve())
-    val url by JField(CommonJdkPrimitives::url, resolve())
-    val status by JField(CommonJdkPrimitives::status, resolve())
+private object JCommonJdkPrimitives : JAny<CommonJdkPrimitives>() {
+    val duration by str(duration().asJConverter(), CommonJdkPrimitives::duration)
+    val localDate by str(localDate().asJConverter(), CommonJdkPrimitives::localDate)
+    val localTime by str(localTime().asJConverter(), CommonJdkPrimitives::localTime)
+    val localDateTime by str(localDateTime().asJConverter(), CommonJdkPrimitives::localDateTime)
+    val zonedDateTime by str(zonedDateTime().asJConverter(), CommonJdkPrimitives::zonedDateTime)
+    val offsetTime by str(offsetTime().asJConverter(), CommonJdkPrimitives::offsetTime)
+    val offsetDateTime by str(offsetDateTime().asJConverter(), CommonJdkPrimitives::offsetDateTime)
+    val instant by str(instant().asJConverter(), CommonJdkPrimitives::instant)
+    val uuid by str(uuid().asJConverter(), CommonJdkPrimitives::uuid)
+    val uri by str(uri().asJConverter(), CommonJdkPrimitives::uri)
+    val url by str(url().asJConverter(), CommonJdkPrimitives::url)
+    val status by JField(CommonJdkPrimitives::status, BiDiMapping({ Status(it, "") }, Status::code).asJConverter(JInt))
 
     override fun JsonNodeObject.deserializeOrThrow() =
         CommonJdkPrimitives(
@@ -163,16 +197,16 @@ private class JCommonJdkPrimitives(resolve: JConverterResolver) : JAny<CommonJdk
         )
 }
 
-private class JRegexHolder(resolve: JConverterResolver) : JAny<RegexHolder>() {
-    val regex by JField(RegexHolder::regex, resolve())
+private object JRegexHolder : JAny<RegexHolder>() {
+    val regex by str(StringBiDiMappings.regexObject().asJConverter(), RegexHolder::regex)
 
     override fun JsonNodeObject.deserializeOrThrow() = RegexHolder(regex = +regex)
 }
 
-private class JZonesAndLocale(resolve: JConverterResolver) : JAny<ZonesAndLocale>() {
-    val zoneId by JField(ZonesAndLocale::zoneId, resolve())
-    val zoneOffset by JField(ZonesAndLocale::zoneOffset, resolve())
-    val locale by JField(ZonesAndLocale::locale, resolve())
+private object JZonesAndLocale : JAny<ZonesAndLocale>() {
+    val zoneId by str(zoneId().asJConverter(), ZonesAndLocale::zoneId)
+    val zoneOffset by str(zoneOffset().asJConverter(), ZonesAndLocale::zoneOffset)
+    val locale by str(locale().asJConverter(), ZonesAndLocale::locale)
 
     override fun JsonNodeObject.deserializeOrThrow() =
         ZonesAndLocale(
@@ -182,8 +216,8 @@ private class JZonesAndLocale(resolve: JConverterResolver) : JAny<ZonesAndLocale
         )
 }
 
-private class JExceptionHolder(lookup: JConverterResolver) : JAny<ExceptionHolder>() {
-    val value by JField(ExceptionHolder::value, lookup[Throwable::class])
+private object JExceptionHolder : JAny<ExceptionHolder>() {
+    val value by str(throwable().asJConverter(), ExceptionHolder::value)
 
     override fun JsonNodeObject.deserializeOrThrow() = null
 }

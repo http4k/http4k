@@ -63,17 +63,17 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
     override fun strictMarshaller() =
         object : ConfigurableJackson(
-            KotlinModule.Builder().build().asConfigurable().customise().done()
+            KotlinModule.Builder().build().asConfigurable().customise()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
         ) {}
 
 
     override fun customMarshaller() =
-        object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise().done()) {}
+        object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise()) {}
 
     override fun customMarshallerProhibitStrings() = object : ConfigurableJackson(
         KotlinModule.Builder().build().asConfigurable().prohibitStrings()
-            .customise().done()
+            .customise()
     ) {}
 
     @Test

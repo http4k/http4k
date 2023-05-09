@@ -19,8 +19,8 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
 
     override val expectedAutoMarshallingZonesAndLocale = """{"locale":"en-CA","zoneId":"America/Toronto","zoneOffset":"-04:00"}"""
 
-    override fun customMarshaller() = object : ConfigurableKlaxon(KKlaxon().asConfigurable().customise().done()) {}
-    override fun customMarshallerProhibitStrings()= object : ConfigurableKlaxon(KKlaxon().asConfigurable().prohibitStrings().customise().done()) {}
+    override fun customMarshaller() = object : ConfigurableKlaxon(KKlaxon().asConfigurable().customise()) {}
+    override fun customMarshallerProhibitStrings()= object : ConfigurableKlaxon(KKlaxon().asConfigurable().prohibitStrings().customise()) {}
 
     override fun strictMarshaller() = throw UnsupportedOperationException()
 

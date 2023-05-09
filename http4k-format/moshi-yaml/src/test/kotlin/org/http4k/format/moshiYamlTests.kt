@@ -68,14 +68,14 @@ bool:true
     override val expectedAutoMarshallingZonesAndLocale = "zoneId:America/Toronto\nzoneOffset:-04:00\nlocale:en-CA\n"
 
     override fun strictMarshaller() = object : ConfigurableMoshiYaml(
-        Builder().asConfigurable().customise().done(), strictness = FailOnUnknown
+        Builder().asConfigurable().customise(), strictness = FailOnUnknown
     ) {}
 
-    override fun customMarshaller() = ConfigurableMoshiYaml(Builder().asConfigurable().customise().done()
+    override fun customMarshaller() = ConfigurableMoshiYaml(Builder().asConfigurable().customise()
         .add(NullSafeMapAdapter).add(ListAdapter))
 
     override fun customMarshallerProhibitStrings() = ConfigurableMoshiYaml(
-        Builder().asConfigurable().prohibitStrings().customise().done()
+        Builder().asConfigurable().prohibitStrings().customise()
     )
 
     data class MapHolder(val map: Map<String, MapHolder?>)
