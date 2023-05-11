@@ -29,26 +29,17 @@ class KondorJson(
     init: InitContext.() -> Unit = {}
 ) : AutoMarshallingJson<JsonNode>() {
 
-    private val converters = mutableListOf<ConverterWrapper<*, *>>()
+    inner class InitContext {
+        fun <T: Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>): InitContext = apply {
+            register(target.java, converter)
+        }
+    }
+
+    private val converters = mutableMapOf<Class<*>, JsonConverter<*, *>>()
 
     init {
         register(Unit::class.java, JInstance(Unit))
         init(InitContext())
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Any> converterFor(target: KClass<T>): ConverterWrapper<T, *> =
-        requireNotNull(converters.find { it.canConvert(target) } as? ConverterWrapper<T, *>) {
-            "JsonConverter for '$target' has not been registered"
-        }
-
-    private fun converterFor(input: Any): ConverterWrapper<*, *> =
-        requireNotNull(converters.find { it.canConvert(input) }) {
-            "JsonConverter for '${input::class}' has not been registered"
-        }
-
-    private fun <T, JN : JsonNode> register(target: Class<T>, converter: JsonConverter<T, JN>) {
-        converters += ConverterWrapper(target, converter)
     }
 
     override fun typeOf(value: JsonNode): JsonType =
@@ -121,16 +112,21 @@ class KondorJson(
 
     // auto
 
-    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = converterFor(target).fromJson(input)
-    override fun <T : Any> asA(input: String, target: KClass<T>): T = converterFor(target).fromJson(input)
-    override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = converterFor(target).fromJsonNode(j)
-    override fun asJsonObject(input: Any): JsonNode = converterFor(input).toJsonNode(input)
+    override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = input.fromJson(converterFor(target))
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = input.fromJson(converterFor(target))
+    override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = j.fromJsonNode(converterFor(target))
+    override fun asJsonObject(input: Any): JsonNode = input.toJsonNode(converterFor(input))
 
-    inline fun <reified T : Any> WsMessage.Companion.auto() =
-        converterFor(T::class).let { converter ->
-            WsMessage.string().map(
-                { converter.fromJson(it) },
-                { converter.toJsonNode(it).asCompactJsonString() }
+    fun <T : Any> autoBody(
+        target: KClass<T>,
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None,
+        contentType: ContentType = defaultContentType
+    ) =
+        converterFor(target).let { converter ->
+            httpBodyLens(description, contentNegotiation, contentType).map(
+                { it.fromJson(converter) },
+                { it.toJsonNode(converter).asCompactJsonString() }
             )
         }
 
@@ -145,30 +141,41 @@ class KondorJson(
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
         contentType: ContentType = defaultContentType
     ) =
-        converterFor(T::class).let { converter ->
-            httpBodyLens(description, contentNegotiation, contentType).map(
-                { converter.fromJson(it) },
-                { converter.toJsonNode(it).asCompactJsonString() }
+        autoBody(T::class, description, contentNegotiation, contentType)
+
+    fun <T : Any> wsAutoBody(target: KClass<T>) =
+        converterFor(target).let { converter ->
+            WsMessage.string().map(
+                { it.fromJson(converter) },
+                { it.toJsonNode(converter).asCompactJsonString() }
             )
         }
 
-    inner class InitContext {
-        fun <T: Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>): InitContext = apply {
-            register(target.java, converter)
-        }
+    inline fun <reified T : Any> WsMessage.Companion.auto() = wsAutoBody(T::class)
+
+    // converter helpers
+
+    private fun <T, JN : JsonNode> register(target: Class<T>, converter: JsonConverter<T, JN>) {
+        converters[target] = converter
     }
-}
-
-class ConverterWrapper<T, JN: JsonNode>(private val target: Class<T>, private val converter: JsonConverter<T, JN>) {
-    fun canConvert(input: Any) = target.isInstance(input)
-    fun canConvert(clazz: KClass<*>) = target == clazz.java
 
     @Suppress("UNCHECKED_CAST")
-    fun toJsonNode(input: Any): JN = converter.toJsonNode(input as T, NodePathRoot)
-    fun fromJson(json: String): T = converter.fromJson(json).orThrow()
-    fun fromJson(stream: InputStream): T = converter.fromJson(stream).orThrow()
+    private fun <T, JN : JsonNode> Any.toJsonNode(converter: JsonConverter<T, JN>) = converter.toJsonNode(this as T, NodePathRoot)
+    private fun <T, JN : JsonNode> String.fromJson(converter: JsonConverter<T, JN>): T = converter.fromJson(this).orThrow()
+    private fun <T, JN : JsonNode> InputStream.fromJson(converter: JsonConverter<T, JN>): T = converter.fromJson(this).orThrow()
     @Suppress("UNCHECKED_CAST")
-    fun fromJsonNode(node: JsonNode): T = converter.fromJsonNode(node as JN).orThrow()
+    private fun <T, JN : JsonNode> JsonNode.fromJsonNode(converter: JsonConverter<T, JN>): T = converter.fromJsonNode(this as JN).orThrow()
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : Any> converterFor(target: KClass<T>): JsonConverter<T, *> =
+        requireNotNull(converters[target.java]) {
+            "JsonConverter for '$target' has not been registered"
+        } as JsonConverter<T, *>
+
+    private fun converterFor(input: Any): JsonConverter<*, *> =
+        requireNotNull(converters.entries.find { it.key.isInstance(input) }) {
+            "JsonConverter for '${input::class}' has not been registered"
+        }.value
 }
 
 inline fun <reified T: Any, JN : JsonNode> KondorJson.InitContext.register(converter: JsonConverter<T, JN>) =

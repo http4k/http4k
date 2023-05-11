@@ -4,9 +4,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.ubertob.kondor.json.*
 import com.ubertob.kondor.json.jsonnode.JsonNodeObject
+import org.http4k.core.ContentType
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
+import org.http4k.hamkrest.hasContentType
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.StringBiDiMappings.bigDecimal
@@ -98,6 +102,27 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(body(Response(Status.OK).with(body of obj)), equalTo(obj))
+    }
+
+    @Test
+    fun `default content type`() {
+        val body = customMarshaller().autoBody<ArbObject>().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(Request(Method.POST, "/").with(body of obj), hasContentType(ContentType.APPLICATION_JSON))
+    }
+
+    @Test
+    fun `custom content type`() {
+        val marshaller = KondorJson(ContentType.Text("application/some-custom+json")) {
+            register(JArbObject)
+        }
+        val body = marshaller.autoBody<ArbObject>().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(Request(Method.POST, "/").with(body of obj), hasContentType(ContentType.Text("application/some-custom+json")))
     }
 }
 
