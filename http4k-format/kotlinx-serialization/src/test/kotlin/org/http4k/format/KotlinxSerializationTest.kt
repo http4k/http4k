@@ -12,6 +12,8 @@ class KotlinxSerializationTest : JsonContract<JsonElement>(KotlinxSerialization)
     "hello": "world"
 }"""
 
+    override val expectedNullBigDecimalJsonType: JsonType = JsonType.String
+
     /**
      * Overridden to allow for BigDecimal being serialized as a string. This is a shortcoming of kotlin.serialization
      * which is currently not customisable.

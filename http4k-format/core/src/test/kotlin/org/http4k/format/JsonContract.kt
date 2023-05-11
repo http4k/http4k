@@ -18,6 +18,8 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
 
     abstract val prettyString: String
 
+    open val expectedNullBigDecimalJsonType = JsonType.Null
+
     @Test
     fun `looks up types`() {
         j {
@@ -28,6 +30,19 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
             assertThat(typeOf(nullNode()), equalTo(JsonType.Null))
             assertThat(typeOf(obj("name" to string(""))), equalTo(JsonType.Object))
             assertThat(typeOf(array(listOf(string("")))), equalTo(JsonType.Array))
+        }
+    }
+
+    @Test
+    fun `converting null values to nodes`() {
+        j {
+            assertThat(typeOf((null as String?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Int?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Double?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Long?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Boolean?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as BigInteger?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as BigDecimal?).asJsonValue()), equalTo(expectedNullBigDecimalJsonType))
         }
     }
 

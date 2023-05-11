@@ -70,7 +70,6 @@ class KondorJson(
     override fun fields(node: JsonNode) = if (node !is JsonNodeObject) emptyList() else node._fieldMap.toList()
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = when (value) {
-        is JsonNodeObject -> value._fieldMap.map { it.value }
         is JsonNodeArray -> value.values
         else -> emptyList()
     }
