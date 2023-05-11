@@ -30,27 +30,29 @@ import org.junit.jupiter.api.Test
 import java.util.*
 
 class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
-    KondorJson()
-        .register(JArbObject)
-        .register(JStringHolder)
-        .register(JMapHolder)
-        .register(JCommonJdkPrimitives)
-        .register(JRegexHolder)
-        .register(JZonesAndLocale)
-        .register(JExceptionHolder)
-        .register(throwable().asJConverter())
-        .register(JMap(JString))
+    KondorJson {
+        register(JArbObject)
+        register(JStringHolder)
+        register(JMapHolder)
+        register(JCommonJdkPrimitives)
+        register(JRegexHolder)
+        register(JZonesAndLocale)
+        register(JExceptionHolder)
+        register(throwable().asJConverter())
+        register(JMap(JString))
+    }
 ) {
-    override fun customMarshaller() = KondorJson()
-        .register(JArbObject)
-        .register(JInOnlyHolder)
-        .register(JOutOnlyHolder)
-        .register(JHolderHolder)
-        .register(JMyValueHolder)
-        .register(BiDiMapping(::BooleanHolder, BooleanHolder::value).asJConverter())
-        .register(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value).asJConverter(JBigDecimal))
-        .register(bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value).asJConverter())
-        .register(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value).asJConverter(JBigInteger))
+    override fun customMarshaller() = KondorJson {
+        register(JArbObject)
+        register(JInOnlyHolder)
+        register(JOutOnlyHolder)
+        register(JHolderHolder)
+        register(JMyValueHolder)
+        register(BiDiMapping(::BooleanHolder, BooleanHolder::value).asJConverter())
+        register(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value).asJConverter(JBigDecimal))
+        register(bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value).asJConverter())
+        register(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value).asJConverter(JBigInteger))
+    }
 
     override fun strictMarshaller() = throw UnsupportedOperationException()
     override fun customMarshallerProhibitStrings() = throw UnsupportedOperationException()

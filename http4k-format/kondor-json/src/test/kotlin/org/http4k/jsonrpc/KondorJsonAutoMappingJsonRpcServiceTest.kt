@@ -9,9 +9,10 @@ import org.http4k.format.KondorJson
 import org.http4k.format.register
 
 class KondorJsonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonNode>(
-    KondorJson()
-        .register(JCounterIncrement)
-        .register(JInt)
+    KondorJson {
+        register(JCounterIncrement)
+        register(JInt)
+    }
 )
 
 private object JCounterIncrement : JAny<Counter.Increment>() {

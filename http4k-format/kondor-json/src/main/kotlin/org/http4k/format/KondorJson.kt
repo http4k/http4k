@@ -25,13 +25,15 @@ import java.math.BigInteger
 import kotlin.reflect.KClass
 
 class KondorJson(
-    val defaultContentType: ContentType = ContentType.APPLICATION_JSON
+    val defaultContentType: ContentType = ContentType.APPLICATION_JSON,
+    init: InitContext.() -> Unit = {}
 ) : AutoMarshallingJson<JsonNode>() {
 
     private val converters = mutableListOf<ConverterWrapper<*, *>>()
 
     init {
         register(Unit::class.java, JInstance(Unit))
+        init(InitContext())
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -44,10 +46,6 @@ class KondorJson(
         requireNotNull(converters.find { it.canConvert(input) }) {
             "JsonConverter for '${input::class}' has not been registered"
         }
-
-    fun <T: Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>): KondorJson = apply {
-        register(target.java, converter)
-    }
 
     private fun <T, JN : JsonNode> register(target: Class<T>, converter: JsonConverter<T, JN>) {
         converters += ConverterWrapper(target, converter)
@@ -153,6 +151,12 @@ class KondorJson(
                 { converter.toJsonNode(it).asCompactJsonString() }
             )
         }
+
+    inner class InitContext {
+        fun <T: Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>): InitContext = apply {
+            register(target.java, converter)
+        }
+    }
 }
 
 class ConverterWrapper<T, JN: JsonNode>(private val target: Class<T>, private val converter: JsonConverter<T, JN>) {
@@ -167,7 +171,7 @@ class ConverterWrapper<T, JN: JsonNode>(private val target: Class<T>, private va
     fun fromJsonNode(node: JsonNode): T = converter.fromJsonNode(node as JN).orThrow()
 }
 
-inline fun <reified T: Any, JN : JsonNode> KondorJson.register(converter: JsonConverter<T, JN>) =
+inline fun <reified T: Any, JN : JsonNode> KondorJson.InitContext.register(converter: JsonConverter<T, JN>) =
     register(T::class, converter)
 
 // Lifted the render logic from kondor-json, but changed to not output blank spaces between fields and values,
