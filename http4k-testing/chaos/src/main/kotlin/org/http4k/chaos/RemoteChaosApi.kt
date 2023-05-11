@@ -122,7 +122,7 @@ object RemoteChaosApi {
             |
             |Using this UI you can inject new dynamic chaotic behaviour into any http4k application, or toggle/disable it. 
             |
-            |See the <a href="https://www.http4k.org/guide/modules/chaos/">user guide</a> for details about the 
+            |See the <a href="https://http4k.org/guide/reference/chaos/">user guide</a> for details about the 
             | exact format of the JSON to post to the activation endpoint.""".trimMargin()
 
         val currentChaosDescription = Repeat {

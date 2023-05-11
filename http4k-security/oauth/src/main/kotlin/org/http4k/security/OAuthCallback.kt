@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
+import org.http4k.core.Uri
 import org.http4k.security.oauth.server.AuthorizationCode
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
@@ -53,7 +54,7 @@ class OAuthCallback(
     }
 
     private fun Request.authorizationCode() = queryOrFragmentParameter("code")?.let(::AuthorizationCode)
-        ?.let(::Success) ?: Failure(OAuthCallbackError.AuthorizationCodeMissing)
+        ?.let(::Success) ?: Failure(OAuthCallbackError.AuthorizationCodeMissing(uri))
 
     private fun validateCsrf(
         parameters: CallbackParameters,
@@ -88,7 +89,7 @@ class OAuthCallback(
 }
 
 sealed class OAuthCallbackError {
-    object AuthorizationCodeMissing : OAuthCallbackError()
+    data class AuthorizationCodeMissing(val callbackUri: Uri) : OAuthCallbackError()
     data class InvalidCsrfToken(val expected: String?, val received: String?) : OAuthCallbackError()
     data class InvalidNonce(val expected: String?, val received: String?) : OAuthCallbackError()
     data class InvalidAccessToken(val reason: String) : OAuthCallbackError()
