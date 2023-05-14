@@ -31,3 +31,7 @@ dependencies {
 ### Processing Files with a Filter and convert to standard form [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_multipart_forms/example_processing.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_multipart_forms/example_processing.kt"></script>
+
+### Multipart combined with typesafe contract (OpenApi) [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_multipart_forms/example_contract.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/use_multipart_forms/example_contract.kt"></script>
