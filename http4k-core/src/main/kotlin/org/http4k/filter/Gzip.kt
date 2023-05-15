@@ -165,7 +165,7 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
     private fun deflatePendingInput(readBuffer: ByteArray, readOffset: Int, readLength: Int): Int {
         var bytesCompressed = 0
         while (!deflater.needsInput() && readLength - bytesCompressed > 0) {
-            bytesCompressed += deflater.deflate(readBuffer, readOffset + bytesCompressed, readLength - bytesCompressed, Deflater.NO_FLUSH)
+            bytesCompressed += deflater.deflate(readBuffer, readOffset + bytesCompressed, readLength - bytesCompressed, Deflater.FULL_FLUSH)
         }
         return bytesCompressed
     }
