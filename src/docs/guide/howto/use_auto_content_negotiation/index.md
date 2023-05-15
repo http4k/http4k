@@ -9,7 +9,7 @@ Auto Content Negotiation is available in the core http4k module.
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.43.0.0"))
+    implementation(platform("org.http4k:http4k-bom:4.43.1.0"))
     implementation("org.http4k:http4k-format-core")
 }
 ```
@@ -18,7 +18,7 @@ But it also integrates with the contract module.
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.43.0.0"))
+    implementation(platform("org.http4k:http4k-bom:4.43.1.0"))
     implementation("org.http4k:http4k-contract")
 }
 ```
