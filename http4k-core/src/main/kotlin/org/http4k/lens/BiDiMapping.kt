@@ -13,6 +13,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.net.URI
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
@@ -74,7 +75,7 @@ object StringBiDiMappings {
     fun urlEncoded() = BiDiMapping(String::urlDecoded, String::urlEncoded)
     fun duration() = BiDiMapping(Duration::parse, Duration::toString)
     fun uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
-    fun url() = BiDiMapping(::URL, URL::toExternalForm)
+    fun url() = BiDiMapping({ URI(it).toURL() }, URL::toExternalForm)
     fun uuid() = BiDiMapping(UUID::fromString, UUID::toString)
     fun base64() = BiDiMapping(String::base64Decoded, String::base64Encode)
 
