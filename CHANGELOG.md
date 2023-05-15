@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.43.1.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-core** : Fix #901. Improve performance of GZip in streaming mode.
+- **http4k-core** : [Fix] #901. Improve performance of GZip in streaming mode.
 
 ### v4.43.0.0
 - **http4k-*** : Upgrade some dependency versions.
