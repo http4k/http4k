@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v4.43.2.0 (uncut)
+- **http4k-core** : [Breaking] Allow setting of compression level on GZip filter in both Streaming and Memory mode. To fix change from GzipCompressionMode.Memory/GzipCompressionMode.Streaming to GzipCompressionMode.Memory()/GzipCompressionMode.Streaming() 
+
 ### v4.43.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : [Fix] #901. Improve performance of GZip in streaming mode.
