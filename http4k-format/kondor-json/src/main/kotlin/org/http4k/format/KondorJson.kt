@@ -16,6 +16,7 @@ import com.ubertob.kondor.json.jsonnode.parseJsonNode
 import com.ubertob.kondor.json.parser.pretty
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
@@ -24,13 +25,11 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-class KondorJson(
-    val defaultContentType: ContentType = ContentType.APPLICATION_JSON,
-    init: InitContext.() -> Unit = {}
-) : AutoMarshallingJson<JsonNode>() {
+class KondorJson(val defaultContentType: ContentType = APPLICATION_JSON, init: InitContext.() -> Unit = {}) :
+    AutoMarshallingJson<JsonNode>() {
 
     inner class InitContext {
-        fun <T: Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>): InitContext = apply {
+        fun <T : Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>): InitContext = apply {
             register(target.java, converter)
         }
     }
@@ -57,11 +56,21 @@ class KondorJson(
 
     override fun String.asJsonObject() = parseJsonNode(this).orThrow()
     override fun String?.asJsonValue() = this?.let { JsonNodeString(it, NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
-    override fun Int?.asJsonValue() = this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
-    override fun Double?.asJsonValue() = this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
-    override fun Long?.asJsonValue() = this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
-    override fun BigDecimal?.asJsonValue() = this?.let { JsonNodeNumber(it, NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
-    override fun BigInteger?.asJsonValue() = this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
+    override fun Int?.asJsonValue() =
+        this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
+
+    override fun Double?.asJsonValue() =
+        this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
+
+    override fun Long?.asJsonValue() =
+        this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
+
+    override fun BigDecimal?.asJsonValue() =
+        this?.let { JsonNodeNumber(it, NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
+
+    override fun BigInteger?.asJsonValue() =
+        this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
+
     override fun Boolean?.asJsonValue() = this?.let { JsonNodeBoolean(it, NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
     override fun <T : Iterable<JsonNode>> T.asJsonArray() = JsonNodeArray(this, NodePathRoot).updateNodePath()
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject() =
@@ -159,11 +168,18 @@ class KondorJson(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T, JN : JsonNode> Any.toJsonNode(converter: JsonConverter<T, JN>) = converter.toJsonNode(this as T, NodePathRoot)
-    private fun <T, JN : JsonNode> String.fromJson(converter: JsonConverter<T, JN>): T = converter.fromJson(this).orThrow()
-    private fun <T, JN : JsonNode> InputStream.fromJson(converter: JsonConverter<T, JN>): T = converter.fromJson(this).orThrow()
+    private fun <T, JN : JsonNode> Any.toJsonNode(converter: JsonConverter<T, JN>) =
+        converter.toJsonNode(this as T, NodePathRoot)
+
+    private fun <T, JN : JsonNode> String.fromJson(converter: JsonConverter<T, JN>): T =
+        converter.fromJson(this).orThrow()
+
+    private fun <T, JN : JsonNode> InputStream.fromJson(converter: JsonConverter<T, JN>): T =
+        converter.fromJson(this).orThrow()
+
     @Suppress("UNCHECKED_CAST")
-    private fun <T, JN : JsonNode> JsonNode.fromJsonNode(converter: JsonConverter<T, JN>): T = converter.fromJsonNode(this as JN).orThrow()
+    private fun <T, JN : JsonNode> JsonNode.fromJsonNode(converter: JsonConverter<T, JN>): T =
+        converter.fromJsonNode(this as JN).orThrow()
 
     @Suppress("UNCHECKED_CAST")
     private fun <T : Any> converterFor(target: KClass<T>): JsonConverter<T, *> =
@@ -177,7 +193,7 @@ class KondorJson(
         }.value
 }
 
-inline fun <reified T: Any, JN : JsonNode> KondorJson.InitContext.register(converter: JsonConverter<T, JN>) =
+inline fun <reified T : Any, JN : JsonNode> KondorJson.InitContext.register(converter: JsonConverter<T, JN>) =
     register(T::class, converter)
 
 // Lifted the render logic from kondor-json, but changed to not output blank spaces between fields and values,
@@ -188,9 +204,7 @@ private fun JsonNode.render(): String =
         is JsonNodeString -> text.putInQuotes()
         is JsonNodeBoolean -> value.toString()
         is JsonNodeNumber -> num.toString()
-        is JsonNodeArray -> values.joinToString(separator = ",", prefix = "[", postfix = "]") {
-            it.render()
-        }
+        is JsonNodeArray -> values.joinToString(separator = ",", prefix = "[", postfix = "]") { it.render() }
         is JsonNodeObject -> _fieldMap.entries.joinToString(separator = ",", prefix = "{", postfix = "}") {
             it.key.putInQuotes() + ":" + it.value.render()
         }

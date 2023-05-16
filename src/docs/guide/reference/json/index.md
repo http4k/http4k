@@ -19,6 +19,9 @@ dependencies {
     // Klaxon: 
     implementation("org.http4k:http4k-format-klaxon")
 
+    // KondorJson: 
+    implementation("org.http4k:http4k-format-kondorjson")
+
     // Moshi: 
     implementation("org.http4k:http4k-format-moshi")
 

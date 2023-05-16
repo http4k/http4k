@@ -44,8 +44,9 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/xml"><span class="pill">Jackson XML</span></a>
 <a href="/guide/reference/yaml"><span class="pill">Jackson YAML</span></a>
 <a href="/guide/reference/jsonrpc"><span class="pill">JSON RPC</span></a>
-<a href="/guide/reference/json"><span class="pill">KotlinX Serialisation
 <a href="/guide/reference/json"><span class="pill">Klaxon</span></a>
+<a href="/guide/reference/json"><span class="pill">KondorJson</span></a>
+<a href="/guide/reference/json"><span class="pill">KotlinX Serialisation
 <a href="/guide/reference/json"><span class="pill">Moshi</span></a>
 
 ### Templating libraries
