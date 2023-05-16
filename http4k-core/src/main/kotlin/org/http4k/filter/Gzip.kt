@@ -16,12 +16,6 @@ import java.util.zip.Deflater.DEFAULT_COMPRESSION
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
-internal class MyGZIPOutputStream(out: OutputStream?) : GZIPOutputStream(out) {
-    fun setLevel(level: Int) {
-        def.setLevel(level)
-    }
-}
-
 sealed class GzipCompressionMode(
     internal val compress: (Body) -> CompressionResult,
     internal val decompress: (Body) -> Body
