@@ -42,7 +42,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.util.concurrent.atomic.AtomicReference
-import java.util.zip.Deflater
 import java.util.zip.Deflater.BEST_SPEED
 
 class ClientFiltersTest {
