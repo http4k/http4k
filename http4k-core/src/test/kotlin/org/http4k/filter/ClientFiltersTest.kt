@@ -42,6 +42,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.util.concurrent.atomic.AtomicReference
+import java.util.zip.Deflater
+import java.util.zip.Deflater.BEST_SPEED
 
 class ClientFiltersTest {
     val server = { request: Request ->
@@ -350,8 +352,28 @@ class ClientFiltersTest {
         }
 
         @Test
+        fun `in-memory responses with compression level are ungzipped`() {
+            val handler = ClientFilters.AcceptGZip(Memory(BEST_SPEED)).then {
+                Response(OK).header("content-encoding", "gzip")
+                    .body(Body("hello").gzippedStream().body)
+            }
+
+            assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("hello")))
+        }
+
+        @Test
         fun `streaming responses are ungzipped`() {
             val handler = ClientFilters.AcceptGZip(Streaming()).then {
+                Response(OK).header("content-encoding", "gzip")
+                    .body(Body("hello").gzippedStream().body)
+            }
+
+            assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("hello")))
+        }
+
+        @Test
+        fun `streaming responses with compression level are ungzipped`() {
+            val handler = ClientFilters.AcceptGZip(Streaming(BEST_SPEED)).then {
                 Response(OK).header("content-encoding", "gzip")
                     .body(Body("hello").gzippedStream().body)
             }
