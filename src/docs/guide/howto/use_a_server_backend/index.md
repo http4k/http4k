@@ -9,7 +9,7 @@ Alternatively, any http4k application can be mounted into any Servlet container 
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.43.1.0"))
+    implementation(platform("org.http4k:http4k-bom:4.44.0.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-client-apache")
     implementation("org.http4k:http4k-server-jetty")
