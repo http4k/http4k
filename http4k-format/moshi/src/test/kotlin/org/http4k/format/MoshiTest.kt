@@ -178,9 +178,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
 
     override fun customMarshaller() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
     override fun customMarshallerProhibitStrings() = object : ConfigurableMoshi(
-        Builder().asConfigurable().prohibitStrings()
-            .customise()
-    ) {}
+        Builder().asConfigurable().prohibitStrings().customise()) {}
 }
 
 class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {

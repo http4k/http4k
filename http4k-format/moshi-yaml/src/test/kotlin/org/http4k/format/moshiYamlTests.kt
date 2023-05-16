@@ -75,8 +75,7 @@ bool:true
         .add(NullSafeMapAdapter).add(ListAdapter))
 
     override fun customMarshallerProhibitStrings() = ConfigurableMoshiYaml(
-        Builder().asConfigurable().prohibitStrings()
-            .customise()
+        Builder().asConfigurable().prohibitStrings().customise()
     )
 
     data class MapHolder(val map: Map<String, MapHolder?>)

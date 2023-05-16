@@ -18,6 +18,8 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
 
     abstract val prettyString: String
 
+    open val expectedNullBigDecimalJsonType = JsonType.Null
+
     @Test
     fun `looks up types`() {
         j {
@@ -28,6 +30,19 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
             assertThat(typeOf(nullNode()), equalTo(JsonType.Null))
             assertThat(typeOf(obj("name" to string(""))), equalTo(JsonType.Object))
             assertThat(typeOf(array(listOf(string("")))), equalTo(JsonType.Array))
+        }
+    }
+
+    @Test
+    fun `converting null values to nodes`() {
+        j {
+            assertThat(typeOf((null as String?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Int?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Double?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Long?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Boolean?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as BigInteger?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as BigDecimal?).asJsonValue()), equalTo(expectedNullBigDecimalJsonType))
         }
     }
 
@@ -78,8 +93,14 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     @Test
     fun `get fields`() {
         j {
-            val fields = listOf("hello" to string("world"), "hello2" to string("world2"))
-            assertThat(fields(obj(fields)).toList(), equalTo(fields))
+            val result = fields(obj(listOf("hello" to string("world"), "hello2" to string("world2")))).associate {
+                it.first to (typeOf(it.second) to text(it.second))
+            }
+
+            assertThat(result, equalTo(mapOf(
+                "hello" to (JsonType.String to "world"),
+                "hello2" to (JsonType.String to "world2")
+            )))
         }
     }
 
