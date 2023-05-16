@@ -57,7 +57,7 @@ else ByteArrayOutputStream().use {
     Body(ByteBuffer.wrap(it.toByteArray()))
 }
 
-fun Body.gzippedStream(compressionLevel: Int = 8): CompressionResult =
+fun Body.gzippedStream(compressionLevel: Int = DEFAULT_COMPRESSION): CompressionResult =
     sampleStream(stream,
         { CompressionResult(Body.EMPTY, null) },
         { compressedStream ->
