@@ -261,7 +261,7 @@ class ClientFiltersTest {
 
         @Test
         fun `gzip request and gunzip streamed response`() {
-            val handler = ClientFilters.GZip(Streaming).then {
+            val handler = ClientFilters.GZip(Streaming()).then {
                 assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body))))
                 Response(OK).header("content-encoding", "gzip").body(Body("hello").gzippedStream().body)
             }
@@ -271,7 +271,7 @@ class ClientFiltersTest {
 
         @Test
         fun `streaming empty bodies are not encoded`() {
-            val handler = ClientFilters.GZip(Streaming).then {
+            val handler = ClientFilters.GZip(Streaming()).then {
                 assertThat(it, hasBody(equalTo<Body>(EMPTY)).and(!hasHeader("content-encoding", "gzip")))
                 Response(OK).body(EMPTY)
             }
@@ -281,7 +281,7 @@ class ClientFiltersTest {
 
         @Test
         fun `streaming encoded empty responses are handled`() {
-            val handler = ClientFilters.GZip(Streaming).then {
+            val handler = ClientFilters.GZip(Streaming()).then {
                 Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
@@ -332,7 +332,7 @@ class ClientFiltersTest {
 
         @Test
         fun `streaming encoded empty responses are handled`() {
-            val handler = ClientFilters.AcceptGZip(Streaming).then {
+            val handler = ClientFilters.AcceptGZip(Streaming()).then {
                 Response(OK).header("content-encoding", "gzip").body(EMPTY)
             }
 
@@ -341,7 +341,7 @@ class ClientFiltersTest {
 
         @Test
         fun `in-memory responses are ungzipped`() {
-            val handler = ClientFilters.AcceptGZip(Memory).then {
+            val handler = ClientFilters.AcceptGZip(Memory()).then {
                 Response(OK).header("content-encoding", "gzip")
                     .body(Body("hello").gzippedStream().body)
             }
@@ -351,7 +351,7 @@ class ClientFiltersTest {
 
         @Test
         fun `streaming responses are ungzipped`() {
-            val handler = ClientFilters.AcceptGZip(Streaming).then {
+            val handler = ClientFilters.AcceptGZip(Streaming()).then {
                 Response(OK).header("content-encoding", "gzip")
                     .body(Body("hello").gzippedStream().body)
             }
