@@ -28,7 +28,7 @@ object RequestFilters {
      * Basic GZipping of Request.
      */
     object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
             {
                 next(compressionMode.compress(it.body).apply(it))
             }
@@ -39,7 +39,7 @@ object RequestFilters {
      * Basic UnGZipping of Request.
      */
     object GunZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
             { request ->
                 request.header("content-encoding")
                     ?.let { if (it.contains("gzip")) it else null }

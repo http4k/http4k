@@ -233,14 +233,14 @@ object ClientFilters {
     /**
      * Support for GZipped responses from clients.
      */
-    fun AcceptGZip(compressionMode: GzipCompressionMode = Memory): Filter =
+    fun AcceptGZip(compressionMode: GzipCompressionMode = Memory()): Filter =
         ResponseFilters.GunZip(compressionMode)
 
     /**
      * Basic GZip and Gunzip support of Request/Response.
      * Only Gunzip responses when the response contains "content-encoding" header containing 'gzip'
      */
-    fun GZip(compressionMode: GzipCompressionMode = Memory): Filter =
+    fun GZip(compressionMode: GzipCompressionMode = Memory()): Filter =
         RequestFilters.GZip(compressionMode)
             .then(ResponseFilters.GunZip(compressionMode))
 

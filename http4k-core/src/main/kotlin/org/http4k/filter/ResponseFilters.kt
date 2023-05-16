@@ -73,7 +73,7 @@ object ResponseFilters {
      */
     class GZipContentTypes(
         compressibleContentTypes: Set<ContentType>,
-        private val compressionMode: GzipCompressionMode = Memory
+        private val compressionMode: GzipCompressionMode = Memory()
     ) : Filter {
         private val compressibleMimeTypes = compressibleContentTypes
             .map { it.value }
@@ -103,7 +103,7 @@ object ResponseFilters {
      * Basic GZipping of Response.
      */
     object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
             { request ->
                 next(request).let {
                     if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
@@ -118,7 +118,7 @@ object ResponseFilters {
      * Basic UnGZipping of Response.
      */
     object GunZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
             { request ->
                 next(request.header("accept-encoding", "gzip")).let { response ->
                     response.header("content-encoding")

@@ -159,7 +159,7 @@ class ResponseFiltersTest {
     inner class GzipStreamFilters {
         @Test
         fun `gunzip response handling sets the accept-encoding header to gzip on requests`() {
-            val handler = ResponseFilters.GunZip(Streaming).then {
+            val handler = ResponseFilters.GunZip(Streaming()).then {
                 assertThat(it, hasHeader("accept-encoding", "gzip"))
                 Response(OK)
             }
@@ -168,21 +168,21 @@ class ResponseFiltersTest {
 
         @Test
         fun `gzip response and adds gzip content encoding if the request has accept-encoding of gzip`() {
-            val zipped = ResponseFilters.GZip(Streaming).then { Response(OK).body("foobar") }
+            val zipped = ResponseFilters.GZip(Streaming()).then { Response(OK).body("foobar") }
             assertThat(zipped(Request(GET, "").header("accept-encoding", "gzip")),
                 hasBody(equalTo<Body>(Body("foobar").gzippedStream().body)).and(hasHeader("content-encoding", "gzip")))
         }
 
         @Test
         fun `do not gzip response nor add content encoding if the request body is empty`() {
-            val zipped = ResponseFilters.GZip(Streaming).then { Response(OK).header("content-type", "text/html;charset=utf-8").body("") }
+            val zipped = ResponseFilters.GZip(Streaming()).then { Response(OK).header("content-type", "text/html;charset=utf-8").body("") }
             assertThat(zipped(Request(GET, "").header("accept-encoding", "gzip")),
                 hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
         }
 
         @Test
         fun `gzip response and adds gzip content encoding if the request has accept-encoding of gzip and content type is acceptable`() {
-            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming)
+            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming())
                 .then { Response(OK).header("content-type", "text/html").body("foobar") }
             assertThat(zipped(Request(GET, "").header("accept-encoding", "gzip")),
                 hasBody(equalTo<Body>(Body("foobar").gzippedStream().body)).and(hasHeader("content-encoding", "gzip")))
@@ -190,27 +190,27 @@ class ResponseFiltersTest {
 
         @Test
         fun `gzip response and adds gzip content encoding if the request has accept-encoding of gzip and content type with a charset is acceptable`() {
-            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming).then { Response(OK).header("content-type", "text/html;charset=utf-8").body("foobar") }
+            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming()).then { Response(OK).header("content-type", "text/html;charset=utf-8").body("foobar") }
             assertThat(zipped(Request(GET, "").header("accept-encoding", "gzip")),
                 hasBody(equalTo<Body>(Body("foobar").gzippedStream().body)).and(hasHeader("content-encoding", "gzip")))
         }
 
         @Test
         fun `do not gzip response if content type is missing`() {
-            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming).then { Response(OK).body("unzipped") }
+            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming()).then { Response(OK).body("unzipped") }
             assertThat(zipped(Request(GET, "").header("accept-encoding", "gzip")), hasBody(equalTo<Body>(Body("unzipped"))).and(!hasHeader("content-encoding", "gzip")))
         }
 
         @Test
         fun `do not gzip response if content type is not acceptable`() {
-            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming).then { Response(OK).header("content-type", "image/png").body("unzipped") }
+            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming()).then { Response(OK).header("content-type", "image/png").body("unzipped") }
             assertThat(zipped(Request(GET, "").header("accept-encoding", "gzip")), hasBody(equalTo<Body>(Body("unzipped"))).and(!hasHeader("content-encoding", "gzip")))
         }
 
         @Test
         fun `gunzip response which has gzip content encoding`() {
             fun assertSupportsUnzipping(body: String) {
-                val handler = ResponseFilters.GunZip(Streaming).then { Response(OK).header("content-encoding", "gzip").body(Body(body).gzipped().body) }
+                val handler = ResponseFilters.GunZip(Streaming()).then { Response(OK).header("content-encoding", "gzip").body(Body(body).gzipped().body) }
                 assertThat(handler(Request(GET, "")), hasBody(body).and(hasHeader("content-encoding", "gzip")))
             }
             assertSupportsUnzipping("foobar")
@@ -219,7 +219,7 @@ class ResponseFiltersTest {
 
         @Test
         fun `gunzip empty response which has gzip content encoding`() {
-            val handler = ResponseFilters.GunZip(Streaming).then { Response(OK).header("content-encoding", "gzip").body(Body.EMPTY) }
+            val handler = ResponseFilters.GunZip(Streaming()).then { Response(OK).header("content-encoding", "gzip").body(Body.EMPTY) }
             assertThat(handler(Request(GET, "")), hasBody("").and(hasHeader("content-encoding", "gzip")))
         }
     }
