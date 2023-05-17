@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.44.1.0 (uncut)
-- **http4k-server-format-kondorjson**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
+- **http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
 
 ### v4.44.0.0
 - **http4k-*** : Upgrade some dependency versions.
