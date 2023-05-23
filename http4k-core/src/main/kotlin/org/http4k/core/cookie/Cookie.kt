@@ -84,7 +84,7 @@ data class Cookie(
         }
 
         private fun String.parseSameSite() = try {
-            SameSite.valueOf(this)
+            SameSite.valueOf(this.lowercase().replaceFirstChar { it.uppercaseChar() })
         } catch (_: IllegalArgumentException) {
             null
         }

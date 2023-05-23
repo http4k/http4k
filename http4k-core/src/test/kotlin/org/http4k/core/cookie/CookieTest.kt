@@ -227,4 +227,13 @@ class CookieTest {
 
         assertThat(Cookie.parse("foo=bar; SameSite=Unknown"), equalTo(expected))
     }
+
+    @Test
+    fun `forgives SameSite attributes that aren't strictly correct`() {
+        val expected = Cookie("foo", "bar", sameSite = Lax)
+
+        assertThat(Cookie.parse("foo=bar; SameSite=lax"), equalTo(expected))
+        assertThat(Cookie.parse("foo=bar; SameSite=Lax"), equalTo(expected))
+        assertThat(Cookie.parse("foo=bar; SameSite=LAX"), equalTo(expected))
+    }
 }
