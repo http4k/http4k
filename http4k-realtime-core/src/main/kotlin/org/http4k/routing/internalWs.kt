@@ -21,8 +21,7 @@ sealed class WsRouterMatch(private val priority: Int) :
 }
 
 internal class RouterWsHandler(private val list: List<WsRouter>) : RoutingWsHandler {
-    override fun match(request: Request) =
-        list.map { next -> next.match(request) }.minOrNull() ?: Unmatched
+    override fun match(request: Request) = list.minOfOrNull { it.match(request) } ?: Unmatched
 
     override operator fun invoke(request: Request): WsConsumer = when (val match = match(request)) {
         is MatchingHandler -> match.wsConsumer
@@ -50,7 +49,7 @@ internal class TemplateRoutingWsHandler(
 
     override operator fun invoke(request: Request): WsConsumer = when (val match = match(request)) {
         is MatchingHandler -> match.wsConsumer
-        is Unmatched -> { it: Websocket -> it.close(REFUSE) }
+        is Unmatched -> { it -> it.close(REFUSE) }
     }
 
     override fun withBasePath(new: String): TemplateRoutingWsHandler =
