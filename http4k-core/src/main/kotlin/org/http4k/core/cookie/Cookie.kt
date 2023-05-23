@@ -77,14 +77,14 @@ data class Cookie(
             for (supportedFormat in supportedFormats) {
                 try {
                     return supportedFormat.parse(this).let { LocalDateTime.from(it) }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                 }
             }
             return null
         }
 
         private fun String.parseSameSite() = try {
-            SameSite.valueOf(this.lowercase().replaceFirstChar { it.uppercaseChar() })
+            SameSite.valueOf(lowercase().replaceFirstChar(Char::uppercaseChar))
         } catch (_: IllegalArgumentException) {
             null
         }
@@ -98,8 +98,8 @@ data class Cookie(
         if (toCheck) add(toInclude)
     }
 
-    fun fullCookieString(unquotedValue: Boolean = false): String = "$name=${if (unquotedValue) value else value.quoted()}; ${attributes()}"
-    fun keyValueCookieString(unquotedValue: Boolean = false): String = "$name=${if (unquotedValue) value else value.quoted()}"
+    fun fullCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.quoted()}; ${attributes()}"
+    fun keyValueCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.quoted()}"
 }
 
 enum class SameSite {
