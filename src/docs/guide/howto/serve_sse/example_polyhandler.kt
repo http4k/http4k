@@ -1,5 +1,3 @@
-package guide.howto.serve_sse
-
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -13,6 +11,7 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseMessage
 import org.http4k.sse.then
+import kotlin.concurrent.thread
 
 fun main() {
     val namePath = Path.of("name")
@@ -29,7 +28,13 @@ fun main() {
         sse(
             "/{name}" bind { sse: Sse ->
                 val name = namePath(sse.connectRequest)
-                sse.send(SseMessage.Data("hello"))
+                thread {
+                    repeat(10) {
+                        sse.send(SseMessage.Data("hello $it"))
+                        Thread.sleep(100)
+                    }
+                    sse.close()
+                }
                 sse.onClose { println("$name is closing") }
             }
         )
