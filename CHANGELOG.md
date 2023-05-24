@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v4.45.0.0 (uncut)
 - **http4k-core**: [Breaking] Fix #912 - CatchLensFailure filter now can pass the Request object into the receiver. H/T @mikaelstaldal
+- **http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
 
 ### v4.44.1.0
 - **http4k-*** : Upgrade some dependency versions.
