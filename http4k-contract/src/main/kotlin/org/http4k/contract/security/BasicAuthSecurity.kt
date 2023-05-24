@@ -11,6 +11,8 @@ class BasicAuthSecurity private constructor(override val filter: Filter, val nam
      */
     constructor(realm: String, credentials: Credentials, name: String = "basicAuth"): this(ServerFilters.BasicAuth(realm, credentials), name)
 
+    constructor(realm: String, credentials: (Credentials) -> Boolean) : this(ServerFilters.BasicAuth(realm, credentials))
+
     companion object {
         /**
          * Population of a RequestContext with custom principal object
