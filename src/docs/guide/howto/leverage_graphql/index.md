@@ -5,7 +5,7 @@ description: Recipe for using GraphQL plugins
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.44.0.0"))
+    implementation(platform("org.http4k:http4k-bom:4.44.1.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-graphql")
 }
