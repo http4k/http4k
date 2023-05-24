@@ -60,7 +60,7 @@ First, let's take a tour of the `/src/main/kotlin/HelloWorld.kt` file which cont
 Hit the little green arrow and the application will run and start. Point your browser at `http://localhost:9000/ping` to check that it's working. Note that the `Filter` is printing each incoming request to the console.
 
 #### Step 5
-In `/src/main/kotlin/HelloWorldClient.kt` there is an example of an HTTP client which we can use to call our running app.
+In `/src/test/kotlin/HelloWorldClient.kt` there is an example of an HTTP client which we can use to call our running app.
 
 <img class="blogImage" src="step5.png" alt="client code"/>
 
