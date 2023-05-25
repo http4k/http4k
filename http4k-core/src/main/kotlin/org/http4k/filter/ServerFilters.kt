@@ -235,15 +235,37 @@ object ServerFilters {
             try {
                 next(it)
             } catch (lensFailure: LensFailure) {
-                when {
-                    lensFailure.target is Response -> throw lensFailure
-                    lensFailure.target is RequestContext -> throw lensFailure
-                    lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
-                    else -> failResponseFn(lensFailure)
-                }
+                handleLensFailure(lensFailure, it) { _, lensFailure -> failResponseFn(lensFailure) }
             }
         }
     }
+
+    /**
+     * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
+     * This is required when using lenses to automatically unmarshall inbound requests.
+     * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
+     *
+     * Pass the failResponseFn param to provide a custom response for the LensFailure case
+     */
+    fun CatchLensFailureWithRequest(
+        failResponseFn: (Request, LensFailure) -> Response = { _, lensFailure -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; "))) }
+    ) = Filter { next ->
+        {
+            try {
+                next(it)
+            } catch (lensFailure: LensFailure) {
+                handleLensFailure(lensFailure, it, failResponseFn)
+            }
+        }
+    }
+
+    private fun handleLensFailure(lensFailure: LensFailure, request: Request, failResponseFn: (Request, LensFailure) -> Response) =
+            when {
+                lensFailure.target is Response -> throw lensFailure
+                lensFailure.target is RequestContext -> throw lensFailure
+                lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
+                else -> failResponseFn(request, lensFailure)
+            }
 
     /**
      * Last gasp filter which catches all `Throwable`s and invokes `onError`.
