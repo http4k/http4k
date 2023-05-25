@@ -12,7 +12,10 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Headers
-import org.http4k.core.Method.*
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
 import org.http4k.core.Response
