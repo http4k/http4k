@@ -15,7 +15,7 @@ interface AccessTokens {
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest,
         authorizationCode: AuthorizationCode
-    ): Result<AccessToken, AuthorizationCodeAlreadyUsed>
+    ): Result<AccessToken, AccessTokenError>
 
     /**
      * creates a new access token for a given client.
