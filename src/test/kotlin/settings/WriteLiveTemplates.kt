@@ -81,6 +81,7 @@ fun File.writeLiveTemplates() {
         Status.UNPROCESSABLE_ENTITY,
         Status.UPGRADE_REQUIRED,
         Status.TOO_MANY_REQUESTS,
+        Status.UNAVAILABLE_FOR_LEGAL_REASONS,
         Status.INTERNAL_SERVER_ERROR,
         Status.NOT_IMPLEMENTED,
         Status.BAD_GATEWAY,
