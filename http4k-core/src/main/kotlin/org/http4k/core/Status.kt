@@ -52,6 +52,7 @@ class Status internal constructor(val code: Int, val description: String, privat
         @JvmField val UNPROCESSABLE_ENTITY = Status(422, "Unprocessable Entity")
         @JvmField val UPGRADE_REQUIRED = Status(426, "Upgrade Required")
         @JvmField val TOO_MANY_REQUESTS = Status(429, "Too many requests")
+        @JvmField val UNAVAILABLE_FOR_LEGAL_REASONS = Status(451, "Unavailable For Legal Reasons")
 
         private val SERVER_ERROR = 500..599
         @JvmField val INTERNAL_SERVER_ERROR = Status(500, "Internal Server Error")
