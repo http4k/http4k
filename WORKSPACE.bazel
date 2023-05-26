@@ -33,6 +33,10 @@ maven_install(
         "javax.servlet:javax.servlet-api:4.0.1",
         "dev.forkhandles:result4k:2.0.0.0",
         "dev.forkhandles:values4k:2.0.0.0",
+        "org.junit.jupiter:junit-jupiter-api:5.8.2",
+        "org.junit.jupiter:junit-jupiter-engine:5.8.2",
+        "com.natpryce:hamkrest:1.8.0.1",
+        "org.jetbrains.kotlin:kotlin-reflect:1.6.10",
         ],
     repositories = [
         "https://repo1.maven.org/maven2",
