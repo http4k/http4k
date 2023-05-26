@@ -1,0 +1,13 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
+
+kt_jvm_library(
+    name = "main",
+    visibility = ["//visibility:public"],
+    srcs = glob(["src/main/**/*.kt"]),
+    resources = glob(["src/main/resources/**"]),
+    deps = [
+        "//http4k-core:main",
+        "//http4k-format/core:main",
+        "@maven//:com_natpryce_hamkrest",
+    ],
+)
