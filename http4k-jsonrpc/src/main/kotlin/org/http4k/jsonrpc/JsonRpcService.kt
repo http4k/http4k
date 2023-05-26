@@ -34,7 +34,7 @@ data class JsonRpcService<NODE : Any>(
     private val jsonLens = json.body("JSON-RPC request", StrictNoDirective).toLens()
     private val methods = bindings.map { it.name to it.handler }.toMap()
 
-    private val handler = CatchLensFailure { Response(OK).with(jsonLens of renderError(ParseError)) }
+    private val handler = CatchLensFailure { _ -> Response(OK).with(jsonLens of renderError(ParseError)) }
         .then(Filter { next -> { if (it.method == POST) next(it) else Response(METHOD_NOT_ALLOWED) } })
         .then {
             when (val responseJson = process(jsonLens(it))) {

@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Headers
@@ -426,7 +427,7 @@ class ServerFiltersTest {
     @Test
     fun `catch lens failure - custom response`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Request(GET, ""))
-        val handler = ServerFilters.CatchLensFailure { Response(OK).body(it.localizedMessage) }
+        val handler = ServerFilters.CatchLensFailure { it -> Response(OK).body(it.localizedMessage) }
             .then { throw e }
 
         val response = handler(Request(GET, "/"))
@@ -435,9 +436,26 @@ class ServerFiltersTest {
     }
 
     @Test
+    fun `catch lens failure - custom response with request`() {
+        val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Request(GET, ""))
+        val handler = ServerFilters.CatchLensFailure { request, lensFailure ->
+            if (Header.ACCEPT(request)?.accepts(APPLICATION_JSON) == true) {
+                Response(OK).body("""{"error":"${lensFailure.localizedMessage}"}""").header("Content-Type", APPLICATION_JSON.value)
+            } else {
+                Response(OK).body(lensFailure.localizedMessage)
+            }
+        }
+            .then { throw e }
+
+        val response = handler(Request(GET, "/").header("Accept", APPLICATION_JSON.value))
+
+        assertThat(response, hasStatus(OK).and(hasBody("""{"error":"header 'bob' must be string, header 'bill' is required"}""")))
+    }
+
+    @Test
     fun `catch lens failure - invalid`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Request(GET, ""))
-        val handler = ServerFilters.CatchLensFailure().then { throw e }
+        val handler = ServerFilters.CatchLensFailure().then {  throw e }
 
         val response = handler(Request(GET, "/"))
 

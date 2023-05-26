@@ -71,7 +71,7 @@ class ContractRoute internal constructor(val method: Method,
         return when (val matchResult = toRouter(Root).match(request)) {
             is MatchingHandler -> {
                 (meta.security?.filter ?: Filter.NoOp)
-                    .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
+                    .then(ServerFilters.CatchLensFailure { _ -> Response(BAD_REQUEST) })
                     .then(PreFlightExtractionFilter(meta, Companion.All))
                     .then(matchResult)(request)
             }
