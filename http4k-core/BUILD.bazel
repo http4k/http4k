@@ -1,7 +1,8 @@
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
 
 kt_jvm_library(
-    name = "http4k-core",
+    name = "main",
+    visibility = ["//visibility:public"],
     srcs = glob(["src/main/**/*.kt"]),
     resources = glob(["src/main/resources/**"]),
     deps = [
@@ -15,7 +16,8 @@ kt_jvm_test(
     name = "tests",
     srcs = glob(["**/*Test.kt"]),
     deps = [
-        ":http4k-core",
+        "//http4k-core:main",
+        "//http4k-client/apache:main",
        "@maven//:org_junit_jupiter_junit_jupiter_api",
        "@maven//:org_junit_jupiter_junit_jupiter_engine",
        "@maven//:com_natpryce_hamkrest",
