@@ -219,7 +219,8 @@ object ServerFilters {
      * This is required when using lenses to automatically unmarshall inbound requests.
      * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
      */
-    object CatchLensFailure : Filter by CatchLensFailure()
+    object CatchLensFailure :
+        Filter by CatchLensFailure({ lensFailure -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; "))) })
 
     /**
      * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
@@ -228,14 +229,12 @@ object ServerFilters {
      *
      * Pass the failResponseFn param to provide a custom response for the LensFailure case
      */
-    fun CatchLensFailure(
-        failResponseFn: (LensFailure) -> Response = { Response(BAD_REQUEST.description(it.failures.joinToString("; "))) }
-    ) = Filter { next ->
+    fun CatchLensFailure(failResponseFn: (LensFailure) -> Response) = Filter { next ->
         {
             try {
                 next(it)
             } catch (lensFailure: LensFailure) {
-                handleLensFailure(lensFailure, it) { _, lensFailure -> failResponseFn(lensFailure) }
+                handleLensFailure(lensFailure, it) { _, _ -> failResponseFn(lensFailure) }
             }
         }
     }
@@ -247,8 +246,10 @@ object ServerFilters {
      *
      * Pass the failResponseFn param to provide a custom response for the LensFailure case
      */
-    fun CatchLensFailureWithRequest(
-        failResponseFn: (Request, LensFailure) -> Response = { _, lensFailure -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; "))) }
+    fun CatchLensFailure(
+        failResponseFn: (Request, LensFailure) -> Response = { _, lensFailure ->
+            Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
+        }
     ) = Filter { next ->
         {
             try {
@@ -259,13 +260,17 @@ object ServerFilters {
         }
     }
 
-    private fun handleLensFailure(lensFailure: LensFailure, request: Request, failResponseFn: (Request, LensFailure) -> Response) =
-            when {
-                lensFailure.target is Response -> throw lensFailure
-                lensFailure.target is RequestContext -> throw lensFailure
-                lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
-                else -> failResponseFn(request, lensFailure)
-            }
+    private fun handleLensFailure(
+        lensFailure: LensFailure,
+        request: Request,
+        failResponseFn: (Request, LensFailure) -> Response
+    ) =
+        when {
+            lensFailure.target is Response -> throw lensFailure
+            lensFailure.target is RequestContext -> throw lensFailure
+            lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
+            else -> failResponseFn(request, lensFailure)
+        }
 
     /**
      * Last gasp filter which catches all `Throwable`s and invokes `onError`.
@@ -370,7 +375,8 @@ object ServerFilters {
     object ContentDispositionAttachment {
         private fun Request.extension(): String = this.uri.path.substringAfterLast(".", "")
         private fun Request.filename() =
-            this.uri.path.split("/").last().let { if(it.isBlank()) "unnamed" else it }
+            this.uri.path.split("/").last().let { if (it.isBlank()) "unnamed" else it }
+
         private val ALL_EXTENSIONS = setOf("*")
 
         operator fun invoke(extensions: Set<String> = ALL_EXTENSIONS): Filter = Filter { next ->
@@ -383,6 +389,7 @@ object ServerFilters {
                                 "Content-Disposition",
                                 "attachment; filename=${request.filename()}"
                             )
+
                         else -> response
                     }
                 }

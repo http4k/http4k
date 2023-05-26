@@ -427,7 +427,7 @@ class ServerFiltersTest {
     @Test
     fun `catch lens failure - custom response`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Request(GET, ""))
-        val handler = ServerFilters.CatchLensFailure { Response(OK).body(it.localizedMessage) }
+        val handler = ServerFilters.CatchLensFailure { it -> Response(OK).body(it.localizedMessage) }
             .then { throw e }
 
         val response = handler(Request(GET, "/"))
@@ -438,7 +438,7 @@ class ServerFiltersTest {
     @Test
     fun `catch lens failure - custom response with request`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Request(GET, ""))
-        val handler = ServerFilters.CatchLensFailureWithRequest { request, lensFailure ->
+        val handler = ServerFilters.CatchLensFailure { request, lensFailure ->
             if (Header.ACCEPT(request)?.accepts(APPLICATION_JSON) == true) {
                 Response(OK).body("""{"error":"${lensFailure.localizedMessage}"}""").header("Content-Type", APPLICATION_JSON.value)
             } else {
@@ -455,7 +455,7 @@ class ServerFiltersTest {
     @Test
     fun `catch lens failure - invalid`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Request(GET, ""))
-        val handler = ServerFilters.CatchLensFailure().then { throw e }
+        val handler = ServerFilters.CatchLensFailure().then {  throw e }
 
         val response = handler(Request(GET, "/"))
 
