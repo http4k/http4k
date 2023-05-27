@@ -1,2 +1,11 @@
+load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options", "kt_javac_options",  "define_kt_toolchain")
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 
+
+define_kt_toolchain(
+    name = "kotlin_toolchain",
+    api_version = "1.7",  # "1.1", "1.2", "1.3", "1.4", "1.5" "1.6", or "1.7"
+    jvm_target = "1.8", # "1.6", "1.8", "9", "10", "11", "12", "13", "15", "16", or "17"
+    language_version = "1.7",  # "1.1", "1.2", "1.3", "1.4", "1.5" "1.6", or "1.7"
+)
