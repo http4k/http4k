@@ -44,6 +44,7 @@ maven_install(
         "com.fasterxml.jackson.core:jackson-databind:2.13.1",
         "com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1",
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.1",
+        "org.webjars:swagger-ui:3.44.0",
         ],
     repositories = [
         "https://repo1.maven.org/maven2",

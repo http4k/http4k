@@ -31,6 +31,7 @@ kt_jvm_test(
        "@maven//:com_natpryce_hamkrest",
        "@maven//:org_jetbrains_kotlin_kotlin_reflect",
        "@maven//:org_junit_platform_junit_platform_console",
+       "@maven//:org_webjars_swagger_ui",
     ],
 )
 
