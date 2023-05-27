@@ -1,0 +1,6 @@
+filegroup(
+    name = "test-deps",
+    testonly = 1,
+    srcs = glob(["**/*"]),
+    visibility = ["//visibility:public"],
+)
