@@ -15,6 +15,7 @@ kt_jvm_library(
 kt_jvm_test(
     name = "tests",
     srcs = glob(["**/*.kt"]),
+    resources = glob(["src/test/resources/**"]),
     main_class = "org.junit.platform.console.ConsoleLauncher",
     args = [
     "--select-package=org.http4k",
