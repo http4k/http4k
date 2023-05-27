@@ -15,6 +15,10 @@ kt_jvm_library(
 kt_jvm_test(
     name = "tests",
     srcs = glob(["**/*.kt"]),
+    main_class = "org.junit.platform.console.ConsoleLauncher",
+    args = [
+    "--select-package=org.http4k",
+    ],
     deps = [
         "//http4k-core:main",
         "//http4k-client/apache:main",
@@ -25,5 +29,8 @@ kt_jvm_test(
        "@maven//:org_junit_jupiter_junit_jupiter_engine",
        "@maven//:com_natpryce_hamkrest",
        "@maven//:org_jetbrains_kotlin_kotlin_reflect",
+       "@maven//:org_junit_platform_junit_platform_console",
     ],
 )
+
+

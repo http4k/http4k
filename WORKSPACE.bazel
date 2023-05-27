@@ -36,6 +36,7 @@ maven_install(
         "dev.forkhandles:values4k:2.0.0.0",
         "org.junit.jupiter:junit-jupiter-api:5.8.2",
         "org.junit.jupiter:junit-jupiter-engine:5.8.2",
+        "org.junit.platform:junit-platform-console:1.9.3",
         "com.natpryce:hamkrest:1.8.0.1",
         "org.jetbrains.kotlin:kotlin-reflect:1.6.10",
         "org.apache.httpcomponents.client5:httpclient5:5.1.3",
