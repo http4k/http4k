@@ -14,11 +14,12 @@ kt_jvm_library(
 
 kt_jvm_test(
     name = "tests",
-    srcs = glob(["**/*Test.kt"]),
+    srcs = glob(["**/*.kt"]),
     deps = [
         "//http4k-core:main",
         "//http4k-client/apache:main",
         "//http4k-server/apache:main",
+        "//http4k-testing/approval:main",
         "//http4k-testing/hamkrest:main",
        "@maven//:org_junit_jupiter_junit_jupiter_api",
        "@maven//:org_junit_jupiter_junit_jupiter_engine",
