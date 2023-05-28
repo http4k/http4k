@@ -47,12 +47,16 @@ unknown: "2000-01-01"
     override val expectedMap = "key:value\n" +
         "key2:'123'\n"
 
-    override val expectedAbitraryArray = """- foo
+    override val expectedArbitraryArray = """- foo
 - 123.1
 - foo:bar
 - - 1.1
   - 2.1
 - true
+"""
+
+    override val expectedArbitrarySet = """- foo
+- bar
 """
 
     override val expectedArbitraryMap = """str:val1

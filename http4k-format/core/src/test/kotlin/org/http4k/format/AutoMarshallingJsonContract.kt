@@ -19,7 +19,8 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     val expectedCustomWrappedNumber = """{"value":"1.01"}"""
     val expectedInOutOnly = """{"value":"foobar"}"""
     override val expectedMap = """{"key":"value","key2":"123"}"""
-    override val expectedAbitraryArray = """["foo",123.1,{"foo":"bar"},[1.1,2.1],true]"""
+    override val expectedArbitraryArray = """["foo",123.1,{"foo":"bar"},[1.1,2.1],true]"""
+    override val expectedArbitrarySet = """["foo","bar"]"""
     override val expectedArbitraryMap = """{"str":"val1","num":123.1,"array":[1.1,"stuff"],"map":{"foo":"bar"},"bool":true}"""
 
     @Test

@@ -81,7 +81,8 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val expectedWrappedMap: String
     protected abstract val expectedMap: String
     protected abstract val expectedArbitraryMap: String
-    protected abstract val expectedAbitraryArray: String
+    protected abstract val expectedArbitraryArray: String
+    protected abstract val expectedArbitrarySet: String
     protected abstract val expectedConvertToInputStream: String
     protected abstract val expectedThrowable: String
     protected abstract val inputUnknownValue: String
@@ -136,7 +137,11 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     open fun `roundtrip zones and locale`() {
-        val obj = ZonesAndLocale(zoneId = ZoneId.of("America/Toronto"), zoneOffset = ZoneOffset.of("-04:00"), locale = Locale.CANADA)
+        val obj = ZonesAndLocale(
+            zoneId = ZoneId.of("America/Toronto"),
+            zoneOffset = ZoneOffset.of("-04:00"),
+            locale = Locale.CANADA
+        )
         val out = marshaller.asFormatString(obj)
         assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingZonesAndLocale.normaliseJson()))
         assertThat(marshaller.asA(out, ZonesAndLocale::class), equalTo(obj))
@@ -163,7 +168,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val wrapper = mapOf(
             "str" to "val1",
             "num" to 123.1,
-            "array" to listOf(1.1,"stuff"),
+            "array" to listOf(1.1, "stuff"),
             "map" to mapOf("foo" to "bar"),
             "bool" to true
         )
@@ -178,12 +183,24 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
             "foo",
             123.1,
             mapOf("foo" to "bar"),
-            listOf(1.1,2.1),
+            listOf(1.1, 2.1),
             true
         )
         val asString = marshaller.asFormatString(wrapper)
-        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryArray.normaliseJson()))
         assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    open fun `roundtrip arbitrary set`() {
+        val wrapper = setOf(
+            "foo",
+            "bar",
+            "foo",
+        )
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitrarySet.normaliseJson()))
+        assertThat(marshaller.asA<Set<Any>>(asString), equalTo(wrapper))
     }
 
     @Test

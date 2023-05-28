@@ -132,12 +132,15 @@ unknown: "2000-01-01"
 key2:"123"
 """
 
-    override val expectedAbitraryArray = """- "foo"
+    override val expectedArbitraryArray = """- "foo"
 - 123.1
 - foo:"bar"
 - - 1.1
   - 2.1
 - true
+"""
+    override val expectedArbitrarySet = """- "foo"
+- "bar"
 """
 
     override val expectedArbitraryMap = """str: "val1"
@@ -176,7 +179,7 @@ bool: true
             true
         )
         val asString = JacksonYaml.asFormatString(wrapper)
-        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryArray.normaliseJson()))
         assertThat(JacksonYaml.asA(asString), equalTo(wrapper))
     }
 

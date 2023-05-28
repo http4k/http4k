@@ -8,6 +8,7 @@ private fun standardConfig(kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapte
     .addLast(EventAdapter)
     .addLast(ThrowableAdapter)
     .addLast(ListAdapter)
+    .addLast(SetAdapter)
     .addLast(MapAdapter)
     .asConfigurable(kotlinFactory)
     .withStandardMappings()

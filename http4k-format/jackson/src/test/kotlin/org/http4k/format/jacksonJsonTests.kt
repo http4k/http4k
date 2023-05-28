@@ -165,7 +165,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
             true
         )
         val asString = Jackson.asFormatString(wrapper)
-        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryArray.normaliseJson()))
         assertThat(Jackson.asA(asString), equalTo(wrapper))
     }
 

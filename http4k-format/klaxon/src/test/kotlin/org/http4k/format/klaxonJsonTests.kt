@@ -71,6 +71,10 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     @Disabled("not supported by Klaxon")
     override fun `roundtrip arbitrary array`() {
     }
+
+    @Disabled("not supported by Klaxon")
+    override fun `roundtrip arbitrary set`() {
+    }
 }
 
 class KlaxonAutoEventsTest : AutoMarshallingEventsContract(Klaxon)

@@ -305,8 +305,12 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
             true
         )
         val asString = KotlinxSerialization.asFormatString(wrapper)
-        assertThat(asString.normaliseJson(), equalTo(expectedAbitraryArray.normaliseJson()))
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryArray.normaliseJson()))
         assertThat(KotlinxSerialization.asA(asString), equalTo(wrapper))
+    }
+
+    @Disabled
+    override fun `roundtrip arbitrary set`() {
     }
 
     override fun strictMarshaller() = KotlinxSerialization

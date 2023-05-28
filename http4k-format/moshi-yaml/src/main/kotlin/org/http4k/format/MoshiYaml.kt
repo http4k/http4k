@@ -3,12 +3,16 @@ package org.http4k.format
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.lang.reflect.Type
 
-private fun standardConfig() = Builder()
+private fun standardConfig(kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory()) = Builder()
+    .addLast(EventAdapter)
+    .addLast(ThrowableAdapter)
     .addLast(ListAdapter)
-    .addLast(NullSafeMapAdapter)
-    .asConfigurable()
+    .addLast(SetAdapter)
+    .addLast(MapAdapter)
+    .asConfigurable(kotlinFactory)
     .withStandardMappings()
 
 object MoshiYaml : ConfigurableMoshiYaml(standardConfig().done()) {
