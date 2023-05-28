@@ -5,7 +5,7 @@ description: Recipes for using http4k with Server-Sent Events
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.44.1.0"))
+    implementation(platform("org.http4k:http4k-bom:4.45.0.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-server-undertow")
     implementation("org.http4k:http4k-server-jetty")
