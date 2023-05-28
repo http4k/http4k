@@ -3,11 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v4.45.0.0 (uncut)
+### v4.45.0.0
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-core**: [Breaking] Fix #912 - CatchLensFailure filter now can pass the Request object into the receiver. H/T
   @mikaelstaldal
-- **http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
-- **http4k-server-format-moshi**: Add support for sets
+- **http4k-server-format-moshi**: Add support for Sets
 - **http4k-security-oauth**: [Breaking] AccessTokens create method took an unnecessary duplicate parameter. To fix, just
   remove the `authorizationCode` parameter from your implementations and use the code from the `tokenRequest`
 
