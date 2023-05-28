@@ -158,7 +158,6 @@ class InsecureAccessTokens : AccessTokens {
     // (i.e. limited to the requested scopes), and contain an expiration date
     override fun create(
         clientId: ClientId,
-        tokenRequest: AuthorizationCodeAccessTokenRequest,
-        authorizationCode: AuthorizationCode
+        tokenRequest: AuthorizationCodeAccessTokenRequest
     ) = Success(AccessToken(UUID.randomUUID().toString()))
 }

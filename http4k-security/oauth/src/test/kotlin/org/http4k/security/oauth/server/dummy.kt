@@ -69,7 +69,6 @@ class DummyAccessTokens : AccessTokens {
     override fun create(
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest,
-        authorizationCode: AuthorizationCode
     ) = Success(AccessToken("dummy-access-token"))
 }
 
@@ -103,7 +102,6 @@ class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : Ac
     override fun create(
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest,
-        authorizationCode: AuthorizationCode
     ) = Failure(error)
 }
 
