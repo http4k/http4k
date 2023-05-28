@@ -31,7 +31,6 @@ import org.http4k.security.oauth.server.TokenRequest
 import org.http4k.security.oauth.server.UnsupportedGrantType
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
-import sun.jvm.hotspot.oops.CellTypeState.value
 import java.time.Clock
 import java.time.temporal.ChronoUnit
 import java.util.UUID
