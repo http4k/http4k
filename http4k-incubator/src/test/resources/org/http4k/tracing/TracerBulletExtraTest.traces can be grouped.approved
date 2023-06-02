@@ -1,0 +1,290 @@
+[ {
+  "event" : {
+    "event" : {
+      "value" : "Event 1.0",
+      "category" : "Foo"
+    },
+    "metadata" : {
+      "traces" : {
+        "traceId" : "-A",
+        "spanId" : "span1.A.1",
+        "parentSpanId" : null,
+        "samplingDecision" : "1"
+      },
+      "timestamp" : 9
+    }
+  },
+  "children" : [ {
+    "event" : {
+      "event" : {
+        "value" : "Event 1.1 (A-B)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "1",
+          "spanId" : "span1.B.1",
+          "parentSpanId" : "span1.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 0
+      }
+    },
+    "children" : [ ]
+  }, {
+    "event" : {
+      "event" : {
+        "value" : "Event 1.2 (A-B)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "1",
+          "spanId" : "span1.B.2",
+          "parentSpanId" : "span1.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 1
+      }
+    },
+    "children" : [ ]
+  }, {
+    "event" : {
+      "event" : {
+        "value" : "Event 1.3 (A-B)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "1",
+          "spanId" : "span1.B.3",
+          "parentSpanId" : "span1.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 4
+      }
+    },
+    "children" : [ {
+      "event" : {
+        "event" : {
+          "value" : "Event 1.4 (B-C)",
+          "category" : "Foo"
+        },
+        "metadata" : {
+          "traces" : {
+            "traceId" : "1",
+            "spanId" : "span1.C.1",
+            "parentSpanId" : "span1.B.3",
+            "samplingDecision" : "1"
+          },
+          "timestamp" : 3
+        }
+      },
+      "children" : [ {
+        "event" : {
+          "event" : {
+            "value" : "Event 1.5 (C-D)",
+            "category" : "Foo"
+          },
+          "metadata" : {
+            "traces" : {
+              "traceId" : "1",
+              "spanId" : "span1.D.1",
+              "parentSpanId" : "span1.C.1",
+              "samplingDecision" : "1"
+            },
+            "timestamp" : 2
+          }
+        },
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "event" : {
+      "event" : {
+        "value" : "Event 1.6 (A-B)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "1",
+          "spanId" : "span1.B.4",
+          "parentSpanId" : "span1.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 7
+      }
+    },
+    "children" : [ {
+      "event" : {
+        "event" : {
+          "value" : "Event 1.7 (B-C)",
+          "category" : "Foo"
+        },
+        "metadata" : {
+          "traces" : {
+            "traceId" : "1",
+            "spanId" : "span1.C.2",
+            "parentSpanId" : "span1.B.4",
+            "samplingDecision" : "1"
+          },
+          "timestamp" : 6
+        }
+      },
+      "children" : [ {
+        "event" : {
+          "event" : {
+            "value" : "Event 1.8 (C-D)",
+            "category" : "Foo"
+          },
+          "metadata" : {
+            "traces" : {
+              "traceId" : "1",
+              "spanId" : "span1.D.2",
+              "parentSpanId" : "span1.C.2",
+              "samplingDecision" : "1"
+            },
+            "timestamp" : 5
+          }
+        },
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "event" : {
+      "event" : {
+        "value" : "Event 1.9 (A-D)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "1",
+          "spanId" : "span1.D.3",
+          "parentSpanId" : "span1.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 8
+      }
+    },
+    "children" : [ ]
+  } ]
+}, {
+  "event" : {
+    "event" : {
+      "value" : "Event 2.0",
+      "category" : "Foo"
+    },
+    "metadata" : {
+      "traces" : {
+        "traceId" : "-B",
+        "spanId" : "span2.A.1",
+        "parentSpanId" : null,
+        "samplingDecision" : "1"
+      },
+      "timestamp" : 16
+    }
+  },
+  "children" : [ {
+    "event" : {
+      "event" : {
+        "value" : "Event 2.1 (A-B)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "2",
+          "spanId" : "span2.B.1",
+          "parentSpanId" : "span2.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 10
+      }
+    },
+    "children" : [ ]
+  }, {
+    "event" : {
+      "event" : {
+        "value" : "Event 2.2 (A-B)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "2",
+          "spanId" : "span2.B.2",
+          "parentSpanId" : "span2.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 11
+      }
+    },
+    "children" : [ ]
+  }, {
+    "event" : {
+      "event" : {
+        "value" : "Event 2.3 (A-B)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "2",
+          "spanId" : "span2.B.3",
+          "parentSpanId" : "span2.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 14
+      }
+    },
+    "children" : [ {
+      "event" : {
+        "event" : {
+          "value" : "Event 2.4 (B-D)",
+          "category" : "Foo"
+        },
+        "metadata" : {
+          "traces" : {
+            "traceId" : "2",
+            "spanId" : "span2.D.1",
+            "parentSpanId" : "span2.B.3",
+            "samplingDecision" : "1"
+          },
+          "timestamp" : 13
+        }
+      },
+      "children" : [ {
+        "event" : {
+          "event" : {
+            "value" : "Event 2.5 (D-E)",
+            "category" : "Foo"
+          },
+          "metadata" : {
+            "traces" : {
+              "traceId" : "2",
+              "spanId" : "span2.E.1",
+              "parentSpanId" : "span2.D.1",
+              "samplingDecision" : "1"
+            },
+            "timestamp" : 12
+          }
+        },
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "event" : {
+      "event" : {
+        "value" : "Event 2.6 (A-E)",
+        "category" : "Foo"
+      },
+      "metadata" : {
+        "traces" : {
+          "traceId" : "2",
+          "spanId" : "span2.E.2",
+          "parentSpanId" : "span2.A.1",
+          "samplingDecision" : "1"
+        },
+        "timestamp" : 15
+      }
+    },
+    "children" : [ ]
+  } ]
+} ]

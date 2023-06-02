@@ -1,20 +1,19 @@
 package org.http4k.tracing
 
 import org.http4k.events.Event
-import org.http4k.events.MetadataEvent
 import org.http4k.tracing.ActorType.Database
 import java.time.Instant
 
 data class MyCustomEvent(val serviceIdentifier: String, val myTime: Instant) : Event
 
 class MyCustomTracer(private val actorFrom: ActorResolver) : Tracer {
-    override fun invoke(parent: MetadataEvent, rest: List<MetadataEvent>, tracer: Tracer) = parent
-        .takeIf { it.event is MyCustomEvent }
+    override fun invoke(node: EventNode, tracer: Tracer) = node
+        .takeIf { it.event.event is MyCustomEvent }
         ?.let {
             BiDirectional(
-                actorFrom(it),
+                actorFrom(it.event),
                 Actor("db", Database),
-                (it.event as MyCustomEvent).serviceIdentifier,
+                (it.event.event as MyCustomEvent).serviceIdentifier,
                 emptyList()
             )
         }
