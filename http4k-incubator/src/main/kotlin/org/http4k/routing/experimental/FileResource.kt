@@ -4,6 +4,7 @@ import org.http4k.core.ContentType
 import java.io.File
 import java.io.InputStream
 import java.time.Instant
+import java.time.temporal.ChronoUnit.SECONDS
 
 internal class FileResource(
     private val file: File,
@@ -14,5 +15,6 @@ internal class FileResource(
 
     override val length: Long get() = file.length()
 
-    override val lastModified: Instant get() = Instant.ofEpochMilli(file.lastModified())
+    // We must truncate the lastModified value because the If-Last-Modified header  doesn't support fractions of seconds.
+    override val lastModified: Instant get() = Instant.ofEpochMilli(file.lastModified()).truncatedTo(SECONDS)
 }
