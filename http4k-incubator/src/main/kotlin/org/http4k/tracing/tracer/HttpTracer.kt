@@ -10,8 +10,8 @@ import org.http4k.tracing.Trace
 import org.http4k.tracing.Tracer
 import org.http4k.tracing.traces
 
-fun HttpTracer(actorFrom: ActorResolver) = Tracer { parent, tracer ->
-    parent
+fun HttpTracer(actorFrom: ActorResolver) = Tracer { eventNode, tracer ->
+    eventNode
         .takeIf { it.event.event is HttpEvent.Outgoing }
         ?.toTrace(actorFrom, tracer)
         ?.let { listOf(it) } ?: emptyList()
