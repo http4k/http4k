@@ -6,8 +6,9 @@ changes with their rationale when appropriate:
 ### v4.47.0.0 (uncut)
 - **http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
 
-### v4.46.0.1
-- **http4k-incubator** Fix TracerBuller to handle non-root spans when building trees
+### v4.47.1.0
+- **http4k-core** Make it easy to propegate 
+- **http4k-incubator** Further simplifications of tracing algorithm
 
 ### v4.46.0.0
 - **http4k-*** : Upgrade some dependency versions.
