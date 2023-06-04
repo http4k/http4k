@@ -3,9 +3,16 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v4.46.0.0 (uncut)
-- **http4k-*** : Upgrade some dependency versions.
+### v4.47.0.0 (uncut)
 - **http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
+
+### v4.46.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Added status lookup by code. H/T @jhult
+- **http4k-core** : [Unlikely break] Client request tracing now sets and resets the ThreadLocal containing the current Zipkin traces. Possible break
+if you were relying on Zipkin state in a downstream handler. This change will allow better in-memory testing as traces will be reported correctly inside the context of the filter.
+- **http4k-incubator** : [Break] Changes to improve how we create Tracing trees, and this the signature of the Tracer to take EventNode which is a tree node.
+**http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)~~~~
 
 ### v4.45.0.0
 - **http4k-*** : Upgrade some dependency versions.
