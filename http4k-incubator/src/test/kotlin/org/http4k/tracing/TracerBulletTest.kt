@@ -1,6 +1,7 @@
 package org.http4k.tracing
 
 import org.http4k.core.Status.Companion.OK
+import org.http4k.events.MetadataEvent
 import org.http4k.routing.reverseProxy
 import org.http4k.strikt.bodyString
 import org.http4k.strikt.status

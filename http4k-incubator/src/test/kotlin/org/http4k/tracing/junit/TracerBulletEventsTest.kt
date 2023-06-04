@@ -4,11 +4,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.events.Event
 import org.http4k.events.EventFilters.AddZipkinTraces
-import org.http4k.events.MetadataEvent
 import org.http4k.events.then
 import org.http4k.tracing.Actor
 import org.http4k.tracing.ActorType.System
 import org.http4k.tracing.FireAndForget
+import org.http4k.tracing.EventNode
 import org.http4k.tracing.ScenarioTraces
 import org.http4k.tracing.TracePersistence
 import org.http4k.tracing.TraceRender
@@ -141,8 +141,7 @@ private class MyTraceRenderer : TraceRenderer {
 }
 
 private class MyTracer : Tracer {
-    override fun invoke(parent: MetadataEvent, rest: List<MetadataEvent>, tracer: Tracer) =
-        listOf(toTrace(parent.event))
+    override fun invoke(node: EventNode, tracer: Tracer) = listOf(toTrace(node.event.event))
 }
 
 object MyEvent : Event
@@ -161,12 +160,9 @@ private class FakeEC(val exception: Boolean = false) : ExtensionContext by proxy
     override fun getTestMethod() = Optional.of(String::class.java.getMethod("toString"))
 }
 
-private fun toTrace(event: Event): FireAndForget {
-    val name = event.javaClass.simpleName
-    return FireAndForget(
-        Actor(name, System),
-        Actor("target", System),
-        "req",
-        emptyList()
-    )
-}
+private fun toTrace(event: Event) = FireAndForget(
+    Actor(event.javaClass.simpleName, System),
+    Actor("target", System),
+    "req",
+    emptyList()
+)

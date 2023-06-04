@@ -2,6 +2,7 @@ package org.http4k.tracing
 
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
+import org.http4k.filter.TraceId
 import org.http4k.tracing.CollectEvents.Collect
 import org.http4k.tracing.CollectEvents.Drop
 import org.http4k.tracing.tracer.TreeWalker
@@ -13,14 +14,18 @@ import org.http4k.tracing.tracer.TreeWalker
 class TracerBullet(private val tracers: List<Tracer>) {
     constructor(vararg tracers: Tracer) : this(tracers.toList())
 
-    operator fun invoke(events: List<Event>): List<Trace> {
-        val metadataEvents = events.filterIsInstance<MetadataEvent>().removeUnrenderedEvents()
-        val uberTracer = Tracer.TreeWalker(tracers)
+    operator fun invoke(events: List<Event>): List<Trace> =
+        events.filterIsInstance<MetadataEvent>().removeUnrenderedEvents().buildTree()
+            .flatMap { event -> tracers.flatMap { it(event, Tracer.TreeWalker(tracers)) } }
+}
 
-        return metadataEvents
-            .filter { it.traces()?.let { it.parentSpanId == null } ?: false }
-            .flatMap { event -> tracers.flatMap { it(event, metadataEvents - event, uberTracer) } }
-    }
+fun List<MetadataEvent>.buildTree(): List<EventNode> {
+    val eventsByParent = groupBy { it.traces()?.parentSpanId }
+
+    fun createEventNodes(parentSpan: TraceId?): List<EventNode> =
+        (eventsByParent[parentSpan] ?: emptyList()).map { EventNode(it, createEventNodes(it.traces()?.spanId)) }
+
+    return createEventNodes(null)
 }
 
 private enum class CollectEvents { Collect, Drop }
