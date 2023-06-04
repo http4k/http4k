@@ -1,22 +1,30 @@
 package org.http4k.tracing
 
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.with
 import org.http4k.events.MetadataEvent
+import org.http4k.events.then
+import org.http4k.format.Jackson
 import org.http4k.routing.reverseProxy
 import org.http4k.strikt.bodyString
 import org.http4k.strikt.status
+import org.http4k.testing.Approver
+import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.RecordingEvents
 import org.http4k.tracing.ActorType.Database
 import org.http4k.tracing.ActorType.System
 import org.http4k.tracing.tracer.HttpTracer
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
+@ExtendWith(JsonApprovalTest::class)
 class TracerBulletTest {
 
     private val recording = RecordingEvents()
-    private val events = recording//.then { println(it) }
+    private val events = recording
     private val child1 = Child1(events)
     private val grandchild = Grandchild(events, reverseProxy("Child1" to child1))
 
@@ -31,12 +39,14 @@ class TracerBulletTest {
     )
 
     @Test
-    fun `calls are recorded to events`() {
+    fun `calls are recorded to events`(approver: Approver) {
         expectThat(Root(events, stack).call("bob")) {
             status.isEqualTo(OK)
             bodyString.isEqualTo("bob")
         }
 
+        approver.assertApproved(Response(OK).with(Jackson.autoBody<Any>().toLens() of
+            TracerBullet(HttpTracer(actorFrom), MyCustomTracer(actorFrom))(recording.toList())))
         expectThat(
             TracerBullet(HttpTracer(actorFrom), MyCustomTracer(actorFrom))(recording.toList())
         ).isEqualTo(listOf(expectedCallTree))

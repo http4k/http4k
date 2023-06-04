@@ -29,6 +29,13 @@ class StatusTest {
     }
 
     @Test
+    fun `can lookup server code by code`() {
+        Status.serverValues.distinct().forEach {
+            assertThat(Status.fromCode(it.code), equalTo(it))
+        }
+    }
+
+    @Test
     fun `use default description when there is no matching description for the status code`() {
         val status = Status(510, null)
 

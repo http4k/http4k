@@ -40,7 +40,7 @@ fun File.writeLiveTemplates() {
     fun Status.statusTemplate(): Template = Template(code.toString(), "http4k $code Response", "org.http4k.core.Response(org.http4k.core.Status.Companion.${
         description.uppercase(getDefault()).replace(' ', '_')})")
 
-    val statii = TemplateSet("Response", Status.values
+    val statii = TemplateSet("Response", Status.serverValues
         .distinct()
         .sortedBy { it.code }
         .map(Status::statusTemplate)
