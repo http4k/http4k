@@ -19,13 +19,17 @@ class TracerBullet(private val tracers: List<Tracer>) {
             .flatMap { event -> tracers.flatMap { it(event, Tracer.TreeWalker(tracers)) } }
 }
 
-fun List<MetadataEvent>.buildTree(): List<EventNode> {
+internal fun List<MetadataEvent>.buildTree(): List<EventNode> {
     val eventsByParent = groupBy { it.traces()?.parentSpanId }
 
-    fun createEventNodes(parentSpan: TraceId?): List<EventNode> =
-        (eventsByParent[parentSpan] ?: emptyList()).map { EventNode(it, createEventNodes(it.traces()?.spanId)) }
+    fun createEventNodes(parentService: TraceId?): List<EventNode> =
+        (eventsByParent[parentService] ?: emptyList()).map { EventNode(it, createEventNodes(it.traces()?.spanId)) }
 
-    return createEventNodes(null)
+    val rootEvents = filter { event ->
+        eventsByParent.none { it.value.any { it.traces()?.spanId == event.traces()?.parentSpanId } }
+    }
+    return rootEvents.map { EventNode(it, createEventNodes(it.traces()?.spanId))
+    }
 }
 
 private enum class CollectEvents { Collect, Drop }

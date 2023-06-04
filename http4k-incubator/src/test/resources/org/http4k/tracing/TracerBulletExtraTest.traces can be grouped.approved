@@ -178,7 +178,7 @@
       "traces" : {
         "traceId" : "-B",
         "spanId" : "span2.A.1",
-        "parentSpanId" : null,
+        "parentSpanId" : "ROOT",
         "samplingDecision" : "1"
       },
       "timestamp" : 16
