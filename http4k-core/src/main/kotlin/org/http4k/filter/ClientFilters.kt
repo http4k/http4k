@@ -41,12 +41,16 @@ object ClientFilters {
         storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL
     ): Filter = Filter { next ->
         {
-            storage.forCurrentThread().run {
-                val updated = copy(parentSpanId = spanId, spanId = TraceId.new())
-                startReportFn(it, updated)
-                val response = next(ZipkinTraces(updated, it))
-                endReportFn(it, response, updated)
-                response
+            val previous = storage.forCurrentThread()
+            val updated = previous.copy(parentSpanId = previous.spanId, spanId = TraceId.new())
+            storage.setForCurrentThread(updated)
+            startReportFn(it, updated)
+
+            try {
+                next(ZipkinTraces(updated, it))
+                    .apply { endReportFn(it, this, updated) }
+            } finally {
+                storage.setForCurrentThread(previous)
             }
         }
     }
@@ -137,7 +141,8 @@ object ClientFilters {
             }
         }
 
-        fun Request.withBasicAuth(credentials: Credentials, header: String = "Authorization") = header(header, mapping(credentials))
+        fun Request.withBasicAuth(credentials: Credentials, header: String = "Authorization") =
+            header(header, mapping(credentials))
 
         operator fun invoke(header: String, provider: CredentialsProvider<Credentials>) =
             CustomBasicAuth(header, provider::invoke)
