@@ -119,9 +119,9 @@ class Status internal constructor(val code: Int, val description: String, privat
                 HTTP_VERSION_NOT_SUPPORTED
             )
         }
-    }
 
-    fun from(code: Int) = values.firstOrNull { it.code == code }
+        fun from(code: Int) = values.firstOrNull { it.code == code }
+    }
 
     val successful by lazy { SUCCESSFUL.contains(code) }
     val informational by lazy { INFORMATIONAL.contains(code) }
