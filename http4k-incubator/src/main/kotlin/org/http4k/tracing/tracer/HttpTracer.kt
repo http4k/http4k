@@ -8,13 +8,12 @@ import org.http4k.tracing.EventNode
 import org.http4k.tracing.RequestResponse
 import org.http4k.tracing.Trace
 import org.http4k.tracing.Tracer
-import org.http4k.tracing.traces
 
 fun HttpTracer(actorFrom: ActorResolver) = Tracer { eventNode, tracer ->
     eventNode
         .takeIf { it.event.event is HttpEvent.Outgoing }
         ?.toTrace(actorFrom, tracer)
-        ?.let { listOf(it) } ?: emptyList()
+        ?.let(::listOf) ?: emptyList()
 }
 
 private fun EventNode.toTrace(actorFrom: ActorResolver, tracer: Tracer): Trace {
@@ -25,10 +24,7 @@ private fun EventNode.toTrace(actorFrom: ActorResolver, tracer: Tracer): Trace {
         Actor(parentEvent.uri.host, System),
         parentEvent.method.name + " " + parentEvent.xUriTemplate,
         parentEvent.status.toString(),
-        children
-            .filter { it.event.traces() != null && event.traces()?.spanId == it.event.traces()?.parentSpanId }
-            .filter { parentEvent.uri.host == actorFrom(it.event).name }
-            .flatMap { tracer(it, tracer) }
+        children.flatMap { tracer(it, tracer) }
     )
 }
 

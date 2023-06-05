@@ -64,8 +64,8 @@ class Status internal constructor(val code: Int, val description: String, privat
         @JvmField val GATEWAY_TIMEOUT = Status(504, "Gateway Timeout")
         @JvmField val CLIENT_TIMEOUT = Status(504, "Client Timeout", true)
         @JvmField val HTTP_VERSION_NOT_SUPPORTED = Status(505, "HTTP Version Not Supported")
-        
-        val values by lazy {
+
+        val serverValues by lazy {
             listOf(
                 CONTINUE,
                 SWITCHING_PROTOCOLS,
@@ -117,11 +117,11 @@ class Status internal constructor(val code: Int, val description: String, privat
                 GATEWAY_TIMEOUT,
                 CLIENT_TIMEOUT,
                 HTTP_VERSION_NOT_SUPPORTED
-            )
+            ).filterNot { it.clientGenerated }
         }
-    }
 
-    fun from(code: Int) = values.firstOrNull { it.code == code }
+        fun fromCode(code: Int) = serverValues.firstOrNull { it.code == code }
+    }
 
     val successful by lazy { SUCCESSFUL.contains(code) }
     val informational by lazy { INFORMATIONAL.contains(code) }

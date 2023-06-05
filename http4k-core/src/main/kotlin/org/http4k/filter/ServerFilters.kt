@@ -88,17 +88,13 @@ object ServerFilters {
             endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> },
             storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL
         ): Filter = Filter { next ->
-            {
-                val previous = storage.forCurrentThread()
-                val fromRequest = ZipkinTraces(it)
-                startReportFn(it, fromRequest)
-                storage.setForCurrentThread(fromRequest)
-
-                try {
-                    ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, it)))
-                        .apply { endReportFn(it, this, fromRequest) }
-                } finally {
-                    storage.setForCurrentThread(previous)
+            { req ->
+                storage.ensureCurrentSpan {
+                    val fromRequest = ZipkinTraces(req)
+                    startReportFn(req, fromRequest)
+                    storage.setForCurrentThread(fromRequest)
+                    ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, req)))
+                        .apply { endReportFn(req, this, fromRequest) }
                 }
             }
         }

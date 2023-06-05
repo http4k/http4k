@@ -41,16 +41,10 @@ object ClientFilters {
         storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL
     ): Filter = Filter { next ->
         {
-            val previous = storage.forCurrentThread()
-            val updated = previous.copy(parentSpanId = previous.spanId, spanId = TraceId.new())
-            storage.setForCurrentThread(updated)
-            startReportFn(it, updated)
-
-            try {
+            storage.inChildSpan { updated ->
+                startReportFn(it, updated)
                 next(ZipkinTraces(updated, it))
                     .apply { endReportFn(it, this, updated) }
-            } finally {
-                storage.setForCurrentThread(previous)
             }
         }
     }

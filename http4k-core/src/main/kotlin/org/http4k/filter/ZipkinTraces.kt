@@ -85,3 +85,25 @@ interface ZipkinTracesStorage {
         }
     }
 }
+
+/**
+ * Use this to wrap a block of code in a new span. It rolls the span and sets it for the duration of the passed block.
+ */
+fun <T> ZipkinTracesStorage.inChildSpan(fn: (ZipkinTraces) -> T): T =
+    ensureCurrentSpan { previous ->
+        val updated = previous.copy(parentSpanId = previous.spanId, spanId = TraceId.new())
+        setForCurrentThread(updated)
+        fn(updated)
+    }
+
+/**
+ * Use this to wrap a block of code and ensure the current span exists at the end.
+ */
+fun <T> ZipkinTracesStorage.ensureCurrentSpan(fn: (ZipkinTraces) -> T): T {
+    val previous = forCurrentThread()
+    return try {
+        fn(previous)
+    } finally {
+        setForCurrentThread(previous)
+    }
+}
