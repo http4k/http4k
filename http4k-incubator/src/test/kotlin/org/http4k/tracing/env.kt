@@ -8,6 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.events.EventFilters.AddServiceName
+import org.http4k.events.EventFilters.AddTimestamp
 import org.http4k.events.EventFilters.AddZipkinTraces
 import org.http4k.events.Events
 import org.http4k.events.HttpEvent.Incoming
@@ -17,9 +18,13 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.ResetRequestTracing
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.filter.ServerFilters
+import org.http4k.filter.ZipkinTracesStorage
+import org.http4k.filter.ZipkinTracesStorage.Companion.THREAD_LOCAL
+import org.http4k.filter.inChildSpan
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
+import org.http4k.util.TickingClock
 import java.time.Instant.EPOCH
 
 class Root(rawEvents: Events, http: HttpHandler) {
@@ -30,21 +35,32 @@ class Root(rawEvents: Events, http: HttpHandler) {
     fun call(name: String) = http(Request(GET, "http://EntryPoint/$name"))
 }
 
-fun TraceEvents(actorName: String) = AddZipkinTraces().then(AddServiceName(actorName))
+private val clock = TickingClock()
 
-fun ClientStack(events: Events) = ReportHttpTransaction { events(Outgoing(it)) }
-    .then(ClientFilters.RequestTracing())
+fun TraceEvents(actorName: String) =
+    AddZipkinTraces().then(AddServiceName(actorName)).then(AddTimestamp(clock))
 
-fun ServerStack(events: Events) = ReportHttpTransaction { events(Incoming(it)) }
-    .then(ServerFilters.RequestTracing())
+fun ClientStack(events: Events) = ClientFilters.RequestTracing()
+    .then(ReportHttpTransaction { events(Outgoing(it)) })
+
+fun ServerStack(events: Events) = ServerFilters.RequestTracing()
+    .then(ReportHttpTransaction { events(Incoming(it)) })
+
+fun Database(events: Events, tracesStorage: ZipkinTracesStorage = THREAD_LOCAL): (String) -> Unit = { caller: String ->
+    tracesStorage.inChildSpan {
+        events(DbEvent(caller, EPOCH))
+    }
+}
 
 fun EntryPoint(rawEvents: Events, http: HttpHandler): HttpHandler {
     val events = TraceEvents("EntryPoint").then(rawEvents)
     val client = ClientStack(events).then(http)
+    val database = Database(events)
+
     return ServerStack(events).then(
         routes("{name}" bind GET to { req: Request ->
             client(Request(GET, "http://Child1/report"))
-            events(MyCustomEvent("EntryPoint", EPOCH))
+            database("EntryPoint")
             client(Request(GET, "http://Child2/" + req.path("name")!!))
         })
     )
@@ -52,9 +68,11 @@ fun EntryPoint(rawEvents: Events, http: HttpHandler): HttpHandler {
 
 fun Child1(rawEvents: Events): HttpHandler {
     val events = TraceEvents("Child1").then(rawEvents)
+    val database = Database(events)
+
     return ServerStack(events).then(
         routes("report" bind GET to { _: Request ->
-            events(MyCustomEvent("Child1", EPOCH))
+            database("Child1")
             Response(OK)
         })
     )

@@ -7,7 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
 
 ### v4.47.1.0
-- **http4k-core** Make it easy to propegate 
+- **http4k-core** Make it easy to propagate or update trace spans in ZipkinStorage 
 - **http4k-incubator** Further simplifications of tracing algorithm
 
 ### v4.46.0.0
