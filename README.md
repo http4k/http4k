@@ -189,7 +189,7 @@ To install, add these dependencies to your **Gradle** file:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.47.1.0"))
+    implementation(platform("org.http4k:http4k-bom:4.47.2.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-server-jetty")
     implementation("org.http4k:http4k-client-okhttp")
