@@ -9,6 +9,9 @@ user 1: {
 user 2: {
     shape: person
 }
+events: {
+    shape: square
+}
 system_b: {
     shape: square
 }
@@ -16,9 +19,6 @@ system-c: {
     shape: square
 }
 system/d: {
-    shape: square
-}
-events: {
     shape: square
 }
 db: {
@@ -29,6 +29,7 @@ external: {
 }    
 user 1 -> system_b
 user 1 -> events
+events -> user 1
 system_b -> system-c
 system_b -> db
 system-c -> external

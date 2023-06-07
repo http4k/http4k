@@ -27,6 +27,20 @@
             },
             "request": "event a",
             "children": [
+              {
+                "type": "FireAndForget",
+                "origin": {
+                  "name": "events",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "user 1",
+                  "type": "Human"
+                },
+                "request": "event x",
+                "children": [
+                ]
+              }
             ]
           },
           {
@@ -105,6 +119,20 @@
             },
             "request": "event a",
             "children": [
+              {
+                "type": "FireAndForget",
+                "origin": {
+                  "name": "events",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "user 1",
+                  "type": "Human"
+                },
+                "request": "event x",
+                "children": [
+                ]
+              }
             ]
           },
           {
@@ -183,6 +211,20 @@
             },
             "request": "event a",
             "children": [
+              {
+                "type": "FireAndForget",
+                "origin": {
+                  "name": "events",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "user 1",
+                  "type": "Human"
+                },
+                "request": "event x",
+                "children": [
+                ]
+              }
             ]
           },
           {
@@ -363,6 +405,20 @@
             },
             "request": "event a",
             "children": [
+              {
+                "type": "FireAndForget",
+                "origin": {
+                  "name": "events",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "user 1",
+                  "type": "Human"
+                },
+                "request": "event x",
+                "children": [
+                ]
+              }
             ]
           },
           {

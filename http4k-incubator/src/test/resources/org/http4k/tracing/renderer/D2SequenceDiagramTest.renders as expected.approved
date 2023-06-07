@@ -3,11 +3,14 @@ title: |md
 # foobar - Sequence
 | {near: top-center}
 shape: sequence_diagram
-    user 1; user 2; system.b; system-c; system/d; events; db; external
+    user 1; user 2; events; system.b; system-c; system/d; db; external
 
     user 1 -> system.b: init 1 req
     
     user 1 -> events: event a
+    
+    events -> user 1: event x
+    
     
     
 	

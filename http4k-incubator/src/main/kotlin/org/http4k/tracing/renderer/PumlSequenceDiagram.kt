@@ -13,7 +13,6 @@ import org.http4k.tracing.Trace
 import org.http4k.tracing.TraceRender
 import org.http4k.tracing.TraceRenderer
 import org.http4k.tracing.TraceStep
-import org.http4k.tracing.renderer.PumlSequenceDiagram.toColour
 
 object PumlSequenceDiagram : TraceRenderer {
     override fun render(scenarioName: String, steps: List<TraceStep>): TraceRender {
@@ -76,44 +75,46 @@ object PumlSequenceDiagram : TraceRenderer {
         "<color:Black>>"
     }
 
-    private fun BiDirectional.asPumlSequenceDiagram(): String = """
-           |"${origin.name}" <-> "${target.name}": $request
-           |activate "${target.name}"
+    private fun BiDirectional.asPumlSequenceDiagram(): String = (
+        """
+           |"${origin.name}" <-> "${target.name}": $request""" +
+            if (children.isNotEmpty()) """|activate "${target.name}"
            |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
-           |deactivate "${target.name}"
-            """.trimMargin()
+           |deactivate "${target.name}"""
+            else ""
+        ).trimMargin()
 
-    private fun FireAndForget.asPumlSequenceDiagram(): String = """
-           |"${origin.name}" -> "${target.name}": $request
-           |activate "${target.name}"
-           |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
-           |deactivate "${target.name}"
-            """.trimMargin()
+    private fun FireAndForget.asPumlSequenceDiagram(): String = (
+        """
+           |"${origin.name}" -> "${target.name}": $request""" +
+            if (children.isNotEmpty()) """
+           |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}"""
+            else ""
+        ).trimMargin()
 
     private fun StartInteraction.asPumlSequenceDiagram(): String = """
-        
-        note over "$origin" : "$origin" $interactionName
-        """.trimIndent()
-}
 
-private fun String.toArrow(): String =
-    try {
-        with(toStatus()) {
-            when {
-                successful -> "-[#DarkGreen]>"
-                redirection -> "-[#DarkBlue]>"
-                clientError -> "X-[#DarkOrange]>"
-                serverError -> "X-[#FireBrick]>"
-                else -> "-[#Black]>"
+    note over "$origin" : "$origin" $interactionName
+    """.trimIndent()
+
+    private fun String.toArrow(): String =
+        try {
+            with(toStatus()) {
+                when {
+                    successful -> "-[#DarkGreen]>"
+                    redirection -> "-[#DarkBlue]>"
+                    clientError -> "X-[#DarkOrange]>"
+                    serverError -> "X-[#FireBrick]>"
+                    else -> "-[#Black]>"
+                }
             }
+        } catch (e: Exception) {
+            "-->"
         }
-    } catch (e: Exception) {
-        "-->"
-    }
 
-private fun String.toStatus() = Status(
-    split(" ").first()
-        .filter(Char::isDigit)
-        .toInt(), split(" ").last()
-)
-
+    private fun String.toStatus() = Status(
+        split(" ").first()
+            .filter(Char::isDigit)
+            .toInt(), split(" ").last()
+    )
+}

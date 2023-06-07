@@ -2,10 +2,10 @@ sequenceDiagram
     title foobar - Sequence
     actor user 1
 	actor user 2
+	participant events
 	participant system_b
 	participant system_c
 	participant system_d
-	participant events
 	participant db
 	participant external
 
@@ -13,6 +13,14 @@ sequenceDiagram
     activate system_b
     
     user 1-)events: event a
+    
+    events-)user 1: event x
+    
+    
+    
+    
+    events-)user 1: event x
+    
     
     
     

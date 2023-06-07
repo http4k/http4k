@@ -27,11 +27,18 @@ val b_to_c = RequestResponse(
     listOf(bidi_b, c_to_external)
 )
 
+val fireAndForget_user1_response = FireAndForget(
+    Actor("events", System),
+    Actor("user 1", Human),
+    "event x",
+    listOf()
+)
+
 val fireAndForget_user1 = FireAndForget(
     Actor("user 1", Human),
     Actor("events", System),
     "event a",
-    listOf()
+    listOf(fireAndForget_user1_response)
 )
 
 val entire_trace_1 = RequestResponse(
