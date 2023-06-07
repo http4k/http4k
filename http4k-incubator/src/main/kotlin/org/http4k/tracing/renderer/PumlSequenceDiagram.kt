@@ -13,6 +13,7 @@ import org.http4k.tracing.Trace
 import org.http4k.tracing.TraceRender
 import org.http4k.tracing.TraceRenderer
 import org.http4k.tracing.TraceStep
+import org.http4k.tracing.renderer.PumlSequenceDiagram.toColour
 
 object PumlSequenceDiagram : TraceRenderer {
     override fun render(scenarioName: String, steps: List<TraceStep>): TraceRender {
@@ -77,10 +78,16 @@ object PumlSequenceDiagram : TraceRenderer {
 
     private fun BiDirectional.asPumlSequenceDiagram(): String = """
            |"${origin.name}" <-> "${target.name}": $request
+           |activate "${target.name}"
+           |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
+           |deactivate "${target.name}"
             """.trimMargin()
 
     private fun FireAndForget.asPumlSequenceDiagram(): String = """
            |"${origin.name}" -> "${target.name}": $request
+           |activate "${target.name}"
+           |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
+           |deactivate "${target.name}"
             """.trimMargin()
 
     private fun StartInteraction.asPumlSequenceDiagram(): String = """

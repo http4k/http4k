@@ -15,6 +15,7 @@ sequenceDiagram
     user 1-)events: event a
     
     
+    
 	
     system_b->>system_c: b-to-c req
     activate system_c
@@ -41,6 +42,7 @@ sequenceDiagram
     activate system_d
     
     system_d-)events: event d
+    
     
     
     system_d->>user 2: 500 init 2

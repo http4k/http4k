@@ -11,9 +11,15 @@ participant "external"
 "user 1" -> "system.b": init 1 req
 activate "system.b"
 "user 1" -> "events": event a
+activate "events"
+
+deactivate "events"
 "system.b" -> "system-c": b-to-c req
 activate "system-c"
 "system.b" <-> "db": bidi-b req-resp
+activate "db"
+
+deactivate "db"
 "system-c" -> "external": c-to-external req
 activate "external"
 
@@ -26,6 +32,9 @@ deactivate "system.b"
 "user 2" -> "system/d": init 2 req
 activate "system/d"
 "system/d" -> "events": event d
+activate "events"
+
+deactivate "events"
 "system/d" X-[#FireBrick]> "user 2": <color:FireBrick> 500 init 2
 deactivate "system/d"
 @enduml

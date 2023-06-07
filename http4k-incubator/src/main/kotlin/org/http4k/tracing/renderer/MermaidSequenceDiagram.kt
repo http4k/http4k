@@ -68,6 +68,7 @@ ${
     private fun FireAndForget.asMermaidSequenceDiagram(): String = """
     ${origin.safeName()}-)${target.safeName()}: $request
     ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
+    ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
     """
 
     private fun StartInteraction.asMermaidSequenceDiagram(): String = """
