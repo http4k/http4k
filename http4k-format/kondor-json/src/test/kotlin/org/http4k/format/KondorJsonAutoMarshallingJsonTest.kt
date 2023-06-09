@@ -75,6 +75,12 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
 
     @Test
     @Disabled("not supported")
+    override fun `roundtrip arbitrary set`() {
+        super.`roundtrip arbitrary set`()
+    }
+
+    @Test
+    @Disabled("not supported")
     override fun `prohibit strings`() {
         super.`prohibit strings`()
     }
