@@ -32,7 +32,6 @@ changes with their rationale when appropriate:
 - **http4k-core** : [Unlikely break] Client request tracing now sets and resets the ThreadLocal containing the current Zipkin traces. Possible break
 if you were relying on Zipkin state in a downstream handler. This change will allow better in-memory testing as traces will be reported correctly inside the context of the filter.
 - **http4k-incubator** : [Break] Changes to improve how we create Tracing trees, and this the signature of the Tracer to take EventNode which is a tree node.
-**http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)~~~~
 
 ### v4.45.0.0
 - **http4k-*** : Upgrade some dependency versions.
