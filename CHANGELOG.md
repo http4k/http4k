@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v4.48.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.8.22.
 - **http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)
 
 ### v4.47.2.0
