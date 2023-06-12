@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v3.10.0
         with:
           distribution: temurin
-          java-version: 11
+          java-version: 20
           cache: gradle
       - id: step-2
         name: create-branch
