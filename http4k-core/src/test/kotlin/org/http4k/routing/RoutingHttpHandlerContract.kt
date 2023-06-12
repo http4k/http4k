@@ -10,12 +10,20 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.format.Jackson
+import org.http4k.format.Jackson.asFormatString
+import org.http4k.format.Jackson.prettify
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.testing.ApprovalTest
+import org.http4k.testing.Approver
+import org.http4k.testing.assertApproved
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(ApprovalTest::class)
 abstract class RoutingHttpHandlerContract {
 
     protected open val validPath = "/route-contract"
@@ -105,6 +113,11 @@ abstract class RoutingHttpHandlerContract {
 
         assertThat(withBase.matchAndInvoke(request), present(criteria))
         assertThat(withBase(request), criteria)
+    }
+
+    @Test
+    fun `can describe routing`(approver: Approver) {
+        approver.assertApproved(prettify(asFormatString(handler.description)))
     }
 
     protected fun filterAppending(value: String) = Filter { next ->

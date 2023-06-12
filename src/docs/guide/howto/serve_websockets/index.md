@@ -3,11 +3,14 @@ description: Recipes for using http4k with websockets
 
 ### Gradle setup
 
-```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.25.15.0"
-implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.25.15.0"
-implementation group: "org.http4k", name: "http4k-client-websocket", version: "4.25.15.0"
-implementation group: "org.http4k", name: "http4k-format-jackson", version: "4.25.15.0"
+```kotlin
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation("org.http4k:http4k-core")
+    implementation("org.http4k:http4k-server-jetty")
+    implementation("org.http4k:http4k-client-websocket")
+    implementation("org.http4k:http4k-format-jackson")
+}
 ```
 
 **http4k** provides Websocket support using a simple, consistent, typesafe, and testable API on supported server backends (see above). Websocket communication consists of 4 main concepts:

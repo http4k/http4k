@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
@@ -12,8 +13,10 @@ import org.http4k.format.Jackson.asA
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
+import org.http4k.lens.BiDiMapping
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
@@ -57,6 +60,13 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
 
         assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }
+
+    override fun strictMarshaller() =
+        object : ConfigurableJackson(
+            KotlinModule.Builder().build().asConfigurable().customise()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+        ) {}
+
 
     override fun customMarshaller() =
         object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise()) {}
@@ -129,6 +139,44 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val list = listOf(FirstChild("hello"), SecondChild("world"))
 
         assertThat(body(Response(OK).with(body of list)), equalTo(list))
+    }
+
+    @Test
+    override fun `roundtrip arbitrary map`() {
+        val wrapper = mapOf(
+            "str" to "val1",
+            "num" to BigDecimal("123.1"),
+            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "map" to mapOf("foo" to "bar"),
+            "bool" to true
+        )
+        val asString = Jackson.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryMap))
+        assertThat(Jackson.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    override fun `roundtrip arbitrary array`() {
+        val wrapper = listOf(
+            "foo",
+            BigDecimal("123.1"),
+            mapOf("foo" to "bar"),
+            listOf(BigDecimal("1.1"),BigDecimal("2.1")),
+            true
+        )
+        val asString = Jackson.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryArray.normaliseJson()))
+        assertThat(Jackson.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    fun `custom jackson`() {
+        val jackson = Jackson.custom {
+            text(BiDiMapping({StringHolder(it)},{it.value}))
+        }
+
+        val value = StringHolder("stuff")
+        assertThat(jackson.asFormatString(value), equalTo("\"stuff\""))
     }
 }
 

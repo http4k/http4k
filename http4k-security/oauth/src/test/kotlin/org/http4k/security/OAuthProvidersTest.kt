@@ -32,6 +32,7 @@ class OAuthProvidersTest {
         assertProvider(OAuthProvider.google(client("www.googleapis.com"), credentials, uri, oAuthPersistence), "https://accounts.google.com/o/oauth2/v2/auth")
         assertProvider(OAuthProvider.soundCloud(client("api.soundcloud.com"), credentials, uri, oAuthPersistence), "https://soundcloud.com/connect")
         assertProvider(OAuthProvider.gitLab(client("gitlab.com"), credentials, uri, oAuthPersistence), "https://gitlab.com/oauth/authorize")
+        assertProvider(OAuthProvider.discord(client("discord.com"), credentials, uri, oAuthPersistence), "https://discord.com/api/oauth2/authorize")
     }
 
     private fun assertProvider(provider: OAuthProvider, expectedRedirectPrefix: String) {

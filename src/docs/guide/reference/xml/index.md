@@ -3,12 +3,15 @@ description: Feature overview of the modules providing XML support, including an
 
 ### Installation (Gradle)
 
-```groovy
-// json.org XML:
-implementation group: "org.http4k", name: "http4k-format-xml", version: "4.25.15.0"
+```kotlin
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    // json.org XML:
+    implementation("org.http4k:http4k-format-xml")
 
-// Jackson XML:
-implementation group: "org.http4k", name: "http4k-format-jackson-xml", version: "4.25.15.0"
+    // Jackson XML:
+    implementation("org.http4k:http4k-format-jackson-xml")
+}
 ```
 
 ### About

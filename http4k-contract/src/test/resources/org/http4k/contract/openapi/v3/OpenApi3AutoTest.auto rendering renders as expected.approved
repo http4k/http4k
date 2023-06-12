@@ -31,7 +31,10 @@
               "example": {
                 "foo": 123,
                 "arb": {
-                  "anotherString": "bing"
+                  "anotherString": "bing",
+                  "listEnum": [
+                    "bing"
+                  ]
                 }
               },
               "schema": {
@@ -49,14 +52,13 @@
                   "example": {
                     "foo": 123,
                     "arb": {
-                      "anotherString": "bing"
+                      "anotherString": "bing",
+                      "listEnum": [
+                        "bing"
+                      ]
                     }
                   },
-                  "type": "object",
-                  "required": [
-                    "arb",
-                    "foo"
-                  ]
+                  "type": "object"
                 },
                 "type": "object"
               }
@@ -90,7 +92,10 @@
               "example": {
                 "string": "s",
                 "child": {
-                  "anotherString": "bar"
+                  "anotherString": "bar",
+                  "listEnum": [
+                    "bar"
+                  ]
                 },
                 "numbers": [
                   1
@@ -130,7 +135,10 @@
                 "additional": {
                   "foo": 123,
                   "arb": {
-                    "anotherString": "bing"
+                    "anotherString": "bing",
+                    "listEnum": [
+                      "bing"
+                    ]
                   }
                 }
               },
@@ -148,7 +156,10 @@
               "application/json": {
                 "example": [
                   {
-                    "anotherString": "bing"
+                    "anotherString": "bing",
+                    "listEnum": [
+                      "bing"
+                    ]
                   }
                 ],
                 "schema": {
@@ -157,7 +168,10 @@
                   },
                   "example": [
                     {
-                      "anotherString": "bing"
+                      "anotherString": "bing",
+                      "listEnum": [
+                        "bing"
+                      ]
                     }
                   ],
                   "type": "array"
@@ -293,7 +307,10 @@
             "content": {
               "application/json": {
                 "example": {
-                  "anotherString": "bing"
+                  "anotherString": "bing",
+                  "listEnum": [
+                    "bing"
+                  ]
                 },
                 "schema": {
                   "$ref": "#/components/schemas/ArbObject1"
@@ -365,6 +382,191 @@
         "operationId": "postBasepathBody_auto_schema_name_definition_id",
         "deprecated": false
       }
+    },
+    "/basepath/body_negotiated": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "custom/v1": {
+              "schema": {
+                "example": "john",
+                "type": "string"
+              }
+            },
+            "custom/v2": {
+              "schema": {
+                "example": "john",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "custom/v1": {
+                "schema": {
+                  "example": "john",
+                  "type": "string"
+                }
+              },
+              "custom/v2": {
+                "schema": {
+                  "example": "john",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_negotiated",
+        "deprecated": false
+      }
+    },
+    "/basepath/callback_with_body": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathCallback_with_body",
+        "deprecated": false,
+        "callbacks": {
+          "name": {
+            "/foo": {
+              "post": {
+                "summary": "<unknown>",
+                "parameters": [
+                ],
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "example": {
+                        "sub": {
+                          "uri": "http://foowang",
+                          "additional": {
+                            "foo": 123,
+                            "arb": {
+                              "anotherString": "bing",
+                              "listEnum": [
+                                "bing"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "schema": {
+                        "$ref": "#/components/schemas/ArbObject5"
+                      }
+                    }
+                  },
+                  "required": true
+                },
+                "responses": {
+                },
+                "deprecated": false
+              }
+            },
+            "/bar": {
+              "put": {
+                "summary": "<unknown>",
+                "parameters": [
+                ],
+                "responses": {
+                  "201": {
+                    "description": "Created",
+                    "content": {
+                      "application/json": {
+                        "example": {
+                          "foo": "bing"
+                        },
+                        "schema": {
+                          "$ref": "#/components/schemas/ArbObject6"
+                        }
+                      }
+                    }
+                  }
+                },
+                "deprecated": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/basepath/multipart-fields": {
+      "put": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "stringField": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "fileField": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "autoJsonField": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "stringField",
+                  "fileField",
+                  "autoJsonField"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "putBasepathMultipart_fields",
+        "deprecated": false
+      }
     }
   },
   "components": {
@@ -396,7 +598,10 @@
         "example": {
           "string": "s",
           "child": {
-            "anotherString": "bar"
+            "anotherString": "bar",
+            "listEnum": [
+              "bar"
+            ]
           },
           "numbers": [
             1
@@ -414,14 +619,27 @@
         "properties": {
           "anotherString": {
             "$ref": "#/components/schemas/Foo"
+          },
+          "listEnum": {
+            "items": {
+              "$ref": "#/components/schemas/Foo"
+            },
+            "example": [
+              "bing"
+            ],
+            "type": "array"
           }
         },
         "example": {
-          "anotherString": "bing"
+          "anotherString": "bing",
+          "listEnum": [
+            "bing"
+          ]
         },
         "type": "object",
         "required": [
-          "anotherString"
+          "anotherString",
+          "listEnum"
         ]
       },
       "Foo": {
@@ -468,14 +686,13 @@
               "example": {
                 "foo": 123,
                 "arb": {
-                  "anotherString": "bing"
+                  "anotherString": "bing",
+                  "listEnum": [
+                    "bing"
+                  ]
                 }
               },
-              "type": "object",
-              "required": [
-                "arb",
-                "foo"
-              ]
+              "type": "object"
             },
             "type": "object"
           }
@@ -485,7 +702,10 @@
           "additional": {
             "foo": 123,
             "arb": {
-              "anotherString": "bing"
+              "anotherString": "bing",
+              "listEnum": [
+                "bing"
+              ]
             }
           }
         },
@@ -493,6 +713,45 @@
         "required": [
           "additional",
           "uri"
+        ]
+      },
+      "ArbObject5": {
+        "properties": {
+          "sub": {
+            "$ref": "#/components/schemas/ArbObject3"
+          }
+        },
+        "example": {
+          "sub": {
+            "uri": "http://foowang",
+            "additional": {
+              "foo": 123,
+              "arb": {
+                "anotherString": "bing",
+                "listEnum": [
+                  "bing"
+                ]
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "sub"
+        ]
+      },
+      "ArbObject6": {
+        "properties": {
+          "foo": {
+            "$ref": "#/components/schemas/Foo"
+          }
+        },
+        "example": {
+          "foo": "bing"
+        },
+        "type": "object",
+        "required": [
+          "foo"
         ]
       },
       "impl1": {

@@ -15,8 +15,12 @@ This is a fairly comprehensive example of the core-routing logic available:
 ### Dynamic Paths / Path Variables
 As you would expect, http4k allows routes to include dynamic or variable elements in the matching path, and allows you to reference the variable in the Handler. For example:
 ```
-"/book/{title}" bind GET to { req -> Response.invoke(Status.OK).body(GetBookDetails(req.path("title")) }
-"/author/{name}/latest" bind GET to { req -> Response.invoke(Status.OK).body(GetAllBooks(author = req.path("name")).last()) }
+"/book/{title}" bind GET to { req -> 
+    Response.invoke(Status.OK).body(GetBookDetails(req.path("title")) 
+}
+"/author/{name}/latest" bind GET to { req -> 
+    Response.invoke(Status.OK).body(GetAllBooks(author = req.path("name")).last()) 
+}
 ```
 
 By default, the variable(s) will match anything. However you can append the variable name with a RegEx expression to limit the matches.
@@ -39,8 +43,11 @@ Note that paths, not strings, will match by default. `"/news/{date}"` will match
 
 ### Gradle setup
 
-```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.25.15.0"
+```kotlin
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation("org.http4k:http4k-core")
+}
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/nestable_routes/example.kt)

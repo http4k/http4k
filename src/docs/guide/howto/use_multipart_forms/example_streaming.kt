@@ -25,15 +25,18 @@ fun main() {
     val server = ServerFilters.CatchAll().then { r: Request ->
 
         // here we are iterating over the multiparts as we read them out of the input
-        val fields = r.multipartIterator().asSequence().fold(emptyList<MultipartEntity.Field>()) { memo, next ->
-            when (next) {
-                is MultipartEntity.File -> {
-                    // do something with the file right here... like stream it to another server
-                    memo
+        val fields = r.multipartIterator().asSequence()
+            .fold(emptyList<MultipartEntity.Field>()) { memo, next ->
+                when (next) {
+                    is MultipartEntity.File -> {
+                        // do something with the file right here...
+                        // like stream it to another server
+                        memo
+                    }
+
+                    is MultipartEntity.Field -> memo.plus(next)
                 }
-                is MultipartEntity.Field -> memo.plus(next)
             }
-        }
 
         println(fields)
 
@@ -51,10 +54,17 @@ private fun buildMultipartRequest(): Request {
     val imageFile = MultipartFormFile.optional("image")
 
     // add fields to a form definition, along with a validator
-    val strictFormBody = Body.multipartForm(Validator.Strict, nameField, imageFile, diskThreshold = 5).toLens()
+    val strictFormBody =
+        Body.multipartForm(Validator.Strict, nameField, imageFile, diskThreshold = 5).toLens()
 
     val multipartform = MultipartForm().with(
         nameField of Name("rita"),
-        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
-    return Request(POST, "http://localhost:8000").with(strictFormBody of multipartform)
+        imageFile of MultipartFormFile(
+            "image.txt",
+            ContentType.OCTET_STREAM,
+            "somebinarycontent".byteInputStream()
+        )
+    )
+    return Request(POST, "http://localhost:8000")
+        .with(strictFormBody of multipartform)
 }

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <script src="https://unpkg.com/swagger-ui-dist@4.18.3/swagger-ui-standalone-preset.js" integrity="sha512-V5Zdt9ZPs6AWG/eQJp9a27pWGO8iBITXxdCD6/VNbO+XdHD8QnhsifVaUKeAkoYumdQZOFy45hPPLZ5aRolGxQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@4.18.3/swagger-ui-bundle.js" integrity="sha512-jh2caNMlyLKhcis1ISQoVqJeT/SLXdeVz46/g46RsUuVPOVAMcXTeB9DGQymsQKIwieP6zXX1Lna+ESnXLbouQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@4.18.3/swagger-ui.css" integrity="sha512-hki9EANjyxPBN/cHBLCllLIRqS/XFUYzEv32spn5AgpZVk5TteqGuTtQThuaTXoZ74i1WNox6ywGY0oTGerbow==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <title>Cat Shelter</title>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="swagger-initializer.js"></script>
+</body>
+</html>

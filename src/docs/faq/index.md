@@ -44,4 +44,16 @@ If you're running http4k in production and would like to be listed on the site a
 
 **A.** You forgot to add the `ServerFilters.CatchLensFailure` filter to your Server stack.
 
+### OpenAPI Contracts
+**Q. When I use binary uploads, my OpenAPI endpoint receives no data.**
+
+**A.** With binary attachments, you need to turn ensure that the pre-flight validation does not eat the stream. You can 
+do this by instruction http4k to ignore the incoming body for validation purposes:
+
+```kotlin
+routes += "/api/document-upload" meta {
+    preFlightExtraction = PreFlightExtraction.IgnoreBody
+} bindContract POST to { req -> Response(OK) }
+```
+
 [http4k]: https://http4k.org

@@ -3,6 +3,8 @@ package org.http4k.format
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.squareup.moshi.Moshi.Builder
+import org.http4k.format.StrictnessMode.FailOnUnknown
+import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -45,14 +47,39 @@ unknown: "2000-01-01"
     override val expectedMap = "key:value\n" +
         "key2:'123'\n"
 
+    override val expectedArbitraryArray = """- foo
+- 123.1
+- foo:bar
+- - 1.1
+  - 2.1
+- true
+"""
+
+    override val expectedArbitrarySet = """- foo
+- bar
+"""
+
+    override val expectedArbitraryMap = """str:val1
+num:123.1
+array:
+- 1.1
+- stuff
+map:
+  foo:bar
+bool:true
+"""
+
     override val expectedAutoMarshallingZonesAndLocale = "zoneId:America/Toronto\nzoneOffset:-04:00\nlocale:en-CA\n"
+
+    override fun strictMarshaller() = object : ConfigurableMoshiYaml(
+        Builder().asConfigurable().customise(), strictness = FailOnUnknown
+    ) {}
 
     override fun customMarshaller() = ConfigurableMoshiYaml(Builder().asConfigurable().customise()
         .add(NullSafeMapAdapter).add(ListAdapter))
 
     override fun customMarshallerProhibitStrings() = ConfigurableMoshiYaml(
-        Builder().asConfigurable().prohibitStrings()
-            .customise()
+        Builder().asConfigurable().prohibitStrings().customise()
     )
 
     data class MapHolder(val map: Map<String, MapHolder?>)
@@ -108,4 +135,19 @@ unknown: "2000-01-01"
         assertThat(marshaller.asA("value: \n", MyValueHolder::class), equalTo(MyValueHolder(null)))
     }
 
+    @Test
+    fun `on as a key is not quoted`() {
+        val wrapper = mapOf("on" to "hello")
+        assertThat(MoshiYaml.asFormatString(wrapper), equalTo("on: hello\n"))
+    }
+
+    @Test
+    fun `custom moshi yaml`() {
+        val moshi = MoshiYaml.custom {
+            text(BiDiMapping({StringHolder(it)},{it.value}))
+        }
+
+        val value = StringHolder("stuff")
+        assertThat(moshi.asFormatString(value), equalTo("'\"stuff\"'\n"))
+    }
 }

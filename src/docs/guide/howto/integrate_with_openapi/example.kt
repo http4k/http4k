@@ -52,9 +52,10 @@ fun main() {
         )
     }
 
-    val filter: Filter = ResponseFilters.ReportHttpTransaction(Clock.systemUTC()) { tx: HttpTransaction ->
-        println(tx.labels.toString() + " took " + tx.duration)
-    }
+    val filter: Filter =
+        ResponseFilters.ReportHttpTransaction(Clock.systemUTC()) { tx: HttpTransaction ->
+            println(tx.labels.toString() + " took " + tx.duration)
+        }
 
     val mySecurity = ApiKeySecurity(Query.int().required("apiKey"), { it == 42 })
 
@@ -64,7 +65,7 @@ fun main() {
             Argo,
             servers = listOf(ApiServer(Uri.of("http://localhost:8000"), "the greatest server"))
         )
-        descriptionPath = "/docs/swagger.json"
+        descriptionPath = "/docs/openapi.json"
         security = mySecurity
 
         routes += "/ping" meta {
@@ -84,7 +85,9 @@ fun main() {
             summary = "divide"
             description = "Divides 2 numbers"
             returning(OK to "The result")
-        } bindContract GET to { first, second, _ -> { Response(OK).body((first / second).toString()) } }
+        } bindContract GET to { first, second, _ ->
+            { Response(OK).body((first / second).toString()) }
+        }
 
         routes += "/echo" / Path.of("name") meta {
             summary = "echo"
@@ -104,7 +107,8 @@ fun main() {
         }
     )
 
-    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).asServer(Jetty(8000)).start()
+    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).asServer(Jetty(8000))
+        .start()
 }
 
 // Ping!                    curl -v "http://localhost:8000/context/ping?apiKey=42"
@@ -112,5 +116,5 @@ fun main() {
 // Echo (fail):             curl -v "http://localhost:8000/context/echo/myName?age=notANumber&apiKey=42"
 // API Key enforcement:     curl -v "http://localhost:8000/context/add/123/564?apiKey=444"
 // Static content:          curl -v "http://localhost:8000/static/someStaticFile.txt"
-// OpenApi/Swagger documentation:   curl -v "http://localhost:8000/context/docs/swagger.json"
+// OpenApi/Swagger documentation:   curl -v "http://localhost:8000/context/docs/openapi.json"
 // Echo endpoint (at root): curl -v "http://localhost:8000/echo/hello?age=123"

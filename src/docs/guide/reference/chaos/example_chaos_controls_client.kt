@@ -42,6 +42,13 @@ fun main() {
           }
         }]
         """.trimIndent()
-    println(appWithChaos(Request(POST, "/chaos/activate/new").body(alwaysReturn418)).bodyString())
+    println(
+        appWithChaos(
+            Request(
+                POST,
+                "/chaos/activate/new"
+            ).body(alwaysReturn418)
+        ).bodyString()
+    )
     println(appWithChaos(Request(GET, "/")).status)
 }

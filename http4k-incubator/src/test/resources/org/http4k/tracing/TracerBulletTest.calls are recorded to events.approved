@@ -1,0 +1,111 @@
+[
+  {
+    "origin": {
+      "name": "Root",
+      "type": "System"
+    },
+    "target": {
+      "name": "EntryPoint",
+      "type": "System"
+    },
+    "request": "GET {name}",
+    "response": "200 OK",
+    "children": [
+      {
+        "origin": {
+          "name": "EntryPoint",
+          "type": "System"
+        },
+        "target": {
+          "name": "Child1",
+          "type": "System"
+        },
+        "request": "GET report",
+        "response": "200 OK",
+        "children": [
+          {
+            "origin": {
+              "name": "Child1",
+              "type": "System"
+            },
+            "target": {
+              "name": "db",
+              "type": "Database"
+            },
+            "request": "Child1",
+            "children": [
+            ]
+          }
+        ]
+      },
+      {
+        "origin": {
+          "name": "EntryPoint",
+          "type": "System"
+        },
+        "target": {
+          "name": "db",
+          "type": "Database"
+        },
+        "request": "EntryPoint",
+        "children": [
+        ]
+      },
+      {
+        "origin": {
+          "name": "EntryPoint",
+          "type": "System"
+        },
+        "target": {
+          "name": "Child2",
+          "type": "System"
+        },
+        "request": "GET {name}",
+        "response": "200 OK",
+        "children": [
+          {
+            "origin": {
+              "name": "Child2",
+              "type": "System"
+            },
+            "target": {
+              "name": "Grandchild",
+              "type": "System"
+            },
+            "request": "POST echo",
+            "response": "200 OK",
+            "children": [
+              {
+                "origin": {
+                  "name": "Grandchild",
+                  "type": "System"
+                },
+                "target": {
+                  "name": "Child1",
+                  "type": "System"
+                },
+                "request": "GET report",
+                "response": "200 OK",
+                "children": [
+                  {
+                    "origin": {
+                      "name": "Child1",
+                      "type": "System"
+                    },
+                    "target": {
+                      "name": "db",
+                      "type": "Database"
+                    },
+                    "request": "Child1",
+                    "children": [
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

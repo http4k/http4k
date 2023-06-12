@@ -13,6 +13,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
 import org.http4k.contract.openapi.OpenAPIJackson
+import org.http4k.contract.openapi.v3.Foo.value1
+import org.http4k.contract.openapi.v3.Foo.value2
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -57,7 +59,7 @@ data class ArbObject(
     val nullableChild: ArbObject2? = ArbObject2(),
     val stringList: List<String> = listOf("hello", "goodbye"),
     val anyList: List<Any> = listOf("123", ArbObject2(), true, listOf(ArbObject2())),
-    val enumVal: Foo? = Foo.value2
+    val enumVal: Foo? = value2
 ) : Generic
 
 data class JsonPrimitives(
@@ -76,6 +78,8 @@ enum class Foo {
 }
 
 data class Nulls(val f1: String? = null, val f2: String? = null)
+
+data class EnumListHolder<T : Enum<T>>(val value: List<T>)
 
 data class GenericListHolder(val value: List<Generic>)
 data class GenericHolder<T>(val value: T)
@@ -239,7 +243,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for non-string-keyed map field`(approver: Approver) {
-        approver.assertApproved(MapHolder(mapOf(Foo.value1 to "value", LocalDate.of(1970, 1, 1) to "value")))
+        approver.assertApproved(MapHolder(mapOf(value1 to "value", LocalDate.of(1970, 1, 1) to "value")))
     }
 
     @Test
@@ -259,7 +263,13 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for different enum types`(approver: Approver) {
-        approver.assertApproved(listOf(GenericHolder(Enum1.value1_1), GenericHolder(Enum2.value2_1), GenericHolder(Enum1.value1_2)))
+        approver.assertApproved(
+            listOf(
+                GenericHolder(Enum1.value1_1),
+                GenericHolder(Enum2.value2_1),
+                GenericHolder(Enum1.value1_2)
+            )
+        )
     }
 
     @Test
@@ -269,12 +279,17 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for list of enums`(approver: Approver) {
-        approver.assertApproved(listOf(Foo.value1, Foo.value2))
+        approver.assertApproved(listOf(value1, value2))
+    }
+
+    @Test
+    fun `renders schema for nested list of enums`(approver: Approver) {
+        approver.assertApproved(EnumListHolder(listOf(value1, value2)))
     }
 
     @Test
     fun `renders schema for enum`(approver: Approver) {
-        approver.assertApproved(Foo.value1)
+        approver.assertApproved(value1)
     }
 
     @Test

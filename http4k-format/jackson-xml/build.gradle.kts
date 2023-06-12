@@ -5,6 +5,6 @@ dependencies {
     api(project(":http4k-format-jackson"))
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:_")
     testImplementation(project(":http4k-core"))
-    testImplementation(project(path = ":http4k-core", configuration ="testArtifacts"))
-    testImplementation(project(path = ":http4k-format-core", configuration ="testArtifacts"))
+    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(project(path = ":http4k-format-core", configuration = "testArtifacts"))
 }

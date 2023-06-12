@@ -3,9 +3,12 @@ description: Recipe for using http4k Events to send structured logs to external 
 
 ### Gradle setup
 
-```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.25.15.0"
-implementation group: "org.http4k", name: "http4k-format-jackson", version: "4.25.15.0"
+```kotlin
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation("org.http4k:http4k-core")
+    implementation("org.http4k:http4k-format-jackson")
+}
 ```
 
 In order to leverage modern log aggregation platforms, we should move away from logging arbitrary strings into the StdOut of our applications, and move towards [Structured Logging](https://www.thoughtworks.com/radar/techniques/structured-logging) instead, which allows us to treat logs as data which can be mined to give us better observability of our systems. This also encourages the move for developers to think about which events happening in your apps are actually important and what data is appropriate to be attached to each one.
@@ -36,7 +39,7 @@ Attaching metadata to an `Event` results in (compactified) JSON similar to this:
 }
 ```
 
-In harmony with the ethos of **http4k** there is no need to bring in a custom logging library such as SL4J, although they would be very simple to integrate if required by implementing a custom `Events` instance.
+In harmony with the [ethos](/guide/concepts/rationale) of **http4k** there is no need to bring in a custom logging library such as SL4J, although they would be very simple to integrate if required by implementing a custom `Events` instance.
 
 The example below shows a simple application that outputs structured logs to StdOut which can be analysed by an aggregator, along with the attachment of extra `Event` metadata via a custom `EventFilter`.
  

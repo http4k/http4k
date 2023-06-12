@@ -30,4 +30,16 @@ class DigestChallengeTest {
             qop = listOf(Qop.Auth)
         )))
     }
+
+    @Test
+    fun `process auth challenge with '=' in nonce`() {
+        val challenge = DigestChallenge.parse("Digest realm=\"axis\", nonce=\"1234=abcd\", algorithm=MD5, qop=\"auth\"")
+        assertThat(challenge, equalTo(DigestChallenge(
+            realm = "axis",
+            nonce = Nonce("1234=abcd"),
+            algorithm = "MD5",
+            opaque = null,
+            qop = listOf(Qop.Auth)
+        )))
+    }
 }

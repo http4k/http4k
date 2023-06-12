@@ -3,24 +3,28 @@ description: Feature overview of the http4k-serverless modules, covering Serverl
 
 ### Installation (Gradle)
 
-```groovy
-// AWS Lambda: 
-implementation group: "org.http4k", name: "http4k-serverless-lambda", version: "4.25.15.0"
+```kotlin
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
 
-// Google Cloud Functions: 
-implementation group: "org.http4k", name: "http4k-serverless-gcf", version: "4.25.15.0"
+    // AWS Lambda: 
+    implementation("org.http4k:http4k-serverless-lambda")
 
-// Apache OpenWhisk (IBM Cloud Functions): 
-implementation group: "org.http4k", name: "http4k-serverless-openwhisk", version: "4.25.15.0"
+    // Google Cloud Functions: 
+    implementation("org.http4k:http4k-serverless-gcf")
 
-// Azure Functions: 
-implementation group: "org.http4k", name: "http4k-serverless-azure", version: "4.25.15.0"
+    // Apache OpenWhisk (IBM Cloud Functions): 
+    implementation("org.http4k:http4k-serverless-openwhisk")
 
-// Alibaba Function Compute: 
-implementation group: "org.http4k", name: "http4k-serverless-alibaba", version: "4.25.15.0"
+    // Azure Functions: 
+    implementation("org.http4k:http4k-serverless-azure")
 
-// Tencent Serverless Cloud Functions: 
-implementation group: "org.http4k", name: "http4k-serverless-tencent", version: "4.25.15.0"
+    // Alibaba Function Compute: 
+    implementation("org.http4k:http4k-serverless-alibaba")
+
+    // Tencent Serverless Cloud Functions: 
+    implementation("org.http4k:http4k-serverless-tencent")
+}
 ```
 
 ### About
@@ -51,7 +55,7 @@ We hope to soon provide some tools to automate at least some of the above proces
 #### AWS Lambda integration (Event-based apps)
 http4k also supports writing Event-based functions to receive AWS events from services like SQS and Dynamo. One advantage of using http4k version is that it uses the AWS SDK RequestStreamHandler instead of the standard RequestHandler - which avoids the heavyweight Jackson deserialisation process (we use Moshi under the covers) utilised by the standard AWS runtime. To use this events functionality, you should also import the AWS Events JAR:
 
-```groovy
+```kotlin
 implementation "com.amazonaws:aws-lambda-java-events:3.8.0"
 ```
 
@@ -83,7 +87,7 @@ After building, and having your jar as the only file in the `libs/` folder you c
 ```gcloud functions deploy example-function --runtime=java11 --entry-point=guide.modules.serverless.gcf.FunctionsExampleEntryClass --trigger-http --source=libs/```
 
 If you wan't to invoke functions locally you can do it with this gradle setup and passing a `-PrunFunction.target` parameter to the build task : 
-```groovy
+```kotlin
 configurations {
     invoker
 }

@@ -60,7 +60,7 @@ First, let's take a tour of the `/src/main/kotlin/HelloWorld.kt` file which cont
 Hit the little green arrow and the application will run and start. Point your browser at `http://localhost:9000/ping` to check that it's working. Note that the `Filter` is printing each incoming request to the console.
 
 #### Step 5
-In `/src/main/kotlin/HelloWorldClient.kt` there is an example of an HTTP client which we can use to call our running app.
+In `/src/test/kotlin/HelloWorldClient.kt` there is an example of an HTTP client which we can use to call our running app.
 
 <img class="blogImage" src="step5.png" alt="client code"/>
 
@@ -77,7 +77,7 @@ To bind an `HttpHandler` to the `pong` endpoint, modify `/src/main/kotlin/HelloW
 
 <img class="blogImage" src="step6.png" alt="client code"/>
 
-- **Lines 18-20** add an HTTP endpoint binding all HTTP `GET` requests on the path `/pong` to an `HttpHandler` function.
+- **Lines 19-21** add an HTTP endpoint binding all HTTP `GET` requests on the path `/pong` to an `HttpHandler` function.
 
 To see this update in action, first rerun the main application by hitting the green arrow now on **line 23** in `/src/main/kotlin/HelloWorld.kt`, and then running the client again using the green arrow on **line 11** in `/src/test/kotlin/HelloWorldClient.kt`. You should see the new "ping" response printed to the console.
 

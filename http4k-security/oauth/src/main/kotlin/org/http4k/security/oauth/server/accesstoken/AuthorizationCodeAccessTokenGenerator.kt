@@ -32,19 +32,18 @@ class AuthorizationCodeAccessTokenGenerator(
         extract(clientId, tokenRequest).flatMap { generate(it) }
 
     fun generate(request: AuthorizationCodeAccessTokenRequest): Result<AccessTokenDetails, AccessTokenError> {
-        val code = request.authorizationCode
-        val codeDetails = authorizationCodes.detailsFor(code)
+        val codeDetails = authorizationCodes.detailsFor(request.authorizationCode)
 
         return when {
             codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
             codeDetails.clientId != request.clientId -> Failure(ClientIdMismatch)
             codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
-            else -> accessTokens.create(codeDetails.clientId, request, code)
+            else -> accessTokens.create(codeDetails.clientId, request)
                 .map { token ->
                     when {
                         codeDetails.isOIDC -> AccessTokenDetails(
                             token,
-                            idTokens.createForAccessToken(codeDetails, code, token)
+                            idTokens.createForAccessToken(codeDetails, request.authorizationCode, token)
                         )
                         else -> AccessTokenDetails(token)
                     }

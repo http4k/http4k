@@ -9,7 +9,7 @@ import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
 import org.json.XML
 import org.w3c.dom.Document
@@ -50,7 +50,7 @@ object Xml : AutoMarshallingXml() {
 
     fun Body.Companion.xml(description: String? = null,
                            contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Document> =
-        httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), APPLICATION_XML, contentNegotiation)
+        httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_XML, contentNegotiation)
             .map(Body::payload) { Body(it) }
             .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlDocument() }, { it.asXmlString() })
 }

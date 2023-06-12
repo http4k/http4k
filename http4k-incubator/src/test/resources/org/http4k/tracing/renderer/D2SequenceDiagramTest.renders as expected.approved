@@ -1,0 +1,38 @@
+
+title: |md
+# foobar - Sequence
+| {near: top-center}
+shape: sequence_diagram
+    user 1; user 2; events; system.b; system-c; system/d; db; external
+
+    user 1 -> system.b: init 1 req
+    
+    user 1 -> events: event a
+    
+    events -> user 1: event x
+    
+    
+    
+	
+    system.b -> system-c: b-to-c req
+    
+    system.b <-> db: bidi-b req-resp
+    
+    
+	
+    system-c -> external: c-to-external req
+    
+    external -> system-c: 200 c-to-external
+    
+    system-c -> system.b: 300 b-to-c
+    
+    system.b -> user 1: 400 init 2
+    
+	
+    user 2 -> system/d: init 2 req
+    
+    system/d -> events: event d
+    
+    
+    system/d -> user 2: 500 init 2
+    

@@ -17,8 +17,10 @@ import org.http4k.filter.ResponseFilters
 import org.http4k.format.Jackson
 
 fun main() {
-    // Stack filters for Events in the same way as HttpHandlers to transform or add metadata to the Events.
-    // We use AutoMarshallingEvents (here with Jackson) to handle the final serialisation process.
+    // Stack filters for Events in the same way as HttpHandlers to
+    // transform or add metadata to the Events.
+    // We use AutoMarshallingEvents (here with Jackson) to
+    // handle the final serialisation process.
     val events =
         EventFilters.AddTimestamp()
             .then(EventFilters.AddEventName())
@@ -31,7 +33,13 @@ fun main() {
     val appWithEvents =
         ResponseFilters.ReportHttpTransaction {
             // to "emit" an event, just invoke() the Events!
-            events(IncomingHttpRequest(it.request.uri, it.response.status.code, it.duration.toMillis()))
+            events(
+                IncomingHttpRequest(
+                    uri = it.request.uri,
+                    status = it.response.status.code,
+                    duration = it.duration.toMillis()
+                )
+            )
         }.then(app)
 
     appWithEvents(Request(GET, "/path1"))

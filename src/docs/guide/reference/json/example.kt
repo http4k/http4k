@@ -46,7 +46,13 @@ val objectUsingDslApi: JsonNode = json {
 }
 
 val response = Response(OK).with(
-    Body.json().toLens() of json.array(listOf(objectUsingDirectApi, objectUsingExtensionFunctions, objectUsingDslApi))
+    Body.json().toLens() of json.array(
+        listOf(
+            objectUsingDirectApi,
+            objectUsingExtensionFunctions,
+            objectUsingDslApi
+        )
+    )
 )
 
 val xmlLens = Body.xml().toLens()

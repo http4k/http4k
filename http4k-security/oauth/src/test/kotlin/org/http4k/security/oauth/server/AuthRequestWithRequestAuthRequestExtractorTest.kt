@@ -177,7 +177,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest().extract(
                     Request(
                         GET,
-                        "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&scope=openid+email+address&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -203,7 +203,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest().extract(
                     Request(
                         GET,
-                        "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -229,7 +229,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest().extract(
                     Request(
                         GET,
-                        "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -312,7 +312,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest(AuthRequestOnly).extract(
                     Request(
                         GET,
-                        "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&scope=openid+email+address&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -338,7 +338,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest(AuthRequestOnly).extract(
                     Request(
                         GET,
-                        "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -364,7 +364,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest(AuthRequestOnly).extract(
                     Request(
                         GET,
-                        "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -447,7 +447,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest(RequestObjectOnly).extract(
                     Request(
                         GET,
-                        "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&scope=openid+email+address&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -473,7 +473,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest(RequestObjectOnly).extract(
                     Request(
                         GET,
-                        "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(
@@ -499,7 +499,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
                 underTest(RequestObjectOnly).extract(
                     Request(
                         GET,
-                        "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt"
+                        "/?client_id=12345&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt"
                     )
                 ), equalTo(
                     success(

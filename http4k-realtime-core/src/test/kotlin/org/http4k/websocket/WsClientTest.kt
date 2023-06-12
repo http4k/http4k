@@ -2,6 +2,7 @@ package org.http4k.websocket
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isEmpty
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -102,5 +103,6 @@ class WsClientTest {
         }.testWsClient(Request(GET, "/"))
 
         assertThat(client.received().none(), equalTo(true))
+        assertThat(client.received().toList(), isEmpty) // verify NoSuchElement not thrown during iteration
     }
 }

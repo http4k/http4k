@@ -2,11 +2,14 @@ name: New Release - Slack
 on:
   repository_dispatch:
     types: [http4k-release]
+permissions:
+  contents: read
+
 jobs:
   slackify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.5.0
       - run: ./notify-slack.sh ${{ github.event.client_payload.version }}
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

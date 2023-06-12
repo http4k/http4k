@@ -18,10 +18,14 @@ data class Person(val name: String, val age: Age, val children: List<Person> = e
 
 fun Family(): ContractRoute {
 
-    val familyData = Person("Bob", Age(85), listOf(
-        Person("Anita", Age(55)),
-        Person("Donald", Age(52), listOf(Person("Don Jr", Age(21))))
-    ))
+    val familyData = Person(
+        "Bob",
+        Age(85),
+        listOf(
+            Person("Anita", Age(55)),
+            Person("Donald", Age(52), listOf(Person("Don Jr", Age(21))))
+        )
+    )
 
     val responseLens = Body.auto<Person>("The matched family tree").toLens()
 
@@ -31,14 +35,20 @@ fun Family(): ContractRoute {
             else -> children.firstOrNull { it.search() != null }
         }
 
-        familyData.search()?.let { Response(OK).with(responseLens of it) } ?: Response(NOT_FOUND)
+        familyData.search()
+            ?.let { Response(OK).with(responseLens of it) }
+            ?: Response(NOT_FOUND)
     }
 
     return "/search" / Path.of("name", "The name to search for in the tree") meta {
         summary = "Search family tree"
         description = "Given a name, returns a sub family tree starting with that person"
         tags += Tag("query")
-        returning(OK, responseLens to Person("Donald", Age(52), listOf(Person("Don Jr", Age(21)))), "Cut down family tree")
+        returning(
+            OK,
+            responseLens to Person("Donald", Age(52), listOf(Person("Don Jr", Age(21)))),
+            "Cut down family tree"
+        )
         returning(NOT_FOUND to "That person does not exist the family")
     } bindContract GET to ::handler
 }

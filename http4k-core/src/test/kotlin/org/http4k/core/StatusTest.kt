@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.junit.jupiter.api.Test
 
 class StatusTest {
@@ -18,6 +19,20 @@ class StatusTest {
     @Test
     fun `equality does not include description`() {
         assertThat(CONNECTION_REFUSED.description("foo") == CONNECTION_REFUSED.description("bar"), equalTo(true))
+        assertThat(CONNECTION_REFUSED.description("foo") == SERVICE_UNAVAILABLE.description("foo"), equalTo(false))
+    }
+
+    @Test
+    fun `hashcode does not include description`() {
+        assertThat(CONNECTION_REFUSED.description("foo").hashCode() == CONNECTION_REFUSED.description("bar").hashCode(), equalTo(true))
+        assertThat(CONNECTION_REFUSED.description("foo").hashCode() == SERVICE_UNAVAILABLE.description("foo").hashCode(), equalTo(false))
+    }
+
+    @Test
+    fun `can lookup server code by code`() {
+        Status.serverValues.distinct().forEach {
+            assertThat(Status.fromCode(it.code), equalTo(it))
+        }
     }
 
     @Test

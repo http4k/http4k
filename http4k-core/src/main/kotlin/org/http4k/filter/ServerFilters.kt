@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import org.http4k.base64Decoded
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
@@ -19,7 +18,6 @@ import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
-import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -35,7 +33,9 @@ data class CorsPolicy(
     val originPolicy: OriginPolicy,
     val headers: List<String>,
     val methods: List<Method>,
-    val credentials: Boolean = false
+    val credentials: Boolean = false,
+    val exposedHeaders: List<String> = emptyList(),
+    val maxAge: Int? = null
 ) {
     companion object {
         val UnsafeGlobalPermissive =
@@ -67,7 +67,13 @@ object ServerFilters {
                     Header.required("access-control-allow-headers") of policy.headers.joined(),
                     Header.required("access-control-allow-methods") of policy.methods.map { method -> method.name }
                         .joined(),
-                    { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res }
+                    { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res },
+                    { res ->
+                        res.takeIf { policy.exposedHeaders.isNotEmpty() }
+                            ?.header("access-control-expose-headers", policy.exposedHeaders.joined())
+                            ?: res
+                    },
+                    { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res }
                 )
             }
         }
@@ -79,21 +85,16 @@ object ServerFilters {
     object RequestTracing {
         operator fun invoke(
             startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> },
+            storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL
         ): Filter = Filter { next ->
-            {
-                val previous = THREAD_LOCAL.get()
-
-                val fromRequest = ZipkinTraces(it)
-                startReportFn(it, fromRequest)
-                THREAD_LOCAL.set(fromRequest)
-
-                try {
-                    val response = ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, it)))
-                    endReportFn(it, response, fromRequest)
-                    response
-                } finally {
-                    THREAD_LOCAL.set(previous)
+            { req ->
+                storage.ensureCurrentSpan {
+                    val fromRequest = ZipkinTraces(req)
+                    startReportFn(req, fromRequest)
+                    storage.setForCurrentThread(fromRequest)
+                    ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, req)))
+                        .apply { endReportFn(req, this, fromRequest) }
                 }
             }
         }
@@ -108,7 +109,7 @@ object ServerFilters {
          */
         operator fun invoke(realm: String, authorize: (Credentials) -> Boolean) = Filter { next ->
             {
-                val credentials = it.basicAuthenticationCredentials()
+                val credentials = Header.AUTHORIZATION_BASIC(it)
                 if (credentials == null || !authorize(credentials)) {
                     Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
                 } else next(it)
@@ -131,28 +132,12 @@ object ServerFilters {
         operator fun <T> invoke(realm: String, key: RequestContextLens<T>, lookup: (Credentials) -> T?) =
             Filter { next ->
                 {
-                    it.basicAuthenticationCredentials()
+                    Header.AUTHORIZATION_BASIC(it)
                         ?.let(lookup)
                         ?.let { found -> next(it.with(key of found)) }
                         ?: Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
                 }
             }
-
-        private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")
-            ?.trim()
-            ?.takeIf { it.startsWith("Basic") }
-            ?.substringAfter("Basic")
-            ?.trim()
-            ?.safeBase64Decoded()
-            ?.toCredentials()
-
-        private fun String.safeBase64Decoded(): String? = try {
-            base64Decoded()
-        } catch (e: IllegalArgumentException) { null }
-
-        private fun String.toCredentials(): Credentials =
-            split(":", ignoreCase = false, limit = 2)
-            .let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
     }
 
     /**
@@ -228,7 +213,25 @@ object ServerFilters {
      * This is required when using lenses to automatically unmarshall inbound requests.
      * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
      */
-    object CatchLensFailure : Filter by CatchLensFailure()
+    object CatchLensFailure :
+        Filter by CatchLensFailure({ lensFailure -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; "))) })
+
+    /**
+     * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
+     * This is required when using lenses to automatically unmarshall inbound requests.
+     * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
+     *
+     * Pass the failResponseFn param to provide a custom response for the LensFailure case
+     */
+    fun CatchLensFailure(failResponseFn: (LensFailure) -> Response) = Filter { next ->
+        {
+            try {
+                next(it)
+            } catch (lensFailure: LensFailure) {
+                handleLensFailure(lensFailure, it) { _, _ -> failResponseFn(lensFailure) }
+            }
+        }
+    }
 
     /**
      * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
@@ -238,21 +241,30 @@ object ServerFilters {
      * Pass the failResponseFn param to provide a custom response for the LensFailure case
      */
     fun CatchLensFailure(
-        failResponseFn: (LensFailure) -> Response = { Response(BAD_REQUEST.description(it.failures.joinToString("; "))) }
+        failResponseFn: (Request, LensFailure) -> Response = { _, lensFailure ->
+            Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
+        }
     ) = Filter { next ->
         {
             try {
                 next(it)
             } catch (lensFailure: LensFailure) {
-                when {
-                    lensFailure.target is Response -> throw lensFailure
-                    lensFailure.target is RequestContext -> throw lensFailure
-                    lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
-                    else -> failResponseFn(lensFailure)
-                }
+                handleLensFailure(lensFailure, it, failResponseFn)
             }
         }
     }
+
+    private fun handleLensFailure(
+        lensFailure: LensFailure,
+        request: Request,
+        failResponseFn: (Request, LensFailure) -> Response
+    ) =
+        when {
+            lensFailure.target is Response -> throw lensFailure
+            lensFailure.target is RequestContext -> throw lensFailure
+            lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
+            else -> failResponseFn(request, lensFailure)
+        }
 
     /**
      * Last gasp filter which catches all `Throwable`s and invokes `onError`.
@@ -300,22 +312,22 @@ object ServerFilters {
 
     /**
      * Basic GZip and Gunzip support of Request/Response.
-     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
     object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory): Filter =
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()): Filter =
             RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
     }
 
     /**
      * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list.
-     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
      */
     class GZipContentTypes(
         private val compressibleContentTypes: Set<ContentType>,
-        private val compressionMode: GzipCompressionMode = Memory
+        private val compressionMode: GzipCompressionMode = Memory()
     ) : Filter {
         override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode)
             .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
@@ -357,7 +369,8 @@ object ServerFilters {
     object ContentDispositionAttachment {
         private fun Request.extension(): String = this.uri.path.substringAfterLast(".", "")
         private fun Request.filename() =
-            this.uri.path.split("/").last().let { if(it.isBlank()) "unnamed" else it }
+            this.uri.path.split("/").last().let { if (it.isBlank()) "unnamed" else it }
+
         private val ALL_EXTENSIONS = setOf("*")
 
         operator fun invoke(extensions: Set<String> = ALL_EXTENSIONS): Filter = Filter { next ->
@@ -370,6 +383,7 @@ object ServerFilters {
                                 "Content-Disposition",
                                 "attachment; filename=${request.filename()}"
                             )
+
                         else -> response
                     }
                 }

@@ -9,6 +9,7 @@ import org.http4k.core.with
 import org.http4k.format.Klaxon.auto
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.lang.UnsupportedOperationException
 import com.beust.klaxon.Klaxon as KKlaxon
 
 class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
@@ -20,6 +21,8 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
 
     override fun customMarshaller() = object : ConfigurableKlaxon(KKlaxon().asConfigurable().customise()) {}
     override fun customMarshallerProhibitStrings()= object : ConfigurableKlaxon(KKlaxon().asConfigurable().prohibitStrings().customise()) {}
+
+    override fun strictMarshaller() = throw UnsupportedOperationException()
 
     @Test
     fun `write interface implementation to body`() {
@@ -42,6 +45,10 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     }
 
     @Disabled("not supported by Klaxon")
+    override fun `fails decoding when a extra key found`() {
+    }
+
+    @Disabled("not supported by Klaxon")
     override fun `roundtrip custom value`() {
     }
 
@@ -55,6 +62,18 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
 
     @Disabled("not supported by Klaxon")
     override fun `roundtrip custom boolean`() {
+    }
+
+    @Disabled("not supported by Klaxon")
+    override fun `roundtrip arbitrary map`() {
+    }
+
+    @Disabled("not supported by Klaxon")
+    override fun `roundtrip arbitrary array`() {
+    }
+
+    @Disabled("not supported by Klaxon")
+    override fun `roundtrip arbitrary set`() {
     }
 }
 

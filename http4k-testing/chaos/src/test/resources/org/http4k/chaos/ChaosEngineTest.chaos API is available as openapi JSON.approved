@@ -2,7 +2,7 @@
   "info": {
     "title": "http4k Chaos Engine",
     "version": "1.0",
-    "description": "This is the Open API interface for the http4k Chaos Engine. \n\nUsing this UI you can inject new dynamic chaotic behaviour into any http4k application, or toggle/disable it. \n\nSee the <a href=\"https://www.http4k.org/guide/modules/chaos/\">user guide</a> for details about the \n exact format of the JSON to post to the activation endpoint."
+    "description": "This is the Open API interface for the http4k Chaos Engine. \n\nUsing this UI you can inject new dynamic chaotic behaviour into any http4k application, or toggle/disable it. \n\nSee the <a href=\"https://http4k.org/guide/reference/chaos/\">user guide</a> for details about the \n exact format of the JSON to post to the activation endpoint."
   },
   "tags": [
   ],

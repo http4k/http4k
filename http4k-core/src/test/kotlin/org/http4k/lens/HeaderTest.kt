@@ -10,12 +10,14 @@ import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.Credentials
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Parameter
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.with
+import org.http4k.hamkrest.hasHeader
 import org.junit.jupiter.api.Test
 
 class HeaderTest {
@@ -166,5 +168,34 @@ class HeaderTest {
     fun `case-insensitive enum`() {
         val lens = Header.enum<Method>(caseSensitive = false).required("method")
         assertThat(lens(Request(GET, "/").header("method", "delete")), equalTo(Method.DELETE))
+    }
+
+    @Test
+    fun `link header can get parsed and injected`() {
+        val links = mapOf(
+            "previous" to of("prevLink"),
+            "next" to of("nextLink")
+        )
+
+        val link = Header.LINK
+
+        val reqWithHeader = Request(GET, "").with(link of links)
+        assertThat(reqWithHeader.header("Link"), equalTo("""<prevLink>; rel="previous", <nextLink>; rel="next""""))
+        assertThat(link(reqWithHeader), equalTo(links))
+    }
+
+    @Test
+    fun `basic auth header parsed correctly from message`() {
+        val credentials = Header.AUTHORIZATION_BASIC(Request(GET, "").header("Authorization", "Basic YWRtaW46aHVudGVyMg=="))
+
+        assertThat(credentials, equalTo(Credentials("admin", "hunter2")))
+    }
+
+    @Test
+    fun `basic auth header added correctly to message`() {
+        val request = Request(GET, "")
+            .with(Header.AUTHORIZATION_BASIC of Credentials("admin", "hunter2"))
+
+        assertThat(request, hasHeader("Authorization", "Basic YWRtaW46aHVudGVyMg=="))
     }
 }

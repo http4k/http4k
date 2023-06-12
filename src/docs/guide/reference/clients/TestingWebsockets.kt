@@ -38,16 +38,21 @@ abstract class WebsocketContract {
 
     @Test
     fun `echoes back connected name`() {
-        assertThat(client().received().take(1).toList(), equalTo(listOf(WsMessage("hello bob"))))
+        assertThat(
+            client().received().take(1).toList(),
+            equalTo(listOf(WsMessage("hello bob")))
+        )
     }
 }
 
 // a unit test version of the contract - it connects to the websocket in memory with no network
 class WebsocketUnitTest : WebsocketContract() {
-    override fun client() = guide.howto.serve_websockets.testApp.testWsClient(Request(GET, "/bob"))
+    override fun client() =
+        guide.howto.serve_websockets.testApp.testWsClient(Request(GET, "/bob"))
 }
 
-// a integration test version of the contract - it starts a server and connects to the websocket over the network
+// a integration test version of the contract -
+// it starts a server and connects to the websocket over the network
 class WebsocketServerTest : WebsocketContract() {
     override fun client() = WebsocketClient.blocking(Uri.of("ws://localhost:8000/bob"))
 

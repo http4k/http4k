@@ -29,7 +29,8 @@ import kotlin.random.Random
 // the entire k8s application consists of 2 servers - the main and the health
 object App {
     // settings
-    private val otherServiceUri: Lens<Environment, Uri> = EnvironmentKey.k8s.serviceUriFor("otherservice")
+    private val otherServiceUri: Lens<Environment, Uri> =
+        EnvironmentKey.k8s.serviceUriFor("otherservice")
     private val dbRole = EnvironmentKey.required("database.user.role")
     private val dbPassword = EnvironmentKey.secret().required("database.user.password")
 
@@ -42,9 +43,13 @@ object App {
         // define the health app API
         val healthApp = Health(
             "/config" bind GET to { Response(OK).body(env.toString()) },
-            checks = listOf(DatabaseCheck(
-                RandomlyFailingDatabase(dbRole(env), dbPassword(env)
-                )))
+            checks = listOf(
+                DatabaseCheck(
+                    RandomlyFailingDatabase(
+                        dbRole(env), dbPassword(env)
+                    )
+                )
+            )
         )
         return mainApp.asK8sServer(::SunHttp, env, healthApp)
     }
@@ -97,7 +102,8 @@ fun main() {
         defaultConfig
 
     // the end-server that we will proxy to
-    val upstream = { _: Request -> Response(OK).body("HELLO!") }.asServer(SunHttp(9000)).start()
+    val upstream =
+        { _: Request -> Response(OK).body("HELLO!") }.asServer(SunHttp(9000)).start()
 
     val server = App(k8sPodEnv).start()
 

@@ -1,6 +1,5 @@
 package org.http4k.filter
 
-import org.http4k.base64Encode
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
@@ -19,11 +18,11 @@ import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
-import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.StringBiDiMappings
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.security.CredentialsProvider
 import java.time.Clock
@@ -38,15 +37,14 @@ object ClientFilters {
      */
     fun RequestTracing(
         startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-        endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }
+        endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> },
+        storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL
     ): Filter = Filter { next ->
         {
-            THREAD_LOCAL.get().run {
-                val updated = copy(parentSpanId = spanId, spanId = TraceId.new())
+            storage.inChildSpan { updated ->
                 startReportFn(it, updated)
-                val response = next(ZipkinTraces(updated, it))
-                endReportFn(it, response, updated)
-                response
+                next(ZipkinTraces(updated, it))
+                    .apply { endReportFn(it, this, updated) }
             }
         }
     }
@@ -54,9 +52,9 @@ object ClientFilters {
     /**
      * Reset Zipkin request tracing. Use this to provide a new TraceId for every outbound call.
      */
-    fun ResetRequestTracing() = Filter { next ->
+    fun ResetRequestTracing(storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL) = Filter { next ->
         {
-            ZipkinTraces.setForCurrentThread(ZipkinTraces(TraceId.new(), TraceId.new(), null))
+            storage.setForCurrentThread(ZipkinTraces(TraceId.new(), TraceId.new(), null))
             next(it)
         }
     }
@@ -125,6 +123,8 @@ object ClientFilters {
     }
 
     object CustomBasicAuth {
+        private val mapping = StringBiDiMappings.basicCredentials()
+
         operator fun invoke(header: String, provider: () -> Credentials?): Filter = Filter { next ->
             { req ->
                 provider()
@@ -135,7 +135,8 @@ object ClientFilters {
             }
         }
 
-        fun Request.withBasicAuth(it: Credentials, header: String) = header(header, "Basic ${it.base64Encoded()}")
+        fun Request.withBasicAuth(credentials: Credentials, header: String = "Authorization") =
+            header(header, mapping(credentials))
 
         operator fun invoke(header: String, provider: CredentialsProvider<Credentials>) =
             CustomBasicAuth(header, provider::invoke)
@@ -144,8 +145,6 @@ object ClientFilters {
             CustomBasicAuth(header, Credentials(user, password))
 
         operator fun invoke(header: String, credentials: Credentials): Filter = CustomBasicAuth(header) { credentials }
-
-        private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
     }
 
     object BearerAuth {
@@ -233,14 +232,14 @@ object ClientFilters {
     /**
      * Support for GZipped responses from clients.
      */
-    fun AcceptGZip(compressionMode: GzipCompressionMode = Memory): Filter =
+    fun AcceptGZip(compressionMode: GzipCompressionMode = Memory()): Filter =
         ResponseFilters.GunZip(compressionMode)
 
     /**
      * Basic GZip and Gunzip support of Request/Response.
-     * Only Gunzip responses when the response contains "transfer-encoding" header containing 'gzip'
+     * Only Gunzip responses when the response contains "content-encoding" header containing 'gzip'
      */
-    fun GZip(compressionMode: GzipCompressionMode = Memory): Filter =
+    fun GZip(compressionMode: GzipCompressionMode = Memory()): Filter =
         RequestFilters.GZip(compressionMode)
             .then(ResponseFilters.GunZip(compressionMode))
 

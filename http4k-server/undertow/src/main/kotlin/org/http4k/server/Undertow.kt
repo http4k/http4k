@@ -26,13 +26,13 @@ class Undertow(
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
         val httpHandler =
-            (http ?: { Response(BAD_REQUEST) }).let (::Http4kUndertowHttpHandler).let(::BlockingHandler)?.let { handler ->
-            if (stopMode is StopMode.Graceful) {
-                GracefulShutdownHandler(handler)
-            } else {
-                handler
+            (http ?: { Response(BAD_REQUEST) }).let (::Http4kUndertowHttpHandler).let(::BlockingHandler).let { handler ->
+                if (stopMode is StopMode.Graceful) {
+                    GracefulShutdownHandler(handler)
+                } else {
+                    handler
+                }
             }
-        }
         val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
         val sseCallback = sse?.let { serverSentEvents(Http4kSseCallback(sse)) }
 

@@ -7,18 +7,24 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import java.io.PushbackInputStream
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 import java.util.zip.Deflater
+import java.util.zip.Deflater.DEFAULT_COMPRESSION
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
-sealed class GzipCompressionMode(internal val compress: (Body) -> CompressionResult, internal val decompress: (Body) -> Body) {
+sealed class GzipCompressionMode(
+    internal val compress: (Body) -> CompressionResult,
+    internal val decompress: (Body) -> Body
+) {
+    class Memory(compressionLevel: Int = DEFAULT_COMPRESSION) :
+        GzipCompressionMode({ it.gzipped(compressionLevel) }, Body::gunzippedStream)
 
-    object Memory : GzipCompressionMode(Body::gzipped, Body::gunzipped)
-
-    object Streaming : GzipCompressionMode(Body::gzippedStream, Body::gunzippedStream)
+    class Streaming(compressionLevel: Int = DEFAULT_COMPRESSION) :
+        GzipCompressionMode({ it.gzippedStream(compressionLevel) }, Body::gunzippedStream)
 }
 
 data class CompressionResult(
@@ -38,10 +44,10 @@ data class CompressionResult(
             .body(body)
 }
 
-fun Body.gzipped(): CompressionResult = if (payload.array().isEmpty())
+fun Body.gzipped(compressionLevel: Int = DEFAULT_COMPRESSION): CompressionResult = if (payload.array().isEmpty())
     CompressionResult(Body.EMPTY, null)
 else ByteArrayOutputStream().run {
-    GZIPOutputStream(this).use { it.write(payload.array()) }
+    GZIPOutputStreamWith(this, compressionLevel).use { it.write(payload.array()) }
     CompressionResult(Body(ByteBuffer.wrap(toByteArray())), "gzip")
 }
 
@@ -51,10 +57,15 @@ else ByteArrayOutputStream().use {
     Body(ByteBuffer.wrap(it.toByteArray()))
 }
 
-fun Body.gzippedStream(): CompressionResult =
+fun Body.gzippedStream(compressionLevel: Int = DEFAULT_COMPRESSION): CompressionResult =
     sampleStream(stream,
         { CompressionResult(Body.EMPTY, null) },
-        { compressedStream -> CompressionResult(Body(GZippingInputStream(compressedStream)), "gzip") })
+        { compressedStream ->
+            CompressionResult(
+                Body(GZippingInputStream(compressedStream, compressionLevel)),
+                "gzip"
+            )
+        })
 
 fun Body.gunzippedStream(): Body = if (length != null && length == 0L) {
     Body.EMPTY
@@ -64,7 +75,11 @@ fun Body.gunzippedStream(): Body = if (length != null && length == 0L) {
         { compressedStream -> Body(GZIPInputStream(compressedStream)) })
 }
 
-private fun <T> sampleStream(sourceStream: InputStream, actionIfEmpty: () -> T, actionIfHasContent: (InputStream) -> T): T {
+private fun <T> sampleStream(
+    sourceStream: InputStream,
+    actionIfEmpty: () -> T,
+    actionIfHasContent: (InputStream) -> T
+): T {
     val pushbackStream = PushbackInputStream(sourceStream)
     val firstByte = pushbackStream.read()
     return if (firstByte == -1) {
@@ -75,7 +90,13 @@ private fun <T> sampleStream(sourceStream: InputStream, actionIfEmpty: () -> T, 
     }
 }
 
-internal class GZippingInputStream(private val source: InputStream) : InputStream() {
+private fun GZIPOutputStreamWith(out: OutputStream, compressionLevel: Int): GZIPOutputStream = object : GZIPOutputStream(out) {
+    init {
+        def.setLevel(compressionLevel)
+    }
+}
+
+internal class GZippingInputStream(private val source: InputStream, private val compressionLevel: Int) : InputStream() {
 
     companion object {
         // see http://www.zlib.org/rfc-gzip.html#header-trailer
@@ -84,7 +105,8 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
             GZIP_MAGIC.toByte(),
             (GZIP_MAGIC shr 8).toByte(),
             Deflater.DEFLATED.toByte(),
-            0, 0, 0, 0, 0, 0, 0)
+            0, 0, 0, 0, 0, 0, 0
+        )
         private const val INITIAL_BUFFER_SIZE = 8192
     }
 
@@ -92,7 +114,7 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
         HEADER, DATA, FINALISE, TRAILER, DONE
     }
 
-    private val deflater = Deflater(Deflater.DEFLATED, true)
+    private val deflater = Deflater(Deflater.DEFLATED, true).apply { setLevel(compressionLevel) }
     private val crc = CRC32()
     private var trailer: ByteArrayInputStream? = null
     private val header = ByteArrayInputStream(HEADER_DATA)
@@ -122,6 +144,7 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
             }
             bytesRead
         }
+
         State.DATA -> {
             if (!deflater.needsInput()) {
                 deflatePendingInput(readBuffer, readOffset, readLength)
@@ -142,6 +165,7 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
                 }
             }
         }
+
         State.FINALISE -> if (deflater.finished()) {
             stage = State.TRAILER
             val crcValue = crc.value.toInt()
@@ -151,6 +175,7 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
         } else {
             deflater.deflate(readBuffer, readOffset, readLength, Deflater.FULL_FLUSH)
         }
+
         State.TRAILER -> {
             val trailerStream = trailer ?: error("Trailer stream is null in trailer stage")
             val bytesRead = trailerStream.read(readBuffer, readOffset, readLength)
@@ -159,27 +184,36 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
             }
             bytesRead
         }
+
         State.DONE -> -1
     }
 
     private fun deflatePendingInput(readBuffer: ByteArray, readOffset: Int, readLength: Int): Int {
         var bytesCompressed = 0
         while (!deflater.needsInput() && readLength - bytesCompressed > 0) {
-            bytesCompressed += deflater.deflate(readBuffer, readOffset + bytesCompressed, readLength - bytesCompressed, Deflater.NO_FLUSH)
+            bytesCompressed += deflater.deflate(
+                readBuffer,
+                readOffset + bytesCompressed,
+                readLength - bytesCompressed,
+                Deflater.FULL_FLUSH
+            )
         }
         return bytesCompressed
     }
 
     private fun createTrailer(crcValue: Int, totalIn: Int) =
-        ByteArrayInputStream(byteArrayOf(
-            (crcValue shr 0).toByte(),
-            (crcValue shr 8).toByte(),
-            (crcValue shr 16).toByte(),
-            (crcValue shr 24).toByte(),
-            (totalIn shr 0).toByte(),
-            (totalIn shr 8).toByte(),
-            (totalIn shr 16).toByte(),
-            (totalIn shr 24).toByte()))
+        ByteArrayInputStream(
+            byteArrayOf(
+                (crcValue shr 0).toByte(),
+                (crcValue shr 8).toByte(),
+                (crcValue shr 16).toByte(),
+                (crcValue shr 24).toByte(),
+                (totalIn shr 0).toByte(),
+                (totalIn shr 8).toByte(),
+                (totalIn shr 16).toByte(),
+                (totalIn shr 24).toByte()
+            )
+        )
 
     override fun available(): Int {
         if (stage == State.DONE) {

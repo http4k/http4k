@@ -97,9 +97,10 @@ private fun AddUserToContext(user: RequestContextLens<String>) = Filter { next -
 }
 
 fun main() {
-    App().asServer(SunHttp(5000)).start()
+    App().asServer(SunHttp(6000)).start()
 
-    val graphQLClient = JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:5000/graphql"))
+    val graphQLClient =
+        JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:6000/graphql"))
 
     fun runAndDisplay(query: String) {
         println(graphQLClient(GraphQLRequest(query)).data)

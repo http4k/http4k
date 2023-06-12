@@ -15,7 +15,6 @@
 <a href="https://mvnrepository.com/artifact/org.http4k"><img alt="download" src="https://img.shields.io/maven-central/v/org.http4k/http4k-core"></a>
 <a href="https://codecov.io/gh/http4k/http4k"><img src="https://codecov.io/gh/http4k/http4k/branch/master/graph/badge.svg" /></a>
 <a href="http//www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub license" src="https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat"></a>
-<a href="http://kotlinlang.org"><img alt="kotlin version" src="https://img.shields.io/badge/kotlin-1.6-blue.svg"></a>
 <a href="https://codebeat.co/projects/github-com-http4k-http4k-master"><img alt="codebeat" src="https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e"></a>
 <a href="https://kotlin.link"><img alt="awesome kotlin" src="https://kotlin.link/awesome-kotlin.svg"></a>
 <a href="https://opencollective.com/http4k"><img alt="Kotlin Slack" src="https://img.shields.io/badge/chat-kotlin%20slack-orange.svg"></a>
@@ -78,18 +77,19 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **Apache** sync + async HTTP
         * **Java** (bundled with `http4k-core`)
         * **Fuel** HTTP (supports sync and async HTTP)
-        * **Jetty** HTTP (supports sync and async HTTP)
+        * **Jetty** HTTP (supports sync and async HTTP and websockets)
         * **OkHttp** HTTP (supports sync and async HTTP)
-    * **1LOC** WebSocket client, with blocking and non-blocking modes
+    * **1LOC** Websocket client, with blocking and non-blocking modes
     * **GraphQL** client (bundled with GraphQL module)
 * [Server:](https://http4k.org/guide/reference/servers)
     * **1LOC** server backend spin-up for:
         * **Apache v4 & v5** (from httpcore)
-        * **Jetty** (including WebSocket support)
+        * **Jetty** (including SSE and Websocket support)
         * **Ktor CIO & Netty**
-        * **Netty** (including WebSocket support)
+        * **Netty** (including Websocket support)
         * **SunHttp** (bundled with `http4k-core`)
-        * **Undertow** (including SSE and WebSocket support)
+        * **Undertow** (including SSE and Websocket support)
+        * **Java-WebSocket** (Websocket support only)
     * API design allows for simple customization of underying backend.
     * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/reference/serverless)
@@ -105,13 +105,15 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
     * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-    * Self-documenting for all routes - eg. Built in support for live **OpenApi v2 and v3** description endpoints including **JSON Schema** model breakdown. 
+    * Self-documenting for all routes - eg. Built in support for live **OpenApi v2 and v3** description endpoints including **JSON Schema** model breakdown.
+    * [Redoc and Swagger UI](https://http4k.org/guide/howto/create_a_swagger_ui) for OpenApi descriptions
 * [Templating:](https://http4k.org/guide/reference/templating) 
     * **Pluggable** templating system support for:
         * **Dust** 
         * **Freemarker**
         * **Handlebars** 
         * **Pebble**
+        * **Rocker**
         * **Thymeleaf**
         * **Jade4j**
     * Caching and **Hot-Reload** template support
@@ -121,6 +123,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
             * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
             * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
             * **Klaxon** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
+            * **KondorJson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
             * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
             * **KotlinX Serialization** - official Kotlin JSON API. 
             * **Argo** - lightweight Java JSON API with zero dependencies.            
@@ -151,7 +154,10 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Implement OAuth Authorisation Code Grant flow with a single Interface
     * **Pre-configured** OAuth for following providers:
         * **Auth0** 
+        * **Discord**
         * **Dropbox** 
+        * **Facebook** 
+        * **GitLab** 
         * **Google** 
         * **Soundcloud**
 * [Digest Security:](https://http4k.org/guide/reference/digest)
@@ -181,11 +187,12 @@ This quick example is designed to convey the simplicity & features of [http4k] .
 
 To install, add these dependencies to your **Gradle** file:
 
-```groovy
+```kotlin
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "4.25.15.0"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "4.25.15.0"
-    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "4.25.15.0"
+    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation("org.http4k:http4k-core")
+    implementation("org.http4k:http4k-server-jetty")
+    implementation("org.http4k:http4k-client-okhttp")
 }
 ```
 

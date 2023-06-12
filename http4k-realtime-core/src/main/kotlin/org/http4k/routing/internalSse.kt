@@ -19,11 +19,11 @@ sealed class SseRouterMatch(private val priority: Int) : Comparable<SseRouterMat
 }
 
 internal class RouterSseHandler(private val list: List<SseRouter>) : RoutingSseHandler {
-    override fun match(request: Request) = list.map { next -> next.match(request) }.minOrNull() ?: Unmatched
+    override fun match(request: Request) = list.minOfOrNull { it.match(request) } ?: Unmatched
 
     override operator fun invoke(request: Request): SseConsumer = when (val match = match(request)) {
         is MatchingHandler -> match
-        is Unmatched -> { it: Sse -> it.close() }
+        is Unmatched -> Sse::close
     }
 
     override fun withBasePath(new: String): RoutingSseHandler =
@@ -47,7 +47,7 @@ internal class TemplateRoutingSseHandler(
 
     override operator fun invoke(request: Request): SseConsumer = when (val match = match(request)) {
         is MatchingHandler -> match
-        is Unmatched -> { it: Sse -> it.close() }
+        is Unmatched -> Sse::close
     }
 
     override fun withBasePath(new: String) = TemplateRoutingSseHandler(UriTemplate.from("$new/$template"), consumer)

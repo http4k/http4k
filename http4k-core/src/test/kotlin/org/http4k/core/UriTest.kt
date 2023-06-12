@@ -109,4 +109,13 @@ class UriTest {
     fun `can extend existing uri`() {
         assertThat(Uri.of("http://ignore?foo=bar").extend(Uri.of("/?abc=xyz")), equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz")))
     }
+
+    @Test
+    fun `can encode query param values`() {
+        val unEncodedUri = Uri.of("http://ignore/?q1=encode me pls&q2=encode me 2")
+        val encodedUri = "http://ignore/?q1=encode+me+pls&q2=encode+me+2"
+        val queryParametersEncodedUri = unEncodedUri.queryParametersEncoded()
+        assertThat(queryParametersEncodedUri.toString(), equalTo(encodedUri))
+        assertThat(queryParametersEncodedUri.queries(), equalTo(listOf("q1" to "encode me pls", "q2" to "encode me 2")))
+    }
 }

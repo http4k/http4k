@@ -74,7 +74,8 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
         }
     }
 
-    private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
+    private fun HCookie.toWebDriver(): Cookie = Cookie(
+        name, value, domain, path,
         expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly
     )
 
@@ -178,8 +179,6 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
         override fun deleteCookie(cookie: Cookie) {
             siteCookies.remove(cookie.name)
         }
-
-        override fun ime() = throw FeatureNotImplementedYet
 
         override fun logs() = throw FeatureNotImplementedYet
 

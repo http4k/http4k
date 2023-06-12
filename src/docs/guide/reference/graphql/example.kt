@@ -13,6 +13,7 @@ import org.http4k.graphql.GraphQLRequest
 import org.http4k.graphql.GraphQLResponse
 import org.http4k.routing.bind
 import org.http4k.routing.graphQL
+import org.http4k.routing.graphQLPlayground
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -23,9 +24,11 @@ object MyGraphQLHandler : GraphQLHandler {
             SchemaGeneratorConfig(supportedPackages = listOf("guide.reference.graphql")),
             listOf(TopLevelObject(UserQueries())),
             listOf()
-        )).build()
+        )
+    ).build()
 
-    override fun invoke(request: GraphQLRequest) = GraphQLResponse.from(graphQL.execute(request.query))
+    override fun invoke(request: GraphQLRequest) =
+        GraphQLResponse.from(graphQL.execute(request.query))
 }
 
 data class User(val id: Int, val name: String)
@@ -42,21 +45,27 @@ class UserQueries {
 
 fun main() {
     val app: HttpHandler = routes(
-        "/graphql" bind graphQL(MyGraphQLHandler)
+        "/graphql" bind graphQL(MyGraphQLHandler),
+        graphQLPlayground(Uri.of("/graphql"))
     )
 
     // serve GQL queries/mutations at /graphql
-    val server = app.asServer(SunHttp(8000)).start()
+    app.asServer(SunHttp(8000)).start()
 
     // for clients, just convert any app into a GQL handler
-    val gql: GraphQLHandler = JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:8000/graphql"))
-    val response: GraphQLResponse = gql(GraphQLRequest("""{
+    val gql: GraphQLHandler =
+        JavaHttpClient().asGraphQLHandler(Uri.of("http://localhost:8000/graphql"))
+    val response: GraphQLResponse = gql(
+        GraphQLRequest(
+            """{
         search(params: { ids: [1]}) {
             id
             name
         }
-    }"""))
+    }"""
+        )
+    )
     println(response)
 
-    server.stop()
+    println("You can visit the GraphQL playground at: http://localhost:8000")
 }

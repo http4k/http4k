@@ -52,6 +52,7 @@ class Status internal constructor(val code: Int, val description: String, privat
         @JvmField val UNPROCESSABLE_ENTITY = Status(422, "Unprocessable Entity")
         @JvmField val UPGRADE_REQUIRED = Status(426, "Upgrade Required")
         @JvmField val TOO_MANY_REQUESTS = Status(429, "Too many requests")
+        @JvmField val UNAVAILABLE_FOR_LEGAL_REASONS = Status(451, "Unavailable For Legal Reasons")
 
         private val SERVER_ERROR = 500..599
         @JvmField val INTERNAL_SERVER_ERROR = Status(500, "Internal Server Error")
@@ -63,6 +64,63 @@ class Status internal constructor(val code: Int, val description: String, privat
         @JvmField val GATEWAY_TIMEOUT = Status(504, "Gateway Timeout")
         @JvmField val CLIENT_TIMEOUT = Status(504, "Client Timeout", true)
         @JvmField val HTTP_VERSION_NOT_SUPPORTED = Status(505, "HTTP Version Not Supported")
+
+        val serverValues by lazy {
+            listOf(
+                CONTINUE,
+                SWITCHING_PROTOCOLS,
+                OK,
+                CREATED,
+                ACCEPTED,
+                NON_AUTHORITATIVE_INFORMATION,
+                NO_CONTENT,
+                RESET_CONTENT,
+                PARTIAL_CONTENT,
+                MULTIPLE_CHOICES,
+                MOVED_PERMANENTLY,
+                FOUND,
+                SEE_OTHER,
+                NOT_MODIFIED,
+                USE_PROXY,
+                TEMPORARY_REDIRECT,
+                PERMANENT_REDIRECT,
+                BAD_REQUEST,
+                UNSATISFIABLE_PARAMETERS,
+                UNAUTHORIZED,
+                PAYMENT_REQUIRED,
+                FORBIDDEN,
+                NOT_FOUND,
+                METHOD_NOT_ALLOWED,
+                NOT_ACCEPTABLE,
+                PROXY_AUTHENTICATION_REQUIRED,
+                REQUEST_TIMEOUT,
+                CONFLICT,
+                GONE,
+                LENGTH_REQUIRED,
+                PRECONDITION_FAILED,
+                REQUEST_ENTITY_TOO_LARGE,
+                REQUEST_URI_TOO_LONG,
+                UNSUPPORTED_MEDIA_TYPE,
+                REQUESTED_RANGE_NOT_SATISFIABLE,
+                EXPECTATION_FAILED,
+                I_M_A_TEAPOT,
+                UNPROCESSABLE_ENTITY,
+                UPGRADE_REQUIRED,
+                TOO_MANY_REQUESTS,
+                UNAVAILABLE_FOR_LEGAL_REASONS,
+                INTERNAL_SERVER_ERROR,
+                NOT_IMPLEMENTED,
+                BAD_GATEWAY,
+                SERVICE_UNAVAILABLE,
+                CONNECTION_REFUSED,
+                UNKNOWN_HOST,
+                GATEWAY_TIMEOUT,
+                CLIENT_TIMEOUT,
+                HTTP_VERSION_NOT_SUPPORTED
+            ).filterNot { it.clientGenerated }
+        }
+
+        fun fromCode(code: Int) = serverValues.firstOrNull { it.code == code }
     }
 
     val successful by lazy { SUCCESSFUL.contains(code) }
@@ -73,7 +131,8 @@ class Status internal constructor(val code: Int, val description: String, privat
 
     fun description(newDescription: String) = Status(code, newDescription, clientGenerated)
 
-    override fun hashCode(): Int = code.hashCode()
+    override fun hashCode(): Int = code.hashCode() + clientGenerated.hashCode()
+
     override fun toString(): String = "$code $description"
 
     override fun equals(other: Any?): Boolean {

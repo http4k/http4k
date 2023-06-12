@@ -1,6 +1,7 @@
 package org.http4k.contract
 
 import org.http4k.contract.PreFlightExtraction.Companion
+import org.http4k.contract.openapi.operationId
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -19,6 +20,7 @@ import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
+import org.http4k.routing.RouterDescription
 import org.http4k.routing.RouterMatch
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
@@ -36,7 +38,10 @@ class ContractRoute internal constructor(val method: Method,
     fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
 
     internal fun toRouter(contractRoot: PathSegments) = object : Router {
-        override fun toString(): String = "${method.name}: ${spec.describe(contractRoot)}"
+
+        override fun toString() = description.description
+
+        override val description = RouterDescription(spec.describe(contractRoot))
 
         override fun match(request: Request): RouterMatch =
             if ((request.method == OPTIONS || request.method == method) && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
@@ -66,7 +71,7 @@ class ContractRoute internal constructor(val method: Method,
         return when (val matchResult = toRouter(Root).match(request)) {
             is MatchingHandler -> {
                 (meta.security?.filter ?: Filter.NoOp)
-                    .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
+                    .then(ServerFilters.CatchLensFailure { _ -> Response(BAD_REQUEST) })
                     .then(PreFlightExtractionFilter(meta, Companion.All))
                     .then(matchResult)(request)
             }
@@ -75,6 +80,9 @@ class ContractRoute internal constructor(val method: Method,
             is MatchedWithoutHandler -> Response(NOT_FOUND)
         }
     }
+
+    internal fun operationId(contractRoot: PathSegments) =
+        operationId(meta, method, describeFor(contractRoot))
 
     override fun toString() = "${method.name}: ${spec.describe(Root)}"
 }

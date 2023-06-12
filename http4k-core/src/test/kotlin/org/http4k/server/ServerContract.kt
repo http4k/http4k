@@ -6,6 +6,9 @@ import com.natpryce.hamkrest.anyOf
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
+import org.apache.hc.client5.http.impl.classic.HttpClients.createDefault
+import org.apache.hc.core5.http.ClassicHttpResponse
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
@@ -14,6 +17,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
@@ -29,9 +33,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
+import java.net.URI.create
 
-abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
-                              private val requiredMethods: Array<Method> = Method.values()) {
+abstract class ServerContract(
+    private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
+    private val requiredMethods: Array<Method> = Method.values()
+) {
     private lateinit var server: Http4kServer
 
     protected val baseUrl by lazy { "http://localhost:${server.port()}" }
@@ -51,7 +58,11 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             "/stream" bind GET to { Response(OK).with(Body.binary(TEXT_PLAIN).toLens() of "hello".byteInputStream()) },
             "/presetlength" bind GET to { Response(OK).header("Content-Length", "0") },
             "/echo" bind POST to { Response(OK).body(it.bodyString()) },
-            "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+            "/request-headers" bind GET to { request: Request ->
+                Response(OK).body(
+                    request.headerValues("foo").joinToString(", ")
+                )
+            },
             "/length" bind { req: Request ->
                 when (req.body) {
                     is StreamBody -> Response(OK).body(req.body.length.toString())
@@ -66,6 +77,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                     .header("x-address", request.source?.address ?: "")
                     .header("x-port", (request.source?.port ?: 0).toString())
                     .header("x-scheme", (request.source?.scheme ?: "unsupported").toString())
+            },
+            "/status-with-foobar-description" bind GET to {
+                Response(Status(201, "FooBar"))
+            },
+            "/null-header-value" bind GET to {
+                Response(OK).header("header", null)
             }
         )
 
@@ -84,6 +101,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             if (method == Method.HEAD) assertThat(response.body, equalTo(Body.EMPTY))
             else assertThat(response.bodyString(), equalTo(method.name))
         }
+    }
+
+    @Test
+    fun `null header`() {
+        val response = client(Request(GET, "$baseUrl/null-header-value"))
+        assertThat(response.status, equalTo(OK))
     }
 
     @Test
@@ -121,15 +144,17 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Test
     fun `returns headers`() {
         val response = client(Request(GET, "$baseUrl/headers"))
-
         assertThat(response.status, equalTo(ACCEPTED))
+        assertThat(response.headerValues("content-type").size, equalTo(1))
         assertThat(response.header("content-type"), equalTo("text/plain"))
     }
 
     @Test
     fun `length is set on body if it is sent`() {
-        val response = client(Request(POST, "$baseUrl/length")
-            .body("12345").header("Content-Length", "5"))
+        val response = client(
+            Request(POST, "$baseUrl/length")
+                .body("12345").header("Content-Length", "5")
+        )
         assertThat(response, hasStatus(OK).and(hasBody("5")))
     }
 
@@ -156,7 +181,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Test
     fun `can handle multiple request headers`() {
-        val response = client(Request(GET, "$baseUrl/request-headers").header("foo", "one").header("foo", "two").header("foo", "three"))
+        val response = client(
+            Request(GET, "$baseUrl/request-headers").header("foo", "one").header("foo", "two").header("foo", "three")
+        )
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("one, two, three"))
@@ -185,13 +212,27 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     }
 
     @Test
+    fun `returns 501 on illegal request`() {
+        val client = createDefault()
+        client.use {
+            assertThat(
+                client.execute(HttpUriRequestBase("FOOBAR", create(baseUrl)), ClassicHttpResponse::getCode),
+                equalTo(501)
+            )
+        }
+    }
+
+    @Test
     fun `can resolve request source`() {
-        assertThat(client(Request(GET, "$baseUrl/request-source")),
-            allOf(hasStatus(OK),
+        assertThat(
+            client(Request(GET, "$baseUrl/request-source")),
+            allOf(
+                hasStatus(OK),
                 hasHeader("x-address", clientAddress()),
                 hasHeader("x-port", present()),
                 hasHeader("x-scheme", requestScheme())
-            ))
+            )
+        )
     }
 
     open fun clientAddress() = anyOf(

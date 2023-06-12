@@ -1,7 +1,7 @@
 package org.http4k.core
 
-import java.net.URLDecoder
-import java.net.URLEncoder
+import org.http4k.urlDecoded
+import org.http4k.urlEncoded
 
 typealias Parameters = List<Parameter>
 
@@ -19,10 +19,10 @@ fun Parameters.findSingle(name: String): String? = find { it.first == name }?.se
 
 fun Parameters.findMultiple(name: String) = filter { it.first == name }.map { it.second }
 
-private fun String.toParameter(): Parameter = split("=").map(String::fromFormEncoded).let { l -> l.elementAt(0) to l.elementAtOrNull(1) }
+private fun String.toParameter(): Parameter = split("=", limit = 2).map(String::fromFormEncoded).let { l -> l.elementAt(0) to l.elementAtOrNull(1) }
 
-internal fun String.fromFormEncoded() = URLDecoder.decode(this, "UTF-8")
+internal fun String.fromFormEncoded() = this.urlDecoded()
 
-internal fun String.toFormEncoded() = URLEncoder.encode(this, "UTF-8")
+internal fun String.toFormEncoded() = this.urlEncoded()
 
 internal typealias Parameter = Pair<String, String?>

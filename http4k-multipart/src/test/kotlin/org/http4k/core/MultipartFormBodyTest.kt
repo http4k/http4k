@@ -105,6 +105,22 @@ class MultipartFormBodyTest {
         //original stream are automatically closed during parsing
     }
 
+    @Test
+    fun `gets boundary successfully from content type`() {
+        val boundary = "boundary"
+
+        val withCharset = Request(POST, "")
+            .with(Header.CONTENT_TYPE of ContentType("multipart/form-data", listOf("charset" to "utf-8", "boundary" to boundary)))
+            .body(MultipartFormBody(boundary))
+
+        val noCharset = Request(POST, "")
+            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(boundary))
+            .body(MultipartFormBody(boundary))
+
+        assertThat(MultipartFormBody.from(withCharset).boundary, equalTo(boundary))
+        assertThat(MultipartFormBody.from(noCharset).boundary, equalTo(boundary))
+    }
+
     private fun List<TestInputStream>.toMultipartForm() =
         foldIndexed(MultipartFormBody())
         { index, acc, stream -> acc.plus("file$index" to MultipartFormFile("foo$index.txt", TEXT_PLAIN, stream)) }

@@ -21,7 +21,8 @@ fun main() {
 
     val client = ClientFilters.AwsAuth(
         AwsCredentialScope(region, service),
-        AwsCredentials(accessKey, secretKey))
+        AwsCredentials(accessKey, secretKey)
+    )
         .then(ApacheClient())
 
     // create a bucket

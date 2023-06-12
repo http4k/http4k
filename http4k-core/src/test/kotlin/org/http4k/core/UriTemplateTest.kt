@@ -90,6 +90,14 @@ class UriTemplateTest {
     }
 
     @Test
+    fun canExtractFromUri_withMultipleSlashes() {
+        val template = from("///{id:.+}/{id2:.+}///")
+        val extracted = template.extract("/foo/bar/")
+        assertThat(extracted.getValue("id"), equalTo("foo"))
+        assertThat(extracted.getValue("id2"), equalTo("bar"))
+    }
+
+    @Test
     fun canExtractFromUriWithEncodedSpace() {
         val template = from("path/{id1}")
         assertThat(template.extract("path/foo%20bar").getValue("id1"), equalTo("foo bar"))

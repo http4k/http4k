@@ -11,13 +11,13 @@ We'll take an existing http4k application built with Gradle and deployed with Pu
 <hr/>
 
 #### Step 1
-We need to add the AWS Lambda Serverless Runtime module to our project. Install it into your `build.gradle` file with:
+We need to add the http4k AWS Lambda Serverless Runtime module to our project. Install it into your `build.gradle` file with:
 
-```groovy
-implementation("org.http4k:http4k-serverless-lambda-runtime:4.25.15.0")
+```kotlin
+implementation("org.http4k:http4k-serverless-lambda-runtime:4.48.0.0")
 ```
 
-This custom runtime is a lightweight, zero-reflection module which allows you to deploy both Java and GraalVN based binaries to AWS.
+This custom runtime is a lightweight, zero-reflection module which allows you to deploy both Java and GraalVM based binaries to AWS.
 
 #### Step 2
 Lambdas working from a native binary have to supply their own `main` function to launch the runtime, instead of implementing the standard `Request/StreamHandler` interfaces. To use it on our app, we simply create a launcher and wrap our http4k `HttpHandler` with the appropriate FnHandler class before starting the Runtime:
@@ -26,7 +26,7 @@ Lambdas working from a native binary have to supply their own `main` function to
 
 #### Step 3
 Compile the Lambda code into a GraalVM file is a 2 stage process. First, install and configure the ShadowJar plugin into `build.gradle` to merge the entire application into a single JAR file with a known main class. Add the following sections:
-```groovy
+```kotlin
 buildScript {
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'

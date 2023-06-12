@@ -12,6 +12,8 @@ import org.http4k.core.with
 import org.http4k.lens.LensFailure
 import org.http4k.lens.composite
 import org.http4k.lens.int
+import org.http4k.lens.of
+import org.http4k.lens.long
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.Properties
@@ -22,6 +24,7 @@ class EnvironmentKeyTest {
 
     @Test
     fun `custom key roundtrip`() {
+
         val lens = EnvironmentKey.int().required("some-value")
         assertThrows<LensFailure> { lens(env) }
 
@@ -68,8 +71,16 @@ class EnvironmentKeyTest {
         assertThat(single(single(2, single(1, original))), equalTo(2))
 
         val multi = EnvironmentKey.int().multi.required("value")
-        assertThat(multi(multi(listOf(3, 4), multi(listOf(1, 2), original))),
-            equalTo(listOf(3, 4)))
+        assertThat(
+            multi(multi(listOf(3, 4), multi(listOf(1, 2), original))),
+            equalTo(listOf(3, 4))
+        )
+    }
+
+    @Test
+    fun `using property method`() {
+        val MY_GREAT_ENV_VARIABLE by EnvironmentKey.long().of().required()
+        assertThat(MY_GREAT_ENV_VARIABLE(from("MY_GREAT_ENV_VARIABLE" to "123")), equalTo(123))
     }
 
     @Test

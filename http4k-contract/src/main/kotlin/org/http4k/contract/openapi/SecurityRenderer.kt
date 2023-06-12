@@ -21,7 +21,7 @@ interface SecurityRenderer {
 
             override fun <NODE> ref(security: Security): Render<NODE>? = when (security) {
                 is AndSecurity -> security.renderAll { ref<NODE>(it) }?.toObj()
-                is OrSecurity -> security.renderAll { ref<NODE>(it) }?.toArray()
+                is OrSecurity -> security.all.mapNotNull<Security, Render<NODE>> { ref(it) }.toArray()
                 else -> renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
             }
 
@@ -33,7 +33,7 @@ interface SecurityRenderer {
             }
 
             private fun <NODE> List<Render<NODE>>.toArray(): Render<NODE> = {
-                array(flatMap { fields(it(this)) }.map { obj(it) })
+                array(map { it(this) })
             }
         }
     }

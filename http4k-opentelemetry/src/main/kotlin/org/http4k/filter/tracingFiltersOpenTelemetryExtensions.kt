@@ -7,10 +7,12 @@ import io.opentelemetry.api.trace.SpanBuilder
 import io.opentelemetry.api.trace.SpanKind.CLIENT
 import io.opentelemetry.api.trace.SpanKind.SERVER
 import io.opentelemetry.api.trace.StatusCode.ERROR
+import io.opentelemetry.api.trace.StatusCode.UNSET
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.context.propagation.TextMapSetter
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes.*
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
@@ -21,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 fun ClientFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
-    spanNamer: (Request) -> String = { it.uri.toString() },
+    spanNamer: (Request) -> String = defaultSpanNamer,
     error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder) -> SpanBuilder = { it },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
@@ -42,9 +44,14 @@ fun ClientFilters.OpenTelemetryTracing(
                     makeCurrent().use {
                         val ref = AtomicReference(req)
                         textMapPropagator.inject(Context.current(), ref, setter)
-                        next(ref.get()).apply {
-                            setAttribute("http.status_code", status.code.toString())
-                            spanCompletionMutator(this@with, req, this)
+                        next(ref.get()).also {
+                            setAttribute(NET_PEER_NAME, req.uri.host)
+                            req.uri.port?.also { if (it != 80 && it != 443) setAttribute(NET_PEER_PORT, it) }
+
+                            addStandardDataFrom(it, req)
+
+                            spanCompletionMutator(this@with, req, it)
+                            if (it.status.clientError || it.status.serverError) setStatus(ERROR)
                         }
                     }
                 } catch (t: Throwable) {
@@ -60,7 +67,7 @@ fun ClientFilters.OpenTelemetryTracing(
 
 fun ServerFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
-    spanNamer: (Request) -> String = { it.uri.toString() },
+    spanNamer: (Request) -> String = defaultSpanNamer,
     error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
@@ -86,8 +93,10 @@ fun ServerFilters.OpenTelemetryTracing(
 
                         textMapPropagator.inject(Context.current(), ref, setter)
                         ref.get().also {
+                            addStandardDataFrom(it, req)
                             spanCompletionMutator(this, req, it)
-                            setAttribute("http.status_code", it.status.code.toString())
+                            if (it.status.serverError) setStatus(ERROR)
+                            else if (it.status.clientError) setStatus(UNSET)
                         }
                     } catch (t: Throwable) {
                         setStatus(ERROR, error(req, t))
@@ -100,6 +109,7 @@ fun ServerFilters.OpenTelemetryTracing(
         }
     }
 }
+
 @Suppress("UNCHECKED_CAST")
 internal fun <T : HttpMessage> setter() = TextMapSetter<AtomicReference<T>> { ref, name, value ->
     ref?.run { set(get().header(name, value) as T) }
@@ -110,3 +120,17 @@ internal fun <T : HttpMessage> getter(textMapPropagator: TextMapPropagator) = ob
 
     override fun get(carrier: T?, key: String) = carrier?.header(key)
 }
+
+val defaultSpanNamer: (Request) -> String = {
+    when (it) {
+        is RoutedRequest -> it.method.name + it.xUriTemplate
+        else -> it.method.name
+    }
+}
+
+private fun Span.addStandardDataFrom(resp: Response, req: Request) {
+    resp.body.length?.also { setAttribute(HTTP_RESPONSE_CONTENT_LENGTH, it) }
+    req.body.length?.also { setAttribute(HTTP_REQUEST_CONTENT_LENGTH, it) }
+    setAttribute("http.status_code", resp.status.code.toString())
+}
+

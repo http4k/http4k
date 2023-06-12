@@ -1,7 +1,7 @@
 rootProject.name = "http4k"
 
 plugins {
-    id("de.fayard.refreshVersions").version("0.40.1")
+    id("de.fayard.refreshVersions").version("0.40.2")
 }
 
 refreshVersions {
@@ -15,7 +15,7 @@ refreshVersions {
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")
-    project(":$projectName").projectDir = File("$this/${name.replace(':','/')}")
+    project(":$projectName").projectDir = File("$this/${name.replace(':', '/')}")
 }
 
 fun includeWithDirectory(projectName: String, name: String) {
@@ -39,7 +39,12 @@ include("http4k-bom")
 
 include("http4k-cloudevents")
 include("http4k-cloudnative")
+
 include("http4k-contract")
+"http4k-contract-ui".apply {
+    includeModule("swagger")
+    includeModule("redoc")
+}
 
 "http4k-format".apply {
     includeModule("core")
@@ -49,6 +54,7 @@ include("http4k-contract")
     includeModule("jackson-xml")
     includeModule("jackson-yaml")
     includeModule("klaxon")
+//    includeModule("kondor-json")
     includeModule("kotlinx-serialization")
     includeModule("moshi")
     includeModule("moshi-yaml")
@@ -61,6 +67,7 @@ include("http4k-incubator")
 include("http4k-jsonrpc")
 include("http4k-metrics-micrometer")
 include("http4k-multipart")
+include("http4k-failsafe")
 include("http4k-resilience4j")
 include("http4k-opentelemetry")
 include("http4k-realtime-core")
@@ -75,6 +82,7 @@ include("http4k-realtime-core")
     includeModule("ratpack")
     includeModule("shutdown-integration-test")
     includeModule("undertow")
+    includeModule("websocket")
 }
 
 "http4k-serverless".apply {
@@ -101,6 +109,7 @@ include("http4k-realtime-core")
     includeModule("dust")
     includeModule("freemarker")
     includeModule("handlebars")
+    includeModule("rocker")
     includeModule("pebble")
     includeModule("thymeleaf")
     includeModule("jade4j")

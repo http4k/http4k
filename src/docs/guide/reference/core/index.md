@@ -3,8 +3,11 @@ description: Feature overview of the http4k-core module, including the Lens syst
 
 ### Installation (Gradle)
 
-```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "4.25.15.0"
+```kotlin
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation("org.http4k:http4k-core")
+}
 ```
 
 ### About
@@ -93,7 +96,7 @@ routes(
 ).asServer(Jetty(8000)).start()
 ```
 
-Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality, with runtime-generated live documentation in OpenApi/Swagger format.
+Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality, with runtime-generated live documentation in OpenApi format.
 
 #### Testing Routers [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/core/RoutingTest.kt)
 

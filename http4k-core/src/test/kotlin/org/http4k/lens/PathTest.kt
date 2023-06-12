@@ -113,6 +113,12 @@ class PathTest {
     }
 
     @Test
+    fun urlEncoded() {
+        val requiredLens = Path.urlEncoded().of("hello")
+        assertThat(requiredLens("123%2F456"), equalTo("123/456"))
+    }
+
+    @Test
     fun int() = checkContract(Path.int(), "123", 123)
 
     @Test

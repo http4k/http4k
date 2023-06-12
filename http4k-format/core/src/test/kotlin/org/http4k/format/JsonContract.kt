@@ -3,6 +3,7 @@ package org.http4k.format
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -17,6 +18,8 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
 
     abstract val prettyString: String
 
+    open val expectedNullBigDecimalJsonType = JsonType.Null
+
     @Test
     fun `looks up types`() {
         j {
@@ -27,6 +30,19 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
             assertThat(typeOf(nullNode()), equalTo(JsonType.Null))
             assertThat(typeOf(obj("name" to string(""))), equalTo(JsonType.Object))
             assertThat(typeOf(array(listOf(string("")))), equalTo(JsonType.Array))
+        }
+    }
+
+    @Test
+    fun `converting null values to nodes`() {
+        j {
+            assertThat(typeOf((null as String?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Int?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Double?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Long?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as Boolean?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as BigInteger?).asJsonValue()), equalTo(JsonType.Null))
+            assertThat(typeOf((null as BigDecimal?).asJsonValue()), equalTo(expectedNullBigDecimalJsonType))
         }
     }
 
@@ -43,13 +59,16 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
                 "null" to nullNode(),
                 "int" to number(2),
                 "empty" to obj(),
-                "array" to array(listOf(
-                    string(""),
-                    number(123)
-                )),
+                "array" to array(
+                    listOf(
+                        string(""),
+                        number(123)
+                    )
+                ),
                 "singletonArray" to array(obj("number" to number(123)))
             )
-            val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
+            val expected =
+                """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
             assertThat(compact(input), equalTo(expected))
         }
     }
@@ -74,8 +93,14 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     @Test
     fun `get fields`() {
         j {
-            val fields = listOf("hello" to string("world"), "hello2" to string("world2"))
-            assertThat(fields(obj(fields)).toList(), equalTo(fields))
+            val result = fields(obj(listOf("hello" to string("world"), "hello2" to string("world2")))).associate {
+                it.first to (typeOf(it.second) to text(it.second))
+            }
+
+            assertThat(result, equalTo(mapOf(
+                "hello" to (JsonType.String to "world"),
+                "hello2" to (JsonType.String to "world2")
+            )))
         }
     }
 
@@ -86,6 +111,20 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
             assertThat(integer(number(1)), equalTo(1L))
             assertThat(decimal(number(BigDecimal("1.0567"))), equalTo(BigDecimal("1.0567")))
             assertThat(bool(boolean(true)), equalTo(true))
+        }
+    }
+
+    @Test
+    fun `get text for all primitive types`() {
+        j {
+            assertThat(text(string("1.0")), equalTo("1.0"))
+            assertThat(text(number(1)), equalTo("1"))
+            assertThat(text(number(1L)), equalTo("1"))
+            assertThat(text(number(1.1)), present()) // won't depend on platform differences
+            assertThat(text(number(BigInteger("1"))), equalTo("1"))
+            assertThat(text(number(BigDecimal("1.1"))), equalTo("1.1"))
+            assertThat(text(boolean(false)), equalTo("false"))
+            assertThat(text(nullNode()), equalTo("null"))
         }
     }
 
@@ -111,7 +150,16 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     fun `can write and read spec as json`() {
         j {
             val validValue = """{"hello":"world"}"""
-            checkContract(lens(spec), obj("hello" to string("world")), validValue, "", "hello", "o", "o$validValue", "o$validValue$validValue")
+            checkContract(
+                jsonLens(spec),
+                obj("hello" to string("world")),
+                validValue,
+                "",
+                "hello",
+                "o",
+                "o$validValue",
+                "o$validValue$validValue"
+            )
         }
     }
 

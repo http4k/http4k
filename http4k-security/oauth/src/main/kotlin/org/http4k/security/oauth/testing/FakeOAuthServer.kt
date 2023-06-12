@@ -2,7 +2,6 @@ package org.http4k.security.oauth.testing
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,9 +11,11 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header.LOCATION
 import org.http4k.lens.LensFailure
+import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessToken
+import org.http4k.security.oauth.server.AccessTokenResponseRenderer
 import org.http4k.security.oauth.server.AccessTokens
 import org.http4k.security.oauth.server.AuthRequest
 import org.http4k.security.oauth.server.AuthRequestTracking
@@ -23,10 +24,13 @@ import org.http4k.security.oauth.server.AuthorizationCodeDetails
 import org.http4k.security.oauth.server.AuthorizationCodes
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.ClientValidator
+import org.http4k.security.oauth.server.DefaultAccessTokenResponseRenderer
+import org.http4k.security.oauth.server.IdTokens
 import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.security.oauth.server.TokenRequest
 import org.http4k.security.oauth.server.UnsupportedGrantType
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
+import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import java.time.Clock
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -34,30 +38,34 @@ import java.util.UUID
 /**
  * This Server provides auto-login functionality without the need for user action.
  */
-object FakeOAuthServer {
-    operator fun invoke(
-        authPath: String,
-        tokenPath: String,
-        clock: Clock = Clock.systemDefaultZone(),
-        authCodeToAccessToken: (AuthorizationCode) -> String = { "OAUTH_" + it.value.reversed() }
-    ): HttpHandler {
-        val server = OAuthServer(
-            tokenPath,
-            InMemoryAuthRequestTracking(),
-            AlwaysOkClientValidator(),
-            InMemoryAuthorizationCodes(clock),
-            SimpleAccessTokens(authCodeToAccessToken),
-            clock
-        )
+fun FakeOAuthServer(
+    authPath: String,
+    tokenPath: String,
+    clock: Clock = Clock.systemDefaultZone(),
+    accessTokens: AccessTokens = SimpleAccessTokens(),
+    idTokens: IdTokens = IdTokens.Unsupported,
+    refreshTokens: RefreshTokens = RefreshTokens.Unsupported,
+    tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
+): RoutingHttpHandler {
+    val server = OAuthServer(
+        tokenPath,
+        InMemoryAuthRequestTracking(),
+        AlwaysOkClientValidator(),
+        InMemoryAuthorizationCodes(clock),
+        accessTokens,
+        clock,
+        tokenResponseRenderer = tokenResponseRenderer,
+        idTokens = idTokens,
+        refreshTokens = refreshTokens,
+    )
 
-        return routes(
-            server.tokenRoute,
-            authPath bind GET to server.authenticationStart.then {
-                Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
-            },
-            "/autologin" bind GET to { server.authenticationComplete(it) }
-        )
-    }
+    return routes(
+        server.tokenRoute,
+        authPath bind GET to server.authenticationStart.then {
+            Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
+        },
+        "/autologin" bind GET to { server.authenticationComplete(it) }
+    )
 }
 
 private class AlwaysOkClientValidator : ClientValidator {
@@ -108,13 +116,12 @@ private class InMemoryAuthRequestTracking : AuthRequestTracking {
         }
 }
 
-private class SimpleAccessTokens(private val authCodeToAccessToken: (AuthorizationCode) -> String) : AccessTokens {
+private class SimpleAccessTokens : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest) =
         Failure(UnsupportedGrantType("client_credentials"))
 
     override fun create(
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest,
-        authorizationCode: AuthorizationCode
-    ) = Success(AccessToken(authCodeToAccessToken(authorizationCode)))
+    ) = Success(AccessToken("OAUTH_" + tokenRequest.authorizationCode.value.reversed()))
 }

@@ -1,16 +1,17 @@
+import groovy.namespace.QName
 import groovy.util.Node
-import groovy.xml.QName
 import org.gradle.api.JavaVersion.VERSION_1_8
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.time.Duration
 
 plugins {
     kotlin("jvm")
     idea
     jacoco
-    signing
-    publishing
+    `java-library`
     `maven-publish`
+    signing
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
 }
 
 buildscript {
@@ -22,12 +23,9 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
-        classpath("com.github.jengelman.gradle.plugins:shadow:_")
-        classpath("io.codearte.nexus-staging:io.codearte.nexus-staging.gradle.plugin:_")
+        classpath("gradle.plugin.com.github.johnrengelman:shadow:_")
     }
 }
-
-apply(plugin = "io.codearte.nexus-staging")
 
 allprojects {
     apply(plugin = "java")
@@ -38,11 +36,11 @@ allprojects {
         mavenCentral()
     }
 
-    version = project.getProperties()["releaseVersion"] ?: "LOCAL"
+    version = project.properties["releaseVersion"] ?: "LOCAL"
     group = "org.http4k"
 
     jacoco {
-        toolVersion = "0.8.7"
+        toolVersion = "0.8.9"
     }
 
     tasks {
@@ -63,8 +61,9 @@ allprojects {
 
         named<JacocoReport>("jacocoTestReport") {
             reports {
-                html.isEnabled = true
-                xml.isEnabled = true
+                html.required.set(true)
+                xml.required.set(true)
+                csv.required.set(false)
             }
         }
 
@@ -76,7 +75,6 @@ allprojects {
     dependencies {
         testImplementation(Testing.junit.jupiter.api)
         testImplementation(Testing.junit.jupiter.engine)
-        testImplementation("org.jetbrains.kotlin:kotlin-reflect:_")
         testImplementation("com.natpryce:hamkrest:_")
     }
 }
@@ -134,28 +132,7 @@ subprojects {
             }
         }
 
-        val nexusUsername: String? by project
-        val nexusPassword: String? by project
-
         publishing {
-            repositories {
-                maven {
-                    name = "SonatypeStaging"
-                    setUrl("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                    credentials {
-                        username = nexusUsername
-                        password = nexusPassword
-                    }
-                }
-                maven {
-                    name = "SonatypeSnapshot"
-                    setUrl("https://oss.sonatype.org/content/repositories/snapshots/")
-                    credentials {
-                        username = nexusUsername
-                        password = nexusPassword
-                    }
-                }
-            }
             publications {
                 val archivesBaseName = tasks.jar.get().archiveBaseName.get()
                 create<MavenPublication>("mavenJava") {
@@ -171,7 +148,7 @@ subprojects {
                             .appendNode("developer").appendNode("name", "David Denton").parent()
                             .appendNode("email", "david@http4k.org")
                         asNode().appendNode("scm")
-                            .appendNode("url", "git@github.com:http4k/$archivesBaseName.git").parent()
+                            .appendNode("url", "https://github.com/http4k/http4k").parent()
                             .appendNode("connection", "scm:git:git@github.com:http4k/http4k.git").parent()
                             .appendNode("developerConnection", "scm:git:git@github.com:http4k/http4k.git")
                         asNode().appendNode("licenses").appendNode("license")
@@ -196,10 +173,8 @@ subprojects {
     }
 
     sourceSets {
-        named("test") {
-            withConvention(KotlinSourceSet::class) {
-                kotlin.srcDir("$projectDir/src/examples/kotlin")
-            }
+        test {
+            kotlin.srcDir("$projectDir/src/examples/kotlin")
         }
     }
 }
@@ -217,10 +192,10 @@ tasks.register<JacocoReport>("jacocoRootReport") {
     )
 
     reports {
-        html.isEnabled = true
-        xml.isEnabled = true
-        csv.isEnabled = false
-        xml.destination = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+        xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml"))
     }
 }
 
@@ -231,6 +206,8 @@ dependencies {
             api(project(it.name))
             testImplementation(project(path = it.name, configuration = "testArtifacts"))
         }
+
+    testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
 
     testImplementation("software.amazon.awssdk:s3:_") {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
@@ -243,11 +220,9 @@ dependencies {
 fun hasAnArtifact(it: Project) = !it.name.contains("test-function") && !it.name.contains("integration-test")
 
 sourceSets {
-    named("test") {
-        withConvention(KotlinSourceSet::class) {
-            kotlin.srcDir("$projectDir/src/docs")
-            resources.srcDir("$projectDir/src/docs")
-        }
+    test {
+        kotlin.srcDir("$projectDir/src/docs")
+        resources.srcDir("$projectDir/src/docs")
     }
 }
 
@@ -269,6 +244,22 @@ fun Node.childrenCalled(wanted: String) = children()
 tasks.named<KotlinCompile>("compileTestKotlin") {
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
+        freeCompilerArgs += listOf("-Xjvm-default=all")
+    }
+}
+
+val nexusUsername: String? by project
+val nexusPassword: String? by project
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username.set(nexusUsername)
+            password.set(nexusPassword)
+        }
+    }
+    transitionCheckOptions {
+        maxRetries.set(150)
+        delayBetween.set(Duration.ofSeconds(5))
     }
 }

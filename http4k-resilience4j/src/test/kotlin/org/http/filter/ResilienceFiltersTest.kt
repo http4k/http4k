@@ -10,6 +10,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.of
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType.COUNT_BASED
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.retry.Retry
@@ -24,6 +25,10 @@ import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
 import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
+import org.http4k.filter.ResilienceFilters.Bulkheading
+import org.http4k.filter.ResilienceFilters.CircuitBreak
+import org.http4k.filter.ResilienceFilters.RateLimit
+import org.http4k.filter.ResilienceFilters.RetryFailures
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -37,21 +42,25 @@ class ResilienceFiltersTest {
     fun `circuit break filter`() {
         val minimumOpenStateApparently = Duration.ofSeconds(1)
         val config = CircuitBreakerConfig.custom()
-            .slidingWindow(2, 2, SlidingWindowType.COUNT_BASED)
+            .slidingWindow(2, 2, COUNT_BASED)
             .permittedNumberOfCallsInHalfOpenState(2)
             .waitDurationInOpenState(minimumOpenStateApparently)
             .build()
 
-        val responses = ArrayDeque<Response>()
-        responses.add(Response(INTERNAL_SERVER_ERROR))
-        responses.add(Response(OK))
-        responses.add(Response(OK))
+        val responses = ArrayDeque<Response>().apply {
+            add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(OK))
+            add(Response(OK))
+            add(Response(OK))
+        }
 
         val circuitBreaker = of("hello", config)
 
-        val circuited = ResilienceFilters.CircuitBreak(circuitBreaker).then { responses.removeFirst() }
+        val circuited = CircuitBreak(circuitBreaker).then { responses.removeFirst() }
 
         assertThat(circuitBreaker.state, equalTo(CLOSED))
+        assertThat(circuited(Request(GET, "/")), hasStatus(INTERNAL_SERVER_ERROR))
         assertThat(circuited(Request(GET, "/")), hasStatus(INTERNAL_SERVER_ERROR))
         assertThat(circuitBreaker.state, equalTo(OPEN))
         assertThat(circuited(Request(GET, "/")), hasStatus(SERVICE_UNAVAILABLE))
@@ -68,11 +77,12 @@ class ResilienceFiltersTest {
         val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
-        val responses = ArrayDeque<Response>()
-        responses.add(Response(INTERNAL_SERVER_ERROR))
-        responses.add(Response(OK))
+        val responses = ArrayDeque<Response>().apply {
+            add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(OK))
+        }
 
-        val retrying = ResilienceFilters.RetryFailures(retry).then {
+        val retrying = RetryFailures(retry).then {
             responses.removeFirst()
         }
 
@@ -85,11 +95,12 @@ class ResilienceFiltersTest {
         val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
-        val responses = ArrayDeque<Response>()
-        responses.add(Response(INTERNAL_SERVER_ERROR))
-        responses.add(Response(BAD_GATEWAY))
-        responses.add(Response(SERVICE_UNAVAILABLE))
-        val retrying = ResilienceFilters.RetryFailures(retry).then {
+        val responses = ArrayDeque<Response>().apply {
+            add(Response(INTERNAL_SERVER_ERROR))
+            add(Response(BAD_GATEWAY))
+            add(Response(SERVICE_UNAVAILABLE))
+        }
+        val retrying = RetryFailures(retry).then {
             responses.removeFirst()
         }
 
@@ -103,7 +114,7 @@ class ResilienceFiltersTest {
             .limitForPeriod(1)
             .timeoutDuration(Duration.ofMillis(10)).build()
 
-        val rateLimits = ResilienceFilters.RateLimit(RateLimiter.of("ratelimiter", config)).then { Response(OK) }
+        val rateLimits = RateLimit(RateLimiter.of("ratelimiter", config)).then { Response(OK) }
 
         assertThat(rateLimits(Request(GET, "/")).status, equalTo(OK))
         assertThat(rateLimits(Request(GET, "/")).status, equalTo(TOO_MANY_REQUESTS))
@@ -117,7 +128,7 @@ class ResilienceFiltersTest {
             .build()
 
         val latch = CountDownLatch(1)
-        val bulkheading = ResilienceFilters.Bulkheading(Bulkhead.of("bulkhead", config)).then {
+        val bulkheading = Bulkheading(Bulkhead.of("bulkhead", config)).then {
             latch.countDown()
             Thread.sleep(1000)
             Response(OK)

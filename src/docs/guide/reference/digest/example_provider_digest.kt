@@ -25,7 +25,9 @@ fun main() {
         }
     )
 
-    val authFilter = ServerFilters.DigestAuth(realm = "http4k", passwordLookup = { username -> users[username] })
+    val authFilter = ServerFilters.DigestAuth(
+        realm = "http4k",
+        passwordLookup = { username -> users[username] })
 
     authFilter
         .then(routes)

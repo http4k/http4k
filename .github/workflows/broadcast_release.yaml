@@ -13,9 +13,9 @@ jobs:
       version: ${{ steps.check-version.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.5.0
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2.0.0
         with:
           aws-access-key-id: ${{ secrets.S3_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.S3_SECRET_ACCESS_KEY }}
@@ -29,7 +29,7 @@ jobs:
 
           if [[ $S3_VERSION == $LOCAL_VERSION ]]; then
             echo "Version $LOCAL_VERSION has been broadcasted already."
-            echo "::set-output name=requires-broadcast::false"
+            echo "requires-broadcast=false" >> $GITHUB_OUTPUT
             exit 0
           fi;
 
@@ -42,8 +42,8 @@ jobs:
           if [[ $MC_STATUS == "200" ]]; then
             echo "Version $LOCAL_VERSION available in MC. Preparing for broadcast..."
             echo "${LOCAL_VERSION}" | aws s3 cp - s3://http4k/latest-broadcasted-version.txt
-            echo "::set-output name=requires-broadcast::true"
-            echo "::set-output name=version::${LOCAL_VERSION}"
+            echo "requires-broadcast=true" >> $GITHUB_OUTPUT
+            echo "version=${LOCAL_VERSION}" >> $GITHUB_OUTPUT
           fi;
   broadcast-release:
     runs-on: ubuntu-latest
@@ -51,12 +51,12 @@ jobs:
     if: ${{ needs.check-new-version.outputs.requires-broadcast == 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.5.0
       - name: Grab tag name
-        uses: olegtarasov/get-tag@v2
+        uses: olegtarasov/get-tag@v2.1.2
         id: tagName
       - name: Dispatch Release Event
-        uses: peter-evans/repository-dispatch@v1.1.1
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING }}
           repository: http4k/http4k

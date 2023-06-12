@@ -37,7 +37,10 @@ abstract class WebsocketContract {
 
     @Test
     fun `echoes back connected name`() {
-        assertThat(client().received().take(1).toList(), equalTo(listOf(WsMessage("hello bob"))))
+        assertThat(
+            client().received().take(1).toList(),
+            equalTo(listOf(WsMessage("hello bob")))
+        )
     }
 }
 

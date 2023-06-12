@@ -9,7 +9,8 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
 
     private val items = listOf(
         Item("item1", "£1", listOf(Feature("pretty"))),
-        Item("item2", "£3", listOf(Feature("nasty"))))
+        Item("item2", "£3", listOf(Feature("nasty")))
+    )
 
     @Test
     fun `caching classpath`() {
@@ -22,8 +23,13 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     @Test
     fun `caching classpath not at root`() {
         val renderer = templates.CachingClasspath("org.http4k.template")
-        assertThat(renderer(OnClasspathNotAtRoot(items)), equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
+        assertThat(
+            renderer(onClasspathNotAtRootViewModel(items)).trim(),
+            equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>")
+        )
     }
+
+    open fun onClasspathNotAtRootViewModel(items: List<Item>): ViewModel = OnClasspathNotAtRoot(items)
 
     @Test
     fun `caching file-based`() {
@@ -42,14 +48,24 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     }
 
     private fun checkOnClasspath(renderer: TemplateRenderer) {
-        val actual = renderer(OnClasspath(items))
-        assertThat(actual, equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
+        assertThat(
+            renderer(onClasspathViewModel(items)).trim(),
+            equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>")
+        )
     }
 
+    open fun onClasspathViewModel(items: List<Item>): ViewModel = OnClasspath(items)
+
     private fun checkAtRoot(renderer: TemplateRenderer) {
-        assertThat(renderer(AtRoot(items)), equalTo("<ul><li>AtRootName:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>AtRootName:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty" +
-            "</span></li></ul></li></ul>"))
+        assertThat(
+            renderer(atRootViewModel(items)).trim(), equalTo(
+                "<ul><li>AtRootName:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>AtRootName:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty" +
+                    "</span></li></ul></li></ul>"
+            )
+        )
     }
+
+    open fun atRootViewModel(items: List<Item>): ViewModel = AtRoot(items)
 
     private fun checkNonExistent(renderer: TemplateRenderer) {
         assertThat({ renderer(NonExistent) }, throws(equalTo(ViewNotFound(NonExistent))))

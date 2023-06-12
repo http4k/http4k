@@ -4,6 +4,7 @@ import com.github.underscore.Json
 import com.github.underscore.Json.JsonStringBuilder.Step.TWO_SPACES
 import com.github.underscore.Json.formatJson
 import com.github.underscore.Xml.formatXml
+import org.http4k.core.CLOUD_EVENT_JSON
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
@@ -89,7 +90,21 @@ class JsonApprovalTest(
     override fun format(input: String): String = try {
         formatJson(input, TWO_SPACES)
     } catch (e: Json.ParseException) {
-        throw AssertionFailedError("Invalid JSON generated", "<valid JSON>", input)
+        throw AssertionFailedError("Invalid JSON generated", "<valid JSON>", input, e)
+    }
+}
+
+/**
+ * Approval JUnit5 extension configured to compare prettified-JSON messages.
+ */
+class CloudEventsJsonApprovalTest(
+    testNamer: TestNamer = ClassAndMethod,
+    approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
+) : ContentTypeAwareApprovalTest(ContentType.CLOUD_EVENT_JSON, testNamer, approvalSource) {
+    override fun format(input: String): String = try {
+        formatJson(input, TWO_SPACES)
+    } catch (e: Json.ParseException) {
+        throw AssertionFailedError("Invalid JSON generated", "<valid JSON>", input, e)
     }
 }
 
@@ -104,7 +119,7 @@ class HtmlApprovalTest(
     override fun format(input: String): String = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
-        throw AssertionFailedError("Invalid HTML generated", "<valid HTML>", input)
+        throw AssertionFailedError("Invalid HTML generated", "<valid HTML>", input, e)
     }
 }
 
@@ -118,7 +133,7 @@ class XmlApprovalTest(
     override fun format(input: String): String = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
-        throw AssertionFailedError("Invalid XML generated", "<valid XML>", input)
+        throw AssertionFailedError("Invalid XML generated", "<valid XML>", input, e)
     }
 }
 
@@ -133,6 +148,6 @@ class YamlApprovalTest(
         JacksonYaml.asA<Map<String, Any>>(input)
         input
     } catch (e: Exception) {
-        throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input)
+        throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input, e)
     }
 }

@@ -2,11 +2,9 @@ package org.http4k.multipart
 
 import org.http4k.multipart.Part.DiskBacked
 import org.http4k.multipart.Part.InMemory
-import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.charset.Charset
-import java.util.UUID
 
 /**
  * Parser for creating serialised form parts using the encoding
@@ -16,10 +14,13 @@ import java.util.UUID
  * @param encoding               encoding of the stream
  * @param writeToDiskThreshold   if a Part is bigger than this threshold it will be purged from memory
  * and written to disk
- * @param temporaryFileDirectory where to write the files for Parts that are too big. Uses the default
- * temporary directory if null.
+ * @param diskLocation           persistence implementation for multipart files which are stored during  processing.
  */
-internal class MultipartFormParser(private val encoding: Charset, private val writeToDiskThreshold: Int, private val temporaryFileDirectory: File) {
+internal class MultipartFormParser(
+    private val encoding: Charset,
+    private val writeToDiskThreshold: Int,
+    private val diskLocation: DiskLocation,
+) {
 
     /**
      * Returns a list of Parts.
@@ -56,7 +57,8 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
                 part.inputStream.use {
                     return InMemory(
                         part,
-                        storeInMemory(bytes, length), encoding)
+                        storeInMemory(bytes, length), encoding
+                    )
                 }
             }
             length += count
@@ -64,7 +66,8 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
                 part.inputStream.use {
                     return DiskBacked(
                         part,
-                        writeToDisk(part, bytes, length))
+                        diskLocation.createFile(part.fileName).writeFile(part, bytes, length),
+                    )
                 }
             }
         }
@@ -72,13 +75,13 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
 
     private fun storeInMemory(bytes: ByteArray, length: Int) = ByteArray(length).apply { System.arraycopy(bytes, 0, this, 0, length) }
 
-    private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int) =
-        File.createTempFile(part.fileName ?: UUID.randomUUID().toString()
-        + "-", ".tmp", temporaryFileDirectory).apply {
-            deleteOnExit()
-            FileOutputStream(this).apply {
-                write(bytes, 0, length)
-                use { part.inputStream.copyTo(it, writeToDiskThreshold) }
+    private fun MultipartFile.writeFile(part: StreamingPart, bytes: ByteArray, length: Int): MultipartFile =
+        this.also { multipartFile ->
+            multipartFile.file().apply {
+                FileOutputStream(this).apply {
+                    write(bytes, 0, length)
+                    use { part.inputStream.copyTo(it, writeToDiskThreshold) }
+                }
             }
         }
 }

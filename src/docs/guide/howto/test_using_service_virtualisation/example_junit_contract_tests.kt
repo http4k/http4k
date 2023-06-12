@@ -32,7 +32,8 @@ import java.nio.file.Paths
  * This client wraps the calls to a remote WordCounter service
  */
 class WordCounterClient(private val http: HttpHandler) {
-    fun wordCount(name: String): Int = http(Request(POST, "/count").body(name)).bodyString().toInt()
+    fun wordCount(name: String): Int =
+        http(Request(POST, "/count").body(name)).bodyString().toInt()
 }
 
 /**
@@ -45,14 +46,17 @@ class WordCounterApp : HttpHandler {
 }
 
 /**
- * Defines the test contract which will be recorded and replayed later. The injected HttpHandler
- * is provided by the implementations of this interface.
+ * Defines the test contract which will be recorded and replayed later.
+ * The injected HttpHandler is provided by the implementations of this interface.
  */
 interface WordCounterContract {
 
     @Test
     fun `count the number of words`(handler: HttpHandler) {
-        assertThat(WordCounterClient(handler).wordCount("A random string with 6 words"), equalTo(6))
+        assertThat(
+            WordCounterClient(handler).wordCount("A random string with 6 words"),
+            equalTo(6)
+        )
     }
 
     @Test
@@ -62,8 +66,8 @@ interface WordCounterContract {
 }
 
 /**
- * For the traditional use-case of a CDC, we use a real Http client to record the traffic against
- * a running version of the producing service.
+ * For the traditional use-case of a CDC, we use a real Http client to
+ * record the traffic against a running version of the producing service.
  */
 @Disabled
 class RemoteHttpRecordingWordCounterTest : WordCounterContract {
@@ -133,8 +137,10 @@ class ReplayFromDiskTest : WordCounterContract {
 class ReplayFromGitHubTest : WordCounterContract {
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay("WordCounter",
-        GitHub("http4k", "http4k",
+    val replay = ServirtiumReplay(
+        "WordCounter",
+        GitHub(
+            "http4k", "http4k",
             Credentials("<github user>", "<personal access token>"),
             Paths.get("src/test/resources/guide/howto/service_virtualisation")
         )

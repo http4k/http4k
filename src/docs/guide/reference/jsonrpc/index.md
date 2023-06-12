@@ -3,8 +3,11 @@ description: Feature overview of the http4k-jsonrpc module
 
 ### Installation (Gradle)
 
-```groovy
-implementation group: "org.http4k", name: "http4k-jsonrpc", version: "4.25.15.0"
+```kotlin
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation("org.http4k:http4k-jsonrpc")
+}
 ```
 
 ### About

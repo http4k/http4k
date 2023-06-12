@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import org.http4k.base64Encode
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -14,7 +15,6 @@ import java.security.MessageDigest
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
-import java.util.Base64
 
 object ResponseFilters {
 
@@ -73,7 +73,7 @@ object ResponseFilters {
      */
     class GZipContentTypes(
         compressibleContentTypes: Set<ContentType>,
-        private val compressionMode: GzipCompressionMode = Memory
+        private val compressionMode: GzipCompressionMode = Memory()
     ) : Filter {
         private val compressibleMimeTypes = compressibleContentTypes
             .map { it.value }
@@ -103,7 +103,7 @@ object ResponseFilters {
      * Basic GZipping of Response.
      */
     object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
             { request ->
                 next(request).let {
                     if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
@@ -118,7 +118,7 @@ object ResponseFilters {
      * Basic UnGZipping of Response.
      */
     object GunZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
             { request ->
                 next(request.header("accept-encoding", "gzip")).let { response ->
                     response.header("content-encoding")
@@ -133,7 +133,7 @@ object ResponseFilters {
      * Some platforms deliver bodies as Base64 encoded strings.
      */
     fun Base64EncodeBody() = Filter { next ->
-        { next(it).run { body(Base64.getEncoder().encodeToString(body.payload.array())) } }
+        { next(it).run { body(body.payload.base64Encode()) } }
     }
 
     class EtagSupport : Filter {

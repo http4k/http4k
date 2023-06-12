@@ -166,6 +166,49 @@
         ]
       }
     },
+    "/basepath/body_form_example": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_form_example",
+        "produces": [
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "b",
+            "required": true,
+            "type": "boolean",
+            "description": "booleanField"
+          },
+          {
+            "in": "formData",
+            "name": "j",
+            "required": true,
+            "type": "string",
+            "description": "jsonField"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_json_list_schema": {
       "post": {
         "tags": [
@@ -312,6 +355,54 @@
         ]
       }
     },
+    "/basepath/body_negotiated": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_negotiated",
+        "produces": [
+          "custom/v1",
+          "custom/v2"
+        ],
+        "consumes": [
+          "custom/v1",
+          "custom/v2"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_receiving_string": {
       "post": {
         "tags": [
@@ -358,6 +449,34 @@
         "operationId": "getBasepathBody_string",
         "produces": [
           "text/plain"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/callback_with_body": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathCallback_with_body",
+        "produces": [
         ],
         "consumes": [
         ],
@@ -513,7 +632,7 @@
         ]
       }
     },
-    "/basepath/multipart_fields": {
+    "/basepath/multipart-fields": {
       "put": {
         "tags": [
           "/basepath"
@@ -539,7 +658,15 @@
             "name": "fileField",
             "required": true,
             "schema": {
-              "type": "array"
+              "type": "file"
+            }
+          },
+          {
+            "in": "form",
+            "name": "jsonField",
+            "required": true,
+            "schema": {
+              "type": "object"
             }
           }
         ],
@@ -762,6 +889,16 @@
             "required": false,
             "type": "string",
             "description": "enumQuery"
+          },
+          {
+            "in": "query",
+            "name": "el",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "enumQueryList"
           },
           {
             "in": "query",

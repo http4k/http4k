@@ -7,9 +7,14 @@ import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.core.with
+import org.http4k.lens.Query
 import org.http4k.lens.StringBiDiMappings
+import org.http4k.lens.string
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -49,7 +54,7 @@ data class RegexHolder(val regex: Regex)
 data class StringHolder(val value: String)
 data class AnotherString(val value: String)
 data class BooleanHolder(val value: Boolean)
-data class MapHolder(val value: Map<String, Any>)
+data class MapHolder(val value: Map<String, String>)
 data class BigDecimalHolder(val value: BigDecimal)
 data class BigIntegerHolder(val value: BigInteger)
 data class MappedBigDecimalHolder(val value: BigDecimal)
@@ -75,6 +80,9 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val expectedAutoMarshallingResultPrimitives: String
     protected abstract val expectedWrappedMap: String
     protected abstract val expectedMap: String
+    protected abstract val expectedArbitraryMap: String
+    protected abstract val expectedArbitraryArray: String
+    protected abstract val expectedArbitrarySet: String
     protected abstract val expectedConvertToInputStream: String
     protected abstract val expectedThrowable: String
     protected abstract val inputUnknownValue: String
@@ -129,7 +137,11 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
 
     @Test
     open fun `roundtrip zones and locale`() {
-        val obj = ZonesAndLocale(zoneId = ZoneId.of("America/Toronto"), zoneOffset = ZoneOffset.of("-04:00"), locale = Locale.CANADA)
+        val obj = ZonesAndLocale(
+            zoneId = ZoneId.of("America/Toronto"),
+            zoneOffset = ZoneOffset.of("-04:00"),
+            locale = Locale.CANADA
+        )
         val out = marshaller.asFormatString(obj)
         assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingZonesAndLocale.normaliseJson()))
         assertThat(marshaller.asA(out, ZonesAndLocale::class), equalTo(obj))
@@ -149,6 +161,46 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val asString = marshaller.asFormatString(wrapper)
         assertThat(asString.normaliseJson(), equalTo(expectedMap))
         assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    open fun `roundtrip arbitrary map`() {
+        val wrapper = mapOf(
+            "str" to "val1",
+            "num" to 123.1,
+            "array" to listOf(1.1, "stuff"),
+            "map" to mapOf("foo" to "bar"),
+            "bool" to true
+        )
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryMap))
+        assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    open fun `roundtrip arbitrary array`() {
+        val wrapper = listOf(
+            "foo",
+            123.1,
+            mapOf("foo" to "bar"),
+            listOf(1.1, 2.1),
+            true
+        )
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitraryArray.normaliseJson()))
+        assertThat(marshaller.asA(asString), equalTo(wrapper))
+    }
+
+    @Test
+    open fun `roundtrip arbitrary set`() {
+        val wrapper = setOf(
+            "foo",
+            "bar",
+            "foo",
+        )
+        val asString = marshaller.asFormatString(wrapper)
+        assertThat(asString.normaliseJson(), equalTo(expectedArbitrarySet.normaliseJson()))
+        assertThat(marshaller.asA<Set<Any>>(asString), equalTo(wrapper))
     }
 
     @Test
@@ -228,6 +280,26 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
     }
 
+    @Test
+    fun `marshall a lens to a type`() {
+        val o = StringHolder("foo")
+        val request = Request(GET, "").query("foo", marshaller.asFormatString(o))
+        val lens = marshaller.autoLens<Request, StringHolder>(Query.string()).required("foo")
+        val extracted = lens(request)
+        assertThat(Request(GET, "").with(lens of extracted), equalTo(request))
+    }
+
+    @Test
+    open fun `auto marshall any lens`() {
+        assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
+    }
+
+    @Test
+    open fun `fails decoding when a extra key found`() {
+        assertThat({ strictMarshaller().asA(inputUnknownValue, StringHolder::class) }, throws<Exception>())
+    }
+
+    abstract fun strictMarshaller(): AutoMarshalling
     abstract fun customMarshaller(): AutoMarshalling
     abstract fun customMarshallerProhibitStrings(): AutoMarshalling
 }

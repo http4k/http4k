@@ -26,10 +26,9 @@ fun main() {
         .then(server)
 
     // ... or to a client
-    val client =
-        ClientFilters.MicrometerMetrics.RequestCounter(registry)
-            .then(ClientFilters.MicrometerMetrics.RequestTimer(registry))
-            .then(ApacheClient())
+    val client = ClientFilters.MicrometerMetrics.RequestCounter(registry)
+        .then(ClientFilters.MicrometerMetrics.RequestTimer(registry))
+        .then(ApacheClient())
 
     // make some calls
     (0..10).forEach {

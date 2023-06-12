@@ -43,7 +43,7 @@ import org.http4k.routing.matchAndInvoke
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
+class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
     private data class ARandomObject(val field: String)
 

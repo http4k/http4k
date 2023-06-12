@@ -24,7 +24,6 @@ class MultipartFormParserTest {
 
         val maxStreamLength = 100000 // maximum length of the stream, will throw exception if this is exceeded
         val writeToDiskThreshold = 1024 // maximum length of in memory object - if part is bigger then write to disk
-        val temporaryFileDirectory: File? = null // use default temporary file directory
         val contentType = "multipart/form-data; boundary=------WebKitFormBoundary6LmirFeqsyCQRtbj" // content type from HTTP header
 
         // you are responsible for closing the body InputStream
@@ -33,9 +32,10 @@ class MultipartFormParserTest {
 
                 val boundary = contentType.substring(contentType.indexOf("boundary=") + "boundary=".length).toByteArray(ISO_8859_1)
                 val streamingParts = StreamingMultipartFormParts.parse(
-                    boundary, body, ISO_8859_1, maxStreamLength)
+                    boundary, body, ISO_8859_1, maxStreamLength
+                )
 
-                val parts = MultipartFormParser(UTF_8, writeToDiskThreshold, temporaryFileDirectory!!).formParts(streamingParts)
+                val parts = MultipartFormParser(UTF_8, writeToDiskThreshold, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(streamingParts)
                 parts.let {
                     val articleType = it.parts("articleType")[0]
                     println(articleType.fieldName) // "articleType"
@@ -71,7 +71,7 @@ class MultipartFormParserTest {
             .stream()
         val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
 
-        val parts = MultipartFormParser(UTF_8, 1024, TEMPORARY_FILE_DIRECTORY).formParts(form)
+        val parts = MultipartFormParser(UTF_8, 1024, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
 
         assertThat(parts.parts("file")[0].fileName, equalTo("foo.tab"))
         assertThat(parts.parts("anotherFile")[0].fileName, equalTo("BAR.tab"))
@@ -85,7 +85,7 @@ class MultipartFormParserTest {
     fun canLoadComplexRealLifeSafariExample() {
         val form = safariExample()
 
-        val parts = MultipartFormParser(UTF_8, 1024000, TEMPORARY_FILE_DIRECTORY).formParts(form)
+        val parts = MultipartFormParser(UTF_8, 1024000, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
         allFieldsAreLoadedCorrectly(parts, true, true, true, true)
         parts.forEach { it.close() }
     }
@@ -100,7 +100,7 @@ class MultipartFormParserTest {
         )
 
         try {
-            MultipartFormParser(UTF_8, 1024, TEMPORARY_FILE_DIRECTORY).formParts(form)
+            MultipartFormParser(UTF_8, 1024, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
             fail("should have failed because the form is too big")
         } catch (e: Throwable) {
             assertThat(e.localizedMessage, containsSubstring("Form contents was longer than 1024 bytes"))
@@ -111,7 +111,7 @@ class MultipartFormParserTest {
     fun savesAllPartsToDisk() {
         val form = safariExample()
 
-        val parts = MultipartFormParser(UTF_8, 100, TEMPORARY_FILE_DIRECTORY).formParts(form)
+        val parts = MultipartFormParser(UTF_8, 100, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
 
         allFieldsAreLoadedCorrectly(parts, false, false, false, false)
 
@@ -124,7 +124,7 @@ class MultipartFormParserTest {
     fun savesSomePartsToDisk() {
         val form = safariExample()
 
-        val parts = MultipartFormParser(UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY).formParts(form)
+        val parts = MultipartFormParser(UTF_8, 1024 * 4, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
 
         allFieldsAreLoadedCorrectly(parts, false, true, true, false)
 
@@ -138,19 +138,43 @@ class MultipartFormParserTest {
     }
 
     @Test
+    fun shouldKeepSomePartsOnDisk() {
+        try {
+            val form = safariExample()
+
+            val parts = MultipartFormParser(UTF_8, 1024 * 4, DiskLocation.Permanent(TEMPORARY_FILE_DIRECTORY)).formParts(form)
+
+            allFieldsAreLoadedCorrectly(parts, false, true, true, false)
+
+            val files = temporaryFileList()
+            assertPartSaved("simple7bit.txt", files)
+            assertPartSaved("starbucks.jpeg", files)
+            assertThat(files!!.size, equalTo(2))
+
+            parts.close()
+            assertThat(temporaryFileList()!!.size, equalTo(2))
+        } finally {
+            temporaryFileList()!!.forEach { TEMPORARY_FILE_DIRECTORY.resolve(it).delete() }
+        }
+    }
+
+    @Test
     fun throwsExceptionIfMultipartMalformed() {
         val form = StreamingMultipartFormParts.parse(
             "---2345".toByteArray(UTF_8),
-            ByteArrayInputStream(("-----2345" + CR_LF +
-                "Content-Disposition: form-data; name=\"name\"" + CR_LF +
-                "" + CR_LF +
-                "value" + // no CR_LF
+            ByteArrayInputStream(
+                ("-----2345" + CR_LF +
+                    "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                    "" + CR_LF +
+                    "value" + // no CR_LF
 
-                "-----2345--" + CR_LF).toByteArray()),
-            UTF_8)
+                    "-----2345--" + CR_LF).toByteArray()
+            ),
+            UTF_8
+        )
 
         try {
-            MultipartFormParser(UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY).formParts(form)
+            MultipartFormParser(UTF_8, 1024 * 4, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
             fail("Should have thrown an Exception")
         } catch (e: Throwable) {
             assertThat(e.localizedMessage, containsSubstring("Boundary must be proceeded by field separator, but didn't find it"))
@@ -178,7 +202,8 @@ class MultipartFormParserTest {
     private fun assertPartSaved(fileName: String, files: Array<String>?) {
         assertThat(
             "couldn't find " + fileName + " in " + Arrays.toString(files),
-            files!![0].contains(fileName) || files[1].contains(fileName), equalTo(true))
+            files!![0].contains(fileName) || files[1].contains(fileName), equalTo(true)
+        )
     }
 
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inMemory: Boolean) {

@@ -52,7 +52,14 @@ fun main() {
         val app: HttpHandler = TweetEchoLambda(System.getenv())
         val localLambda = app.asServer(SunHttp(8000)).start()
 
-        println(ApacheClient()(Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")))
+        println(
+            ApacheClient()(
+                Request(
+                    POST,
+                    "http://localhost:8000/echo"
+                ).body("hello hello hello, i suppose this isn't 140 characters anymore..")
+            )
+        )
         localLambda.stop()
     }
 
@@ -61,8 +68,15 @@ fun main() {
         println("RUNNING AS GCF:")
 
         val response = FakeGCFResponse()
-        FunctionsExampleEntryClass().service(FakeGCFRequest
-        (Request(POST, "http://localhost:8000/echo").body("hello hello hello, i suppose this isn't 140 characters anymore..")), response)
+        FunctionsExampleEntryClass().service(
+            FakeGCFRequest
+                (
+                Request(
+                    POST,
+                    "http://localhost:8000/echo"
+                ).body("hello hello hello, i suppose this isn't 140 characters anymore..")
+            ), response
+        )
         println(response.status)
         println(response.headers)
         println(response.body)

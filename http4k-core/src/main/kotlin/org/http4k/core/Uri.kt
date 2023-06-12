@@ -2,8 +2,8 @@ package org.http4k.core
 
 import org.http4k.appendIfNotBlank
 import org.http4k.appendIfPresent
-import java.net.URLDecoder
-import java.net.URLEncoder
+import org.http4k.urlDecoded
+import org.http4k.urlEncoded
 
 data class Uri(val scheme: String, val userInfo: String, val host: String, val port: Int?, val path: String, val query: String, val fragment: String) : Comparable<Uri> {
 
@@ -70,6 +70,9 @@ fun Uri.removeQueries(prefix: String) =
 fun Uri.query(name: String, value: String?): Uri =
     copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
 
+fun Uri.queryParametersEncoded(): Uri =
+    copy(query = query.toParameters().toUrlFormEncoded())
+
 /**
  * @see [RFC 3986, appendix A](https://www.ietf.org/rfc/rfc3986.txt)
  */
@@ -88,16 +91,16 @@ fun String.toPathSegmentEncoded(): String =
         when {
             it.isAsciiLetter() || it.isDigit() || it.isValidSpecialPathSegmentChar() -> it
             it.isWhitespace() -> "%20"
-            else -> URLEncoder.encode(it.toString(), "UTF-8")
+            else -> it.toString().urlEncoded()
         }
     }.joinToString(separator = "")
 
 fun String.toPathSegmentDecoded(): String =
-    URLDecoder.decode(this.replace("+", "%2B"), "UTF-8")
+    this.replace("+", "%2B").urlDecoded()
 
 fun Uri.extend(uri: Uri): Uri =
     appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())
 
-private fun Uri.appendToPath(newPath: String): Uri =
-    if (newPath == "") this
-    else copy(path = (path.removeSuffix("/") + "/" + newPath.removePrefix("/")))
+fun Uri.appendToPath(pathToAppend: String?): Uri =
+    if (pathToAppend.isNullOrBlank()) this
+    else copy(path = (path.removeSuffix("/") + "/" + pathToAppend.removePrefix("/")))

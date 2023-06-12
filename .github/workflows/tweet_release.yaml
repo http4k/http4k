@@ -2,13 +2,18 @@ name: New Release - Twitter
 on:
   repository_dispatch:
     types: [http4k-release]
+permissions:
+  contents: read
+
 jobs:
   tweet:
+    permissions:
+      contents: none
     runs-on: ubuntu-latest
     steps:
       - uses: ethomson/send-tweet-action@v1
         with:
-          status: "New version ${{ github.event.client_payload.version }} 🎉. Changelog available at: https://github.com/http4k/http4k/blob/master/CHANGELOG.md#changelog"
+          status: "🎉New http4k version ${{ github.event.client_payload.version }} 🎉. Changelog available at: https://http4k.org/changelog/"
           consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
           consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
           access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}

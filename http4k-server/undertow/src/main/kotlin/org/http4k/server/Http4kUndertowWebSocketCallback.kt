@@ -63,7 +63,16 @@ class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCa
 private fun WebSocketHttpExchange.asRequest() = Request(GET, requestURI)
     .headers(requestHeaders.toList().flatMap { h -> h.second.map { h.first to it } })
 
-fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = {
-    (it.requestHeaders["Connection"]?.any { it.equals("upgrade", true) } ?: false) &&
-        (it.requestHeaders["Upgrade"]?.any { it.equals("websocket", true) } ?: false)
+fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = { httpServerExchange ->
+    val containsValidConnectionHeader = httpServerExchange.requestHeaders["Connection"]
+        ?.any { headerValue ->
+            headerValue.split(",")
+                .map { it.trim().lowercase() }
+                .contains("upgrade")
+        } ?: false
+
+    val containsValidUpgradeHeader = httpServerExchange.requestHeaders["Upgrade"]
+        ?.any { it.equals("websocket", true) } ?: false
+
+    containsValidConnectionHeader && containsValidUpgradeHeader
 }

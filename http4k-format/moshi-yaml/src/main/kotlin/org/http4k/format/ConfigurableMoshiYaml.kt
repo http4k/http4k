@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_YAML
+import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -24,10 +25,11 @@ import kotlin.reflect.KClass
 open class ConfigurableMoshiYaml(
     builder: Moshi.Builder, val defaultContentType: ContentType = APPLICATION_YAML,
     private val yamlDumperOptions: DumperOptions = defaultDumperOptions,
-    private val resolver: Resolver = MinimalResolver
+    private val resolver: Resolver = MinimalResolver,
+    strictness: StrictnessMode = Lenient
 ) :
     AutoMarshalling() {
-    private val json = ConfigurableMoshi(builder, defaultContentType)
+    private val json = ConfigurableMoshi(builder, defaultContentType, strictness)
 
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T =
         json.asA(json.asFormatString(yaml().load<Map<String, Any>>(input)), target)
@@ -38,15 +40,21 @@ open class ConfigurableMoshiYaml(
         val str = json.asFormatString(input)
         val yaml = yaml()
 
-        return try {
-            yaml.dump(json.asA<Map<String, Any>>(str))
-        } catch (e: Exception) {
-            yaml.dump(str)
+        return when(input) {
+            is Iterable<*> -> yaml.dump(json.asA<List<Any>>(str))
+            is Array<*> -> yaml.dump(json.asA<Array<Any>>(str))
+            else -> try {
+                yaml.dump(json.asA<Map<String, Any>>(str))
+            } catch (e: Exception) {
+                yaml.dump(str)
+            }
         }
     }
 
     private fun yaml() = Yaml(
-        Constructor(), Representer(), yamlDumperOptions, LoaderOptions(), resolver)
+        Constructor(LoaderOptions()), Representer(DumperOptions()), yamlDumperOptions, LoaderOptions(), resolver
+    )
+
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map({ }, ::asFormatString)
 
     inline fun <reified T : Any> Body.Companion.auto(
@@ -75,14 +83,16 @@ val defaultDumperOptions = DumperOptions().apply {
  * interprets strings like "on" and "off" as boolean values).
  */
 object MinimalResolver : Resolver() {
-    override fun addImplicitResolver(tag: Tag, regexp: Pattern, first: String?) =
+    override fun addImplicitResolver(tag: Tag, regexp: Pattern, first: String?, limit: Int) =
         when (tag) {
             Tag.BOOL -> super.addImplicitResolver(
                 tag,
                 Pattern.compile("^(?:true|True|TRUE|false|False|FALSE)$"),
-                "tTfF"
+                "tTfF",
+                limit
             )
-            else -> super.addImplicitResolver(tag, regexp, first)
+
+            else -> super.addImplicitResolver(tag, regexp, first, limit)
         }
 }
 

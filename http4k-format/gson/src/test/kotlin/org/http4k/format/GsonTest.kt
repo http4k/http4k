@@ -52,6 +52,13 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     override fun `fails decoding when a required value is null`() {
     }
 
+    @Test
+    @Disabled("GSON does not currently have this support")
+    override fun `fails decoding when a extra key found`() {
+    }
+
+    override fun strictMarshaller() = throw UnsupportedOperationException()
+
     override fun customMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
     override fun customMarshallerProhibitStrings() = object : ConfigurableGson(GsonBuilder().asConfigurable().prohibitStrings()
         .customise()) {}

@@ -1,0 +1,32 @@
+@startuml
+title foobar
+participant "user 1"
+participant "user 2"
+participant "events"
+participant "system.b"
+participant "system-c"
+participant "system/d"
+database "db"
+participant "external"
+"user 1" -> "system.b": init 1 req
+activate "system.b"
+"user 1" -> "events": event a
+"events" -> "user 1": event x
+"system.b" -> "system-c": b-to-c req
+activate "system-c"
+"system.b" <-> "db": bidi-b req-resp
+"system-c" -> "external": c-to-external req
+activate "external"
+
+"external" -[#DarkGreen]> "system-c": <color:DarkGreen> 200 c-to-external
+deactivate "external"
+"system-c" -[#DarkBlue]> "system.b": <color:DarkBlue> 300 b-to-c
+deactivate "system-c"
+"system.b" X-[#DarkOrange]> "user 1": <color:DarkOrange> 400 init 2
+deactivate "system.b"
+"user 2" -> "system/d": init 2 req
+activate "system/d"
+"system/d" -> "events": event d
+"system/d" X-[#FireBrick]> "user 2": <color:FireBrick> 500 init 2
+deactivate "system/d"
+@enduml

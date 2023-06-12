@@ -1,0 +1,16 @@
+{
+  "description" : "and",
+  "children" : [ {
+    "description" : "Headers [host]",
+    "children" : [ ]
+  }, {
+    "description" : "and",
+    "children" : [ {
+      "description" : "method == GET",
+      "children" : [ ]
+    }, {
+      "description" : "template == 'route-contract'",
+      "children" : [ ]
+    } ]
+  } ]
+}

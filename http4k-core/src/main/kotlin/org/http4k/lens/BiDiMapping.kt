@@ -2,14 +2,18 @@ package org.http4k.lens
 
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
+import org.http4k.core.Credentials
 import org.http4k.core.Uri
 import org.http4k.events.EventCategory
 import org.http4k.filter.SamplingDecision
 import org.http4k.filter.TraceId
+import org.http4k.urlDecoded
+import org.http4k.urlEncoded
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.net.URI
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
@@ -68,10 +72,10 @@ object StringBiDiMappings {
     fun nonEmpty() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException("String cannot be empty") else s }, { it })
     fun regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
-
+    fun urlEncoded() = BiDiMapping(String::urlDecoded, String::urlEncoded)
     fun duration() = BiDiMapping(Duration::parse, Duration::toString)
     fun uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
-    fun url() = BiDiMapping(::URL, URL::toExternalForm)
+    fun url() = BiDiMapping({ URI(it).toURL() }, URL::toExternalForm)
     fun uuid() = BiDiMapping(UUID::fromString, UUID::toString)
     fun base64() = BiDiMapping(String::base64Decoded, String::base64Encode)
 
@@ -93,11 +97,31 @@ object StringBiDiMappings {
         { s -> Locale.forLanguageTag(s).takeIf { it.language.isNotEmpty() } ?: throw IllegalArgumentException("Could not parse IETF locale") },
         Locale::toLanguageTag
     )
+    fun basicCredentials() = BiDiMapping(
+        { value -> value.trim()
+            .takeIf { value.startsWith("Basic") }
+            ?.substringAfter("Basic")
+            ?.trim()
+            ?.safeBase64Decoded()
+            ?.split(":", ignoreCase = false, limit = 2)
+            .let { Credentials(it?.getOrNull(0) ?: "", it?.getOrNull(1) ?: "") }
+        },
+        { credentials: Credentials -> "Basic ${"${credentials.user}:${credentials.password}".base64Encode()}" }
+    )
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
     inline fun <reified T : Enum<T>> caseInsensitiveEnum() = BiDiMapping(
         { text -> enumValues<T>().first { it.name.equals(text, ignoreCase = true) } },
         Enum<T>::name
     )
+
+    fun <T> csv(delimiter: String = ",", mapElement: BiDiMapping<String, T>) = BiDiMapping<String, List<T>>(
+        asOut = { if (it.isEmpty()) emptyList() else it.split(delimiter).map(mapElement::invoke) },
+        asIn = { it.joinToString(delimiter, transform = mapElement::invoke) }
+    )
+
+    private fun String.safeBase64Decoded(): String? = try {
+        base64Decoded()
+    } catch (e: IllegalArgumentException) { null }
 }
 
 internal fun Throwable.asString() = StringWriter().use { output -> PrintWriter(output).use { printer -> printStackTrace(printer); output.toString() } }

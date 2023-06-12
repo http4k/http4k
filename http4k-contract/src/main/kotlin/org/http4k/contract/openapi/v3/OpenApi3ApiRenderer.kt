@@ -3,14 +3,12 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
-import org.http4k.contract.openapi.v3.BodyContent.FormContent
-import org.http4k.contract.openapi.v3.BodyContent.NoSchema
-import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
-import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
+import org.http4k.contract.openapi.v3.BodyContent.*
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.format.Json
 import org.http4k.util.JsonSchema
+import java.util.*
 
 /**
  * Converts a API to OpenApi3 format JSON, using non-reflective JSON marshalling - this is the limited version
@@ -18,18 +16,30 @@ import org.http4k.util.JsonSchema
  * If you are using Jackson, you probably want to use ApiRenderer.Auto()!
  */
 class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
-    private val jsonToJsonSchema = JsonToJsonSchema(json, "components/schemas")
+    private val refLocationPrefix = "components/schemas"
+    private val jsonToJsonSchema = JsonToJsonSchema(json, refLocationPrefix)
 
     override fun api(api: Api<NODE>): NODE =
         with(api) {
             json {
                 obj(
-                    "openapi" to string(openapi),
-                    "info" to info.asJson(),
-                    "tags" to array(tags.map { it.asJson() }),
-                    "paths" to paths.asJson(),
-                    "components" to components.asJson(),
-                    "servers" to array(servers.map { it.asJson() })
+                    listOfNotNull(
+                        "openapi" to string(openapi),
+                        "info" to info.asJson(),
+                        "tags" to array(tags.map { it.asJson() }),
+                        "paths" to paths.asJson(),
+                        webhooks?.let {
+                            "webhooks" to obj(
+                                it.map { (path, methodsToPaths) ->
+                                    path to obj(
+                                        methodsToPaths.map { it.key to it.value.toJson() }
+                                    )
+                                }
+                            )
+                        },
+                        "components" to components.asJson(),
+                        "servers" to array(servers.map { it.asJson() })
+                    )
                 )
             }
         }
@@ -75,13 +85,26 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
             listOfNotNull(
                 "summary" to summary.asJson(),
                 "description" to description.asJson(),
-                "tags" to array(tags.map { string(it) }),
+                tags?.takeIf { it.isNotEmpty() }?.let { "tags" to array(it.map(::string)) },
                 "parameters" to parameters.asJson(),
                 if (this@toJson is ApiPath.WithBody<NODE>) this@toJson.requestBody.asJson() else null,
                 "responses" to responses.asJson(),
-                "security" to security,
-                "operationId" to operationId.asJson(),
-                "deprecated" to boolean(deprecated)
+                security?.let { "security" to it },
+                operationId?.let { "operationId" to it.asJson() },
+                deprecated?.let { "deprecated" to boolean(it) },
+                callbacks?.let { cb ->
+                    "callbacks" to obj(
+                        cb.map {
+                            it.key to obj(
+                                it.value.map { (path, methodsToPaths) ->
+                                    path.toString() to obj(
+                                        methodsToPaths.map { it.key to it.value.toJson() }
+                                    )
+                                }
+                            )
+                        }
+                    )
+                }
             )
         )
     }
@@ -208,6 +231,28 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
         try {
             jsonToJsonSchema.toSchema(obj as NODE, overrideDefinitionId, refModelNamePrefix)
         } catch (e: ClassCastException) {
-            jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId, refModelNamePrefix)
+            when (obj) {
+                is Enum<*> -> toEnumSchema(obj, refModelNamePrefix, overrideDefinitionId)
+                else -> jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId, refModelNamePrefix)
+            }
         }
+
+    private fun toEnumSchema(
+        obj: Enum<*>,
+        refModelNamePrefix: String?,
+        overrideDefinitionId: String?
+    ): JsonSchema<NODE> {
+        val newDefinition = json.obj(
+            "example" to json.string(obj.name),
+            "type" to json.string("string"),
+            "enum" to json.array(obj.javaClass.enumConstants.map { json.string(it.name) })
+        )
+        val definitionId =
+            (refModelNamePrefix ?: "") + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
+        return JsonSchema(
+            json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) }, setOf(
+                definitionId to newDefinition
+            )
+        )
+    }
 }

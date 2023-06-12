@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import java.time.Duration
 
 interface Http4kServer : AutoCloseable {
@@ -32,3 +33,5 @@ interface ServerConfig {
 }
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
+
+fun Method.Companion.supportedOrNull(method: String) = runCatching { Method.valueOf(method) }.getOrNull()

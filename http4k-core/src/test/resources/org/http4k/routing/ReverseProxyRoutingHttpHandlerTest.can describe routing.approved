@@ -1,0 +1,22 @@
+{
+  "description" : "or",
+  "children" : [ {
+    "description" : "and",
+    "children" : [ {
+      "description" : "Host or URI: 'host'",
+      "children" : [ ]
+    }, {
+      "description" : "<http-handler>",
+      "children" : [ ]
+    } ]
+  }, {
+    "description" : "and",
+    "children" : [ {
+      "description" : "Host or URI: 'anotherHost'",
+      "children" : [ ]
+    }, {
+      "description" : "<http-handler>",
+      "children" : [ ]
+    } ]
+  } ]
+}

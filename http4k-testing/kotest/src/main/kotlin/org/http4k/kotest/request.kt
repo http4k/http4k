@@ -70,7 +70,7 @@ fun haveMethod(expected: Method): Matcher<Request> = httpMessageHas("Method", { 
 
 infix fun Request.shouldHaveUri(expected: Regex) = this should haveUri(expected)
 infix fun Request.shouldNotHaveUri(expected: Regex) = this shouldNot haveUri(expected)
-fun haveUri(expected: Regex): Matcher<Request> = haveUri(contain(expected).compose(Uri::toString))
+fun haveUri(expected: Regex): Matcher<Request> = haveUri(contain(expected).contramap(Uri::toString))
 
 infix fun Request.shouldHaveUri(expected: Uri) = this should haveUri(expected)
 infix fun Request.shouldNotHaveUri(expected: Uri) = this shouldNot haveUri(expected)
@@ -78,7 +78,7 @@ fun haveUri(expected: Uri): Matcher<Request> = haveUri(be(expected))
 
 infix fun Request.shouldHaveUri(expected: String) = this should haveUri(expected)
 infix fun Request.shouldNotHaveUri(expected: String) = this shouldNot haveUri(expected)
-fun haveUri(expected: String): Matcher<Request> = haveUri(be(expected).compose(Uri::toString))
+fun haveUri(expected: String): Matcher<Request> = haveUri(be(expected).contramap(Uri::toString))
 
 infix fun Request.shouldHaveUri(match: Matcher<Uri>) = this should haveUri(match)
 infix fun Request.shouldNotHaveUri(match: Matcher<Uri>) = this shouldNot haveUri(match)
