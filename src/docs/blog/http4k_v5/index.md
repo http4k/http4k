@@ -5,7 +5,7 @@ description:  There's a new major http4k release! Read about all the new things 
 
 ##### june 2023 / the http4k team
 
-<img class="blogImage" src="./lego.png" alt="http4k lego"/>
+<img class="blogImageSmall" src="./lego.png" alt="http4k lego"/>
 
 We’re thrilled to announce the next major release of http4k! Since the last major release, the team has been busy enhancing existing features and adding new capabilities from the amazing community, things that we've needed on real world projects and a sprinkling of new magic to keep pushing the boundaries of what's possible with the http4k technologies.
 
@@ -29,7 +29,7 @@ We’re excited to see the re-introduction of virtual threads in Java and the pe
 
 For this new major version, we’re introducing three new server backends taking advantage of Java Loom virtual threads: the SDK built-in SunHttp, [Jetty], and [Helidon Nima].
 
-<img class="blogImage" src="./threads.png" alt="Threads"/>
+<img class="blogImageSmall" src="./threads.png" alt="Threads"/>
 
 Servers are only half of the story though - http4k will also add support for Loom-friendy HTTP clients as they get released, and is introducing support for the Loom-native Helidon client in this release. We'll be sure to keep up-to-date with the other major HTTP client libraries as they update to support Loom.
 
@@ -39,7 +39,7 @@ We're incredibly proud to be introducing [TracerBullet], an innovative testing a
 
 As a side-effect of introducing TracerBullet, http4k can [automatically generate sequence and interaction diagrams], taking advantage of existing tools such as [PlantUML], [Mermaid], and [d2] to create living documentation for your services after each test run!
 
-<img class="blogImage" src="./tracerbullet.png" alt="http4k TracerBullet"/>
+<img class="blogImageSmall" src="./tracerbullet.png" alt="http4k TracerBullet"/>
 
 The http4k team were excited to be invited back to [KotlinConf 2023], where we presented how we used the TracerBullet along with Hexagonal Design to visually document multi-service tests. You can check out the video of the presentation [here] or see a full example of how it works in the [demo repo].
 
@@ -73,7 +73,7 @@ A little later, the team received an early access invite to the [ChatGPT plugin 
 
 The SDK provides a simple API for developers to simply compose their plugins by supplying come config and a standard `http4k-contract` endpoints, which generate the required OpenAPI specifications. The SDK does the rest for you, providing the required OpenAI plugin manifest, and then protects the API with one of 4 security models - including the ability to "login with ChatGPT" and OAuth into your plugin.
 
-<img class="blogImage" src="./chatgpt.png" alt="http4k openapi ChatGPT plugin"/>
+<img class="blogImageSmall" src="./chatgpt.png" alt="http4k openapi ChatGPT plugin"/>
 
 Once created, plugins can be installed into the `FakeOpenAI` server, and expose a standard http4k `HttpHandler` which means they can be tested in memory, run locally standalone, or composed into part of a larger http4k application. It's pretty neat and we can't wait to see what the community uses it for!
 
