@@ -106,6 +106,7 @@ nav:
       - Kotest: guide/reference/kotest/index.md
       - Service Virtualisation: guide/reference/servicevirtualisation/index.md
       - Strikt: guide/reference/strikt/index.md
+      - Tracer Bullet: guide/reference/tracerbullet/index.md
       - WebDriver: guide/reference/webdriver/index.md
   - Blog:
     - Overview: blog/index.md
@@ -117,6 +118,7 @@ nav:
     - Nanoservices: blog/nanoservices/index.md
     - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
     - http4k v4 - 17 platforms and counting...: blog/http4k_v4/index.md
+    - http4k v5 - New Servers, More Modules, TracerBullet, and More...: blog/http4k_v5/index.md
     - JCenter Shutdown: blog/regarding_jcenter/index.md
   - Changelog: changelog/index.md
   - http4k in action: in_action/index.md

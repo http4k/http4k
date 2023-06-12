@@ -21,11 +21,11 @@ interface Http4kServer : AutoCloseable {
 interface ServerConfig {
     sealed class StopMode {
         object Immediate : StopMode()
-        data class Graceful(val timeout: Duration): StopMode()
+        data class Graceful(val timeout: Duration) : StopMode()
     }
 
-    class UnsupportedStopMode(stopMode: StopMode)
-        : IllegalArgumentException("Server does not support stop mode $stopMode")
+    class UnsupportedStopMode(stopMode: StopMode) :
+        IllegalArgumentException("Server does not support stop mode $stopMode")
 
     val stopMode: StopMode get() = StopMode.Immediate
 

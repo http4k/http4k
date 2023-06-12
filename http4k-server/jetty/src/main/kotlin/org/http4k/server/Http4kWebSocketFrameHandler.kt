@@ -17,9 +17,10 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 
-class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
-                                  private val upgradeRequest: Request) : FrameHandler {
-
+class Http4kWebSocketFrameHandler(
+    private val wSocket: WsConsumer,
+    private val upgradeRequest: Request
+) : FrameHandler {
     private var websocket: PushPullAdaptingWebSocket? = null
     private val textBuffer = Utf8StringBuilder()
 

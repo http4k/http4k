@@ -30,10 +30,6 @@ data class Cookie(
     fun httpOnly() = copy(httpOnly = true)
     fun expires(date: ZonedDateTime): Cookie = copy(expires = date.toInstant())
     fun expires(date: Instant): Cookie = copy(expires = date)
-
-    @Deprecated("Use Instant version instead for clarity", ReplaceWith("Instant.ofEpochSecond(date.toEpochSecond(UTC))"))
-    fun expires(date: LocalDateTime): Cookie = copy(expires = Instant.ofEpochSecond(date.toEpochSecond(UTC)))
-
     fun sameSite(sameSite: SameSite) = copy(sameSite = sameSite)
 
     override fun toString(): String = fullCookieString()

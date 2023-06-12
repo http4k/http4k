@@ -84,10 +84,11 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
 * [Server:](https://http4k.org/guide/reference/servers)
     * **1LOC** server backend spin-up for:
         * **Apache v4 & v5** (from httpcore)
-        * **Jetty** (including SSE and Websocket support)
+        * **Jetty & Jetty Loom** (including SSE and Websocket support)
+        * **Helidon Nima (Loom)**
         * **Ktor CIO & Netty**
         * **Netty** (including Websocket support)
-        * **SunHttp** (bundled with `http4k-core`)
+        * **SunHttp & SunHttpLoom** (bundled with `http4k-core`)
         * **Undertow** (including SSE and Websocket support)
         * **Java-WebSocket** (Websocket support only)
     * API design allows for simple customization of underying backend.
@@ -109,7 +110,6 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * [Redoc and Swagger UI](https://http4k.org/guide/howto/create_a_swagger_ui) for OpenApi descriptions
 * [Templating:](https://http4k.org/guide/reference/templating) 
     * **Pluggable** templating system support for:
-        * **Dust** 
         * **Freemarker**
         * **Handlebars** 
         * **Pebble**
@@ -178,6 +178,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Record and replay versioned HTTP contracts to/from `Servirtium` Markdown format. Includes Servirtium MiTM server and simple JUnit extensions.
 * [Strikt:](https://http4k.org/guide/reference/strikt) 
     * A set of Strikt matchers for testing [http4k] Request and Response messages.
+* [TracerBullet:](https://http4k.org/guide/reference/tracerbuller)
+    * Visually document your applications using the JUnit plugin.
 * [WebDriver:](https://http4k.org/guide/reference/webdriver)
     * Ultra-lightweight Selenium WebDriver implementation for [http4k] application.
     

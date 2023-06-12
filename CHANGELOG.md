@@ -3,6 +3,19 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.0.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.8.22.
+- **http4k-*** : [Breaking] Remove all previous deprecations from all modules for v4. To upgrade cleanly, first upgrade to `v4.41.4.0` and then re-upgrade to `v5.0.0.0`. This will ensure that you only have to deal with Deprecations between the major versions.
+- **http4k-templates-dust**: [Breaking] Nashorn is finally removed, so we are dropping support for this module. If you are on-pre Java 19 you can continue to use the old module version with no breaking changes.
+- **http4k-***: [Breaking] http4k is now built with Java 20. We are still compiling for older Java versions. New major versions will now be incoming with every major JDK release in order to track new and retired JVM features (6 month cycle).
+- **http4k-server-jetty**: New Server Backend `JettyLoom`, based on Loom VirtualThreads. Requires Java >=19 to use. Standard `Jetty` remains usable with any Java version.
+- **http4k-core**: New Server Backend `SunHttpLoom`, based on Loom VirtualThreads. Requires Java >=19 to use. Standard `SunHttp` remains usable with any Java version.
+- **http4k-server-helidon**: [New Module] Helidon is a Loom-first rewrite of the popular server. Requires Java >= 19 to use.
+- **http4k-server-websocket**: [New Module] A lightweight Websocket server built on  [TooTallNate/Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). H/T @oharaandrew314
+- **http4k-client-helidon**: [New Module] An HTTP client build from the ground up to take advantage of project Loom. Requires Java >= 19 to use.
+- **http4k-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json) , the reflection-free JSON library.
+- **http4k-testing-tracerbullet**: [New Module] TracerBullet allows you to hook into the http4k `Events` implementation to visually document your applications through testing. See example in reference guide.
+
 ### v4.48.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.8.22.
 
@@ -20,7 +33,6 @@ changes with their rationale when appropriate:
 - **http4k-core** : [Unlikely break] Client request tracing now sets and resets the ThreadLocal containing the current Zipkin traces. Possible break
 if you were relying on Zipkin state in a downstream handler. This change will allow better in-memory testing as traces will be reported correctly inside the context of the filter.
 - **http4k-incubator** : [Break] Changes to improve how we create Tracing trees, and this the signature of the Tracer to take EventNode which is a tree node.
-**http4k-server-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json)~~~~
 
 ### v4.45.0.0
 - **http4k-*** : Upgrade some dependency versions.
@@ -60,8 +72,6 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.41.4.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-websocket**: [New Module] A lightweight Websocket server built
-  on  [TooTallNate/Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). H/T @oharaandrew314
 - **http4k-contract-ui-redoc**: [New Module] Serve Redoc with the `redocUiWebjar` function.
 - **http4k-contract**: [New Feature] Serve Redoc with the `redocUiLite` function.
 - **http4k-contract-ui-swagger**: [Fix] #880. `swaggerUiWebjar` now works properly with a non-root path. Plus
@@ -148,7 +158,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.35.0.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-failsafe** : [New Module Alert!] Failsafe is a lightweight, zero-dependency library for handling failures.
+- **http4k-failsafe** : [New Module!] Failsafe is a lightweight, zero-dependency library for handling failures.
   H/T @FredNordin
 - **http4k-incubator** : [Breaking] Rewrite of infrastructure for generating tracing diagrams, including new interfaces
   and support for rendering to various formats. Initial support for PUML and Mermaid.
@@ -170,7 +180,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.34.1.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-template-rocker** : New module! Compile-time templating with Rocker!
+- **http4k-template-rocker** : [New module] Compile-time templating with Rocker!
 
 ### v4.34.0.4
 - **http4k-contract-** : Fix errant import which broke multipart Openapi V3 spec.
@@ -242,7 +252,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.32.1.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-format-moshi*** : Added ability to make Automarshallers strictness.
+- **http4k-format-moshi*** : Added ability to make Automarshallers strict.
 
 ### v4.32.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.7.20.
@@ -316,7 +326,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 - **http4k-contract** : [Unlikely break] Remove direct dependency on kotlin-reflect JAR, as it is brought in
   my `http4k-format-jackson` anyway. This builds ok but we have bumped the version number just to be sure. H/T
   @oharaandrew314 for the inspiration.
-- **http4k-format-auto** : Add `ContentNegotiator` and auto versions to be plugged into `http4k-format-*` modules. H/T
+- **http4k-format-core** : Add `ContentNegotiator` and auto versions to be plugged into `http4k-format-*` modules. H/T
   @oharaandrew314
 - **http4k-core**: Add cors exposed headers property. H/T @oharaandrew314
 
@@ -402,7 +412,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.25.9.0
 - **http4k-*** : Upgrade some dependency versions, including Ktor to v2.0.0
-- **http4k-format-jackson-csv*** : New module! H/T @oharaandrew314 for the contribution.
+- **http4k-format-jackson-csv*** : [New module] H/T @oharaandrew314 for the contribution.
 - **http4k-core**: New standard mappings for Time primitives. H/T @oharaandrew314
 
 ### v4.25.8.0
@@ -411,7 +421,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 - **http4k-multipart**: Add disk cache path to MultipartFormBody.from() parameters. H/T @rny
 
 ### v4.25.7.0
-- **http4k-client-fuel**: New Module! An http4k client based on [Fuel](https://github.com/kittinunf/Fuel) with both sync
+- **http4k-client-fuel**: [New module] An http4k client based on [Fuel](https://github.com/kittinunf/Fuel) with both sync
   and async support.
 
 ### v4.25.6.0
@@ -545,7 +555,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.17.6.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-format-moshi-yaml** : New module! YAML marshalling with zero-reflection is now possible due to a combination
+- **http4k-format-moshi-yaml** : [New module] YAML marshalling with zero-reflection is now possible due to a combination
   of Moshi and SnakeYaml
 - **http4k-core** : Fix to HttpEvent to use correct value in xUriTemplate instead of full path.
 - **http4k-format-jackson-xml** : Add autoBody for ConfigurableJacksonXml. H/T @oharaandrew314
@@ -689,7 +699,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.9.10.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-security-digest*** : New module! H/T @oharaandrew314 for the contribution!
+- **http4k-security-digest*** : [New module] H/T @oharaandrew314 for the contribution!
 
 ### v4.9.9.0
 - **http4k-contract** : Fix #626 - Non JSON bodies do not display examples.
@@ -706,7 +716,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.9.6.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-testing-strikt** : New module! Matchers for Strikt assertion library.
+- **http4k-testing-strikt** : [New module] Matchers for Strikt assertion library.
 - **http4k-core** : no longer exposing `UriTemplate.trimSlashes()` . H/T @PaulienVa
 
 ### v4.9.5.0
@@ -714,7 +724,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 - **http4k-serverless-lambda** : Functions can now be matched on a pattern instead of an exact match.
 
 ### v4.9.4.0
-- **http4k-serverless-lambda-runtime** : New module! Sidestep the AWS Lambda Runtime with the super lightweight http4k
+- **http4k-serverless-lambda-runtime** : [New module] Sidestep the AWS Lambda Runtime with the super lightweight http4k
   version!
 
 ### v4.9.3.1
@@ -843,7 +853,6 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.3.5.4
 - **http4k-*** : Disable publishing of gradle module metadata files to Maven Central.
-  0 (
 
 ### v4.3.5.3
 - **http4k-*** : Define groupId for all modules so release to Maven Central can use the value from root.
@@ -856,7 +865,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.3.5.0
 - **http4k-*** : Upgrade some dependency versions
-- **http4k-core** : Add WebJars support. Activate WebJars with 1LOC!
+- **http4k-core** : [New module] Add WebJars support. Activate WebJars with 1LOC!
 
 ### v4.3.4.1
 - **http4k-bom** : Fix #588 - Maven Central version of BOM is empty
@@ -881,7 +890,7 @@ if you were relying on Zipkin state in a downstream handler. This change will al
 
 ### v4.3.2.0
 - **http4k-*** : Upgrade some dependency versions
-- **http4k-cloudevents** : New module! Support for CloudEvents using Jackson and pluggable event formats.
+- **http4k-cloudevents** : [New module] Support for CloudEvents using Jackson and pluggable event formats.
 
 ### v4.3.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.4.30
@@ -1002,7 +1011,7 @@ data class MyDto(val field: String? = null)
 - **http4k-core** : Fix routing when it doesn't match both method and path.
 
 ### v3.276.0
-- **http4k-graphql** : New module! Adds integration with `GraphQL-Java` and the ability to serve/consume GQL using the
+- **http4k-graphql** : [New module] Adds integration with `GraphQL-Java` and the ability to serve/consume GQL using the
   standard routing patterns.
 
 ### v3.275.0
@@ -1102,7 +1111,7 @@ data class MyDto(val field: String? = null)
 - **http4k-server-ratpack** : Tweak to SO_BACKLOG size (1000).
 
 ### v3.258.0
-- **http4k-testing-kotest** : New module! A set of matchers for use with the `kotest` library. H/T @nlochschmidt for the
+- **http4k-testing-kotest** : [New module] A set of matchers for use with the `kotest` library. H/T @nlochschmidt for the
   PR.
 - **http4k-*** : Upgrade some dependency versions.
 
@@ -1175,7 +1184,7 @@ data class MyDto(val field: String? = null)
 
 ### v3.248.0
 - **http4k-server-ratpack** : New backend module!
-- **http4k-format-jackson-yaml** : New module!
+- **http4k-format-jackson-yaml** : [New module]
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-cloudnative** : - Fix #418 - Fix separator propagation when adding values to an existing MapEnvironment. H/T
   @jshiell
@@ -1473,7 +1482,7 @@ data class MyDto(val field: String? = null)
 - **http4k-contract** : Marking endpoints as deprecated in OpenApi3
 
 ### v3.192.0
-- **http4k-template-jade4j** : New module! H/T @RichyHBM for the contribution! :)
+- **http4k-template-jade4j** : [New module] H/T @RichyHBM for the contribution! :)
 
 ### v3.191.0
 - **http4k-contract** : Better support for overriding of raw map definition id in JSON schema generation

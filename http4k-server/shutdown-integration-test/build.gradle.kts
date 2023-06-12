@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":http4k-server-apache4"))
     implementation(project(":http4k-server-undertow"))
     implementation(project(":http4k-server-ratpack"))
+    implementation(project(":http4k-server-helidon"))
     implementation(project(":http4k-server-jetty"))
     implementation(project(":http4k-server-netty"))
     implementation(project(":http4k-server-ktornetty"))

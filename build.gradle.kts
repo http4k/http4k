@@ -57,6 +57,7 @@ allprojects {
 
         withType<Test> {
             useJUnitPlatform()
+            jvmArgs = listOf("--enable-preview")
         }
 
         named<JacocoReport>("jacocoTestReport") {

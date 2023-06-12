@@ -12,11 +12,12 @@ description: Details about the various http4k integration libraries
 ### HTTP Server Backends
 <a href="/guide/reference/servers"><span class="pill">Apache 4 & 5</span></a>
 <a href="/guide/reference/servers"><span class="pill">Java-WebSocket</span></a>
-<a href="/guide/reference/servers"><span class="pill">Jetty</span></a>
+<a href="/guide/reference/servers"><span class="pill">Jetty & JettyLoom</span></a>
+<a href="/guide/reference/servers"><span class="pill">Helidon (Loom)</span></a>
 <a href="/guide/reference/servers"><span class="pill">Ktor CIO & Netty</span></a>
 <a href="/guide/reference/servers"><span class="pill">Netty</span></a>
 <a href="/guide/reference/servers"><span class="pill">Ratpack</span></a>
-<a href="/guide/reference/servers"><span class="pill">SunHttp</span></a>
+<a href="/guide/reference/servers"><span class="pill">SunHttp & SunHttpLoom</span></a>
 <a href="/guide/reference/servers"><span class="pill">Undertow</span></a>
 
 ### HTTP Serverless Backends
@@ -32,6 +33,7 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/clients"><span class="pill">Apache5 Sync & Async</span></a>
 <a href="/guide/reference/clients"><span class="pill">Java</span></a>
 <a href="/guide/reference/clients"><span class="pill">Fuel</span></a>
+<a href="/guide/reference/clients"><span class="pill">Helidon</span></a>
 <a href="/guide/reference/clients"><span class="pill">Jetty</span></a>
 <a href="/guide/reference/clients"><span class="pill">OkHttp</span></a>
 <a href="/guide/reference/clients"><span class="pill">Websocket</span></a>
@@ -50,7 +52,6 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/json"><span class="pill">Moshi</span></a>
 
 ### Templating libraries
-<a href="/guide/reference/templating"><span class="pill">Dust</span></a>
 <a href="/guide/reference/templating"><span class="pill">Freemarker</span></a>
 <a href="/guide/reference/templating"><span class="pill">Handlebars</span></a>
 <a href="/guide/reference/templating"><span class="pill">Jade4j</span></a>
@@ -77,3 +78,4 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/strikt"><span class="pill">Strikt</span></a>
 <a href="/guide/reference/servicevirtualisation"><span class="pill">Servirtium</span></a>
 <a href="/guide/reference/webdriver"><span class="pill">WebDriver</span></a>
+<a href="/guide/reference/tracerbullet"><span class="pill">Tracer Bullet</span></a>
