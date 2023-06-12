@@ -1,4 +1,5 @@
 site_name: http4k
+site_name: http4k
 site_url: https://www.http4k.org/
 site_description: The Functional toolkit for Kotlin HTTP applications
 site_author: David Denton (@daviddenton), Ivan Sanchez (@s4nchez)
@@ -118,7 +119,7 @@ nav:
     - Nanoservices: blog/nanoservices/index.md
     - "Toolbox: Guns for show, knives for a pro": blog/toolbox/index.md
     - http4k v4 - 17 platforms and counting...: blog/http4k_v4/index.md
-    - http4k v5 - New Servers, More Modules, TracerBullet, and More...: blog/http4k_v5/index.md
+#    - http4k v5 - New Servers, More Modules, TracerBullet, and More...: blog/http4k_v5/index.md
     - JCenter Shutdown: blog/regarding_jcenter/index.md
   - Changelog: changelog/index.md
   - http4k in action: in_action/index.md
