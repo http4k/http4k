@@ -40,7 +40,7 @@ allprojects {
     group = "org.http4k"
 
     jacoco {
-        toolVersion = "0.8.8"
+        toolVersion = "0.8.9"
     }
 
     tasks {
@@ -244,7 +244,7 @@ fun Node.childrenCalled(wanted: String) = children()
 tasks.named<KotlinCompile>("compileTestKotlin") {
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
+        freeCompilerArgs += listOf("-Xjvm-default=all")
     }
 }
 

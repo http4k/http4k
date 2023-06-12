@@ -1,6 +1,5 @@
 package org.http4k.contract.ui
 
-import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.routes
