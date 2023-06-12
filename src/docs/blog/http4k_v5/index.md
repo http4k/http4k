@@ -73,7 +73,7 @@ A little later, the team received an early access invite to the [ChatGPT plugin 
 
 The SDK provides a simple API for developers to simply compose their plugins by supplying come config and a standard `http4k-contract` endpoints, which generate the required OpenAPI specifications. The SDK does the rest for you, providing the required OpenAI plugin manifest, and then protects the API with one of 4 security models - including the ability to "login with ChatGPT" and OAuth into your plugin.
 
-<img class="blogImageSmall" src="./chatgpt.png" alt="http4k openapi ChatGPT plugin"/>
+<img class="blogImage" src="./chatgpt.png" alt="http4k openapi ChatGPT plugin"/>
 
 Once created, plugins can be installed into the `FakeOpenAI` server, and expose a standard http4k `HttpHandler` which means they can be tested in memory, run locally standalone, or composed into part of a larger http4k application. It's pretty neat and we can't wait to see what the community uses it for!
 
