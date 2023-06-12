@@ -52,6 +52,9 @@ As part of the major release cycle, we’re removing all code marked as deprecat
 
 We're also removed the http4k-templates-dust module due to the removal of Nashorn from the Java distribution. We understand this may impact some users, and we recommend seeking alternative solutions in the long term, but you can continue to use the existing `http4k-template-dust` assets which are still binary compatible  with v5 of http4k.
 
+### Upgrading from http4k v4
+If you are upgrading, the best idea is to first upgrade to the last v4 version, deal with any existing deprecations in place, then simply upgrade again to v5.0.0.0 and repeat.
+
 ## http4k-connect v5
 
 [http4k-connect] was conceived as a library of providing client adapters for popular cloud services based on the innovative [Connect pattern]. v3 of the library added 20 different modules, and covered a number of popular AWS services, as well as integrating with Kafka via HTTP.
@@ -82,6 +85,9 @@ There's a full example of how to build a plugin with the http4k-connect-openai-p
 ### Removal of deprecated and unsupported features
 
 As part of the major release cycle, we’re removing all code marked as deprecated in v3 of http4k-connect.
+
+### Upgrading from http4k-connect v3
+If you are upgrading, the best idea is to first upgrade to the last v3 version, deal with any existing deprecations in place, then simply upgrade again to v5.0.0.0 and repeat.
 
 <hr>
 
