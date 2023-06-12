@@ -19,5 +19,5 @@ fun main() {
 
     app.asServer(SunHttp(8080)).start()
 
-    // then browse to: http://localhost:8080/webjars/swagger-ui/4.11.1/index.html
+    // then browse to: http://localhost:8080/webjars/swagger-ui/4.19.0/index.html
 }
