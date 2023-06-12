@@ -20,7 +20,7 @@ Before we dive into the details of the library updates themselves, we're announc
 
 In addition, to keep pace with Java's own rapidly evolving ecosystem, we're going to be switching to aligning major releases of http4k libraries with every JDK release - currently scheduled for every 6 months. This will allow us to track major-version support as features are added and removed from the platform and provide an easy way for our users to track the this compatibility. For the moment, http4k and http4k Connect will still have different release cadence and numbers, but will all unite under the same v5 banner, and are which are now developed using Java 20 as a base.
 
-In terms of Java compatibility - for the foreseeable future, we are still going to compile http4k for older Java versions (we still target Java 8 as a base). Over time though, we plan to adjust our standard of support for ancient versions and introduce a paid support program for those who still need to run http4k against legacy versions of Java and require updates such as security patches. If that’s already the case for your team or project, [be sure to get in touch with the http4k team] to discuss your particular needs.
+In terms of Java compatibility - for the foreseeable future, we are still going to compile http4k for older Java versions (we still target Java 8 as a base). Over time though, we plan to adjust our standard of support for ancient versions and introduce a paid support program for those who still need to run http4k against legacy versions of Java and require updates such as security patches. If that’s already the case for your team or project, be sure to  [get in touch with the http4k team](mailto:contact@http4k.org?subject=Support for legacy JVM version) to discuss your particular needs.
 
 ## http4k v5
 
@@ -44,7 +44,7 @@ As a side-effect of introducing TracerBullet, http4k can [automatically generate
 
 <img class="blogImage" src="./tracerbullet.png" alt="http4k TracerBullet"/>
 
-The http4k team were excited to be invited back to [KotlinConf 2023], where we presented how we used the TracerBullet along with Hexagonal Design to visually document multi-service tests. You can check out the video of the presentation [here] or see a full example of how it works in the [demo repo](https://github.com/http4k/exploring-the-testing-hyperpyramid).
+The http4k team were excited to be invited back to [KotlinConf 2023], where we presented how we used the TracerBullet along with Hexagonal Design to visually document multi-service tests. You can check out the video of the presentation [here] or see a full example of how it works in the [demo repo].
 
 ### Removal of deprecated and unsupported features
 
@@ -95,7 +95,6 @@ Cheers,
 
 [http4k]: https://http4k.org
 [http4k-connect]: https://github.com/http4k/http4k-connect
-[get in touch with the team]: mailto:contact@http4k.org?subject=Support for legacy JVM version
 [serverless-lambda-runtime]: /guide/tutorials/going_native_with_graal_on_aws_lambda
 [digest]: /guide/reference/digest
 [strikt]: /guide/reference/strikt/
@@ -107,9 +106,10 @@ Cheers,
 [KotlinConf 2023]: https://kotlinconf.com/
 [automatically generate sequence and interaction diagrams]: /guide/howto/self_document_systems_with_tests
 [here]: https://bit.ly/hyperpyramid-kotlinconf
-[http4k-connect]: https://github.com/http4k-connect
 [Connect pattern]: https://dentondav.id/posts/2021/02/smash-your-adapter-monolith
 [http4k-connect-openai]: https://github.com/http4k/http4k-connect/tree/master/openai
 [the repo]: https://github.com/http4k/http4k-connect-examples/tree/master/developing-openai-plugins
 [ChatGPT plugin programme]: https://openai.com/blog/chatgpt-plugins
 [http4k-connect-openai-plugin]: https://mvnrepository.com/artifact/org.http4k/http4k-connect-openai-plugin
+[demo repo]: https://github.com/http4k/exploring-the-testing-hyperpyramid
+
