@@ -7,17 +7,19 @@ description:  There's a new major http4k release! Read about all the new things 
 
 <img class="blogImageSmall" src="./lego.png" alt="http4k lego"/>
 
-We’re thrilled to announce the next major release of http4k! Since the last major release, the team has been busy enhancing existing features and adding new capabilities from the amazing community, things that we've needed on real world projects and a sprinkling of new magic to keep pushing the boundaries of what's possible with the http4k technologies.
+We’re thrilled to announce the next major release of http4k! Since the last major release, the team has been busy enhancing existing features and adding new capabilities from the amazing community, things that we've needed on our own real world projects, and a sprinkling of new magic to keep pushing the boundaries of what's possible with the http4k technology - all 127 modules of it.
 
 The first thing to tell you is that we've hit a significant milestone and are now getting about 1 million downloads per month from Maven Central. From these numbers and our interactions with the global http4k community, it makes the us very happy that so many teams are seeing the power of the Server-as-a-Function model.
 
-## Introducing the http4k Platform v5
+## Introducing the http4k Platform v5: 127 modules and counting
 
-Before we dive into the details of the library updates themselves, we're announcing today that for the simplicity (to both the http4k community and the team!), we are unifying all http4k ecosystem projects under a single major platform version number - starting with v5.
+Before we dive into the details of the library updates themselves, we're announcing today that for the simplicity (to both the http4k community and the team!), we are unifying all http4k ecosystem projects under a single major platform version number - starting with v5. 
 
 In addition, to keep pace with Java's own rapidly evolving ecosystem, we're going to be switching to aligning major releases of "the Platform"  with every JDK release - currently scheduled for every 6 months. This will allow us to track major-version support as features are added and removed from Java and provide an easy way for our users to track the this compatibility. For the moment, http4k and http4k Connect will still have different release cadence and individual release numbers and which are now developed using Java 20 as a base.
 
 In terms of Java compatibility - for the foreseeable future, we are still going to compile http4k for older Java versions (we still target Java 8 as a base). Over time though, we plan to adjust our standard of support for ancient versions and introduce a paid support program for those who still need to run http4k against legacy versions of Java and require updates such as security patches. If that’s already the case for your team or project, be sure to [get in touch with the http4k team](mailto:contact@http4k.org?subject=Support for legacy JVM version) to discuss your particular needs.
+
+Now - 127 is a pretty big number of modules, especially for what started out with a modest [43 line spike]. But we're definitely not done yet - http4k is a solid foundation - it's arguably one of the simplest and most test-driven web libraries on the planet. We've also proven in http4k-connect that those parts can be composed into an powerful integration layer. Now the http4k team intend to continue that journey - and v5 is just the start.
 
 ## http4k
 
@@ -90,13 +92,12 @@ If you are upgrading, the best idea is to first upgrade to the last v3 version, 
 
 And that's it (for now!). We hope you're as excited about these updates to the http4k platform as we are! This release brings a wealth of new features and improvements, and we believe it will make your experience using http4k technologies even better.
 
-Here's to an amazing 2023 with http4k!
-
 Cheers,
 
 #### // the http4k team
 
 [http4k]: https://http4k.org
+[43 line spike]: https://bit.ly/BarelyMagical
 [http4k-connect]: https://github.com/http4k/http4k-connect
 [serverless-lambda-runtime]: /guide/tutorials/going_native_with_graal_on_aws_lambda
 [digest]: /guide/reference/digest
