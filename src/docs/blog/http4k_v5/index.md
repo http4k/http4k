@@ -49,7 +49,7 @@ The http4k team were excited to be invited back to [KotlinConf 2023], where we p
 
 As part of the major release cycle, we’re removing all code marked as deprecated in v4 of http4k.
 
-We're also removed the http4k-templates-dust module due to the removal of Nashorn from the Java distribution. We understand this may impact some users, and we recommend seeking alternative solutions in the long term, but you can continue to use the existing `http4k-template-dust` assets which are still binary compatible  with v5 of http4k.
+We're also removed the http4k-templates-dust module due to the removal of Nashorn from the Java distribution. We understand this may impact some users, and we recommend seeking alternative solutions in the long term, but you can continue to use the existing http4k-template-dust assets which are still binary compatible  with v5 of http4k.
 
 ### Upgrading from http4k v4
 If you are upgrading, the best idea is to first upgrade to the last v4 version, deal with any existing deprecations in place, then simply upgrade again to v5.0.0.0 and repeat.
