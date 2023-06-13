@@ -1,7 +1,7 @@
-title: http4k blog: http4k v5: New Servers, Loom, TracerBullet, OpenAI plugin SDK and more
+title: http4k blog: http4k Platform v5: New Servers, Loom, TracerBullet, OpenAI plugin SDK and more
 description:  There's a new major http4k release! Read about all the new things the team have been working on for http4k v5.
 
-# http4k v5: New Servers, Loom, TracerBullet, OpenAI plugin SDK and more
+# http4k Platform v5: New Servers, Loom, TracerBullet, OpenAI plugin SDK and more
 
 ##### june 2023 / the http4k team
 
@@ -11,7 +11,7 @@ We’re thrilled to announce the next major release of http4k! Since the last ma
 
 The first thing to tell you is that we've hit a significant milestone and are now getting about 1 million downloads per month from Maven Central. From these numbers and our interactions with the global http4k community, it makes the us very happy that so many teams are seeing the power of the Server-as-a-Function model.
 
-## Introducing the http4k Platform v5: 127 modules and counting
+## Introducing the http4k Platform: 127 modules and counting
 
 Before we dive into the details of the library updates themselves, we're announcing today that for the simplicity (to both the http4k community and the team!), we are unifying all http4k ecosystem projects under a single major platform version number - starting with v5. 
 
