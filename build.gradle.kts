@@ -14,6 +14,12 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
 }
 
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(20))
+    }
+}
+
 buildscript {
     repositories {
         mavenCentral()
