@@ -98,8 +98,8 @@ private fun createServer(
             }
         }
 
-        wsHandler(upgradeRequest)(wsAdapter)
         conn.setAttachment(wsAdapter)
+        wsHandler(upgradeRequest)(wsAdapter)
     }
 
     override fun onClose(conn: WebSocket, code: Int, reason: String?, remote: Boolean) {
