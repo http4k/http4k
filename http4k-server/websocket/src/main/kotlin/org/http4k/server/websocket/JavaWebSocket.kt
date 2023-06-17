@@ -127,7 +127,7 @@ private fun createServer(
     }
 
     override fun onError(conn: WebSocket?, ex: Exception) {
-        conn?.adapter()?.triggerError(ex) ?: throw ex
+        conn?.adapter()?.triggerError(ex)
     }
 
     override fun onStart() = onServerStart()
