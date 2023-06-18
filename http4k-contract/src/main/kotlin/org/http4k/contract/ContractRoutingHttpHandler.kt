@@ -79,7 +79,7 @@ data class ContractRoutingHttpHandler(
                     renderer.description(
                         contractRoot,
                         security,
-                        routes + extra,
+                        (routes + extra).filter { route -> route.meta.described },
                         tags,
                         webhooks
                     )

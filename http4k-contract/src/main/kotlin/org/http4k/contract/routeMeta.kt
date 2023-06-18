@@ -46,6 +46,7 @@ class RouteMetaDsl internal constructor() {
     var preFlightExtraction: PreFlightExtraction? = null
     internal var deprecated: Boolean = false
     internal val callbacks = mutableMapOf<String, MutableMap<Uri, WebCallback>>()
+    var described: Boolean = true
 
     /**
      * Add possible responses to this Route.
@@ -200,7 +201,8 @@ fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).ru
         security,
         operationId,
         deprecated,
-        callbacks.takeIf { it.isNotEmpty() }
+        callbacks.takeIf { it.isNotEmpty() },
+        described
     )
 }
 
@@ -218,7 +220,8 @@ data class RouteMeta(
     val security: Security? = null,
     val operationId: String? = null,
     val deprecated: Boolean = false,
-    val callbacks: Map<String, Map<Uri, WebCallback>>? = null
+    val callbacks: Map<String, Map<Uri, WebCallback>>? = null,
+    val described: Boolean = true,
 )
 
 data class WebCallback(val method: Method, val meta: RouteMeta)

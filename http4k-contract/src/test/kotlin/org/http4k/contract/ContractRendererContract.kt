@@ -237,6 +237,9 @@ abstract class ContractRendererContract<NODE : Any>(
                 receiving(negotiator to "john")
                 returning(OK, negotiator to "john")
             } bindContract POST to { _ -> Response(OK) }
+            routes += "/not-described" meta {
+                described = false
+            } bindContract GET to { _ -> Response(OK) }
 
             webhook("foobar") {
                 "/doo" meta {
