@@ -98,38 +98,39 @@ private fun createServer(
             }
         }
 
-        wsHandler(upgradeRequest)(wsAdapter)
         conn.setAttachment(wsAdapter)
+        wsHandler(upgradeRequest)(wsAdapter)
     }
 
-    override fun onClose(conn: WebSocket, code: Int, reason: String?, remote: Boolean) = conn.withAdapter { ws ->
-        ws.triggerClose(WsStatus(code, reason ?: ""))
+    override fun onClose(conn: WebSocket, code: Int, reason: String?, remote: Boolean) {
+        conn.adapter()?.triggerClose(WsStatus(code, reason ?: ""))
     }
 
-    override fun onMessage(conn: WebSocket, message: ByteBuffer) = conn.withAdapter { ws ->
-        try {
-            ws.triggerMessage(WsMessage(MemoryBody(message)))
-        } catch (e: Throwable) {
-            ws.triggerError(e)
+    override fun onMessage(conn: WebSocket, message: ByteBuffer) {
+        conn.adapter()?.let { ws ->
+            try {
+                ws.triggerMessage(WsMessage(MemoryBody(message)))
+            } catch (e: Throwable) {
+                ws.triggerError(e)
+            }
         }
     }
 
-    override fun onMessage(conn: WebSocket, message: String) = conn.withAdapter { ws ->
-        try {
-            ws.triggerMessage(WsMessage(message))
-        } catch (e: Throwable) {
-            ws.triggerError(e)
+    override fun onMessage(conn: WebSocket, message: String) {
+        conn.adapter()?.let { ws ->
+            try {
+                ws.triggerMessage(WsMessage(message))
+            } catch(e: Throwable) {
+                ws.triggerError(e)
+            }
         }
     }
 
-    override fun onError(conn: WebSocket?, ex: Exception) = conn.withAdapter { ws ->
-        ws.triggerError(ex)
+    override fun onError(conn: WebSocket?, ex: Exception) {
+        conn?.adapter()?.triggerError(ex)
     }
 
     override fun onStart() = onServerStart()
 }
 
-private fun WebSocket?.withAdapter(fn: (PushPullAdaptingWebSocket) -> Unit) {
-    if (this == null) return
-    fn(getAttachment())
-}
+private fun WebSocket.adapter(): PushPullAdaptingWebSocket? = getAttachment()
