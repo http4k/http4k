@@ -13,11 +13,11 @@ import org.http4k.server.asServer
 fun main() {
     // mix the WebJars routing into your app...
     val app = routes(
-        "/myGreatRoute" bind GET to { req: Request -> Response(OK) },
+        "/myGreatRoute" bind GET to { _: Request -> Response(OK) },
         webJars()
     )
 
     app.asServer(SunHttp(8080)).start()
 
-    // then browse to: http://localhost:8080/webjars/swagger-ui/4.19.0/index.html
+    // then browse to: http://localhost:8080/webjars/swagger-ui/5.0.0/index.html
 }
