@@ -15,6 +15,7 @@ changes with their rationale when appropriate:
 - **http4k-client-helidon**: [New Module] An HTTP client build from the ground up to take advantage of project Loom. Requires Java >= 19 to use.
 - **http4k-format-kondor-json**: [New Module] Support for [KondorJson](https://github.com/uberto/kondor-json) , the reflection-free JSON library.
 - **http4k-testing-tracerbullet**: [New Module] TracerBullet allows you to hook into the http4k `Events` implementation to visually document your applications through testing. See example in reference guide.
+- **http4k-contract**: Allow RouteMetaDsl to be marked as hidden H/T @oharaandrew314
 
 ### v4.48.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.8.22.
