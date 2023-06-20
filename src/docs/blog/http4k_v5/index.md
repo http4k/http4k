@@ -13,7 +13,7 @@ The first thing to tell you is that we've hit a significant milestone and are no
 
 Another thing to celebrate is that http4k now has it's first major corporate partner - the wonderful [SpringerNature Technology], where http4k powers a sizeable percentage of their global content delivery platform. The http4k team thanks all the folks at SN Technology for their ongoing collaboration and support - undoubtedly the project would not be where it is now without them!
 
-<a href="https://springernature.com"><img src="/SN_Technology_simple_black_resized.png" alt="Springer Nature Technology"/></a>
+<a href="https://springernature.com"><img src="/img/SN_Technology_simple_black_resized.png" alt="Springer Nature Technology"/></a>
 
 If your organisation is using the http4k platform and would like to explore potential partnership options - including access to priority support channels, training opportunities, and input into the development plan, then please [reach out](mailto:contact@http4k.org?subject=Partnership opportunities) and we'll be in touch to see how we can work together.
 
