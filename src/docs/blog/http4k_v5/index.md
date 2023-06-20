@@ -11,6 +11,8 @@ We’re thrilled to announce the next major release of http4k! Since the last ma
 
 The first thing to tell you is that we've hit a significant milestone and are now getting about 1 million downloads per month from Maven Central. From these numbers and our interactions with the global http4k community, it makes the us very happy that so many teams are seeing the power of the Server-as-a-Function model.
 
+### Partnership programme
+
 Another thing to celebrate is that http4k now has it's first major corporate partner - the wonderful [SpringerNature Technology], where http4k powers a sizeable percentage of their global content delivery platform. The http4k team thanks all the folks at SN Technology for their ongoing collaboration and support - undoubtedly the project would not be where it is now without them!
 
 <a href="https://springernature.com"><img  class="blogImageSmall" src="/img/SN_Technology_simple_black_resized.png" alt="Springer Nature Technology"/></a>
