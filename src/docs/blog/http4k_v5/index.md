@@ -5,7 +5,7 @@ description:  There's a new major http4k release! Read about all the new things 
 
 ##### june 2023 / the http4k team
 
-<img class="blogImageSmall" src="./lego.png" alt="http4k lego"/>
+<img class="blogImageMid" src="./lego.png" alt="http4k lego"/>
 
 We’re thrilled to announce the next major release of http4k! Since the last major release, the team has been busy enhancing existing features, adding new capabilities with help from our amazing community, things that we've needed on our own real world projects, and a sprinkling of new magic to keep pushing the boundaries of what's possible with the http4k technology - all 127 modules of it.
 
@@ -55,7 +55,7 @@ We're incredibly proud to be introducing [TracerBullet], an innovative testing a
 
 As a side-effect of introducing TracerBullet, http4k can [automatically generate sequence and interaction diagrams], taking advantage of existing tools such as [PlantUML], [Mermaid], and [d2] to create living documentation for your services after each test run!
 
-<img class="blogImageSmall" src="./tracerbullet.png" alt="http4k TracerBullet"/>
+<img class="blogImageMid" src="./tracerbullet.png" alt="http4k TracerBullet"/>
 
 The http4k team were excited to be invited back to [KotlinConf 2023], where we presented how we used the TracerBullet along with Hexagonal Design to visually document multi-service tests. You can check out the video of the presentation [here] or see a full example of how it works in the [demo repo].
 
