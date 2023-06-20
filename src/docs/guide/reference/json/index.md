@@ -5,7 +5,7 @@ description: Feature overview of the JSON http4k-format modules, several of whic
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.0.0.0"))
  
     // Argo:  
     implementation("org.http4k:http4k-format-argo")

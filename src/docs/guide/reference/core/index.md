@@ -5,7 +5,7 @@ description: Feature overview of the http4k-core module, including the Lens syst
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.0.0.0"))
     implementation("org.http4k:http4k-core")
 }
 ```
