@@ -7,15 +7,23 @@ description:  There's a new major http4k release! Read about all the new things 
 
 <img class="blogImageSmall" src="./lego.png" alt="http4k lego"/>
 
-We’re thrilled to announce the next major release of http4k! Since the last major release, the team has been busy enhancing existing features and adding new capabilities from the amazing community, things that we've needed on our own real world projects, and a sprinkling of new magic to keep pushing the boundaries of what's possible with the http4k technology - all 127 modules of it.
+We’re thrilled to announce the next major release of http4k! Since the last major release, the team has been busy enhancing existing features, adding new capabilities with help from our amazing community, things that we've needed on our own real world projects, and a sprinkling of new magic to keep pushing the boundaries of what's possible with the http4k technology - all 127 modules of it.
 
 The first thing to tell you is that we've hit a significant milestone and are now getting about 1 million downloads per month from Maven Central. From these numbers and our interactions with the global http4k community, it makes the us very happy that so many teams are seeing the power of the Server-as-a-Function model.
+
+Another thing to celebrate is that http4k now has it's first major corporate partner - the wonderful [SpringerNature Technology], where http4k powers a sizeable percentage of their global content delivery platform. The http4k team thanks all the folks at SN Technology for their ongoing collaboration and support - undoubtedly the project would not be where it is now without them!
+
+<a href="https://springernature.com"><img src="/SN_Technology_simple_black_resized.png" alt="Springer Nature Technology"/></a>
+
+If your organisation is using the http4k platform and would like to explore potential partnership options - including access to priority support channels, training opportunities, and input into the development plan, then please [reach out](mailto:contact@http4k.org?subject=Partnership opportunities) and we'll be in touch to see how we can work together.
+
+With those things out of the way, let's get on to what you really came for - features!
 
 ## Introducing the http4k Platform: 127 modules and counting
 
 Before we dive into the details of the library updates themselves, we're announcing today that for the simplicity (to both the http4k community and the team!), we are unifying all http4k ecosystem projects under a single major platform version number - starting with v5. 
 
-In addition, to keep pace with Java's own rapidly evolving ecosystem, we're going to be switching to aligning major releases of "the Platform"  with every JDK release - currently scheduled for every 6 months. This will allow us to track major-version support as features are added and removed from Java and provide an easy way for our users to track the this compatibility. For the moment, http4k and http4k Connect will still have different release cadence and individual release numbers and which are now developed using Java 20 as a base.
+In addition, to keep pace with Java's own rapidly evolving ecosystem, we're going to be switching to aligning major releases of "the Platform"  with every JDK release - currently scheduled for every 6 months. This will allow us to track major-version support as features are added and removed from Java and provide an easy way for our users to track the this compatibility. For the moment, http4k and http4k Connect will still have different release cadence and individual release numbers and which are now developed using Java 20 as a base, but in the future there are plans to consolidate the projects under a single platform version.
 
 In terms of Java compatibility - for the foreseeable future, we are still going to compile http4k for older Java versions (we still target Java 8 as a base). Over time though, we plan to adjust our standard of support for ancient versions and introduce a paid support program for those who still need to run http4k against legacy versions of Java and require updates such as security patches. If that’s already the case for your team or project, be sure to [get in touch with the http4k team](mailto:contact@http4k.org?subject=Support for legacy JVM version) to discuss your particular needs.
 
@@ -98,6 +106,7 @@ Cheers,
 
 [http4k]: https://http4k.org
 [43 line spike]: https://bit.ly/BarelyMagical
+[SN (SpringerNature) Technology]: https://springernature.com
 [http4k-connect]: https://github.com/http4k/http4k-connect
 [serverless-lambda-runtime]: /guide/tutorials/going_native_with_graal_on_aws_lambda
 [digest]: /guide/reference/digest
