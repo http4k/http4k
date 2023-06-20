@@ -23,7 +23,7 @@ With those things out of the way, let's get on to what you really came for - fea
 
 ## Introducing the http4k Platform: 127 modules and counting
 
-Before we dive into the details of the library updates themselves, we're announcing today that for the simplicity (to both the http4k community and the team!), we are unifying all http4k ecosystem projects under a single major platform version number - starting with v5. 
+Before we dive into the details of the library updates themselves, we're announcing today that for the simplicity (to both the http4k community and the team!), we are unifying all http4k ecosystem projects (currently http4k and http4k-connect) under a single major platform version number - starting with v5. 
 
 In addition, to keep pace with Java's own rapidly evolving ecosystem, we're going to be switching to aligning major releases of "the Platform"  with every JDK release - currently scheduled for every 6 months. This will allow us to track major-version support as features are added and removed from Java and provide an easy way for our users to track the this compatibility. For the moment, http4k and http4k Connect will still have different release cadence and individual release numbers and which are now developed using Java 20 as a base, but in the future there are plans to consolidate the projects under a single platform version.
 
