@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.0.0.0 (uncut)
+### v5.0.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-*** : [Breaking] Remove all previous deprecations from all modules for v4. To upgrade cleanly, first upgrade to `v4.48.0.0` and then re-upgrade to `v5.0.0.0`. This will ensure that you only have to deal with Deprecations between the major versions.
 - **http4k-templates-dust**: [Breaking] Nashorn is finally removed, so we are dropping support for this module. If you are on-pre Java 19 you can continue to use the old module version with no breaking changes.
