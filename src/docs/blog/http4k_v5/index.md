@@ -106,7 +106,7 @@ Cheers,
 
 [http4k]: https://http4k.org
 [43 line spike]: https://bit.ly/BarelyMagical
-[SN (SpringerNature) Technology]: https://springernature.com
+[SpringerNature Technology]: https://springernature.com
 [http4k-connect]: https://github.com/http4k/http4k-connect
 [serverless-lambda-runtime]: /guide/tutorials/going_native_with_graal_on_aws_lambda
 [digest]: /guide/reference/digest
