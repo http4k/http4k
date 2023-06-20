@@ -11,7 +11,7 @@ We’re thrilled to announce the next major release of http4k! Since the last ma
 
 The first thing to tell you is that we've hit a significant milestone and are now getting about 1 million downloads per month from Maven Central. From these numbers and our interactions with the global http4k community, it makes the us very happy that so many teams are seeing the power of the Server-as-a-Function model.
 
-### Partnership programme
+#### Partnership programme
 
 Another thing to celebrate is that http4k now has it's first major corporate partner - the wonderful [SpringerNature Technology], where http4k powers a sizeable percentage of their global content delivery platform. The http4k team thanks all the folks at SN Technology for their ongoing collaboration and support - undoubtedly the project would not be where it is now without them!
 
@@ -35,7 +35,7 @@ Now - 127 is a pretty big number of modules, especially for what started out wit
 
 In v4, we shipped a massive 197 releases (an average of 1.5 per week!) and introduced 12 new modules in a variety of areas: deployment ([serverless-lambda-runtime]), wire formats (moshi-yaml, jackson-csv, kondor-json), security ([digest]), testing ([strikt]), and around simpler usages of OpenAPI (Redoc/SwaggerUI). http4k 5 introduces 5 new modules and tidies up the decks for future developments.
 
-### Loom support
+#### Loom support
 
 We’re excited to see the re-introduction of virtual threads in Java and the performance improvements that can bring to well-established servers. Loom goes gold in Java 21 and we're going to be ready for our users to use it straight away.
 
@@ -45,7 +45,7 @@ For this new major version, we’re introducing three new server backends taking
 
 Servers are only half of the story though - http4k will also add support for Loom-friendy HTTP clients as they get released, and is introducing support for the Loom-native Helidon client in this release. We'll be sure to keep up-to-date with the other major HTTP client libraries as they update to support Loom.
 
-### TracerBullet: a brand new way of getting test feedback and documenting your systems
+#### TracerBullet: a brand new way of getting test feedback and documenting your systems
 
 We're incredibly proud to be introducing [TracerBullet], an innovative testing add-on that integrates with the http4k events system. TracerBullet enables teams to focus on **how** their services work, not just **if** they work. This powerful tool will change how you approach testing and help you gain deeper insights into your services.
 
@@ -55,13 +55,13 @@ As a side-effect of introducing TracerBullet, http4k can [automatically generate
 
 The http4k team were excited to be invited back to [KotlinConf 2023], where we presented how we used the TracerBullet along with Hexagonal Design to visually document multi-service tests. You can check out the video of the presentation [here] or see a full example of how it works in the [demo repo].
 
-### Removal of deprecated and unsupported features
+#### Removal of deprecated and unsupported features
 
 As part of the major release cycle, we’re removing all code marked as deprecated in v4 of http4k.
 
 We have also removed the http4k-templates-dust module due to the removal of Nashorn from the Java distribution. We understand this may impact some users, and we recommend seeking alternative solutions in the long term, but you can continue to use the existing http4k-template-dust assets which are still binary compatible  with v5 of http4k.
 
-### Upgrading from http4k v4
+#### Upgrading from http4k v4
 If you are upgrading, the best idea is to first upgrade to the last v4 version, deal with any existing deprecations in place, then simply upgrade again to v5.0.0.0 and repeat.
 
 ## http4k-connect
@@ -77,7 +77,7 @@ Today with the v5 release, we're expanding the focus slightly - http4k-connect w
 - A pluggable unified Storage interface with five different storage backends - including in-memory, Redis and S3, as well as a StorageExplorer that provides an OpenAPI UI to allow interaction with the storage via browser.
 - Plugin SDKs for building integrations with popular platforms - starting with...
 
-### OpenAI/ChatGPT support
+#### OpenAI/ChatGPT support
 
 It's 2023, and the new hotness that everyone is talking about is AI - and who are we to go against the weight of the hypemachine? After playing with GPT-4, one of the most frustrating things we found was the slowness of the responses and the effect that had on our testing-cycle, so the http4k team started to build a client adapter and fake OpenAI server so that Kotlin developer teams could integrate and test with OpenAI APIs quickly without waiting ages for the model to respond, and burning through those precious GPT-4 tokens and API limits. And thus [http4k-connect-openai] was born. The Fake server even allows you to generate images.
 
@@ -91,11 +91,11 @@ Once created, plugins can be installed into the `FakeOpenAI` server, and expose 
 
 There's a full example of how to build a plugin with the http4k-connect-openai-plugin SDK and deploy it to AWS Lambda with Pulumi - see [the repo] for details.
 
-### Removal of deprecated and unsupported features
+#### Removal of deprecated and unsupported features
 
 As part of the major release cycle, we’re removing all code marked as deprecated in v3 of http4k-connect.
 
-### Upgrading from http4k-connect v3
+#### Upgrading from http4k-connect v3
 If you are upgrading, the best idea is to first upgrade to the last v3 version, deal with any existing deprecations in place, then simply upgrade again to v5.0.0.0 and repeat.
 
 <hr>
