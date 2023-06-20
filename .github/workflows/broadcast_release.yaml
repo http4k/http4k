@@ -1,7 +1,7 @@
 name: Broadcast Release
 on:
   schedule:
-    - cron: '0 * * * *' # every hour
+    - cron: '0 9 * * *' # 9 am
   push:
     branches:
       - master
