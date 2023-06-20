@@ -31,8 +31,10 @@ In terms of Java compatibility - for the foreseeable future, we are still going 
 
 Now - 127 is a pretty big number of modules, especially for what started out with a modest [43 line spike]. But we're definitely not done yet - http4k is a solid foundation - it's arguably one of the simplest and most test-driven web libraries on the planet. We've also proven in http4k-connect that those parts can be composed into an powerful integration layer. Now the http4k team intend to continue that journey - and v5 is just the start.
 
-## http4k
+<hr/>
 
+## http4k
+ to
 In v4, we shipped a massive 197 releases (an average of 1.5 per week!) and introduced 12 new modules in a variety of areas: deployment ([serverless-lambda-runtime]), wire formats (moshi-yaml, jackson-csv, kondor-json), security ([digest]), testing ([strikt]), and around simpler usages of OpenAPI (Redoc/SwaggerUI). http4k 5 introduces 5 new modules and tidies up the decks for future developments.
 
 #### Loom support
@@ -63,6 +65,8 @@ We have also removed the http4k-templates-dust module due to the removal of Nash
 
 #### Upgrading from http4k v4
 If you are upgrading, the best idea is to first upgrade to the last v4 version, deal with any existing deprecations in place, then simply upgrade again to v5.0.0.0 and repeat.
+
+<hr/>
 
 ## http4k-connect
 
@@ -98,7 +102,7 @@ As part of the major release cycle, we’re removing all code marked as deprecat
 #### Upgrading from http4k-connect v3
 If you are upgrading, the best idea is to first upgrade to the last v3 version, deal with any existing deprecations in place, then simply upgrade again to v5.0.0.0 and repeat.
 
-<hr>
+<hr/>
 
 And that's it (for now!). We hope you're as excited about these updates to the http4k platform as we are! This release brings a wealth of new features and improvements, and we believe it will make your experience using http4k technologies even better.
 
