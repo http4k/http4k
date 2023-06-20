@@ -35,8 +35,8 @@ Now - 127 is a pretty big number of modules, especially for what started out wit
 
 <hr/>
 
-## http4k
- to
+## http4k Updates
+
 In v4, we shipped a massive 197 releases (an average of 1.5 per week!) and introduced 12 new modules in a variety of areas: deployment ([serverless-lambda-runtime]), wire formats (moshi-yaml, jackson-csv, kondor-json), security ([digest]), testing ([strikt]), and around simpler usages of OpenAPI (Redoc/SwaggerUI). http4k 5 introduces 5 new modules and tidies up the decks for future developments.
 
 #### Loom support
@@ -70,7 +70,7 @@ If you are upgrading, the best idea is to first upgrade to the last v4 version, 
 
 <hr/>
 
-## http4k-connect
+## http4k-connect Updates
 
 [http4k-connect] was conceived as a library of providing client adapters for popular cloud services based on the innovative [Connect pattern]. v3 of the library added 20 different modules, and covered a number of popular AWS services, as well as integrating with Kafka via HTTP.
 
