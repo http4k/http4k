@@ -39,6 +39,8 @@ Now - 127 is a pretty big number of modules, especially for what started out wit
 
 In v4, we shipped a massive 197 releases (an average of 1.5 per week!) and introduced 12 new modules in a variety of areas: deployment ([serverless-lambda-runtime]), wire formats (moshi-yaml, jackson-csv, kondor-json), security ([digest]), testing ([strikt]), and around simpler usages of OpenAPI (Redoc/SwaggerUI). http4k 5 introduces 5 new modules and tidies up the decks for future developments.
 
+http4k v5 is available right now from the [Toolbox], where you can configure an download a fully compilable project with any combination of the 70 available http4k modules.
+
 #### Loom support
 
 We’re excited to see the re-introduction of virtual threads in Java and the performance improvements that can bring to well-established servers. Loom goes gold in Java 21 and we're going to be ready for our users to use it straight away.
@@ -60,7 +62,6 @@ As a side-effect of introducing TracerBullet, http4k can [automatically generate
 The http4k team were excited to be invited back to [KotlinConf 2023], where we presented how we used the TracerBullet along with Hexagonal Design to visually document multi-service tests. You can check out the video of the presentation [here] or see a full example of how it works in the [demo repo].
 
 #### Removal of deprecated and unsupported features
-
 As part of the major release cycle, we’re removing all code marked as deprecated in v4 of http4k.
 
 We have also removed the http4k-templates-dust module due to the removal of Nashorn from the Java distribution. We understand this may impact some users, and we recommend seeking alternative solutions in the long term, but you can continue to use the existing http4k-template-dust assets which are still binary compatible  with v5 of http4k.
@@ -108,11 +109,12 @@ If you are upgrading, the best idea is to first upgrade to the last v3 version, 
 
 And that's it (for now!). We hope you're as excited about these updates to the http4k platform as we are! This release brings a wealth of new features and improvements, and we believe it will make your experience using http4k technologies even better.
 
-Cheers,
+Cheers
 
 #### // the http4k team
 
 [http4k]: https://http4k.org
+[Toolbox]: https://toolbox.http4k.org
 [43 line spike]: https://bit.ly/BarelyMagical
 [SpringerNature Technology]: https://springernature.com
 [http4k-connect]: https://github.com/http4k/http4k-connect
