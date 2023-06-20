@@ -21,6 +21,8 @@ If your organisation is using the http4k platform and would like to explore pote
 
 With those things out of the way, let's get on to what you really came for - features!
 
+<hr/>
+
 ## Introducing the http4k Platform: 127 modules and counting
 
 Before we dive into the details of the library updates themselves, we're announcing today that for the simplicity (to both the http4k community and the team!), we are unifying all http4k ecosystem projects (currently http4k and http4k-connect) under a single major platform version number - starting with v5. 
