@@ -35,6 +35,7 @@ import org.http4k.format.AwsLambdaMoshi.asFormatString
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
+import org.http4k.testing.assertApproved
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.format.ISODateTimeFormat
@@ -204,6 +205,41 @@ class AwsLambdaMoshiTest {
                 }
             )
         })
+    }
+
+    @Test
+    fun `SNS event - read null subject`() {
+        val actual = javaClass.getResourceAsStream("AwsLambdaMoshiTest.SNS event - read null subject.approved")!!
+            .reader().readText()
+            .let { asA<SNSEvent>(it) }
+
+        val expected = SNSEvent().apply {
+            records = listOf(
+                SNSEvent.SNSRecord().apply {
+                    eventSource = "eventSource"
+                    eventSubscriptionArn = "eventSubscriptionArn"
+                    eventVersion = "eventVersion"
+                    setSns(SNSEvent.SNS().apply {
+                        signingCertUrl = "signingCertUrl"
+                        messageId = "messageId"
+                        message = "message"
+                        subject = null
+                        unsubscribeUrl = "unsubscribeUrl"
+                        type = "type"
+                        signatureVersion = "type"
+                        signature = "signature"
+                        topicArn = "topicArn"
+                        timestamp = DateTime(0, UTC)
+                        messageAttributes = mapOf("msgAttrName" to SNSEvent.MessageAttribute().apply {
+                            type = "type"
+                            value = "value"
+                        })
+                    })
+                }
+            )
+        }
+
+        assertThat(expected, equalTo(actual))
     }
 
     @Test
