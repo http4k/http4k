@@ -38,7 +38,7 @@ class WebSocketServerHandler(private val wsHandler: WsHandler) : ChannelInboundH
                                 ctx.pipeline().addAfter(
                                     ctx.name(),
                                     Http4kWsChannelHandler::class.java.name,
-                                    Http4kWsChannelHandler(wsConsumer, upgradeRequest)
+                                    Http4kWsChannelHandler(wsConsumer)
                                 )
                             }
                         }

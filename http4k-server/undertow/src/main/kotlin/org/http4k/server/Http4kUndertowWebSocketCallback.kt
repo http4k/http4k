@@ -25,7 +25,7 @@ class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCa
     override fun onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel) {
         val upgradeRequest = exchange.asRequest()
 
-        val socket = object : PushPullAdaptingWebSocket(upgradeRequest) {
+        val socket = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) =
                 if (message.body is StreamBody) sendBinary(message.body.payload, channel, null)
                 else sendText(message.bodyString(), channel, null)

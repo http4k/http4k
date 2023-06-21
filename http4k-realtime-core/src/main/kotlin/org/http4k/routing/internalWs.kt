@@ -4,16 +4,16 @@ import org.http4k.core.Request
 import org.http4k.core.UriTemplate
 import org.http4k.routing.WsRouterMatch.MatchingHandler
 import org.http4k.routing.WsRouterMatch.Unmatched
-import org.http4k.websocket.Websocket
-import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsFilter
+import org.http4k.websocket.WsHandler
+import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus.Companion.REFUSE
 import org.http4k.websocket.then
 
 sealed class WsRouterMatch(private val priority: Int) :
     Comparable<WsRouterMatch> {
 
-    data class MatchingHandler(val wsConsumer: WsConsumer) : WsRouterMatch(0)
+    data class MatchingHandler(private val handler: WsHandler) : WsRouterMatch(0), WsHandler by handler
 
     object Unmatched : WsRouterMatch(1)
 
@@ -23,9 +23,9 @@ sealed class WsRouterMatch(private val priority: Int) :
 internal class RouterWsHandler(private val list: List<WsRouter>) : RoutingWsHandler {
     override fun match(request: Request) = list.minOfOrNull { it.match(request) } ?: Unmatched
 
-    override operator fun invoke(request: Request): WsConsumer = when (val match = match(request)) {
-        is MatchingHandler -> match.wsConsumer
-        is Unmatched -> { it: Websocket -> it.close(REFUSE) }
+    override operator fun invoke(request: Request): WsResponse = when (val match = match(request)) {
+        is MatchingHandler -> match(request)
+        is Unmatched -> WsResponse { it.close() }
     }
 
     override fun withBasePath(new: String): RoutingWsHandler =
@@ -36,24 +36,28 @@ internal class RouterWsHandler(private val list: List<WsRouter>) : RoutingWsHand
 
 internal class TemplateRoutingWsHandler(
     private val template: UriTemplate,
-    private val consumer: WsConsumer
+    private val handler: WsHandler
 ) : RoutingWsHandler {
     override fun match(request: Request): WsRouterMatch = when {
-        template.matches(request.uri.path) -> MatchingHandler { ws ->
-            consumer(object : Websocket by ws {
-                override val upgradeRequest: Request = RoutedRequest(ws.upgradeRequest, template)
-            })
+        template.matches(request.uri.path) -> MatchingHandler { req ->
+            handler(
+                RoutedRequest(
+                    req,
+                    template
+                )
+            )
         }
+
         else -> Unmatched
     }
 
-    override operator fun invoke(request: Request): WsConsumer = when (val match = match(request)) {
-        is MatchingHandler -> match.wsConsumer
-        is Unmatched -> { it -> it.close(REFUSE) }
+    override operator fun invoke(request: Request): WsResponse = when (val matched = match(request)) {
+        is MatchingHandler -> matched(RoutedRequest(request, template))
+        is Unmatched -> WsResponse { it.close(REFUSE) }
     }
 
     override fun withBasePath(new: String): TemplateRoutingWsHandler =
-        TemplateRoutingWsHandler(UriTemplate.from("$new/$template"), consumer)
+        TemplateRoutingWsHandler(UriTemplate.from("$new/$template"), handler)
 
-    override fun withFilter(new: WsFilter) = TemplateRoutingWsHandler(template, new.then(consumer))
+    override fun withFilter(new: WsFilter) = TemplateRoutingWsHandler(template, new.then(handler))
 }

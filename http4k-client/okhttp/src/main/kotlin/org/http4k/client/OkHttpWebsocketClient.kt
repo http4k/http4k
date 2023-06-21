@@ -81,14 +81,15 @@ private class OkHttpNonBlockingWebsocket(
     client: OkHttpClient,
     onError: (Throwable) -> Unit,
     private val onConnect: WsConsumer
-) : PushPullAdaptingWebSocket(Request(Method.GET, uri).headers(headers)) {
+) : PushPullAdaptingWebSocket() {
 
+    val req = Request(Method.GET, uri).headers(headers)
     init {
         onError(onError)
     }
 
     private val ws = client.newBuilder().connectTimeout(timeout).build()
-        .newWebSocket(upgradeRequest.asOkHttp(), Listener())
+        .newWebSocket(req.asOkHttp(), Listener())
 
     override fun send(message: WsMessage) {
         val messageSent = when (message.body) {
@@ -96,7 +97,7 @@ private class OkHttpNonBlockingWebsocket(
             else -> ws.send(message.body.toString())
         }
         check(messageSent) {
-            "Connection to ${upgradeRequest.uri} is closed."
+            "Connection to ${req.uri} is closed."
         }
     }
 

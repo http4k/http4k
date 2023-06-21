@@ -1,14 +1,16 @@
 package guide.howto.serve_websockets
 
 import org.http4k.client.WebsocketClient
+import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.format.Jackson.auto
-import org.http4k.routing.bind
+import org.http4k.routing.ws.bind
 import org.http4k.routing.websockets
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsResponse
 
 data class Person(val name: String, val age: Int)
 
@@ -18,11 +20,13 @@ fun main() {
     val personLens = WsMessage.auto<Person>().toLens()
 
     val server = websockets(
-        "/ageMe" bind { ws: Websocket ->
-            ws.onMessage {
-                val person = personLens(it)
-                ws.send(personLens.create(person.copy(age = person.age + 10)))
-                ws.close()
+        "/ageMe" bind { req: Request ->
+            WsResponse { ws: Websocket ->
+                ws.onMessage {
+                    val person = personLens(it)
+                    ws.send(personLens.create(person.copy(age = person.age + 10)))
+                    ws.close()
+                }
             }
         }
     ).asServer(Jetty(8000)).start()

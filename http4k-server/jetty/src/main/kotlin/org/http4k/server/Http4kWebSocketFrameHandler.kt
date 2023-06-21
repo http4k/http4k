@@ -44,7 +44,7 @@ class Http4kWebSocketFrameHandler(
     }
 
     override fun onOpen(session: CoreSession, callback: Callback) {
-        websocket = object : PushPullAdaptingWebSocket(upgradeRequest) {
+        websocket = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
                 session.sendFrame(Frame(
                     if (message.body is StreamBody) BINARY else TEXT,

@@ -85,7 +85,7 @@ private fun createServer(
             .let { if (handshake.content != null) it.body(MemoryBody(handshake.content)) else it }
             .source(RequestSource(conn.remoteSocketAddress.hostString, conn.remoteSocketAddress.port))
 
-        val wsAdapter = object : PushPullAdaptingWebSocket(upgradeRequest) {
+        val wsAdapter = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
                 when (message.body) {
                     is StreamBody -> conn.send(message.body.payload)
