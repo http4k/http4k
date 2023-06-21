@@ -22,7 +22,7 @@ class Http4kSseCallback(private val sse: SseHandler) : ServerSentEventConnection
     override fun connected(connection: ServerSentEventConnection, lastEventId: String?) {
         val connectRequest = connection.asRequest()
 
-        val socket = object : PushAdaptingSse(connectRequest) {
+        val socket = object : PushAdaptingSse() {
             override fun send(message: SseMessage) =
                 when (message) {
                     is Retry -> connection.sendRetry(message.backoff.toMillis())
@@ -32,12 +32,12 @@ class Http4kSseCallback(private val sse: SseHandler) : ServerSentEventConnection
 
             override fun close() = connection.close()
         }
-
         val (headers, consumer) = sse(connectRequest)
 
-        headers.forEach { connection.responseHeaders.add(HttpString(it.first), it.second ?: "") }
+        headers.forEach { connection.responseHeaders.put(HttpString(it.first), it.second ?: "") }
 
         consumer(socket)
+
         connection.addCloseTask { socket.triggerClose() }
     }
 

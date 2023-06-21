@@ -28,9 +28,22 @@ class SseClientTest {
     fun `when match, passes a consumer with the matching request`() {
         val consumer = TestConsumer();
 
-        { _: Request -> SseResponse(consumer) }.testSseClient(Request(GET, "/"))
+        { req: Request ->
+            assertThat(req, equalTo(Request(GET, "/")))
+            SseResponse(consumer)
+        }.testSseClient(Request(GET, "/"))
+    }
 
-        assertThat(consumer.sse.connectRequest, equalTo(Request(GET, "/")))
+    @Test
+    fun `when match passes HTTP headers back`() {
+        val consumer = TestConsumer();
+
+        val client = { req: Request ->
+            assertThat(req, equalTo(Request(GET, "/")))
+            SseResponse(listOf("foo" to "bar"), consumer)
+        }.testSseClient(Request(GET, "/"))
+
+        assertThat(client.headers, equalTo(listOf("foo" to "bar")))
     }
 
     @Test
@@ -59,7 +72,7 @@ class SseClientTest {
     }
 
     @Test
-    fun `no match is just cosed`() {
+    fun `no match is just closed`() {
         val actual = object : SseHandler {
             override fun invoke(request: Request) = SseResponse { it.close() }
         }.testSseClient(Request(GET, "/"))

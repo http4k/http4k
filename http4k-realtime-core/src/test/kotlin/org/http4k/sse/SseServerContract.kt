@@ -4,6 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.or
 import org.http4k.base64Encode
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -12,6 +14,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.filter.debug
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.path
@@ -27,6 +30,7 @@ import org.http4k.sse.SseMessage.Event
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.concurrent.thread
 import org.http4k.routing.bind as hbind
 
 abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
@@ -36,22 +40,25 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
         "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) }
     )
 
-    private val sse = sse(
-        "/hello" bind sse(
-            "/{name}" bind { _: Request ->
-                SseResponse { sse ->
-                    val name = sse.connectRequest.path("name")!!
-                    sse.send(Event("event1", "hello $name", "123"))
-                    sse.send(Event("event2", "again $name\nHi!", "456"))
-                    sse.send(Data("goodbye $name".byteInputStream()))
+    private val sse = sse("/hello" bind sse(
+        "/{name}" bind { req: Request ->
+            SseResponse(listOf("foo" to "bar")) { sse ->
+                val name = req.path("name")!!
+                sse.send(Event("event1", "hello $name", "123"))
+                sse.send(Event("event2", "again $name\nHi!", "456"))
+                sse.send(Data("goodbye $name".byteInputStream()))
+                thread {
+                    Thread.sleep(100)
+                    sse.close()
                 }
             }
-        )
+        }
+    )
     )
 
     @BeforeEach
     fun before() {
-        server = PolyHandler(http, sse = sse).asServer(serverConfig(0)).start()
+        server = PolyHandler(sse = sse).asServer(serverConfig(0)).start()
     }
 
     @AfterEach
@@ -77,6 +84,16 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
                     Data("goodbye bob".base64Encode())
                 )
             )
+        )
+    }
+
+    @Test
+    fun `can get headers`() {
+        assertThat(
+            JavaHttpClient().debug()(
+                Request(GET, "http://localhost:${server.port()}/hello/leia")
+                    .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+            ).header("foo"), equalTo("bar")
         )
     }
 

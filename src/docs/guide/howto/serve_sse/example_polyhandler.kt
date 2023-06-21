@@ -27,9 +27,9 @@ fun main() {
 
     val sse = sayHello.then(
         sse(
-            "/{name}" bind { _ ->
+            "/{name}" bind { req ->
                 SseResponse { sse: Sse ->
-                    val name = namePath(sse.connectRequest)
+                    val name = namePath(req)
                     thread {
                         repeat(10) {
                             sse.send(SseMessage.Data("hello $it"))

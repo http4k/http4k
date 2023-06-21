@@ -4,7 +4,6 @@ import org.http4k.core.Request
 import org.http4k.core.UriTemplate
 import org.http4k.routing.SseRouterMatch.MatchingHandler
 import org.http4k.routing.SseRouterMatch.Unmatched
-import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseResponse
@@ -38,15 +37,13 @@ internal class TemplateRoutingSseHandler(
     private val handler: SseHandler
 ) : RoutingSseHandler {
     override fun match(request: Request): SseRouterMatch = when {
-        template.matches(request.uri.path) -> MatchingHandler { req ->
-            handler(RoutedRequest(req, template))
-        }
+        template.matches(request.uri.path) -> MatchingHandler { req -> handler(RoutedRequest(req, template)) }
 
         else -> Unmatched
     }
 
-    override operator fun invoke(request: Request): SseResponse = when (val match = match(request)) {
-        is MatchingHandler -> match(request)
+    override operator fun invoke(request: Request): SseResponse = when (val matched = match(request)) {
+        is MatchingHandler -> matched(RoutedRequest(request, template))
         is Unmatched -> SseResponse { it.close() }
     }
 

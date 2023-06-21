@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class PushAdaptingSseTest {
 
-    class TestAdapter : PushAdaptingSse(Request(Method.GET, "/bob")) {
+    class TestAdapter : PushAdaptingSse() {
         val received = mutableListOf<SseMessage>()
         var closed = AtomicBoolean(false)
 
