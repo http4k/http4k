@@ -38,8 +38,8 @@ internal class TemplateRoutingSseHandler(
     private val handler: SseHandler
 ) : RoutingSseHandler {
     override fun match(request: Request): SseRouterMatch = when {
-        template.matches(request.uri.path) -> MatchingHandler { sse ->
-            handler(RoutedRequest(request, template))
+        template.matches(request.uri.path) -> MatchingHandler { req ->
+            handler(RoutedRequest(req, template))
         }
 
         else -> Unmatched

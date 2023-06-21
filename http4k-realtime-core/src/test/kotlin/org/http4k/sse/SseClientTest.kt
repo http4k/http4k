@@ -71,7 +71,6 @@ class SseClientTest {
     fun `when no messages`() {
         val client = { _: Request ->
             SseResponse { sse: Sse ->
-                sse.send(SseMessage.Data("asd"))
                 sse.close()
             }
         }.testSseClient(Request(GET, "/"))
