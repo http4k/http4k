@@ -4,6 +4,7 @@ import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.sse.ServerSentEventConnection
 import io.undertow.server.handlers.sse.ServerSentEventConnection.EventCallback
 import io.undertow.server.handlers.sse.ServerSentEventConnectionCallback
+import io.undertow.util.HttpString
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -30,11 +31,14 @@ class Http4kSseCallback(private val sse: SseHandler) : ServerSentEventConnection
                 }
 
             override fun close() = connection.close()
-        }.apply(sse(connectRequest))
-
-        connection.addCloseTask {
-            socket.triggerClose()
         }
+
+        val (headers, consumer) = sse(connectRequest)
+
+        headers.forEach { connection.responseHeaders.add(HttpString(it.first), it.second ?: "") }
+
+        consumer(socket)
+        connection.addCloseTask { socket.triggerClose() }
     }
 
     private fun ServerSentEventConnection.asRequest(): Request =

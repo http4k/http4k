@@ -5,13 +5,14 @@ import org.http4k.core.UriTemplate
 import org.http4k.routing.SseRouterMatch.MatchingHandler
 import org.http4k.routing.SseRouterMatch.Unmatched
 import org.http4k.sse.Sse
-import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseFilter
+import org.http4k.sse.SseHandler
+import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 
 sealed class SseRouterMatch(private val priority: Int) : Comparable<SseRouterMatch> {
 
-    data class MatchingHandler(private val wsHandler: SseConsumer) : SseRouterMatch(0), SseConsumer by wsHandler
+    data class MatchingHandler(private val handler: SseHandler) : SseRouterMatch(0), SseHandler by handler
 
     object Unmatched : SseRouterMatch(1)
 
@@ -21,9 +22,9 @@ sealed class SseRouterMatch(private val priority: Int) : Comparable<SseRouterMat
 internal class RouterSseHandler(private val list: List<SseRouter>) : RoutingSseHandler {
     override fun match(request: Request) = list.minOfOrNull { it.match(request) } ?: Unmatched
 
-    override operator fun invoke(request: Request): SseConsumer = when (val match = match(request)) {
-        is MatchingHandler -> match
-        is Unmatched -> Sse::close
+    override operator fun invoke(request: Request): SseResponse = when (val match = match(request)) {
+        is MatchingHandler -> match(request)
+        is Unmatched -> SseResponse { it.close() }
     }
 
     override fun withBasePath(new: String): RoutingSseHandler =
@@ -34,23 +35,22 @@ internal class RouterSseHandler(private val list: List<SseRouter>) : RoutingSseH
 
 internal class TemplateRoutingSseHandler(
     private val template: UriTemplate,
-    private val consumer: SseConsumer
+    private val handler: SseHandler
 ) : RoutingSseHandler {
     override fun match(request: Request): SseRouterMatch = when {
         template.matches(request.uri.path) -> MatchingHandler { sse ->
-            consumer(object : Sse by sse {
-                override val connectRequest: Request = RoutedRequest(sse.connectRequest, template)
-            })
+            handler(RoutedRequest(request, template))
         }
+
         else -> Unmatched
     }
 
-    override operator fun invoke(request: Request): SseConsumer = when (val match = match(request)) {
-        is MatchingHandler -> match
-        is Unmatched -> Sse::close
+    override operator fun invoke(request: Request): SseResponse = when (val match = match(request)) {
+        is MatchingHandler -> match(request)
+        is Unmatched -> SseResponse { it.close() }
     }
 
-    override fun withBasePath(new: String) = TemplateRoutingSseHandler(UriTemplate.from("$new/$template"), consumer)
+    override fun withBasePath(new: String) = TemplateRoutingSseHandler(UriTemplate.from("$new/$template"), handler)
 
-    override fun withFilter(new: SseFilter) = TemplateRoutingSseHandler(template, new.then(consumer))
+    override fun withFilter(new: SseFilter) = TemplateRoutingSseHandler(template, new.then(handler))
 }

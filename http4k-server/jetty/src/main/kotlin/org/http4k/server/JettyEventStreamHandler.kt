@@ -7,6 +7,7 @@ import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.thread.AutoLock
 import org.eclipse.jetty.util.thread.Scheduler
 import org.http4k.core.ContentType
+import org.http4k.core.Headers
 import org.http4k.core.Request
 import org.http4k.servlet.jakarta.asHttp4kRequest
 import org.http4k.sse.PushAdaptingSse
@@ -29,7 +30,6 @@ class JettyEventStreamHandler(
         if (!baseRequest.isHandled && request.isEventStream()) {
             val connectRequest = request.asHttp4kRequest()
             if (connectRequest != null) {
-                response.writeEventStreamResponse()
 
                 val async = request.startAsyncWithNoTimeout()
                 val output = async.response.outputStream
@@ -40,7 +40,9 @@ class JettyEventStreamHandler(
                     server.removeEventListener(it)
                 }).also(server::addEventListener)
 
-                sse(connectRequest)(emitter)
+                val (headers, consumer) = sse(connectRequest)
+                consumer(emitter)
+                response.writeEventStreamResponse(headers)
 
                 baseRequest.isHandled = true
             }
@@ -53,7 +55,7 @@ class JettyEventStreamHandler(
         private fun HttpServletRequest.isEventStream() =
             method == "GET" && getHeaders("Accept").toList().any { it.equals(ContentType.TEXT_EVENT_STREAM.value, true) }
 
-        private fun HttpServletResponse.writeEventStreamResponse() {
+        private fun HttpServletResponse.writeEventStreamResponse(headers: Headers) {
             status = HttpServletResponse.SC_OK
             characterEncoding = StandardCharsets.UTF_8.name()
             contentType = ContentType.TEXT_EVENT_STREAM.value
@@ -61,6 +63,7 @@ class JettyEventStreamHandler(
             // we disable HTTP chunking, and we can use write()+flush()
             // to send data in the text/event-stream protocol
             addHeader("Connection", "close")
+            headers.forEach { addHeader(it.first, it.second) }
             flushBuffer()
         }
 

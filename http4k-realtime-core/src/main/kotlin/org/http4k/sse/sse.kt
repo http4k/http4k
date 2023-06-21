@@ -1,6 +1,7 @@
 package org.http4k.sse
 
 import org.http4k.base64Encode
+import org.http4k.core.Headers
 import org.http4k.core.Request
 import org.http4k.routing.RoutingSseHandler
 import java.io.InputStream
@@ -15,7 +16,11 @@ interface Sse {
 
 typealias SseConsumer = (Sse) -> Unit
 
-typealias SseHandler = (Request) -> SseConsumer
+data class SseResponse(val headers: Headers = emptyList(), val consumer: SseConsumer) {
+    constructor(consumer: SseConsumer) : this(emptyList(), consumer)
+}
+
+typealias SseHandler = (Request) -> SseResponse
 
 sealed class SseMessage {
     data class Data(val data: String) : SseMessage() {
@@ -38,7 +43,7 @@ sealed class SseMessage {
     companion object
 }
 
-fun interface SseFilter : (SseConsumer) -> SseConsumer {
+fun interface SseFilter : (SseHandler) -> SseHandler {
     companion object
 }
 
@@ -46,6 +51,6 @@ val SseFilter.Companion.NoOp: SseFilter get() = SseFilter { next -> { next(it) }
 
 fun SseFilter.then(next: SseFilter): SseFilter = SseFilter { this(next(it)) }
 
-fun SseFilter.then(next: SseConsumer): SseConsumer = { this(next)(it) }
+fun SseFilter.then(next: SseHandler): SseHandler = { this(next)(it) }
 
 fun SseFilter.then(routingSseHandler: RoutingSseHandler): RoutingSseHandler = routingSseHandler.withFilter(this)

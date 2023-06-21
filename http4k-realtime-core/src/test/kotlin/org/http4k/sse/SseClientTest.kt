@@ -28,7 +28,7 @@ class SseClientTest {
     fun `when match, passes a consumer with the matching request`() {
         val consumer = TestConsumer();
 
-        { _: Request -> consumer }.testSseClient(Request(GET, "/"))
+        { _: Request -> SseResponse(consumer) }.testSseClient(Request(GET, "/"))
 
         assertThat(consumer.sse.connectRequest, equalTo(Request(GET, "/")))
     }
@@ -36,7 +36,7 @@ class SseClientTest {
     @Test
     fun `sends inbound messages to the client`() {
         val client = { _: Request ->
-            { sse: Sse ->
+            SseResponse { sse: Sse ->
                 sse.send(message)
                 sse.send(message)
                 sse.close()
@@ -50,7 +50,7 @@ class SseClientTest {
     @Test
     fun `closed sse`() {
         val client = { _: Request ->
-            { sse: Sse ->
+            SseResponse { sse: Sse ->
                 sse.close()
             }
         }.testSseClient(Request(GET, "/"))
@@ -61,7 +61,7 @@ class SseClientTest {
     @Test
     fun `no match is just cosed`() {
         val actual = object : SseHandler {
-            override fun invoke(request: Request): SseConsumer = { it.close() }
+            override fun invoke(request: Request) = SseResponse { it.close() }
         }.testSseClient(Request(GET, "/"))
 
         assertThat(actual.received().none(), equalTo(true))
@@ -70,7 +70,8 @@ class SseClientTest {
     @Test
     fun `when no messages`() {
         val client = { _: Request ->
-            { sse: Sse ->
+            SseResponse { sse: Sse ->
+                sse.send(SseMessage.Data("asd"))
                 sse.close()
             }
         }.testSseClient(Request(GET, "/"))
