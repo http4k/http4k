@@ -2,14 +2,15 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Path
-import org.http4k.routing.bind
 import org.http4k.routing.sse
+import org.http4k.routing.sse.bind
 import org.http4k.server.PolyHandler
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseMessage
+import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import kotlin.concurrent.thread
 
@@ -26,16 +27,18 @@ fun main() {
 
     val sse = sayHello.then(
         sse(
-            "/{name}" bind { sse: Sse ->
-                val name = namePath(sse.connectRequest)
-                thread {
-                    repeat(10) {
-                        sse.send(SseMessage.Data("hello $it"))
-                        Thread.sleep(100)
+            "/{name}" bind { _ ->
+                SseResponse { sse: Sse ->
+                    val name = namePath(sse.connectRequest)
+                    thread {
+                        repeat(10) {
+                            sse.send(SseMessage.Data("hello $it"))
+                            Thread.sleep(100)
+                        }
+                        sse.close()
                     }
-                    sse.close()
+                    sse.onClose { println("$name is closing") }
                 }
-                sse.onClose { println("$name is closing") }
             }
         )
     )

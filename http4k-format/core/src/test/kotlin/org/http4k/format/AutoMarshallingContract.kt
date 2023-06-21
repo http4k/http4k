@@ -18,6 +18,7 @@ import org.http4k.lens.string
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.net.URI
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
@@ -127,7 +128,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
             Instant.EPOCH,
             UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
             Uri.of("http://uri:8000"),
-            URL("http://url:9000"),
+            URI("http://url:9000").toURL(),
             Status.OK
         )
         val out = marshaller.asFormatString(obj)

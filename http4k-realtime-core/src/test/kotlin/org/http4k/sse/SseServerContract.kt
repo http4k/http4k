@@ -14,10 +14,10 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.routing.sse
+import org.http4k.routing.sse.bind
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
@@ -27,21 +27,24 @@ import org.http4k.sse.SseMessage.Event
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.http4k.routing.bind as hbind
 
 abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
 
     private val http = routes(
-        "/hello/{name}" bind { r: Request -> Response(OK).body(r.path("name")!!) }
+        "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) }
     )
 
     private val sse = sse(
         "/hello" bind sse(
-            "/{name}" bind { sse: Sse ->
-                val name = sse.connectRequest.path("name")!!
-                sse.send(Event("event1", "hello $name", "123"))
-                sse.send(Event("event2", "again $name\nHi!", "456"))
-                sse.send(Data("goodbye $name".byteInputStream()))
+            "/{name}" bind { _: Request ->
+                SseResponse { sse ->
+                    val name = sse.connectRequest.path("name")!!
+                    sse.send(Event("event1", "hello $name", "123"))
+                    sse.send(Event("event2", "again $name\nHi!", "456"))
+                    sse.send(Data("goodbye $name".byteInputStream()))
+                }
             }
         )
     )
