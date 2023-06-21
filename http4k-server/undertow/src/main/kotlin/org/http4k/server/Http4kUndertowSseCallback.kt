@@ -17,7 +17,7 @@ import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.SseMessage.Retry
 import java.io.IOException
 
-class Http4kSseCallback(private val sse: SseHandler) : ServerSentEventConnectionCallback {
+class Http4kSseCallback(private val sseHandler: SseHandler) : ServerSentEventConnectionCallback {
 
     override fun connected(connection: ServerSentEventConnection, lastEventId: String?) {
         val connectRequest = connection.asRequest()
@@ -32,7 +32,8 @@ class Http4kSseCallback(private val sse: SseHandler) : ServerSentEventConnection
 
             override fun close() = connection.close()
         }
-        val (headers, consumer) = sse(connectRequest)
+        val sse = sseHandler(connectRequest)
+        val (headers, consumer) = sse
 
         headers.forEach { connection.responseHeaders.put(HttpString(it.first), it.second ?: "") }
 
