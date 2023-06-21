@@ -13,7 +13,7 @@ import org.http4k.sse.SseHandler
 class Http4kSetHeadersHandler(private val next: HttpHandler, private val sse: SseHandler) : HttpHandler {
 
     override fun handleRequest(exchange: HttpServerExchange) {
-        // we probably shouldn't to deal with request here...
+        // we probably shouldn't have to deal with request here...
         val (headers, _) = sse(exchange.asRequest() ?: error("Cannot create request from exchange"))
         headers.toParametersMap().forEach { (name, values) ->
             exchange.responseHeaders.putAll(HttpString(name), values.toList())
