@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.1.0.0
+- **http4k-server-realtime-core*** : [Breaking] Change Websocket and SSE interfaces to return WsResponse and SSEResponse objects. This makes it easier to set response headers and control if a connection is made from the incoming request as it is no-longer hidden (it is exposed at the top level instead of being hidden in the SSE and Websocket objects)
+- **http4k-server-jetty*** : As above
+- **http4k-server-undertow*** : As above
+
 ### v5.0.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-*** : [Breaking] Remove all previous deprecations from all modules for v4. To upgrade cleanly, first upgrade to `v4.48.0.0` and then re-upgrade to `v5.0.0.0`. This will ensure that you only have to deal with Deprecations between the major versions.
