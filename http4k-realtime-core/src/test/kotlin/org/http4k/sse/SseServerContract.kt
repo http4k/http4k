@@ -42,15 +42,19 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
 
     private val sse = sse("/hello" bind sse(
         "/{name}" bind { req: Request ->
-            SseResponse(listOf("foo" to "bar")) { sse ->
-                val name = req.path("name")!!
-                sse.send(Event("event1", "hello $name", "123"))
-                sse.send(Event("event2", "again $name\nHi!", "456"))
-                sse.send(Data("goodbye $name".byteInputStream()))
-                thread {
-                    Thread.sleep(100)
-                    sse.close()
+            when {
+                req.query("reject") == null -> SseResponse(listOf("foo" to "bar")) { sse ->
+                    val name = req.path("name")!!
+                    sse.send(Event("event1", "hello $name", "123"))
+                    sse.send(Event("event2", "again $name\nHi!", "456"))
+                    sse.send(Data("goodbye $name".byteInputStream()))
+                    thread {
+                        Thread.sleep(100)
+                        sse.close()
+                    }
                 }
+
+                else -> SseResponse { it.close() }
             }
         }
     )
@@ -58,7 +62,7 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
 
     @BeforeEach
     fun before() {
-        server = PolyHandler(sse = sse).asServer(serverConfig(0)).start()
+        server = PolyHandler(http, sse = sse).asServer(serverConfig(0)).start()
     }
 
     @AfterEach
@@ -94,6 +98,16 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
                 Request(GET, "http://localhost:${server.port()}/hello/leia")
                     .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
             ).header("foo"), equalTo("bar")
+        )
+    }
+
+    @Test
+    fun `can reject request`() {
+        val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/bob?reject=true"))
+
+        assertThat(
+            client.received().toList(),
+            equalTo(listOf())
         )
     }
 
