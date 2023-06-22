@@ -35,10 +35,10 @@ import org.http4k.format.AwsLambdaMoshi.asFormatString
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
-import org.http4k.testing.assertApproved
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.format.ISODateTimeFormat
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.Date
@@ -240,6 +240,32 @@ class AwsLambdaMoshiTest {
         }
 
         assertThat(expected, equalTo(actual))
+    }
+
+    @Test
+    fun `SQS event with null md5OfMessageAttributes`() {
+        val json = """
+            {
+              "Records": [
+                {
+                  "messageId": "messageId",
+                  "receiptHandle": "receiptHandle",
+                  "body": "body",
+                  "md5OfBody": "md5OfBody",
+                  "md5OfMessageAttributes": null,
+                  "eventSourceArn": "eventSourceArn",
+                  "eventSource": "eventSource",
+                  "awsRegion": "awsRegion",
+                  "attributes": {
+                    "attr": "attrvalue"
+                  },
+                  "messageAttributes": { }
+                }
+              ]
+            }
+        """.trimIndent()
+        val evt = asA<SQSEvent>(json)
+        assertNull(evt.records[0].md5OfMessageAttributes)
     }
 
     @Test

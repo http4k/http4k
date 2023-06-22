@@ -23,7 +23,7 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                             "receiptHandle" -> receiptHandle = nextString()
                             "body" -> body = nextString()
                             "md5OfBody" -> md5OfBody = nextString()
-                            "md5OfMessageAttributes" -> md5OfMessageAttributes = nextString()
+                            "md5OfMessageAttributes" -> md5OfMessageAttributes = readJsonValue() as String?
                             "eventSourceArn" -> eventSourceArn = nextString()
                             "eventSource" -> eventSource = nextString()
                             "awsRegion" -> awsRegion = nextString()
