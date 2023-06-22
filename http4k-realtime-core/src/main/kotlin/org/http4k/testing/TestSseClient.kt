@@ -1,6 +1,7 @@
 package org.http4k.testing
 
 import org.http4k.core.Request
+import org.http4k.server.PolyHandler
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseClient
 import org.http4k.sse.SseHandler
@@ -41,3 +42,4 @@ class TestSseClient internal constructor(sseResponse: SseResponse) : SseClient {
 }
 
 fun SseHandler.testSseClient(request: Request): TestSseClient = TestSseClient(invoke(request))
+fun PolyHandler.testSseClient(request: Request): TestSseClient = sse?.testSseClient(request) ?: error("No SSE handler set.")

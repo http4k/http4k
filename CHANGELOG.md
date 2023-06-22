@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.1.1.0
+- **http4k-realtime-core*** : Readd test client methods for SSE and WS 
+
 ### v5.1.0.0
 - **http4k-server-realtime-core*** : [Breaking - Fix #931] Change Websocket and SSE interfaces to return `WsResponse` and `SseResponse` objects. This makes it easier to set response headers and control if a connection is made from the incoming request as it is no-longer hidden (it is exposed at the top level instead of being hidden in the SSE and Websocket objects). It also means that the interfaces for the protocols follow the same pattern.
 - **http4k-server-jetty*** : As above

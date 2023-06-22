@@ -59,3 +59,4 @@ class TestWsClient internal constructor(wsResponse: WsResponse) : WsClient {
 }
 
 fun WsHandler.testWsClient(request: Request): TestWsClient = TestWsClient(invoke(request))
+fun PolyHandler.testWsClient(request: Request): TestWsClient = ws?.testWsClient(request) ?: error("No WS handler set.")
