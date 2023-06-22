@@ -25,7 +25,7 @@ internal class RouterWsHandler(private val list: List<WsRouter>) : RoutingWsHand
 
     override operator fun invoke(request: Request): WsResponse = when (val match = match(request)) {
         is MatchingHandler -> match(request)
-        is Unmatched -> WsResponse { it.close() }
+        is Unmatched -> WsResponse { it.close(REFUSE) }
     }
 
     override fun withBasePath(new: String): RoutingWsHandler =
@@ -39,15 +39,7 @@ internal class TemplateRoutingWsHandler(
     private val handler: WsHandler
 ) : RoutingWsHandler {
     override fun match(request: Request): WsRouterMatch = when {
-        template.matches(request.uri.path) -> MatchingHandler { req ->
-            handler(
-                RoutedRequest(
-                    req,
-                    template
-                )
-            )
-        }
-
+        template.matches(request.uri.path) -> MatchingHandler { req -> handler(RoutedRequest(req, template)) }
         else -> Unmatched
     }
 
