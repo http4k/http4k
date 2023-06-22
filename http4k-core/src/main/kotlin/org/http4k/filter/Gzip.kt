@@ -39,7 +39,13 @@ data class CompressionResult(
 
     fun apply(response: Response): Response =
         (contentEncoding?.let {
-            response.header("content-encoding", it)
+            response.header("content-encoding", it).let { r ->
+                if (r.header("content-length") != null && body.length != null) {
+                    r.replaceHeader("content-length", body.length.toString())
+                } else {
+                    r
+                }
+            }
         } ?: response)
             .body(body)
 }

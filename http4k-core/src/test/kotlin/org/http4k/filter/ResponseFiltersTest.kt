@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -109,6 +110,39 @@ class ResponseFiltersTest {
             assertThat(zipped(Request(GET, "").header("accept-encoding", "gzip")),
                 hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
         }
+
+        @Test
+        fun `gzip response updates content-length if the contents had a content-length before`() {
+            val longBody = "a".repeat(12355)
+            val gZippedBody = Body(longBody).gzipped().body
+            val uncompressedLength = longBody.length.toString()
+            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then {
+                Response(OK).header("content-type", "text/html;charset=utf-8")
+                    .header("content-length", uncompressedLength).body(longBody)
+            }
+            assertThat(
+                zipped(Request(GET, "").header("accept-encoding", "gzip")),
+                hasBody(equalTo<Body>(gZippedBody))
+                    .and(hasHeader("content-encoding", "gzip"))
+                    .and(hasHeader("content-length", gZippedBody.length!!.toString()))
+            )
+        }
+
+        @Test
+        fun `gzip response does update content-length if the contents did not have a content-length before`() {
+            val longBody = "a".repeat(12355)
+            val gZippedBody = Body(longBody).gzipped().body
+            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then {
+                Response(OK).header("content-type", "text/html;charset=utf-8").body(longBody)
+            }
+            assertThat(
+                zipped(Request(GET, "").header("accept-encoding", "gzip")),
+                hasBody(equalTo<Body>(gZippedBody))
+                    .and(hasHeader("content-encoding", "gzip"))
+                    .and(hasHeader("content-length", absent()))
+            )
+        }
+
 
         @Test
         fun `gzip response and adds gzip content encoding if the request has accept-encoding of gzip and content type is acceptable`() {
