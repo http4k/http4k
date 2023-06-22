@@ -71,7 +71,7 @@ As part of the major release cycle, we’re removing all code marked as deprecat
 We have also removed the http4k-templates-dust module due to the removal of Nashorn from the Java distribution. We understand this may impact some users, and we recommend seeking alternative solutions in the long term, but you can continue to use the existing http4k-template-dust assets which are still binary compatible  with v5 of http4k.
 
 #### Upgrading from http4k v4
-If you are upgrading, the best idea is to first upgrade to the last v4 version, deal with any existing deprecations in place, then simply upgrade again the latest v5 and repeat.
+If you are upgrading, the best idea is to first upgrade to the last v4 version, deal with any existing deprecations in place, then simply upgrade again the latest v5 version and repeat.
 
 <hr/>
 
@@ -107,7 +107,7 @@ There's a full example of how to build a plugin with the http4k-connect-openai-p
 As part of the major release cycle, we’re removing all code marked as deprecated in v3 of http4k-connect.
 
 #### Upgrading from http4k-connect v3
-If you are upgrading, the best idea is to first upgrade to the last v3 version, deal with any existing deprecations in place, then simply upgrade again to the latest v5 and repeat.
+If you are upgrading, the best idea is to first upgrade to the last v3 version, deal with any existing deprecations in place, then simply upgrade again to the latest v5 version and repeat.
 
 <hr/>
 
