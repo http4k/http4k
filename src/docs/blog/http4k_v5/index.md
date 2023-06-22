@@ -9,7 +9,7 @@ description:  There's a new major http4k release! Read about all the new things 
 
 We’re thrilled to announce the next major release of http4k! Since the last major release, the team has been busy enhancing existing features, adding new capabilities with help from our amazing community, things that we've needed on our own real world projects, and a sprinkling of new magic to keep pushing the boundaries of what's possible with the http4k technology - all 127 modules of it.
 
-The first thing to tell you is that we've hit a significant milestone and are now getting about 1 million downloads per month from Maven Central. From these numbers and our interactions with the global http4k community, it makes the us very happy that so many teams are seeing the power of the Server-as-a-Function model.
+The first thing to tell you is that we've hit a significant milestone and are now getting about 1 million downloads per month from Maven Central. From these numbers and our interactions with the global http4k community, it makes us very happy that so many teams are seeing the power of the Server-as-a-Function model.
 
 #### Partnership programme
 
