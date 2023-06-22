@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-server-realtime-core*** : [Breaking] Change Websocket and SSE interfaces to return `WsResponse` and `SseResponse` objects. This makes it easier to set response headers and control if a connection is made from the incoming request as it is no-longer hidden (it is exposed at the top level instead of being hidden in the SSE and Websocket objects). It also means that the interfaces for the protocols follow the same pattern.
 - **http4k-server-jetty*** : As above
 - **http4k-server-undertow*** : As above
+- **http4k-core*** : [Fix #930] Update content-length header after GZipping it. H/T @bjornbugge
 
 ### v5.0.0.0
 - **http4k-*** : Upgrade some dependency versions.
