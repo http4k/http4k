@@ -7,7 +7,7 @@ It is very easy to configure http4k to integrate with any OAuth2 provider who su
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.0.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.1.0.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-security-oauth")
 }
