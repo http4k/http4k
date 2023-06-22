@@ -3,7 +3,7 @@ package org.http4k.routing
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Method
+import org.http4k.core.Methodimport org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.routing.ws.bind
 import org.http4k.websocket.WsResponse
@@ -27,7 +27,7 @@ class WsRoutingTest {
                 }
             ))
 
-        val sentRequestWithNoUriTemplateHeader = Request(Method.GET, "/path1/correct")
+        val sentRequestWithNoUriTemplateHeader = Request(GET, "/path1/correct")
 
         ws(sentRequestWithNoUriTemplateHeader)
         assertThat(request.get().path("name"), equalTo("correct"))
@@ -38,7 +38,7 @@ class WsRoutingTest {
     fun `not found connection is refused`() {
         val websockets = websockets()
 
-        val request = Request(Method.GET, "/path1/index.html")
+        val request = Request(GET, "/path1/index.html")
         websockets(request)
 
         assertThat(closed.get(), equalTo(WsStatus.REFUSE))

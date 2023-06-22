@@ -1,7 +1,6 @@
 package org.http4k.server
 
 import io.undertow.Handlers.predicate
-import io.undertow.Handlers.serverSentEvents
 import io.undertow.Handlers.websocket
 import io.undertow.Undertow
 import io.undertow.UndertowOptions.ENABLE_HTTP2
@@ -34,7 +33,7 @@ class Undertow(
             }
         val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
 
-        val sseCallback = sse?.let { Http4kSetHeadersHandler(serverSentEvents(Http4kSseCallback(sse)), sse)  }
+        val sseCallback = sse?.let { Http4kSetHeadersHandler(sse)  }
 
         val handlerWithWs = predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
 
