@@ -27,7 +27,7 @@ With those things out of the way, let's get on to what you really came for - fea
 
 Before we dive into the details of the library updates themselves, we're announcing today that for the simplicity (to both the http4k community and the team!), we are unifying all http4k ecosystem projects (currently http4k and http4k-connect) under a single major platform version number - starting with v5. 
 
-In addition, to keep pace with Java's own rapidly evolving ecosystem, we're going to be switching to aligning major releases of "the Platform"  with every JDK release - currently scheduled for every 6 months. This will allow us to track major-version support as features are added and removed from Java and provide an easy way for our users to track the this compatibility. For the moment, http4k and http4k Connect will still have different release cadence and individual release numbers and which are now developed using Java 20 as a base, but in the future there are plans to consolidate the projects under a single platform version.
+In addition, to keep pace with Java's own rapidly evolving ecosystem, we're going to be switching to aligning major releases of "the Platform"  with every JDK release - currently scheduled for every 6 months. This will allow us to track major-version support as features are added and removed from Java and provide an easy way for our users to track the this compatibility. For the moment, http4k and http4k-connect will still have different release cadence and individual release numbers and which are now developed using Java 20 as a base, but in the future there are plans to consolidate the projects under a single platform version.
 
 In terms of Java compatibility - for the foreseeable future, we are still going to compile http4k for older Java versions (we still target Java 8 as a base). Over time though, we plan to adjust our standard of support for ancient versions and introduce a paid support program for those who still need to run http4k against legacy versions of Java and require updates such as security patches. If that’s already the case for your team or project, be sure to [get in touch with the http4k team](mailto:contact@http4k.org?subject=Support for legacy JVM version) to discuss your particular needs.
 
@@ -61,6 +61,10 @@ As a side-effect of introducing TracerBullet, http4k can [automatically generate
 
 The http4k team were excited to be invited back to [KotlinConf 2023], where we presented how we used the TracerBullet along with Hexagonal Design to visually document multi-service tests. You can check out the video of the presentation [here] or see a full example of how it works in the [demo repo].
 
+#### Remodelling of Websocket and SSE support
+
+Various http4k backends have supported SSE and Websockets for a while, but whilst the innovation was that you could unit-test them entirely in-memory (a world first?), the models did have some restrictions in handling request filtering. As such we have reworked the support to be more consistent with the HTTP handling. This is a breaking change, but it very important for us to be able to more fully support these protocols.
+
 #### Removal of deprecated and unsupported features
 As part of the major release cycle, we’re removing all code marked as deprecated in v4 of http4k.
 
@@ -90,7 +94,7 @@ It's 2023, and the new hotness that everyone is talking about is AI - and who ar
 
 A little later, the team received an early access invite to the [ChatGPT plugin programme] and it immediately occured that the requirements for developing plugins were all already supported within existing http4k libraries. So we set out to develop a plugin SDK, and [http4k-connect-openai-plugin] was born.
 
-The SDK provides a simple API for developers to simply compose their plugins by supplying come config and a standard `http4k-contract` endpoints, which generate the required OpenAPI specifications. The SDK does the rest for you, providing the required OpenAI plugin manifest, and then protects the API with one of 4 security models - including the ability to "login with ChatGPT" and OAuth into your plugin.
+The SDK provides a simple API for developers to simply compose their plugins by supplying some config and a standard `http4k-contract` endpoints, which generate the required OpenAPI specifications. The SDK does the rest for you, providing the required OpenAI plugin manifest, and then protects the API with one of 4 security models - including the ability to "login with ChatGPT" and OAuth into your plugin.
 
 <img class="blogImage" src="./chatgpt.png" alt="http4k openapi ChatGPT plugin"/>
 
