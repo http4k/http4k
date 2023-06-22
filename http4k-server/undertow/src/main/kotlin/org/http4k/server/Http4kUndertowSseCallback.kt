@@ -33,9 +33,7 @@ class Http4kSseCallback(private val sseHandler: SseHandler) : ServerSentEventCon
             override fun close() = connection.close()
         }
         val sse = sseHandler(connectRequest)
-        val (headers, consumer) = sse
-
-        headers.forEach { connection.responseHeaders.put(HttpString(it.first), it.second ?: "") }
+        val (_, _, consumer) = sse
 
         consumer(socket)
 

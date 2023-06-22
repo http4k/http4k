@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.OK
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicReference
@@ -40,9 +41,10 @@ class SseClientTest {
 
         val client = { req: Request ->
             assertThat(req, equalTo(Request(GET, "/")))
-            SseResponse(listOf("foo" to "bar"), consumer)
+            SseResponse(OK, listOf("foo" to "bar"), consumer)
         }.testSseClient(Request(GET, "/"))
 
+        assertThat(client.status, equalTo(OK))
         assertThat(client.headers, equalTo(listOf("foo" to "bar")))
     }
 

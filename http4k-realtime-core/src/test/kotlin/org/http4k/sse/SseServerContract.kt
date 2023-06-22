@@ -10,11 +10,11 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
-import org.http4k.filter.debug
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.path
@@ -43,7 +43,7 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
     private val sse = sse("/hello" bind sse(
         "/{name}" bind { req: Request ->
             when {
-                req.query("reject") == null -> SseResponse(listOf("foo" to "bar")) { sse ->
+                req.query("reject") == null -> SseResponse(ACCEPTED, listOf("foo" to "bar")) { sse ->
                     val name = req.path("name")!!
                     sse.send(Event("event1", "hello $name", "123"))
                     sse.send(Event("event2", "again $name\nHi!", "456"))
@@ -92,13 +92,13 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
     }
 
     @Test
-    fun `can get headers`() {
-        assertThat(
-            JavaHttpClient().debug()(
-                Request(GET, "http://localhost:${server.port()}/hello/leia")
-                    .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
-            ).header("foo"), equalTo("bar")
+    fun `can set response headers and status`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${server.port()}/hello/leia")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
         )
+        assertThat(response.status, equalTo(ACCEPTED))
+        assertThat(response.header("foo"), equalTo("bar"))
     }
 
     @Test

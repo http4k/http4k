@@ -1,7 +1,6 @@
 package org.http4k.testing
 
 import org.http4k.core.Request
-import org.http4k.server.PolyHandler
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseClient
 import org.http4k.sse.SseHandler
@@ -14,6 +13,7 @@ import java.util.ArrayDeque
  */
 class TestSseClient internal constructor(sseResponse: SseResponse) : SseClient {
 
+    val status = sseResponse.status
     val headers = sseResponse.headers
 
     private val queue = ArrayDeque<() -> SseMessage?>()

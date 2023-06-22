@@ -3,6 +3,8 @@ package org.http4k.sse
 import org.http4k.base64Encode
 import org.http4k.core.Headers
 import org.http4k.core.Request
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.RoutingSseHandler
 import java.io.InputStream
 import java.time.Duration
@@ -15,8 +17,8 @@ interface Sse {
 
 typealias SseConsumer = (Sse) -> Unit
 
-data class SseResponse(val headers: Headers = emptyList(), val consumer: SseConsumer) {
-    constructor(consumer: SseConsumer) : this(emptyList(), consumer)
+data class SseResponse(val status: Status = OK, val headers: Headers = emptyList(), val consumer: SseConsumer) {
+    constructor(consumer: SseConsumer) : this(OK, emptyList(), consumer)
 }
 
 typealias SseHandler = (Request) -> SseResponse
