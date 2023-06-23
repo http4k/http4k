@@ -11,6 +11,7 @@ import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.format.Jackson
+import org.http4k.format.OAuthMoshi
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -29,7 +30,7 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
         clientValidator = DummyClientValidator(),
         authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
         accessTokens = DummyAccessTokens(),
-        json = OAuthServerMoshi,
+        json = OAuthMoshi,
         clock = FixedClock,
         authRequestExtractor = AuthRequestFromQueryParameters,
         idTokens = DummyIdTokens()

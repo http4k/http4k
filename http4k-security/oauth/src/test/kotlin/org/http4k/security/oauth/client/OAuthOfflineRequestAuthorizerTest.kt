@@ -24,7 +24,7 @@ import org.http4k.routing.routes
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.OAuthProviderConfig
 import org.http4k.security.oauth.core.RefreshToken
-import org.http4k.security.oauth.server.OAuthServerMoshi.auto
+import org.http4k.format.OAuthMoshi.auto
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration

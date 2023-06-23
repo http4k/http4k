@@ -15,7 +15,7 @@ import org.http4k.core.with
 import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.OAuthWebForms.responseForm
 import org.http4k.security.oauth.core.RefreshToken
-import org.http4k.security.oauth.server.OAuthServerMoshi.auto
+import org.http4k.format.OAuthMoshi.auto
 import org.http4k.security.openid.IdToken
 import org.junit.jupiter.api.Test
 

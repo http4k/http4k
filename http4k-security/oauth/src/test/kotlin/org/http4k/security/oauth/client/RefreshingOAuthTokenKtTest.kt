@@ -15,7 +15,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.OAuthProviderConfig
-import org.http4k.security.oauth.server.OAuthServerMoshi.auto
+import org.http4k.format.OAuthMoshi.auto
 import org.http4k.util.TickingClock
 import org.junit.jupiter.api.Test
 import java.time.Duration
