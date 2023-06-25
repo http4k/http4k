@@ -3,8 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.1.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth*** : Remove dependency on Kotlin-reflect by adding custom adapters. H/T 
+
 ### v5.1.1.1
-- **http4k-serverless-lambda*** : [Fix #933] AWS SQS deserialization issue when md5OfMessageAttributes is null. H/T @ashcor
+- **http4k-serverless-lambda*** : [Fix #933] AWS SQS deserialization issue when md5OfMessageAttributes is null. H/T @oharaandrew314
 
 ### v5.1.1.0
 - **http4k-realtime-core*** : Readd test client methods for SSE and WS 

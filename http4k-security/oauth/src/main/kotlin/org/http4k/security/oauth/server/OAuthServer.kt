@@ -5,7 +5,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.format.AutoMarshalling
-import org.http4k.format.OAuthMoshi
+import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.lens.FormField
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict

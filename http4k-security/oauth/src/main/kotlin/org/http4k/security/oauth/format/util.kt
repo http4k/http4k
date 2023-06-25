@@ -1,4 +1,4 @@
-package org.http4k.security.oauth.server
+package org.http4k.security.oauth.format
 
 internal fun <T> Map<String, Any>.value(name: String, fn: Function1<String, T>) =
     this[name]?.toString()?.let(fn)

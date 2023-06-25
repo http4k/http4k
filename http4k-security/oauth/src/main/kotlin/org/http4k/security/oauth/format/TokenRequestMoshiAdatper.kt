@@ -1,4 +1,4 @@
-package org.http4k.format
+package org.http4k.security.oauth.format
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
@@ -7,9 +7,12 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import org.http4k.core.Uri
+import org.http4k.format.obj
+import org.http4k.format.string
+import org.http4k.format.stringOrNull
 import org.http4k.security.oauth.client.TokenRequest
 
-object TokenRequestMoshi : JsonAdapter<TokenRequest>() {
+object TokenRequestMoshiAdatper : JsonAdapter<TokenRequest>() {
     @FromJson
     override fun fromJson(reader: JsonReader) =
         with(reader) {

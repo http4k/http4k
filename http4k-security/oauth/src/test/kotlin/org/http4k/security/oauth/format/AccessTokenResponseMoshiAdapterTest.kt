@@ -1,4 +1,4 @@
-package org.http4k.format
+package org.http4k.security.oauth.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -7,13 +7,14 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.accessTokenResponseBody
+import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(JsonApprovalTest::class)
-class AccessTokenResponseMoshiTest {
+class AccessTokenResponseMoshiAdapterTest {
 
     private val marshaller = OAuthMoshi
 
