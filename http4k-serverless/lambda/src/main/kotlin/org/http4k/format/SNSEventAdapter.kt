@@ -28,7 +28,7 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
                                     "SigningCertUrl" -> signingCertUrl = nextString()
                                     "MessageId" -> messageId = nextString()
                                     "Message" -> message = nextString()
-                                    "Subject" -> subject = nextStringOrNull()
+                                    "Subject" -> subject = stringOrNull()
                                     "UnsubscribeUrl" -> unsubscribeUrl = nextString()
                                     "Type" -> type = nextString()
                                     "SignatureVersion" -> signatureVersion = nextString()
@@ -90,5 +90,3 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
         }
     }
 }
-
-private fun JsonReader.nextStringOrNull() = if (peek() == JsonReader.Token.NULL) nextNull() else nextString()

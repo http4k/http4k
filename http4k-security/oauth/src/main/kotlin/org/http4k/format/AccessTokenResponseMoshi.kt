@@ -30,14 +30,11 @@ object AccessTokenResponseMoshi : JsonAdapter<AccessTokenResponse>() {
 
     @FromJson
     override fun fromJson(reader: JsonReader): AccessTokenResponse {
-        val values = mutableMapOf<String, String>()
+        val values = mutableMapOf<String, String?>()
         with(reader) {
             beginObject()
             while (hasNext()) {
-                when {
-                    peek() != JsonReader.Token.NULL -> values[nextName()] = nextSource().readUtf8().trim('"').trimEnd('"')
-                    else -> skipValue()
-                }
+                values[nextName()] = stringOrNull()
             }
             endObject()
         }

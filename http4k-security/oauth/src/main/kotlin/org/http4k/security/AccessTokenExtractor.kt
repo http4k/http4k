@@ -36,4 +36,4 @@ class ContentTypeJsonOrForm : AccessTokenExtractor {
         }.mapFailure { CouldNotFetchAccessToken(msg.status, msg.bodyString()) }
 }
 
-private val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()
+val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()

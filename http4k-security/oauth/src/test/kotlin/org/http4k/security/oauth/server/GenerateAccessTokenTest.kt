@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.get
-import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -23,7 +22,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.State
-import org.http4k.format.OAuthMoshi.auto
+import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
@@ -58,7 +57,7 @@ class GenerateAccessTokenTest {
         )
 
         assertThat(response, hasStatus(OK) and hasBody(
-            Body.auto<AccessTokenResponse>().toLens(),
+            accessTokenResponseBody,
             equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))
         ))
     }
@@ -79,7 +78,7 @@ class GenerateAccessTokenTest {
         assertThat(response, hasStatus(OK))
 
         assertThat(
-            Body.auto<AccessTokenResponse>().toLens()(response),
+            accessTokenResponseBody(response),
             equalTo(AccessTokenResponse("dummy-access-token", "Bearer", id_token = "dummy-id-token-for-access-token"))
         )
     }
@@ -94,7 +93,7 @@ class GenerateAccessTokenTest {
             .form("client_secret", "a-secret"))
 
         assertThat(response, hasStatus(OK) and hasBody(
-            Body.auto<AccessTokenResponse>().toLens(), equalTo(
+            accessTokenResponseBody, equalTo(
                 AccessTokenResponse(
                     access_token = DummyRefreshTokens.newAccessToken.value,
                     token_type = DummyRefreshTokens.newAccessToken.type,
@@ -157,7 +156,7 @@ class GenerateAccessTokenTest {
         assertThat(response, hasStatus(OK))
 
         assertThat(
-            Body.auto<AccessTokenResponse>().toLens()(response),
+            accessTokenResponseBody(response),
             equalTo(AccessTokenResponse("dummy-access-token", "Bearer", id_token = "dummy-id-token-for-access-token"))
         )
     }
@@ -172,7 +171,7 @@ class GenerateAccessTokenTest {
         )
 
         assertThat(response, hasStatus(OK) and hasBody(
-            Body.auto<AccessTokenResponse>().toLens(),
+            accessTokenResponseBody,
             equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))
         ))
     }

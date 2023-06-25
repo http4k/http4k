@@ -56,3 +56,5 @@ fun <T> JsonReader.map(valueFn: () -> T): Map<String, T> {
     endObject()
     return map
 }
+
+fun JsonReader.stringOrNull() = if (peek() == JsonReader.Token.NULL) nextNull() else nextString()

@@ -14,12 +14,9 @@ object TokenRequestMoshi : JsonAdapter<TokenRequest>() {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             beginObject()
-            val values = buildMap<String, String> {
+            val values = buildMap<String, String?> {
                 while(hasNext()) {
-                    when {
-                        peek() != JsonReader.Token.NULL -> put(nextName(), nextSource().readUtf8().trim('"').trimEnd('"'))
-                        else -> skipValue()
-                    }
+                    put(nextName(), stringOrNull())
                 }
             }
             endObject()
