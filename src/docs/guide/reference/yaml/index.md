@@ -5,7 +5,7 @@ description: Feature overview of the YAML http4k-format modules, several of whic
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.1.1.1"))
+    implementation(platform("org.http4k:http4k-bom:5.1.2.0"))
     implementation("org.http4k:http4k-format-jackson-yaml")
     implementation("org.http4k:http4k-format-moshi-yaml")
 }
