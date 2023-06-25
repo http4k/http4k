@@ -5,12 +5,12 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
 import org.http4k.core.Uri
+import org.http4k.format.OAuthMoshi
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.InvalidRequestObject
-import org.http4k.security.oauth.server.OAuthServerMoshi
 import org.http4k.security.oauth.server.boolean
 import org.http4k.security.oauth.server.long
 import org.http4k.security.oauth.server.map
@@ -71,7 +71,7 @@ object RequestObjectExtractor {
         else -> emptyList()
     }
 
-    private val moshi = OAuthServerMoshi
+    private val moshi = OAuthMoshi
 
     private fun parseJsonFromJWT(value: String) = try {
         val jwtParts = value.split(".")

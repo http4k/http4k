@@ -10,7 +10,7 @@ import org.http4k.core.Response
 import org.http4k.lens.Header
 import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.OAuthWebForms.responseForm
-import org.http4k.security.oauth.server.OAuthServerMoshi.auto
+import org.http4k.format.OAuthMoshi.auto
 import org.http4k.security.openid.IdToken
 
 fun interface AccessTokenExtractor : (Response) -> Result<AccessTokenDetails, CouldNotFetchAccessToken>
@@ -36,4 +36,4 @@ class ContentTypeJsonOrForm : AccessTokenExtractor {
         }.mapFailure { CouldNotFetchAccessToken(msg.status, msg.bodyString()) }
 }
 
-private val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()
+val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()
