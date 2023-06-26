@@ -38,6 +38,7 @@ import org.http4k.testing.JsonApprovalTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.format.ISODateTimeFormat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -243,7 +244,34 @@ class AwsLambdaMoshiTest {
     }
 
     @Test
-    fun `SQS event with null md5OfMessageAttributes`() {
+    fun `SQS event with no message attributes`() {
+        assertNull(
+            asA<SQSEvent>(
+                """
+                    {
+                      "Records": [
+                        {
+                          "messageId": "messageId",
+                          "receiptHandle": "receiptHandle",
+                          "body": "body",
+                          "md5OfBody": "md5OfBody",
+                          "md5OfMessageAttributes": null,
+                          "eventSourceArn": "eventSourceArn",
+                          "eventSource": "eventSource",
+                          "awsRegion": "awsRegion",
+                          "attributes": {
+                            "attr": "attrvalue"
+                          },
+                          "messageAttributes": { }
+                        }
+                      ]
+                    }
+                """.trimIndent()
+            ).records[0].md5OfMessageAttributes)
+    }
+
+    @Test
+    fun `SQS event with null message attributes`() {
         val json = """
             {
               "Records": [
@@ -252,20 +280,29 @@ class AwsLambdaMoshiTest {
                   "receiptHandle": "receiptHandle",
                   "body": "body",
                   "md5OfBody": "md5OfBody",
-                  "md5OfMessageAttributes": null,
+                  "md5OfMessageAttributes": "md5OfMessageAttributes",
                   "eventSourceArn": "eventSourceArn",
                   "eventSource": "eventSource",
                   "awsRegion": "awsRegion",
                   "attributes": {
                     "attr": "attrvalue"
                   },
-                  "messageAttributes": { }
+                  "messageAttributes": {
+                    "msgAttrName": {
+                      "binaryValue": null,
+                      "binaryListValues": null,
+                      "dataType": "String",
+                      "stringValue": "stringValue"
+                    }
+                  }
                 }
               ]
             }
         """.trimIndent()
         val evt = asA<SQSEvent>(json)
-        assertNull(evt.records[0].md5OfMessageAttributes)
+        println(evt)
+        assertNull(evt.records[0].messageAttributes["msgAttrName"]?.binaryValue)
+        assertEquals("stringValue", evt.records[0].messageAttributes["msgAttrName"]?.stringValue)
     }
 
     @Test

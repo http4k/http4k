@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.1.2.1
+- **http4k-serverless-lambda*** : [Fix #936] AWS SQS null deserialization issues
+
 ### v5.1.2.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-security-oauth*** : Remove dependency on Kotlin-reflect by adding custom adapters. H/T 
