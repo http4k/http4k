@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.2.0.0
+- **http4k-contract-jsonschema** : [New module] Extracted this so we can reuse in non-OpenAPI scenarios
 - **http4k-contract** : [Deprecation] Repackaging of JSON schema classes. Should only affect users if they have explicitly used/extended the standard behaviour.
 
 ### v5.1.2.1
