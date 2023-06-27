@@ -1,0 +1,44 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceHolder"
+  },
+  "definitions": [
+    {
+      "first": "prefixorg.http4k.contract.jsonschema.v3.InterfaceHolder",
+      "second": {
+        "properties": {
+          "i": {
+            "$ref": "#/customPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceImpl1"
+          }
+        },
+        "example": {
+          "i": {
+            "a": "a"
+          }
+        },
+        "type": "object",
+        "required": [
+          "i"
+        ]
+      }
+    },
+    {
+      "first": "prefixorg.http4k.contract.jsonschema.v3.InterfaceImpl1",
+      "second": {
+        "properties": {
+          "a": {
+            "example": "a",
+            "type": "string"
+          }
+        },
+        "example": {
+          "a": "a"
+        },
+        "type": "object",
+        "required": [
+          "a"
+        ]
+      }
+    }
+  ]
+}
