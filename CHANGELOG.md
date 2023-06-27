@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.2.0.0
+- **http4k-contract** : [Deprecation] Repackaging of JSON schema classes. Should only affect users if they have explicitly used/extended the standard behaviour.
+
 ### v5.1.2.1
 - **http4k-serverless-lambda*** : [Fix #936] AWS SQS null deserialization issues
 

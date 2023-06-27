@@ -1,0 +1,38 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.RecursiveObject",
+      "second": {
+        "properties": {
+          "children": {
+            "items": {
+              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
+            },
+            "example": [
+              {
+                "children": [
+                ]
+              }
+            ],
+            "type": "array"
+          }
+        },
+        "example": {
+          "children": [
+            {
+              "children": [
+              ]
+            }
+          ]
+        },
+        "type": "object",
+        "required": [
+          "children"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldAnnotated"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.JacksonFieldAnnotated",
+      "second": {
+        "properties": {
+          "OTHERNAME": {
+            "example": "foobar",
+            "type": "string"
+          }
+        },
+        "example": {
+          "OTHERNAME": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "OTHERNAME"
+        ]
+      }
+    }
+  ]
+}

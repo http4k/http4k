@@ -1,0 +1,18 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.Foo",
+      "second": {
+        "example": "value1",
+        "enum": [
+          "value1",
+          "value2"
+        ],
+        "type": "string"
+      }
+    }
+  ]
+}

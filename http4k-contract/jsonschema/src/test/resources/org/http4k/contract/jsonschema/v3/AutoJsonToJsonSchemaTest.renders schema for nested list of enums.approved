@@ -1,0 +1,45 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.EnumListHolder"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.EnumListHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "items": {
+              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+            },
+            "example": [
+              "value1",
+              "value2"
+            ],
+            "type": "array"
+          }
+        },
+        "example": {
+          "value": [
+            "value1",
+            "value2"
+          ]
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.jsonschema.v3.Foo",
+      "second": {
+        "example": "value1",
+        "enum": [
+          "value1",
+          "value2"
+        ],
+        "type": "string"
+      }
+    }
+  ]
+}
