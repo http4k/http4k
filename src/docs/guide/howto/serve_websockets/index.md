@@ -5,7 +5,7 @@ description: Recipes for using http4k with websockets
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.1.2.1"))
+    implementation(platform("org.http4k:http4k-bom:5.2.0.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-server-jetty")
     implementation("org.http4k:http4k-client-websocket")

@@ -9,7 +9,7 @@ For the typesafe contract-style routing, refer to [this](/guide/howto/integrate_
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.1.2.1"))
+    implementation(platform("org.http4k:http4k-bom:5.2.0.0"))
     implementation("org.http4k:http4k-core")
 }
 ```
