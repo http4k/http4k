@@ -259,6 +259,13 @@ interface Request : HttpMessage {
 
         operator fun invoke(method: Method, template: UriTemplate, version: String = HTTP_1_1): Request =
             RoutedRequest(Request(method, template.toString(), version), template)
+
+        operator fun invoke(
+            method: Method,
+            template: UriTemplate,
+            parameters: Map<String, String>,
+            version: String = HTTP_1_1
+        ): Request = RoutedRequest(Request(method, template.generate(parameters), version), template)
     }
 }
 
