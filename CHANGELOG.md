@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.2.1.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : [Fix #939] Override all Request and Response mutators for routed messages. H/T @kwydler
+
 ### v5.2.0.0
 - **http4k-contract-jsonschema** : [New module] Extracted this so we can reuse in non-OpenAPI scenarios
 - **http4k-contract** : [Deprecation] Repackaging of JSON schema classes. Should only affect users if they have explicitly used/extended the standard behaviour.
