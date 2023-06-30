@@ -8,13 +8,12 @@ dependencies {
     implementation("dev.forkhandles:values4k:_")
 
     testApi(project(":http4k-client-apache"))
-    testApi(project(":http4k-client-websocket"))
-    testApi(project(":http4k-format-jackson"))
-    testApi(project(":http4k-server-apache"))
     testApi(project(":http4k-testing-approval"))
     testApi(project(":http4k-testing-hamkrest"))
-
-    testApi("org.webjars:swagger-ui:4.11.1") // leave hardcoded - tests
+    testApi(project(":http4k-format-jackson"))
+    testApi(project(":http4k-client-websocket"))
+    testApi(project(":http4k-server-apache"))
+    testApi("org.webjars:swagger-ui:_")
     testApi("com.launchdarkly:okhttp-eventsource:_")
     testApi("org.apache.httpcomponents:httpcore:_")
     testApi("org.slf4j:slf4j-nop:_")

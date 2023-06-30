@@ -4,20 +4,23 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.or
 import org.http4k.base64Encode
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.routing.sse
+import org.http4k.routing.sse.bind
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
@@ -27,23 +30,34 @@ import org.http4k.sse.SseMessage.Event
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.concurrent.thread
+import org.http4k.routing.bind as hbind
 
 abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
 
     private val http = routes(
-        "/hello/{name}" bind { r: Request -> Response(OK).body(r.path("name")!!) }
+        "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) }
     )
 
-    private val sse = sse(
-        "/hello" bind sse(
-            "/{name}" bind { sse: Sse ->
-                val name = sse.connectRequest.path("name")!!
-                sse.send(Event("event1", "hello $name", "123"))
-                sse.send(Event("event2", "again $name\nHi!", "456"))
-                sse.send(Data("goodbye $name".byteInputStream()))
+    private val sse = sse("/hello" bind sse(
+        "/{name}" bind { req: Request ->
+            when {
+                req.query("reject") == null -> SseResponse(ACCEPTED, listOf("foo" to "bar")) { sse ->
+                    val name = req.path("name")!!
+                    sse.send(Event("event1", "hello $name", "123"))
+                    sse.send(Event("event2", "again $name\nHi!", "456"))
+                    sse.send(Data("goodbye $name".byteInputStream()))
+                    thread {
+                        Thread.sleep(100)
+                        sse.close()
+                    }
+                }
+
+                else -> SseResponse { it.close() }
             }
-        )
+        }
+    )
     )
 
     @BeforeEach
@@ -74,6 +88,26 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
                     Data("goodbye bob".base64Encode())
                 )
             )
+        )
+    }
+
+    @Test
+    fun `can set response headers and status`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${server.port()}/hello/leia")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.status, equalTo(ACCEPTED))
+        assertThat(response.header("foo"), equalTo("bar"))
+    }
+
+    @Test
+    fun `can reject request`() {
+        val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/bob?reject=true"))
+
+        assertThat(
+            client.received().toList(),
+            equalTo(listOf())
         )
     }
 

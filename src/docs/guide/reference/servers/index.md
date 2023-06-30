@@ -5,15 +5,18 @@ description: Feature overview of the http4k-server modules, covering Server back
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.48.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.2.0.0"))
     // Apache v5: 
     implementation("org.http4k:http4k-server-apache")
 
     // Apache v4: 
     implementation("org.http4k:http4k-server-apache4")
 
-    // Jetty: 
+    // Jetty & JettyLoom: 
     implementation("org.http4k:http4k-server-jetty")
+
+    // Helidon Nima (Loom): 
+    implementation("org.http4k:http4k-server-helidon")
 
     // Ktor CIO: 
     implementation("org.http4k:http4k-server-ktorcio")
@@ -33,7 +36,7 @@ dependencies {
     // Java WebSocket:
     implementation("org.http4k:http4k-server-websocket")
 
-    // SunHttp (for development only): 
+    // SunHttp & SunHttpLoom (for development only): 
     implementation("org.http4k:http4k-core")
 }
 ```

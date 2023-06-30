@@ -1,0 +1,68 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/foobar"
+  },
+  "definitions": [
+    {
+      "first": "foobar",
+      "second": {
+        "properties": {
+          "key": {
+            "example": "value",
+            "type": "string"
+          },
+          "key2": {
+            "example": 123,
+            "format": "int32",
+            "type": "integer"
+          },
+          "key3": {
+            "additionalProperties": {
+              "properties": {
+                "inner": {
+                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                }
+              },
+              "example": {
+                "inner": {
+                  "uri": "foobar"
+                }
+              },
+              "type": "object"
+            },
+            "type": "object"
+          }
+        },
+        "example": {
+          "key": "value",
+          "key2": 123,
+          "key3": {
+            "inner": {
+              "uri": "foobar"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "first": "org.http4k.contract.jsonschema.v3.ArbObject2",
+      "second": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "uri"
+        ]
+      }
+    }
+  ]
+}

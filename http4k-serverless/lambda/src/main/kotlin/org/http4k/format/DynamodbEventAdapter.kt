@@ -107,13 +107,13 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
         list("SS", attributeValue.ss)
     }
 
-    private fun JsonReader.item(): Map<String, AttributeValue> =
+    private fun JsonReader.item() =
         map { obj(::AttributeValue) { attributeValue(it, this) } }
 
     private fun JsonReader.attributeValue(name: String, attributeValue: AttributeValue) {
         when (name) {
             "B" -> attributeValue.b = nextString().base64DecodedByteBuffer()
-            "BS" -> attributeValue.setBS(stringList().map { it.base64DecodedByteBuffer() })
+            "BS" -> attributeValue.setBS(stringList()?.map { it.base64DecodedByteBuffer() })
             "BOOL" -> attributeValue.bool = nextBoolean()
             "L" -> attributeValue.setL(list { obj(::AttributeValue) { attributeValue(it, this) } })
             "M" -> attributeValue.m = item()

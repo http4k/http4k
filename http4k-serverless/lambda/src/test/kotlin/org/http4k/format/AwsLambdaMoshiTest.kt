@@ -38,6 +38,8 @@ import org.http4k.testing.JsonApprovalTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.format.ISODateTimeFormat
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.Date
@@ -204,6 +206,103 @@ class AwsLambdaMoshiTest {
                 }
             )
         })
+    }
+
+    @Test
+    fun `SNS event - read null subject`() {
+        val actual = javaClass.getResourceAsStream("AwsLambdaMoshiTest.SNS event - read null subject.approved")!!
+            .reader().readText()
+            .let { asA<SNSEvent>(it) }
+
+        val expected = SNSEvent().apply {
+            records = listOf(
+                SNSEvent.SNSRecord().apply {
+                    eventSource = "eventSource"
+                    eventSubscriptionArn = "eventSubscriptionArn"
+                    eventVersion = "eventVersion"
+                    setSns(SNSEvent.SNS().apply {
+                        signingCertUrl = "signingCertUrl"
+                        messageId = "messageId"
+                        message = "message"
+                        subject = null
+                        unsubscribeUrl = "unsubscribeUrl"
+                        type = "type"
+                        signatureVersion = "type"
+                        signature = "signature"
+                        topicArn = "topicArn"
+                        timestamp = DateTime(0, UTC)
+                        messageAttributes = mapOf("msgAttrName" to SNSEvent.MessageAttribute().apply {
+                            type = "type"
+                            value = "value"
+                        })
+                    })
+                }
+            )
+        }
+
+        assertThat(expected, equalTo(actual))
+    }
+
+    @Test
+    fun `SQS event with no message attributes`() {
+        assertNull(
+            asA<SQSEvent>(
+                """
+                    {
+                      "Records": [
+                        {
+                          "messageId": "messageId",
+                          "receiptHandle": "receiptHandle",
+                          "body": "body",
+                          "md5OfBody": "md5OfBody",
+                          "md5OfMessageAttributes": null,
+                          "eventSourceArn": "eventSourceArn",
+                          "eventSource": "eventSource",
+                          "awsRegion": "awsRegion",
+                          "attributes": {
+                            "attr": "attrvalue"
+                          },
+                          "messageAttributes": { }
+                        }
+                      ]
+                    }
+                """.trimIndent()
+            ).records[0].md5OfMessageAttributes)
+    }
+
+    @Test
+    fun `SQS event with null message attributes`() {
+        val json = """
+            {
+              "Records": [
+                {
+                  "messageId": "messageId",
+                  "receiptHandle": "receiptHandle",
+                  "body": "body",
+                  "md5OfBody": "md5OfBody",
+                  "md5OfMessageAttributes": "md5OfMessageAttributes",
+                  "eventSourceArn": "eventSourceArn",
+                  "eventSource": "eventSource",
+                  "awsRegion": "awsRegion",
+                  "attributes": {
+                    "attr": "attrvalue"
+                  },
+                  "messageAttributes": {
+                    "msgAttrName": {
+                      "binaryValue": null,
+                      "binaryListValues": null,
+                      "dataType": "String",
+                      "stringValue": "stringValue"
+                    }
+                  }
+                }
+              ]
+            }
+        """.trimIndent()
+        val evt = asA<SQSEvent>(json)
+        println(evt)
+        assertNull(evt.records[0].messageAttributes["msgAttrName"]?.binaryValue)
+        assertEquals("stringValue", evt.records[0].messageAttributes["msgAttrName"]?.stringValue)
     }
 
     @Test

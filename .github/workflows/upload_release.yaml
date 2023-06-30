@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v3.10.0
         with:
           distribution: temurin
-          java-version: 11
+          java-version: 20
           cache: gradle
       - name: Upload to Sonatype
         run: |
@@ -29,4 +29,3 @@ jobs:
           -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}" \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
-  

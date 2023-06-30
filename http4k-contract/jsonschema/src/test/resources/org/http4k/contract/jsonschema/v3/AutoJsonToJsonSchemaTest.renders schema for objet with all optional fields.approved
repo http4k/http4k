@@ -1,0 +1,27 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Nulls"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.Nulls",
+      "second": {
+        "properties": {
+          "f1": {
+            "example": "foo",
+            "type": "string"
+          },
+          "f2": {
+            "example": "bar",
+            "type": "string"
+          }
+        },
+        "example": {
+          "f1": "foo",
+          "f2": "bar"
+        },
+        "type": "object"
+      }
+    }
+  ]
+}

@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 class PushPullAdaptingWebSocketTest {
 
-    class TestAdapter : PushPullAdaptingWebSocket(Request(GET, "/bob")) {
+    class TestAdapter : PushPullAdaptingWebSocket() {
         val received = mutableListOf<WsMessage>()
         val closed = AtomicReference<WsStatus>(null)
 

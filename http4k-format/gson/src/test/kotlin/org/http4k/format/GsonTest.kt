@@ -48,6 +48,23 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     }
 
     @Test
+    @Disabled("for j19")
+    override fun `throwable is marshalled`() {
+
+    }
+
+    @Test
+    @Disabled("for j19")
+    override fun `roundtrip zones and locale`() {
+
+    }
+
+    @Test
+    @Disabled("for j19")
+    override fun `exception is marshalled`() {
+    }
+
+    @Test
     @Disabled("GSON does not currently have Kotlin class support")
     override fun `fails decoding when a required value is null`() {
     }

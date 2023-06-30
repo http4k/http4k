@@ -31,15 +31,19 @@ class WebsocketTest {
     fun `when match, passes a consumer with the matching request`() {
         val consumer = TestConsumer();
 
-        { _: Request -> consumer }.testWebsocket(Request(Method.GET, "/"))
+        var r: Request? = null
+        { req: Request ->
+            r = req
+            WsResponse(consumer)
+        }.testWebsocket(Request(Method.GET, "/"))
 
-        assertThat(consumer.websocket.upgradeRequest, equalTo(Request(Method.GET, "/")))
+        assertThat(r, equalTo(Request(Method.GET, "/")))
     }
 
     @Test
     fun `sends outbound messages to the websocket`() {
         val consumer = TestConsumer()
-        val client = { _: Request -> consumer }.testWebsocket(Request(Method.GET, "/"))
+        val client = { _: Request -> WsResponse(consumer) }.testWebsocket(Request(Method.GET, "/"))
         client.onMessage {
             fail("Client must not receive messages it sends")
         }
@@ -53,7 +57,7 @@ class WebsocketTest {
     @Test
     fun `sends inbound messages to the client`() {
         val consumer = TestConsumer()
-        val client = { _: Request -> consumer }.testWebsocket(Request(Method.GET, "/"))
+        val client = { _: Request -> WsResponse(consumer) }.testWebsocket(Request(Method.GET, "/"))
         consumer.websocket.onMessage {
             fail("Server must not receive messages it sends")
         }

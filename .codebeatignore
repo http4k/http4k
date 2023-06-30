@@ -2,5 +2,4 @@ src/docs/**
 tools/**
 .idea/**
 gradle/**
-http4k-template-dust/src/main/resources/org/http4k/template/dust/dust-*.js
 http4k-multipart/src/main/java/org/apache/**

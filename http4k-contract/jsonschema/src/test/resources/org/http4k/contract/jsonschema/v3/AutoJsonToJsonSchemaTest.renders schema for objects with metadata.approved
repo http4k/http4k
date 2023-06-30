@@ -1,0 +1,59 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.MetaDataValueHolder"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.MetaDataValueHolder",
+      "second": {
+        "properties": {
+          "i": {
+            "example": 1,
+            "format": "int32",
+            "type": "integer"
+          },
+          "j": {
+            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldWithMetadata"
+          }
+        },
+        "example": {
+          "i": 1,
+          "j": {
+            "field1": "field1",
+            "field2": "field2"
+          }
+        },
+        "type": "object",
+        "required": [
+          "i",
+          "j"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.jsonschema.v3.JacksonFieldWithMetadata",
+      "second": {
+        "properties": {
+          "field1": {
+            "example": "field1",
+            "description": "Field 1 description",
+            "type": "string"
+          },
+          "field2": {
+            "example": "field2",
+            "type": "string"
+          }
+        },
+        "example": {
+          "field1": "field1",
+          "field2": "field2"
+        },
+        "type": "object",
+        "required": [
+          "field1",
+          "field2"
+        ]
+      }
+    }
+  ]
+}

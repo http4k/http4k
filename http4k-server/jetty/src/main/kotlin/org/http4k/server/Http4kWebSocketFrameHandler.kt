@@ -17,9 +17,10 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 
-class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
-                                  private val upgradeRequest: Request) : FrameHandler {
-
+class Http4kWebSocketFrameHandler(
+    private val wSocket: WsConsumer,
+    private val upgradeRequest: Request
+) : FrameHandler {
     private var websocket: PushPullAdaptingWebSocket? = null
     private val textBuffer = Utf8StringBuilder()
 
@@ -43,7 +44,7 @@ class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
     }
 
     override fun onOpen(session: CoreSession, callback: Callback) {
-        websocket = object : PushPullAdaptingWebSocket(upgradeRequest) {
+        websocket = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
                 session.sendFrame(Frame(
                     if (message.body is StreamBody) BINARY else TEXT,

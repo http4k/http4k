@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import org.http4k.core.Body
 import org.http4k.core.Credentials
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -15,7 +14,6 @@ import org.http4k.core.with
 import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.OAuthWebForms.responseForm
 import org.http4k.security.oauth.core.RefreshToken
-import org.http4k.security.oauth.server.OAuthServerMoshi.auto
 import org.http4k.security.openid.IdToken
 import org.junit.jupiter.api.Test
 
@@ -51,7 +49,7 @@ internal class AccessTokenFetcherTest {
             refresh_token = token.refreshToken?.value,
         )
 
-        val api = { _: Request -> Response(OK).with(Body.auto<AccessTokenResponse>().toLens() of response) }
+        val api = { _: Request -> Response(OK).with(accessTokenResponseBody of response) }
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 

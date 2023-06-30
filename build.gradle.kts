@@ -11,7 +11,13 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
+    id("io.github.gradle-nexus.publish-plugin")
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(20))
+    }
 }
 
 buildscript {
@@ -57,6 +63,7 @@ allprojects {
 
         withType<Test> {
             useJUnitPlatform()
+            jvmArgs = listOf("--enable-preview")
         }
 
         named<JacocoReport>("jacocoTestReport") {

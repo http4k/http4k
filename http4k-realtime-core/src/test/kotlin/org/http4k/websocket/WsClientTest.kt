@@ -41,16 +41,19 @@ class WsClientTest {
     @Test
     fun `when match, passes a consumer with the matching request`() {
         val consumer = TestConsumer();
+        var r: Request? = null
+        { req: Request ->
+            r = req
+            WsResponse(consumer)
+        }.testWsClient(Request(GET, "/"))
 
-        { _: Request -> consumer }.testWsClient(Request(GET, "/"))
-
-        assertThat(consumer.websocket.upgradeRequest, equalTo(Request(GET, "/")))
+        assertThat(r!!, equalTo(Request(GET, "/")))
     }
 
     @Test
     fun `sends outbound messages to the websocket`() {
         val consumer = TestConsumer()
-        val client = { _: Request -> consumer }.testWsClient(Request(GET, "/"))
+        val client = { _: Request -> WsResponse(consumer) }.testWsClient(Request(GET, "/"))
 
         client.send(message)
         assertThat(consumer.messages, equalTo(listOf(message)))
@@ -63,7 +66,7 @@ class WsClientTest {
     @Test
     fun `sends inbound messages to the client`() {
         val client = { _: Request ->
-            { ws: Websocket ->
+            WsResponse { ws: Websocket ->
                 ws.send(message)
                 ws.send(message)
                 ws.close(NEVER_CONNECTED)
@@ -77,7 +80,7 @@ class WsClientTest {
     @Test
     fun `closed websocket throws when read attempted`() {
         val client = { _: Request ->
-            { ws: Websocket ->
+            WsResponse { ws: Websocket ->
                 ws.close(NEVER_CONNECTED)
             }
         }.testWsClient(Request(GET, "/"))
@@ -88,7 +91,7 @@ class WsClientTest {
     @Test
     fun `throws for no match`() {
         val actual = object : WsHandler {
-            override fun invoke(request: Request): WsConsumer = { it.close(NEVER_CONNECTED) }
+            override fun invoke(request: Request) = WsResponse { it.close(NEVER_CONNECTED) }
         }.testWsClient(Request(GET, "/"))
 
         assertThat({ actual.received().toList() }, throws<ClosedWebsocket>())
@@ -97,7 +100,7 @@ class WsClientTest {
     @Test
     fun `when no messages`() {
         val client = { _: Request ->
-            { ws: Websocket ->
+            WsResponse { ws: Websocket ->
                 ws.close(NORMAL)
             }
         }.testWsClient(Request(GET, "/"))

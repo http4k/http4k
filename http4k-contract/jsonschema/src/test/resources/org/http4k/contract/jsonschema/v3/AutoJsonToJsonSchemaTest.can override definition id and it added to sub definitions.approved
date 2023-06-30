@@ -1,0 +1,181 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/foobar"
+  },
+  "definitions": [
+    {
+      "first": "foobar",
+      "second": {
+        "properties": {
+          "child": {
+            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+          },
+          "list": {
+            "items": {
+              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            },
+            "example": [
+              {
+                "uri": "foobar"
+              },
+              {
+                "uri": "foobar"
+              }
+            ],
+            "type": "array"
+          },
+          "nestedList": {
+            "items": {
+              "items": {
+                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+              },
+              "type": "array"
+            },
+            "example": [
+              [
+                {
+                  "uri": "foobar"
+                },
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "type": "array"
+          },
+          "nullableChild": {
+            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+          },
+          "stringList": {
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "hello",
+              "goodbye"
+            ],
+            "type": "array"
+          },
+          "anyList": {
+            "items": {
+              "oneOf": [
+                {
+                  "items": {
+                    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                }
+              ]
+            },
+            "example": [
+              "123",
+              {
+                "uri": "foobar"
+              },
+              true,
+              [
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "type": "array"
+          },
+          "enumVal": {
+            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+          }
+        },
+        "example": {
+          "child": {
+            "uri": "foobar"
+          },
+          "list": [
+            {
+              "uri": "foobar"
+            },
+            {
+              "uri": "foobar"
+            }
+          ],
+          "nestedList": [
+            [
+              {
+                "uri": "foobar"
+              },
+              {
+                "uri": "foobar"
+              }
+            ]
+          ],
+          "nullableChild": {
+            "uri": "foobar"
+          },
+          "stringList": [
+            "hello",
+            "goodbye"
+          ],
+          "anyList": [
+            "123",
+            {
+              "uri": "foobar"
+            },
+            true,
+            [
+              {
+                "uri": "foobar"
+              }
+            ]
+          ],
+          "enumVal": "value2"
+        },
+        "type": "object",
+        "required": [
+          "anyList",
+          "child",
+          "list",
+          "nestedList",
+          "stringList"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.jsonschema.v3.ArbObject2",
+      "second": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "uri"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.jsonschema.v3.Foo",
+      "second": {
+        "example": "value2",
+        "enum": [
+          "value1",
+          "value2"
+        ],
+        "type": "string"
+      }
+    }
+  ]
+}

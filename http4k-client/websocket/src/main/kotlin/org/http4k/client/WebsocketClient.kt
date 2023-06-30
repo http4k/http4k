@@ -31,7 +31,7 @@ object WebsocketClient {
     fun nonBlocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO, onError: (Throwable) -> Unit = {}, draft: Draft = Draft_6455(), onConnect: WsConsumer = {}): Websocket {
         val socket = AtomicReference<PushPullAdaptingWebSocket>()
         val client = NonBlockingClient(uri, headers, timeout, onConnect, draft, socket)
-        socket.set(AdaptingWebSocket(uri, client).apply { onError(onError) })
+        socket.set(AdaptingWebSocket(client).apply { onError(onError) })
         client.connect()
         return socket.get()
     }

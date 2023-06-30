@@ -1,8 +1,6 @@
 package org.http4k.sse
 
-import org.http4k.core.Request
-
-abstract class PushAdaptingSse(override val connectRequest: Request) : Sse {
+abstract class PushAdaptingSse : Sse {
 
     private val closeHandlers: MutableList<() -> Unit> = mutableListOf()
 

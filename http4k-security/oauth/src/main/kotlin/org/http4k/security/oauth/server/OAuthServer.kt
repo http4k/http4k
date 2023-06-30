@@ -5,6 +5,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.format.AutoMarshalling
+import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.lens.FormField
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
@@ -44,7 +45,7 @@ class OAuthServer(
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens,
     clock: Clock,
-    json: AutoMarshalling = OAuthServerMoshi,
+    json: AutoMarshalling = OAuthMoshi,
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
     idTokens: IdTokens = IdTokens.Unsupported,
@@ -61,7 +62,7 @@ class OAuthServer(
         authorizationCodes: AuthorizationCodes,
         accessTokens: AccessTokens,
         clock: Clock,
-        json: AutoMarshalling = OAuthServerMoshi,
+        json: AutoMarshalling = OAuthMoshi,
         authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
         grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(
             ClientSecretAccessTokenRequestAuthentication(clientValidator)

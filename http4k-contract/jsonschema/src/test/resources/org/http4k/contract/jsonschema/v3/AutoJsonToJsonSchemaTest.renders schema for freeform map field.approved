@@ -1,0 +1,32 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.MapHolder"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.MapHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "additionalProperties": {
+              "properties": {
+              },
+              "example": {
+              },
+              "type": "object"
+            },
+            "type": "object"
+          }
+        },
+        "example": {
+          "value": {
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import org.eclipse.jetty.websocket.client.ClientUpgradeRequest
 import org.eclipse.jetty.websocket.client.WebSocketClient
 import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.Headers
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
@@ -34,7 +34,7 @@ object JettyWebsocketClient {
         timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
         wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient())
     ): WsClient {
-        if(!wsClient.isRunning) wsClient.start()
+        if (!wsClient.isRunning) wsClient.start()
 
         return JettyBlockingWebsocket(uri, headers, timeout, wsClient).awaitConnected()
     }
@@ -47,7 +47,7 @@ object JettyWebsocketClient {
         onError: (Throwable) -> Unit = {},
         onConnect: WsConsumer = {}
     ): Websocket {
-        if(!wsClient.isRunning) wsClient.start()
+        if (!wsClient.isRunning) wsClient.start()
 
         return JettyNonBlockingWebsocket(uri, headers, timeout, wsClient, onError, onConnect)
     }
@@ -63,12 +63,13 @@ private class JettyBlockingWebsocket(
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
-    private val websocket = JettyNonBlockingWebsocket(uri, headers, timeout, client, connected::completeExceptionally) { ws ->
-        ws.onMessage { queue += { it } }
-        ws.onError { queue += { throw it } }
-        ws.onClose { queue += { null } }
-        connected.complete(this)
-    }
+    private val websocket =
+        JettyNonBlockingWebsocket(uri, headers, timeout, client, connected::completeExceptionally) { ws ->
+            ws.onMessage { queue += { it } }
+            ws.onError { queue += { throw it } }
+            ws.onClose { queue += { null } }
+            connected.complete(this)
+        }
 
     fun awaitConnected(): WsClient = try {
         connected.get()
@@ -90,9 +91,11 @@ private class JettyNonBlockingWebsocket(
     client: WebSocketClient,
     onError: (Throwable) -> Unit,
     private val onConnect: WsConsumer
-) : PushPullAdaptingWebSocket(Request(Method.GET, uri).headers(headers)) {
+) : PushPullAdaptingWebSocket() {
 
     private val listener = Listener()
+
+    private val req = Request(GET, uri).headers(headers)
 
     init {
         onError(onError)
@@ -102,7 +105,7 @@ private class JettyNonBlockingWebsocket(
 
     override fun send(message: WsMessage) = with(listener) {
         if (isNotConnected) {
-            throw WebSocketException("Connection to ${upgradeRequest.uri} is closed.")
+            throw WebSocketException("Connection to ${req.uri} is closed.")
         }
         when (message.body) {
             is StreamBody -> remote.sendBytes(message.body.payload)

@@ -23,7 +23,7 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                             "receiptHandle" -> receiptHandle = nextString()
                             "body" -> body = nextString()
                             "md5OfBody" -> md5OfBody = nextString()
-                            "md5OfMessageAttributes" -> md5OfMessageAttributes = nextString()
+                            "md5OfMessageAttributes" -> md5OfMessageAttributes = stringOrNull()
                             "eventSourceArn" -> eventSourceArn = nextString()
                             "eventSource" -> eventSource = nextString()
                             "awsRegion" -> awsRegion = nextString()
@@ -31,11 +31,11 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                             "messageAttributes" -> messageAttributes = map {
                                 obj(::MessageAttribute) {
                                     when (it) {
-                                        "binaryValue" -> binaryValue = nextString().base64DecodedByteBuffer()
+                                        "binaryValue" -> binaryValue = stringOrNull()?.base64DecodedByteBuffer()
                                         "binaryListValues" -> binaryListValues =
-                                            stringList().map { it.base64DecodedByteBuffer() }
-                                        "dataType" -> dataType = nextString()
-                                        "stringValue" -> stringValue = nextString()
+                                            stringList()?.map { it.base64DecodedByteBuffer() }
+                                        "dataType" -> dataType = stringOrNull()
+                                        "stringValue" -> stringValue = stringOrNull()
                                         "stringListValues" -> stringListValues = stringList()
                                         else -> skipValue()
                                     }
@@ -67,13 +67,8 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
                         obj("messageAttributes", messageAttributes) {
                             forEach {
                                 obj(it.key, it.value) {
-                                    list(
-                                        "binaryListValues",
-                                        binaryListValues?.map { it.base64Encode() })
-                                    string(
-                                        "binaryValue",
-                                        binaryValue?.base64Encode()
-                                    )
+                                    list("binaryListValues", binaryListValues?.map { it.base64Encode() })
+                                    string("binaryValue", binaryValue?.base64Encode())
                                     string("dataType", dataType)
                                     list("stringListValues", stringListValues)
                                     string("stringValue", stringValue)

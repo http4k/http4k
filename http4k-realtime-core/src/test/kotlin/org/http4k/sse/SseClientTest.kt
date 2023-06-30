@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.OK
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicReference
@@ -28,15 +29,29 @@ class SseClientTest {
     fun `when match, passes a consumer with the matching request`() {
         val consumer = TestConsumer();
 
-        { _: Request -> consumer }.testSseClient(Request(GET, "/"))
+        { req: Request ->
+            assertThat(req, equalTo(Request(GET, "/")))
+            SseResponse(consumer)
+        }.testSseClient(Request(GET, "/"))
+    }
 
-        assertThat(consumer.sse.connectRequest, equalTo(Request(GET, "/")))
+    @Test
+    fun `when match passes HTTP headers back`() {
+        val consumer = TestConsumer();
+
+        val client = { req: Request ->
+            assertThat(req, equalTo(Request(GET, "/")))
+            SseResponse(OK, listOf("foo" to "bar"), consumer)
+        }.testSseClient(Request(GET, "/"))
+
+        assertThat(client.status, equalTo(OK))
+        assertThat(client.headers, equalTo(listOf("foo" to "bar")))
     }
 
     @Test
     fun `sends inbound messages to the client`() {
         val client = { _: Request ->
-            { sse: Sse ->
+            SseResponse { sse: Sse ->
                 sse.send(message)
                 sse.send(message)
                 sse.close()
@@ -50,7 +65,7 @@ class SseClientTest {
     @Test
     fun `closed sse`() {
         val client = { _: Request ->
-            { sse: Sse ->
+            SseResponse { sse: Sse ->
                 sse.close()
             }
         }.testSseClient(Request(GET, "/"))
@@ -59,9 +74,9 @@ class SseClientTest {
     }
 
     @Test
-    fun `no match is just cosed`() {
+    fun `no match is just closed`() {
         val actual = object : SseHandler {
-            override fun invoke(request: Request): SseConsumer = { it.close() }
+            override fun invoke(request: Request) = SseResponse { it.close() }
         }.testSseClient(Request(GET, "/"))
 
         assertThat(actual.received().none(), equalTo(true))
@@ -70,7 +85,7 @@ class SseClientTest {
     @Test
     fun `when no messages`() {
         val client = { _: Request ->
-            { sse: Sse ->
+            SseResponse { sse: Sse ->
                 sse.close()
             }
         }.testSseClient(Request(GET, "/"))
