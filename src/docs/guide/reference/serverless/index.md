@@ -56,7 +56,7 @@ We hope to soon provide some tools to automate at least some of the above proces
 http4k also supports writing Event-based functions to receive AWS events from services like SQS and Dynamo. One advantage of using http4k version is that it uses the AWS SDK RequestStreamHandler instead of the standard RequestHandler - which avoids the heavyweight Jackson deserialisation process (we use Moshi under the covers) utilised by the standard AWS runtime. To use this events functionality, you should also import the AWS Events JAR:
 
 ```kotlin
-implementation "com.amazonaws:aws-lambda-java-events:3.8.0"
+implementation("com.amazonaws:aws-lambda-java-events:3.8.0")
 ```
 
 Similarly to HttpHandler, for event processing in a functional style, the main body of the Lambda function is encapsulated in a single interface `FnHandler`. This typesafe class is created by an `FnLoader` function and simply passed into an extension of `AwsLambdaEventFunction` - which is the class configured as the entry point of your AWS lambda.

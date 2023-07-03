@@ -82,9 +82,9 @@ When we conceived http4k, it was a simple 40 line shim over the top of another J
 
 ```kotlin
 dependencies {
-    implementation platform("org.http4k:http4k-bom:3.259.0")
-    implementation "org.http4k:http4k-core"
-    implementation "org.http4k:http4k-server-undertow"
+    implementation(platform("org.http4k:http4k-bom:3.259.0"))
+    implementation("org.http4k:http4k-core")
+    implementation("org.http4k:http4k-server-undertow")
 }
 ```
 
