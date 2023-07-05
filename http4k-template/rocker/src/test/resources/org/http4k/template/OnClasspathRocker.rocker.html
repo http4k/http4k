@@ -1,2 +1,2 @@
 @args (Iterable<org.http4k.template.Item> items)
-  <ul>@for ((i, item) : items) {<li>Name:<span>@item.getName()</span>Price:<span>@item.getPrice()</span><ul>@for ((feature) : item.getFeatures()) {<li>Feature:<span>@feature.getDescription()</span></li>}</ul></li>}</ul>
+<ul>@for ((i, item) : items) {<li>Name:<span>@item.getName()</span>Price:<span>@item.getPrice()</span><ul>@for ((feature) : item.getFeatures()) {<li>Feature:<span>@feature.getDescription()</span></li>}</ul></li>}</ul>
