@@ -11,6 +11,29 @@ interface ViewModel {
      * is added by the template implementation (eg. java.lang.String -> java/lang/String.hbs)
      */
     fun template(): String = javaClass.name.replace('.', '/')
+
+    /**
+     * This is the model to use in the template, or `null` to not use any model.
+     */
+    fun model(): Any? = this
+}
+
+/**
+ * Use a template with a specific model.
+ * Does not work with Rocker.
+ */
+data class ViewWithModel(val template: String, val model: Any) : ViewModel {
+    override fun template() = template.replace('.', '/')
+    override fun model() = model
+}
+
+/**
+ * Use a template with a specific model.
+ * Does not work with Rocker.
+ */
+data class View(val template: String) : ViewModel {
+    override fun template() = template.replace('.', '/')
+    override fun model() = null
 }
 
 fun Body.Companion.viewModel(renderer: TemplateRenderer, contentType: ContentType) =

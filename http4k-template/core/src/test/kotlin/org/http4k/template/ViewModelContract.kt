@@ -30,6 +30,32 @@ abstract class ViewModelContract(private val templates: Templates) {
     }
 
     @Test
+    fun `renders into Body with ViewWithModel`() {
+        val renderer = templates.CachingClasspath()
+
+        val view = Body.viewModel(renderer, TEXT_HTML).toLens()
+
+        val response = view(ViewWithModel("org.http4k.template.OnClasspath", OnClasspath(items)), Response(OK))
+
+        assertThat(response.bodyString(), equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
+        assertThat(response.status, equalTo(OK))
+        assertThat(CONTENT_TYPE(response), equalTo(TEXT_HTML))
+    }
+
+    @Test
+    fun `renders into Body with View`() {
+        val renderer = templates.CachingClasspath()
+
+        val view = Body.viewModel(renderer, TEXT_HTML).toLens()
+
+        val response = view(View("org.http4k.template.NoModel"), Response(OK))
+
+        assertThat(response.bodyString(), equalTo("<div>No model</div>"))
+        assertThat(response.status, equalTo(OK))
+        assertThat(CONTENT_TYPE(response), equalTo(TEXT_HTML))
+    }
+
+    @Test
     fun `renders into WsMessage`() {
         val renderer = templates.CachingClasspath()
 

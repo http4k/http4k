@@ -30,7 +30,7 @@ class FreemarkerTemplates(private val configure: (Configuration) -> Configuratio
         override fun invoke(viewModel: ViewModel): String = try {
             val stringWriter = StringWriter()
             val template = configuration.getTemplate(viewModel.template())
-            template.process(viewModel, stringWriter)
+            template.process(viewModel.model(), stringWriter)
             stringWriter.toString()
         } catch (e: TemplateNotFoundException) {
             throw ViewNotFound(viewModel)

@@ -38,7 +38,9 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
     private class ThymeleafTemplateRenderer(private val engine: ITemplateEngine) : TemplateRenderer {
         override fun invoke(viewModel: ViewModel): String = try {
             engine.process(viewModel.template(), Context().apply {
-                setVariable("model", viewModel)
+                viewModel.model()?.let {
+                    setVariable("model", it)
+                }
             })
         } catch (e: TemplateInputException) {
             when (e.cause) {

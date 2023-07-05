@@ -19,7 +19,7 @@ class Jade4jTemplates(private val configure: JadeConfiguration = JadeConfigurati
         return fun(viewModel: ViewModel): String {
             try {
                 val template = configure.getTemplate(basePath + viewModel.template())
-                return configure.renderTemplate(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
+                return configure.renderTemplate(template, model(viewModel))
             } catch (e: NullPointerException) {
                 throw ViewNotFound(viewModel)
             }
@@ -32,7 +32,7 @@ class Jade4jTemplates(private val configure: JadeConfiguration = JadeConfigurati
 
         val cachingFun = fun(viewModel: ViewModel): String {
             val template = configure.getTemplate(viewModel.template())
-            return configure.renderTemplate(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
+            return configure.renderTemplate(template, model(viewModel))
         }
         return safeRender(cachingFun)
     }
@@ -40,10 +40,12 @@ class Jade4jTemplates(private val configure: JadeConfiguration = JadeConfigurati
     override fun HotReload(baseTemplateDir: String): TemplateRenderer {
         val hotReloadFun = fun(viewModel: ViewModel) = Jade4J.render(
             baseTemplateDir + File.separator + viewModel.template(),
-            mutableMapOf<String, Any>(Pair("model", viewModel))
+            model(viewModel)
         )
         return safeRender(hotReloadFun)
     }
+
+    private fun model(viewModel: ViewModel) = viewModel.model()?.let { mutableMapOf(Pair("model", it)) } ?: emptyMap()
 
     private fun safeRender(fn: (ViewModel) -> String): (ViewModel) -> String = {
         try {
