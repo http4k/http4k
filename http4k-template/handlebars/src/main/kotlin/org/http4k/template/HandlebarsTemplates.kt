@@ -16,29 +16,18 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
     override fun CachingClasspath(baseClasspathPackage: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Pair<Class<*>, String>, Template>()
         private val handlebars = configure(Handlebars(ClassPathTemplateLoader("/" + baseClasspathPackage.replace('.', '/'))))
-
-        override fun invoke(viewModel: ViewModel) =
-            safeRender {
-                classToTemplate.getOrPut(it.javaClass to it.template()) { handlebars.compile(it.template()) }.apply(it.model())
-            }(viewModel)
+        override fun invoke(viewModel: ViewModel): String = renderCached(handlebars, classToTemplate, viewModel)
     }
 
     override fun Caching(baseTemplateDir: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Pair<Class<*>, String>, Template>()
         private val handlebars = configure(Handlebars(FileTemplateLoader(File(baseTemplateDir))))
-
-        override fun invoke(viewModel: ViewModel) =
-            safeRender {
-                classToTemplate.getOrPut(it.javaClass to it.template()) { handlebars.compile(it.template()) }.apply(it.model())
-            }(viewModel)
+        override fun invoke(viewModel: ViewModel): String = renderCached(handlebars, classToTemplate, viewModel)
     }
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer = object : TemplateRenderer {
-        val handlebars = configure(Handlebars(FileTemplateLoader(File(baseTemplateDir))))
-        override fun invoke(viewModel: ViewModel): String =
-            safeRender {
-                handlebars.compile(it.template()).apply(it.model())
-            }(viewModel)
+        private val handlebars = configure(Handlebars(FileTemplateLoader(File(baseTemplateDir))))
+        override fun invoke(viewModel: ViewModel): String = renderDirect(handlebars, viewModel)
     }
 
     /**
@@ -51,11 +40,18 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
     fun HotReload(firstBaseDir: String, secondBaseDir: String, vararg rest: String): TemplateRenderer = object : TemplateRenderer {
         val loaders = listOf(firstBaseDir, secondBaseDir, *rest).map { FileTemplateLoader(File(it)) }
         val handlebars = configure(Handlebars(CompositeTemplateLoader(*loaders.toTypedArray())))
-        override fun invoke(viewModel: ViewModel): String =
-            safeRender {
-                handlebars.compile(it.template()).apply(it.model())
-            }(viewModel)
+        override fun invoke(viewModel: ViewModel): String = renderDirect(handlebars, viewModel)
     }
+
+    private fun renderDirect(handlebars: Handlebars, viewModel: ViewModel): String =
+        safeRender {
+            handlebars.compile(it.template()).apply(it.model())
+        }(viewModel)
+
+    private fun renderCached(handlebars: Handlebars, classToTemplate: ConcurrentHashMap<Pair<Class<*>, String>, Template>, viewModel: ViewModel): String =
+        safeRender {
+            classToTemplate.getOrPut(it.javaClass to it.template()) { handlebars.compile(it.template()) }.apply(it.model())
+        }(viewModel)
 
     private fun safeRender(fn: (ViewModel) -> String): (ViewModel) -> String = {
         try {
