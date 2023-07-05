@@ -28,7 +28,7 @@ data class ViewWithModel(val template: String, val model: Any) : ViewModel {
 }
 
 /**
- * Use a template with a specific model.
+ * Use a template without a model.
  * Does not work with Rocker.
  */
 data class View(val template: String) : ViewModel {
