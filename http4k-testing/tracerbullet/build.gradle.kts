@@ -1,4 +1,4 @@
-description = "http4k incubator module"
+description = "http4k Tracer Bullet module"
 
 dependencies {
     api(project(":http4k-core"))

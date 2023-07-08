@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-description = "http4k incubator module"
+description = "http4k Servirtium module"
 
 dependencies {
     api(project(":http4k-core"))
