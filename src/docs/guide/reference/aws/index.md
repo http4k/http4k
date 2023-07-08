@@ -11,7 +11,7 @@ dependencies {
 ```
 
 ### About
-This module provides 2 things: A http4k compatible `SdkHttpClient` and a super-simple AWS request signing functionality for talking to AWS services.
+This module provides 2 things: a http4k compatible `SdkHttpClient` and a super-simple AWS request signing functionality for talking to AWS services.
 
 1. With the `SdkHttpClient` you can use the standard Amazon SDKs libraries by plugging in a standard `HttpHandler`. This simplifies fault testing and means that you can print out the exact traffic which is going to AWS - which is brilliant for both debugging and writing Fakes. :)
 
