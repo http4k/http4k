@@ -18,6 +18,7 @@ import software.amazon.awssdk.http.SdkHttpFullRequest
 import software.amazon.awssdk.http.SdkHttpFullResponse
 import software.amazon.awssdk.http.SdkHttpMethod
 import software.amazon.awssdk.http.SdkHttpResponse
+import java.net.URI
 import java.net.URL
 import java.util.Optional
 
@@ -45,7 +46,7 @@ class AwsSdkClientTest {
                     .method(SdkHttpMethod.POST)
                     .headers(headers.groupBy { it.first }
                         .mapValues { it.value.map { it.second } })
-                    .uri(URL(request.uri.toString()).toURI())
+                    .uri(URI.create(request.uri.toString()))
                     .putRawQueryParameter("foo", listOf("bar1", "bar2"))
                     .contentStreamProvider { request.body.stream }.build()
             ).build()
