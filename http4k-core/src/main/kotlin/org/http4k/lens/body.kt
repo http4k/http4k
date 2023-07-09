@@ -13,7 +13,11 @@ import org.http4k.lens.ParamMeta.StringParam
 /**
  * A BodyLens provides the uni-directional extraction of an entity from a target body.
  */
-open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentType, private val getLens: (HttpMessage) -> FINAL) : LensExtractor<HttpMessage, FINAL> {
+open class BodyLens<out FINAL>(
+    val metas: List<Meta>,
+    val contentType: ContentType,
+    private val getLens: (HttpMessage) -> FINAL
+) : LensExtractor<HttpMessage, FINAL> {
 
     override operator fun invoke(target: HttpMessage): FINAL = try {
         getLens(target)
@@ -42,7 +46,11 @@ class BiDiBodyLens<FINAL>(
 /**
  * Represents a uni-directional extraction of an entity from a target Body.
  */
-open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val contentType: ContentType, internal val get: LensGet<HttpMessage, OUT>) {
+open class BodyLensSpec<out OUT>(
+    internal val metas: List<Meta>,
+    internal val contentType: ContentType,
+    internal val get: LensGet<HttpMessage, OUT>
+) {
     /**
      * Create a lens for this Spec
      */
@@ -71,7 +79,8 @@ open class BiDiBodyLensSpec<OUT>(
      * Create another BiDiBodyLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
      * used to extract or insert the final type from/into a Body.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiBodyLensSpec(metas, contentType, get.map(nextIn), set.map(nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) =
+        BiDiBodyLensSpec(metas, contentType, get.map(nextIn), set.map(nextOut))
 
     /**
      * Create a lens for this Spec
@@ -79,8 +88,13 @@ open class BiDiBodyLensSpec<OUT>(
     override fun toLens(): BiDiBodyLens<OUT> {
         val getLens = get("")
         val setLens = set("")
-        return BiDiBodyLens(metas, contentType,
-            { getLens(it).let { if (it.isEmpty()) throw LensFailure(metas.map(::Missing), target = it) else it.first() } },
+        return BiDiBodyLens(metas, contentType, { target ->
+            try {
+                getLens(target)
+            } catch (e: Exception) {
+                throw if (e is LensFailure) e else LensFailure(metas.map(::Invalid), e, target, e.message ?: "<unknown>")
+            }.let { if (it.isEmpty()) throw LensFailure(metas.map(::Missing), target = target) else it.first() }
+        },
             { out: OUT, target: HttpMessage -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
@@ -92,7 +106,9 @@ fun httpBodyRoot(metas: List<Meta>, acceptedContentType: ContentType, contentNeg
             contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
             listOf(target.body)
         },
-        LensSet { _, values, target -> values.fold(target) { memo, next -> memo.body(next) }.with(CONTENT_TYPE of acceptedContentType) }
+        LensSet { _, values, target ->
+            values.fold(target) { memo, next -> memo.body(next) }.with(CONTENT_TYPE of acceptedContentType)
+        }
     )
 
 /**
@@ -107,17 +123,31 @@ fun interface ContentNegotiation {
         /**
          * The received Content-type header passed back MUST equal the expected Content-type, including directive
          */
-        val Strict = ContentNegotiation { expected, actual -> if (actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual) }
+        val Strict = ContentNegotiation { expected, actual ->
+            if (actual != expected) throw LensFailure(
+                Unsupported(CONTENT_TYPE.meta),
+                target = actual
+            )
+        }
 
         /**
          * The received Content-type header passed back MUST equal the expected Content-type, not including the directive
          */
-        val StrictNoDirective = ContentNegotiation { expected, actual -> if (expected.value != actual?.value) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual) }
+        val StrictNoDirective = ContentNegotiation { expected, actual ->
+            if (expected.value != actual?.value) throw LensFailure(
+                Unsupported(CONTENT_TYPE.meta), target = actual
+            )
+        }
 
         /**
          * If present, the received Content-type header passed back MUST equal the expected Content-type, including directive
          */
-        val NonStrict = ContentNegotiation { expected, actual -> if (actual != null && actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual) }
+        val NonStrict = ContentNegotiation { expected, actual ->
+            if (actual != null && actual != expected) throw LensFailure(
+                Unsupported(CONTENT_TYPE.meta),
+                target = actual
+            )
+        }
 
         /**
          * No validation is done on the received content type at all
@@ -126,15 +156,33 @@ fun interface ContentNegotiation {
     }
 }
 
-fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = httpBodyRoot(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation)
+fun Body.Companion.string(
+    contentType: ContentType,
+    description: String? = null,
+    contentNegotiation: ContentNegotiation = None
+) = httpBodyRoot(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation)
     .map({ it.payload.asString() }, { Body(it) })
 
-fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = string(contentType, description, contentNegotiation).map(StringBiDiMappings.nonEmpty())
+fun Body.Companion.nonEmptyString(
+    contentType: ContentType,
+    description: String? = null,
+    contentNegotiation: ContentNegotiation = None
+) = string(contentType, description, contentNegotiation).map(StringBiDiMappings.nonEmpty())
 
-fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = httpBodyRoot(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
+fun Body.Companion.binary(
+    contentType: ContentType,
+    description: String? = null,
+    contentNegotiation: ContentNegotiation = None
+) = httpBodyRoot(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
     .map({ it.stream }, { Body(it) })
 
-fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = None) =
+fun Body.Companion.regex(
+    pattern: String,
+    group: Int = 1,
+    contentType: ContentType = ContentType.TEXT_PLAIN,
+    description: String? = null,
+    contentNegotiation: ContentNegotiation = None
+) =
     StringBiDiMappings.regex(pattern, group).let { string(contentType, description, contentNegotiation).map(it) }
 
 internal fun <IN, NEXT> BiDiBodyLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)

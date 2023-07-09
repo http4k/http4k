@@ -1,5 +1,6 @@
 package org.http4k.lens
 
+import com.natpryce.hamkrest.MatchResult
 import com.natpryce.hamkrest.MatchResult.Match
 import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
@@ -91,7 +92,6 @@ object BiDiLensContract {
 }
 
 data class MyCustomType(val value: String)
-data class MyCustomNullableType(val value: String?)
 
 inline fun <reified T> lensFailureWith(vararg failures: Failure, overallType: Failure.Type) = object : Matcher<LensFailure> {
     private val expectedList = failures.toList()

@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status
@@ -99,6 +100,10 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult.normaliseJson()))
         assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
     }
+
+    val invalidArbObjectRequest = Request(GET, "").body("{}")
+
+    abstract fun `automarshalling failure has expected message`()
 
     @Test
     open fun `roundtrip arbitrary object through convert`() {

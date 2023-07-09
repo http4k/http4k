@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -25,6 +29,12 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = Jackson.asJsonObject(obj)
         assertThat(Jackson.asA(out, ArbObject::class), equalTo(obj))
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { Jackson.autoBody<ArbObject>().toLens()(Request(GET, "").body("{}")) }
+            .exceptionOrNull()!!.message!!, startsWith("Instantiation of [simple type"))
     }
 
     @Test

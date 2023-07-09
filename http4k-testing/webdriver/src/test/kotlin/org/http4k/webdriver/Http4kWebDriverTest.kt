@@ -15,6 +15,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
+import java.net.URI
 import java.net.URL
 import java.time.Instant
 import java.util.Date
@@ -135,8 +136,7 @@ class Http4kWebDriverTest {
         driver.navigate().to("https://localhost/rita")
         driver.assertOnPage("https://localhost/rita")
         assertThat(driver.currentUrl, equalTo("https://localhost/rita"))
-
-        driver.navigate().to(URL("http://localhost/bob"))
+        driver.navigate().to(URI.create("http://localhost/bob").toURL())
         driver.assertOnPage("http://localhost/bob")
         assertThat(driver.currentUrl, equalTo("http://localhost/bob"))
 

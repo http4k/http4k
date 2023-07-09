@@ -10,7 +10,7 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.JacksonCsv.auto
 import org.junit.jupiter.api.Test
-import java.net.URL
+import java.net.URI
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -74,7 +74,7 @@ class JacksonCsvBodyTest {
             Instant.EPOCH,
             UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
             Uri.of("http://uri:8000"),
-            URL("http://url:9000"),
+            URI.create("http://url:9000").toURL(),
             OK
         )
 

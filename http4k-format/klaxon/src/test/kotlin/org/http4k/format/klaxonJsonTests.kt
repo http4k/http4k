@@ -2,7 +2,10 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -75,6 +78,13 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     @Disabled("not supported by Klaxon")
     override fun `roundtrip arbitrary set`() {
     }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { Klaxon.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Unable to instantiate ArbObject"))
+    }
+
 }
 
 class KlaxonAutoEventsTest : AutoMarshallingEventsContract(Klaxon)
