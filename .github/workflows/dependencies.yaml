@@ -1,0 +1,26 @@
+name: Analyse Dependencies
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    name: Dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3.10.0
+        with:
+          distribution: temurin
+          java-version: 20
+          cache: gradle
+
+      - name: Run snapshot action
+        uses: mikepenz/gradle-dependency-submission@{latest}
+        with:
+          sub-module-mode: COMBINED
