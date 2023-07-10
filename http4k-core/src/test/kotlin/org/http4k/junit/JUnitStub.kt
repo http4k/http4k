@@ -14,6 +14,6 @@ class JUnitStub(private val t: Any) : ExtensionContext by proxy(), ParameterCont
     }
 
     override fun getTestInstance() = Optional.of(t)
-    override fun getTestMethod() = Optional.of(ServirtiumReplayTest::class.java.getMethod("hashCode"))
+    override fun getTestMethod() = Optional.of(JUnitStub::class.java.getMethod("hashCode"))
     override fun getParameter(): Parameter = Lookup::class.java.methods.first().parameters[0]
 }

@@ -1,0 +1,41 @@
+[ {
+  "name" : "POST /foo",
+  "stub" : {
+    "request" : {
+      "method" : "POST",
+      "path" : "/foo",
+      "headers" : {
+        "toBeRetained" : "reqHeaderValue1",
+        "toBeRemoved" : "reqHeaderValue2"
+      },
+      "body" : {
+        "string" : "",
+        "httpContentType" : "text/plain",
+        "isPatternToken" : false,
+        "nativeValue" : ""
+      },
+      "queryParams" : { },
+      "formFields" : { },
+      "multiPartFormData" : [ ],
+      "bodyString" : ""
+    },
+    "response" : {
+      "status" : 500,
+      "headers" : {
+        "toBeRetained" : "respHeaderValue1",
+        "toBeRemoved" : "respHeaderValue2"
+      },
+      "body" : {
+        "string" : "helloWorldResponse",
+        "httpContentType" : "text/plain",
+        "isPatternToken" : false,
+        "nativeValue" : "helloWorldResponse"
+      },
+      "externalisedResponseCommand" : ""
+    },
+    "kafkaMessage" : null,
+    "delayInSeconds" : null,
+    "stubToken" : null,
+    "requestBodyRegex" : null
+  }
+} ]
