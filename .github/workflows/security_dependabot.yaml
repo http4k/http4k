@@ -1,4 +1,4 @@
-name: Analyse Dependencies
+name: "Security - Dependency Analysis (dependabot)"
 on:
   push:
     branches:
