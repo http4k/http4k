@@ -21,6 +21,6 @@ jobs:
           cache: gradle
 
       - name: Run snapshot action
-        uses: mikepenz/gradle-dependency-submission@{latest}
+        uses: mikepenz/gradle-dependency-submission@0.8.6
         with:
           sub-module-mode: COMBINED
