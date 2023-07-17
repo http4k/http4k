@@ -11,10 +11,13 @@ import org.http4k.lens.LensFailure
 import org.junit.jupiter.api.AfterEach
 import org.opentest4j.TestAbortedException
 import java.util.UUID
+import java.util.concurrent.ThreadLocalRandom
+import kotlin.random.Random
+import kotlin.streams.asSequence
 
 abstract class AbstractAwsRealS3TestCase {
-    val bucketName = UUID.randomUUID().toString()
-    val key = UUID.randomUUID().toString()
+    val bucketName = randomString()
+    val key = randomString()
     val bucketUrl = Uri.of("https://$bucketName.s3.amazonaws.com/")
     val keyUrl = Uri.of("https://$bucketName.s3.amazonaws.com/$key")
     val s3Root = Uri.of("https://s3.amazonaws.com/")
@@ -33,5 +36,12 @@ abstract class AbstractAwsRealS3TestCase {
         profile(name)
     } catch (failure: LensFailure) {
         throw TestAbortedException("Could not load profile: ${failure.message}")
+    }
+
+    private fun randomString(): String {
+        val charPool = ('a'..'z') + ('0'..'9')
+        return (1..36)
+            .map { Random.nextInt(0, charPool.size).let { charPool[it] } }
+            .joinToString("")
     }
 }
