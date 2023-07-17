@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.3.1.0 (uncut)
 - **http4k-aws**: [Fix #656] AWS request signing issue for URLs with special characters. H/T @krissrex 
+- **http4k-aws**: [Fix #947] AWS request signing issue for duplicated headers and header values with multiple spaces. H/T @krissrex 
 
 ### v5.3.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.0.
