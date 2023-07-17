@@ -40,6 +40,9 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 .sorted()
                 .joinToString("&")
 
-        private fun Uri.normalisedPath() = if (path.isBlank()) "/" else path.split("/").joinToString("/") { it.urlEncoded() }
+        private fun Uri.normalisedPath() = if (path.isBlank()) "/" else path.split("/")
+            .joinToString("/") {
+                it.urlEncoded().replace("+", "%20").replace("*", "%2A").replace("%7E", "~")
+            }
     }
 }
