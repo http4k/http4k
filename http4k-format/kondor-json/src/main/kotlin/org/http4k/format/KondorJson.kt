@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.ubertob.kondor.json.JInstance
 import com.ubertob.kondor.json.JsonConverter
+import com.ubertob.kondor.json.JsonStyle
 import com.ubertob.kondor.json.jsonnode.JsonNode
 import com.ubertob.kondor.json.jsonnode.JsonNodeArray
 import com.ubertob.kondor.json.jsonnode.JsonNodeBoolean
@@ -13,7 +14,7 @@ import com.ubertob.kondor.json.jsonnode.NodePath
 import com.ubertob.kondor.json.jsonnode.NodePathRoot
 import com.ubertob.kondor.json.jsonnode.NodePathSegment
 import com.ubertob.kondor.json.jsonnode.parseJsonNode
-import com.ubertob.kondor.json.parser.pretty
+import com.ubertob.kondor.json.render
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -25,7 +26,12 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-class KondorJson(val defaultContentType: ContentType = APPLICATION_JSON, init: InitContext.() -> Unit = {}) :
+class KondorJson(
+    val defaultContentType: ContentType = APPLICATION_JSON,
+    private val compactJsonStyle: JsonStyle = JsonStyle.compactWithNulls,
+    private val prettyJsonStyle: JsonStyle = JsonStyle.prettyWithNulls,
+    init: InitContext.() -> Unit = {}
+) :
     AutoMarshallingJson<JsonNode>() {
 
     inner class InitContext {
@@ -51,8 +57,8 @@ class KondorJson(val defaultContentType: ContentType = APPLICATION_JSON, init: I
             is JsonNodeString -> JsonType.String
         }
 
-    override fun JsonNode.asPrettyJsonString(): String = this.pretty(explicitNull = true)
-    override fun JsonNode.asCompactJsonString(): String = this.render()
+    override fun JsonNode.asPrettyJsonString(): String = this.render(prettyJsonStyle)
+    override fun JsonNode.asCompactJsonString(): String = this.render(compactJsonStyle)
 
     override fun String.asJsonObject() = parseJsonNode(this).orThrow()
     override fun String?.asJsonValue() = this?.let { JsonNodeString(it, NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
@@ -196,33 +202,6 @@ class KondorJson(val defaultContentType: ContentType = APPLICATION_JSON, init: I
 inline fun <reified T : Any, JN : JsonNode> KondorJson.InitContext.register(converter: JsonConverter<T, JN>) =
     register(T::class, converter)
 
-// Lifted the render logic from kondor-json, but changed to not output blank spaces between fields and values,
-// so that it is http4k json compliant.
-private fun JsonNode.render(): String =
-    when (this) {
-        is JsonNodeNull -> "null"
-        is JsonNodeString -> text.putInQuotes()
-        is JsonNodeBoolean -> value.toString()
-        is JsonNodeNumber -> num.toString()
-        is JsonNodeArray -> values.joinToString(separator = ",", prefix = "[", postfix = "]") { it.render() }
-        is JsonNodeObject -> _fieldMap.entries.joinToString(separator = ",", prefix = "{", postfix = "}") {
-            it.key.putInQuotes() + ":" + it.value.render()
-        }
-    }
-
-private val regex = """[\\"\n\r\t]""".toRegex()
-private fun String.putInQuotes(): String =
-    replace(regex) { m ->
-        when (m.value) {
-            "\\" -> "\\\\"
-            "\"" -> "\\\""
-            "\n" -> "\\n"
-            "\b" -> "\\b"
-            "\r" -> "\\r"
-            "\t" -> "\\t"
-            else -> ""
-        }
-    }.let { "\"${it}\"" }
 
 private fun JsonNodeObject.updateNodePath(parentPath: NodePath = NodePathRoot): JsonNodeObject {
     val updatedFields = _fieldMap.map { (name, field) ->
