@@ -1,6 +1,6 @@
 package org.http4k.aws
 
-import org.http4k.client.JavaHttpClient
+import org.http4k.client.OkHttp
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -10,10 +10,7 @@ import org.http4k.filter.Payload.Mode.Signed
 import org.http4k.lens.LensFailure
 import org.junit.jupiter.api.AfterEach
 import org.opentest4j.TestAbortedException
-import java.util.UUID
-import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
-import kotlin.streams.asSequence
 
 abstract class AbstractAwsRealS3TestCase {
     val bucketName = randomString()
@@ -27,7 +24,7 @@ abstract class AbstractAwsRealS3TestCase {
         aClient()(Request(DELETE, bucketUrl))
     }
 
-    protected fun aClient() = awsClientFilter(Signed).then(JavaHttpClient())
+    protected fun aClient() = awsClientFilter(Signed).then(OkHttp())
 
     protected fun awsClientFilter(signed: Payload.Mode) =
         awsCliUserProfiles().profileIfAvailable("http4k-integration-test").awsClientFilterFor("s3", signed)
