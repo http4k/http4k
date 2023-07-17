@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.3.1.0 (uncut)
+- **http4k-aws**: [Fix #656] AWS request signing issue for URLs with special characters. H/T @krissrex 
+
 ### v5.3.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.0.
 - **http4k-core** : Surface root error messages in Body lenses when failure occurs on deserialisation.
