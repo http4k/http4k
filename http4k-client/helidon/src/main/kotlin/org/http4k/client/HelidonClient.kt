@@ -22,7 +22,7 @@ object HelidonClient {
     @JvmOverloads
     @JvmName("create")
     operator fun invoke(
-        client: Http1Client = WebClient.builder().build(),
+        client: Http1Client = WebClient.builder().followRedirect(false).build(),
         bodyMode: BodyMode = Memory,
     ): HttpHandler = object : HttpHandler {
 

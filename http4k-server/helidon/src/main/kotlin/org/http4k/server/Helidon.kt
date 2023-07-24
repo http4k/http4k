@@ -10,7 +10,7 @@ class Helidon(val port: Int = 8000) : ServerConfig {
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val server = WebServer.builder()
-            .addRouting(builder().any(HelidonHandler(http)))
+            .addRouting(builder().any(HelidonHandler(http)).build())
             .port(port)
             .build()
 
