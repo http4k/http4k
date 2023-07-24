@@ -9,6 +9,8 @@ changes with their rationale when appropriate:
 - **http4k-server-helidon** : API changes from Helidon alpha to M1
 - **http4k-contract** : [Fix #750] JacksonFieldMetadataRetrievalStrategy is incompatible with kotlinx.serialization @Serializable classes. H/T @krissrex
 - **http4k-realtime-core** : [Fix #951] Add filters to initialise request context for SSE and WS.
+- **http4k-realtime-core** : [Fix #885] Accept websocket subprotocols. Note that not all servers are currently supported
+- **http4k-server-jetty** : [Fix #885] Support subprotocols for Websockets
 
 ### v5.4.0.0 
 - **http4k-*** : Upgrade some dependency versions. 

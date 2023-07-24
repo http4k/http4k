@@ -26,3 +26,9 @@ fun ServerFilters.InitialiseWsRequestContext(contexts: Store<RequestContext>) = 
         }
     }
 }
+
+fun ServerFilters.SetWsSubProtocol(subprotocol: String) = WsFilter { next ->
+    {
+        next(it).copy(subprotocol = subprotocol)
+    }
+}

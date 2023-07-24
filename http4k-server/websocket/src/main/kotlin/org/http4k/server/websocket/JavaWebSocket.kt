@@ -2,7 +2,7 @@ package org.http4k.server.websocket
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.MemoryBody
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.StreamBody
@@ -34,7 +34,7 @@ class JavaWebSocket(
     private val configFn: WebSocketServer.() -> Unit = {
         isReuseAddr = true // Set SO_REUSEADDR by default
     },
-): PolyServerConfig {
+) : PolyServerConfig {
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
         if (http != null) throw UnsupportedOperationException("JavaWebSocket does not support http")
@@ -45,12 +45,13 @@ class JavaWebSocket(
         val address = InetSocketAddress(hostName, port)
         val server = createServer(ws, address, drafts, startLatch::countDown).also(configFn)
 
-        val http4kServer = object: Http4kServer {
+        val http4kServer = object : Http4kServer {
             override fun port() = server.port
             override fun start() = also {
                 server.start()
                 startLatch.await(startupTimeout.toMillis(), TimeUnit.MILLISECONDS)
             }
+
             override fun stop() = also {
                 when (stopMode) {
                     ServerConfig.StopMode.Immediate -> server.stop()
@@ -72,7 +73,7 @@ private fun createServer(
     address: InetSocketAddress,
     drafts: List<Draft>?,
     onServerStart: () -> Unit
-) = object: WebSocketServer(address, drafts) {
+) = object : WebSocketServer(address, drafts) {
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
         val headers = handshake.iterateHttpFields()
@@ -80,7 +81,7 @@ private fun createServer(
             .map { it to handshake.getFieldValue(it) }
             .toList()
 
-        val upgradeRequest = Request(Method.GET, handshake.resourceDescriptor)
+        val upgradeRequest = Request(GET, handshake.resourceDescriptor)
             .headers(headers)
             .let { if (handshake.content != null) it.body(MemoryBody(handshake.content)) else it }
             .source(RequestSource(conn.remoteSocketAddress.hostString, conn.remoteSocketAddress.port))
@@ -120,7 +121,7 @@ private fun createServer(
         conn.adapter()?.let { ws ->
             try {
                 ws.triggerMessage(WsMessage(message))
-            } catch(e: Throwable) {
+            } catch (e: Throwable) {
                 ws.triggerError(e)
             }
         }

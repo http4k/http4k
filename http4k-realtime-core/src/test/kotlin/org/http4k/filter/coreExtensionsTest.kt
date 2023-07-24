@@ -59,4 +59,11 @@ class CoreExtensionsTest {
 
         assertThat(found.get(), equalTo(credentials))
     }
+
+    @Test
+    fun `can set subprotocol on WsResponse`() {
+        val handler = ServerFilters.SetWsSubProtocol("foobar")
+            .then { WsResponse { _ -> } }
+        assertThat(handler(Request(GET, "/")).subprotocol, equalTo("foobar"))
+    }
 }
