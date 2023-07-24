@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-client-helidon** : API changes from Helidon alpha to M1
 - **http4k-server-helidon** : API changes from Helidon alpha to M1
+- **http4k-contract** : [Fix #750] JacksonFieldMetadataRetrievalStrategy is incompatible with kotlinx.serialization @Serializable classes. H/T @krissrex
 
 ### v5.4.0.0 
 - **http4k-*** : Upgrade some dependency versions. 
