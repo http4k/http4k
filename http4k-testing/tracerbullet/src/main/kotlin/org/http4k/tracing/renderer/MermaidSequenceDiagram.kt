@@ -52,21 +52,21 @@ ${
         }
 
     private fun RequestResponse.asMermaidSequenceDiagram(): String = """
-    ${origin.safeName()}->>${target.safeName()}: $request
+    ${origin.safeName()} ->> ${target.safeName()}: $request
     activate ${target.safeName()}
     ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
-    ${target.safeName()}->>${origin.safeName()}: $response
+    ${target.safeName()} ->> ${origin.safeName()}: $response
     deactivate ${target.safeName()}
     """
 
     private fun BiDirectional.asMermaidSequenceDiagram(): String = """
-    ${origin.safeName()}->>${target.safeName()}: $request
+    ${origin.safeName()} ->> ${target.safeName()}: $request
     ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
-    ${target.safeName()}->>${origin.safeName()}: 
+    ${target.safeName()} ->> ${origin.safeName()}: 
     """
 
     private fun FireAndForget.asMermaidSequenceDiagram(): String = """
-    ${origin.safeName()}-)${target.safeName()}: $request
+    ${origin.safeName()} -) ${target.safeName()}: $request
     ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
     ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
     """
