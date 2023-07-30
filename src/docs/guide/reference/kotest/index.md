@@ -5,7 +5,7 @@ description: Feature overview of the http4k-testing-kotest module
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.4.1.0"))
+    implementation(platform("org.http4k:http4k-bom:5.5.0.0"))
     implementation("org.http4k:http4k-testing-kotest")
 }
 ```
