@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.5.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-cloudnative** - Add support for enums in EnvironmentKey
 - **http4k-testing-tracerbullet** : [Breaking] Fixed SequenceDiagrams for Mermaid to be formatted correctly. This may break approval files for any tests.
 
 ### v5.4.1.0

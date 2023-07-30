@@ -2,7 +2,7 @@ package org.http4k.testing
 
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
-import org.http4k.lens.enum
+import org.http4k.cloudnative.env.enum
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.asServer
 import org.http4k.testing.TestServerEvent.ServerStarted
@@ -12,7 +12,7 @@ import java.time.Duration
 
 fun main() {
     val events = ContainerEvents().apply { this(TestServerEvent.ApplicationStarted()) }
-    val backendKey = EnvironmentKey.enum({ ServerBackend.valueOf(it) }, ServerBackend::name).required("BACKEND")
+    val backendKey = EnvironmentKey.enum<ServerBackend>().required("BACKEND")
     val stopModeKey = EnvironmentKey.map({ resolveStopMode(it) }, { it.javaClass.simpleName }).required("STOP_MODE")
 
     val environment = Environment.ENV
