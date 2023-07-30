@@ -746,7 +746,7 @@ header p {
   background: transparent;
   border: none;
   position: static !important;
-  width: 75%;
+  width: 90%;
   margin-left: 15px;
   transform: none !important;
 }
@@ -763,9 +763,13 @@ header p {
   }
 }
 
+.nav-link {
+    padding: 0.3em;
+}
+
 .intro .aside .nav .dropdown-menu .dropdown-item {
   padding: 0.2rem 0.5rem;
-  margin-bottom: 7px;
+  margin-bottom: 4px;
   transition: 0.05s ease-in-out all;
 }
 
