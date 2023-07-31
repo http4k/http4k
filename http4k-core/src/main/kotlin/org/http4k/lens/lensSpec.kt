@@ -285,6 +285,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
 
 fun <IN : Any> BiDiLensSpec<IN, String>.string() = this
 fun <IN : Any> BiDiLensSpec<IN, String>.nonEmptyString() = map(StringBiDiMappings.nonEmpty())
+fun <IN : Any> BiDiLensSpec<IN, String>.nonBlankString() = map(StringBiDiMappings.nonBlank())
 fun <IN : Any> BiDiLensSpec<IN, String>.int() = mapWithNewMeta(StringBiDiMappings.int(), IntegerParam)
 fun <IN : Any> BiDiLensSpec<IN, String>.long() = mapWithNewMeta(StringBiDiMappings.long(), IntegerParam)
 fun <IN : Any> BiDiLensSpec<IN, String>.double() = mapWithNewMeta(StringBiDiMappings.double(), NumberParam)
