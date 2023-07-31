@@ -1,8 +1,9 @@
 package org.http4k.websocket
 
-import org.http4k.routing.bind
+import org.http4k.core.Request
 import org.http4k.routing.path
 import org.http4k.routing.websockets
+import org.http4k.routing.ws.bind
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
@@ -19,38 +20,46 @@ abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerC
     @BeforeEach
     fun before() {
         val ws = websockets(
-            "/bin" bind { ws: Websocket ->
-                ws.onMessage {
-                    val content = it.body.stream.readBytes()
-                    ws.send(WsMessage(content.inputStream()))
-                    ws.close(WsStatus.NORMAL)
-                }
-            },
-
-            "/headers" bind { ws: Websocket ->
-                ws.onMessage {
-                    ws.upgradeRequest.headers.filter { it.first.startsWith("test") }.forEach { header ->
-                        ws.send(WsMessage("${header.first}=${header.second}"))
+            "/bin" bind { req: Request ->
+                WsResponse { ws ->
+                    ws.onMessage {
+                        val content = it.body.stream.readBytes()
+                        ws.send(WsMessage(content.inputStream()))
+                        ws.close(WsStatus.NORMAL)
                     }
-                    ws.close(WsStatus.NORMAL)
                 }
             },
 
-            "/{name}" bind { ws: Websocket ->
-                val name = ws.upgradeRequest.path("name")!!
-                ws.send(WsMessage(name))
-                ws.onMessage {
-                    ws.send(it)
-                    ws.close(WsStatus.NORMAL)
+            "/headers" bind { req: Request ->
+                WsResponse { ws ->
+                    ws.onMessage {
+                        req.headers.filter { it.first.startsWith("test") }.forEach { header ->
+                            ws.send(WsMessage("${header.first}=${header.second}"))
+                        }
+                        ws.close(WsStatus.NORMAL)
+                    }
                 }
             },
 
-            "/long-living/{name}" bind { ws: Websocket ->
-                val name = ws.upgradeRequest.path("name")!!
-                ws.send(WsMessage(name))
-                ws.onMessage {
-                    ws.send(it)
-                    // not sending close
+            "/{name}" bind { req: Request ->
+                WsResponse { ws ->
+                    val name = req.path("name")!!
+                    ws.send(WsMessage(name))
+                    ws.onMessage {
+                        ws.send(it)
+                        ws.close(WsStatus.NORMAL)
+                    }
+                }
+            },
+
+            "/long-living/{name}" bind { req: Request ->
+                WsResponse { ws ->
+                    val name = req.path("name")!!
+                    ws.send(WsMessage(name))
+                    ws.onMessage {
+                        ws.send(it)
+                        // not sending close
+                    }
                 }
             }
         )

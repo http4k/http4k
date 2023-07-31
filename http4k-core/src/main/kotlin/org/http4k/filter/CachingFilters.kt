@@ -96,38 +96,6 @@ object CachingFilters {
         }
 
         /**
-         * Hash algo stolen from http://stackoverflow.com/questions/26423662/scalatra-response-hmac-calulation
-         * By default, only applies when the status code of the response is < 400. This is overridable.
-         */
-        @Deprecated("Deprecated in favour of EtagSupport", ReplaceWith("ResponseFilters.EtagSupport"))
-        object AddETag {
-
-            operator fun invoke(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = Filter { next ->
-                { request ->
-                    val response = next(request)
-                    if (predicate(response)) {
-                        val hashedBody = md5().digest(response.body.payload.copyToByteArray()).joinToString("") { "%02x".format(it) }
-                        response.replaceHeader("Etag", hashedBody)
-                    } else
-                        response
-                }
-            }
-
-            private fun md5() = MessageDigest.getInstance("MD5")
-
-            private fun ByteBuffer.copyToByteArray(): ByteArray {
-                val clone = ByteBuffer.allocate(capacity())
-                rewind()
-                clone.put(this)
-                rewind()
-                clone.flip()
-                val ba = ByteArray(clone.remaining())
-                clone.get(ba)
-                return ba
-            }
-        }
-
-        /**
          * Applies the passed cache timings (Cache-Control, Expires, Vary) to responses, but only if they are not there already.
          * Use this for adding default cache settings.
          * By default, only applies when the status code of the response is < 400. This is overridable.

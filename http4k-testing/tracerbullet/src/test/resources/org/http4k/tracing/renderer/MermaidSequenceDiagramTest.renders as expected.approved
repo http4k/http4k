@@ -1,0 +1,58 @@
+sequenceDiagram
+    title foobar - Sequence
+    actor user 1
+	actor user 2
+	participant events
+	participant system_b
+	participant system_c
+	participant system_d
+	participant db
+	participant external
+
+    user 1 ->> system_b: init 1 req
+    activate system_b
+    
+    user 1 -) events: event a
+    
+    events -) user 1: event x
+    
+    
+    
+    
+    events -) user 1: event x
+    
+    
+    
+    
+	
+    system_b ->> system_c: b-to-c req
+    activate system_c
+    
+    system_b ->> db: bidi-b req-resp
+    
+    db ->> system_b: 
+    
+	
+    system_c ->> external: c-to-external req
+    activate external
+    
+    external ->> system_c: 200 c-to-external
+    deactivate external
+    
+    system_c ->> system_b: 300 b-to-c
+    deactivate system_c
+    
+    system_b ->> user 1: 400 init 2
+    deactivate system_b
+    
+	
+    user 2 ->> system_d: init 2 req
+    activate system_d
+    
+    system_d -) events: event d
+    
+    
+    
+    system_d ->> user 2: 500 init 2
+    deactivate system_d
+    

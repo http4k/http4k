@@ -3,7 +3,10 @@ package org.http4k.format
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
@@ -154,6 +157,12 @@ bool: true
 """
 
     override val expectedAutoMarshallingZonesAndLocale = "zoneId:\"America/Toronto\"\nzoneOffset:\"-04:00\"\nlocale:\"en-CA\"\n"
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { JacksonYaml.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Instantiation of [simple type"))
+    }
 
     @Test
     override fun `roundtrip arbitrary map`() {

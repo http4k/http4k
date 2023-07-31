@@ -5,5 +5,6 @@ dependencies {
     implementation("software.amazon.awssdk:http-client-spi:_")
     testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
     testImplementation(project(":http4k-cloudnative"))
+    testImplementation(project(":http4k-client-okhttp"))
 }
 

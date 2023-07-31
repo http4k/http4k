@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import com.ubertob.kondor.json.*
 import com.ubertob.kondor.json.jsonnode.JsonNodeObject
 import org.http4k.core.ContentType
@@ -75,6 +76,12 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
 
     @Test
     @Disabled("not supported")
+    override fun `roundtrip arbitrary set`() {
+        super.`roundtrip arbitrary set`()
+    }
+
+    @Test
+    @Disabled("not supported")
     override fun `prohibit strings`() {
         super.`prohibit strings`()
     }
@@ -124,6 +131,17 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
 
         assertThat(Request(Method.POST, "/").with(body of obj), hasContentType(ContentType.Text("application/some-custom+json")))
     }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        val marshaller = KondorJson(ContentType.Text("application/some-custom+json")) {
+            register(JArbObject)
+        }
+
+        assertThat(runCatching { marshaller.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Error reading property <string> of node <[root]"))
+    }
+
 }
 
 private object JInOnly : JStringRepresentable<InOnly>() {

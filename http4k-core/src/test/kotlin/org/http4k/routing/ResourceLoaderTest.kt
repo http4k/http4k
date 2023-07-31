@@ -37,8 +37,8 @@ class ResourceLoaderTest {
 
     @Test
     fun `directory loader should not load resources above the base directory`() {
-        assertThat(Directory("./src/test/resources").load("../../../../.java-version"), absent())
-        assertThat(Directory(File("./src/test/resources").absolutePath).load("../../../../.java-version"), absent())
+        assertThat(Directory("./src/test/resources").load("../../../../.python-version"), absent())
+        assertThat(Directory(File("./src/test/resources").absolutePath).load("../../../../.python-version"), absent())
     }
 
     @Test

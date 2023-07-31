@@ -12,7 +12,7 @@ import java.io.ByteArrayInputStream
 import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
-import java.net.URL
+import java.net.URI
 import java.net.UnknownHostException
 import java.nio.ByteBuffer
 import java.time.Duration
@@ -33,7 +33,7 @@ object Java8HttpClient {
         connectionTimeout: Duration = ZERO
     ): HttpHandler = { request: Request ->
         try {
-            val connection = (URL(request.uri.toString()).openConnection() as HttpURLConnection).apply {
+            val connection = (URI(request.uri.toString()).toURL().openConnection() as HttpURLConnection).apply {
                 this.readTimeout = readTimeout.toMillis().toInt()
                 this.connectTimeout = connectionTimeout.toMillis().toInt()
                 instanceFollowRedirects = false

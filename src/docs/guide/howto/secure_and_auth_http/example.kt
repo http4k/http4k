@@ -23,7 +23,7 @@ import org.http4k.security.RefreshCredentials
 import org.http4k.security.Refreshing
 import org.http4k.security.oauth.client.OAuthClientCredentials
 import org.http4k.security.oauth.client.RefreshingOAuthToken
-import org.http4k.security.oauth.server.OAuthServerMoshi.auto
+import org.http4k.security.oauth.format.OAuthMoshi.auto
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer

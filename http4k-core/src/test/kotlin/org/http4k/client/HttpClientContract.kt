@@ -31,6 +31,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.server.ServerConfig
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.util.Locale.getDefault
@@ -268,5 +269,12 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     fun `host header not abusable`() {
         val response = client(Request(GET, "http://localhost:$port/hostheaders").header("host", "foobar:$port"))
         assertThat(response.bodyString(), !containsSubstring("foobar").and(containsSubstring(",")))
+    }
+
+    @Test
+    @Disabled
+    fun `sanitises uri`() {
+        val response = client(Request(GET, "http://localhost:$port/encoded-uri/foo, bar & baz!"))
+        assertThat(response.bodyString(), equalTo("foo, bar & baz!"))
     }
 }

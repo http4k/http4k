@@ -5,7 +5,7 @@ description: Feature overview of the http4k-webdriver module
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.47.1.0"))
+    implementation(platform("org.http4k:http4k-bom:5.5.0.0"))
     implementation("org.http4k:http4k-testing-webdriver")
 }
 ```
@@ -27,9 +27,7 @@ A basic Selenium WebDriver API implementation for http4k HttpHandlers, which run
 | Frames|no||
 | Multiple windows|no||
 
-Use the API like any other WebDriver implementation, by simply passing your app HttpHandler to construct it. Note that we now support version 4 of the API, which has deprecated the old `By` implementations. 
-http4k ships with a custom set of JSoup `By` implementations, so be sure to import `org.http4k.webdriver.By` instead of the old `org.openqa.selenium.By` ones (which will fail with a `ClassCastException` 
-when used).
+Use the API like any other WebDriver implementation, by simply passing your app HttpHandler to construct it.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/webdriver/example.kt)
 

@@ -7,16 +7,16 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.lens.Path
-import org.http4k.routing.bind
 import org.http4k.routing.websockets
+import org.http4k.routing.ws.bind
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.testing.testWsClient
-import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsResponse
 import org.http4k.websocket.then
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -35,9 +35,11 @@ val sayHello = WsFilter { next ->
 // here is our websocket app - it uses dynamic path binding and lenses
 val testApp: WsHandler = sayHello.then(
     websockets(
-        "/{name}" bind { ws: Websocket ->
-            val name = namePath(ws.upgradeRequest)
-            ws.send(WsMessage("hello $name"))
+        "/{name}" bind { req: Request ->
+            WsResponse { ws ->
+                val name = namePath(req)
+                ws.send(WsMessage("hello $name"))
+            }
         }
     )
 )
@@ -64,7 +66,8 @@ class WebsocketUnitTest : WebsocketContract() {
 // a integration test version of the contract -
 // it starts a server and connects to the websocket over the network
 class WebsocketServerTest : WebsocketContract() {
-    override fun client() = WebsocketClient.blocking(Uri.of("ws://localhost:8000/bob"))
+    override fun client() =
+        WebsocketClient.blocking(Uri.of("ws://localhost:8000/bob"))
 
     private val server = testApp.asServer(Jetty(8000))
 

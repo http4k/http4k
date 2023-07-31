@@ -1,3 +1,5 @@
+import org.gradle.internal.impldep.org.bouncycastle.asn1.x500.style.RFC4519Style.name
+
 rootProject.name = "http4k"
 
 plugins {
@@ -18,6 +20,11 @@ fun String.includeModule(name: String) {
     project(":$projectName").projectDir = File("$this/${name.replace(':', '/')}")
 }
 
+fun String.includeSubmodule(name: String) {
+    include(":$this-$name")
+    project(":$this-$name").projectDir = File("$this/${name.replace('-', '/')}")
+}
+
 fun includeWithDirectory(projectName: String, name: String) {
     include("$projectName-$name")
 }
@@ -32,6 +39,7 @@ include("http4k-bom")
     includeModule("apache-async")
     includeModule("apache4-async")
     includeModule("fuel")
+    includeModule("helidon")
     includeModule("jetty")
     includeModule("okhttp")
     includeModule("websocket")
@@ -40,10 +48,12 @@ include("http4k-bom")
 include("http4k-cloudevents")
 include("http4k-cloudnative")
 
-include("http4k-contract")
-"http4k-contract-ui".apply {
-    includeModule("swagger")
-    includeModule("redoc")
+"http4k-contract".apply {
+    include(":$this")
+    project(":$this").projectDir = File("$this/openapi")
+    includeSubmodule("jsonschema")
+    includeSubmodule("ui-swagger")
+    includeSubmodule("ui-redoc")
 }
 
 "http4k-format".apply {
@@ -54,7 +64,7 @@ include("http4k-contract")
     includeModule("jackson-xml")
     includeModule("jackson-yaml")
     includeModule("klaxon")
-//    includeModule("kondor-json")
+    includeModule("kondor-json")
     includeModule("kotlinx-serialization")
     includeModule("moshi")
     includeModule("moshi-yaml")
@@ -75,6 +85,7 @@ include("http4k-realtime-core")
 "http4k-server".apply {
     includeModule("apache")
     includeModule("apache4")
+    includeModule("helidon")
     includeModule("jetty")
     includeModule("ktorcio")
     includeModule("ktornetty")
@@ -106,7 +117,6 @@ include("http4k-realtime-core")
 
 "http4k-template".apply {
     includeModule("core")
-    includeModule("dust")
     includeModule("freemarker")
     includeModule("handlebars")
     includeModule("rocker")
@@ -128,5 +138,6 @@ include("http4k-realtime-core")
     includeModule("kotest")
     includeModule("strikt")
     includeModule("servirtium")
+    includeModule("tracerbullet")
     includeModule("webdriver")
 }

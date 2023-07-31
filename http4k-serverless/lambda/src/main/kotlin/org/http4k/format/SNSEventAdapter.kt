@@ -28,7 +28,7 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
                                     "SigningCertUrl" -> signingCertUrl = nextString()
                                     "MessageId" -> messageId = nextString()
                                     "Message" -> message = nextString()
-                                    "Subject" -> subject = nextString()
+                                    "Subject" -> subject = stringOrNull()
                                     "UnsubscribeUrl" -> unsubscribeUrl = nextString()
                                     "Type" -> type = nextString()
                                     "SignatureVersion" -> signatureVersion = nextString()

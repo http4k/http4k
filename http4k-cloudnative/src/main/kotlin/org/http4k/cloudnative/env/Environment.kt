@@ -6,7 +6,10 @@ import org.http4k.lens.Lens
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.EnumParam
+import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.int
+import org.http4k.lens.mapWithNewMeta
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.Reader
@@ -129,5 +132,10 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
         }
     }
 }
+
+inline fun <reified T : Enum<T>> EnvironmentKey.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
+    if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
+    EnumParam(T::class)
+)
 
 internal fun String.convertFromKey() = replace("_", "-").replace(".", "-").lowercase(getDefault())

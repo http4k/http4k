@@ -10,6 +10,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
 
 class BodyTest {
@@ -27,14 +28,14 @@ class BodyTest {
     fun `can get regex body`() {
         val regexBody = Body.regex("bob(.+)alice").toLens()
         assertThat(regexBody(emptyRequest.body("bobritaalice")), equalTo("rita"))
-        assertThat({ regexBody(emptyRequest.body("foobaralice")) }, throws(lensFailureWith<Request>(Invalid(Meta(true, "body", ParamMeta.StringParam, "body")), overallType = Failure.Type.Invalid)))
+        assertThat({ regexBody(emptyRequest.body("foobaralice")) }, throws(lensFailureWith<Request>(Invalid(Meta(true, "body", StringParam, "body")), overallType = Failure.Type.Invalid)))
     }
 
     @Test
     fun `non empty string`() {
         val nonEmpty = Body.nonEmptyString(TEXT_PLAIN).toLens()
         assertThat(nonEmpty(emptyRequest.body("123")), equalTo("123"))
-        assertThat({ nonEmpty(emptyRequest.body("")) }, throws(lensFailureWith<Request>(Invalid(Meta(true, "body", ParamMeta.StringParam, "body")), overallType = Failure.Type.Invalid)))
+        assertThat({ nonEmpty(emptyRequest.body("")) }, throws(lensFailureWith<Request>(Invalid(Meta(true, "body", StringParam, "body")), overallType = Failure.Type.Invalid)))
     }
 
     @Test

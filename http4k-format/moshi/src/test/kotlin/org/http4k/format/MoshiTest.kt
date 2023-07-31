@@ -2,8 +2,11 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import com.squareup.moshi.Moshi.Builder
 import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -28,6 +31,12 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
         val expected = listOf(obj)
         val actual = body(Response(OK).with(body of expected))
         assertThat(actual, equalTo(expected))
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { Moshi.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Required value 'string' missing at \$"))
     }
 
     @Test

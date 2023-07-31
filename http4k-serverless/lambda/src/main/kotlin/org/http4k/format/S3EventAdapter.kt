@@ -19,7 +19,7 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             beginObject()
-            val records = mutableListOf<S3EventNotificationRecord>()
+            val records = mutableListOf<S3EventNotificationRecord?>()
             while (hasNext()) {
                 when (nextName()) {
                     "Records" -> {

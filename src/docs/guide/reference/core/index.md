@@ -5,7 +5,7 @@ description: Feature overview of the http4k-core module, including the Lens syst
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:4.47.1.0"))
+    implementation(platform("org.http4k:http4k-bom:5.5.0.0"))
     implementation("org.http4k:http4k-core")
 }
 ```
@@ -153,14 +153,15 @@ routes(
 ### Typesafe Websockets.
 Websockets have been modeled using the same methodology as standard HTTP endpoints - ie. with both simplicity and testability as a first class concern, as well as benefiting from Lens-based typesafety. Websocket communication consists of 3 main concepts:
 
-1. `WsHandler` - represented as a typealias: `WsHandler =  (Request) -> WsConsumer?`. This is responsible for matching an HTTP request to a websocket.
+1. `WsHandler` - represented as a typealias: `WsHandler =  (Request) -> WsResponse`. This is responsible for matching an HTTP request to a websocket.
 1. `WsConsumer` - represented as a typealias: `WsConsumer = (WebSocket) -> Unit`. This function is called on connection of a websocket and allow the API user to react to events coming from the connected websocket.
 1. `WsMessage` - a message which is sent or received on a websocket. This message can take advantage of the typesafety accorded to other entities in http4k by using the Lens API. Just like the http4k HTTP message model, WsMessages are immutable data classes.
 
 The routing aspect of Websockets is done using a very similar API to the standard HTTP routing for HTTP messages and dynamic parts of the upgrade request are available when constructing a websocket instance:
 
 ```kotlin
-data class Wrapper(val value: String)
+
+ import java.nio.file.Pathdata class Wrapper(val value: String)
 
 val body = WsMessage.string().map(::Wrapper, Wrapper::value).toLens()
 
@@ -168,16 +169,18 @@ val nameLens = Path.of("name")
 
 val ws: WsHandler = websockets(
     "/hello" bind websockets(
-        "/{name}" bind { ws: WebSocket ->
-            val name = nameLens(ws.upgradeRequest)
-            ws.send(WsMessage("hello $name"))
-            ws.onMessage {
-                val received = body(it)
-                ws.send(body(received))
-            }
-            ws.onClose {
-                println("closed")
-            }
+        "/{name}" bind { req: Request ->
+                WsResponse { ws: Websocket ->
+                    val name = nameLens(req)
+                    ws.send(WsMessage("hello $name"))
+                    ws.onMessage {
+                        val received = body(it)
+                        ws.send(body(received))
+                    }
+                    ws.onClose {
+                        println("closed")
+                    }
+                }
         }
     )
 )
@@ -190,7 +193,10 @@ val app = PolyHandler(
         "/" bind { r: Request -> Response(OK) }
     ),
     websockets(
-        "/ws" bind { ws: WebSocket -> ws.send(WsMessage("hello!"))
+        "/ws" bind { req: Request ->
+            WsResponse { ws: Websocket ->
+                ws.send(WsMessage("hello!"))
+            }
         }
     )
 )

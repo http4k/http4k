@@ -10,27 +10,28 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.CachingFilters.Request.AddIfModifiedSince
-import org.http4k.filter.CachingFilters.Response.AddETag
 import org.http4k.filter.CachingFilters.Response.FallbackCacheControl
 import org.http4k.filter.CachingFilters.Response.MaxAge
 import org.http4k.filter.CachingFilters.Response.NoCache
 import org.http4k.hamkrest.hasHeader
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
 import java.time.Duration
 import java.time.Duration.ZERO
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 
-@Suppress("DEPRECATION")
 class CachingFiltersTest {
 
     private val clock = FixedClock
     private val maxAge = Duration.ofSeconds(10)
-    private val timings = DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(Duration.ofSeconds(2000)), StaleWhenRevalidateTtl(Duration.ofSeconds(3000)))
-    private val timingsWithZeroValues = DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(ZERO), StaleWhenRevalidateTtl(ZERO))
+    private val timings = DefaultCacheTimings(
+        MaxAgeTtl(maxAge),
+        StaleIfErrorTtl(Duration.ofSeconds(2000)),
+        StaleWhenRevalidateTtl(Duration.ofSeconds(3000))
+    )
+    private val timingsWithZeroValues =
+        DefaultCacheTimings(MaxAgeTtl(maxAge), StaleIfErrorTtl(ZERO), StaleWhenRevalidateTtl(ZERO))
 
     private val request = Request(GET, "")
     private val response = Response(OK)
@@ -38,36 +39,22 @@ class CachingFiltersTest {
     @Test
     fun `Adds If-Modified-Since to Request`() {
         val maxAge = Duration.ofSeconds(1)
-        val response = AddIfModifiedSince(clock, maxAge).then { Response(OK).header("If-modified-since", it.header("If-modified-since")) }(
-            request)
-        assertThat(response, hasHeader("If-modified-since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
+        val response = AddIfModifiedSince(clock, maxAge).then {
+            Response(OK).header(
+                "If-modified-since",
+                it.header("If-modified-since")
+            )
+        }(
+            request
+        )
+        assertThat(
+            response,
+            hasHeader("If-modified-since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge)))
+        )
     }
 
-    @ParameterizedTest
-    @CsvSource(
-        """  bob, 9f9d51bc70ef21ca5c14f307980a29d8  """,
-        """  999, b706835de79a2b4e80506f582af3676a  """,
-        """  &*(, f2cd6baf16754f03166b2c846088de53  """,
-    )
-    fun `Add eTag - string body`(actualBody: String, expectedETag: String) {
-        val response = AddETag { true }.then { Response(OK).body(actualBody) }(request)
-        assertThat(response, hasHeader("etag", expectedETag))
-        assertThat(response.bodyString(), equalTo(actualBody))
-    }
-
-    @ParameterizedTest
-    @CsvSource(
-        """  bob, 9f9d51bc70ef21ca5c14f307980a29d8  """,
-        """  999, b706835de79a2b4e80506f582af3676a  """,
-        """  &*(, f2cd6baf16754f03166b2c846088de53  """,
-    )
-    fun `Add eTag - input stream body`(actualBody: String, expectedETag: String) {
-        val response = AddETag { true }.then { Response(OK).body(actualBody.byteInputStream()) }(request)
-        assertThat(response, hasHeader("etag", expectedETag))
-        assertThat(response.bodyString(), equalTo(actualBody))
-    }
-
-    private fun getResponseWith(cacheTimings: DefaultCacheTimings, response: Response) = FallbackCacheControl(clock, cacheTimings).then { response }(request)
+    private fun getResponseWith(cacheTimings: DefaultCacheTimings, response: Response) =
+        FallbackCacheControl(clock, cacheTimings).then { response }(request)
 
     @Test
     fun `FallbackCacheControl - adds the headers if they are not set`() {
@@ -75,14 +62,18 @@ class CachingFiltersTest {
         val responseWithNoHeaders = Response(OK)
         val response = getResponseWith(timings, responseWithNoHeaders)
 
-        assertThat(response, hasHeader("Cache-Control", "public, max-age=10, stale-while-revalidate=3000, stale-if-error=2000"))
+        assertThat(
+            response,
+            hasHeader("Cache-Control", "public, max-age=10, stale-while-revalidate=3000, stale-if-error=2000")
+        )
         assertThat(response, hasHeader("Expires", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(maxAge))))
         assertThat(response, hasHeader("Vary", "Accept-Encoding"))
     }
 
     @Test
     fun `FallbackCacheControl - does not overwrite the headers if they are set`() {
-        val responseWithHeaders = Response(OK).header("Cache-Control", "rita").header("Expires", "sue").header("Vary", "bob")
+        val responseWithHeaders =
+            Response(OK).header("Cache-Control", "rita").header("Expires", "sue").header("Vary", "bob")
         val response = getResponseWith(timings, responseWithHeaders)
 
         assertThat(response, hasHeader("Cache-Control", listOf("rita")))

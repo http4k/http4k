@@ -1,17 +1,15 @@
 package org.http4k.server
 
 import io.undertow.Handlers.predicate
-import io.undertow.Handlers.serverSentEvents
 import io.undertow.Handlers.websocket
 import io.undertow.Undertow
 import io.undertow.UndertowOptions.ENABLE_HTTP2
 import io.undertow.server.handlers.BlockingHandler
 import io.undertow.server.handlers.GracefulShutdownHandler
 import org.http4k.core.HttpHandler
-import org.http4k.server.ServerConfig.StopMode
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.server.ServerConfig.StopMode
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
@@ -34,7 +32,8 @@ class Undertow(
                 }
             }
         val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
-        val sseCallback = sse?.let { serverSentEvents(Http4kSseCallback(sse)) }
+
+        val sseCallback = sse?.let { Http4kSetHeadersHandler(sse)  }
 
         val handlerWithWs = predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
 
@@ -46,6 +45,7 @@ class Undertow(
             val server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, enableHttp2)
+                .setWorkerThreads(32 * Runtime.getRuntime().availableProcessors())
                 .setHandler(handlerWithSse).build()
 
             override fun start() = apply { server.start() }

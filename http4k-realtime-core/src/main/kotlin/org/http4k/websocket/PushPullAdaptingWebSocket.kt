@@ -1,9 +1,8 @@
 package org.http4k.websocket
 
-import org.http4k.core.Request
 import org.http4k.websocket.WsStatus.Companion.NORMAL
 
-abstract class PushPullAdaptingWebSocket(override val upgradeRequest: Request) : Websocket {
+abstract class PushPullAdaptingWebSocket : Websocket {
 
     private val errorHandlers: MutableList<(Throwable) -> Unit> = mutableListOf()
     private val closeHandlers: MutableList<(WsStatus) -> Unit> = mutableListOf()

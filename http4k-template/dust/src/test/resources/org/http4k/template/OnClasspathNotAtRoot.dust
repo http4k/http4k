@@ -1,1 +1,0 @@
-<ul>{#items}<li>Name:<span>{name}</span>Price:<span>{price}</span><ul>{#features}<li>Feature:<span>{description}</span></li>{/features}</ul></li>{/items}</ul>

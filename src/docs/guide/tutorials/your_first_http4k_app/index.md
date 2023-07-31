@@ -5,7 +5,7 @@ Welcome to the world of http4k! In this guide, we'll run you through the steps r
 
 ## Pre-requisites:
 - An internet connection
-- JDK 11 or greater installed and set up
+- JDK 19 or greater installed and set up
 - An IDE/Text-editor - (http4k is developed using IntelliJ)
 
 <hr/>

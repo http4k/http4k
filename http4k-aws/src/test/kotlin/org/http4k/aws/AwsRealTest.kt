@@ -3,7 +3,7 @@ package org.http4k.aws
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import org.http4k.client.JavaHttpClient
+import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -25,14 +25,14 @@ class AwsRealTest : AbstractAwsRealS3TestCase() {
     @Test
     fun `default usage`() {
         val client = awsClientFilter(Payload.Mode.Signed)
-            .then(JavaHttpClient())
+            .then(OkHttp())
         bucketLifecycle((client))
     }
 
     @Test
     fun streaming() {
         val client = awsClientFilter(Payload.Mode.Unsigned)
-            .then(JavaHttpClient())
+            .then(OkHttp())
 
         bucketLifecycle((client))
     }

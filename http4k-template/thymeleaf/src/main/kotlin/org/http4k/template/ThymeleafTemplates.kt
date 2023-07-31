@@ -5,6 +5,7 @@ import org.thymeleaf.TemplateEngine
 import org.thymeleaf.cache.StandardCacheManager
 import org.thymeleaf.context.Context
 import org.thymeleaf.exceptions.TemplateInputException
+import org.thymeleaf.templatemode.TemplateMode
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import org.thymeleaf.templateresolver.FileTemplateResolver
 import java.io.FileNotFoundException
@@ -14,14 +15,18 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer =
         ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
             setTemplateResolver(ClassLoaderTemplateResolver(classLoader).apply {
+                templateMode = TemplateMode.HTML
                 prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', '/') + "/"
+                suffix = ".html"
             })
         }))
 
     override fun Caching(baseTemplateDir: String): TemplateRenderer =
         ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
             setTemplateResolver(FileTemplateResolver().apply {
+                templateMode = TemplateMode.HTML
                 prefix = "$baseTemplateDir/"
+                suffix = ".html"
             })
         }))
 
@@ -31,7 +36,9 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
                 templateCacheMaxSize = 0
             }
             setTemplateResolver(FileTemplateResolver().apply {
+                templateMode = TemplateMode.HTML
                 prefix = "$baseTemplateDir/"
+                suffix = ".html"
             })
         }))
 

@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status
@@ -18,6 +19,7 @@ import org.http4k.lens.string
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.net.URI
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
@@ -99,6 +101,10 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
     }
 
+    val invalidArbObjectRequest = Request(GET, "").body("{}")
+
+    abstract fun `automarshalling failure has expected message`()
+
     @Test
     open fun `roundtrip arbitrary object through convert`() {
         assertThat(marshaller.convert(obj), equalTo(obj))
@@ -127,7 +133,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
             Instant.EPOCH,
             UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
             Uri.of("http://uri:8000"),
-            URL("http://url:9000"),
+            URI("http://url:9000").toURL(),
             Status.OK
         )
         val out = marshaller.asFormatString(obj)

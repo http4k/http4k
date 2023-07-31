@@ -6,14 +6,15 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.Path
-import org.http4k.routing.bind
 import org.http4k.routing.websockets
+import org.http4k.routing.ws.bind
 import org.http4k.server.Jetty
 import org.http4k.server.PolyHandler
 import org.http4k.server.asServer
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsResponse
 
 // in json, this looks like: {"value": 123, "currency: "EUR" }
 data class Money(val value: Int, val currency: String)
@@ -29,14 +30,16 @@ fun main() {
     // on connection, the bound WsConsumer is called with the Websocket instance
     val ws: WsHandler = websockets(
         "/hello" bind websockets(
-            "/{name}" bind { ws: Websocket ->
-                val name = nameLens(ws.upgradeRequest)
-                ws.onMessage {
-                    val received = moneyLens(it)
-                    ws.send(moneyLens(received))
+            "/{name}" bind { req: Request ->
+                WsResponse { ws: Websocket ->
+                    val name = nameLens(req)
+                    ws.onMessage {
+                        val received = moneyLens(it)
+                        ws.send(moneyLens(received))
+                    }
+                    ws.onClose { println("closed") }
+                    ws.send(WsMessage("hello $name"))
                 }
-                ws.onClose { println("closed") }
-                ws.send(WsMessage("hello $name"))
             }
         )
     )

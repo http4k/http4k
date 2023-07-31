@@ -20,10 +20,12 @@ import org.eclipse.jetty.websocket.core.server.WebSocketNegotiation
 import org.eclipse.jetty.websocket.core.server.WebSocketNegotiator
 import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler
 import org.http4k.core.HttpHandler
+import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.servlet.jakarta.asHttp4kRequest
 import org.http4k.servlet.jakarta.asServlet
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
+import java.time.Duration.ofSeconds
 
 fun HttpHandler.toJettyHandler(withStatisticsHandler: Boolean = false): HandlerWrapper = ServletContextHandler(
     SESSIONS
@@ -41,8 +43,9 @@ fun WsHandler.toJettyWsHandler() = WebSocketUpgradeHandler(WebSocketComponents()
 
 fun WsHandler.toJettyNegotiator() = object : WebSocketNegotiator.AbstractNegotiator() {
     override fun negotiate(negotiation: WebSocketNegotiation): FrameHandler {
-        val request = negotiation.request.asHttp4kRequest()!!
-        return Http4kWebSocketFrameHandler(this@toJettyNegotiator(request), request)
+        val consumer = this@toJettyNegotiator(negotiation.request.asHttp4kRequest()!!)
+        consumer.subprotocol?.also { negotiation.subprotocol = it }
+        return Http4kWebSocketFrameHandler(consumer)
     }
 }
 
@@ -74,3 +77,5 @@ fun http2(http2Port: Int, keystorePath: String, keystorePassword: String): Conne
             })
         ).apply { port = http2Port }
     }
+
+internal val defaultStopMode = Graceful(ofSeconds(5))

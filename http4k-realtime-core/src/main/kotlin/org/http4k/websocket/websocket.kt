@@ -11,7 +11,6 @@ import java.io.InputStream
  * to react to events on the WS event stream by attaching listeners.
  */
 interface Websocket {
-    val upgradeRequest: Request
     fun send(message: WsMessage)
     fun close(status: WsStatus = NORMAL)
     fun onError(fn: (Throwable) -> Unit)
@@ -19,9 +18,13 @@ interface Websocket {
     fun onMessage(fn: (WsMessage) -> Unit)
 }
 
+data class WsResponse(val subprotocol: String? = null, val consumer: WsConsumer) : WsConsumer by consumer {
+    constructor(consumer: WsConsumer) : this(null, consumer)
+}
+
 typealias WsConsumer = (Websocket) -> Unit
 
-typealias WsHandler = (Request) -> WsConsumer
+typealias WsHandler = (Request) -> WsResponse
 
 data class WsMessage(val body: Body) {
     constructor(value: String) : this(Body(value))
@@ -33,7 +36,7 @@ data class WsMessage(val body: Body) {
     companion object
 }
 
-fun interface WsFilter : (WsConsumer) -> WsConsumer {
+fun interface WsFilter : (WsHandler) -> WsHandler {
     companion object
 }
 
@@ -41,6 +44,6 @@ val WsFilter.Companion.NoOp: WsFilter get() = WsFilter { next -> { next(it) } }
 
 fun WsFilter.then(next: WsFilter): WsFilter = WsFilter { this(next(it)) }
 
-fun WsFilter.then(next: WsConsumer): WsConsumer = { this(next)(it) }
+fun WsFilter.then(next: WsHandler): WsHandler = { this(next)(it) }
 
 fun WsFilter.then(routingWsHandler: RoutingWsHandler): RoutingWsHandler = routingWsHandler.withFilter(this)

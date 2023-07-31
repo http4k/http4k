@@ -12,7 +12,6 @@ import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
 import io.netty.handler.codec.http.websocketx.WebSocketFrame
 import org.http4k.core.Body
-import org.http4k.core.Request
 import org.http4k.core.StreamBody
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
@@ -20,24 +19,30 @@ import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.http4k.websocket.WsStatus.Companion.NOCODE
 
-class Http4kWsChannelHandler(private val wSocket: WsConsumer, private val upgradeRequest: Request) : SimpleChannelInboundHandler<WebSocketFrame>() {
+class Http4kWsChannelHandler(private val wSocket: WsConsumer) : SimpleChannelInboundHandler<WebSocketFrame>() {
     private var websocket: PushPullAdaptingWebSocket? = null
     private var normalClose = false
 
     override fun handlerAdded(ctx: ChannelHandlerContext) {
-        websocket = object : PushPullAdaptingWebSocket(upgradeRequest) {
+        websocket = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
                 when (message.body) {
-                    is StreamBody -> ctx.writeAndFlush(BinaryWebSocketFrame(message.body.stream.use { Unpooled.wrappedBuffer(it.readBytes()) }))
+                    is StreamBody -> ctx.writeAndFlush(BinaryWebSocketFrame(message.body.stream.use {
+                        Unpooled.wrappedBuffer(
+                            it.readBytes()
+                        )
+                    }))
+
                     else -> ctx.writeAndFlush(TextWebSocketFrame(message.bodyString()))
                 }
             }
 
             override fun close(status: WsStatus) {
-                ctx.writeAndFlush(CloseWebSocketFrame(status.code, status.description)).addListeners(ChannelFutureListener {
-                    normalClose = true
-                    websocket?.triggerClose(status)
-                }, CLOSE)
+                ctx.writeAndFlush(CloseWebSocketFrame(status.code, status.description))
+                    .addListeners(ChannelFutureListener {
+                        normalClose = true
+                        websocket?.triggerClose(status)
+                    }, CLOSE)
             }
         }.apply(wSocket)
     }

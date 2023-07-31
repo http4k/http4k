@@ -107,7 +107,7 @@ open class ConfigurableGson(builder: GsonBuilder,
     inline fun <reified T : Any> autoBody(description: String? = null,
                                           contentNegotiation: ContentNegotiation = None,
                                           contentType: ContentType = defaultContentType) =
-        httpBodyLens(description, contentNegotiation, contentType).map(mapper.read<T>(), { mapper.toJson(it) })
+        httpBodyLens(description, contentNegotiation, contentType).map(mapper.read<T>()) { mapper.toJson(it) }
 }
 
 inline fun <reified T : Any> Gson.read(): (String) -> T =

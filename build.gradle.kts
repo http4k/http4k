@@ -11,7 +11,13 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
+    id("io.github.gradle-nexus.publish-plugin")
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(20))
+    }
 }
 
 buildscript {
@@ -40,7 +46,7 @@ allprojects {
     group = "org.http4k"
 
     jacoco {
-        toolVersion = "0.8.8"
+        toolVersion = "0.8.9"
     }
 
     tasks {
@@ -57,6 +63,7 @@ allprojects {
 
         withType<Test> {
             useJUnitPlatform()
+            jvmArgs = listOf("--enable-preview")
         }
 
         named<JacocoReport>("jacocoTestReport") {
@@ -244,7 +251,7 @@ fun Node.childrenCalled(wanted: String) = children()
 tasks.named<KotlinCompile>("compileTestKotlin") {
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
+        freeCompilerArgs += listOf("-Xjvm-default=all")
     }
 }
 

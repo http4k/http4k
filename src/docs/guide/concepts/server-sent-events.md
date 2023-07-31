@@ -28,10 +28,10 @@ The primary callback received when an Sse server is connected to a client. API u
 
 ### SseHandler
 ```kotlin
-typelias SseHandler =  (Request) -> SseConsumer
+typelias SseHandler = (Request) -> SseResponse
 ```
 
-Provides the route mapping of an [HTTP Request](/guide/concepts/http#HttpMessage) to a particular SseConsumer.
+Provides the route mapping of an [HTTP Request](/guide/concepts/http#HttpMessage) to a particular SseResponse (which contains a SseConsumer).
 
 ### SseFilter
 ```kotlin

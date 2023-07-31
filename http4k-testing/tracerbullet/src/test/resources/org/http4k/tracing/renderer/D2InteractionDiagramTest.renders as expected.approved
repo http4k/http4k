@@ -1,0 +1,37 @@
+
+title: |md
+# foobar - Interactions
+| {near: top-center}
+
+user 1: {
+    shape: person
+}
+user 2: {
+    shape: person
+}
+events: {
+    shape: square
+}
+system_b: {
+    shape: square
+}
+system-c: {
+    shape: square
+}
+system/d: {
+    shape: square
+}
+db: {
+     shape: cylinder
+}
+external: {
+    shape: square
+}    
+user 1 -> system_b
+user 1 -> events
+events -> user 1
+system_b -> system-c
+system_b -> db
+system-c -> external
+user 2 -> system/d
+system/d -> events    

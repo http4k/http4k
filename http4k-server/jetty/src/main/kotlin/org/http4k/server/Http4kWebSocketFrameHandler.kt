@@ -10,16 +10,13 @@ import org.eclipse.jetty.websocket.core.OpCode.BINARY
 import org.eclipse.jetty.websocket.core.OpCode.CONTINUATION
 import org.eclipse.jetty.websocket.core.OpCode.TEXT
 import org.http4k.core.Body
-import org.http4k.core.Request
 import org.http4k.core.StreamBody
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 
-class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
-                                  private val upgradeRequest: Request) : FrameHandler {
-
+class Http4kWebSocketFrameHandler(private val consumer: WsConsumer) : FrameHandler {
     private var websocket: PushPullAdaptingWebSocket? = null
     private val textBuffer = Utf8StringBuilder()
 
@@ -43,7 +40,7 @@ class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
     }
 
     override fun onOpen(session: CoreSession, callback: Callback) {
-        websocket = object : PushPullAdaptingWebSocket(upgradeRequest) {
+        websocket = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
                 session.sendFrame(Frame(
                     if (message.body is StreamBody) BINARY else TEXT,
@@ -57,7 +54,7 @@ class Http4kWebSocketFrameHandler(private val wSocket: WsConsumer,
                     override fun succeeded() = session.flush(object : Callback {})
                 })
             }
-        }.apply(wSocket)
+        }.apply(consumer)
         callback.succeeded()
     }
 

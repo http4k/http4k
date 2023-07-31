@@ -2,11 +2,14 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
@@ -16,6 +19,7 @@ import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
+import java.net.URI
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
@@ -120,7 +124,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
             Instant.EPOCH,
             UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
             Uri.of("http://uri:8000"),
-            URL("http://url:9000"),
+            URI.create("http://url:9000").toURL(),
             Status.OK
         )
         val out = KotlinxSerialization.asFormatString(obj)
@@ -311,6 +315,12 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
 
     @Disabled
     override fun `roundtrip arbitrary set`() {
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { KotlinxSerialization.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Fields [string, child, numbers, bool]"))
     }
 
     override fun strictMarshaller() = KotlinxSerialization
