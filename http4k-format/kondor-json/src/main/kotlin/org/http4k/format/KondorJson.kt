@@ -137,12 +137,7 @@ class KondorJson(
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
         contentType: ContentType = defaultContentType
     ) =
-        converterFor(target).let { converter ->
-            httpBodyLens(description, contentNegotiation, contentType).map(
-                { it.fromJson(converter) },
-                { it.toJsonNode(converter).asCompactJsonString() }
-            )
-        }
+        converterFor(target).autoBody(description, contentNegotiation, contentType, compactJsonStyle)
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
@@ -157,13 +152,7 @@ class KondorJson(
     ) =
         autoBody(T::class, description, contentNegotiation, contentType)
 
-    fun <T : Any> wsAutoBody(target: KClass<T>) =
-        converterFor(target).let { converter ->
-            WsMessage.string().map(
-                { it.fromJson(converter) },
-                { it.toJsonNode(converter).asCompactJsonString() }
-            )
-        }
+    fun <T : Any> wsAutoBody(target: KClass<T>) = converterFor(target).wsAutoBody(compactJsonStyle)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = wsAutoBody(T::class)
 
@@ -172,13 +161,6 @@ class KondorJson(
     private fun <T, JN : JsonNode> register(target: Class<T>, converter: JsonConverter<T, JN>) {
         converters[target] = converter
     }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun <T, JN : JsonNode> Any.toJsonNode(converter: JsonConverter<T, JN>) =
-        converter.toJsonNode(this as T, NodePathRoot)
-
-    private fun <T, JN : JsonNode> String.fromJson(converter: JsonConverter<T, JN>): T =
-        converter.fromJson(this).orThrow()
 
     private fun <T, JN : JsonNode> InputStream.fromJson(converter: JsonConverter<T, JN>): T =
         converter.fromJson(this).orThrow()
@@ -202,6 +184,29 @@ class KondorJson(
 inline fun <reified T : Any, JN : JsonNode> KondorJson.InitContext.register(converter: JsonConverter<T, JN>) =
     register(T::class, converter)
 
+fun <T : Any> JsonConverter<T, *>.autoBody(
+    description: String? = null,
+    contentNegotiation: ContentNegotiation = ContentNegotiation.None,
+    contentType: ContentType = APPLICATION_JSON,
+    renderStyle: JsonStyle = JsonStyle.compactWithNulls
+) =
+    httpBodyLens(description, contentNegotiation, contentType).map(
+        { it.fromJson(this) },
+        { it.toJsonNode(this).render(renderStyle) }
+    )
+
+fun <T : Any> JsonConverter<T, *>.wsAutoBody(renderStyle: JsonStyle = JsonStyle.compactWithNulls) =
+    WsMessage.string().map(
+        { it.fromJson(this) },
+        { it.toJsonNode(this).render(renderStyle) }
+    )
+
+private fun <T, JN : JsonNode> String.fromJson(converter: JsonConverter<T, JN>): T =
+    converter.fromJson(this).orThrow()
+
+@Suppress("UNCHECKED_CAST")
+private fun <T, JN : JsonNode> Any.toJsonNode(converter: JsonConverter<T, JN>) =
+    converter.toJsonNode(this as T, NodePathRoot)
 
 private fun JsonNodeObject.updateNodePath(parentPath: NodePath = NodePathRoot): JsonNodeObject {
     val updatedFields = _fieldMap.map { (name, field) ->
