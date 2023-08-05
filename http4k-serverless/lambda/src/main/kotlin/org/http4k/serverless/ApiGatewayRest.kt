@@ -10,10 +10,20 @@ import org.http4k.core.toUrlFormEncoded
 
 /**
  * Function loader for ApiGatewayRest Lambdas
+ *
+ * Use main constructor if you need to read ENV variables to make your HttpHandler and the AWS context
  */
 class ApiGatewayRestFnLoader(input: AppLoaderWithContexts) :
     ApiGatewayFnLoader(ApiGatewayRestAwsHttpAdapter, input) {
+
+    /**
+     * Use this constructor if you need to read ENV variables to make your HttpHandler
+     */
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+
+    /**
+     * Use this constructor if you just want to convert a standard HttpHandler
+     */
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
 
