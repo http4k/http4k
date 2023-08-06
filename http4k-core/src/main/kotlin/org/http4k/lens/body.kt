@@ -169,6 +169,12 @@ fun Body.Companion.nonEmptyString(
     contentNegotiation: ContentNegotiation = None
 ) = string(contentType, description, contentNegotiation).map(StringBiDiMappings.nonEmpty())
 
+fun Body.Companion.nonBlankString(
+    contentType: ContentType,
+    description: String? = null,
+    contentNegotiation: ContentNegotiation = None
+) = string(contentType, description, contentNegotiation).map(StringBiDiMappings.nonBlank())
+
 fun Body.Companion.binary(
     contentType: ContentType,
     description: String? = null,

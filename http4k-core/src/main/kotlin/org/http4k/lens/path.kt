@@ -114,6 +114,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 
 fun Path.string() = this
 fun Path.nonEmptyString() = map(StringBiDiMappings.nonEmpty())
+fun Path.nonBlankString() = map(StringBiDiMappings.nonBlank())
 fun Path.int() = mapWithNewMeta(StringBiDiMappings.int(), IntegerParam)
 fun Path.long() = mapWithNewMeta(StringBiDiMappings.long(), IntegerParam)
 fun Path.double() = mapWithNewMeta(StringBiDiMappings.double(), NumberParam)

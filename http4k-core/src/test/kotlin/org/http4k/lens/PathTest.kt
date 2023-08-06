@@ -113,6 +113,14 @@ class PathTest {
     }
 
     @Test
+    fun nonBlankString() {
+        val requiredLens = Path.nonBlankString().of("hello")
+        assertThat(requiredLens("123"), equalTo("123"))
+        assertThat({ requiredLens("") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredLens(" ") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+    }
+
+    @Test
     fun urlEncoded() {
         val requiredLens = Path.urlEncoded().of("hello")
         assertThat(requiredLens("123%2F456"), equalTo("123/456"))
