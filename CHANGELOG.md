@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.0.1.0 (uncut)
+### v5.6.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Added `nonBlank()` to set of standard BiDiMappings. H/T @dmcg
+- **http4k-core** : [Unlikely break: Fix #956] Lenses don't really work for optional fields in HTML form parsing. Form-fields are now filtered for values which are not blank. This means that 
 
 ### v5.5.0.0
 - **http4k-*** : Upgrade some dependency versions.

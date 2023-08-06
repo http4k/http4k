@@ -10,11 +10,11 @@ import java.net.URLDecoder.decode
 
 object FormField : BiDiLensSpec<WebForm, String>("formData",
     StringParam,
-    LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
+    LensGet { name, (fields) -> fields.getOrDefault(name, listOf()).filter { it.isNotEmpty() } },
     LensSet { name, values, target -> values.fold(target - name) { m, next -> m + (name to next) } }
 )
 
-data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(), val errors: List<Failure> = emptyList()) {
+data class WebForm(val fields: Map<String, List<String>> = emptyMap(), val errors: List<Failure> = emptyList()) {
     operator fun plus(kv: Pair<String, String>): WebForm =
         copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
@@ -27,7 +27,9 @@ fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlFormEncoded() })
-        .map({ it.copy(errors = validator(it, formFields.toList())) }, { it.copy(errors = validator(it, formFields.toList())) })
+        .map(
+            { it.copy(errors = validator(it, formFields.toList())) },
+            { it.copy(errors = validator(it, formFields.toList())) })
 
 private fun formParametersFrom(target: String): Map<String, List<String>> = target
     .split("&")
