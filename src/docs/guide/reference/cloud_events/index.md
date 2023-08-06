@@ -5,7 +5,7 @@ description: Feature overview of the http4k-cloudevents module
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.5.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.6.0.0"))
     implementation("org.http4k:http4k-cloudevents")
 }
 ```
@@ -20,7 +20,7 @@ In this example we are using the Jackson JSONFormat which is included by default
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.5.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.6.0.0"))
     // to access the lenses in the Jackson module
     implementation("org.http4k:http4k-format-jackson")
 }
