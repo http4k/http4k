@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisFirehoseEvent
 import com.amazonaws.services.lambda.runtime.events.S3Event
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
+import com.amazonaws.services.lambda.runtime.events.SQSBatchResponse
 import com.amazonaws.services.lambda.runtime.events.SQSEvent
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.MessageAttribute
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage
@@ -52,6 +53,17 @@ class AwsLambdaMoshiTest {
             awsLogs = CloudWatchLogsEvent.AWSLogs().apply {
                 data = "logsData"
             }
+        })
+    }
+
+    @Test
+    fun `SQSBatchResponse event`(approver: Approver) {
+        approver.assertRoundtrips(SQSBatchResponse().apply {
+            batchItemFailures = listOf(
+                SQSBatchResponse.BatchItemFailure().apply {
+                    itemIdentifier = "itemIdentifier"
+                }
+            )
         })
     }
 
@@ -267,7 +279,8 @@ class AwsLambdaMoshiTest {
                       ]
                     }
                 """.trimIndent()
-            ).records[0].md5OfMessageAttributes)
+            ).records[0].md5OfMessageAttributes
+        )
     }
 
     @Test

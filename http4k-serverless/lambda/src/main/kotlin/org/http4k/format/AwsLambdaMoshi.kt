@@ -11,6 +11,7 @@ object AwsLambdaMoshi : ConfigurableMoshi(
         .addTyped(S3EventAdapter)
         .addTyped(ScheduledEventAdapter)
         .addTyped(SNSEventAdapter)
+        .addTyped(SQSBatchResponseAdapter)
         .addTyped(SQSEventAdapter)
         .addLast(MapAdapter)
         .addLast(ListAdapter)
