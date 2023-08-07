@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.6.1.0 (uncut)
+### v5.6.1.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-serverless-core** : Add some filters for Serverless functions.
 
 ### v5.6.0.0
 - **http4k-*** : Upgrade some dependency versions.
