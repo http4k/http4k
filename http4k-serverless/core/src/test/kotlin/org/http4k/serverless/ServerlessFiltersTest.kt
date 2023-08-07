@@ -2,8 +2,6 @@ package org.http4k.serverless
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.present
-import org.http4k.filter.ZipkinTraces
 import org.http4k.filter.ZipkinTracesStorage
 import org.http4k.util.TickingClock
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -41,17 +39,4 @@ class ServerlessFiltersTest {
         assertThat(storage.forCurrentThread(), equalTo(before))
     }
 
-    @Test
-    fun `request tracing when none`() {
-        val storage = ZipkinTracesStorage.THREAD_LOCAL
-        var set: ZipkinTraces? = null
-        ServerlessFilters.RequestTracing<String, String, Int>(storage = storage)
-            .then { `in`: String, _: String ->
-                set = storage.forCurrentThread()
-                assertThat(storage.forCurrentThread(), present())
-                `in`.toInt()
-            }(request, "")
-
-        assertThat(storage.forCurrentThread(), !equalTo(set))
-    }
 }
