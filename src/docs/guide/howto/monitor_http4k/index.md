@@ -7,7 +7,7 @@ Measuring performance of application estate is crucial in today's microservice w
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.6.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.6.1.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-metrics-micrometer")
 }
