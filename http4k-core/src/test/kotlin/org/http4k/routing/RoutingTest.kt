@@ -56,6 +56,34 @@ class RoutingTest {
     }
 
     @Test
+    fun `custom not found`() {
+        val customBody = "Custom not found"
+        val routes = routes(
+            "/a/b" bind GET to { Response(OK) },
+            notFoundHandler = { Response(NOT_FOUND).body(customBody) }
+        )
+
+        val response = routes(Request(GET, "/a/something"))
+
+        assertThat(response.status, equalTo(NOT_FOUND))
+        assertThat(response.bodyString(), equalTo(customBody))
+    }
+
+    @Test
+    fun `custom method not allowed`() {
+        val customBody = "Custom not found"
+        val routes = routes(
+            "/a/{route}" bind GET to { Response(OK).body("matched") },
+            methodNotAllowedHandler = { Response(OK).body(customBody) }
+        )
+
+        val response = routes(Request(POST, "/a/something"))
+
+        assertThat(response.status, equalTo(METHOD_NOT_ALLOWED))
+        assertThat(response.bodyString(), equalTo(customBody))
+    }
+
+    @Test
     fun `mismatched path with no alternate method should be unmatched`() {
         val routes = routes(
             "/search/foo" bind POST to { Response(OK) },

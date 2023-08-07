@@ -6,10 +6,36 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
 
-fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler =
-    routes(*list.map { "" bind it.first to it.second }.toTypedArray())
+fun routes(
+    vararg list: Pair<Method, HttpHandler>,
+    notFoundHandler: HttpHandler = routeNotFoundHandler,
+    methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler,
+): RoutingHttpHandler =
+    routes(list.map { "" bind it.first to it.second }, notFoundHandler, methodNotAllowedHandler)
 
-fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(OrRouter.from(list.toList()))
+fun routes(
+    vararg list: Pair<Method, HttpHandler>,
+): RoutingHttpHandler =
+    routes(list.map { "" bind it.first to it.second })
+
+fun routes(
+    vararg list: RoutingHttpHandler,
+    notFoundHandler: HttpHandler = routeNotFoundHandler,
+    methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler,
+): RoutingHttpHandler =
+    routes(list.toList(), notFoundHandler, methodNotAllowedHandler)
+
+fun routes(
+    vararg list: RoutingHttpHandler,
+): RoutingHttpHandler =
+    routes(list.toList())
+
+fun routes(
+    list: List<RoutingHttpHandler>,
+    notFoundHandler: HttpHandler = routeNotFoundHandler,
+    methodNotAllowedHandler: HttpHandler = routeMethodNotAllowedHandler,
+): RoutingHttpHandler =
+    RouterBasedHttpHandler(OrRouter.from(list), notFoundHandler, methodNotAllowedHandler)
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 infix fun String.bind(httpHandler: RoutingHttpHandler): RoutingHttpHandler = httpHandler.withBasePath(this)
