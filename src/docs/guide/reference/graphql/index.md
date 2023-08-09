@@ -5,7 +5,7 @@ description: Feature overview of the http4k-graphql module.
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.6.1.0"))
+    implementation(platform("org.http4k:http4k-bom:5.6.2.0"))
     implementation("org.http4k:http4k-graphql")
 
     // for the example below you will also need this dependency...
