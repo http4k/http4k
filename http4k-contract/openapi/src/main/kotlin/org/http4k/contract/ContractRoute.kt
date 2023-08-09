@@ -37,7 +37,7 @@ class ContractRoute internal constructor(val method: Method,
 
     fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
 
-    internal fun toRouter(contractRoot: PathSegments) = object : Router {
+    fun toRouter(contractRoot: PathSegments) = object : Router {
 
         override fun toString() = description.description
 

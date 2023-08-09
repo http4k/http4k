@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.6.2.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-security-oauth** : [Fix] In-memory request tracking for FakeOAuthServer now supports full AuthRequest.
+
 ### v5.6.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-core** : Add some filters for Serverless functions.
