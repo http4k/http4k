@@ -7,7 +7,9 @@ import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.routing.bind
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 import org.http4k.security.Nonce.Companion.SECURE_NONCE
+import org.http4k.security.ResponseType.Code
 import org.http4k.security.openid.IdTokenConsumer
+import org.http4k.security.openid.IdTokenConsumer.Companion.NoOp
 import org.http4k.security.openid.RequestJwts
 
 /**
@@ -22,14 +24,15 @@ class OAuthProvider(
     private val modifyAuthState: (Uri) -> Uri = { it },
     private val generateCrsf: CsrfGenerator = SECURE_CSRF,
     private val nonceGenerator: NonceGenerator = SECURE_NONCE,
-    private val responseType: ResponseType = ResponseType.Code,
-    idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
+    private val responseType: ResponseType = Code,
+    idTokenConsumer: IdTokenConsumer = NoOp,
     accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(
         providerConfig
     ),
     private val jwtRedirectionUriBuilder: (RequestJwts) -> RedirectionUriBuilder = ::uriBuilderWithRequestJwt,
     redirectionUrlBuilder: RedirectionUriBuilder = defaultUriBuilder,
-    accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
+    accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
+    private val responseMode: ResponseMode? = null
 ) {
 
     // pre-configured API client for this provider
@@ -45,7 +48,8 @@ class OAuthProvider(
         modifyAuthState,
         oAuthPersistence,
         responseType,
-        redirectionUrlBuilder
+        redirectionUrlBuilder,
+        responseMode = responseMode
     )
 
     // protect endpoint and provide custom request JWT creation mechanism
@@ -59,7 +63,8 @@ class OAuthProvider(
             modifyAuthState,
             oAuthPersistence,
             responseType,
-            jwtRedirectionUriBuilder(requestJwts)
+            jwtRedirectionUriBuilder(requestJwts),
+            responseMode = responseMode
         )
 
     private val accessTokenFetcher =

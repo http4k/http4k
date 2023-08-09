@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.6.3.0
+- **http4k-security-oauth** :Add ability to override response mode in OAuthProvider.
+
 ### v5.6.2.1
 - **http4k-core** : [Fix] Extend URI now supports fragment parameters
 
