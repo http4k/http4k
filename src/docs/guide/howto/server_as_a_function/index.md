@@ -7,7 +7,7 @@ This example is the simplest possible "server" implementation. Note that we are 
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.6.2.0"))
+    implementation(platform("org.http4k:http4k-bom:5.6.2.1"))
     implementation("org.http4k:http4k-core")
 }
 ```
