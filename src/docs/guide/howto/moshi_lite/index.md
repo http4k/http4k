@@ -16,7 +16,7 @@ This recipe uses the 3rd-party [moshi-metadata-reflect](https://github.com/ZacSw
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.6.2.1"))
+    implementation(platform("org.http4k:http4k-bom:5.6.3.0"))
     implementation("org.http4k:http4k-format-moshi") {
         exclude("com.squareup.moshi", "moshi-kotlin")
     }
