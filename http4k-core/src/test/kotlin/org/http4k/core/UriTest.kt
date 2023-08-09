@@ -107,7 +107,8 @@ class UriTest {
 
     @Test
     fun `can extend existing uri`() {
-        assertThat(Uri.of("http://ignore?foo=bar").extend(Uri.of("/?abc=xyz")), equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz")))
+        assertThat(Uri.of("http://ignore?foo=bar").extend(Uri.of("/?abc=xyz#bob")), equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz#bob")))
+        assertThat(Uri.of("http://ignore?foo=bar#bob").extend(Uri.of("/?abc=xyz")), equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz#bob")))
     }
 
     @Test

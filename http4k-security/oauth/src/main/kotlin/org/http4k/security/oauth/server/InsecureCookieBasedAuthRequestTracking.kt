@@ -24,5 +24,6 @@ class InsecureCookieBasedAuthRequestTracking : AuthRequestTracking {
         .with(OAuthServer.scopesQueryParameter of scopes)
         .with(OAuthServer.state of state)
         .with(OAuthServer.responseType of responseType)
+        .with(OAuthServer.responseMode of responseMode)
         .uri.query
 }

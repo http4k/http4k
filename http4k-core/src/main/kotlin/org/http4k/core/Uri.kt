@@ -98,8 +98,9 @@ fun String.toPathSegmentEncoded(): String =
 fun String.toPathSegmentDecoded(): String =
     this.replace("+", "%2B").urlDecoded()
 
-fun Uri.extend(uri: Uri): Uri =
-    appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())
+fun Uri.extend(uri: Uri) : Uri =
+    appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded(),
+        fragment = uri.fragment.takeIf { it.isNotEmpty() } ?: fragment)
 
 fun Uri.appendToPath(pathToAppend: String?): Uri =
     if (pathToAppend.isNullOrBlank()) this

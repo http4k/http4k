@@ -24,7 +24,8 @@ class OAuthRedirectionFilter(
     private val oAuthPersistence: OAuthPersistence,
     private val responseType: ResponseType,
     private val redirectionBuilder: RedirectionUriBuilder = defaultUriBuilder,
-    private val originalUri: (Request) -> Uri = Request::uri
+    private val originalUri: (Request) -> Uri = Request::uri,
+    private val responseMode: ResponseMode? = null
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler = {
@@ -39,7 +40,8 @@ class OAuthRedirectionFilter(
                 callbackUri,
                 state,
                 responseType,
-                nonce
+                nonce,
+                responseMode
             )
 
             val redirect = Response(TEMPORARY_REDIRECT)
