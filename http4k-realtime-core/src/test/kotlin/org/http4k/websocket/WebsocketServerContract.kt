@@ -56,7 +56,7 @@ abstract class WebsocketServerContract(
                     }
                 }
             ),
-            "/errors" bind { req: Request ->
+            "/errors" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onMessage { lens(it) }
                     ws.onError {
@@ -70,7 +70,7 @@ abstract class WebsocketServerContract(
                     ws.onError { ws.send(WsMessage(it.localizedMessage)) }
                 }
             },
-            "/echo" bind { req: Request ->
+            "/echo" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onMessage { ws.send(it) }
                 }
@@ -117,7 +117,7 @@ abstract class WebsocketServerContract(
         var closeStatus: WsStatus? = null
 
         val server = websockets(
-            "/closes" bind { req: Request ->
+            "/closes" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onClose {
                         closeStatus = it
@@ -139,7 +139,7 @@ abstract class WebsocketServerContract(
         var closeStatus: WsStatus? = null
 
         val server = websockets(
-            "/closes" bind { req: Request ->
+            "/closes" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onMessage {
                         ws.close()
@@ -165,7 +165,7 @@ abstract class WebsocketServerContract(
         var closeStatus: WsStatus? = null
 
         val server = websockets(
-            "/closes" bind { req: Request ->
+            "/closes" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onClose {
                         closeStatus = it

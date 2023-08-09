@@ -23,7 +23,7 @@ fun main() {
     // lens.inject(object, response) serializes the object and sets content-type header to 'application/json'
     // can be used with any Serializable type (Map, List, etc)
     val app: HttpHandler =
-        { request: Request -> lensCarResponse.inject(sweetride, Response(Status.OK)) }
+        { _: Request -> lensCarResponse.inject(sweetride, Response(Status.OK)) }
 
     val request: Request = Request(Method.GET, "/")
     val response = app(request)

@@ -20,7 +20,7 @@ abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerC
     @BeforeEach
     fun before() {
         val ws = websockets(
-            "/bin" bind { req: Request ->
+            "/bin" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onMessage {
                         val content = it.body.stream.readBytes()
