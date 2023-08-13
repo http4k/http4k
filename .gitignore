@@ -11,3 +11,4 @@ intellij-settings/
 **/*.actual
 **/generated/**
 /RenderingTest - render successful trace - Sequence.puml
+jte-classes
