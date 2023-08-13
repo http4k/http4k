@@ -112,10 +112,11 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * **Pluggable** templating system support for:
         * **Freemarker**
         * **Handlebars** 
+        * **Jade4j**
+        * **JTE**
         * **Pebble**
         * **Rocker**
         * **Thymeleaf**
-        * **Jade4j**
     * Caching and **Hot-Reload** template support
 * **Message formats:** 
     * Consistent API provides first class support for marshalling formats to/from HTTP messages for:

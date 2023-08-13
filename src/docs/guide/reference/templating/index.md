@@ -19,6 +19,9 @@ dependencies {
     // Jade4j: 
     implementation("org.http4k:http4k-template-jade4j")
     
+    // JTE: 
+    implementation("org.http4k:http4k-template-jte")
+    
     // Pebble: 
     implementation("org.http4k:http4k-template-pebble")
     
