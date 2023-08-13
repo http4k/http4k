@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.org.bouncycastle.asn1.x500.style.RFC4519Style.name
-
 rootProject.name = "http4k"
 
 plugins {
@@ -115,20 +113,21 @@ include("http4k-realtime-core")
     includeModule("tencent:integration-test:test-function")
 }
 
-"http4k-template".apply {
-    includeModule("core")
-    includeModule("freemarker")
-    includeModule("handlebars")
-    includeModule("rocker")
-    includeModule("pebble")
-    includeModule("thymeleaf")
-    includeModule("jade4j")
-}
-
 "http4k-security".apply {
     includeModule("core")
     includeModule("digest")
     includeModule("oauth")
+}
+
+"http4k-template".apply {
+    includeModule("core")
+    includeModule("freemarker")
+    includeModule("handlebars")
+    includeModule("jte")
+    includeModule("rocker")
+    includeModule("pebble")
+    includeModule("thymeleaf")
+    includeModule("jade4j")
 }
 
 "http4k-testing".apply {

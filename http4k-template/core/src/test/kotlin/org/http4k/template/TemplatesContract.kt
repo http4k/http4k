@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test
 
 abstract class TemplatesContract<out T : Templates>(protected val templates: T) {
 
+    open val supportsRoot = true
+
     private val items = listOf(
         Item("item1", "£1", listOf(Feature("pretty"))),
         Item("item2", "£3", listOf(Feature("nasty")))
@@ -16,7 +18,7 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     fun `caching classpath`() {
         val renderer = templates.CachingClasspath()
         checkOnClasspath(renderer)
-        checkAtRoot(renderer)
+        if (supportsRoot) checkAtRoot(renderer)
         checkNonExistent(renderer)
     }
 
@@ -35,7 +37,7 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     fun `caching file-based`() {
         val renderer = templates.Caching("src/test/resources")
         checkOnClasspath(renderer)
-        checkAtRoot(renderer)
+        if (supportsRoot) checkAtRoot(renderer)
         checkNonExistent(renderer)
     }
 
@@ -43,7 +45,7 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     fun `hot reload`() {
         val renderer = templates.HotReload("src/test/resources")
         checkOnClasspath(renderer)
-        checkAtRoot(renderer)
+        if (supportsRoot) checkAtRoot(renderer)
         checkNonExistent(renderer)
     }
 
