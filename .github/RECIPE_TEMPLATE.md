@@ -6,7 +6,7 @@ Brief overview of the recipe.
 ### Gradle setup
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.6.3.0"))
+    implementation(platform("org.http4k:http4k-bom:5.6.4.0"))
     implementation("org.http4k:http4k-core")
     // include here all of the dependencies that are needed to make the code run
 }
