@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.6.4.0
 - **http4k-*** : Upgrade some dependency versions
-- **http4k-server-apache4**: upgrade compromised `commons-codec` version  H/T @oharaandrew314
+- **http4k-server-apache4**: Upgrade compromised `commons-codec` version. H/T @oharaandrew314
 - **http4k-template-jte** : [New module] JTE templating support
 
 ### v5.6.3.0
