@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - '**/*.md'
 jobs:
   check-new-version:
     runs-on: ubuntu-latest
