@@ -20,13 +20,13 @@ object MermaidInteractionDiagram : TraceRenderer {
             """C4Context
 title $scenarioName
 
-${traces.chronologicalActors().toPumlActor().joinToString("\n")}    
+${traces.chronologicalActors().toMermaidActor().joinToString("\n")}    
 ${relations.joinToString("\n") { "Rel_D(${it.origin.identifier()}, ${it.target.identifier()}, \" \") " }}    
 """.trimMargin()
         )
     }
 
-    private fun Iterable<Actor>.toPumlActor() =
+    private fun Iterable<Actor>.toMermaidActor() =
         fold(emptyList<String>()) { acc, it ->
             val nextVal = when (it.type) {
                 Database -> "ContainerDb"
