@@ -29,7 +29,7 @@ changes with their rationale when appropriate:
 ### v5.6.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Added `nonBlank()` to set of standard BiDiMappings. H/T @dmcg
-- **http4k-core** : [Unlikely break: Fix #956] Lenses don't really work for optional fields in HTML form parsing. Form-fields are now filtered for values which are not blank. This means that 
+- **http4k-core** : [Unlikely break: Fix #956] Lenses don't really work for optional fields in HTML form parsing. Form-fields are now filtered for values which are not blank. This means that you may need to change form lenses to be optional and default to an empty string if they are missing.
 
 ### v5.5.0.0
 - **http4k-*** : Upgrade some dependency versions.
