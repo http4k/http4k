@@ -44,8 +44,8 @@ class NamedResourceApprover(private val name: String,
                 }
                 else -> try {
                     assertEquals(
-                        approvalContent(this).reader().use { it.readText().normalizeLineEndings() },
-                        approvalContent(httpMessage).reader().readText().normalizeLineEndings()
+                        approvalContent(this).reader().use { it.readText().normalizeLineEndings().trimEnd() },
+                        approvalContent(httpMessage).reader().readText().normalizeLineEndings().trimEnd()
                     )
                     actual.output()
                 } catch (e: AssertionError) {

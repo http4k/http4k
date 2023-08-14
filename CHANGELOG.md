@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.6.5.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-testing-approval** : Whitespace is now trimmed from end of approval file content. Improves compatibility with IntelliJ (as final line endings might be added automatically)
+
 ### v5.6.4.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-server-apache4**: Upgrade compromised `commons-codec` version. H/T @oharaandrew314
