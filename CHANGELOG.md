@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.6.5.0 (uncut)
+### v5.6.5.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-testing-approval** : Whitespace is now trimmed from end of approval file content. Improves compatibility with IntelliJ (as final line endings might be added automatically)
+- **http4k-testing-webdriver** : [Fix #963] Submitting empty textarea form element in the webdriver causes a validation error
 
 ### v5.6.4.0
 - **http4k-*** : Upgrade some dependency versions

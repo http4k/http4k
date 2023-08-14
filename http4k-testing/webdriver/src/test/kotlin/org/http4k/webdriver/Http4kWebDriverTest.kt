@@ -16,7 +16,6 @@ import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URI
-import java.net.URL
 import java.time.Instant
 import java.util.Date
 import org.http4k.core.cookie.Cookie as HCookie
@@ -262,6 +261,16 @@ class Http4kWebDriverTest {
         isNotImplemented { driver.switchTo().frame("bob") }
         isNotImplemented { driver.switchTo().frame(windowHandle) }
         isNotImplemented { driver.switchTo().parentFrame() }
+    }
+
+    @Test
+    fun `POST form with an empty text box`() {
+        driver.get("https://example.com/bob")
+        driver.findElement(By.tagName("textarea"))!!.sendKeys("")
+        driver.findElement(By.id("button"))!!.submit()
+        driver.assertOnPage("https://example.com/form")
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=&select1=option1&select1=option2&button=yes"))
+        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
     private fun WebDriver.assertOnPage(expected: String) {

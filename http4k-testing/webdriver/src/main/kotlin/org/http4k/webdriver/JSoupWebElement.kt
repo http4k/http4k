@@ -75,15 +75,15 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
             val body = Body.webForm(
                 Validator.Strict,
-                *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())
+                *(form.fields.map { FormField.multi.optional(it.key) }.toTypedArray())
             ).toLens()
 
-            val formtarget = Uri.of(it.element.attr("action") ?: "")
+            val formTarget = Uri.of(it.element.attr("action") ?: "")
             val current = getURL()
             val action = when {
-                formtarget.host == "" && formtarget.path == "" && current != null -> Uri.of(current)
-                formtarget.host == "" && current != null -> Uri.of(current).path(formtarget.path)
-                else -> formtarget
+                formTarget.host == "" && formTarget.path == "" && current != null -> Uri.of(current)
+                formTarget.host == "" && current != null -> Uri.of(current).path(formTarget.path)
+                else -> formTarget
             }
             val postRequest = Request(method, action.toString()).with(body of form)
 
