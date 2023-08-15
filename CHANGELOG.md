@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.7.0.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-server-undertow** : [Unlikely break] - Reverse removal of the connectRequest from the SSE interface. This should undo the break caused by the recent rewrite.
+- **http4k-server-jetty** : [Unlikely break] - Reverse removal of the connectRequest from the SSE interface. This should undo the break caused by the recent rewrite.
+
 ### v5.6.5.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-testing-approval** : Whitespace is now trimmed from end of approval file content. Improves compatibility with IntelliJ (as final line endings might be added automatically)

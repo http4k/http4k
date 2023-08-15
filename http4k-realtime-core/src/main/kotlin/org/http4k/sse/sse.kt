@@ -10,6 +10,7 @@ import java.io.InputStream
 import java.time.Duration
 
 interface Sse {
+    val connectRequest: Request
     fun send(message: SseMessage)
     fun close()
     fun onClose(fn: () -> Unit)

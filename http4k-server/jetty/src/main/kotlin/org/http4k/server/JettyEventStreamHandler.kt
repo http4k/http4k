@@ -8,6 +8,7 @@ import org.eclipse.jetty.util.thread.AutoLock
 import org.eclipse.jetty.util.thread.Scheduler
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Headers
+import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.servlet.jakarta.asHttp4kRequest
 import org.http4k.sse.PushAdaptingSse
@@ -40,7 +41,7 @@ class JettyEventStreamHandler(
                 val scheduler = baseRequest.httpChannel.connector.scheduler
                 val server = baseRequest.httpChannel.connector.server
 
-                val emitter = JettyEventStreamEmitter(output, heartBeatDuration, scheduler, onClose = {
+                val emitter = JettyEventStreamEmitter(connectRequest, output, heartBeatDuration, scheduler, onClose = {
                     async.complete()
                     server.removeEventListener(it)
                 }).also(server::addEventListener)
@@ -79,11 +80,12 @@ class JettyEventStreamHandler(
 }
 
 internal class JettyEventStreamEmitter(
+    connectRequest: Request,
     private val output: OutputStream,
     private val heartBeatDuration: Duration,
     private val scheduler: Scheduler,
     private val onClose: (JettyEventStreamEmitter) -> Unit
-) : PushAdaptingSse(), Runnable, LifeCycle.Listener {
+) : PushAdaptingSse(connectRequest), Runnable, LifeCycle.Listener {
     private val lock: AutoLock = AutoLock()
     private var heartBeat: Scheduler.Task? = null
     private var closed = false

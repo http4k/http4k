@@ -8,6 +8,8 @@ import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.sameInstance
 import org.eclipse.jetty.util.component.AbstractLifeCycle
 import org.eclipse.jetty.util.thread.Scheduler
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
@@ -18,10 +20,19 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class JettyEventStreamEmitterTest {
 
+    private val connectRequest = Request(Method.GET, "")
+
+    @Test
+    fun `sse connectRequest is returned`() {
+        val emitter = JettyEventStreamEmitter(connectRequest, FakeOutput(), Duration.ofMillis(5), FakeScheduler(), onClose = {})
+
+        assertThat(emitter.connectRequest, equalTo(connectRequest))
+    }
+
     @Test
     fun `can send Retry message`() {
         val output = FakeOutput()
-        val emitter = JettyEventStreamEmitter(output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
+        val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
 
         emitter.send(SseMessage.Retry(Duration.ofMillis(3)))
 
@@ -32,7 +43,7 @@ class JettyEventStreamEmitterTest {
     @Test
     fun `can send Data message`() {
         val output = FakeOutput()
-        val emitter = JettyEventStreamEmitter(output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
+        val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
 
         emitter.send(SseMessage.Data("some data"))
 
@@ -43,7 +54,7 @@ class JettyEventStreamEmitterTest {
     @Test
     fun `can send Data message containing multiple lines`() {
         val output = FakeOutput()
-        val emitter = JettyEventStreamEmitter(output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
+        val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
 
         emitter.send(SseMessage.Data("some data\nwith another line"))
 
@@ -54,7 +65,7 @@ class JettyEventStreamEmitterTest {
     @Test
     fun `can send Event message with an id`() {
         val output = FakeOutput()
-        val emitter = JettyEventStreamEmitter(output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
+        val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
 
         emitter.send(SseMessage.Event("event name", "some data", "an id"))
 
@@ -65,7 +76,7 @@ class JettyEventStreamEmitterTest {
     @Test
     fun `can send Event message without an id`() {
         val output = FakeOutput()
-        val emitter = JettyEventStreamEmitter(output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
+        val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
 
         emitter.send(SseMessage.Event("event name", "some data", id = null))
 
@@ -76,7 +87,7 @@ class JettyEventStreamEmitterTest {
     @Test
     fun `can send Event message with multiline data`() {
         val output = FakeOutput()
-        val emitter = JettyEventStreamEmitter(output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
+        val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), onClose = {})
 
         emitter.send(SseMessage.Event("event name", "some data\nwith another line", id = null))
 
@@ -87,7 +98,7 @@ class JettyEventStreamEmitterTest {
     @Test
     fun `schedules a heart beat on creation with provided duration`() {
         val scheduler = FakeScheduler()
-        val emitter = JettyEventStreamEmitter(FakeOutput(), Duration.ofMillis(5), scheduler, onClose = {})
+        val emitter = JettyEventStreamEmitter(connectRequest, FakeOutput(), Duration.ofMillis(5), scheduler, onClose = {})
 
         assertThat(
             scheduler.currentTask, present(
@@ -105,7 +116,7 @@ class JettyEventStreamEmitterTest {
     fun `when a heart beat triggers a blank line is written to the output and a new heart beat is scheduled`() {
         val scheduler = FakeScheduler()
         val output = FakeOutput()
-        JettyEventStreamEmitter(output, Duration.ofMillis(5), scheduler, onClose = {})
+        JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), scheduler, onClose = {})
 
         scheduler.trigger()
 
@@ -119,7 +130,7 @@ class JettyEventStreamEmitterTest {
         val scheduler = FakeScheduler()
         val emitterOnCloseCallCount = AtomicInteger(0)
         val sseOnCloseCallCount = AtomicInteger(0)
-        val emitter = JettyEventStreamEmitter(FakeOutput(), Duration.ofMillis(5), scheduler,
+        val emitter = JettyEventStreamEmitter(connectRequest, FakeOutput(), Duration.ofMillis(5), scheduler,
             onClose = { emitterOnCloseCallCount.incrementAndGet() })
         emitter.onClose { sseOnCloseCallCount.incrementAndGet() }
 
@@ -135,7 +146,7 @@ class JettyEventStreamEmitterTest {
         val scheduler = FakeScheduler()
         val emitterOnCloseCallCount = AtomicInteger(0)
         val sseOnCloseCallCount = AtomicInteger(0)
-        val emitter = JettyEventStreamEmitter(FakeOutput(), Duration.ofMillis(5), scheduler,
+        val emitter = JettyEventStreamEmitter(connectRequest, FakeOutput(), Duration.ofMillis(5), scheduler,
             onClose = { emitterOnCloseCallCount.incrementAndGet() })
         emitter.onClose { sseOnCloseCallCount.incrementAndGet() }
 
@@ -153,7 +164,7 @@ class JettyEventStreamEmitterTest {
         val scheduler = FakeScheduler()
         val emitterOnCloseCallCount = AtomicInteger(0)
         val sseOnCloseCallCount = AtomicInteger(0)
-        val emitter = JettyEventStreamEmitter(FakeOutput(), Duration.ofMillis(5), scheduler,
+        val emitter = JettyEventStreamEmitter(connectRequest, FakeOutput(), Duration.ofMillis(5), scheduler,
             onClose = { emitterOnCloseCallCount.incrementAndGet() })
         emitter.onClose { sseOnCloseCallCount.incrementAndGet() }
 
@@ -169,7 +180,7 @@ class JettyEventStreamEmitterTest {
         val scheduler = FakeScheduler()
         val emitterOnCloseCallCount = AtomicInteger(0)
         val sseOnCloseCallCount = AtomicInteger(0)
-        val emitter = JettyEventStreamEmitter(FakeOutput(flushFails = true), Duration.ofMillis(5), scheduler,
+        val emitter = JettyEventStreamEmitter(connectRequest, FakeOutput(flushFails = true), Duration.ofMillis(5), scheduler,
             onClose = { emitterOnCloseCallCount.incrementAndGet() })
         emitter.onClose { sseOnCloseCallCount.incrementAndGet() }
 

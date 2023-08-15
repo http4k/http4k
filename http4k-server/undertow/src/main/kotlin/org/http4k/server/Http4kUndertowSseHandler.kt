@@ -19,7 +19,9 @@ import java.io.IOException
 class Http4kSetHeadersHandler(private val sse: SseHandler) : HttpHandler {
 
     override fun handleRequest(exchange: HttpServerExchange) {
-        val (status, headers, consumer) = sse(exchange.asRequest() ?: error("Cannot create request from exchange"))
+        val asRequest = exchange.asRequest()
+        val request = asRequest ?: error("Cannot create request from exchange")
+        val (status, headers, consumer) = sse(request)
         exchange.setStatusCode(status.code)
 
         headers.toParametersMap().forEach { (name, values) ->
@@ -27,7 +29,8 @@ class Http4kSetHeadersHandler(private val sse: SseHandler) : HttpHandler {
         }
 
         val next = ServerSentEventHandler { connection, _ ->
-            val socket = object : PushAdaptingSse() {
+            val socket = object : PushAdaptingSse(request) {
+
                 override fun send(message: SseMessage) =
                     when (message) {
                         is SseMessage.Retry -> connection.sendRetry(message.backoff.toMillis())
