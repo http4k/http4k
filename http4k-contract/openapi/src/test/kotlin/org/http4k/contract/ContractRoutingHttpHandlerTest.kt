@@ -361,7 +361,23 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `can all paramter checking by overriding pre-request-extraction`() {
+    fun `can all parameter checking by overriding pre-request-extraction`() {
         assertThat(handler(Request(GET, "/bad-request-body-ignore-all")), hasStatus(OK))
+    }
+
+    @Test
+    fun `matches requests without root slash`() {
+        val route = "foo" / Path.of("id") bindContract GET to { value -> { Response(OK).body(value) } }
+        val http = contract { routes += listOf(route) }
+
+        assertThat(http(Request(GET, "/foo/fooBar")), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
+        assertThat(http(Request(GET, "foo/fooBar")), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
+        assertThat(http(Request(GET, UriTemplate.from("foo/fooBar"))), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
+        assertThat(http(Request(GET, UriTemplate.from("/foo/fooBar"))), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
+
+        assertThat(http(Request(GET, "/foo/barFoo")), hasStatus(OK) and hasBody("barFoo")) // --> 200 OK
+        assertThat(http(Request(GET, "foo/barFoo")), hasStatus(OK) and hasBody("barFoo")) // --> FAILS - 404 NOT_FOUND
+        assertThat(http(Request(GET, UriTemplate.from("foo/barFoo"))), hasStatus(OK) and hasBody("barFoo")) // --> FAILS - 404 NOT_FOUND
+        assertThat(http(Request(GET, UriTemplate.from("/foo/barFoo"))), hasStatus(OK) and hasBody("barFoo")) // --> FAILS - 404 NOT_FOUND
     }
 }

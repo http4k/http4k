@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.7.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions
+- **http4k-contract*** : [Fix #964] ContractRoute - inconsistent behavior on route matching. H/T @potfur for the investigation.
 
 ### v5.7.0.0
 - **http4k-*** : Upgrade some dependency versions
