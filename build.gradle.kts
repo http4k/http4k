@@ -1,6 +1,7 @@
 import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
+import org.gradle.internal.impldep.org.bouncycastle.cms.RecipientId.password
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Duration
 
@@ -26,7 +27,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
+        classpath(Kotlin.gradlePlugin)
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
         classpath("gradle.plugin.com.github.johnrengelman:shadow:_")
