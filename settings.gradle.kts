@@ -1,7 +1,7 @@
 rootProject.name = "http4k"
 
 plugins {
-    id("de.fayard.refreshVersions").version("0.60.0")
+    id("de.fayard.refreshVersions").version("0.40.2")
 }
 
 refreshVersions {
@@ -123,6 +123,7 @@ include("http4k-realtime-core")
     includeModule("core")
     includeModule("freemarker")
     includeModule("handlebars")
+    includeModule("htmx")
     includeModule("jte")
     includeModule("rocker")
     includeModule("pebble")
