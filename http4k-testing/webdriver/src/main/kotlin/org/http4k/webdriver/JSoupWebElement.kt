@@ -106,7 +106,12 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             isA("input") && element.attr("type") == "checkbox" ->
                 if (isSelected) clear() else element.attr("checked", "checked")
 
-            isA("input") && element.attr("type") == "radio" -> element.attr("checked", "checked")
+            isA("input") && element.attr("type") == "radio" -> {
+                if (element.hasAttr("name")) {
+                    current("form")?.findElements(By.tagName("input"))?.filter { it.getAttribute("name") == element.attr("name") }?.forEach { it.clear() }
+                }
+                element.attr("checked", "checked")
+            }
 
             isA("option") -> {
                 val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") == true
