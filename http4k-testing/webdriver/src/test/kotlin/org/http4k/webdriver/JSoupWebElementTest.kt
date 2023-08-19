@@ -46,6 +46,14 @@ class JSoupWebElementTest {
         </form>
         """)).findElement(By.tagName("form"))!!
 
+    private fun radioGroupForm() = JSoupWebElement(navigate, getURL, Jsoup.parse("""
+        <form>
+            <input id="radio11" name="group1" type="radio" value="group1value1" checked/>
+            <input id="radio12" name="group1" type="radio" value="group1value2"/>
+            <input id="radio21" name="group2" type="radio" value="group2value1" checked/>
+        </form>
+        """)).findElement(By.tagName("form"))!!
+
     @Test
     fun `find sub elements`() = assertThat(element().findElements(By.tagName("span"))[0].text, equalTo("hello"))
 
@@ -97,6 +105,25 @@ class JSoupWebElementTest {
         assertThat(input.isSelected, equalTo(true))
         input.click()
         assertThat(input.isSelected, equalTo(false))
+    }
+
+    @Test
+    fun `click radio to remain checked`() {
+        val input = input("radio")
+        input.click()
+        assertThat(input.isSelected, equalTo(true))
+        input.click()
+        assertThat(input.isSelected, equalTo(true))
+    }
+
+    @Test
+    fun `click radio to clear others in radio group`() {
+        val form = radioGroupForm()
+
+        form.findElement(By.id("radio12")).click()
+        assertThat(form.findElement(By.id("radio11")).isSelected, equalTo(false))
+        assertThat(form.findElement(By.id("radio12")).isSelected, equalTo(true))
+        assertThat(form.findElement(By.id("radio21")).isSelected, equalTo(true))
     }
 
     @Test
