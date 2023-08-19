@@ -100,6 +100,15 @@ class JSoupWebElementTest {
     }
 
     @Test
+    fun `click radio to remain checked`() {
+        val input = input("radio")
+        input.click()
+        assertThat(input.isSelected, equalTo(true))
+        input.click()
+        assertThat(input.isSelected, equalTo(true))
+    }
+
+    @Test
     fun `click link`() {
         element("a").click()
         assertThat(newLocation, equalTo(GET to "/link"))

@@ -102,8 +102,11 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     override fun click() {
         when {
             isA("a") -> navigate(Request(GET, element.attr("href")))
-            isCheckable() -> if (isSelected) clear()
-            else element.attr("checked", "checked")
+
+            isA("input") && element.attr("type") == "checkbox" ->
+                if (isSelected) clear() else element.attr("checked", "checked")
+
+            isA("input") && element.attr("type") == "radio" -> element.attr("checked", "checked")
 
             isA("option") -> {
                 val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") == true
