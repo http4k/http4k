@@ -147,7 +147,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
 * [OpenTelemetry:](https://http4k.org/guide/reference/opentelemetry) 
     * Instrument http4k apps with OpenTelemetry tooling.
 * [htmx:](https://http4k.org/guide/reference/htmx)
-    * Support for plugging powering http4k apps with htmx.
+    * Support for powering http4k apps with htmx.
 * [GraphQL:](https://http4k.org/guide/reference/graphql) 
     * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
 * [AWS:](https://http4k.org/guide/reference/aws) 
