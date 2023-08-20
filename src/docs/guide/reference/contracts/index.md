@@ -5,7 +5,7 @@ description: Feature overview of the http4k-contract module
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.7.1.0"))
+    implementation(platform("org.http4k:http4k-bom:5.7.2.0"))
     implementation("org.http4k:http4k-contract")
     implementation("org.http4k:http4k-format-<insert json lib>")
 }
