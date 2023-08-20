@@ -71,6 +71,7 @@ include("http4k-cloudnative")
 }
 
 include("http4k-graphql")
+include("http4k-htmx")
 include("http4k-incubator")
 include("http4k-jsonrpc")
 include("http4k-metrics-micrometer")

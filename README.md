@@ -136,6 +136,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
             * **Moshi** - includes support for **fully automatic marshalling of Data classes**
         * **CSV** - includes support for: 
             * **Jackson** - CSV format for Jackson
+* [Multipart:](https://http4k.org/guide/reference/multipart)
+    * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [Resilience4J:](https://http4k.org/guide/reference/resilience4j) 
     * Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
 * [Micrometer:](https://http4k.org/guide/reference/micrometer) 
@@ -144,8 +146,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Consume and produce CloudEvents using typesafe lenses.
 * [OpenTelemetry:](https://http4k.org/guide/reference/opentelemetry) 
     * Instrument http4k apps with OpenTelemetry tooling.
-* [Multipart:](https://http4k.org/guide/reference/multipart) 
-    * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
+* [HTMX:](https://http4k.org/guide/reference/htmx)
+    * Support for plugging powering http4k apps with HTMX.
 * [GraphQL:](https://http4k.org/guide/reference/graphql) 
     * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
 * [AWS:](https://http4k.org/guide/reference/aws) 
