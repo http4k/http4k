@@ -146,8 +146,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Consume and produce CloudEvents using typesafe lenses.
 * [OpenTelemetry:](https://http4k.org/guide/reference/opentelemetry) 
     * Instrument http4k apps with OpenTelemetry tooling.
-* [HTMX:](https://http4k.org/guide/reference/htmx)
-    * Support for plugging powering http4k apps with HTMX.
+* [htmx:](https://http4k.org/guide/reference/htmx)
+    * Support for plugging powering http4k apps with htmx.
 * [GraphQL:](https://http4k.org/guide/reference/graphql) 
     * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
 * [AWS:](https://http4k.org/guide/reference/aws) 

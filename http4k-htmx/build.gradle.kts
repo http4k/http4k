@@ -1,4 +1,4 @@
-description = "Http4k HTMX support utilities"
+description = "Http4k htmx support utilities"
 
 dependencies {
     api(project(":http4k-core"))

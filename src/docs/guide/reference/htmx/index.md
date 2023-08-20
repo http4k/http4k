@@ -1,4 +1,4 @@
-title: http4k HTMX Module
+title: http4k htmx Module
 description: Feature overview of the http4k-htmx module
 
 ### Installation (Gradle)
@@ -14,7 +14,7 @@ dependencies {
 
 ### About
 
-Utilities to support [HTMX](https://htmx.org) development. Includes the Webjar and a set of classes/functions to ease development of HTMX powered applications.
+Utilities to support [htmx](https://htmx.org) development. Includes the Webjar and a set of classes/functions to ease development of htmx powered applications.
 
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/htmx/example.kt)
