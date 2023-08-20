@@ -96,6 +96,7 @@ nav:
     - OAuth: guide/reference/oauth/index.md
     - Digest: guide/reference/digest/index.md
     - GraphQL: guide/reference/graphql/index.md
+    - htmx: guide/reference/htmx/index.md
     - JSON RPC: guide/reference/jsonrpc/index.md
     - XML handling: guide/reference/xml/index.md
     - YAML handling: guide/reference/yaml/index.md
