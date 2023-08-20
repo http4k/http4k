@@ -28,8 +28,7 @@ internal fun List<MetadataEvent>.buildTree(): List<EventNode> {
     val rootEvents = filter { event ->
         eventsByParent.none { it.value.any { it.traces()?.spanId == event.traces()?.parentSpanId } }
     }
-    return rootEvents.map { EventNode(it, createEventNodes(it.traces()?.spanId))
-    }
+    return rootEvents.map { EventNode(it, createEventNodes(it.traces()?.spanId)) }
 }
 
 private enum class CollectEvents { Collect, Drop }
