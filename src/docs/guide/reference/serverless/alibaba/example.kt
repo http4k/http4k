@@ -1,5 +1,6 @@
 package guide.reference.serverless.alibaba
 
+import dev.forkhandles.mock4k.mock
 import org.http4k.client.ApacheClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -16,7 +17,6 @@ import org.http4k.serverless.AlibabaCloudHttpFunction
 import org.http4k.serverless.AppLoader
 import org.http4k.servlet.FakeHttpServletRequest
 import org.http4k.servlet.FakeHttpServletResponse
-import java.lang.reflect.Proxy
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to ACF
 // Along with the extension class below, is the only actual piece of code that needs to be written.
@@ -76,7 +76,7 @@ fun main() {
                     POST,
                     "http://localhost:8000/echo"
                 ).body("hello hello hello, i suppose this isn't 140 characters anymore..")
-            ), response, proxy()
+            ), response, mock()
         )
         println(response.http4k.status)
         println(response.http4k.headers)
@@ -86,9 +86,3 @@ fun main() {
     runFunctionLocally()
     runFunctionAsAFCWould()
 }
-
-// helper method to stub the Lambda Context
-private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
-    T::class.java.classLoader,
-    arrayOf(T::class.java)
-) { _, _, _ -> TODO("not implemented") } as T

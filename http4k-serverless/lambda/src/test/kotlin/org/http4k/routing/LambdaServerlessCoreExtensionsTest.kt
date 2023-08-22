@@ -4,10 +4,10 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.mock4k.mock
 import org.http4k.serverless.AwsEnvironment.AWS_LAMBDA_FUNCTION_NAME
 import org.http4k.serverless.FnHandler
 import org.http4k.serverless.FnLoader
-import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -38,13 +38,13 @@ class LambdaServerlessCoreExtensionsTest {
         assertMatch(functions, "function2", "function2")
 
         assertThrows<IllegalStateException> {
-            functions(mapOf(AWS_LAMBDA_FUNCTION_NAME to "foobar"))("{}".byteInputStream(), proxy())
+            functions(mapOf(AWS_LAMBDA_FUNCTION_NAME to "foobar"))("{}".byteInputStream(), mock<Context>() as Context)
         }
     }
 
     private fun assertMatch(functions: FnLoader<Context>, name: String, matched: String) {
         assertThat(
-            functions(mapOf(AWS_LAMBDA_FUNCTION_NAME to name))("{}".byteInputStream(), proxy()).reader()
+            functions(mapOf(AWS_LAMBDA_FUNCTION_NAME to name))("{}".byteInputStream(), mock<Context>() as Context).reader()
                 .readText(),
             equalTo(matched)
         )

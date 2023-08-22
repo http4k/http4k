@@ -3,7 +3,7 @@ package org.http4k.serverless
 import com.aliyun.fc.runtime.Context
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.util.proxy
+import dev.forkhandles.mock4k.mock
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 
@@ -19,7 +19,7 @@ class AlibabaCloudEventFunctionTest {
             FnHandler { input: Foo, _: Context ->
                 "${input.name} alibaba"
             }
-        }) {}.handleRequest("""{"name":"hello"}""".byteInputStream(), response, proxy())
+        }) {}.handleRequest("""{"name":"hello"}""".byteInputStream(), response, mock<Context>() as Context)
 
         assertThat(response.toString(), equalTo("hello alibaba"))
     }

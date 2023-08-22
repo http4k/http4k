@@ -13,6 +13,7 @@ dependencies {
     testApi(project(":http4k-format-jackson"))
     testApi(project(":http4k-client-websocket"))
     testApi(project(":http4k-server-apache"))
+    testApi("dev.forkhandles:mock4k:_")
     testApi("org.webjars:swagger-ui:_")
     testApi("com.launchdarkly:okhttp-eventsource:_")
     testApi("org.apache.httpcomponents:httpcore:_")

@@ -10,7 +10,7 @@ import dev.forkhandles.values.IntValueFactory
 import dev.forkhandles.values.LocalDateTimeValueFactory
 import dev.forkhandles.values.LongValueFactory
 import dev.forkhandles.values.StringValueFactory
-import org.http4k.util.proxyReturnNull
+import org.http4k.util.mockReturnNull
 import org.junit.jupiter.api.Test
 
 class TV<T : Any>(value: T) : AbstractValue<T>(value)
@@ -18,7 +18,7 @@ class TV<T : Any>(value: T) : AbstractValue<T>(value)
 class Values4kExtensionTest {
     @Test
     fun `type checks ok`() {
-        val mapping = object : AutoMappingConfiguration<String> by proxyReturnNull() {}
+        val mapping = object : AutoMappingConfiguration<String> by mockReturnNull() {}
 
         mapping.value(IntValueFactory(::TV))
         mapping.value(LongValueFactory(::TV))

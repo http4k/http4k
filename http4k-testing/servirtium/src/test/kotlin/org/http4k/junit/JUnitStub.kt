@@ -1,13 +1,14 @@
 package org.http4k.junit
 
+import dev.forkhandles.mock4k.mock
 import org.http4k.core.HttpHandler
-import org.http4k.util.proxy
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import java.lang.reflect.Parameter
 import java.util.Optional
 
-class JUnitStub(private val t: Any) : ExtensionContext by proxy(), ParameterContext by proxy() {
+class JUnitStub(private val t: Any) : ExtensionContext by mock<ExtensionContext>() as ExtensionContext,
+    ParameterContext by mock<ParameterContext>() as ParameterContext {
     private object Lookup {
         @Suppress("UNUSED_PARAMETER")
         fun handler(handler: HttpHandler): Nothing = TODO()

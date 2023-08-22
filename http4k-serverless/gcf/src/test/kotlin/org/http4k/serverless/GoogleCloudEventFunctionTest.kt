@@ -3,8 +3,8 @@ package org.http4k.serverless
 import com.google.cloud.functions.Context
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.mock4k.mock
 import org.http4k.format.Moshi
-import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicReference
 
@@ -22,7 +22,7 @@ class GoogleCloudEventFunctionTest {
             }
         }) {}
 
-        function.accept(Moshi.asFormatString(input), proxy())
+        function.accept(Moshi.asFormatString(input), mock<Context>() as Context)
         assertThat(captured.get(), equalTo(input))
     }
 }

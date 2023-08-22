@@ -6,11 +6,11 @@ import com.microsoft.azure.functions.HttpResponseMessage
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.sameInstance
+import dev.forkhandles.mock4k.mock
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 import java.util.Optional
 
@@ -18,7 +18,7 @@ class AzureFunctionTest {
 
     @Test
     fun `adapts Azure request and response and receives context`() {
-        val context: ExecutionContext = proxy()
+        val context: ExecutionContext = mock<ExecutionContext>() as ExecutionContext
         val request: HttpRequestMessage<Optional<String>> = FakeAzureRequest(
             Request(GET, "/path")
                 .header("c", "d")
@@ -33,18 +33,25 @@ class AzureFunctionTest {
                 assertThat(contexts[it].get<ExecutionContext>(AZURE_CONTEXT_KEY), sameInstance(context))
                 assertThat(contexts[it].get<Request>(AZURE_REQUEST_KEY), equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context-azure"), equalTo(Request(GET, "/path")
-                    .header("c", "d")
-                    .body("input body")
-                    .query("query", "value")))
+                assertThat(
+                    it.removeHeader("x-http4k-context-azure"), equalTo(
+                        Request(GET, "/path")
+                            .header("c", "d")
+                            .body("input body")
+                            .query("query", "value")
+                    )
+                )
                 response
             }
         }) {
-            override fun handleRequest(req: HttpRequestMessage<Optional<String>>,
-                                       ctx: ExecutionContext): HttpResponseMessage = handle(req, ctx)
+            override fun handleRequest(
+                req: HttpRequestMessage<Optional<String>>,
+                ctx: ExecutionContext
+            ): HttpResponseMessage = handle(req, ctx)
         }
 
-        assertThat(function.handleRequest(request, context),
+        assertThat(
+            function.handleRequest(request, context),
             equalTo(Http4kResponse(response))
         )
     }

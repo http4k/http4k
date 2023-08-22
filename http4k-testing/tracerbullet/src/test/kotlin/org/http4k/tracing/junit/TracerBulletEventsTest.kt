@@ -2,13 +2,14 @@ package org.http4k.tracing.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.mock4k.mock
 import org.http4k.events.Event
 import org.http4k.events.EventFilters.AddZipkinTraces
 import org.http4k.events.then
 import org.http4k.tracing.Actor
 import org.http4k.tracing.ActorType.System
-import org.http4k.tracing.FireAndForget
 import org.http4k.tracing.EventNode
+import org.http4k.tracing.FireAndForget
 import org.http4k.tracing.ScenarioTraces
 import org.http4k.tracing.TracePersistence
 import org.http4k.tracing.TraceRender
@@ -23,7 +24,6 @@ import org.http4k.tracing.junit.RenderingMode.Companion.Always
 import org.http4k.tracing.persistence.InMemory
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
-import java.lang.reflect.Proxy
 import java.util.Optional
 
 class TracerBulletEventsTest {
@@ -148,12 +148,7 @@ object MyEvent : Event
 object MyOtherEvent : Event
 object YetAnotherEvent : Event
 
-inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
-    T::class.java.classLoader,
-    arrayOf(T::class.java)
-) { _, m, _ -> TODO(m.name + " not implemented") } as T
-
-private class FakeEC(val exception: Boolean = false) : ExtensionContext by proxy() {
+private class FakeEC(val exception: Boolean = false) : ExtensionContext by mock<ExtensionContext>() {
     override fun getExecutionException() =
         if (exception) Optional.of<Throwable>(Exception()) else Optional.empty<Throwable>()
 

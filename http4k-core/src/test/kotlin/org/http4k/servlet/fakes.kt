@@ -1,10 +1,10 @@
 package org.http4k.servlet
 
+import dev.forkhandles.mock4k.mock
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
-import org.http4k.util.proxy
 import java.util.Collections.enumeration
 import java.util.Enumeration
 import javax.servlet.ReadListener
@@ -14,7 +14,8 @@ import javax.servlet.WriteListener
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class FakeHttpServletRequest(private val request: Request) : HttpServletRequest by proxy() {
+class FakeHttpServletRequest(private val request: Request) :
+    HttpServletRequest by mock<HttpServletRequest>() {
     override fun getMethod() = request.method.name
     override fun getRequestURI() = request.uri.toString()
     override fun getQueryString() = request.uri.query
@@ -38,7 +39,7 @@ class FakeHttpServletRequest(private val request: Request) : HttpServletRequest 
     override fun getScheme() = request.uri.scheme
 }
 
-class FakeHttpServletResponse : HttpServletResponse by proxy() {
+class FakeHttpServletResponse : HttpServletResponse by mock<HttpServletResponse>() as HttpServletResponse {
     var http4k = Response(OK)
 
     override fun setStatus(sc: Int, sm: String) {

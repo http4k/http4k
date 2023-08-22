@@ -6,11 +6,11 @@ import com.natpryce.hamkrest.sameInstance
 import com.qcloud.scf.runtime.Context
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyRequestEvent
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyResponseEvent
+import dev.forkhandles.mock4k.mock
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 
 class TencentCloudFunctionTest {
@@ -18,7 +18,7 @@ class TencentCloudFunctionTest {
     @Test
     fun `adapts API Gateway request and response and receives context`() {
 
-        val context: Context = proxy()
+        val context: Context = mock<Context>() as Context
 
         val request = APIGatewayProxyRequestEvent().apply {
             httpMethod = "GET"
@@ -33,15 +33,20 @@ class TencentCloudFunctionTest {
                 assertThat(contexts[it].get<Request>(TENCENT_CONTEXT_KEY), sameInstance(context))
                 assertThat(contexts[it].get<Request>(TENCENT_REQUEST_KEY), equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
-                assertThat(it.removeHeader("x-http4k-context-tencent"), equalTo(Request(GET, "/path")
-                    .header("c", "d")
-                    .body("input body")
-                    .query("query", "value")))
+                assertThat(
+                    it.removeHeader("x-http4k-context-tencent"), equalTo(
+                        Request(GET, "/path")
+                            .header("c", "d")
+                            .body("input body")
+                            .query("query", "value")
+                    )
+                )
                 Response(OK).header("a", "b").body("hello there")
             }
         }) {}
 
-        assertThat(tencent.handleRequest(request, context),
+        assertThat(
+            tencent.handleRequest(request, context),
             equalTo(
                 APIGatewayProxyResponseEvent().apply {
                     statusCode = 200

@@ -1,6 +1,7 @@
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.SQSEvent
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage
+import dev.forkhandles.mock4k.mock
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -15,9 +16,7 @@ import org.http4k.serverless.FnHandler
 import org.http4k.serverless.FnLoader
 import org.http4k.serverless.ServerlessFilters.ReportFnTransaction
 import org.http4k.serverless.then
-import org.http4k.util.proxy
 import java.io.ByteArrayOutputStream
-import java.lang.reflect.Proxy
 
 // This is the handler for the incoming AWS SQS event. It's just a function so you can call it without any infrastructure
 fun EventFnHandler(http: HttpHandler) =
@@ -58,7 +57,7 @@ fun main() {
     fun runLambdaInMemoryOrForTesting() {
         println("RUNNING In memory:")
         val app = EventFnHandler(JavaHttpClient())
-        app(sqsEvent, proxy())
+        app(sqsEvent, mock<Context>() as Context)
     }
 
     fun runLambdaAsAwsWould() {
@@ -66,7 +65,7 @@ fun main() {
 
         val out = ByteArrayOutputStream()
 
-        EventFunction().handleRequest(AwsLambdaMoshi.asInputStream(sqsEvent), out, proxy())
+        EventFunction().handleRequest(AwsLambdaMoshi.asInputStream(sqsEvent), out, mock<Context>() as Context)
 
         // the response is empty b
         println(out.toString())
@@ -77,9 +76,3 @@ fun main() {
 
     receivingServer.stop()
 }
-
-// helper method to stub the Lambda Context
-private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
-    T::class.java.classLoader,
-    arrayOf(T::class.java)
-) { _, _, _ -> TODO("not implemented") } as T

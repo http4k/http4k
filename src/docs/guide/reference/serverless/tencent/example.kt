@@ -1,6 +1,7 @@
 package guide.reference.serverless.tencent
 
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyRequestEvent
+import dev.forkhandles.mock4k.mock
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -11,7 +12,6 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
 import org.http4k.serverless.TencentCloudFunction
-import java.lang.reflect.Proxy
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
 // It is the only actual piece of code that needs to be written.
@@ -54,16 +54,10 @@ fun main() {
                 httpMethod = "GET"
                 headers = mapOf()
                 queryStringParameters = mapOf()
-            }, proxy())
+            }, mock())
         println(response)
     }
 
     runFunctionLocally()
     runFunctionAsSCFWould()
 }
-
-// helper method to stub the Lambda Context
-private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
-    T::class.java.classLoader,
-    arrayOf(T::class.java)
-) { _, _, _ -> TODO("not implemented") } as T
