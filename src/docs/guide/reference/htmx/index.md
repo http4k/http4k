@@ -5,7 +5,7 @@ description: Feature overview of the http4k-htmx module
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.7.2.0"))
+    implementation(platform("org.http4k:http4k-bom:5.7.3.0"))
     implementation("org.http4k:http4k-htmx")
 
     implementation("org.http4k:http4k-handlebars") // for example
