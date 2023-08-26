@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.7.3.0 (uncut)
+### v5.7.3.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.10
 - **http4k-htmx** : Added hyperscript.js webjar to the distribution.
 
