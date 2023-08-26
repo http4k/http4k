@@ -20,12 +20,12 @@ class AwsSdkClient(private val http: HttpHandler) : SdkHttpClient {
     }
 
     override fun prepareRequest(request: HttpExecuteRequest) = object : ExecutableHttpRequest {
-        override fun call() = http(request.toHttp4k()).awsHeaders()
+        override fun call() = http(request.fromAws()).asAws()
         override fun abort() {}
     }
 }
 
-private fun HttpExecuteRequest.toHttp4k() = with(httpRequest()) {
+private fun HttpExecuteRequest.fromAws() = with(httpRequest()) {
     val init = Request(Method.valueOf(method().name), Uri.of(uri.toString()))
         .headers(headers().entries.flatMap { (name, values) -> values.map { name to it } })
 
@@ -36,7 +36,7 @@ private fun HttpExecuteRequest.toHttp4k() = with(httpRequest()) {
     }
 }
 
-private fun Response.awsHeaders(): HttpExecuteResponse? {
+private fun Response.asAws(): HttpExecuteResponse? {
     val content = create(body.stream)
     return HttpExecuteResponse.builder()
         .response(builder()
