@@ -18,13 +18,13 @@ class AwsSdkAsyncClient(private val http: HttpHandler) : SdkAsyncHttpClient {
     override fun close() {}
 
     override fun execute(request: AsyncExecuteRequest) = try {
-        val response = http(request.fromAws())
+        val response = http(request.toHttp4k())
 
         val publisher = SimplePublisher<ByteBuffer>()
         publisher.send(response.body.payload)
 
         with(request.responseHandler()) {
-            onHeaders(response.asAws())
+            onHeaders(response.awsHeaders())
             onStream(publisher)
         }
 
@@ -38,7 +38,7 @@ class AwsSdkAsyncClient(private val http: HttpHandler) : SdkAsyncHttpClient {
     }
 }
 
-private fun AsyncExecuteRequest.fromAws() = with(request()) {
+private fun AsyncExecuteRequest.toHttp4k() = with(request()) {
     val init = Request(Method.valueOf(method().name), Uri.of(uri.toString()))
         .headers(headers().entries.flatMap { (name, values) -> values.map { name to it } })
 
@@ -49,7 +49,7 @@ private fun AsyncExecuteRequest.fromAws() = with(request()) {
     }
 }
 
-private fun Response.asAws() = SdkHttpResponse.builder()
+private fun Response.awsHeaders() = SdkHttpResponse.builder()
     .statusCode(status.code)
     .statusText(status.description)
     .headers(headers.groupBy { it.first }.mapValues { it.value.map { it.second } })
