@@ -1,14 +1,16 @@
+@file:Suppress("UnstableApiUsage")
+
+import de.fayard.refreshVersions.core.StabilityLevel.Stable
+
 rootProject.name = "http4k"
 
 plugins {
-    id("de.fayard.refreshVersions").version("0.40.2")
+    id("de.fayard.refreshVersions").version("0.60.1")
 }
 
 refreshVersions {
-    enableBuildSrcLibs()
-
     rejectVersionIf {
-        candidate.stabilityLevel.isLessStableThan(current.stabilityLevel)
+        candidate.stabilityLevel != Stable
     }
 }
 

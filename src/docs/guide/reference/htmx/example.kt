@@ -10,7 +10,7 @@ import org.http4k.core.isHtmx
 import org.http4k.core.with
 import org.http4k.routing.Router.Companion.orElse
 import org.http4k.routing.bind
-import org.http4k.routing.htmxWebjar
+import org.http4k.routing.htmxWebjars
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -23,7 +23,7 @@ fun main() {
     val view = Body.viewModel(HandlebarsTemplates().CachingClasspath(), TEXT_HTML).toLens()
 
     val app = routes(
-        htmxWebjar(),
+        htmxWebjars(),
         "/" bind GET to routes(
             // Respond to htmx powered requests
             Request.isHtmx bind { Response(OK).with(view of Time(Date())) },
