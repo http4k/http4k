@@ -21,6 +21,7 @@ class RunWithPlaywright @JvmOverloads constructor(
     private val launchOptions: LaunchOptions = LaunchOptions(),
     private val createPlaywright: () -> Playwright? = { Playwright.create() },
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) =
         pc.parameter.parameterizedType.typeName == Browser::class.java.name ||
             pc.parameter.parameterizedType.typeName == Http4kBrowser::class.java.name
@@ -29,11 +30,10 @@ class RunWithPlaywright @JvmOverloads constructor(
 
     private val server = http.asServer(SunHttp(0))
 
-    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Browser =
-        Http4kBrowser(
-            browserType(playwright.get()).launch(launchOptions),
-            Uri.of("http://localhost:${server.port()}")
-        )
+    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) = Http4kBrowser(
+        browserType(playwright.get()).launch(launchOptions),
+        Uri.of("http://localhost:${server.port()}")
+    )
 
     override fun beforeTestExecution(context: ExtensionContext?) {
         playwright.set(createPlaywright())

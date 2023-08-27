@@ -1,6 +1,7 @@
 package org.http4k.playwright
 
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Response
 import org.http4k.core.Uri
 import org.http4k.core.extend
 
@@ -10,7 +11,22 @@ import org.http4k.core.extend
 class HttpPage(delegate: Page, private val baseUri: Uri) : Page by delegate {
 
     /**
-     * Navigate to an http4k application route, based on the base Uri of our application.
+     * Navigates to the base URL of the http4k application
      */
-    fun navigate(uri: Uri = baseUri) = super.navigate(baseUri.extend(uri).toString())
+    fun navigateHome() = navigate(baseUri)
+
+    /**
+     * Navigates to an arbitrary URL
+     */
+    fun navigate(uri: Uri) = navigate(uri.toString())
+
+    /**
+     * Navigate to a URL. If the scheme is not set, we use the base URL of the http4k application
+     */
+    override fun navigate(uri: String): Response = super.navigate(
+        when (Uri.of(uri).scheme) {
+            "" -> baseUri.extend(Uri.of(uri)).toString()
+            else -> uri
+        }
+    )
 }
