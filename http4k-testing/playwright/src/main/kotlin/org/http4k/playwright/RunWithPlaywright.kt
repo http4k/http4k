@@ -6,6 +6,7 @@ import com.microsoft.playwright.BrowserType.LaunchOptions
 import com.microsoft.playwright.Playwright
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
+import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
@@ -20,6 +21,7 @@ class RunWithPlaywright @JvmOverloads constructor(
     private val browserType: Playwright.() -> BrowserType = Playwright::chromium,
     private val launchOptions: LaunchOptions = LaunchOptions(),
     private val createPlaywright: () -> Playwright? = { Playwright.create() },
+    serverFn: (Int) -> ServerConfig = ::SunHttp
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) =
@@ -28,7 +30,7 @@ class RunWithPlaywright @JvmOverloads constructor(
 
     private val playwright = AtomicReference<Playwright>()
 
-    private val server = http.asServer(SunHttp(0))
+    private val server = http.asServer(serverFn(0))
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) = Http4kBrowser(
         browserType(playwright.get()).launch(launchOptions),
