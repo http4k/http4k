@@ -4,6 +4,7 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserType
 import com.microsoft.playwright.BrowserType.LaunchOptions
 import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.Playwright.create
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.server.ServerConfig
@@ -20,7 +21,7 @@ class LaunchPlaywrightBrowser @JvmOverloads constructor(
     http: HttpHandler,
     private val browserType: Playwright.() -> BrowserType = Playwright::chromium,
     private val launchOptions: LaunchOptions = LaunchOptions(),
-    private val createPlaywright: () -> Playwright? = { Playwright.create() },
+    private val createPlaywright: () -> Playwright = ::create,
     serverFn: (Int) -> ServerConfig = ::SunHttp
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
