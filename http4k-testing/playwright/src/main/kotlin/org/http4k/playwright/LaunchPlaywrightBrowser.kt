@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import java.util.concurrent.atomic.AtomicReference
 
-class RunWithPlaywright @JvmOverloads constructor(
+class LaunchPlaywrightBrowser @JvmOverloads constructor(
     http: HttpHandler,
     private val browserType: Playwright.() -> BrowserType = Playwright::chromium,
     private val launchOptions: LaunchOptions = LaunchOptions(),

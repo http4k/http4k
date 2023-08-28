@@ -183,8 +183,11 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * A set of Strikt matchers for testing [http4k] Request and Response messages.
 * [TracerBullet:](https://http4k.org/guide/reference/tracerbullet)
     * Visually document your applications using the JUnit plugin.
+
+[//]: # (* [Playwright:]&#40;https://http4k.org/guide/reference/playwright&#41;)
+    * Simplify in-browser testing with this JUnit extension.
 * [WebDriver:](https://http4k.org/guide/reference/webdriver)
-    * Ultra-lightweight Selenium WebDriver implementation for [http4k] application.
+    * Ultra-lightweight Selenium WebDriver implementation for [http4k] applications.
     
 ## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/howz/readme/example.kt)
 

@@ -17,7 +17,7 @@ import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class RunWithPlaywrightTest {
+class LaunchPlaywrightBrowserTest {
 
     private val app = routes(
         "/foo" bind GET to { _: Request -> Response(OK).body("foo") },
@@ -26,7 +26,7 @@ class RunWithPlaywrightTest {
     )
 
     @RegisterExtension
-    val playwright = RunWithPlaywright(app)
+    val playwright = LaunchPlaywrightBrowser(app)
 
     @Test
     fun `provides http4k browser`(browser: Http4kBrowser) {
