@@ -5,7 +5,7 @@ description: Recipes for using JSON in http4k applications with a variety of pop
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.7.3.0"))
+    implementation(platform("org.http4k:http4k-bom:5.7.4.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-format-jackson")
 }
