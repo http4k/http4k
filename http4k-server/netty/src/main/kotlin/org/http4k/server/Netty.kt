@@ -18,11 +18,12 @@ import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
-import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerConfig {
-    constructor(port: Int = 8000) : this(port, Graceful(ofSeconds(5)))
+class Netty(val port: Int = 8000, override val stopMode: StopMode, private val workerGroup: NioEventLoopGroup) : PolyServerConfig {
+    constructor(port: Int = 8000) : this(port, defaultStopMode)
+    constructor(port: Int = 8000, stopMode: StopMode) : this(port, stopMode, NioEventLoopGroup())
+    constructor(port: Int = 8000, workerGroup: NioEventLoopGroup) : this(port, defaultStopMode, workerGroup)
 
     val shutdownTimeoutMillis = when(stopMode) {
         is Graceful -> stopMode.timeout.toMillis()
@@ -35,7 +36,6 @@ class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerC
         }
 
         private val masterGroup = NioEventLoopGroup()
-        private val workerGroup = NioEventLoopGroup()
         private var closeFuture: ChannelFuture? = null
         private lateinit var address: InetSocketAddress
 
