@@ -10,10 +10,13 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
+import org.http4k.template.ViewWithModel
 import org.http4k.template.viewModel
 import java.io.File
 
 data class Person(val name: String, val age: Int) : ViewModel
+
+data class Company(val name: String, val employees: Int)
 
 fun main() {
 
@@ -42,4 +45,11 @@ fun main() {
         .use { it.write("{{name}} is not {{age}} years old") }
 
     println(appUsingLens(Request(GET, "/someUrl")))
+
+    // to use a template with a specific model
+    val appUsingViewWithModel: HttpHandler = {
+        Response(OK).with(viewLens of ViewWithModel("guide.reference.templating.BigCompany", Company("Acme", 10000)))
+    }
+
+    println(appUsingViewWithModel(Request(GET, "/someUrl")))
 }
