@@ -85,21 +85,21 @@ class KondorJson(
     override fun fields(node: JsonNode) = if (node !is JsonNodeObject) emptyList() else node._fieldMap.toList()
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = when (value) {
-        is JsonNodeArray -> value.values
+        is JsonNodeArray -> value.elements
         else -> emptyList()
     }
 
     override fun text(value: JsonNode): String = when (value) {
         is JsonNodeString -> value.text
         is JsonNodeNumber -> value.num.toString()
-        is JsonNodeBoolean -> value.value.toString()
+        is JsonNodeBoolean -> value.boolean.toString()
         is JsonNodeArray -> ""
         is JsonNodeNull -> "null"
         is JsonNodeObject -> ""
     }
 
     override fun bool(value: JsonNode): Boolean = when (value) {
-        is JsonNodeBoolean -> value.value
+        is JsonNodeBoolean -> value.boolean
         is JsonNodeString -> value.text.toBooleanStrict()
         else -> throw IllegalArgumentException("The node type '${value.nodeKind.desc}' is not a boolean")
     }
@@ -119,7 +119,7 @@ class KondorJson(
             when (val foundNode = it.second) {
                 is JsonNodeString -> foundNode.text
                 is JsonNodeNumber -> foundNode.num.toString()
-                is JsonNodeBoolean -> foundNode.value.toString()
+                is JsonNodeBoolean -> foundNode.boolean.toString()
                 else -> null
             }
         }
@@ -224,7 +224,7 @@ private fun JsonNodeObject.updateNodePath(parentPath: NodePath = NodePathRoot): 
 }
 
 private fun JsonNodeArray.updateNodePath(parentPath: NodePath = NodePathRoot): JsonNodeArray {
-    val updatedValues = values.map { item ->
+    val updatedValues = elements.map { item ->
         when (item) {
             is JsonNodeObject -> item.updateNodePath(parentPath)
             is JsonNodeArray -> item.updateNodePath(parentPath)
@@ -234,6 +234,6 @@ private fun JsonNodeArray.updateNodePath(parentPath: NodePath = NodePathRoot): J
             is JsonNodeBoolean -> item.copy(_path = parentPath)
         }
     }
-    return this.copy(values = updatedValues, _path = parentPath)
+    return this.copy(elements = updatedValues, _path = parentPath)
 }
 
