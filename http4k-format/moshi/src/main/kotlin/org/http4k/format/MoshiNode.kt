@@ -10,7 +10,7 @@ data class MoshiString(val value: String): MoshiNode
 data class MoshiInteger(val value: Long): MoshiNode
 data class MoshiDecimal(val value: Double): MoshiNode
 data class MoshiBoolean(val value: Boolean): MoshiNode
-object MoshiNull: MoshiNode
+data object MoshiNull: MoshiNode
 
 fun MoshiNode.unwrap(): Any? = when(this) {
     is MoshiArray -> elements.map { it.unwrap() }
