@@ -24,6 +24,6 @@ fun <IN: Number, OUT: Any> BiDiMapping<IN, OUT>.asJConverter(valueConverter: JNu
 
 fun <OUT> BiDiMapping<Boolean, OUT>.asJConverter() = object : JsonConverter<OUT, JsonNodeBoolean> {
     override val _nodeType: NodeKind<JsonNodeBoolean> = BooleanNode
-    override fun fromJsonNode(node: JsonNodeBoolean): JsonOutcome<OUT> = tryFromNode(node) { invoke(node.value) }
+    override fun fromJsonNode(node: JsonNodeBoolean): JsonOutcome<OUT> = tryFromNode(node) { invoke(node.boolean) }
     override fun toJsonNode(value: OUT, path: NodePath): JsonNodeBoolean = JsonNodeBoolean(invoke(value), path)
 }
