@@ -6,7 +6,6 @@ import org.http4k.contract.security.NoSecurity
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.LensFailure
 import org.junit.jupiter.api.Test
 
@@ -23,6 +22,6 @@ class NoRendererTest {
 
     @Test
     fun `renders description`() {
-        assertThat(NoRenderer.description(Root, NoSecurity, listOf(), emptySet(), emptyMap()), equalTo(Response(OK)))
+        assertThat(NoRenderer.description(Root, NoSecurity, listOf(), emptySet(), emptyMap()), equalTo(Response(NOT_FOUND)))
     }
 }

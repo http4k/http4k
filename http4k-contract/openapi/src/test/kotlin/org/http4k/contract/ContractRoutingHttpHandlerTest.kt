@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.PreFlightExtraction.Companion.IgnoreBody
 import org.http4k.contract.PreFlightExtraction.Companion.None
+import org.http4k.contract.openapi.OpenAPIJackson
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.simple.SimpleJson
@@ -275,6 +276,7 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `can change path to description route`() {
         val response = ("/root/foo" bind contract {
+            renderer = SimpleJson(OpenAPIJackson)
             descriptionPath = "/docs/swagger.json"
         }).invoke(Request(GET, "/root/foo/docs/swagger.json"))
         assertThat(response.status, equalTo(OK))
