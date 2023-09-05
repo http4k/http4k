@@ -53,4 +53,4 @@ interface LensExtractor<in IN, out OUT> : (IN) -> OUT {
     fun <NEXT : IN> restrictFrom(): LensExtractor<NEXT, OUT> = this
 }
 
-interface LensInjectorExtractor<IN, OUT> : LensExtractor<IN, OUT>, LensInjector<OUT, IN>
+interface LensInjectorExtractor<in IN, OUT> : LensExtractor<IN, OUT>, LensInjector<OUT, IN>

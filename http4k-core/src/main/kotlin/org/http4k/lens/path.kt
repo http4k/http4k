@@ -31,7 +31,7 @@ class BiDiPathLens<FINAL>(
     meta: Meta,
     get: (String) -> FINAL,
     private val set: (FINAL, Request) -> Request
-) : LensInjector<FINAL, Request>, PathLens<FINAL>(meta, get) {
+) : LensInjectorExtractor<Request, FINAL>, PathLens<FINAL>(meta, get) {
     @Suppress("UNCHECKED_CAST")
     override operator fun <R : Request> invoke(value: FINAL, target: R): R = set(value, target) as R
 }
