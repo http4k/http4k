@@ -10,7 +10,7 @@ HTML form support is provided on 2 levels:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.7.5.0"))
+    implementation(platform("org.http4k:http4k-bom:5.8.0.0"))
     implementation("org.http4k:http4k-core")
 }
 ```
