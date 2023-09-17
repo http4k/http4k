@@ -5,7 +5,7 @@ description: Feature overview of the http4k-client modules
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.8.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.8.1.0"))
     
     // Java (for development only):
     implementation("org.http4k:http4k-core")
