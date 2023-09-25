@@ -57,7 +57,7 @@ fun main() {
     fun runLambdaInMemoryOrForTesting() {
         println("RUNNING In memory:")
         val app = EventFnHandler(JavaHttpClient())
-        app(sqsEvent, mock<Context>() as Context)
+        app(sqsEvent, mock())
     }
 
     fun runLambdaAsAwsWould() {
@@ -65,7 +65,7 @@ fun main() {
 
         val out = ByteArrayOutputStream()
 
-        EventFunction().handleRequest(AwsLambdaMoshi.asInputStream(sqsEvent), out, mock<Context>() as Context)
+        EventFunction().handleRequest(AwsLambdaMoshi.asInputStream(sqsEvent), out, mock())
 
         // the response is empty b
         println(out.toString())

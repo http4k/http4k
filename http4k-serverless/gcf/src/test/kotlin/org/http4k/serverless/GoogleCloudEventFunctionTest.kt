@@ -22,7 +22,7 @@ class GoogleCloudEventFunctionTest {
             }
         }) {}
 
-        function.accept(Moshi.asFormatString(input), mock<Context>() as Context)
+        function.accept(Moshi.asFormatString(input), mock())
         assertThat(captured.get(), equalTo(input))
     }
 }

@@ -19,7 +19,7 @@ class AlibabaCloudEventFunctionTest {
             FnHandler { input: Foo, _: Context ->
                 "${input.name} alibaba"
             }
-        }) {}.handleRequest("""{"name":"hello"}""".byteInputStream(), response, mock<Context>() as Context)
+        }) {}.handleRequest("""{"name":"hello"}""".byteInputStream(), response, mock())
 
         assertThat(response.toString(), equalTo("hello alibaba"))
     }

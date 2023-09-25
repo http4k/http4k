@@ -19,7 +19,7 @@ class AwsLambdaEventFunctionTest {
     fun `can implement function and call it`() {
         val input = "{}"
         val output = ByteArrayOutputStream()
-        MyFunction().handleRequest(input.byteInputStream(), output, mock<Context>() as Context)
+        MyFunction().handleRequest(input.byteInputStream(), output, mock())
         assertThat(output.toString(), equalTo("hello"))
     }
 }

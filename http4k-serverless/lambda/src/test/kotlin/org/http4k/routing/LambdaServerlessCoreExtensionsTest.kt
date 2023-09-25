@@ -38,13 +38,13 @@ class LambdaServerlessCoreExtensionsTest {
         assertMatch(functions, "function2", "function2")
 
         assertThrows<IllegalStateException> {
-            functions(mapOf(AWS_LAMBDA_FUNCTION_NAME to "foobar"))("{}".byteInputStream(), mock<Context>() as Context)
+            functions(mapOf(AWS_LAMBDA_FUNCTION_NAME to "foobar"))("{}".byteInputStream(), mock())
         }
     }
 
     private fun assertMatch(functions: FnLoader<Context>, name: String, matched: String) {
         assertThat(
-            functions(mapOf(AWS_LAMBDA_FUNCTION_NAME to name))("{}".byteInputStream(), mock<Context>() as Context).reader()
+            functions(mapOf(AWS_LAMBDA_FUNCTION_NAME to name))("{}".byteInputStream(), mock()).reader()
                 .readText(),
             equalTo(matched)
         )

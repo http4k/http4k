@@ -148,7 +148,7 @@ object MyEvent : Event
 object MyOtherEvent : Event
 object YetAnotherEvent : Event
 
-private class FakeEC(val exception: Boolean = false) : ExtensionContext by mock<ExtensionContext>() {
+private class FakeEC(val exception: Boolean = false) : ExtensionContext by mock() {
     override fun getExecutionException() =
         if (exception) Optional.of<Throwable>(Exception()) else Optional.empty<Throwable>()
 

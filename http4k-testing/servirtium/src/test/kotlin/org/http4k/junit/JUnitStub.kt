@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ParameterContext
 import java.lang.reflect.Parameter
 import java.util.Optional
 
-class JUnitStub(private val t: Any) : ExtensionContext by mock<ExtensionContext>() as ExtensionContext,
-    ParameterContext by mock<ParameterContext>() as ParameterContext {
+class JUnitStub(private val t: Any) : ExtensionContext by mock(),
+    ParameterContext by mock() {
     private object Lookup {
         @Suppress("UNUSED_PARAMETER")
         fun handler(handler: HttpHandler): Nothing = TODO()

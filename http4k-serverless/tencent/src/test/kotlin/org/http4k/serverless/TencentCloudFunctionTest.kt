@@ -18,7 +18,7 @@ class TencentCloudFunctionTest {
     @Test
     fun `adapts API Gateway request and response and receives context`() {
 
-        val context: Context = mock<Context>() as Context
+        val context: Context = mock()
 
         val request = APIGatewayProxyRequestEvent().apply {
             httpMethod = "GET"

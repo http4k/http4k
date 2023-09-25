@@ -18,7 +18,7 @@ class AzureFunctionTest {
 
     @Test
     fun `adapts Azure request and response and receives context`() {
-        val context: ExecutionContext = mock<ExecutionContext>() as ExecutionContext
+        val context = mock<ExecutionContext>()
         val request: HttpRequestMessage<Optional<String>> = FakeAzureRequest(
             Request(GET, "/path")
                 .header("c", "d")

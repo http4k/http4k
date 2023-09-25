@@ -39,7 +39,7 @@ class FakeHttpServletRequest(private val request: Request) :
     override fun getScheme() = request.uri.scheme
 }
 
-class FakeHttpServletResponse : HttpServletResponse by mock<HttpServletResponse>() as HttpServletResponse {
+class FakeHttpServletResponse : HttpServletResponse by mock() {
     var http4k = Response(OK)
 
     override fun setStatus(sc: Int, sm: String) {
