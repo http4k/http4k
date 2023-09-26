@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.8.2.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core*** : Added extension function `ExecutionService.withRequestTracing()` to propagate Zipkin traces across threads
 
 ### v5.8.1.0
 - **http4k-*** : Upgrade some dependency versions.

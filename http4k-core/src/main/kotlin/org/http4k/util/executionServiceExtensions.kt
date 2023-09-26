@@ -11,43 +11,43 @@ import java.util.concurrent.TimeUnit
 fun ExecutorService.withRequestTracing(storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL) =
     object : ExecutorService by this {
         override fun execute(command: Runnable) = with(storage) {
-            val traces = forCurrentThread()
+            val initial = forCurrentThread()
             this@withRequestTracing.execute {
-                setForCurrentThread(traces)
+                setForCurrentThread(initial)
                 command.run()
             }
         }
 
         override fun <T : Any?> submit(task: Callable<T>) = with(storage) {
-            val traces = forCurrentThread()
+            val initial = forCurrentThread()
             this@withRequestTracing.submit(Callable<T> {
-                setForCurrentThread(traces)
+                setForCurrentThread(initial)
                 task.call()
             })
         }
 
         override fun <T : Any?> submit(task: Runnable, result: T) = with(storage) {
-            val traces = forCurrentThread()
+            val initial = forCurrentThread()
             this@withRequestTracing.submit({
-                setForCurrentThread(traces)
+                setForCurrentThread(initial)
                 task.run()
             }, result)
         }
 
         override fun submit(task: Runnable) = with(storage) {
-            val traces = forCurrentThread()
+            val initial = forCurrentThread()
             this@withRequestTracing.submit {
-                setForCurrentThread(traces)
+                setForCurrentThread(initial)
                 task.run()
             }
         }
 
         override fun <T : Any?> invokeAll(tasks: MutableCollection<out Callable<T>>) =
             with(storage) {
-                val traces = forCurrentThread()
+                val initial = forCurrentThread()
                 this@withRequestTracing.invokeAll(tasks.map {
                     Callable {
-                        setForCurrentThread(traces)
+                        setForCurrentThread(initial)
                         it.call()
                     }
                 })
@@ -58,10 +58,10 @@ fun ExecutorService.withRequestTracing(storage: ZipkinTracesStorage = ZipkinTrac
             timeout: Long,
             unit: TimeUnit
         ) = with(storage) {
-            val traces = forCurrentThread()
+            val initial = forCurrentThread()
             this@withRequestTracing.invokeAll(tasks.map {
                 Callable {
-                    setForCurrentThread(traces)
+                    setForCurrentThread(initial)
                     it.call()
                 }
             })
@@ -69,10 +69,10 @@ fun ExecutorService.withRequestTracing(storage: ZipkinTracesStorage = ZipkinTrac
 
         override fun <T : Any?> invokeAny(tasks: MutableCollection<out Callable<T>>) =
             with(storage) {
-                val traces = forCurrentThread()
+                val initial = forCurrentThread()
                 this@withRequestTracing.invokeAny(tasks.map {
                     Callable {
-                        setForCurrentThread(traces)
+                        setForCurrentThread(initial)
                         it.call()
                     }
                 })
@@ -83,10 +83,10 @@ fun ExecutorService.withRequestTracing(storage: ZipkinTracesStorage = ZipkinTrac
             timeout: Long,
             unit: TimeUnit
         ) = with(storage) {
-            val traces = forCurrentThread()
+            val initial = forCurrentThread()
             this@withRequestTracing.invokeAny(tasks.map {
                 Callable {
-                    setForCurrentThread(traces)
+                    setForCurrentThread(initial)
                     it.call()
                 }
             })
