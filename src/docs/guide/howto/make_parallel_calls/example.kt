@@ -12,7 +12,6 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.ServerFilters
-import org.http4k.filter.ZipkinTracesStorage
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.http4k.util.withRequestTracing
@@ -62,7 +61,8 @@ fun main() {
     val originalExecutor = ThreadPoolExecutor(5, 5, 10, SECONDS, LinkedBlockingDeque())
 
     // convert the execution service to one that propagates the trace information
-    val executor = originalExecutor.withRequestTracing(ZipkinTracesStorage.THREAD_LOCAL)
+    // optionally pass a custom ZipkinStorage
+    val executor = originalExecutor.withRequestTracing()
 
     val subServer = serverWithTracing { _: Request -> Thread.sleep(500); Response(OK) }
     val runningSubServer = subServer.asServer(Undertow(0)).start()
