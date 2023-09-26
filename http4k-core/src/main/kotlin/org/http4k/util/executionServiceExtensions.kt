@@ -5,6 +5,9 @@ import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 
+/**
+ * Decorate the ExecutorService with propagation of Zipkin trace headers
+ */
 fun ExecutorService.withRequestTracing(storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL) =
     object : ExecutorService by this {
         override fun execute(command: Runnable) = with(storage) {
