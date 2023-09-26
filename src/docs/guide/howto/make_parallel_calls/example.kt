@@ -15,7 +15,9 @@ import org.http4k.filter.ServerFilters
 import org.http4k.filter.ZipkinTracesStorage
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
+import org.http4k.util.withRequestTracing
 import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.SECONDS
@@ -31,16 +33,21 @@ private fun clientWithTracing() = Filter.NoOp
     .then(DebuggingFilters.PrintRequestAndResponse())
     .then(OkHttp())
 
-private fun serverWithParallelCallsAndTracing(dependencyServerPort: Int, executor: ThreadPoolExecutor): HttpHandler {
+private fun serverWithParallelCallsAndTracing(
+    dependencyServerPort: Int,
+    executor: ExecutorService
+): HttpHandler {
     val localClient = clientWithTracing()
 
     return serverWithTracing { _: Request ->
-        val parentThreadTraces = ZipkinTracesStorage.THREAD_LOCAL.forCurrentThread()
-
         val overallStatus = (1..5).map {
             executor.submit(Callable {
-                ZipkinTracesStorage.THREAD_LOCAL.setForCurrentThread(parentThreadTraces)
-                localClient(Request(GET, "http://localhost:$dependencyServerPort/sub-request-${it}"))
+                localClient(
+                    Request(
+                        GET,
+                        "http://localhost:$dependencyServerPort/sub-request-${it}"
+                    )
+                )
             })
         }.foldRight(OK) { future, overallStatus ->
             val nextResponse = future.get(5, SECONDS)
@@ -52,7 +59,10 @@ private fun serverWithParallelCallsAndTracing(dependencyServerPort: Int, executo
 }
 
 fun main() {
-    val executor = ThreadPoolExecutor(5, 5, 10, SECONDS, LinkedBlockingDeque())
+    val originalExecutor = ThreadPoolExecutor(5, 5, 10, SECONDS, LinkedBlockingDeque())
+
+    // convert the execution service to one that propagates the trace information
+    val executor = originalExecutor.withRequestTracing(ZipkinTracesStorage.THREAD_LOCAL)
 
     val subServer = serverWithTracing { _: Request -> Thread.sleep(500); Response(OK) }
     val runningSubServer = subServer.asServer(Undertow(0)).start()
