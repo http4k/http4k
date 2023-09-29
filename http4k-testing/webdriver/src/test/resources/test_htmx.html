@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page title</title>
+</head>
+<body>
+  <button hx-get="/text?value=foo" id="hx-get-button">Click Me!</button>
+
+  <div hx-get="/div?id=loaded-div&htmx-action=hx-get&htmx-target=%2Ftext%3Fvalue%3Dbar&value=foo" id="hx-get-div">Click me!</div>
+</body>
