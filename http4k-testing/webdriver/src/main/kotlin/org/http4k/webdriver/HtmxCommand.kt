@@ -3,6 +3,7 @@ package org.http4k.webdriver
 import org.http4k.core.Method
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
 
 data class HtmxCommand(
     val method: Method,
@@ -15,11 +16,11 @@ data class HtmxCommand(
         val response = element.handler(org.http4k.core.Request(method, uri))
         val responseBody = Jsoup.parse(response.bodyString()).getElementsByTag("body").first()
 
-        element.delegate.element.empty()
-
-        if (responseBody != null) {
-            element.delegate.element.appendChildren(responseBody.childNodes())
-        }
+        swap
+            .performSwap(
+                element = element.delegate.element,
+                responseNodes = responseBody?.childNodes() ?: emptyList()
+            )
     }
 
     companion object {
@@ -45,8 +46,10 @@ data class HtmxCommand(
                     HtmxCommand(
                         method = it.second,
                         uri = element.attr(it.first),
-                        target = targetFromString(element.attr("hx-target")) ?: targetFromString(element.attr("data-hx-target")),
-                        swap = swapFromString(element.attr("hx-swap")) ?: swapFromString(element.attr("data-hx-swap")) ?: HtmxSwap.InnerHtml
+                        target = targetFromString(element.attr("hx-target"))
+                            ?: targetFromString(element.attr("data-hx-target")),
+                        swap = swapFromString(element.attr("hx-swap")) ?: swapFromString(element.attr("data-hx-swap"))
+                        ?: HtmxSwap.InnerHtml
                     )
                 }
 
@@ -60,15 +63,53 @@ data class HtmxCommand(
     }
 }
 
-enum class HtmxSwap {
-    InnerHtml,
-    OuterHtml,
-    BeforeBegin,
-    AfterBegin,
-    BeforeEnd,
-    AfterEnd,
-    Delete,
-    None,
+interface HtmxSwapAction {
+    fun performSwap(element: Element, responseNodes: List<Node>)
+}
+
+enum class HtmxSwap : HtmxSwapAction {
+    InnerHtml {
+        override fun performSwap(element: Element, responseNodes: List<Node>) {
+            element.empty()
+            element.appendChildren(responseNodes)
+        }
+    },
+    OuterHtml {
+        override fun performSwap(element: Element, responseNodes: List<Node>) {
+            responseNodes.forEach { element.before(it) }
+            element.remove()
+        }
+    },
+    BeforeBegin {
+        override fun performSwap(element: Element, responseNodes: List<Node>) {
+            responseNodes.forEach { element.before(it) }
+        }
+    },
+    AfterBegin {
+        override fun performSwap(element: Element, responseNodes: List<Node>) {
+            element.insertChildren(0, responseNodes)
+        }
+    },
+    BeforeEnd {
+        override fun performSwap(element: Element, responseNodes: List<Node>) {
+            element.appendChildren(responseNodes)
+        }
+    },
+    AfterEnd {
+        override fun performSwap(element: Element, responseNodes: List<Node>) {
+            responseNodes.reversed().forEach { element.after(it) }
+        }
+    },
+    Delete {
+        override fun performSwap(element: Element, responseNodes: List<Node>) {
+            element.remove()
+        }
+    },
+    None {
+        override fun performSwap(element: Element, responseNodes: List<Node>) {
+
+        }
+    },
 }
 
 
