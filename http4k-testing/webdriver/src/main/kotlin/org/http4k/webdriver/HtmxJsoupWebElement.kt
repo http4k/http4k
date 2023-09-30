@@ -27,17 +27,6 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
 
     override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = delegate.getScreenshotAs(target)
 
-    private fun performHxCommand(command: String) {
-        val response = handler(Request(Method.GET, command))
-        val responseBody = Jsoup.parse(response.bodyString()).getElementsByTag("body").first()
-
-        this.delegate.element.empty()
-
-        if (responseBody != null) {
-            this.delegate.element.appendChildren(responseBody.childNodes())
-        }
-    }
-
     override fun click() {
         val hxCommand = HtmxCommand.from(this)
         when {
