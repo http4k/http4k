@@ -19,6 +19,8 @@ class HtmxJsoupWebElementTest {
     private val navigate: (Request) -> Unit = { it -> newLocation = it.method to it.uri.toString() }
     private val getURL: () -> String? = { null }
 
+    private val jsoupOutputSettings = Document.OutputSettings().prettyPrint(false)
+
     private fun createTestElement(
         tagName: String,
         htmxVerb: String,
@@ -29,7 +31,7 @@ class HtmxJsoupWebElementTest {
         val document =
             Jsoup
                 .parse("""<body><$tagName>-NONE-</$tagName></body>""")
-                .outputSettings(Document.OutputSettings().prettyPrint(false))
+                .outputSettings(jsoupOutputSettings)
 
         val bodyElement = document.getElementsByTag("body").first()!!
         val tagElement = document.getElementsByTag(tagName).first()!!
@@ -224,6 +226,31 @@ class HtmxJsoupWebElementTest {
                 expectedResponse = "<div>-NONE-</div>"
             )
         }
+    }
+
+    @Test
+    fun `handles inheritance`() {
+        val handler: HttpHandler = { Response(Status.OK).body("responded") }
+        val html = Jsoup.parse("""
+            |<body>
+            |<div hx-target="this" hx-swap="outerHTML">
+            |<div id="actor" hx-get="/test"/>
+            |</div>
+            |</body>
+        """.trimMargin())
+            .outputSettings(jsoupOutputSettings)
+
+        val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), handler)
+
+        val body = element.findElement(By.tagName("body"))
+
+        element.findElement(By.id("actor"))!!.click()
+
+        assertThat(body.toString(), equalTo("""
+            |<body>
+            |responded
+            |</body>
+        """.trimMargin()))
     }
 
 }
