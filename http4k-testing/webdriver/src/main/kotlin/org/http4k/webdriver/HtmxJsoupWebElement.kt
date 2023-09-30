@@ -1,5 +1,6 @@
 package org.http4k.webdriver
 
+import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -13,10 +14,7 @@ import org.openqa.selenium.WebElement
 
 data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpHandler) : WebElement {
     private fun toHtmx(element: WebElement): HtmxJsoupWebElement =
-        when (element) {
-            is JSoupWebElement -> HtmxJsoupWebElement(element, handler)
-            else -> throw RuntimeException("could not convert $element to HtmxJsoupWebElement")
-        }
+        HtmxJsoupWebElement(element as JSoupWebElement, handler)
 
     override fun findElements(by: By): List<WebElement> =
         delegate
@@ -30,18 +28,21 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
 
     override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = delegate.getScreenshotAs(target)
 
-    private fun hxCommand(): String? = getAttribute("hx-get")
-
     private fun performHxCommand(command: String) {
         val response = handler(Request(Method.GET, command))
-        this.delegate.element.childNodes().forEach { it.remove() }
-        this.delegate.element.appendChild(Jsoup.parse(response.bodyString()))
+        val responseBody = Jsoup.parse(response.bodyString()).getElementsByTag("body").first()
+
+        this.delegate.element.empty()
+
+        if (responseBody != null) {
+            this.delegate.element.appendChildren(responseBody.childNodes())
+        }
     }
 
     override fun click() {
-        val hxCommand = hxCommand()
+        val hxCommand = HtmxCommand.from(this)
         when {
-            hxCommand != null -> performHxCommand(hxCommand)
+            hxCommand != null -> hxCommand.performOn(this)
             else -> delegate.click()
         }
     }
@@ -74,4 +75,6 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
     override fun getRect(): Rectangle = delegate.getRect()
 
     override fun getCssValue(propertyName: String): String = delegate.getCssValue(propertyName)
+
+    override fun toString(): String = delegate.toString()
 }

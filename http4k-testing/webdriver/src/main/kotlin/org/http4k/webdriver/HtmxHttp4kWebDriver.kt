@@ -5,7 +5,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 
-class Http4kHtmxWebDriver(private val initialHandler: HttpHandler) : WebDriver {
+class HtmxHttp4kWebDriver(private val initialHandler: HttpHandler) : WebDriver {
 
     val driver: Http4kWebDriver = Http4kWebDriver(initialHandler)
 

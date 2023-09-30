@@ -3,21 +3,29 @@ package org.http4k.webdriver
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Method
+import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.routing.path
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import java.io.File
 
-class Http4kHtmxWebDriverTest {
+class HtmxHttp4kWebDriverTest {
     val body = File("src/test/resources/test_htmx.html").readText()
-    private val driver = Http4kHtmxWebDriver { req ->
+    private val driver = HtmxHttp4kWebDriver { req ->
         when {
-            req.uri.path == "/text" -> Response(Status.OK).body(req.query("value") ?: "")
-            req.uri.path == "/div" -> Response(Status.OK).body("""<div id="${req.query("id")}" ${req.query("htmx-action")}="${req.query("htmx-target")}">${req.query("value")}</div>""")
-            else -> Response(Status.OK).body(body)
+            req.uri.path == "/text" ->
+                Response(Status.OK)
+                    .body(req.query("value") ?: "")
+                    .header("Content-Type", ContentType.TEXT_PLAIN.toHeaderValue())
+            req.uri.path == "/div" ->
+                Response(Status.OK)
+                    .body("""<div id="${req.query("id")}" ${req.query("htmx-action")}="${req.query("htmx-target")}">${req.query("value")}</div>""")
+                    .header("Content-Type", ContentType.TEXT_HTML.toHeaderValue())
+            else ->
+                Response(Status.OK)
+                    .body(body)
+                    .header("Content-Type", ContentType.TEXT_HTML.toHeaderValue())
         }
     }
 
@@ -42,6 +50,7 @@ class Http4kHtmxWebDriverTest {
 
         assertThat(button.text, equalTo("foo"))
     }
+
     @Test
     fun `issues a GET request on click and swaps html content`() {
         driver.navigate().to("/")
@@ -54,6 +63,4 @@ class Http4kHtmxWebDriverTest {
 
         assertThat(loadedDiv.text, equalTo("bar"))
     }
-
-
 }
