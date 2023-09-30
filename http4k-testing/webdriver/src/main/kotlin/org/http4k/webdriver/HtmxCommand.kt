@@ -12,7 +12,7 @@ data class HtmxCommand(
 ) {
 
     fun performOn(element: HtmxJsoupWebElement) {
-        val response = element.handler(org.http4k.core.Request(Method.GET, uri))
+        val response = element.handler(org.http4k.core.Request(method, uri))
         val responseBody = Jsoup.parse(response.bodyString()).getElementsByTag("body").first()
 
         element.delegate.element.empty()
@@ -23,35 +23,40 @@ data class HtmxCommand(
     }
 
     companion object {
-        private val hxAttrs = mapOf(
+
+        private fun withDataPrefix(p: Pair<String, Method>): List<Pair<String, Method>> =
+            listOf(p, "data-${p.first}" to p.second)
+
+        private val hxAttrs = listOf(
             "hx-get" to Method.GET,
-            "data-hx-get" to Method.GET,
-        )
+            "hx-post" to Method.POST,
+            "hx-delete" to Method.DELETE,
+            "hx-patch" to Method.PATCH,
+            "hx-put" to Method.PUT,
+        ).flatMap(::withDataPrefix)
 
         fun from(element: HtmxJsoupWebElement): HtmxCommand? =
             fromElement(element.delegate.element)
 
         private fun fromElement(element: Element): HtmxCommand? =
             hxAttrs
-                .entries
-                .firstOrNull { element.hasAttr(it.key) }
+                .firstOrNull { element.hasAttr(it.first) }
                 ?.let {
                     HtmxCommand(
-                        method = it.value,
-                        uri = element.attr(it.key),
-                        target = targetFromString(element.attr("hx-target")),
-                        swap = swapFromString(element.attr("hx-swap"))
+                        method = it.second,
+                        uri = element.attr(it.first),
+                        target = targetFromString(element.attr("hx-target")) ?: targetFromString(element.attr("data-hx-target")),
+                        swap = swapFromString(element.attr("hx-swap")) ?: swapFromString(element.attr("data-hx-swap")) ?: HtmxSwap.InnerHtml
                     )
                 }
 
         private fun targetFromString(s: String): String? =
             s.trim().ifEmpty { null }
 
-        private fun swapFromString(s: String): HtmxSwap =
+        private fun swapFromString(s: String): HtmxSwap? =
             HtmxSwap
                 .entries
-                .firstOrNull() { it.toString().lowercase() == s.lowercase() }
-                ?: HtmxSwap.InnerHtml
+                .firstOrNull() { s.lowercase().startsWith(it.toString().lowercase()) }
     }
 }
 

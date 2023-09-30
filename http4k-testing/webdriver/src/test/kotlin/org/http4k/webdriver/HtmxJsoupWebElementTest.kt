@@ -94,4 +94,48 @@ class HtmxJsoupWebElementTest {
         )
     }
 
+    @Test
+    fun `issues a POST request on click with default swap`() {
+        asssertClickResponds(
+            htmxVerb = "hx-post",
+            htmxUri = "/test",
+            htmxSwap = null,
+            expectedMethod = Method.POST,
+            expectedResponse = "<div>responded</div>"
+        )
+    }
+
+    @Test
+    fun `issues a DELETE request on click with default swap`() {
+        asssertClickResponds(
+            htmxVerb = "hx-delete",
+            htmxUri = "/test",
+            htmxSwap = null,
+            expectedMethod = Method.DELETE,
+            expectedResponse = "<div>responded</div>"
+        )
+    }
+
+    @Test
+    fun `issues a PATCH request on click with default swap`() {
+        asssertClickResponds(
+            htmxVerb = "hx-patch",
+            htmxUri = "/test",
+            htmxSwap = null,
+            expectedMethod = Method.PATCH,
+            expectedResponse = "<div>responded</div>"
+        )
+    }
+
+    @Test
+    fun `issues a PUT request on click with default swap`() {
+        asssertClickResponds(
+            htmxVerb = "hx-put",
+            htmxUri = "/test",
+            htmxSwap = null,
+            expectedMethod = Method.PUT,
+            expectedResponse = "<div>responded</div>"
+        )
+    }
+
 }
