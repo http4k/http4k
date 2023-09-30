@@ -1,6 +1,5 @@
 package org.http4k.webdriver
 
-import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request

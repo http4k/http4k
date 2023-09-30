@@ -10,8 +10,6 @@ import org.http4k.core.Status
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.junit.jupiter.api.Test
-import org.openqa.selenium.By
-import org.openqa.selenium.WebElement
 
 class HtmxJsoupWebElementTest {
 
