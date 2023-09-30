@@ -12,7 +12,7 @@ import java.io.File
 
 class HtmxHttp4kWebDriverTest {
     val body = File("src/test/resources/test_htmx.html").readText()
-    private val driver = HtmxHttp4kWebDriver { req ->
+    private val driver = Http4kWebDriver { req ->
         when {
             req.uri.path == "/text" ->
                 Response(Status.OK)
@@ -27,7 +27,7 @@ class HtmxHttp4kWebDriverTest {
                     .body(body)
                     .header("Content-Type", ContentType.TEXT_HTML.toHeaderValue())
         }
-    }
+    }.withHtmx()
 
     @Test
     fun `test the driver`() {

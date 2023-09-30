@@ -5,13 +5,11 @@ import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 
-class HtmxHttp4kWebDriver(private val initialHandler: HttpHandler) : WebDriver {
-
-    val driver: Http4kWebDriver = Http4kWebDriver(initialHandler)
+class HtmxHttp4kWebDriver(val driver: Http4kWebDriver) : WebDriver {
 
     private fun toHtmx(element: WebElement): HtmxJsoupWebElement =
         when (element) {
-            is JSoupWebElement -> HtmxJsoupWebElement(element, initialHandler)
+            is JSoupWebElement -> HtmxJsoupWebElement(element, driver.handler)
             else -> throw RuntimeException("could not convert $element to HtmxJsoupWebElement")
         }
 
@@ -40,5 +38,6 @@ class HtmxHttp4kWebDriver(private val initialHandler: HttpHandler) : WebDriver {
     override fun navigate(): WebDriver.Navigation = driver.navigate()
 
     override fun manage(): WebDriver.Options = driver.manage()
-
 }
+
+fun Http4kWebDriver.withHtmx(): HtmxHttp4kWebDriver = HtmxHttp4kWebDriver(this)
