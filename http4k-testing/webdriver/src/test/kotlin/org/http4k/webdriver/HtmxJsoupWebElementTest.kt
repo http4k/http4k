@@ -28,7 +28,7 @@ class HtmxJsoupWebElementTest {
     ): HtmxJsoupWebElement {
         val document =
             Jsoup
-                .parse("""<body><$tagName>none</$tagName></body>""")
+                .parse("""<body><$tagName>-NONE-</$tagName></body>""")
                 .outputSettings(Document.OutputSettings().prettyPrint(false))
 
         val bodyElement = document.getElementsByTag("body").first()!!
@@ -166,7 +166,7 @@ class HtmxJsoupWebElementTest {
                 htmxUri = "/test",
                 htmxSwap = "beforebegin",
                 expectedMethod = Method.GET,
-                expectedResponse = "responded<div>none</div>"
+                expectedResponse = "responded<div>-NONE-</div>"
             )
         }
 
@@ -177,7 +177,7 @@ class HtmxJsoupWebElementTest {
                 htmxUri = "/test",
                 htmxSwap = "afterbegin",
                 expectedMethod = Method.GET,
-                expectedResponse = "<div>respondednone</div>"
+                expectedResponse = "<div>responded-NONE-</div>"
             )
         }
 
@@ -188,7 +188,7 @@ class HtmxJsoupWebElementTest {
                 htmxUri = "/test",
                 htmxSwap = "beforeend",
                 expectedMethod = Method.GET,
-                expectedResponse = "<div>noneresponded</div>"
+                expectedResponse = "<div>-NONE-responded</div>"
             )
         }
 
@@ -199,7 +199,7 @@ class HtmxJsoupWebElementTest {
                 htmxUri = "/test",
                 htmxSwap = "afterend",
                 expectedMethod = Method.GET,
-                expectedResponse = "<div>none</div>responded"
+                expectedResponse = "<div>-NONE-</div>responded"
             )
         }
 
@@ -221,7 +221,7 @@ class HtmxJsoupWebElementTest {
                 htmxUri = "/test",
                 htmxSwap = "none",
                 expectedMethod = Method.GET,
-                expectedResponse = "<div>none</div>"
+                expectedResponse = "<div>-NONE-</div>"
             )
         }
     }
