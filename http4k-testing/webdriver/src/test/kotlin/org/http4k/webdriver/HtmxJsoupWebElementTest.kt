@@ -250,7 +250,7 @@ class HtmxJsoupWebElementTest {
             val html = Jsoup.parse(
                 """
                     |<body>
-                    |<div id="foo" hx-get="/test" hx-target="bar">foo</div>
+                    |<div id="foo" hx-get="/test" hx-target="#bar">foo</div>
                     |<div id="bar">bar</div>
                     |</body>
                 """.trimMargin()
@@ -267,7 +267,7 @@ class HtmxJsoupWebElementTest {
                 equalTo(
                     """
                         |<body>
-                        |<div id="foo" hx-get="/test" hx-target="bar">foo</div>
+                        |<div id="foo" hx-get="/test" hx-target="#bar">foo</div>
                         |<div id="bar">responded</div>
                         |</body>
                     """.trimMargin()
@@ -307,6 +307,8 @@ class HtmxJsoupWebElementTest {
             )
         }
     }
+
+
 
 
 }

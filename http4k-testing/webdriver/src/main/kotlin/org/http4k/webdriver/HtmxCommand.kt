@@ -43,7 +43,6 @@ data class HtmxCommand(
             this.attr("hx-$key").takeIf { it.isNotEmpty() }
                 ?: this.attr("data-hx-$key").takeIf { it.isNotEmpty() }
 
-
         private fun <T> Element.findInheritedValue(f: (Element) -> T?): T? =
             f(this) ?: this.parents().firstNotNullOfOrNull { f(it) }
 
@@ -53,7 +52,8 @@ data class HtmxCommand(
                 ?.let {
                     when {
                         it == "this" -> element
-                        else -> element.ownerDocument()?.getElementById(it)
+                        it.startsWith('#') -> element.ownerDocument()?.getElementById(it.drop(1))
+                        else -> null
                     }
                 }
 
