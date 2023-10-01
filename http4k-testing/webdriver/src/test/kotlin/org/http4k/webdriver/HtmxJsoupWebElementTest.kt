@@ -66,7 +66,7 @@ class HtmxJsoupWebElementTest {
     }
 
     @Nested
-    inner class `handles hx-methods` {
+    inner class `Handles hx-methods` {
         @Test
         fun `issues a GET request on click with default swap`() {
             asssertClickResponds(
@@ -139,7 +139,7 @@ class HtmxJsoupWebElementTest {
     }
 
     @Nested
-    inner class `Handles different hx-swap` {
+    inner class `Handles hx-swap` {
         @Test
         fun `issues a GET request on click with outerHTML swap`() {
             asssertClickResponds(
@@ -307,8 +307,4 @@ class HtmxJsoupWebElementTest {
             )
         }
     }
-
-
-
-
 }
