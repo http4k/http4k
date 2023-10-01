@@ -1,9 +1,6 @@
 package org.http4k.webdriver
 
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.jsoup.Jsoup
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.OutputType
