@@ -22,21 +22,19 @@ class HtmxJsoupWebElementTest {
     private val jsoupOutputSettings = Document.OutputSettings().prettyPrint(false)
 
     private fun createTestElement(
-        tagName: String,
         htmxVerb: String,
-        htmxUri: String,
         htmxSwap: String?,
         handler: HttpHandler
     ): HtmxJsoupWebElement {
         val document =
             Jsoup
-                .parse("""<body><$tagName>-NONE-</$tagName></body>""")
+                .parse("""<body><div>-NONE-</div></body>""")
                 .outputSettings(jsoupOutputSettings)
 
         val bodyElement = document.getElementsByTag("body").first()!!
-        val tagElement = document.getElementsByTag(tagName).first()!!
+        val tagElement = document.getElementsByTag("div").first()!!
 
-        tagElement.attr(htmxVerb, htmxUri)
+        tagElement.attr(htmxVerb, "/test")
         if (htmxSwap != null) {
             tagElement.attr("hx-swap", htmxSwap)
         }
@@ -46,7 +44,6 @@ class HtmxJsoupWebElementTest {
 
     private fun asssertClickResponds(
         htmxVerb: String,
-        htmxUri: String,
         htmxSwap: String?,
         expectedMethod: Method,
         expectedResponse: String
@@ -59,7 +56,7 @@ class HtmxJsoupWebElementTest {
             }
         }
 
-        val body = createTestElement("div", htmxVerb, htmxUri, htmxSwap, handler)
+        val body = createTestElement(htmxVerb, htmxSwap, handler)
 
         body.findElement(By.tagName("div"))!!.click()
 
@@ -74,7 +71,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with default swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = null,
                 expectedMethod = Method.GET,
                 expectedResponse = "<div>responded</div>"
@@ -85,7 +81,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with innerHtml swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = "innerHTML",
                 expectedMethod = Method.GET,
                 expectedResponse = "<div>responded</div>"
@@ -96,7 +91,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a data-GET request on click with innerHtml swap`() {
             asssertClickResponds(
                 htmxVerb = "data-hx-get",
-                htmxUri = "/test",
                 htmxSwap = "innerHTML",
                 expectedMethod = Method.GET,
                 expectedResponse = "<div>responded</div>"
@@ -107,7 +101,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a POST request on click with default swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-post",
-                htmxUri = "/test",
                 htmxSwap = null,
                 expectedMethod = Method.POST,
                 expectedResponse = "<div>responded</div>"
@@ -118,7 +111,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a DELETE request on click with default swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-delete",
-                htmxUri = "/test",
                 htmxSwap = null,
                 expectedMethod = Method.DELETE,
                 expectedResponse = "<div>responded</div>"
@@ -129,7 +121,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a PATCH request on click with default swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-patch",
-                htmxUri = "/test",
                 htmxSwap = null,
                 expectedMethod = Method.PATCH,
                 expectedResponse = "<div>responded</div>"
@@ -140,7 +131,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a PUT request on click with default swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-put",
-                htmxUri = "/test",
                 htmxSwap = null,
                 expectedMethod = Method.PUT,
                 expectedResponse = "<div>responded</div>"
@@ -154,7 +144,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with outerHTML swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = "outerHTML",
                 expectedMethod = Method.GET,
                 expectedResponse = "responded"
@@ -165,7 +154,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with beforebegin swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = "beforebegin",
                 expectedMethod = Method.GET,
                 expectedResponse = "responded<div>-NONE-</div>"
@@ -176,7 +164,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with afterbegin swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = "afterbegin",
                 expectedMethod = Method.GET,
                 expectedResponse = "<div>responded-NONE-</div>"
@@ -187,7 +174,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with beforeend swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = "beforeend",
                 expectedMethod = Method.GET,
                 expectedResponse = "<div>-NONE-responded</div>"
@@ -198,7 +184,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with afterend swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = "afterend",
                 expectedMethod = Method.GET,
                 expectedResponse = "<div>-NONE-</div>responded"
@@ -209,7 +194,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with delete swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = "delete",
                 expectedMethod = Method.GET,
                 expectedResponse = ""
@@ -220,7 +204,6 @@ class HtmxJsoupWebElementTest {
         fun `issues a GET request on click with none swap`() {
             asssertClickResponds(
                 htmxVerb = "hx-get",
-                htmxUri = "/test",
                 htmxSwap = "none",
                 expectedMethod = Method.GET,
                 expectedResponse = "<div>-NONE-</div>"
@@ -228,29 +211,102 @@ class HtmxJsoupWebElementTest {
         }
     }
 
-    @Test
-    fun `handles inheritance`() {
-        val handler: HttpHandler = { Response(Status.OK).body("responded") }
-        val html = Jsoup.parse("""
-            |<body>
-            |<div hx-target="this" hx-swap="outerHTML">
-            |<div id="actor" hx-get="/test"/>
-            |</div>
-            |</body>
-        """.trimMargin())
-            .outputSettings(jsoupOutputSettings)
+    @Nested
+    inner class `Handles inheritance and targets` {
+        private val alwaysRespondHandler: HttpHandler = { Response(Status.OK).body("responded") }
 
-        val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), handler)
+        @Test
+        fun `targets a parent with hx-target 'this'`() {
+            val html = Jsoup.parse(
+                """
+                    |<body>
+                    |<div hx-target="this">
+                    |<div id="actor" hx-get="/test"/>
+                    |</div>
+                    |</body>
+                """.trimMargin()
+            ).outputSettings(jsoupOutputSettings)
 
-        val body = element.findElement(By.tagName("body"))
+            val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), alwaysRespondHandler)
 
-        element.findElement(By.id("actor"))!!.click()
+            val body = element.findElement(By.tagName("body"))
 
-        assertThat(body.toString(), equalTo("""
-            |<body>
-            |responded
-            |</body>
-        """.trimMargin()))
+            element.findElement(By.id("actor"))!!.click()
+
+            assertThat(
+                body.toString(),
+                equalTo(
+                    """
+                        |<body>
+                        |<div hx-target="this">responded</div>
+                        |</body>
+                    """.trimMargin()
+                )
+            )
+        }
+
+        @Test
+        fun `targets a sibling by id`() {
+            val html = Jsoup.parse(
+                """
+                    |<body>
+                    |<div id="foo" hx-get="/test" hx-target="bar">foo</div>
+                    |<div id="bar">bar</div>
+                    |</body>
+                """.trimMargin()
+            ).outputSettings(jsoupOutputSettings)
+
+            val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), alwaysRespondHandler)
+
+            val body = element.findElement(By.tagName("body"))
+
+            element.findElement(By.id("foo"))!!.click()
+
+            assertThat(
+                body.toString(),
+                equalTo(
+                    """
+                        |<body>
+                        |<div id="foo" hx-get="/test" hx-target="bar">foo</div>
+                        |<div id="bar">responded</div>
+                        |</body>
+                    """.trimMargin()
+                )
+            )
+        }
+
+        @Test
+        fun `inherits hx-swap`() {
+            val html = Jsoup.parse(
+                """
+                    |<body>
+                    |<div hx-swap="outerHTML">
+                    |<div id="foo" hx-get="/test">foo</div>
+                    |</div>
+                    |</body>
+                """.trimMargin()
+            ).outputSettings(jsoupOutputSettings)
+
+            val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), alwaysRespondHandler)
+
+            val body = element.findElement(By.tagName("body"))
+
+            element.findElement(By.id("foo"))!!.click()
+
+            assertThat(
+                body.toString(),
+                equalTo(
+                    """
+                        |<body>
+                        |<div hx-swap="outerHTML">
+                        |responded
+                        |</div>
+                        |</body>
+                    """.trimMargin()
+                )
+            )
+        }
     }
+
 
 }
