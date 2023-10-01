@@ -1,6 +1,7 @@
 package org.http4k.webdriver
 
 import org.http4k.core.Method
+import org.http4k.core.Request
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -11,9 +12,8 @@ data class HtmxCommand(
     val target: Element,
     val swap: HtmxSwap,
 ) {
-
     fun performOn(element: HtmxJsoupWebElement) {
-        val response = element.handler(org.http4k.core.Request(method, uri))
+        val response = element.handler(request(element.delegate.element))
         val responseBody = Jsoup.parse(response.bodyString()).getElementsByTag("body").first()
 
         swap
@@ -22,6 +22,13 @@ data class HtmxCommand(
                 newElements = responseBody?.childNodes() ?: emptyList()
             )
     }
+
+    private fun request(element: Element): Request =
+        if (element.tagName() == "input" && element.hasAttr("name") && method == Method.GET) {
+            Request(method, uri).query(element.attr("name"), element.attr("value"))
+        } else {
+            Request(method, uri)
+        }
 
     companion object {
 
@@ -35,9 +42,6 @@ data class HtmxCommand(
             "hx-patch" to Method.PATCH,
             "hx-put" to Method.PUT,
         ).flatMap(::withDataPrefix)
-
-        fun from(element: HtmxJsoupWebElement): HtmxCommand? =
-            fromElement(element.delegate.element)
 
         private fun Element.hxAttr(key: String): String? =
             this.attr("hx-$key").takeIf { it.isNotEmpty() }
@@ -78,6 +82,9 @@ data class HtmxCommand(
                         swap = element.findInheritedValue(::swap) ?: HtmxSwap.InnerHtml,
                     )
                 }
+
+        fun from(element: HtmxJsoupWebElement): HtmxCommand? =
+            fromElement(element.delegate.element)
     }
 }
 
@@ -124,9 +131,7 @@ enum class HtmxSwap : HtmxSwapAction {
         }
     },
     None {
-        override fun performSwap(element: Element, newElements: List<Node>) {
-
-        }
+        override fun performSwap(element: Element, newElements: List<Node>) { }
     },
 }
 

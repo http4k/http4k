@@ -36,8 +36,11 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
         delegate.submit()
     }
 
-    override fun sendKeys(vararg keysToSend: CharSequence) =
+    override fun sendKeys(vararg keysToSend: CharSequence) {
         delegate.sendKeys(*keysToSend)
+        HtmxCommand.from(this)?.performOn(this)
+    }
+
 
     override fun clear() = delegate.clear()
 

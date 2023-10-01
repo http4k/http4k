@@ -9,6 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
@@ -302,6 +303,46 @@ class HtmxJsoupWebElementTest {
                         |responded
                         |</div>
                         |</body>
+                    """.trimMargin()
+                )
+            )
+        }
+    }
+
+    @Nested
+//    @Disabled("Work in progress")
+    inner class `Handles form data` {
+        @Test
+        fun `single input field`() {
+            val getHandler: HttpHandler = { req ->
+                if (req.method == Method.GET) {
+                    Response(Status.OK).body(req.query("name") ?: "NONE")
+                } else {
+                    Response(Status.BAD_REQUEST).body("expected a GET request, but was ${req.method}")
+                }
+            }
+
+            val html = Jsoup.parse(
+                """
+                    |<body>
+                    |<input name="name" hx-get="/test" hx-swap="outerHTML"/>
+                    |</body>
+                """.trimMargin()
+            ).outputSettings(jsoupOutputSettings)
+
+            val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), getHandler)
+
+            val body = element.findElement(By.tagName("body"))
+
+            element.findElement(By.tagName("input"))!!.sendKeys("keys")
+
+            assertThat(
+                body.toString(),
+                equalTo(
+                    """
+                    |<body>
+                    |keys
+                    |</body>
                     """.trimMargin()
                 )
             )
