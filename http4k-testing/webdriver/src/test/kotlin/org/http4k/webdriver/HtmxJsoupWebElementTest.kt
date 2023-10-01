@@ -277,6 +277,36 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
+        fun `targets a sibling by class`() {
+            val html = Jsoup.parse(
+                """
+                    |<body>
+                    |<div id="foo" hx-get="/test" hx-target=".bar">foo</div>
+                    |<div class="bar">bar</div>
+                    |</body>
+                """.trimMargin()
+            ).outputSettings(jsoupOutputSettings)
+
+            val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), alwaysRespondHandler)
+
+            val body = element.findElement(By.tagName("body"))
+
+            element.findElement(By.id("foo"))!!.click()
+
+            assertThat(
+                body.toString(),
+                equalTo(
+                    """
+                        |<body>
+                        |<div id="foo" hx-get="/test" hx-target=".bar">foo</div>
+                        |<div class="bar">responded</div>
+                        |</body>
+                    """.trimMargin()
+                )
+            )
+        }
+
+        @Test
         fun `inherits hx-swap`() {
             val html = Jsoup.parse(
                 """
