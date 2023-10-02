@@ -2,11 +2,13 @@ package org.http4k.webdriver
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.then
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.junit.jupiter.api.Nested
@@ -18,6 +20,9 @@ class HtmxJsoupWebElementTest {
     private var newLocation: Pair<Method, String>? = null
     private val navigate: (Request) -> Unit = { it -> newLocation = it.method to it.uri.toString() }
     private val getURL: () -> String? = { null }
+    private val contentTypePlainTextFilter = Filter { next: HttpHandler ->
+        { next(it).header("Content-Type", "text/plain") }
+    }
 
     private val jsoupOutputSettings = Document.OutputSettings().prettyPrint(false)
 
@@ -48,7 +53,7 @@ class HtmxJsoupWebElementTest {
         expectedMethod: Method,
         expectedResponse: String
     ) {
-        val handler: HttpHandler = { req ->
+        val handler: HttpHandler = contentTypePlainTextFilter.then { req ->
             if (req.method == expectedMethod && req.uri.path == "/test") {
                 Response(Status.OK).body("responded")
             } else {
@@ -213,7 +218,8 @@ class HtmxJsoupWebElementTest {
 
     @Nested
     inner class `Handles inheritance and targets` {
-        private val alwaysRespondHandler: HttpHandler = { Response(Status.OK).body("responded") }
+        private val alwaysRespondHandler: HttpHandler =
+            contentTypePlainTextFilter.then{ Response(Status.OK).body("responded") }
 
         @Test
         fun `targets a parent with hx-target 'this'`() {
@@ -343,9 +349,10 @@ class HtmxJsoupWebElementTest {
     inner class `Handles form data` {
         @Test
         fun `single input field`() {
-            val getHandler: HttpHandler = { req ->
+            val getHandler: HttpHandler = contentTypePlainTextFilter.then { req ->
                 if (req.method == Method.GET) {
-                    Response(Status.OK).body(req.query("name") ?: "NONE")
+                    Response(Status.OK)
+                        .body(req.query("name") ?: "NONE")
                 } else {
                     Response(Status.BAD_REQUEST).body("expected a GET request, but was ${req.method}")
                 }

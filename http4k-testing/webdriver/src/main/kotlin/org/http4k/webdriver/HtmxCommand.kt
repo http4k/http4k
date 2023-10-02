@@ -5,6 +5,8 @@ import org.http4k.core.Request
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
+import org.jsoup.parser.Parser
 
 data class HtmxCommand(
     val method: Method,
@@ -14,12 +16,21 @@ data class HtmxCommand(
 ) {
     fun performOn(element: HtmxJsoupWebElement) {
         val response = element.handler(request(element.delegate.element))
-        val responseBody = Jsoup.parse(response.bodyString()).getElementsByTag("body").first()
+
+        val mimeType = response.header("content-type")?.split(";")?.firstOrNull()
+
+        val responseBody =
+            when (mimeType) {
+                "text/html" -> Jsoup.parse(response.bodyString(), Parser.xmlParser()).root().children()
+                "text/plain" -> listOf(TextNode(response.bodyString()))
+                null -> throw RuntimeException("No content type on response")
+                else -> throw RuntimeException("Unsupported content type on response ${response.header("content-type")}")
+            }
 
         swap
             .performSwap(
                 element = target,
-                newElements = responseBody?.childNodes() ?: emptyList()
+                newElements = responseBody ?: emptyList()
             )
     }
 

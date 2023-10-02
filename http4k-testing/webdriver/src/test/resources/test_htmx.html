@@ -8,4 +8,23 @@
   <button data-hx-get="/text?value=foo" id="hx-get-button">Click Me!</button>
 
   <div data-hx-get="/div?id=loaded-div&htmx-action=hx-get&htmx-target=%2Ftext%3Fvalue%3Dbar&value=foo" id="hx-get-div">Click me!</div>
+
+  <section>
+  <h1>Example 3: Click to Load</h1>
+
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>ID</th></tr></thead>
+    <tbody id="example3tbody">
+      <tr id="example3ReplaceMe">
+        <td colspan="3">
+          <button id="example3button" data-hx-get="/example3?page=1"
+                  data-hx-target="#example3ReplaceMe"
+                  data-hx-swap="outerHTML">
+            Load More Agents...
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </section>
 </body>
