@@ -9,7 +9,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
