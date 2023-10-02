@@ -56,9 +56,7 @@ data class HtmxCommand(
                 ?.let {
                     when {
                         it == "this" -> element
-                        it.startsWith('#') -> element.ownerDocument()?.getElementById(it.drop(1))
-                        it.startsWith('.') -> element.ownerDocument()?.getElementsByClass(it.drop(1))?.first()
-                        else -> element.ownerDocument()?.getElementsByTag(it)?.first()
+                        else -> element.root().select(it).firstOrNull()
                     }
                 }
 
