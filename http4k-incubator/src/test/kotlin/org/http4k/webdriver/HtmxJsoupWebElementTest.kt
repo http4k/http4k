@@ -346,7 +346,6 @@ class HtmxJsoupWebElementTest {
     }
 
     @Nested
-//    @Disabled("Work in progress")
     inner class `Handles form data` {
         @Test
         fun `single input field`() {
