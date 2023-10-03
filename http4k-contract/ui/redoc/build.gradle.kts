@@ -4,6 +4,6 @@ dependencies {
     api(project(":http4k-contract"))
     api("org.webjars:redoc:_")
 
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 

@@ -7,7 +7,6 @@ import com.natpryce.hamkrest.has
 import org.http4k.core.Headers
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
-import org.http4k.hamkrest.hasUri
 import org.http4k.server.PolyServerConfig
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
