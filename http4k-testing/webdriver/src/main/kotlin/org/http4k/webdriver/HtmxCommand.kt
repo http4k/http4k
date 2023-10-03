@@ -16,7 +16,19 @@ data class HtmxCommand(
     val swap: HtmxSwap,
 ) {
     fun performOn(element: HtmxJsoupWebElement) {
-        val response = element.handler(request(element.delegate.element))
+        // TODO: re-use headers from http4k.http4k-htmx instead of repeating?
+        val headers = listOf(
+            "hx-request" to "true",
+            element.getAttribute("id")?.let { "hx-trigger" to it },
+            element.getAttribute("name")?.let { "hx-trigger-name" to it },
+            if (target.hasAttr("id")) "hx-target" to target.attr("id") else null,
+        ).filterNotNull()
+
+        val response = element
+            .handler(
+                request(element.delegate.element)
+                    .headers(headers)
+            )
 
         val mimeType = response.header("content-type")?.split(";")?.firstOrNull()
 

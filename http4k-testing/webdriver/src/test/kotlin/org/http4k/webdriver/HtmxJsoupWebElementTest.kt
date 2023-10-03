@@ -220,7 +220,7 @@ class HtmxJsoupWebElementTest {
     @Nested
     inner class `Handles inheritance and targets` {
         private val alwaysRespondHandler: HttpHandler =
-            contentTypePlainTextFilter.then{ Response(Status.OK).body("responded") }
+            contentTypePlainTextFilter.then { Response(Status.OK).body("responded") }
 
         @Test
         fun `targets a parent with hx-target 'this'`() {
@@ -423,6 +423,54 @@ class HtmxJsoupWebElementTest {
                     """.trimMargin()
                 )
             )
+        }
+    }
+
+    @Nested
+    inner class `Handles header values` {
+        @Test
+        fun `sends headers for request`() {
+            val getHandler: HttpHandler = contentTypePlainTextFilter.then { req ->
+                Response(Status.OK)
+                    .body(
+                        req
+                            .headers
+                            .sortedBy { it.first }
+                            .map { "${it.first}: ${it.second}" }
+                            .joinToString("\n")
+                    )
+            }
+
+            val html = Jsoup.parse(
+                """
+                    |<body>
+                    |<div id="tgt" hx-target="this" hx-swap="outerHTML">
+                    |<div id="a" name="adiv" hx-get="/"/>
+                    |</div>
+                    |</body>
+                """.trimMargin()
+            ).outputSettings(jsoupOutputSettings)
+
+            val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), getHandler)
+
+            val body = element.findElement(By.tagName("body"))
+
+            element.findElement(By.id("a"))!!.click()
+
+            assertThat(
+                body.toString(),
+                equalTo(
+                    """
+                    |<body>
+                    |hx-request: true
+                    |hx-target: tgt
+                    |hx-trigger: a
+                    |hx-trigger-name: adiv
+                    |</body>
+                    """.trimMargin()
+                )
+            )
+
         }
     }
 }
