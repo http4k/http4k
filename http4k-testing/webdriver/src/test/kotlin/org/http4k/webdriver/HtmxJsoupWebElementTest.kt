@@ -8,6 +8,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.body.form
 import org.http4k.core.then
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -378,6 +379,46 @@ class HtmxJsoupWebElementTest {
                     """
                     |<body>
                     |keys
+                    |</body>
+                    """.trimMargin()
+                )
+            )
+        }
+
+        @Test
+        fun `post a form`() {
+            val getHandler: HttpHandler = contentTypePlainTextFilter.then { req ->
+                if (req.method == Method.POST) {
+                    Response(Status.OK)
+                        .body(req.form().joinToString { "${it.first}: ${it.second}" })
+                } else {
+                    Response(Status.BAD_REQUEST).body("expected a POST request, but was ${req.method}")
+                }
+            }
+
+            val html = Jsoup.parse(
+                """
+                    |<body>
+                    |<form hx-post="/" hx-swap="outerHtml">
+                    |<input type="text" id="foo1" name="foo1" value="bar1"/>
+                    |<input type="text" id="foo2" name="foo2" value="bar2"/>
+                    |</form>
+                    |</body>
+                """.trimMargin()
+            ).outputSettings(jsoupOutputSettings)
+
+            val element = HtmxJsoupWebElement(JSoupWebElement(navigate, getURL, html), getHandler)
+
+            val body = element.findElement(By.tagName("body"))
+
+            element.findElement(By.tagName("form"))!!.submit()
+
+            assertThat(
+                body.toString(),
+                equalTo(
+                    """
+                    |<body>
+                    |foo1: bar1, foo2: bar2
                     |</body>
                     """.trimMargin()
                 )

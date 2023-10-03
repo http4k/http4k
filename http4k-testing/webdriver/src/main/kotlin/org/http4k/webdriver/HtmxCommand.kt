@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.parser.Parser
+import java.net.URLEncoder
 
 data class HtmxCommand(
     val method: Method,
@@ -34,12 +35,77 @@ data class HtmxCommand(
             )
     }
 
-    private fun request(element: Element): Request =
-        if (element.tagName() == "input" && element.hasAttr("name") && method == Method.GET) {
-            Request(method, uri).query(element.attr("name"), element.attr("value"))
-        } else {
-            Request(method, uri)
+    private fun request(element: Element): Request {
+        val formBody = formBodyOfElement(element)
+        val isInput = listOf("input", "textarea", "select", "button").contains(element.tagName())
+
+        return when {
+            isInput && element.hasAttr("name") && method == Method.GET ->
+                Request(Method.GET, uri).query(element.attr("name"), element.attr("value"))
+
+            formBody != null && method == Method.GET ->
+                Request(Method.GET, "$uri?$formBody")
+
+            formBody != null ->
+                Request(method, uri).body(formBody)
+
+            else ->
+                Request(method, uri)
         }
+    }
+
+    private fun formBodyOfElement(element: Element): String? =
+        if (element.tagName() == "form")
+            formBody(element)
+        else
+            element
+                .parents()
+                .toList()
+                .firstOrNull { it.tagName() == "form" }
+                ?.let { formBody(it) }
+
+    private fun formBody(formElement: Element): String {
+        // TODO: lots of duplication with JSoupWebElement
+        // and slightly different approaches
+        val inputs =
+            formElement
+                .getElementsByTag("input")
+                .toList()
+                .filter { it.hasAttr("name") }
+                .map { it.attr("name") to it.attr("value") }
+
+        val textAreas =
+            formElement
+                .getElementsByTag("textarea")
+                .toList()
+                .filter { it.hasAttr("name") }
+                .map { it.attr("name") to it.text() }
+
+        val selects =
+            formElement
+                .getElementsByTag("select")
+                .toList()
+                .filter { it.hasAttr("name") }
+                .mapNotNull {
+                    it.getElementsByTag("option")
+                        .toList()
+                        .find { option -> option.hasAttr("selected") }
+                        ?.let { option -> it.attr("name") to option.attr("value") }
+                }
+
+        val buttons =
+            formElement
+                .getElementsByTag("button")
+                .toList()
+                .filter { it.hasAttr("name") }
+                .map { it.attr("name") to it.attr("value") }
+
+        val all = (inputs + textAreas + selects + buttons)
+
+        return all.joinToString("&") {
+            "${URLEncoder.encode(it.first, "UTF-8")}=${URLEncoder.encode(it.second, "UTF-8")}"
+        }
+    }
 
     companion object {
 
@@ -141,7 +207,7 @@ enum class HtmxSwap : HtmxSwapAction {
         }
     },
     None {
-        override fun performSwap(element: Element, newElements: List<Node>) { }
+        override fun performSwap(element: Element, newElements: List<Node>) {}
     },
 }
 

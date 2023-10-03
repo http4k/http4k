@@ -25,15 +25,16 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
     override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = delegate.getScreenshotAs(target)
 
     override fun click() {
-        val hxCommand = HtmxCommand.from(this)
-        when {
-            hxCommand != null -> hxCommand.performOn(this)
-            else -> delegate.click()
-        }
+        delegate.click()
+        HtmxCommand.from(this)?.performOn(this)
     }
 
     override fun submit() {
-        delegate.submit()
+        val hxCommand = HtmxCommand.from(this)
+        when {
+            hxCommand != null -> hxCommand.performOn(this)
+            else -> delegate.submit()
+        }
     }
 
     override fun sendKeys(vararg keysToSend: CharSequence) {
