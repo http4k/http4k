@@ -6,6 +6,6 @@ dependencies {
     api("io.cloudevents:cloudevents-core:_")
     api("io.cloudevents:cloudevents-json-jackson:_")
     api(project(":http4k-format-jackson"))
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-testing-hamkrest"))
 }

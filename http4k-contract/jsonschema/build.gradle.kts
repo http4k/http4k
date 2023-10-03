@@ -12,6 +12,6 @@ dependencies {
 
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-format-jackson"))
-    testImplementation(project(path = ":http4k-format-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-format-core")))
     testImplementation(project(":http4k-testing-approval"))
 }

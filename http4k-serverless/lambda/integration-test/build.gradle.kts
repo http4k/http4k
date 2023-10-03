@@ -8,9 +8,9 @@ dependencies {
 
     api("com.amazonaws:aws-lambda-java-events:_")
     api("dev.forkhandles:result4k:_")
-    api(project(path = ":http4k-core", configuration = "testArtifacts"))
-    api(project(path = ":http4k-serverless-core", configuration = "testArtifacts"))
-    testImplementation(project(path = ":http4k-aws", configuration = "testArtifacts"))
+    api(testFixtures(project(":http4k-core")))
+    api(testFixtures(project(":http4k-serverless-core")))
+    testImplementation(testFixtures(project(":http4k-aws")))
 }
 
 task<JavaExec>("deployTestFunction") {

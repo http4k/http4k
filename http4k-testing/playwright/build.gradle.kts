@@ -5,6 +5,6 @@ dependencies {
     api("com.microsoft.playwright:playwright:_")
     implementation(Testing.junit.jupiter.api)
 
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
 
 }
