@@ -15,8 +15,8 @@ dependencies {
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-format-argo"))
     testImplementation(project(":http4k-testing-approval"))
-    testImplementation(project(path: ":http4k-core", configuration: "testArtifacts"))
-    testImplementation(project(path: ":http4k-security-oauth", configuration: "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-security-oauth")))
 }
 
 task generateOpenApi3AutoClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {

@@ -10,6 +10,7 @@ plugins {
     idea
     jacoco
     `java-library`
+    `java-test-fixtures`
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin")
@@ -38,6 +39,7 @@ allprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
     apply(plugin = "org.gradle.jacoco")
+    apply(plugin = "java-test-fixtures")
 
     repositories {
         mavenCentral()
@@ -84,6 +86,10 @@ allprojects {
         testImplementation(Testing.junit.jupiter.api)
         testImplementation(Testing.junit.jupiter.engine)
         testImplementation("com.natpryce:hamkrest:_")
+
+        testFixturesImplementation(Testing.junit.jupiter.api)
+        testFixturesImplementation(Testing.junit.jupiter.engine)
+        testFixturesImplementation("com.natpryce:hamkrest:_")
     }
 }
 
@@ -113,15 +119,6 @@ subprojects {
         val testJar by creating(Jar::class) {
             archiveClassifier.set("test")
             from(project.the<SourceSetContainer>()["test"].output)
-        }
-
-        configurations.create("testArtifacts") {
-            extendsFrom(configurations["testApi"])
-        }
-        artifacts {
-            add("testArtifacts", testJar)
-            archives(sourcesJar)
-            archives(javadocJar)
         }
     }
 
@@ -212,7 +209,7 @@ dependencies {
         .filter { hasAnArtifact(it) }
         .forEach {
             api(project(it.name))
-            testImplementation(project(path = it.name, configuration = "testArtifacts"))
+            testImplementation(testFixtures(project(it.name)))
         }
 
     testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")

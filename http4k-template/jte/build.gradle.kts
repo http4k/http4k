@@ -5,6 +5,6 @@ dependencies {
     api("gg.jte:jte:_")
     api("gg.jte:jte-kotlin:_")
 
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
-    testImplementation(project(path = ":http4k-template-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-template-core")))
 }
