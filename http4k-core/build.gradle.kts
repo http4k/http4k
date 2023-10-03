@@ -21,9 +21,6 @@ dependencies {
     testFixturesApi(project(":http4k-server-apache"))
     testFixturesApi("dev.forkhandles:mock4k:_")
     testFixturesApi("org.webjars:swagger-ui:_")
-    testFixturesApi("com.launchdarkly:okhttp-eventsource:_")
-    testFixturesApi("org.apache.httpcomponents:httpcore:_")
-    testFixturesApi("org.slf4j:slf4j-nop:_")
 
     // TODO: remove after Kotlin-1.9.20 is released (see https://youtrack.jetbrains.com/issue/KT-34901)
     kotlin.target.compilations { named("testFixtures") { associateWith(getByName("main")) } }
