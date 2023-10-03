@@ -64,7 +64,7 @@ class HtmxHttp4kWebDriverTest {
         val button = driver.findElement(By.id("hx-get-button"))!!
         button.click()
 
-        assertThat(button.text, equalTo("foo"))
+        assertThat(driver.findElement(By.id("hx-get-button"))!!.text, equalTo("foo"))
     }
 
     @Test
@@ -86,17 +86,15 @@ class HtmxHttp4kWebDriverTest {
         fun `Example 3 - Click to Load`() {
             driver.navigate().to("/")
 
-            val tableBody = driver.findElement(By.id("example3tbody"))!!
-
-            assertThat(tableBody.text, equalTo("Load More Agents..."))
+            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Load More Agents..."))
 
             driver.findElement(By.id("example3button"))!!.click()
 
-            assertThat(tableBody.text, equalTo("Agent Smith void1@null.org 1 Load More Agents..."))
+            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Agent Smith void1@null.org 1 Load More Agents..."))
 
             driver.findElement(By.id("example3button"))!!.click()
 
-            assertThat(tableBody.text, equalTo("Agent Smith void1@null.org 1 Agent Smith void2@null.org 2 Load More Agents..."))
+            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Agent Smith void1@null.org 1 Agent Smith void2@null.org 2 Load More Agents..."))
         }
     }
 }
