@@ -726,13 +726,6 @@ header p {
   transition: 0.05s ease-in-out all;
 }
 
-.intro .aside .nav .nav-item.active {
-  border-left: 6px solid #60c0ff;
-  border-radius: 6px;
-  background-color: #fff;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-
 .intro .aside .nav .nav-item a {
   color: #5c5c5c;
   white-space: normal;
@@ -767,19 +760,19 @@ header p {
     padding: 0.3em;
 }
 
+.intro .dropdown-menu.show {
+    margin: 0;
+    padding: 0;
+}
+
 .intro .aside .nav .dropdown-menu .dropdown-item {
-  padding: 0.2rem 0.5rem;
-  margin-bottom: 4px;
   transition: 0.05s ease-in-out all;
 }
 
 .intro .aside .nav .dropdown-menu .dropdown-item.active,
 .intro .aside .nav .dropdown-menu .dropdown-item:active {
-  border-left: 6px solid #60c0ff;
-  border-radius: 6px;
-  background-color: #fff;
-  color: #5c5c5c;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  background-color: rgb(248, 248, 248);
+  font-weight: bold;
 }
 
 .intro main {
