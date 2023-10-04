@@ -8,7 +8,7 @@ changes with their rationale when appropriate:
 
 ### v5.8.3.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-incubator*** : Added HMTX emulation on Http4kWebDriver H/T @mbcltd
+- **http4k-incubator*** : Added HTMX emulation on Http4kWebDriver H/T @mbcltd
 
 ### v5.8.2.0
 - **http4k-*** : Upgrade some dependency versions.
