@@ -34,7 +34,7 @@ interface Http4KNavigation : Navigation {
 }
 
 class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
-    private val handler = ClientFilters.FollowRedirects()
+    val handler = ClientFilters.FollowRedirects()
         .then(ClientFilters.Cookies(storage = cookieStorage()))
         .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
         .then(initialHandler)
