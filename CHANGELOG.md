@@ -3,6 +3,13 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.8.3.1 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
+### v5.8.3.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-incubator*** : Added HMTX emulation on Http4kWebDriver H/T @mbcltd
+
 ### v5.8.2.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core*** : Added extension function `ExecutionService.withRequestTracing()` to propagate Zipkin traces across threads
