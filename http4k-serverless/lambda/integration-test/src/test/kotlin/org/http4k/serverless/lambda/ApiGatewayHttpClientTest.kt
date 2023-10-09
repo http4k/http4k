@@ -35,6 +35,10 @@ abstract class ApiGatewayHttpClientTest(version: ApiIntegrationVersion) :
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
     override fun `unknown host are converted into 503`() = assumeTrue(false, "Unsupported client feature")
+    override fun `supports query parameter list`() = assumeTrue(false, "Unsupported client feature")
+    override fun `fails with no protocol`() = assumeTrue(false, "Unsupported client feature")
+    override fun `unknown host is correctly reported`() = assumeTrue(false, "Unsupported client feature")
+    override fun `socket timeouts are converted into 504`() = assumeTrue(false, "Unsupported client feature")
 }
 
 class ApiGatewayV1ClientTest : ApiGatewayHttpClientTest(v1) {
