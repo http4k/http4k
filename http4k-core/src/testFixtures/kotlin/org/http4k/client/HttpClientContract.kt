@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -24,9 +25,11 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
+import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
+import org.http4k.core.queries
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
@@ -259,7 +262,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    fun `fails with no protocol`() {
+    open fun `fails with no protocol`() {
         assertThat(
             { client(Request(GET, "/boom").header("host", "localhost:$port")) }, throws<Exception>()
         )
@@ -269,6 +272,13 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     fun `host header not abusable`() {
         val response = client(Request(GET, "http://localhost:$port/hostheaders").header("host", "foobar:$port"))
         assertThat(response.bodyString(), !containsSubstring("foobar").and(containsSubstring(",")))
+    }
+
+    @Test
+    open fun `supports query parameter list`(){
+        val response = client(Request(GET, "http://localhost:$port/echo").query("p1", "foo").query("p1", "bar"))
+        val uriFromResponse = Uri.of(response.bodyString())
+        assertThat(uriFromResponse.queries(), equalTo(listOf("p1" to "foo", "p1" to "bar")))
     }
 
     @Test
