@@ -32,6 +32,10 @@ abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
     override fun `connection refused are converted into 503`() = unsupportedFeature()
     override fun `unknown host are converted into 503`() = unsupportedFeature()
     override fun `send binary data`() = unsupportedFeature()
+    override fun `supports query parameter list`() = unsupportedFeature()
+    override fun `socket timeouts are converted into 504`() = unsupportedFeature()
+    override fun `fails with no protocol`() = unsupportedFeature()
+    override fun `unknown host is correctly reported`() = unsupportedFeature()
 }
 
 class LambdaV1HttpClientTest : LambdaHttpClientTest(ApiGatewayV1, ::ApiGatewayV1LambdaClient) {
