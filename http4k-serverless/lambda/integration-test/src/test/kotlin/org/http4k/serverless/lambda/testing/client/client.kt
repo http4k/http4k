@@ -5,7 +5,9 @@ import org.http4k.aws.AwsProfile
 import org.http4k.aws.awsClientFilterFor
 import org.http4k.client.OkHttp
 import org.http4k.core.then
+import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.Payload.Mode.Signed
+import org.http4k.filter.inIntelliJOnly
 import org.http4k.serverless.lambda.testing.setup.aws.apigateway.AwsApiGateway
 import org.http4k.serverless.lambda.testing.setup.aws.apigateway.Http
 import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.AwsApiGatewayV2
@@ -22,6 +24,7 @@ fun AwsProfile.restApiGatewayApiClient() = AwsApiGateway.Http(client("apigateway
 fun AwsProfile.awsLambdaApiClient() = Lambda.Http(client("lambda"), Region(region))
 
 private fun AwsProfile.client(service: String) = awsClientFilterFor(service, Signed)
+    .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
     .then(
         OkHttp(
             OkHttpClient.Builder()

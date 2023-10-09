@@ -32,7 +32,8 @@ fun AwsApiGateway.Companion.Http(rawHttp: HttpHandler, region: Region) = object 
 fun AwsApiGateway.createApi(name: ApiName, region: Region) =
     this(CreateApi(name)).map { toApiDetails(it, region) }.getOrThrow()
 fun AwsApiGateway.listApis(region: Region): List<ApiDetails> =
-    this(ListApis()).map { it._embedded.item.map { item -> toApiDetails(item, region) } }.getOrThrow()
+    this(ListApis())
+        .map { (it._embedded?: EmbeddedDetails(emptyList())).item.map { item -> toApiDetails(item, region) } }.getOrThrow()
 fun AwsApiGateway.delete(apiId: ApiId) = this(DeleteApi(apiId))
 fun AwsApiGateway.listResources(apiId: ApiId) = this(ListRootResource(apiId)).getOrThrow()
 fun AwsApiGateway.createResource(apiId: ApiId, parentResource: RestResourceDetails) =
@@ -47,7 +48,7 @@ fun AwsApiGateway.createStage(apiId: ApiId, stage: Stage, deploymentId: Deployme
     this(CreateStage(apiId, stage, deploymentId)).getOrThrow()
 
 data class RestApiDetails(val name: String, val id: String)
-data class ListApiResponse(val _embedded: EmbeddedDetails)
+data class ListApiResponse(val _embedded: EmbeddedDetails? = EmbeddedDetails(emptyList()))
 data class EmbeddedDetails(val item: List<RestApiDetails>)
 data class RestResourceDetails(val id: String, val path: String)
 data class ListResourcesResponse(val _embedded: EmbeddedResourceDetails)
