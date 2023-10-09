@@ -61,8 +61,10 @@ object DeployServerAsLambdaForClientContract {
 
         val lambdaApiClient = config.awsLambdaApiClient()
 
-        println("Deleting existing function (if exists)...")
-        lambdaApiClient.delete(functionName)
+        lambdaApiClient.list().find { it.name == functionName.value }?.let {
+            println("Function ${functionName.value} exists. Deleting...")
+            lambdaApiClient.delete(functionName)
+        }
 
         val functionPackage = FunctionPackage(
             functionName,
