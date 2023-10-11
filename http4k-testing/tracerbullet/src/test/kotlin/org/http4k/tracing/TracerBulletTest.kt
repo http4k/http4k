@@ -3,7 +3,6 @@ package org.http4k.tracing
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.events.then
 import org.http4k.format.Jackson
 import org.http4k.routing.reverseProxy
 import org.http4k.strikt.bodyString

@@ -13,7 +13,7 @@ interface Event {
     }
 }
 
-fun Events.then(next: Events): Events = { it.also(this).also(next) }
+fun Events.and(next: Events): Events = { it.also(this).also(next) }
 
 /**
  * An EventFilter is used to create pipelines for Event processing.
