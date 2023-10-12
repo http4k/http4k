@@ -1,6 +1,7 @@
 package org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2
 
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
@@ -8,6 +9,9 @@ import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiGatewayJac
 import org.http4k.serverless.lambda.testing.setup.aws.kClass
 
 class CreateStage(private val apiId: ApiId, private val stage: Stage) : AwsApiGatewayV2Action<Unit>(kClass()) {
+    private val createStageLens =
+        Body.auto<Stage>(contentType = ContentType.APPLICATION_JSON.withNoDirectives()).toLens()
+
     override fun toRequest() = Request(Method.POST, "/v2/apis/${apiId.value}/stages")
-        .with(Body.auto<Stage>().toLens() of stage)
+        .with(createStageLens of stage)
 }
