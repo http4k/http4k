@@ -78,7 +78,6 @@ nav:
     - Make parallel HTTP calls: guide/howto/make_parallel_calls/index.md
   - Reference:
     - Overview: guide/reference/index.md
-    - API docs: api/
     - Core: guide/reference/core/index.md
     - Server backend: guide/reference/servers/index.md
     - Serverless backend: guide/reference/serverless/index.md
