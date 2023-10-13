@@ -4,7 +4,6 @@ package org.http4k.serverless.lambda.testing.setup
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
-import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
@@ -84,20 +83,22 @@ object DeployServerAsLambdaForClientContract {
         println("Performing a test request...")
         val client = clientFn(functionName(type), Region(config.region))
             .then(config.awsClientFor("lambda").debugBodies())
-        val functionResponse = client(
-            Request(POST, "/")
-                .query("query1", "queryValue1")
-                .query("query1", "queryValue2")
-                .query("query2", "queryValue3")
-                .header("single", "value1")
-                .header("multi", "value2")
-                .header("multi", "value3")
-                .cookie(Cookie("cookie1", "value1"))
-                .cookie(Cookie("cookie2", "value2"))
-                .body("""{"hello":"http4k"}""")
-        )
 
-        assertThat(functionResponse.status, equalTo(OK))
+        val functionResponse = retryUntil(OK) {
+            client(
+                Request(POST, "/")
+                    .query("query1", "queryValue1")
+                    .query("query1", "queryValue2")
+                    .query("query2", "queryValue3")
+                    .header("single", "value1")
+                    .header("multi", "value2")
+                    .header("multi", "value3")
+                    .cookie(Cookie("cookie1", "value1"))
+                    .cookie(Cookie("cookie2", "value2"))
+                    .body("""{"hello":"http4k"}""")
+            )
+        }
+
         assertThat(functionResponse.bodyString(), containsSubstring("""{"hello":"http4k"}"""))
     }
 
