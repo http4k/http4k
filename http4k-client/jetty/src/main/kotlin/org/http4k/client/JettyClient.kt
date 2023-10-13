@@ -23,8 +23,8 @@ import java.net.UnknownHostException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
-import org.eclipse.jetty.client.api.Request as JettyRequest
-import org.eclipse.jetty.client.api.Response as JettyResponse
+import org.eclipse.jetty.client.Request as JettyRequest
+import org.eclipse.jetty.client.Response as JettyResponse
 
 object JettyClient {
     @JvmStatic
