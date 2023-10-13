@@ -8,10 +8,10 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.SetAwsServiceUrl
 import org.http4k.connect.amazon.RemoteFailure
-import org.http4k.connect.amazon.apigatewayv2.ApiDetails
-import org.http4k.connect.amazon.apigatewayv2.ApiId
-import org.http4k.connect.amazon.apigatewayv2.ApiName
-import org.http4k.connect.amazon.apigatewayv2.Stage
+import org.http4k.connect.amazon.apigatewayv2.model.ApiDetails
+import org.http4k.connect.amazon.apigatewayv2.model.ApiId
+import org.http4k.connect.amazon.apigatewayv2.model.ApiName
+import org.http4k.connect.amazon.apigatewayv2.model.Stage
 import org.http4k.connect.amazon.getOrThrow
 import org.http4k.connect.amazon.lambda.model.Region
 

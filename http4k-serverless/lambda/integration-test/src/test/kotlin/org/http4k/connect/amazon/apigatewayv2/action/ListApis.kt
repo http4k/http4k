@@ -1,5 +1,7 @@
-package org.http4k.connect.amazon.apigatewayv2
+package org.http4k.connect.amazon.apigatewayv2.action
 
+import org.http4k.connect.amazon.apigatewayv2.AwsApiGatewayV2Action
+import org.http4k.connect.amazon.apigatewayv2.ListApiResponse
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.connect.amazon.kClass

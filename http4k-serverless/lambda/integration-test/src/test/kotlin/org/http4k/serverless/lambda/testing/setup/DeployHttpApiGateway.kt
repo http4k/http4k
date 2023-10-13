@@ -8,11 +8,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.connect.amazon.apigatewayv2.ApiIntegrationVersion
-import org.http4k.connect.amazon.apigatewayv2.ApiIntegrationVersion.v1
-import org.http4k.connect.amazon.apigatewayv2.ApiIntegrationVersion.v2
-import org.http4k.connect.amazon.apigatewayv2.ApiName
-import org.http4k.connect.amazon.apigatewayv2.Stage
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v1
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v2
+import org.http4k.connect.amazon.apigatewayv2.model.ApiName
+import org.http4k.connect.amazon.apigatewayv2.model.Stage
 import org.http4k.connect.amazon.apigatewayv2.createApi
 import org.http4k.connect.amazon.apigatewayv2.createDefaultRoute
 import org.http4k.connect.amazon.apigatewayv2.createLambdaIntegration
