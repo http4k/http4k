@@ -13,7 +13,7 @@ import org.http4k.connect.amazon.apigatewayv2.ApiId
 import org.http4k.connect.amazon.apigatewayv2.ApiName
 import org.http4k.connect.amazon.apigatewayv2.Stage
 import org.http4k.connect.amazon.getOrThrow
-import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.model.Region
 
 interface AwsApiGateway {
     operator fun <R : Any> invoke(action: AwsApiGatewayAction<R>): Result<R, RemoteFailure>

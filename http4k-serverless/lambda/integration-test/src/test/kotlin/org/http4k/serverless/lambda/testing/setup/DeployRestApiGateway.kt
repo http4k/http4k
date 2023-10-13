@@ -22,8 +22,8 @@ import org.http4k.connect.amazon.apigateway.listResources
 import org.http4k.connect.amazon.apigatewayv2.ApiName
 import org.http4k.connect.amazon.apigatewayv2.Stage
 import org.http4k.connect.amazon.getOrThrow
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayRest
-import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayRest
+import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.connect.amazon.lambda.list
 
 object DeployRestApiGateway {

@@ -9,8 +9,8 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.SetAwsServiceUrl
-import org.http4k.connect.amazon.lambda.Function
-import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.model.Function
+import org.http4k.connect.amazon.lambda.model.Region
 
 abstract class LambdaHttpClient(function: Function, region: Region) : Filter {
     private fun createFunctionRequest(function: Function) = Filter { next ->

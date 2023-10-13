@@ -7,18 +7,18 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.present
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
-import org.http4k.connect.amazon.lambda.Function
-import org.http4k.connect.amazon.lambda.FunctionHandler
-import org.http4k.connect.amazon.lambda.FunctionPackage
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayRest
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApplicationLoadBalancer
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType.Invocation
+import org.http4k.connect.amazon.lambda.model.Function
+import org.http4k.connect.amazon.lambda.model.FunctionHandler
+import org.http4k.connect.amazon.lambda.model.FunctionPackage
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayRest
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApplicationLoadBalancer
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.Invocation
 import org.http4k.connect.amazon.lambda.Permission
-import org.http4k.connect.amazon.lambda.Region
-import org.http4k.connect.amazon.lambda.Role
+import org.http4k.connect.amazon.lambda.model.Region
+import org.http4k.connect.amazon.lambda.model.Role
 import org.http4k.connect.amazon.lambda.createFunction
 import org.http4k.connect.amazon.lambda.delete
 import org.http4k.connect.amazon.lambda.list
@@ -103,7 +103,7 @@ object DeployServerAsLambdaForClientContract {
     }
 
     fun functionName(version: LambdaIntegrationType) =
-        org.http4k.connect.amazon.lambda.Function("test-function-${version.functionNamePrefix()}")
+        Function("test-function-${version.functionNamePrefix()}")
 
     private fun LambdaIntegrationType.functionMainClass(): String = when (this) {
         ApiGatewayRest -> "org.http4k.serverless.lambda.TestFunctionRest"

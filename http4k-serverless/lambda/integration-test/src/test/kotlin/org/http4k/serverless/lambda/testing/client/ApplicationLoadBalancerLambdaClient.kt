@@ -10,8 +10,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.toParameters
 import org.http4k.format.Jackson.auto
-import org.http4k.connect.amazon.lambda.Function
-import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.model.Function
+import org.http4k.connect.amazon.lambda.model.Region
 
 class ApplicationLoadBalancerLambdaClient(function: Function, region: Region) : LambdaHttpClient(function, region) {
     override fun Request.toLambdaFormat(): (Request) -> Request = requestLens of ApplicationLoadBalancerRequestEvent().apply {

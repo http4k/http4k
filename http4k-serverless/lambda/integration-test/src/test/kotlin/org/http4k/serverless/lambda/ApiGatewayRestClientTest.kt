@@ -13,7 +13,7 @@ import org.http4k.serverless.lambda.testing.NoOpServerConfig
 import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployRestApiGateway
 import org.http4k.connect.amazon.apigateway.listApis
-import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.model.Region
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 

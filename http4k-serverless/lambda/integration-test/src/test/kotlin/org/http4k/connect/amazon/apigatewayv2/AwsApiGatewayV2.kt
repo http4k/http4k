@@ -15,7 +15,7 @@ import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
 import org.http4k.connect.amazon.RemoteFailure
 import org.http4k.connect.amazon.getOrThrow
-import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.model.Region
 
 interface AwsApiGatewayV2 {
     operator fun <R : Any> invoke(action: AwsApiGatewayV2Action<R>): Result<R, RemoteFailure>

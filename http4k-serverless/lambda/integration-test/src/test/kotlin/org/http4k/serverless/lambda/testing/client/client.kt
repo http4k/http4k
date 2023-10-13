@@ -14,7 +14,7 @@ import org.http4k.connect.amazon.apigatewayv2.AwsApiGatewayV2
 import org.http4k.connect.amazon.apigatewayv2.Http
 import org.http4k.connect.amazon.lambda.Http
 import org.http4k.connect.amazon.lambda.Lambda
-import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.model.Region
 import java.util.concurrent.TimeUnit.SECONDS
 
 fun AwsProfile.apiGatewayApiClient() = AwsApiGatewayV2.Http(client("apigateway"), Region(region))

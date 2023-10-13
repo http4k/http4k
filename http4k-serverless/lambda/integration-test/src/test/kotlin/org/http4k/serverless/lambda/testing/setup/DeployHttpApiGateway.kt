@@ -19,9 +19,9 @@ import org.http4k.connect.amazon.apigatewayv2.createLambdaIntegration
 import org.http4k.connect.amazon.apigatewayv2.createStage
 import org.http4k.connect.amazon.apigatewayv2.delete
 import org.http4k.connect.amazon.apigatewayv2.listApis
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.connect.amazon.lambda.list
 
 object DeployHttpApiGateway {
