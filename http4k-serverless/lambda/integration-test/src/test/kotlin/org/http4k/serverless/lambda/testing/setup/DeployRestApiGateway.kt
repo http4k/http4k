@@ -57,7 +57,7 @@ object DeployRestApiGateway {
         val deploymentId = apiGateway(CreateDeployment(api.apiId, DeploymentName(Stage.restDefault.stageName.value))).getOrThrow()
         apiGateway.createStage(api.apiId, Stage.restDefault, deploymentId)
 
-        waitUntil(OK) {
+        retryUntil(OK) {
             JavaHttpClient()(Request(GET, api.apiEndpoint.path("/default/empty"))).also { println(it.status) }
         }
     }
