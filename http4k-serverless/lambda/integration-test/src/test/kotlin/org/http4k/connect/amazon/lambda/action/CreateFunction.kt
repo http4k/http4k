@@ -8,7 +8,6 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.connect.amazon.kClass
-import org.http4k.connect.amazon.lambda.FunctionDetailsData
 import org.http4k.connect.amazon.lambda.model.FunctionPackage
 import org.http4k.connect.amazon.lambda.LambdaAction
 import org.http4k.connect.amazon.lambda.LambdaJackson.auto

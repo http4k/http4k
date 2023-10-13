@@ -1,5 +1,6 @@
 package org.http4k.connect.amazon.lambda.action
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.map
 import org.http4k.core.Method
@@ -11,7 +12,6 @@ import org.http4k.connect.amazon.kClass
 import org.http4k.connect.amazon.lambda.model.FunctionDetails
 import org.http4k.connect.amazon.lambda.LambdaAction
 import org.http4k.connect.amazon.lambda.LambdaJackson
-import org.http4k.connect.amazon.lambda.ListFunctionsResponse
 import org.http4k.connect.amazon.lambda.toActionResult
 
 class ListFunctions : LambdaAction<List<FunctionDetails>>(kClass()) {
@@ -24,3 +24,9 @@ class ListFunctions : LambdaAction<List<FunctionDetails>>(kClass()) {
                     .map { f -> FunctionDetails(f.arn, f.name) }
             }
 }
+
+data class ListFunctionsResponse(@JsonProperty("Functions") val functions: List<FunctionDetailsData>)
+data class FunctionDetailsData(
+    @JsonProperty("FunctionArn") val arn: String,
+    @JsonProperty("FunctionName") val name: String
+)

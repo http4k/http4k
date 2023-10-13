@@ -15,7 +15,7 @@ import org.http4k.serverless.lambda.testing.setup.DeployHttpApiGateway
 import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion
 import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v1
 import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v2
-import org.http4k.connect.amazon.apigatewayv2.listApis
+import org.http4k.connect.amazon.apigatewayv2.action.listApis
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 

@@ -13,16 +13,16 @@ import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v1
 import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v2
 import org.http4k.connect.amazon.apigatewayv2.model.ApiName
 import org.http4k.connect.amazon.apigatewayv2.model.Stage
-import org.http4k.connect.amazon.apigatewayv2.createApi
-import org.http4k.connect.amazon.apigatewayv2.createDefaultRoute
-import org.http4k.connect.amazon.apigatewayv2.createLambdaIntegration
-import org.http4k.connect.amazon.apigatewayv2.createStage
-import org.http4k.connect.amazon.apigatewayv2.delete
-import org.http4k.connect.amazon.apigatewayv2.listApis
+import org.http4k.connect.amazon.apigatewayv2.action.createApi
+import org.http4k.connect.amazon.apigatewayv2.action.createDefaultRoute
+import org.http4k.connect.amazon.apigatewayv2.action.createLambdaIntegration
+import org.http4k.connect.amazon.apigatewayv2.action.createStage
+import org.http4k.connect.amazon.apigatewayv2.action.delete
+import org.http4k.connect.amazon.apigatewayv2.action.listApis
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.connect.amazon.lambda.list
+import org.http4k.connect.amazon.lambda.action.list
 
 object DeployHttpApiGateway {
 

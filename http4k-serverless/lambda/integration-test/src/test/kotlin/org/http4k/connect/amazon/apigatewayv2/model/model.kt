@@ -27,4 +27,5 @@ data class Integration(
 data class IntegrationId(val value: String)
 
 data class IntegrationInfo(val integrationId: IntegrationId)
+
 enum class ApiIntegrationVersion { v1, v2 }
