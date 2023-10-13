@@ -8,23 +8,23 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.CreateDeployment
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.DeploymentName
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createApi
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createIntegration
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createIntegrationResponse
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createMethod
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createResource
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createStage
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.delete
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.listApis
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.listResources
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiName
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
-import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayRest
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
+import org.http4k.connect.amazon.apigateway.CreateDeployment
+import org.http4k.connect.amazon.apigateway.DeploymentName
+import org.http4k.connect.amazon.apigateway.createApi
+import org.http4k.connect.amazon.apigateway.createIntegration
+import org.http4k.connect.amazon.apigateway.createIntegrationResponse
+import org.http4k.connect.amazon.apigateway.createMethod
+import org.http4k.connect.amazon.apigateway.createResource
+import org.http4k.connect.amazon.apigateway.createStage
+import org.http4k.connect.amazon.apigateway.delete
+import org.http4k.connect.amazon.apigateway.listApis
+import org.http4k.connect.amazon.apigateway.listResources
+import org.http4k.connect.amazon.apigatewayv2.ApiName
+import org.http4k.connect.amazon.apigatewayv2.Stage
+import org.http4k.connect.amazon.getOrThrow
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayRest
+import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.list
 
 object DeployRestApiGateway {
 

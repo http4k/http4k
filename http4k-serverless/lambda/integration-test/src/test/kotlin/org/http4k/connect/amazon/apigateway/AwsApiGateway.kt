@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.testing.setup.aws.apigateway
+package org.http4k.connect.amazon.apigateway
 
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.map
@@ -7,13 +7,13 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.SetAwsServiceUrl
-import org.http4k.serverless.lambda.testing.setup.aws.RemoteFailure
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiDetails
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiId
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiName
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
-import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
+import org.http4k.connect.amazon.RemoteFailure
+import org.http4k.connect.amazon.apigatewayv2.ApiDetails
+import org.http4k.connect.amazon.apigatewayv2.ApiId
+import org.http4k.connect.amazon.apigatewayv2.ApiName
+import org.http4k.connect.amazon.apigatewayv2.Stage
+import org.http4k.connect.amazon.getOrThrow
+import org.http4k.connect.amazon.lambda.Region
 
 interface AwsApiGateway {
     operator fun <R : Any> invoke(action: AwsApiGatewayAction<R>): Result<R, RemoteFailure>

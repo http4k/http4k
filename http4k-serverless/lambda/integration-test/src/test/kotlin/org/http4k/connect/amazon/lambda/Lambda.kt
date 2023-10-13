@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.testing.setup.aws.lambda
+package org.http4k.connect.amazon.lambda
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import dev.forkhandles.result4k.Result
@@ -9,8 +9,8 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.SetAwsServiceUrl
 import org.http4k.filter.inIntelliJOnly
-import org.http4k.serverless.lambda.testing.setup.aws.RemoteFailure
-import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
+import org.http4k.connect.amazon.RemoteFailure
+import org.http4k.connect.amazon.getOrThrow
 import java.nio.ByteBuffer
 
 interface Lambda {

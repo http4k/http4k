@@ -8,21 +8,21 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion.v1
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion.v2
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiName
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createApi
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createDefaultRoute
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createLambdaIntegration
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createStage
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.delete
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.listApis
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
+import org.http4k.connect.amazon.apigatewayv2.ApiIntegrationVersion
+import org.http4k.connect.amazon.apigatewayv2.ApiIntegrationVersion.v1
+import org.http4k.connect.amazon.apigatewayv2.ApiIntegrationVersion.v2
+import org.http4k.connect.amazon.apigatewayv2.ApiName
+import org.http4k.connect.amazon.apigatewayv2.Stage
+import org.http4k.connect.amazon.apigatewayv2.createApi
+import org.http4k.connect.amazon.apigatewayv2.createDefaultRoute
+import org.http4k.connect.amazon.apigatewayv2.createLambdaIntegration
+import org.http4k.connect.amazon.apigatewayv2.createStage
+import org.http4k.connect.amazon.apigatewayv2.delete
+import org.http4k.connect.amazon.apigatewayv2.listApis
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.connect.amazon.lambda.list
 
 object DeployHttpApiGateway {
 

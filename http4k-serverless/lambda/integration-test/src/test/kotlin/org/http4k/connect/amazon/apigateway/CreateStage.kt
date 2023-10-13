@@ -1,13 +1,13 @@
-package org.http4k.serverless.lambda.testing.setup.aws.apigateway
+package org.http4k.connect.amazon.apigateway
 
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.ApiGatewayJackson.auto
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiId
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
-import org.http4k.serverless.lambda.testing.setup.aws.kClass
+import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
+import org.http4k.connect.amazon.apigatewayv2.ApiId
+import org.http4k.connect.amazon.apigatewayv2.Stage
+import org.http4k.connect.amazon.kClass
 
 class CreateStage(private val apiId: ApiId, private val stage: Stage, private val deploymentId: DeploymentId)
     : AwsApiGatewayAction<Unit>(kClass()) {

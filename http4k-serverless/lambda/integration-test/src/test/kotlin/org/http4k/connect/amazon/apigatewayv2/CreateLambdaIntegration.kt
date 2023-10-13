@@ -1,12 +1,12 @@
-package org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2
+package org.http4k.connect.amazon.apigatewayv2
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiGatewayJackson.auto
-import org.http4k.serverless.lambda.testing.setup.aws.kClass
+import org.http4k.connect.amazon.apigatewayv2.ApiGatewayJackson.auto
+import org.http4k.connect.amazon.kClass
 
 class CreateLambdaIntegration(
     private val apiId: ApiId,

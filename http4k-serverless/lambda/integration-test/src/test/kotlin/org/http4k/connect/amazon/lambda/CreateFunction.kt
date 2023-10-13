@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.testing.setup.aws.lambda
+package org.http4k.connect.amazon.lambda
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.base64Encode
@@ -7,8 +7,8 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.serverless.lambda.testing.setup.aws.kClass
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaJackson.auto
+import org.http4k.connect.amazon.kClass
+import org.http4k.connect.amazon.lambda.LambdaJackson.auto
 
 class CreateFunction(private val functionPackage: FunctionPackage) : LambdaAction<FunctionDetailsData>(kClass()) {
     override fun toRequest(): Request {

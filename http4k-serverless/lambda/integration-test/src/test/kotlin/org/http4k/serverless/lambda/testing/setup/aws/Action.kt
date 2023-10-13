@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.testing.setup.aws
+package org.http4k.connect.amazon
 
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.recover

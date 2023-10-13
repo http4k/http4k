@@ -1,4 +1,4 @@
-package org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2
+package org.http4k.connect.amazon.apigatewayv2
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -13,9 +13,9 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
-import org.http4k.serverless.lambda.testing.setup.aws.RemoteFailure
-import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
+import org.http4k.connect.amazon.RemoteFailure
+import org.http4k.connect.amazon.getOrThrow
+import org.http4k.connect.amazon.lambda.Region
 
 interface AwsApiGatewayV2 {
     operator fun <R : Any> invoke(action: AwsApiGatewayV2Action<R>): Result<R, RemoteFailure>

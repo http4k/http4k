@@ -1,11 +1,11 @@
-package org.http4k.serverless.lambda.testing.setup.aws.lambda
+package org.http4k.connect.amazon.lambda
 
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.http4k.serverless.lambda.testing.setup.aws.kClass
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaJackson.auto
+import org.http4k.connect.amazon.kClass
+import org.http4k.connect.amazon.lambda.LambdaJackson.auto
 
 class SetFunctionPermission(private val functionArn: String, private val permission: Permission)
     : LambdaAction<Unit>(kClass()) {

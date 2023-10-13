@@ -7,6 +7,22 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.present
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
+import org.http4k.connect.amazon.lambda.Function
+import org.http4k.connect.amazon.lambda.FunctionHandler
+import org.http4k.connect.amazon.lambda.FunctionPackage
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayRest
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType.ApplicationLoadBalancer
+import org.http4k.connect.amazon.lambda.LambdaIntegrationType.Invocation
+import org.http4k.connect.amazon.lambda.Permission
+import org.http4k.connect.amazon.lambda.Region
+import org.http4k.connect.amazon.lambda.Role
+import org.http4k.connect.amazon.lambda.createFunction
+import org.http4k.connect.amazon.lambda.delete
+import org.http4k.connect.amazon.lambda.list
+import org.http4k.connect.amazon.lambda.setPermission
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -22,22 +38,6 @@ import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambda
 import org.http4k.serverless.lambda.testing.client.InvocationLambdaClient
 import org.http4k.serverless.lambda.testing.client.LambdaHttpClient
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Function
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.FunctionHandler
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.FunctionPackage
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayRest
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApplicationLoadBalancer
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.Invocation
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Permission
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Role
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.createFunction
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.delete
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.setPermission
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.io.PrintStream
@@ -102,7 +102,8 @@ object DeployServerAsLambdaForClientContract {
         assertThat(functionResponse.bodyString(), containsSubstring("""{"hello":"http4k"}"""))
     }
 
-    fun functionName(version: LambdaIntegrationType) = Function("test-function-${version.functionNamePrefix()}")
+    fun functionName(version: LambdaIntegrationType) =
+        org.http4k.connect.amazon.lambda.Function("test-function-${version.functionNamePrefix()}")
 
     private fun LambdaIntegrationType.functionMainClass(): String = when (this) {
         ApiGatewayRest -> "org.http4k.serverless.lambda.TestFunctionRest"
