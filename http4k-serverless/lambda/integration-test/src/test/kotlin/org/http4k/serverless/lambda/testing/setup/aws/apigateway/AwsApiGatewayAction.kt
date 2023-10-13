@@ -1,5 +1,7 @@
 package org.http4k.serverless.lambda.testing.setup.aws.apigateway
 
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.result4k.Failure
@@ -31,4 +33,8 @@ object ApiGatewayJackson : ConfigurableJackson(KotlinModule.Builder().build()
     .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
     .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
     .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
+    .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+    .apply {
+        configOverride(List::class.java).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY))
+    }
 )
