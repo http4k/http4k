@@ -1,10 +1,11 @@
-package org.http4k.connect.amazon.apigateway
+package org.http4k.connect.amazon.apigateway.action
 
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
+import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
 import org.http4k.connect.amazon.apigatewayv2.model.ApiId
 import org.http4k.connect.amazon.kClass
 import org.http4k.connect.amazon.lambda.model.Region
@@ -19,7 +20,8 @@ class CreateIntegration(private val apiId: ApiId,
     override fun toRequest() =
         Request(Method.PUT, "/restapis/${apiId.value}/resources/${resource.id}/methods/ANY/integration")
             .with(Body.auto<CreateMethodWithIntegration>().toLens() of
-                CreateMethodWithIntegration(uri = functionArn.invocation(region)))
+                CreateMethodWithIntegration(uri = functionArn.invocation(region))
+            )
 
     private data class CreateMethodWithIntegration(
         val type: String = "AWS_PROXY",

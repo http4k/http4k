@@ -1,5 +1,6 @@
-package org.http4k.connect.amazon.apigateway
+package org.http4k.connect.amazon.apigateway.action
 
+import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.connect.amazon.apigatewayv2.model.ApiId
