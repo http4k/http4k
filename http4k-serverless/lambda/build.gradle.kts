@@ -11,4 +11,17 @@ dependencies {
     testImplementation(project(":http4k-format-jackson"))
 
     testImplementation("com.amazonaws:aws-lambda-java-events:_")
+
+    testFixturesApi(project(":http4k-core"))
+    testFixturesApi(project(":http4k-cloudnative"))
+    testFixturesApi(project(":http4k-serverless-lambda"))
+    testFixturesApi(project(":http4k-aws"))
+    testFixturesApi(project(":http4k-format-jackson"))
+    testFixturesApi(project(":http4k-client-okhttp"))
+
+    testFixturesApi("com.amazonaws:aws-lambda-java-events:_")
+    testFixturesApi("dev.forkhandles:result4k:_")
+    testFixturesApi(testFixtures(project(":http4k-core")))
+    testFixturesApi(testFixtures(project(":http4k-serverless-core")))
+    testFixturesImplementation(testFixtures(project(":http4k-aws")))
 }
