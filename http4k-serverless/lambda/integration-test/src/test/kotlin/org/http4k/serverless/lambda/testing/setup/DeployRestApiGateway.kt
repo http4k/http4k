@@ -19,8 +19,8 @@ import org.http4k.connect.amazon.apigateway.action.createStage
 import org.http4k.connect.amazon.apigateway.action.delete
 import org.http4k.connect.amazon.apigateway.action.listApis
 import org.http4k.connect.amazon.apigateway.action.listResources
-import org.http4k.connect.amazon.apigatewayv2.model.ApiName
-import org.http4k.connect.amazon.apigatewayv2.model.Stage
+import org.http4k.connect.amazon.apigateway.model.ApiName
+import org.http4k.connect.amazon.apigateway.model.Stage
 import org.http4k.connect.amazon.getOrThrow
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayRest
 import org.http4k.connect.amazon.lambda.model.Region

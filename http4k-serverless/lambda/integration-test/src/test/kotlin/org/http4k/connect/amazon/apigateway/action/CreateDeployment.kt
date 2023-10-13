@@ -8,11 +8,11 @@ import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
 import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
 import org.http4k.connect.amazon.apigateway.model.DeploymentId
 import org.http4k.connect.amazon.apigateway.model.DeploymentName
-import org.http4k.connect.amazon.apigatewayv2.model.ApiId
+import org.http4k.connect.amazon.apigateway.model.ApiId
 import org.http4k.connect.amazon.kClass
 
-class CreateDeployment(private val apiId: ApiId, private val name: DeploymentName)
-    : AwsApiGatewayAction<DeploymentId>(kClass()) {
+class CreateDeployment(private val apiId: ApiId, private val name: DeploymentName) :
+    AwsApiGatewayAction<DeploymentId>(kClass()) {
     override fun toRequest() = Request(Method.POST, "/restapis/${apiId.value}/deployments")
         .with(Body.auto<CreateDeploymentRequest>().toLens() of CreateDeploymentRequest(name.value))
 

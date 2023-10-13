@@ -7,12 +7,12 @@ import org.http4k.core.with
 import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
 import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
 import org.http4k.connect.amazon.apigateway.model.DeploymentId
-import org.http4k.connect.amazon.apigatewayv2.model.ApiId
-import org.http4k.connect.amazon.apigatewayv2.model.Stage
+import org.http4k.connect.amazon.apigateway.model.ApiId
+import org.http4k.connect.amazon.apigateway.model.Stage
 import org.http4k.connect.amazon.kClass
 
-class CreateStage(private val apiId: ApiId, private val stage: Stage, private val deploymentId: DeploymentId)
-    : AwsApiGatewayAction<Unit>(kClass()) {
+class CreateStage(private val apiId: ApiId, private val stage: Stage, private val deploymentId: DeploymentId) :
+    AwsApiGatewayAction<Unit>(kClass()) {
     override fun toRequest() = Request(Method.POST, "/restapis/${apiId.value}/stages")
         .with(Body.auto<CreateStage>().toLens() of CreateStage(stage.stageName.value, deploymentId.id))
 

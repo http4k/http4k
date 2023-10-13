@@ -6,7 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
 import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
-import org.http4k.connect.amazon.apigatewayv2.model.ApiName
+import org.http4k.connect.amazon.apigateway.model.ApiName
 import org.http4k.connect.amazon.kClass
 
 class CreateApi(val name: ApiName) : AwsApiGatewayAction<RestApiDetails>(kClass()) {

@@ -3,10 +3,10 @@ package org.http4k.connect.amazon.apigateway.action
 import dev.forkhandles.result4k.map
 import org.http4k.connect.amazon.apigateway.AwsApiGateway
 import org.http4k.connect.amazon.apigateway.model.DeploymentId
-import org.http4k.connect.amazon.apigatewayv2.model.ApiDetails
-import org.http4k.connect.amazon.apigatewayv2.model.ApiId
-import org.http4k.connect.amazon.apigatewayv2.model.ApiName
-import org.http4k.connect.amazon.apigatewayv2.model.Stage
+import org.http4k.connect.amazon.apigateway.model.ApiDetails
+import org.http4k.connect.amazon.apigateway.model.ApiId
+import org.http4k.connect.amazon.apigateway.model.ApiName
+import org.http4k.connect.amazon.apigateway.model.Stage
 import org.http4k.connect.amazon.getOrThrow
 import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.core.Uri

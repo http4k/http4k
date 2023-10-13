@@ -6,7 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
 import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
-import org.http4k.connect.amazon.apigatewayv2.model.ApiId
+import org.http4k.connect.amazon.apigateway.model.ApiId
 import org.http4k.connect.amazon.kClass
 
 class CreateResource(private val apiId: ApiId, private val parentResource: RestResourceDetails)
