@@ -3,8 +3,9 @@ description = "Http4k Jackson JSON support"
 dependencies {
     api(project(":http4k-format-core"))
     api(project(":http4k-realtime-core"))
-    api("com.fasterxml.jackson.core:jackson-databind:_")
-    api("com.fasterxml.jackson.module:jackson-module-kotlin:_")
+    api(platform("com.fasterxml.jackson:jackson-bom:2.15.3"))
+    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.cloudevents:cloudevents-core:_")
     implementation("io.cloudevents:cloudevents-json-jackson:_")
 
