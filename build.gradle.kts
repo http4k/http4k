@@ -139,6 +139,11 @@ subprojects {
 
         publishing {
             publications {
+                val javaComponent = components["java"] as AdhocComponentWithVariants
+
+                javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+                javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+
                 val archivesBaseName = tasks.jar.get().archiveBaseName.get()
                 create<MavenPublication>("mavenJava") {
                     artifactId = archivesBaseName
