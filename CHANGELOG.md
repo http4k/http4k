@@ -3,8 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.8.4.1 (uncut)
-- **http4k-*** : Upgrade some dependency versions.
+### v5.8.5.0
+- **http4k-*** : Upgrade some dependency versions, including CVE fix for Jetty.
 - **http4k-core** : Rename `Events.then()` with `Events.and()` for clarity.
 
 ### v5.8.4.0
