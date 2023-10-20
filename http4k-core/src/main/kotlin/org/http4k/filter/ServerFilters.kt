@@ -9,6 +9,7 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
@@ -18,6 +19,9 @@ import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
+import org.http4k.filter.ZipkinTraces.Companion.X_B3_PARENTSPANID
+import org.http4k.filter.ZipkinTraces.Companion.X_B3_SPANID
+import org.http4k.filter.ZipkinTraces.Companion.X_B3_TRACEID
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -75,6 +79,35 @@ object ServerFilters {
                     },
                     { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res }
                 )
+            }
+        }
+    }
+
+    /**
+     * Checks that client supplied values are valid, and either remove or reject
+     */
+    object InboundRequestTracingValidation {
+        operator fun invoke(minAllowed: Int = 10, maxAllowed: Int = 32, pattern: String= "^[a-fA-F0-9-]+$", rejection: Status? = null): Filter {
+            val regex = pattern.toRegex()
+            val headers = listOf(X_B3_TRACEID, X_B3_SPANID, X_B3_PARENTSPANID)
+
+            return Filter { next ->
+                { request ->
+                    val values = headers.mapNotNull { it(request) }.map { it.value }
+                    if (values.isEmpty()) {
+                        next(request)
+                    } else {
+                        if (values.all { it.length in minAllowed..maxAllowed && regex.matches(it) }) {
+                            next(request)
+                        } else {
+                            if (rejection != null) {
+                                Response(rejection)
+                            } else {
+                                next(request.removeHeaders("x-b3-"))
+                            }
+                        }
+                    }
+                }
             }
         }
     }
