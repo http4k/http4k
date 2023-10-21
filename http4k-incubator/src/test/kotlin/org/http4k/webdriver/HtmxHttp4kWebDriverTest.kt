@@ -12,7 +12,7 @@ import org.openqa.selenium.By
 import java.io.File
 
 class HtmxHttp4kWebDriverTest {
-    val body = File("src/test/resources/test_htmx.html").readText()
+    private val body = File("src/test/resources/test_htmx.html").readText()
     private val driver = Http4kWebDriver { req ->
         when (req.uri.path) {
             "/text" ->
@@ -90,11 +90,11 @@ class HtmxHttp4kWebDriverTest {
 
             driver.findElement(By.id("example3button"))!!.click()
 
-            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Agent Smith void1@null.org 1 Load More Agents..."))
+            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Agent Smithvoid1@null.org1 Load More Agents..."))
 
             driver.findElement(By.id("example3button"))!!.click()
 
-            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Agent Smith void1@null.org 1 Agent Smith void2@null.org 2 Load More Agents..."))
+            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Agent Smithvoid1@null.org1Agent Smithvoid2@null.org2 Load More Agents..."))
         }
     }
 }

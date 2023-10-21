@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.8.6.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v5.8.5.1
 - **http4k-*** : Fix maven dependencies marked as optional in various http4k modules
 
