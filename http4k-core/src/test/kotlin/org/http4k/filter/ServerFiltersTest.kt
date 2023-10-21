@@ -32,6 +32,8 @@ import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
+import org.http4k.filter.ServerFilters.ValidateRequestTracingHeaders
+import org.http4k.filter.ZipkinTracesStorage.Companion.INTERNAL_THREAD_LOCAL
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
@@ -52,7 +54,7 @@ class ServerFiltersTest {
 
     @BeforeEach
     fun before() {
-        ZipkinTracesStorage.INTERNAL_THREAD_LOCAL.remove()
+        INTERNAL_THREAD_LOCAL.remove()
     }
 
     @Nested
@@ -132,7 +134,7 @@ class ServerFiltersTest {
 
         private val trace_id = "x-b3-traceid"
 
-        private fun appExpecting(headerValue: String) = ServerFilters.InboundRequestTracingValidation().then {
+        private fun appExpecting(headerValue: String) = ValidateRequestTracingHeaders().then {
             assertThat(it.header(trace_id), equalTo(headerValue))
             Response(OK)
         }
@@ -152,7 +154,7 @@ class ServerFiltersTest {
             app(Request(GET, Uri.of("/")).header(trace_id, value))
         }
 
-        val appExpectingNoHeader = ServerFilters.InboundRequestTracingValidation().then {
+        val appExpectingNoHeader = ValidateRequestTracingHeaders().then {
             assertThat(it.header(trace_id), absent())
             Response(OK)
         }
@@ -195,8 +197,7 @@ class ServerFiltersTest {
 
         @Test
         fun `filters invalid zipkin trace ids - rejection`() {
-            val app =
-                ServerFilters.InboundRequestTracingValidation(rejection = BAD_REQUEST).then { Response(OK) }
+            val app = ValidateRequestTracingHeaders(BAD_REQUEST).then { Response(OK) }
             val response =
                 app(Request(GET, Uri.of("/")).header(trace_id, "01234567890123456789012345678901234567890"))
             assertThat(response.status, equalTo(BAD_REQUEST))
@@ -205,7 +206,7 @@ class ServerFiltersTest {
         @Test
         fun `is compatible with our own tracing`() {
             val traced = ClientFilters.RequestTracing()
-                .then(ServerFilters.InboundRequestTracingValidation(rejection = BAD_REQUEST))
+                .then(ValidateRequestTracingHeaders(BAD_REQUEST))
                 .then { Response(OK) }
 
             assertThat(traced(Request(GET, Uri.of("/"))).status, equalTo(OK))

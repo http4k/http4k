@@ -86,30 +86,27 @@ object ServerFilters {
     /**
      * Checks that client supplied values are valid, and either remove or reject
      */
-    object InboundRequestTracingValidation {
-        operator fun invoke(minAllowed: Int = 10, maxAllowed: Int = 32, pattern: String= "^[a-fA-F0-9-]+$", rejection: Status? = null): Filter {
-            val regex = pattern.toRegex()
-            val headers = listOf(X_B3_TRACEID, X_B3_SPANID, X_B3_PARENTSPANID)
+    object ValidateRequestTracingHeaders {
+        private val X_B3_FORMAT: (TraceId) -> Boolean = "^[a-fA-F0-9-]+$".toRegex()
+            .let { { part -> part.value.length in 10..32 && it.matches(part.value) } }
 
-            return Filter { next ->
-                { request ->
-                    val values = headers.mapNotNull { it(request) }.map { it.value }
-                    if (values.isEmpty()) {
-                        next(request)
-                    } else {
-                        if (values.all { it.length in minAllowed..maxAllowed && regex.matches(it) }) {
-                            next(request)
-                        } else {
-                            if (rejection != null) {
-                                Response(rejection)
-                            } else {
-                                next(request.removeHeaders("x-b3-"))
+        operator fun invoke(rejectStatus: Status? = null, tracePredicate: (TraceId) -> Boolean = X_B3_FORMAT) =
+            Filter { next ->
+                {
+                    val traceParts = listOfNotNull(X_B3_TRACEID(it), X_B3_SPANID(it), X_B3_PARENTSPANID(it))
+                    when {
+                        traceParts.isEmpty() -> next(it)
+                        else ->
+                            when {
+                                traceParts.all(tracePredicate) -> next(it)
+                                else -> when {
+                                    rejectStatus != null -> Response(rejectStatus)
+                                    else -> next(it.removeHeaders("x-b3-"))
+                                }
                             }
-                        }
                     }
                 }
             }
-        }
     }
 
     /**
