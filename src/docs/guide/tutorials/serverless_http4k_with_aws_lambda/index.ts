@@ -61,7 +61,7 @@ const lambdaIntegration = new aws.apigatewayv2.Integration("hello-http4k-api-lam
     apiId: api.id,
     integrationType: "AWS_PROXY",
     integrationUri: lambdaFunction.arn,
-    payloadFormatVersion: "1.0"
+    payloadFormatVersion: "2.0"
 });
 
 let serverlessHttp4kApiRoute = "hello-http4k";
