@@ -5,7 +5,7 @@ description: Feature overview of the http4k-server modules, covering Server back
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.8.5.1"))
+    implementation(platform("org.http4k:http4k-bom:5.8.6.0"))
     // Apache v5: 
     implementation("org.http4k:http4k-server-apache")
 
