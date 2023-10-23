@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.8.6.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : New filter to validate zipkin headers. H/T @time4tea
 
 ### v5.8.5.1
 - **http4k-*** : Fix maven dependencies marked as optional in various http4k modules
