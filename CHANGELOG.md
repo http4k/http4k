@@ -4,9 +4,10 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.9.0.0
-- **http4k-*** : Upgrade some dependency versions
-- **http4k-server-helidon** : [Breaking[ Upgrade to stable v4 of Helidon, API changes
-- **http4k-client-helidon** : [Breaking[ Upgrade to stable v4 of Helidon, API changes
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-helidon** : [Breaking] Upgrade to stable v4 of Helidon, API changes.
+- **http4k-client-helidon** : [Breaking] Upgrade to stable v4 of Helidon, API changes.
+- **http4k-*** : [Breaking - dev only] http4k is now built with Java 21, although Java 8 is still targeted.
 
 ### v5.8.6.0
 - **http4k-*** : Upgrade some dependency versions.
