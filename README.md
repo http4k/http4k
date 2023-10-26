@@ -85,7 +85,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * **1LOC** server backend spin-up for:
         * **Apache v4 & v5** (from httpcore)
         * **Jetty & Jetty Loom** (including SSE and Websocket support)
-        * **Helidon Nima (Loom)**
+        * **Helidon (Loom)**
         * **Ktor CIO & Netty**
         * **Netty** (including Websocket support)
         * **SunHttp & SunHttpLoom** (bundled with `http4k-core`)

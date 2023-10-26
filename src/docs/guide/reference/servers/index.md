@@ -15,7 +15,7 @@ dependencies {
     // Jetty & JettyLoom: 
     implementation("org.http4k:http4k-server-jetty")
 
-    // Helidon Nima (Loom): 
+    // Helidon (Loom): 
     implementation("org.http4k:http4k-server-helidon")
 
     // Ktor CIO: 

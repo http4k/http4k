@@ -25,6 +25,9 @@ dependencies {
     // Fuel (Sync + Async): 
     implementation("org.http4k:http4k-client-fuel")
     
+    // Helidon (Loom): 
+    implementation("org.http4k:http4k-client-helidon")
+    
     // Jetty (Sync + Async + WebSocket): 
     implementation("org.http4k:http4k-client-jetty")
     

@@ -45,7 +45,7 @@ http4k v5 is available right now from the [Toolbox], where you can configure an 
 
 We’re excited to see the re-introduction of virtual threads in Java and the performance improvements that can bring to well-established servers. Loom goes gold in Java 21 and we're going to be ready for our users to use it straight away.
 
-For this new major version, we’re introducing three new server backends taking advantage of Java Loom virtual threads: the SDK built-in SunHttp, [Jetty], and [Helidon Nima].
+For this new major version, we’re introducing three new server backends taking advantage of Java Loom virtual threads: the SDK built-in SunHttp, [Jetty], and [Helidon].
 
 <img class="blogImageSmall" src="./threads.png" alt="Threads"/>
 
@@ -125,7 +125,7 @@ Cheers
 [serverless-lambda-runtime]: /guide/tutorials/going_native_with_graal_on_aws_lambda
 [digest]: /guide/reference/digest
 [strikt]: /guide/reference/strikt/
-[Helidon Nima]: https://helidon.io/nima
+[Helidon]: https://helidon.io/
 [Jetty]: https://github.com/eclipse/jetty.project/issues/8007
 [TracerBullet]: /guide/reference/tracerbullet/
 [PlantUML]: https://plantuml.com/
