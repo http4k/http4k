@@ -8,7 +8,9 @@ plugins {
 
 refreshVersions {
     rejectVersionIf {
-        candidate.stabilityLevel.isLessStableThan(current.stabilityLevel)
+        candidate.stabilityLevel.isLessStableThan(current.stabilityLevel) ||
+            setOf("milestone", "RC1").map { it.lowercase() }.any { candidate.value.contains(it) } ||
+            Regex("""\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}.*""").matches(candidate.value) // graphql nightlies
     }
 }
 
