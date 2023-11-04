@@ -27,7 +27,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
+        classpath(Kotlin.gradlePlugin)
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
         classpath("gradle.plugin.com.github.johnrengelman:shadow:_")
@@ -218,7 +218,7 @@ dependencies {
 
     testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
 
-    testImplementation("software.amazon.awssdk:s3") {
+    testImplementation("software.amazon.awssdk:s3:_") {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
         exclude(group = "software.amazon.awssdk", module = "apache-client")
     }

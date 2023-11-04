@@ -2,7 +2,7 @@ description = "Http4k HTTP Server built on top of Ktor CIO engine"
 
 dependencies {
     api(project(":http4k-core"))
-    api("io.ktor:ktor-server-cio:_")
+    api(Ktor.server.cio)
     testImplementation(testFixtures(project(":http4k-core")))
 }
 
