@@ -7,12 +7,12 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import org.http4k.connect.amazon.Action
+import org.http4k.connect.amazon.RemoteFailure
 import org.http4k.core.Response
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
-import org.http4k.connect.amazon.Action
-import org.http4k.connect.amazon.RemoteFailure
 import kotlin.reflect.KClass
 
 abstract class AwsApiGatewayAction<R : Any>(private val clazz: KClass<R>) : Action<Result<R, RemoteFailure>> {

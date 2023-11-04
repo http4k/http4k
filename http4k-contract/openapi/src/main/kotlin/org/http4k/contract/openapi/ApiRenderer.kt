@@ -1,10 +1,10 @@
 package org.http4k.contract.openapi
 
+import org.http4k.contract.jsonschema.JsonSchema
+import org.http4k.contract.jsonschema.JsonSchemaCreator
 import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.format.AutoMarshallingJson
-import org.http4k.contract.jsonschema.JsonSchema
-import org.http4k.contract.jsonschema.JsonSchemaCreator
 import java.util.concurrent.atomic.AtomicReference
 
 /**

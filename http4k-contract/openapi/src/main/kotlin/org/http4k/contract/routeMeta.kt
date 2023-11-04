@@ -1,8 +1,15 @@
 package org.http4k.contract
 
 import org.http4k.contract.security.Security
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.HttpMessage
+import org.http4k.core.Method
 import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Uri
+import org.http4k.core.with
 import org.http4k.format.AutoContentNegotiator
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens

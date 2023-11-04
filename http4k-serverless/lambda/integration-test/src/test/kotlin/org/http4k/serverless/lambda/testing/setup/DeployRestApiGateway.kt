@@ -2,14 +2,7 @@ package org.http4k.serverless.lambda.testing.setup
 
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Status.Companion.OK
-import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
-import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
-import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
 import org.http4k.connect.amazon.apigateway.action.CreateDeployment
-import org.http4k.connect.amazon.apigateway.model.DeploymentName
 import org.http4k.connect.amazon.apigateway.action.createApi
 import org.http4k.connect.amazon.apigateway.action.createIntegration
 import org.http4k.connect.amazon.apigateway.action.createIntegrationResponse
@@ -20,11 +13,18 @@ import org.http4k.connect.amazon.apigateway.action.delete
 import org.http4k.connect.amazon.apigateway.action.listApis
 import org.http4k.connect.amazon.apigateway.action.listResources
 import org.http4k.connect.amazon.apigateway.model.ApiName
+import org.http4k.connect.amazon.apigateway.model.DeploymentName
 import org.http4k.connect.amazon.apigateway.model.Stage
 import org.http4k.connect.amazon.getOrThrow
+import org.http4k.connect.amazon.lambda.action.list
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayRest
 import org.http4k.connect.amazon.lambda.model.Region
-import org.http4k.connect.amazon.lambda.action.list
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Status.Companion.OK
+import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
+import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
+import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
 
 object DeployRestApiGateway {
 

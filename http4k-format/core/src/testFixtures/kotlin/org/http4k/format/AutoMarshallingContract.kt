@@ -7,7 +7,6 @@ import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status

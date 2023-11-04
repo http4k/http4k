@@ -1,11 +1,5 @@
 package org.http4k.contract.openapi.v3
 
-import org.http4k.contract.openapi.ApiInfo
-import org.http4k.contract.openapi.ApiRenderer
-import org.http4k.contract.openapi.OpenAPIJackson
-import org.http4k.contract.openapi.OpenApiExtension
-import org.http4k.contract.openapi.OpenApiVersion
-import org.http4k.format.ConfigurableJackson
 import org.http4k.contract.jsonschema.v3.FieldRetrieval
 import org.http4k.contract.jsonschema.v3.JacksonFieldMetadataRetrievalStrategy
 import org.http4k.contract.jsonschema.v3.JacksonJsonNamingAnnotated
@@ -13,6 +7,12 @@ import org.http4k.contract.jsonschema.v3.JacksonJsonPropertyAnnotated
 import org.http4k.contract.jsonschema.v3.PrimitivesFieldMetadataRetrievalStrategy
 import org.http4k.contract.jsonschema.v3.SimpleLookup
 import org.http4k.contract.jsonschema.v3.then
+import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.OpenAPIJackson
+import org.http4k.contract.openapi.OpenApiExtension
+import org.http4k.contract.openapi.OpenApiVersion
+import org.http4k.format.ConfigurableJackson
 
 /**
  * Defaults for configuring OpenApi3 with Jackson

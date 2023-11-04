@@ -7,6 +7,11 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.present
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
+import org.http4k.connect.amazon.lambda.action.Permission
+import org.http4k.connect.amazon.lambda.action.createFunction
+import org.http4k.connect.amazon.lambda.action.delete
+import org.http4k.connect.amazon.lambda.action.list
+import org.http4k.connect.amazon.lambda.action.setPermission
 import org.http4k.connect.amazon.lambda.model.Function
 import org.http4k.connect.amazon.lambda.model.FunctionHandler
 import org.http4k.connect.amazon.lambda.model.FunctionPackage
@@ -16,13 +21,8 @@ import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.Invocation
-import org.http4k.connect.amazon.lambda.action.Permission
 import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.connect.amazon.lambda.model.Role
-import org.http4k.connect.amazon.lambda.action.createFunction
-import org.http4k.connect.amazon.lambda.action.delete
-import org.http4k.connect.amazon.lambda.action.list
-import org.http4k.connect.amazon.lambda.action.setPermission
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST

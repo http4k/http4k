@@ -2,8 +2,8 @@ package org.http4k.security.oauth.client
 
 import org.http4k.core.Body
 import org.http4k.core.Uri
-import org.http4k.security.oauth.format.OAuthMoshi.auto
 import org.http4k.security.oauth.core.RefreshToken
+import org.http4k.security.oauth.format.OAuthMoshi.auto
 import org.http4k.security.oauth.server.ClientId
 
 data class TokenRequest(

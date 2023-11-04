@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler

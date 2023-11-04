@@ -12,7 +12,10 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.context.propagation.TextMapSetter
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes.*
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_PEER_NAME
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_PEER_PORT
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request

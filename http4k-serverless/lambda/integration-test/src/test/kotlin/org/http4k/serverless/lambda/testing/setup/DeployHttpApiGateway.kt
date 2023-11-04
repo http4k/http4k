@@ -2,27 +2,27 @@ package org.http4k.serverless.lambda.testing.setup
 
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Status.Companion.OK
-import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
-import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
-import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion
-import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v1
-import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v2
-import org.http4k.connect.amazon.apigatewayv2.model.ApiName
-import org.http4k.connect.amazon.apigatewayv2.model.Stage
 import org.http4k.connect.amazon.apigatewayv2.action.createApi
 import org.http4k.connect.amazon.apigatewayv2.action.createDefaultRoute
 import org.http4k.connect.amazon.apigatewayv2.action.createLambdaIntegration
 import org.http4k.connect.amazon.apigatewayv2.action.createStage
 import org.http4k.connect.amazon.apigatewayv2.action.delete
 import org.http4k.connect.amazon.apigatewayv2.action.listApis
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v1
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v2
+import org.http4k.connect.amazon.apigatewayv2.model.ApiName
+import org.http4k.connect.amazon.apigatewayv2.model.Stage
+import org.http4k.connect.amazon.lambda.action.list
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.connect.amazon.lambda.action.list
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Status.Companion.OK
+import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
+import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
+import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
 
 object DeployHttpApiGateway {
 

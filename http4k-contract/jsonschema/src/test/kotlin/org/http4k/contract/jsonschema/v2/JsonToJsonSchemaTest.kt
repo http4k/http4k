@@ -4,7 +4,6 @@ import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
-import org.http4k.contract.jsonschema.v2.JsonToJsonSchema
 import org.http4k.lens.Header
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest

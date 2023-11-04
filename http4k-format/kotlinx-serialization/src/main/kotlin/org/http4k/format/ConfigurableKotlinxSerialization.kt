@@ -4,7 +4,6 @@ package org.http4k.format
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN
 import kotlinx.serialization.descriptors.PrimitiveKind.DOUBLE

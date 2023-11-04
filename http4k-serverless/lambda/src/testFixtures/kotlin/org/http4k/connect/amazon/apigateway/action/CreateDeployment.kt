@@ -1,15 +1,15 @@
 package org.http4k.connect.amazon.apigateway.action
 
+import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
+import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
+import org.http4k.connect.amazon.apigateway.model.ApiId
+import org.http4k.connect.amazon.apigateway.model.DeploymentId
+import org.http4k.connect.amazon.apigateway.model.DeploymentName
+import org.http4k.connect.amazon.kClass
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
-import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
-import org.http4k.connect.amazon.apigateway.model.DeploymentId
-import org.http4k.connect.amazon.apigateway.model.DeploymentName
-import org.http4k.connect.amazon.apigateway.model.ApiId
-import org.http4k.connect.amazon.kClass
 
 class CreateDeployment(private val apiId: ApiId, private val name: DeploymentName) :
     AwsApiGatewayAction<DeploymentId>(kClass()) {

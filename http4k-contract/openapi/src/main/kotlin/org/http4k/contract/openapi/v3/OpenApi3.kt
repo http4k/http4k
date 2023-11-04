@@ -10,6 +10,8 @@ import org.http4k.contract.RouteMeta
 import org.http4k.contract.Tag
 import org.http4k.contract.WebCallback
 import org.http4k.contract.jsonschema.JsonSchema
+import org.http4k.contract.jsonschema.v2.value
+import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
@@ -17,7 +19,6 @@ import org.http4k.contract.openapi.OpenApiVersion
 import org.http4k.contract.openapi.OpenApiVersion._3_0_0
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.contract.jsonschema.v2.value
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -38,7 +39,6 @@ import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
 import org.http4k.format.JsonType
-import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.lens.MultipartForm
@@ -49,7 +49,7 @@ import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.WebForm
-import java.util.*
+import java.util.Locale
 
 /**
  * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of

@@ -1,13 +1,13 @@
 package org.http4k.connect.amazon.apigateway.action
 
-import org.http4k.core.Body
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.with
 import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
 import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
 import org.http4k.connect.amazon.apigateway.model.ApiId
 import org.http4k.connect.amazon.kClass
+import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.with
 
 class CreateResource(private val apiId: ApiId, private val parentResource: RestResourceDetails)
     : AwsApiGatewayAction<RestResourceDetails>(kClass()){

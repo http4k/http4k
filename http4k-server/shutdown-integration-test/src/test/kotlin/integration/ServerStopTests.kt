@@ -1,18 +1,17 @@
 package integration
 
 import org.http4k.client.ApacheClient
-import org.http4k.testing.ServerBackend
 import org.http4k.testing.ServerBackend.Apache
 import org.http4k.testing.ServerBackend.Apache4
+import org.http4k.testing.ServerBackend.Helidon
 import org.http4k.testing.ServerBackend.Jetty
 import org.http4k.testing.ServerBackend.JettyLoom
 import org.http4k.testing.ServerBackend.KtorCIO
 import org.http4k.testing.ServerBackend.KtorNetty
 import org.http4k.testing.ServerBackend.Netty
-import org.http4k.testing.ServerBackend.Helidon
 import org.http4k.testing.ServerBackend.Ratpack
-import org.http4k.testing.ServerBackend.SunHttpLoom
 import org.http4k.testing.ServerBackend.SunHttp
+import org.http4k.testing.ServerBackend.SunHttpLoom
 import org.http4k.testing.ServerBackend.Undertow
 
 class ApacheServerStopTest : ServerStopContract(Apache, ApacheClient(), {

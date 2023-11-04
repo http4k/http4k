@@ -4,7 +4,6 @@ import org.http4k.events.MetadataEvent
 import org.http4k.events.MyEvent
 import org.http4k.filter.TraceId
 import org.http4k.filter.ZipkinTraces
-import org.http4k.format.Jackson
 import org.http4k.format.Jackson.asFormatString
 import org.http4k.format.Jackson.prettify
 import org.http4k.testing.ApprovalTest
