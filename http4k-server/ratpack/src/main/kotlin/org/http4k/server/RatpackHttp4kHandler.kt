@@ -6,10 +6,11 @@ import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
-import ratpack.handling.Context
-import ratpack.handling.Handler
-import ratpack.http.TypedData
+import ratpack.core.handling.Context
+import ratpack.core.handling.Handler
+import ratpack.core.http.TypedData
 
+@Suppress("UnstableApiUsage")
 class RatpackHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
     override fun handle(context: Context) {
         context.request.body.then { data ->

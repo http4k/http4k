@@ -4,9 +4,8 @@ import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.UnsupportedStopMode
-import ratpack.server.RatpackServer
-import ratpack.server.RatpackServerSpec
-import ratpack.server.ServerConfig.builder
+import ratpack.core.server.RatpackServer
+import ratpack.core.server.RatpackServerSpec
 
 class Ratpack(port: Int = 8000, stopMode: StopMode) : ServerConfig {
     constructor(port: Int = 8000) : this(port, StopMode.Immediate)
@@ -18,7 +17,7 @@ class Ratpack(port: Int = 8000, stopMode: StopMode) : ServerConfig {
         }
     }
 
-    private val serverConfig = builder().connectQueueSize(1000).port(port)
+    private val serverConfig = ratpack.core.server.ServerConfig.builder().connectQueueSize(1000).port(port)
 
     override fun toServer(http: HttpHandler): Http4kServer {
         val server = RatpackServer.of { server: RatpackServerSpec ->
