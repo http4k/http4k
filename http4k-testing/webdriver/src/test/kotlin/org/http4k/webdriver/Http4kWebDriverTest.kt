@@ -278,9 +278,14 @@ class Http4kWebDriverTest {
         val driver = Http4kWebDriver { req ->
             Response(OK).body(req.header("host") ?: "none")
         }
+
+        driver.navigate().to("/baz")
+        assertThat(driver.pageSource, equalTo("none"))
         driver.navigate().to("http://foo.com:5000/bar")
         driver.navigate().to("/baz")
         assertThat(driver.pageSource, equalTo("foo.com:5000"))
+        driver.navigate().to("http://baz.com/")
+        assertThat(driver.pageSource, equalTo("baz.com"))
     }
 
     private fun WebDriver.assertOnPage(expected: String) {
