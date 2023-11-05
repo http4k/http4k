@@ -37,15 +37,19 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     val handler = ClientFilters.FollowRedirects()
         .then(ClientFilters.Cookies(storage = cookieStorage()))
         .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
+        .then(Filter { next -> { request -> next(request.header("host", latestHost)) } })
         .then(initialHandler)
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
     private val siteCookies = mutableMapOf<String, StoredCookie>()
     private var latestUri: String = ""
+    private var latestHost: String? = null
 
     private fun navigateTo(request: Request) {
         val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
+        val host = request.uri.host + (request.uri.port?.let { ":$it" } ?: "")
+        if (host.isNotEmpty()) latestHost = host
         val response = handler(normalizedPath)
         current = Page(
             response.status,
