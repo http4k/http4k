@@ -273,6 +273,21 @@ class Http4kWebDriverTest {
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
+    @Test
+    fun `Set the host header when navigating to a URL`() {
+        val driver = Http4kWebDriver { req ->
+            Response(OK).body(req.header("host") ?: "none")
+        }
+
+        driver.navigate().to("/baz")
+        assertThat(driver.pageSource, equalTo("none"))
+        driver.navigate().to("http://foo.com:5000/bar")
+        driver.navigate().to("/baz")
+        assertThat(driver.pageSource, equalTo("foo.com:5000"))
+        driver.navigate().to("http://baz.com/")
+        assertThat(driver.pageSource, equalTo("baz.com"))
+    }
+
     private fun WebDriver.assertOnPage(expected: String) {
         assertThat(findElement(By.tagName("h1"))!!.text, equalTo(expected))
     }
