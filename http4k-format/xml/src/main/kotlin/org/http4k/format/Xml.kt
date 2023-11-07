@@ -4,6 +4,7 @@ import com.google.gson.JsonElement
 import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
@@ -23,6 +24,7 @@ import javax.xml.transform.stream.StreamResult
 import kotlin.reflect.KClass
 
 object Xml : AutoMarshallingXml() {
+    override val defaultContentType = APPLICATION_XML
 
     override fun Any.asXmlString(): String = throw UnsupportedOperationException("")
 

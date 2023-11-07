@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.lens.BiDiLensSpec
@@ -11,6 +12,8 @@ import kotlin.reflect.KClass
  * Common base type for all format libraries which can convert directly from String -> Classes
  */
 abstract class AutoMarshalling {
+
+    abstract val defaultContentType: ContentType
 
     abstract fun <T : Any> asA(input: String, target: KClass<T>): T
 

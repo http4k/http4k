@@ -36,7 +36,7 @@ import kotlin.reflect.KClass
 
 open class ConfigurableJackson(
     val mapper: ObjectMapper,
-    val defaultContentType: ContentType = APPLICATION_JSON
+    override val defaultContentType: ContentType = APPLICATION_JSON
 ) : AutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {

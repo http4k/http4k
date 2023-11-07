@@ -12,8 +12,9 @@ import org.http4k.websocket.WsMessage
 import java.io.InputStream
 import kotlin.reflect.KClass
 
-open class ConfigurableJacksonYaml(val mapper: ObjectMapper, val defaultContentType: ContentType = TEXT_YAML) :
+open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaultContentType: ContentType = TEXT_YAML) :
     AutoMarshalling() {
+
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = mapper.readValue(input, target.java)
 

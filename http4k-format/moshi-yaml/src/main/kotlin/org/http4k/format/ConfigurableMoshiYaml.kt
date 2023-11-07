@@ -23,7 +23,8 @@ import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
 open class ConfigurableMoshiYaml(
-    builder: Moshi.Builder, val defaultContentType: ContentType = APPLICATION_YAML,
+    builder: Moshi.Builder,
+    override val defaultContentType: ContentType = APPLICATION_YAML,
     private val yamlDumperOptions: DumperOptions = defaultDumperOptions,
     private val resolver: Resolver = MinimalResolver,
     strictness: StrictnessMode = Lenient

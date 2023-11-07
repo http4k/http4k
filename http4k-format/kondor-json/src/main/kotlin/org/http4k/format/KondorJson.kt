@@ -27,7 +27,7 @@ import java.math.BigInteger
 import kotlin.reflect.KClass
 
 class KondorJson(
-    val defaultContentType: ContentType = APPLICATION_JSON,
+    override val defaultContentType: ContentType = APPLICATION_JSON,
     private val compactJsonStyle: JsonStyle = JsonStyle.compactWithNulls,
     private val prettyJsonStyle: JsonStyle = JsonStyle.prettyWithNulls,
     init: InitContext.() -> Unit = {}

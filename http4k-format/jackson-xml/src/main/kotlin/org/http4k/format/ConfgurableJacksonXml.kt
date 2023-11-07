@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
@@ -14,7 +15,8 @@ import org.http4k.lens.httpBodyRoot
 import java.io.InputStream
 import kotlin.reflect.KClass
 
-open class ConfigurableJacksonXml(private val mapper: XmlMapper, val defaultContentType: ContentType = ContentType.APPLICATION_XML) : AutoMarshallingXml() {
+open class ConfigurableJacksonXml(private val mapper: XmlMapper,
+                                  override val defaultContentType: ContentType = APPLICATION_XML) : AutoMarshallingXml() {
     override fun Any.asXmlString(): String = mapper.writeValueAsString(this)
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)

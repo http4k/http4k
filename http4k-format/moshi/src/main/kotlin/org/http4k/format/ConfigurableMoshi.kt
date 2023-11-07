@@ -26,7 +26,7 @@ import kotlin.reflect.KClass
 
 open class ConfigurableMoshi(
     builder: Moshi.Builder,
-    val defaultContentType: ContentType = APPLICATION_JSON,
+    override val defaultContentType: ContentType = APPLICATION_JSON,
     private val strictness: StrictnessMode = Lenient
 ) : AutoMarshallingJson<MoshiNode>() {
 

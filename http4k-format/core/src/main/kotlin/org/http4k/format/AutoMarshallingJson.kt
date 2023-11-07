@@ -11,6 +11,7 @@ import org.http4k.lens.httpBodyRoot
 import kotlin.reflect.KClass
 
 abstract class AutoMarshallingJson<NODE : Any> : AutoMarshalling(), Json<NODE> {
+
     override fun asFormatString(input: Any): String = compact(asJsonObject(input))
 
     abstract fun asJsonObject(input: Any): NODE
