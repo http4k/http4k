@@ -10,6 +10,7 @@ import okio.source
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
 import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
@@ -173,3 +174,6 @@ private object UnitAdapter : JsonAdapter<Unit>() {
         value?.let { writer.beginObject().endObject() } ?: writer.nullValue()
     }
 }
+
+inline operator fun <reified T : Any> ConfigurableMoshi.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableMoshi.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

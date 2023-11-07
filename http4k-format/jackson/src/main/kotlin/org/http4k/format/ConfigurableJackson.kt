@@ -22,6 +22,7 @@ import io.cloudevents.jackson.JsonCloudEventData
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
 import org.http4k.format.JsonType.Integer
 import org.http4k.format.JsonType.Number
 import org.http4k.lens.BiDiBodyLensSpec
@@ -138,3 +139,6 @@ inline fun <reified T : Any> ObjectMapper.write(): (T) -> String = {
         }
     }
 }
+
+inline operator fun <reified T : Any> ConfigurableJackson.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJackson.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

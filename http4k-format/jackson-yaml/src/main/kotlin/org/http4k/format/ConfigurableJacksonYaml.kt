@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_YAML
+import org.http4k.core.HttpMessage
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -33,3 +34,6 @@ open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaul
     ): BiDiBodyLensSpec<T> =
         httpBodyLens(description, contentNegotiation, defaultContentType).map(mapper.read(), mapper.write())
 }
+
+inline operator fun <reified T : Any> ConfigurableJacksonYaml.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJacksonYaml.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

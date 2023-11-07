@@ -7,6 +7,7 @@ import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
+import org.http4k.core.HttpMessage
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
@@ -35,3 +36,6 @@ open class ConfigurableJacksonXml(private val mapper: XmlMapper,
 fun KotlinModule.asConfigurableXml() = asConfigurable(
     XmlMapper(JacksonXmlModule().apply { setDefaultUseWrapper(false) })
 )
+
+inline operator fun <reified T : Any> ConfigurableJacksonXml.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJacksonXml.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

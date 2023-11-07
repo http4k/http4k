@@ -18,6 +18,10 @@ import com.ubertob.kondor.json.render
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
@@ -237,3 +241,5 @@ private fun JsonNodeArray.updateNodePath(parentPath: NodePath = NodePathRoot): J
     return this.copy(elements = updatedValues, _path = parentPath)
 }
 
+inline operator fun <reified T : Any> KondorJson.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> KondorJson.invoke(item: T) = autoBody<T>().toLens().of<R>(item)
