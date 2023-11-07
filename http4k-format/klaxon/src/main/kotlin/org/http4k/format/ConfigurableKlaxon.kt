@@ -7,6 +7,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -41,6 +42,8 @@ open class ConfigurableKlaxon(private val klaxon: KKlaxon,
         Body.string(contentType, description, contentNegotiation).map({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asFormatString(it) })
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun KKlaxon.asConfigurable() = asConfigurable(KKlaxon())

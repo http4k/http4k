@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.10.1.0 (uncut)
-- **http4k-format-*** : Add alternative syntax for Automarshalling injection of bodies into and out of HttpMessages
+- **http4k-format-*** : Add alternative syntax for Automarshalling injection/extraction of bodies into and out of HttpMessages
 
 ### v5.10.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.20

@@ -11,6 +11,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
@@ -96,6 +97,8 @@ open class ConfigurableMoshi(
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = adapterFor(target).fromJson(
         input.source().buffer()
     )!!
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
     override fun asJsonObject(input: Any): MoshiNode = MoshiNode.wrap(objectAdapter.toJsonValue(input))
 

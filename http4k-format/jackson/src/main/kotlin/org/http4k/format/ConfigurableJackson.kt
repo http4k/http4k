@@ -23,6 +23,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.format.JsonType.Integer
 import org.http4k.format.JsonType.Number
 import org.http4k.lens.BiDiBodyLensSpec
@@ -101,9 +102,10 @@ open class ConfigurableJackson(
         description: String? = null,
         contentNegotiation: ContentNegotiation = None,
         contentType: ContentType = defaultContentType
-    )
-        : BiDiBodyLensSpec<T> =
+    ): BiDiBodyLensSpec<T> =
         httpBodyLens(description, contentNegotiation, contentType).map(mapper.read(), mapper.write())
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String =

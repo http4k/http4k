@@ -8,6 +8,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
@@ -31,6 +32,8 @@ open class ConfigurableJacksonXml(private val mapper: XmlMapper,
         httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), contentType, contentNegotiation)
             .map({ it.payload.asString() }, { Body(it) })
             .map({ it.asA<T>() }, { it.asXmlString() })
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun KotlinModule.asConfigurableXml() = asConfigurable(

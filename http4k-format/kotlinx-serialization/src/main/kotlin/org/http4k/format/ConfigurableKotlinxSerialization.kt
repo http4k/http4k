@@ -35,6 +35,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -173,6 +174,8 @@ open class ConfigurableKotlinxSerialization(
         httpBodyLens(description, contentNegotiation, contentType).map(
             { json.decodeFromString<T>(it) },
             { json.encodeToString(it) })
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {
