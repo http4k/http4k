@@ -3,7 +3,13 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.10.2.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core-** : [Fix] FollowRedirects now remove host header
+- **http4k-testing-webdriver-** : Ability to inject clock into the Webdriver
+
 ### v5.10.1.0
+- **http4k-testing-webdriver*** : Allow the originalUri method of the OAuthRedirectionFilter to be configured when constructing an OAuthProvider H/T @mbcltd
 - **http4k-format-*** : Add alternative syntax for Automarshalling injection/extraction of bodies into and out of HttpMessages
 
 ### v5.10.0.0

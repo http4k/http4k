@@ -177,7 +177,15 @@ object ClientFilters {
                 } else it
             }
 
-        private fun Request.toNewLocation(location: String) = ensureValidMethodForRedirect().uri(newLocation(location))
+        private fun Request.toNewLocation(location: String): Request {
+            val newUri = newLocation(location)
+            val redirect = ensureValidMethodForRedirect().uri(newUri)
+
+            return when {
+                header("host") != null && newUri.host.isNotEmpty() -> redirect.replaceHeader("host", newUri.host)
+                else -> redirect
+            }
+        }
 
         private fun Response.location() = header("location")?.replace(";\\s*charset=.*$".toRegex(), "").orEmpty()
 

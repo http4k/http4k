@@ -21,7 +21,7 @@ import java.util.Date
 import org.http4k.core.cookie.Cookie as HCookie
 
 class Http4kWebDriverTest {
-    private val driver = Http4kWebDriver { req ->
+    private val driver = Http4kWebDriver({ req ->
         val body = File("src/test/resources/test.html").readText()
         Response(OK).body(body
             .replace("FORMMETHOD", POST.name)
@@ -31,7 +31,7 @@ class Http4kWebDriverTest {
             .replace("THETIME", System.currentTimeMillis().toString())
             .replace("ACTION", "action=\"/form\"")
         )
-    }
+    })
 
     @Test
     fun `page details`() {
@@ -64,7 +64,7 @@ class Http4kWebDriverTest {
     @Test
     fun `POST form with empty action`() {
         var loadCount = 0
-        val driver = Http4kWebDriver { req ->
+        val driver = Http4kWebDriver({ req ->
             loadCount++
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
@@ -75,7 +75,8 @@ class Http4kWebDriverTest {
                 .replace("THETIME", System.currentTimeMillis().toString())
                 .replace("ACTION", "action")
             )
-        }
+        })
+
         val n0 = loadCount
         driver.get("http://example.com/bob")
         driver.findElement(By.id("button"))!!.submit()
@@ -88,7 +89,7 @@ class Http4kWebDriverTest {
     @Test
     fun `POST form with action set to empty string`() {
         var loadCount = 0
-        val driver = Http4kWebDriver { req ->
+        val driver = Http4kWebDriver({ req ->
             loadCount++
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
@@ -99,7 +100,7 @@ class Http4kWebDriverTest {
                 .replace("THETIME", System.currentTimeMillis().toString())
                 .replace("ACTION", "action=\"\"")
             )
-        }
+        })
         val n0 = loadCount
         driver.get("http://127.0.0.1/bob")
         driver.findElement(By.id("button"))!!.submit()
@@ -111,7 +112,7 @@ class Http4kWebDriverTest {
 
     @Test
     fun `GET form`() {
-        val driver = Http4kWebDriver { req ->
+        val driver = Http4kWebDriver({ req ->
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
                 .replace("FORMMETHOD", Method.GET.name)
@@ -121,7 +122,7 @@ class Http4kWebDriverTest {
                 .replace("THETIME", System.currentTimeMillis().toString())
                 .replace("ACTION", "action=\"/form\"")
             )
-        }
+        })
 
         driver.get("/bob")
         driver.findElement(By.id("button"))!!.submit()
@@ -225,9 +226,9 @@ class Http4kWebDriverTest {
 
     @Test
     fun `cookies are added to request`() {
-        val driver = Http4kWebDriver { req ->
+        val driver = Http4kWebDriver({ req ->
             Response(OK).body(req.cookies().joinToString("; \n") { it.name + "=" + it.value })
-        }
+        })
         driver.manage().addCookie(Cookie("foo1", "bar1", "domain", "/", Date(0), true, true))
         driver.manage().addCookie(Cookie("foo2", "bar2"))
 
@@ -238,9 +239,9 @@ class Http4kWebDriverTest {
 
     @Test
     fun `service set cookies are stored in the driver`() {
-        val driver = Http4kWebDriver {
+        val driver = Http4kWebDriver({
             Response(OK).cookie(HCookie("name", "value", 100, Instant.EPOCH, "domain", "path", true, true))
-        }
+        })
 
         driver.get("/")
 
@@ -275,9 +276,9 @@ class Http4kWebDriverTest {
 
     @Test
     fun `Set the host header when navigating to a URL`() {
-        val driver = Http4kWebDriver { req ->
+        val driver = Http4kWebDriver({ req ->
             Response(OK).body(req.header("host") ?: "none")
-        }
+        })
 
         driver.navigate().to("/baz")
         assertThat(driver.pageSource, equalTo("none"))
