@@ -32,7 +32,7 @@ class Secret(input: ByteArray) : Closeable {
     }.apply { close() }
 
     override fun close(): Unit = run {
-        value.get().apply { (0 until size).forEach { this[it] = 0 } }
+        value.get().apply { indices.forEach { this[it] = 0 } }
         value.set(ByteArray(0))
     }
 }
