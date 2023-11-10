@@ -12,38 +12,49 @@ import org.openqa.selenium.By
 import java.io.File
 
 class HtmxHttp4kWebDriverTest {
-    val body = File("src/test/resources/test_htmx.html").readText()
-    private val driver = Http4kWebDriver { req ->
+    private val body = File("src/test/resources/test_htmx.html").readText()
+    private val driver = Http4kWebDriver({ req ->
         when (req.uri.path) {
             "/text" ->
                 Response(Status.OK)
                     .body(req.query("value") ?: "")
                     .header("Content-Type", ContentType.TEXT_PLAIN.toHeaderValue())
+
             "/div" ->
                 Response(Status.OK)
-                    .body("""<div id="${req.query("id")}" ${req.query("htmx-action")}="${req.query("htmx-target")}">${req.query("value")}</div>""")
+                    .body(
+                        """<div id="${req.query("id")}" ${req.query("htmx-action")}="${req.query("htmx-target")}">${
+                            req.query(
+                                "value"
+                            )
+                        }</div>"""
+                    )
                     .header("Content-Type", ContentType.TEXT_HTML.toHeaderValue())
+
             "/example3" -> {
                 val page = req.query("page")?.toInt() ?: 1
                 Response(Status.OK)
-                    .body("""<tr><td>Agent Smith</td><td>void$page@null.org</td><td>$page</td></tr>
+                    .body(
+                        """<tr><td>Agent Smith</td><td>void$page@null.org</td><td>$page</td></tr>
                             |<tr id="example3ReplaceMe">
                             |  <td colspan="3">
-                            |    <button id="example3button" data-hx-get="/example3?page=${page+1}"
+                            |    <button id="example3button" data-hx-get="/example3?page=${page + 1}"
                             |            data-hx-target="#example3ReplaceMe"
                             |            data-hx-swap="outerHTML">
                             |      Load More Agents...
                             |    </button>
                             |  </td>
                             |</tr>
-                        """.trimMargin())
+                        """.trimMargin()
+                    )
                     .header("Content-Type", ContentType.TEXT_HTML.toHeaderValue())
             }
+
             else -> Response(Status.OK)
                 .body(body)
                 .header("Content-Type", ContentType.TEXT_HTML.toHeaderValue())
         }
-    }.withHtmx()
+    }).withHtmx()
 
     @Test
     fun `test the driver`() {
@@ -90,11 +101,17 @@ class HtmxHttp4kWebDriverTest {
 
             driver.findElement(By.id("example3button"))!!.click()
 
-            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Agent Smith void1@null.org 1 Load More Agents..."))
+            assertThat(
+                driver.findElement(By.id("example3tbody"))!!.text,
+                equalTo("Agent Smithvoid1@null.org1 Load More Agents...")
+            )
 
             driver.findElement(By.id("example3button"))!!.click()
 
-            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Agent Smith void1@null.org 1 Agent Smith void2@null.org 2 Load More Agents..."))
+            assertThat(
+                driver.findElement(By.id("example3tbody"))!!.text,
+                equalTo("Agent Smithvoid1@null.org1Agent Smithvoid2@null.org2 Load More Agents...")
+            )
         }
     }
 }

@@ -4,10 +4,25 @@ package org.http4k.serverless.lambda.testing.setup
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
-import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
+import org.http4k.connect.amazon.lambda.action.Permission
+import org.http4k.connect.amazon.lambda.action.createFunction
+import org.http4k.connect.amazon.lambda.action.delete
+import org.http4k.connect.amazon.lambda.action.list
+import org.http4k.connect.amazon.lambda.action.setPermission
+import org.http4k.connect.amazon.lambda.model.Function
+import org.http4k.connect.amazon.lambda.model.FunctionHandler
+import org.http4k.connect.amazon.lambda.model.FunctionPackage
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayRest
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV2
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApplicationLoadBalancer
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.Invocation
+import org.http4k.connect.amazon.lambda.model.Region
+import org.http4k.connect.amazon.lambda.model.Role
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -23,22 +38,6 @@ import org.http4k.serverless.lambda.testing.client.ApplicationLoadBalancerLambda
 import org.http4k.serverless.lambda.testing.client.InvocationLambdaClient
 import org.http4k.serverless.lambda.testing.client.LambdaHttpClient
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Function
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.FunctionHandler
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.FunctionPackage
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayRest
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApplicationLoadBalancer
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.Invocation
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Permission
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Role
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.createFunction
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.delete
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.setPermission
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 import java.io.PrintStream
@@ -84,24 +83,27 @@ object DeployServerAsLambdaForClientContract {
         println("Performing a test request...")
         val client = clientFn(functionName(type), Region(config.region))
             .then(config.awsClientFor("lambda").debugBodies())
-        val functionResponse = client(
-            Request(POST, "/")
-                .query("query1", "queryValue1")
-                .query("query1", "queryValue2")
-                .query("query2", "queryValue3")
-                .header("single", "value1")
-                .header("multi", "value2")
-                .header("multi", "value3")
-                .cookie(Cookie("cookie1", "value1"))
-                .cookie(Cookie("cookie2", "value2"))
-                .body("""{"hello":"http4k"}""")
-        )
 
-        assertThat(functionResponse.status, equalTo(OK))
+        val functionResponse = retryUntil(OK) {
+            client(
+                Request(POST, "/")
+                    .query("query1", "queryValue1")
+                    .query("query1", "queryValue2")
+                    .query("query2", "queryValue3")
+                    .header("single", "value1")
+                    .header("multi", "value2")
+                    .header("multi", "value3")
+                    .cookie(Cookie("cookie1", "value1"))
+                    .cookie(Cookie("cookie2", "value2"))
+                    .body("""{"hello":"http4k"}""")
+            )
+        }
+
         assertThat(functionResponse.bodyString(), containsSubstring("""{"hello":"http4k"}"""))
     }
 
-    fun functionName(version: LambdaIntegrationType) = Function("test-function-${version.functionNamePrefix()}")
+    fun functionName(version: LambdaIntegrationType) =
+        Function("test-function-${version.functionNamePrefix()}")
 
     private fun LambdaIntegrationType.functionMainClass(): String = when (this) {
         ApiGatewayRest -> "org.http4k.serverless.lambda.TestFunctionRest"

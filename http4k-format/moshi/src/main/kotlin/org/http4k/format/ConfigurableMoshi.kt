@@ -10,6 +10,8 @@ import okio.source
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
@@ -26,7 +28,7 @@ import kotlin.reflect.KClass
 
 open class ConfigurableMoshi(
     builder: Moshi.Builder,
-    val defaultContentType: ContentType = APPLICATION_JSON,
+    override val defaultContentType: ContentType = APPLICATION_JSON,
     private val strictness: StrictnessMode = Lenient
 ) : AutoMarshallingJson<MoshiNode>() {
 
@@ -95,6 +97,8 @@ open class ConfigurableMoshi(
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = adapterFor(target).fromJson(
         input.source().buffer()
     )!!
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
     override fun asJsonObject(input: Any): MoshiNode = MoshiNode.wrap(objectAdapter.toJsonValue(input))
 
@@ -173,3 +177,6 @@ private object UnitAdapter : JsonAdapter<Unit>() {
         value?.let { writer.beginObject().endObject() } ?: writer.nullValue()
     }
 }
+
+inline operator fun <reified T : Any> ConfigurableMoshi.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableMoshi.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

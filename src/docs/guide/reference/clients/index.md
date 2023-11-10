@@ -5,7 +5,7 @@ description: Feature overview of the http4k-client modules
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.8.4.0"))
+    implementation(platform("org.http4k:http4k-bom:5.10.2.0"))
     
     // Java (for development only):
     implementation("org.http4k:http4k-core")
@@ -24,6 +24,9 @@ dependencies {
     
     // Fuel (Sync + Async): 
     implementation("org.http4k:http4k-client-fuel")
+    
+    // Helidon (Loom): 
+    implementation("org.http4k:http4k-client-helidon")
     
     // Jetty (Sync + Async + WebSocket): 
     implementation("org.http4k:http4k-client-jetty")

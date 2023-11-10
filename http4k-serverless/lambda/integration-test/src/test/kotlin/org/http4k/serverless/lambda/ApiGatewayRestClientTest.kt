@@ -3,6 +3,8 @@ package org.http4k.serverless.lambda
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.HttpClientContract
 import org.http4k.client.OkHttp
+import org.http4k.connect.amazon.apigateway.action.listApis
+import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.then
@@ -12,8 +14,6 @@ import org.http4k.filter.inIntelliJOnly
 import org.http4k.serverless.lambda.testing.NoOpServerConfig
 import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployRestApiGateway
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.listApis
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.opentest4j.TestAbortedException
 

@@ -11,7 +11,6 @@ import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.format.Jackson
-import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -20,6 +19,7 @@ import org.http4k.security.OAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
 import org.http4k.security.ResponseType
+import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.util.FixedClock
 

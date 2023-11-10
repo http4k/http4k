@@ -3,7 +3,12 @@ package org.http4k.client
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.ResponseResultOf
-import org.http4k.core.*
+import org.http4k.core.BodyMode
+import org.http4k.core.Parameters
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.toParametersMap
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException

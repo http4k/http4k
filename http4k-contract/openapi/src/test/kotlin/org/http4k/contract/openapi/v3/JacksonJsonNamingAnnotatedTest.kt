@@ -7,14 +7,14 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.format.ConfigurableJackson
-import org.http4k.format.Jackson
-import org.http4k.format.asConfigurable
-import org.http4k.format.withStandardMappings
 import org.http4k.contract.jsonschema.v3.Field
 import org.http4k.contract.jsonschema.v3.FieldMetadata
 import org.http4k.contract.jsonschema.v3.JacksonJsonNamingAnnotated
 import org.http4k.contract.jsonschema.v3.NoFieldFound
+import org.http4k.format.ConfigurableJackson
+import org.http4k.format.Jackson
+import org.http4k.format.asConfigurable
+import org.http4k.format.withStandardMappings
 import org.junit.jupiter.api.Test
 
 internal class JacksonJsonNamingAnnotatedTest {

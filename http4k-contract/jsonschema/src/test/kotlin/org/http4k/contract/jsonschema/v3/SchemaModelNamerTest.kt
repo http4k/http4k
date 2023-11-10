@@ -2,7 +2,6 @@ package org.http4k.contract.jsonschema.v3
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.contract.jsonschema.v3.SchemaModelNamer
 import org.junit.jupiter.api.Test
 
 class SchemaModelNamerTest {

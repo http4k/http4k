@@ -7,6 +7,7 @@ import org.http4k.contract.jsonschema.v3.FieldMetadata
 import org.http4k.contract.jsonschema.v3.JacksonFieldMetadataRetrievalStrategy
 import org.junit.jupiter.api.Test
 
+@Suppress("UNUSED_PARAMETER")
 class JacksonFieldMetadataRetrievalStrategyTest {
     open class Base(@JsonPropertyDescription("Parent Field Description") val parentField: String = "parent")
     data class Model(
@@ -59,6 +60,8 @@ class JacksonFieldMetadataRetrievalStrategyTest {
         /**
          * This constructor is usually generated from `@Serializable`.
          */
+
+        @Suppress("unused")
         constructor(generatedField: Int, describedField: String, anotherGeneratedField: Any) {
             this.describedField = describedField
         }

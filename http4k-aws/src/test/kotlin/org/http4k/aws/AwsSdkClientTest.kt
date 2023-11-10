@@ -19,7 +19,6 @@ import software.amazon.awssdk.http.SdkHttpFullResponse
 import software.amazon.awssdk.http.SdkHttpMethod
 import software.amazon.awssdk.http.SdkHttpResponse
 import java.net.URI
-import java.net.URL
 import java.util.Optional
 
 class AwsSdkClientTest {

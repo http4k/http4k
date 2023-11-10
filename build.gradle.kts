@@ -1,7 +1,6 @@
 import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
-import org.gradle.internal.impldep.org.bouncycastle.cms.RecipientId.password
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Duration
 
@@ -18,7 +17,7 @@ plugins {
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(20))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -28,7 +27,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
+        classpath(Kotlin.gradlePlugin)
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
         classpath("gradle.plugin.com.github.johnrengelman:shadow:_")
@@ -139,6 +138,11 @@ subprojects {
 
         publishing {
             publications {
+                val javaComponent = components["java"] as AdhocComponentWithVariants
+
+                javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+                javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+
                 val archivesBaseName = tasks.jar.get().archiveBaseName.get()
                 create<MavenPublication>("mavenJava") {
                     artifactId = archivesBaseName
@@ -200,7 +204,7 @@ tasks.register<JacocoReport>("jacocoRootReport") {
         html.required.set(true)
         xml.required.set(true)
         csv.required.set(false)
-        xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml"))
+        xml.outputLocation.set(file("${layout.buildDirectory}/reports/jacoco/test/jacocoRootReport.xml"))
     }
 }
 
@@ -214,7 +218,7 @@ dependencies {
 
     testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
 
-    testImplementation("software.amazon.awssdk:s3") {
+    testImplementation("software.amazon.awssdk:s3:_") {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
         exclude(group = "software.amazon.awssdk", module = "apache-client")
     }

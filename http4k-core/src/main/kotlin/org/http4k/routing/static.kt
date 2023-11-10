@@ -26,7 +26,7 @@ fun static(
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
 ): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
 
-internal data class StaticRoutingHttpHandler(
+ data class StaticRoutingHttpHandler(
     private val pathSegments: String,
     private val resourceLoader: ResourceLoader,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,

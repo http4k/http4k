@@ -1,6 +1,5 @@
 package org.http4k.events
 
-import org.http4k.filter.ZipkinTraces
 import org.http4k.filter.ZipkinTracesStorage
 import java.time.Clock
 

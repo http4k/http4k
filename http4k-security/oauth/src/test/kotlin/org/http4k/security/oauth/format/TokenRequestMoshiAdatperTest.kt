@@ -6,7 +6,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.security.oauth.client.TokenRequest
 import org.http4k.security.oauth.client.tokenRequestLens
 import org.http4k.testing.Approver

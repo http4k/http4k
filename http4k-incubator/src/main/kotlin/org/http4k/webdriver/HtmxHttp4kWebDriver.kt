@@ -4,7 +4,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 
-class HtmxHttp4kWebDriver(val driver: Http4kWebDriver) : WebDriver {
+class HtmxHttp4kWebDriver(private val driver: Http4kWebDriver) : WebDriver {
 
     private fun toHtmx(element: WebElement): HtmxJsoupWebElement =
         when (element) {

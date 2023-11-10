@@ -85,7 +85,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * **1LOC** server backend spin-up for:
         * **Apache v4 & v5** (from httpcore)
         * **Jetty & Jetty Loom** (including SSE and Websocket support)
-        * **Helidon Nima (Loom)**
+        * **Helidon (Loom)**
         * **Ktor CIO & Netty**
         * **Netty** (including Websocket support)
         * **SunHttp & SunHttpLoom** (bundled with `http4k-core`)
@@ -196,7 +196,7 @@ To install, add these dependencies to your **Gradle** file:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.8.4.0"))
+    implementation(platform("org.http4k:http4k-bom:5.10.2.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-server-jetty")
     implementation("org.http4k:http4k-client-okhttp")

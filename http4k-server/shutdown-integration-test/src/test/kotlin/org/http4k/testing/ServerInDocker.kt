@@ -2,7 +2,11 @@ package org.http4k.testing
 
 import com.github.dockerjava.api.async.ResultCallback
 import com.github.dockerjava.api.command.BuildImageResultCallback
-import com.github.dockerjava.api.model.*
+import com.github.dockerjava.api.model.ExposedPort
+import com.github.dockerjava.api.model.Frame
+import com.github.dockerjava.api.model.HostConfig
+import com.github.dockerjava.api.model.LogConfig
+import com.github.dockerjava.api.model.Ports
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient

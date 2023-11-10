@@ -2,29 +2,29 @@ package org.http4k.serverless.lambda.testing.setup
 
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.JavaHttpClient
+import org.http4k.connect.amazon.apigateway.action.CreateDeployment
+import org.http4k.connect.amazon.apigateway.action.createApi
+import org.http4k.connect.amazon.apigateway.action.createIntegration
+import org.http4k.connect.amazon.apigateway.action.createIntegrationResponse
+import org.http4k.connect.amazon.apigateway.action.createMethod
+import org.http4k.connect.amazon.apigateway.action.createResource
+import org.http4k.connect.amazon.apigateway.action.createStage
+import org.http4k.connect.amazon.apigateway.action.delete
+import org.http4k.connect.amazon.apigateway.action.listApis
+import org.http4k.connect.amazon.apigateway.action.listResources
+import org.http4k.connect.amazon.apigateway.model.ApiName
+import org.http4k.connect.amazon.apigateway.model.DeploymentName
+import org.http4k.connect.amazon.apigateway.model.Stage
+import org.http4k.connect.amazon.getOrThrow
+import org.http4k.connect.amazon.lambda.action.list
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayRest
+import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.client.restApiGatewayApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.CreateDeployment
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.DeploymentName
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createApi
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createIntegration
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createIntegrationResponse
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createMethod
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createResource
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.createStage
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.delete
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.listApis
-import org.http4k.serverless.lambda.testing.setup.aws.apigateway.listResources
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiName
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
-import org.http4k.serverless.lambda.testing.setup.aws.getOrThrow
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayRest
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.Region
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
 
 object DeployRestApiGateway {
 
@@ -57,7 +57,7 @@ object DeployRestApiGateway {
         val deploymentId = apiGateway(CreateDeployment(api.apiId, DeploymentName(Stage.restDefault.stageName.value))).getOrThrow()
         apiGateway.createStage(api.apiId, Stage.restDefault, deploymentId)
 
-        waitUntil(OK) {
+        retryUntil(OK) {
             JavaHttpClient()(Request(GET, api.apiEndpoint.path("/default/empty"))).also { println(it.status) }
         }
     }

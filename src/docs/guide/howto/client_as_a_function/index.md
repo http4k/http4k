@@ -7,7 +7,7 @@ This example demonstrates using http4k as a client, to consume HTTP services. A 
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.8.4.0"))
+    implementation(platform("org.http4k:http4k-bom:5.10.2.0"))
     implementation("org.http4k:http4k-core")
 }
 ```

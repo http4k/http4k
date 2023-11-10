@@ -19,6 +19,7 @@ import org.openqa.selenium.WebElement
 import org.openqa.selenium.WindowType
 import java.net.URL
 import java.nio.file.Paths
+import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset.UTC
@@ -33,19 +34,23 @@ interface Http4KNavigation : Navigation {
     fun to(uri: Uri)
 }
 
-class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
+class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDefaultZone()) : WebDriver {
     val handler = ClientFilters.FollowRedirects()
-        .then(ClientFilters.Cookies(storage = cookieStorage()))
+        .then(ClientFilters.Cookies(clock, cookieStorage()))
         .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
+        .then(Filter { next -> { request -> next(request.header("host", latestHost)) } })
         .then(initialHandler)
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
     private val siteCookies = mutableMapOf<String, StoredCookie>()
     private var latestUri: String = ""
+    private var latestHost: String? = null
 
     private fun navigateTo(request: Request) {
         val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
+        val host = request.uri.host + (request.uri.port?.let { ":$it" } ?: "")
+        if (host.isNotEmpty()) latestHost = host
         val response = handler(normalizedPath)
         current = Page(
             response.status,
@@ -65,7 +70,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
                 path.startsWith("/") -> Paths.get(path)
                 else -> {
                     val currentPath = currentUrl?.let {
-                        Uri.of(it).path.let { if (it.isEmpty()) "/" else it }
+                        Uri.of(it).path.let { it.ifEmpty { "/" } }
                     } ?: "/"
                     Paths.get(currentPath, path)
                 }

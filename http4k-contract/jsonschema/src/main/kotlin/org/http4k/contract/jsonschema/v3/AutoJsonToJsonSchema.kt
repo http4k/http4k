@@ -1,11 +1,11 @@
 package org.http4k.contract.jsonschema.v3
 
-import org.http4k.format.AutoMarshallingJson
-import org.http4k.format.JsonType
 import org.http4k.contract.jsonschema.IllegalSchemaException
 import org.http4k.contract.jsonschema.JsonSchema
 import org.http4k.contract.jsonschema.JsonSchemaCreator
 import org.http4k.contract.jsonschema.v3.SchemaModelNamer.Companion.Simple
+import org.http4k.format.AutoMarshallingJson
+import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.BooleanParam

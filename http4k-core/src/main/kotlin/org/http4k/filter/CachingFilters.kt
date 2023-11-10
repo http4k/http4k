@@ -4,8 +4,6 @@ import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
-import java.nio.ByteBuffer
-import java.security.MessageDigest
 import java.time.Clock
 import java.time.Duration
 import java.time.ZonedDateTime

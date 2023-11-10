@@ -1,16 +1,17 @@
 @file:Suppress("UnstableApiUsage")
 
-import de.fayard.refreshVersions.core.StabilityLevel.Stable
-
 rootProject.name = "http4k"
 
 plugins {
-    id("de.fayard.refreshVersions").version("0.40.2")
+    id("de.fayard.refreshVersions").version("0.60.3")
 }
 
 refreshVersions {
     rejectVersionIf {
-        candidate.stabilityLevel != Stable
+        candidate.stabilityLevel.isLessStableThan(current.stabilityLevel) ||
+            setOf("milestone", "-RC").map { it.lowercase() }.any { candidate.value.contains(it) } ||
+            Regex("""\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}.*""").matches(candidate.value) || // graphql nightlies
+            candidate.value.contains("nf-execution") // graphql nightlies
     }
 }
 

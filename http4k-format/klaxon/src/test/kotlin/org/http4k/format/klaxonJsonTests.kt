@@ -4,15 +4,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Body
-import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Klaxon.auto
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.lang.UnsupportedOperationException
 import com.beust.klaxon.Klaxon as KKlaxon
 
 class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {

@@ -1,10 +1,10 @@
 package org.http4k.contract.jsonschema.v3
 
-import org.http4k.format.Json
-import org.http4k.format.JsonType
 import org.http4k.contract.jsonschema.IllegalSchemaException
 import org.http4k.contract.jsonschema.JsonSchema
 import org.http4k.contract.jsonschema.JsonSchemaCreator
+import org.http4k.format.Json
+import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
 
 class JsonToJsonSchema<NODE>(

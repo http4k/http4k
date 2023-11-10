@@ -1,6 +1,5 @@
 package org.http4k.contract.openapi.v3
 
-import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.SecurityRendererContract
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
@@ -9,7 +8,6 @@ import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
 import org.http4k.contract.security.OAuthScope
 import org.http4k.contract.security.OpenIdConnectSecurity
-import org.http4k.contract.security.Security
 import org.http4k.contract.security.UserCredentialsOAuthSecurity
 import org.http4k.core.Credentials
 import org.http4k.core.Filter

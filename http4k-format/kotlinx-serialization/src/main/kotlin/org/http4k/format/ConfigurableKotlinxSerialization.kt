@@ -4,7 +4,6 @@ package org.http4k.format
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN
 import kotlinx.serialization.descriptors.PrimitiveKind.DOUBLE
@@ -35,6 +34,8 @@ import kotlinx.serialization.serializer
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -48,7 +49,7 @@ import kotlinx.serialization.json.Json as KotlinxJson
 
 open class ConfigurableKotlinxSerialization(
     json: JsonBuilder.() -> Unit,
-    val defaultContentType: ContentType = APPLICATION_JSON
+    override val defaultContentType: ContentType = APPLICATION_JSON
 ) : AutoMarshallingJson<JsonElement>() {
     val json = KotlinxJson { json() }
     private val prettyJson =
@@ -173,6 +174,8 @@ open class ConfigurableKotlinxSerialization(
         httpBodyLens(description, contentNegotiation, contentType).map(
             { json.decodeFromString<T>(it) },
             { json.encodeToString(it) })
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {
@@ -227,3 +230,6 @@ fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder
 
     override fun done(): JsonBuilder = this@asConfigurable
 }
+
+inline operator fun <reified T : Any> ConfigurableKotlinxSerialization.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableKotlinxSerialization.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

@@ -3,6 +3,36 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.10.2.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core-** : [Fix] FollowRedirects now remove host header
+- **http4k-testing-webdriver-** : Ability to inject clock into the Webdriver
+
+### v5.10.1.0
+- **http4k-testing-webdriver*** : Allow the originalUri method of the OAuthRedirectionFilter to be configured when constructing an OAuthProvider H/T @mbcltd
+- **http4k-format-*** : Add alternative syntax for Automarshalling injection/extraction of bodies into and out of HttpMessages
+
+### v5.10.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.20
+- **http4k-testing-webdriver*** : Host header is populated in Http4kWebDriver H/T @mbcltd
+
+### v5.9.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-helidon** : [Breaking] Upgrade to stable v4 of Helidon, API changes.
+- **http4k-client-helidon** : [Breaking] Upgrade to stable v4 of Helidon, API changes.
+- **http4k-*** : [Breaking - dev only] http4k is now built with Java 21, although Java 8 is still targeted.
+
+### v5.8.6.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : New filter to validate zipkin headers. H/T @time4tea
+
+### v5.8.5.1
+- **http4k-*** : Fix maven dependencies marked as optional in various http4k modules
+
+### v5.8.5.0
+- **http4k-*** : Upgrade some dependency versions, including CVE fix for Jetty.
+- **http4k-core** : Rename `Events.then()` with `Events.and()` for clarity.
+
 ### v5.8.4.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-lambda** : Add support to multiple query/header values with the same key
@@ -135,8 +165,8 @@ changes with their rationale when appropriate:
 - **http4k-*** : [Breaking] Remove all previous deprecations from all modules for v4. To upgrade cleanly, first upgrade to `v4.48.0.0` and then re-upgrade to `v5.0.0.0`. This will ensure that you only have to deal with Deprecations between the major versions.
 - **http4k-templates-dust**: [Breaking] Nashorn is finally removed, so we are dropping support for this module. If you are on-pre Java 19 you can continue to use the old module version with no breaking changes.
 - **http4k-***: [Breaking] http4k is now built with Java 20. We are still compiling for older Java versions. New major versions will now be incoming with every major JDK release in order to track new and retired JVM features (6 month cycle).
-- **http4k-server-jetty**: New Server Backend `JettyLoom`, based on Loom VirtualThreads. Requires Java >=19 to use. Standard `Jetty` remains usable with any Java version.
-- **http4k-core**: New Server Backend `SunHttpLoom`, based on Loom VirtualThreads. Requires Java >=19 to use. Standard `SunHttp` remains usable with any Java version.
+- **http4k-server-jetty**: New Server Backend `JettyLoom`, based on Loom VirtualThreads. Requires Java 21 to use. Standard `Jetty` remains usable with any Java version.
+- **http4k-core**: New Server Backend `SunHttpLoom`, based on Loom VirtualThreads. Requires Java 21 to use. Standard `SunHttp` remains usable with any Java version.
 - **http4k-server-helidon**: [New Module] Helidon is a Loom-first rewrite of the popular server. Requires Java >= 19 to use.
 - **http4k-server-websocket**: [New Module] A lightweight Websocket server built on  [TooTallNate/Java-Websocket](https://github.com/TooTallNate/Java-WebSocket). H/T @oharaandrew314
 - **http4k-client-helidon**: [New Module] An HTTP client build from the ground up to take advantage of project Loom. Requires Java >= 19 to use.

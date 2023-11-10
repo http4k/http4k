@@ -1,6 +1,7 @@
 package org.http4k.security
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
@@ -32,7 +33,8 @@ class OAuthProvider(
     private val jwtRedirectionUriBuilder: (RequestJwts) -> RedirectionUriBuilder = ::uriBuilderWithRequestJwt,
     redirectionUrlBuilder: RedirectionUriBuilder = defaultUriBuilder,
     accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
-    private val responseMode: ResponseMode? = null
+    private val responseMode: ResponseMode? = null,
+    originalUri: (Request) -> Uri = Request::uri,
 ) {
 
     // pre-configured API client for this provider
@@ -49,7 +51,8 @@ class OAuthProvider(
         oAuthPersistence,
         responseType,
         redirectionUrlBuilder,
-        responseMode = responseMode
+        responseMode = responseMode,
+        originalUri = originalUri
     )
 
     // protect endpoint and provide custom request JWT creation mechanism

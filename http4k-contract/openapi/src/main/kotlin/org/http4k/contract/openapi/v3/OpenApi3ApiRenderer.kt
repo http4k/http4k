@@ -2,14 +2,16 @@ package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.Tag
 import org.http4k.contract.jsonschema.JsonSchema
+import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
-import org.http4k.contract.openapi.v3.BodyContent.*
+import org.http4k.contract.openapi.v3.BodyContent.FormContent
+import org.http4k.contract.openapi.v3.BodyContent.NoSchema
+import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
+import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.format.Json
-import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
-import java.util.*
 
 /**
  * Converts a API to OpenApi3 format JSON, using non-reflective JSON marshalling - this is the limited version

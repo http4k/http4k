@@ -12,7 +12,9 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.context.propagation.TextMapSetter
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes.*
+import io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE
+import io.opentelemetry.semconv.SemanticAttributes.SERVER_ADDRESS
+import io.opentelemetry.semconv.SemanticAttributes.SERVER_PORT
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
@@ -45,8 +47,8 @@ fun ClientFilters.OpenTelemetryTracing(
                         val ref = AtomicReference(req)
                         textMapPropagator.inject(Context.current(), ref, setter)
                         next(ref.get()).also {
-                            setAttribute(NET_PEER_NAME, req.uri.host)
-                            req.uri.port?.also { if (it != 80 && it != 443) setAttribute(NET_PEER_PORT, it) }
+                            setAttribute(SERVER_ADDRESS, req.uri.host)
+                            req.uri.port?.also { if (it != 80 && it != 443) setAttribute(SERVER_PORT, it) }
 
                             addStandardDataFrom(it, req)
 
@@ -129,8 +131,8 @@ val defaultSpanNamer: (Request) -> String = {
 }
 
 private fun Span.addStandardDataFrom(resp: Response, req: Request) {
-    resp.body.length?.also { setAttribute(HTTP_RESPONSE_CONTENT_LENGTH, it) }
-    req.body.length?.also { setAttribute(HTTP_REQUEST_CONTENT_LENGTH, it) }
+    resp.body.length?.also { setAttribute(HTTP_RESPONSE_BODY_SIZE, it) }
+    req.body.length?.also { setAttribute(HTTP_RESPONSE_BODY_SIZE, it) }
     setAttribute("http.status_code", resp.status.code.toString())
 }
 

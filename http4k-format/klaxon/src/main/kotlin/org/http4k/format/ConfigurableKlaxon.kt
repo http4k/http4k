@@ -6,6 +6,8 @@ import com.beust.klaxon.JsonParsingException
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -16,9 +18,9 @@ import kotlin.reflect.KClass
 import com.beust.klaxon.Klaxon as KKlaxon
 
 open class ConfigurableKlaxon(private val klaxon: KKlaxon,
-                              val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshalling() {
+                              override val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshalling() {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> asA(input: String, target: KClass<T>) = asA<T>(input.byteInputStream(), target)
+    override fun <T : Any> asA(input: String, target: KClass<T>) = asA(input.byteInputStream(), target)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T =
@@ -40,6 +42,11 @@ open class ConfigurableKlaxon(private val klaxon: KKlaxon,
         Body.string(contentType, description, contentNegotiation).map({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asFormatString(it) })
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun KKlaxon.asConfigurable() = asConfigurable(KKlaxon())
+
+inline operator fun <reified T : Any> ConfigurableKlaxon.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableKlaxon.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

@@ -4,9 +4,12 @@ import com.natpryce.hamkrest.MatchResult
 import com.natpryce.hamkrest.MatchResult.Match
 import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
+import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.with
+import org.http4k.lens.Header
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.opentest4j.AssertionFailedError
 import java.io.InputStream
@@ -22,9 +25,11 @@ interface Approver {
     fun <T : HttpMessage> assertApproved(httpMessage: T)
 }
 
-class NamedResourceApprover(private val name: String,
-                            private val approvalContent: ApprovalContent,
-                            private val approvalSource: ApprovalSource) : Approver {
+class NamedResourceApprover(
+    private val name: String,
+    private val approvalContent: ApprovalContent,
+    private val approvalSource: ApprovalSource
+) : Approver {
 
     private val matchAllLineEndings = "\\r\\n?".toRegex()
     private fun String.normalizeLineEndings() = replace(matchAllLineEndings, "\n")
@@ -42,6 +47,7 @@ class NamedResourceApprover(private val name: String,
                         throw ApprovalFailed("No approved content found", actual, approved)
                     }
                 }
+
                 else -> try {
                     assertEquals(
                         approvalContent(this).reader().use { it.readText().normalizeLineEndings().trimEnd() },
@@ -57,11 +63,17 @@ class NamedResourceApprover(private val name: String,
     }
 }
 
-class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResource) : RuntimeException("$prefix. To approve output:\nmv '$actual' '$expected'")
+class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResource) :
+    RuntimeException("$prefix. To approve output:\nmv '$actual' '$expected'")
 
-fun Approver.assertApproved(response: Response, expectedStatus: Status) = assertApproved(response.apply { assertEquals(expectedStatus, response.status) })
-fun Approver.assertApproved(content: String) = assertApproved(Response(Status.OK).body(content))
-fun Approver.assertApproved(content: InputStream) = assertApproved(Response(Status.OK).body(content))
+fun Approver.assertApproved(response: Response, expectedStatus: Status) =
+    assertApproved(response.apply { assertEquals(expectedStatus, response.status) })
+
+fun Approver.assertApproved(content: String, contentType: ContentType? = null) =
+    assertApproved(Response(Status.OK).body(content).with(Header.CONTENT_TYPE of contentType))
+
+fun Approver.assertApproved(content: InputStream, contentType: ContentType? = null) =
+    assertApproved(Response(Status.OK).body(content).with(Header.CONTENT_TYPE of contentType))
 
 /**
  * Create a Hamkrest Matcher for this message that can be combined with other Matchers

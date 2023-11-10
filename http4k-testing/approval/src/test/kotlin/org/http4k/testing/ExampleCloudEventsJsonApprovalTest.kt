@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import org.http4k.core.CLOUD_EVENT_JSON
 import org.http4k.core.ContentType
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request

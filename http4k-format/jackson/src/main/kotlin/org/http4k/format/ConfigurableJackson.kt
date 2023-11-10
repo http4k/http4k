@@ -22,6 +22,8 @@ import io.cloudevents.jackson.JsonCloudEventData
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.format.JsonType.Integer
 import org.http4k.format.JsonType.Number
 import org.http4k.lens.BiDiBodyLensSpec
@@ -36,7 +38,7 @@ import kotlin.reflect.KClass
 
 open class ConfigurableJackson(
     val mapper: ObjectMapper,
-    val defaultContentType: ContentType = APPLICATION_JSON
+    override val defaultContentType: ContentType = APPLICATION_JSON
 ) : AutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
@@ -100,9 +102,10 @@ open class ConfigurableJackson(
         description: String? = null,
         contentNegotiation: ContentNegotiation = None,
         contentType: ContentType = defaultContentType
-    )
-        : BiDiBodyLensSpec<T> =
+    ): BiDiBodyLensSpec<T> =
         httpBodyLens(description, contentNegotiation, contentType).map(mapper.read(), mapper.write())
+
+    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String =
@@ -138,3 +141,6 @@ inline fun <reified T : Any> ObjectMapper.write(): (T) -> String = {
         }
     }
 }
+
+inline operator fun <reified T : Any> ConfigurableJackson.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJackson.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

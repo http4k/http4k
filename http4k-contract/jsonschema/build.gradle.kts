@@ -1,6 +1,3 @@
-import KotlinX.reflect
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-
 description = "Http4k Jackson JSON support"
 
 dependencies {

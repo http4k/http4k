@@ -12,8 +12,6 @@ import dev.forkhandles.values.UUIDValue
 import dev.forkhandles.values.Value
 import org.http4k.core.Uri
 import org.http4k.core.UriValue
-import org.http4k.contract.jsonschema.v3.FieldMetadata
-import org.http4k.contract.jsonschema.v3.Values4kFieldMetadataRetrievalStrategy
 import org.junit.jupiter.api.Test
 import java.time.Instant.MAX
 import java.time.LocalDate

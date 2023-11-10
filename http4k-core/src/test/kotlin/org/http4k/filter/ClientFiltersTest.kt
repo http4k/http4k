@@ -25,6 +25,7 @@ import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.parse
 import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
@@ -32,9 +33,11 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.Header
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
+import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
 import org.http4k.security.CredentialsProvider
 import org.junit.jupiter.api.BeforeEach
@@ -73,6 +76,17 @@ class ClientFiltersTest {
     fun `does not follow redirect by default`() {
         val defaultClient = server
         assertThat(defaultClient(Request(GET, "/redirect")), equalTo(Response(FOUND).header("location", "/ok")))
+    }
+
+    @Test
+    fun `follow redirects does not route to the wrong host`() {
+        val app = ClientFilters.FollowRedirects()
+            .then(reverseProxy(
+                "host1" to { Response(FOUND).with(Header.LOCATION of Uri.of("http://host2")) },
+                "host2" to { Response(OK).body("hello") }
+            ))
+
+        assertThat(app(Request(GET, "http://host1").header("host", "host1")), hasBody("hello"))
     }
 
     @Test

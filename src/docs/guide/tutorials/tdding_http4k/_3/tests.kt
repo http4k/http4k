@@ -2,6 +2,7 @@ package guide.tutorials.tdding_http4k._3
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import guide.tutorials.tdding_http4k._3.Matchers.answerShouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -13,7 +14,6 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import guide.tutorials.tdding_http4k._3.Matchers.answerShouldBe
 
 object Matchers {
     fun Response.answerShouldBe(expected: Int) {

@@ -10,7 +10,6 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.format.Jackson
 import org.http4k.format.Jackson.asFormatString
 import org.http4k.format.Jackson.prettify
 import org.http4k.hamkrest.hasBody
