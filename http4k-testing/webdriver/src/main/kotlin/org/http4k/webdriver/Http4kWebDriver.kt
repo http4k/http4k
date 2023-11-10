@@ -23,8 +23,7 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset.UTC
-import java.util.Date
-import java.util.UUID
+import java.util.*
 import org.http4k.core.cookie.Cookie as HCookie
 
 typealias Navigate = (Request) -> Unit
@@ -35,11 +34,12 @@ interface Http4KNavigation : Navigation {
 }
 
 class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDefaultZone()) : WebDriver {
-    val handler = ClientFilters.FollowRedirects()
-        .then(ClientFilters.Cookies(clock, cookieStorage()))
-        .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
-        .then(Filter { next -> { request -> next(request.header("host", latestHost)) } })
-        .then(initialHandler)
+    val handler =
+        Filter { next -> { request -> next(request.header("host", latestHost)) } }
+            .then(ClientFilters.FollowRedirects())
+            .then(ClientFilters.Cookies(clock, cookieStorage()))
+            .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
+            .then(initialHandler)
 
     private var current: Page? = null
     private var activeElement: WebElement? = null

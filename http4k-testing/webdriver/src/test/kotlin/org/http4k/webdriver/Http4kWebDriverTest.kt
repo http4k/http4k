@@ -7,6 +7,7 @@ import org.http4k.core.Method
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
@@ -287,6 +288,19 @@ class Http4kWebDriverTest {
         assertThat(driver.pageSource, equalTo("foo.com:5000"))
         driver.navigate().to("http://baz.com/")
         assertThat(driver.pageSource, equalTo("baz.com"))
+    }
+
+    @Test
+    fun `Set the host header when redirecting to a URL`() {
+        val driver = Http4kWebDriver({ req ->
+            when (req.header("host")) {
+                "redirect.com" -> Response(SEE_OTHER).header("location", "http://destination.com")
+                else -> Response(OK).body(req.header("host") ?: "none")
+            }
+        })
+
+        driver.navigate().to("http://redirect.com")
+        assertThat(driver.pageSource, equalTo("destination.com"))
     }
 
     private fun WebDriver.assertOnPage(expected: String) {
