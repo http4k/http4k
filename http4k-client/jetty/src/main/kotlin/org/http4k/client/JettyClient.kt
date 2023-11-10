@@ -1,12 +1,12 @@
 package org.http4k.client
 
 import org.eclipse.jetty.client.HttpClient
-import org.eclipse.jetty.client.api.Result
-import org.eclipse.jetty.client.util.BufferingResponseListener
-import org.eclipse.jetty.client.util.InputStreamRequestContent
-import org.eclipse.jetty.client.util.InputStreamResponseListener
+import org.eclipse.jetty.client.BufferingResponseListener
+import org.eclipse.jetty.client.InputStreamRequestContent
+import org.eclipse.jetty.client.InputStreamResponseListener
+import org.eclipse.jetty.client.Result
 import org.eclipse.jetty.http.HttpFields
-import org.eclipse.jetty.util.HttpCookieStore
+import org.eclipse.jetty.http.HttpCookieStore
 import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.BodyMode
 import org.http4k.core.Headers
@@ -115,6 +115,6 @@ object JettyClient {
 object PreCannedJettyHttpClients {
     fun defaultJettyHttpClient() = HttpClient().apply {
         isFollowRedirects = false
-        cookieStore = HttpCookieStore.Empty()
+        httpCookieStore = HttpCookieStore.Empty()
     }
 }
