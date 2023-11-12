@@ -22,18 +22,18 @@ Command-line JVM options, however, were tuned for the test to take advantage of 
 The full implementation of the benchmark can be found [here](https://github.com/TechEmpower/FrameworkBenchmarks/tree/master/frameworks/Kotlin/http4k).
 
 ### Results - Round 22
-Overall, http4k continues to do very well in this round of benchmarking, placing 19/104 - especially considering that the [ethos](/guide/concepts/rationale) of the library is one of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
+Overall, http4k continues to do well in this round of benchmarking, placing 48/159 - especially considering that the [ethos](/guide/concepts/rationale) of the library is one of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
 
 Rankings below are filtered for JVM libraries:
 
-#### Overall ranking (a: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=composite&l=xan3h7-cn3):
-*Top rank: 13/76
+#### Composite ranking: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=composite&l=xan3h7-cn3):
+*Top rank: 13/41
 
 #### DB query + HTML rendering: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=fortune&l=xan3h7-cn3):
 *Top rank: 25/146 - Apache backend*
 
 Database driver used is PostgreSql backed by a Hikari pool.
-Handlebars templating engine used for rendering.
+Rocker templating engine used for rendering.
 
 #### Multiple DB queries: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=query&l=xan3h7-cn3):
 *Top rank: 23/145 - Jetty Loom backend*
