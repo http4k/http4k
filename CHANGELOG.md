@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.10.3.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions
+- **http4k-contract** [Fix #1002]: Ability to use RequestContexts for providing a User Principal with Security.
 
 ### v5.10.2.0
 - **http4k-*** : Upgrade some dependency versions
