@@ -8,7 +8,7 @@ import org.http4k.server.ServerConfig
 import org.http4k.streaming.StreamingContract
 
 class JettyStreamingTest : StreamingContract() {
-    override fun serverConfig(): ServerConfig = Jetty(0)
+    override fun serverConfig(): ServerConfig = Jetty(0, ServerConfig.StopMode.Immediate)
 
     override fun createClient(): HttpHandler =
         ApacheClient(requestBodyMode = Stream, responseBodyMode = Stream)
