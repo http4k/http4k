@@ -34,8 +34,6 @@ class JettyEventStreamHandler(
                 val (status, headers, consumer) = sse(connectRequest)
                 response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
                     if (flushFailure == null) {
-
-//                        val async = request.startAsyncWithNoTimeout()
                         val output = Content.Sink.asOutputStream(response)
                         val scheduler = request.connectionMetaData.connector.scheduler
                         val server = request.connectionMetaData.connector.server
@@ -82,13 +80,6 @@ class JettyEventStreamHandler(
                 write(false, null, flushCallback)
             }
         }
-
-//        private fun JettyRequest.startAsyncWithNoTimeout() =
-//            startAsync().apply {
-//                // Infinite timeout because the continuation is never resumed,
-//                // but only completed on close
-//                timeout = 0
-//            }
     }
 }
 
