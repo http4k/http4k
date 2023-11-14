@@ -9,15 +9,10 @@ import org.eclipse.jetty.server.SecureRequestCustomizer
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
 import org.eclipse.jetty.server.SslConnectionFactory
+import org.eclipse.jetty.server.handler.ContextHandler
 import org.eclipse.jetty.server.handler.StatisticsHandler
-import org.eclipse.jetty.util.Callback
 import org.eclipse.jetty.util.ssl.SslContextFactory
-import org.eclipse.jetty.websocket.core.FrameHandler
-import org.eclipse.jetty.websocket.core.WebSocketComponents
-import org.eclipse.jetty.websocket.core.server.ServerUpgradeRequest
-import org.eclipse.jetty.websocket.core.server.ServerUpgradeResponse
-import org.eclipse.jetty.websocket.core.server.WebSocketNegotiator
-import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler
+import org.eclipse.jetty.websocket.server.WebSocketUpgradeHandler
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.sse.SseHandler
@@ -32,30 +27,24 @@ fun HttpHandler.toJettyHandler(withStatisticsHandler: Boolean = false): Wrapper 
 
 fun SseHandler.toJettySseHandler(): Wrapper = Wrapper(JettyEventStreamHandler(this))
 
-fun WsHandler.toJettyWsHandler() = WebSocketUpgradeHandler(WebSocketComponents()).apply {
-    addMapping("/*", this@toJettyWsHandler.toJettyNegotiator())
-}
+fun WsHandler.toJettyWsHandler(server: Server): Wrapper {
+    val contextHandler = ContextHandler("/")
+    val wsUpgradeHandler = WebSocketUpgradeHandler.from(server, contextHandler)
+    contextHandler.handler = wsUpgradeHandler
 
-fun WsHandler.toJettyNegotiator() = object : WebSocketNegotiator.AbstractNegotiator() {
-    override fun negotiate(
-        request: ServerUpgradeRequest,
-        response: ServerUpgradeResponse,
-        callback: Callback
-    ): FrameHandler? {
-        val frameHandler = request.asHttp4kRequest()?.let {
-            val consumer = this@toJettyNegotiator(it)
-            Http4kWebSocketFrameHandler(consumer).takeUnless {
-                val subProtocol = consumer.subprotocol
-                subProtocol != null && !request.hasSubProtocol(subProtocol)
+    wsUpgradeHandler.configure { container ->
+        container.addMapping("/*") { request, _, _ ->
+            request.asHttp4kRequest()?.let { http4kRequest ->
+                val consumer = this.invoke(http4kRequest)
+                if (consumer.subprotocol == null || request.hasSubProtocol(consumer.subprotocol)) {
+                    Http4kJettyServerWebSocketEndpoint(consumer, http4kRequest)
+                } else {
+                    null
+                }
             }
         }
-
-        if (frameHandler == null) {
-            callback.succeeded()
-        }
-
-        return frameHandler
     }
+    return contextHandler
 }
 
 typealias ConnectorBuilder = (Server) -> ServerConnector

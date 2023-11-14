@@ -138,12 +138,21 @@ private class JettyNonBlockingWebsocket(
         }
 
         override fun onWebSocketText(message: String) {
-            triggerMessage(WsMessage(message))
+            try {
+                triggerMessage(WsMessage(message))
+            } catch (e: Throwable) {
+                triggerError(e)
+            }
         }
 
         override fun onWebSocketBinary(payload: ByteBuffer, callback: Callback) {
-            triggerMessage(WsMessage(BufferUtil.toArray(payload).inputStream()))
-            callback.succeed()
+            try {
+                triggerMessage(WsMessage(BufferUtil.toArray(payload).inputStream()))
+                callback.succeed()
+            } catch (e: Throwable) {
+                triggerError(e)
+                callback.fail(e)
+            }
         }
 
         override fun onWebSocketError(cause: Throwable) {

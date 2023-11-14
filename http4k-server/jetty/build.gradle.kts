@@ -6,7 +6,7 @@ dependencies {
 
     api(platform("org.eclipse.jetty:jetty-bom:_"))
     api("org.eclipse.jetty:jetty-server")
-    api("org.eclipse.jetty.websocket:jetty-websocket-core-server")
+    api("org.eclipse.jetty.websocket:jetty-websocket-jetty-server")
 
     // this list is for reference since http2 support is optional
     implementation("org.eclipse.jetty.http2:jetty-http2-server")
