@@ -51,6 +51,13 @@ class ResponseCacheExtTest {
     }
 
     @Test
+    fun `adds immutable to a response Cache-Control header`() {
+        val immutableResponse = Response(OK).immutable()
+
+        assertThat(immutableResponse.header("Cache-Control"), equalTo("immutable"))
+    }
+
+    @Test
     fun `adds max-age to response Cache-Control header`() {
         val maxAgeResponse = Response(OK).maxAge(Duration.ofMinutes(1))
 
@@ -73,9 +80,9 @@ class ResponseCacheExtTest {
 
     @Test
     fun `can chain together multiple calls to add to the header`() {
-        val chainedResponse = Response(OK).public().private().maxAge(Duration.ofMinutes(1)).maxAge(Duration.ofMinutes(2))
+        val chainedResponse = Response(OK).public().private().maxAge(Duration.ofMinutes(1)).maxAge(Duration.ofMinutes(2)).immutable()
 
-        assertThat(chainedResponse.header("Cache-Control"), equalTo("private, max-age=120"))
+        assertThat(chainedResponse.header("Cache-Control"), equalTo("private, max-age=120, immutable"))
     }
 
     @Test
@@ -84,9 +91,10 @@ class ResponseCacheExtTest {
             .public().private()
             .noCache().noCache()
             .noStore().noStore()
+            .immutable().immutable()
             .maxAge(Duration.ofMinutes(1)).maxAge(Duration.ofMinutes(2))
             .staleIfError(Duration.ofMinutes(2)).staleIfError(Duration.ofMinutes(2))
 
-        assertThat(chainedResponse.header("Cache-Control"), equalTo("private, no-cache, no-store, max-age=120, stale-if-error=120"))
+        assertThat(chainedResponse.header("Cache-Control"), equalTo("private, no-cache, no-store, immutable, max-age=120, stale-if-error=120"))
     }
 }
