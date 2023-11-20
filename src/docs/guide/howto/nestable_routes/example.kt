@@ -38,7 +38,7 @@ fun main() {
         "/bob" bind routesWithFilter,
         "/static" bind staticWithFilter,
         "/pattern/{rest:.*}" bind { req: Request ->
-            Response(OK).body(req.path("rest") ?: "")
+            Response(OK).body(req.path("rest").orEmpty())
         },
         "/rita" bind routes(
             "/delete/{name}" bind DELETE to { Response(OK) },

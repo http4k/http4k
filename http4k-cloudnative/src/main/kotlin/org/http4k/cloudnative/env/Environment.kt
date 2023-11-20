@@ -107,10 +107,10 @@ class MapEnvironment private constructor(
  * entire list, or override the comma separator in your initial Environment.
  */
 object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
-    LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim) ?: emptyList() },
+    LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim).orEmpty() },
     LensSet { name, values, target ->
         values.fold(target - name) { acc, next ->
-            val existing = acc[name]?.let { listOf(it) } ?: emptyList()
+            val existing = acc[name]?.let { listOf(it) }.orEmpty()
             acc.set(name, (existing + next).joinToString(target.separator))
         }
     }

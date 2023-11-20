@@ -30,8 +30,8 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
 
         private val multipleSpaces = Regex("\\s+")
         private fun Request.canonicalHeaders(): String = headers
-            .map { it.first.lowercase(getDefault()) to (it.second?.replace(multipleSpaces, " ")?.trim() ?: "") }
-            .groupBy ({ it.first }) { it.second }
+            .map { it.first.lowercase(getDefault()) to (it.second?.replace(multipleSpaces, " ")?.trim().orEmpty()) }
+            .groupBy({ it.first }) { it.second }
             .mapValues { it.value.joinToString(",") }
             .toList()
             .sortedBy { it.first }

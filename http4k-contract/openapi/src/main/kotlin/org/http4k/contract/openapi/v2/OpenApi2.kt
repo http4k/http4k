@@ -119,7 +119,7 @@ open class OpenApi2<out NODE>(
                         "type" to string(meta.coerceForSimpleType().value)
                     )
                 } +
-                (description?.let { listOf("description" to string(it)) } ?: emptyList())
+                (description?.let { listOf("description" to string(it)) }.orEmpty())
         )
     }
 
@@ -132,7 +132,7 @@ open class OpenApi2<out NODE>(
                 if (location != "formData") {
                     "schema" to (schema?.node ?: obj("type" to string(paramMeta.value)))
                 } else "type" to string(paramMeta.coerceForSimpleType().value)
-            ) + (description?.let { listOf("description" to string(it)) } ?: emptyList())
+            ) + (description?.let { listOf("description" to string(it)) }.orEmpty())
         )
     }
 
@@ -145,13 +145,13 @@ open class OpenApi2<out NODE>(
             Header.CONTENT_TYPE(it.message)?.equalsIgnoringDirectives(APPLICATION_JSON) ?: false
         }?.asSchema()
 
-        val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
+        val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) }.orEmpty()
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { it.renderMeta() }
 
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagNames()
         val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
-            ?: emptyList())
+            .orEmpty())
 
         return json {
             val security = listOfNotNull(route.meta.security ?: contractSecurity)
@@ -169,7 +169,7 @@ open class OpenApi2<out NODE>(
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
                     "security" to array(security)
-                ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
+                ) + (route.meta.description?.let { listOf("description" to string(it)) }.orEmpty())
 
             FieldAndDefinitions(
                 route.method.toString().lowercase(getDefault()) to obj(fields),
@@ -210,7 +210,7 @@ open class OpenApi2<out NODE>(
     private fun ContractRoute.tagNames() = tags.map(Tag::name).map(json::string)
 
     private fun ApiInfo.asJson() = json {
-        obj("title" to string(title), "version" to string(version), "description" to string(description ?: ""))
+        obj("title" to string(title), "version" to string(version), "description" to string(description.orEmpty()))
     }
 
     private fun List<ContractRoute>.renderTags(globalTags: Set<Tag>) =
@@ -239,7 +239,7 @@ private data class FieldAndDefinitions<out NODE>(
     val definitions: Set<Pair<String, NODE>>
 )
 
-private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()
+private fun <T> T?.asList() = this?.let(::listOf).orEmpty()
 
 // we do this to continue to treat complex objects as strings in params
 private fun ParamMeta.coerceForSimpleType() = when (this) {

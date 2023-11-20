@@ -74,7 +74,7 @@ class UserDbHandler : GraphQLWithContextHandler<String> {
         graphQL.execute(
             Builder()
                 .query(payload.query)
-                .variables(payload.variables ?: emptyMap())
+                .variables(payload.variables.orEmpty())
                 .dataLoaderRegistry(dataLoaderRegistry)
                 .context(context)
         )

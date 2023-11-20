@@ -72,7 +72,7 @@ internal fun Request.asOkHttp(): okhttp3.Request = headers.fold(
         .url(uri.toString())
         .method(method.toString(), requestBody())
 ) { memo, (first, second) ->
-    val notNullValue = second ?: ""
+    val notNullValue = second.orEmpty()
     memo.addHeader(first, notNullValue)
 }.build()
 

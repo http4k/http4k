@@ -11,7 +11,7 @@ import org.http4k.lens.ParamMeta.ObjectParam
 inline fun <reified T : Any> ConfigurableJackson.cloudEventDataLens(): Lens<CloudEvent, T> {
     val get = LensGet<CloudEvent, T> { _, target ->
         target.data?.let { listOf(PojoCloudEventDataMapper.from(mapper, jacksonTypeRef<T>()).map(it).value) }
-            ?: emptyList()
+            .orEmpty()
     }
 
     return object : LensSpec<CloudEvent, T>("CloudEvent", ObjectParam, get) {}.required(T::class.simpleName!!)
