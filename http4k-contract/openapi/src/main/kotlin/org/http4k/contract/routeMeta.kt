@@ -69,7 +69,7 @@ class RouteMetaDsl internal constructor() {
     fun returning(vararg responseMetas: HttpMessageMeta<Response>) {
         responseMetas.forEach { responses += it }
         responseMetas.forEach {
-            produces += CONTENT_TYPE(it.message)?.let { listOf(it) } ?: emptyList()
+            produces += CONTENT_TYPE(it.message)?.let { listOf(it) }.orEmpty()
         }
     }
 

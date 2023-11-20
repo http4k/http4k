@@ -53,7 +53,7 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
 object JacksonFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
     override fun invoke(target: Any, fieldName: String): FieldMetadata =
         FieldMetadata(target.javaClass.findPropertyDescription(fieldName)?.let { mapOf("description" to it) }
-            ?: emptyMap())
+            .orEmpty())
 
     /**
      * Scan all constructors until one contains the property named [name] and has an [JsonPropertyDescription]

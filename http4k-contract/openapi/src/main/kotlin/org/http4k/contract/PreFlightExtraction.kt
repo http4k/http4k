@@ -23,7 +23,7 @@ fun interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *
          */
         val All = PreFlightExtraction {
             it.requestParams + (it.body?.let { listOf(it) }
-                ?: emptyList<BodyLens<*>>())
+                .orEmpty())
         }
 
         /**

@@ -28,7 +28,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?): JsonSchema<NODE> {
-        val schema = json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix ?: "", null)
+        val schema = json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix.orEmpty(), null)
         return JsonSchema(
             json.asJsonObject(schema),
             schema.definitions().map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()

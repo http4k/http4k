@@ -27,8 +27,4 @@ private fun Headers.withSameFieldNames() =
         .values
         .toList()
 
-fun String?.safeLong(): Long? = try {
-    this?.toLong()
-} catch (e: Exception) {
-    null
-}
+fun String?.safeLong(): Long? = this?.toLongOrNull()
