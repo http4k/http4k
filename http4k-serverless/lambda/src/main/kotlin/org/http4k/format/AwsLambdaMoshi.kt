@@ -6,6 +6,7 @@ object AwsLambdaMoshi : ConfigurableMoshi(
     Moshi.Builder()
         .addTyped(CloudWatchLogsEventAdapter)
         .addTyped(DynamodbEventAdapter)
+        .addTyped(EventBridgeEventAdapter)
         .addTyped(KinesisEventAdapter)
         .addTyped(KinesisFirehoseEventAdapter)
         .addTyped(S3EventAdapter)
