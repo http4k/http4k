@@ -67,7 +67,7 @@ class ClientFiltersTest {
 
     @Test
     fun `see other redirect doesn't forward any payload`() {
-        val response = followRedirects(Request(GET, "/see-other").body("body here"))
+        val response = followRedirects(Request(GET, "http://myhost/see-other").body("body here"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.body, equalTo(EMPTY))
     }
@@ -75,7 +75,7 @@ class ClientFiltersTest {
     @Test
     fun `does not follow redirect by default`() {
         val defaultClient = server
-        assertThat(defaultClient(Request(GET, "/redirect")), equalTo(Response(FOUND).header("location", "/ok")))
+        assertThat(defaultClient(Request(GET, "http://myhost/redirect")), equalTo(Response(FOUND).header("location", "/ok")))
     }
 
     @Test
@@ -91,17 +91,17 @@ class ClientFiltersTest {
 
     @Test
     fun `follows redirect for temporary redirect response`() {
-        assertThat(followRedirects(Request(GET, "/redirect")), equalTo(Response(OK).body("ok")))
+        assertThat(followRedirects(Request(GET, "http://myhost/redirect")), equalTo(Response(OK).body("ok")))
     }
 
     @Test
     fun `follows redirect for post`() {
-        assertThat(followRedirects(Request(POST, "/redirect")), equalTo(Response(OK).body("ok")))
+        assertThat(followRedirects(Request(POST, "http://myhost/redirect")), equalTo(Response(OK).body("ok")))
     }
 
     @Test
     fun `follows redirect for put`() {
-        assertThat(followRedirects(Request(PUT, "/redirect")), equalTo(Response(OK).body("ok")))
+        assertThat(followRedirects(Request(PUT, "http://myhost/redirect")), equalTo(Response(OK).body("ok")))
     }
 
     @Test
@@ -111,29 +111,29 @@ class ClientFiltersTest {
             "/redirect" bind GET to { Response(SEE_OTHER).header("Location", "/ok") }
         )
         val client = ClientFilters.FollowRedirects().then(server)
-        assertThat(client(Request(GET, "/ok")).status, equalTo(OK))
-        assertThat(client(Request(GET, "/redirect")).status, equalTo(OK))
+        assertThat(client(Request(GET, "http://myhost/ok")).status, equalTo(OK))
+        assertThat(client(Request(GET, "http://myhost/redirect")).status, equalTo(OK))
     }
 
     @Test
     fun `supports absolute redirects`() {
-        assertThat(followRedirects(Request(GET, "/absolute-redirect")), equalTo(Response(OK).body("absolute")))
+        assertThat(followRedirects(Request(GET, "http://myhost/absolute-redirect")), equalTo(Response(OK).body("absolute")))
     }
 
     @Test
     fun `discards query parameters in relative redirects`() {
-        assertThat(followRedirects(Request(GET, "/redirect?foo=bar")), equalTo(Response(OK).body("ok")))
+        assertThat(followRedirects(Request(GET, "http://myhost/redirect?foo=bar")), equalTo(Response(OK).body("ok")))
     }
 
     @Test
     fun `discards charset from location header`() {
-        assertThat(followRedirects(Request(GET, "/redirect-with-charset")), equalTo(Response(OK).body("destination")))
+        assertThat(followRedirects(Request(GET, "http://myhost/redirect-with-charset")), equalTo(Response(OK).body("destination")))
     }
 
     @Test
     fun `prevents redirection loop after 10 redirects`() {
         try {
-            followRedirects(Request(GET, "/loop"))
+            followRedirects(Request(GET, "http://myhost/loop"))
             fail("should have looped")
         } catch (e: IllegalStateException) {
             assertThat(e.message, equalTo("Too many redirection"))
