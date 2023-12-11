@@ -1,0 +1,7 @@
+or
+	and
+		Host or URI: 'host'
+		<http-handler>
+	and
+		Host or URI: 'anotherHost'
+		<http-handler>

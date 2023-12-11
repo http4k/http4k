@@ -29,6 +29,8 @@ internal data class RouterBasedHttpHandler(
     )
 
     override fun withBasePath(new: String): RoutingHttpHandler = copy(router = router.withBasePath(new))
+
+    override fun toString() = description.toString()
 }
 
 internal val routeNotFoundHandler: HttpHandler = { Response(NOT_FOUND.description("Route not found")) }

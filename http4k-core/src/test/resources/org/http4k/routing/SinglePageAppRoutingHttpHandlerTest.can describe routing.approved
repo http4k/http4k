@@ -1,4 +1,7 @@
 {
-  "description" : "unavailable",
-  "children" : [ ]
+  "description" : "SPA at /route-contract",
+  "children" : [ {
+    "description" : "Static files /route-contract",
+    "children" : [ ]
+  } ]
 }

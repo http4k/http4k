@@ -43,6 +43,8 @@ internal data class StaticRoutingHttpHandler(
             Unmatched(description)
     }
 
+    override fun toString() = description.toString()
+
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }
 
