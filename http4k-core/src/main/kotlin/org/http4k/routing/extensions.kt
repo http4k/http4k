@@ -19,7 +19,7 @@ internal class PredicateRouter(private val predicate: (Request) -> Boolean, rawD
     override fun match(request: Request): RouterMatch =
         if (predicate(request)) MatchedWithoutHandler(description) else Unmatched(description)
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 }
 
 fun Request.path(name: String): String? = when (this) {
@@ -39,7 +39,7 @@ internal class MethodRouter(private val method: Method) : Router {
 
     override fun withBasePath(new: String): Router = this
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 }
 
 fun Method.and(that: Router) = asRouter().and(that)

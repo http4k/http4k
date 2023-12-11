@@ -56,6 +56,6 @@ internal data class SinglePageAppRoutingHandler(
 
     override val description = RouterDescription("SPA at $pathSegments", listOf(staticHandler.description))
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 
 }

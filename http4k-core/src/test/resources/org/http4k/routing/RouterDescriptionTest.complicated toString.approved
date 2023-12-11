@@ -3,11 +3,11 @@ or
 		Host or URI: 'host'
 		and
 	method == GET
-	template == 'route-contract'
+	template == 'foo'
 
 	and
 		Host or URI: 'anotherHost'
 		and
 	method == GET
-	template == 'route-contract'
+	template == 'bar'
 

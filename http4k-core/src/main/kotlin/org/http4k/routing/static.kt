@@ -48,7 +48,7 @@ data class StaticRoutingHttpHandler(
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 }
 
 internal class ResourceLoadingHandler(

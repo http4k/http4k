@@ -6,7 +6,7 @@
       "description" : "Host or URI: 'host'",
       "children" : [ ]
     }, {
-      "description" : "<http-handler>",
+      "description" : "and\n\tmethod == GET\n\ttemplate == 'route-contract'\n",
       "children" : [ ]
     } ]
   }, {
@@ -15,7 +15,7 @@
       "description" : "Host or URI: 'anotherHost'",
       "children" : [ ]
     }, {
-      "description" : "<http-handler>",
+      "description" : "and\n\tmethod == GET\n\ttemplate == 'route-contract'\n",
       "children" : [ ]
     } ]
   } ]

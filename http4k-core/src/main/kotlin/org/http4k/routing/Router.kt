@@ -42,7 +42,7 @@ interface Router {
 
 data class RouterDescription(val description: String, val children: List<RouterDescription> = listOf()) {
 
-    override fun toString(): String = friendlyToString(1)
+    override fun toString(): String = friendlyToString()
 
     companion object {
         val unavailable = RouterDescription("unavailable")
@@ -118,7 +118,7 @@ internal data class OrRouter private constructor(private val list: List<Router>)
 
     override val description = RouterDescription("or", list.map { it.description })
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else OrRouter(list)
@@ -138,7 +138,7 @@ internal data class AndRouter private constructor(private val list: List<Router>
 
     override val description = RouterDescription("and", list.map { it.description })
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else AndRouter(list)
@@ -158,9 +158,14 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
         else -> PassthroughRouter(new.then(handler))
     }
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 
-    override val description = RouterDescription("<http-handler>")
+    override val description = RouterDescription(
+        when (handler) {
+            is Router -> handler.description.friendlyToString()
+            else -> "<http-handler>"
+        }
+    )
 }
 
 internal data class Prefix(private val template: String) : Router {
@@ -173,7 +178,7 @@ internal data class Prefix(private val template: String) : Router {
 
     override val description = RouterDescription("prefix == '$template'")
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 }
 
 internal data class TemplateRouter(
@@ -205,11 +210,11 @@ internal data class TemplateRouter(
 
     override val description = RouterDescription("template == '$template'")
 
-    override fun toString() = description.toString()
+    override fun toString() = description.friendlyToString()
 }
 
 val Fallback = { _: Request -> true }.asRouter("*")
 
-internal fun RouterDescription.friendlyToString(i: Int): String = "$description\n" + children.joinToString("") {
-    "\t".repeat(i) + it.friendlyToString(i + 1)
+fun RouterDescription.friendlyToString(indent: Int = 0): String = "$description\n" + children.joinToString("") {
+    "\t".repeat(indent + 1) + it.friendlyToString(indent + 1)
 }
