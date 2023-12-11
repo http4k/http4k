@@ -160,12 +160,10 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
 
     override fun toString() = description.friendlyToString()
 
-    override val description = RouterDescription(
-        when (handler) {
-            is Router -> handler.description.friendlyToString()
-            else -> "<http-handler>"
-        }
-    )
+    override val description = when (handler) {
+        is Router -> handler.description
+        else -> RouterDescription("<http-handler>")
+    }
 }
 
 internal data class Prefix(private val template: String) : Router {
@@ -210,11 +208,17 @@ internal data class TemplateRouter(
 
     override val description = RouterDescription("template == '$template'")
 
-    override fun toString() = description.friendlyToString()
+    override fun toString(): String {
+        println("TOSTRING")
+        return description.friendlyToString()
+    }
 }
 
 val Fallback = { _: Request -> true }.asRouter("*")
 
-fun RouterDescription.friendlyToString(indent: Int = 0): String = "$description\n" + children.joinToString("") {
-    "\t".repeat(indent + 1) + it.friendlyToString(indent + 1)
+fun RouterDescription.friendlyToString(indent: Int = 0): String {
+    println("" + indent + description)
+    return "$description\n" + children.joinToString("") {
+        "\t".repeat(indent + 1) + it.friendlyToString(indent + 1)
+    }
 }

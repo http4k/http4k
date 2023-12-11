@@ -2,12 +2,10 @@ or
 	and
 		Host or URI: 'host'
 		and
-	method == GET
-	template == 'route-contract'
-
+			method == GET
+			template == 'route-contract'
 	and
 		Host or URI: 'anotherHost'
 		and
-	method == GET
-	template == 'route-contract'
-
+			method == GET
+			template == 'route-contract'
