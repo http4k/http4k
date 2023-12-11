@@ -208,17 +208,11 @@ internal data class TemplateRouter(
 
     override val description = RouterDescription("template == '$template'")
 
-    override fun toString(): String {
-        println("TOSTRING")
-        return description.friendlyToString()
-    }
+    override fun toString() = description.friendlyToString()
 }
 
 val Fallback = { _: Request -> true }.asRouter("*")
 
-fun RouterDescription.friendlyToString(indent: Int = 0): String {
-    println("" + indent + description)
-    return "$description\n" + children.joinToString("") {
-        "\t".repeat(indent + 1) + it.friendlyToString(indent + 1)
-    }
+fun RouterDescription.friendlyToString(indent: Int = 0): String = "$description\n" + children.joinToString("") {
+    "\t".repeat(indent + 1) + it.friendlyToString(indent + 1)
 }
