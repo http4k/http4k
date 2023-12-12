@@ -17,7 +17,8 @@ import java.net.InetSocketAddress
 class Undertow(
     val port: Int = 8000,
     val enableHttp2: Boolean,
-    override val stopMode: StopMode = StopMode.Immediate
+    override val stopMode: StopMode = StopMode.Immediate,
+    val host: String = "0.0.0.0",
 ) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, false)
     constructor(port: Int = 8000, enableHttp2: Boolean) : this(port, enableHttp2, StopMode.Immediate)
@@ -43,7 +44,7 @@ class Undertow(
 
         return object : Http4kServer {
             val server = Undertow.builder()
-                .addHttpListener(port, "0.0.0.0")
+                .addHttpListener(port, host)
                 .setServerOption(ENABLE_HTTP2, enableHttp2)
                 .setWorkerThreads(32 * Runtime.getRuntime().availableProcessors())
                 .setHandler(handlerWithSse).build()
