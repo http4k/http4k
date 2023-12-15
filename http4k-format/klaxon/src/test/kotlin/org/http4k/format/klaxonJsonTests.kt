@@ -78,7 +78,7 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
 
     @Test
     @Disabled("no support for this")
-    override fun `uses enum as a key`() {
+    override fun `serialises enum as a key correctly`() {
     }
 
     @Test

@@ -81,7 +81,7 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
 
     @Test
     @Disabled("no support for this")
-    override fun `uses enum as a key`() {
+    override fun `serialises enum as a key correctly`() {
     }
 
     override fun strictMarshaller() = throw UnsupportedOperationException()

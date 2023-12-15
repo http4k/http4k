@@ -183,7 +183,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Disabled
-    override fun `uses enum as a key`() {
+    override fun `serialises enum as a key correctly`() {
     }
 
 

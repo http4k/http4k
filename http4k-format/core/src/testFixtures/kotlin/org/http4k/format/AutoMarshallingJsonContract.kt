@@ -3,6 +3,7 @@ package org.http4k.format
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.format.StandardEnum.*
 import org.junit.jupiter.api.Test
 
 
@@ -61,7 +62,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    open fun `uses enum as a key`() {
+    open fun `serialises enum as a key correctly`() {
         val marshaller = customMarshaller()
         val input = SpecificMapHolder(mapOf(AnEnum.woo to MyValue.of("yay")))
         val expected = """{"value":{"yay":"yay"}}"""
@@ -70,6 +71,10 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
         assertThat(
             marshaller.asFormatString(GenericMapHolder(mapOf(MyValue.of("yay") to AnEnum.woo))).normaliseJson(),
             equalTo(expected)
+        )
+
+        assertThat(marshaller.asFormatString(GenericMapHolder(mapOf(foo to "bar"))),
+            equalTo("""{"value":{"foo":"bar"}}""")
         )
     }
 

@@ -48,6 +48,10 @@ data class CommonJdkPrimitives(
     val status: Status
 )
 
+enum class StandardEnum {
+    foo
+}
+
 enum class AnEnum(val wire: String) {
     woo("yay");
 
