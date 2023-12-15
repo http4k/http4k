@@ -48,6 +48,14 @@ data class CommonJdkPrimitives(
     val status: Status
 )
 
+enum class AnEnum(val wire: String) {
+    woo("yay");
+
+    companion object {
+        fun parse(wire: String) = entries.first { it.wire == wire }
+    }
+}
+
 data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
 
 data class RegexHolder(val regex: Regex)
@@ -67,6 +75,8 @@ data class InOnly(val value: String)
 data class ExceptionHolder(val value: Throwable)
 class CustomException(m: String) : RuntimeException(m)
 data class ZonesAndLocale(val zoneId: ZoneId, val zoneOffset: ZoneOffset, val locale: Locale)
+data class GenericMapHolder(val value: Map<Any, Any>)
+data class SpecificMapHolder(val value: Map<AnEnum, MyValue>)
 
 class MyValue(value: String) : StringValue(value) {
     companion object : StringValueFactory<MyValue>(::MyValue)
@@ -313,6 +323,7 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = bigDecimal(::BigDecimalHold
     .bigInteger(::BigIntegerHolder, BigIntegerHolder::value)
     .boolean(::BooleanHolder, BooleanHolder::value)
     .text(::AnotherString, AnotherString::value)
+    .text(AnEnum::parse, AnEnum::wire)
     .text(OutOnly::value)
     .text(::InOnly)
     .uuid({ it }, { it })

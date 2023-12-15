@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.KeyDeserializer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -19,7 +20,18 @@ fun <T : ObjectMapper> KotlinModule.asConfigurable(mapper: T): AutoMappingConfig
     override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getBigIntegerValue)
     override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getDecimalValue)
     override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = adapter(mapping, JsonGenerator::writeBoolean, JsonParser::getBooleanValue)
-    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = adapter(mapping, JsonGenerator::writeString, JsonParser::getText)
+    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) =
+        adapter(mapping, JsonGenerator::writeString, JsonParser::getText)
+            .apply {
+                if(mapping.clazz.isEnum) {
+                    addKeySerializer(mapping.clazz, object : JsonSerializer<OUT>() {
+                        override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeFieldName(mapping(value))
+                    })
+                    addKeyDeserializer(mapping.clazz, object : KeyDeserializer() {
+                        override fun deserializeKey(key: String, ctxt: DeserializationContext) = mapping(key)
+                    })
+                }
+            }
 
     private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, write: JsonGenerator.(IN) -> Unit, read: JsonParser.() -> IN) =
         apply {

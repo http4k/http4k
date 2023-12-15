@@ -182,6 +182,11 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     override fun `exception is marshalled`() {
     }
 
+    @Disabled
+    override fun `uses enum as a key`() {
+    }
+
+
     @Test
     override fun `fails decoding when a required value is null`() {
         assertThat({ KotlinxSerialization.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
