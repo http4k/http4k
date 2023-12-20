@@ -25,6 +25,7 @@ class AwsPreSignRequests(
             .query("X-Amz-SignedHeaders", signedHeaders)
             .query("X-Amz-Credential", "${credentials.accessKey}/${scope.datedScope(awsDate)}")
             .query("X-Amz-Expires", expires.seconds.toString())
+            .let { if (credentials.sessionToken != null) it.query("X-Amz-Security-Token", credentials.sessionToken) else it }
 
         val canonicalRequest = AwsCanonicalRequest.of(fullRequest, Payload.Mode.Unsigned(request))
         val signature = AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, awsDate)
