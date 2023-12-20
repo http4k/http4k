@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.11.1.0
 - **http4k-aws** : Pre-sign AWS requests with the new `AwsPreSignRequests` class. H/T @oharaandrew314
+- **http4k-serverless-lambda** : [Fix #1013] Support multi value query parameters in ApiGatewayV2LambdaFunction (http4k-serverless/lambda)
 
 ### v5.11.0.0
 - **http4k-*** : Upgrade some dependency versions
