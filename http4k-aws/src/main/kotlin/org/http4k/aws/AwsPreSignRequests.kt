@@ -7,12 +7,23 @@ import java.time.Duration
 
 class AwsPreSignRequests(
     private val scope: AwsCredentialScope,
-    private val credentials: AwsCredentials,
+    private val credentialsProvider: () -> AwsCredentials,
     private val clock: Clock = Clock.systemDefaultZone()
 ) {
+    constructor(
+        scope: AwsCredentialScope,
+        credentials: AwsCredentials,
+        clock: Clock = Clock.systemDefaultZone()
+    ): this(
+        scope = scope,
+        credentialsProvider = { credentials },
+        clock = clock
+    )
+
     operator fun invoke(request: Request, expires: Duration): AwsPreSignedRequest {
         val time = clock.instant()
         val awsDate = AwsRequestDate.of(time)
+        val credentials = credentialsProvider()
 
         val fullRequest = request
             .replaceHeader("Host", request.uri.host)

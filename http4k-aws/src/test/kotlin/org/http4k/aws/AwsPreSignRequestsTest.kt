@@ -20,7 +20,7 @@ class AwsPreSignRequestsTest {
         val time = Instant.parse("2013-05-24T00:00:00Z")
         val signer = AwsPreSignRequests(
             clock = Clock.fixed(time, ZoneOffset.UTC),
-            credentials = AwsCredentials("AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"),
+            credentialsProvider = { AwsCredentials("AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY") },
             scope = AwsCredentialScope("us-east-1", "s3")
         )
         val request = Request(Method.GET, "https://examplebucket.s3.amazonaws.com/test.txt")
