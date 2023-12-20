@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.11.1.0
+- **http4k-aws** : Pre-sign AWS requests with the new `AwsPreSignRequests` class. H/T @oharaandrew314
+
 ### v5.11.0.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-core** : [Unlikely Break: Fix #1011] Jackson does not honour serialisation of Enums when they are used as Map keys. The fix MAY break JSON serialisation (which actually is a bug as the expected behaviour is for the Enums to use the predefined mapping).
