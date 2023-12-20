@@ -4,7 +4,6 @@ import org.http4k.core.Request
 import org.http4k.filter.Payload
 import java.time.Clock
 import java.time.Duration
-import java.util.Locale
 
 class AwsPreSignRequests(
     private val scope: AwsCredentialScope,
@@ -15,14 +14,11 @@ class AwsPreSignRequests(
         val time = clock.instant()
         val awsDate = AwsRequestDate.of(time)
 
-        val headers = request.headers + ("host" to request.uri.host)
-        val signedHeaders = headers.map { it.first.lowercase(Locale.getDefault()) }.toSet().sorted().joinToString(";")
-
         val fullRequest = request
             .replaceHeader("Host", request.uri.host)
+            .let { it.query("X-Amz-SignedHeaders", it.signedHeaders()) }
             .query("X-Amz-Algorithm", "AWS4-HMAC-SHA256")
             .query("X-Amz-Date", awsDate.full)
-            .query("X-Amz-SignedHeaders", signedHeaders)
             .query("X-Amz-Credential", "${credentials.accessKey}/${scope.datedScope(awsDate)}")
             .query("X-Amz-Expires", expires.seconds.toString())
             .let { if (credentials.sessionToken != null) it.query("X-Amz-Security-Token", credentials.sessionToken) else it }

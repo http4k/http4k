@@ -25,9 +25,6 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
             return AwsCanonicalRequest(canonical, signedHeaders, payload.hash)
         }
 
-        private fun Request.signedHeaders(): String =
-            headers.map { it.first.lowercase(getDefault()) }.toSet().sorted().joinToString(";")
-
         private val multipleSpaces = Regex("\\s+")
         private fun Request.canonicalHeaders(): String = headers
             .map { it.first.lowercase(getDefault()) to (it.second?.replace(multipleSpaces, " ")?.trim().orEmpty()) }
@@ -49,3 +46,6 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
             }
     }
 }
+
+internal fun Request.signedHeaders(): String =
+    headers.map { it.first.lowercase(getDefault()) }.toSet().sorted().joinToString(";")
