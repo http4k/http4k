@@ -44,6 +44,7 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
             .joinToString("/") {
                 it.urlEncoded().replace("+", "%20").replace("*", "%2A").replace("%7E", "~")
             }
+            .let { if (it.startsWith("/")) it else "/$it" }
     }
 }
 
