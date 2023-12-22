@@ -5,7 +5,9 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.filter.CanonicalPayload
+import org.http4k.routing.path
 import org.http4k.security.HmacSha256
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
@@ -52,6 +54,16 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
 
 
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
+    }
+
+    @Test
+    fun `normalises path without leading slash`() {
+        val withLeadingSlash =
+            AwsCanonicalRequest.of(Request(GET, Uri.of("http://www.google.com/foo")), canonicalPayload)
+        val withoutLeadingSlash =
+            AwsCanonicalRequest.of(Request(GET, Uri.of("http://www.google.com").path("foo")), canonicalPayload)
+
+        assertThat(withLeadingSlash, equalTo(withoutLeadingSlash))
     }
 
     @Test
