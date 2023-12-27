@@ -7,14 +7,14 @@ import java.time.Duration
 
 fun interface AwsPreRequestSigner : (Request, Duration) -> AwsPreSignedRequest
 
-fun AwsPreRequestSigner(scope: AwsCredentialScope, credentials: AwsCredentials, clock: Clock = Clock.systemUTC()) =
-    AwsPreRequestSigner(
+fun AwsRequestPreSigner(scope: AwsCredentialScope, credentials: AwsCredentials, clock: Clock = Clock.systemUTC()) =
+    AwsRequestPreSigner(
         scope = scope,
         credentialsProvider = { credentials },
         clock = clock
     )
 
-fun AwsPreRequestSigner(
+fun AwsRequestPreSigner(
     scope: AwsCredentialScope,
     credentialsProvider: () -> AwsCredentials,
     clock: Clock = Clock.systemUTC()
