@@ -32,10 +32,11 @@ class JettyEventStreamHandler(
                 val scheduler = baseRequest.httpChannel.connector.scheduler
                 val server = baseRequest.httpChannel.connector.server
 
-                val emitter = Jetty11EventStreamEmitter(connectRequest, output, heartBeatDuration, scheduler, onClose = {
-                    async.complete()
-                    server.removeEventListener(it)
-                }).also(server::addEventListener)
+                val emitter =
+                    Jetty11EventStreamEmitter(connectRequest, output, heartBeatDuration, scheduler, onClose = {
+                        async.complete()
+                        server.removeEventListener(it)
+                    }).also(server::addEventListener)
                 consumer(emitter)
 
                 baseRequest.isHandled = true
@@ -44,29 +45,27 @@ class JettyEventStreamHandler(
 
         if (!baseRequest.isHandled) super.handle(target, baseRequest, request, response)
     }
-
-    companion object {
-        private fun HttpServletRequest.isEventStream() =
-            method == "GET" && getHeaders("Accept").toList().any { it.contains(TEXT_EVENT_STREAM.value) }
-
-        private fun HttpServletResponse.writeEventStreamResponse(newStatus: Status, headers: Headers) {
-            status = newStatus.code
-            characterEncoding = StandardCharsets.UTF_8.name()
-            contentType = TEXT_EVENT_STREAM.value
-            // By adding this header, and not closing the connection,
-            // we disable HTTP chunking, and we can use write()+flush()
-            // to send data in the text/event-stream protocol
-            addHeader("Connection", "close")
-            headers.forEach { addHeader(it.first, it.second) }
-            flushBuffer()
-        }
-
-        private fun HttpServletRequest.startAsyncWithNoTimeout() =
-            startAsync().apply {
-                // Infinite timeout because the continuation is never resumed,
-                // but only completed on close
-                timeout = 0
-            }
-    }
 }
+
+private fun HttpServletRequest.isEventStream() =
+    method == "GET" && getHeaders("Accept").toList().any { it.contains(TEXT_EVENT_STREAM.value) }
+
+private fun HttpServletResponse.writeEventStreamResponse(newStatus: Status, headers: Headers) {
+    status = newStatus.code
+    characterEncoding = StandardCharsets.UTF_8.name()
+    contentType = TEXT_EVENT_STREAM.value
+    // By adding this header, and not closing the connection,
+    // we disable HTTP chunking, and we can use write()+flush()
+    // to send data in the text/event-stream protocol
+    addHeader("Connection", "close")
+    headers.forEach { addHeader(it.first, it.second) }
+    flushBuffer()
+}
+
+private fun HttpServletRequest.startAsyncWithNoTimeout() =
+    startAsync().apply {
+        // Infinite timeout because the continuation is never resumed,
+        // but only completed on close
+        timeout = 0
+    }
 
