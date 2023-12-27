@@ -13,15 +13,15 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 
-class AwsPreSignRequestsTest {
+class AwsPreRequestSignerTest {
 
     @Test
     fun `signed with standard credentials`() {
         val time = Instant.parse("2013-05-24T00:00:00Z")
-        val signer = AwsPreSignRequests(
-            clock = Clock.fixed(time, ZoneOffset.UTC),
-            credentials = AwsCredentials("AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"),
-            scope = AwsCredentialScope("us-east-1", "s3")
+        val signer = AwsPreRequestSigner(
+            scope = AwsCredentialScope("us-east-1", "s3"),
+            credentialsProvider = { AwsCredentials("AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY") },
+            clock = Clock.fixed(time, ZoneOffset.UTC)
         )
         val request = Request(Method.GET, "https://examplebucket.s3.amazonaws.com/test.txt")
         val signed = signer(request, Duration.ofHours(24))
@@ -44,14 +44,14 @@ class AwsPreSignRequestsTest {
 
     @Test
     fun `signed with STS credentials`() {
-        val signer = AwsPreSignRequests(
-            clock = Clock.fixed(Instant.parse("2013-05-24T00:00:00Z"), ZoneOffset.UTC),
+        val signer = AwsPreRequestSigner(
+            scope = AwsCredentialScope("us-east-1", "s3"),
             credentials = AwsCredentials(
                 accessKey = "AKIAIOSFODNN7EXAMPLE",
                 secretKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
                 sessionToken = "SESSION_TOKEN"
             ),
-            scope = AwsCredentialScope("us-east-1", "s3")
+            clock = Clock.fixed(Instant.parse("2013-05-24T00:00:00Z"), ZoneOffset.UTC)
         )
         val request = Request(Method.GET, "https://examplebucket.s3.amazonaws.com/test.txt")
         val signed = request
