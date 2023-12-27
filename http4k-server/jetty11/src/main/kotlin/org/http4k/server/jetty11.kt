@@ -9,7 +9,7 @@ import org.http4k.server.ServerConfig.UnsupportedStopMode
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 
-class Jetty(private val port: Int, override val stopMode: StopMode, private val server: Server) : PolyServerConfig {
+class Jetty11(private val port: Int, override val stopMode: StopMode, private val server: Server) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, defaultStopMode)
     constructor(port: Int = 8000, stopMode: StopMode) : this(port, stopMode, http(port))
     constructor(port: Int = 8000, server: Server) : this(port, defaultStopMode, server)

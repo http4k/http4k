@@ -6,12 +6,12 @@ import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 import java.io.File
 
-class JettyHttp2Test {
+class Jetty11Http2Test {
 
     @Test
     fun `can configure http2`() {
         val server = { _: Request -> Response(Status.OK) }.asServer(
-            Jetty(
+            Jetty11(
                 0,
                 http2(
                     0,

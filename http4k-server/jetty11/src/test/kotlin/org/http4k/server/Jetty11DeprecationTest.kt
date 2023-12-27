@@ -3,7 +3,7 @@ package org.http4k.server
 import org.eclipse.jetty.http.HttpCompliance.RFC7230_LEGACY
 import org.junit.jupiter.api.Test
 
-class JettyDeprecationTest {
+class Jetty11DeprecationTest {
 
     @Test
     fun `deprecated things exist in jetty library`() {
