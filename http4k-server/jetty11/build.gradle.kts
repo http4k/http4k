@@ -1,4 +1,4 @@
-description = "Http4k HTTP Server built on top of jetty"
+description = "Http4k HTTP Server built on top of jetty v11"
 
 dependencies {
     api(project(":http4k-core"))
