@@ -1,8 +1,10 @@
 package org.http4k.server
 
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
-import org.eclipse.jetty.server.handler.HandlerWrapper
+import org.eclipse.jetty.http.HttpHeader
+import org.eclipse.jetty.http.HttpHeaderValue
+import org.eclipse.jetty.io.Content
+import org.eclipse.jetty.server.Handler.Abstract
+import org.eclipse.jetty.util.Callback
 import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.thread.AutoLock
 import org.eclipse.jetty.util.thread.Scheduler
@@ -10,72 +12,74 @@ import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Headers
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.servlet.jakarta.asHttp4kRequest
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
 import java.io.IOException
 import java.io.OutputStream
-import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 import org.eclipse.jetty.server.Request as JettyRequest
+import org.eclipse.jetty.server.Response as JettyResponse
 
 class JettyEventStreamHandler(
     private val sse: SseHandler,
     private val heartBeatDuration: Duration = Duration.ofSeconds(15)
-) : HandlerWrapper() {
+) : Abstract.NonBlocking() {
 
-    override fun handle(
-        target: String, baseRequest: JettyRequest,
-        request: HttpServletRequest, response: HttpServletResponse
-    ) {
-        if (!baseRequest.isHandled && request.isEventStream()) {
+    override fun handle(request: JettyRequest, response: JettyResponse, callback: Callback): Boolean {
+        if (request.isEventStream()) {
             val connectRequest = request.asHttp4kRequest()
             if (connectRequest != null) {
                 val (status, headers, consumer) = sse(connectRequest)
-                response.writeEventStreamResponse(status, headers)
+                response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
+                    if (flushFailure == null) {
+                        val output = Content.Sink.asOutputStream(response)
+                        val scheduler = request.connectionMetaData.connector.scheduler
+                        val server = request.connectionMetaData.connector.server
 
-                val async = request.startAsyncWithNoTimeout()
-                val output = async.response.outputStream
-                val scheduler = baseRequest.httpChannel.connector.scheduler
-                val server = baseRequest.httpChannel.connector.server
+                        consumer(
+                            JettyEventStreamEmitter(connectRequest, output, heartBeatDuration, scheduler,
+                                onClose = { emitter, emitterFailure ->
+                                    if (emitterFailure == null) {
+                                        callback.succeeded()
+                                    } else {
+                                        callback.failed(emitterFailure)
+                                    }
+                                    server.removeEventListener(emitter)
+                                }
+                            ).also(server::addEventListener)
+                        )
+                    } else {
+                        callback.failed(flushFailure)
+                    }
+                }
 
-                val emitter = JettyEventStreamEmitter(connectRequest, output, heartBeatDuration, scheduler, onClose = {
-                    async.complete()
-                    server.removeEventListener(it)
-                }).also(server::addEventListener)
-                consumer(emitter)
-
-                baseRequest.isHandled = true
+                return true
             }
         }
 
-        if (!baseRequest.isHandled) super.handle(target, baseRequest, request, response)
+        // Not a valid event stream request - return false and let next handler process the request
+        return false
     }
 
     companion object {
-        private fun HttpServletRequest.isEventStream() =
-            method == "GET" && getHeaders("Accept").toList().any { it.contains(TEXT_EVENT_STREAM.value) }
+        private fun JettyRequest.isEventStream() =
+            method == "GET" && headers.contains(HttpHeader.ACCEPT, TEXT_EVENT_STREAM.value)
 
-        private fun HttpServletResponse.writeEventStreamResponse(newStatus: Status, headers: Headers) {
+        private fun JettyResponse.writeEventStreamResponse(newStatus: Status, additionalHeaders: Headers): Callback.Completable {
             status = newStatus.code
-            characterEncoding = StandardCharsets.UTF_8.name()
-            contentType = TEXT_EVENT_STREAM.value
+            headers.add(HttpHeader.CONTENT_TYPE, TEXT_EVENT_STREAM.toHeaderValue())
             // By adding this header, and not closing the connection,
             // we disable HTTP chunking, and we can use write()+flush()
             // to send data in the text/event-stream protocol
-            addHeader("Connection", "close")
-            headers.forEach { addHeader(it.first, it.second) }
-            flushBuffer()
-        }
+            headers.add(HttpHeader.CONNECTION, HttpHeaderValue.CLOSE)
+            additionalHeaders.forEach { (key, value) -> headers.add(key, value) }
 
-        private fun HttpServletRequest.startAsyncWithNoTimeout() =
-            startAsync().apply {
-                // Infinite timeout because the continuation is never resumed,
-                // but only completed on close
-                timeout = 0
+            return Callback.Completable.with { flushCallback ->
+                write(false, null, flushCallback)
             }
+        }
     }
 }
 
@@ -84,7 +88,7 @@ internal class JettyEventStreamEmitter(
     private val output: OutputStream,
     private val heartBeatDuration: Duration,
     private val scheduler: Scheduler,
-    private val onClose: (JettyEventStreamEmitter) -> Unit
+    private val onClose: (JettyEventStreamEmitter, Throwable?) -> Unit
 ) : PushAdaptingSse(connectRequest), Runnable, LifeCycle.Listener {
     private val lock: AutoLock = AutoLock()
     private var heartBeat: Scheduler.Task? = null
@@ -101,40 +105,50 @@ internal class JettyEventStreamEmitter(
     }
 
     private fun sendEvent(event: String, data: String, id: String?) = lock.lock().use {
-        id?.also {
-            output.write(ID_FIELD)
-            output.write(it.toByteArray())
-            output.write(CRLF)
+        safeOutput {
+            id?.also {
+                write(ID_FIELD)
+                write(it.toByteArray())
+                write(CRLF)
+            }
+            write(EVENT_FIELD)
+            write(event.toByteArray())
+            write(CRLF)
+            sendData(data)
         }
-        output.write(EVENT_FIELD)
-        output.write(event.toByteArray())
-        output.write(CRLF)
-        sendData(data)
     }
 
     private fun sendData(data: String) = lock.lock().use {
-        data.lines().forEach { line ->
-            output.write(DATA_FIELD)
-            output.write(line.toByteArray())
-            output.write(CRLF)
+        safeOutput {
+            data.lines().forEach { line ->
+                write(DATA_FIELD)
+                write(line.toByteArray())
+                write(CRLF)
+            }
+            write(CRLF)
+            flush()
         }
-        output.write(CRLF)
-        output.flush()
     }
 
     private fun sendRetry(duration: Duration) = lock.lock().use {
-        output.write(RETRY_FIELD)
-        output.write(duration.toMillis().toString().toByteArray())
-        output.write(CRLF)
-        output.write(CRLF)
-        output.flush()
+        safeOutput {
+            write(RETRY_FIELD)
+            write(duration.toMillis().toString().toByteArray())
+            write(CRLF)
+            write(CRLF)
+            flush()
+        }
     }
 
     override fun close() = lock.lock().use {
+        doClose(null)
+    }
+
+    private fun doClose(failure: Throwable?) {
         if (!closed) {
             closed = true
             heartBeat?.cancel()
-            onClose(this)
+            onClose(this, failure)
             triggerClose()
         }
     }
@@ -144,20 +158,26 @@ internal class JettyEventStreamEmitter(
     }
 
     override fun run() {
-        try {
+        safeOutput {
             // If the other peer closes the connection, the first
             // flush() should generate a TCP reset that is detected
             // on the second flush()
             lock.lock().use {
-                output.write('\r'.code)
-                output.flush()
-                output.write('\n'.code)
-                output.flush()
+                write('\r'.code)
+                flush()
+                write('\n'.code)
+                flush()
             }
             scheduleHeartBeat()
+        }
+    }
+
+    private fun safeOutput(block: OutputStream.() -> Unit) {
+        try {
+            block(output)
         } catch (e: IOException) {
-            // The other peer closed the connection
-            close()
+            // Close connection on write failure
+            doClose(e)
         }
     }
 

@@ -1,12 +1,12 @@
 package org.http4k.client
 
 import org.eclipse.jetty.client.HttpClient
-import org.eclipse.jetty.client.api.Result
-import org.eclipse.jetty.client.util.BufferingResponseListener
-import org.eclipse.jetty.client.util.InputStreamRequestContent
-import org.eclipse.jetty.client.util.InputStreamResponseListener
+import org.eclipse.jetty.client.BufferingResponseListener
+import org.eclipse.jetty.client.InputStreamRequestContent
+import org.eclipse.jetty.client.InputStreamResponseListener
+import org.eclipse.jetty.client.Result
 import org.eclipse.jetty.http.HttpFields
-import org.eclipse.jetty.util.HttpCookieStore
+import org.eclipse.jetty.http.HttpCookieStore
 import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.BodyMode
 import org.http4k.core.Headers
@@ -23,8 +23,8 @@ import java.net.UnknownHostException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
-import org.eclipse.jetty.client.api.Request as JettyRequest
-import org.eclipse.jetty.client.api.Response as JettyResponse
+import org.eclipse.jetty.client.Request as JettyRequest
+import org.eclipse.jetty.client.Response as JettyResponse
 
 object JettyClient {
     @JvmStatic
@@ -115,6 +115,6 @@ object JettyClient {
 object PreCannedJettyHttpClients {
     fun defaultJettyHttpClient() = HttpClient().apply {
         isFollowRedirects = false
-        cookieStore = HttpCookieStore.Empty()
+        httpCookieStore = HttpCookieStore.Empty()
     }
 }

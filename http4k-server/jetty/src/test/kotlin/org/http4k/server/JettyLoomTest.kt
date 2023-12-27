@@ -7,7 +7,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.junit.jupiter.api.Test
 
-class JettyLoomTest : ServerContract(::JettyLoom, ApacheClient()) {
+class JettyLoomTest : ServerContract({ JettyLoom(it, ServerConfig.StopMode.Immediate) }, ApacheClient()) {
     override fun requestScheme() = equalTo("http")
 
     @Test

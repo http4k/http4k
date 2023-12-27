@@ -1,7 +1,9 @@
 package org.http4k.client
 
+import org.eclipse.jetty.util.BufferUtil
+import org.eclipse.jetty.websocket.api.Callback
+import org.eclipse.jetty.websocket.api.Callback.Completable
 import org.eclipse.jetty.websocket.api.Session
-import org.eclipse.jetty.websocket.api.WebSocketAdapter
 import org.eclipse.jetty.websocket.api.exceptions.WebSocketException
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest
 import org.eclipse.jetty.websocket.client.WebSocketClient
@@ -19,6 +21,7 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import java.net.URI
+import java.nio.ByteBuffer
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.CompletableFuture
@@ -104,24 +107,29 @@ private class JettyNonBlockingWebsocket(
     }
 
     override fun send(message: WsMessage) = with(listener) {
-        if (isNotConnected) {
+        if (!isOpen) {
             throw WebSocketException("Connection to ${req.uri} is closed.")
         }
-        when (message.body) {
-            is StreamBody -> remote.sendBytes(message.body.payload)
-            else -> remote.sendString(message.body.toString())
+        try {
+            when (message.body) {
+                is StreamBody -> Completable.with { session.sendBinary(message.body.payload, it) }.get()
+                else -> Completable.with { session.sendText(message.body.toString(), it) }.get()
+            }
+        } catch (error: Throwable) {
+            triggerError(error)
         }
+        Unit
     }
 
     override fun close(status: WsStatus) = with(listener) {
-        if (isConnected) {
-            session.close(status.code, status.description)
+        if (isOpen) {
+            Completable.with { session.close(status.code, status.description, it) }.get()
         }
     }
 
-    inner class Listener : WebSocketAdapter() {
-        override fun onWebSocketConnect(session: Session) {
-            super.onWebSocketConnect(session)
+    inner class Listener : Session.Listener.AbstractAutoDemanding() {
+        override fun onWebSocketOpen(session: Session) {
+            super.onWebSocketOpen(session)
             onConnect(this@JettyNonBlockingWebsocket)
         }
 
@@ -130,11 +138,21 @@ private class JettyNonBlockingWebsocket(
         }
 
         override fun onWebSocketText(message: String) {
-            triggerMessage(WsMessage(message))
+            try {
+                triggerMessage(WsMessage(message))
+            } catch (e: Throwable) {
+                triggerError(e)
+            }
         }
 
-        override fun onWebSocketBinary(payload: ByteArray, offset: Int, len: Int) {
-            triggerMessage(WsMessage(payload.inputStream(offset, len)))
+        override fun onWebSocketBinary(payload: ByteBuffer, callback: Callback) {
+            try {
+                triggerMessage(WsMessage(BufferUtil.toArray(payload).inputStream()))
+                callback.succeed()
+            } catch (e: Throwable) {
+                triggerError(e)
+                callback.fail(e)
+            }
         }
 
         override fun onWebSocketError(cause: Throwable) {
