@@ -9,7 +9,7 @@ import org.http4k.core.Uri
 import org.http4k.lens.Path
 import org.http4k.routing.websockets
 import org.http4k.routing.ws.bind
-import org.http4k.server.Jetty
+import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.http4k.testing.testWsClient
 import org.http4k.websocket.WsClient
@@ -55,7 +55,7 @@ class WebsocketUnitTest : WebsocketContract() {
 class WebsocketServerTest : WebsocketContract() {
     override fun client() = WebsocketClient.blocking(Uri.of("ws://localhost:8000/bob"))
 
-    private val server = testApp.asServer(Jetty(8000))
+    private val server = testApp.asServer(Undertow(8000))
 
     @BeforeEach
     fun before() {
