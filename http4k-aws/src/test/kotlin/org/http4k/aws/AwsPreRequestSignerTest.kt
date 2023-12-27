@@ -13,12 +13,12 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 
-class AwsPreSignRequestsTest {
+class AwsPreRequestSignerTest {
 
     @Test
     fun `signed with standard credentials`() {
         val time = Instant.parse("2013-05-24T00:00:00Z")
-        val signer = AwsPreSignRequests(
+        val signer = AwsPreRequestSigner(
             scope = AwsCredentialScope("us-east-1", "s3"),
             credentialsProvider = { AwsCredentials("AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY") },
             clock = Clock.fixed(time, ZoneOffset.UTC)
@@ -44,7 +44,7 @@ class AwsPreSignRequestsTest {
 
     @Test
     fun `signed with STS credentials`() {
-        val signer = AwsPreSignRequests(
+        val signer = AwsPreRequestSigner(
             scope = AwsCredentialScope("us-east-1", "s3"),
             credentials = AwsCredentials(
                 accessKey = "AKIAIOSFODNN7EXAMPLE",
