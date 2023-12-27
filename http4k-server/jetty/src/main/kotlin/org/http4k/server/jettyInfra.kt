@@ -29,10 +29,7 @@ fun SseHandler.toJettySseHandler(): Wrapper = Wrapper(JettyEventStreamHandler(th
 
 fun WsHandler.toJettyWsHandler(server: Server): Wrapper {
     val contextHandler = ContextHandler("/")
-    val wsUpgradeHandler = WebSocketUpgradeHandler.from(server, contextHandler)
-    contextHandler.handler = wsUpgradeHandler
-
-    wsUpgradeHandler.configure { container ->
+    val wsUpgradeHandler = WebSocketUpgradeHandler.from(server, contextHandler) { container ->
         container.addMapping("/*") { request, _, _ ->
             request.asHttp4kRequest()?.let { http4kRequest ->
                 val consumer = this.invoke(http4kRequest)
@@ -44,6 +41,8 @@ fun WsHandler.toJettyWsHandler(server: Server): Wrapper {
             }
         }
     }
+    contextHandler.handler = wsUpgradeHandler
+
     return contextHandler
 }
 
