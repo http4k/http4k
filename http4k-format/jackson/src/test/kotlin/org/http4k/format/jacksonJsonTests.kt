@@ -18,6 +18,7 @@ import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.BiDiMapping
 import org.http4k.websocket.WsMessage
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 

@@ -79,6 +79,11 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     override fun `automarshalling failure has expected message`() {
     }
 
+    @Test
+    @Disabled("no support for this")
+    override fun `serialises enum as a key correctly`() {
+    }
+
     override fun strictMarshaller() = throw UnsupportedOperationException()
 
     override fun customMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}

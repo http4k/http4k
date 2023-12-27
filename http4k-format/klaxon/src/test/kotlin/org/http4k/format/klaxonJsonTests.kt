@@ -77,6 +77,11 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     }
 
     @Test
+    @Disabled("no support for this")
+    override fun `serialises enum as a key correctly`() {
+    }
+
+    @Test
     override fun `automarshalling failure has expected message`() {
         assertThat(runCatching { Klaxon.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
             .exceptionOrNull()!!.message!!, startsWith("Unable to instantiate ArbObject"))

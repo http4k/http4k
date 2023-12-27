@@ -1,0 +1,1 @@
+StaticRoutingHttpHandler(pathSegments=/route-contract, resourceLoader=org.http4k.routing.experimental.ResourceLoaders$Classpath$invoke$2@72406594, filter=org.http4k.core.Http4kKt$$Lambda/0x000000c801166020@4e1104f4)

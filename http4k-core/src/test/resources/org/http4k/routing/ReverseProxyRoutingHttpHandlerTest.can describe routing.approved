@@ -6,8 +6,14 @@
       "description" : "Host or URI: 'host'",
       "children" : [ ]
     }, {
-      "description" : "<http-handler>",
-      "children" : [ ]
+      "description" : "and",
+      "children" : [ {
+        "description" : "method == GET",
+        "children" : [ ]
+      }, {
+        "description" : "template == 'route-contract'",
+        "children" : [ ]
+      } ]
     } ]
   }, {
     "description" : "and",
@@ -15,8 +21,14 @@
       "description" : "Host or URI: 'anotherHost'",
       "children" : [ ]
     }, {
-      "description" : "<http-handler>",
-      "children" : [ ]
+      "description" : "and",
+      "children" : [ {
+        "description" : "method == GET",
+        "children" : [ ]
+      }, {
+        "description" : "template == 'route-contract'",
+        "children" : [ ]
+      } ]
     } ]
   } ]
 }

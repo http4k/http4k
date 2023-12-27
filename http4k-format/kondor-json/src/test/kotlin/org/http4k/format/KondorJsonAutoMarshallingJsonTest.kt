@@ -79,6 +79,11 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
+    @Disabled
+    override fun `serialises enum as a key correctly`() {
+    }
+
+    @Test
     @Disabled("not supported")
     override fun `roundtrip arbitrary map`() {
         super.`roundtrip arbitrary map`()

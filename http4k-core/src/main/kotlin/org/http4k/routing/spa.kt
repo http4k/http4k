@@ -53,4 +53,9 @@ internal data class SinglePageAppRoutingHandler(
 
     override fun withBasePath(new: String) =
         SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
+
+    override val description = RouterDescription("SPA at $pathSegments", listOf(staticHandler.description))
+
+    override fun toString() = description.friendlyToString()
+
 }

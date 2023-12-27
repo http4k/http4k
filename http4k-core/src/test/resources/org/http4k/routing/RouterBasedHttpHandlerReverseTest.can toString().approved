@@ -1,0 +1,5 @@
+and
+	Headers [host]
+	and
+		method == GET
+		template == 'route-contract'

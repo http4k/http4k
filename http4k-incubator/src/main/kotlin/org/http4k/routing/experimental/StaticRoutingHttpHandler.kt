@@ -18,6 +18,7 @@ import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.friendlyToString
 
 fun static(resourceLoader: Router): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader)
 
@@ -42,6 +43,8 @@ internal data class StaticRoutingHttpHandler(
         else
             Unmatched(description)
     }
+
+    override fun toString() = description.friendlyToString()
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }

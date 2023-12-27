@@ -1,0 +1,5 @@
+and
+	and
+		method == GET
+		Headers [host]
+	Headers [host]

@@ -12,7 +12,7 @@ class JsonToJsonSchema<NODE>(
     private val refLocationPrefix: String = "components/schemas"
 ) : JsonSchemaCreator<NODE, NODE> {
     override fun toSchema(obj: NODE, overrideDefinitionId: String?, refModelNamePrefix: String?) =
-        JsonSchema(obj, emptySet()).toSchema(overrideDefinitionId, refModelNamePrefix ?: "")
+        JsonSchema(obj, emptySet()).toSchema(overrideDefinitionId, refModelNamePrefix.orEmpty())
 
     private fun JsonSchema<NODE>.toSchema(
         overrideDefinitionId: String? = null,

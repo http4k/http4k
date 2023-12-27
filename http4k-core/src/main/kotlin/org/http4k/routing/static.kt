@@ -26,7 +26,7 @@ fun static(
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
 ): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
 
- data class StaticRoutingHttpHandler(
+data class StaticRoutingHttpHandler(
     private val pathSegments: String,
     private val resourceLoader: ResourceLoader,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
@@ -47,6 +47,8 @@ fun static(
     } ?: RouterMatch.Unmatched(description)
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
+
+    override fun toString() = description.friendlyToString()
 }
 
 internal class ResourceLoadingHandler(

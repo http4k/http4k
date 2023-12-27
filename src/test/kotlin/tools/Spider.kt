@@ -34,7 +34,7 @@ fun main() {
                     !it.startsWith("http") &&
                     !nowVisited.contains(it)
             }
-            ?.map { spider(it, nowVisited) } ?: emptyList()
+            ?.map { spider(it, nowVisited) }.orEmpty()
 
         Ok(actualUrl, sublinks)
     } catch (e: Exception) {

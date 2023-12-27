@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.amazonaws.services.lambda.runtime.events.CloudWatchLogsEvent
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent
+import com.amazonaws.services.lambda.runtime.events.EventBridgeEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisFirehoseEvent
 import com.amazonaws.services.lambda.runtime.events.S3Event
@@ -47,6 +48,7 @@ import java.util.Date
 
 @ExtendWith(JsonApprovalTest::class)
 class AwsLambdaMoshiTest {
+
     @Test
     fun `CloudWatchLogs event`(approver: Approver) {
         approver.assertRoundtrips(CloudWatchLogsEvent().apply {
@@ -180,6 +182,20 @@ class AwsLambdaMoshiTest {
     @Test
     fun `Scheduled event`(approver: Approver) {
         approver.assertRoundtrips(ScheduledEvent().apply {
+            id = "id"
+            detailType = "detail"
+            source = "source"
+            account = "account"
+            time = DateTime(0, UTC)
+            region = "region"
+            resources = listOf("resources")
+            detail = mapOf("detailName" to "detailValue")
+        })
+    }
+
+    @Test
+    fun `EventBridge event`(approver: Approver) {
+        approver.assertRoundtrips(EventBridgeEvent().apply {
             id = "id"
             detailType = "detail"
             source = "source"

@@ -27,6 +27,6 @@ object CloudEvent {
         object : LensSpec<CloudEvent, T>(
             "Cloud Event",
             ObjectParam,
-            LensGet { _, target -> target.data?.let { listOf(mapper.map(it)) } ?: emptyList() }
+            LensGet { _, target -> target.data?.let { listOf(mapper.map(it)) }.orEmpty() }
         ) {}.required("data")
 }

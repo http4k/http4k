@@ -63,7 +63,10 @@ abstract class RoutingHttpHandlerContract {
         val request = Request(GET, "/not-found").header("host", "host")
 
         assertThat(filtered.matchAndInvoke(request), absent())
-        assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody))
+        assertThat(
+            filtered(request),
+            hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody)
+        )
     }
 
     @Test
@@ -72,7 +75,10 @@ abstract class RoutingHttpHandlerContract {
         val request = Request(GET, "/not-found").header("host", "host")
 
         assertThat(filtered.matchAndInvoke(request), absent())
-        assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody))
+        assertThat(
+            filtered(request),
+            hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody)
+        )
     }
 
     @Test
@@ -117,6 +123,11 @@ abstract class RoutingHttpHandlerContract {
     @Test
     fun `can describe routing`(approver: Approver) {
         approver.assertApproved(prettify(asFormatString(handler.description)))
+    }
+
+    @Test
+    fun `can toString()`(approver: Approver) {
+        approver.assertApproved(handler.toString())
     }
 
     protected fun filterAppending(value: String) = Filter { next ->

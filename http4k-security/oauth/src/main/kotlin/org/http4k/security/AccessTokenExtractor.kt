@@ -7,9 +7,11 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Header
 import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.OAuthWebForms.responseForm
+import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.security.oauth.format.OAuthMoshi.auto
 import org.http4k.security.openid.IdToken
 
@@ -18,14 +20,17 @@ fun interface AccessTokenExtractor : (Response) -> Result<AccessTokenDetails, Co
 /**
  * Extracts a standard OAuth access token from JSON or Form encoded response.
  */
-class ContentTypeJsonOrForm : AccessTokenExtractor {
+class ContentTypeJsonOrForm(
+    private val autoMarshallingJson: AutoMarshallingJson<*> = OAuthMoshi
+) :
+    AccessTokenExtractor {
     override fun invoke(msg: Response) =
         resultFrom {
             Header.CONTENT_TYPE(msg)
                 ?.let {
                     when {
                         APPLICATION_JSON.equalsIgnoringDirectives(it) ->
-                            with(accessTokenResponseBody(msg)) {
+                            with(autoMarshallingJson.asA<AccessTokenResponse>(msg.bodyString())) {
                                 AccessTokenDetails(toAccessToken(), id_token?.let(::IdToken))
                             }
 

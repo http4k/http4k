@@ -17,6 +17,8 @@ fun Response.mustRevalidate() = addCacheability("must-revalidate")
 
 fun Response.noStore() = addCacheability("no-store")
 
+fun Response.immutable() = addCacheability("immutable")
+
 fun Response.maxAge(duration: Duration) = replaceHeader("Cache-Control", MaxAgeTtl(duration).replaceIn(header("Cache-Control")))
 
 fun Response.staleWhileRevalidate(duration: Duration) = replaceHeader("Cache-Control", StaleWhenRevalidateTtl(duration).replaceIn(header("Cache-Control")))

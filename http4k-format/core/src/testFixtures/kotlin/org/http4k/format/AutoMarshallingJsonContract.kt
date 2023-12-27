@@ -3,7 +3,9 @@ package org.http4k.format
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.format.StandardEnum.*
 import org.junit.jupiter.api.Test
+
 
 abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMarshallingContract(marshaller) {
     override val expectedAutoMarshallingResult = """{"string":"hello","child":{"string":"world","child":null,"numbers":[1],"bool":true},"numbers":[],"bool":false}"""
@@ -57,6 +59,23 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
         val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
         assertThat(marshaller.asFormatString(wrapper).normaliseJson(), equalTo(expectedCustomWrappedNumber))
         assertThat(marshaller.asA(expectedCustomWrappedNumber, HolderHolder::class), equalTo(wrapper))
+    }
+
+    @Test
+    open fun `serialises enum as a key correctly`() {
+        val marshaller = customMarshaller()
+        val input = SpecificMapHolder(mapOf(AnEnum.woo to MyValue.of("yay")))
+        val expected = """{"value":{"yay":"yay"}}"""
+        assertThat(marshaller.asFormatString(input).normaliseJson(), equalTo(expected))
+        assertThat(marshaller.asA(expected), equalTo(input))
+        assertThat(
+            marshaller.asFormatString(GenericMapHolder(mapOf(MyValue.of("yay") to AnEnum.woo))).normaliseJson(),
+            equalTo(expected)
+        )
+
+        assertThat(marshaller.asFormatString(GenericMapHolder(mapOf(foo to "bar"))),
+            equalTo("""{"value":{"foo":"bar"}}""")
+        )
     }
 
     @Test

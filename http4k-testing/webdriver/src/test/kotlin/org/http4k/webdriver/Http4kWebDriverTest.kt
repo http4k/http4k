@@ -5,11 +5,15 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.core.Method
 import org.http4k.core.Method.POST
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
@@ -23,13 +27,14 @@ import org.http4k.core.cookie.Cookie as HCookie
 class Http4kWebDriverTest {
     private val driver = Http4kWebDriver({ req ->
         val body = File("src/test/resources/test.html").readText()
-        Response(OK).body(body
-            .replace("FORMMETHOD", POST.name)
-            .replace("THEMETHOD", req.method.name)
-            .replace("THEBODY", req.bodyString())
-            .replace("THEURL", req.uri.toString())
-            .replace("THETIME", System.currentTimeMillis().toString())
-            .replace("ACTION", "action=\"/form\"")
+        Response(OK).body(
+            body
+                .replace("FORMMETHOD", POST.name)
+                .replace("THEMETHOD", req.method.name)
+                .replace("THEBODY", req.bodyString())
+                .replace("THEURL", req.uri.toString())
+                .replace("THETIME", System.currentTimeMillis().toString())
+                .replace("ACTION", "action=\"/form\"")
         )
     })
 
@@ -42,11 +47,40 @@ class Http4kWebDriverTest {
     }
 
     @Test
+    fun `POSTing a form prefixes with the original host in the URL`() {
+        val driver = Http4kWebDriver(
+            routes(
+                "/submit" bind { Response(OK).body(it.uri.toString()) },
+                "/" bind { req ->
+                    val body = File("src/test/resources/test.html").readText()
+                    Response(OK).body(
+                        body
+                            .replace("FORMMETHOD", POST.name)
+                            .replace("THEMETHOD", req.method.name)
+                            .replace("THEBODY", req.bodyString())
+                            .replace("THEURL", req.uri.toString())
+                            .replace("THETIME", System.currentTimeMillis().toString())
+                            .replace("ACTION", """action="/submit"""")
+                    )
+                })
+        )
+        driver.navigate().to(Uri.of("http://host/"))
+        driver.findElement(By.id("button"))!!.submit()
+        assertThat(
+            driver.pageSource,
+            equalTo("http://host/submit")
+        )
+    }
+
+    @Test
     fun `POST form`() {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("https://example.com/form")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(
+            driver.findElement(By.tagName("thebody"))!!.text,
+            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
+        )
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
@@ -57,7 +91,10 @@ class Http4kWebDriverTest {
         driver.assertOnPage("/bob")
         driver.findElement(By.id("button"))!!.click()
         driver.assertOnPage("/form")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(
+            driver.findElement(By.tagName("thebody"))!!.text,
+            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
+        )
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
@@ -67,13 +104,14 @@ class Http4kWebDriverTest {
         val driver = Http4kWebDriver({ req ->
             loadCount++
             val body = File("src/test/resources/test.html").readText()
-            Response(OK).body(body
-                .replace("FORMMETHOD", POST.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action")
+            Response(OK).body(
+                body
+                    .replace("FORMMETHOD", POST.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action")
             )
         })
 
@@ -82,7 +120,10 @@ class Http4kWebDriverTest {
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("http://example.com/bob")
         assertThat(loadCount, equalTo(n0 + 2))
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(
+            driver.findElement(By.tagName("thebody"))!!.text,
+            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
+        )
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
@@ -92,13 +133,14 @@ class Http4kWebDriverTest {
         val driver = Http4kWebDriver({ req ->
             loadCount++
             val body = File("src/test/resources/test.html").readText()
-            Response(OK).body(body
-                .replace("FORMMETHOD", POST.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action=\"\"")
+            Response(OK).body(
+                body
+                    .replace("FORMMETHOD", POST.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action=\"\"")
             )
         })
         val n0 = loadCount
@@ -106,7 +148,10 @@ class Http4kWebDriverTest {
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("http://127.0.0.1/bob")
         assertThat(loadCount, equalTo(n0 + 2))
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(
+            driver.findElement(By.tagName("thebody"))!!.text,
+            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
+        )
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
@@ -114,13 +159,14 @@ class Http4kWebDriverTest {
     fun `GET form`() {
         val driver = Http4kWebDriver({ req ->
             val body = File("src/test/resources/test.html").readText()
-            Response(OK).body(body
-                .replace("FORMMETHOD", Method.GET.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action=\"/form\"")
+            Response(OK).body(
+                body
+                    .replace("FORMMETHOD", Method.GET.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action=\"/form\"")
             )
         })
 
@@ -245,7 +291,10 @@ class Http4kWebDriverTest {
 
         driver.get("/")
 
-        assertThat(driver.manage().cookies, equalTo(setOf(Cookie("name", "value", "domain", "path", Date(0), true, true))))
+        assertThat(
+            driver.manage().cookies,
+            equalTo(setOf(Cookie("name", "value", "domain", "path", Date(0), true, true)))
+        )
     }
 
     @Test
@@ -270,7 +319,10 @@ class Http4kWebDriverTest {
         driver.findElement(By.tagName("textarea"))!!.sendKeys("")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("https://example.com/form")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=&select1=option1&select1=option2&button=yes"))
+        assertThat(
+            driver.findElement(By.tagName("thebody"))!!.text,
+            equalTo("text1=textValue&checkbox1=checkbox&textarea1=&select1=option1&select1=option2&button=yes")
+        )
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
@@ -287,6 +339,19 @@ class Http4kWebDriverTest {
         assertThat(driver.pageSource, equalTo("foo.com:5000"))
         driver.navigate().to("http://baz.com/")
         assertThat(driver.pageSource, equalTo("baz.com"))
+    }
+
+    @Test
+    fun `Set the host header when redirecting to a URL`() {
+        val driver = Http4kWebDriver({ req ->
+            when (req.header("host")) {
+                "redirect.com" -> Response(SEE_OTHER).header("location", "http://destination.com")
+                else -> Response(OK).body(req.header("host") ?: "none")
+            }
+        })
+
+        driver.navigate().to("http://redirect.com")
+        assertThat(driver.pageSource, equalTo("destination.com"))
     }
 
     private fun WebDriver.assertOnPage(expected: String) {

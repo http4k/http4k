@@ -50,7 +50,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     private fun ApiServer.asJson() = json {
         obj(
             "url" to string(url.toString()),
-            "description" to string(description ?: "")
+            "description" to string(description.orEmpty())
         )
     }
 
@@ -218,7 +218,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     }
 
     private fun ApiInfo.asJson() = json {
-        obj("title" to string(title), "version" to string(version), "description" to string(description ?: ""))
+        obj("title" to string(title), "version" to string(version), "description" to string(description.orEmpty()))
     }
 
     private fun String?.asJson() = this?.let { json.string(it) } ?: json.nullNode()
@@ -251,7 +251,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
             "enum" to json.array(obj.javaClass.enumConstants.map { json.string(it.name) })
         )
         val definitionId =
-            (refModelNamePrefix ?: "") + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
+            (refModelNamePrefix.orEmpty()) + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
         return JsonSchema(
             json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) }, setOf(
                 definitionId to newDefinition
