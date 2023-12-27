@@ -28,7 +28,7 @@ class Jetty11(private val port: Int, override val stopMode: StopMode, private va
     }
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
-        http?.let { server.insertHandler(http.toJettyHandler(stopMode is Graceful)) }
+        http?.let { server.insertHandler(http.toJetty11Handler(stopMode is Graceful)) }
         sse?.let { server.insertHandler(sse.toJettySseHandler()) }
         ws?.let { server.insertHandler(ws.toJettyWsHandler()) }
 

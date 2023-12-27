@@ -27,10 +27,10 @@ import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.time.Duration.ofSeconds
 
-fun HttpHandler.toJettyHandler(withStatisticsHandler: Boolean = false): HandlerWrapper = ServletContextHandler(
+fun HttpHandler.toJetty11Handler(withStatisticsHandler: Boolean = false): HandlerWrapper = ServletContextHandler(
     SESSIONS
 ).apply {
-    addServlet(ServletHolder(this@toJettyHandler.asServlet()), "/*")
+    addServlet(ServletHolder(this@toJetty11Handler.asServlet()), "/*")
 }.let {
     if (withStatisticsHandler) StatisticsHandler().apply { handler = it } else it
 }
