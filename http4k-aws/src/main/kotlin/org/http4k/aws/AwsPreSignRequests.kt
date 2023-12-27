@@ -8,21 +8,16 @@ import java.time.Duration
 class AwsPreSignRequests(
     private val scope: AwsCredentialScope,
     private val credentialsProvider: () -> AwsCredentials,
-    private val clock: Clock = Clock.systemDefaultZone()
+    private val clock: Clock = Clock.systemUTC()
 ) {
-    constructor(
-        scope: AwsCredentialScope,
-        credentials: AwsCredentials,
-        clock: Clock = Clock.systemDefaultZone()
-    ): this(
+    constructor(scope: AwsCredentialScope, credentials: AwsCredentials, clock: Clock = Clock.systemUTC()) : this(
         scope = scope,
         credentialsProvider = { credentials },
         clock = clock
     )
 
     operator fun invoke(request: Request, expires: Duration): AwsPreSignedRequest {
-        val time = clock.instant()
-        val awsDate = AwsRequestDate.of(time)
+        val awsDate = AwsRequestDate.of(clock.instant())
         val credentials = credentialsProvider()
 
         val fullRequest = request
@@ -32,7 +27,12 @@ class AwsPreSignRequests(
             .query("X-Amz-Date", awsDate.full)
             .query("X-Amz-Credential", "${credentials.accessKey}/${scope.datedScope(awsDate)}")
             .query("X-Amz-Expires", expires.seconds.toString())
-            .let { if (credentials.sessionToken != null) it.query("X-Amz-Security-Token", credentials.sessionToken) else it }
+            .let {
+                if (credentials.sessionToken != null) it.query(
+                    "X-Amz-Security-Token",
+                    credentials.sessionToken
+                ) else it
+            }
 
         val canonicalRequest = AwsCanonicalRequest.of(fullRequest, Payload.Mode.Unsigned(request))
         val signature = AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, awsDate)
@@ -40,7 +40,7 @@ class AwsPreSignRequests(
         return AwsPreSignedRequest(
             uri = fullRequest.query("X-Amz-Signature", signature).uri,
             signedHeaders = fullRequest.headers,
-            expires = time + expires
+            expires = clock.instant() + expires
         )
     }
 }
