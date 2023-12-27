@@ -35,7 +35,7 @@ fun HttpHandler.toJetty11Handler(withStatisticsHandler: Boolean = false): Handle
     if (withStatisticsHandler) StatisticsHandler().apply { handler = it } else it
 }
 
-fun SseHandler.toJettySseHandler() = JettyEventStreamHandler(this)
+fun SseHandler.toJettySseHandler() = Jetty11EventStreamHandler(this)
 
 fun WsHandler.toJettyWsHandler() = WebSocketUpgradeHandler(WebSocketComponents()).apply {
     addMapping("/*", this@toJettyWsHandler.toJettyNegotiator())

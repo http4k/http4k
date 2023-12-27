@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets
 import java.time.Duration
 import org.eclipse.jetty.server.Request as JettyRequest
 
-class JettyEventStreamHandler(
+class Jetty11EventStreamHandler(
     private val sse: SseHandler,
     private val heartBeatDuration: Duration = Duration.ofSeconds(15)
 ) : HandlerWrapper() {
@@ -45,27 +45,29 @@ class JettyEventStreamHandler(
 
         if (!baseRequest.isHandled) super.handle(target, baseRequest, request, response)
     }
-}
 
-private fun HttpServletRequest.isEventStream() =
-    method == "GET" && getHeaders("Accept").toList().any { it.contains(TEXT_EVENT_STREAM.value) }
+    companion object {
 
-private fun HttpServletResponse.writeEventStreamResponse(newStatus: Status, headers: Headers) {
-    status = newStatus.code
-    characterEncoding = StandardCharsets.UTF_8.name()
-    contentType = TEXT_EVENT_STREAM.value
-    // By adding this header, and not closing the connection,
-    // we disable HTTP chunking, and we can use write()+flush()
-    // to send data in the text/event-stream protocol
-    addHeader("Connection", "close")
-    headers.forEach { addHeader(it.first, it.second) }
-    flushBuffer()
-}
+        private fun HttpServletRequest.isEventStream() =
+            method == "GET" && getHeaders("Accept").toList().any { it.contains(TEXT_EVENT_STREAM.value) }
 
-private fun HttpServletRequest.startAsyncWithNoTimeout() =
-    startAsync().apply {
-        // Infinite timeout because the continuation is never resumed,
-        // but only completed on close
-        timeout = 0
+        private fun HttpServletResponse.writeEventStreamResponse(newStatus: Status, headers: Headers) {
+            status = newStatus.code
+            characterEncoding = StandardCharsets.UTF_8.name()
+            contentType = TEXT_EVENT_STREAM.value
+            // By adding this header, and not closing the connection,
+            // we disable HTTP chunking, and we can use write()+flush()
+            // to send data in the text/event-stream protocol
+            addHeader("Connection", "close")
+            headers.forEach { addHeader(it.first, it.second) }
+            flushBuffer()
+        }
+
+        private fun HttpServletRequest.startAsyncWithNoTimeout() =
+            startAsync().apply {
+                // Infinite timeout because the continuation is never resumed,
+                // but only completed on close
+                timeout = 0
+            }
     }
-
+}
