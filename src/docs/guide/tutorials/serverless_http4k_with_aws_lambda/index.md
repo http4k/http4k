@@ -23,7 +23,7 @@ implementation("org.http4k:http4k-serverless-lambda:5.12.0.0")
 #### Step 2
 The AWS Lambda runtime works by implementing an AWS supplied interface `Request/StreamHandler` and configuring that class to be loaded on an invocation on the lambda. The invocation requests themselves are transmitted as JSON which normally is unmarshalled by Jackson in the AWS runtime into the relevant AWS Event class.
 
-http4k supplies pre-built StreamHandler adapters (they are faster) using the lightweight Moshi library to convert the invocations to standard http4k Request/Responses. We need to decide which version of the [ApiGateway](https://aws.amazon.com/api-gateway/) binding to use and then use the correct http4k class. For this example we're going to use ApiGateway HTTP Version 1, so we simply create a class `HelloServerlessHttp4k` extending the relevant http4k class and pass our app `HttpHandler` to it's constructor:
+http4k supplies pre-built StreamHandler adapters (they are faster) using the lightweight Moshi library to convert the invocations to standard http4k Request/Responses. We need to decide which version of the [ApiGateway](https://aws.amazon.com/api-gateway/) binding to use and then use the correct http4k class. For this example we're going to use ApiGateway HTTP Version 2, so we simply create a class `HelloServerlessHttp4k` extending the relevant http4k class and pass our app `HttpHandler` to it's constructor:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/serverless_http4k_with_aws_lambda/HelloServerlessHttp4k.kt"></script>
 
