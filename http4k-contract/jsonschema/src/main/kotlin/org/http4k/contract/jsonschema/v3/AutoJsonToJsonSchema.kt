@@ -210,8 +210,8 @@ private interface ArrayItems {
     fun definitions(): Iterable<SchemaNode>
 }
 
-private sealed class ArrayItem : ArrayItems {
-    class Array(val items: ArrayItems, private val schema: SchemaNode) : ArrayItem() {
+private sealed interface ArrayItem : ArrayItems {
+    class Array(val items: ArrayItems, private val schema: SchemaNode) : ArrayItem {
         val type = ArrayParam(NullParam).value
         val format = schema.format
 
@@ -225,7 +225,7 @@ private sealed class ArrayItem : ArrayItems {
         override fun hashCode(): Int = items.hashCode()
     }
 
-    class NonObject(paramMeta: ParamMeta, private val schema: SchemaNode) : ArrayItem() {
+    class NonObject(paramMeta: ParamMeta, private val schema: SchemaNode) : ArrayItem {
         val type = paramMeta.value
         val format = schema.format
 
@@ -244,7 +244,7 @@ private sealed class ArrayItem : ArrayItems {
         override fun definitions(): Iterable<SchemaNode> = schema.definitions()
     }
 
-    class Ref(val `$ref`: String, private val schema: SchemaNode) : ArrayItem() {
+    class Ref(val `$ref`: String, private val schema: SchemaNode) : ArrayItem {
         override fun definitions(): Iterable<SchemaNode> = schema.definitions()
         override fun equals(other: Any?): Boolean = when (other) {
             is Ref -> this.`$ref` == other.`$ref`

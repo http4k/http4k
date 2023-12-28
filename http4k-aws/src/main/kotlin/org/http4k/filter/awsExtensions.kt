@@ -83,15 +83,15 @@ private fun buildAuthHeader(scope: AwsCredentialScope,
 data class CanonicalPayload(val hash: String, val length: Long)
 
 object Payload {
-    sealed class Mode : (Request) -> CanonicalPayload {
-        data object Signed : Mode() {
+    sealed interface Mode : (Request) -> CanonicalPayload {
+        data object Signed : Mode {
             override operator fun invoke(request: Request) =
                 request.body.payload.array().let {
                     CanonicalPayload(hash(it), it.size.toLong())
                 }
         }
 
-        data object Unsigned : Mode() {
+        data object Unsigned : Mode {
             override operator fun invoke(request: Request) = CanonicalPayload(
                 "UNSIGNED-PAYLOAD",
                 request.body.length ?: throw IllegalStateException("request body size could not be determined"))
