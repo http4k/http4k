@@ -14,8 +14,8 @@ sealed interface Trace : TraceStep {
 data class StartInteraction(val origin: String, val interactionName: String) : TraceStep,
     Event
 
-object StartRendering : TraceStep, Event
-object StopRendering : TraceStep, Event
+data object StartRendering : TraceStep, Event
+data object StopRendering : TraceStep, Event
 
 data class RequestResponse(
     override val origin: Actor,
