@@ -20,7 +20,7 @@ interface Http4kServer : AutoCloseable {
  */
 interface ServerConfig {
     sealed class StopMode {
-        object Immediate : StopMode()
+        data object Immediate : StopMode()
         data class Graceful(val timeout: Duration) : StopMode()
     }
 

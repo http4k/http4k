@@ -93,7 +93,7 @@ class AuthRequestWithRequestAuthRequestExtractor(
 
     sealed class CombineAuthRequestRequestStrategy {
 
-        object Combine : CombineAuthRequestRequestStrategy() {
+        data object Combine : CombineAuthRequestRequestStrategy() {
             override fun <T> combine(authRequestValue: T?, requestObjectValue: T?): T? =
                 authRequestValue ?: requestObjectValue
 
@@ -101,7 +101,7 @@ class AuthRequestWithRequestAuthRequestExtractor(
                 if (authRequestValue.isNotEmpty()) authRequestValue else requestObjectValue
         }
 
-        object AuthRequestOnly : CombineAuthRequestRequestStrategy() {
+        data object AuthRequestOnly : CombineAuthRequestRequestStrategy() {
             override fun <T> combine(authRequestValue: T?, requestObjectValue: T?): T? =
                 authRequestValue
 
@@ -109,7 +109,7 @@ class AuthRequestWithRequestAuthRequestExtractor(
                 authRequestValue
         }
 
-        object RequestObjectOnly : CombineAuthRequestRequestStrategy() {
+        data object RequestObjectOnly : CombineAuthRequestRequestStrategy() {
             override fun <T> combine(authRequestValue: T?, requestObjectValue: T?): T? =
                 requestObjectValue
 

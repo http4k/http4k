@@ -12,7 +12,7 @@ sealed class FieldValue {
         constructor(vararg eTags: ETag) : this(eTags.toList())
     }
 
-    object Wildcard : FieldValue()
+    data object Wildcard : FieldValue()
 }
 
 /**

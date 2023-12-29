@@ -66,9 +66,8 @@ object ChaosStages {
     /**
      * Does not apply any ChaosBehaviour.
      */
-    object Wait : Stage {
+    data object Wait : Stage {
         override fun invoke(request: Request) = Filter.NoOp
-        override fun toString() = "Wait"
     }
 
     /**

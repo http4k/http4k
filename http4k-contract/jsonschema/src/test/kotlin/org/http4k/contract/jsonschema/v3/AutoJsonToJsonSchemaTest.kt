@@ -96,7 +96,7 @@ data class JacksonFieldWithMetadata(
 )
 
 sealed class Sealed(val string: String)
-object SealedChild : Sealed("child")
+data object SealedChild : Sealed("child")
 
 interface Interface
 data class InterfaceImpl1(val a: String = "a") : Interface

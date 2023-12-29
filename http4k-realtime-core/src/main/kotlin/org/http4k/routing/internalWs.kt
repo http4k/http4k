@@ -15,7 +15,7 @@ sealed class WsRouterMatch(private val priority: Int) :
 
     data class MatchingHandler(private val handler: WsHandler) : WsRouterMatch(0), WsHandler by handler
 
-    object Unmatched : WsRouterMatch(1)
+    data object Unmatched : WsRouterMatch(1)
 
     override fun compareTo(other: WsRouterMatch): Int = priority.compareTo(other.priority)
 }

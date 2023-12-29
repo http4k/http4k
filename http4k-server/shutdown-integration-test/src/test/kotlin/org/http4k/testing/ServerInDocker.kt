@@ -215,16 +215,16 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
     }
 
     sealed class DockerEvent : Event {
-        object ServerStartedRequested : DockerEvent()
-        object WorkspacePrepared : DockerEvent()
+        data object ServerStartedRequested : DockerEvent()
+        data object WorkspacePrepared : DockerEvent()
         data class RelevantContainersFound(val ids: List<Pair<String, String>>) : DockerEvent()
-        object StartedCreatingContainer : DockerEvent()
+        data object StartedCreatingContainer : DockerEvent()
         data class ContainerCreated(val id: String) : DockerEvent()
         data class ContainerKilled(val id: String) : DockerEvent()
         data class ServerStopRequested(val id: String) : DockerEvent()
         data class ContainerStopped(val id: String) : DockerEvent()
         data class ContainerRemoved(val id: String) : DockerEvent()
-        object ServerReady : DockerEvent()
+        data object ServerReady : DockerEvent()
     }
 }
 
