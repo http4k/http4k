@@ -21,6 +21,7 @@ fun main() {
         Fallback.of(Response(OK).body("Fallback")),
         RetryPolicy.builder<Response>()
             .withMaxAttempts(2)
+            .onRetry { println("Retrying") }
             .handleResultIf { !it.status.successful }
             .build(),
         CircuitBreaker.builder<Response>()
