@@ -16,7 +16,7 @@ import java.time.ZoneOffset
 class AwsRequestPreSignerTest {
 
     @Test
-    fun `signed with standard credentials`() {
+    fun `signed GET with standard credentials`() {
         val time = Instant.parse("2013-05-24T00:00:00Z")
         val signer = AwsRequestPreSigner(
             scope = AwsCredentialScope("us-east-1", "s3"),
@@ -27,6 +27,7 @@ class AwsRequestPreSignerTest {
         val signed = signer(request, Duration.ofHours(24))
         val signedRequest = request.uri(signed.uri)
 
+        assertThat(signed.method, equalTo(Method.GET))
         assertThat(signed.uri, hasHost("examplebucket.s3.amazonaws.com"))
         assertThat(signed.uri, hasUriPath("/test.txt"))
         assertThat(signedRequest, hasQuery("X-Amz-Algorithm", equalTo("AWS4-HMAC-SHA256")))
@@ -43,7 +44,7 @@ class AwsRequestPreSignerTest {
     }
 
     @Test
-    fun `signed with STS credentials`() {
+    fun `signed PUT with STS credentials`() {
         val signer = AwsRequestPreSigner(
             scope = AwsCredentialScope("us-east-1", "s3"),
             credentials = AwsCredentials(
@@ -53,10 +54,11 @@ class AwsRequestPreSignerTest {
             ),
             clock = Clock.fixed(Instant.parse("2013-05-24T00:00:00Z"), ZoneOffset.UTC)
         )
-        val request = Request(Method.GET, "https://examplebucket.s3.amazonaws.com/test.txt")
+        val request = Request(Method.PUT, "https://examplebucket.s3.amazonaws.com/test.txt")
         val signed = request
             .uri(signer(request, Duration.ofHours(24)).uri)
 
+        assertThat(signed.method, equalTo(Method.PUT))
         assertThat(signed.uri, hasHost("examplebucket.s3.amazonaws.com"))
         assertThat(signed.uri, hasUriPath("/test.txt"))
         assertThat(signed, hasQuery("X-Amz-Algorithm", equalTo("AWS4-HMAC-SHA256")))
@@ -65,6 +67,6 @@ class AwsRequestPreSignerTest {
         assertThat(signed, hasQuery("X-Amz-Expires", equalTo("86400")))
         assertThat(signed, hasQuery("X-Amz-SignedHeaders", equalTo("host")))
         assertThat(signed, hasQuery("X-Amz-Security-Token", equalTo("SESSION_TOKEN")))
-        assertThat(signed, hasQuery("X-Amz-Signature", equalTo("2d6c965684dab7f9323f29d2dcbb33660cc71630460c0d5a439c0719a708f274")))
+        assertThat(signed, hasQuery("X-Amz-Signature", equalTo("bc6d96272fce1254e0c9e5cca2ff1b94b76c539772c3540ae7ee739503437e33")))
     }
 }
