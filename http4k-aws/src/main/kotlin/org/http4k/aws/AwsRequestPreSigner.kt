@@ -41,6 +41,7 @@ fun AwsRequestPreSigner(
     val signature = AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, awsDate)
 
     AwsPreSignedRequest(
+        method = fullRequest.method,
         uri = fullRequest.query("X-Amz-Signature", signature).uri,
         signedHeaders = fullRequest.headers,
         expires = clock.instant() + expires
