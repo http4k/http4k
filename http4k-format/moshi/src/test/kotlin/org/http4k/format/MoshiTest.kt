@@ -13,6 +13,7 @@ import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -173,11 +174,28 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
     @Test
     fun `custom moshi`() {
         val moshi = Moshi.custom {
-            text(BiDiMapping({StringHolder(it)},{it.value}))
+            text(BiDiMapping({ StringHolder(it) }, { it.value }))
         }
 
         val value = StringHolder("stuff")
         assertThat(moshi.asFormatString(value), equalTo("\"stuff\""))
+    }
+
+    @Test
+    fun `throws on mapped value class when we specifically prohibit it`() {
+        val marshaller =
+            ConfigurableMoshi(standardConfig()
+                .apply {
+                    value(MyValue)
+                    value(MyOtherValue)
+                }
+                .customise()
+                .add(ProhibitUnknownValuesAdapter)
+            )
+
+        assertThat(marshaller.asFormatString(MyValue.of("hello")), equalTo(""""hello""""))
+        assertThat(marshaller.asFormatString(MyOtherValue.of("world")), equalTo(""""world""""))
+        assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("unknown")).also { println(it) } }
     }
 
     override fun strictMarshaller() = object : ConfigurableMoshi
@@ -185,7 +203,8 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
 
     override fun customMarshaller() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
     override fun customMarshallerProhibitStrings() = object : ConfigurableMoshi(
-        Builder().asConfigurable().prohibitStrings().customise()) {}
+        Builder().asConfigurable().prohibitStrings().customise()
+    ) {}
 }
 
 class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {

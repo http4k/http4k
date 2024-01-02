@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.KeyDeserializer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import dev.forkhandles.values.Value
 import org.http4k.lens.BiDiMapping
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -45,3 +46,14 @@ fun <T : ObjectMapper> KotlinModule.asConfigurable(mapper: T): AutoMappingConfig
 
     override fun done(): T = mapper.apply { registerModule(this@asConfigurable) }
 }
+
+/**
+ * Prevent the unmarshalling of unknown values4k types.
+ */
+fun <BUILDER> AutoMappingConfiguration<BUILDER>.prohibitUnknownValues(): AutoMappingConfiguration<BUILDER> =
+    text(BiDiMapping(
+        Value::class.java,
+        { error("no mapping for ${it.javaClass}") }, { error("no mapping for ${it.javaClass}") })
+    )
+
+

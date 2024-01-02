@@ -18,8 +18,8 @@ import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.BiDiMapping
 import org.http4k.websocket.WsMessage
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 
 class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
@@ -156,7 +156,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val wrapper = mapOf(
             "str" to "val1",
             "num" to BigDecimal("123.1"),
-            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "array" to listOf(BigDecimal("1.1"), "stuff"),
             "map" to mapOf("foo" to "bar"),
             "bool" to true
         )
@@ -171,7 +171,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
             "foo",
             BigDecimal("123.1"),
             mapOf("foo" to "bar"),
-            listOf(BigDecimal("1.1"),BigDecimal("2.1")),
+            listOf(BigDecimal("1.1"), BigDecimal("2.1")),
             true
         )
         val asString = Jackson.asFormatString(wrapper)
@@ -182,11 +182,25 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
     @Test
     fun `custom jackson`() {
         val jackson = Jackson.custom {
-            text(BiDiMapping({StringHolder(it)},{it.value}))
+            text(BiDiMapping({ StringHolder(it) }, { it.value }))
         }
 
         val value = StringHolder("stuff")
         assertThat(jackson.asFormatString(value), equalTo("\"stuff\""))
+    }
+
+    @Test
+    fun `throws on mapped value class when we specifically prohibit it`() {
+        val marshaller = object :
+            ConfigurableJackson(KotlinModule.Builder().build().asConfigurable()
+                .value(MyValue)
+                .prohibitUnknownValues()
+                .value(MyOtherValue)
+                .done()) {}
+
+        assertThat(marshaller.asFormatString(MyValue.of("hello")), equalTo(""""hello""""))
+        assertThat(marshaller.asFormatString(MyOtherValue.of("world")), equalTo(""""world""""))
+        assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("hello")) }
     }
 }
 

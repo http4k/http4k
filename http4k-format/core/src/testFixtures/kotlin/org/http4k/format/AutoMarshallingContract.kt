@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
+import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import org.http4k.core.Method.GET
@@ -86,8 +87,16 @@ class MyValue(value: String) : StringValue(value) {
     companion object : StringValueFactory<MyValue>(::MyValue)
 }
 
+class MyOtherValue(value: String) : StringValue(value) {
+    companion object : StringValueFactory<MyOtherValue>(::MyOtherValue)
+}
+
 data class MyValueHolder(val value: MyValue?)
 data class MyValueHolderHolder(val value: MyValueHolder?)
+
+class UnknownValueType private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<UnknownValueType>(::UnknownValueType)
+}
 
 abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) {
 

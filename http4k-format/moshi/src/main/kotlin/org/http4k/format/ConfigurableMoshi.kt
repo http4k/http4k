@@ -164,8 +164,8 @@ fun Moshi.Builder.asConfigurable(
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
     override fun done() = this@asConfigurable
-        .add(kotlinFactory)
         .add(Unit::class.java, UnitAdapter)
+        .addLast(kotlinFactory)
 }
 
 private object UnitAdapter : JsonAdapter<Unit>() {
