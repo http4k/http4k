@@ -9,6 +9,7 @@ dependencies {
     implementation("io.cloudevents:cloudevents-core:_")
     implementation("io.cloudevents:cloudevents-json-jackson:_")
     implementation("dev.forkhandles:values4k:_")
+    implementation("dev.forkhandles:data4k:_")
 
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-contract"))

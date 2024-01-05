@@ -48,6 +48,7 @@ open class ConfigurableJackson(
             INT, LONG, BIG_INTEGER -> Integer
             else -> Number
         }
+
         is ArrayNode -> JsonType.Array
         is ObjectNode -> JsonType.Object
         is NullNode -> JsonType.Null
@@ -105,7 +106,7 @@ open class ConfigurableJackson(
     ): BiDiBodyLensSpec<T> =
         httpBodyLens(description, contentNegotiation, contentType).map(mapper.read(), mapper.write())
 
-    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String =
@@ -118,14 +119,14 @@ open class ConfigurableJackson(
         description: String? = null,
         contentNegotiation: ContentNegotiation = None,
         contentType: ContentType = APPLICATION_JSON
-    ) =
-        Body.string(contentType, description, contentNegotiation)
-            .map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
+    ) = Body.string(contentType, description, contentNegotiation)
+        .map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 
     inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =
         WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 
-    fun <T: Any> CloudEventBuilder.withData(t: T) = withData(defaultContentType.value, JsonCloudEventData.wrap(asJsonObject(t)))
+    fun <T : Any> CloudEventBuilder.withData(t: T) =
+        withData(defaultContentType.value, JsonCloudEventData.wrap(asJsonObject(t)))
 }
 
 fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
@@ -143,4 +144,5 @@ inline fun <reified T : Any> ObjectMapper.write(): (T) -> String = {
 }
 
 inline operator fun <reified T : Any> ConfigurableJackson.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
-inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJackson.invoke(item: T) = autoBody<T>().toLens().of<R>(item)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJackson.invoke(item: T) =
+    autoBody<T>().toLens().of<R>(item)
