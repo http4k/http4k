@@ -88,3 +88,12 @@ an overloaded OpenApi function automatically provides the default Jackson instan
 }
 ```
 
+### Receiving Binary content with http4k Contracts (application/octet-stream or multipart etc)
+
+With binary attachments, you need to turn ensure that the pre-flight validation does not eat the stream. This is possible by instructing http4k to ignore the incoming body for validation purposes:
+
+```kotlin
+routes += "/api/document-upload" meta {
+    preFlightExtraction = PreFlightExtraction.IgnoreBody
+} bindContract POST to { req -> Response(OK) }
+```
