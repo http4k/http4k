@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-core** : Fix lens replacement of path parameter when there is a regular expression in the path segment
+- **http4k-format-jackson** : Added lens support for deserialising data4k containers directly from HTTP message bodies (via `Body.json(::JsonNodeDataContainer)).toLens()`
 
 ### v5.12.0.0
 
