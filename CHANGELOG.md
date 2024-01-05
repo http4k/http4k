@@ -3,11 +3,17 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.12.1.0
+
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core** : Fix lens replacement of path parameter when there is a regular expression in the path segment
+
 ### v5.12.0.0
 
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.22, and Jetty 12 (see below).
 - **http4k-server-jetty** - [Breaking] Upgrade to Jetty 12. This is a major rewrite of the Jetty engine and the API surface is incompatible with v11. If you are
-  using vanilla Jetty backend then this is a NoOp replacement, otherwise fallback to using the new `Jetty11` module and then plan migration accordingly. Massive H/T to H/T @FredNordin for the implementation upgrade.
+  using vanilla Jetty backend then this is a NoOp replacement, otherwise fallback to using the new `Jetty11` module and then plan migration accordingly. Massive
+  H/T to H/T @FredNordin for the implementation upgrade.
 - **http4k-server-jetty11** - [New Module!] Drop-in replacement module for custom Jetty11 users. Constructor is now called `Jetty11()` instead of `Jetty()`, so
   migration should be very simple. Other renames as required (using `11`) to avoid API clashes in the http4k codebase.
 - **http4k-aws** : [Breaking] Tweaks to the signature of `AwsPreSignRequests`. Use `AwsRequestPreSigner` instead. H/T @oharaandrew314

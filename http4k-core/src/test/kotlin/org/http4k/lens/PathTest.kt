@@ -73,6 +73,20 @@ class PathTest {
     }
 
     @Test
+    fun `can inject into path with simple path`() {
+        val path = Path.of("bob")
+        val injected = Request(GET, "/{bob}").with(path of "hello")
+
+        assertThat(injected.uri.path, equalTo("/hello"))
+    }
+
+    @Test
+    fun `can inject into path with regex path`() {
+        val injected = Request(GET, "/{bob:.*}").with(Path.of("bob") of "hello")
+        assertThat(injected.uri.path, equalTo("/hello"))
+    }
+
+    @Test
     fun `sets value on request uri with proper encoding`() {
         fun checkEncodeDecode(unencoded: String, encoded: String) {
             val pathParam = Path.of("bob")

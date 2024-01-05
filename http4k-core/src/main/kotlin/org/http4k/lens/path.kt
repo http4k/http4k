@@ -92,8 +92,9 @@ object Path : BiDiPathLensSpec<String>(StringParam,
         target.uri(
             target.uri.path(
                 target.uri.path.replaceFirst(
-                    "{$name}",
+                    Regex("""\{$name(:[^}]*)?}"""),
                     values.first().toPathSegmentEncoded()
+                        .replace("\\", "\\\\").replace("$", "\\\$")
                 )
             )
         )
@@ -142,10 +143,17 @@ inline fun <reified T : Enum<T>> Path.enum(caseSensitive: Boolean = true) = mapW
     if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
     EnumParam(T::class)
 )
-inline fun <reified T : Enum<T>> Path.enum(noinline nextOut: (String) -> T, noinline nextIn: (T) -> String) = mapWithNewMeta(BiDiMapping(nextOut, nextIn), EnumParam(T::class))
+
+inline fun <reified T : Enum<T>> Path.enum(noinline nextOut: (String) -> T, noinline nextIn: (T) -> String) =
+    mapWithNewMeta(BiDiMapping(nextOut, nextIn), EnumParam(T::class))
 
 @PublishedApi
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
 fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) =
     mapWithNewMeta(mapping::invoke, mapping::invoke, paramMeta)
+
+fun main() {
+    val name = "bob"
+    "/first/{$name}/second".replaceFirst(Regex("""\{$name(:[^}]*)?}"""), "!\$&'()*+,;=")
+}
