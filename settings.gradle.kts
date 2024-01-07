@@ -118,6 +118,7 @@ include("http4k-realtime-core")
     includeModule("core")
     includeModule("digest")
     includeModule("oauth")
+    includeModule("jwt")
 }
 
 "http4k-template".apply {
