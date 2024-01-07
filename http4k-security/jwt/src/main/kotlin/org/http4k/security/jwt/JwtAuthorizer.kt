@@ -13,17 +13,17 @@ import java.text.ParseException
 import java.time.Clock
 import java.util.Date
 
-fun interface JwtAuthProvider: (String) -> JWTClaimsSet?
+fun interface JwtAuthorizer: (String) -> JWTClaimsSet?
 
 /**
  * Build fully custom JWT Auth Provider
  */
-fun JwtAuthProvider(
+fun JwtAuthorizer(
     processor: JWTProcessor<SecurityContext>,
     onParseFailure: (String, ParseException) -> Unit = { _, _ -> },
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
     onError: (String, JOSEException) -> Unit = { _, _ -> }
-) = JwtAuthProvider { token ->
+) = JwtAuthorizer { token ->
     try {
         processor.process(token, null)
     } catch (e: BadJOSEException){
@@ -41,13 +41,13 @@ fun JwtAuthProvider(
 /**
  * Build provider with the given verifier and key selector
  */
-fun JwtAuthProvider(
+fun JwtAuthorizer(
     verifier: JWTClaimsSetVerifier<SecurityContext>,
     keySelector: JWSKeySelector<SecurityContext>,
     onParseFailure: (String, ParseException) -> Unit = { _, _ -> },
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
     onError: (String, JOSEException) -> Unit = { _, _ -> }
-) = JwtAuthProvider(
+) = JwtAuthorizer(
     processor = DefaultJWTProcessor<SecurityContext>().apply {
         jwtClaimsSetVerifier = verifier
         jwsKeySelector = keySelector
@@ -62,9 +62,9 @@ fun JwtAuthProvider(
  *
  * Expiry is determined with the given Clock.
  */
-fun JwtAuthProvider(
+fun JwtAuthorizer(
     keySelector: JWSKeySelector<SecurityContext>,
-    audience: Set<String> = emptySet(),
+    audience: Set<String>? = null,
     exactMatchClaims: JWTClaimsSet? = null,
     requiredClaims: Set<String> = emptySet(),
     prohibitedClaims: Set<String> = emptySet(),
@@ -72,7 +72,7 @@ fun JwtAuthProvider(
     onParseFailure: (String, ParseException) -> Unit = { _, _ -> },
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
     onError: (String, JOSEException) -> Unit = { _, _ -> }
-) = JwtAuthProvider(
+) = JwtAuthorizer(
     verifier = object: DefaultJWTClaimsVerifier<SecurityContext>(
         audience,
         exactMatchClaims,

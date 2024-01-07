@@ -5,9 +5,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.jwk.KeyUse
+import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.proc.SingleKeyJWSKeySelector
 import com.nimbusds.jwt.JWTClaimsSet
-
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 import java.time.Clock
@@ -16,28 +19,20 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-class JwtAuthProviderTest {
-    private val clock = object: Clock() {
-        override fun instant() = Instant.parse("2024-01-07T12:00:00Z")
-        override fun withZone(zone: ZoneId?) = TODO()
-        override fun getZone() = ZoneOffset.UTC
-    }
-
-    private val rsa = RsaHelper(clock, "testServer", setOf("testApp"))
+class JwtAuthorizerTest {
+    private val rsa = RsaProvider("testServer")
 
     @Test
     fun `process invalid jwt`() {
-        val provider = JwtAuthProvider(
-            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
-            audience = rsa.audience,
-            clock = clock
+        val provider = JwtAuthorizer(
+            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey)
         )
         assertThat(provider("lolcats"), absent())
     }
 
     @Test
-    fun `process local hs jwt`() {
-        val hs = HsHelper( "testServer", setOf("testApp"))
+    fun `process local HS jwt`() {
+        val hs = HsProvider( "testServer")
         val token = hs.generate("sub1")
         val claims = hs.verify(token)
         assertThat(claims, present())
@@ -45,12 +40,10 @@ class JwtAuthProviderTest {
     }
 
     @Test
-    fun `process local rsa jwt`() {
+    fun `get verified subject`() {
         val token = rsa.generate("sub1")
-        val provider = JwtAuthProvider(
-            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
-            audience = rsa.audience,
-            clock = clock
+        val provider = JwtAuthorizer(
+            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey)
         )
 
         val claims = provider(token)
@@ -61,14 +54,18 @@ class JwtAuthProviderTest {
     @Test
     fun `process remote jwt`() {
         val token = rsa.generate("sub1")
-        val provider = JwtAuthProvider(
+        val provider = JwtAuthorizer(
             keySelector = http4kJwsKeySelector(
                 jwkUri = Uri.of("http://localhost/keys.jwks"),
                 algorithm = JWSAlgorithm.RS256,
-                http = rsa.http
-            ),
-            audience = rsa.audience,
-            clock = clock
+                http = jwkServer(
+                    RSAKey.Builder(rsa.publicKey)
+                        .keyUse(KeyUse.SIGNATURE)
+                        .keyID("key1")
+                        .build()
+                        .toPublicJWK()
+                )
+            )
         )
 
         val claims = provider(token)
@@ -77,11 +74,22 @@ class JwtAuthProviderTest {
     }
 
     @Test
+    fun `process remote jwt - 404`() {
+        val provider = JwtAuthorizer(
+            keySelector = http4kJwsKeySelector(
+                jwkUri = Uri.of("http://localhost/keys.jwks"),
+                algorithm = JWSAlgorithm.RS256,
+                http = { Response(NOT_FOUND) }
+            )
+        )
+
+        assertThat(provider(rsa.generate("sub1")), absent())
+    }
+
+    @Test
     fun `verify issuer`() {
-        val provider = JwtAuthProvider(
+        val provider = JwtAuthorizer(
             keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
-            audience = rsa.audience,
-            clock = clock,
             exactMatchClaims = JWTClaimsSet.Builder()
                 .issuer(rsa.issuer)
                 .build()
@@ -92,11 +100,23 @@ class JwtAuthProviderTest {
     }
 
     @Test
-    fun `verify issuer - invalid`() {
-        val provider = JwtAuthProvider(
+    fun `verify audience`() {
+        val provider = JwtAuthorizer(
             keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
-            audience = rsa.audience,
-            clock = clock,
+            audience = setOf("foo", "bar")
+        )
+
+        assertThat(rsa.generate("sub1", audience = emptyList()).let(provider), absent())
+        assertThat(rsa.generate("sub1", audience = listOf("foo")).let(provider), present())
+        assertThat(rsa.generate("sub1", audience = listOf("foo", "bar")).let(provider), present())
+        assertThat(rsa.generate("sub1", audience = listOf("foo", "bar", "baz")).let(provider), present())
+        assertThat(rsa.generate("sub1", audience = listOf("baz")).let(provider), absent())
+    }
+
+    @Test
+    fun `verify issuer - invalid`() {
+        val provider = JwtAuthorizer(
+            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
             exactMatchClaims = JWTClaimsSet.Builder()
                 .issuer("issuer2")
                 .build()
@@ -108,15 +128,13 @@ class JwtAuthProviderTest {
 
     @Test
     fun `verify extra claims`() {
-        val provider = JwtAuthProvider(
+        val provider = JwtAuthorizer(
             keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
             exactMatchClaims = JWTClaimsSet.Builder()
                 .claim("foo", "1")
                 .build(),
             requiredClaims = setOf("bar"),
-            prohibitedClaims = setOf("baz"),
-            audience = rsa.audience,
-            clock = clock
+            prohibitedClaims = setOf("baz")
         )
 
         assertThat(provider(rsa.generate("sub1")), absent())
@@ -128,10 +146,15 @@ class JwtAuthProviderTest {
 
     @Test
     fun `verify expiry`() {
-        val provider = JwtAuthProvider(
+        val clock = object: Clock() {
+            override fun instant() = Instant.parse("2024-01-07T12:00:00Z")
+            override fun withZone(zone: ZoneId?) = TODO()
+            override fun getZone() = ZoneOffset.UTC
+        }
+
+        val provider = JwtAuthorizer(
             keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
-            clock = clock,
-            audience = rsa.audience
+            clock = clock
         )
 
         assertThat(rsa.generate("sub1", expires = clock.instant() - Duration.ofMinutes(1)).let(provider), absent())

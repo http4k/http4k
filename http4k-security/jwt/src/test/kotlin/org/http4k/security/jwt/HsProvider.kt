@@ -8,18 +8,16 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import javax.crypto.spec.SecretKeySpec
 
-class HsHelper(private val issuer: String, private val audience: Set<String>) {
+class HsProvider(private val issuer: String) {
 
     private val hsKey = SecretKeySpec("qwertyuiopasdfghjklzxcvbnm123456".toByteArray(), "HS256")
-    private val provider = JwtAuthProvider(
+    private val provider = JwtAuthorizer(
         keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.HS256, hsKey),
-        audience = audience
     )
 
     fun generate(subject: String): String {
         val header = JWSHeader.Builder(JWSAlgorithm.HS256).build()
         val claims = JWTClaimsSet.Builder()
-            .audience(audience.first())
             .issuer(issuer)
             .subject(subject)
             .build()

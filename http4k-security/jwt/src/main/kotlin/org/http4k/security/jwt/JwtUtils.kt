@@ -1,6 +1,7 @@
 package org.http4k.security.jwt
 
 import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jose.jwk.source.JWKSourceBuilder
 import com.nimbusds.jose.proc.JWSVerificationKeySelector
 import com.nimbusds.jose.proc.SecurityContext
@@ -9,6 +10,8 @@ import com.nimbusds.jose.util.ResourceRetriever
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.lens.Header
 import java.io.IOException
@@ -31,3 +34,12 @@ fun http4kResourceRetriever(http: HttpHandler) = ResourceRetriever { url ->
     if (!response.status.successful) throw IOException("Error retrieving JWK from $url: $response")
     Resource(response.bodyString(), Header.CONTENT_TYPE(response)?.value)
 }
+
+fun jwkServer(publicKeys: Collection<JWK>): HttpHandler {
+    val response = Response(Status.OK)
+        .body( """{"keys":[${publicKeys.joinToString(",")}]}""")
+        .header("Content-Type", "application/json")
+    return { response }
+}
+
+fun jwkServer(vararg publicKeys: JWK) = jwkServer(publicKeys.toList())
