@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.12.2.0 (uncut)
+
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core**  [Fix #1022] For a request with matching if-none-match header the response lacks the etag header. H/T @efasel
+
 ### v5.12.1.0
 
 - **http4k-*** : Upgrade some dependency versions
