@@ -10,14 +10,15 @@ import org.http4k.core.then
 import org.http4k.filter.JwtAuth
 import org.http4k.filter.ServerFilters
 import org.http4k.security.jwt.JwtAuthorizer
+import org.http4k.security.jwt.RsaProvider
 
 fun main() {
     // generate a new RSA key pair
-    val rsa = RsaProvider()
+    val rsa = RsaProvider("exampleServer")
 
     // authorize requests using the RSA public key
     val authorizer = JwtAuthorizer(
-        keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.public),
+        keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
         lookup = { it.subject } // The principal is the JWT's subject
     )
 
@@ -32,6 +33,6 @@ fun main() {
 
     // requests with a valid JWT will be allowed
     val authorizedRequest = Request(GET, "/")
-        .header("Authorization", "Bearer ${rsa.newJwt("user1")}")
+        .header("Authorization", "Bearer ${rsa.generate("user1")}")
     println(http(authorizedRequest))  // OK
 }

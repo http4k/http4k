@@ -21,6 +21,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.uri
 import org.http4k.routing.reverseProxy
 import org.http4k.security.jwt.JwtAuthorizer
+import org.http4k.security.jwt.RsaProvider
 import org.http4k.security.jwt.http4kJwsKeySelector
 import org.http4k.security.jwt.jwkServer
 import org.http4k.server.Jetty
@@ -51,7 +52,7 @@ fun createApp(
 }
 
 class AppTest {
-    private val rsa = RsaProvider()
+    private val rsa = RsaProvider("exampleServer")
 
     // create a fake app
     private val app = createApp(
@@ -62,7 +63,7 @@ class AppTest {
         // override the internet, returning a JWK from a fake issuer
         internet = reverseProxy(
             "auth.fake" to jwkServer(
-                RSAKey.Builder(rsa.public)
+                RSAKey.Builder(rsa.publicKey)
                     .keyUse(KeyUse.SIGNATURE)
                     .keyID("key1")
                     .build()
@@ -75,7 +76,7 @@ class AppTest {
     fun `authorize request`() {
         // when the app authorizes the request, it loads the public key from the fake remote JWK
         val response = Request(Method.GET, "/")
-            .header("Authorization", "Bearer ${rsa.newJwt("user1")}")
+            .header("Authorization", "Bearer ${rsa.generate("user1")}")
             .let(app)
 
         assertThat(response, hasStatus(OK))
