@@ -5,30 +5,16 @@ import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.security.KeyFactory
-import java.security.KeyPair
+import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
-import java.security.spec.PKCS8EncodedKeySpec
-import java.security.spec.X509EncodedKeySpec
 import java.time.Instant
 import java.util.Date
 
 class RsaProvider(val issuer: String) {
 
-    private fun loadResource(name: String) = javaClass.classLoader.getResource(name)
-        ?.toURI()!!
-        .let(Paths::get)
-        .let(Files::readAllBytes)
-
-    private val keyPair = let {
-        val kf = KeyFactory.getInstance("RSA")
-        KeyPair(
-            kf.generatePublic(X509EncodedKeySpec(loadResource("keys/rsa_pub.key"))),
-            kf.generatePrivate(PKCS8EncodedKeySpec(loadResource("keys/rsa_priv.key"))),
-        )
-    }
+    private val keyPair = KeyPairGenerator.getInstance("RSA")
+        .apply { initialize(2048) }
+        .generateKeyPair()
 
     val publicKey: RSAPublicKey get() = keyPair.public as RSAPublicKey
 

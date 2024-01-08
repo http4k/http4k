@@ -13,19 +13,20 @@ import java.text.ParseException
 import java.time.Clock
 import java.util.Date
 
-fun interface JwtAuthorizer: (String) -> JWTClaimsSet?
+fun interface JwtAuthorizer<Principal: Any>: (String) -> Principal?
 
 /**
  * Build fully custom JWT Auth Provider
  */
-fun JwtAuthorizer(
+fun <Principal: Any> JwtAuthorizer(
     processor: JWTProcessor<SecurityContext>,
+    lookup: (JWTClaimsSet) -> Principal?,
     onParseFailure: (String, ParseException) -> Unit = { _, _ -> },
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
     onError: (String, JOSEException) -> Unit = { _, _ -> }
 ) = JwtAuthorizer { token ->
     try {
-        processor.process(token, null)
+        processor.process(token, null).let(lookup)
     } catch (e: BadJOSEException){
         onRejected(token, e)
         null
@@ -41,8 +42,9 @@ fun JwtAuthorizer(
 /**
  * Build provider with the given verifier and key selector
  */
-fun JwtAuthorizer(
+fun <Principal: Any> JwtAuthorizer(
     verifier: JWTClaimsSetVerifier<SecurityContext>,
+    lookup: (JWTClaimsSet) -> Principal?,
     keySelector: JWSKeySelector<SecurityContext>,
     onParseFailure: (String, ParseException) -> Unit = { _, _ -> },
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
@@ -52,6 +54,7 @@ fun JwtAuthorizer(
         jwtClaimsSetVerifier = verifier
         jwsKeySelector = keySelector
     },
+    lookup = lookup,
     onParseFailure = onParseFailure,
     onRejected = onRejected,
     onError = onError
@@ -62,8 +65,9 @@ fun JwtAuthorizer(
  *
  * Expiry is determined with the given Clock.
  */
-fun JwtAuthorizer(
+fun <Principal: Any> JwtAuthorizer(
     keySelector: JWSKeySelector<SecurityContext>,
+    lookup: (JWTClaimsSet) -> Principal?,
     audience: Set<String>? = null,
     exactMatchClaims: JWTClaimsSet? = null,
     requiredClaims: Set<String> = emptySet(),
@@ -73,6 +77,7 @@ fun JwtAuthorizer(
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
     onError: (String, JOSEException) -> Unit = { _, _ -> }
 ) = JwtAuthorizer(
+    lookup = lookup,
     verifier = object: DefaultJWTClaimsVerifier<SecurityContext>(
         audience,
         exactMatchClaims,

@@ -6,13 +6,15 @@ import com.nimbusds.jose.crypto.MACSigner
 import com.nimbusds.jose.proc.SingleKeyJWSKeySelector
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import java.util.UUID
 import javax.crypto.spec.SecretKeySpec
 
 class HsProvider(private val issuer: String) {
 
-    private val hsKey = SecretKeySpec("qwertyuiopasdfghjklzxcvbnm123456".toByteArray(), "HS256")
+    private val hsKey = SecretKeySpec(UUID.randomUUID().toString().toByteArray(), "HS256")
     private val provider = JwtAuthorizer(
         keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.HS256, hsKey),
+        lookup = { it.subject }
     )
 
     fun generate(subject: String): String {

@@ -25,36 +25,45 @@ class JwtAuthorizerTest {
     @Test
     fun `process invalid jwt`() {
         val provider = JwtAuthorizer(
-            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey)
+            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
+            lookup = { it.subject }
         )
         assertThat(provider("lolcats"), absent())
+    }
+
+    @Test
+    fun `process valid jwt for unauthorized user`() {
+        val token = rsa.generate("subject")
+        val provider = JwtAuthorizer(
+            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
+            lookup = { null }
+        )
+        assertThat(provider(token), absent())
     }
 
     @Test
     fun `process local HS jwt`() {
         val hs = HsProvider( "testServer")
         val token = hs.generate("sub1")
-        val claims = hs.verify(token)
-        assertThat(claims, present())
-        assertThat(claims!!.subject, equalTo("sub1"))
+        assertThat(hs.verify(token), equalTo("sub1"))
     }
 
     @Test
     fun `get verified subject`() {
         val token = rsa.generate("sub1")
         val provider = JwtAuthorizer(
-            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey)
+            keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
+            lookup = { it.subject }
         )
 
-        val claims = provider(token)
-        assertThat(claims, present())
-        assertThat(claims!!.subject, equalTo("sub1"))
+        assertThat(provider(token), equalTo("sub1"))
     }
 
     @Test
     fun `process remote jwt`() {
         val token = rsa.generate("sub1")
         val provider = JwtAuthorizer(
+            lookup =  { it.subject },
             keySelector = http4kJwsKeySelector(
                 jwkUri = Uri.of("http://localhost/keys.jwks"),
                 algorithm = JWSAlgorithm.RS256,
@@ -68,14 +77,13 @@ class JwtAuthorizerTest {
             )
         )
 
-        val claims = provider(token)
-        assertThat(claims, present())
-        assertThat(claims!!.subject, equalTo("sub1"))
+        assertThat(provider(token), equalTo("sub1"))
     }
 
     @Test
     fun `process remote jwt - 404`() {
         val provider = JwtAuthorizer(
+            lookup = { it.subject },
             keySelector = http4kJwsKeySelector(
                 jwkUri = Uri.of("http://localhost/keys.jwks"),
                 algorithm = JWSAlgorithm.RS256,
@@ -89,6 +97,7 @@ class JwtAuthorizerTest {
     @Test
     fun `verify issuer`() {
         val provider = JwtAuthorizer(
+            lookup = { it.subject },
             keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
             exactMatchClaims = JWTClaimsSet.Builder()
                 .issuer(rsa.issuer)
@@ -96,14 +105,15 @@ class JwtAuthorizerTest {
         )
 
         val token = rsa.generate("sub1")
-        assertThat(provider(token), present())
+        assertThat(provider(token), equalTo("sub1"))
     }
 
     @Test
     fun `verify audience`() {
         val provider = JwtAuthorizer(
             keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
-            audience = setOf("foo", "bar")
+            audience = setOf("foo", "bar"),
+            lookup = { it.subject }
         )
 
         assertThat(rsa.generate("sub1", audience = emptyList()).let(provider), absent())
@@ -116,6 +126,7 @@ class JwtAuthorizerTest {
     @Test
     fun `verify issuer - invalid`() {
         val provider = JwtAuthorizer(
+            lookup = { it.subject },
             keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
             exactMatchClaims = JWTClaimsSet.Builder()
                 .issuer("issuer2")
@@ -134,7 +145,8 @@ class JwtAuthorizerTest {
                 .claim("foo", "1")
                 .build(),
             requiredClaims = setOf("bar"),
-            prohibitedClaims = setOf("baz")
+            prohibitedClaims = setOf("baz"),
+            lookup = { it.subject }
         )
 
         assertThat(provider(rsa.generate("sub1")), absent())
@@ -154,6 +166,7 @@ class JwtAuthorizerTest {
 
         val provider = JwtAuthorizer(
             keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.RS256, rsa.publicKey),
+            lookup = { it.subject },
             clock = clock
         )
 
