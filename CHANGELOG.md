@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.12.2.0 (uncut)
 
-- **http4k-security-jwt** - [New Module!] Integrates the nimbus JWT library to authenticate requests for a server. H/T @oharaandrew314
+- **http4k-security-jwt** - [New Module!] Integrates the nimbus JWT library to authorize requests for a server. H/T @oharaandrew314
 - **http4k-contract** - Add new `JwtSecurity`
 
 ### v5.12.1.0
