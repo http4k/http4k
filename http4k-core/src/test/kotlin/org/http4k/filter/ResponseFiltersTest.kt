@@ -392,6 +392,16 @@ class ResponseFiltersTest {
         }
 
         @Test
+        fun `response has etag if matches if-none-match`() {
+            val handler = EtagSupport().then {
+                Response(OK)
+                    .body("abc")
+            }
+            val response = handler(Request(GET, "/").header("if-none-match", "\"900150983cd24fb0d6963f7d28e17f72\""))
+            assertThat(response, hasHeader("etag", equalTo("\"900150983cd24fb0d6963f7d28e17f72\"")))
+        }
+
+        @Test
         fun `returns not modified if the etag matches`() {
             val handler = EtagSupport().then {
                 Response(OK).body("abc")
