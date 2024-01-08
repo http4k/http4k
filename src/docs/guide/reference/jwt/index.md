@@ -54,7 +54,7 @@ However, this requires injecting fake components into the app factory method.
 This module provides a universal component that can retrieve a JWK from both a real and fake server.
 
 The `http4kJwsKeySelector` requires you to inject the internet as an `HttpHandler`, which can be faked to return an in-memory JWK.
-With this components, the only difference between a test and production app is the internet that you inject. 
+With this component, the only difference between a test and production app is the internet that you inject. 
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/jwt/testability.kt"></script>
 
