@@ -7,7 +7,7 @@ import org.http4k.lens.RequestContextLens
 import org.http4k.security.jwt.JwtAuthorizer
 
 /**
- * Checks the presence of bearer auth credentials. Filter returns 401 if auth fails.
+ * Checks for the presence of and verifies JWT credentials. Filter returns 401 if auth fails.
  */
 class JwtSecurity(override val filter: Filter, val name: String = "jwtAuth") : Security {
     constructor(authorizer: JwtAuthorizer<*>, name: String = "jwtAuth") : this(ServerFilters.JwtAuth(authorizer), name)
