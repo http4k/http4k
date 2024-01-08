@@ -34,7 +34,7 @@ internal fun JettyRequest.asHttp4kRequest(): Request? =
 
 private fun JettyRequest.headerParameters() =
     headers.fieldNamesCollection.map { name ->
-        headers.getCSV(name, false).map { name to it }
+        headers.getCSV(name, true).map { name to it }
     }.flatten()
 
 private fun Response.transferTo(response: JettyResponse) {
