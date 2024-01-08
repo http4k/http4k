@@ -171,8 +171,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Integrates the [nimbus-jose-jwt] library to authorize requests, including:
         * Server Filters
         * Contract Security
-    * Easily inject a fake JWK server into tests
-    * Test can use hardcoded JWTs by overriding the processor's clock
+        * JWK rendering
+        * Testability tools
 * [Cloud Native:](https://http4k.org/guide/reference/cloud_native)
     * Tooling to support operating [http4k] applications in orchestrated cloud environments such as Kubernetes and CloudFoundry. 12-factor configuration, dual-port servers and health checks such as liveness and readiness checking. 
 * [Approval Testing:](https://http4k.org/guide/reference/approvaltests)
