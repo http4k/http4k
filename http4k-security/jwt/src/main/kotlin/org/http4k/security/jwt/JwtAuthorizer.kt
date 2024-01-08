@@ -1,6 +1,5 @@
 package org.http4k.security.jwt
 
-import com.nimbusds.jose.JOSEException
 import com.nimbusds.jose.proc.BadJOSEException
 import com.nimbusds.jose.proc.JWSKeySelector
 import com.nimbusds.jose.proc.SecurityContext
@@ -23,15 +22,11 @@ fun <Principal: Any> JwtAuthorizer(
     lookup: (JWTClaimsSet) -> Principal?,
     onParseFailure: (String, ParseException) -> Unit = { _, _ -> },
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
-    onError: (String, JOSEException) -> Unit = { _, _ -> }
 ) = JwtAuthorizer { token ->
     try {
         processor.process(token, null).let(lookup)
     } catch (e: BadJOSEException){
         onRejected(token, e)
-        null
-    } catch (e: JOSEException) {
-        onError(token, e)
         null
     } catch (e: ParseException) {
         onParseFailure(token, e)
@@ -48,7 +43,6 @@ fun <Principal: Any> JwtAuthorizer(
     keySelector: JWSKeySelector<SecurityContext>,
     onParseFailure: (String, ParseException) -> Unit = { _, _ -> },
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
-    onError: (String, JOSEException) -> Unit = { _, _ -> }
 ) = JwtAuthorizer(
     processor = DefaultJWTProcessor<SecurityContext>().apply {
         jwtClaimsSetVerifier = verifier
@@ -56,8 +50,7 @@ fun <Principal: Any> JwtAuthorizer(
     },
     lookup = lookup,
     onParseFailure = onParseFailure,
-    onRejected = onRejected,
-    onError = onError
+    onRejected = onRejected
 )
 
 /**
@@ -75,7 +68,6 @@ fun <Principal: Any> JwtAuthorizer(
     clock: Clock = Clock.systemUTC(),
     onParseFailure: (String, ParseException) -> Unit = { _, _ -> },
     onRejected: (String, BadJOSEException) -> Unit = { _, _ -> },
-    onError: (String, JOSEException) -> Unit = { _, _ -> }
 ) = JwtAuthorizer(
     lookup = lookup,
     verifier = object: DefaultJWTClaimsVerifier<SecurityContext>(
@@ -88,6 +80,5 @@ fun <Principal: Any> JwtAuthorizer(
     },
     keySelector = keySelector,
     onParseFailure = onParseFailure,
-    onRejected = onRejected,
-    onError = onError
+    onRejected = onRejected
 )
