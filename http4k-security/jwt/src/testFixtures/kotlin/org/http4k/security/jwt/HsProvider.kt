@@ -11,9 +11,9 @@ import javax.crypto.spec.SecretKeySpec
 
 class HsProvider(private val issuer: String) {
 
-    private val hsKey = SecretKeySpec(UUID.randomUUID().toString().toByteArray(), "HS256")
+    val key = SecretKeySpec(UUID.randomUUID().toString().toByteArray(), "HS256")
     private val provider = JwtAuthorizer(
-        keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.HS256, hsKey),
+        keySelector = SingleKeyJWSKeySelector(JWSAlgorithm.HS256, key),
         lookup = { it.subject }
     )
 
@@ -25,7 +25,7 @@ class HsProvider(private val issuer: String) {
             .build()
 
         return SignedJWT(header, claims)
-            .apply { sign(MACSigner(hsKey)) }
+            .apply { sign(MACSigner(key)) }
             .serialize()
     }
 

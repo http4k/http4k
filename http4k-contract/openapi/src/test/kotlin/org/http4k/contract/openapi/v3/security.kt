@@ -17,9 +17,8 @@ import org.http4k.core.Filter
 import org.http4k.core.NoOp
 import org.http4k.core.Uri
 import org.http4k.lens.Query
+import org.http4k.security.jwt.HsProvider
 import org.http4k.security.jwt.JwtAuthorizer
-import java.security.KeyFactory
-import javax.crypto.spec.SecretKeySpec
 
 class ApiKeySecurityRendererTest : SecurityRendererContract {
     override val security = ApiKeySecurity(Query.required("the_api_key"), { true })
@@ -55,7 +54,7 @@ class JwtSecurityRendererTest : SecurityRendererContract {
         JwtAuthorizer(
             keySelector = SingleKeyJWSKeySelector(
                 JWSAlgorithm.HS256,
-                SecretKeySpec("qwertyuiopasdfghjklzxcvbnm123456".toByteArray(), "HS256")
+                HsProvider("testServer").key
             ),
             lookup = { it.subject }
         )
