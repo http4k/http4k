@@ -148,7 +148,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Instrument http4k apps with OpenTelemetry tooling.
 * [htmx:](https://http4k.org/guide/reference/htmx)
     * Support for powering http4k apps with htmx.
-* [Standard Webhooks:](https://http4k.org/guide/reference/webhooks)
+* [Webhooks:](https://http4k.org/guide/reference/webhooks)
     * Simply use the [Standard Webhooks](https://www.standardwebhooks.com/) format to send signed and consistent Webhook events.
 * [GraphQL:](https://http4k.org/guide/reference/graphql) 
     * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
