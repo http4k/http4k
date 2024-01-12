@@ -1,4 +1,4 @@
-package org.http4k.webhook
+package org.http4k.webhook.signing
 
 enum class SignatureIdentifier {
     v1, // Symmetric

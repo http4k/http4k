@@ -11,13 +11,13 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header
-import org.http4k.webhook.SignatureIdentifier
-import org.http4k.webhook.SignedPayload
+import org.http4k.webhook.signing.SignatureIdentifier
+import org.http4k.webhook.signing.SignedPayload
 import org.http4k.webhook.WEBHOOK_ID
 import org.http4k.webhook.WEBHOOK_SIGNATURE
 import org.http4k.webhook.WEBHOOK_TIMESTAMP
 import org.http4k.webhook.WebhookId
-import org.http4k.webhook.WebhookSignature
+import org.http4k.webhook.signing.WebhookSignature
 import org.http4k.webhook.WebhookTimestamp
 import org.junit.jupiter.api.Test
 

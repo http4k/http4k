@@ -1,7 +1,8 @@
-package org.http4k.webhook
+package org.http4k.lens
 
-import org.http4k.lens.Header
-import org.http4k.lens.value
+import org.http4k.webhook.WebhookId
+import org.http4k.webhook.WebhookTimestamp
+import org.http4k.webhook.signing.WebhookSignature
 
 val Header.WEBHOOK_ID get() = Header.value(WebhookId).required("webhook-id")
 val Header.WEBHOOK_TIMESTAMP get() = Header.value(WebhookTimestamp).required("webhook-timestamp")

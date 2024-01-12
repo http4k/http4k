@@ -1,8 +1,8 @@
-package org.http4k.webhook
+package org.http4k.webhook.signing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.webhook.SignatureIdentifier.v1
+import org.http4k.webhook.signing.SignatureIdentifier.v1
 import org.junit.jupiter.api.Test
 
 class WebhookSignatureTest {

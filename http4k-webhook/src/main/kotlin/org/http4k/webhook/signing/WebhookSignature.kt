@@ -1,4 +1,4 @@
-package org.http4k.webhook
+package org.http4k.webhook.signing
 
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory

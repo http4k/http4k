@@ -1,8 +1,8 @@
-package org.http4k.webhook
+package org.http4k.webhook.signing
 
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
-import org.http4k.webhook.HmacSha256SigningSecret.Companion.PREFIX
+import org.http4k.webhook.signing.HmacSha256SigningSecret.Companion.PREFIX
 import java.util.Base64
 
 class HmacSha256SigningSecret private constructor(value: String) : StringValue(value) {

@@ -4,12 +4,12 @@ import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Header
-import org.http4k.webhook.WEBHOOK_ID
-import org.http4k.webhook.WEBHOOK_SIGNATURE
-import org.http4k.webhook.WEBHOOK_TIMESTAMP
+import org.http4k.lens.WEBHOOK_ID
+import org.http4k.lens.WEBHOOK_SIGNATURE
+import org.http4k.lens.WEBHOOK_TIMESTAMP
 import org.http4k.webhook.WebhookId
-import org.http4k.webhook.WebhookSigner
 import org.http4k.webhook.WebhookTimestamp
+import org.http4k.webhook.signing.WebhookSigner
 import java.time.Clock
 import java.util.UUID
 
