@@ -30,12 +30,12 @@ http4k supplies pre-built StreamHandler adapters (they are faster) using the lig
 #### Step 3
 To build the Lambda code into a ZIP file, we need to add a task to our `build.gradle`:
 ```kotlin
-task buildLambdaZip(type: Zip) {
+tasks.register("buildLambdaZip", Zip) {
     from compileKotlin
-    from processResources
-    into('lib') {
-        from configurations.compileClasspath
-    }
+        from processResources
+        into("lib") {
+            from configurations.compileClasspath
+        }
 }
 ```
 
