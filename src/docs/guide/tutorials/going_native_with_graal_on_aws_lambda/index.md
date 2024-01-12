@@ -14,15 +14,27 @@ We'll take an existing http4k application built with Gradle and deployed with Pu
 We need to add the http4k AWS Lambda Serverless Runtime module to our project. Install it into your `build.gradle` file with:
 
 ```kotlin
-implementation("org.http4k:http4k-serverless-lambda-runtime:5.12.1.0")
+implementation("org.http4k:http4k-serverless-lambda-runtime:${http4kVersion}")
 ```
 
 This custom runtime is a lightweight, zero-reflection module which allows you to deploy both Java and GraalVM based binaries to AWS.
 
 #### Step 2
-Lambdas working from a native binary have to supply their own `main` function to launch the runtime, instead of implementing the standard `Request/StreamHandler` interfaces. To use it on our app, we simply create a launcher and wrap our http4k `HttpHandler` with the appropriate FnHandler class before starting the Runtime. Put this into `HelloServerlessHttp4k.kt`:
+Lambdas working from a native binary have to supply their own `main` function to launch the runtime, instead of implementing the standard `Request/StreamHandler` interfaces. To use it on our app, we simply create a launcher and wrap our http4k `HttpHandler` with the appropriate FnHandler class before starting the Runtime. Put this into a new `HelloServerlessHttp4k.kt` (different package to before:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/going_native_with_graal_on_aws_lambda/HelloServerlessHttp4k.kt"></script>
+
+Update the Pulumi config to point to the new file:
+
+```typescript
+const lambdaFunction = new aws.lambda.Function("hello-http4k", {
+    code: new pulumi.asset.FileArchive("build/distributions/HelloWorld.zip"),
+    handler: "guide.tutorials.going_native_with_graal_on_aws_lambda.HelloServerlessHttp4kKt",
+    role: defaultRole.arn,
+    runtime: "java11",
+    timeout: 15
+});
+```
 
 #### Step 3
 Compile the Lambda code into a GraalVM file is a 2 stage process. First, install and configure the ShadowJar plugin into `build.gradle` to merge the entire application into a single JAR file with a known main class. Add the following sections:
