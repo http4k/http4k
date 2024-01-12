@@ -11,7 +11,7 @@ import org.http4k.lens.WEBHOOK_SIGNATURE
 import org.http4k.lens.WEBHOOK_TIMESTAMP
 import org.http4k.webhook.signing.WebhookSignatureVerifier
 
-fun ClientFilters.VerifyWebhookSignature(
+fun ServerFilters.VerifyWebhookSignature(
     verifier: WebhookSignatureVerifier,
     onFailure: HttpHandler = { Response(UNAUTHORIZED) }
 ) = Filter { next ->

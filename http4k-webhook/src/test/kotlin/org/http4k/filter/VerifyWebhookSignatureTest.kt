@@ -25,7 +25,7 @@ class VerifyWebhookSignatureTest {
 
     @Test
     fun `verify ok signature`() {
-        val app = ClientFilters.VerifyWebhookSignature({ _, _, _, _ ->
+        val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ ->
             true
         }, { Response(I_M_A_TEAPOT) })
             .then { Response(OK) }
@@ -47,7 +47,7 @@ class VerifyWebhookSignatureTest {
 
     @Test
     fun `don't verify bad signature`() {
-        val app = ClientFilters.VerifyWebhookSignature({ _, _, _, _ ->
+        val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ ->
             false
         }, { Response(I_M_A_TEAPOT) })
             .then { Response(OK) }
@@ -69,7 +69,7 @@ class VerifyWebhookSignatureTest {
 
     @Test
     fun `missing signature is bad`() {
-        val app = ClientFilters.VerifyWebhookSignature({ _, _, _, _ -> error("") }, { Response(I_M_A_TEAPOT) })
+        val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ -> error("") }, { Response(I_M_A_TEAPOT) })
             .then { error("") }
 
         assertThat(

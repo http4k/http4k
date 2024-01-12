@@ -10,6 +10,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.ServerFilters
 import org.http4k.filter.SignWebhookPayload
 import org.http4k.filter.VerifyWebhookSignature
 import org.http4k.format.Jackson
@@ -39,7 +40,7 @@ fun main() {
             .then(JavaHttpClient())
 
     val secureWebhookReceiver =
-        ClientFilters.VerifyWebhookSignature(HmacSha256.Verifier(signingSecret))
+        ServerFilters.VerifyWebhookSignature(HmacSha256.Verifier(signingSecret))
             .then { req: Request ->
                 listOf(Header.WEBHOOK_ID, Header.WEBHOOK_SIGNATURE, Header.WEBHOOK_TIMESTAMP)
                     .forEach { println(it.meta.name + ": " + it(req)) }
