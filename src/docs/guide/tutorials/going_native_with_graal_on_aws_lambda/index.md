@@ -26,18 +26,8 @@ Lambdas working from a native binary have to supply their own `main` function to
 
 Update the Pulumi config to point to the new file:
 
-```typescript
-const lambdaFunction = new aws.lambda.Function("hello-http4k", {
-    code: new pulumi.asset.FileArchive("build/distributions/HelloWorld.zip"),
-    handler: "guide.tutorials.going_native_with_graal_on_aws_lambda.HelloServerlessHttp4kKt",
-    role: defaultRole.arn,
-    runtime: "java11",
-    timeout: 15
-});
-```
-
 #### Step 3
-Compile the Lambda code into a GraalVM file is a 2 stage process. First, install and configure the ShadowJar plugin into `build.gradle` to merge the entire application into a single JAR file with a known main class. Add the following sections:
+Compile the Lambda code into a GraalVM file is a 2 stage process. First, install and configure the ShadowJar plugin into `build.gradle` to merge the entire application into a single JAR file with a known main class. Update/add the following sections:
 ```kotlin
 buildscript {
     repositories {
@@ -53,8 +43,10 @@ buildscript {
 apply plugin : "java"
 apply plugin : "com.github.johnrengelman.shadow"
 
+mainClassName = "guide.tutorials.going_native_with_graal_on_aws_lambda.HelloServerlessHttp4kKt"
+
 shadowJar {
-    manifest.attributes["Main-Class"] = "guide.tutorials.going_native_with_graal_on_aws_lambda.HelloServerlessHttp4kKt"
+    manifest.attributes["Main-Class"] = mainClassName
     archiveBaseName.set(project.name)
     archiveClassifier.set(null)
     archiveVersion.set(null)
@@ -75,10 +67,10 @@ Now that we have our JAR file, we need to create a GraalVM image and package it 
 docker run -v $(pwd):/source  --platform=linux/amd64 \
     http4k/amazonlinux-java-graal-community-lambda-runtime \
     build/libs/HelloWorld.jar \
-    HelloHttp4kGraal.zip
+    HelloHttp4k.zip
 ```
 
-GraalVM will churn away for a few minutes and all being well, the `HelloHttp4kGraal.zip` file will be generated in the main directory. 
+GraalVM will churn away for a few minutes and all being well, the `HelloHttp4k.zip` file will be generated in the main directory. 
 
 <img class="blogImage" src="step4.png" alt="graalvm output"/>
 
