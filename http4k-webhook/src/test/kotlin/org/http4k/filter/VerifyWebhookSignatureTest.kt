@@ -11,21 +11,21 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header
+import org.http4k.lens.WEBHOOK_ID
+import org.http4k.lens.WEBHOOK_SIGNATURE
+import org.http4k.lens.WEBHOOK_TIMESTAMP
+import org.http4k.webhook.WebhookId
+import org.http4k.webhook.WebhookTimestamp
 import org.http4k.webhook.signing.SignatureIdentifier
 import org.http4k.webhook.signing.SignedPayload
-import org.http4k.webhook.WEBHOOK_ID
-import org.http4k.webhook.WEBHOOK_SIGNATURE
-import org.http4k.webhook.WEBHOOK_TIMESTAMP
-import org.http4k.webhook.WebhookId
 import org.http4k.webhook.signing.WebhookSignature
-import org.http4k.webhook.WebhookTimestamp
 import org.junit.jupiter.api.Test
 
 class VerifyWebhookSignatureTest {
 
     @Test
     fun `verify ok signature`() {
-        val app = ClientFilters.VerifyWebhookSignature({ _,_,_, _ ->
+        val app = ClientFilters.VerifyWebhookSignature({ _, _, _, _ ->
             true
         }, { Response(I_M_A_TEAPOT) })
             .then { Response(OK) }
@@ -47,7 +47,7 @@ class VerifyWebhookSignatureTest {
 
     @Test
     fun `don't verify bad signature`() {
-        val app = ClientFilters.VerifyWebhookSignature({ _,_,_, _ ->
+        val app = ClientFilters.VerifyWebhookSignature({ _, _, _, _ ->
             false
         }, { Response(I_M_A_TEAPOT) })
             .then { Response(OK) }
@@ -69,7 +69,7 @@ class VerifyWebhookSignatureTest {
 
     @Test
     fun `missing signature is bad`() {
-        val app = ClientFilters.VerifyWebhookSignature({ _,_,_, _ -> error("") }, { Response(I_M_A_TEAPOT) })
+        val app = ClientFilters.VerifyWebhookSignature({ _, _, _, _ -> error("") }, { Response(I_M_A_TEAPOT) })
             .then { error("") }
 
         assertThat(
