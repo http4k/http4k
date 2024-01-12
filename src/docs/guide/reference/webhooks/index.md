@@ -15,6 +15,8 @@ dependencies {
 This module provides infrastructure for the [Webhook standard](https://www.standardwebhooks.com/), providing infrastructure for 
 signing and verifying of Webhook requests (HMAC256 only currently) as per the standard, and support for the defined Webhook event wrapper format.
 
+The example below shows how to use sign and verify filters to automatically provide security and marshalling for the Standard Webhook format.
+
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/webhooks/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/webhooks/example.kt"></script>

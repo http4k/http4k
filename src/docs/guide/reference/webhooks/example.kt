@@ -12,7 +12,12 @@ import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.SignWebhookPayload
 import org.http4k.filter.VerifyWebhookSignature
+import org.http4k.format.Jackson
 import org.http4k.format.Jackson.auto
+import org.http4k.lens.Header
+import org.http4k.lens.WEBHOOK_ID
+import org.http4k.lens.WEBHOOK_SIGNATURE
+import org.http4k.lens.WEBHOOK_TIMESTAMP
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.webhook.EventType
@@ -27,28 +32,36 @@ data class MyEventType(val index: Int)
 fun main() {
     val lens = Body.auto<WebhookPayload<MyEventType>>().toLens()
 
-    val signingSecret = HmacSha256SigningSecret.encode("this_is_my_super_secret")
+    val signingSecret = HmacSha256SigningSecret.encode("this_is_my_super_secret_secret")
 
-    val sendingClient = ClientFilters.SignWebhookPayload(HmacSha256.Signer(signingSecret))
-        .then(JavaHttpClient())
+    val secureWebhookSendingClient =
+        ClientFilters.SignWebhookPayload(HmacSha256.Signer(signingSecret), Jackson)
+            .then(JavaHttpClient())
 
-    val webhookReceiver =
+    val secureWebhookReceiver =
         ClientFilters.VerifyWebhookSignature(HmacSha256.Verifier(signingSecret))
             .then { req: Request ->
-                println(lens(req))
+                listOf(Header.WEBHOOK_ID, Header.WEBHOOK_SIGNATURE, Header.WEBHOOK_TIMESTAMP)
+                    .forEach { println(it.meta.name + ": " + it(req)) }
+
+                println("event received was: " + lens(req))
                 Response(OK)
             }
 
-    val server = webhookReceiver.asServer(SunHttp(0)).start()
+    val server = secureWebhookReceiver.asServer(SunHttp(0)).start()
 
     // create the webhook event wrapper with event type, timestamp
     val webhookPayload = WebhookPayload(
         EventType.of("foo.bar"),
-        WebhookTimestamp.of(Instant.EPOCH),
+        WebhookTimestamp.of(Instant.now()),
         MyEventType(123)
     )
 
     val eventRequest =
         Request(POST, Uri.of("http://localhost:${server.port()}")).with(lens of webhookPayload)
-    sendingClient(eventRequest)
+
+    // send the webhook - the infra signs the request
+    secureWebhookSendingClient(eventRequest)
+
+    server.stop()
 }
