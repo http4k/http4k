@@ -142,3 +142,5 @@ include("http4k-realtime-core")
     includeModule("tracerbullet")
     includeModule("webdriver")
 }
+
+include("http4k-webhook")
