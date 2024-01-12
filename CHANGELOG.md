@@ -6,7 +6,8 @@ changes with their rationale when appropriate:
 ### v5.12.2.0 (uncut)
 
 - **http4k-*** : Upgrade some dependency versions
-- **http4k-core** [Fix #1022] For a request with matching if-none-match header the response lacks the etag header. H/T @efasel
+- **http4k-core** : [New module!] Support for the [Standard Webhooks](https://www.standardwebhooks.com/) format
+- **http4k-core** [Fix #1022] For a request with matching `if-none-match header` the response lacks the etag header. H/T @efasel
 - **http4k-core** [Fix #1030] Maven POM for http4k-format-jackson-xml is invalid: jackson-dataformat-xml is missing a version
 
 ### v5.12.1.0

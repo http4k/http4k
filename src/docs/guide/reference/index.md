@@ -70,6 +70,7 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/resilience4j"><span class="pill">Resilience4J</span></a>
 <a href="/guide/reference/failsafe"><span class="pill">FailSafe</span></a>
 <a href="/guide/reference/htmx"><span class="pill">htmx</span></a>
+<a href="/guide/reference/webhooks"><span class="pill">Webhooks</span></a>
 
 ### Testing
 <a href="/guide/reference/approvaltests"><span class="pill">Approval Testing</span></a>
