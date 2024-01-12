@@ -7,22 +7,33 @@ import org.http4k.webhook.SignatureIdentifier.v1
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class HmacSha256Test {
 
     private val webhookId = WebhookId.of("123")
-    private val scheme = HmacSha256 { "secretkey" }
+    private val secret = HmacSha256SigningSecret.encode("A".repeat(24))
     private val timestamp = WebhookTimestamp.of(123)
     private val payload = Body("helloworld")
 
     @Test
+    fun `signing secret validates`() {
+        assertThrows<Exception> { HmacSha256SigningSecret.encode("A".repeat(23)) }
+        HmacSha256SigningSecret.encode("A".repeat(24))
+        HmacSha256SigningSecret.encode("A".repeat(64))
+        assertThrows<Exception> { HmacSha256SigningSecret.encode("A".repeat(65)) }
+    }
+    
+    @Test
     fun `can sign and verify`() {
-        val signature = scheme.Signer(webhookId, timestamp, payload)
+        val signer = HmacSha256.Signer(secret)
+        val verifier = HmacSha256.Verifier(secret)
+        val signature = signer(webhookId, timestamp, payload)
         assertThat(
             signature,
-            equalTo(WebhookSignature.of(v1, SignedPayload.of("5dFLJKdpOXy5zSGQc8N5SgpF6ABfQXeeVba57De/KU8=")))
+            equalTo(WebhookSignature.of(v1, SignedPayload.of("OcbCYuZZFscUg29vzRqaNlkTWR/87qUI4JLNkd407FY=")))
         )
-        assertTrue(scheme.Verifier(webhookId, timestamp, signature, payload))
-        assertFalse(scheme.Verifier(webhookId, timestamp, WebhookSignature.of(v1, SignedPayload.of("bogus")), payload))
+        assertTrue(verifier(webhookId, timestamp, signature, payload))
+        assertFalse(verifier(webhookId, timestamp, WebhookSignature.of(v1, SignedPayload.of("bogus")), payload))
     }
 }
