@@ -4,8 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 
-class Jade4jTemplatesTest : TemplatesContract<Jade4jTemplates>(Jade4jTemplates()) {
-
+class Pug4JTemplatesTest : TemplatesContract<Pug4jTemplates>(Pug4jTemplates()) {
     @Test
     fun `hot reload multiple loaders`() {
         val renderer = templates.HotReload("src/test/resources/a")
@@ -20,4 +19,4 @@ class Jade4jTemplatesTest : TemplatesContract<Jade4jTemplates>(Jade4jTemplates()
     }
 }
 
-class Jade4jViewModelTest : ViewModelContract(Jade4jTemplates())
+class Pug4jViewModelTest : ViewModelContract(Pug4jTemplates())

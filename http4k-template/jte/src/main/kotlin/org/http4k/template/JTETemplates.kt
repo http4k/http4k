@@ -10,7 +10,7 @@ import java.io.File
 
 
 /**
- * Jade4j templating support. Use the function in the constructor to configure the instance.
+ * JTE templating support. Use the function in the constructor to configure the instance.
  */
 class JTETemplates(private val contentType: ContentType = Html) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String): (ViewModel) -> String {

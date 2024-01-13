@@ -54,7 +54,7 @@ description: Details about the various http4k integration libraries
 ### Templating libraries
 <a href="/guide/reference/templating"><span class="pill">Freemarker</span></a>
 <a href="/guide/reference/templating"><span class="pill">Handlebars</span></a>
-<a href="/guide/reference/templating"><span class="pill">Jade4j</span></a>
+<a href="/guide/reference/templating"><span class="pill">Pug4j</span></a>
 <a href="/guide/reference/templating"><span class="pill">Rocker</span></a>
 <a href="/guide/reference/templating"><span class="pill">Pebble</span></a>
 <a href="/guide/reference/templating"><span class="pill">Thymeleaf</span></a>

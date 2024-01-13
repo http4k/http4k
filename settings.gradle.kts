@@ -128,7 +128,7 @@ include("http4k-realtime-core")
     includeModule("rocker")
     includeModule("pebble")
     includeModule("thymeleaf")
-    includeModule("jade4j")
+    includeModule("pug4j")
 }
 
 "http4k-testing".apply {
