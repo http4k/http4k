@@ -1,11 +1,14 @@
 package org.http4k.contract.openapi.v3
 
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.proc.SingleKeyJWSKeySelector
 import org.http4k.contract.openapi.SecurityRendererContract
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
+import org.http4k.contract.security.JwtSecurity
 import org.http4k.contract.security.OAuthScope
 import org.http4k.contract.security.OpenIdConnectSecurity
 import org.http4k.contract.security.UserCredentialsOAuthSecurity
@@ -14,6 +17,8 @@ import org.http4k.core.Filter
 import org.http4k.core.NoOp
 import org.http4k.core.Uri
 import org.http4k.lens.Query
+import org.http4k.security.jwt.HsProvider
+import org.http4k.security.jwt.JwtAuthorizer
 
 class ApiKeySecurityRendererTest : SecurityRendererContract {
     override val security = ApiKeySecurity(Query.required("the_api_key"), { true })
@@ -41,6 +46,19 @@ class BasicSecurityRendererTest : SecurityRendererContract {
 
 class BearerAuthSecurityRendererTest : SecurityRendererContract {
     override val security = BearerAuthSecurity("foo")
+    override val renderer = OpenApi3SecurityRenderer
+}
+
+class JwtSecurityRendererTest : SecurityRendererContract {
+    override val security = JwtSecurity(
+        JwtAuthorizer(
+            keySelector = SingleKeyJWSKeySelector(
+                JWSAlgorithm.HS256,
+                HsProvider("testServer").key
+            ),
+            lookup = { it.subject }
+        )
+    )
     override val renderer = OpenApi3SecurityRenderer
 }
 

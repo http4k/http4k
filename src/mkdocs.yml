@@ -95,6 +95,7 @@ nav:
     - AWS: guide/reference/aws/index.md
     - OAuth: guide/reference/oauth/index.md
     - Digest: guide/reference/digest/index.md
+    - JWT: guide/reference/jwt/index.md
     - GraphQL: guide/reference/graphql/index.md
     - htmx: guide/reference/htmx/index.md
     - Webhooks: guide/reference/webhooks/index.md

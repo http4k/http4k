@@ -1,0 +1,6 @@
+{
+  "jwtAuth": {
+    "scheme": "bearer",
+    "type": "http"
+  }
+}

@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.12.3.0 (uncut)
+
+- **http4k-security-jwt** - [New Module!] Integrates the Nimbus JWT library to authorize requests for a server. H/T @oharaandrew314
+- **http4k-contract** - Add new `JwtSecurity`
+
 ### v5.12.2.1
 - **http4k-webhooks** : Move `VerifyWebhookSignature` filter to ServerFilters as it's not for HTTP clients!
 

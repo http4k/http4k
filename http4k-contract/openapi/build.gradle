@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":http4k-security-oauth"))
     implementation(project(":http4k-format-jackson"))
     implementation(project(":http4k-multipart"))
+    implementation(project(":http4k-security-jwt"))
 
     testImplementation("dev.forkhandles:values4k:_")
     testImplementation(project(":http4k-format-jackson"))
@@ -17,6 +18,7 @@ dependencies {
     testImplementation(project(":http4k-testing-approval"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-security-oauth")))
+    testImplementation(testFixtures(project(":http4k-security-jwt")))
 }
 
 task generateOpenApi3AutoClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {

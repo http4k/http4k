@@ -9,6 +9,7 @@ import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
+import org.http4k.contract.security.JwtSecurity
 import org.http4k.contract.security.OpenIdConnectSecurity
 import org.http4k.contract.security.UserCredentialsOAuthSecurity
 
@@ -20,6 +21,7 @@ val OpenApi3SecurityRenderer: SecurityRenderer = SecurityRenderer(
     AuthCodeOAuthSecurity.renderer,
     BasicAuthSecurity.renderer,
     BearerAuthSecurity.renderer,
+    JwtSecurity.renderer,
     ImplicitOAuthSecurity.renderer,
     UserCredentialsOAuthSecurity.renderer,
     OpenIdConnectSecurity.renderer
@@ -81,6 +83,20 @@ val BasicAuthSecurity.Companion.renderer
 val BearerAuthSecurity.Companion.renderer
     get() = rendererFor<BearerAuthSecurity> {
         object : RenderModes {
+            override fun <NODE> full(): Render<NODE> = {
+                obj(it.name to obj(
+                    "scheme" to string("bearer"),
+                    "type" to string("http")
+                ))
+            }
+
+            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+        }
+    }
+
+val JwtSecurity.Companion.renderer
+    get() = rendererFor<JwtSecurity> {
+        object: RenderModes {
             override fun <NODE> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "scheme" to string("bearer"),
