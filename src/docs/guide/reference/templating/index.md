@@ -16,8 +16,8 @@ dependencies {
     // Handlebars: 
     implementation("org.http4k:http4k-template-handlebars")
     
-    // Jade4j: 
-    implementation("org.http4k:http4k-template-jade4j")
+    // Pug4j: 
+    implementation("org.http4k:http4k-template-pug4j")
     
     // JTE: 
     implementation("org.http4k:http4k-template-jte")

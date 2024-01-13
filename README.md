@@ -112,9 +112,9 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * **Pluggable** templating system support for:
         * **Freemarker**
         * **Handlebars** 
-        * **Jade4j**
         * **JTE**
         * **Pebble**
+        * **Pug4j**
         * **Rocker**
         * **Thymeleaf**
     * Caching and **Hot-Reload** template support
