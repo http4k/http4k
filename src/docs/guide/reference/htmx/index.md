@@ -8,7 +8,7 @@ dependencies {
     implementation(platform("org.http4k:http4k-bom:5.13.0.0"))
     implementation("org.http4k:http4k-htmx")
 
-    implementation("org.http4k:http4k-handlebars") // for example
+    implementation("org.http4k:http4k-template-handlebars") // Handlebars
 }
 ```
 
