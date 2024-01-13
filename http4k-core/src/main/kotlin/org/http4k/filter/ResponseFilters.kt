@@ -158,7 +158,7 @@ object ResponseFilters {
                 when {
                     etag == request.header("if-none-match") -> {
                         closeOldResponse(response)
-                        Response(Status.NOT_MODIFIED).withSafeHeadersFrom(response)
+                        Response(Status.NOT_MODIFIED).withSafeHeadersFrom(response).header("etag", etag)
                     }
                     upstreamEtag == null -> response.header("etag", etag)
                     else -> response

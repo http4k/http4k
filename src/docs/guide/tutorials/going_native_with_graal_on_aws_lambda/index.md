@@ -14,29 +14,39 @@ We'll take an existing http4k application built with Gradle and deployed with Pu
 We need to add the http4k AWS Lambda Serverless Runtime module to our project. Install it into your `build.gradle` file with:
 
 ```kotlin
-implementation("org.http4k:http4k-serverless-lambda-runtime:5.12.1.0")
+implementation("org.http4k:http4k-serverless-lambda-runtime:${http4kVersion}")
 ```
 
 This custom runtime is a lightweight, zero-reflection module which allows you to deploy both Java and GraalVM based binaries to AWS.
 
 #### Step 2
-Lambdas working from a native binary have to supply their own `main` function to launch the runtime, instead of implementing the standard `Request/StreamHandler` interfaces. To use it on our app, we simply create a launcher and wrap our http4k `HttpHandler` with the appropriate FnHandler class before starting the Runtime:
+Lambdas working from a native binary have to supply their own `main` function to launch the runtime, instead of implementing the standard `Request/StreamHandler` interfaces. To use it on our app, we simply create a launcher and wrap our http4k `HttpHandler` with the appropriate FnHandler class before starting the Runtime. Put this into a new `HelloServerlessHttp4k.kt` (different package to before:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/tutorials/going_native_with_graal_on_aws_lambda/HelloServerlessHttp4k.kt"></script>
 
+Update the Pulumi config to point to the new file:
+
 #### Step 3
-Compile the Lambda code into a GraalVM file is a 2 stage process. First, install and configure the ShadowJar plugin into `build.gradle` to merge the entire application into a single JAR file with a known main class. Add the following sections:
+Compile the Lambda code into a GraalVM file is a 2 stage process. First, install and configure the ShadowJar plugin into `build.gradle` to merge the entire application into a single JAR file with a known main class. Update/add the following sections:
 ```kotlin
-buildScript {
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+        classpath "com.github.johnrengelman:shadow:8.1.1"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
     }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin : "java"
+apply plugin : "com.github.johnrengelman.shadow"
+
+mainClassName = "guide.tutorials.going_native_with_graal_on_aws_lambda.HelloServerlessHttp4kKt"
 
 shadowJar {
-    manifest.attributes['Main-Class'] = 'guide.tutorials.going_native_with_graal_on_aws_lambda.HelloServerlessHttp4kKt'
+    manifest.attributes["Main-Class"] = mainClassName
     archiveBaseName.set(project.name)
     archiveClassifier.set(null)
     archiveVersion.set(null)
@@ -54,13 +64,13 @@ Run the new task with:
 #### Step 4
 Now that we have our JAR file, we need to create a GraalVM image and package it into a ZIP file which can be uploaded to AWS. http4k supplies a convenience Docker image that uses the `native-image` program to create the binary and then packages the ZIP file:
 ```shell
-docker run -v $(pwd):/source \
-    http4k/amazonlinux-java-graal-ce-lambda-runtime:latest \
-    build/libs/HelloHttp4k.jar \
-    HelloHttp4kGraal.zip
+docker run -v $(pwd):/source  --platform=linux/amd64 \
+    http4k/amazonlinux-java-graal-community-lambda-runtime \
+    build/libs/HelloWorld.jar \
+    HelloHttp4k.zip
 ```
 
-GraalVM will churn away for a few minutes and all being well, the `HelloHttp4kGraal.zip` file will be generated in the main directory. 
+GraalVM will churn away for a few minutes and all being well, the `HelloHttp4k.zip` file will be generated in the main directory. 
 
 <img class="blogImage" src="step4.png" alt="graalvm output"/>
 

@@ -3,16 +3,27 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.12.2.0 (uncut)
+### v5.12.3.0 (uncut)
 
-- **http4k-security-jwt** - [New Module!] Integrates the nimbus JWT library to authorize requests for a server. H/T @oharaandrew314
+- **http4k-security-jwt** - [New Module!] Integrates the Nimbus JWT library to authorize requests for a server. H/T @oharaandrew314
 - **http4k-contract** - Add new `JwtSecurity`
+
+### v5.12.2.1
+- **http4k-webhooks** : Move `VerifyWebhookSignature` filter to ServerFilters as it's not for HTTP clients!
+
+### v5.12.2.0
+
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core** : [New module!] Support for the [Standard Webhooks](https://www.standardwebhooks.com/) format
+- **http4k-core** [Fix #1022] For a request with matching `if-none-match header` the response lacks the etag header. H/T @efasel
+- **http4k-core** [Fix #1030] Maven POM for http4k-format-jackson-xml is invalid: jackson-dataformat-xml is missing a version
 
 ### v5.12.1.0
 
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-core** : Fix lens replacement of path parameter when there is a regular expression in the path segment
-- **http4k-format-jackson** : Added lens support for deserialising [data4k](https://github.com/fork-handles/forkhandles/tree/trunk/data4k) containers directly from HTTP message bodies (via `Body.json(::JsonNodeDataContainer)).toLens()`
+- **http4k-format-jackson** : Added lens support for deserialising [data4k](https://github.com/fork-handles/forkhandles/tree/trunk/data4k) containers directly
+  from HTTP message bodies (via `Body.json(::JsonNodeDataContainer)).toLens()`
 
 ### v5.12.0.0
 

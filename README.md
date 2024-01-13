@@ -148,6 +148,8 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Instrument http4k apps with OpenTelemetry tooling.
 * [htmx:](https://http4k.org/guide/reference/htmx)
     * Support for powering http4k apps with htmx.
+* [Webhooks:](https://http4k.org/guide/reference/webhooks)
+    * Simply use the [Standard Webhooks](https://www.standardwebhooks.com/) format to send signed and consistent Webhook events.
 * [GraphQL:](https://http4k.org/guide/reference/graphql) 
     * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
 * [AWS:](https://http4k.org/guide/reference/aws) 
@@ -202,7 +204,7 @@ To install, add these dependencies to your **Gradle** file:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.12.1.0"))
+    implementation(platform("org.http4k:http4k-bom:5.12.2.1"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-server-jetty")
     implementation("org.http4k:http4k-client-okhttp")
