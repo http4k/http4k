@@ -4,13 +4,18 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.13.0.1
-- **http4k-testing-tracerbullet** : [Fix] Mermaid sequence diagram generation was constantly changing by default editorconfig files and people committing with different IDE settings
+
+- **http4k-testing-tracerbullet** : [Fix] Mermaid sequence diagram generation was constantly changing by default editorconfig files and people committing with
+  different IDE settings
 
 ### v5.13.0.0
-- **http4k-format-jade4j** : [Breaking] This module has been renamed due to the library Jade4J becoming Pug4J. Migration should be a no-op apart from switching the imported module, and renaming your templates from .jade to .pug. Please see [Pug4j docs](https://github.com/neuland/pug4j) for anything else.
+
+- **http4k-format-jade4j** : [Breaking] This module has been renamed due to the library Jade4J becoming Pug4J. Migration should be a no-op apart from switching
+  the imported module, and renaming your templates from .jade to .pug. Please see [Pug4j docs](https://github.com/neuland/pug4j) for anything else.
 - **http4k-format-pug4j** : [New module] Replacement for Jade4j
 
 ### v5.12.2.1
+
 - **http4k-webhooks** : Move `VerifyWebhookSignature` filter to ServerFilters as it's not for HTTP clients!
 
 ### v5.12.2.0
@@ -81,7 +86,9 @@ changes with their rationale when appropriate:
 - **http4k-testing-webdriver-** : Ability to inject clock into the Webdriver
 
 ### v5.11.0.0
-- **http4k-format-jade4j** : [Breaking] This module has been renamed due to the library Jade4J becoming Pug4J. Migration should be a no-op apart from renaming your templates from .jade to .pug. Please see Pug4j docs for anything else. 
+
+- **http4k-format-jade4j** : [Breaking] This module has been renamed due to the library Jade4J becoming Pug4J. Migration should be a no-op apart from renaming
+  your templates from .jade to .pug. Please see Pug4j docs for anything else.
 - **http4k-format-pug4j** : [New module] Replacement for Jade4j
 
 ### v5.10.1.0
