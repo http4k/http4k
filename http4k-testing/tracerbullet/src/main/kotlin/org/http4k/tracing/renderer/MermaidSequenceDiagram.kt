@@ -24,7 +24,7 @@ object MermaidSequenceDiagram : TraceRenderer {
     title $scenarioName - Sequence
     ${actors.toMermaidActor().joinToString("\n\t")}
 ${
-                steps.joinToString("\n\t") {
+                steps.joinToString("\t") {
                     when (it) {
                         is RequestResponse -> it.asMermaidSequenceDiagram()
                         is BiDirectional -> it.asMermaidSequenceDiagram()
@@ -54,25 +54,24 @@ ${
     private fun RequestResponse.asMermaidSequenceDiagram(): String = """
     ${origin.safeName()} ->> ${target.safeName()}: $request
     activate ${target.safeName()}
-    ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
+    ${children.joinToString("\t") { it.asMermaidSequenceDiagram() }}
     ${target.safeName()} ->> ${origin.safeName()}: $response
     deactivate ${target.safeName()}
     """
 
     private fun BiDirectional.asMermaidSequenceDiagram(): String = """
     ${origin.safeName()} ->> ${target.safeName()}: $request
-    ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
+    ${children.joinToString("\t") { it.asMermaidSequenceDiagram() }}
     ${target.safeName()} ->> ${origin.safeName()}: 
     """
 
     private fun FireAndForget.asMermaidSequenceDiagram(): String = """
     ${origin.safeName()} -) ${target.safeName()}: $request
-    ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
-    ${children.joinToString("\n\t") { it.asMermaidSequenceDiagram() }}
+    ${children.joinToString("\t") { it.asMermaidSequenceDiagram() }}
+    ${children.joinToString("\t") { it.asMermaidSequenceDiagram() }}
     """
 
     private fun StartInteraction.asMermaidSequenceDiagram(): String = """
-        
         note over $origin: $interactionName
         """
 }

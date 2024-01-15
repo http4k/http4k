@@ -41,16 +41,14 @@ sequenceDiagram
     
     
     
-    
-	
+    	
     system_b ->> system_c: b-to-c req
     activate system_c
     
     system_b ->> db: bidi-b req-resp
     
     db ->> system_b: 
-    
-	
+    	
     system_c ->> external: c-to-external req
     activate external
     
@@ -62,8 +60,7 @@ sequenceDiagram
     
     system_b ->> user 1: 400 init 2
     deactivate system_b
-    
-	
+    	
     user 2 ->> system_d: init 2 req
     activate system_d
     
