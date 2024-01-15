@@ -17,23 +17,26 @@ object MermaidSequenceDiagram : TraceRenderer {
     override fun render(scenarioName: String, steps: List<TraceStep>): TraceRender {
         val actors = steps.filterIsInstance<Trace>().chronologicalActors()
 
+        val stepsRendered = steps.joinToString("\n    ") {
+            when (it) {
+                is RequestResponse -> it.asMermaidSequenceDiagram()
+                is BiDirectional -> it.asMermaidSequenceDiagram()
+                is FireAndForget -> it.asMermaidSequenceDiagram()
+                is StartInteraction -> it.asMermaidSequenceDiagram()
+                is StartRendering, is StopRendering -> ""
+            }
+        }
+        val actorsRendered = actors.toMermaidActor().joinToString("\n    ")
         return TraceRender(
             "$scenarioName - Sequence",
             "MMD",
-            """sequenceDiagram
-title $scenarioName - Sequence
-${actors.toMermaidActor().joinToString("\n")}
-${
-                steps.joinToString("") {
-                    when (it) {
-                        is RequestResponse -> it.asMermaidSequenceDiagram()
-                        is BiDirectional -> it.asMermaidSequenceDiagram()
-                        is FireAndForget -> it.asMermaidSequenceDiagram()
-                        is StartInteraction -> it.asMermaidSequenceDiagram()
-                        is StartRendering, is StopRendering -> ""
-                    }
-                }
-            }""")
+            listOf(
+                "sequenceDiagram",
+                "title $scenarioName - Sequence",
+                actorsRendered,
+                stepsRendered,
+            ).joinToString("\n    ")
+        )
     }
 
     private fun Trace.asMermaidSequenceDiagram() = when (this) {
@@ -51,29 +54,38 @@ ${
             if (acc.contains(nextVal)) acc else acc + nextVal
         }
 
-    private fun RequestResponse.asMermaidSequenceDiagram(): String =
-        """${origin.safeName()} ->> ${target.safeName()}: $request
-activate ${target.safeName()}
-${children.joinToString("") { it.asMermaidSequenceDiagram() }}
-${target.safeName()} ->> ${origin.safeName()}: $response
-deactivate ${target.safeName()}
-"""
+    private fun RequestResponse.asMermaidSequenceDiagram(): String {
+        val header = "${origin.safeName()} ->> ${target.safeName()}: $request"
+        val activate = "activate ${target.safeName()}"
+        val children = renderChildren()
 
-    private fun BiDirectional.asMermaidSequenceDiagram(): String =
-        """${origin.safeName()} ->> ${target.safeName()}: $request
-${children.joinToString("") { it.asMermaidSequenceDiagram() }}
-${target.safeName()} ->> ${origin.safeName()}: 
-"""
+        val deactivate = "deactivate ${target.safeName()}"
 
-    private fun FireAndForget.asMermaidSequenceDiagram(): String =
-        """${origin.safeName()} -) ${target.safeName()}: $request
-${children.joinToString("") { it.asMermaidSequenceDiagram() }}
-${children.joinToString("") { it.asMermaidSequenceDiagram() }}
-"""
+        val post = "${target.safeName()} ->> ${origin.safeName()}: $response"
 
-    private fun StartInteraction.asMermaidSequenceDiagram(): String =
-        """note over $origin: $interactionName
-"""
+        return listOfNotNull(header, activate, children, post, deactivate).joinToString("\n    ") { it.trim() }
+    }
+
+    private fun Trace.renderChildren() = children
+        .joinToString("\n    ") { it.asMermaidSequenceDiagram() }
+        .takeIf { it.isNotEmpty() }
+        ?.let { "$it\n    " }
+
+    private fun BiDirectional.asMermaidSequenceDiagram(): String {
+        val pre = "${origin.safeName()} ->> ${target.safeName()}: $request".trim()
+        val children = renderChildren()?.trim()
+        val post = "${target.safeName()} ->> ${origin.safeName()}: "
+        return listOfNotNull(pre, children, post).joinToString("\n    ")
+    }
+
+    private fun FireAndForget.asMermaidSequenceDiagram(): String {
+        val pre = "${origin.safeName()} -) ${target.safeName()}: $request"
+        val children = renderChildren()
+
+        return listOfNotNull(pre, children).joinToString("\n    ") { it.trim() }
+    }
+
+    private fun StartInteraction.asMermaidSequenceDiagram(): String = """note over $origin: $interactionName"""
 }
 
 private fun Actor.safeName() = name.map { if (it.isWhitespace() || it.isLetterOrDigit()) it else '_' }.joinToString("")
