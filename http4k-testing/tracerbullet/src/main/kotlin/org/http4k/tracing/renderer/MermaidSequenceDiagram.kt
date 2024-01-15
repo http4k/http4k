@@ -21,10 +21,10 @@ object MermaidSequenceDiagram : TraceRenderer {
             "$scenarioName - Sequence",
             "MMD",
             """sequenceDiagram
-    title $scenarioName - Sequence
-    ${actors.toMermaidActor().joinToString("\n\t")}
+title $scenarioName - Sequence
+${actors.toMermaidActor().joinToString("\n")}
 ${
-                steps.joinToString("\t") {
+                steps.joinToString("") {
                     when (it) {
                         is RequestResponse -> it.asMermaidSequenceDiagram()
                         is BiDirectional -> it.asMermaidSequenceDiagram()
@@ -51,29 +51,33 @@ ${
             if (acc.contains(nextVal)) acc else acc + nextVal
         }
 
-    private fun RequestResponse.asMermaidSequenceDiagram(): String = """
-    ${origin.safeName()} ->> ${target.safeName()}: $request
-    activate ${target.safeName()}
-    ${children.joinToString("\t") { it.asMermaidSequenceDiagram() }}
-    ${target.safeName()} ->> ${origin.safeName()}: $response
-    deactivate ${target.safeName()}
-    """
-
-    private fun BiDirectional.asMermaidSequenceDiagram(): String = """
-    ${origin.safeName()} ->> ${target.safeName()}: $request
-    ${children.joinToString("\t") { it.asMermaidSequenceDiagram() }}
-    ${target.safeName()} ->> ${origin.safeName()}: 
-    """
-
-    private fun FireAndForget.asMermaidSequenceDiagram(): String = """
-    ${origin.safeName()} -) ${target.safeName()}: $request
-    ${children.joinToString("\t") { it.asMermaidSequenceDiagram() }}
-    ${children.joinToString("\t") { it.asMermaidSequenceDiagram() }}
-    """
-
-    private fun StartInteraction.asMermaidSequenceDiagram(): String = """
-        note over $origin: $interactionName
+    private fun RequestResponse.asMermaidSequenceDiagram(): String =
         """
+${origin.safeName()} ->> ${target.safeName()}: $request
+activate ${target.safeName()}
+${children.joinToString("") { it.asMermaidSequenceDiagram() }}
+${target.safeName()} ->> ${origin.safeName()}: $response
+deactivate ${target.safeName()}
+"""
+
+    private fun BiDirectional.asMermaidSequenceDiagram(): String =
+        """
+${origin.safeName()} ->> ${target.safeName()}: $request
+${children.joinToString("") { it.asMermaidSequenceDiagram() }}
+${target.safeName()} ->> ${origin.safeName()}: 
+"""
+
+    private fun FireAndForget.asMermaidSequenceDiagram(): String =
+        """
+${origin.safeName()} -) ${target.safeName()}: $request
+${children.joinToString("") { it.asMermaidSequenceDiagram() }}
+${children.joinToString("") { it.asMermaidSequenceDiagram() }}
+"""
+
+    private fun StartInteraction.asMermaidSequenceDiagram(): String =
+        """
+note over $origin: $interactionName
+"""
 }
 
 private fun Actor.safeName() = name.map { if (it.isWhitespace() || it.isLetterOrDigit()) it else '_' }.joinToString("")
