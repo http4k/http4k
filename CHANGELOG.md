@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.13.0.2
+- **http4k-client-helidon** : [Fix #1037] Improve support for query parameters. H/T @franckrasolo
+
 ### v5.13.0.1
 - **http4k-testing-tracerbullet** : [Fix] Mermaid sequence diagram generation was constantly changing by default editorconfig files and people committing with
   different IDE settings
