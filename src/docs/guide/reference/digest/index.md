@@ -5,7 +5,7 @@ description: Feature overview of the http4k-security-digest module
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.13.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.13.0.1"))
     implementation("org.http4k:http4k-security-digest")
 }
 ```
