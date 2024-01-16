@@ -150,6 +150,18 @@ abstract class ServerContract(
     }
 
     @Test
+    fun `can handle quotes in request headers`(){
+        val response = client(
+            Request(GET, "$baseUrl/request-headers")
+                .header("foo", """"my header with quotes"""")
+                .header("foo", """cookie="value"""")
+                .header("foo", """use "cookie=\"value\"" instead.""")
+        )
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo(""""my header with quotes", cookie="value", use "cookie=\"value\"" instead."""))
+    }
+
+    @Test
     fun `length is set on body if it is sent`() {
         val response = client(
             Request(POST, "$baseUrl/length")
