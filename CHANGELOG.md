@@ -4,9 +4,9 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.13.0.1
-
 - **http4k-testing-tracerbullet** : [Fix] Mermaid sequence diagram generation was constantly changing by default editorconfig files and people committing with
   different IDE settings
+- **http4k-server-jetty** : [Fix #1023] Header values in quotes lose their quotes. H/T @efasel, @dhs3000
 
 ### v5.13.0.0
 
