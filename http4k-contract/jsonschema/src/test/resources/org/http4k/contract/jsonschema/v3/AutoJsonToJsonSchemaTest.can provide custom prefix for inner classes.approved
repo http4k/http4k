@@ -11,7 +11,7 @@
             "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner"
           },
           "enum": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum"
+            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum"
           }
         },
         "example": {
@@ -46,7 +46,7 @@
       }
     },
     {
-      "first": "org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum",
+      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum",
       "second": {
         "example": "bar",
         "enum": [
