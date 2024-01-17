@@ -1,0 +1,59 @@
+{
+  "node": {
+    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses",
+      "second": {
+        "properties": {
+          "inner": {
+            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner"
+          },
+          "enum": {
+            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum"
+          }
+        },
+        "example": {
+          "inner": {
+            "name": "name"
+          },
+          "enum": "bar"
+        },
+        "type": "object",
+        "required": [
+          "enum",
+          "inner"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner",
+      "second": {
+        "properties": {
+          "name": {
+            "example": "name",
+            "type": "string"
+          }
+        },
+        "example": {
+          "name": "name"
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "first": "org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum",
+      "second": {
+        "example": "bar",
+        "enum": [
+          "bar"
+        ],
+        "type": "string"
+      }
+    }
+  ]
+}

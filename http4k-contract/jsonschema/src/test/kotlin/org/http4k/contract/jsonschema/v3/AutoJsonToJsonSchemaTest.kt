@@ -15,6 +15,7 @@ import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
 import org.http4k.contract.jsonschema.v3.Foo.value1
 import org.http4k.contract.jsonschema.v3.Foo.value2
+import org.http4k.contract.jsonschema.v3.SchemaModelNamer.Companion.Canonical
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -62,6 +63,16 @@ data class ArbObject(
     val anyList: List<Any> = listOf("123", ArbObject2(), true, listOf(ArbObject2())),
     val enumVal: Foo? = value2
 ) : Generic
+
+data class ArbObjectWithInnerClasses(
+    val inner: Inner = Inner(),
+    val enum: FooEnum = FooEnum.bar,
+) : Generic {
+    data class Inner(val name: String = "name")
+    enum class FooEnum {
+        bar
+    }
+}
 
 data class JsonPrimitives(
     val string: String = "string",
@@ -120,6 +131,11 @@ class AutoJsonToJsonSchemaTest {
     @Test
     fun `can provide custom prefix`(approver: Approver) {
         approver.assertApproved(InterfaceHolder(InterfaceImpl1()), null, "prefix")
+    }
+
+    @Test
+    fun `can provide custom prefix for inner classes`(approver: Approver) {
+        approver.assertApproved(ArbObjectWithInnerClasses(), creator = autoJsonToJsonSchema(json, Canonical))
     }
 
     @Test
@@ -373,7 +389,10 @@ class AutoJsonToJsonSchemaTest {
         )
     }
 
-    private fun autoJsonToJsonSchema(jackson: ConfigurableJackson) = AutoJsonToJsonSchema(
+    private fun autoJsonToJsonSchema(
+        jackson: ConfigurableJackson,
+        schemaModelNamer: SchemaModelNamer = SchemaModelNamer.Full
+    ) = AutoJsonToJsonSchema(
         jackson,
         FieldRetrieval.compose(
             SimpleLookup(
@@ -385,7 +404,7 @@ class AutoJsonToJsonSchemaTest {
             JacksonJsonPropertyAnnotated,
             JacksonJsonNamingAnnotated(Jackson)
         ),
-        SchemaModelNamer.Full,
+        schemaModelNamer,
         "customPrefix"
     )
 }
