@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/foobar"
+    "$ref": "#/locationPrefix/foobar"
   },
   "definitions": [
     {
@@ -23,7 +23,7 @@
                   "additionalProperties": {
                     "properties": {
                       "inner": {
-                        "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                        "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                       }
                     },
                     "example": {

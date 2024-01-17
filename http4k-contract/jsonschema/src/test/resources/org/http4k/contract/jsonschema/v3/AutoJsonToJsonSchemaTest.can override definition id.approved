@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/foobar"
+    "$ref": "#/locationPrefix/foobar"
   },
   "definitions": [
     {

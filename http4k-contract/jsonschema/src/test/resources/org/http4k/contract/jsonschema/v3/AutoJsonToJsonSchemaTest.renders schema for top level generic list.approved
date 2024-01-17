@@ -3,10 +3,10 @@
     "items": {
       "oneOf": [
         {
-          "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
         },
         {
-          "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
         }
       ]
     },
@@ -66,11 +66,11 @@
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "list": {
             "items": {
-              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
             },
             "example": [
               {
@@ -85,7 +85,7 @@
           "nestedList": {
             "items": {
               "items": {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
               "type": "array"
             },
@@ -102,7 +102,7 @@
             "type": "array"
           },
           "nullableChild": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "stringList": {
             "items": {
@@ -119,7 +119,7 @@
               "oneOf": [
                 {
                   "items": {
-                    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                   },
                   "type": "array"
                 },
@@ -130,7 +130,7 @@
                   "type": "boolean"
                 },
                 {
-                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                 }
               ]
             },
@@ -149,7 +149,7 @@
             "type": "array"
           },
           "enumVal": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
           }
         },
         "example": {

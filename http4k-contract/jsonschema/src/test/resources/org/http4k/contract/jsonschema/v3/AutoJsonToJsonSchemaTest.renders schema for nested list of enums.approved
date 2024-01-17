@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.EnumListHolder"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.EnumListHolder"
   },
   "definitions": [
     {
@@ -9,7 +9,7 @@
         "properties": {
           "value": {
             "items": {
-              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
             },
             "example": [
               "value1",

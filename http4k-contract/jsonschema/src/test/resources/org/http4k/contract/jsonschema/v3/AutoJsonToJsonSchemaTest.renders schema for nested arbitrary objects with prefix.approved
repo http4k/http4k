@@ -1,18 +1,18 @@
 {
   "node": {
-    "$ref": "#/customPrefix/customPrefixorg.http4k.contract.jsonschema.v3.ArbObject"
+    "$ref": "#/locationPrefix/locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject"
   },
   "definitions": [
     {
-      "first": "customPrefixorg.http4k.contract.jsonschema.v3.ArbObject",
+      "first": "locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject",
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/customPrefix/customPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "list": {
             "items": {
-              "$ref": "#/customPrefix/customPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
+              "$ref": "#/locationPrefix/locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
             },
             "example": [
               {
@@ -27,7 +27,7 @@
           "nestedList": {
             "items": {
               "items": {
-                "$ref": "#/customPrefix/customPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
               },
               "type": "array"
             },
@@ -44,7 +44,7 @@
             "type": "array"
           },
           "nullableChild": {
-            "$ref": "#/customPrefix/customPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "stringList": {
             "items": {
@@ -61,7 +61,7 @@
               "oneOf": [
                 {
                   "items": {
-                    "$ref": "#/customPrefix/customPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
+                    "$ref": "#/locationPrefix/locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
                   },
                   "type": "array"
                 },
@@ -72,7 +72,7 @@
                   "type": "boolean"
                 },
                 {
-                  "$ref": "#/customPrefix/customPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
+                  "$ref": "#/locationPrefix/locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject2"
                 }
               ]
             },
@@ -91,7 +91,7 @@
             "type": "array"
           },
           "enumVal": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
           }
         },
         "example": {
@@ -148,7 +148,7 @@
       }
     },
     {
-      "first": "customPrefixorg.http4k.contract.jsonschema.v3.ArbObject2",
+      "first": "locationPrefixorg.http4k.contract.jsonschema.v3.ArbObject2",
       "second": {
         "properties": {
           "uri": {

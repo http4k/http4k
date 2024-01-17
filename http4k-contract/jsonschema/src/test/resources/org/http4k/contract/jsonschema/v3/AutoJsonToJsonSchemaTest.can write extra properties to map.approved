@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject3"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject3"
   },
   "definitions": [
     {

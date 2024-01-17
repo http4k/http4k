@@ -1,17 +1,17 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses"
+    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses"
   },
   "definitions": [
     {
-      "first": "org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses",
+      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses",
       "second": {
         "properties": {
           "inner": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner"
+            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner"
           },
           "enum": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum"
           }
         },
         "example": {
@@ -28,7 +28,7 @@
       }
     },
     {
-      "first": "org.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner",
+      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner",
       "second": {
         "properties": {
           "name": {

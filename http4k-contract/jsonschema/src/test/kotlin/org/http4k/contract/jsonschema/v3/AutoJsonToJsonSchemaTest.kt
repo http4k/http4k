@@ -135,7 +135,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `can provide custom prefix for inner classes`(approver: Approver) {
-        approver.assertApproved(ArbObjectWithInnerClasses(), creator = autoJsonToJsonSchema(json, Canonical))
+        approver.assertApproved(ArbObjectWithInnerClasses(), prefix = "prefix", creator = autoJsonToJsonSchema(json, Canonical))
     }
 
     @Test
@@ -188,7 +188,7 @@ class AutoJsonToJsonSchemaTest {
                 }
             },
             SchemaModelNamer.Full,
-            "customPrefix"
+            "locationPrefix"
         )
 
         approver.assertApproved(
@@ -221,7 +221,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for nested arbitrary objects with prefix`(approver: Approver) {
-        approver.assertApproved(ArbObject(), prefix = "customPrefix")
+        approver.assertApproved(ArbObject(), prefix = "locationPrefix")
     }
 
     @Test
@@ -405,7 +405,7 @@ class AutoJsonToJsonSchemaTest {
             JacksonJsonNamingAnnotated(Jackson)
         ),
         schemaModelNamer,
-        "customPrefix"
+        "locationPrefix"
     )
 }
 

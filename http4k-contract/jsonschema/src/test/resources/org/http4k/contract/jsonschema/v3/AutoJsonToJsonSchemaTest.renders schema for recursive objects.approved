@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
   },
   "definitions": [
     {
@@ -9,7 +9,7 @@
         "properties": {
           "children": {
             "items": {
-              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
+              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
             },
             "example": [
               {

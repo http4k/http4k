@@ -1,7 +1,7 @@
 {
   "node": {
     "items": {
-      "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.GenericHolder"
+      "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.GenericHolder"
     },
     "example": [
       {
@@ -22,7 +22,7 @@
       "second": {
         "properties": {
           "value": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Enum1"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Enum1"
           }
         },
         "example": {

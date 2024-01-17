@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.MetaDataValueHolder"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.MetaDataValueHolder"
   },
   "definitions": [
     {
@@ -13,7 +13,7 @@
             "type": "integer"
           },
           "j": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldWithMetadata"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldWithMetadata"
           }
         },
         "example": {

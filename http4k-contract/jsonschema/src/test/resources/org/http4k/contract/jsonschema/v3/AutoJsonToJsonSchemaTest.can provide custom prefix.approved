@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceHolder"
+    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceHolder"
   },
   "definitions": [
     {
@@ -8,7 +8,7 @@
       "second": {
         "properties": {
           "i": {
-            "$ref": "#/customPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceImpl1"
+            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceImpl1"
           }
         },
         "example": {

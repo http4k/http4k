@@ -15,7 +15,7 @@
           "additionalProperties": {
             "properties": {
               "inner": {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               }
             },
             "example": {
@@ -28,16 +28,16 @@
           "type": "object"
         },
         "key4": {
-          "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
         },
         "key5": {
           "items": {
             "oneOf": [
               {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
               {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
               }
             ]
           },
@@ -103,7 +103,7 @@
           "type": "array"
         },
         "key7": {
-          "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder"
         }
       },
       "example": {
@@ -249,11 +249,11 @@
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "list": {
             "items": {
-              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
             },
             "example": [
               {
@@ -268,7 +268,7 @@
           "nestedList": {
             "items": {
               "items": {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
               "type": "array"
             },
@@ -285,7 +285,7 @@
             "type": "array"
           },
           "nullableChild": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "stringList": {
             "items": {
@@ -302,7 +302,7 @@
               "oneOf": [
                 {
                   "items": {
-                    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                   },
                   "type": "array"
                 },
@@ -313,7 +313,7 @@
                   "type": "boolean"
                 },
                 {
-                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                 }
               ]
             },
@@ -332,7 +332,7 @@
             "type": "array"
           },
           "enumVal": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
           }
         },
         "example": {
@@ -407,10 +407,10 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                 },
                 {
-                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
                 }
               ]
             },

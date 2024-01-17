@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Nulls"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Nulls"
   },
   "definitions": [
     {
