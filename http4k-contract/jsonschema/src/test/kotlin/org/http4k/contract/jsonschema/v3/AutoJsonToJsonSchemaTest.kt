@@ -125,12 +125,12 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `can override definition id`(approver: Approver) {
-        approver.assertApproved(JsonPrimitives(), "foobar")
+        approver.assertApproved(JsonPrimitives(), name = "foobar")
     }
 
     @Test
     fun `can provide custom prefix`(approver: Approver) {
-        approver.assertApproved(InterfaceHolder(InterfaceImpl1()), null, "prefix")
+        approver.assertApproved(InterfaceHolder(InterfaceImpl1()), null, prefix = "prefix")
     }
 
     @Test
@@ -140,7 +140,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `can override definition id and it added to sub definitions`(approver: Approver) {
-        approver.assertApproved(ArbObject(), "foobar")
+        approver.assertApproved(ArbObject(), name = "foobar")
     }
 
     @Test
@@ -221,7 +221,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for nested arbitrary objects with prefix`(approver: Approver) {
-        approver.assertApproved(ArbObject(), prefix = "locationPrefix")
+        approver.assertApproved(ArbObject(), prefix = "prefix")
     }
 
     @Test

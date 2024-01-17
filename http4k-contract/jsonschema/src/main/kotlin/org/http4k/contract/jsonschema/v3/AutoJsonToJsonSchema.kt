@@ -46,7 +46,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             is ArrayParam -> toArraySchema("", value, false, null, refModelNamePrefix)
             ObjectParam -> toObjectOrMapSchema(objName, value, false, topLevel, null, refModelNamePrefix)
             else -> value.javaClass.enumConstants?.let {
-                toEnumSchema("", it[0], json.typeOf(this).toParam(), it, false, null)
+                toEnumSchema("", it[0], json.typeOf(this).toParam(), it, false, null, refModelNamePrefix)
             } ?: toSchema("", param, false, metadata)
         }
 
@@ -63,7 +63,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val items = json.elements(this)
             .zip(items(obj)) { node: NODE, value: Any ->
                 value.javaClass.enumConstants?.let {
-                    node.toEnumSchema("", it[0], json.typeOf(node).toParam(), it, false, null)
+                    node.toEnumSchema("", it[0], json.typeOf(node).toParam(), it, false, null, refModelNamePrefix)
                 } ?: node.toSchema(
                     value,
                     null,
@@ -84,13 +84,14 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     private fun NODE.toEnumSchema(
         fieldName: String, obj: Any, param: ParamMeta,
-        enumConstants: Array<Any>, isNullable: Boolean, metadata: FieldMetadata?
+        enumConstants: Array<Any>, isNullable: Boolean, metadata: FieldMetadata?,
+        refModelNamePrefix: String
     ): SchemaNode =
         SchemaNode.Reference(
             fieldName,
-            "#/$refLocationPrefix/${modelNamer(obj)}",
+            "#/$refLocationPrefix/$refModelNamePrefix${modelNamer(obj)}",
             SchemaNode.Enum(
-                modelNamer(obj),
+                "$refModelNamePrefix${modelNamer(obj)}",
                 param,
                 isNullable,
                 this,
@@ -188,7 +189,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
         ObjectParam -> field.toObjectOrMapSchema(fieldName, value, isNullable, false, metadata, refModelNamePrefix)
         else -> with(field) {
             value.javaClass.enumConstants
-                ?.let { toEnumSchema(fieldName, value, param, it, isNullable, metadata) }
+                ?.let { toEnumSchema(fieldName, value, param, it, isNullable, metadata, refModelNamePrefix) }
                 ?: toSchema(fieldName, param, isNullable, metadata)
         }
     }

@@ -3,6 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.13.2.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-contract*** : [Fix] Enums do not pick up custom prefixes in model naming. H/T @ashcor for the tip-off! 
+- **http4k-opentelemetry*** : [Fix] Fix to set HTTP_REQUEST_BODY_SIZE attribute in OpenTelemetryTracing. H/T @dkandalov
+- **http4k-contract*** : Added Canonical model-namer.
+
 ### v5.13.1.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-client-helidon** : [Fix #1037] Improve support for query parameters. H/T @franckrasolo
