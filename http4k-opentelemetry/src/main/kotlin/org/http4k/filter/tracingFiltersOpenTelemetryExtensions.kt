@@ -12,6 +12,7 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.context.propagation.TextMapSetter
+import io.opentelemetry.semconv.SemanticAttributes.HTTP_REQUEST_BODY_SIZE
 import io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE
 import io.opentelemetry.semconv.SemanticAttributes.SERVER_ADDRESS
 import io.opentelemetry.semconv.SemanticAttributes.SERVER_PORT
@@ -132,7 +133,7 @@ val defaultSpanNamer: (Request) -> String = {
 
 private fun Span.addStandardDataFrom(resp: Response, req: Request) {
     resp.body.length?.also { setAttribute(HTTP_RESPONSE_BODY_SIZE, it) }
-    req.body.length?.also { setAttribute(HTTP_RESPONSE_BODY_SIZE, it) }
+    req.body.length?.also { setAttribute(HTTP_REQUEST_BODY_SIZE, it) }
     setAttribute("http.status_code", resp.status.code.toString())
 }
 
