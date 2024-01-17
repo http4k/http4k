@@ -204,6 +204,11 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `renders schema for nested arbitrary objects with prefix`(approver: Approver) {
+        approver.assertApproved(ArbObject(), prefix = "customPrefix")
+    }
+
+    @Test
     fun `renders schema for objet with all optional fields`(approver: Approver) {
         approver.assertApproved(Nulls("foo", "bar"))
     }
