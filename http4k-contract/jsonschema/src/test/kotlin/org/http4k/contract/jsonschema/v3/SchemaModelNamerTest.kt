@@ -14,4 +14,13 @@ class SchemaModelNamerTest {
     fun `full namer`() {
         assertThat(SchemaModelNamer.Full("bob"), equalTo("java.lang.String"))
     }
+
+    @Test
+    fun `canonical namer`() {
+        assertThat(SchemaModelNamer.Canonical(FooBar.BarFoo()), equalTo("org.http4k.contract.jsonschema.v3.FooBar.BarFoo"))
+    }
+}
+
+class FooBar {
+    class BarFoo
 }
