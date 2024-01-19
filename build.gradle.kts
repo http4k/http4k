@@ -13,6 +13,8 @@ plugins {
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin")
+    id("com.google.devtools.ksp")
+    kotlin("plugin.serialization")
 }
 
 kotlin {
@@ -217,6 +219,8 @@ dependencies {
         }
 
     testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
+    testImplementation("se.ansman.kotshi:api:_")
+    kspTest("se.ansman.kotshi:compiler:_")
 
     testImplementation("software.amazon.awssdk:s3:_") {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
