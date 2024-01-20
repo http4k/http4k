@@ -94,8 +94,9 @@ object JettyClient {
 
             private fun HttpClient.newRequest(request: Request) =
                 newRequest(request.uri.toString()).method(request.method.name)
-                .headers { fields -> request.headers.toParametersMap().forEach { fields.put(it.key, it.value)}}
-                .body(InputStreamRequestContent(request.body.stream)).let(requestModifier)
+                    .headers { fields -> request.headers.toParametersMap().forEach { fields.put(it.key, it.value) } }
+                    .body(InputStreamRequestContent(request.body.stream))
+                    .let(requestModifier)
 
             private fun JettyRequest.timeoutOrMax() = if (timeout <= 0) Long.MAX_VALUE else timeout
 
