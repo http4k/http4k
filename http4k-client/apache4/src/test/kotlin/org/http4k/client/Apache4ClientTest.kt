@@ -27,7 +27,8 @@ class Apache4ClientTest : HttpClientContract(
                     .build()
             ).build(), responseBodyMode = Stream
     )
-) {
+),
+    HttpClientWithMemoryModeContract {
 
     @Test
     fun `connect timeout is handled`() {

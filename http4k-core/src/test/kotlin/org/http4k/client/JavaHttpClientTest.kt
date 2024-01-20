@@ -17,7 +17,8 @@ class JavaHttpClientTest : HttpClientContract(
     ::ApacheServer,
     JavaHttpClient(),
     JavaHttpClient { it.timeout(Duration.ofMillis(100)) },
-) {
+),
+    HttpClientWithMemoryModeContract {
 
     @Disabled("unsupported by the underlying java client")
     override fun `handles response with custom status message`() {

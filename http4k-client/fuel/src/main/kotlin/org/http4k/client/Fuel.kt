@@ -4,6 +4,8 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.ResponseResultOf
 import org.http4k.core.BodyMode
+import org.http4k.core.BodyMode.Memory
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Parameters
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -20,7 +22,7 @@ private typealias FuelResult = com.github.kittinunf.result.Result<ByteArray, Fue
 private typealias FuelFuel = com.github.kittinunf.fuel.Fuel
 
 class Fuel(
-    private val bodyMode: BodyMode = BodyMode.Memory,
+    private val bodyMode: BodyMode = Memory,
     private val timeout: Duration = Duration.ofSeconds(15)
 ) :
     DualSyncAsyncHttpHandler {
@@ -55,5 +57,10 @@ class Fuel(
             .timeout(timeout.toMillisPart())
             .timeoutRead(timeout.toMillisPart())
             .header(headers.toParametersMap())
-            .body(bodyMode(body.stream).stream)
+            .also { fuelRequest ->
+                when (bodyMode) {
+                    Memory -> fuelRequest.body(body.payload.array())
+                    Stream -> fuelRequest.body(body.stream)
+                }
+            }
 }

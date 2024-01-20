@@ -16,7 +16,8 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 class Java8HttpClientTest : HttpClientContract(::ApacheServer, Java8HttpClient(),
     ApacheClient(HttpClients.custom()
         .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(100, MILLISECONDS).build()).build()
-        , responseBodyMode = BodyMode.Stream)){
+        , responseBodyMode = BodyMode.Stream)),
+    HttpClientWithMemoryModeContract {
 
     @Test
     fun `allow configuring read timeout`(){

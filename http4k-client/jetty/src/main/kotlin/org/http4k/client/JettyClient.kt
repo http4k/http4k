@@ -1,6 +1,7 @@
 package org.http4k.client
 
 import org.eclipse.jetty.client.BufferingResponseListener
+import org.eclipse.jetty.client.ByteBufferRequestContent
 import org.eclipse.jetty.client.HttpClient
 import org.eclipse.jetty.client.InputStreamRequestContent
 import org.eclipse.jetty.client.InputStreamResponseListener
@@ -95,7 +96,12 @@ object JettyClient {
             private fun HttpClient.newRequest(request: Request) =
                 newRequest(request.uri.toString()).method(request.method.name)
                     .headers { fields -> request.headers.toParametersMap().forEach { fields.put(it.key, it.value) } }
-                    .body(InputStreamRequestContent(request.body.stream))
+                    .body(
+                        when (bodyMode) {
+                            BodyMode.Memory -> ByteBufferRequestContent(request.body.payload)
+                            BodyMode.Stream -> InputStreamRequestContent(request.body.stream)
+                        }
+                    )
                     .let(requestModifier)
 
             private fun JettyRequest.timeoutOrMax() = if (timeout <= 0) Long.MAX_VALUE else timeout
