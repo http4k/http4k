@@ -15,6 +15,8 @@ refreshVersions {
     }
 }
 
+gradle.startParameter.isContinueOnFailure = true
+
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")

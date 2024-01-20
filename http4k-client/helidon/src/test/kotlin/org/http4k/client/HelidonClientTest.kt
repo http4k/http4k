@@ -14,7 +14,9 @@ import java.time.Duration
 class HelidonClientTest : HttpClientContract(
     ::ApacheServer, HelidonClient(),
     HelidonClient(WebClient.builder().readTimeout(Duration.ofMillis(100)).build())
-) {
+),
+    HttpClientWithMemoryModeContract {
+
     @Disabled
     override fun `fails with no protocol`() {
     }

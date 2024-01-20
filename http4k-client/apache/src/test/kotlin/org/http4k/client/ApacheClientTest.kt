@@ -26,7 +26,8 @@ class ApacheClientTest : HttpClientContract(::ApacheServer, ApacheClient(),
                 .setResponseTimeout(Timeout.ofMilliseconds(100))
                 .build()
         ).build()
-        , responseBodyMode = Stream)) {
+        , responseBodyMode = Stream)),
+    HttpClientWithMemoryModeContract {
 
     @Test
     fun `connect timeout is handled`() {
