@@ -29,7 +29,7 @@ class RoutedMessageTest {
         val request = ExtendedRequest(RoutedRequest(Request(GET, "/the-path"), from("/{pathParam}")))
 
         assertThat(request.path("pathParam"), equalTo("the-path"))
-        assertThat(request.query("name","value"), isA<ExtendedRequest>())
+        assertThat(request.query("name", "value"), isA<ExtendedRequest>())
 
         checkMessageFields<RoutedRequest>(request)
     }
@@ -43,7 +43,7 @@ class RoutedMessageTest {
 
         val response = ExtendedResponse(RoutedResponse(Response(OK, "/the-path"), from("/{pathParam}")))
 
-        assertThat(response.header("name","value"), isA<ExtendedResponse>())
+        assertThat(response.header("name", "value"), isA<ExtendedResponse>())
     }
 
     @Test

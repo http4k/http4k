@@ -150,7 +150,7 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `can handle quotes in request headers`(){
+    fun `can handle quotes in request headers`() {
         val response = client(
             Request(GET, "$baseUrl/request-headers")
                 .header("foo", """"my header with quotes"""")

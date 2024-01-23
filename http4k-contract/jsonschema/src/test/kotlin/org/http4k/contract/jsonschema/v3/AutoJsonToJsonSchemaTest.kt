@@ -365,9 +365,8 @@ class AutoJsonToJsonSchemaTest {
         ) {}
 
         approver.assertApproved(
-            MetaDataValueHolder(MyInt.of(1), JacksonFieldWithMetadata()), creator = autoJsonToJsonSchema(
-                jackson
-            )
+            MetaDataValueHolder(MyInt.of(1), JacksonFieldWithMetadata()),
+            creator = autoJsonToJsonSchema(jackson)
         )
     }
 

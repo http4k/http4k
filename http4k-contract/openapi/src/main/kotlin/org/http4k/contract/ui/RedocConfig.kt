@@ -16,7 +16,7 @@ fun RedocConfig.toFilter(bundleUrl: String) = Filter { next ->
                     .replace("%%DESCRIPTION_ROUTE%%", url)
                     .replace("%%PAGE_TITLE%%", pageTitle)
                     .replace("%%BUNDLE_URL%%", bundleUrl)
-                    .replace("%%OPTIONS%%", options.map {(key, value) -> "$key=\"$value\"" }.joinToString(" "))
+                    .replace("%%OPTIONS%%", options.map { (key, value) -> "$key=\"$value\"" }.joinToString(" "))
             )
         }
     }

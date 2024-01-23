@@ -92,7 +92,7 @@ class BodyTest {
 
         val bodyContents = body.stream.readAllBytes()
 
-        assertThat("body contents", bodyContents.toList(), equalTo(byteArrayOf(4,5,6,7,8,9,10,11).toList()))
+        assertThat("body contents", bodyContents.toList(), equalTo(byteArrayOf(4, 5, 6, 7, 8, 9, 10, 11).toList()))
     }
 
     @Test

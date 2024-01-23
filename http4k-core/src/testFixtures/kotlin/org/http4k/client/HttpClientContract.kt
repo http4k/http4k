@@ -38,9 +38,11 @@ import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.util.Locale.getDefault
 
-abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
-                                  val client: HttpHandler,
-                                  private val timeoutClient: HttpHandler = client) : AbstractHttpClientContract(serverConfig) {
+abstract class HttpClientContract(
+    serverConfig: (Int) -> ServerConfig,
+    val client: HttpHandler,
+    private val timeoutClient: HttpHandler = client
+) : AbstractHttpClientContract(serverConfig) {
 
     @Test
     open fun `can forward response body to another request`() {
@@ -257,7 +259,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
         val response = client(Request(GET, "http://reallynotarealserver.bob"))
 
         assertThat(response.status.code, equalTo(SERVICE_UNAVAILABLE.code))
-        assertThat(response.status.toString().lowercase(getDefault()), containsSubstring("unknown") )
+        assertThat(response.status.toString().lowercase(getDefault()), containsSubstring("unknown"))
     }
 
     @Test
@@ -274,7 +276,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    open fun `supports query parameter list`(){
+    open fun `supports query parameter list`() {
         val response = client(Request(GET, "http://localhost:$port/echo").query("p1", "foo").query("p1", "bar"))
         val uriFromResponse = Uri.of(response.bodyString())
         assertThat(uriFromResponse.queries(), equalTo(listOf("p1" to "foo", "p1" to "bar")))

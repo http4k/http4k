@@ -22,5 +22,5 @@ fun redocWebjar(configFn: RedocConfig.() -> Unit = {}) = routes(
         .toFilter("redoc.standalone.js")
         .then(static(Classpath("org/http4k/contract/ui/redoc/"))),
 
-    static(Classpath( "/META-INF/resources/webjars/redoc/2.0.0/"))
+    static(Classpath("/META-INF/resources/webjars/redoc/2.0.0/"))
 )

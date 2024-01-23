@@ -10,7 +10,6 @@ import org.http4k.format.Jackson
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createInstance
 
-
 object JacksonJsonPropertyAnnotated : FieldRetrieval {
     override fun invoke(target: Any, name: String) =
         SimpleLookup(

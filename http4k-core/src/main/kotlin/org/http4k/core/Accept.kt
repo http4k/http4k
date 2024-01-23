@@ -5,5 +5,5 @@ data class Accept(val contentTypes: List<ContentType>, val directives: Parameter
     /**
      * Note that the Accept header ignores CharSet because that is in a separate Accept-CharSet header..
      */
-    fun accepts(contentType: ContentType): Boolean = contentTypes.any { it.equalsIgnoringDirectives(contentType)}
+    fun accepts(contentType: ContentType): Boolean = contentTypes.any { it.equalsIgnoringDirectives(contentType) }
 }

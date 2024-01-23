@@ -98,17 +98,20 @@ object StringBiDiMappings {
         { s -> Locale.forLanguageTag(s).takeIf { it.language.isNotEmpty() } ?: throw IllegalArgumentException("Could not parse IETF locale") },
         Locale::toLanguageTag
     )
+
     fun basicCredentials() = BiDiMapping(
-        { value -> value.trim()
-            .takeIf { value.startsWith("Basic") }
-            ?.substringAfter("Basic")
-            ?.trim()
-            ?.safeBase64Decoded()
-            ?.split(":", ignoreCase = false, limit = 2)
-            .let { Credentials(it?.getOrNull(0) ?: "", it?.getOrNull(1) ?: "") }
+        { value ->
+            value.trim()
+                .takeIf { value.startsWith("Basic") }
+                ?.substringAfter("Basic")
+                ?.trim()
+                ?.safeBase64Decoded()
+                ?.split(":", ignoreCase = false, limit = 2)
+                .let { Credentials(it?.getOrNull(0) ?: "", it?.getOrNull(1) ?: "") }
         },
         { credentials: Credentials -> "Basic ${"${credentials.user}:${credentials.password}".base64Encode()}" }
     )
+
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
     inline fun <reified T : Enum<T>> caseInsensitiveEnum() = BiDiMapping(
         { text -> enumValues<T>().first { it.name.equals(text, ignoreCase = true) } },
@@ -122,7 +125,9 @@ object StringBiDiMappings {
 
     private fun String.safeBase64Decoded(): String? = try {
         base64Decoded()
-    } catch (e: IllegalArgumentException) { null }
+    } catch (e: IllegalArgumentException) {
+        null
+    }
 }
 
 internal fun Throwable.asString() = StringWriter().use { output -> PrintWriter(output).use { printer -> printStackTrace(printer); output.toString() } }

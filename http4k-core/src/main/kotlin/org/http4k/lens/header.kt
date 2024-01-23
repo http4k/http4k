@@ -27,7 +27,6 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
         ContentType::toHeaderValue
     ).optional("content-type")
 
-
     val LOCATION = map(::of, Uri::toString).required("location")
 
     val ACCEPT = map {

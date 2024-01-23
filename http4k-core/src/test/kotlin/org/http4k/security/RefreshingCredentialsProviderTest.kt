@@ -89,7 +89,7 @@ class RefreshingCredentialsProviderTest {
 
         clock.tickBy(Duration.ofSeconds(60))
 
-        assertThat({provider() }, throws(equalTo(e)))
+        assertThat({ provider() }, throws(equalTo(e)))
     }
 
     @Test
