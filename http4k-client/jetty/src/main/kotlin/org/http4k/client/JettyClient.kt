@@ -31,10 +31,12 @@ object JettyClient {
     @JvmStatic
     @JvmOverloads
     @JvmName("create")
-    operator fun invoke(client: HttpClient = defaultJettyHttpClient(),
-                        bodyMode: BodyMode = BodyMode.Memory,
-                        requestModifier: (JettyRequest) -> JettyRequest = { it }): DualSyncAsyncHttpHandler {
-        if(!client.isRunning) client.start()
+    operator fun invoke(
+        client: HttpClient = defaultJettyHttpClient(),
+        bodyMode: BodyMode = BodyMode.Memory,
+        requestModifier: (JettyRequest) -> JettyRequest = { it }
+    ): DualSyncAsyncHttpHandler {
+        if (!client.isRunning) client.start()
 
         return object : DualSyncAsyncHttpHandler {
             override fun close() = client.stop()

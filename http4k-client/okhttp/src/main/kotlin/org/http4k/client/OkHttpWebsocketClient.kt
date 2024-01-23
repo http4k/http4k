@@ -84,6 +84,7 @@ private class OkHttpNonBlockingWebsocket(
 ) : PushPullAdaptingWebSocket() {
 
     val req = Request(Method.GET, uri).headers(headers)
+
     init {
         onError(onError)
     }

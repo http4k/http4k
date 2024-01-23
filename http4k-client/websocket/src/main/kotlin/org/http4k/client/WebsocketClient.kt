@@ -45,7 +45,7 @@ object WebsocketClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val client = BlockingQueueClient(uri, headers, timeout, draft, queue)
             .apply {
-                if(!connectBlocking(timeout.toMillis(), MILLISECONDS)){
+                if (!connectBlocking(timeout.toMillis(), MILLISECONDS)) {
                     throw WebsocketNotConnectedException()
                 }
             }
