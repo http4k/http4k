@@ -57,7 +57,7 @@ class ImplicitOAuthSecurityRendererTest : SecurityRendererContract {
     override val renderer = OpenApi3SecurityRenderer
 }
 
-class UserCredentialsSecurityRendererTest: SecurityRendererContract {
+class UserCredentialsSecurityRendererTest : SecurityRendererContract {
     override val security = UserCredentialsOAuthSecurity(
         Uri.of("/auth"),
         listOf(OAuthScope("name", "value")),
@@ -70,7 +70,7 @@ class UserCredentialsSecurityRendererTest: SecurityRendererContract {
     override val renderer = OpenApi3SecurityRenderer
 }
 
-class OpenIdConnectSecurityRendererTest: SecurityRendererContract {
+class OpenIdConnectSecurityRendererTest : SecurityRendererContract {
     override val security = OpenIdConnectSecurity(
         Uri.of("spec"),
         Filter.NoOp,

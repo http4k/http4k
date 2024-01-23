@@ -253,9 +253,8 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
         val definitionId =
             (refModelNamePrefix.orEmpty()) + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
         return JsonSchema(
-            json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) }, setOf(
-                definitionId to newDefinition
-            )
+            json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) },
+            setOf(definitionId to newDefinition)
         )
     }
 }

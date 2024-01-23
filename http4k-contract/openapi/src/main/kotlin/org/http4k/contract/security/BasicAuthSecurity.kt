@@ -9,7 +9,7 @@ class BasicAuthSecurity private constructor(override val filter: Filter, val nam
     /**
      * Checks the presence of basic auth credentials. Filter returns 401 if auth fails.
      */
-    constructor(realm: String, credentials: Credentials, name: String = "basicAuth"): this(ServerFilters.BasicAuth(realm, credentials), name)
+    constructor(realm: String, credentials: Credentials, name: String = "basicAuth") : this(ServerFilters.BasicAuth(realm, credentials), name)
 
     constructor(realm: String, credentials: (Credentials) -> Boolean) : this(ServerFilters.BasicAuth(realm, credentials))
 

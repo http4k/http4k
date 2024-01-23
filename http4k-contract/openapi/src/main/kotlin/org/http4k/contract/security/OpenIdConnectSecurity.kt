@@ -7,6 +7,6 @@ class OpenIdConnectSecurity(
     val discoveryUrl: Uri,
     override val filter: Filter,
     val name: String = "openIdConnect"
-): Security {
+) : Security {
     companion object
 }

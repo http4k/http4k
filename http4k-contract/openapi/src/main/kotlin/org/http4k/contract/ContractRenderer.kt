@@ -4,9 +4,11 @@ import org.http4k.contract.security.Security
 import org.http4k.core.Response
 
 fun interface ContractRenderer : ErrorResponseRenderer {
-    fun description(contractRoot: PathSegments,
-                    security: Security?,
-                    routes: List<ContractRoute>,
-                    tags: Set<Tag>,
-                    webhooks: Map<String, List<WebCallback>>): Response
+    fun description(
+        contractRoot: PathSegments,
+        security: Security?,
+        routes: List<ContractRoute>,
+        tags: Set<Tag>,
+        webhooks: Map<String, List<WebCallback>>
+    ): Response
 }

@@ -221,7 +221,8 @@ class OpenApi3<NODE : Any>(
         })
 
         is EnumParam<*> -> SchemaParameter(
-            it, apiRenderer.toSchema(
+            it,
+            apiRenderer.toSchema(
                 paramMeta.clz.java.enumConstants[0],
                 it.name,
                 null
