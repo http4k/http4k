@@ -56,7 +56,7 @@ class RouterBasedHttpHandlerSpecialCaseTests {
     }
 
     @Test
-    fun `router + passthrough with filter`(){
+    fun `router + passthrough with filter`() {
         val filter = Filter { next ->
             {
                 next(it.body(it.query("foo").orEmpty()))

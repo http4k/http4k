@@ -18,8 +18,8 @@ class TestResourcesTest {
 
     @Test
     fun `cannot load resource that does not exist`(resourceLoader: ResourceLoader) {
-        assertThat({resourceLoader.text("file.txt") }, throws<IllegalStateException>())
-        assertThat({resourceLoader.stream("file.txt") }, throws<IllegalStateException>())
-        assertThat({resourceLoader.bytes("file.txt") }, throws<IllegalStateException>())
+        assertThat({ resourceLoader.text("file.txt") }, throws<IllegalStateException>())
+        assertThat({ resourceLoader.stream("file.txt") }, throws<IllegalStateException>())
+        assertThat({ resourceLoader.bytes("file.txt") }, throws<IllegalStateException>())
     }
 }

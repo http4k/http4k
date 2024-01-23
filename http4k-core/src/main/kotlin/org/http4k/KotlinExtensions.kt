@@ -7,19 +7,19 @@ import java.util.Base64
 
 fun ByteArray.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(this)
 
-fun ByteArray.base64Encode() : String = Base64.getEncoder().encodeToString(this)
+fun ByteArray.base64Encode(): String = Base64.getEncoder().encodeToString(this)
 
-fun ByteArray.base64EncodeArray() : ByteArray = Base64.getEncoder().encode(this)
+fun ByteArray.base64EncodeArray(): ByteArray = Base64.getEncoder().encode(this)
 
 fun ByteBuffer.length() = limit() - position()
 
 fun ByteBuffer.asString(): String = String(array(), position(), length())
 
-fun ByteBuffer.base64Encode() : String = array().base64Encode()
+fun ByteBuffer.base64Encode(): String = array().base64Encode()
 
-fun ByteBuffer.base64Decoded() : ByteArray = Base64.getDecoder().decode(array())
+fun ByteBuffer.base64Decoded(): ByteArray = Base64.getDecoder().decode(array())
 
-fun ByteBuffer.base64DecodedByteBuffer() : ByteBuffer = base64Decoded().asByteBuffer()
+fun ByteBuffer.base64DecodedByteBuffer(): ByteBuffer = base64Decoded().asByteBuffer()
 
 fun String.asByteBuffer(): ByteBuffer = toByteArray().asByteBuffer()
 

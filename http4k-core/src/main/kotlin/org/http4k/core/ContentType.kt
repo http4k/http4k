@@ -20,6 +20,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         fun Text(value: String, charset: Charset? = UTF_8) = ContentType(value, listOfNotNull(charset?.let {
             "charset" to charset.name().lowercase(getDefault())
         }))
+
         fun MultipartFormWithBoundary(boundary: String): ContentType = ContentType("multipart/form-data", listOf("boundary" to boundary))
         fun MultipartMixedWithBoundary(boundary: String): ContentType = ContentType("multipart/mixed", listOf("boundary" to boundary))
 

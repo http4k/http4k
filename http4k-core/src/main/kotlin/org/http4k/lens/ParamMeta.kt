@@ -6,6 +6,7 @@ sealed class ParamMeta(val description: String) {
     data class ArrayParam(private val itemType: ParamMeta) : ParamMeta("array") {
         fun itemType() = itemType
     }
+
     class EnumParam<T : Enum<T>>(val clz: KClass<T>) : ParamMeta("string")
     data object StringParam : ParamMeta("string")
     data object ObjectParam : ParamMeta("object")

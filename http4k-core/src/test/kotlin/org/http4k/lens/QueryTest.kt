@@ -176,7 +176,7 @@ class QueryTest {
     @Test
     fun `case-insensitive enum`() {
         val lens = Query.enum<Method>(caseSensitive = false).required("method")
-        assertThat(lens(Request(GET,"/?method=delete")), equalTo(Method.DELETE))
+        assertThat(lens(Request(GET, "/?method=delete")), equalTo(Method.DELETE))
     }
 
     @Test
@@ -184,10 +184,10 @@ class QueryTest {
         val lens = Query.csv().required("stuff")
         assertThat(
             lens(Request(GET, "/?stuff=foo\",1,,bar")),
-            equalTo(listOf("foo\"","1", "", "bar"))
+            equalTo(listOf("foo\"", "1", "", "bar"))
         )
         assertThat(
-            Request(GET, "/").with(lens of listOf("foo\"","1", "", "bar")),
+            Request(GET, "/").with(lens of listOf("foo\"", "1", "", "bar")),
             hasQuery("stuff", "foo\",1,,bar")
         )
         assertThat(

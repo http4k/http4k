@@ -12,7 +12,7 @@ interface HttpClientWithMemoryModeContract {
     val port: Int
 
     @Test
-    fun `honors the memory body mode when a request body is an input stream`(){
+    fun `honors the memory body mode when a request body is an input stream`() {
         val expectedBody = "hello world"
 
         val request = Request(POST, "http://localhost:$port/echo").body(expectedBody.byteInputStream())

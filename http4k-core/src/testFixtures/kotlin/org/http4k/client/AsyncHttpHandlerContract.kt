@@ -17,9 +17,11 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-abstract class AsyncHttpHandlerContract(serverConfig: (Int) -> ServerConfig,
-                                        val client: AsyncHttpHandler,
-                                        private val timeoutClient: AsyncHttpHandler) : AbstractHttpClientContract(serverConfig) {
+abstract class AsyncHttpHandlerContract(
+    serverConfig: (Int) -> ServerConfig,
+    val client: AsyncHttpHandler,
+    private val timeoutClient: AsyncHttpHandler
+) : AbstractHttpClientContract(serverConfig) {
 
     @AfterEach
     fun close() {
@@ -56,9 +58,11 @@ abstract class AsyncHttpHandlerContract(serverConfig: (Int) -> ServerConfig,
     @Test
     open fun `fails with no protocol`() {
         assertThat(
-            { client(Request(GET, "/boom").header("host", "localhost:$port")) {
-                println(it)
-            } }, throws<Exception>()
+            {
+                client(Request(GET, "/boom").header("host", "localhost:$port")) {
+                    println(it)
+                }
+            }, throws<Exception>()
         )
     }
 

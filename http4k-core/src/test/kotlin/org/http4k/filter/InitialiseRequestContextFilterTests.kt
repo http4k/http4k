@@ -41,16 +41,17 @@ class InitialiseRequestContextFilterTests {
 
         val app =
             InitialiseRequestContext(contexts1)
-            .then(InitialiseRequestContext(contexts2))
-            .then(Filter { next ->
-                {
-                    next(
-                        it.with(key1 of "foo", key2 of "bar")
-                    )
+                .then(InitialiseRequestContext(contexts2))
+                .then(Filter { next ->
+                    {
+                        next(
+                            it.with(key1 of "foo", key2 of "bar")
+                        )
+                    }
+                })
+                .then {
+                    Response(Status.OK).body(key1(it) + key2(it))
                 }
-            })
-            .then {
-                Response(Status.OK).body(key1(it) + key2(it)) }
 
         assertThat(app(Request(Method.GET, "/")), hasBody("foobar"))
     }
