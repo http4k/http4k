@@ -167,7 +167,7 @@ bool: true
         val wrapper = mapOf(
             "str" to "val1",
             "num" to BigDecimal("123.1"),
-            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "array" to listOf(BigDecimal("1.1"), "stuff"),
             "map" to mapOf("foo" to "bar"),
             "bool" to true
         )
@@ -193,7 +193,7 @@ bool: true
     @Test
     fun `custom jackson yaml`() {
         val jackson = JacksonYaml.custom {
-            text(BiDiMapping({StringHolder(it)},{it.value}))
+            text(BiDiMapping({ StringHolder(it) }, { it.value }))
         }
 
         val value = StringHolder("stuff")

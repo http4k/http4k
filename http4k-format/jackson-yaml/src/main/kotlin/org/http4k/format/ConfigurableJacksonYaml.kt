@@ -35,7 +35,7 @@ open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaul
     ): BiDiBodyLensSpec<T> =
         httpBodyLens(description, contentNegotiation, defaultContentType).map(mapper.read(), mapper.write())
 
-    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 inline operator fun <reified T : Any> ConfigurableJacksonYaml.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)

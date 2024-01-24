@@ -17,8 +17,10 @@ import org.http4k.lens.httpBodyRoot
 import java.io.InputStream
 import kotlin.reflect.KClass
 
-open class ConfigurableJacksonXml(private val mapper: XmlMapper,
-                                  override val defaultContentType: ContentType = APPLICATION_XML) : AutoMarshallingXml() {
+open class ConfigurableJacksonXml(
+    private val mapper: XmlMapper,
+    override val defaultContentType: ContentType = APPLICATION_XML
+) : AutoMarshallingXml() {
     override fun Any.asXmlString(): String = mapper.writeValueAsString(this)
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
@@ -33,7 +35,7 @@ open class ConfigurableJacksonXml(private val mapper: XmlMapper,
             .map({ it.payload.asString() }, { Body(it) })
             .map({ it.asA<T>() }, { it.asXmlString() })
 
-    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun KotlinModule.asConfigurableXml() = asConfigurable(

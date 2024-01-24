@@ -145,7 +145,7 @@ bool:true
     @Test
     fun `custom moshi yaml`() {
         val moshi = MoshiYaml.custom {
-            text(BiDiMapping({StringHolder(it)},{it.value}))
+            text(BiDiMapping({ StringHolder(it) }, { it.value }))
         }
 
         val value = StringHolder("stuff")

@@ -82,7 +82,6 @@ interface Json<NODE> {
 
     fun WsMessage.Companion.json() = WsMessage.string().map({ parse(it) }, { compact(it) })
 
-
     fun textValueOf(node: NODE, name: String): String?
 
     operator fun <T> invoke(fn: Json<NODE>.() -> T): T = run(fn)

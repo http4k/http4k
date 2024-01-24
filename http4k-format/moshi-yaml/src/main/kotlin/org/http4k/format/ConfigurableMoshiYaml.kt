@@ -43,7 +43,7 @@ open class ConfigurableMoshiYaml(
         val str = json.asFormatString(input)
         val yaml = yaml()
 
-        return when(input) {
+        return when (input) {
             is Iterable<*> -> yaml.dump(json.asA<List<Any>>(str))
             is Array<*> -> yaml.dump(json.asA<Array<Any>>(str))
             else -> try {
@@ -73,7 +73,7 @@ open class ConfigurableMoshiYaml(
         defaultContentType
     ).map({ asA(it) }, ::asFormatString)
 
-    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 val defaultDumperOptions = DumperOptions().apply {

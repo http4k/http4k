@@ -80,7 +80,6 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
         ) {}
 
-
     override fun customMarshaller() =
         object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise()) {}
 

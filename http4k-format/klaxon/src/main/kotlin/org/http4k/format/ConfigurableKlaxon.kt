@@ -17,8 +17,10 @@ import java.io.InputStream
 import kotlin.reflect.KClass
 import com.beust.klaxon.Klaxon as KKlaxon
 
-open class ConfigurableKlaxon(private val klaxon: KKlaxon,
-                              override val defaultContentType: ContentType = APPLICATION_JSON) : AutoMarshalling() {
+open class ConfigurableKlaxon(
+    private val klaxon: KKlaxon,
+    override val defaultContentType: ContentType = APPLICATION_JSON
+) : AutoMarshalling() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> asA(input: String, target: KClass<T>) = asA(input.byteInputStream(), target)
 
@@ -31,19 +33,23 @@ open class ConfigurableKlaxon(private val klaxon: KKlaxon,
 
     override fun asFormatString(input: Any) = klaxon.toJsonString(input)
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null,
-                                                     contentNegotiation: ContentNegotiation = ContentNegotiation.None,
-                                                     contentType: ContentType = defaultContentType): BiDiBodyLensSpec<T> = autoBody(description, contentNegotiation, contentType)
+    inline fun <reified T : Any> Body.Companion.auto(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None,
+        contentType: ContentType = defaultContentType
+    ): BiDiBodyLensSpec<T> = autoBody(description, contentNegotiation, contentType)
 
-    inline fun <reified T : Any> autoBody(description: String? = null,
-                                          contentNegotiation: ContentNegotiation = ContentNegotiation.None,
-                                          contentType: ContentType = defaultContentType)
+    inline fun <reified T : Any> autoBody(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None,
+        contentType: ContentType = defaultContentType
+    )
         : BiDiBodyLensSpec<T> =
         Body.string(contentType, description, contentNegotiation).map({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asFormatString(it) })
 
-    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun KKlaxon.asConfigurable() = asConfigurable(KKlaxon())

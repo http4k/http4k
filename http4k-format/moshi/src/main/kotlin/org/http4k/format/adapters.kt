@@ -35,7 +35,6 @@ inline fun <reified K> JsonAdapter<K>.asFactory() = SimpleMoshiAdapterFactory(K:
 inline fun <reified T : JsonAdapter<K>, reified K> Moshi.Builder.addTyped(fn: T): Moshi.Builder =
     add(K::class.java, fn)
 
-
 /**
  * This adapter factory will capture ALL instances of a particular superclass/interface.
  */

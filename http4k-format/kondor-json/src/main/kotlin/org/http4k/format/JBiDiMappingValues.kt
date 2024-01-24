@@ -17,7 +17,7 @@ fun <OUT> BiDiMapping<String, OUT>.asJConverter() = object : JStringRepresentabl
     override val render: (OUT) -> String = ::invoke
 }
 
-fun <IN: Number, OUT: Any> BiDiMapping<IN, OUT>.asJConverter(valueConverter: JNumRepresentable<IN>) = object : JNumRepresentable<OUT>() {
+fun <IN : Number, OUT : Any> BiDiMapping<IN, OUT>.asJConverter(valueConverter: JNumRepresentable<IN>) = object : JNumRepresentable<OUT>() {
     override val cons: (BigDecimal) -> OUT = { asOut(valueConverter.cons(it)) }
     override val render: (OUT) -> BigDecimal = { valueConverter.render(asIn(it)) }
 }

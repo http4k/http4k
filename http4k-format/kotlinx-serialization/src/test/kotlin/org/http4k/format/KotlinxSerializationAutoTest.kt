@@ -186,7 +186,6 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     override fun `serialises enum as a key correctly`() {
     }
 
-
     @Test
     override fun `fails decoding when a required value is null`() {
         assertThat({ KotlinxSerialization.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
@@ -294,7 +293,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         val wrapper = mapOf(
             "str" to "val1",
             "num" to BigDecimal("123.1"),
-            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "array" to listOf(BigDecimal("1.1"), "stuff"),
             "map" to mapOf("foo" to "bar"),
             "bool" to true
         )
@@ -308,7 +307,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
             "foo",
             BigDecimal("123.1"),
             mapOf("foo" to "bar"),
-            listOf(BigDecimal("1.1"),BigDecimal("2.1")),
+            listOf(BigDecimal("1.1"), BigDecimal("2.1")),
             true
         )
         val asString = KotlinxSerialization.asFormatString(wrapper)

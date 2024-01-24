@@ -67,7 +67,7 @@ object Argo : Json<JsonNode> {
         if (typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
-    override fun text(value: JsonNode): String = when(value.type) {
+    override fun text(value: JsonNode): String = when (value.type) {
         STRING -> value.text
         NUMBER -> value.getNumberValue().toString()
         ARRAY -> ""

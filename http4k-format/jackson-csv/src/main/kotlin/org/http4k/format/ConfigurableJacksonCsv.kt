@@ -17,7 +17,7 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
 
     inline fun <reified T> defaultSchema(): CsvSchema = mapper.schemaFor(T::class.java).withHeader()
 
-    fun <T: Any> writerFor(type: KClass<T>, schema: CsvSchema): (List<T>) -> String {
+    fun <T : Any> writerFor(type: KClass<T>, schema: CsvSchema): (List<T>) -> String {
         val writer = mapper.writerFor(type.java).with(schema)
         return { body: List<T> ->
             StringWriter().use { stringWriter ->
@@ -28,19 +28,19 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
         }
     }
 
-    fun <T: Any> readerFor(type: KClass<T>, schema: CsvSchema): (String) -> List<T> {
+    fun <T : Any> readerFor(type: KClass<T>, schema: CsvSchema): (String) -> List<T> {
         val reader = mapper.readerFor(type.java).with(schema)
         return { body: String ->
             reader.readValues<T>(body).readAll()
         }
     }
 
-    inline fun <reified T: Any> writeCsv(input: List<T>, schema: CsvSchema = defaultSchema<T>()): String {
+    inline fun <reified T : Any> writeCsv(input: List<T>, schema: CsvSchema = defaultSchema<T>()): String {
         val writer = writerFor(T::class, schema)
         return writer(input)
     }
 
-    inline fun <reified T: Any> readCsv(input: String , schema: CsvSchema = defaultSchema<T>()): List<T> {
+    inline fun <reified T : Any> readCsv(input: String, schema: CsvSchema = defaultSchema<T>()): List<T> {
         val reader = readerFor(T::class, schema)
         return reader(input)
     }
