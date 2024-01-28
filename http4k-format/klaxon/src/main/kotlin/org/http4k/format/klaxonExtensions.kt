@@ -37,7 +37,7 @@ fun KKlaxon.asConfigurable(klaxon: KKlaxon): AutoMappingConfiguration<KKlaxon> =
         addConverter(mapping)
     }
 
-    private fun <IN, OUT> addConverter(mapping: BiDiMapping<IN, OUT>,) {
+    private fun <IN, OUT> addConverter(mapping: BiDiMapping<IN, OUT>) {
         klaxon.converter(object : Converter {
             override fun canConvert(cls: Class<*>) = cls == mapping.clazz
 

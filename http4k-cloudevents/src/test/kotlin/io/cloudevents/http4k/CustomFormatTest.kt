@@ -58,7 +58,7 @@ class CustomFormatTest {
 
         val withData = Request(GET, "").with(lens of originalEvent)
 
-        approver.assertApproved(withData.toMessage().replace("\r",""))
+        approver.assertApproved(withData.toMessage().replace("\r", ""))
 
         val bytes = (lens(withData).data as BytesCloudEventData).toBytes()
 

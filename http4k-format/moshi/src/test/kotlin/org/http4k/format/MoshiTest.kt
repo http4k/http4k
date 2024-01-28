@@ -198,13 +198,14 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
         assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("unknown")).also { println(it) } }
     }
 
-    override fun strictMarshaller() = object : ConfigurableMoshi
-        (Builder().asConfigurable().customise(), strictness = FailOnUnknown) {}
+    override fun strictMarshaller() =
+        object : ConfigurableMoshi(Builder().asConfigurable().customise(), strictness = FailOnUnknown) {}
 
-    override fun customMarshaller() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
-    override fun customMarshallerProhibitStrings() = object : ConfigurableMoshi(
-        Builder().asConfigurable().prohibitStrings().customise()
-    ) {}
+    override fun customMarshaller() =
+        object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
+
+    override fun customMarshallerProhibitStrings() =
+        object : ConfigurableMoshi(Builder().asConfigurable().prohibitStrings().customise()) {}
 }
 
 class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {

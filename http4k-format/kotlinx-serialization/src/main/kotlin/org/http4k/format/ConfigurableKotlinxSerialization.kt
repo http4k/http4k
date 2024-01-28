@@ -119,7 +119,7 @@ open class ConfigurableKotlinxSerialization(
     }
 
     // auto
-    override fun asJsonObject(input: Any): JsonElement = when(input) {
+    override fun asJsonObject(input: Any): JsonElement = when (input) {
         is Map<*, *> -> JsonObject(
             input.mapNotNull {
                 (it.key as? String ?: return@mapNotNull null) to (it.value?.asJsonObject() ?: nullNode())
@@ -131,7 +131,7 @@ open class ConfigurableKotlinxSerialization(
     }
 
     private fun JsonElement.toPrimitive(): Any? {
-        return when(this) {
+        return when (this) {
             is JsonPrimitive -> content
                 .takeIf { isString }
                 ?: content.toBooleanStrictOrNull()
@@ -175,7 +175,7 @@ open class ConfigurableKotlinxSerialization(
             { json.decodeFromString<T>(it) },
             { json.encodeToString(it) })
 
-    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {

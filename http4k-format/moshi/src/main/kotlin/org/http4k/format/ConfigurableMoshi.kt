@@ -58,7 +58,7 @@ open class ConfigurableMoshi(
     override fun decimal(value: MoshiNode) = (value as MoshiDecimal).value.toBigDecimal()
     override fun integer(value: MoshiNode) = ((value as MoshiInteger).value)
     override fun bool(value: MoshiNode) = (value as MoshiBoolean).value
-    override fun text(value: MoshiNode) = when(value) {
+    override fun text(value: MoshiNode) = when (value) {
         is MoshiString -> value.value
         is MoshiBoolean -> value.value.toString()
         is MoshiInteger -> value.value.toString()
@@ -67,6 +67,7 @@ open class ConfigurableMoshi(
         is MoshiObject -> ""
         MoshiNull -> "null"
     }
+
     override fun elements(value: MoshiNode) = (value as MoshiArray).elements
     override fun fields(node: MoshiNode) = (node as? MoshiObject)
         ?.attributes
@@ -98,7 +99,7 @@ open class ConfigurableMoshi(
         input.source().buffer()
     )!!
 
-    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
     override fun asJsonObject(input: Any): MoshiNode = MoshiNode.wrap(objectAdapter.toJsonValue(input))
 

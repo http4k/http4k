@@ -12,12 +12,12 @@ import org.http4k.lens.LensExtractor
 class AutoContentNegotiator<T>(
     private val defaultLens: BiDiBodyLens<T>,
     private val alternateLenses: List<BiDiBodyLens<T>>
-): Iterable<BiDiBodyLens<T>>, LensExtractor<HttpMessage, T> {
+) : Iterable<BiDiBodyLens<T>>, LensExtractor<HttpMessage, T> {
 
     override fun iterator() = listOf(defaultLens).plus(alternateLenses).iterator()
 
-    operator fun invoke(accept: Accept?): BiDiBodyLens<T>
-        = find { accept == null || accept.accepts(it.contentType) } ?: defaultLens
+    operator fun invoke(accept: Accept?): BiDiBodyLens<T> =
+        find { accept == null || accept.accepts(it.contentType) } ?: defaultLens
 
     override fun invoke(target: HttpMessage): T = Header
         .CONTENT_TYPE(target)

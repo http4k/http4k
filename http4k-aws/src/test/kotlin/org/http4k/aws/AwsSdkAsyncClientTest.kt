@@ -26,7 +26,7 @@ import java.net.URI
 import java.nio.ByteBuffer
 import java.util.Optional
 
-private fun testResponseHandler(responseBuilder: SdkHttpFullResponse.Builder) = object: SdkAsyncHttpResponseHandler {
+private fun testResponseHandler(responseBuilder: SdkHttpFullResponse.Builder) = object : SdkAsyncHttpResponseHandler {
 
     override fun onHeaders(headers: SdkHttpResponse) {
         responseBuilder.statusCode(headers.statusCode())
@@ -35,13 +35,16 @@ private fun testResponseHandler(responseBuilder: SdkHttpFullResponse.Builder) = 
     }
 
     override fun onStream(stream: Publisher<ByteBuffer>) {
-        stream.subscribe(object: Subscriber<ByteBuffer> {
+        stream.subscribe(object : Subscriber<ByteBuffer> {
             override fun onSubscribe(s: Subscription) {
                 s.request(Long.MAX_VALUE)
             }
 
-            override fun onError(t: Throwable) { throw t }
-            override fun onComplete() { }
+            override fun onError(t: Throwable) {
+                throw t
+            }
+
+            override fun onComplete() {}
 
             override fun onNext(t: ByteBuffer) {
                 responseBuilder.content(AbortableInputStream.create(BinaryUtils.toStream(t)))

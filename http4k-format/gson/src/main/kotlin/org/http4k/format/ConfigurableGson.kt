@@ -60,7 +60,7 @@ open class ConfigurableGson(
         )
     }
 
-    inline fun <reified T: Any, R: HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
     override fun String?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun Int?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE

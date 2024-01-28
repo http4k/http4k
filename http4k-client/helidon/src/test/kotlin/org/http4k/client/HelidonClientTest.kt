@@ -22,7 +22,7 @@ class HelidonClientTest : HttpClientContract(
     }
 
     @Test
-    fun `query parameters are preserved in requests made by the Helidon client`(){
+    fun `query parameters are preserved in requests made by the Helidon client`() {
         val helidonQuery = WebClient.create()
             .makeHelidonRequest(Request(GET, "http://localhost?p1=foo&p2=123&p1=bar"))
             .resolvedUri()
