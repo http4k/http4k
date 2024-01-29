@@ -61,7 +61,7 @@ object ServerForClientContract : HttpHandler {
         "/headers" bind { request: Request -> Response(OK).body(request.headers.joinToString(",") { it.first }) },
         "/hostheaders" bind { request: Request -> Response(OK).body(request.headerValues("host").joinToString(",")) },
         "/check-image" bind POST to { request: Request ->
-            if (Arrays.equals(testImageBytes(), request.body.payload.array()))
+            if (testImageBytes().contentEquals(request.body.payload.array()))
                 Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
                 .body("EXPECTED " + testImageBytes().size + " GOT " + request.body.payload.array().size)
         },
