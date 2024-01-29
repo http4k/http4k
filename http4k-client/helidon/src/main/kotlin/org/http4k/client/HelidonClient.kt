@@ -32,6 +32,11 @@ object HelidonClient {
             client.makeHelidonRequest(request)
                 .submit(request.body.payload.array())
                 .asHttp4k()
+        } catch (e: IllegalArgumentException) {
+            when {
+                e.localizedMessage.contains("Failed to get address") -> Response(UNKNOWN_HOST.toClientStatus(e))
+                else -> throw e
+            }
         } catch (e: UncheckedIOException) {
             when (e.cause) {
                 is UnknownHostException -> Response(UNKNOWN_HOST.toClientStatus(e))

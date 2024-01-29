@@ -207,7 +207,6 @@ abstract class HttpClientContract(
         fun checkNoBannedHeaders(m: Method, vararg banned: String) {
             val response = client(Request(m, "http://localhost:$port/headers"))
             val bannedHeaders = banned.intersect(response.bodyString().split(","))
-            println("$m contained headers ${response.bodyString().split(",")}")
             assertThat("$m contained banned headers $bannedHeaders", bannedHeaders.isEmpty(), equalTo(true))
             response.close()
         }
