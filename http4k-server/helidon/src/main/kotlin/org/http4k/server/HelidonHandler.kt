@@ -21,7 +21,7 @@ private fun ServerRequest.toHttp4k(): Request? =
         ?.let {
             Request(it, Uri.of(path().rawPath() + query()), prologue().protocolVersion())
                 .body(content().inputStream(), headers().contentLength().let {
-                    if(it.isPresent) it.asLong else null
+                    if (it.isPresent) it.asLong else null
                 })
                 .headers(
                     headers()

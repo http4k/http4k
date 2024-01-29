@@ -18,7 +18,7 @@ object TokenRequestMoshiAdatper : JsonAdapter<TokenRequest>() {
         with(reader) {
             beginObject()
             val values = buildMap<String, String?> {
-                while(hasNext()) {
+                while (hasNext()) {
                     put(nextName(), stringOrNull())
                 }
             }

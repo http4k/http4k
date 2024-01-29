@@ -15,9 +15,11 @@ import java.time.Duration
  * This is an example implementation which stores CSRF and AccessToken values in an INSECURE client-side cookie.
  * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
-class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
-                                          private val cookieValidity: Duration = Duration.ofDays(1),
-                                          private val clock: Clock = Clock.systemUTC()) : OAuthPersistence {
+class InsecureCookieBasedOAuthPersistence(
+    cookieNamePrefix: String,
+    private val cookieValidity: Duration = Duration.ofDays(1),
+    private val clock: Clock = Clock.systemUTC()
+) : OAuthPersistence {
 
     private val csrfName = "${cookieNamePrefix}Csrf"
 
@@ -40,9 +42,9 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken, idToken: IdToken?) =
         redirect.cookie(expiring(accessTokenCookieName, accessToken.value))
-        .invalidateCookie(csrfName)
-        .invalidateCookie(nonceName)
-        .invalidateCookie(originalUriName)
+            .invalidateCookie(csrfName)
+            .invalidateCookie(nonceName)
+            .invalidateCookie(originalUriName)
 
     override fun assignNonce(redirect: Response, nonce: Nonce): Response = redirect.cookie(expiring(nonceName, nonce.value))
 

@@ -16,7 +16,7 @@ fun AwsApiGateway.createApi(name: ApiName, region: Region) =
 
 fun AwsApiGateway.listApis(region: Region): List<ApiDetails> =
     this(ListApis())
-        .map { (it._embedded?: EmbeddedDetails(emptyList())).item.map { item -> toApiDetails(item, region) } }.getOrThrow()
+        .map { (it._embedded ?: EmbeddedDetails(emptyList())).item.map { item -> toApiDetails(item, region) } }.getOrThrow()
 
 fun AwsApiGateway.delete(apiId: ApiId) = this(DeleteApi(apiId))
 fun AwsApiGateway.listResources(apiId: ApiId) = this(ListRootResource(apiId)).getOrThrow()

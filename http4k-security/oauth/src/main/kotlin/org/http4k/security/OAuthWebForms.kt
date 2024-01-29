@@ -11,7 +11,7 @@ import org.http4k.lens.webForm
 import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.openid.IdToken
 
-object OAuthWebForms  {
+object OAuthWebForms {
     val grantType = FormField.required("grant_type")
     val clientId = FormField.optional("client_id")
     val clientSecret = FormField.optional("client_secret")

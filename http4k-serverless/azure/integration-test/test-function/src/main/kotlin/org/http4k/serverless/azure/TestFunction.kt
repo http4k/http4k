@@ -23,9 +23,11 @@ import java.util.Optional
 class TestFunction : AzureFunction(ServerForClientContract) {
     @FunctionName("testFunction")
     override fun handleRequest(
-        @HttpTrigger(name = "req",
+        @HttpTrigger(
+            name = "req",
             methods = [CONNECT, DELETE, GET, HEAD, OPTIONS, POST, PUT, TRACE],
             authLevel = ANONYMOUS)
         req: HttpRequestMessage<Optional<String>>,
-        ctx: ExecutionContext): HttpResponseMessage = handle(req, ctx)
+        ctx: ExecutionContext
+    ): HttpResponseMessage = handle(req, ctx)
 }

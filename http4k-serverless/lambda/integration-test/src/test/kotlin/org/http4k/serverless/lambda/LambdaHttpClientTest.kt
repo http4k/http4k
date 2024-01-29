@@ -21,13 +21,14 @@ import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientC
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 
-abstract class LambdaHttpClientTest(type: LambdaIntegrationType,
-                                    clientFn: (Function, Region) -> LambdaHttpClient
-) :
-    HttpClientContract({ NoOpServerConfig },
-        clientFn(functionName(type), Region(awsCliUserProfiles().profile("http4k-integration-test").region))
-            .then(awsCliUserProfiles().profile("http4k-integration-test").awsClientFor("lambda"))) {
-
+abstract class LambdaHttpClientTest(
+    type: LambdaIntegrationType,
+    clientFn: (Function, Region) -> LambdaHttpClient
+) : HttpClientContract(
+    { NoOpServerConfig },
+    clientFn(functionName(type), Region(awsCliUserProfiles().profile("http4k-integration-test").region))
+        .then(awsCliUserProfiles().profile("http4k-integration-test").awsClientFor("lambda"))
+) {
     override fun `handles response with custom status message`() = unsupportedFeature()
     override fun `connection refused are converted into 503`() = unsupportedFeature()
     override fun `unknown host are converted into 503`() = unsupportedFeature()

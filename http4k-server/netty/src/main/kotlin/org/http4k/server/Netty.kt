@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, Graceful(ofSeconds(5)))
 
-    val shutdownTimeoutMillis = when(stopMode) {
+    val shutdownTimeoutMillis = when (stopMode) {
         is Graceful -> stopMode.timeout.toMillis()
         is Immediate -> 0
     }

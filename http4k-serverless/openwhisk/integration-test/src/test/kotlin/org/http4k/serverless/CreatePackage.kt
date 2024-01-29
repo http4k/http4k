@@ -8,7 +8,8 @@ object CreatePackage {
     fun main(args: Array<String>) =
         OpenWhiskCliFlags(args).use {
             val openWhiskClient = openWhiskClient()
-            openWhiskClient.updatePackage("_", packageName, "true",
+            openWhiskClient.updatePackage(
+                "_", packageName, "true",
                 PackagePut("_", packageName)
             )
         }
