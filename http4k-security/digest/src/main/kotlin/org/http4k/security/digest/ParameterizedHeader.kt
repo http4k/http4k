@@ -2,7 +2,8 @@ package org.http4k.security.digest
 
 data class ParameterizedHeader(
     val prefix: String,
-    val parameters: Map<String, String?>) {
+    val parameters: Map<String, String?>
+) {
 
     companion object {
         fun parse(headerValue: String): ParameterizedHeader {
