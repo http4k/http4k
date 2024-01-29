@@ -9,8 +9,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 
-class CreateResource(private val apiId: ApiId, private val parentResource: RestResourceDetails)
-    : AwsApiGatewayAction<RestResourceDetails>(kClass()){
+class CreateResource(private val apiId: ApiId, private val parentResource: RestResourceDetails) : AwsApiGatewayAction<RestResourceDetails>(kClass()) {
     override fun toRequest() = Request(Method.POST, "/restapis/${apiId.value}/resources/${parentResource.id}")
         .with(Body.auto<CreateProxyResource>().toLens() of CreateProxyResource())
 

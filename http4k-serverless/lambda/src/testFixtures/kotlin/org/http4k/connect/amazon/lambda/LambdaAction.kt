@@ -28,13 +28,14 @@ fun Response.toActionResult(originalRequest: Request) = with(this) {
     }
 }
 
-object LambdaJackson : ConfigurableJackson(KotlinModule.Builder().build()
-    .asConfigurable()
-    .withStandardMappings()
-    .done()
-    .deactivateDefaultTyping()
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
-    .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
-    .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
+object LambdaJackson : ConfigurableJackson(
+    KotlinModule.Builder().build()
+        .asConfigurable()
+        .withStandardMappings()
+        .done()
+        .deactivateDefaultTyping()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+        .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
+        .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
 )

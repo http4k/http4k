@@ -15,7 +15,7 @@ class LambdaEnvironmentContextTest {
 
     private val ctx = LambdaEnvironmentContext(
         Request(GET, "")
-            .header("Lambda-Runtime-Aws-Request-Id", UUID(0,0).toString())
+            .header("Lambda-Runtime-Aws-Request-Id", UUID(0, 0).toString())
             .header("Lambda-Runtime-Deadline-Ms", "1000")
             .header("Lambda-Runtime-Invoked-Function-Arn", "Arn")
             .header("Lambda-Runtime-Trace-Id", "Trace"),
@@ -25,7 +25,7 @@ class LambdaEnvironmentContextTest {
             "AWS_LAMBDA_FUNCTION_NAME" to "Name",
             "AWS_LAMBDA_FUNCTION_VERSION" to "Version",
             "AWS_LAMBDA_FUNCTION_MEMORY_SIZE" to "128"
-            ),
+        ),
         Clock.fixed(EPOCH, ZoneId.of("UTC"))
     )
 

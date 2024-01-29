@@ -27,14 +27,16 @@ class CreateFunction(private val functionPackage: FunctionPackage) : LambdaActio
             )
     }
 
-    private data class CreateFunction(@JsonProperty("Code") val code: Code,
-                                      @JsonProperty("FunctionName") val functionName: String,
-                                      @JsonProperty("Handler") val handler: String,
-                                      @JsonProperty("Role") val role: String,
-                                      @JsonProperty("Environment") val environment: Environment,
-                                      @JsonProperty("Timeout") val timeout: Int = 3,
-                                      @JsonProperty("Runtime") val runtime: String = "java8",
-                                      @JsonProperty("MemorySize") val memory: Int = 128)
+    private data class CreateFunction(
+        @JsonProperty("Code") val code: Code,
+        @JsonProperty("FunctionName") val functionName: String,
+        @JsonProperty("Handler") val handler: String,
+        @JsonProperty("Role") val role: String,
+        @JsonProperty("Environment") val environment: Environment,
+        @JsonProperty("Timeout") val timeout: Int = 3,
+        @JsonProperty("Runtime") val runtime: String = "java8",
+        @JsonProperty("MemorySize") val memory: Int = 128
+    )
 
     private data class Code(@JsonProperty("ZipFile") val zipFile: String)
     private data class Environment(@JsonProperty("Variables") val variables: Map<String, String>)
