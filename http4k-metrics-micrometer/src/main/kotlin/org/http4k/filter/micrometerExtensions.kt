@@ -11,22 +11,26 @@ import org.http4k.metrics.MetricsDefaults.Companion.server
 import java.time.Clock
 
 class MicrometerMetrics(private val defaults: MetricsDefaults) {
-    fun RequestTimer(meterRegistry: MeterRegistry,
-                     name: String = defaults.timerDescription.first,
-                     description: String = defaults.timerDescription.second,
-                     labeler: HttpTransactionLabeler = defaults.labeler,
-                     clock: Clock = Clock.systemUTC()): Filter =
+    fun RequestTimer(
+        meterRegistry: MeterRegistry,
+        name: String = defaults.timerDescription.first,
+        description: String = defaults.timerDescription.second,
+        labeler: HttpTransactionLabeler = defaults.labeler,
+        clock: Clock = Clock.systemUTC()
+    ): Filter =
         ReportHttpTransaction(clock) {
             labeler(it).labels.entries.fold(Timer.builder(name).publishPercentileHistogram().description(description)) { memo, next ->
                 memo.tag(next.key, next.value)
             }.register(meterRegistry).record(it.duration)
         }
 
-    fun RequestCounter(meterRegistry: MeterRegistry,
-                       name: String = defaults.counterDescription.first,
-                       description: String = defaults.counterDescription.second,
-                       labeler: HttpTransactionLabeler = defaults.labeler,
-                       clock: Clock = Clock.systemUTC()): Filter =
+    fun RequestCounter(
+        meterRegistry: MeterRegistry,
+        name: String = defaults.counterDescription.first,
+        description: String = defaults.counterDescription.second,
+        labeler: HttpTransactionLabeler = defaults.labeler,
+        clock: Clock = Clock.systemUTC()
+    ): Filter =
         ReportHttpTransaction(clock) {
             labeler(it).labels.entries.fold(Counter.builder(name).description(description)) { memo, next ->
                 memo.tag(next.key, next.value)

@@ -27,14 +27,14 @@ class OpenTelemetryMetrics(private val defaults: MetricsDefaults) {
         return ReportHttpTransaction(clock) { tx ->
             meterInstance
                 .record(
-                    tx.duration.toMillis().toDouble(), Attributes.builder()
-                        .apply {
-                            labeler(tx)
-                                .labels
-                                .forEach {
-                                    put(AttributeKey.stringKey(it.key), it.value)
-                                }
-                        }.build()
+                    tx.duration.toMillis().toDouble(),
+                    Attributes.builder().apply {
+                        labeler(tx)
+                            .labels
+                            .forEach {
+                                put(AttributeKey.stringKey(it.key), it.value)
+                            }
+                    }.build()
                 )
         }
     }
