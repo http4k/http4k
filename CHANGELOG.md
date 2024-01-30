@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.13.3.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-cloudnative*** : Ability to override separator in `Environment`.
+
 ### v5.13.2.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract*** : [Fix] Enums do not pick up custom prefixes in model naming. H/T @ashcor for the tip-off! 

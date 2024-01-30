@@ -73,9 +73,10 @@ interface Environment {
          */
         fun defaults(vararg fn: (Environment) -> Environment) = fn.fold(EMPTY) { acc, next -> next(acc) }
 
-        fun from(vararg pairs: Pair<String, String>): Environment = MapEnvironment.from(pairs.toMap().toProperties())
+        fun from(vararg pairs: Pair<String, String>, separator: String = ","): Environment =
+            MapEnvironment.from(pairs.toMap().toProperties(), separator)
 
-        fun from(env: Map<String, String>): Environment = MapEnvironment.from(env.toProperties())
+        fun from(env: Map<String, String>, separator: String = ","): Environment = MapEnvironment.from(env.toProperties(), separator)
     }
 }
 
@@ -92,8 +93,9 @@ class MapEnvironment private constructor(
     override fun keys() = contents.keys
 
     companion object {
-        fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(properties.entries
-            .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator
+        fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(
+            properties.entries
+                .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator
         )
 
         fun from(reader: Reader, separator: String = ","): Environment =
