@@ -16,6 +16,14 @@ class SwaggerUiConfigTest {
     }
 
     @Test
+    fun `serve config where property explicitly set to null`(approver: Approver) {
+        val handler = swaggerUiLite {
+            tryItOutEnabled = null
+        }
+        approver.assertApproved(handler(Request(Method.GET, "swagger-initializer.js")))
+    }
+
+    @Test
     fun `serve fully customized config`(approver: Approver) {
         val handler = swaggerUiLite {
             url = "foo"

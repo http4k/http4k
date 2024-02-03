@@ -10,16 +10,19 @@ internal class MapDelegate<T>(
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T = properties[name]?.value as T
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        if (value == null) {
+        val formatted = value?.let(format)
+        if (formatted == null) {
             properties.remove(name)
         } else {
-            properties[name] = UiProperty(value, format(value))
+            properties[name] = UiProperty(value, formatted)
         }
     }
 
     init {
-        if (default != null) properties[name] = UiProperty(default, format(default))
+        default?.let(format)?.let {
+            properties[name] = UiProperty(default, it)
+        }
     }
 }
 
-internal data class UiProperty<T>(val value: T, val formatted: String?)
+internal data class UiProperty<T>(val value: T, val formatted: String)
