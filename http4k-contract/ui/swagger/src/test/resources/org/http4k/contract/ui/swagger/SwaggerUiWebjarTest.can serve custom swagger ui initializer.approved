@@ -1,0 +1,11 @@
+window.onload = function() {
+    document.title = "Cat Shelter";
+    SwaggerUIBundle({
+        url: "spec",
+        dom_id: "#swagger-ui",
+        layout: "BaseLayout",
+        presets: [SwaggerUIBundle.presets.apis],
+        displayOperationId: true,
+        requestSnippetsEnabled: true
+    })
+}
