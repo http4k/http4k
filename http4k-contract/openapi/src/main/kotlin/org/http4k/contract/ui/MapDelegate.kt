@@ -22,4 +22,4 @@ internal class MapDelegate<T>(
     }
 }
 
-data class UiProperty<T>(val value: T, val formatted: String?)
+internal data class UiProperty<T>(val value: T, val formatted: String?)
