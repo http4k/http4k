@@ -50,6 +50,7 @@ fun SwaggerUiConfig.toFilter() = Filter { next ->
             resp.body(
                 resp.bodyString()
                     .replace("%%PAGE_TITLE%%", pageTitle)
+                    .replace("%%DOM_ID%%", domId)
                     .replace("%%PROPERTIES%%", properties)
             )
         }
