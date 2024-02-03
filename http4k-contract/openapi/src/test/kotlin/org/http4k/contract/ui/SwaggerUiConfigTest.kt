@@ -35,6 +35,8 @@ class SwaggerUiConfigTest {
 
             layout = "myLayout"
             presets += "customPreset"
+
+            additionalProperties += "foo" to "\"bar\""
         }
         approver.assertApproved(handler(Request(Method.GET, "swagger-initializer.js")))
     }

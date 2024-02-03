@@ -3,52 +3,54 @@ package org.http4k.contract.ui
 import org.http4k.core.Filter
 
 // See https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
-data class SwaggerUiConfig(
-    var pageTitle: String = "Swagger UI",
+class SwaggerUiConfig {
+
+    var pageTitle: String = "Swagger UI"
+    internal val properties = mutableMapOf<String, UiProperty<out Any>>()
 
     // core
-    var url: String = "https://petstore.swagger.io/v2/swagger.json",
-    var domId: String = "swagger-ui",
-    var queryConfigEnabled: Boolean? = null,
+    var url: String by MapDelegate(properties, "url", { "\"$it\"" }, default = "https://petstore.swagger.io/v2/swagger.json",)
+    var domId: String by MapDelegate(properties,"dom_id", { "\"#$it\"" }, default = "swagger-ui",)
+    var queryConfigEnabled: Boolean? by MapDelegate(properties,"queryConfigEnabled")
 
     // display
-    var displayOperationId: Boolean? = null,
-    var displayRequestDuration: Boolean? = null,
-    var requestSnippetsEnabled: Boolean? = null,
-    var tryItOutEnabled: Boolean? = null,
-    var deepLinking: Boolean? = null,
+    var displayOperationId: Boolean? by MapDelegate(properties, "displayOperationId")
+
+    var displayRequestDuration: Boolean? by MapDelegate(properties, "displayRequestDuration")
+    var requestSnippetsEnabled: Boolean? by MapDelegate(properties, "requestSnippetsEnabled")
+    var tryItOutEnabled: Boolean? by MapDelegate(properties, "tryItOutEnabled")
+    var deepLinking: Boolean? by MapDelegate(properties, "deepLinking")
 
     // Network
-    var oauth2RedirectUrl: String? = null,
-    var withCredentials: Boolean? = null,
+    var oauth2RedirectUrl: String? by MapDelegate(properties, "oauth2RedirectUrl")
+    var withCredentials: Boolean? by MapDelegate(properties, "withCredentials")
 
     // Authorization
-    var persistAuthorization: Boolean? = null,
+    var persistAuthorization: Boolean? by MapDelegate(properties, "persistAuthorization")
 
     // plugins
-    var layout: String = "BaseLayout",
-    var presets: List<String> = listOf("SwaggerUIBundle.presets.apis")
-)
+    var layout: String by MapDelegate(properties, "layout", { "\"$it\"" }, default = "BaseLayout")
+    var presets: List<String> by MapDelegate(
+        properties = properties,
+        name = "presets",
+        format = { "[" + it.joinToString(",") + "]" },
+        default = listOf("SwaggerUIBundle.presets.apis")
+    )
+
+    val additionalProperties = mutableMapOf<String, String>()
+}
 
 fun SwaggerUiConfig.toFilter() = Filter { next ->
     { req ->
         next(req).let { resp ->
+            val properties = (properties.mapValues { it.value.formatted } + additionalProperties)
+                .entries
+                .joinToString(",\n        ") { (key, value) -> "$key: $value" }
+
             resp.body(
                 resp.bodyString()
-                    .replace("%%DESCRIPTION_ROUTE%%", url)
                     .replace("%%PAGE_TITLE%%", pageTitle)
-                    .replace("%%DISPLAY_OPERATION_ID%%", displayOperationId.toString())
-                    .replace("%%DISPLAY_REQUEST_DURATION%%", displayRequestDuration.toString())
-                    .replace("%%REQUEST_SNIPPETS_ENABLED%%", requestSnippetsEnabled.toString())
-                    .replace("%%PERSIST_AUTHORIZATION%%", persistAuthorization.toString())
-                    .replace("%%QUERY_CONFIG_ENABLED%%", queryConfigEnabled.toString())
-                    .replace("%%TRY_IT_OUT_ENABLED%%", tryItOutEnabled.toString())
-                    .replace("%%DEEP_LINKING%%", deepLinking.toString())
-                    .replace("%%OAUTH2_REDIRECT_URL%%", oauth2RedirectUrl.toString())
-                    .replace("%%WITH_CREDENTIALS%%", withCredentials.toString())
-                    .replace("%%LAYOUT%%", layout)
-                    .replace("%%PRESETS%%", presets.joinToString(","))
-                    .replace("%%DOM_ID%%", domId)
+                    .replace("%%PROPERTIES%%", properties)
             )
         }
     }
