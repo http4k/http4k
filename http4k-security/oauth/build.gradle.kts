@@ -6,7 +6,7 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
     }
-    api("dev.forkhandles:result4k:_")
+    api("dev.forkhandles:result4k")
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation("commons-codec:commons-codec:_")

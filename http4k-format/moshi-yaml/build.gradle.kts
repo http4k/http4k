@@ -6,7 +6,7 @@ dependencies {
     api("org.yaml:snakeyaml:_")
 
     testImplementation(project(":http4k-core"))
-    testImplementation("dev.forkhandles:values4k:_")
+    testImplementation("dev.forkhandles:values4k")
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))
 }

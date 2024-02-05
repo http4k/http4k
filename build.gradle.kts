@@ -222,7 +222,7 @@ dependencies {
     testImplementation("se.ansman.kotshi:api:_")
     kspTest("se.ansman.kotshi:compiler:_")
 
-    testImplementation("software.amazon.awssdk:s3:_") {
+    testImplementation("software.amazon.awssdk:s3") {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
         exclude(group = "software.amazon.awssdk", module = "apache-client")
     }

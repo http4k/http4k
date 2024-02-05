@@ -6,12 +6,12 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-contract-jsonschema"))
 
-    implementation("dev.forkhandles:values4k:_")
+    implementation("dev.forkhandles:values4k")
     implementation(project(":http4k-security-oauth"))
     implementation(project(":http4k-format-jackson"))
     implementation(project(":http4k-multipart"))
 
-    testImplementation("dev.forkhandles:values4k:_")
+    testImplementation("dev.forkhandles:values4k")
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-format-argo"))
     testImplementation(project(":http4k-testing-approval"))

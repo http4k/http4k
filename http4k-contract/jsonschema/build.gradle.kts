@@ -4,7 +4,7 @@ dependencies {
     api(project(":http4k-format-core"))
 
     implementation(project(":http4k-format-jackson"))
-    implementation("dev.forkhandles:values4k:_")
+    implementation("dev.forkhandles:values4k")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     testImplementation(project(":http4k-core"))
