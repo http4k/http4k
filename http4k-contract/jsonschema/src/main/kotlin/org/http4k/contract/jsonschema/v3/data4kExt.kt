@@ -1,7 +1,7 @@
 package org.http4k.contract.jsonschema.v3
 
 import dev.forkhandles.data.DataContainer
-import dev.forkhandles.data.MetaDatum
+import dev.forkhandles.data.Metadatum
 
 /**
  * Values of the json schema metadata
@@ -26,7 +26,7 @@ sealed interface Data4kJsonSchemaMeta {
     data object maxProperties : Data4kJsonSchemaMeta
     data object minProperties : Data4kJsonSchemaMeta
 
-    class Datum<T>(val name: String, val value: T) : MetaDatum
+    class Datum<T>(val name: String, val value: T) : Metadatum
 
     infix fun of(t: Any) = Datum(this::class.simpleName ?: "error", t)
 }
@@ -34,7 +34,7 @@ sealed interface Data4kJsonSchemaMeta {
 object Data4kFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
     override fun invoke(target: Any, fieldName: String) = FieldMetadata(
         when (target) {
-            is DataContainer<*> -> target.propertyMetaData()
+            is DataContainer<*> -> target.propertyMetadata()
                 .firstOrNull { it.name == fieldName }
                 ?.let {
                     it.data.filterIsInstance<Data4kJsonSchemaMeta.Datum<*>>()
