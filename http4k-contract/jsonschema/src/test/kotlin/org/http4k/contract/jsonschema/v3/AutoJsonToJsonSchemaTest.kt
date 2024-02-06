@@ -11,10 +11,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import dev.forkhandles.data.MapDataContainer
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
 import org.http4k.contract.jsonschema.v3.Foo.value1
 import org.http4k.contract.jsonschema.v3.Foo.value2
+import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.default
+import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.exclusiveMinimum
+import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.format
+import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.maxLength
 import org.http4k.contract.jsonschema.v3.SchemaModelNamer.Companion.Canonical
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
@@ -63,6 +68,11 @@ data class ArbObject(
     val anyList: List<Any> = listOf("123", ArbObject2(), true, listOf(ArbObject2())),
     val enumVal: Foo? = value2
 ) : Generic
+
+class Data4kContainer : MapDataContainer() {
+    var anInt by required(MyInt, format of "foobar", default of 123)
+    var anString by required<String>(maxLength of 12, exclusiveMinimum of true)
+}
 
 data class ArbObjectWithInnerClasses(
     val inner: Inner = Inner(),
@@ -135,7 +145,11 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `can provide custom prefix for inner classes`(approver: Approver) {
-        approver.assertApproved(ArbObjectWithInnerClasses(), prefix = "prefix", creator = autoJsonToJsonSchema(json, Canonical))
+        approver.assertApproved(
+            ArbObjectWithInnerClasses(),
+            prefix = "prefix",
+            creator = autoJsonToJsonSchema(json, Canonical)
+        )
     }
 
     @Test
@@ -375,6 +389,30 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(SealedChild)
     }
 
+    @Test
+    fun `renders schema for data4k container and metadata`(approver: Approver) {
+        val jackson = object : ConfigurableJackson(
+            KotlinModule.Builder().build()
+                .asConfigurable()
+                .withStandardMappings()
+                .value(MyInt)
+                .done()
+                .setSerializationInclusion(NON_NULL)
+        ) {}
+
+        approver.assertApproved(
+            Data4kContainer().apply {
+                anInt = MyInt.of(123)
+                anString = "helloworld"
+            },
+            creator = autoJsonToJsonSchema(
+                jackson, strategy = PrimitivesFieldMetadataRetrievalStrategy
+                    .then(Values4kFieldMetadataRetrievalStrategy)
+                    .then(Data4kFieldMetadataRetrievalStrategy)
+            )
+        )
+    }
+
     private fun Approver.assertApproved(
         obj: Any,
         name: String? = null,
@@ -390,16 +428,14 @@ class AutoJsonToJsonSchemaTest {
 
     private fun autoJsonToJsonSchema(
         jackson: ConfigurableJackson,
-        schemaModelNamer: SchemaModelNamer = SchemaModelNamer.Full
+        schemaModelNamer: SchemaModelNamer = SchemaModelNamer.Full,
+        strategy: FieldMetadataRetrievalStrategy = PrimitivesFieldMetadataRetrievalStrategy
+            .then(Values4kFieldMetadataRetrievalStrategy)
+            .then(JacksonFieldMetadataRetrievalStrategy)
     ) = AutoJsonToJsonSchema(
         jackson,
         FieldRetrieval.compose(
-            SimpleLookup(
-                metadataRetrievalStrategy =
-                PrimitivesFieldMetadataRetrievalStrategy
-                    .then(Values4kFieldMetadataRetrievalStrategy)
-                    .then(JacksonFieldMetadataRetrievalStrategy)
-            ),
+            SimpleLookup(metadataRetrievalStrategy = strategy),
             JacksonJsonPropertyAnnotated,
             JacksonJsonNamingAnnotated(Jackson)
         ),
