@@ -10,6 +10,6 @@ dependencies {
     api(project(":http4k-client-okhttp"))
     api(testFixtures(project(":http4k-core")))
     api(testFixtures(project(":http4k-serverless-core")))
-    testImplementation("dev.forkhandles:bunting4k")
+    testImplementation("dev.forkhandles:bunting4k:2.13.4.0")
     testImplementation(testFixtures(project(":http4k-core")))
 }

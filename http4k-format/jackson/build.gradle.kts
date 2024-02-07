@@ -8,8 +8,8 @@ dependencies {
     api("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.cloudevents:cloudevents-core:_")
     implementation("io.cloudevents:cloudevents-json-jackson:_")
-    implementation("dev.forkhandles:values4k")
-    implementation("dev.forkhandles:data4k")
+    implementation("dev.forkhandles:values4k:2.13.4.0")
+    implementation("dev.forkhandles:data4k:2.13.4.0")
 
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-contract"))
