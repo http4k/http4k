@@ -43,6 +43,7 @@ object Java8HttpClient {
                 request.headers.forEach {
                     addRequestProperty(it.first, it.second)
                 }
+                request.header("content-length")?.toLongOrNull()?.let { setFixedLengthStreamingMode(it) }
                 request.body.apply {
                     if (this != Body.EMPTY) {
                         val content = if (stream.available() == 0) payload.array().inputStream() else stream

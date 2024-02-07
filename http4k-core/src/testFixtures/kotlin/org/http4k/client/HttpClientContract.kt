@@ -282,6 +282,20 @@ abstract class HttpClientContract(
     }
 
     @Test
+    open fun `supports zero content-length`() {
+        val response = client(Request(PUT, "http://localhost:$port/headerValues").header("content-length", "0"))
+        assertThat(response.bodyString().lowercase(), containsSubstring("content-length=0"))
+    }
+
+    @Test
+    open fun `supports explicit content-length`() {
+        val response = client(Request(PUT, "http://localhost:$port/headerValues")
+            .header("content-length", "3")
+            .body("foo"))
+        assertThat(response.bodyString().lowercase(), containsSubstring("content-length=3"))
+    }
+
+    @Test
     @Disabled
     fun `sanitises uri`() {
         val response = client(Request(GET, "http://localhost:$port/encoded-uri/foo, bar & baz!"))
