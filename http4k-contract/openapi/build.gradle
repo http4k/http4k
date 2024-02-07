@@ -6,12 +6,12 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-contract-jsonschema"))
 
-    implementation("dev.forkhandles:values4k")
+    implementation("dev.forkhandles:values4k:_")
     implementation(project(":http4k-security-oauth"))
     implementation(project(":http4k-format-jackson"))
     implementation(project(":http4k-multipart"))
 
-    testImplementation("dev.forkhandles:values4k")
+    testImplementation("dev.forkhandles:values4k:_")
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-format-argo"))
     testImplementation(project(":http4k-testing-approval"))
@@ -19,7 +19,7 @@ dependencies {
     testImplementation(testFixtures(project(":http4k-security-oauth")))
 }
 
-task generateOpenApi3AutoClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+tasks.register('generateOpenApi3AutoClient', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
     generatorName = "kotlin"
     outputDir = "."
     validateSpec = false
@@ -27,7 +27,7 @@ task generateOpenApi3AutoClient(type: org.openapitools.generator.gradle.plugin.t
     inputs.file(inputSpec)
 }
 
-task generateOpenApi3Client(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+tasks.register('generateOpenApi3Client', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
     generatorName = "kotlin"
     outputDir = "."
     validateSpec = false
@@ -36,7 +36,7 @@ task generateOpenApi3Client(type: org.openapitools.generator.gradle.plugin.tasks
     mustRunAfter(generateOpenApi3AutoClient)
 }
 
-task generateOpenApi2Client(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+tasks.register('generateOpenApi2Client', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
     generatorName = "kotlin"
     outputDir = "."
     validateSpec = false

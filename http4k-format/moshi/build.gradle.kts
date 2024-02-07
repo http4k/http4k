@@ -5,7 +5,7 @@ dependencies {
     api(project(":http4k-realtime-core"))
     api(Square.moshi)
     api(Square.moshi.kotlinReflect)
-    implementation("dev.forkhandles:values4k:2.13.4.0")
+    implementation("dev.forkhandles:values4k:_")
 
     testImplementation(project(":http4k-core"))
     testImplementation(Square.moshi)
