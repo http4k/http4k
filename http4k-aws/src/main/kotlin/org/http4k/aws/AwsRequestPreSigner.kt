@@ -23,7 +23,7 @@ fun AwsRequestPreSigner(
     val credentials = credentialsProvider()
 
     val fullRequest = request
-        .replaceHeader("Host", request.uri.host)
+        .replaceHeader("Host", request.uri.hostAndPort)
         .let { it.query("X-Amz-SignedHeaders", it.signedHeaders()) }
         .query("X-Amz-Algorithm", "AWS4-HMAC-SHA256")
         .query("X-Amz-Date", awsDate.full)
