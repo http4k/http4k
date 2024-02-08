@@ -4,11 +4,11 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.13.5.0
-- **http4k-client-core*** : Ensure consistent content-length behaviour across clients
-- **http4k-client-apache*** : Ensure consistent content-length behaviour across clients
-- **http4k-client-apache4*** : Ensure consistent content-length behaviour across clients
-- **http4k-client-fuel*** : Ensure consistent content-length behaviour across clients
-- **http4k-client-jetty*** : Ensure consistent content-length behaviour across clients
+- **http4k-client-core** : Ensure consistent content-length behaviour across clients
+- **http4k-client-apache** : Ensure consistent content-length behaviour across clients
+- **http4k-client-apache4** : Ensure consistent content-length behaviour across clients
+- **http4k-client-fuel** : Ensure consistent content-length behaviour across clients
+- **http4k-client-jetty** : Ensure consistent content-length behaviour across clients
 
 ### v5.13.4.1
 - **http4k-*** : Fix broken POM dependencies.
