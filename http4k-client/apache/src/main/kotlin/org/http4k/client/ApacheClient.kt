@@ -104,7 +104,7 @@ object ApacheClient {
 private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpUriRequestBase(request.method.toString(), URI(request.uri.toString())) {
     init {
         entity = when (requestBodyMode) {
-            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1, null)
+            Stream -> InputStreamEntity(request.body.stream, request.body.length ?: request.header("content-length")?.toLong() ?: -1, null)
             Memory -> ByteArrayEntity(request.body.payload.array(), null)
         }
     }

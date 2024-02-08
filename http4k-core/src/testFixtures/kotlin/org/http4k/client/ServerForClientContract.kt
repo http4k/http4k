@@ -59,6 +59,9 @@ object ServerForClientContract : HttpHandler {
             POST to { request: Request -> Response(OK).body(request.bodyString()) }
         ),
         "/headers" bind { request: Request -> Response(OK).body(request.headers.joinToString(",") { it.first }) },
+        "/headerValues" bind { request: Request ->
+            Response(OK).body(request.headers.joinToString(",") { "${it.first}=${it.second}" })
+        },
         "/hostheaders" bind { request: Request -> Response(OK).body(request.headerValues("host").joinToString(",")) },
         "/check-image" bind POST to { request: Request ->
             if (testImageBytes().contentEquals(request.body.payload.array()))

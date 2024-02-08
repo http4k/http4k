@@ -24,6 +24,7 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
+import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
@@ -279,6 +280,33 @@ abstract class HttpClientContract(
         val response = client(Request(GET, "http://localhost:$port/echo").query("p1", "foo").query("p1", "bar"))
         val uriFromResponse = Uri.of(response.bodyString())
         assertThat(uriFromResponse.queries(), equalTo(listOf("p1" to "foo", "p1" to "bar")))
+    }
+
+    @Test
+    open fun `supports zero content-length`() {
+        val response = client(Request(PUT, "http://localhost:$port/headerValues").header("content-length", "0"))
+        assertThat(response.bodyString().lowercase(), containsSubstring("content-length=0"))
+    }
+
+    @Test
+    open fun `supports explicit content-length`() {
+        val response = client(Request(PUT, "http://localhost:$port/headerValues")
+            .header("content-length", "3")
+            .body("foo"))
+        assertThat(response.bodyString().lowercase(), containsSubstring("content-length=3"))
+    }
+
+    @Test
+    open fun `supports content-length set in body`() {
+        val response = client(Request(PUT, "http://localhost:$port/headerValues")
+            .body(StreamBody("foo".byteInputStream(), 3)))
+        assertThat(response.bodyString().lowercase(), containsSubstring("content-length=3"))
+    }
+
+    @Test
+    open fun `includes content-length for regular requests`() {
+        val response = client(Request(PUT, "http://localhost:$port/headerValues").body("foo"))
+        assertThat(response.bodyString().lowercase(), containsSubstring("content-length=3"))
     }
 
     @Test
