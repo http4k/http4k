@@ -218,6 +218,8 @@ dependencies {
             testImplementation(testFixtures(project(it.name)))
         }
 
+    testImplementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.32.0-alpha")
+
     testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
     testImplementation("se.ansman.kotshi:api:_")
     kspTest("se.ansman.kotshi:compiler:_")
