@@ -182,7 +182,10 @@ object ClientFilters {
             val redirect = ensureValidMethodForRedirect().uri(newUri)
 
             return when {
-                header("host") != null && newUri.host.isNotEmpty() -> redirect.replaceHeader("host", newUri.host)
+                header("host") != null && newUri.host.isNotEmpty() ->
+                    redirect.replaceHeader("host",
+                    "${newUri.host}${newUri.port?.let { port -> ":$port" } ?: ""}")
+
                 else -> redirect
             }
         }
