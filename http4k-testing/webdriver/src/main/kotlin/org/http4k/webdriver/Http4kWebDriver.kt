@@ -67,16 +67,40 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         Regex("http[s]?://.*").matches(path) -> path
         else -> {
             val newPath = when {
-                path.startsWith("/") -> Paths.get(path)
+                path.startsWith("/") -> path
                 else -> {
                     val currentPath = currentUrl?.let {
                         Uri.of(it).path.let { it.ifEmpty { "/" } }
                     } ?: "/"
-                    Paths.get(currentPath, path)
+                    currentPath.appendToPath(path)
                 }
             }
-            newPath.normalize().toString()
+            newPath.normalizePath()
         }
+    }
+
+    private fun String.appendToPath(pathToAppend: String): String {
+        val newPath = StringBuilder(this)
+        if (!this.endsWith("/") && !pathToAppend.startsWith("/")) newPath.append("/")
+        newPath.append(pathToAppend)
+        return newPath.toString()
+    }
+
+    private fun String.normalizePath(): String {
+        if (this == "/") return this
+        val pathParts = this.split("/").filter { part -> part != "." }
+        val newPathParts = mutableListOf<String>()
+        pathParts.forEachIndexed { index, part ->
+            if ((index < pathParts.lastIndex && pathParts[index + 1] != "..") || index == pathParts.lastIndex)
+                if (part != "..") newPathParts.add(part)
+        }
+        var normalizedPath = newPathParts.joinToString(separator = "/")
+        if (!normalizedPath.startsWith("/")) normalizedPath = "/$normalizedPath"
+        if (normalizedPath != "/" && normalizedPath.endsWith("/"))
+            normalizedPath = normalizedPath.removeRange(
+                IntRange(normalizedPath.lastIndex, normalizedPath.lastIndex)
+            )
+        return normalizedPath
     }
 
     private fun HCookie.toWebDriver(): Cookie = Cookie(
