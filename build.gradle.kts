@@ -218,7 +218,6 @@ dependencies {
             testImplementation(testFixtures(project(it.name)))
         }
 
-    testImplementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.32.0-alpha")
 
     testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
     testImplementation("se.ansman.kotshi:api:_")
@@ -228,6 +227,8 @@ dependencies {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
         exclude(group = "software.amazon.awssdk", module = "apache-client")
     }
+
+    testImplementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:_")
     testImplementation("com.expediagroup:graphql-kotlin-schema-generator:_")
     testImplementation("com.amazonaws:aws-lambda-java-events:_")
 }
