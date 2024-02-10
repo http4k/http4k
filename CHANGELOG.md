@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.13.5.1
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-serverless-lambda** :[Fix  #1057] Error when parsing AWS lambda event from S3 bucket
+
 ### v5.13.5.0
 - **http4k-client-core** : Ensure consistent content-length behaviour across clients
 - **http4k-client-apache** : Ensure consistent content-length behaviour across clients
