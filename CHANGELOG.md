@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.13.5.1
+### v5.13.6.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-serverless-lambda** :[Fix  #1057] Error when parsing AWS lambda event from S3 bucket
+- **http4k-testing-webdriver** :[Fix  #1050]  Http4kWebDriver does not work on Windows due to path issues. H/T @cmh-dev
 
 ### v5.13.5.0
 - **http4k-client-core** : Ensure consistent content-length behaviour across clients
