@@ -7,7 +7,7 @@ Example showing how to create and apply lenses to requests and responses to both
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.13.6.0"))
+    implementation(platform("org.http4k:http4k-bom:5.13.6.1"))
     implementation("org.http4k:http4k-core")
 }
 ```
