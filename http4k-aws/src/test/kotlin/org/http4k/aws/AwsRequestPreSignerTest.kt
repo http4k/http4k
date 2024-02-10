@@ -23,7 +23,7 @@ class AwsRequestPreSignerTest {
             credentialsProvider = { AwsCredentials("AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY") },
             clock = Clock.fixed(time, ZoneOffset.UTC)
         )
-        val request = Request(Method.GET, "https://examplebucket.s3.amazonaws.com/test.txt")
+        val request = Request(Method.GET, "https://examplebucket.s3.amazonaws.com:443/test.txt")
         val signed = signer(request, Duration.ofHours(24))
         val signedRequest = request.uri(signed.uri)
 
@@ -35,10 +35,10 @@ class AwsRequestPreSignerTest {
         assertThat(signedRequest, hasQuery("X-Amz-Date", equalTo("20130524T000000Z")))
         assertThat(signedRequest, hasQuery("X-Amz-Expires", equalTo("86400")))
         assertThat(signedRequest, hasQuery("X-Amz-SignedHeaders", equalTo("host")))
-        assertThat(signedRequest, hasQuery("X-Amz-Signature", equalTo("aeeed9bbccd4d02ee5c0109b86d86835f995330da4c265957d157751f604d404")))
+        assertThat(signedRequest, hasQuery("X-Amz-Signature", equalTo("bc2c848cc8a13f5c872c5746f62d22aa133562cbf22502591ceb422525a06483")))
 
         assertThat(signed.signedHeaders, equalTo(listOf(
-            "Host" to "examplebucket.s3.amazonaws.com"
+            "Host" to "examplebucket.s3.amazonaws.com:443"
         )))
         assertThat(signed.expires, equalTo(time + Duration.ofHours(24)))
     }

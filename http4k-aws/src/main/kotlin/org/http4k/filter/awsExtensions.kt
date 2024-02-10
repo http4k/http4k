@@ -46,7 +46,7 @@ fun ClientFilters.AwsAuth(
             val date = AwsRequestDate.of(clock.instant())
 
             val fullRequest = it
-                .replaceHeader("host", it.uri.host)
+                .replaceHeader("host", "${it.uri.host}${it.uri.port?.let { port -> ":$port" } ?: ""}")
                 .replaceHeader("x-amz-content-sha256", payload.hash)
                 .replaceHeader("x-amz-date", date.full).let {
                     if (it.method.allowsContent) {
