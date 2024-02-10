@@ -177,7 +177,7 @@ private fun JsonReader.requestParameters() =
     }
 
 private fun JsonReader.responseElements() =
-    obj({ it -> ResponseElementsEntity(it["xAmzId2"] as? String, it["xAmzRequestId"] as? String) }) {
+    obj({ it -> ResponseElementsEntity(it["x-amz-id-2"] as? String, it["x-amz-request-id"] as? String) }) {
         when (it) {
             "x-amz-id-2" -> nextString()
             "x-amz-request-id" -> nextString()
