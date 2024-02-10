@@ -7,7 +7,6 @@ dependencies {
     api("io.opentelemetry:opentelemetry-sdk-metrics")
     api("io.opentelemetry.semconv:opentelemetry-semconv:_")
     testFixturesApi("io.opentelemetry:opentelemetry-extension-trace-propagators")
-    testFixturesApi("io.opentelemetry:opentelemetry-extension-aws")
     testFixturesApi("io.opentelemetry:opentelemetry-sdk-testing")
 
     testImplementation(testFixtures(project(":http4k-core")))
