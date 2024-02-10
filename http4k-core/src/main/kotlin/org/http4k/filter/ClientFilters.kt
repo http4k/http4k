@@ -66,7 +66,7 @@ object ClientFilters {
     fun SetHostFrom(uri: Uri): Filter = Filter { next ->
         {
             next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))
-                .replaceHeader("Host", uri.hostAndPort))
+                .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}"))
         }
     }
 
@@ -182,7 +182,7 @@ object ClientFilters {
             val redirect = ensureValidMethodForRedirect().uri(newUri)
 
             return when {
-                header("host") != null && newUri.host.isNotEmpty() -> redirect.replaceHeader("host", newUri.hostAndPort)
+                header("host") != null && newUri.host.isNotEmpty() -> redirect.replaceHeader("host", newUri.host)
                 else -> redirect
             }
         }

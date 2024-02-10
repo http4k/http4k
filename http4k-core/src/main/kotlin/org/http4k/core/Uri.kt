@@ -30,14 +30,10 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
         }
     }
 
-    val hostAndPort = StringBuilder()
-        .appendIfNotBlank(host, host)
-        .appendIfPresent(port, ":", port.toString())
-        .toString()
-
     val authority = StringBuilder()
         .appendIfNotBlank(userInfo, userInfo, "@")
-        .append(hostAndPort)
+        .appendIfNotBlank(host, host)
+        .appendIfPresent(port, ":", port.toString())
         .toString()
 
     fun scheme(scheme: String) = copy(scheme = scheme)

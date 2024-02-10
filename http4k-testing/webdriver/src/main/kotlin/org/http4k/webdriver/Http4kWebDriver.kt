@@ -49,7 +49,7 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
 
     private fun navigateTo(request: Request) {
         val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
-        val host = request.uri.hostAndPort
+        val host = request.uri.host + (request.uri.port?.let { ":$it" } ?: "")
         if (host.isNotEmpty()) latestHost = host
         val response = handler(normalizedPath)
         current = Page(
