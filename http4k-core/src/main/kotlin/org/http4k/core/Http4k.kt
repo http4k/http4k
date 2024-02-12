@@ -14,4 +14,4 @@ fun Filter.then(next: Filter): Filter = Filter { this(next(it)) }
 
 fun Filter.then(next: HttpHandler): HttpHandler = this(next).let { http -> { http(it) } }
 
-fun Filter.then(routingHttpHandler: RoutingHttpHandler): RoutingHttpHandler = routingHttpHandler.withFilter(this)
+fun Filter.then(next: RoutingHttpHandler): RoutingHttpHandler = next.withFilter(this)
