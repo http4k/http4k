@@ -8,10 +8,10 @@ fun interface Filter : (HttpHandler) -> HttpHandler {
     companion object
 }
 
-val Filter.Companion.NoOp: Filter get() = Filter { next -> { next(it) } }
+val Filter.Companion.NoOp: Filter get() = Filter { it }
 
 fun Filter.then(next: Filter): Filter = Filter { this(next(it)) }
 
-fun Filter.then(next: HttpHandler): HttpHandler = this(next).let { http -> { http(it) } }
+fun Filter.then(next: HttpHandler): HttpHandler = this(next)
 
 fun Filter.then(routingHttpHandler: RoutingHttpHandler): RoutingHttpHandler = routingHttpHandler.withFilter(this)
