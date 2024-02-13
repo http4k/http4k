@@ -1,10 +1,12 @@
+import com.microsoft.azure.gradle.configuration.GradleRuntimeConfig
+
 plugins {
-    id "com.microsoft.azure.azurefunctions"
+    id("com.microsoft.azure.azurefunctions")
 }
 
 description = "Testing against a functions deployed to Azure Functions"
 
-apply plugin: "com.microsoft.azure.azurefunctions"
+apply(plugin = "com.microsoft.azure.azurefunctions")
 
 dependencies {
     api(project(":http4k-serverless-azure"))
@@ -18,9 +20,11 @@ azurefunctions {
     appName = "http4k-test-function" // this global to Azure and needs to be changed if you"re using your own account
     pricingTier = "Consumption"
     region = "westus"
-    runtime {
-        os = "windows"
-        javaVersion = "8"
+    runtime = object : GradleRuntimeConfig() {
+        init {
+            os("windows")
+            javaVersion("8")
+        }
     }
     localDebug = "transport=dt_socket,server=y,suspend=n,address=5005"
 }
