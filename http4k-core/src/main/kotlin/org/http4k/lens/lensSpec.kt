@@ -57,7 +57,7 @@ interface LensBuilder<IN : Any, OUT> {
     /**
      * Make a concrete Lens for this spec that falls back to another lens if no value is found in the target.
      */
-    fun defaulted(name: String, default: Lens<IN, OUT>, description: String? = null): Lens<IN, OUT>
+    fun defaulted(name: String, default: LensExtractor<IN, OUT>, description: String? = null): Lens<IN, OUT>
 }
 
 /**
@@ -77,7 +77,7 @@ open class LensSpec<IN : Any, OUT>(
     override fun defaulted(name: String, default: OUT, description: String?): Lens<IN, OUT> =
         defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
-    override fun defaulted(name: String, default: Lens<IN, OUT>, description: String?): Lens<IN, OUT> {
+    override fun defaulted(name: String, default: LensExtractor<IN, OUT>, description: String?): Lens<IN, OUT> {
         val getLens = get(name)
         return Lens(
             Meta(
@@ -117,7 +117,7 @@ open class LensSpec<IN : Any, OUT>(
                 description
             )
 
-        override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): Lens<IN, List<OUT>> {
+        override fun defaulted(name: String, default: LensExtractor<IN, List<OUT>>, description: String?): Lens<IN, List<OUT>> {
             val getLens = get(name)
             return Lens(
                 Meta(
@@ -173,7 +173,7 @@ interface BiDiLensBuilder<IN : Any, OUT> : LensBuilder<IN, OUT> {
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT?>
     override fun required(name: String, description: String?): BiDiLens<IN, OUT>
     override fun defaulted(name: String, default: OUT, description: String?): BiDiLens<IN, OUT>
-    override fun defaulted(name: String, default: Lens<IN, OUT>, description: String?): BiDiLens<IN, OUT>
+    override fun defaulted(name: String, default: LensExtractor<IN, OUT>, description: String?): BiDiLens<IN, OUT>
 }
 
 /**
@@ -198,7 +198,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
     override fun defaulted(name: String, default: OUT, description: String?) =
         defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
-    override fun defaulted(name: String, default: Lens<IN, OUT>, description: String?): BiDiLens<IN, OUT> {
+    override fun defaulted(name: String, default: LensExtractor<IN, OUT>, description: String?): BiDiLens<IN, OUT> {
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(Meta(false, location, paramMeta, name, description),
@@ -237,7 +237,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
 
         override fun defaulted(
             name: String,
-            default: Lens<IN, List<OUT>>,
+            default: LensExtractor<IN, List<OUT>>,
             description: String?
         ): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)

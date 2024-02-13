@@ -3,6 +3,7 @@ package org.http4k.cloudnative.env
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.Lens
+import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta
@@ -26,7 +27,7 @@ interface Environment {
 
     fun keys(): Set<String>
 
-    operator fun <T> get(key: Lens<Environment, T>): T
+    operator fun <T> get(key: LensExtractor<Environment, T>): T
 
     operator fun get(key: String): String?
 
@@ -84,7 +85,7 @@ class MapEnvironment private constructor(
     private val contents: Map<String, String>,
     override val separator: String = ","
 ) : Environment {
-    override operator fun <T> get(key: Lens<Environment, T>) = key(this)
+    override operator fun <T> get(key: LensExtractor<Environment, T>) = key(this)
     override operator fun get(key: String): String? = contents[key.convertFromKey()]
     override operator fun set(key: String, value: String) =
         MapEnvironment(contents + (key.convertFromKey() to value), separator)
