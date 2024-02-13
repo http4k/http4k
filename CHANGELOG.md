@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.13.7.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions
+- **http4k-contract** : Allow user to provide schema creation implementation. H/T @tamj0rd2
 - **http4k-core** : [Fix 1053]:  Add BiDiLensSpec defaulted with factory method
 
 ### v5.13.6.1
