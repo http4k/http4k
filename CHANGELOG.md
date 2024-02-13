@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.13.7.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-core** : [Fix 1053]:  Add BiDiLensSpec defaulted with factory method
+
 ### v5.13.6.1
 - **http4k-core** : FollowRedirects also sets port on redirect.
 

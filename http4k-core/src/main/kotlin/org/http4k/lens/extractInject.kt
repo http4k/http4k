@@ -27,7 +27,7 @@ interface LensInjector<in IN, in OUT> {
     fun <NEXT : OUT> restrictInto(): LensInjector<IN, NEXT> = this
 }
 
-interface LensExtractor<in IN, out OUT> : (IN) -> OUT {
+fun interface LensExtractor<in IN, out OUT> : (IN) -> OUT {
     /**
      * Lens operation to get the value from the target
      * @throws LensFailure if the value could not be retrieved from the target (missing/invalid etc)
