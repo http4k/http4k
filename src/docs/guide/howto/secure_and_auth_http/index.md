@@ -5,7 +5,7 @@ description: Recipes for how to secure and authenticate HTTP services
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.13.6.1"))
+    implementation(platform("org.http4k:http4k-bom:5.13.7.0"))
     implementation("org.http4k:http4k-core")
 
     // for OAuth examples
