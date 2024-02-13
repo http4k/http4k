@@ -2,6 +2,7 @@ package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.Tag
 import org.http4k.contract.jsonschema.JsonSchema
+import org.http4k.contract.jsonschema.JsonSchemaCreator
 import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
@@ -18,9 +19,11 @@ import org.http4k.format.Json
  *
  * If you are using Jackson, you probably want to use ApiRenderer.Auto()!
  */
-class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
-    private val refLocationPrefix = "components/schemas"
-    private val jsonToJsonSchema = JsonToJsonSchema(json, refLocationPrefix)
+class OpenApi3ApiRenderer<NODE : Any>(
+    private val json: Json<NODE>,
+    private val refLocationPrefix: String = "components/schemas",
+    private val jsonToJsonSchema: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json, refLocationPrefix),
+) : ApiRenderer<Api<NODE>, NODE> {
 
     override fun api(api: Api<NODE>): NODE =
         with(api) {
@@ -243,7 +246,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     private fun toEnumSchema(
         obj: Enum<*>,
         refModelNamePrefix: String?,
-        overrideDefinitionId: String?
+        overrideDefinitionId: String?,
     ): JsonSchema<NODE> {
         val newDefinition = json.obj(
             "example" to json.string(obj.name),
