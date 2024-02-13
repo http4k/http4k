@@ -25,11 +25,11 @@ If there are any message format library or templating engine bindings that you'd
 
 https://github.com/http4k/http4k
 
-Testing with default settings is required when push changes. Note that we currently build against Java 11 ([jEnv](https://www.jenv.be/) is good for managing multiple java versions):
+Testing with default settings is required when push changes. Note that we currently build against Java 21 ([jEnv](https://www.jenv.be/) is good for managing multiple java versions):
 
-`sh
+```shell
 ./gradlew check
-`
+```
 
 ## Credits
 
