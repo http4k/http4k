@@ -19,9 +19,6 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
@@ -56,7 +53,7 @@ class KondorJson(
             is JsonNodeArray -> JsonType.Array
             is JsonNodeBoolean -> JsonType.Boolean
             is JsonNodeNull -> JsonType.Null
-            is JsonNodeNumber -> if (value.num.scale() == 0) JsonType.Integer else JsonType.Number
+            is JsonNodeNumber -> if (value.num.toBigDecimal().scale() == 0) JsonType.Integer else JsonType.Number
             is JsonNodeObject -> JsonType.Object
             is JsonNodeString -> JsonType.String
         }
@@ -64,7 +61,11 @@ class KondorJson(
     override fun JsonNode.asPrettyJsonString(): String = this.render(prettyJsonStyle)
     override fun JsonNode.asCompactJsonString(): String = this.render(compactJsonStyle)
 
-    override fun String.asJsonObject() = parseJsonNode(this).orThrow()
+    override fun String.asJsonObject() = when (this) {
+        "" -> error("Empty string found") // this is a bug in the kondor parser
+        else -> parseJsonNode(this).orThrow()
+    }
+
     override fun String?.asJsonValue() = this?.let { JsonNodeString(it, NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
     override fun Int?.asJsonValue() =
         this?.let { JsonNodeNumber(it.toBigDecimal(), NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
@@ -109,12 +110,12 @@ class KondorJson(
     }
 
     override fun integer(value: JsonNode): Long = when (value) {
-        is JsonNodeNumber -> value.num.longValueExact()
+        is JsonNodeNumber -> value.num.toBigDecimal().longValueExact()
         else -> throw IllegalArgumentException("The node type '${value.nodeKind.desc}' is not a number")
     }
 
     override fun decimal(value: JsonNode): BigDecimal = when (value) {
-        is JsonNodeNumber -> value.num
+        is JsonNodeNumber -> value.num.toBigDecimal()
         else -> throw IllegalArgumentException("The node type '${value.nodeKind.desc}' is not a number")
     }
 
@@ -160,7 +161,7 @@ class KondorJson(
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = wsAutoBody(T::class)
 
-    // converter helpers
+// converter helpers
 
     private fun <T, JN : JsonNode> register(target: Class<T>, converter: JsonConverter<T, JN>) {
         converters[target] = converter

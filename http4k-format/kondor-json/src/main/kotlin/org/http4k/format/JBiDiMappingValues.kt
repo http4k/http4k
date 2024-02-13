@@ -1,9 +1,12 @@
 package org.http4k.format
 
+import com.ubertob.kondor.json.CharWriter
 import com.ubertob.kondor.json.JNumRepresentable
 import com.ubertob.kondor.json.JStringRepresentable
 import com.ubertob.kondor.json.JsonConverter
 import com.ubertob.kondor.json.JsonOutcome
+import com.ubertob.kondor.json.JsonStyle
+import com.ubertob.kondor.json.JsonStyle.Companion.appendBoolean
 import com.ubertob.kondor.json.jsonnode.BooleanNode
 import com.ubertob.kondor.json.jsonnode.JsonNodeBoolean
 import com.ubertob.kondor.json.jsonnode.NodeKind
@@ -18,12 +21,15 @@ fun <OUT> BiDiMapping<String, OUT>.asJConverter() = object : JStringRepresentabl
 }
 
 fun <IN : Number, OUT : Any> BiDiMapping<IN, OUT>.asJConverter(valueConverter: JNumRepresentable<IN>) = object : JNumRepresentable<OUT>() {
-    override val cons: (BigDecimal) -> OUT = { asOut(valueConverter.cons(it)) }
-    override val render: (OUT) -> BigDecimal = { valueConverter.render(asIn(it)) }
+    override val cons: (Number) -> OUT = { asOut(valueConverter.cons(it)) }
+    override val render: (OUT) -> BigDecimal = { valueConverter.render(asIn(it)).toBigDecimal() }
 }
 
 fun <OUT> BiDiMapping<Boolean, OUT>.asJConverter() = object : JsonConverter<OUT, JsonNodeBoolean> {
     override val _nodeType: NodeKind<JsonNodeBoolean> = BooleanNode
     override fun fromJsonNode(node: JsonNodeBoolean): JsonOutcome<OUT> = tryFromNode(node) { invoke(node.boolean) }
     override fun toJsonNode(value: OUT, path: NodePath): JsonNodeBoolean = JsonNodeBoolean(invoke(value), path)
+    override fun appendValue(app: CharWriter, style: JsonStyle, offset: Int, value: OUT): CharWriter = app.appendBoolean(asIn(value))
 }
+
+internal fun Number.toBigDecimal() = if (this is BigDecimal) this else toString().toBigDecimal()
