@@ -3,18 +3,19 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.13.7.0 (uncut)
+### v5.13.7.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract** : Allow user to provide schema creation implementation. H/T @tamj0rd2
-- **http4k-core** : [Fix 1053]:  Add BiDiLensSpec defaulted with factory method
+- **http4k-core** : [Fix #1053]:  Add BiDiLensSpec defaulted with factory method
+- **http4k-core** : [Fix #1059]:  Update kondor-json to 2.2.2. H/T @asadmanji
 
 ### v5.13.6.1
 - **http4k-core** : FollowRedirects also sets port on redirect.
 
 ### v5.13.6.0
 - **http4k-*** : Upgrade some dependency versions
-- **http4k-serverless-lambda** :[Fix  #1057] Error when parsing AWS lambda event from S3 bucket
-- **http4k-testing-webdriver** :[Fix  #1050]  Http4kWebDriver does not work on Windows due to path issues. H/T @cmh-dev
+- **http4k-serverless-lambda** :[Fix #1057] Error when parsing AWS lambda event from S3 bucket
+- **http4k-testing-webdriver** :[Fix #1050]  Http4kWebDriver does not work on Windows due to path issues. H/T @cmh-dev
 - **http4k-core** :[Fix #1055]  Host header should contain host with port. H/T @obecker
 
 ### v5.13.5.0
