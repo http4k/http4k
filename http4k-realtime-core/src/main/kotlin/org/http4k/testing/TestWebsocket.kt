@@ -3,6 +3,7 @@ package org.http4k.testing
 import org.http4k.core.Request
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.Websocket
+import org.http4k.websocket.SymmetricWsHandler
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse
@@ -34,3 +35,5 @@ class TestWebsocket(response: WsResponse) : PushPullAdaptingWebSocket() {
 }
 
 fun WsHandler.testWebsocket(request: Request): Websocket = TestWebsocket(invoke(request))
+
+fun WsHandler.toSymmetric(): SymmetricWsHandler = { TestWebsocket(invoke(it)) }
