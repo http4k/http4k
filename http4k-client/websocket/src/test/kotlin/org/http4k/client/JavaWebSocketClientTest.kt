@@ -29,9 +29,8 @@ class JavaWebSocketClientTest {
 
     @Test
     fun `open websocket through client`() {
-        client(Request(Method.GET, "/")).use {
-            it.send(WsMessage("hi"))
-        }
+        client(Request(Method.GET, "/"))
+            .send(WsMessage("hi"))
 
         assertThat(messages, equalTo(listOf("hi")))
     }

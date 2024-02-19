@@ -18,9 +18,8 @@ class SymmetricWsHandlerTest {
 
     @Test
     fun `open websocket directly from handler`() {
-        handler(Request(Method.GET, "/")).use {
-            it.send(WsMessage("hi"))
-        }
+        handler(Request(Method.GET, "/"))
+            .send(WsMessage("hi"))
 
         assertThat(messages, equalTo(listOf("hi")))
     }

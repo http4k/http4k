@@ -52,3 +52,11 @@ interface WsRouter {
 }
 ```
 Applies the route matching functionality when requests for WebSocket connections are received by the server.
+
+### SymmetricWsHandler
+```kotlin
+typealias SymmetricWsHandler = (Request) -> Websocket
+```
+
+Unifies a WebSocket client and server into a single interface.
+This can be injected into your application to make testing and swapping WebSocket clients easier.
