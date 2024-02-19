@@ -7,7 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
-import org.http4k.websocket.SymmetricWsFilters
+import org.http4k.websocket.SetHostFrom
+import org.http4k.websocket.SymmetricWsFilter
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.then
@@ -24,7 +25,7 @@ class JavaWebsocketClientTest {
 
     private val server = wsHandler.asServer(Jetty(0)).start()
 
-    private val client = SymmetricWsFilters.SetHostFrom(Uri.of("ws://localhost:${server.port()}"))
+    private val client = SymmetricWsFilter.SetHostFrom(Uri.of("ws://localhost:${server.port()}"))
         .then(JavaWebsocketClient())
 
     @Test

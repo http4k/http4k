@@ -10,7 +10,8 @@ import org.http4k.routing.path
 import org.http4k.routing.websockets
 import org.http4k.routing.ws.bind
 import org.http4k.testing.toSymmetric
-import org.http4k.websocket.SymmetricWsFilters
+import org.http4k.websocket.SetHostFrom
+import org.http4k.websocket.SymmetricWsFilter
 import org.http4k.websocket.SymmetricWsHandler
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse
@@ -40,7 +41,7 @@ fun main() {
     val host = Uri.of(System.getenv("GREETER_HOST"))
 
     // the JavaWebSocketClient is a SymmetricWsHandler
-    val wsHandler: SymmetricWsHandler = SymmetricWsFilters.SetHostFrom(host)
+    val wsHandler: SymmetricWsHandler = SymmetricWsFilter.SetHostFrom(host)
         .then(JavaWebsocketClient())
 
     // The SymmetricWsHandler can be injected directly into the GreetingClient under test
