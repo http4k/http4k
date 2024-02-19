@@ -10,9 +10,10 @@ import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class JavaWebSocketClient(
+class JavaWebsocketClient(
     private val draft: Draft = Draft_6455(),
-    private val timeout: Duration? = null
+    private val timeout: Duration? = null,
+    private val errorHandler: (Request, Throwable) -> Unit = { _, e -> throw e }
 ): SymmetricWsHandler {
 
     override fun invoke(request: Request): Websocket {
@@ -24,7 +25,7 @@ class JavaWebSocketClient(
                 websocket = it
                 waitForWs.countDown()
             },
-            onError = { throw it }
+            onError = { errorHandler(request, it) }
         )
 
         if (timeout == null) {

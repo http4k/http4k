@@ -13,7 +13,7 @@ import org.http4k.websocket.WsResponse
 import org.http4k.websocket.then
 import org.junit.jupiter.api.Test
 
-class JavaWebSocketClientTest {
+class JavaWebsocketClientTest {
 
     private val messages = mutableListOf<String>()
     private val wsHandler = { _: Request ->
@@ -25,7 +25,7 @@ class JavaWebSocketClientTest {
     private val server = wsHandler.asServer(Jetty(0)).start()
 
     private val client = SymmetricWsFilters.SetHostFrom(Uri.of("ws://localhost:${server.port()}"))
-        .then(JavaWebSocketClient())
+        .then(JavaWebsocketClient())
 
     @Test
     fun `open websocket through client`() {
