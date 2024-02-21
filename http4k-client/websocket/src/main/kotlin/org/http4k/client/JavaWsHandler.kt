@@ -10,7 +10,7 @@ import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class JavaWebsocketClient(
+class JavaWsHandler(
     private val draft: Draft = Draft_6455(),
     private val timeout: Duration? = null,
     private val errorHandler: (Request, Throwable) -> Unit = { _, e -> throw e }
