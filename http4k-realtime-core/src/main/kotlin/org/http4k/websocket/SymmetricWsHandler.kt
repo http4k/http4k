@@ -12,7 +12,7 @@ fun interface SymmetricWsFilter : (SymmetricWsHandler) -> SymmetricWsHandler {
 fun SymmetricWsFilter.then(next: SymmetricWsFilter): SymmetricWsFilter = SymmetricWsFilter { this(next(it)) }
 fun SymmetricWsFilter.then(next: SymmetricWsHandler): SymmetricWsHandler = { this(next)(it) }
 
-val SymmetricWsFilter.Companion.NoOp: SymmetricWsFilter get() = SymmetricWsFilter { next -> { next(it) } }
+val SymmetricWsFilter.Companion.NoOp: SymmetricWsFilter get() = SymmetricWsFilter { it }
 fun SymmetricWsFilter.Companion.SetHostFrom(uri: Uri): SymmetricWsFilter = SymmetricWsFilter { next ->
     {
         next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))
