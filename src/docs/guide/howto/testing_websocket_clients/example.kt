@@ -61,7 +61,7 @@ class GreetingClientTest {
     )
 
     @Test
-    fun foo() {
+    fun `get greeting`() {
         // convert the server to a SymmetricWsHandler to inject it into GreetingClient
         val client = GreetingClient(server.toSymmetric())
 
