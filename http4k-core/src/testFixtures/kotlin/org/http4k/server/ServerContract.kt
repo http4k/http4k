@@ -60,7 +60,7 @@ abstract class ServerContract(
             "/echo" bind POST to { Response(OK).body(it.bodyString()) },
             "/request-headers" bind GET to { request: Request ->
                 Response(OK).body(
-                    request.headerValues("foo").joinToString(", ")
+                    request.headerValues("foo").joinToString("\n") { "foo: $it" }
                 )
             },
             "/length" bind { req: Request ->
@@ -158,7 +158,10 @@ abstract class ServerContract(
                 .header("foo", """use "cookie=\"value\"" instead.""")
         )
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), equalTo(""""my header with quotes", cookie="value", use "cookie=\"value\"" instead."""))
+        assertThat(response.bodyString(), equalTo(
+            """foo: "my header with quotes"
+              |foo: cookie="value"
+              |foo: use "cookie=\"value\"" instead.""".trimMargin()))
     }
 
     @Test
@@ -198,7 +201,20 @@ abstract class ServerContract(
         )
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), equalTo("one, two, three"))
+        assertThat(response.bodyString(), equalTo(
+            """foo: one
+              |foo: two
+              |foo: three""".trimMargin()))
+    }
+
+    @Test
+    open fun `treats multiple request headers as single item comma-separated list`() {
+        val response = client(
+            Request(GET, "$baseUrl/request-headers").header("foo", "one,two,three")
+        )
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo("foo: one,two,three"))
     }
 
     @Test

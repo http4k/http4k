@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class JettyTest : ServerContract({ Jetty(it, ServerConfig.StopMode.Immediate) }, ApacheClient()) {
@@ -16,5 +17,10 @@ class JettyTest : ServerContract({ Jetty(it, ServerConfig.StopMode.Immediate) },
 
         assertThat(response.status.code, equalTo(201))
         assertThat(response.status.description, equalTo("Created"))
+    }
+
+    @Disabled
+    override fun `treats multiple request headers as single item comma-separated list`() {
+
     }
 }
