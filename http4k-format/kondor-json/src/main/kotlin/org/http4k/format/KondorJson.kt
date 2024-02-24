@@ -180,7 +180,7 @@ class KondorJson(
             "JsonConverter for '$target' has not been registered"
         } as JsonConverter<T, *>
 
-    private fun converterFor(input: Any): JsonConverter<*, *> =
+    fun converterFor(input: Any): JsonConverter<*, *> =
         requireNotNull(converters.entries.find { it.key.isInstance(input) }) {
             "JsonConverter for '${input::class}' has not been registered"
         }.value
