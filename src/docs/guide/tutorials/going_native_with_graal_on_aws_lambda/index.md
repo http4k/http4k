@@ -35,13 +35,13 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "com.github.johnrengelman:shadow:8.1.1"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        classpath("com.github.johnrengelman:shadow:8.1.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     }
 }
 
-apply plugin : "java"
-apply plugin : "com.github.johnrengelman.shadow"
+apply(plugin = "java")
+apply(plugin = "com.github.johnrengelman.shadow")
 
 mainClassName = "guide.tutorials.going_native_with_graal_on_aws_lambda.HelloServerlessHttp4kKt"
 

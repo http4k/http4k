@@ -8,6 +8,9 @@ dependencies {
     compileOnly(Testing.junit.jupiter.api)
 
     testImplementation(project(":http4k-client-apache"))
+
+    testImplementation("dev.forkhandles:values4k:_")
+
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(path = ":http4k-testing-approval"))
     testImplementation(testFixtures(project(":http4k-contract")))
