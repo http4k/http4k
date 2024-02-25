@@ -6,9 +6,13 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.core.UriTemplate
+import org.http4k.routing.RequestWithRoute
+import org.http4k.routing.RoutedRequest
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -49,8 +53,14 @@ abstract class TypedHttpMessage {
     }
 }
 
-open class TypedRequest(request: Request) : TypedHttpMessage(), Request by httpMessage(request) {
+abstract class TypedRequest(request: Request) : TypedHttpMessage(), RequestWithRoute by httpMessage(when {
+    request is RequestWithRoute -> request
+    else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
+}) {
     protected constructor(method: Method, uri: Uri) : this(Request(method, uri))
+
+    protected fun <T : Any> required(spec: PathLensSpec<T>) =
+        ReadOnlyProperty<Request, T> { thisRef, property -> spec.of(property.name)(thisRef) }
 
     override fun toString() = super.toMessage()
 }
@@ -69,7 +79,7 @@ private inline fun <reified T : HttpMessage> httpMessage(initial: T): T = Proxy.
             method(ref.get(), *(args ?: arrayOf<Any>()))
                 .let {
                     when {
-                        T::class.java != method.returnType -> it
+                        !method.returnType.isAssignableFrom(T::class.java) -> it
                         else -> proxy.apply { ref.set(it as T) }
                     }
                 }

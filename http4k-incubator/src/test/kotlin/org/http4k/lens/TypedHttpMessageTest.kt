@@ -7,11 +7,15 @@ import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.core.Method
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Moshi.auto
+import org.http4k.hamkrest.hasStatus
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.UUID
@@ -23,6 +27,7 @@ class TypedHttpMessageTest {
     }
 
     class MyRequest(request: Request) : TypedRequest(request) {
+        val path by required(Path.value(MyValue))
         var query by required(Query.int())
         var header by optional(Header)
         var defaulted by defaulted(Query.uuid()) { UUID(0, 0) }
@@ -40,12 +45,20 @@ class TypedHttpMessageTest {
 
     @Test
     fun `required fields`() {
-        val req = MyRequest(Request(Method.GET, "").query("query", "123"))
-        assertThat(req.query, equalTo(123))
-        req.query = 456
-        assertThat(req.query, equalTo(456))
+        val out = routes("/{path}" bind GET to { input: Request ->
+            val req = MyRequest(input)
+            assertThat(req.path, equalTo(MyValue.of(999)))
 
-        assertThat(req.query, equalTo(456))
+            assertThat(req.query, equalTo(123))
+            req.query = 456
+            assertThat(req.query, equalTo(456))
+
+            assertThat(req.query, equalTo(456))
+
+            Response(OK)
+        })(Request(GET, "/999").query("query", "123"))
+
+        assertThat(out, hasStatus(OK))
 
         val resp = MyResponse(Response(OK))
         assertThrows<LensFailure> { resp.requiredHeader }
@@ -58,7 +71,7 @@ class TypedHttpMessageTest {
 
     @Test
     fun `optional fields`() {
-        val req = MyRequest(Request(Method.GET, "").query("query", "123"))
+        val req = MyRequest(Request(GET, "").query("query", "123"))
         assertThat(req.header, absent())
         req.header = "123456"
         assertThat(req.header, equalTo("123456"))
@@ -71,15 +84,15 @@ class TypedHttpMessageTest {
 
     @Test
     fun `defaulted fields`() {
-        val req = MyRequest(Request(Method.GET, ""))
+        val req = MyRequest(Request(GET, ""))
         assertThat(req.defaulted, equalTo(UUID(0, 0)))
     }
 
     @Test
-    fun `body`() {
+    fun `body can be read and written`() {
         val resp = MyResponse(Response(OK))
         resp.aBody = MyType("hello")
         assertThat(resp.aBody, equalTo(MyType("hello")))
-        assertThat(resp.`content-type`, equalTo(ContentType.APPLICATION_JSON.toHeaderValue()))
+        assertThat(resp.`content-type`, equalTo(APPLICATION_JSON.toHeaderValue()))
     }
 }
