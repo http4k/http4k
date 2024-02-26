@@ -19,14 +19,20 @@ import java.lang.reflect.Proxy
 import java.util.concurrent.atomic.AtomicReference
 
 abstract class TypedHttpMessage {
-    protected fun <IN : HttpMessage, OUT : Any> required(spec: BiDiLensBuilder<IN, OUT>) = Required(spec)
+    protected fun <IN : HttpMessage, OUT : Any> required(spec: BiDiLensBuilder<IN, OUT>) =
+        Required(spec)
 
-    protected fun <IN : HttpMessage, OUT : Any> optional(spec: BiDiLensBuilder<IN, OUT>) = Optional(spec)
+    protected fun <IN : HttpMessage, OUT : Any> optional(spec: BiDiLensBuilder<IN, OUT>) =
+        Optional(spec,)
 
-    protected fun <IN : HttpMessage, OUT : Any> defaulted(spec: BiDiLensBuilder<IN, OUT>, default: (IN) -> OUT) =
+    protected fun <IN : HttpMessage, OUT : Any> defaulted(
+        spec: BiDiLensBuilder<IN, OUT>,
+        default: (IN) -> OUT
+    ) =
         Defaulted(spec, default)
 
-    protected fun <IN : HttpMessage, OUT : Any> body(spec: BiDiBodyLensSpec<OUT>) = Body<IN, OUT>(spec)
+    protected fun <IN : HttpMessage, OUT : Any> body(spec: BiDiBodyLensSpec<OUT>, example: OUT? = null) =
+        Body<IN, OUT>(spec, example)
 }
 
 abstract class TypedRequest(request: Request) : TypedHttpMessage(), RequestWithRoute by httpMessage(

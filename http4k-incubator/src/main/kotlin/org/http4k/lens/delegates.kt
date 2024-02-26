@@ -7,6 +7,7 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 sealed interface TypedField<IN : HttpMessage, OUT : Any> {
+
     class Required<IN : HttpMessage, OUT : Any>(internal val spec: BiDiLensBuilder<IN, OUT>) :
         ReadWriteProperty<IN, OUT>, TypedField<IN, OUT> {
         override fun getValue(thisRef: IN, property: KProperty<*>) = spec.required(property.name)(thisRef)
@@ -36,7 +37,7 @@ sealed interface TypedField<IN : HttpMessage, OUT : Any> {
         }
     }
 
-    class Body<IN : HttpMessage, OUT : Any>(internal val spec: BiDiBodyLensSpec<OUT>) :
+    class Body<IN : HttpMessage, OUT : Any>(internal val spec: BiDiBodyLensSpec<OUT>, val example: OUT?) :
         ReadWriteProperty<IN, OUT>, TypedField<IN, OUT> {
         override fun getValue(thisRef: IN, property: KProperty<*>) = spec.toLens()(thisRef)
 
