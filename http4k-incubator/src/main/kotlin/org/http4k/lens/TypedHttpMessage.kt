@@ -7,82 +7,58 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
+import org.http4k.lens.TypedField.Body
+import org.http4k.lens.TypedField.Defaulted
+import org.http4k.lens.TypedField.Optional
+import org.http4k.lens.TypedField.Path
+import org.http4k.lens.TypedField.Required
 import org.http4k.routing.RequestWithRoute
 import org.http4k.routing.RoutedRequest
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.properties.ReadOnlyProperty
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 abstract class TypedHttpMessage {
-    protected fun <T : Any, M : HttpMessage> required(spec: BiDiLensBuilder<M, T>) =
-        object : ReadWriteProperty<M, T> {
-            override fun getValue(thisRef: M, property: KProperty<*>) = spec.required(property.name)(thisRef)
+    protected fun <IN : HttpMessage, OUT : Any> required(spec: BiDiLensBuilder<IN, OUT>) = Required(spec)
 
-            override fun setValue(thisRef: M, property: KProperty<*>, value: T) {
-                spec.required(property.name)(value, thisRef)
-            }
-        }
+    protected fun <IN : HttpMessage, OUT : Any> optional(spec: BiDiLensBuilder<IN, OUT>) = Optional(spec)
 
-    protected fun <T : Any, M : HttpMessage> optional(spec: BiDiLensBuilder<M, T>) =
-        object : ReadWriteProperty<M, T?> {
-            override fun getValue(thisRef: M, property: KProperty<*>) = spec.optional(property.name)(thisRef)
+    protected fun <IN : HttpMessage, OUT : Any> defaulted(spec: BiDiLensBuilder<IN, OUT>, default: (IN) -> OUT) =
+        Defaulted(spec, default)
 
-            override fun setValue(thisRef: M, property: KProperty<*>, value: T?) {
-                spec.optional(property.name)(value, thisRef)
-            }
-        }
-
-    protected fun <T : Any, M : HttpMessage> defaulted(spec: BiDiLensBuilder<M, T>, default: (M) -> T) =
-        object : ReadWriteProperty<M, T> {
-            override fun getValue(thisRef: M, property: KProperty<*>) = spec.defaulted(property.name, default)(thisRef)
-
-            override fun setValue(thisRef: M, property: KProperty<*>, value: T) {
-                spec.optional(property.name)(value, thisRef)
-            }
-        }
-
-    protected fun <T : Any, M : HttpMessage> body(spec: BiDiBodyLensSpec<T>) = object : ReadWriteProperty<M, T> {
-        override fun getValue(thisRef: M, property: KProperty<*>) = spec.toLens()(thisRef)
-
-        override fun setValue(thisRef: M, property: KProperty<*>, value: T) {
-            spec.toLens()(value, thisRef)
-        }
-    }
+    protected fun <IN : HttpMessage, OUT : Any> body(spec: BiDiBodyLensSpec<OUT>) = Body<IN, OUT>(spec)
 }
 
-abstract class TypedRequest(request: Request) : TypedHttpMessage(), RequestWithRoute by httpMessage(when {
-    request is RequestWithRoute -> request
-    else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
-}) {
+abstract class TypedRequest(request: Request) : TypedHttpMessage(), RequestWithRoute by httpMessage(
+    when {
+        request is RequestWithRoute -> request
+        else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
+    }
+) {
     protected constructor(method: Method, uri: Uri) : this(Request(method, uri))
 
-    protected fun <T : Any> required(spec: PathLensSpec<T>) =
-        ReadOnlyProperty<Request, T> { thisRef, property -> spec.of(property.name)(thisRef) }
+    protected fun <OUT : Any> required(spec: PathLensSpec<OUT>) = Path(spec)
 
     override fun toString() = super.toMessage()
 }
 
-open class TypedResponse(response: Response) : TypedHttpMessage(), Response by httpMessage(response) {
+abstract class TypedResponse(response: Response) : TypedHttpMessage(), Response by httpMessage(response) {
     protected constructor(status: Status) : this(Response(status))
 
     override fun toString() = super.toMessage()
 }
 
-private inline fun <reified T : HttpMessage> httpMessage(initial: T): T = Proxy.newProxyInstance(
-    T::class.java.classLoader,
-    arrayOf(T::class.java), object : InvocationHandler {
+private inline fun <reified IN : HttpMessage> httpMessage(initial: IN): IN = Proxy.newProxyInstance(
+    IN::class.java.classLoader,
+    arrayOf(IN::class.java), object : InvocationHandler {
         private val ref = AtomicReference(initial)
         override fun invoke(proxy: Any, method: java.lang.reflect.Method, args: Array<out Any>?) =
             method(ref.get(), *(args ?: arrayOf<Any>()))
                 .let {
                     when {
-                        !method.returnType.isAssignableFrom(T::class.java) -> it
-                        else -> proxy.apply { ref.set(it as T) }
+                        !method.returnType.isAssignableFrom(IN::class.java) -> it
+                        else -> proxy.apply { ref.set(it as IN) }
                     }
                 }
     }
-) as T
-
+) as IN

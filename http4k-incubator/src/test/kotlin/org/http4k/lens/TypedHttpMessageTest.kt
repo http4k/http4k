@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
 import org.http4k.core.Body
-import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -20,11 +19,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.UUID
 
+class MyValue private constructor(value: Int) : IntValue(value) {
+    companion object : IntValueFactory<MyValue>(::MyValue)
+}
+
+data class MyType(val value: String)
+
 class TypedHttpMessageTest {
 
-    class MyValue private constructor(value: Int) : IntValue(value) {
-        companion object : IntValueFactory<MyValue>(::MyValue)
-    }
 
     class MyRequest(request: Request) : TypedRequest(request) {
         val path by required(Path.value(MyValue))
@@ -32,8 +34,6 @@ class TypedHttpMessageTest {
         var header by optional(Header)
         var defaulted by defaulted(Query.uuid()) { UUID(0, 0) }
     }
-
-    data class MyType(val value: String)
 
     class MyResponse(response: Response) : TypedResponse(response) {
         var requiredHeader by required(Header.int())
