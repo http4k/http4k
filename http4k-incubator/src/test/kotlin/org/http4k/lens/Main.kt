@@ -12,5 +12,5 @@ class Foo(request: Request) : TypedRequest(request) {
 
 fun main() {
     val kClass = Foo::class
-    println(kClass.metaAndExample())
+    println(kClass.routeParams())
 }
