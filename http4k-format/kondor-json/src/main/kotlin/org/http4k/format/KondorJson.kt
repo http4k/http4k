@@ -61,10 +61,7 @@ class KondorJson(
     override fun JsonNode.asPrettyJsonString(): String = this.render(prettyJsonStyle)
     override fun JsonNode.asCompactJsonString(): String = this.render(compactJsonStyle)
 
-    override fun String.asJsonObject() = when (this) {
-        "" -> error("Empty string found") // this is a bug in the kondor parser
-        else -> parseJsonNode(this).orThrow()
-    }
+    override fun String.asJsonObject() = parseJsonNode(this).orThrow()
 
     override fun String?.asJsonValue() = this?.let { JsonNodeString(it, NodePathRoot) } ?: JsonNodeNull(NodePathRoot)
     override fun Int?.asJsonValue() =
