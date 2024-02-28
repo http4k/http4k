@@ -50,4 +50,13 @@ class NamedSourceApproverTest {
         assertThat(actualFile.exists(), equalTo(false))
         assertThat(approvedFile.readText(), equalTo(body))
     }
+
+    @Test
+    fun `uses file name suffix`() {
+        assertThat({ approver.withNameSuffix("suffix").assertApproved(Response(OK).body(body)) }, throws<ApprovalFailed>())
+        val actualFile = File(baseFile, "${testName}.suffix.actual")
+        assertThat(actualFile.exists(), equalTo(true))
+        assertThat(actualFile.readText(), equalTo(body))
+        assertThat(approvedFile.exists(), equalTo(false))
+    }
 }

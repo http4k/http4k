@@ -23,6 +23,8 @@ interface Approver {
      * Check the content of the passed message against the previously approved content.
      */
     fun <T : HttpMessage> assertApproved(httpMessage: T)
+
+    fun withNameSuffix(suffix: String): Approver
 }
 
 class NamedResourceApprover(
@@ -33,6 +35,10 @@ class NamedResourceApprover(
 
     private val matchAllLineEndings = "\\r\\n?".toRegex()
     private fun String.normalizeLineEndings() = replace(matchAllLineEndings, "\n")
+
+    override fun withNameSuffix(suffix: String): Approver {
+        return NamedResourceApprover(name = "$name.$suffix", approvalContent = approvalContent, approvalSource = approvalSource)
+    }
 
     override fun <T : HttpMessage> assertApproved(httpMessage: T) {
         val approved = approvalSource.approvedFor(name)
