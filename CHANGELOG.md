@@ -3,9 +3,15 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.13.9.0
+- **http4k-*** : Upgrade some dependency versions
+- **http4k-contract** : Implement Kondor Schema creator. H/T @tamj0rd2
+- **http4k-cloudnative** : Read environment properties from yaml resources.  H/T @dzappold
+- **http4k-webdriver** : [Fix] Bug when submitting with inputs of type submit H/T @gypsydave5
+
 ### v5.13.8.0
 - **http4k-*** : Upgrade some dependency versions
-- **http4k-format-kondor** : Expose converterFor method.  H/T @tamj0rd2
+- **http4k-format-kondor** : Expose converterFor method. H/T @tamj0rd2
 
 ### v5.13.7.0
 - **http4k-*** : Upgrade some dependency versions
@@ -121,7 +127,7 @@ changes with their rationale when appropriate:
 
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.21
 
-### v5.10.3.0
+### v5.11.8.0
 
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract** [Fix #1002]: Ability to use RequestContexts for providing a User Principal with Security.
