@@ -8,6 +8,7 @@ changes with their rationale when appropriate:
 - **http4k-contract** : Implement Kondor Schema creator. H/T @tamj0rd2
 - **http4k-cloudnative** : Read environment properties from yaml resources.  H/T @dzappold
 - **http4k-webdriver** : [Fix] Bug when submitting with inputs of type submit H/T @gypsydave5
+- **http4k-testing-approval** : Allow adding a suffix to an approval test file name. H/T @becky-sequence
 
 ### v5.13.8.0
 - **http4k-*** : Upgrade some dependency versions
