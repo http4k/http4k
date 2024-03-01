@@ -178,10 +178,10 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun hashCode(): Int = element.hashCode()
 
-    override fun findElement(by: org.openqa.selenium.By): WebElement? =
+    override fun findElement(by: By): WebElement? =
         JSoupElementFinder(navigate, getURL, element).findElement(by)
 
-    override fun findElements(by: org.openqa.selenium.By) =
+    override fun findElements(by: By) =
         JSoupElementFinder(navigate, getURL, element).findElements(by)
 
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)
