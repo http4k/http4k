@@ -54,7 +54,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val inputs = it
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
-                .filter { el -> if (el.getAttribute("type") == "submit") { el == this } else { true } }
+                .filterNot { it.isAnInactiveSubmitInput() }
                 .filterNot(::isUncheckedInput)
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
             val textareas = it.findElements(By.tagName("textarea"))
@@ -92,6 +92,15 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             else navigate(Request(method, action.query(postRequest.bodyString())).body(""))
         }
     }
+
+    private fun WebElement.isAnInactiveSubmitInput() =
+        if (isSubmitInput()) {
+            this != this@JSoupWebElement
+        } else {
+            false
+        }
+
+    private fun WebElement.isSubmitInput() = getAttribute("type") == "submit"
 
     private fun isUncheckedInput(input: WebElement): Boolean =
         (listOf("checkbox", "radio").contains(input.getAttribute("type"))) && input.getAttribute("checked") == null
