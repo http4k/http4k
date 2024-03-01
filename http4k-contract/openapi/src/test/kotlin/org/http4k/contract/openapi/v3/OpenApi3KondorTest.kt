@@ -63,6 +63,7 @@ class OpenApi3KondorTest : ContractRendererContract<JsonNode>(
         extensions = listOf(AddSimpleFieldToRootNode),
     )
 ) {
+
     @Test
     override fun `renders as expected`(approver: Approver) {
         /*
@@ -83,6 +84,10 @@ class OpenApi3KondorTest : ContractRendererContract<JsonNode>(
                 println(scrubbedBody)
 
                 approver.assertApproved(httpMessage.body(scrubbedBody))
+            }
+
+            override fun withNameSuffix(suffix: String): Approver {
+                TODO("Not yet implemented")
             }
         }
 
