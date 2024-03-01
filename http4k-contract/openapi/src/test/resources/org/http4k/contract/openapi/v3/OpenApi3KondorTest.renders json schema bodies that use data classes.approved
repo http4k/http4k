@@ -1,0 +1,137 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "tags": [
+  ],
+  "paths": {
+    "/basepath/body_json_schema_data_class": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "nestedObject": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/TopLevelObject"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+        ],
+        "operationId": "postBasepathBody_json_schema_data_class",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_json_schema_data_class_with_definition_id": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "nestedObject": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/a_prefix_OverriddenDefinitionId"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+        ],
+        "operationId": "postBasepathBody_json_schema_data_class_with_definition_id",
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TopLevelObject": {
+        "type": "object",
+        "properties": {
+          "nestedObject": {
+            "type": "object",
+            "properties": {
+              "aNullField": {
+                "type": "string"
+              },
+              "aNumberField": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "aNumberField"
+            ]
+          }
+        },
+        "required": [
+          "nestedObject"
+        ]
+      },
+      "a_prefix_OverriddenDefinitionId": {
+        "type": "object",
+        "properties": {
+          "nestedObject": {
+            "type": "object",
+            "properties": {
+              "aNullField": {
+                "type": "string"
+              },
+              "aNumberField": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "aNumberField"
+            ]
+          }
+        },
+        "required": [
+          "nestedObject"
+        ]
+      }
+    },
+    "securitySchemes": {
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": ""
+    }
+  ],
+  "x-extension": [
+    "extensionField"
+  ]
+}

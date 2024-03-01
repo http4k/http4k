@@ -11,7 +11,6 @@ import org.http4k.contract.Tag
 import org.http4k.contract.WebCallback
 import org.http4k.contract.jsonschema.JsonSchema
 import org.http4k.contract.jsonschema.v2.value
-import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
@@ -293,9 +292,9 @@ class OpenApi3<NODE : Any>(
 
         return SchemaContent(jsonSchema, message.bodyString().safeParse())
     }
-
+    
     private fun String.toSchema(definitionId: String? = null) = safeParse()
-        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId, null) }
+        ?.let { apiRenderer.toSchema(it, definitionId, null) }
         ?: JsonSchema(json.obj(), emptySet())
 
     private fun List<Security>.combineFull(): Render<NODE> = {

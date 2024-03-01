@@ -77,6 +77,8 @@ The `http4k-core` module comes with a set of handy Filters for application to bo
 - Cache Control
 - CORS
 - Cookie handling
+- Compression and un-compression
+- Cross-cutting concerns like logging, exception handling
 - Debugging request and responses
 
 Check out the `org.http4k.filter` package for the exact list.
