@@ -8,7 +8,9 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasStatus
+import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ApprovalTest::class)
@@ -29,5 +31,17 @@ class ExampleApprovalTest {
     @Test
     fun `create hamkrest matcher`(approver: Approver) {
         assertThat(app(Request(GET, "/url")), hasStatus(OK).and(approver.hasApprovedContent()))
+    }
+
+    @TestFactory
+    fun `dynamic test`(
+        approver: Approver
+    ): List<DynamicTest> {
+        return listOf("A", "B", "C").map { value ->
+            DynamicTest.dynamicTest(value) {
+                val dynamicApp: HttpHandler = { Response(OK).body(value) }
+                assertThat(dynamicApp(Request(GET, "/url")), hasStatus(OK).and(approver.withNameSuffix(value).hasApprovedContent()))
+            }
+        }
     }
 }
