@@ -54,6 +54,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val inputs = it
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
+                .filterNot { it.isAnInactiveSubmitInput() }
                 .filterNot(::isUncheckedInput)
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
             val textareas = it.findElements(By.tagName("textarea"))
@@ -92,6 +93,15 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         }
     }
 
+    private fun WebElement.isAnInactiveSubmitInput() =
+        if (isSubmitInput()) {
+            this != this@JSoupWebElement
+        } else {
+            false
+        }
+
+    private fun WebElement.isSubmitInput() = getAttribute("type") == "submit"
+
     private fun isUncheckedInput(input: WebElement): Boolean =
         (listOf("checkbox", "radio").contains(input.getAttribute("type"))) && input.getAttribute("checked") == null
 
@@ -111,6 +121,12 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                     current("form")?.findElements(By.tagName("input"))?.filter { it.getAttribute("name") == element.attr("name") }?.forEach { it.clear() }
                 }
                 element.attr("checked", "checked")
+            }
+
+            isA("input") -> {
+                val t = element.attr("type")
+                if (t == "" || t.lowercase(getDefault()) == "submit")
+                    submit()
             }
 
             isA("option") -> {
@@ -162,10 +178,10 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun hashCode(): Int = element.hashCode()
 
-    override fun findElement(by: org.openqa.selenium.By): WebElement? =
+    override fun findElement(by: By): WebElement? =
         JSoupElementFinder(navigate, getURL, element).findElement(by)
 
-    override fun findElements(by: org.openqa.selenium.By) =
+    override fun findElements(by: By) =
         JSoupElementFinder(navigate, getURL, element).findElements(by)
 
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)

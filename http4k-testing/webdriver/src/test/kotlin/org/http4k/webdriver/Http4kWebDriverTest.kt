@@ -354,7 +354,27 @@ class Http4kWebDriverTest {
         assertThat(driver.pageSource, equalTo("destination.com"))
     }
 
+    // https://www.w3.org/TR/html401/interact/forms.html#h-17.13
+    @Test
+    fun `POST form via input of type 'submit' click`() {
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("input-submit"))!!.click()
+        driver.assertOnPage("https://example.com/form")
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2"))
+        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+    }
+
+    @Test
+    fun `POST form - activated submit buttons ('input' elements) are submitted with the form`() {
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("only-send-when-activated"))!!.submit()
+        driver.assertOnPage("https://example.com/form")
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&only-send-when-activated=only-send-when-activated&textarea1=textarea&select1=option1&select1=option2"))
+        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+    }
+
     private fun WebDriver.assertOnPage(expected: String) {
         assertThat(findElement(By.tagName("h1"))!!.text, equalTo(expected))
     }
+
 }
