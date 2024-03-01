@@ -4,6 +4,7 @@ dependencies {
     api(project(":http4k-format-core"))
 
     implementation(project(":http4k-format-jackson"))
+    implementation(project(":http4k-format-kondor-json"))
     implementation("dev.forkhandles:values4k:_")
     implementation("dev.forkhandles:data4k:_")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
