@@ -4,7 +4,7 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
 
-    val jettyVersion = "11.0.18"
+    val jettyVersion = "11.0.20"
     api(platform("org.eclipse.jetty:jetty-bom:$jettyVersion"))
 
     api("org.eclipse.jetty:jetty-server:$jettyVersion")
