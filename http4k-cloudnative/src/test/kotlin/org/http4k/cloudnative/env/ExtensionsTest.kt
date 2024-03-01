@@ -20,6 +20,19 @@ class ExtensionsTest {
     }
 
     @Test
+    fun `can read yaml resources into properties`() {
+        val env = Environment.fromYaml("/local.yaml")
+
+        assertThat(env["string"], equalTo("hello"))
+        assertThat(env["child.string"], equalTo("world"))
+        assertThat(env["child.child"], equalTo(""))
+        assertThat(env["child.numbers"], equalTo("1,2"))
+        assertThat(env["child.bool"], equalTo("true"))
+        assertThat(env["numbers"], equalTo(""))
+        assertThat(env["bool"], equalTo("false"))
+    }
+
+    @Test
     fun `can read config into properties`() {
         val env = Environment.fromConfigFile(File("src/test/resources/local.config"))
 
