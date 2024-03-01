@@ -54,6 +54,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val inputs = it
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
+                .filter { el -> if (el.getAttribute("type") == "submit") { el == this } else { true } }
                 .filterNot(::isUncheckedInput)
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
             val textareas = it.findElements(By.tagName("textarea"))
