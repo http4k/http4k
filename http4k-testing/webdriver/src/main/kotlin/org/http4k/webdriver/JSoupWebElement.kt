@@ -113,6 +113,12 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 element.attr("checked", "checked")
             }
 
+            isA("input") -> {
+                val t = element.attr("type")
+                if (t == "" || t.lowercase(getDefault()) == "submit")
+                    submit()
+            }
+
             isA("option") -> {
                 val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") == true
 
