@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.junit.jupiter.api.BeforeEach
@@ -49,7 +48,8 @@ class StaticPrefixRoutingTest {
     @Test
     fun `test static resource bar - bar`() {
         val result = app(Request(GET, "/bar/bar/"))
-        assertThat(result.status, equalTo(NOT_FOUND)) // because index.html is read only for root
+        assertThat(result.status, equalTo(OK))
+        assertThat(result.bodyString(), equalTo("contents of bar/bar/index.html"))
     }
 
     @Test
