@@ -186,12 +186,44 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `cannot serve a directory`() {
+    fun `Classpath ResourceLoader cannot serve a directory without an index file`() {
         val handler = "/svc" bind static()
-        val request = Request(GET, of("/svc/org"))
+        val request = Request(GET, of("/svc/org/http4k"))
         val criteria = hasStatus(NOT_FOUND)
 
         assertThat(handler.matchAndInvoke(request), absent())
+        assertThat(handler(request), criteria)
+    }
+
+    @Test
+    fun `Classpath ResourceLoader can serve a directory with an index file`() {
+        val handler = "/svc" bind static()
+        val request = Request(GET, of("/svc/org"))
+        val criteria =
+            hasStatus(OK) and hasBody("hello from the io index.html") and hasHeader("Content-type", TEXT_HTML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(handler(request), criteria)
+    }
+
+    @Test
+    fun `Directory ResourceLoader cannot serve a directory without an index file`() {
+        val handler = "/svc" bind static(ResourceLoader.Directory("../http4k-core/src/test/resources"))
+        val request = Request(GET, of("/svc/org/http4k"))
+        val criteria = hasStatus(NOT_FOUND)
+
+        assertThat(handler.matchAndInvoke(request), absent())
+        assertThat(handler(request), criteria)
+    }
+
+    @Test
+    fun `Directory ResourceLoader can serve a directory with an index file`() {
+        val handler = "/svc" bind static(ResourceLoader.Directory("../http4k-core/src/test/resources"))
+        val request = Request(GET, of("/svc/org"))
+        val criteria =
+            hasStatus(OK) and hasBody("hello from the io index.html") and hasHeader("Content-type", TEXT_HTML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
