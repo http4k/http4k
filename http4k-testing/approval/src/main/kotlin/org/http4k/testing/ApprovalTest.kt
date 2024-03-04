@@ -70,15 +70,14 @@ abstract class ContentTypeAwareApprovalTest(
             assertEquals(contentType, CONTENT_TYPE(httpMessage))
         }
 
-        private var delegate: Approver = NamedResourceApprover(
+        private val delegate: Approver = NamedResourceApprover(
             testNamer.nameFor(context.requiredTestClass, context.requiredTestMethod),
             HttpBodyOnly(::format),
             approvalSource
         )
 
         override fun withNameSuffix(suffix: String): Approver {
-            delegate = delegate.withNameSuffix(suffix)
-            return this
+            return delegate.withNameSuffix(suffix)
         }
     }
 

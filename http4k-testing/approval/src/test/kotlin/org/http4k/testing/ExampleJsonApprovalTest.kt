@@ -1,5 +1,6 @@
 package org.http4k.testing
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -9,8 +10,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(JsonApprovalTest::class)
@@ -44,5 +48,17 @@ class ExampleJsonApprovalTest {
         approver.assertApproved(
             Request(GET, "/url").with(CONTENT_TYPE of APPLICATION_JSON).body("""{"message":"value"}""")
         )
+    }
+
+    @TestFactory
+    fun `dynamic test`(
+        approver: Approver
+    ): List<DynamicTest> {
+        return listOf("A", "B", "C").map { value ->
+            DynamicTest.dynamicTest(value) {
+                val dynamicApp: HttpHandler = { Response(OK).body("{\"value\": \"$value\"}") }
+                assertThat(dynamicApp(Request(GET, "/url")), hasStatus(OK).and(approver.withNameSuffix(value).hasApprovedContent()))
+            }
+        }
     }
 }
