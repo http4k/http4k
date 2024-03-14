@@ -6,15 +6,15 @@ package org.http4k.lens
 enum class Validator(private val actOn: (LensFailure) -> List<Failure>) {
     Strict({ if (it.failures.isNotEmpty()) throw it else it.failures }),
     Feedback({ it.failures }),
-    Ignore({ emptyList<Failure>() });
+    Ignore({ emptyList() });
 
     operator fun <T : Any> invoke(entity: T, lenses: List<LensExtractor<T, *>>): List<Failure> =
         collectErrors(lenses, entity).run {
-            actOn(when (size) {
-                0 -> LensFailure()
-                1 -> first()
-                else -> LensFailure(flatMap { it.failures }, LensFailures(this), entity)
-            })
+            when (size) {
+                0 -> emptyList()
+                1 -> actOn(first())
+                else -> actOn(LensFailure(flatMap { it.failures }, LensFailures(this), entity))
+            }
         }
 
     private fun <T : Any> collectErrors(lenses: List<LensExtractor<T, *>>, entity: T): List<LensFailure> =
