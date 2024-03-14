@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.core.Method
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
@@ -154,6 +153,27 @@ class Http4kWebDriverTest {
         )
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
+
+    @Test
+    fun `POST form with action set to fragment with no leading slash replaces last part of current base path`() {
+        val driver = Http4kWebDriver({ req ->
+            val body = File("src/test/resources/test.html").readText()
+            Response(OK).body(
+                body
+                    .replace("FORMMETHOD", POST.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action=\"fragmentWithNoLeadingSlash\"")
+            )
+        })
+
+        driver.get("http://example.com/bob/was/here/today")
+        driver.findElement(By.id("button"))!!.submit()
+        driver.assertCurrentUrl("http://example.com/bob/was/here/fragmentWithNoLeadingSlash")
+    }
+
 
     @Test
     fun `GET form`() {
@@ -360,7 +380,10 @@ class Http4kWebDriverTest {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("input-submit"))!!.click()
         driver.assertOnPage("https://example.com/form")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2"))
+        assertThat(
+            driver.findElement(By.tagName("thebody"))!!.text,
+            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2")
+        )
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
@@ -369,7 +392,10 @@ class Http4kWebDriverTest {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("only-send-when-activated"))!!.submit()
         driver.assertOnPage("https://example.com/form")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&only-send-when-activated=only-send-when-activated&textarea1=textarea&select1=option1&select1=option2"))
+        assertThat(
+            driver.findElement(By.tagName("thebody"))!!.text,
+            equalTo("text1=textValue&checkbox1=checkbox&only-send-when-activated=only-send-when-activated&textarea1=textarea&select1=option1&select1=option2")
+        )
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
@@ -377,4 +403,7 @@ class Http4kWebDriverTest {
         assertThat(findElement(By.tagName("h1"))!!.text, equalTo(expected))
     }
 
+    private fun Http4kWebDriver.assertCurrentUrl(expectedUrl: String) {
+        assertThat(currentUrl, equalTo(expectedUrl))
+    }
 }

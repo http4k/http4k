@@ -129,7 +129,7 @@ fun Uri.relative(relative: Uri): Uri {
 private fun String.normalizePath(): String {
     fun String.replacePrefix(original: String, newPrefix: String): String = newPrefix + (removePrefix(original))
     fun String.removeLastSegment(): String = lastIndexOf('/').let { this.slice(0..<it) }
-    fun String.secondIndexOf(char: Char): Int = indexOf(char, indexOf(char) + 1);
+    fun String.secondIndexOf(char: Char): Int = indexOf(char, indexOf(char) + 1)
     fun String.firstSegment() = when {
         startsWith("/") -> if (secondIndexOf('/') == -1) this else slice(0..<secondIndexOf('/'))
         else -> if (indexOf('/') == -1) this else slice(0..<indexOf('/'))
