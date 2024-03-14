@@ -3,15 +3,18 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.14.1.0 (uncut)
+- **http4k-*** : Fix bug in webdriver form submission + a method for relative Uri resolution.  H/T @gypsydave5
+
 ### v5.14.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.23
-- **http4k-*** : Static handlers serve an index.html file from a subdirectory H/T @mbcltd
+- **http4k-*** : Static handlers serve an index.html file from a subdirectory. H/T @mbcltd
 
 ### v5.13.9.0
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract** : Implement Kondor Schema creator. H/T @tamj0rd2
 - **http4k-cloudnative** : Read environment properties from yaml resources.  H/T @dzappold
-- **http4k-webdriver** : [Fix] Bug when submitting with inputs of type submit H/T @gypsydave5
+- **http4k-webdriver** : [Fix] Bug when submitting with inputs of type submit. H/T @gypsydave5
 - **http4k-testing-approval** : Allow adding a suffix to an approval test file name. H/T @becky-sequence
 
 ### v5.13.8.0
@@ -132,7 +135,7 @@ changes with their rationale when appropriate:
 
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.21
 
-### v5.11.8.0
+### v5.11.10.0
 
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract** [Fix #1002]: Ability to use RequestContexts for providing a User Principal with Security.
