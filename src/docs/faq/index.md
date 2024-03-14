@@ -56,4 +56,12 @@ routes += "/api/document-upload" meta {
 } bindContract POST to { req -> Response(OK) }
 ```
 
+### Serverless 
+**Q. When using AWS Lambda, I get an "method is invalid" error when testing my lambda.**
+
+**A.** This comes from the fact that there are 2 different payload formats for AWS Lambda HTTP functions. We support both v1 and v2 formats, 
+but recommend V2 is used as the JSON format is superior. To fix the problem, ensure that your Lambda function payload version matches the name 
+of the AWS adapter function class being used (v1 or v2)
+
+
 [http4k]: https://http4k.org
