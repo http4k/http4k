@@ -108,7 +108,7 @@ fun Uri.appendToPath(pathToAppend: String?): Uri =
 
 fun Uri.relative(relative: String): Uri = if (relative == "") this else this.relative(Uri.of(relative))
 
-// Impletmentation of relative resolution as per [RFC3986 5.2](https://datatracker.ietf.org/doc/html/rfc3986#section-5.2)
+// Implementation of relative resolution as per [RFC3986 5.2](https://datatracker.ietf.org/doc/html/rfc3986#section-5.2)
 fun Uri.relative(relative: Uri): Uri {
     fun String.merge(relativePath: String): String {
         return when {

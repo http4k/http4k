@@ -84,7 +84,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val formActionUri = Uri.of(actionString)
             val current = getURL()?.let { Uri.of(it) }
             val formUri = current?.relative(formActionUri) ?: formActionUri
-            val postRequest = Request(method, formUri.toString()).with(body of form)
+            val postRequest = Request(method, formUri).with(body of form)
 
             if (method == POST) navigate(postRequest)
             else navigate(Request(method, formUri.query(postRequest.bodyString())).body(""))
