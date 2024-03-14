@@ -6,6 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.relative
 import org.http4k.core.with
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator
@@ -79,17 +80,14 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 *(form.fields.map { FormField.multi.optional(it.key) }.toTypedArray())
             ).toLens()
 
-            val formTarget = Uri.of(it.element.attr("action") ?: "")
-            val current = getURL()
-            val action = when {
-                formTarget.host == "" && formTarget.path == "" && current != null -> Uri.of(current)
-                formTarget.host == "" && current != null -> Uri.of(current).path(formTarget.path)
-                else -> formTarget
-            }
-            val postRequest = Request(method, action.toString()).with(body of form)
+            val actionString = it.element.attr("action") ?: ""
+            val formActionUri = Uri.of(actionString)
+            val current = getURL()?.let { Uri.of(it) }
+            val formUri = current?.relative(formActionUri) ?: formActionUri
+            val postRequest = Request(method, formUri).with(body of form)
 
             if (method == POST) navigate(postRequest)
-            else navigate(Request(method, action.query(postRequest.bodyString())).body(""))
+            else navigate(Request(method, formUri.query(postRequest.bodyString())).body(""))
         }
     }
 
@@ -118,7 +116,8 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
             isA("input") && element.attr("type") == "radio" -> {
                 if (element.hasAttr("name")) {
-                    current("form")?.findElements(By.tagName("input"))?.filter { it.getAttribute("name") == element.attr("name") }?.forEach { it.clear() }
+                    current("form")?.findElements(By.tagName("input"))
+                        ?.filter { it.getAttribute("name") == element.attr("name") }?.forEach { it.clear() }
                 }
                 element.attr("checked", "checked")
             }
