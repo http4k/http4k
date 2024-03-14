@@ -4,7 +4,9 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.14.1.0 (uncut)
-- **http4k-*** : Fix bug in webdriver form submission + a method for relative Uri resolution.  H/T @gypsydave5
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : Validator optimisation. H/T @dkandalov
+- **http4k-*** : Fix bug in webdriver form submission + a method for relative Uri resolution. H/T @gypsydave5
 
 ### v5.14.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.23
