@@ -29,6 +29,6 @@ fun htmxWebjars() = routes(
 fun htmxWebjar() = htmxWebjars()
 
 private object Versions {
-    const val HTMX_VERSION = "1.9.10"
+    const val HTMX_VERSION = "1.9.11"
     const val HYPERSCRIPT_VERSION = "0.9.12"
 }
