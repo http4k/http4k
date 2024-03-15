@@ -126,7 +126,7 @@ internal fun <T : HttpMessage> getter(textMapPropagator: TextMapPropagator) = ob
 
 val defaultSpanNamer: (Request) -> String = {
     when (it) {
-        is RoutedRequest -> it.method.name + it.xUriTemplate
+        is RoutedRequest -> it.method.name + " " + it.xUriTemplate
         else -> it.method.name
     }
 }
