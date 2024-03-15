@@ -137,7 +137,7 @@ changes with their rationale when appropriate:
 
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.21
 
-### v5.11.10.0
+### v5.10.3.0
 
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract** [Fix #1002]: Ability to use RequestContexts for providing a User Principal with Security.
@@ -147,12 +147,6 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-core-** : [Fix] FollowRedirects now remove host header
 - **http4k-testing-webdriver-** : Ability to inject clock into the Webdriver
-
-### v5.11.0.0
-
-- **http4k-format-jade4j** : [Breaking] This module has been renamed due to the library Jade4J becoming Pug4J. Migration should be a no-op apart from renaming
-  your templates from .jade to .pug. Please see Pug4j docs for anything else.
-- **http4k-format-pug4j** : [New module] Replacement for Jade4j
 
 ### v5.10.1.0
 
