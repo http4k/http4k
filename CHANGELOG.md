@@ -6,7 +6,9 @@ changes with their rationale when appropriate:
 ### v5.14.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract** : Validator optimisation. H/T @dkandalov
-- **http4k-*** : Fix bug in webdriver form submission + a method for relative Uri resolution. H/T @gypsydave5
+- **http4k-testing-webdriver** : Adding a space between method name and URI when naming spans  H/T @ReinholdsB
+- **http4k-testing-webdriver** : Multipart forms in the webdriver, including sending files. H/T @gypsydave5
+- **http4k-testing-webdriver** : Fix bug in webdriver form submission + a method for relative Uri resolution. H/T @gypsydave5
 
 ### v5.14.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.23

@@ -6,5 +6,4 @@ dependencies {
     api("org.jsoup:jsoup:_")
     implementation(project(mapOf("path" to ":http4k-multipart")))
     testImplementation(project(mapOf("path" to ":http4k-multipart")))
-    testImplementation(project(mapOf("path" to ":http4k-multipart")))
 }
