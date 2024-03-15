@@ -51,10 +51,7 @@ class Http4kWebDriverFormTest {
         )
         driver.navigate().to(Uri.of("http://host/"))
         driver.findElement(By.id("button"))!!.submit()
-        assertThat(
-            driver.pageSource,
-            equalTo("http://host/submit")
-        )
+        assertThat(driver.pageSource, equalTo("http://host/submit"))
     }
 
     @Test
@@ -62,11 +59,8 @@ class Http4kWebDriverFormTest {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("https://example.com/form")
-        assertThat(
-            driver.findElement(By.tagName("thebody"))!!.text,
-            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
-        )
-        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+        assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(driver, showsWeUsedTheMethod("POST"))
     }
 
     @Test
@@ -76,11 +70,8 @@ class Http4kWebDriverFormTest {
         driver.assertOnPage("/bob")
         driver.findElement(By.id("button"))!!.click()
         driver.assertOnPage("/form")
-        assertThat(
-            driver.findElement(By.tagName("thebody"))!!.text,
-            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
-        )
-        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+        assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(driver, showsWeUsedTheMethod("POST"))
     }
 
     @Test
@@ -105,11 +96,8 @@ class Http4kWebDriverFormTest {
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("http://example.com/bob")
         assertThat(loadCount, equalTo(n0 + 2))
-        assertThat(
-            driver.findElement(By.tagName("thebody"))!!.text,
-            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
-        )
-        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+        assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(driver, showsWeUsedTheMethod("POST"))
     }
 
     @Test
@@ -133,11 +121,8 @@ class Http4kWebDriverFormTest {
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("http://127.0.0.1/bob")
         assertThat(loadCount, equalTo(n0 + 2))
-        assertThat(
-            driver.findElement(By.tagName("thebody"))!!.text,
-            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
-        )
-        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+        assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(driver, showsWeUsedTheMethod("POST"))
     }
 
     @Test
@@ -157,7 +142,7 @@ class Http4kWebDriverFormTest {
 
         driver.get("http://example.com/bob/was/here/today")
         driver.findElement(By.id("button"))!!.submit()
-        driver.assertCurrentUrl("http://example.com/bob/was/here/fragmentWithNoLeadingSlash")
+        assertThat(driver, hasCurrentUrl("http://example.com/bob/was/here/fragmentWithNoLeadingSlash"))
     }
 
 
@@ -179,8 +164,9 @@ class Http4kWebDriverFormTest {
         driver.get("/bob")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("/form?text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo(""))
-        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("GET"))
+
+        assertThat(driver, showsWeSentTheBody(""))
+        assertThat(driver, showsWeUsedTheMethod("GET"))
     }
 
     @Test
@@ -189,11 +175,8 @@ class Http4kWebDriverFormTest {
         driver.findElement(By.tagName("textarea"))!!.sendKeys("")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("https://example.com/form")
-        assertThat(
-            driver.findElement(By.tagName("thebody"))!!.text,
-            equalTo("text1=textValue&checkbox1=checkbox&textarea1=&select1=option1&select1=option2&button=yes")
-        )
-        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+        assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=&select1=option1&select1=option2&button=yes"))
+        assertThat(driver, showsWeUsedTheMethod("POST"))
     }
 
 
@@ -203,11 +186,8 @@ class Http4kWebDriverFormTest {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("input-submit"))!!.click()
         driver.assertOnPage("https://example.com/form")
-        assertThat(
-            driver.findElement(By.tagName("thebody"))!!.text,
-            equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2")
-        )
-        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+        assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2"))
+        assertThat(driver, showsWeUsedTheMethod("POST"))
     }
 
     @Test
@@ -215,11 +195,10 @@ class Http4kWebDriverFormTest {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("only-send-when-activated"))!!.submit()
         driver.assertOnPage("https://example.com/form")
-        assertThat(
-            driver.findElement(By.tagName("thebody"))!!.text,
-            equalTo("text1=textValue&checkbox1=checkbox&only-send-when-activated=only-send-when-activated&textarea1=textarea&select1=option1&select1=option2")
-        )
-        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+        val expectedFormBody = "text1=textValue&checkbox1=checkbox&only-send-when-activated=only-send-when-activated&textarea1=textarea&select1=option1&select1=option2"
+
+        assertThat(driver, showsWeSentTheBody(expectedFormBody))
+        assertThat(driver, showsWeUsedTheMethod("POST"))
     }
 
     @Test
@@ -263,3 +242,6 @@ class Http4kWebDriverFormTest {
         assertThat(driver, hasElement(By.tagName("theotherformfields"), hasText(equalTo(expectedOtherFields))))
     }
 }
+
+private fun showsWeSentTheBody(body: String) = hasElement(By.tagName("thebody"), hasText(equalTo(body)))
+private fun showsWeUsedTheMethod(method: String) = hasElement(By.tagName("themethod"), hasText(equalTo(method)))

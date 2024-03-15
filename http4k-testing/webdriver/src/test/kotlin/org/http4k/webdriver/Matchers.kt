@@ -22,7 +22,15 @@ internal fun WebDriver.assertOnPage(expected: String) {
 }
 
 internal fun Http4kWebDriver.assertCurrentUrl(expectedUrl: String) {
-    assertThat(currentUrl, equalTo(expectedUrl))
+    assertThat(this, hasCurrentUrl(expectedUrl))
+}
+
+internal fun hasCurrentUrl(url: String): Matcher<WebDriver> = object : Matcher<WebDriver> {
+    override val description: String = "has the current url of \"$url\""
+
+    override fun invoke(actual: WebDriver): MatchResult {
+        return equalTo(url)(actual.currentUrl)
+    }
 }
 
 internal fun hasElement(by: By, matcher: Matcher<WebElement>): Matcher<SearchContext> = object :
