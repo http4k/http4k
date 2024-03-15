@@ -1,10 +1,15 @@
 package org.http4k.webdriver
 
+import com.natpryce.hamkrest.MatchResult
+import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.MultipartFormBody
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
@@ -16,9 +21,13 @@ import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
+import org.openqa.selenium.SearchContext
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.WebElement
 import java.io.File
+import java.io.InputStream
 import java.net.URI
+import java.nio.file.Files
 import java.time.Instant
 import java.util.Date
 import org.http4k.core.cookie.Cookie as HCookie
@@ -399,11 +408,69 @@ class Http4kWebDriverTest {
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
-    private fun WebDriver.assertOnPage(expected: String) {
-        assertThat(findElement(By.tagName("h1"))!!.text, equalTo(expected))
-    }
+    @Test
+    fun `POST form - a form that has an 'enctype' of 'multipart form-data' transmits its data as a multipart form`() {
+        val driver = Http4kWebDriver({ req ->
+            val body = File("src/test/resources/file_upload_test.html").readText()
+            if (req.method == GET) return@Http4kWebDriver Response(OK).body(body)
 
-    private fun Http4kWebDriver.assertCurrentUrl(expectedUrl: String) {
-        assertThat(currentUrl, equalTo(expectedUrl))
+            val formBody = MultipartFormBody.from(req)
+            val file = formBody.file("file")!!
+
+            Response(OK).body(body
+                .replace("ENCODING", req.header("content-type")!!)
+                .replace("FILENAME", file.filename)
+                .replace("FILECONTENT", file.content.asString()))
+        })
+
+        val fileContent = "hello mum"
+        val filePath = kotlin.io.path.createTempFile("file-upload-test", ".txt")
+        Files.newBufferedWriter(filePath).use { it.write(fileContent) }
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.tagName("input"))!!.sendKeys(filePath.toString())
+        driver.findElement(By.tagName("button"))!!.submit()
+
+        assertThat(driver, hasElement(By.tagName("theformencoding"), hasText(startsWith("multipart/form-data"))))
+        assertThat(driver, hasElement(By.tagName("thefilename"), hasText(equalTo(filePath.fileName.toString()))))
+        assertThat(driver, hasElement(By.tagName("thefilecontent"), hasText(equalTo(fileContent))))
+    }
+}
+
+private fun InputStream.asString(): String {
+    return reader().use { it.readText() }
+}
+
+private fun WebDriver.assertOnPage(expected: String) {
+    assertThat(findElement(By.tagName("h1"))!!.text, equalTo(expected))
+}
+
+private fun Http4kWebDriver.assertCurrentUrl(expectedUrl: String) {
+    assertThat(currentUrl, equalTo(expectedUrl))
+}
+
+private fun hasElement(by: By, matcher: Matcher<WebElement>): Matcher<SearchContext> = object : Matcher<SearchContext> {
+    override val description: String = "has the element matching ${by} that " + matcher.description
+
+    override fun invoke(actual: SearchContext): MatchResult {
+        val element: WebElement? = actual.findElement(by)
+
+        return when (element) {
+            null -> MatchResult.Mismatch("could not find element")
+            else -> matcher(element)
+        }
+    }
+}
+
+private fun hasText(matcher: Matcher<String>): Matcher<WebElement> = object : Matcher<WebElement> {
+    override val description: String = "has the text content " + matcher.description
+
+    override fun invoke(actual: WebElement): MatchResult {
+        val text : String? = actual.text
+
+        return when (text) {
+            null -> MatchResult.Mismatch("could not find any text content")
+            else -> matcher(text)
+        }
     }
 }
