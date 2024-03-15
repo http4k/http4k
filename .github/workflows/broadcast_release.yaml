@@ -55,7 +55,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
       - name: Grab tag name
-        uses: olegtarasov/get-tag@v2.1.2
+        uses: olegtarasov/get-tag@v2.1.3
         id: tagName
       - name: Dispatch Release Event
         uses: peter-evans/repository-dispatch@v2
