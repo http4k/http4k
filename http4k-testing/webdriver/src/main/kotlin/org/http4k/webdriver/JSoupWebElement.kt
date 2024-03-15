@@ -1,6 +1,7 @@
 package org.http4k.webdriver
 
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -9,8 +10,12 @@ import org.http4k.core.Uri
 import org.http4k.core.relative
 import org.http4k.core.with
 import org.http4k.lens.FormField
+import org.http4k.lens.MultipartForm
+import org.http4k.lens.MultipartFormField
+import org.http4k.lens.MultipartFormFile
 import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
+import org.http4k.lens.multipartForm
 import org.http4k.lens.webForm
 import org.jsoup.nodes.Element
 import org.openqa.selenium.By
@@ -19,6 +24,8 @@ import org.openqa.selenium.OutputType
 import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
+import java.io.File
+import java.nio.file.Files
 import java.util.Locale.getDefault
 
 data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, val element: Element) :
@@ -50,14 +57,24 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun submit() {
         current("form")?.let {
+            val enctype = it.getAttribute("enctype") ?: ContentType.APPLICATION_FORM_URLENCODED.value
+
             val method =
                 runCatching { Method.valueOf(it.element.attr("method").uppercase(getDefault())) }.getOrDefault(POST)
             val inputs = it
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
+                .filterNot { it.isAFileInput() }
                 .filterNot { it.isAnInactiveSubmitInput() }
                 .filterNot(::isUncheckedInput)
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+
+            val fileInputs = it
+                .findElements(By.tagName("input"))
+                .filter { it.getAttribute("name") != "" }
+                .filter { it.isAFileInput() }
+                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+
             val textareas = it.findElements(By.tagName("textarea"))
                 .filter { it.getAttribute("name") != "" }
                 .map { it.getAttribute("name") to listOf(it.text) }
@@ -71,25 +88,23 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val buttons = it.findElements(By.tagName("button"))
                 .filter { it.getAttribute("name") != "" && it == this }
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
-            val form = WebForm(inputs.plus(textareas).plus(selects).plus(buttons)
-                .groupBy { it.first }
-                .mapValues { it.value.map { it.second }.flatten() })
 
-            val body = Body.webForm(
-                Validator.Strict,
-                *(form.fields.map { FormField.multi.optional(it.key) }.toTypedArray())
-            ).toLens()
+            val ordinaryInputs = inputs + textareas + selects + buttons
+            val addFormModifier = createForm(enctype, ordinaryInputs, fileInputs)
 
             val actionString = it.element.attr("action") ?: ""
             val formActionUri = Uri.of(actionString)
             val current = getURL()?.let { Uri.of(it) }
             val formUri = current?.relative(formActionUri) ?: formActionUri
-            val postRequest = Request(method, formUri).with(body of form)
+            val postRequest = Request(method, formUri).with(addFormModifier)
 
             if (method == POST) navigate(postRequest)
             else navigate(Request(method, formUri.query(postRequest.bodyString())).body(""))
         }
     }
+
+    private fun WebElement.isAFileInput() = getAttribute("type") == "file"
+    private fun WebElement.isSubmitInput() = getAttribute("type") == "submit"
 
     private fun WebElement.isAnInactiveSubmitInput() =
         if (isSubmitInput()) {
@@ -98,7 +113,6 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             false
         }
 
-    private fun WebElement.isSubmitInput() = getAttribute("type") == "submit"
 
     private fun isUncheckedInput(input: WebElement): Boolean =
         (listOf("checkbox", "radio").contains(input.getAttribute("type"))) && input.getAttribute("checked") == null
@@ -234,3 +248,72 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         )
     }
 }
+
+private fun createForm(
+    enctype: String,
+    fileFields: List<Pair<String, List<String>>>,
+    otherFields: List<Pair<String, List<String>>>
+): (Request) -> Request {
+    return when (enctype) {
+        ContentType.MULTIPART_FORM_DATA.value -> createFormMultipart(fileFields, otherFields)
+        else -> createFormUrlEncoded(otherFields + fileFields)
+    }
+}
+
+private fun createFormMultipart(
+    otherFields: List<Pair<String, List<String>>>,
+    fileFields: List<Pair<String, List<String>>>
+): (Request) -> Request {
+    val fields = otherFields
+        .groupBy { it.first }
+        .mapValues { (_, values) -> values.flatMap { it.second.map { MultipartFormField(it) } } }
+
+    val files = fileFields
+        .groupBy { it.first }
+        .mapValues { (_, values) ->
+            values.flatMap {
+                it.second.map { filepath ->
+
+                    val file = File(filepath)
+                    val contentType: String? = Files.probeContentType(file.toPath())
+
+                    MultipartFormFile(
+                        filename = file.name,
+                        contentType = contentType?.let { ContentType(it) } ?: ContentType.TEXT_PLAIN,
+                        content = file.inputStream()
+                    )
+                }
+            }
+        }
+
+    val form = MultipartForm(
+        fields = fields,
+        files = files
+    )
+
+    val body = Body.multipartForm(
+        Validator.Strict,
+        *(form.fields.map { MultipartFormField.multi.optional(it.key) }.toTypedArray()),
+        *(form.fields.map { MultipartFormFile.multi.optional(it.key) }.toTypedArray())
+    ).toLens()
+
+    return body.of(form)
+}
+
+private fun createFormUrlEncoded(
+    fields: List<Pair<String, List<String>>>,
+): (Request) -> Request {
+    val form = WebForm(
+        fields
+            .groupBy { it.first }
+            .mapValues { it.value.map { it.second }.flatten() }
+    )
+
+    val body = Body.webForm(
+        Validator.Strict,
+        *(form.fields.map { FormField.multi.optional(it.key) }.toTypedArray())
+    ).toLens()
+
+    return body.of(form)
+}
+
