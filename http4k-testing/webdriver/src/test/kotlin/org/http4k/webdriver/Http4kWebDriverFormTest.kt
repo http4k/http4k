@@ -230,11 +230,19 @@ class Http4kWebDriverFormTest {
 
             val formBody = MultipartFormBody.from(req)
             val file = formBody.file("file")!!
+            val otherFieldNames = listOf("text1", "textarea1", "checkbox1", "select1", "button")
+            val pairsOfOtherFields =
+                otherFieldNames.flatMap { fieldName -> formBody.fieldValues(fieldName).map { fieldName to it } }
+            val otherFieldsString =
+                pairsOfOtherFields.map { (fieldName, value) -> "$fieldName=$value" }.joinToString("&")
 
-            Response(Status.OK).body(body
-                .replace("ENCODING", req.header("content-type")!!)
-                .replace("FILENAME", file.filename)
-                .replace("FILECONTENT", file.content.asString()))
+            Response(Status.OK).body(
+                body
+                    .replace("ENCODING", req.header("content-type")!!)
+                    .replace("FILENAME", file.filename)
+                    .replace("FILECONTENT", file.content.asString())
+                    .replace("OTHERFORMFIELDS", otherFieldsString)
+            )
         })
 
         val fileContent = "hello mum"
@@ -242,11 +250,16 @@ class Http4kWebDriverFormTest {
         Files.newBufferedWriter(filePath).use { it.write(fileContent) }
 
         driver.get("https://example.com/bob")
-        driver.findElement(By.tagName("input"))!!.sendKeys(filePath.toString())
+        driver.findElement(By.cssSelector("input[type=file]"))!!.sendKeys(filePath.toString())
         driver.findElement(By.tagName("button"))!!.submit()
 
         assertThat(driver, hasElement(By.tagName("theformencoding"), hasText(startsWith("multipart/form-data"))))
         assertThat(driver, hasElement(By.tagName("thefilename"), hasText(equalTo(filePath.fileName.toString()))))
         assertThat(driver, hasElement(By.tagName("thefilecontent"), hasText(equalTo(fileContent))))
+
+        val expectedOtherFields =
+            "text1=textValue&textarea1=textarea&checkbox1=checkbox&select1=option1&select1=option2&button=yes"
+
+        assertThat(driver, hasElement(By.tagName("theotherformfields"), hasText(equalTo(expectedOtherFields))))
     }
 }
