@@ -6,13 +6,11 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.queries
 import org.http4k.core.toUrlFormEncoded
-import org.http4k.lens.RequestContextKey
 import java.util.Locale.getDefault
 
 /**
@@ -52,10 +50,7 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
         val headers = toHeaders() +
             (getStringList("cookies")?.map { "Cookie" to it } ?: emptyList())
 
-        return Request(
-            Method.valueOf(method),
-            Uri.of(getString("rawPath").orEmpty()).query(query.toUrlFormEncoded())
-        )
+        return Request(Method.valueOf(method), Uri.of(getString("rawPath").orEmpty()).query(query.toUrlFormEncoded()))
             .headers(headers)
             .body(toBody())
     }
@@ -67,8 +62,7 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
         return mapOf(
             "statusCode" to resp.status.code,
             "headers" to nonCookies.toMap(),
-            "multiValueHeaders" to nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }
-                .toMap(),
+            "multiValueHeaders" to nonCookies.groupBy { it.first }.mapValues { it.value.map { it.second } }.toMap(),
             "cookies" to resp.cookies().map(Cookie::fullCookieString),
             "body" to resp.body.payload.base64Encode(),
             "isBase64Encoded" to true
