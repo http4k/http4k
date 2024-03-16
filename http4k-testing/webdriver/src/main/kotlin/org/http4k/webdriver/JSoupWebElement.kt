@@ -202,7 +202,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     private fun associatedForm(): JSoupWebElement? {
         val formId = getAttribute("form")
-        return if (formId != null) {
+        return if (formId?.isNotBlank() == true)  {
             element.root().getElementById(formId)?.let { JSoupWebElement(navigate, getURL, it) }
         } else {
             current("form")
@@ -215,9 +215,9 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     private fun associatedFormElements(form: JSoupWebElement, tagName: String): List<WebElement> {
         val root = JSoupWebElement(navigate, getURL, form.element.root())
-        val formId = form.getAttribute("id")
+        val formId: String? = form.getAttribute("id")?.ifBlank { null }
 
-        return form.findElements(By.tagName(tagName)) + root.findElements(By.cssSelector("$tagName[form=$formId]"))
+        return form.findElements(By.tagName(tagName)) + (formId?.let { root.findElements(By.cssSelector("$tagName[form=$formId]")) } ?: emptyList())
     }
 
     companion object {
