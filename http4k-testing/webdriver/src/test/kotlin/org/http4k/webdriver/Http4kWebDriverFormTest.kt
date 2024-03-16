@@ -202,6 +202,25 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
+    fun `POST form - form elements associated with the form by the 'form' attribute are still sent`() {
+        val driver = Http4kWebDriver({ req ->
+            val body = File("src/test/resources/form_element_association.html").readText()
+
+            Response(Status.OK).body(
+                body.replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+            )
+        })
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("button"))!!.click()
+        driver.assertOnPage("https://example.com/form")
+        val expectedFormBody = "text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"
+
+        assertThat(driver, showsWeSentTheBody(expectedFormBody))
+    }
+
+    @Test
     fun `POST form - a form that has an 'enctype' of 'multipart form-data' transmits its data as a multipart form`() {
         val driver = Http4kWebDriver({ req ->
             val body = File("src/test/resources/file_upload_test.html").readText()
