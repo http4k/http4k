@@ -56,43 +56,44 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     }
 
     override fun submit() {
-        current("form")?.let {
-            val enctype = it.getAttribute("enctype") ?: ContentType.APPLICATION_FORM_URLENCODED.value
+        associatedForm()?.let { form ->
+            val enctype = form.getAttribute("enctype") ?: ContentType.APPLICATION_FORM_URLENCODED.value
 
             val method =
-                runCatching { Method.valueOf(it.element.attr("method").uppercase(getDefault())) }.getOrDefault(POST)
-            val inputs = it
-                .findElements(By.tagName("input"))
+                runCatching { Method.valueOf(form.element.attr("method").uppercase(getDefault())) }.getOrDefault(POST)
+
+            val inputs = associatedFormElements(form, "input")
                 .filter { it.getAttribute("name") != "" }
                 .filterNot { it.isAFileInput() }
                 .filterNot { it.isAnInactiveSubmitInput() }
                 .filterNot(::isUncheckedInput)
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
 
-            val fileInputs = it
-                .findElements(By.tagName("input"))
+            val fileInputs = associatedFormElements(form, "input")
                 .filter { it.getAttribute("name") != "" }
                 .filter { it.isAFileInput() }
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
 
-            val textareas = it.findElements(By.tagName("textarea"))
+            val textareas = associatedFormElements(form, "textarea")
                 .filter { it.getAttribute("name") != "" }
                 .map { it.getAttribute("name") to listOf(it.text) }
-            val selects = it.findElements(By.tagName("select"))
+
+            val selects = associatedFormElements(form, "select")
                 .filter { it.getAttribute("name") != "" }
                 .map {
                     it.getAttribute("name") to it.findElements(By.tagName("option"))
                         .filter { it.isSelected }
                         .map { it.getAttribute("value") }
                 }
-            val buttons = it.findElements(By.tagName("button"))
+
+            val buttons = associatedFormElements(form, "button")
                 .filter { it.getAttribute("name") != "" && it == this }
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
 
             val ordinaryInputs = inputs + textareas + selects + buttons
             val addFormModifier = createForm(enctype, ordinaryInputs, fileInputs)
 
-            val actionString = it.element.attr("action") ?: ""
+            val actionString = form.element.attr("action") ?: ""
             val formActionUri = Uri.of(actionString)
             val current = getURL()?.let { Uri.of(it) }
             val formUri = current?.relative(formActionUri) ?: formActionUri
@@ -199,9 +200,25 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)
 
+    private fun associatedForm(): JSoupWebElement? {
+        val formId = getAttribute("form")
+        return if (formId?.isNotBlank() == true)  {
+            element.root().getElementById(formId)?.let { JSoupWebElement(navigate, getURL, it) }
+        } else {
+            current("form")
+        }
+    }
+
     private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it) }
 
     private fun isA(tag: String) = tagName.lowercase(getDefault()) == tag.lowercase(getDefault())
+
+    private fun associatedFormElements(form: JSoupWebElement, tagName: String): List<WebElement> {
+        val root = JSoupWebElement(navigate, getURL, form.element.root())
+        val formId: String? = form.getAttribute("id")?.ifBlank { null }
+
+        return form.findElements(By.tagName(tagName)) + (formId?.let { root.findElements(By.cssSelector("$tagName[form=$formId]")) } ?: emptyList())
+    }
 
     companion object {
         private val booleanAttributes = listOf(
@@ -316,4 +333,6 @@ private fun createFormUrlEncoded(
 
     return body.of(form)
 }
+
+
 
