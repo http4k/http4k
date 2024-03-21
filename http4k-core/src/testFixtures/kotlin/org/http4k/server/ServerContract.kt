@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anyOf
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
@@ -158,10 +159,13 @@ abstract class ServerContract(
                 .header("foo", """use "cookie=\"value\"" instead.""")
         )
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), equalTo(
-            """foo: "my header with quotes"
+        assertThat(
+            response.bodyString(), equalTo(
+                """foo: "my header with quotes"
               |foo: cookie="value"
-              |foo: use "cookie=\"value\"" instead.""".trimMargin()))
+              |foo: use "cookie=\"value\"" instead.""".trimMargin()
+            )
+        )
     }
 
     @Test
@@ -201,10 +205,13 @@ abstract class ServerContract(
         )
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), equalTo(
-            """foo: one
+        assertThat(
+            response.bodyString(), equalTo(
+                """foo: one
               |foo: two
-              |foo: three""".trimMargin()))
+              |foo: three""".trimMargin()
+            )
+        )
     }
 
     @Test
@@ -261,6 +268,11 @@ abstract class ServerContract(
                 hasHeader("x-scheme", requestScheme())
             )
         )
+    }
+
+    @Test
+    open fun `illegal url doesn't expose stacktrace`() {
+        assertThat(client(Request(GET, "$baseUrl/v1/foo//bar")).bodyString().lowercase(), !containsSubstring("exception"))
     }
 
     open fun clientAddress() = anyOf(
