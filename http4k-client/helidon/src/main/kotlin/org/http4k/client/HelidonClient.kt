@@ -64,7 +64,7 @@ object HelidonClient {
                     queryParam(it.key, *it.value.map { value -> value?.urlEncoded() }.toTypedArray())
                 }
                 request.headers.groupBy { it.first }.entries.fold(this) { acc, (key, parameters) ->
-                    acc.header(HeaderNames.create(key, key), parameters.map { it.second })
+                    acc.header(HeaderNames.create(key.lowercase(), key), parameters.map { it.second })
                 }
             }
 }
