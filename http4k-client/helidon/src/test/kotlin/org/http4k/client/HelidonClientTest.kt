@@ -6,6 +6,7 @@ import io.helidon.webclient.api.WebClient
 import org.http4k.client.HelidonClient.makeHelidonRequest
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.OK
 import org.http4k.server.ApacheServer
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -30,5 +31,12 @@ class HelidonClientTest : HttpClientContract(
             .rawValue()
 
         assertThat(helidonQuery, equalTo("p1=foo&p1=bar&p2=123"))
+    }
+
+    @Test
+    fun `helidon doesn't add another host header`() {
+        val response = client(Request(GET, "http://localhost:$port/headers").header("Host", "localhost:$port"))
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo("Host,User-Agent,Connection,Content-Length"))
     }
 }
