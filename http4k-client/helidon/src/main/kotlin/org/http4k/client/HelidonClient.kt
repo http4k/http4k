@@ -47,21 +47,24 @@ object HelidonClient {
         }
 
         private fun HttpClientResponse.asHttp4k() =
-            headers().fold(Response(Status(status().code(), status().reasonPhrase()))) { acc, next ->
-                next.allValues().fold(acc) { acc2, value -> acc2.header(next.name(), value) }
-            }.body(bodyMode(inputStream()))
+            headers()
+                .fold(Response(Status(status().code(), status().reasonPhrase()))) { acc, header ->
+                    header.allValues().fold(acc) { acc2, value ->
+                        acc2.header(header.name(), value)
+                    }
+                }
+                .body(bodyMode(inputStream()))
     }
 
     internal fun WebClient.makeHelidonRequest(request: Request) =
-        request.headers.groupBy { it.first }
-            .entries
-            .fold(
-                method(Method.create(request.method.name))
-                    .uri(request.uri.copy(query = "").toString())
-                    .apply {
-                        request.uri.queries().toParametersMap().forEach {
-                            queryParam(it.key, *it.value.map { value -> value?.urlEncoded() }.toTypedArray())
-                        }
-                    }
-            ) { acc, next -> acc.header(HeaderNames.create(next.key, next.key), next.value.map { it.second }) }
+        method(Method.create(request.method.name))
+            .uri(request.uri.copy(query = "").toString())
+            .apply {
+                request.uri.queries().toParametersMap().forEach {
+                    queryParam(it.key, *it.value.map { value -> value?.urlEncoded() }.toTypedArray())
+                }
+                request.headers.groupBy { it.first }.entries.fold(this) { acc, (key, parameters) ->
+                    acc.header(HeaderNames.create(key, key), parameters.map { it.second })
+                }
+            }
 }
