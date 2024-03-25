@@ -76,7 +76,7 @@ fun Internal1(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
 
 // the second internal app
 fun Internal2(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
-    val events = TraceEvents("internal2").then(rawEvents).and(rawEvents)
+    val events = TraceEvents("internal2").then(rawEvents)
     val http = ClientStack(events).then(rawHttp)
 
     return ServerStack(events)
