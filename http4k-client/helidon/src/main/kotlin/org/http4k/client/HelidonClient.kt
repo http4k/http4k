@@ -14,7 +14,6 @@ import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import org.http4k.core.queries
 import org.http4k.core.toParametersMap
-import org.http4k.urlEncoded
 import java.io.UncheckedIOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -60,8 +59,9 @@ object HelidonClient {
         method(Method.create(request.method.name))
             .uri(request.uri.copy(query = "").toString())
             .apply {
-                request.uri.queries().toParametersMap().forEach {
-                    queryParam(it.key, *it.value.map { value -> value?.urlEncoded() }.toTypedArray())
+                request.uri.queries().toParametersMap().forEach { (name, values) ->
+                    // Replacing space with '+' because unlike other http clients, Helidon encodes space as %20
+                    queryParam(name, *values.map { it?.replace(' ', '+') }.toTypedArray())
                 }
                 request.headers.groupBy { it.first }.entries.fold(this) { acc, (key, parameters) ->
                     acc.header(HeaderNames.create(key.lowercase(), key), parameters.map { it.second })
