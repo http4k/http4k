@@ -67,10 +67,10 @@ abstract class HttpClientContract(
 
     @Test
     fun `performs simple GET request`() {
-        val response = client(Request(GET, "http://localhost:$port/echo").query("name", "John Doe"))
+        val response = client(Request(GET, "http://localhost:$port/echo").query("name", "John Doe 12:34"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("/echo?name=John+Doe"))
+        assertThat(response.bodyString(), containsSubstring("/echo?name=John+Doe+12:34"))
     }
 
     @Test
