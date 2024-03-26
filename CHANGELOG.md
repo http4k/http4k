@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.14.3.0 (uncut)
+- **http4k-client-helidon** : Various fixes H/T @dkandalov
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v5.14.2.0
 - **http4k-*** : Upgrade some dependency versions.
 
