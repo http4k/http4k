@@ -24,28 +24,28 @@ class TracerBullet(private val tracers: List<Tracer>) {
 internal fun List<MetadataEvent>.buildTree(): List<EventNode> {
     val eventsByParent = groupBy { it.traces()?.parentSpanId }
 
-    fun MetadataEvent.createEventNodes(events: List<MetadataEvent>): List<EventNode> =
+    fun MetadataEvent.childEventNodes(): List<EventNode> =
         eventsByParent[traces()?.spanId]
-            ?.map { EventNode(it.findIncoming(events), it.createEventNodes(events)) }
+            ?.map { EventNode(attachIncomingFor(it), it.childEventNodes()) }
             ?: emptyList()
 
     val rootEvents = filter { event ->
         eventsByParent.none { it.value.any { it.traces()?.spanId == event.traces()?.parentSpanId } }
     }
 
-    return rootEvents.map { EventNode(it.findIncoming(this), it.createEventNodes(this)) }
+    return rootEvents.map { EventNode(attachIncomingFor(it), it.childEventNodes()) }
 }
 
-private fun MetadataEvent.findIncoming(events: List<MetadataEvent>) =
-    (when (event) {
+private fun List<MetadataEvent>.attachIncomingFor(candidate: MetadataEvent) =
+    (when (candidate.event) {
         is Outgoing -> {
-            when (val incoming = events.firstOrNull { it.matchingIncoming(traces()) }) {
-                null -> this
-                else -> this + (X_HTTP4K_INCOMING_EVENT to incoming)
+            when (val incoming = asReversed().firstOrNull { it.matchingIncoming(candidate.traces()) }) {
+                null -> candidate
+                else -> candidate + (X_HTTP4K_INCOMING_EVENT to incoming)
             }
         }
 
-        else -> this
+        else -> candidate
     }) as MetadataEvent
 
 private fun MetadataEvent.matchingIncoming(traces: Any?) =
