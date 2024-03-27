@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger ${{ matrix.repo }}
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3.0.0
         with:
           token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
           repository: ${{ matrix.repo }}

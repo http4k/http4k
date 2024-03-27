@@ -58,7 +58,7 @@ jobs:
         uses: olegtarasov/get-tag@v2.1.3
         id: tagName
       - name: Dispatch Release Event
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3.0.0
         with:
           token: ${{ secrets.ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING }}
           repository: http4k/http4k
