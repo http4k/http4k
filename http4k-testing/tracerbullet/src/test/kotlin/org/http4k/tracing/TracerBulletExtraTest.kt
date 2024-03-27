@@ -34,14 +34,16 @@ class TracerBulletExtraTest {
             eventWith("Event 1.7 (B-C)", "1", "span1.C.2", "span1.B.4"),
             eventWith("Event 1.6 (A-B)", "1", "span1.B.4", "span1.A.1"),
             eventWith("Event 1.9 (A-D)", "1", "span1.D.3", "span1.A.1"),
-            eventWith("Event 1.0", "-A", "span1.A.1", null),
+            eventWith("Event 1.0", "1", "span1.A.1", null),
             eventWith("Event 2.1 (A-B)", "2", "span2.B.1", "span2.A.1"),
             eventWith("Event 2.2 (A-B)", "2", "span2.B.2", "span2.A.1"),
             eventWith("Event 2.5 (D-E)", "2", "span2.E.1", "span2.D.1"),
             eventWith("Event 2.4 (B-D)", "2", "span2.D.1", "span2.B.3"),
             eventWith("Event 2.3 (A-B)", "2", "span2.B.3", "span2.A.1"),
             eventWith("Event 2.6 (A-E)", "2", "span2.E.2", "span2.A.1"),
-            eventWith("Event 2.0", "-B", "span2.A.1", "ROOT")
+            eventWith("Event 2.0", "2", "span2.A.1", "ROOT"),
+            eventWith("Event 3.1 (A-B,diff trace)", "3.1", "span3.B.1", "span3.A.1"),
+            eventWith("Event 3.0", "3.0", "span3.A.1", null),
         ).buildTree()
         prettyPrint(input, 0)
         approver.assertApproved(prettify(asFormatString(input)))

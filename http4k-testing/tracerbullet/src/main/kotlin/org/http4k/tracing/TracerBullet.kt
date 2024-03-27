@@ -22,6 +22,12 @@ class TracerBullet(private val tracers: List<Tracer>) {
 }
 
 internal fun List<MetadataEvent>.buildTree(): List<EventNode> {
+    return groupBy { it.traces()?.traceId }
+        .mapValues { it.value.buildTreeForTrace() }
+        .flatMap { it.value }
+}
+
+private fun List<MetadataEvent>.buildTreeForTrace(): List<EventNode> {
     val eventsByParent = groupBy { it.traces()?.parentSpanId }
 
     fun MetadataEvent.childEventNodes(): List<EventNode> =
