@@ -40,12 +40,12 @@ import java.io.File
 fun TraceEvents(actorName: String) = AddZipkinTraces().then(AddServiceName(actorName))
 
 // standardised client filter stack which adds tracing and records traffic events
-fun ClientStack(events: Events) = ReportHttpTransaction { events(Outgoing(it)) }
-    .then(ClientFilters.RequestTracing())
+fun ClientStack(events: Events) = ClientFilters.RequestTracing()
+    .then(ReportHttpTransaction { events(Outgoing(it)) })
 
 // standardised server filter stack which adds tracing and records traffic events
-fun ServerStack(events: Events) = ReportHttpTransaction { events(Incoming(it)) }
-    .then(RequestTracing())
+fun ServerStack(events: Events) =
+    RequestTracing().then(ReportHttpTransaction { events(Incoming(it)) })
 
 // Our "User" object who will send a request to our system
 class User(rawEvents: Events, rawHttp: HttpHandler) {
