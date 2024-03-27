@@ -1,7 +1,8 @@
 package org.http4k.tracing
 
 import org.http4k.events.Event
-import org.http4k.events.HttpEvent
+import org.http4k.events.HttpEvent.Incoming
+import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.events.MetadataEvent
 import org.http4k.events.plus
 import org.http4k.tracing.CollectEvents.Collect
@@ -23,36 +24,32 @@ class TracerBullet(private val tracers: List<Tracer>) {
 internal fun List<MetadataEvent>.buildTree(): List<EventNode> {
     val eventsByParent = groupBy { it.traces()?.parentSpanId }
 
+    fun MetadataEvent.createEventNodes(events: List<MetadataEvent>): List<EventNode> =
+        eventsByParent[traces()?.spanId]
+            ?.map { EventNode(it.findIncoming(events), it.createEventNodes(events)) }
+            ?: emptyList()
+
     val rootEvents = filter { event ->
         eventsByParent.none { it.value.any { it.traces()?.spanId == event.traces()?.parentSpanId } }
     }
 
-    return rootEvents.map { it.asEventNode(this) }
+    return rootEvents.map { EventNode(it.findIncoming(this), it.createEventNodes(this)) }
 }
 
-private fun MetadataEvent.asEventNode(events: List<MetadataEvent>): EventNode {
-    val updated = (when (event) {
-        is HttpEvent.Outgoing -> {
+private fun MetadataEvent.findIncoming(events: List<MetadataEvent>) =
+    (when (event) {
+        is Outgoing -> {
             when (val incoming = events.firstOrNull { it.matchingIncoming(traces()) }) {
                 null -> this
-                else -> this + ("x-http4k-tracing-incoming" to incoming)
+                else -> this + (X_HTTP4K_INCOMING_EVENT to incoming)
             }
         }
 
         else -> this
     }) as MetadataEvent
 
-    return EventNode(updated, createEventNodes(events))
-}
-
 private fun MetadataEvent.matchingIncoming(traces: Any?) =
-    event is HttpEvent.Incoming && metadata["traces"] == traces
-
-private fun MetadataEvent.createEventNodes(events: List<MetadataEvent>): List<EventNode> {
-    val eventsByParent = events.groupBy { it.traces()?.parentSpanId }
-
-    return eventsByParent[traces()?.spanId]?.map { it.asEventNode(events) } ?: emptyList()
-}
+    event is Incoming && metadata["traces"] == traces
 
 private enum class CollectEvents { Collect, Drop }
 
