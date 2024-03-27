@@ -4,7 +4,6 @@ import org.http4k.events.Event
 import org.http4k.events.HttpEvent
 import org.http4k.events.MetadataEvent
 import org.http4k.events.plus
-import org.http4k.filter.TraceId
 import org.http4k.tracing.CollectEvents.Collect
 import org.http4k.tracing.CollectEvents.Drop
 import org.http4k.tracing.tracer.TreeWalker
@@ -28,28 +27,32 @@ internal fun List<MetadataEvent>.buildTree(): List<EventNode> {
         eventsByParent.none { it.value.any { it.traces()?.spanId == event.traces()?.parentSpanId } }
     }
 
-    return rootEvents.map { it.asEventNode(eventsByParent) }
+    return rootEvents.map { it.asEventNode(this) }
 }
 
-private fun MetadataEvent.asEventNode(eventsByParent: Map<TraceId?, List<MetadataEvent>>): EventNode {
+private fun MetadataEvent.asEventNode(events: List<MetadataEvent>): EventNode {
     val updated = (when (event) {
-        is HttpEvent.Outgoing ->
-            when (val incoming = eventsByParent[traces()?.traceId]?.firstOrNull(::matchingIncoming)) {
+        is HttpEvent.Outgoing -> {
+            when (val incoming = events.firstOrNull { it.matchingIncoming(traces()) }) {
                 null -> this
-                else -> this + ("target" to incoming)
+                else -> this + ("x-http4k-tracing-incoming" to incoming)
             }
+        }
 
         else -> this
     }) as MetadataEvent
 
-    return EventNode(updated, createEventNodes(eventsByParent))
+    return EventNode(updated, createEventNodes(events))
 }
 
-private fun MetadataEvent.matchingIncoming(candidate: MetadataEvent): Boolean =
-    candidate.event is HttpEvent.Incoming && candidate.metadata["traces"] == metadata["traces"]
+private fun MetadataEvent.matchingIncoming(traces: Any?) =
+    event is HttpEvent.Incoming && metadata["traces"] == traces
 
-private fun MetadataEvent.createEventNodes(eventsByParent: Map<TraceId?, List<MetadataEvent>>): List<EventNode> =
-    eventsByParent[traces()?.spanId]?.map { it.asEventNode(eventsByParent) } ?: emptyList()
+private fun MetadataEvent.createEventNodes(events: List<MetadataEvent>): List<EventNode> {
+    val eventsByParent = events.groupBy { it.traces()?.parentSpanId }
+
+    return eventsByParent[traces()?.spanId]?.map { it.asEventNode(events) } ?: emptyList()
+}
 
 private enum class CollectEvents { Collect, Drop }
 

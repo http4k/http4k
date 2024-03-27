@@ -1,6 +1,7 @@
 package org.http4k.tracing.tracer
 
 import org.http4k.events.HttpEvent
+import org.http4k.events.MetadataEvent
 import org.http4k.tracing.Actor
 import org.http4k.tracing.ActorResolver
 import org.http4k.tracing.ActorType.System
@@ -21,7 +22,9 @@ private fun EventNode.toTrace(actorFrom: ActorResolver, tracer: Tracer): Trace {
 
     return RequestResponse(
         actorFrom(event),
-        Actor(parentEvent.uri.host, System),
+        (event.metadata["x-http4k-tracing-incoming"] as? MetadataEvent)
+            ?.let(actorFrom)
+            ?: Actor(parentEvent.uri.host, System),
         parentEvent.method.name + " " + parentEvent.xUriTemplate,
         parentEvent.status.toString(),
         children.flatMap { tracer(it, tracer) }
