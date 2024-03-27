@@ -36,10 +36,18 @@ internal fun List<MetadataEvent>.buildTree(): List<EventNode> {
     return rootEvents.map { EventNode(attachIncomingFor(it), it.childEventNodes()) }
 }
 
-private fun List<MetadataEvent>.attachIncomingFor(candidate: MetadataEvent) =
-    (when (candidate.event) {
+private fun List<MetadataEvent>.attachIncomingFor(candidate: MetadataEvent): MetadataEvent {
+    val outgoing = candidate.event
+    return (when (outgoing) {
         is Outgoing -> {
-            when (val incoming = asReversed().firstOrNull { it.matchingIncoming(candidate.traces()) }) {
+            when (val incoming = asReversed()
+                .firstOrNull {
+                    val event = it.event
+                    event is Incoming &&
+                        it.metadata["traces"] == candidate.traces() &&
+                        event.uri.path == event.uri.path
+                }
+            ) {
                 null -> candidate
                 else -> candidate + (X_HTTP4K_INCOMING_EVENT to incoming)
             }
@@ -47,9 +55,7 @@ private fun List<MetadataEvent>.attachIncomingFor(candidate: MetadataEvent) =
 
         else -> candidate
     }) as MetadataEvent
-
-private fun MetadataEvent.matchingIncoming(traces: Any?) =
-    event is Incoming && metadata["traces"] == traces
+}
 
 private enum class CollectEvents { Collect, Drop }
 
