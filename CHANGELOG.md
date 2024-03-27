@@ -8,9 +8,6 @@ changes with their rationale when appropriate:
 - **http4k-testing-tracerbullet** : Improve identification of actor for incoming traces.
 - **http4k-client-helidon** : Various fixes H/T @dkandalov
 
-### v5.14.3.0
-- **http4k-*** : Upgrade some dependency versions.
-
 ### v5.14.2.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-tracerbullet** : Improve identification of actor for incoming traces.
