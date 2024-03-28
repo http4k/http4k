@@ -6,7 +6,7 @@
     },
     "metadata" : {
       "traces" : {
-        "traceId" : "-A",
+        "traceId" : "1",
         "spanId" : "span1.A.1",
         "parentSpanId" : null,
         "samplingDecision" : "1"
@@ -176,7 +176,7 @@
     },
     "metadata" : {
       "traces" : {
-        "traceId" : "-B",
+        "traceId" : "2",
         "spanId" : "span2.A.1",
         "parentSpanId" : "ROOT",
         "samplingDecision" : "1"
@@ -287,4 +287,38 @@
     },
     "children" : [ ]
   } ]
+}, {
+  "event" : {
+    "event" : {
+      "value" : "Event 3.1 (A-B,diff trace)",
+      "category" : "Foo"
+    },
+    "metadata" : {
+      "traces" : {
+        "traceId" : "3.1",
+        "spanId" : "span3.B.1",
+        "parentSpanId" : "span3.A.1",
+        "samplingDecision" : "1"
+      },
+      "timestamp" : 17
+    }
+  },
+  "children" : [ ]
+}, {
+  "event" : {
+    "event" : {
+      "value" : "Event 3.0",
+      "category" : "Foo"
+    },
+    "metadata" : {
+      "traces" : {
+        "traceId" : "3.0",
+        "spanId" : "span3.A.1",
+        "parentSpanId" : null,
+        "samplingDecision" : "1"
+      },
+      "timestamp" : 18
+    }
+  },
+  "children" : [ ]
 } ]
