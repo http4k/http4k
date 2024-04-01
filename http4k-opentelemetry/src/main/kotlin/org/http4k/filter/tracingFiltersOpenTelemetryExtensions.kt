@@ -12,10 +12,10 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.context.propagation.TextMapSetter
-import io.opentelemetry.semconv.SemanticAttributes.HTTP_REQUEST_BODY_SIZE
-import io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE
-import io.opentelemetry.semconv.SemanticAttributes.SERVER_ADDRESS
-import io.opentelemetry.semconv.SemanticAttributes.SERVER_PORT
+import io.opentelemetry.semconv.ServerAttributes.SERVER_ADDRESS
+import io.opentelemetry.semconv.ServerAttributes.SERVER_PORT
+import io.opentelemetry.semconv.incubating.HttpIncubatingAttributes.HTTP_REQUEST_BODY_SIZE
+import io.opentelemetry.semconv.incubating.HttpIncubatingAttributes.HTTP_RESPONSE_BODY_SIZE
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
