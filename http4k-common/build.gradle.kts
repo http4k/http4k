@@ -7,4 +7,8 @@ dependencies {
     implementation("jakarta.servlet:jakarta.servlet-api:_")
     implementation("dev.forkhandles:result4k:_")
     implementation("dev.forkhandles:values4k:_")
+
+    testFixturesApi(project(":http4k-client-apache"))
+    testFixturesApi(project(":http4k-server-apache"))
+
 }

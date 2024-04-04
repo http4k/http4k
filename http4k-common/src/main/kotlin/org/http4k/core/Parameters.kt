@@ -3,6 +3,8 @@ package org.http4k.core
 import org.http4k.urlDecoded
 import org.http4k.urlEncoded
 
+typealias Parameter = Pair<String, String?>
+
 typealias Parameters = List<Parameter>
 
 fun Uri.queries(): Parameters = query.toParameters()
@@ -24,5 +26,3 @@ private fun String.toParameter(): Parameter = split("=", limit = 2).map(String::
 internal fun String.fromFormEncoded() = this.urlDecoded()
 
 internal fun String.toFormEncoded() = this.urlEncoded()
-
-internal typealias Parameter = Pair<String, String?>

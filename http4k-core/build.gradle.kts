@@ -15,6 +15,7 @@ dependencies {
     testFixturesImplementation("jakarta.servlet:jakarta.servlet-api:_")
     testFixturesImplementation("dev.forkhandles:result4k:_")
     testFixturesImplementation("dev.forkhandles:values4k:_")
+    testFixturesApi(project(":http4k-common"))
     testFixturesApi(project(":http4k-client-apache"))
     testFixturesApi(project(":http4k-testing-approval"))
     testFixturesApi(project(":http4k-testing-hamkrest"))
