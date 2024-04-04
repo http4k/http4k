@@ -3,6 +3,8 @@ description = "Dependency-lite Server as a Function in pure Kotlin"
 dependencies {
     api(Kotlin.stdlib)
 
+    api(project(":http4k-common"))
+    api(project(":http4k-lens"))
     implementation("javax.servlet:javax.servlet-api:_")
     implementation("jakarta.servlet:jakarta.servlet-api:_")
     implementation("dev.forkhandles:result4k:_")
@@ -14,6 +16,12 @@ dependencies {
     testFixturesImplementation("jakarta.servlet:jakarta.servlet-api:_")
     testFixturesImplementation("dev.forkhandles:result4k:_")
     testFixturesImplementation("dev.forkhandles:values4k:_")
+    testFixturesApi(project(":http4k-common"))
+    testFixturesApi(project(":http4k-lens"))
+
+    testFixturesApi(testFixtures(project(":http4k-common")))
+    testFixturesApi(testFixtures(project(":http4k-lens")))
+
     testFixturesApi(project(":http4k-client-apache"))
     testFixturesApi(project(":http4k-testing-approval"))
     testFixturesApi(project(":http4k-testing-hamkrest"))

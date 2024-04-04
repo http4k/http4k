@@ -28,7 +28,10 @@ fun String.includeSubmodule(name: String) {
     project(":$this-$name").projectDir = File("$this/${name.replace('-', '/')}")
 }
 
+include("http4k-common")
 include("http4k-core")
+include("http4k-lens")
+
 include("http4k-aws")
 include("http4k-bom")
 
