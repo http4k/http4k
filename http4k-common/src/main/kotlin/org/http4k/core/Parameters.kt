@@ -25,4 +25,4 @@ internal fun String.fromFormEncoded() = this.urlDecoded()
 
 internal fun String.toFormEncoded() = this.urlEncoded()
 
-internal typealias Parameter = Pair<String, String?>
+typealias Parameter = Pair<String, String?>

@@ -5,7 +5,6 @@ import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
 import org.http4k.length
-import org.http4k.lens.WebForm
 import org.http4k.routing.RoutedRequest
 import java.io.Closeable
 import java.io.InputStream
@@ -389,4 +388,3 @@ data class RequestSource(val address: String, val port: Int? = 0, val scheme: St
 
 fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this) { memo, next -> next(memo) }
 
-fun WebForm.with(vararg modifiers: (WebForm) -> WebForm) = modifiers.fold(this) { memo, next -> next(memo) }

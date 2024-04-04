@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import org.http4k.core.MimeTypes
 import org.junit.jupiter.api.Test
+import java.lang.IllegalStateException
 
 class LoadMetaResouceTest {
 
@@ -19,8 +20,14 @@ class LoadMetaResouceTest {
     fun `throws on missing`() {
         assertThat(
             { loadMetaResource<MimeTypes>("myfile.txt") },
-            throws(has(java.lang.IllegalStateException::message, equalTo("" +
-                "Could not find 'myfile.txt' inside META-INF. If using Shadow JAR, add mergeServiceFiles() to the configuration")))
+            throws(
+                has(
+                    IllegalStateException::message, equalTo(
+                        "" +
+                            "Could not find 'myfile.txt' inside META-INF. If using Shadow JAR, add mergeServiceFiles() to the configuration"
+                    )
+                )
+            )
         )
     }
 }

@@ -10,7 +10,6 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.HttpTransaction
-import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP_LABEL
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -318,7 +317,10 @@ class ResponseFiltersTest {
         handler(request)
 
         assertThat(transaction, equalTo(HttpTransaction(request,
-            Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}"))))
+            Response(OK), ZERO, mapOf("routingGroup" to "sue/bob/{name}")
+        )
+        )
+        )
     }
 
     @Test
