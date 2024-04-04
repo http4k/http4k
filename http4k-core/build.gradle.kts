@@ -1,7 +1,8 @@
 description = "Dependency-lite Server as a Function in pure Kotlin"
 
 dependencies {
-    api(Kotlin.stdlib)
+    api(project(":http4k-common"))
+    api(project(":http4k-lens"))
 
     implementation("javax.servlet:javax.servlet-api:_")
     implementation("jakarta.servlet:jakarta.servlet-api:_")
