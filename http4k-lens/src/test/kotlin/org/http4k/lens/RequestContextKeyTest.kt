@@ -18,7 +18,7 @@ class RequestContextKeyTest {
 
     @Test
     fun `required key behaviour`() {
-        val key = RequestContextKey.required<String>(contexts)
+        val key = org.http4k.lens.RequestContextKey.required<String>(contexts)
         assertThat({ key(request) }, throws(targetIsA<RequestContext>()))
         key("hello", request)
         assertThat(key(request), equalTo("hello"))
@@ -26,7 +26,7 @@ class RequestContextKeyTest {
 
     @Test
     fun `optional key behaviour`() {
-        val key = RequestContextKey.optional<String>(contexts)
+        val key = org.http4k.lens.RequestContextKey.optional<String>(contexts)
         assertThat(key(request), absent())
         key("hello", request)
         assertThat(key(request), equalTo("hello"))
@@ -34,7 +34,7 @@ class RequestContextKeyTest {
 
     @Test
     fun `defaulted key behaviour`() {
-        val key = RequestContextKey.defaulted(contexts, "world")
+        val key = org.http4k.lens.RequestContextKey.defaulted(contexts, "world")
         assertThat(key(request), equalTo("world"))
         key("hello", request)
         assertThat(key(request), equalTo("hello"))

@@ -10,6 +10,8 @@ dependencies {
     testImplementation(project(":http4k-jsonrpc"))
     testImplementation(project(":http4k-testing-hamkrest"))
 
+
+    testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesImplementation("dev.forkhandles:values4k:_")
     testFixturesImplementation(testFixtures(project(":http4k-core")))
     testFixturesImplementation(testFixtures(project(":http4k-common")))

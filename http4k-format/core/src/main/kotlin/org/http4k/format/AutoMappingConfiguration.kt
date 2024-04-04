@@ -3,6 +3,7 @@ package org.http4k.format
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiMapping
+import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.StringBiDiMappings.duration
 import org.http4k.lens.StringBiDiMappings.eventCategory
 import org.http4k.lens.StringBiDiMappings.instant
@@ -13,9 +14,7 @@ import org.http4k.lens.StringBiDiMappings.locale
 import org.http4k.lens.StringBiDiMappings.offsetDateTime
 import org.http4k.lens.StringBiDiMappings.offsetTime
 import org.http4k.lens.StringBiDiMappings.regexObject
-import org.http4k.lens.StringBiDiMappings.samplingDecision
 import org.http4k.lens.StringBiDiMappings.throwable
-import org.http4k.lens.StringBiDiMappings.traceId
 import org.http4k.lens.StringBiDiMappings.uri
 import org.http4k.lens.StringBiDiMappings.url
 import org.http4k.lens.StringBiDiMappings.uuid
@@ -23,6 +22,8 @@ import org.http4k.lens.StringBiDiMappings.yearMonth
 import org.http4k.lens.StringBiDiMappings.zoneId
 import org.http4k.lens.StringBiDiMappings.zoneOffset
 import org.http4k.lens.StringBiDiMappings.zonedDateTime
+import org.http4k.lens.samplingDecision
+import org.http4k.lens.traceId
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Duration
@@ -83,8 +84,8 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(zoneId())
     text(zoneOffset())
     text(eventCategory())
-    text(traceId())
-    text(samplingDecision())
+    text(StringBiDiMappings.traceId())
+    text(StringBiDiMappings.samplingDecision())
     text(throwable())
     text(locale())
     int({ Status(it, "") }, Status::code)
@@ -187,10 +188,12 @@ inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.zonedDateTim
  * Utility method for when only writing/serialization is required
  */
 @JvmName("textSerialize")
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline mapping: (OUT) -> String): AutoMappingConfiguration<BUILDER> = text(BiDiMapping(OUT::class.java, { throw java.lang.IllegalArgumentException() }, mapping))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline mapping: (OUT) -> String): AutoMappingConfiguration<BUILDER> =
+    text(BiDiMapping(OUT::class.java, { throw java.lang.IllegalArgumentException() }, mapping))
 
 /**
  * Utility method for when only reading/deserialization is required
  */
 @JvmName("textDeserialize")
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline mapping: (String) -> OUT): AutoMappingConfiguration<BUILDER> = text(BiDiMapping(OUT::class.java, mapping, { throw java.lang.IllegalArgumentException() }))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline mapping: (String) -> OUT): AutoMappingConfiguration<BUILDER> =
+    text(BiDiMapping(OUT::class.java, mapping, { throw java.lang.IllegalArgumentException() }))
