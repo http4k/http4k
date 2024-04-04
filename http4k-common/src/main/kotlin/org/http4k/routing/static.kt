@@ -13,8 +13,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.core.with
-import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 
 /**
@@ -72,7 +70,7 @@ internal class ResourceLoadingHandler(
             val lookupType = extMap.forFile(path)
             if (lookupType != OCTET_STREAM) {
                 Response(OK)
-                    .with(CONTENT_TYPE of lookupType)
+                    .header("Content-Type", lookupType.toHeaderValue())
                     .body(Body(url.openStream()))
             } else null
         }
