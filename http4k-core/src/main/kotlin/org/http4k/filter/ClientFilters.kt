@@ -23,6 +23,7 @@ import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.StringBiDiMappings
+import org.http4k.lens.basicCredentials
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.security.CredentialsProvider
 import java.time.Clock

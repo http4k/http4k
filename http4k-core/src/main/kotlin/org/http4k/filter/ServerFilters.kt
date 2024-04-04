@@ -22,6 +22,7 @@ import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.ZipkinTraces.Companion.X_B3_PARENTSPANID
 import org.http4k.filter.ZipkinTraces.Companion.X_B3_SPANID
 import org.http4k.filter.ZipkinTraces.Companion.X_B3_TRACEID
+import org.http4k.lens.AUTHORIZATION_BASIC
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE

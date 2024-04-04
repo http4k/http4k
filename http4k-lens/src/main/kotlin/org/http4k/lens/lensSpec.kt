@@ -326,7 +326,6 @@ fun <IN : Any> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormat
 fun <IN : Any> BiDiLensSpec<IN, String>.zoneId() = map(StringBiDiMappings.zoneId())
 fun <IN : Any> BiDiLensSpec<IN, String>.zoneOffset() = map(StringBiDiMappings.zoneOffset())
 fun <IN : Any> BiDiLensSpec<IN, String>.locale() = map(StringBiDiMappings.locale())
-fun <IN : Any> BiDiLensSpec<IN, String>.basicCredentials() = map(StringBiDiMappings.basicCredentials())
 fun <IN : Any, T : Any> BiDiLensSpec<IN, String>.csv(delimiter: String = ",", mapElement: BiDiMapping<String, T>) =
     map(StringBiDiMappings.csv(delimiter, mapElement))
 

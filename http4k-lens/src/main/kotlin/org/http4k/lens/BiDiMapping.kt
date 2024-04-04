@@ -2,7 +2,6 @@ package org.http4k.lens
 
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
-import org.http4k.core.Credentials
 import org.http4k.core.Uri
 import org.http4k.urlDecoded
 import org.http4k.urlEncoded
@@ -41,7 +40,10 @@ import java.util.UUID
 
 open class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, val asIn: (OUT) -> IN) {
 
-    inline fun <reified NEXT> map(crossinline nextOut: (OUT) -> NEXT, crossinline nextIn: (NEXT) -> OUT): BiDiMapping<IN, NEXT> =
+    inline fun <reified NEXT> map(
+        crossinline nextOut: (OUT) -> NEXT,
+        crossinline nextIn: (NEXT) -> OUT
+    ): BiDiMapping<IN, NEXT> =
         BiDiMapping(NEXT::class.java, { nextOut(asOut(it)) }, { asIn(nextIn(it)) })
 
     @JvmName("asIn")
@@ -51,7 +53,8 @@ open class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, v
     operator fun invoke(asIn: IN): OUT = asOut(asIn)
 
     companion object {
-        inline operator fun <IN, reified T> invoke(noinline asOut: (IN) -> T, noinline asIn: (T) -> IN) = BiDiMapping(T::class.java, asOut, asIn)
+        inline operator fun <IN, reified T> invoke(noinline asOut: (IN) -> T, noinline asIn: (T) -> IN) =
+            BiDiMapping(T::class.java, asOut, asIn)
     }
 }
 
@@ -66,9 +69,15 @@ object StringBiDiMappings {
     fun bigDecimal() = BiDiMapping(String::toBigDecimal, BigDecimal::toString)
     fun bigInteger() = BiDiMapping(String::toBigInteger, BigInteger::toString)
     fun boolean() = BiDiMapping(String::asSafeBoolean, Boolean::toString)
-    fun nonEmpty() = BiDiMapping({ s: String -> s.ifEmpty { throw IllegalArgumentException("String cannot be empty") } }, { it })
-    fun nonBlank() = BiDiMapping({ s: String -> s.ifBlank { throw IllegalArgumentException("String cannot be blank") } }, { it })
-    fun regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
+    fun nonEmpty() =
+        BiDiMapping({ s: String -> s.ifEmpty { throw IllegalArgumentException("String cannot be empty") } }, { it })
+
+    fun nonBlank() =
+        BiDiMapping({ s: String -> s.ifBlank { throw IllegalArgumentException("String cannot be blank") } }, { it })
+
+    fun regex(pattern: String, group: Int = 1) =
+        pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
+
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
     fun urlEncoded() = BiDiMapping(String::urlDecoded, String::urlEncoded)
     fun duration() = BiDiMapping(Duration::parse, Duration::toString)
@@ -78,32 +87,36 @@ object StringBiDiMappings {
     fun base64() = BiDiMapping(String::base64Decoded, String::base64Encode)
 
     fun instant() = BiDiMapping(Instant::parse, ISO_INSTANT::format)
-    fun yearMonth(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM")) = BiDiMapping({ YearMonth.parse(it, formatter) }, formatter::format)
-    fun localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = BiDiMapping({ LocalTime.parse(it, formatter) }, formatter::format)
-    fun localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = BiDiMapping({ LocalDate.parse(it, formatter) }, formatter::format)
-    fun localDateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = BiDiMapping({ LocalDateTime.parse(it, formatter) }, formatter::format)
-    fun zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = BiDiMapping({ ZonedDateTime.parse(it, formatter) }, formatter::format)
-    fun offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = BiDiMapping({ OffsetTime.parse(it, formatter) }, formatter::format)
-    fun offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = BiDiMapping({ OffsetDateTime.parse(it, formatter) }, formatter::format)
+    fun yearMonth(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM")) =
+        BiDiMapping({ YearMonth.parse(it, formatter) }, formatter::format)
+
+    fun localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) =
+        BiDiMapping({ LocalTime.parse(it, formatter) }, formatter::format)
+
+    fun localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) =
+        BiDiMapping({ LocalDate.parse(it, formatter) }, formatter::format)
+
+    fun localDateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) =
+        BiDiMapping({ LocalDateTime.parse(it, formatter) }, formatter::format)
+
+    fun zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) =
+        BiDiMapping({ ZonedDateTime.parse(it, formatter) }, formatter::format)
+
+    fun offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) =
+        BiDiMapping({ OffsetTime.parse(it, formatter) }, formatter::format)
+
+    fun offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) =
+        BiDiMapping({ OffsetDateTime.parse(it, formatter) }, formatter::format)
+
     fun zoneId() = BiDiMapping(ZoneId::of, ZoneId::getId)
     fun zoneOffset() = BiDiMapping(ZoneOffset::of, ZoneOffset::getId)
     fun throwable() = BiDiMapping({ throw Exception(it) }, Throwable::asString)
     fun locale() = BiDiMapping(
-        { s -> Locale.forLanguageTag(s).takeIf { it.language.isNotEmpty() } ?: throw IllegalArgumentException("Could not parse IETF locale") },
-        Locale::toLanguageTag
-    )
-
-    fun basicCredentials() = BiDiMapping(
-        { value ->
-            value.trim()
-                .takeIf { value.startsWith("Basic") }
-                ?.substringAfter("Basic")
-                ?.trim()
-                ?.safeBase64Decoded()
-                ?.split(":", ignoreCase = false, limit = 2)
-                .let { Credentials(it?.getOrNull(0) ?: "", it?.getOrNull(1) ?: "") }
+        { s ->
+            Locale.forLanguageTag(s).takeIf { it.language.isNotEmpty() }
+                ?: throw IllegalArgumentException("Could not parse IETF locale")
         },
-        { credentials: Credentials -> "Basic ${"${credentials.user}:${credentials.password}".base64Encode()}" }
+        Locale::toLanguageTag
     )
 
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
@@ -116,15 +129,10 @@ object StringBiDiMappings {
         asOut = { if (it.isEmpty()) emptyList() else it.split(delimiter).map(mapElement::invoke) },
         asIn = { it.joinToString(delimiter, transform = mapElement::invoke) }
     )
-
-    private fun String.safeBase64Decoded(): String? = try {
-        base64Decoded()
-    } catch (e: IllegalArgumentException) {
-        null
-    }
 }
 
-internal fun Throwable.asString() = StringWriter().use { output -> PrintWriter(output).use { printer -> printStackTrace(printer); output.toString() } }
+internal fun Throwable.asString() =
+    StringWriter().use { output -> PrintWriter(output).use { printer -> printStackTrace(printer); output.toString() } }
 
 internal fun String.asSafeBoolean(): Boolean =
     when {
