@@ -316,7 +316,10 @@ class ResponseFiltersTest {
 
         handler(request)
 
-        assertThat(transaction, equalTo(HttpTransaction(request,
+        assertThat(
+            transaction, equalTo(
+                HttpTransaction(
+                    request,
             Response(OK), ZERO, mapOf("routingGroup" to "sue/bob/{name}")
         )
         )

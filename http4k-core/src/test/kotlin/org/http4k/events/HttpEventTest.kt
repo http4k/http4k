@@ -26,8 +26,14 @@ class HttpEventTest {
     @Test
     fun `outgoing uses template if available`() {
         assertThat(Outgoing(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf())).xUriTemplate, equalTo("bob"))
-        assertThat(Outgoing(HttpTransaction(Request(GET, "/bob"),
-            RoutedResponse(Response(OK), UriTemplate.from("bar")), ZERO, mapOf())).xUriTemplate, equalTo("bar"))
+        assertThat(
+            Outgoing(
+                HttpTransaction(
+                    Request(GET, "/bob"),
+                    RoutedResponse(Response(OK), UriTemplate.from("bar")), ZERO, mapOf()
+                )
+            ).xUriTemplate, equalTo("bar")
+        )
     }
 
     @Test
