@@ -13,6 +13,6 @@ dependencies {
     implementation("org.eclipse.jetty:jetty-alpn-java-server")
     implementation("org.mortbay.jetty.alpn:alpn-boot:_")
 
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
     testImplementation(testFixtures(project(":http4k-realtime-core")))
 }

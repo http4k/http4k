@@ -10,7 +10,7 @@ apply(plugin = "com.microsoft.azure.azurefunctions")
 
 dependencies {
     api(project(":http4k-serverless-azure"))
-    api(testFixtures(project(":http4k-core")))
+    api(testFixtures(project(":http4k-common")))
     api(testFixtures(project(":http4k-serverless-core")))
 }
 

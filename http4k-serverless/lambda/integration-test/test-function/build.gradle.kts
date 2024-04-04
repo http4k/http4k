@@ -9,7 +9,7 @@ configurations {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-serverless-lambda"))
-    api(testFixtures(project(":http4k-core")))
+    api(testFixtures(project(":http4k-common")))
     api(testFixtures(project(":http4k-serverless-core")))
     api("com.amazonaws:aws-lambda-java-events:_")
     api("joda-time:joda-time:_")

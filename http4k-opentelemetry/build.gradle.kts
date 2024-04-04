@@ -10,5 +10,5 @@ dependencies {
     testFixturesApi("io.opentelemetry:opentelemetry-extension-trace-propagators")
     testFixturesApi("io.opentelemetry:opentelemetry-sdk-testing")
 
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
 }

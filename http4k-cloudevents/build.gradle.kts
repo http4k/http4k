@@ -7,6 +7,6 @@ dependencies {
     api("io.cloudevents:cloudevents-json-jackson:_")
     api("com.fasterxml.jackson.datatype:jackson-datatype-guava") // for CVE workaround (guava)
     api(project(":http4k-format-jackson"))
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
     testImplementation(project(":http4k-testing-hamkrest"))
 }

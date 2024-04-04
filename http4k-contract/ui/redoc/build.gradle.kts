@@ -4,6 +4,6 @@ dependencies {
     api(project(":http4k-contract"))
     api("org.webjars:redoc:_")
 
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
 }
 

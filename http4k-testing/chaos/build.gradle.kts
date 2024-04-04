@@ -7,5 +7,5 @@ dependencies {
     api(project(":http4k-testing-hamkrest"))
     testImplementation(project(":http4k-testing-approval"))
 
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
 }

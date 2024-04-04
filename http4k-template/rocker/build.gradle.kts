@@ -12,7 +12,7 @@ dependencies {
     api("com.fizzed:rocker-runtime:_")
 
     testImplementation("com.fizzed:rocker-compiler:_")
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
     testImplementation(testFixtures(project(":http4k-template-core")))
 }
 

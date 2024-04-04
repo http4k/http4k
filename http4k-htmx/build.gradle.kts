@@ -6,5 +6,5 @@ dependencies {
     api("org.webjars.npm:hyperscript.org:_")
     api("dev.forkhandles:values4k:_")
 
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
 }

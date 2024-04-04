@@ -6,4 +6,5 @@ dependencies {
 
     testImplementation(project(":http4k-format-moshi"))
     testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
 }

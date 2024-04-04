@@ -18,7 +18,7 @@ dependencies {
     testImplementation(project(":http4k-format-argo"))
     testImplementation(project(":http4k-format-kondor-json"))
     testImplementation(project(":http4k-testing-approval"))
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
     testImplementation(testFixtures(project(":http4k-security-oauth")))
 }
 

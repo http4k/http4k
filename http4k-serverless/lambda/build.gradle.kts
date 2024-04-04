@@ -7,7 +7,7 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
     }
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
     testImplementation(project(":http4k-format-jackson"))
 
     testImplementation("com.amazonaws:aws-lambda-java-events:_")

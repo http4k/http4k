@@ -7,7 +7,7 @@ dependencies {
     api("org.eclipse.jetty:jetty-client")
     api("org.eclipse.jetty.websocket:jetty-websocket-jetty-client")
 
-    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-common")))
     testImplementation(project(path = ":http4k-server-jetty"))
     testImplementation(testFixtures(project(":http4k-realtime-core")))
 }
