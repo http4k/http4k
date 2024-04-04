@@ -4,9 +4,6 @@ import org.http4k.base64Decoded
 import org.http4k.base64Encode
 import org.http4k.core.Credentials
 import org.http4k.core.Uri
-import org.http4k.events.EventCategory
-import org.http4k.filter.SamplingDecision
-import org.http4k.filter.TraceId
 import org.http4k.urlDecoded
 import org.http4k.urlEncoded
 import java.io.PrintWriter
@@ -90,9 +87,6 @@ object StringBiDiMappings {
     fun offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = BiDiMapping({ OffsetDateTime.parse(it, formatter) }, formatter::format)
     fun zoneId() = BiDiMapping(ZoneId::of, ZoneId::getId)
     fun zoneOffset() = BiDiMapping(ZoneOffset::of, ZoneOffset::getId)
-    fun eventCategory() = BiDiMapping(::EventCategory, EventCategory::toString)
-    fun traceId() = BiDiMapping(::TraceId, TraceId::value)
-    fun samplingDecision() = BiDiMapping(::SamplingDecision, SamplingDecision::value)
     fun throwable() = BiDiMapping({ throw Exception(it) }, Throwable::asString)
     fun locale() = BiDiMapping(
         { s -> Locale.forLanguageTag(s).takeIf { it.language.isNotEmpty() } ?: throw IllegalArgumentException("Could not parse IETF locale") },

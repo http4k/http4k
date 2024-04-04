@@ -3,8 +3,9 @@ package org.http4k.format
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiMapping
+import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.StringBiDiMappings.duration
-import org.http4k.lens.StringBiDiMappings.eventCategory
+import org.http4k.lens.eventCategory
 import org.http4k.lens.StringBiDiMappings.instant
 import org.http4k.lens.StringBiDiMappings.localDate
 import org.http4k.lens.StringBiDiMappings.localDateTime
@@ -13,9 +14,9 @@ import org.http4k.lens.StringBiDiMappings.locale
 import org.http4k.lens.StringBiDiMappings.offsetDateTime
 import org.http4k.lens.StringBiDiMappings.offsetTime
 import org.http4k.lens.StringBiDiMappings.regexObject
-import org.http4k.lens.StringBiDiMappings.samplingDecision
+import org.http4k.lens.samplingDecision
 import org.http4k.lens.StringBiDiMappings.throwable
-import org.http4k.lens.StringBiDiMappings.traceId
+import org.http4k.lens.traceId
 import org.http4k.lens.StringBiDiMappings.uri
 import org.http4k.lens.StringBiDiMappings.url
 import org.http4k.lens.StringBiDiMappings.uuid
@@ -82,9 +83,9 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(offsetDateTime())
     text(zoneId())
     text(zoneOffset())
-    text(eventCategory())
-    text(traceId())
-    text(samplingDecision())
+    text(StringBiDiMappings.eventCategory())
+    text(StringBiDiMappings.traceId())
+    text(StringBiDiMappings.samplingDecision())
     text(throwable())
     text(locale())
     int({ Status(it, "") }, Status::code)

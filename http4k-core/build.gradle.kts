@@ -24,7 +24,6 @@ dependencies {
     testFixturesApi(project(":http4k-testing-approval"))
     testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesApi(project(":http4k-format-jackson"))
-    testFixturesApi(project(":http4k-client-websocket"))
     testFixturesApi(project(":http4k-server-apache"))
     testFixturesApi("dev.forkhandles:mock4k:_")
 }
