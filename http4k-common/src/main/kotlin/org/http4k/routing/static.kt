@@ -13,9 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.routing.ResourceLoader.Companion.Classpath
-import java.util.jar.Attributes.Name.CONTENT_TYPE
 
 /**
  * Serve static content using the passed ResourceLoader. Note that for security, by default ONLY mime-types registered in
