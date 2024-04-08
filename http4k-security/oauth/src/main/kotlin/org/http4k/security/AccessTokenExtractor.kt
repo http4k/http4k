@@ -22,23 +22,17 @@ fun interface AccessTokenExtractor : (Response) -> Result<AccessTokenDetails, Co
  */
 class ContentTypeJsonOrForm(
     private val autoMarshallingJson: AutoMarshallingJson<*> = OAuthMoshi
-) :
-    AccessTokenExtractor {
-    override fun invoke(msg: Response) =
+) : AccessTokenExtractor {
+    override fun invoke(response: Response) =
         resultFrom {
-            Header.CONTENT_TYPE(msg)
-                ?.let {
-                    when {
-                        APPLICATION_JSON.equalsIgnoringDirectives(it) ->
-                            with(autoMarshallingJson.asA<AccessTokenResponse>(msg.bodyString())) {
-                                AccessTokenDetails(toAccessToken(), id_token?.let(::IdToken))
-                            }
-
-                        APPLICATION_FORM_URLENCODED.equalsIgnoringDirectives(it) -> responseForm(msg)
-                        else -> null
-                    }
-                } ?: AccessTokenDetails(AccessToken(msg.bodyString()))
-        }.mapFailure { CouldNotFetchAccessToken(msg.status, msg.bodyString()) }
+            when (Header.CONTENT_TYPE(response)?.value) {
+                APPLICATION_JSON.value ->
+                    autoMarshallingJson.asA<AccessTokenResponse>(response.bodyString())
+                        .let { AccessTokenDetails(it.toAccessToken(), it.id_token?.let(::IdToken)) }
+                APPLICATION_FORM_URLENCODED.value -> responseForm(response)
+                else -> AccessTokenDetails(AccessToken(response.bodyString()))
+            }
+        }.mapFailure { CouldNotFetchAccessToken(response.status, response.bodyString()) }
 }
 
 val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()
