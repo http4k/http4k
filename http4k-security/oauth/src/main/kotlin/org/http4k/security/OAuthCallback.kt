@@ -12,6 +12,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
+import org.http4k.security.OAuthCallbackError.AuthorizationCodeMissing
+import org.http4k.security.OAuthCallbackError.InvalidCsrfToken
+import org.http4k.security.OAuthCallbackError.InvalidNonce
 import org.http4k.security.oauth.server.AuthorizationCode
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
@@ -26,7 +29,7 @@ class OAuthCallback(
         .flatMap { parameters -> validateCsrf(parameters, request, oAuthPersistence.retrieveCsrf(request)) }
         .flatMap { parameters -> validateNonce(parameters, oAuthPersistence.retrieveNonce(request)) }
         .flatMap { parameters -> consumeIdToken(parameters) }
-        .flatMap { parameters -> fetchAccessToken(parameters) }
+        .flatMap { parameters -> accessTokenFetcher.fetch(parameters.code.value) }
         .flatMap { tokenDetails -> consumeIdToken(tokenDetails) }
         .map { tokenDetails ->
             oAuthPersistence.assignToken(
@@ -37,14 +40,6 @@ class OAuthCallback(
             )
         }.mapFailure { oAuthPersistence.authFailureResponse(it) }.get()
 
-    private fun consumeIdToken(tokenDetails: AccessTokenDetails) =
-        tokenDetails.idToken?.let(idTokenConsumer::consumeFromAccessTokenResponse)?.map { tokenDetails }
-            ?: Success(tokenDetails)
-
-    private fun consumeIdToken(parameters: CallbackParameters) =
-        parameters.idToken?.let(idTokenConsumer::consumeFromAuthorizationResponse)?.map { parameters }
-            ?: Success(parameters)
-
     private fun Request.callbackParameters() = authorizationCode().map {
         CallbackParameters(
             code = it,
@@ -54,7 +49,7 @@ class OAuthCallback(
     }
 
     private fun Request.authorizationCode() = queryOrFragmentParameter("code")?.let(::AuthorizationCode)
-        ?.let(::Success) ?: Failure(OAuthCallbackError.AuthorizationCodeMissing(uri))
+        ?.let(::Success) ?: Failure(AuthorizationCodeMissing(uri))
 
     private fun validateCsrf(
         parameters: CallbackParameters,
@@ -63,18 +58,23 @@ class OAuthCallback(
     ) = request.queryOrFragmentParameter("state")?.let(::CrossSiteRequestForgeryToken)
         .let {
             if (it == persistedToken) Success(parameters)
-            else Failure(OAuthCallbackError.InvalidCsrfToken(persistedToken?.value, it?.value))
+            else Failure(InvalidCsrfToken(persistedToken?.value, it?.value))
         }
 
     private fun validateNonce(parameters: CallbackParameters, storedNonce: Nonce?) =
         parameters.idToken?.let { idToken ->
             val received = idTokenConsumer.nonceFromIdToken(idToken)
             if (received == storedNonce)
-                Success(parameters) else Failure(OAuthCallbackError.InvalidNonce(storedNonce?.value, received?.value))
+                Success(parameters) else Failure(InvalidNonce(storedNonce?.value, received?.value))
         } ?: Success(parameters)
 
-    private fun fetchAccessToken(parameters: CallbackParameters) =
-        accessTokenFetcher.fetch(parameters.code.value)
+    private fun consumeIdToken(parameters: CallbackParameters) =
+        parameters.idToken?.let(idTokenConsumer::consumeFromAuthorizationResponse)?.map { parameters }
+            ?: Success(parameters)
+
+    private fun consumeIdToken(tokenDetails: AccessTokenDetails) =
+        tokenDetails.idToken?.let(idTokenConsumer::consumeFromAccessTokenResponse)?.map { tokenDetails }
+            ?: Success(tokenDetails)
 
     private fun redirectionResponse(request: Request) = Response(TEMPORARY_REDIRECT)
         .header("Location", oAuthPersistence.retrieveOriginalUri(request)?.toString() ?: "/")
