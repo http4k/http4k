@@ -28,12 +28,12 @@ class OAuthRedirectionFilter(
     private val responseMode: ResponseMode? = null
 ) : Filter {
 
-    override fun invoke(next: HttpHandler): HttpHandler = {
-        if (oAuthPersistence.retrieveToken(it) != null) next(it) else {
-            val csrf = generateCrsf(it)
+    override fun invoke(next: HttpHandler): HttpHandler = { request ->
+        if (oAuthPersistence.retrieveToken(request) != null) next(request)
+        else {
+            val csrf = generateCrsf(request)
             val state = State(csrf.value)
-            val nonce = generateNonceIfRequired()
-
+            val nonce = if (responseType == CodeIdToken) nonceGenerator.invoke() else null
             val authRequest = AuthRequest(
                 ClientId(providerConfig.credentials.user),
                 scopes,
@@ -43,21 +43,12 @@ class OAuthRedirectionFilter(
                 nonce,
                 responseMode
             )
+            val redirectUri = modifyState(redirectionBuilder(providerConfig.authUri, authRequest, state, nonce))
 
-            val redirect = Response(TEMPORARY_REDIRECT)
-                .with(LOCATION of modifyState(redirectionBuilder(providerConfig.authUri, authRequest, state, nonce)))
-            assignNonceIfRequired(
-                oAuthPersistence.assignOriginalUri(
-                    oAuthPersistence.assignCsrf(redirect, csrf),
-                    originalUri(it)
-                ), nonce
-            )
+            Response(TEMPORARY_REDIRECT).with(LOCATION of redirectUri)
+                .let { response -> oAuthPersistence.assignCsrf(response, csrf) }
+                .let { response -> oAuthPersistence.assignOriginalUri(response, originalUri(request)) }
+                .let { response -> if (nonce != null) oAuthPersistence.assignNonce(response, nonce) else response }
         }
     }
-
-    private fun generateNonceIfRequired() =
-        if (responseType == CodeIdToken) nonceGenerator.invoke() else null
-
-    private fun assignNonceIfRequired(redirect: Response, nonce: Nonce?): Response =
-        if (nonce != null) oAuthPersistence.assignNonce(redirect, nonce) else redirect
 }
