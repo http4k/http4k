@@ -33,40 +33,6 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant.MAX
 
-/**
- * Filter to authenticate and refresh against a OAuth server. Use the correct OAuth filter for your flow.
- * e.g. ClientFilters.ClientCredentials()
- */
-fun ClientFilters.RefreshingOAuthToken(
-    oauthCredentials: Credentials,
-    tokenUri: Uri,
-    backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, scopes = emptyList()),
-    gracePeriod: Duration = Duration.ofSeconds(10),
-    clock: Clock = Clock.systemUTC(),
-    tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
-    scopes: List<String> = emptyList(),
-): Filter {
-    val refresher = CredentialsProvider.Refreshing<AccessToken>(gracePeriod, clock) {
-        val filter = it?.refreshToken
-            ?.let { token -> ClientFilters.OAuthRefreshToken(oauthCredentials, token, scopes) }
-            ?: oAuthFlowFilter
-
-        filter
-            .then(backend)(Request(POST, tokenUri))
-            .takeIf { it.status.successful }
-            ?.let { tokenExtractor(it).map { it.accessToken }.valueOrNull() }
-            ?.let {
-                ExpiringCredentials(
-                    credentials = it,
-                    expiry = it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
-                )
-            }
-    }
-
-    return ClientFilters.BearerAuth(CredentialsProvider { refresher()?.value })
-}
-
 fun ClientFilters.RefreshingOAuthToken(
     config: OAuthProviderConfig,
     backend: HttpHandler,
@@ -83,6 +49,40 @@ fun ClientFilters.RefreshingOAuthToken(
     clock = clock,
     scopes = scopes,
 )
+
+/**
+ * Filter to authenticate and refresh against a OAuth server. Use the correct OAuth filter for your flow.
+ * e.g. ClientFilters.ClientCredentials()
+ */
+fun ClientFilters.RefreshingOAuthToken(
+    oauthCredentials: Credentials,
+    tokenUri: Uri,
+    backend: HttpHandler,
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, scopes = emptyList()),
+    gracePeriod: Duration = Duration.ofSeconds(10),
+    clock: Clock = Clock.systemUTC(),
+    tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
+    scopes: List<String> = emptyList(),
+): Filter {
+    val refresher = CredentialsProvider.Refreshing<AccessToken>(gracePeriod, clock) { token ->
+        val filter = token?.refreshToken
+            ?.let { ClientFilters.OAuthRefreshToken(oauthCredentials, it, scopes) }
+            ?: oAuthFlowFilter
+
+        filter
+            .then(backend)(Request(POST, tokenUri))
+            .takeIf { it.status.successful }
+            ?.let { response -> tokenExtractor(response).map { it.accessToken }.valueOrNull() }
+            ?.let {
+                ExpiringCredentials(
+                    credentials = it,
+                    expiry = it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
+                )
+            }
+    }
+
+    return ClientFilters.BearerAuth(CredentialsProvider { refresher()?.value })
+}
 
 fun ClientFilters.OAuthUserCredentials(
     config: OAuthProviderConfig,
