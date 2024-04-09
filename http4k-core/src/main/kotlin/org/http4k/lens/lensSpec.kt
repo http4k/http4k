@@ -163,11 +163,7 @@ open class LensSpec<IN : Any, OUT>(
  * Represents a bi-directional extraction of a list of entities from a target, or an insertion into a target.
  */
 
-interface BiDiMultiLensSpec<IN : Any, OUT> : BiDiLensBuilder<IN, List<OUT>> {
-    override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>>
-    override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?>
-    override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>>
-}
+interface BiDiMultiLensSpec<IN : Any, OUT> : BiDiLensBuilder<IN, List<OUT>>
 
 interface BiDiLensBuilder<IN : Any, OUT> : LensBuilder<IN, OUT> {
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT?>
