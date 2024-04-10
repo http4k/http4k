@@ -44,7 +44,6 @@ import org.http4k.lens.MultipartForm
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.EnumParam
-import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.WebForm
@@ -202,9 +201,6 @@ class OpenApi3<NODE : Any>(
     private fun requestParameter(meta: Meta): RequestParameter<NODE> =
         when (val paramMeta: ParamMeta = meta.paramMeta) {
             ObjectParam -> SchemaParameter(meta, "{}".toSchema())
-            FileParam -> PrimitiveParameter(meta, json {
-                obj("type" to string(FileParam.value), "format" to string("binary"))
-            })
 
             is ArrayParam -> PrimitiveParameter(meta, json {
                 val itemType = paramMeta.itemType()
