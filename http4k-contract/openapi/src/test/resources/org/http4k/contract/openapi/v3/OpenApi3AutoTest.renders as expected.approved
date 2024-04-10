@@ -676,7 +676,8 @@
             "required": false,
             "description": "enumHeader",
             "schema": {
-              "$ref": "#/components/schemas/Foo"
+              "$ref": "#/components/schemas/Foo",
+              "default": "bar"
             }
           },
           {

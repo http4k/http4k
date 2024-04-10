@@ -199,8 +199,14 @@ class OpenApi3<NODE : Any>(
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
         .toMap()
 
-    private fun requestParameter(meta: Meta) =
-        when (val paramMeta: ParamMeta = meta.paramMeta) {
+    private fun requestParameter(meta: Meta): RequestParameter<NODE> {
+        @Suppress("UNCHECKED_CAST")
+        val schemaFields = meta.metadata?.let { it["schema"] as Map<String, Any> }?.map { entry ->
+            entry.key to asNode(
+                entry.value
+            )
+        } ?: emptyList()
+        return when (val paramMeta: ParamMeta = meta.paramMeta) {
             ObjectParam -> SchemaParameter(meta, "{}".toSchema())
             FileParam -> PrimitiveParameter(meta, json {
                 obj("type" to string(FileParam.value), "format" to string("binary"))
@@ -224,31 +230,49 @@ class OpenApi3<NODE : Any>(
 
             is EnumParam<*> -> SchemaParameter(
                 meta,
-                apiRenderer.toSchema(
-                    paramMeta.clz.java.enumConstants[0],
-                    meta.name,
-                    null
-                )
+                json {
+                    apiRenderer.toSchema(
+                        paramMeta.clz.java.enumConstants[0],
+                        meta.name,
+                        null
+                    ).appendFields(
+                        schemaFields
+                    )
+                }
             )
 
             else -> PrimitiveParameter(meta, json {
-                @Suppress("UNCHECKED_CAST")
-                val schema = meta.metadata?.let { it["schema"] as Map<String, Any> } ?: emptyMap()
-                fun asNode(thing: Any?): NODE = when (thing) {
-                    is Boolean -> boolean(thing)
-                    is Int -> number(thing)
-                    is Double -> number(thing)
-                    is BigDecimal -> number(thing)
-                    is BigInteger -> number(thing)
-                    is Long -> number(thing)
-                    is Iterable<*> -> array(thing.map { asNode(it) })
-                    is Map<*, *> -> obj(thing.map { it.key.toString() to asNode(it.value) }.toList())
-                    else -> string(thing.toString())
-                }
-
-                obj(listOf("type" to string(paramMeta.value)) + schema.map { entry -> entry.key to asNode(entry.value) })
+                obj(listOf("type" to string(paramMeta.value)) + (schemaFields))
             })
         }
+    }
+
+    private fun JsonSchema<NODE>.appendFields(
+        fields: List<Pair<String, NODE>>
+    ): JsonSchema<NODE> {
+        return JsonSchema(
+            this@OpenApi3.json {
+                obj(fields(node) + fields)
+            },
+            definitions
+        )
+    }
+
+    private fun asNode(thing: Any?): NODE =
+        this@OpenApi3.json {
+            when (thing) {
+                is Boolean -> boolean(thing)
+                is Int -> number(thing)
+                is Double -> number(thing)
+                is BigDecimal -> number(thing)
+                is BigInteger -> number(thing)
+                is Long -> number(thing)
+                is Iterable<*> -> array(thing.map { asNode(it) })
+                is Map<*, *> -> obj(thing.map { it.key.toString() to asNode(it.value) }.toList())
+                else -> string(thing.toString())
+            }
+        }
+
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }

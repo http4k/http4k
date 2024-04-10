@@ -577,7 +577,8 @@
         "parameters": [
           {
             "schema": {
-              "$ref": "#/components/schemas/e"
+              "$ref": "#/components/schemas/e",
+              "default": "bar"
             },
             "in": "header",
             "name": "e",
