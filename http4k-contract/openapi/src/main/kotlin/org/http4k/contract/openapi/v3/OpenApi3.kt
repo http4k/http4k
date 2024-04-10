@@ -48,6 +48,8 @@ import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.WebForm
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.Locale
 
 /**
@@ -197,41 +199,56 @@ class OpenApi3<NODE : Any>(
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
         .toMap()
 
-    private fun requestParameter(it: Meta) = when (val paramMeta: ParamMeta = it.paramMeta) {
-        ObjectParam -> SchemaParameter(it, "{}".toSchema())
-        FileParam -> PrimitiveParameter(it, json {
-            obj("type" to string(FileParam.value), "format" to string("binary"))
-        })
+    private fun requestParameter(meta: Meta) =
+        when (val paramMeta: ParamMeta = meta.paramMeta) {
+            ObjectParam -> SchemaParameter(meta, "{}".toSchema())
+            FileParam -> PrimitiveParameter(meta, json {
+                obj("type" to string(FileParam.value), "format" to string("binary"))
+            })
 
-        is ArrayParam -> PrimitiveParameter(it, json {
-            val itemType = paramMeta.itemType()
-            obj(
-                "type" to string("array"),
-                "items" to when (itemType) {
-                    is EnumParam<*> -> apiRenderer.toSchema(
-                        itemType.clz.java.enumConstants[0],
-                        it.name,
-                        null
-                    ).definitions.first().second
+            is ArrayParam -> PrimitiveParameter(meta, json {
+                val itemType = paramMeta.itemType()
+                obj(
+                    "type" to string("array"),
+                    "items" to when (itemType) {
+                        is EnumParam<*> -> apiRenderer.toSchema(
+                            itemType.clz.java.enumConstants[0],
+                            meta.name,
+                            null
+                        ).definitions.first().second
 
-                    else -> obj("type" to string(itemType.value))
+                        else -> obj("type" to string(itemType.value))
+                    }
+                )
+            })
+
+            is EnumParam<*> -> SchemaParameter(
+                meta,
+                apiRenderer.toSchema(
+                    paramMeta.clz.java.enumConstants[0],
+                    meta.name,
+                    null
+                )
+            )
+
+            else -> PrimitiveParameter(meta, json {
+                @Suppress("UNCHECKED_CAST")
+                val schema = meta.metadata?.let { it["schema"] as Map<String, Any> } ?: emptyMap()
+                fun asNode(thing: Any?): NODE = when (thing) {
+                    is Boolean -> boolean(thing)
+                    is Int -> number(thing)
+                    is Double -> number(thing)
+                    is BigDecimal -> number(thing)
+                    is BigInteger -> number(thing)
+                    is Long -> number(thing)
+                    is Iterable<*> -> array(thing.map { asNode(it) })
+                    is Map<*, *> -> obj(thing.map { it.key.toString() to asNode(it.value) }.toList())
+                    else -> string(thing.toString())
                 }
-            )
-        })
 
-        is EnumParam<*> -> SchemaParameter(
-            it,
-            apiRenderer.toSchema(
-                paramMeta.clz.java.enumConstants[0],
-                it.name,
-                null
-            )
-        )
-
-        else -> PrimitiveParameter(it, json {
-            obj("type" to string(paramMeta.value))
-        })
-    }
+                obj(listOf("type" to string(paramMeta.value)) + schema.map { entry -> entry.key to asNode(entry.value) })
+            })
+        }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
