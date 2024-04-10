@@ -144,7 +144,7 @@ abstract class ContractRendererContract<NODE : Any>(
                 headers += Header.map { listOf("a", "b") }.optional("list", "listHeader", schemaOf(mapOf("default" to listOf("a", "b"))))
                 headers += Header.map { mapOf("a" to "b") }.optional("obj", "objHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
                 headers += Header.enum<HttpMessage, Foo>().optional("e", "enumHeader", schemaOf(mapOf("default" to Foo.bar)))
-                headers += json.jsonLens(Header).optional("j", "jsonHeader")
+                headers += json.jsonLens(Header).optional("j", "jsonHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/body_receiving_string" meta {
                 summary = "body_receiving_string"

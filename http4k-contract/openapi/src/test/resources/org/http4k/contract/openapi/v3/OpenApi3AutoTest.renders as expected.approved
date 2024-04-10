@@ -686,7 +686,10 @@
             "required": false,
             "description": "jsonHeader",
             "schema": {
-              "$ref": "#/components/schemas/object1955914966"
+              "$ref": "#/components/schemas/object1955914966",
+              "default": {
+                "a": "b"
+              }
             }
           }
         ],

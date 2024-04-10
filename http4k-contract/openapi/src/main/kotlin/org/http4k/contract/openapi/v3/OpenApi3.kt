@@ -200,7 +200,8 @@ class OpenApi3<NODE : Any>(
 
     private fun requestParameter(meta: Meta): RequestParameter<NODE> =
         when (val paramMeta: ParamMeta = meta.paramMeta) {
-            ObjectParam -> SchemaParameter(meta, "{}".toSchema())
+            ObjectParam -> SchemaParameter(meta, "{}".toSchema()
+                .appendFields(meta.schemaFields()))
 
             is ArrayParam -> PrimitiveParameter(meta, json {
                 val itemType = paramMeta.itemType()

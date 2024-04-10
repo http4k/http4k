@@ -587,7 +587,10 @@
           },
           {
             "schema": {
-              "$ref": "#/components/schemas/object744721296"
+              "$ref": "#/components/schemas/object744721296",
+              "default": {
+                "a": "b"
+              }
             },
             "in": "header",
             "name": "j",

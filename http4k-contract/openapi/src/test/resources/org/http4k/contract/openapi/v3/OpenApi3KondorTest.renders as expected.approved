@@ -587,7 +587,10 @@
           },
           {
             "schema": {
-              "$ref": "#/components/schemas/generatedDefinitionId2"
+              "$ref": "#/components/schemas/generatedDefinitionId2",
+              "default": {
+                "a": "b"
+              }
             },
             "in": "header",
             "name": "j",
