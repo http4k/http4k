@@ -208,7 +208,7 @@ class OpenApi3<NODE : Any>(
 
             is ArrayParam -> PrimitiveParameter(meta, json {
                 val itemType = paramMeta.itemType()
-                obj(
+                obj(listOf(
                     "type" to string("array"),
                     "items" to when (itemType) {
                         is EnumParam<*> -> apiRenderer.toSchema(
@@ -218,7 +218,8 @@ class OpenApi3<NODE : Any>(
                         ).definitions.first().second
 
                         else -> obj("type" to string(itemType.value))
-                    }
+                    })
+                    + meta.schemaFields()
                 )
             })
 
@@ -243,6 +244,7 @@ class OpenApi3<NODE : Any>(
     private fun Meta.schemaFields(): List<Pair<String, NODE>> =
         this.schemaMetadata()?.map { entry -> entry.key to asNode(entry.value) } ?: emptyList()
 
+    @Suppress("UNCHECKED_CAST")
     private fun Meta.schemaMetadata(): Map<String, Any>? = metadata?.let { it["schema"] as Map<String, Any> }
 
     private fun JsonSchema<NODE>.appendFields(fields: List<Pair<String, NODE>>): JsonSchema<NODE> =

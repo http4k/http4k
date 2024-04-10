@@ -893,7 +893,11 @@
               "type": "array",
               "items": {
                 "type": "boolean"
-              }
+              },
+              "default": [
+                true,
+                false
+              ]
             },
             "in": "query",
             "name": "b",

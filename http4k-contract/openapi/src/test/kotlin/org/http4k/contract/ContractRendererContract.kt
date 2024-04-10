@@ -122,7 +122,7 @@ abstract class ContractRendererContract<NODE : Any>(
             routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") / Path.enum<Foo>()
                 .of("foo") bindContract POST to { a, _, _, _ -> { Response(OK).body(a) } }
             routes += "/queries" meta {
-                queries += Query.boolean().multi.required("b", "booleanQuery")
+                queries += Query.boolean().multi.required("b", "booleanQuery", schemaOf(mapOf("default" to listOf(true, false))))
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += Query.enum<Foo>().optional("e", "enumQuery")
