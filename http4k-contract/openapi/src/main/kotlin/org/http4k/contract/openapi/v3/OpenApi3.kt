@@ -199,14 +199,8 @@ class OpenApi3<NODE : Any>(
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
         .toMap()
 
-    private fun requestParameter(meta: Meta): RequestParameter<NODE> {
-        @Suppress("UNCHECKED_CAST")
-        val schemaFields = meta.metadata?.let { it["schema"] as Map<String, Any> }?.map { entry ->
-            entry.key to asNode(
-                entry.value
-            )
-        } ?: emptyList()
-        return when (val paramMeta: ParamMeta = meta.paramMeta) {
+    private fun requestParameter(meta: Meta): RequestParameter<NODE> =
+        when (val paramMeta: ParamMeta = meta.paramMeta) {
             ObjectParam -> SchemaParameter(meta, "{}".toSchema())
             FileParam -> PrimitiveParameter(meta, json {
                 obj("type" to string(FileParam.value), "format" to string("binary"))
@@ -236,27 +230,26 @@ class OpenApi3<NODE : Any>(
                         meta.name,
                         null
                     ).appendFields(
-                        schemaFields
+                        meta.schemaFields()
                     )
                 }
             )
 
             else -> PrimitiveParameter(meta, json {
-                obj(listOf("type" to string(paramMeta.value)) + (schemaFields))
+                obj(listOf("type" to string(paramMeta.value)) + meta.schemaFields())
             })
         }
-    }
 
-    private fun JsonSchema<NODE>.appendFields(
-        fields: List<Pair<String, NODE>>
-    ): JsonSchema<NODE> {
-        return JsonSchema(
-            this@OpenApi3.json {
-                obj(fields(node) + fields)
-            },
+    private fun Meta.schemaFields(): List<Pair<String, NODE>> =
+        this.schemaMetadata()?.map { entry -> entry.key to asNode(entry.value) } ?: emptyList()
+
+    private fun Meta.schemaMetadata(): Map<String, Any>? = metadata?.let { it["schema"] as Map<String, Any> }
+
+    private fun JsonSchema<NODE>.appendFields(fields: List<Pair<String, NODE>>): JsonSchema<NODE> =
+        JsonSchema(
+            this@OpenApi3.json { obj(fields(node) + fields) },
             definitions
         )
-    }
 
     private fun asNode(thing: Any?): NODE =
         this@OpenApi3.json {
@@ -272,7 +265,6 @@ class OpenApi3<NODE : Any>(
                 else -> string(thing.toString())
             }
         }
-
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
