@@ -28,10 +28,11 @@ class AutoJsonToJsonSchema<NODE : Any>(
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?): JsonSchema<NODE> {
-        val schema = json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix.orEmpty(), null)
+        val schema =
+            json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix.orEmpty(), null)
         return JsonSchema(
             json.asJsonObject(schema),
-            schema.definitions().map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()
+            schema.definitions.map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()
         )
     }
 
@@ -213,11 +214,11 @@ private interface ArrayItems {
 }
 
 private sealed interface ArrayItem : ArrayItems {
-    class Array(val items: ArrayItems, private val schema: SchemaNode) : ArrayItem {
+    class Array(val items: ArrayItems, val format: Any?, private val definitions: Iterable<SchemaNode>) : ArrayItem {
+        @Suppress("unused")
         val type = ArrayParam(NullParam).value
-        val format = schema.format
 
-        override fun definitions(): Iterable<SchemaNode> = schema.definitions()
+        override fun definitions(): Iterable<SchemaNode> = definitions
 
         override fun equals(other: Any?): Boolean = when (other) {
             is Array -> this.items == other.items
@@ -227,9 +228,8 @@ private sealed interface ArrayItem : ArrayItems {
         override fun hashCode(): Int = items.hashCode()
     }
 
-    class NonObject(paramMeta: ParamMeta, private val schema: SchemaNode) : ArrayItem {
+    class NonObject(paramMeta: ParamMeta, val format: Any?, private val definitions: Iterable<SchemaNode>) : ArrayItem {
         val type = paramMeta.value
-        val format = schema.format
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -237,17 +237,19 @@ private sealed interface ArrayItem : ArrayItems {
 
             other as NonObject
 
-            if (type != other.type) return false
-
-            return true
+            return type == other.type
         }
 
         override fun hashCode(): Int = type.hashCode()
-        override fun definitions(): Iterable<SchemaNode> = schema.definitions()
+        override fun definitions(): Iterable<SchemaNode> = definitions
     }
 
-    class Ref(val `$ref`: String, private val schema: SchemaNode) : ArrayItem {
-        override fun definitions(): Iterable<SchemaNode> = schema.definitions()
+    class Ref(
+        @Suppress("unused")
+        val `$ref`: String,
+        private val definitions: Iterable<SchemaNode>
+    ) : ArrayItem {
+        override fun definitions(): Iterable<SchemaNode> = definitions
         override fun equals(other: Any?): Boolean = when (other) {
             is Ref -> this.`$ref` == other.`$ref`
             else -> false
@@ -262,13 +264,10 @@ private object EmptyArray : ArrayItems {
 }
 
 private class OneOfArray(private val schemas: Set<ArrayItem>) : ArrayItems {
+    @Suppress("unused")
     val oneOf = schemas.toSet().sortedBy { it.javaClass.simpleName }
 
     override fun definitions() = schemas.flatMap { it.definitions() }
-}
-
-enum class ArrayItemType {
-    NONE, NAME_REF, PARAM_META, COMPONENT_REF
 }
 
 private abstract class PassThroughMap(var map: Map<String, Any?>) : Map<String, Any?> {
@@ -327,34 +326,23 @@ private abstract class SchemaSortingMap(map: Map<String, Any?>) : PassThroughMap
 }
 
 private class SchemaNode(
-    private val _name: String,
-    private val _paramMeta: ParamMeta,
+    private val name: String,
+    private val paramMeta: ParamMeta,
     private val isNullable: Boolean,
     val example: Any?,
     metadata: FieldMetadata?,
-    val arrayItemType: ArrayItemType,
-    val definitions: Iterable<SchemaNode> = emptyList<SchemaNode>(),
-    val items: ArrayItems? = null,
-    val ref: String? =null,
-): SchemaSortingMap(metadata?.extra ?: emptyMap()) {
+    val definitions: Iterable<SchemaNode> = emptyList(),
+    val arrayItem: ArrayItem
+) : SchemaSortingMap(metadata?.extra ?: emptyMap()) {
     init {
         plus("format", map["format"])
         plus("example", example)
     }
 
-    fun definitions(): Iterable<SchemaNode> = definitions
-    fun name() = _name
-    fun paramMeta() = _paramMeta
-    fun arrayItem(): ArrayItem = when (arrayItemType) {
-        ArrayItemType.NONE -> ArrayItem.NonObject(paramMeta(), this)
-        ArrayItemType.NAME_REF -> ArrayItem.Ref(name(), this)
-        ArrayItemType.PARAM_META -> when (paramMeta()) {
-            is ArrayParam -> ArrayItem.Array(items!!, this)
-            ObjectParam -> ArrayItem.Ref(name(), this)
-            else -> ArrayItem.NonObject(paramMeta(), this)
-        }
-        ArrayItemType.COMPONENT_REF -> ArrayItem.Ref(ref!!, this)
-    }
+    fun name() = name
+    fun arrayItem(): ArrayItem = arrayItem
+
+    @Suppress("unused")
     val format = map["format"]
 
     companion object {
@@ -365,8 +353,18 @@ private class SchemaNode(
             example: Any?,
             metadata: FieldMetadata?
         ) =
-            SchemaNode(name, paramMeta, isNullable, example, metadata, ArrayItemType.NONE).apply {
-                plus("type", paramMeta().value)
+            SchemaNode(
+                name = name,
+                paramMeta = paramMeta,
+                isNullable = isNullable,
+                example = example,
+                metadata = metadata,
+                arrayItem = ArrayItem.NonObject(
+                    paramMeta,
+                    metadata.format(), emptyList()
+                )
+            ).apply {
+                plus("type", paramMeta.value)
             }
 
         fun Enum(
@@ -377,41 +375,57 @@ private class SchemaNode(
             enum: List<String>,
             metadata: FieldMetadata?
         ) =
-            SchemaNode(name, paramMeta, isNullable, example, metadata, ArrayItemType.NAME_REF).apply {
-                plus("type", paramMeta().value)
+            SchemaNode(
+                name = name,
+                paramMeta = paramMeta,
+                isNullable = isNullable,
+                example = example,
+                metadata = metadata,
+                arrayItem = ArrayItem.Ref(name, emptyList())
+            ).apply {
+                plus("type", paramMeta.value)
                 plus("enum", enum)
             }
 
-        fun Array(name: String, isNullable: Boolean, items: ArrayItems, example: Any?, metadata: FieldMetadata?) =
-            SchemaNode(
-                name,
-                ArrayParam(items.definitions().map { it.paramMeta() }.toSet().firstOrNull() ?: NullParam),
-                isNullable,
-                example,
-                metadata,
-                ArrayItemType.PARAM_META, items.definitions(), items
+        fun Array(name: String, isNullable: Boolean, items: ArrayItems, example: Any?, metadata: FieldMetadata?): SchemaNode {
+            val paramMeta: ParamMeta = ArrayParam(items.definitions().map { it.paramMeta }.toSet().firstOrNull() ?: NullParam)
+            return SchemaNode(
+                name = name,
+                paramMeta = paramMeta,
+                isNullable = isNullable,
+                example = example,
+                metadata = metadata,
+                definitions = items.definitions(),
+                arrayItem = ArrayItem.Array(items, metadata.format(), items.definitions())
             ).apply {
                 plus("items", items)
-                plus("type", paramMeta().value)
+                plus("type", paramMeta.value)
             }
+        }
+
+        private fun FieldMetadata?.format() = this?.extra?.get("format")
 
         fun Object(
             name: String, isNullable: Boolean, properties: Map<String, SchemaNode>,
             example: Any?, metadata: FieldMetadata?
-        ) = SchemaNode(
-            name,
-            ObjectParam,
-            isNullable,
-            example,
-            metadata,
-            ArrayItemType.NAME_REF,
-            properties.values.flatMap { it.definitions() }).apply {
-
-            plus("type", paramMeta().value)
-            plus(
-                "required",
-                properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() })
-            plus("properties", properties)
+        ): SchemaNode {
+            val paramMeta = ObjectParam
+            return SchemaNode(
+                name = name,
+                paramMeta = paramMeta,
+                isNullable = isNullable,
+                example = example,
+                metadata = metadata,
+                definitions = properties.values.flatMap { it.definitions },
+                arrayItem = ArrayItem.Ref(name, properties.values.flatMap { it.definitions })
+            ).apply {
+                plus("type", paramMeta.value)
+                plus(
+                    "required",
+                    properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() }
+                )
+                plus("properties", properties)
+            }
         }
 
         fun Reference(
@@ -420,31 +434,32 @@ private class SchemaNode(
             schemaNode: SchemaNode,
             metadata: FieldMetadata?
         ) = SchemaNode(
-            name,
-            ObjectParam,
-            schemaNode.isNullable,
-            null,
-            metadata,
-            ArrayItemType.COMPONENT_REF,
-            ref = ref,
-            definitions = listOf(schemaNode) + schemaNode.definitions()
+            name = name,
+            paramMeta = ObjectParam,
+            isNullable = schemaNode.isNullable,
+            example = null,
+            metadata = metadata,
+            definitions = listOf(schemaNode) + schemaNode.definitions,
+            arrayItem = ArrayItem.Ref(ref, listOf(schemaNode) + schemaNode.definitions)
         ).apply {
             plus("\$ref", ref)
         }
 
-        fun MapType(name: String, isNullable: Boolean, additionalProperties: SchemaNode, metadata: FieldMetadata?) =
-            SchemaNode(
+        fun MapType(name: String, isNullable: Boolean, additionalProperties: SchemaNode, metadata: FieldMetadata?): SchemaNode {
+            val paramMeta = ObjectParam
+            return SchemaNode(
                 name,
-                ObjectParam,
+                paramMeta,
                 isNullable,
                 null,
                 metadata,
-                ArrayItemType.NAME_REF,
-                definitions = additionalProperties.definitions()
+                definitions = additionalProperties.definitions,
+                arrayItem = ArrayItem.Ref(name, additionalProperties.definitions)
             ).apply {
-                plus("type", paramMeta().value)
+                plus("type", paramMeta.value)
                 plus("additionalProperties", additionalProperties)
             }
+        }
     }
 }
 

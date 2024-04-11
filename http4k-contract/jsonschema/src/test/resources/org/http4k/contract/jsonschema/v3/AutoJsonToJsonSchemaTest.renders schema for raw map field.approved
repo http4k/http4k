@@ -93,8 +93,8 @@
         },
         "key6": {
           "items": {
-            "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "type": "integer"
           },
           "example": [
             1,
