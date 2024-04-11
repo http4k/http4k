@@ -15,7 +15,6 @@ import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.unquoted
-import java.util.Comparator
 
 class AutoJsonToJsonSchema<NODE : Any>(
     private val json: AutoMarshallingJson<NODE>,
@@ -272,17 +271,25 @@ enum class ArrayItemType {
     NONE, NAME_REF, PARAM_META, COMPONENT_REF
 }
 
-private class SchemaNode(
-    private val _name: String,
-    private val _paramMeta: ParamMeta,
-    private val isNullable: Boolean,
-    val example: Any?,
-    metadata: FieldMetadata?,
-    val arrayItemType: ArrayItemType,
-    val definitions: Iterable<SchemaNode> = emptyList<SchemaNode>(),
-    val items: ArrayItems? = null,
-    val ref: String? =null,
-): Map<String, Any?> {
+private abstract class PassThroughMap(var map: Map<String, Any?>) : Map<String, Any?> {
+    override val keys: Set<String>
+        get() = map.keys
+    override val size: Int
+        get() = map.size
+    override val values: Collection<Any?>
+        get() = map.values
+    override val entries: Set<Map.Entry<String, Any?>> = map.entries
+    override fun isEmpty(): Boolean = map.isEmpty()
+    override fun get(key: String): Any? = map.get(key)
+    override fun containsValue(value: Any?): Boolean = map.containsValue(value)
+    override fun containsKey(key: String): Boolean = map.containsKey(key)
+
+    fun plus(key: String, value: Any?) {
+        map = map.plus(key to value)
+    }
+}
+
+private abstract class SchemaSortingMap(map: Map<String, Any?>) : PassThroughMap(map) {
     var order: List<String> = listOf(
         "properties",
         "items",
@@ -310,19 +317,29 @@ private class SchemaNode(
         "required",
         "title",
     )
-    var map: Map<String, Any?> = metadata?.extra ?: emptyMap()
 
-    init {
-        put("format", map["format"])
-        put("example", example)
-    }
-
-    fun put(key: String, value: Any?) {
-        map = map.plus(key to value)
-    }
+    override val entries: Set<Map.Entry<String, Any?>>
+        get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
 
     private fun sortOrder(o1: String) = order.indexOf(o1).let {
         if (it > -1) it else Int.MAX_VALUE
+    }
+}
+
+private class SchemaNode(
+    private val _name: String,
+    private val _paramMeta: ParamMeta,
+    private val isNullable: Boolean,
+    val example: Any?,
+    metadata: FieldMetadata?,
+    val arrayItemType: ArrayItemType,
+    val definitions: Iterable<SchemaNode> = emptyList<SchemaNode>(),
+    val items: ArrayItems? = null,
+    val ref: String? =null,
+): SchemaSortingMap(metadata?.extra ?: emptyMap()) {
+    init {
+        plus("format", map["format"])
+        plus("example", example)
     }
 
     fun definitions(): Iterable<SchemaNode> = definitions
@@ -349,7 +366,7 @@ private class SchemaNode(
             metadata: FieldMetadata?
         ) =
             SchemaNode(name, paramMeta, isNullable, example, metadata, ArrayItemType.NONE).apply {
-                put("type", paramMeta().value)
+                plus("type", paramMeta().value)
             }
 
         fun Enum(
@@ -361,8 +378,8 @@ private class SchemaNode(
             metadata: FieldMetadata?
         ) =
             SchemaNode(name, paramMeta, isNullable, example, metadata, ArrayItemType.NAME_REF).apply {
-                put("type", paramMeta().value)
-                put("enum", enum)
+                plus("type", paramMeta().value)
+                plus("enum", enum)
             }
 
         fun Array(name: String, isNullable: Boolean, items: ArrayItems, example: Any?, metadata: FieldMetadata?) =
@@ -374,8 +391,8 @@ private class SchemaNode(
                 metadata,
                 ArrayItemType.PARAM_META, items.definitions(), items
             ).apply {
-                put("items", items)
-                put("type", paramMeta().value)
+                plus("items", items)
+                plus("type", paramMeta().value)
             }
 
         fun Object(
@@ -390,11 +407,11 @@ private class SchemaNode(
             ArrayItemType.NAME_REF,
             properties.values.flatMap { it.definitions() }).apply {
 
-            put("type", paramMeta().value)
-            put(
+            plus("type", paramMeta().value)
+            plus(
                 "required",
                 properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() })
-            put("properties", properties)
+            plus("properties", properties)
         }
 
         fun Reference(
@@ -412,7 +429,7 @@ private class SchemaNode(
             ref = ref,
             definitions = listOf(schemaNode) + schemaNode.definitions()
         ).apply {
-            put("\$ref", ref)
+            plus("\$ref", ref)
         }
 
         fun MapType(name: String, isNullable: Boolean, additionalProperties: SchemaNode, metadata: FieldMetadata?) =
@@ -425,25 +442,10 @@ private class SchemaNode(
                 ArrayItemType.NAME_REF,
                 definitions = additionalProperties.definitions()
             ).apply {
-
-                put("type", paramMeta().value)
-                put("additionalProperties", additionalProperties)
+                plus("type", paramMeta().value)
+                plus("additionalProperties", additionalProperties)
             }
     }
-
-    override val entries: Set<Map.Entry<String, Any?>>
-        get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
-
-    override val keys: Set<String>
-        get() = map.keys
-    override val size: Int
-        get() = map.size
-    override val values: Collection<Any?>
-        get() = map.values
-    override fun isEmpty(): Boolean = map.isEmpty()
-    override fun get(key: String): Any? = map.get(key)
-    override fun containsValue(value: Any?): Boolean = map.containsValue(value)
-    override fun containsKey(key: String): Boolean = map.containsKey(key)
 }
 
 private fun items(obj: Any) = when (obj) {
