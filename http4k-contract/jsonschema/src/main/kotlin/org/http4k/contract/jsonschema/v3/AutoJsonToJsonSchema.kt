@@ -270,19 +270,7 @@ private class OneOfArray(private val schemas: Set<ArrayItem>) : ArrayItems {
     override fun definitions() = schemas.flatMap { it.definitions() }
 }
 
-private abstract class PassThroughMap(map: Map<String, Any?>) : Map<String, Any?> {
-    val map = map.toMutableMap()
-    override val keys get() = map.keys
-    override val size get() = map.size
-    override val values get() = map.values
-    override val entries = map.entries
-    override fun isEmpty() = map.isEmpty()
-    override fun get(key: String) = map[key]
-    override fun containsValue(value: Any?) = map.containsValue(value)
-    override fun containsKey(key: String) = map.containsKey(key)
-}
-
-private abstract class SchemaSortingMap(map: Map<String, Any?>) : PassThroughMap(map) {
+private abstract class SchemaSortingMap(private val map: MutableMap<String, Any?>) : MutableMap<String, Any?> by map {
     override val entries
         get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
 
@@ -329,10 +317,10 @@ private class SchemaNode(
     metadata: FieldMetadata?,
     val definitions: Iterable<SchemaNode> = emptyList(),
     val arrayItem: ArrayItem
-) : SchemaSortingMap(metadata?.extra ?: emptyMap()) {
+) : SchemaSortingMap(metadata?.extra?.toMutableMap() ?: mutableMapOf()) {
     init {
-        map["format"] = map["format"]
-        map["example"] = example
+        this["format"] = this["format"]
+        this["example"] = example
     }
 
     fun name() = name
@@ -357,7 +345,7 @@ private class SchemaNode(
                     metadata.format(), emptyList()
                 )
             ).apply {
-                map["type"] = paramMeta.value
+                this["type"] = paramMeta.value
             }
 
         fun Enum(
@@ -376,8 +364,8 @@ private class SchemaNode(
                 metadata = metadata,
                 arrayItem = ArrayItem.Ref(name, emptyList())
             ).apply {
-                map["type"] = paramMeta.value
-                map["enum"] = enum
+                this["type"] = paramMeta.value
+                this["enum"] = enum
             }
 
         fun Array(
@@ -398,8 +386,8 @@ private class SchemaNode(
                 definitions = items.definitions(),
                 arrayItem = ArrayItem.Array(items, metadata.format(), items.definitions())
             ).apply {
-                map["items"] = items
-                map["type"] = paramMeta.value
+                this["items"] = items
+                this["type"] = paramMeta.value
             }
         }
 
@@ -419,10 +407,10 @@ private class SchemaNode(
                 definitions = properties.values.flatMap { it.definitions },
                 arrayItem = ArrayItem.Ref(name, properties.values.flatMap { it.definitions })
             ).apply {
-                map["type"] = paramMeta.value
-                map["required"] =
+                this["type"] = paramMeta.value
+                this["required"] =
                     properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() }
-                map["properties"] = properties
+                this["properties"] = properties
             }
         }
 
@@ -440,7 +428,7 @@ private class SchemaNode(
             definitions = listOf(schemaNode) + schemaNode.definitions,
             arrayItem = ArrayItem.Ref(ref, listOf(schemaNode) + schemaNode.definitions)
         ).apply {
-            map["\$ref"] = ref
+            this["\$ref"] = ref
         }
 
         fun MapType(
@@ -459,8 +447,8 @@ private class SchemaNode(
                 definitions = additionalProperties.definitions,
                 arrayItem = ArrayItem.Ref(name, additionalProperties.definitions)
             ).apply {
-                map["type"] = paramMeta.value
-                map["additionalProperties"] = additionalProperties
+                this["type"] = paramMeta.value
+                this["additionalProperties"] = additionalProperties
             }
         }
     }
