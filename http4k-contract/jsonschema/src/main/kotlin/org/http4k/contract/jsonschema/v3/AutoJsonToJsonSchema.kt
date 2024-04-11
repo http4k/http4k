@@ -283,39 +283,41 @@ private abstract class PassThroughMap(map: Map<String, Any?>) : Map<String, Any?
 }
 
 private abstract class SchemaSortingMap(map: Map<String, Any?>) : PassThroughMap(map) {
-    val order = listOf(
-        "properties",
-        "items",
-        "\$ref",
-        "example",
-        "enum",
-        "additionalProperties",
-        "description",
-        "format",
-        "default",
-        "multipleOf",
-        "maximum",
-        "exclusiveMaximum",
-        "minimum",
-        "exclusiveMinimum",
-        "maxLength",
-        "minLength",
-        "pattern",
-        "maxItems",
-        "minItems",
-        "uniqueItems",
-        "maxProperties",
-        "minProperties",
-        "type",
-        "required",
-        "title",
-    )
-
     override val entries
         get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
 
     private fun sortOrder(o1: String) = order.indexOf(o1).let {
         if (it > -1) it else Int.MAX_VALUE
+    }
+
+    companion object {
+        val order = listOf(
+            "properties",
+            "items",
+            "\$ref",
+            "example",
+            "enum",
+            "additionalProperties",
+            "description",
+            "format",
+            "default",
+            "multipleOf",
+            "maximum",
+            "exclusiveMaximum",
+            "minimum",
+            "exclusiveMinimum",
+            "maxLength",
+            "minLength",
+            "pattern",
+            "maxItems",
+            "minItems",
+            "uniqueItems",
+            "maxProperties",
+            "minProperties",
+            "type",
+            "required",
+            "title",
+        )
     }
 }
 
