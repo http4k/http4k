@@ -274,12 +274,12 @@ private abstract class SchemaSortingMap(private val map: MutableMap<String, Any?
     override val entries
         get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
 
-    private fun sortOrder(o1: String) = order.indexOf(o1).let {
+    private fun sortOrder(o1: String) = SORT_ORDER.indexOf(o1).let {
         if (it > -1) it else Int.MAX_VALUE
     }
 
     companion object {
-        val order = listOf(
+        val SORT_ORDER = listOf(
             "properties",
             "items",
             "\$ref",
