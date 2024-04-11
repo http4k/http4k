@@ -160,7 +160,11 @@ fun Body.Companion.string(
     contentType: ContentType,
     description: String? = null,
     contentNegotiation: ContentNegotiation = None
-) = httpBodyRoot(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation)
+) = httpBodyRoot(
+    listOf(Meta(true, "body", StringParam, "body", description, emptyMap())),
+    contentType,
+    contentNegotiation
+)
     .map({ it.payload.asString() }, { Body(it) })
 
 fun Body.Companion.nonEmptyString(
@@ -179,7 +183,11 @@ fun Body.Companion.binary(
     contentType: ContentType,
     description: String? = null,
     contentNegotiation: ContentNegotiation = None
-) = httpBodyRoot(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
+) = httpBodyRoot(
+    listOf(Meta(true, "body", FileParam, "body", description, emptyMap())),
+    contentType,
+    contentNegotiation
+)
     .map({ it.stream }, { Body(it) })
 
 fun Body.Companion.regex(

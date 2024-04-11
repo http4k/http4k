@@ -76,8 +76,8 @@ abstract class ContractRendererContract<NODE : Any>(
         val response = rendererToUse.badRequest(
             LensFailure(
                 listOf(
-                    Missing(Meta(true, "location1", StringParam, "name1")),
-                    Invalid(Meta(false, "location2", NumberParam, "name2"))
+                    Missing(Meta(true, "location1", StringParam, "name1", null, emptyMap())),
+                    Invalid(Meta(false, "location2", NumberParam, "name2", null, emptyMap()))
                 )
             )
         )

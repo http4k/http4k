@@ -25,5 +25,10 @@ abstract class AutoMarshallingJson<NODE : Any> : AutoMarshalling(), Json<NODE> {
     fun <T : Any> NODE.asA(target: KClass<T>): T = asA(this, target)
 }
 
-fun httpBodyLens(description: String? = null, contentNegotiation: ContentNegotiation = None, contentType: ContentType) = httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), contentType, contentNegotiation)
+fun httpBodyLens(description: String? = null, contentNegotiation: ContentNegotiation = None, contentType: ContentType) =
+    httpBodyRoot(
+        listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),
+        contentType,
+        contentNegotiation
+    )
     .map({ it.payload.asString() }, { Body(it) })

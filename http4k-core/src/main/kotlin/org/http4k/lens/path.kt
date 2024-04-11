@@ -39,10 +39,13 @@ class BiDiPathLens<FINAL>(
 /**
  * Represents a uni-directional extraction of an entity from a target path segment.
  */
-open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<String, OUT>) {
-    open fun of(name: String, description: String? = null): PathLens<OUT> {
+open class PathLensSpec<out OUT>(
+    protected val paramMeta: ParamMeta,
+    internal val get: LensGet<String, OUT>
+) {
+    open fun of(name: String, description: String? = null, metadata: Map<String, Any> = emptyMap()): PathLens<OUT> {
         val getLens = get(name)
-        val meta = Meta(true, "path", paramMeta, name, description)
+        val meta = Meta(true, "path", paramMeta, name, description, metadata)
         return PathLens(meta) { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) }
     }
 
@@ -75,11 +78,11 @@ open class BiDiPathLensSpec<OUT>(
     /**
      * Create a lens for this Spec
      */
-    override fun of(name: String, description: String?): BiDiPathLens<OUT> {
+    override fun of(name: String, description: String?, metadata: Map<String, Any>): BiDiPathLens<OUT> {
         val getLens = get(name)
         val setLens = set(name)
 
-        val meta = Meta(true, "path", paramMeta, name, description)
+        val meta = Meta(true, "path", paramMeta, name, description, metadata)
         return BiDiPathLens(meta,
             { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
             { it: OUT, target: Request -> setLens(listOf(it), target) })
@@ -103,7 +106,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
     fun fixed(name: String): PathLens<String> {
         if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
         val getLens = get(name)
-        val meta = Meta(true, "path", StringParam, name)
+        val meta = Meta(true, "path", StringParam, name, null, emptyMap())
         return object : PathLens<String>(meta,
             { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta), target = it) }) {
             override fun toString(): String = name

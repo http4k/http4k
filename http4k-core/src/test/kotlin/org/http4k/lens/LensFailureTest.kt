@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test
 
 class LensFailureTest {
     private val unsupported = Unsupported(CONTENT_TYPE.meta)
-    private val invalid = Invalid(Meta(true, "query", ParamMeta.BooleanParam, "name"))
-    private val missing = Missing(Meta(true, "header", ParamMeta.BooleanParam, "name"))
+    private val invalid = Invalid(Meta(true, "query", ParamMeta.BooleanParam, "name", null, emptyMap()))
+    private val missing = Missing(Meta(true, "header", ParamMeta.BooleanParam, "name", null, emptyMap()))
 
     @Test
     fun `overall returns invalid if there are no failures`() {

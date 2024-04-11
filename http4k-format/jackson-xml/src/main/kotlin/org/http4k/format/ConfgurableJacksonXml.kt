@@ -31,7 +31,11 @@ open class ConfigurableJacksonXml(
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
         contentType: ContentType = defaultContentType
     ): BiDiBodyLensSpec<T> =
-        httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), contentType, contentNegotiation)
+        httpBodyRoot(
+            listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),
+            contentType,
+            contentNegotiation
+        )
             .map({ it.payload.asString() }, { Body(it) })
             .map({ it.asA<T>() }, { it.asXmlString() })
 

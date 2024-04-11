@@ -60,7 +60,7 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
         val writer = writerFor(T::class, schema)
 
         return httpBodyRoot(
-            listOf(Meta(true, "body", ObjectParam, "body", description)),
+            listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),
             contentType,
             contentNegotiation
         )

@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.15.0.0
+- **http4k-core** : [Unlikely break] Change to Meta to remove default params 
+
 ### v5.14.5.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Make Lenses support metadata passed through the LensBuilder construction methods. H/T @BBB, @ivanmoore @jack-bolles
