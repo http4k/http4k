@@ -45,7 +45,7 @@ fun main() {
         )
     }
 
-    val ageQuery = Query.int().required("age")
+    val ageQuery = Query.int().required("age", "Your age", mapOf("schema" to mapOf("minimum" to 18)))
     fun echo(name: String): HttpHandler = {
         Response(OK).with(
             Body.string(TEXT_PLAIN).toLens() of "hello $name you are ${ageQuery(it)}"

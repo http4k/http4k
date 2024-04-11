@@ -33,5 +33,4 @@ class MultipartExtensionsTest {
             equalTo(Moshi.asFormatString(foo))
         )
     }
-
 }
