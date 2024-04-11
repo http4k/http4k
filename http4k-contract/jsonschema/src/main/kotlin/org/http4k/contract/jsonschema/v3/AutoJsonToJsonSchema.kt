@@ -283,7 +283,7 @@ private abstract class PassThroughMap(map: Map<String, Any?>) : Map<String, Any?
 }
 
 private abstract class SchemaSortingMap(map: Map<String, Any?>) : PassThroughMap(map) {
-    var order: List<String> = listOf(
+    val order = listOf(
         "properties",
         "items",
         "\$ref",
@@ -311,7 +311,7 @@ private abstract class SchemaSortingMap(map: Map<String, Any?>) : PassThroughMap
         "title",
     )
 
-    override val entries: Set<Map.Entry<String, Any?>>
+    override val entries
         get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
 
     private fun sortOrder(o1: String) = order.indexOf(o1).let {
