@@ -1,7 +1,10 @@
 package org.http4k.format
 
+import argo.JsonGenerator
+import argo.JsonGenerator.JsonGeneratorStyle.COMPACT
+import argo.JsonGenerator.JsonGeneratorStyle.PRETTY
+import argo.JsonParser
 import argo.format.CompactJsonFormatter
-import argo.format.PrettyJsonFormatter
 import argo.jdom.JdomParser
 import argo.jdom.JsonNode
 import argo.jdom.JsonNodeFactories
@@ -30,9 +33,9 @@ object Argo : Json<JsonNode> {
             else -> throw IllegalArgumentException("Don't know how to translate $value")
         }
 
-    private val pretty = PrettyJsonFormatter()
-    private val compact = CompactJsonFormatter()
-    private val jdomParser = JdomParser()
+    private val pretty = JsonGenerator().style(PRETTY)
+    private val compact = JsonGenerator().style(COMPACT)
+    private val jdomParser = JsonParser()
 
     override fun String.asJsonObject(): JsonNode = let(jdomParser::parse)
     override fun String?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.string(it) }
@@ -57,8 +60,8 @@ object Argo : Json<JsonNode> {
         ?: JsonNodeFactories.nullNode()
 
     override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = JsonNodeFactories.array(this)
-    override fun JsonNode.asPrettyJsonString(): String = pretty.format(this)
-    override fun JsonNode.asCompactJsonString(): String = compact.format(this)
+    override fun JsonNode.asPrettyJsonString(): String = pretty.generate(this)
+    override fun JsonNode.asCompactJsonString(): String = compact.generate(this)
 
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
         `object`(associate { JsonNodeFactories.string(it.first) to it.second })
