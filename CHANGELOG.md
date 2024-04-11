@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.14.5.0 (uncut)
+### v5.14.5.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Make Lenses support metadata passed through the LensBuilder construction methods. H/T @BBB, @ivanmoore @jack-bolles
 - **http4k-testing-tracerbullet** : Account for spans across traces with same spanId. H/T @IvanPavlov1995 
