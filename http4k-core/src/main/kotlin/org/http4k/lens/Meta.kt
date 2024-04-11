@@ -6,5 +6,5 @@ data class Meta(
     val paramMeta: ParamMeta,
     val name: String,
     val description: String? = null,
-    val metadata: Map<String, Any>? = null
+    val metadata: Map<String, Any> = emptyMap()
 )
