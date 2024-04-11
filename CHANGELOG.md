@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.14.5.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Make Lenses support metadata passed through the LensBuilder construction methods. H/T @BBB, @ivanmoore @jack-bolles
 - **http4k-testing-tracerbullet** : Account for spans across traces with same spanId. H/T @IvanPavlov1995 
 
 ### v5.14.4.0

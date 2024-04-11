@@ -183,7 +183,8 @@ class AutoJsonToJsonSchemaTest {
                             mapOf(
                                 "key" to "string",
                                 "description" to "string description",
-                                "format" to "string format"
+                                "format" to "string format",
+                                "a-x-thing" to "some special value"
                             )
                         )
                     )

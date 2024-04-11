@@ -604,6 +604,48 @@
           },
           {
             "in": "header",
+            "name": "d",
+            "required": false,
+            "type": "number",
+            "description": "dHeader"
+          },
+          {
+            "in": "header",
+            "name": "bd",
+            "required": false,
+            "type": "number",
+            "description": "bigDHeader"
+          },
+          {
+            "in": "header",
+            "name": "bi",
+            "required": false,
+            "type": "integer",
+            "description": "bigIHeader"
+          },
+          {
+            "in": "header",
+            "name": "l",
+            "required": false,
+            "type": "integer",
+            "description": "lHeader"
+          },
+          {
+            "in": "header",
+            "name": "list",
+            "required": false,
+            "type": "string",
+            "description": "listHeader"
+          },
+          {
+            "in": "header",
+            "name": "obj",
+            "required": false,
+            "type": "string",
+            "description": "objHeader"
+          },
+          {
+            "in": "header",
             "name": "e",
             "required": false,
             "type": "string",
