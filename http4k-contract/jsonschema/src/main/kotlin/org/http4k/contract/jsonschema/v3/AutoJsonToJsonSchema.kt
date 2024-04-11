@@ -270,22 +270,16 @@ private class OneOfArray(private val schemas: Set<ArrayItem>) : ArrayItems {
     override fun definitions() = schemas.flatMap { it.definitions() }
 }
 
-private abstract class PassThroughMap(var map: Map<String, Any?>) : Map<String, Any?> {
-    override val keys: Set<String>
-        get() = map.keys
-    override val size: Int
-        get() = map.size
-    override val values: Collection<Any?>
-        get() = map.values
-    override val entries: Set<Map.Entry<String, Any?>> = map.entries
-    override fun isEmpty(): Boolean = map.isEmpty()
-    override fun get(key: String): Any? = map.get(key)
-    override fun containsValue(value: Any?): Boolean = map.containsValue(value)
-    override fun containsKey(key: String): Boolean = map.containsKey(key)
-
-    fun plus(key: String, value: Any?) {
-        map = map.plus(key to value)
-    }
+private abstract class PassThroughMap(map: Map<String, Any?>) : Map<String, Any?> {
+    val map = map.toMutableMap()
+    override val keys get() = map.keys
+    override val size get() = map.size
+    override val values get() = map.values
+    override val entries = map.entries
+    override fun isEmpty() = map.isEmpty()
+    override fun get(key: String) = map[key]
+    override fun containsValue(value: Any?) = map.containsValue(value)
+    override fun containsKey(key: String) = map.containsKey(key)
 }
 
 private abstract class SchemaSortingMap(map: Map<String, Any?>) : PassThroughMap(map) {
@@ -335,8 +329,8 @@ private class SchemaNode(
     val arrayItem: ArrayItem
 ) : SchemaSortingMap(metadata?.extra ?: emptyMap()) {
     init {
-        plus("format", map["format"])
-        plus("example", example)
+        map["format"] = map["format"]
+        map["example"] = example
     }
 
     fun name() = name
@@ -364,7 +358,7 @@ private class SchemaNode(
                     metadata.format(), emptyList()
                 )
             ).apply {
-                plus("type", paramMeta.value)
+                map["type"] = paramMeta.value
             }
 
         fun Enum(
@@ -383,12 +377,19 @@ private class SchemaNode(
                 metadata = metadata,
                 arrayItem = ArrayItem.Ref(name, emptyList())
             ).apply {
-                plus("type", paramMeta.value)
-                plus("enum", enum)
+                map["type"] = paramMeta.value
+                map["enum"] = enum
             }
 
-        fun Array(name: String, isNullable: Boolean, items: ArrayItems, example: Any?, metadata: FieldMetadata?): SchemaNode {
-            val paramMeta: ParamMeta = ArrayParam(items.definitions().map { it.paramMeta }.toSet().firstOrNull() ?: NullParam)
+        fun Array(
+            name: String,
+            isNullable: Boolean,
+            items: ArrayItems,
+            example: Any?,
+            metadata: FieldMetadata?
+        ): SchemaNode {
+            val paramMeta: ParamMeta =
+                ArrayParam(items.definitions().map { it.paramMeta }.toSet().firstOrNull() ?: NullParam)
             return SchemaNode(
                 name = name,
                 paramMeta = paramMeta,
@@ -398,8 +399,8 @@ private class SchemaNode(
                 definitions = items.definitions(),
                 arrayItem = ArrayItem.Array(items, metadata.format(), items.definitions())
             ).apply {
-                plus("items", items)
-                plus("type", paramMeta.value)
+                map["items"] = items
+                map["type"] = paramMeta.value
             }
         }
 
@@ -419,12 +420,10 @@ private class SchemaNode(
                 definitions = properties.values.flatMap { it.definitions },
                 arrayItem = ArrayItem.Ref(name, properties.values.flatMap { it.definitions })
             ).apply {
-                plus("type", paramMeta.value)
-                plus(
-                    "required",
+                map["type"] = paramMeta.value
+                map["required"] =
                     properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() }
-                )
-                plus("properties", properties)
+                map["properties"] = properties
             }
         }
 
@@ -442,10 +441,15 @@ private class SchemaNode(
             definitions = listOf(schemaNode) + schemaNode.definitions,
             arrayItem = ArrayItem.Ref(ref, listOf(schemaNode) + schemaNode.definitions)
         ).apply {
-            plus("\$ref", ref)
+            map["\$ref"] = ref
         }
 
-        fun MapType(name: String, isNullable: Boolean, additionalProperties: SchemaNode, metadata: FieldMetadata?): SchemaNode {
+        fun MapType(
+            name: String,
+            isNullable: Boolean,
+            additionalProperties: SchemaNode,
+            metadata: FieldMetadata?
+        ): SchemaNode {
             val paramMeta = ObjectParam
             return SchemaNode(
                 name,
@@ -456,8 +460,8 @@ private class SchemaNode(
                 definitions = additionalProperties.definitions,
                 arrayItem = ArrayItem.Ref(name, additionalProperties.definitions)
             ).apply {
-                plus("type", paramMeta.value)
-                plus("additionalProperties", additionalProperties)
+                map["type"] = paramMeta.value
+                map["additionalProperties"] = additionalProperties
             }
         }
     }
