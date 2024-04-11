@@ -338,9 +338,6 @@ private class SchemaNode(
     fun name() = name
     fun arrayItem(): ArrayItem = arrayItem
 
-    @Suppress("unused")
-    val format = map["format"]
-
     companion object {
         fun Primitive(
             name: String,
