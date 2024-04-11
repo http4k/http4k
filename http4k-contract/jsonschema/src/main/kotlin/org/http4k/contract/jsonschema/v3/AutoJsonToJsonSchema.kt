@@ -318,7 +318,7 @@ private class SchemaNode(
     }
 
     fun put(key: String, value: Any?) {
-        map = map.plus(key to value).toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it })
+        map = map.plus(key to value)
     }
 
     private fun sortOrder(o1: String) = order.indexOf(o1).let {
@@ -341,7 +341,6 @@ private class SchemaNode(
     val format = map["format"]
 
     companion object {
-
         fun Primitive(
             name: String,
             paramMeta: ParamMeta,
@@ -396,7 +395,6 @@ private class SchemaNode(
                 "required",
                 properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() })
             put("properties", properties)
-
         }
 
         fun Reference(
@@ -431,34 +429,21 @@ private class SchemaNode(
                 put("type", paramMeta().value)
                 put("additionalProperties", additionalProperties)
             }
-
     }
 
-
     override val entries: Set<Map.Entry<String, Any?>>
-        get() = map.entries
+        get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
+
     override val keys: Set<String>
         get() = map.keys
     override val size: Int
         get() = map.size
     override val values: Collection<Any?>
         get() = map.values
-
-    override fun isEmpty(): Boolean {
-        return map.isEmpty()
-    }
-
-    override fun get(key: String): Any? {
-        return map.get(key)
-    }
-
-    override fun containsValue(value: Any?): Boolean {
-        return map.containsValue(value)
-    }
-
-    override fun containsKey(key: String): Boolean {
-        return map.containsKey(key)
-    }
+    override fun isEmpty(): Boolean = map.isEmpty()
+    override fun get(key: String): Any? = map.get(key)
+    override fun containsValue(value: Any?): Boolean = map.containsValue(value)
+    override fun containsKey(key: String): Boolean = map.containsKey(key)
 }
 
 private fun items(obj: Any) = when (obj) {
