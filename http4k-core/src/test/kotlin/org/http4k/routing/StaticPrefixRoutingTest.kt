@@ -25,6 +25,14 @@ class StaticPrefixRoutingTest {
     }
 
     @Test
+    fun `test static resource bar with a leading slash`() {
+        app = routes("bar" bind static(Classpath("bar")))
+        val result = app(Request(GET, "/bar/"))
+        assertThat(result.status, equalTo(OK))
+        assertThat(result.bodyString(), equalTo("contents of bar/index.html"))
+    }
+
+    @Test
     fun `test static resource bar - index html`() {
         val result = app(Request(GET, "/bar/index.html"))
         assertThat(result.status, equalTo(OK))
