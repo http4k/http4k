@@ -17,6 +17,7 @@ import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.io.IOException
 import java.io.InterruptedIOException
 import java.net.ConnectException
+import java.net.NoRouteToHostException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.security.SecureRandom
@@ -40,6 +41,8 @@ object OkHttp {
                 } catch (e: ConnectException) {
                     Response(CONNECTION_REFUSED.toClientStatus(e))
                 } catch (e: UnknownHostException) {
+                    Response(UNKNOWN_HOST.toClientStatus(e))
+                } catch (e: NoRouteToHostException) {
                     Response(UNKNOWN_HOST.toClientStatus(e))
                 } catch (e: InterruptedIOException) {
                     when {
