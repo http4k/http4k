@@ -58,7 +58,7 @@ internal class ResourceLoadingHandler(
 ) : HttpHandler {
     private val extMap = MimeTypes(extraFileExtensionToContentTypes)
 
-    override fun invoke(p1: Request): Response = if (p1.uri.path.startsWith(pathSegments) && p1.method == GET) {
+    override fun invoke(p1: Request): Response = if (isStartingWithPathSegment(p1) && p1.method == GET) {
         load(convertPath(p1.uri.path))
     } else Response(NOT_FOUND)
 
@@ -87,4 +87,7 @@ internal class ResourceLoadingHandler(
         val resolved = if (newPath == "/" || newPath.isBlank()) "/index.html" else newPath
         return resolved.trimStart('/')
     }
+
+    private fun isStartingWithPathSegment(p1: Request) =
+        (p1.uri.path.startsWith(pathSegments) || p1.uri.path.startsWith("/$pathSegments"))
 }
