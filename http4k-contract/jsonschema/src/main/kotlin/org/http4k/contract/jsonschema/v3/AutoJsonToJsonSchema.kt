@@ -24,12 +24,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
         )
     ),
     private val modelNamer: SchemaModelNamer = Simple,
-    private val refLocationPrefix: String = "components/schemas"
+    private val refLocationPrefix: String = "components/schemas",
+    private val metadataRetrieval: MetadataRetrieval = MetadataRetrieval.compose(SimpleMetadataLookup(emptyMap()))
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?): JsonSchema<NODE> {
         val schema =
-            json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix.orEmpty(), null)
+            json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix.orEmpty(), metadataRetrieval(obj))
         return JsonSchema(
             json.asJsonObject(schema),
             schema.definitions.map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()
@@ -45,7 +46,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
     ) =
         when (val param = json.typeOf(this).toParam()) {
             is ArrayParam -> toArraySchema("", value, false, null, refModelNamePrefix)
-            ObjectParam -> toObjectOrMapSchema(objName, value, false, topLevel, null, refModelNamePrefix)
+            ObjectParam -> toObjectOrMapSchema(objName, value, false, topLevel, metadata, refModelNamePrefix)
             else -> value.javaClass.enumConstants?.let {
                 toEnumSchema("", it[0], json.typeOf(this).toParam(), it, false, null, refModelNamePrefix)
             } ?: toSchema("", param, false, metadata)
@@ -139,7 +140,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
         return SchemaNode.Reference(
             objName
                 ?: modelNamer(obj), "#/$refLocationPrefix/$refModelNamePrefix$nameToUseForRef",
-            SchemaNode.Object(refModelNamePrefix + nameToUseForRef, isNullable, properties, this, null), metadata
+            SchemaNode.Object(refModelNamePrefix + nameToUseForRef, isNullable, properties, this, metadata), null
         )
     }
 

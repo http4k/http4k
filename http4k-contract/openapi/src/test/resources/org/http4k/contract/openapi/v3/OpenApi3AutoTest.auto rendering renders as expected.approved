@@ -608,6 +608,7 @@
           ],
           "bool": true
         },
+        "additionalProperties": false,
         "type": "object",
         "required": [
           "bool",

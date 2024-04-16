@@ -214,6 +214,34 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `can add extra properties to a root component`(approver: Approver) {
+        val creator = AutoJsonToJsonSchema(
+            json,
+            metadataRetrieval = { obj ->
+                if (obj is ArbObject3) {
+                    FieldMetadata(
+                        mapOf(
+                            "key" to "arb",
+                            "description" to "arb desc",
+                            "additionalProperties" to false
+                        )
+                    )
+                } else {
+                    FieldMetadata()
+                }
+            },
+            modelNamer = SchemaModelNamer.Full,
+            refLocationPrefix = "locationPrefix"
+        )
+
+        approver.assertApproved(
+            Response(OK)
+                .with(CONTENT_TYPE of APPLICATION_JSON)
+                .body(Jackson.asFormatString(creator.toSchema(ArbObject3(), refModelNamePrefix = null)))
+        )
+    }
+
+    @Test
     fun `can override definition id for a raw map`(approver: Approver) {
         approver.assertApproved(
             mapOf(
