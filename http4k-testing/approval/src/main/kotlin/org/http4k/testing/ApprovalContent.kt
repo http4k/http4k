@@ -17,10 +17,19 @@ interface ApprovalContent {
             override fun invoke(input: HttpMessage) = input.toString().byteInputStream()
         }
 
-        fun HttpBodyOnly(formatter: (String) -> String = { it }) = object : ApprovalContent {
+        fun HttpTextBody(formatter: (String) -> String = { it }) = object : ApprovalContent {
             override fun invoke(input: InputStream) = input
 
             override fun invoke(input: HttpMessage) = formatter(input.bodyString()).byteInputStream()
         }
+
+        fun HttpBinaryBody() = object : ApprovalContent {
+            override fun invoke(input: InputStream): InputStream = input
+
+            override fun invoke(input: HttpMessage): InputStream = invoke(input.body.stream)
+        }
+
+        @Deprecated("Use HttpTextBody", ReplaceWith("HttpTextBody()"))
+        fun HttpBodyOnly(formatter: (String) -> String = { it }) = HttpTextBody(formatter)
     }
 }
