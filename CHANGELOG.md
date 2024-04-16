@@ -3,8 +3,16 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.15.1.0 (uncut)
-- **http4k-core** : Fix static routes with leading slash. H/T @ArthurS1
+### v5.16.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-approval** : [Unlikely break] Rename typo in an ApprovalSource instance
+- **http4k-testing-approval** : Addition of optional suffix to the approval file name
+- **http4k-core** : [Fix #1084] Route name without a beginning / works for everything except static resources. H/T @ArthurS1
+
+### v5.15.1.0
+- **http4k-core** : [Unlikely break] Change to Meta to remove default params 
+- 
+- **http4k-testing-approval** : Add ability to add a suffix to the approval file name. 
 
 ### v5.15.0.0
 - **http4k-core** : [Unlikely break] Change to Meta to remove default params 

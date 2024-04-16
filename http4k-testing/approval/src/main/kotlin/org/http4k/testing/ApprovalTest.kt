@@ -76,9 +76,7 @@ abstract class ContentTypeAwareApprovalTest(
             approvalSource
         )
 
-        override fun withNameSuffix(suffix: String): Approver {
-            return delegate.withNameSuffix(suffix)
-        }
+        override fun withNameSuffix(suffix: String): Approver = delegate.withNameSuffix(suffix)
     }
 
     abstract fun format(input: String): String

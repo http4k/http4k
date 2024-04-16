@@ -20,10 +20,15 @@ interface ApprovalSource {
     fun approvedFor(testName: String): ReadResource
 }
 
-class FileSystemApprovalSource(private val base: File) : ApprovalSource {
-    override fun actualFor(testName: String): ReadWriteResource = FileReadWriteResource(File(base, "$testName.actual"))
+/**
+ * Read the approval file from the file system, using an optional suffix
+ */
+class FileSystemApprovalSource(private val base: File, private val suffix: String = "") : ApprovalSource {
+    override fun actualFor(testName: String): ReadWriteResource =
+        FileReadWriteResource(File(base, "$testName.actual$suffix"))
 
-    override fun approvedFor(testName: String): ReadResource = FileReadWriteResource(File(base, "$testName.approved"))
+    override fun approvedFor(testName: String): ReadResource =
+        FileReadWriteResource(File(base, "$testName.approved$suffix"))
 }
 
 internal class FileReadWriteResource(private val target: File) : ReadWriteResource {
