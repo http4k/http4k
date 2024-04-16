@@ -57,7 +57,7 @@ class NamedResourceApprover(
                 else -> try {
                     assertEquals(
                         approvalContent(this).reader().use { it.readText().normalizeLineEndings().trimEnd() },
-                        approvalContent(httpMessage).reader().readText().normalizeLineEndings().trimEnd()
+                        approvalContent(httpMessage).reader().use { it.readText().normalizeLineEndings().trimEnd() },
                     )
                     actual.output()
                 } catch (e: AssertionError) {
