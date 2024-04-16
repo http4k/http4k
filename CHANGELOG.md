@@ -6,7 +6,7 @@ changes with their rationale when appropriate:
 ### v5.16.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** : [Unlikely break] Rename typo in an ApprovalSource instance
-- **http4k-testing-approval** : Addition of optional suffix to the approval file name
+- **http4k-testing-approval** : Addition of optional suffix to the approval file name, and added ApprovalTransformer for varying the compared content from the InputStream
 - **http4k-core** : [Fix #1084] Route name without a beginning / works for everything except static resources. H/T @ArthurS1
 
 ### v5.15.1.0

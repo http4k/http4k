@@ -31,11 +31,9 @@ interface Approver {
 class NamedResourceApprover(
     private val name: String,
     private val approvalContent: ApprovalContent,
-    private val approvalSource: ApprovalSource
+    private val approvalSource: ApprovalSource,
+    private val transformer: ApprovalTransformer<*> = ApprovalTransformer.StringWithNormalisedLineEndings()
 ) : Approver {
-
-    private val matchAllLineEndings = "\\r\\n?".toRegex()
-    private fun String.normalizeLineEndings() = replace(matchAllLineEndings, "\n")
 
     override fun withNameSuffix(suffix: String) = NamedResourceApprover(
         name = "$name.$suffix",
@@ -62,11 +60,7 @@ class NamedResourceApprover(
                 }
 
                 else -> try {
-                    assertEquals(
-                        approvalContent(this).reader().use { it.readText().normalizeLineEndings().trimEnd() },
-                        ByteArrayInputStream(actualBytes).reader()
-                            .use { it.readText().normalizeLineEndings().trimEnd() },
-                    )
+                    assertEquals(transformer(approvalContent(this)), transformer(ByteArrayInputStream(actualBytes)))
                 } catch (e: AssertionError) {
                     ByteArrayInputStream(actualBytes).copyTo(actual.output())
                     throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)
