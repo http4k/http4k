@@ -195,7 +195,7 @@ object ResponseFilters {
         private fun ByteArray.toHex() = joinToString("") { "%02x".format(it) }
 
         companion object {
-            private val SAFE_HEADERS = listOf("date", "last-modified", "cache-control", "expires", "set-cookie", "vary")
+            private val SAFE_HEADERS = listOf("date", "last-modified", "cache-control", "expires", "set-cookie", "vary", "surrogate-key")
         }
     }
 
