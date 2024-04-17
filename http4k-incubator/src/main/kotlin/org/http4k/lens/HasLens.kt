@@ -6,7 +6,9 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import kotlin.reflect.KClass
 
 /**
- * Experimental template for a companion object to provide a lens into a class
+ * Experimental superclass companion objects to provide a lens for a class.
+ *
+ * Access the lens using Class.lens
  */
 abstract class HasLens<T : Any>(
     private val autoMarshalling: AutoMarshalling,
