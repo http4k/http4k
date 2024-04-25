@@ -17,7 +17,7 @@ class NamedSourceApproverTest {
     private val testName = "somename" + Random.nextLong()
     private val actualFile = File(baseFile, "$testName.actual")
     private val approvedFile = File(baseFile, "$testName.approved")
-    private val approver = NamedResourceApprover(testName, ApprovalContent.HttpBodyOnly(), FileSystemApprovalSource(baseFile))
+    private val approver = NamedResourceApprover(testName, ApprovalContent.HttpTextBody(), FileSystemApprovalSource(baseFile))
 
     @Test
     fun `when no approval recorded, create actual and throw`() {
