@@ -128,14 +128,16 @@ data class ContractRoutingHttpHandler(
         }
 }
 
-internal class PreFlightExtractionFilter(meta: RouteMeta, preFlightExtraction: PreFlightExtraction) : Filter {
-    private val preFlightChecks = (meta.preFlightExtraction ?: preFlightExtraction)(meta)
-    override fun invoke(next: HttpHandler): HttpHandler = {
-        when (it.method) {
-            OPTIONS -> next(it)
-            else -> {
-                val failures = Validator.Strict(it, preFlightChecks)
-                if (failures.isEmpty()) next(it) else throw LensFailure(failures, target = it)
+internal fun PreFlightExtractionFilter(meta: RouteMeta, preFlightExtraction: PreFlightExtraction): Filter {
+    val preFlightChecks = (meta.preFlightExtraction ?: preFlightExtraction)(meta)
+    return Filter { next ->
+        {
+            when (it.method) {
+                OPTIONS -> next(it)
+                else -> {
+                    val failures = Validator.Strict(it, preFlightChecks)
+                    if (failures.isEmpty()) next(it) else throw LensFailure(failures, target = it)
+                }
             }
         }
     }

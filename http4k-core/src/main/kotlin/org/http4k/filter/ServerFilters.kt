@@ -243,8 +243,9 @@ object ServerFilters {
      * This is required when using lenses to automatically unmarshall inbound requests.
      * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
      */
-    object CatchLensFailure :
-        Filter by CatchLensFailure({ lensFailure -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; "))) })
+    val CatchLensFailure = CatchLensFailure { lensFailure ->
+        Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
+    }
 
     /**
      * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
