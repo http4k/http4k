@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.16.0.0 (uncut)
+- **http4k-*** : Tweaks to make the K2 compiler happy
+
 ### v5.16.2.0
 - **http4k-*** : Upgrade some dependency versions.
 
