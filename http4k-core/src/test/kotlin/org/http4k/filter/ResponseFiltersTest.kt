@@ -440,6 +440,7 @@ class ResponseFiltersTest {
                     .header("date", "passesThroughDate")
                     .header("vary", "passesThroughVary")
                     .header("X-foo", "doesntPassThrough")
+                    .header("surrogate-key", "passesThroughSurrogateKey")
             }
 
             val response = handler(
@@ -451,6 +452,7 @@ class ResponseFiltersTest {
                 response, !hasHeader("x-foo")
                     and hasHeader("date", equalTo("passesThroughDate"))
                     and hasHeader("vary", equalTo("passesThroughVary"))
+                    and hasHeader("surrogate-key", equalTo("passesThroughSurrogateKey"))
             )
         }
     }

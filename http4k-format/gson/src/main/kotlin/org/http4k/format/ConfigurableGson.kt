@@ -96,6 +96,11 @@ open class ConfigurableGson(
         else -> throw IllegalArgumentException("node is not an object")
     }
 
+    /**
+     * Convenience function to write the object as JSON to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.yaml(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+
     // auto
     override fun asJsonObject(input: Any): JsonElement = mapper.toJsonTree(input)
 

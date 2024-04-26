@@ -26,6 +26,11 @@ open class ConfigurableJacksonXml(
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = mapper.readValue(input, target.java)
 
+    /**
+     * Convenience function to write the object as XM to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.xml(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+
     inline fun <reified T : Any> autoBody(
         description: String? = null,
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
@@ -38,8 +43,6 @@ open class ConfigurableJacksonXml(
         )
             .map({ it.payload.asString() }, { Body(it) })
             .map({ it.asA<T>() }, { it.asXmlString() })
-
-    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 }
 
 fun KotlinModule.asConfigurableXml() = asConfigurable(

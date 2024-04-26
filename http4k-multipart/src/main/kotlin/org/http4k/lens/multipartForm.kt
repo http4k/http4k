@@ -11,6 +11,7 @@ import org.http4k.core.MultipartFormBody.Companion.DEFAULT_DISK_THRESHOLD
 import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation.Companion.Strict
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.Validator.*
 import java.io.Closeable
 import java.util.UUID
 
@@ -38,6 +39,11 @@ data class MultipartForm(
 }
 
 val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
+
+/**
+ * Convenience function to write the MultipartForm to the message body and set the content type.
+ */
+fun <R : HttpMessage> R.multipartForm(t: MultipartForm): R = with(Body.multipartForm(Ignore).toLens() of t)
 
 fun Body.Companion.multipartForm(
     validator: Validator,

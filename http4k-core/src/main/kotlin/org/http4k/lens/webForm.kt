@@ -3,9 +3,12 @@ package org.http4k.lens
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.http4k.core.HttpMessage
 import org.http4k.core.toUrlFormEncoded
+import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.lens.Validator.*
 import java.net.URLDecoder.decode
 
 object FormField : BiDiLensSpec<WebForm, String>("formData",
@@ -20,6 +23,11 @@ data class WebForm(val fields: Map<String, List<String>> = emptyMap(), val error
 
     operator fun minus(name: String): WebForm = copy(fields = fields.filterKeys { it != name })
 }
+
+/**
+ * Convenience function to write the Webform to the message body and set the content type.
+ */
+fun <R : HttpMessage> R.webForm(t: WebForm): R = with(Body.webForm(Ignore).toLens() of t)
 
 fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
     httpBodyRoot(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, StrictNoDirective)
