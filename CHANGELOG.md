@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-*** : Tweaks to make the K2 compiler happy
 - **http4k** : Added convenience methods to set the body of an HTTP message. The works for both standard body types and with automarshallers. 
 - **http4k-core** : Fix request source in SunHttp. H/T @dkandalov
+- **http4k-contract** : Added top-level MetadataRetrieval to schema objects. H/T @BBB
 - **http4k-format-*** : [Unlikely break] rename `with()` functions on auto-marshallers to match content type, so you can now do `req.json(myObj)` and get the content type and body set in one go. Likewise for other content types
 
 ### v5.16.2.0
