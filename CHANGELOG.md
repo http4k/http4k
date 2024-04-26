@@ -24,7 +24,6 @@ changes with their rationale when appropriate:
 
 ### v5.15.1.0
 - **http4k-core** : [Unlikely break] Change to Meta to remove default params 
-- 
 - **http4k-testing-approval** : Add ability to add a suffix to the approval file name. 
 
 ### v5.15.0.0
