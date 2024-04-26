@@ -73,7 +73,10 @@ open class ConfigurableMoshiYaml(
         defaultContentType
     ).map({ asA(it) }, ::asFormatString)
 
-    inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
+    /**
+     * Convenience function to write the object as YAML to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.yaml(t: T): R = with(Body.auto<T>().toLens() of t)
 }
 
 val defaultDumperOptions = DumperOptions().apply {

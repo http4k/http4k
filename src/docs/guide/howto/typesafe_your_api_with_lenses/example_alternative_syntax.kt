@@ -3,7 +3,7 @@ package guide.howto.typesafe_your_api_with_lenses
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.http4k.format.Jackson.with
+import org.http4k.format.Jackson.json
 import org.http4k.format.Jackson
 import org.http4k.format.invoke
 
@@ -18,7 +18,7 @@ fun main() {
     println(messageWithJsonInjected)
 
     // or we can use yet another alternative syntax to inject the value
-    val messageWithJsonInjected2 = Request(GET, "").with(obj)
+    val messageWithJsonInjected2 = Request(GET, "").json(obj)
     println(messageWithJsonInjected2)
 
     // or to extract it again

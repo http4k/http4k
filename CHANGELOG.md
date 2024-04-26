@@ -3,8 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.16.0.0 (uncut)
+### v5.17.0.0 (uncut)
 - **http4k-*** : Tweaks to make the K2 compiler happy
+- **http4k-core** : Fix request source in SunHttp. H/T @dkandalov
+- **http4k-format-*** : [Unlikely break] rename `with()` functions on auto-marshallers to match content type, so you can now do `req.json(myObj)` and get the content type and body set in one go. Likewise for other content types
 
 ### v5.16.2.0
 - **http4k-*** : Upgrade some dependency versions.

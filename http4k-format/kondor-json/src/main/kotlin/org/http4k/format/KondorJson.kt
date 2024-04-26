@@ -19,6 +19,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
@@ -155,6 +156,11 @@ class KondorJson(
         autoBody(T::class, description, contentNegotiation, contentType)
 
     fun <T : Any> wsAutoBody(target: KClass<T>) = converterFor(target).wsAutoBody(compactJsonStyle)
+
+    /**
+     * Convenience function to write the object as JSON to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.json(t: T): R = with(Body.auto<T>().toLens() of t)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = wsAutoBody(T::class)
 

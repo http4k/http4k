@@ -6,6 +6,8 @@ import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -48,6 +50,11 @@ object Xml : AutoMarshallingXml() {
         it.toString()
     }
 
+    inline fun <reified T : Any, R : HttpMessage> R.xml(t: T): R = with(Body.auto<T>().toLens() of t)
+
+    /**
+     * Convenience function to write the object as XML to the message body and set the content type.
+     */
     fun <IN : Any> BiDiLensSpec<IN, String>.xml() = map({ it.asXmlDocument() }, { it.asXmlString() })
 
     fun Body.Companion.xml(

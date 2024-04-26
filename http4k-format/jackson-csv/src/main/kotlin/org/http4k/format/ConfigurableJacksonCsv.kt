@@ -5,6 +5,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
@@ -44,6 +46,11 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
         val reader = readerFor(T::class, schema)
         return reader(input)
     }
+
+    /**
+     * Convenience function to write the object as CSV to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.csv(t: List<T>): R = with(Body.auto<T>().toLens() of t)
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
