@@ -2,10 +2,18 @@ package org.http4k.lens
 
 import org.http4k.core.Accept
 import org.http4k.core.ContentType
+import org.http4k.core.Credentials
 import org.http4k.core.HttpMessage
 import org.http4k.core.Parameters
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.with
+import org.http4k.lens.Header.ACCEPT
+import org.http4k.lens.Header.AUTHORIZATION_BASIC
+import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.Header.LOCATION
 import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.StringParam
 import java.util.Locale.getDefault
@@ -66,3 +74,17 @@ inline fun <reified T : Enum<T>> Header.enum(caseSensitive: Boolean = true) = ma
     if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
     EnumParam(T::class)
 )
+
+fun HttpMessage.contentType(): ContentType? = CONTENT_TYPE(this)
+
+fun <T : HttpMessage> T.contentType(contentType: ContentType): T = with(CONTENT_TYPE of contentType)
+
+fun Response.location(): Uri = LOCATION(this)
+
+fun Response.location(uri: Uri): HttpMessage = with(LOCATION of uri)
+
+fun Request.accept(): Accept? = ACCEPT(this)
+
+fun Request.basicAuthentication(): Credentials? = AUTHORIZATION_BASIC(this)
+
+fun Request.basicAuthentication(credentials: Credentials): HttpMessage = with(AUTHORIZATION_BASIC of credentials)
