@@ -37,11 +37,18 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
 
     val LOCATION = map(::of, Uri::toString).required("location")
 
-    val ACCEPT = map {
-        parseValueAndDirectives(it).let {
-            Accept(it.first.split(",").map { it.trim() }.map(::ContentType), it.second)
-        }
-    }.optional("Accept")
+    val ACCEPT = map(::parseAcceptHeaders, ::injectAcceptHeaders).optional("Accept")
+
+    private fun parseAcceptHeaders(it: String): Accept = parseValueAndDirectives(it).let {
+        Accept(it.first.split(",").map { it.trim() }.map(::ContentType), it.second)
+    }
+
+    private fun injectAcceptHeaders(accept: Accept): String = accept.let {
+        it.contentTypes.joinToString(", ") { it.withNoDirectives().toHeaderValue() } +
+            it.directives.takeIf { it.isNotEmpty() }
+                ?.map { it.first + (it.second?.let { "=$it" } ?: "") }?.joinToString(";", prefix = ";")
+                .orEmpty()
+    }
 
     val LINK = map(
         {
@@ -84,6 +91,8 @@ fun Response.location(): Uri = LOCATION(this)
 fun Response.location(uri: Uri): HttpMessage = with(LOCATION of uri)
 
 fun Request.accept(): Accept? = ACCEPT(this)
+
+fun Request.accept(accept: Accept): Request = with(ACCEPT of accept)
 
 fun Request.basicAuthentication(): Credentials? = AUTHORIZATION_BASIC(this)
 

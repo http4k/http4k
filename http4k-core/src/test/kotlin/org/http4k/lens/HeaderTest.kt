@@ -139,6 +139,15 @@ class HeaderTest {
     }
 
     @Test
+    fun `accept header serialises correctly to message`() {
+        val reqWithHeader = Request(GET, "").with(Header.ACCEPT of Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
+
+        assertThat(reqWithHeader.header("Accept"), equalTo("text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))
+        assertThat(reqWithHeader.accept(), equalTo(Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
+        )
+    }
+
+    @Test
     fun `multiple directives are parsed correctly`() {
         assertThat(Header.parseValueAndDirectives("some value"), equalTo("some value" to emptyList()))
         assertThat(Header.parseValueAndDirectives("some value ;"), equalTo("some value" to emptyList()))
