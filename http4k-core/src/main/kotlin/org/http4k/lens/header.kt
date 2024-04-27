@@ -88,7 +88,7 @@ fun <T : HttpMessage> T.contentType(contentType: ContentType): T = with(CONTENT_
 
 fun Response.location(): Uri = LOCATION(this)
 
-fun Response.location(uri: Uri): HttpMessage = with(LOCATION of uri)
+fun Response.location(uri: Uri): Response = with(LOCATION of uri)
 
 fun Request.accept(): Accept? = ACCEPT(this)
 
