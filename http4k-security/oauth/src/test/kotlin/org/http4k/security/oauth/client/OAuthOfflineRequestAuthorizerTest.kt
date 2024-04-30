@@ -18,6 +18,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.bearerToken
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessTokenResponse
@@ -91,7 +92,7 @@ class OAuthOfflineRequestAuthorizerTest {
         )
 
         return security.toFilter(RefreshToken(refreshToken)).then { request ->
-            val token = request.header("Authorization")?.replace("Bearer ", "")
+            val token = request.bearerToken()
             val status = if (token == null) UNAUTHORIZED else OK
             Response(status).body(token ?: "")
         }

@@ -86,14 +86,21 @@ fun HttpMessage.contentType(): ContentType? = CONTENT_TYPE(this)
 
 fun <T : HttpMessage> T.contentType(contentType: ContentType): T = with(CONTENT_TYPE of contentType)
 
-fun Response.location(): Uri = LOCATION(this)
+fun Response.location()= LOCATION(this)
 
-fun Response.location(uri: Uri): Response = with(LOCATION of uri)
+fun Response.location(uri: Uri) = with(LOCATION of uri)
 
 fun Request.accept(): Accept? = ACCEPT(this)
 
-fun Request.accept(accept: Accept): Request = with(ACCEPT of accept)
+fun Request.accept(accept: Accept) = with(ACCEPT of accept)
 
-fun Request.basicAuthentication(): Credentials? = AUTHORIZATION_BASIC(this)
+fun Request.basicAuthentication() = AUTHORIZATION_BASIC(this)
 
-fun Request.basicAuthentication(credentials: Credentials): HttpMessage = with(AUTHORIZATION_BASIC of credentials)
+fun Request.basicAuthentication(credentials: Credentials) = with(AUTHORIZATION_BASIC of credentials)
+
+fun Request.bearerAuth(token: String, scheme: String = "Bearer") = header("Authorization", "$scheme $token")
+
+fun Request.bearerToken(): String? = header("Authorization")
+    ?.trim()
+    ?.takeIf { it.startsWith("Bearer ") || it.startsWith("bearer ") }
+    ?.substringAfter("earer ")

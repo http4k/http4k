@@ -28,6 +28,7 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 import org.http4k.lens.RequestContextLens
+import org.http4k.lens.bearerToken
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
@@ -199,12 +200,6 @@ object ServerFilters {
                     ?: Response(UNAUTHORIZED)
             }
         }
-
-        private fun Request.bearerToken(): String? = header("Authorization")
-            ?.trim()
-            ?.takeIf { it.startsWith("Bearer") }
-            ?.substringAfter("Bearer")
-            ?.trim()
     }
 
     /**

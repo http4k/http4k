@@ -202,9 +202,19 @@ class HeaderTest {
 
     @Test
     fun `basic auth header added correctly to message`() {
-        val request = Request(GET, "")
-            .with(Header.AUTHORIZATION_BASIC of Credentials("admin", "hunter2"))
+        val credentials = Credentials("admin", "hunter2")
+        val request = Request(GET, "").basicAuthentication(credentials)
 
         assertThat(request, hasHeader("Authorization", "Basic YWRtaW46aHVudGVyMg=="))
+        assertThat(request.basicAuthentication(), equalTo(credentials))
+    }
+
+    @Test
+    fun `bearer auth header added correctly to message`() {
+        val token = "foo"
+        val request = Request(GET, ""). bearerAuth(token)
+
+        assertThat(request, hasHeader("Authorization", "Bearer $token"))
+        assertThat(request.bearerToken(), equalTo(token))
     }
 }
