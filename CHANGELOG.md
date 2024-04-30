@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.18.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : [Behaviour break] We now do not set the legacy Expires header in CachingFilters. Modern caches should use the Cache-Control header instead (max-age).
+
 ### v5.17.0.0
 - **http4k-*** : Tweaks to make the K2 compiler happy
 - **http4k** : Added convenience methods to set the body of an HTTP message. The works for both standard body types and with automarshallers. 
