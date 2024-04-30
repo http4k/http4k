@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.18.1.0
+- **http4k-core** : Add convenience methods to set common headers to HTTP message.
+
 ### v5.18.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : [Behaviour break] We now do not set the legacy Expires header in CachingFilters. Modern caches should use the Cache-Control header instead (max-age).
