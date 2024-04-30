@@ -111,6 +111,11 @@ open class ConfigurableJackson(
      */
     inline fun <reified T : Any, R : HttpMessage> R.json(t: T): R = with(Body.auto<T>().toLens() of t)
 
+    /**
+     * Convenience function to read an object as JSON from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
+
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String =
         mapper.writerWithView(v.java).writeValueAsString(this)

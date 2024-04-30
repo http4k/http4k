@@ -50,7 +50,15 @@ object Xml : AutoMarshallingXml() {
         it.toString()
     }
 
+    /**
+     * Convenience function to write the object as XML to the message body and set the content type.
+     */
     inline fun <reified T : Any, R : HttpMessage> R.xml(t: T): R = with(Body.auto<T>().toLens() of t)
+
+    /**
+     * Convenience function to read an object as XML from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
 
     /**
      * Convenience function to write the object as XML to the message body and set the content type.

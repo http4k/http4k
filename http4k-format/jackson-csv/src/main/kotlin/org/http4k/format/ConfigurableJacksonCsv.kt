@@ -52,6 +52,11 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
      */
     inline fun <reified T : Any, R : HttpMessage> R.csv(t: List<T>): R = with(Body.auto<T>().toLens() of t)
 
+    /**
+     * Convenience function to read an object as CSV from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.csv(): List<T> = Body.auto<T>().toLens()(this)
+
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
         contentNegotiation: ContentNegotiation = ContentNegotiation.None

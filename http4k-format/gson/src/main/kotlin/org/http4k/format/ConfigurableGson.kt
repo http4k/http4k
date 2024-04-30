@@ -101,6 +101,11 @@ open class ConfigurableGson(
      */
     inline fun <reified T : Any, R : HttpMessage> R.yaml(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
+    /**
+     * Convenience function to read an object as YAML from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
+
     // auto
     override fun asJsonObject(input: Any): JsonElement = mapper.toJsonTree(input)
 

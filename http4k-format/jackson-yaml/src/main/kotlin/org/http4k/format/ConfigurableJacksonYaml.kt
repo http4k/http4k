@@ -39,6 +39,11 @@ open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaul
      * Convenience function to write the object as YAML to the message body and set the content type.
      */
     inline fun <reified T : Any, R : HttpMessage> R.yaml(t: T): R = with(Body.auto<T>().toLens() of t)
+
+    /**
+     * Convenience function to read an object as YAML from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
 }
 
 inline operator fun <reified T : Any> ConfigurableJacksonYaml.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)

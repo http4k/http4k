@@ -31,6 +31,11 @@ open class ConfigurableJacksonXml(
      */
     inline fun <reified T : Any, R : HttpMessage> R.xml(t: T): R = with<R>(Body.auto<T>().toLens() of t)
 
+    /**
+     * Convenience function to read an object as XML from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
+
     inline fun <reified T : Any> autoBody(
         description: String? = null,
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,

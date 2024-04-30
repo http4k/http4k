@@ -104,6 +104,11 @@ open class ConfigurableMoshi(
      */
     inline fun <reified T : Any, R : HttpMessage> R.json(t: T): R = with(Body.auto<T>().toLens() of t)
 
+    /**
+     * Convenience function to read an object as JSON from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
+
     override fun asJsonObject(input: Any): MoshiNode = MoshiNode.wrap(objectAdapter.toJsonValue(input))
 
     override fun <T : Any> asA(j: MoshiNode, target: KClass<T>): T = adapterFor(target)
