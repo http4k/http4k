@@ -86,7 +86,7 @@ fun HttpMessage.contentType(): ContentType? = CONTENT_TYPE(this)
 
 fun <T : HttpMessage> T.contentType(contentType: ContentType): T = with(CONTENT_TYPE of contentType)
 
-fun Response.location()= LOCATION(this)
+fun Response.location() = LOCATION(this)
 
 fun Response.location(uri: Uri) = with(LOCATION of uri)
 
@@ -102,5 +102,5 @@ fun Request.bearerAuth(token: String, scheme: String = "Bearer") = header("Autho
 
 fun Request.bearerToken(): String? = header("Authorization")
     ?.trim()
-    ?.takeIf { it.startsWith("Bearer ") || it.startsWith("bearer ") }
+    ?.takeIf { it.startsWith("Bearer ", true) }
     ?.substringAfter("earer ")
