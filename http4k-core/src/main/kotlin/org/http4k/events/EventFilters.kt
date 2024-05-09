@@ -2,6 +2,7 @@ package org.http4k.events
 
 import org.http4k.filter.ZipkinTracesStorage
 import java.time.Clock
+import java.time.Instant
 
 /**
  * Useful EventFilters used in building event processing pipelines to add various types of metadata to the events
@@ -31,9 +32,14 @@ object EventFilters {
     /**
      * Adds timestamp metadata to the event.
      */
-    fun AddTimestamp(clock: Clock = Clock.systemUTC()) = EventFilter { next ->
+    fun AddTimestamp(clock: Clock = Clock.systemUTC()) = AddTimestamp(clock::instant)
+
+    /**
+     * Adds timestamp metadata to the event.
+     */
+    fun AddTimestamp(timeSource: () -> Instant) = EventFilter { next ->
         {
-            next(it + ("timestamp" to clock.instant()))
+            next(it + ("timestamp" to timeSource()))
         }
     }
 
