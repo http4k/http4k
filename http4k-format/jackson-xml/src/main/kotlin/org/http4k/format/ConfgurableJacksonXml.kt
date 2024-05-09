@@ -26,6 +26,8 @@ open class ConfigurableJacksonXml(
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = mapper.readValue(input, target.java)
 
+    override fun asInputStream(input: Any): InputStream = mapper.writeValueAsBytes(input).inputStream()
+
     /**
      * Convenience function to write the object as XM to the message body and set the content type.
      */

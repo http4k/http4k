@@ -91,6 +91,8 @@ open class ConfigurableJackson(
 
     inline fun <reified T : Any> JsonNode.asA(): T = mapper.convertValue(this)
 
+    override fun asInputStream(input: Any): InputStream = mapper.writeValueAsBytes(input).inputStream()
+
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 
     inline fun <reified T : Any> Body.Companion.auto(

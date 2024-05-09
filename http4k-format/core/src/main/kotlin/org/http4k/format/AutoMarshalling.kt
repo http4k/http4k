@@ -30,7 +30,7 @@ abstract class AutoMarshalling {
 
     abstract fun asFormatString(input: Any): String
 
-    fun asInputStream(input: Any): InputStream = asFormatString(input).byteInputStream()
+    open fun asInputStream(input: Any): InputStream = asFormatString(input).byteInputStream()
 
     /**
      * Conversion happens by converting the base object into JSON and then out again
