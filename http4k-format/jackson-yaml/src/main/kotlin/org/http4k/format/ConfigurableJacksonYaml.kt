@@ -22,6 +22,8 @@ open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaul
 
     override fun asFormatString(input: Any): String = mapper.writeValueAsString(input)
 
+    override fun asInputStream(input: Any): InputStream = mapper.writeValueAsBytes(input).inputStream()
+
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 
     inline fun <reified T : Any> Body.Companion.auto(
