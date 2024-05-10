@@ -18,6 +18,12 @@ fun <T> CredentialsProvider.Companion.Refreshing(
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
     refreshFn: RefreshCredentials<T>
+) = Refreshing(gracePeriod, clock::instant, refreshFn)
+
+fun <T> CredentialsProvider.Companion.Refreshing(
+    gracePeriod: Duration = Duration.ofSeconds(10),
+    timeSource: () -> Instant,
+    refreshFn: RefreshCredentials<T>
 ) = object : CredentialsProvider<T> {
     private val stored = AtomicReference<ExpiringCredentials<T>>(null)
 
@@ -53,5 +59,5 @@ fun <T> CredentialsProvider.Companion.Refreshing(
     private fun ExpiringCredentials<T>.expiresWithin(duration: Duration): Boolean =
         expiry
             .minus(duration)
-            .isBefore(clock.instant())
+            .isBefore(timeSource())
 }

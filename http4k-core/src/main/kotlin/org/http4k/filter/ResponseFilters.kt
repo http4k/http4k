@@ -15,6 +15,7 @@ import java.security.MessageDigest
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
+import java.time.Instant
 
 object ResponseFilters {
 
@@ -42,11 +43,17 @@ object ResponseFilters {
             clock: Clock = Clock.systemUTC(),
             transactionLabeler: HttpTransactionLabeler = { it },
             recordFn: (HttpTransaction) -> Unit
+        ) = invoke(clock::instant, transactionLabeler, recordFn)
+
+        operator fun invoke(
+            timeSource: () -> Instant,
+            transactionLabeler: HttpTransactionLabeler = { it },
+            recordFn: (HttpTransaction) -> Unit
         ): Filter = Filter { next ->
             {
-                clock.instant().let { start ->
+                timeSource().let { start ->
                     next(it).apply {
-                        recordFn(transactionLabeler(HttpTransaction(it, this, between(start, clock.instant()))))
+                        recordFn(transactionLabeler(HttpTransaction(it, this, between(start, timeSource()))))
                     }
                 }
             }
@@ -58,8 +65,11 @@ object ResponseFilters {
      * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportRouteLatency {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit): Filter =
-            ReportHttpTransaction(clock) { tx ->
+        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit) =
+            invoke(clock::instant, recordFn)
+
+        operator fun invoke(timeSource: () -> Instant, recordFn: (String, Duration) -> Unit): Filter =
+            ReportHttpTransaction(timeSource) { tx ->
                 recordFn(
                     "${tx.request.method}.${tx.routingGroup.replace('.', '_').replace(':', '.').replace('/', '_')}" +
                         ".${tx.response.status.code / 100}xx" +
