@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.19.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.24
+- **http4k-core** : Add support for the timesource typealias `() -> Instant` where a Clock is used. H/T @kwydler
+
 ### v5.18.2.0
 - **http4k-core** : Add convenience methods to read bodies from HttpMessages as JSON/XML/CSV etc.. `request.json<MyType>()`
 
