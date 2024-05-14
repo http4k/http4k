@@ -90,10 +90,7 @@ class DelayTriggerTest : ChaosTriggerContract() {
 class MatchRequestTriggerTest : ChaosTriggerContract() {
     override val asJson = """{"type":"request","method":"get","path":".*bob","queries":{"query":".*query"},"headers":{"header":".*header"},"body":".*body"}"""
 
-    override val expectedDescription = "has Method that is equal to GET and has Uri that has Path " +
-        "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
-        " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
-
+    override val expectedDescription = "method == GET AND path matches '.*bob' AND query 'query' matches '.*query' AND header 'header' matches '.*header' AND body matches '.*body'"
     private fun assertMatchNoMatch(s: Trigger, match: Request, noMatch: Request) {
         assertThat(s(match), equalTo(true))
         assertThat(s(noMatch), equalTo(false))

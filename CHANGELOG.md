@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.20.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-chaos*** : [Unlikely break]: remove Hamkrest dependency so that it does not appear randomly in your projects. If you were accidentally relying on this it will need to be re-added manually.
+
 ### v5.19.0.0
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.24
 - **http4k-core** : Add support for the timesource typealias `() -> Instant` where a Clock is used. H/T @kwydler
