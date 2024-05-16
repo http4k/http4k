@@ -16,7 +16,7 @@ If you're running http4k in production and would like to be listed on the site a
 
 **Q. Does http4k support an Async model? I need webscale!**
 
-**A.** Not at the moment. Adding Async support is a decision that we are thinking about carefully so that we don't end up complicating the API. When we do add it, it'll use co-routines model so we also want to ensure that the integrations with the various backends and clients are solid, as well as supporting essential features that currently rely on Threads, such as Zipkin Request Tracing and Resilience4j support. As for the scaling arguments, see the above answer relating to production usage, or checkout the [benchmark results](/performance/) to see how http4k compares to other JVM-based sync and async web libraries.
+**A.** Currently there is no coroutine support in http4k. However, with the advent of project Loom on the JVM, we get a lot of the benefits of async model out of the box without the need to complicate the API with the use of suspend etc. As for scaling arguments, see the above answer relating to production usage, or checkout the [benchmark results](/performance/) to see how http4k compares to other JVM-based sync and async web libraries.
 
 ### API
 **Q. I'm attempting to build HTTP messages using the API, but changes don't affect the object (e.g. calling `request.body("hello")`)?**
@@ -36,7 +36,7 @@ If you're running http4k in production and would like to be listed on the site a
 - `org.http4k.filter.TrafficFilters`
 
 ### Lenses & Auto-Marshalling
-**Q. I am having a problem with the usage of Jackson or GSON for auto marshalling**
+**Q. I am having a problem with the usage of Moshi, Jackson or GSON for auto marshalling**
 
 **A.** Please see the [custom FAQ](/guide/reference/json/) for JSON handling questions.
 
