@@ -11,10 +11,12 @@ dependencies {
     implementation("dev.forkhandles:values4k:_")
     implementation(project(":http4k-security-oauth"))
     implementation(project(":http4k-format-jackson"))
+    implementation(project(":http4k-format-moshi"))
     implementation(project(":http4k-multipart"))
 
     testImplementation("dev.forkhandles:values4k:_")
     testImplementation(project(":http4k-format-jackson"))
+    testImplementation(project(":http4k-format-moshi"))
     testImplementation(project(":http4k-format-argo"))
     testImplementation(project(":http4k-format-kondor-json"))
     testImplementation(project(":http4k-testing-approval"))
