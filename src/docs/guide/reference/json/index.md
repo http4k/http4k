@@ -36,16 +36,24 @@ implementation adds a set of standard methods and extension methods for converti
 objects, including custom Lens methods for each library so that JSON node objects can be written and read directly from
  HTTP messages:
 
+### Notes on individual module choice
+- As a default, we recommend using **Moshi** as an engine for JSON marshalling, as it is the most modern, lightweight and Kotlin-friendly library with automarshalling capabilities. It also has the option of [Kotshi](https://github.com/ansman/kotshi), which allows the compile-time generation of adapters for Kotlin data classes.
+- If you are using OpenAPI contracts, the only current option is to use **Jackson**.
+- **Kondor** is an excellent choice for manual mapping of classes to JSON, and does not use reflection.
+- For the simplest use-cases, **Argo** is a good lightweight non-reflection choice, although it's API is Java-first.
+- **GSON** support is provided in http4k, but is not recommended due to being mostly unsupported.
+- We have found **KotlinSerialisation** is possibly the least friendly to use in the context of http4k.
+
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/example.kt"></script>
 
 ### Auto-marshalling capabilities
 
-Some of the message libraries (eg. GSON, Jackson, Kotlin serialization, Moshi, XML) provide the mechanism to automatically marshall data objects 
+Some of the message libraries (eg. Moshi, Jackson, Kotlin serialization, GSON, XML, CSV ....) provide the mechanism to automatically marshall data objects 
 to/from JSON and XML using reflection.
 
-We can use this facility in http4k to automatically marshall objects to/from HTTP message bodies using **Lenses**:
+We can use this facility in http4k to automatically marshall objects to/from HTTP message bodies using **Lenses**. Note that this approach also sets the appropriate `Content-Type` header for the message.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/autoJson.kt)
 
@@ -64,25 +72,25 @@ These data classes are compatible with using the `Body.auto<T>()` functionality.
 **A.** `Body.auto` is an extension method which is declared on the parent singleton `object` for each of the message libraries that supports auto-marshalling - eg. `Jackson`, `Gson`, `Moshi` and `Xml`. All of these objects are declared in the same package, so you need to add an import similar to:
 `import org.http4k.format.Jackson.auto`
 
-**Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
+**Q. Jackson: The Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
 
 **A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class with `@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)` or the fields with `@JsonAlias` or to get it work correctly.
 
-**Q. Using Jackson, Boolean properties with names starting with "is" do not marshall properly**
+**Q. Jackson: Boolean properties with names starting with "is" do not marshall properly**
 
 **A.** This is due to the way in which the Jackson `ObjectMapper` is configured. Annotation of the fields in question should help, or using `ObjectMapper.disable(MapperFeature.AUTO_DETECT_IS_GETTERS)`
 
-**Q. Using Gson, the data class auto-marshalling does not fail when a null is populated in a Kotlin non-nullable field**
-
-**A.** This happens because http4k uses straight GSON demarshalling, of JVM objects with no-Kotlin library in the mix. The nullability generally gets checked at compile-type and the lack of a Kotlin sanity check library exposes this flaw. No current fix - apart from to use the Jackson demarshalling instead!
-
-**Q. Declared with `Body.auto<List<XXX>>().toLens()`, my auto-marshalled List doesn't extract properly!**
+**Q. Moshi: Declared with `Body.auto<List<XXX>>().toLens()`, my auto-marshalled List doesn't extract properly!**
 
 **A.** This occurs in Moshi when serialising bare lists to/from JSON and is to do with the underlying library being lazy in deserialising objects (using LinkedHashTreeMap) ()). Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
 
-**Q. Using Kotlin serialization, the standard mappings are not working on my data classes.**
+**Q. Kotlin Serialization: the standard mappings are not working on my data classes.**
 
 **A.** This happens because http4k adds the standard mappings to Kotlin serialization as contextual serializers. This can be solved by marking the fields as `@Contextual`.
+
+**Q. Gson: the data class auto-marshalling does not fail when a null is populated in a Kotlin non-nullable field**
+
+**A.** This happens because http4k uses straight GSON demarshalling, of JVM objects with no-Kotlin library in the mix. The nullability generally gets checked at compile-type and the lack of a Kotlin sanity check library exposes this flaw. No current fix - apart from to use the Jackson demarshalling instead!
 
 This can be demonstrated by the following, where you can see that the output of the auto-unmarshalling a naked JSON is NOT 
 the same as a native Kotlin list of objects. This can make tests break as the unmarshalled list is NOT equal to the native list.
