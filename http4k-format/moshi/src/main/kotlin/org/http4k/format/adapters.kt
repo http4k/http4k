@@ -1,6 +1,8 @@
 package org.http4k.format
 
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dev.forkhandles.values.AbstractValue
@@ -68,6 +70,27 @@ object SetAdapter : IsAnInstanceOfAdapter<Set<*>>(Set::class)
 object EventAdapter : JsonAdapter.Factory {
     override fun create(p0: Type, p1: MutableSet<out Annotation>, p2: Moshi) =
         if (p0.typeName == Event::class.java.typeName) p2.adapter(Any::class.java) else null
+}
+
+private fun <T : Any> writer(fn: JsonWriter.(T) -> Unit) = object : JsonAdapter<T>() {
+    override fun fromJson(p0: JsonReader) = throw UnsupportedOperationException("This adapter is write-only")
+    override fun toJson(p0: JsonWriter, p1: T?) {
+        p1?.let { p0.fn(it) } ?: p0.nullValue()
+    }
+}
+
+object MoshiNodeAdapter : JsonAdapter.Factory {
+    override fun create(p0: Type, p1: MutableSet<out Annotation>, p2: Moshi): JsonAdapter<out MoshiNode>? =
+        when (p0.typeName) {
+            MoshiArray::class.java.typeName -> null
+            MoshiObject::class.java.typeName -> null
+            MoshiString::class.java.typeName -> writer<MoshiString> { value(it.value) }
+            MoshiInteger::class.java.typeName -> writer<MoshiInteger> { value(it.value)  }
+            MoshiDecimal::class.java.typeName ->  writer<MoshiDecimal> { value(it.value)  }
+            MoshiBoolean::class.java.typeName ->  writer<MoshiBoolean> { value(it.value)  }
+            MoshiNull::class.java.typeName ->  writer<MoshiNull> { nullValue()  }
+            else -> null
+        }
 }
 
 object ProhibitUnknownValuesAdapter : JsonAdapter.Factory {

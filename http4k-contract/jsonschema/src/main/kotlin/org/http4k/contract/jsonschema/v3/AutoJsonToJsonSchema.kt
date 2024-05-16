@@ -30,7 +30,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?): JsonSchema<NODE> {
         val schema =
-            json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix.orEmpty(), metadataRetrieval(obj))
+            json.asJsonObject(obj)
+                .toSchema(obj, overrideDefinitionId, true, refModelNamePrefix.orEmpty(), metadataRetrieval(obj))
         return JsonSchema(
             json.asJsonObject(schema),
             schema.definitions.map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()
@@ -325,7 +326,7 @@ private class SchemaNode(
     }
 
     fun name() = name
-    fun arrayItem(): ArrayItem = arrayItem
+    fun arrayItem() = arrayItem
 
     companion object {
         fun Primitive(
@@ -345,9 +346,7 @@ private class SchemaNode(
                     paramMeta,
                     metadata.format(), emptyList()
                 )
-            ).apply {
-                this["type"] = paramMeta.value
-            }
+            ).apply { this["type"] = paramMeta.value }
 
         fun Enum(
             name: String,
