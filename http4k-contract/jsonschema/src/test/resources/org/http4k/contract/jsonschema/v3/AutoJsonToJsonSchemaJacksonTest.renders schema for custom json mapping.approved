@@ -1,0 +1,37 @@
+{
+  "node": {
+    "$ref": "#/components/schemas/ArbObjectHolder",
+    "example": null,
+    "format": null
+  },
+  "definitions": [
+    {
+      "first": "ArbObjectHolder",
+      "second": {
+        "properties": {
+          "inner": {
+            "items": {
+              "format": null,
+              "type": "string"
+            },
+            "example": [
+              "foobar"
+            ],
+            "format": null,
+            "type": "array"
+          }
+        },
+        "example": {
+          "inner": [
+            "foobar"
+          ]
+        },
+        "format": null,
+        "type": "object",
+        "required": [
+          "inner"
+        ]
+      }
+    }
+  ]
+}

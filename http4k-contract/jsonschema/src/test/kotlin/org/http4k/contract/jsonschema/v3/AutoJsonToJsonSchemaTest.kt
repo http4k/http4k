@@ -8,18 +8,17 @@ import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PR
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.data.MapDataContainer
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
-import org.http4k.contract.jsonschema.v3.Foo.value1
-import org.http4k.contract.jsonschema.v3.Foo.value2
 import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.default
 import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.exclusiveMinimum
 import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.format
 import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.maxLength
+import org.http4k.contract.jsonschema.v3.Foo.value1
+import org.http4k.contract.jsonschema.v3.Foo.value2
 import org.http4k.contract.jsonschema.v3.SchemaModelNamer.Companion.Canonical
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
@@ -27,10 +26,10 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.AutoMappingConfiguration
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 import org.http4k.format.asConfigurable
-import org.http4k.format.value
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -130,8 +129,8 @@ class MyInt private constructor(value: Int) : IntValue(value) {
 data class MetaDataValueHolder(val i: MyInt, val j: JacksonFieldWithMetadata)
 
 @ExtendWith(JsonApprovalTest::class)
-class AutoJsonToJsonSchemaTest {
-    private val json = OpenAPIJackson
+interface AutoJsonToJsonSchemaTest<NODE : Any> {
+    val json: AutoMarshallingJson<NODE>
 
     @Test
     fun `can override definition id`(approver: Approver) {
@@ -392,24 +391,11 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for objects with metadata`(approver: Approver) {
-        val jackson = object : ConfigurableJackson(
-            KotlinModule.Builder().build()
-                .asConfigurable()
-                .withStandardMappings()
-                .value(MyInt)
-                .done()
-                .deactivateDefaultTyping()
-                .setSerializationInclusion(NON_NULL)
-                .configure(FAIL_ON_NULL_FOR_PRIMITIVES, true)
-                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(FAIL_ON_IGNORED_PROPERTIES, false)
-                .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
-                .configure(USE_BIG_INTEGER_FOR_INTS, true)
-        ) {}
+        val json: AutoMarshallingJson<NODE> = customJson()
 
         approver.assertApproved(
             MetaDataValueHolder(MyInt.of(1), JacksonFieldWithMetadata()),
-            creator = autoJsonToJsonSchema(jackson)
+            creator = autoJsonToJsonSchema(json)
         )
     }
 
@@ -418,35 +404,11 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(SealedChild)
     }
 
-    @Test
-    fun `renders schema for data4k container and metadata`(approver: Approver) {
-        val jackson = object : ConfigurableJackson(
-            KotlinModule.Builder().build()
-                .asConfigurable()
-                .withStandardMappings()
-                .value(MyInt)
-                .done()
-                .setSerializationInclusion(NON_NULL)
-        ) {}
-
-        approver.assertApproved(
-            Data4kContainer().apply {
-                anInt = MyInt.of(123)
-                anString = "helloworld"
-            },
-            creator = autoJsonToJsonSchema(
-                jackson, strategy = PrimitivesFieldMetadataRetrievalStrategy
-                    .then(Values4kFieldMetadataRetrievalStrategy)
-                    .then(Data4kFieldMetadataRetrievalStrategy)
-            )
-        )
-    }
-
-    private fun Approver.assertApproved(
+    fun Approver.assertApproved(
         obj: Any,
         name: String? = null,
         prefix: String? = null,
-        creator: AutoJsonToJsonSchema<JsonNode> = autoJsonToJsonSchema(json)
+        creator: AutoJsonToJsonSchema<NODE> = autoJsonToJsonSchema(json)
     ) {
         assertApproved(
             Response(OK)
@@ -455,8 +417,8 @@ class AutoJsonToJsonSchemaTest {
         )
     }
 
-    private fun autoJsonToJsonSchema(
-        jackson: ConfigurableJackson,
+    fun autoJsonToJsonSchema(
+        jackson: AutoMarshallingJson<NODE>,
         schemaModelNamer: SchemaModelNamer = SchemaModelNamer.Full,
         strategy: FieldMetadataRetrievalStrategy = PrimitivesFieldMetadataRetrievalStrategy
             .then(Values4kFieldMetadataRetrievalStrategy)
@@ -471,6 +433,8 @@ class AutoJsonToJsonSchemaTest {
         schemaModelNamer,
         "locationPrefix"
     )
+
+    fun customJson(): AutoMarshallingJson<NODE>
 }
 
 private fun standardConfig(
