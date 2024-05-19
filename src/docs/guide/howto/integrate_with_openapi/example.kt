@@ -19,7 +19,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.CachingFilters.Response.NoCache
+import org.http4k.filter.CachingFilters.CacheResponse.NoCache
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.ResponseFilters
 import org.http4k.filter.ServerFilters

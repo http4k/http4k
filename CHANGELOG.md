@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.21.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : [Possible Break] Renamed `CachingFilters.Request/Response`to `CachingFilters.CacheRequest/CacheResponse`. If you have imports then they may break and need to be updated. 
+
 ### v5.20.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-chaos*** : [Unlikely break]: remove Hamkrest dependency so that it does not appear randomly in your projects. If you were accidentally relying on this it will need to be re-added manually.

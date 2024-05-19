@@ -36,10 +36,13 @@ data class DefaultCacheTimings(
  */
 object CachingFilters {
 
+    @Deprecated("Renamed to CacheRequest", ReplaceWith("CacheRequest", "org.http4k.filter.CachingFilters"))
+    val Request = CacheRequest
+
     /**
      * These filters operate on Requests (pre-flight)
      */
-    object Request {
+    object CacheRequest {
         fun AddIfModifiedSince(clock: Clock, maxAge: Duration) = Filter { next ->
             {
                 next(it.replaceHeader("If-Modified-Since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
@@ -47,10 +50,13 @@ object CachingFilters {
         }
     }
 
+    @Deprecated("Renamed to CacheResponse", ReplaceWith("CacheResponse", "org.http4k.filter.CachingFilters"))
+    val Response = CacheResponse
+
     /**
      * These filters operate on Responses (post-flight)
      */
-    object Response {
+    object CacheResponse {
 
         private abstract class CacheFilter(private val predicate: (org.http4k.core.Response) -> Boolean) : Filter {
             abstract fun headersFor(response: org.http4k.core.Response): Headers

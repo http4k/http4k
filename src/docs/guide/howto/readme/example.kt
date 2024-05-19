@@ -48,7 +48,7 @@ fun main() {
     }
 
     // we can "stack" filters to create reusable units, and then apply them to an HttpHandler
-    val compositeFilter = CachingFilters.Response.NoCache().then(timingFilter)
+    val compositeFilter = CachingFilters.CacheResponse.NoCache().then(timingFilter)
     val filteredApp: HttpHandler = compositeFilter.then(app)
 
     // only 1 LOC to mount an app and start it in a container

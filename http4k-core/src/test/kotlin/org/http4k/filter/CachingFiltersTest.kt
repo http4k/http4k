@@ -9,10 +9,10 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.filter.CachingFilters.Request.AddIfModifiedSince
-import org.http4k.filter.CachingFilters.Response.FallbackCacheControl
-import org.http4k.filter.CachingFilters.Response.MaxAge
-import org.http4k.filter.CachingFilters.Response.NoCache
+import org.http4k.filter.CachingFilters.CacheRequest.AddIfModifiedSince
+import org.http4k.filter.CachingFilters.CacheResponse.FallbackCacheControl
+import org.http4k.filter.CachingFilters.CacheResponse.MaxAge
+import org.http4k.filter.CachingFilters.CacheResponse.NoCache
 import org.http4k.hamkrest.hasHeader
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
