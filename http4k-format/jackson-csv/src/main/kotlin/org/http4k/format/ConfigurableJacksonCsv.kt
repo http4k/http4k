@@ -19,15 +19,13 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
 
     inline fun <reified T> defaultSchema(): CsvSchema = mapper.schemaFor(T::class.java).withHeader()
 
-    fun <T : Any> writerFor(type: KClass<T>, schema: CsvSchema): (List<T>) -> String {
-        val writer = mapper.writerFor(type.java).with(schema)
-        return { body: List<T> ->
-            StringWriter().use { stringWriter ->
-                writer.writeValues(stringWriter)
-                    .writeAll(body)
-                stringWriter
-            }.toString()
-        }
+    fun <T : Any> writerFor(type: KClass<T>, schema: CsvSchema): (List<T>) -> String = { body: List<T> ->
+        StringWriter().use { stringWriter ->
+            mapper.writerFor(type.java).with(schema).writeValues(stringWriter).use {
+                it.writeAll(body)
+            }
+            stringWriter
+        }.toString()
     }
 
     fun <T : Any> readerFor(type: KClass<T>, schema: CsvSchema): (String) -> List<T> {

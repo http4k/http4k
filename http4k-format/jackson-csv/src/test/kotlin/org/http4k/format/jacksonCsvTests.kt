@@ -1,8 +1,10 @@
 package org.http4k.format
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -40,6 +42,29 @@ class JacksonCsvBodyTest {
         assertThat(
             lens(Response(OK).with(lens of objects)),
             equalTo(objects)
+        )
+    }
+
+    @Test
+    fun `default schema is set to use headers`() {
+        assertThat(
+            JacksonCsv.defaultSchema<CsvArbObject>(),
+            has(CsvSchema::usesHeader, equalTo(true))
+        )
+    }
+
+    @Test
+    fun `empty list of objects with schema headers results in output with only headers`() {
+        val writer = JacksonCsv.writerFor(CsvArbObject::class, JacksonCsv.defaultSchema<CsvArbObject>())
+
+        assertThat(
+            writer(emptyList()),
+            equalTo(
+                """
+                    |string,numbers,bool
+                    |
+                """.trimMargin()
+            )
         )
     }
 
