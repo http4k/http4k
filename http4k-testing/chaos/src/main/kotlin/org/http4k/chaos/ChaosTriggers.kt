@@ -20,7 +20,7 @@ import kotlin.random.Random
 
 typealias Trigger = (req: Request) -> Boolean
 
-operator fun Trigger.not() = object : Function1<Request, Boolean> {
+operator fun Trigger.not() = object : Trigger {
     override fun invoke(req: Request) = !this@not(req)
     override fun toString() = "NOT " + this@not.toString()
 }
