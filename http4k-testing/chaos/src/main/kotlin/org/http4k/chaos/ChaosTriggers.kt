@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
-typealias Trigger = (req: Request) -> Boolean
+fun interface Trigger : (Request) -> Boolean
 
 operator fun Trigger.not() = object : Trigger {
     override fun invoke(req: Request) = !this@not(req)
@@ -115,13 +115,24 @@ object ChaosTriggers {
             body: Regex? = null
         ): Trigger {
             val headerMatchers =
-                headers?.map { (k, v) -> RequestMatcher("header '$k' matches '$v'") { it.headerValues(k).any { v.matches(it ?: "") } } }
+                headers?.map { (k, v) ->
+                    RequestMatcher("header '$k' matches '$v'") {
+                        it.headerValues(k).any { v.matches(it ?: "") }
+                    }
+                }
                     ?: emptyList()
             val queriesMatchers =
-                queries?.map { (k, v) -> RequestMatcher("query '$k' matches '$v'") { it.queries(k).any { v.matches(it ?: "") } } }
+                queries?.map { (k, v) ->
+                    RequestMatcher("query '$k' matches '$v'") {
+                        it.queries(k).any { v.matches(it ?: "") }
+                    }
+                }
                     ?: emptyList()
-            val pathMatchers = path?.let { p -> listOf(RequestMatcher("path matches '$p'") { it.uri.path.matches(p) }) } ?: emptyList()
-            val bodyMatchers = body?.let { b -> listOf(RequestMatcher("body matches '$b'") { it.bodyString().matches(b) }) } ?: emptyList()
+            val pathMatchers =
+                path?.let { p -> listOf(RequestMatcher("path matches '$p'") { it.uri.path.matches(p) }) } ?: emptyList()
+            val bodyMatchers =
+                body?.let { b -> listOf(RequestMatcher("body matches '$b'") { it.bodyString().matches(b) }) }
+                    ?: emptyList()
             val methodMatchers =
                 method?.let { m -> listOf(RequestMatcher("method == ${m.uppercase()}") { it.method == Method.valueOf(m.uppercase()) }) }
                     ?: emptyList()
