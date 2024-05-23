@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.21.0.0 (uncut)
+### v5.21.0.0
 - **http4k-*** : Upgrade some dependency versions including Kotlin to v2
 - **http4k-testing-chaos** : [Breaking] Changed Trigger to be a fun interface instead of a typealias. Should be no-op or a simple fix to the type.
 - **http4k-core** : [Possible Break] Renamed `CachingFilters.Request/Response`to `CachingFilters.CacheRequest/CacheResponse`. If you have imports then they may break and need to be updated. 
