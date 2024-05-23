@@ -16,7 +16,7 @@ class ChaosEngine(initialStage: Stage = Wait) : Filter {
     constructor(behaviour: Behaviour) : this(behaviour.appliedWhen(Always()))
 
     private val on = AtomicBoolean(false)
-    private var trigger: Trigger = { on.get() }
+    private var trigger = Trigger { on.get() }
     private val state = ChaosStages.Variable(initialStage)
 
     override fun invoke(p1: HttpHandler) = Repeat { Wait.until(trigger).then(state.until(!trigger)) }.asFilter()(p1)
