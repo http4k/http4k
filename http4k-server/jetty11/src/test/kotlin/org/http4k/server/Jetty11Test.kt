@@ -9,7 +9,7 @@ import org.http4k.testingStopMode
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled("temporary")
+@Disabled("temporarily disabled")
 class Jetty11Test : ServerContract({ Jetty11(it, testingStopMode) }, ApacheClient()) {
     override fun requestScheme() = equalTo("http")
 

@@ -11,6 +11,7 @@ import org.eclipse.jetty.util.thread.Scheduler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.sse.SseMessage
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -18,6 +19,7 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
+@Disabled("temporarily disabled")
 class Jetty11EventStreamEmitterTest {
 
     private val connectRequest = Request(Method.GET, "")

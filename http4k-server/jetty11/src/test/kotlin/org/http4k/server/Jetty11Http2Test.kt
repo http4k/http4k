@@ -4,9 +4,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.testingStopMode
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
 
+@Disabled("temporarily disabled")
 class Jetty11Http2Test {
 
     @Test

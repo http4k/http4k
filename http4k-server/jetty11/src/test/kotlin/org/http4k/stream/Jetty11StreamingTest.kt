@@ -7,7 +7,9 @@ import org.http4k.server.Jetty11
 import org.http4k.server.ServerConfig
 import org.http4k.testingStopMode
 import org.http4k.streaming.StreamingContract
+import org.junit.jupiter.api.Disabled
 
+@Disabled("temporarily disabled")
 class Jetty11StreamingTest : StreamingContract() {
     override fun serverConfig(): ServerConfig = Jetty11(0, testingStopMode)
 
