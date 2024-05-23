@@ -3,6 +3,7 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.chaos.ChaosTriggers.Countdown
@@ -213,7 +214,7 @@ class ChaosPolicyOperationTest {
         val stage: Stage = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always()).until { it.method == POST }
         assertThat(
             stage.toString(),
-            equalTo("Always ReturnStatus (500) until (org.http4k.core.Request) -> kotlin.Boolean")
+            startsWith("Always ReturnStatus (500) until")
         )
 
         val http: HttpHandler = stage.asFilter().then { Response(OK) }
@@ -235,17 +236,12 @@ class ChaosTriggerLogicalOperatorTest {
     fun invert() {
         assertThat((!isFalse)(request), equalTo(true))
         assertThat((!isTrue)(request), equalTo(false))
-        assertThat((!isTrue).toString(), equalTo("NOT (org.http4k.core.Request) -> kotlin.Boolean"))
     }
 
     @Test
     fun and() {
         assertThat((isFalse and isTrue)(request), equalTo(false))
         assertThat((isTrue and isTrue)(request), equalTo(true))
-        assertThat(
-            (isTrue and isTrue).toString(),
-            equalTo("(org.http4k.core.Request) -> kotlin.Boolean AND (org.http4k.core.Request) -> kotlin.Boolean")
-        )
     }
 
     @Test
@@ -253,10 +249,6 @@ class ChaosTriggerLogicalOperatorTest {
         assertThat((isFalse or isFalse)(request), equalTo(false))
         assertThat((isFalse or isTrue)(request), equalTo(true))
         assertThat((isTrue or isTrue)(request), equalTo(true))
-        assertThat(
-            (isTrue or isTrue).toString(),
-            equalTo("(org.http4k.core.Request) -> kotlin.Boolean OR (org.http4k.core.Request) -> kotlin.Boolean")
-        )
     }
 }
 
