@@ -1,10 +1,8 @@
 package org.http4k.server
 
 import org.eclipse.jetty.http.HttpCompliance.RFC7230_LEGACY
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled("temporarily disabled")
 class Jetty11DeprecationTest {
 
     @Test

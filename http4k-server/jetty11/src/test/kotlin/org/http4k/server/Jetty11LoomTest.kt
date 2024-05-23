@@ -6,10 +6,8 @@ import org.http4k.client.ApacheClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.testingStopMode
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled("temporarily disabled")
 class Jetty11LoomTest :
     ServerContract({ Jetty11Loom(it, testingStopMode) }, ApacheClient()) {
     override fun requestScheme() = equalTo("http")

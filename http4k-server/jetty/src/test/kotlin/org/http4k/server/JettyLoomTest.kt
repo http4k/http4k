@@ -8,7 +8,6 @@ import org.http4k.core.Request
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled("temporary")
 class JettyLoomTest : ServerContract({ JettyLoom(it, ServerConfig.StopMode.Immediate) }, ApacheClient()) {
     override fun requestScheme() = equalTo("http")
 
