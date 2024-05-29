@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 description = "http4k Servirtium module"
 
@@ -16,9 +16,9 @@ dependencies {
 }
 
 tasks {
-    withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
+    withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.add("-Xjvm-default=all")
         }
     }
 }

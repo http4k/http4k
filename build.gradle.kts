@@ -1,7 +1,9 @@
 import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.time.Duration
 
 plugins {
@@ -54,9 +56,9 @@ allprojects {
     }
 
     tasks {
-        withType<KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "1.8"
+        withType<KotlinJvmCompile>().configureEach {
+            compilerOptions {
+                jvmTarget.set(JVM_1_8)
             }
         }
 
