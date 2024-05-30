@@ -15,7 +15,7 @@ import java.io.InputStream
 class MultipartFormBodyTest {
 
     @Test
-    fun `retreiving files and fields`() {
+    fun `retrieving files and fields`() {
         val file1 = MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream())
         val file2 = MultipartFormFile("foo2.txt", TEXT_PLAIN, "content2".byteInputStream())
         val form = MultipartFormBody("bob") +

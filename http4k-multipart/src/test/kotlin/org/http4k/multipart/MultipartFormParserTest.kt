@@ -60,7 +60,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun uploadMultipleFilesAndFields() {
+    fun `upload multiple files and fields`() {
         val boundary = "-----1234"
         val multipartFormContentsStream = MultipartFormBuilder(boundary)
             .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream(), emptyList())
@@ -82,7 +82,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun canLoadComplexRealLifeSafariExample() {
+    fun `can load complex real life safari example`() {
         val form = safariExample()
 
         val parts = MultipartFormParser(UTF_8, 1024000, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
@@ -91,7 +91,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun throwsExceptionIfFormIsTooBig() {
+    fun `throws exception if form is too big`() {
         val form = StreamingMultipartFormParts.parse(
             "----WebKitFormBoundary6LmirFeqsyCQRtbj".toByteArray(UTF_8),
             FileInputStream("examples/safari-example.multipart"),
@@ -108,7 +108,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun savesAllPartsToDisk() {
+    fun `saves all parts to disk`() {
         val form = safariExample()
 
         val parts = MultipartFormParser(UTF_8, 100, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
@@ -121,7 +121,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun savesSomePartsToDisk() {
+    fun `saves some parts to disk`() {
         val form = safariExample()
 
         val parts = MultipartFormParser(UTF_8, 1024 * 4, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
@@ -138,7 +138,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun shouldKeepSomePartsOnDisk() {
+    fun `should keep some parts on disk`() {
         try {
             val form = safariExample()
 
@@ -159,7 +159,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun throwsExceptionIfMultipartMalformed() {
+    fun `throws exception if multipart malformed`() {
         val form = StreamingMultipartFormParts.parse(
             "---2345".toByteArray(UTF_8),
             ByteArrayInputStream(
