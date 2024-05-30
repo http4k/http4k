@@ -42,10 +42,12 @@ class MultipartFormBodyTest {
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
-        assertThat(MultipartFormBody.from(req), equalTo(
-            MultipartFormBody("bob") + ("field" to formFieldValue) +
-                ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
-        ))
+        assertThat(
+            MultipartFormBody.from(req), equalTo(
+                MultipartFormBody("bob") + ("field" to formFieldValue) +
+                    ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            )
+        )
     }
 
     @Test

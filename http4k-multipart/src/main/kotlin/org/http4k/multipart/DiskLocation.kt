@@ -10,7 +10,7 @@ import java.util.UUID
  * Provides the management of the on-disk persistence for mulitpart files which are too big
  * to be processed in-memory.
  */
-interface DiskLocation {
+interface DiskLocation : Closeable {
     fun createFile(filename: String?): MultipartFile
 
     companion object {
@@ -25,6 +25,11 @@ interface DiskLocation {
                             deleteOnExit()
                         }
                     )
+
+                override fun close() {
+                    diskDir.listFiles()?.forEach { it.delete() }
+                    diskDir.delete()
+                }
             }
 
         fun Permanent(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
@@ -36,6 +41,8 @@ interface DiskLocation {
                             ".tmp", diskDir
                         )
                     )
+
+                override fun close() {}
             }
     }
 }
