@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.21.2.0
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v5.21.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart*** : [Fix #1113] Disk-backed multipart form field data is now cleaned up when the body is closed, including the parent form directory.
