@@ -6,4 +6,4 @@ set -o pipefail
 set -o nounset
 
 ./gradlew check jacocoRootReport --build-cache
-#bash <(curl -s https://codecov.io/bash)
+bash <(curl -s https://codecov.io/bash)
