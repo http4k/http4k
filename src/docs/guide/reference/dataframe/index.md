@@ -6,13 +6,12 @@ description: Feature overview of the DataFrame http4k-format module, allowing fo
 ```kotlin
 dependencies {
     implementation(platform("org.http4k:http4k-bom:5.21.1.0"))
- 
     implementation("org.http4k:http4k-format-dataframe")
 }
 ```
 
 ### About
-These modules add the ability to use DataFrames as a first-class citizen when reading from HTTP messages. Extraction from the HTTP message body is done automatically when using a lens with a DataFrame type.
+These modules add the ability to use [Kotlin DataFrames](https://kotlin.github.io/dataframe) as a first-class citizen when reading from HTTP messages. Extraction from the HTTP message body is done automatically when using a lens with a DataFrame type.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/dataframe/example.kt)
 
