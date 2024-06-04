@@ -12,9 +12,9 @@ dependencies {
 ```
 
 ### About
-These modules add the ability to use DataFrame as a first-class citizen when reading from HTTP messages. 
+These modules add the ability to use DataFrames as a first-class citizen when reading from HTTP messages. Extraction from the HTTP message body is done automatically when using a lens with a DataFrame type.
 
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/json/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/dataframe/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/reference/dataframe/example.kt"></script>
 
