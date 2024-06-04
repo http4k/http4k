@@ -135,11 +135,9 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
             * **Moshi** - includes support for **fully automatic marshalling of Data classes**
 
-[//]: # (        * **DataFrame&#40;https://www.http4k.org/guide/reference/dataframe/&#41;** - with support for: )
-
-[//]: # (            * **CSV** )
-
-[//]: # (            * **JSON**)
+        * **DataFrame(https://www.http4k.org/guide/reference/dataframe/)** - with support for: 
+            * **CSV** 
+            * **JSON**
         * **CSV** - includes support for: 
             * **Jackson** - CSV format for Jackson
 * [Multipart:](https://http4k.org/guide/reference/multipart)

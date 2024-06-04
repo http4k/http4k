@@ -41,7 +41,7 @@ description: Details about the various http4k integration libraries
 ### Messaging formats
 <a href="/guide/reference/json"><span class="pill">Argo</span></a>
 
-[//]: # (<a href="/guide/reference/json"><span class="pill">DataFrame</span></a>)
+<a href="/guide/reference/json"><span class="pill">DataFrame</span></a>
 <a href="/guide/reference/json"><span class="pill">Gson</span></a>
 <a href="/guide/reference/xml"><span class="pill">Gson XML</span></a>
 <a href="/guide/reference/json"><span class="pill">Jackson</span></a>
