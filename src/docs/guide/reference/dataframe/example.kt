@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dataframe.api.filter
 
 fun main() {
 
+    // define a simple CSV endpoint
     val app = { _: Request ->
         Response(OK).body(
             """
@@ -41,7 +42,8 @@ fun main() {
     // you can also use the Kotlin KSP DataFrame plugin to generate typed data classes
     // . Then use the `dataFrameCsv` extension function to cast the DataFrame to a typed DataFrame
 
-    // this is a fake class - we would the generated one in a real project!
+    // this is a fake class - we would the generated one in a real project and to manipulate
+    // the dataframe as above
     data class Repository(val fullName: String)
 
     println(response.dataFrameCsv<Repository>())
