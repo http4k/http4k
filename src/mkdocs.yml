@@ -97,6 +97,7 @@ nav:
     - Digest: guide/reference/digest/index.md
     - GraphQL: guide/reference/graphql/index.md
     - htmx: guide/reference/htmx/index.md
+    - DataFrame: guide/reference/dataframe/index.md
     - Webhooks: guide/reference/webhooks/index.md
     - JSON RPC: guide/reference/jsonrpc/index.md
     - XML handling: guide/reference/xml/index.md
