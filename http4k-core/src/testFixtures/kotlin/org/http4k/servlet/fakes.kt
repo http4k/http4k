@@ -42,6 +42,7 @@ class FakeHttpServletRequest(private val request: Request) :
 class FakeHttpServletResponse : HttpServletResponse by mock() {
     var http4k = Response(OK)
 
+    @Deprecated("Deprecated in Java")
     override fun setStatus(sc: Int, sm: String) {
         http4k = http4k.status(Status(sc, sm))
     }
