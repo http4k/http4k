@@ -1,4 +1,4 @@
-title: http4k DataFrame Message Format Modules
+title: http4k DataFrame Message Format Module
 description: Feature overview of the DataFrame http4k-format module, allowing for automatic extraction of DataFrames from HTTP messages.
 
 ### Installation (Gradle)
