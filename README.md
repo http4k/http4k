@@ -134,8 +134,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **[YAML](https://www.http4k.org/guide/reference/yaml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
             * **Moshi** - includes support for **fully automatic marshalling of Data classes**
-
-        * **DataFrame(https://www.http4k.org/guide/reference/dataframe/)** - with support for: 
+        * **[DataFrame](https://www.http4k.org/guide/reference/dataframe/)** - with support for: 
             * **CSV** 
             * **JSON**
         * **CSV** - includes support for: 
