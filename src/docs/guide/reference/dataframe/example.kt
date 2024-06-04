@@ -39,8 +39,8 @@ fun main() {
 
     println(all_h_projects)
 
-    // you can also use the Kotlin KSP DataFrame plugin to generate typed data classes
-    // . Then use the `dataFrameCsv` extension function to cast the DataFrame to a typed DataFrame
+    // you can also use the Kotlin KSP DataFrame plugin to generate typed data classes.
+    // Then use the `dataFrameCsv` extension function to cast the DataFrame to a typed DataFrame
 
     // this is a fake class - we would the generated one in a real project and to manipulate
     // the dataframe as above
