@@ -15,9 +15,8 @@ import org.jetbrains.kotlinx.dataframe.size
 import org.junit.jupiter.api.Test
 
 class DataFrameJsonTests {
-
     @Test
-    fun `can extract a set of records from an HTTP message`() {
+    fun `can extract a set of typed JSON records from an HTTP message`() {
         val request = Request(GET, "").body(javaClass.getResourceAsStream("/services.json")!!)
         val services = request.dataFrameJson<Service>()
         assertThat(services.size(), equalTo(DataFrameSize(2, 2)))
