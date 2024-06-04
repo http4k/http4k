@@ -1,4 +1,4 @@
-title: http4k DataFrame Message Format Module
+title: http4k KotlinX DataFrame Module
 description: Feature overview of the DataFrame http4k-format module, allowing for automatic extraction of DataFrames from HTTP messages.
 
 ### Installation (Gradle)
