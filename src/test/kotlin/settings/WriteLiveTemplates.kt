@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package settings
 
 import org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4
