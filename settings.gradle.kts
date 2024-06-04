@@ -58,6 +58,7 @@ include("http4k-cloudnative")
 "http4k-format".apply {
     includeModule("core")
     includeModule("argo")
+    includeModule("dataframe")
     includeModule("gson")
     includeModule("jackson")
     includeModule("jackson-xml")
