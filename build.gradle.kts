@@ -2,7 +2,6 @@ import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.time.Duration
 
@@ -259,10 +258,14 @@ fun Node.childrenCalled(wanted: String) = children()
         (name is QName) && name.localPart == wanted
     }
 
-tasks.named<KotlinCompile>("compileTestKotlin") {
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += listOf("-Xjvm-default=all")
+tasks {
+    named<KotlinJvmCompile>("compileTestKotlin").configure {
+        if (name == "compileTestKotlin") {
+            compilerOptions {
+                jvmTarget.set(JVM_1_8)
+                freeCompilerArgs.add("-Xjvm-default=all")
+            }
+        }
     }
 }
 

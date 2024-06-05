@@ -3,7 +3,7 @@
     path = "src/test/resources/services.json",
 )
 
-package org.http4k.format
+package org.http4k.format.dataframe
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo

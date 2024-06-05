@@ -1,4 +1,4 @@
-package org.http4k.format
+package org.http4k.format.dataframe
 
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON

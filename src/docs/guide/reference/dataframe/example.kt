@@ -5,9 +5,9 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.format.CSV
-import org.http4k.format.dataFrame
-import org.http4k.format.dataFrameCsv
+import org.http4k.format.dataframe.CSV
+import org.http4k.format.dataframe.dataFrame
+import org.http4k.format.dataframe.dataFrameCsv
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.jetbrains.kotlinx.dataframe.api.filter

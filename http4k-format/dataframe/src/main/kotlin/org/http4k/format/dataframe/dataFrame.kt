@@ -1,4 +1,4 @@
-package org.http4k.format
+package org.http4k.format.dataframe
 
 import org.http4k.core.Body
 import org.http4k.core.HttpMessage

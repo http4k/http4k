@@ -3,14 +3,13 @@
     path = "src/test/resources/repositories.csv",
 )
 
-package org.http4k.format
+package org.http4k.format.dataframe
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.jetbrains.kotlinx.dataframe.annotations.ImportDataSchema
-import org.jetbrains.kotlinx.dataframe.api.cast
 import org.jetbrains.kotlinx.dataframe.impl.DataFrameSize
 import org.jetbrains.kotlinx.dataframe.size
 import org.junit.jupiter.api.Test

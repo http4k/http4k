@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.22.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-format-dataframe** : [Break] Move classes to alternative package to not clash with existing format objects. 
+
 ### v5.21.2.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-format-dataframe** : [New module] Support for KotlinX DataFrame. 

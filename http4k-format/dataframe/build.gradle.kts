@@ -14,5 +14,5 @@ dependencies {
 
 dataframes {
     sourceSet = "test"
-    packageName = "org.http4k.format"
+    packageName = "org.http4k.format.dataframe"
 }
