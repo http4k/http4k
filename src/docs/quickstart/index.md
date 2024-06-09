@@ -19,7 +19,7 @@ Depending on your learning style, there are a number of options to get started w
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.23.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.22.0.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-server-undertow")
     implementation("org.http4k:http4k-client-apache")
