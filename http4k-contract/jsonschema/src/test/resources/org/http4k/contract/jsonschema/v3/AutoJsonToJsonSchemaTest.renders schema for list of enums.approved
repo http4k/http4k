@@ -7,7 +7,8 @@
       "value1",
       "value2"
     ],
-    "type": "array"
+    "type": "array",
+    "nullable": false
   },
   "definitions": [
     {
@@ -18,7 +19,8 @@
           "value1",
           "value2"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": false
       }
     }
   ]

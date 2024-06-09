@@ -68,7 +68,8 @@
           "bar",
           "bing"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": false
       }
     },
     "securitySchemes": {

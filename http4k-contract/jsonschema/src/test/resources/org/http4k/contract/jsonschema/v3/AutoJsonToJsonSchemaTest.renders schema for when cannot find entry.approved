@@ -9,7 +9,8 @@
         "properties": {
           "OTHERNAME": {
             "example": "foobar",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {

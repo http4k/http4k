@@ -347,6 +347,7 @@ private class SchemaNode(
                 )
             ).apply {
                 this["type"] = paramMeta.value
+                this["nullable"] = isNullable
             }
 
         fun Enum(
@@ -366,6 +367,7 @@ private class SchemaNode(
                 arrayItem = ArrayItem.Ref(name, emptyList())
             ).apply {
                 this["type"] = paramMeta.value
+                this["nullable"] = isNullable
                 this["enum"] = enum
             }
 
@@ -387,8 +389,9 @@ private class SchemaNode(
                 definitions = items.definitions(),
                 arrayItem = ArrayItem.Array(items, metadata.format(), items.definitions())
             ).apply {
-                this["items"] = items
                 this["type"] = paramMeta.value
+                this["nullable"] = isNullable
+                this["items"] = items
             }
         }
 

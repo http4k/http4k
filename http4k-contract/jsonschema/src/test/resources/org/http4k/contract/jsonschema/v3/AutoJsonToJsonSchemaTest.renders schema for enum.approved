@@ -11,7 +11,8 @@
           "value1",
           "value2"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": false
       }
     }
   ]

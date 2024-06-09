@@ -12,12 +12,14 @@
               "properties": {
                 "key": {
                   "example": "value",
-                  "type": "string"
+                  "type": "string",
+                  "nullable": true
                 },
                 "key2": {
                   "example": 123,
                   "format": "int32",
-                  "type": "integer"
+                  "type": "integer",
+                  "nullable": true
                 },
                 "key3": {
                   "additionalProperties": {
@@ -83,7 +85,8 @@
           "uri": {
             "example": "foobar",
             "format": "uri",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {

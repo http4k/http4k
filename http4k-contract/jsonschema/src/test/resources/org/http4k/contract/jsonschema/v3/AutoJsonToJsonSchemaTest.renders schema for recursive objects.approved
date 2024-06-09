@@ -17,7 +17,8 @@
                 ]
               }
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           }
         },
         "example": {

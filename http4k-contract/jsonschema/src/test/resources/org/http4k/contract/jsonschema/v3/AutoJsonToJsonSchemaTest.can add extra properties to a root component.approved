@@ -9,12 +9,14 @@
         "properties": {
           "str": {
             "example": "stringValue",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           },
           "num": {
             "example": 1,
             "format": "int32",
-            "type": "integer"
+            "type": "integer",
+            "nullable": false
           }
         },
         "example": {

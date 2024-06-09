@@ -9,7 +9,8 @@
         "properties": {
           "string": {
             "example": "child",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {

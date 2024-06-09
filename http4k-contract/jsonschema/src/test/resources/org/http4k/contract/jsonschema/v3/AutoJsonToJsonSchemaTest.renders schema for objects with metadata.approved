@@ -10,7 +10,8 @@
           "i": {
             "example": 1,
             "format": "int32",
-            "type": "integer"
+            "type": "integer",
+            "nullable": false
           },
           "j": {
             "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldWithMetadata"
@@ -37,11 +38,13 @@
           "field1": {
             "example": "field1",
             "description": "Field 1 description",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           },
           "field2": {
             "example": "field2",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {

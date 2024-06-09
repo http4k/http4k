@@ -3,7 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.22.0.0 (uncut)
+### v5.23.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-contract** : [Approval test break]  Addition of "nullable" field to every model property. This improves JSON output compatability with various tooling for generating types from the definitions.
+
+### v5.22.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-format-dataframe** : [Break] Move classes to alternative package to not clash with existing format objects. 
 

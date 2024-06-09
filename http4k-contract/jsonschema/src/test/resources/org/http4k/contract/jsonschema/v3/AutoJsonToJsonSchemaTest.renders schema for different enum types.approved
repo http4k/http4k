@@ -14,7 +14,8 @@
         "value": "value1_2"
       }
     ],
-    "type": "array"
+    "type": "array",
+    "nullable": false
   },
   "definitions": [
     {
@@ -42,7 +43,8 @@
           "value1_1",
           "value1_2"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": false
       }
     }
   ]

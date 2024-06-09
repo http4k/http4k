@@ -33,7 +33,8 @@
         "properties": {
           "name": {
             "example": "name",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {
@@ -52,7 +53,8 @@
         "enum": [
           "bar"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": false
       }
     }
   ]

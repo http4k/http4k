@@ -9,11 +9,13 @@
         "properties": {
           "f1": {
             "example": "foo",
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "f2": {
             "example": "bar",
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "example": {

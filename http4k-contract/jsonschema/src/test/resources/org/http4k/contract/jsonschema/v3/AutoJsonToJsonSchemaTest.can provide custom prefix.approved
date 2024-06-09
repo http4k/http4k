@@ -28,7 +28,8 @@
         "properties": {
           "a": {
             "example": "a",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {

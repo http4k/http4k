@@ -10,11 +10,13 @@
           "field1": {
             "example": "field1",
             "description": "Field 1 description",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           },
           "field2": {
             "example": "field2",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {
