@@ -4,6 +4,7 @@ package guide.reference.contracts
 // function that is defined on the Jackson instance
 
 import org.http4k.contract.ContractRoute
+import org.http4k.contract.Tag
 import org.http4k.contract.bind
 import org.http4k.contract.bindCallback
 import org.http4k.contract.contract
@@ -12,78 +13,97 @@ import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v3.OpenApi3
 import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.BasicAuthSecurity
+import org.http4k.contract.ui.swaggerUiLite
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.auto
+import org.http4k.format.Klaxon.json
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
-import org.http4k.lens.string
 import org.http4k.routing.routes
+import org.http4k.server.SunHttp
+import org.http4k.server.asServer
 
-// this route has a dynamic path segment
-fun greetRoute(): ContractRoute {
-
-    // these lenses define the dynamic parts of the request that will be used in processing
-    val ageQuery = Query.int().required("age")
-    val stringBody = Body.string(TEXT_PLAIN).toLens()
-
-    // this specifies the route contract, with the desired contract of path, headers, queries and body parameters.
-    val spec = "/greet" / Path.of("name") meta {
-        summary = "tells the user hello!"
-        queries += ageQuery
-        receiving(stringBody)
-    } bindContract GET
-
-    // the this function will dynamically supply a new HttpHandler for each call. The number of parameters
-    // matches the number of dynamic sections in the path (1)
-    fun greet(nameFromPath: String): HttpHandler = { request: Request ->
-        val age = ageQuery(request)
-        val sentMessage = stringBody(request)
-
-        Response(OK).with(stringBody of "hello $nameFromPath you are $age. You sent $sentMessage")
+// 1. this route has no dynamic path segments and simply echoes the body back. We are also adding various metadata
+// to the route, which will be used in the OpenAPI documentation. All of the metadata is optional.
+fun echo(): ContractRoute =
+    "/echo" meta {
+        summary = "echoes the body back"
+        description = "This is a simple route which echoes the body back to the caller"
+        tags += Tag("env", "production")
+        consumes += TEXT_PLAIN
+        produces += TEXT_PLAIN
+        returning(OK, I_M_A_TEAPOT)
+    } bindContract POST to { req: Request ->
+        Response(OK).body(req.body)
     }
 
-    return spec to ::greet
+// 2. this route has a dynamic path which is automatically injected into the handler and security applied. There
+// are various security instances, from Basic to APIKey to OAuth2
+fun securelyGreet(): ContractRoute =
+    "/greet" / Path.of("name") meta {
+        security = BasicAuthSecurity("myrealm", Credentials("user", "password"))
+    } bindContract POST to { name ->
+        { _: Request ->
+            Response(OK).body("hello $name")
+        }
+    }
+
+// 3. this route uses a query lens to extract a parameter from the query string. we add the lens to the contract metadata
+fun copy(): ContractRoute {
+    val times = Query.int().required("times")
+
+    return "/copy" meta {
+        // register the query lens with the contract
+        queries += times
+    } bindContract POST to
+        { req: Request ->
+            // extract the value from the request using the lens
+            val copies: Int = times(req)
+            Response(OK).body(req.bodyString().repeat(copies))
+        }
 }
 
-data class NameAndMessage(val name: String, val message: String)
-
-// this route uses auto-marshalling to convert the JSON body directly to/from a data class instance
-fun echoRoute(): ContractRoute {
+// 4. echoing JSON
+fun echoJson(): ContractRoute {
+    data class NameAndMessage(val name: String, val message: String)
 
     // the body lens here is imported as an extension function from the Jackson instance
     val body = Body.auto<NameAndMessage>().toLens()
 
-    // this specifies the route contract, including examples of the input and output body objects - they will
-    // get exploded into JSON schema in the OpenAPI docs
-    val spec = "/echo" meta {
-        summary = "echoes the name and message sent to it"
-        receiving(body to NameAndMessage("jim", "hello!"))
+    return "/echoJson" meta {
+        // register the receiving and returning lenses - these also set the content type
+        receiving(body)
         returning(OK, body to NameAndMessage("jim", "hello!"))
-    } bindContract POST
+    } bindContract POST to { req: Request ->
+        val input: NameAndMessage = body(req)
 
-    // note that because we don't have any dynamic parameters, we can use a HttpHandler instance instead of a function
-    val echo: HttpHandler = { request: Request ->
-        val received: NameAndMessage = body(request)
-        Response(OK).with(body of received)
+        // we can inject the type directly into the response using either...
+        Response(OK).with(body of input)
+
+        // ... or the more convenient... (note that json() is an extension function from the Jackson instance)
+        Response(OK).json(input)
     }
-
-    return spec to echo
 }
 
 // this route has a callback registered, so can be used when processes have asynchronous updates
 // they will be POSTed back to callbackUrl received in the request
 fun routeWithCallback(): ContractRoute {
+
+    data class StartProcess(val callbackUrl: Uri)
 
     val body = Body.auto<StartProcess>().toLens()
 
@@ -94,9 +114,7 @@ fun routeWithCallback(): ContractRoute {
         // from the OpenApi spec
         callback("update") {
             """{${"$"}request.body#/callbackUrl}""" meta {
-                receiving(
-                    body to StartProcess(Uri.of("http://caller"))
-                )
+                receiving(body to StartProcess(Uri.of("http://caller")))
             } bindCallback POST
         }
     } bindContract POST
@@ -109,33 +127,23 @@ fun routeWithCallback(): ContractRoute {
     return spec to echo
 }
 
-data class StartProcess(val callbackUrl: Uri)
-
-// use another Lens to set up the API-key - the answer is 42!
-val mySecurity = ApiKeySecurity(Query.int().required("reference/api"), { it == 42 })
-
 // Combine the Routes into a contract and bind to a context, defining a renderer (in this example
-// OpenApi/Swagger) and a security model (in this case an API-Key):
+// OpenApi/Swagger) and a global security model (in this case an API-Key):
 val contract = contract {
     renderer = OpenApi3(ApiInfo("My great API", "v1.0"), Jackson)
     descriptionPath = "/openapi.json"
-    security = mySecurity
-    routes += greetRoute()
-    routes += echoRoute()
+    security = ApiKeySecurity(Query.required("api_key"), { it.isNotEmpty() })
+
+    routes += echo()
+    routes += echoJson()
+    routes += copy()
+    routes += securelyGreet()
     routes += routeWithCallback()
 }
 
-val handler: HttpHandler = routes("/reference/api/v1" bind contract)
+val handler: HttpHandler = routes("/api/v1" bind contract)
 
 // by default, the OpenAPI docs live at the root of the contract context, but we can override it..
 fun main() {
-    println(handler(Request(GET, "/reference/api/v1/openapi.json")))
-
-    println(
-        handler(
-            Request(POST, "/reference/api/v1/echo")
-                .query("reference/api", "42")
-                .body("""{"name":"Bob","message":"Hello"}""")
-        )
-    )
+    println(handler(Request(GET, "https://localhost:10000/api/v1/openapi.json")))
 }
