@@ -26,6 +26,7 @@ do this after any exception handling has occurred (so that we can record the 5XX
 ### Serverside
 
 A typical stack looks like:
+
 1. Debugging/Tracing <-- to ensure that we see all traffic
 2. Reporting & metrics capture <-- to record accurately what we sent back
 3. Catch unexpected exceptions <-- to ensure that all responses are handled by the application instead of the runtime
