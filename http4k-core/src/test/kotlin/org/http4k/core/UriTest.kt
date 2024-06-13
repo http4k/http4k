@@ -90,6 +90,28 @@ class UriTest {
     }
 
     @Test
+    fun can_remove_all_parameter_with_prefix() {
+        assertThat(
+            Uri.of(value = "http://ignore")
+                .query("aa", "b")
+                .query("c", "d")
+                .query("ab", "c")
+                .removeQueries("a").toString(), equalTo("http://ignore?c=d")
+        )
+    }
+
+    @Test
+    fun can_remove_all_parameter() {
+        assertThat(
+            Uri.of(value = "http://ignore")
+                .query("aa", "b")
+                .query("c", "d")
+                .query("ab", "c")
+                .removeQueries().toString(), equalTo("http://ignore")
+        )
+    }
+
+    @Test
     fun parameters_can_be_defined_in_value() {
         assertThat(Uri.of("http://www.google.com?a=b"), equalTo(Uri.of("http://www.google.com").query("a", "b")))
     }
