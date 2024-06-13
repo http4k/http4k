@@ -51,6 +51,7 @@ nav:
     - "Basic: Different test-types": guide/howto/write_different_test_types/index.md
     - "Basic: Simple routing": guide/howto/simple_routing/index.md
     - "Basic: Nestable routes": guide/howto/nestable_routes/index.md
+    - "Basic: Arrange Filters into Stacks": guide/howto/arrange_filters_into_stacks/index.md
     - Attach context to a request: guide/howto/attach_context_to_a_request/index.md
     - Configure an OAuth Server: guide/howto/configure_an_oauth_server/index.md
     - Create a custom JSON marshaller: guide/howto/create_a_custom_json_marshaller/index.md
