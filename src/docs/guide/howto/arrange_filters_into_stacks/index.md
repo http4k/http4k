@@ -1,15 +1,6 @@
 title: http4k How-to: Arrange Filters into stacks
 description: A strategy for composing your applications
 
-### Gradle setup
-
-```kotlin
-dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.23.0.0"))
-    implementation("org.http4k:http4k-core")
-}
-```
-
 http4k Filters are just decorator functions for HttpHandlers and process requests by applying the following process:
 
 1. Receive the Request
@@ -43,6 +34,14 @@ The client-side is similar, but simpler:
 3. Routing <-- if we want to route traffic based on the request (eg. `reverseProxy()`)
 4. Http client <-- to process the traffic
 
+### Gradle setup
+
+```kotlin
+dependencies {
+    implementation(platform("org.http4k:http4k-bom:5.23.0.0"))
+    implementation("org.http4k:http4k-core")
+}
+```
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/howto/arrange_filters_into_stacks/example.kt)
 
