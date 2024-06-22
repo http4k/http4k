@@ -5,7 +5,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.format.AutoMarshalling
-import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.lens.FormField
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
@@ -18,6 +17,7 @@ import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.State
 import org.http4k.security.oauth.core.RefreshToken
+import org.http4k.security.oauth.format.OAuthMoshi
 import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType

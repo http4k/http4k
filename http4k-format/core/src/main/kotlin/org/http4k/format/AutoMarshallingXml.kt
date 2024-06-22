@@ -22,7 +22,11 @@ abstract class AutoMarshallingXml : AutoMarshalling() {
     override fun asFormatString(input: Any): String = input.asXmlString()
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None, contentType: ContentType = APPLICATION_XML): BiDiBodyLensSpec<T> =
-        httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), contentType, contentNegotiation)
+        httpBodyRoot(
+            listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),
+            contentType,
+            contentNegotiation
+        )
             .map({ it.payload.asString() }, { Body(it) })
             .map({ it.asA<T>() }, { it.asXmlString() })
 

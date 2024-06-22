@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
-private fun standardConfig(kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory()) = Moshi.Builder()
+fun standardConfig(kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory()) = Moshi.Builder()
     .addLast(EventAdapter)
     .addLast(ThrowableAdapter)
     .addLast(ListAdapter)

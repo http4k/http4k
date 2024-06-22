@@ -4,8 +4,8 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
     api("io.undertow:undertow-core:_")
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
-    testImplementation(project(path = ":http4k-realtime-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-realtime-core")))
 
     testImplementation(Testing.junit.jupiter.params)
 }

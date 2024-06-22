@@ -3,10 +3,10 @@
     "items": {
       "oneOf": [
         {
-          "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
         },
         {
-          "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
         }
       ]
     },
@@ -58,7 +58,8 @@
         "uri": "foobar"
       }
     ],
-    "type": "array"
+    "type": "array",
+    "nullable": false
   },
   "definitions": [
     {
@@ -66,11 +67,11 @@
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "list": {
             "items": {
-              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
             },
             "example": [
               {
@@ -80,12 +81,13 @@
                 "uri": "foobar"
               }
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "nestedList": {
             "items": {
               "items": {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
               "type": "array"
             },
@@ -99,10 +101,11 @@
                 }
               ]
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "nullableChild": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "stringList": {
             "items": {
@@ -112,14 +115,15 @@
               "hello",
               "goodbye"
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "anyList": {
             "items": {
               "oneOf": [
                 {
                   "items": {
-                    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                   },
                   "type": "array"
                 },
@@ -130,7 +134,7 @@
                   "type": "boolean"
                 },
                 {
-                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                 }
               ]
             },
@@ -146,10 +150,11 @@
                 }
               ]
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "enumVal": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
           }
         },
         "example": {
@@ -212,7 +217,8 @@
           "uri": {
             "example": "foobar",
             "format": "uri",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {
@@ -232,7 +238,8 @@
           "value1",
           "value2"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": true
       }
     }
   ]

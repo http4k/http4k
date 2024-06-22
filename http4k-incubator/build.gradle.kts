@@ -4,11 +4,14 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-moshi"))
     api(Square.moshi.adapters)
+    implementation(project(mapOf("path" to ":http4k-testing-webdriver")))
     compileOnly(Testing.junit.jupiter.api)
 
-    testImplementation(project(":http4k-testing-strikt"))
     testImplementation(project(":http4k-client-apache"))
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+
+    testImplementation("dev.forkhandles:values4k:_")
+
+    testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(path = ":http4k-testing-approval"))
-    testImplementation(project(path = ":http4k-contract", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-contract")))
 }

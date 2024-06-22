@@ -1,6 +1,7 @@
 .idea/
 *.iml
 .gradle/
+.kotlin
 build/
 .DS_Store
 classes/
@@ -11,3 +12,5 @@ intellij-settings/
 **/*.actual
 **/generated/**
 /RenderingTest - render successful trace - Sequence.puml
+jte-classes
+/dependencies.txt

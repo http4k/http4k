@@ -14,6 +14,10 @@ internal fun Map<*, *>.getStringMap(name: String): Map<String, String>? = get(na
 @Suppress("UNCHECKED_CAST")
 internal fun Map<*, *>.getStringList(name: String): List<String>? = get(name) as? List<String>
 
+@Suppress("UNCHECKED_CAST")
+private fun Map<String, Any>.multiParameter(name: String) = (getNested(name) as? Map<String, *>)
+    ?.flatMap { kv -> (kv.value as? List<String>)?.map { kv.key to it } ?: emptyList() } ?: emptyList()
+
 internal fun Map<String, Any>.toBody() = (getString("body")
     ?.let {
         MemoryBody(
@@ -28,3 +32,9 @@ internal fun Map<String, Any>.toBody() = (getString("body")
 internal fun Map<String, Any>.toHeaders() = (getStringMap("headers")
     ?.map { (k, v) -> v.split(",").map { k to it } }?.flatten()
     ?: emptyList())
+
+internal fun Map<String, Any>.toMultiHeaders() = multiParameter("multiValueHeaders")
+
+internal fun Map<String, Any>.toQueries() = getStringMap("queryStringParameters")?.toList() ?: emptyList()
+
+internal fun Map<String, Any>.toMultiQueries() = multiParameter("multiValueQueryStringParameters")

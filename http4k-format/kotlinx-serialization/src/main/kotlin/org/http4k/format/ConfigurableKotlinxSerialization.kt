@@ -4,7 +4,6 @@ package org.http4k.format
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN
 import kotlinx.serialization.descriptors.PrimitiveKind.DOUBLE
@@ -35,6 +34,8 @@ import kotlinx.serialization.serializer
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -48,7 +49,7 @@ import kotlinx.serialization.json.Json as KotlinxJson
 
 open class ConfigurableKotlinxSerialization(
     json: JsonBuilder.() -> Unit,
-    val defaultContentType: ContentType = APPLICATION_JSON
+    override val defaultContentType: ContentType = APPLICATION_JSON
 ) : AutoMarshallingJson<JsonElement>() {
     val json = KotlinxJson { json() }
     private val prettyJson =
@@ -118,7 +119,7 @@ open class ConfigurableKotlinxSerialization(
     }
 
     // auto
-    override fun asJsonObject(input: Any): JsonElement = when(input) {
+    override fun asJsonObject(input: Any): JsonElement = when (input) {
         is Map<*, *> -> JsonObject(
             input.mapNotNull {
                 (it.key as? String ?: return@mapNotNull null) to (it.value?.asJsonObject() ?: nullNode())
@@ -130,7 +131,7 @@ open class ConfigurableKotlinxSerialization(
     }
 
     private fun JsonElement.toPrimitive(): Any? {
-        return when(this) {
+        return when (this) {
             is JsonPrimitive -> content
                 .takeIf { isString }
                 ?: content.toBooleanStrictOrNull()
@@ -173,6 +174,16 @@ open class ConfigurableKotlinxSerialization(
         httpBodyLens(description, contentNegotiation, contentType).map(
             { json.decodeFromString<T>(it) },
             { json.encodeToString(it) })
+
+    /**
+     * Convenience function to write the object as JSON to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.json(t: T): R = with(Body.auto<T>().toLens() of t)
+
+    /**
+     * Convenience function to read an object as JSON from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
 }
 
 fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {
@@ -227,3 +238,6 @@ fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder
 
     override fun done(): JsonBuilder = this@asConfigurable
 }
+
+inline operator fun <reified T : Any> ConfigurableKotlinxSerialization.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableKotlinxSerialization.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

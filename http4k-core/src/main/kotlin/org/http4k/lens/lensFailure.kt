@@ -1,8 +1,20 @@
 package org.http4k.lens
 
-class LensFailure(val failures: List<Failure>, override val cause: Exception? = null, val target: Any? = null) : Exception(failures.joinToString { it.toString() }, cause) {
+class LensFailure(
+    val failures: List<Failure>, override val cause: Exception? = null,
+    val target: Any? = null,
+    message: String = failures.joinToString { it.toString() }
+) : Exception(message, cause) {
 
-    constructor(vararg failures: Failure, cause: Exception? = null, target: Any? = null) : this(failures.asList(), cause, target)
+    constructor(
+        vararg failures: Failure, cause: Exception? = null, target: Any? = null,
+        message: String = failures.joinToString { it.toString() }
+    ) : this(
+        failures.asList(),
+        cause,
+        target,
+        message
+    )
 
     fun overall(): Failure.Type = with(failures.map(Failure::type)) {
         when {

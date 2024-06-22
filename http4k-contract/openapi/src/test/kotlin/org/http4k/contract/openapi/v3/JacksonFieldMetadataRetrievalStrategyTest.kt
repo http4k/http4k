@@ -7,6 +7,7 @@ import org.http4k.contract.jsonschema.v3.FieldMetadata
 import org.http4k.contract.jsonschema.v3.JacksonFieldMetadataRetrievalStrategy
 import org.junit.jupiter.api.Test
 
+@Suppress("UNUSED_PARAMETER")
 class JacksonFieldMetadataRetrievalStrategyTest {
     open class Base(@JsonPropertyDescription("Parent Field Description") val parentField: String = "parent")
     data class Model(
@@ -43,6 +44,34 @@ class JacksonFieldMetadataRetrievalStrategyTest {
         assertThat(
             JacksonFieldMetadataRetrievalStrategy(Model(), "unknownField"),
             equalTo(FieldMetadata.empty)
+        )
+    }
+
+    /**
+     * Emulate a class annotated with `kotlinx.serialization`'s `@Serializable`.
+     */
+    class ModelWithMultipleConstructors {
+        val describedField: String
+
+        constructor(@JsonPropertyDescription("My description") describedField: String) {
+            this.describedField = describedField
+        }
+
+        /**
+         * This constructor is usually generated from `@Serializable`.
+         */
+
+        @Suppress("unused")
+        constructor(generatedField: Int, describedField: String, anotherGeneratedField: Any) {
+            this.describedField = describedField
+        }
+    }
+
+    @Test
+    fun `extract description when multiple constructors are present`() {
+        assertThat(
+            JacksonFieldMetadataRetrievalStrategy(ModelWithMultipleConstructors(""), "describedField"),
+            equalTo(FieldMetadata(mapOf("description" to "My description")))
         )
     }
 }

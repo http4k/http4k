@@ -69,7 +69,8 @@ object StringBiDiMappings {
     fun bigDecimal() = BiDiMapping(String::toBigDecimal, BigDecimal::toString)
     fun bigInteger() = BiDiMapping(String::toBigInteger, BigInteger::toString)
     fun boolean() = BiDiMapping(String::asSafeBoolean, Boolean::toString)
-    fun nonEmpty() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException("String cannot be empty") else s }, { it })
+    fun nonEmpty() = BiDiMapping({ s: String -> s.ifEmpty { throw IllegalArgumentException("String cannot be empty") } }, { it })
+    fun nonBlank() = BiDiMapping({ s: String -> s.ifBlank { throw IllegalArgumentException("String cannot be blank") } }, { it })
     fun regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
     fun urlEncoded() = BiDiMapping(String::urlDecoded, String::urlEncoded)
@@ -97,17 +98,20 @@ object StringBiDiMappings {
         { s -> Locale.forLanguageTag(s).takeIf { it.language.isNotEmpty() } ?: throw IllegalArgumentException("Could not parse IETF locale") },
         Locale::toLanguageTag
     )
+
     fun basicCredentials() = BiDiMapping(
-        { value -> value.trim()
-            .takeIf { value.startsWith("Basic") }
-            ?.substringAfter("Basic")
-            ?.trim()
-            ?.safeBase64Decoded()
-            ?.split(":", ignoreCase = false, limit = 2)
-            .let { Credentials(it?.getOrNull(0) ?: "", it?.getOrNull(1) ?: "") }
+        { value ->
+            value.trim()
+                .takeIf { value.startsWith("Basic") }
+                ?.substringAfter("Basic")
+                ?.trim()
+                ?.safeBase64Decoded()
+                ?.split(":", ignoreCase = false, limit = 2)
+                .let { Credentials(it?.getOrNull(0) ?: "", it?.getOrNull(1) ?: "") }
         },
         { credentials: Credentials -> "Basic ${"${credentials.user}:${credentials.password}".base64Encode()}" }
     )
+
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)
     inline fun <reified T : Enum<T>> caseInsensitiveEnum() = BiDiMapping(
         { text -> enumValues<T>().first { it.name.equals(text, ignoreCase = true) } },
@@ -121,7 +125,9 @@ object StringBiDiMappings {
 
     private fun String.safeBase64Decoded(): String? = try {
         base64Decoded()
-    } catch (e: IllegalArgumentException) { null }
+    } catch (e: IllegalArgumentException) {
+        null
+    }
 }
 
 internal fun Throwable.asString() = StringWriter().use { output -> PrintWriter(output).use { printer -> printStackTrace(printer); output.toString() } }

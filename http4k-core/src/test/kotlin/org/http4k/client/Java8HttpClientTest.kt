@@ -16,17 +16,18 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 class Java8HttpClientTest : HttpClientContract(::ApacheServer, Java8HttpClient(),
     ApacheClient(HttpClients.custom()
         .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(100, MILLISECONDS).build()).build()
-        , responseBodyMode = BodyMode.Stream)){
+        , responseBodyMode = BodyMode.Stream)),
+    HttpClientWithMemoryModeContract {
 
     @Test
-    fun `allow configuring read timeout`(){
+    fun `allow configuring read timeout`() {
         val client = Java8HttpClient(readTimeout = Duration.ofMillis(10))
         val response = client(Request(Method.GET, "http://localhost:$port/delay").query("millis", "50"))
         assertThat(response.status, equalTo(CLIENT_TIMEOUT))
     }
 
     @Test
-    fun `allow configuring connect timeout`(){
+    fun `allow configuring connect timeout`() {
         val client = Java8HttpClient(connectionTimeout = Duration.ofMillis(10))
         val response = client(Request(Method.GET, "http://120.0.0.0:81/does-not-exist")) //non-routable host/port
         assertThat(response.status, equalTo(CLIENT_TIMEOUT))

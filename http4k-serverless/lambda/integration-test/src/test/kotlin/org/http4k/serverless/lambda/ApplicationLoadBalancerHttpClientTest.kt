@@ -6,7 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters
+import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.inIntelliJOnly
 import org.http4k.serverless.lambda.testing.NoOpServerConfig
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 
 private fun client(): (Request) -> Response {
-    val apiClient = ClientFilters.SetHostFrom(Uri.of("http://http4k-load-balancer-<something>.eu-west-2.elb.amazonaws.com"))
+    val apiClient = SetHostFrom(Uri.of("http://http4k-load-balancer-<something>.eu-west-2.elb.amazonaws.com"))
         .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly())
         .then(OkHttp())
     return { request: Request -> apiClient(request) }

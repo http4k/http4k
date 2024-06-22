@@ -8,8 +8,8 @@ dependencies {
     api(project(":http4k-serverless-openwhisk"))
     api(project(":http4k-format-jackson"))
     api(project(":http4k-client-okhttp"))
-    api(project(path = ":http4k-core", configuration = "testArtifacts"))
-    api(project(path = ":http4k-serverless-core", configuration = "testArtifacts"))
+    api(testFixtures(project(":http4k-core")))
+    api(testFixtures(project(":http4k-serverless-core")))
     testImplementation("dev.forkhandles:bunting4k:_")
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
 }

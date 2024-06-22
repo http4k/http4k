@@ -5,7 +5,7 @@ description: Feature overview of the http4k-core module, including the Lens syst
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.2.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.23.0.0"))
     implementation("org.http4k:http4k-core")
 }
 ```
@@ -77,6 +77,8 @@ The `http4k-core` module comes with a set of handy Filters for application to bo
 - Cache Control
 - CORS
 - Cookie handling
+- Compression and un-compression
+- Cross-cutting concerns like logging, exception handling
 - Debugging request and responses
 
 Check out the `org.http4k.filter` package for the exact list.

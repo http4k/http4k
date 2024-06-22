@@ -4,18 +4,20 @@
       "properties": {
         "key": {
           "example": "value",
-          "type": "string"
+          "type": "string",
+          "nullable": true
         },
         "key2": {
           "example": 123,
           "format": "int32",
-          "type": "integer"
+          "type": "integer",
+          "nullable": true
         },
         "key3": {
           "additionalProperties": {
             "properties": {
               "inner": {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               }
             },
             "example": {
@@ -28,16 +30,16 @@
           "type": "object"
         },
         "key4": {
-          "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
         },
         "key5": {
           "items": {
             "oneOf": [
               {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
               {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
               }
             ]
           },
@@ -89,21 +91,23 @@
               "enumVal": "value2"
             }
           ],
-          "type": "array"
+          "type": "array",
+          "nullable": true
         },
         "key6": {
           "items": {
-            "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "type": "integer"
           },
           "example": [
             1,
             2
           ],
-          "type": "array"
+          "type": "array",
+          "nullable": true
         },
         "key7": {
-          "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder"
         }
       },
       "example": {
@@ -232,7 +236,8 @@
           "uri": {
             "example": "foobar",
             "format": "uri",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {
@@ -249,11 +254,11 @@
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "list": {
             "items": {
-              "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
             },
             "example": [
               {
@@ -263,12 +268,13 @@
                 "uri": "foobar"
               }
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "nestedList": {
             "items": {
               "items": {
-                "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
               "type": "array"
             },
@@ -282,10 +288,11 @@
                 }
               ]
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "nullableChild": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
           "stringList": {
             "items": {
@@ -295,14 +302,15 @@
               "hello",
               "goodbye"
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "anyList": {
             "items": {
               "oneOf": [
                 {
                   "items": {
-                    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                   },
                   "type": "array"
                 },
@@ -313,7 +321,7 @@
                   "type": "boolean"
                 },
                 {
-                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                 }
               ]
             },
@@ -329,10 +337,11 @@
                 }
               ]
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "enumVal": {
-            "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
           }
         },
         "example": {
@@ -396,7 +405,8 @@
           "value1",
           "value2"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": true
       }
     },
     {
@@ -407,10 +417,10 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                 },
                 {
-                  "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
                 }
               ]
             },
@@ -462,7 +472,8 @@
                 "enumVal": "value2"
               }
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           }
         },
         "example": {

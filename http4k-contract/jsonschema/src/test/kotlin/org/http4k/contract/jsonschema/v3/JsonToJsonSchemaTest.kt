@@ -6,7 +6,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Jackson
-import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.lens.Header
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest

@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import com.squareup.moshi.Moshi.Builder
 import org.http4k.core.Body
 import org.http4k.core.Response
@@ -12,6 +13,7 @@ import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -28,6 +30,12 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
         val expected = listOf(obj)
         val actual = body(Response(OK).with(body of expected))
         assertThat(actual, equalTo(expected))
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { Moshi.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Required value 'string' missing at \$"))
     }
 
     @Test
@@ -166,19 +174,38 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
     @Test
     fun `custom moshi`() {
         val moshi = Moshi.custom {
-            text(BiDiMapping({StringHolder(it)},{it.value}))
+            text(BiDiMapping({ StringHolder(it) }, { it.value }))
         }
 
         val value = StringHolder("stuff")
         assertThat(moshi.asFormatString(value), equalTo("\"stuff\""))
     }
 
-    override fun strictMarshaller() = object : ConfigurableMoshi
-        (Builder().asConfigurable().customise(), strictness = FailOnUnknown) {}
+    @Test
+    fun `throws on mapped value class when we specifically prohibit it`() {
+        val marshaller =
+            ConfigurableMoshi(standardConfig()
+                .apply {
+                    value(MyValue)
+                    value(MyOtherValue)
+                }
+                .customise()
+                .add(ProhibitUnknownValuesAdapter)
+            )
 
-    override fun customMarshaller() = object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
-    override fun customMarshallerProhibitStrings() = object : ConfigurableMoshi(
-        Builder().asConfigurable().prohibitStrings().customise()) {}
+        assertThat(marshaller.asFormatString(MyValue.of("hello")), equalTo(""""hello""""))
+        assertThat(marshaller.asFormatString(MyOtherValue.of("world")), equalTo(""""world""""))
+        assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("unknown")).also { println(it) } }
+    }
+
+    override fun strictMarshaller() =
+        object : ConfigurableMoshi(Builder().asConfigurable().customise(), strictness = FailOnUnknown) {}
+
+    override fun customMarshaller() =
+        object : ConfigurableMoshi(Builder().asConfigurable().customise()) {}
+
+    override fun customMarshallerProhibitStrings() =
+        object : ConfigurableMoshi(Builder().asConfigurable().prohibitStrings().customise()) {}
 }
 
 class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {

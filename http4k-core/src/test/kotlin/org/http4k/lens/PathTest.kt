@@ -73,6 +73,20 @@ class PathTest {
     }
 
     @Test
+    fun `can inject into path with simple path`() {
+        val path = Path.of("bob")
+        val injected = Request(GET, "/{bob}").with(path of "hello")
+
+        assertThat(injected.uri.path, equalTo("/hello"))
+    }
+
+    @Test
+    fun `can inject into path with regex path`() {
+        val injected = Request(GET, "/{bob:.*}").with(Path.of("bob") of "hello")
+        assertThat(injected.uri.path, equalTo("/hello"))
+    }
+
+    @Test
     fun `sets value on request uri with proper encoding`() {
         fun checkEncodeDecode(unencoded: String, encoded: String) {
             val pathParam = Path.of("bob")
@@ -110,6 +124,14 @@ class PathTest {
         val requiredLens = Path.nonEmptyString().of("hello")
         assertThat(requiredLens("123"), equalTo("123"))
         assertThat({ requiredLens("") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+    }
+
+    @Test
+    fun nonBlankString() {
+        val requiredLens = Path.nonBlankString().of("hello")
+        assertThat(requiredLens("123"), equalTo("123"))
+        assertThat({ requiredLens("") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredLens(" ") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test

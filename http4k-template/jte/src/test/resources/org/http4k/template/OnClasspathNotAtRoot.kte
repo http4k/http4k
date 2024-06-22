@@ -1,0 +1,4 @@
+@import org.http4k.template.Item
+@import org.http4k.template.OnClasspathNotAtRoot
+@param model: OnClasspathNotAtRoot
+<ul>@for(item in model.items)<li>Name:<span>${item.name}</span>Price:<span>${item.price}</span><ul>@for(feature in item.features)<li>Feature:<span>${feature.description}</span></li>@endfor</ul></li>@endfor</ul>

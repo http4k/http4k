@@ -39,9 +39,9 @@ data class ZipkinTraces(
     val samplingDecision: SamplingDecision = SAMPLE
 ) {
     companion object {
-        private val X_B3_TRACEID = Header.map(::TraceId, TraceId::value).optional("x-b3-traceid")
-        private val X_B3_SPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-spanid")
-        private val X_B3_PARENTSPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-parentspanid")
+        val X_B3_TRACEID = Header.map(::TraceId, TraceId::value).optional("x-b3-traceid")
+        val X_B3_SPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-spanid")
+        val X_B3_PARENTSPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-parentspanid")
         private val X_B3_SAMPLED =
             Header.map(SamplingDecision.Companion::from, SamplingDecision::value).optional("x-b3-sampled")
 

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package settings
 
 import org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4
@@ -29,7 +31,7 @@ fun File.writeLiveTemplates() {
     )
 
     val methods = TemplateSet("Request",
-        Method.values().map {
+        Method.entries.map {
             Template(
                 it.name.lowercase(getDefault()), "http4k ${it.name} Request",
                 """org.http4k.core.Request(org.http4k.core.Method.${it.name}, &quot;${"$"}path${"$"}&quot;)""",

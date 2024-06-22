@@ -30,7 +30,7 @@ class HttpExchangeHandler(private val handler: HttpHandler) : com.sun.net.httpse
                         ?: Uri.of(requestURI.rawPath))
                     .body(requestBody, requestHeaders.getFirst("Content-Length").safeLong())
                     .headers(requestHeaders.toList().flatMap { (key, values) -> values.map { key to it } })
-                    .source(RequestSource(localAddress.address.hostAddress, localAddress.port))
+                    .source(RequestSource(remoteAddress.address.hostAddress, remoteAddress.port))
             }
 
     override fun handle(exchange: HttpExchange) {

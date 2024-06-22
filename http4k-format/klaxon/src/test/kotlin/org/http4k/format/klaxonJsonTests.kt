@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -9,7 +10,6 @@ import org.http4k.core.with
 import org.http4k.format.Klaxon.auto
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.lang.UnsupportedOperationException
 import com.beust.klaxon.Klaxon as KKlaxon
 
 class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
@@ -20,7 +20,7 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     override val expectedAutoMarshallingZonesAndLocale = """{"locale":"en-CA","zoneId":"America/Toronto","zoneOffset":"-04:00"}"""
 
     override fun customMarshaller() = object : ConfigurableKlaxon(KKlaxon().asConfigurable().customise()) {}
-    override fun customMarshallerProhibitStrings()= object : ConfigurableKlaxon(KKlaxon().asConfigurable().prohibitStrings().customise()) {}
+    override fun customMarshallerProhibitStrings() = object : ConfigurableKlaxon(KKlaxon().asConfigurable().prohibitStrings().customise()) {}
 
     override fun strictMarshaller() = throw UnsupportedOperationException()
 
@@ -75,6 +75,18 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
     @Disabled("not supported by Klaxon")
     override fun `roundtrip arbitrary set`() {
     }
+
+    @Test
+    @Disabled("no support for this")
+    override fun `serialises enum as a key correctly`() {
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { Klaxon.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Unable to instantiate ArbObject"))
+    }
+
 }
 
 class KlaxonAutoEventsTest : AutoMarshallingEventsContract(Klaxon)

@@ -30,6 +30,7 @@ import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.security.oauth.server.TokenRequest
 import org.http4k.security.oauth.server.UnsupportedGrantType
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
+import org.http4k.security.oauth.server.authorizationRequest
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import java.time.Clock
 import java.time.temporal.ChronoUnit
@@ -102,13 +103,7 @@ private class InMemoryAuthRequestTracking : AuthRequestTracking {
     override fun resolveAuthRequest(request: Request) =
         try {
             with(OAuthServer) {
-                val extracted = AuthRequest(
-                    clientIdQueryParameter(request),
-                    scopesQueryParameter(request) ?: listOf(),
-                    redirectUriQueryParameter(request),
-                    state(request),
-                    responseType(request)
-                )
+                val extracted = request.authorizationRequest()
                 if (inFlightRequests.remove(extracted)) extracted else null
             }
         } catch (e: LensFailure) {

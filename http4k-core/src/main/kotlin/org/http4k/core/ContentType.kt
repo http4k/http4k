@@ -20,11 +20,13 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         fun Text(value: String, charset: Charset? = UTF_8) = ContentType(value, listOfNotNull(charset?.let {
             "charset" to charset.name().lowercase(getDefault())
         }))
+
         fun MultipartFormWithBoundary(boundary: String): ContentType = ContentType("multipart/form-data", listOf("boundary" to boundary))
         fun MultipartMixedWithBoundary(boundary: String): ContentType = ContentType("multipart/mixed", listOf("boundary" to boundary))
 
         val APPLICATION_FORM_URLENCODED = Text("application/x-www-form-urlencoded")
         val APPLICATION_JSON = Text("application/json")
+        val APPLICATION_ND_JSON = Text("application/x-ndjson")
         val APPLICATION_PDF = Text("application/pdf")
         val APPLICATION_XML = Text("application/xml")
         val APPLICATION_YAML = Text("application/yaml")

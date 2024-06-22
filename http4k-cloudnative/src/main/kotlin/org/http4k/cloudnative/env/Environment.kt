@@ -2,11 +2,14 @@ package org.http4k.cloudnative.env
 
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.Lens
+import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.EnumParam
+import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.int
+import org.http4k.lens.mapWithNewMeta
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.Reader
@@ -23,7 +26,7 @@ interface Environment {
 
     fun keys(): Set<String>
 
-    operator fun <T> get(key: Lens<Environment, T>): T
+    operator fun <T> get(key: LensExtractor<Environment, T>): T
 
     operator fun get(key: String): String?
 
@@ -70,9 +73,10 @@ interface Environment {
          */
         fun defaults(vararg fn: (Environment) -> Environment) = fn.fold(EMPTY) { acc, next -> next(acc) }
 
-        fun from(vararg pairs: Pair<String, String>): Environment = MapEnvironment.from(pairs.toMap().toProperties())
+        fun from(vararg pairs: Pair<String, String>, separator: String = ","): Environment =
+            MapEnvironment.from(pairs.toMap().toProperties(), separator)
 
-        fun from(env: Map<String, String>): Environment = MapEnvironment.from(env.toProperties())
+        fun from(env: Map<String, String>, separator: String = ","): Environment = MapEnvironment.from(env.toProperties(), separator)
     }
 }
 
@@ -80,7 +84,7 @@ class MapEnvironment private constructor(
     private val contents: Map<String, String>,
     override val separator: String = ","
 ) : Environment {
-    override operator fun <T> get(key: Lens<Environment, T>) = key(this)
+    override operator fun <T> get(key: LensExtractor<Environment, T>) = key(this)
     override operator fun get(key: String): String? = contents[key.convertFromKey()]
     override operator fun set(key: String, value: String) =
         MapEnvironment(contents + (key.convertFromKey() to value), separator)
@@ -89,8 +93,9 @@ class MapEnvironment private constructor(
     override fun keys() = contents.keys
 
     companion object {
-        fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(properties.entries
-            .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator
+        fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(
+            properties.entries
+                .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator
         )
 
         fun from(reader: Reader, separator: String = ","): Environment =
@@ -104,10 +109,10 @@ class MapEnvironment private constructor(
  * entire list, or override the comma separator in your initial Environment.
  */
 object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
-    LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim) ?: emptyList() },
+    LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim).orEmpty() },
     LensSet { name, values, target ->
         values.fold(target - name) { acc, next ->
-            val existing = acc[name]?.let { listOf(it) } ?: emptyList()
+            val existing = acc[name]?.let { listOf(it) }.orEmpty()
             acc.set(name, (existing + next).joinToString(target.separator))
         }
     }
@@ -129,5 +134,10 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
         }
     }
 }
+
+inline fun <reified T : Enum<T>> EnvironmentKey.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
+    if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
+    EnumParam(T::class)
+)
 
 internal fun String.convertFromKey() = replace("_", "-").replace(".", "-").lowercase(getDefault())

@@ -52,6 +52,18 @@ class BiDiLensSpecTest {
     )
 
     @Test
+    fun nonBlankString() = checkContract(
+        oSpec.nonBlankString(),
+        "123",
+        Container("123"),
+        Container(null),
+        Container(""),
+        Container("o"),
+        Container("o123"),
+        Container("o123123")
+    )
+
+    @Test
     fun int() = checkContract(spec.int(), 123, "123", "", "invalid", "o", "o123", "o123123")
 
     @Test

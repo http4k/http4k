@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.PreFlightExtraction.Companion.IgnoreBody
 import org.http4k.contract.PreFlightExtraction.Companion.None
+import org.http4k.contract.openapi.OpenAPIJackson
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.simple.SimpleJson
@@ -275,6 +276,7 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `can change path to description route`() {
         val response = ("/root/foo" bind contract {
+            renderer = SimpleJson(OpenAPIJackson)
             descriptionPath = "/docs/swagger.json"
         }).invoke(Request(GET, "/root/foo/docs/swagger.json"))
         assertThat(response.status, equalTo(OK))
@@ -361,7 +363,23 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `can all paramter checking by overriding pre-request-extraction`() {
+    fun `can all parameter checking by overriding pre-request-extraction`() {
         assertThat(handler(Request(GET, "/bad-request-body-ignore-all")), hasStatus(OK))
+    }
+
+    @Test
+    fun `matches requests without root slash`() {
+        val route = "foo" / Path.of("id") bindContract GET to { value -> { Response(OK).body(value) } }
+        val http = contract { routes += listOf(route) }
+
+        assertThat(http(Request(GET, "/foo/fooBar")), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
+        assertThat(http(Request(GET, "foo/fooBar")), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
+        assertThat(http(Request(GET, UriTemplate.from("foo/fooBar"))), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
+        assertThat(http(Request(GET, UriTemplate.from("/foo/fooBar"))), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
+
+        assertThat(http(Request(GET, "/foo/barFoo")), hasStatus(OK) and hasBody("barFoo")) // --> 200 OK
+        assertThat(http(Request(GET, "foo/barFoo")), hasStatus(OK) and hasBody("barFoo")) // --> FAILS - 404 NOT_FOUND
+        assertThat(http(Request(GET, UriTemplate.from("foo/barFoo"))), hasStatus(OK) and hasBody("barFoo")) // --> FAILS - 404 NOT_FOUND
+        assertThat(http(Request(GET, UriTemplate.from("/foo/barFoo"))), hasStatus(OK) and hasBody("barFoo")) // --> FAILS - 404 NOT_FOUND
     }
 }

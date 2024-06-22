@@ -12,15 +12,14 @@ jobs:
           - 'http4k/http4k-by-example'
           - 'http4k/http4k-connect'
           - 'http4k/http4k-connect-examples'
-          - 'http4k/http4k-heroku-travis-example-app'
           - 'http4k/http4k-contract-todo-backend'
           - 'http4k/http4k-bin'
           - 'http4k/http4k-todo-backend'
-          - 'http4k/http4k-bootstrap'
+
     runs-on: ubuntu-latest
     steps:
       - name: Trigger ${{ matrix.repo }}
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3.0.0
         with:
           token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
           repository: ${{ matrix.repo }}

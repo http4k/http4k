@@ -32,7 +32,7 @@ class Root(rawEvents: Events, http: HttpHandler) {
 
     private val http = ResetRequestTracing().then(ClientStack(events)).then(http)
 
-    fun call(name: String) = http(Request(GET, "http://EntryPoint/$name"))
+    fun call(name: String) = http(Request(GET, "/$name"))
 }
 
 private val clock = TickingClock()

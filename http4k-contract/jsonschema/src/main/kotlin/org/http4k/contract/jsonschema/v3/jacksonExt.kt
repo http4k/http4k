@@ -10,7 +10,6 @@ import org.http4k.format.Jackson
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createInstance
 
-
 object JacksonJsonPropertyAnnotated : FieldRetrieval {
     override fun invoke(target: Any, name: String) =
         SimpleLookup(
@@ -53,14 +52,21 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
 object JacksonFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
     override fun invoke(target: Any, fieldName: String): FieldMetadata =
         FieldMetadata(target.javaClass.findPropertyDescription(fieldName)?.let { mapOf("description" to it) }
-            ?: emptyMap())
+            .orEmpty())
 
+    /**
+     * Scan all constructors until one contains the property named [name] and has an [JsonPropertyDescription]
+     * annotation with non-null value.
+     *
+     * By scanning multiple constructors, this also works in cases with generated constructors and no-arg constructors.
+     */
     private fun Class<Any>.findPropertyDescription(name: String): String? =
-        kotlin.constructors.firstOrNull()?.let {
-            it.parameters
-                .firstOrNull { p -> p.kind == KParameter.Kind.VALUE && p.name == name }
-                ?.let { p ->
-                    p.annotations.filterIsInstance<JsonPropertyDescription>().firstOrNull()?.value
-                } ?: superclass?.findPropertyDescription(name)
-        } ?: superclass?.findPropertyDescription(name)
+        kotlin.constructors.asSequence()
+            .mapNotNull { constructor ->
+                constructor.parameters.find { parameter ->
+                    parameter.kind == KParameter.Kind.VALUE && parameter.name == name
+                }
+            }
+            .map { parameter -> parameter.annotations.filterIsInstance<JsonPropertyDescription>().firstOrNull() }
+            .firstNotNullOfOrNull { annotation -> annotation?.value } ?: superclass?.findPropertyDescription(name)
 }

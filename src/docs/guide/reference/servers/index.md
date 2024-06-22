@@ -5,7 +5,7 @@ description: Feature overview of the http4k-server modules, covering Server back
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.2.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.23.0.0"))
     // Apache v5: 
     implementation("org.http4k:http4k-server-apache")
 
@@ -15,7 +15,7 @@ dependencies {
     // Jetty & JettyLoom: 
     implementation("org.http4k:http4k-server-jetty")
 
-    // Helidon Nima (Loom): 
+    // Helidon (Loom): 
     implementation("org.http4k:http4k-server-helidon")
 
     // Ktor CIO: 

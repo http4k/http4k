@@ -1,7 +1,7 @@
 package guide.reference.opentelemetry
 
 import io.opentelemetry.context.propagation.ContextPropagators.create
-import io.opentelemetry.extension.aws.AwsXrayPropagator
+import io.opentelemetry.contrib.awsxray.propagator.AwsXrayPropagator
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET

@@ -2,10 +2,12 @@ package org.http4k.format
 
 import com.amazonaws.services.lambda.runtime.events.CloudWatchLogsEvent
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent
+import com.amazonaws.services.lambda.runtime.events.EventBridgeEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisFirehoseEvent
 import com.amazonaws.services.lambda.runtime.events.S3Event
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
+import com.amazonaws.services.lambda.runtime.events.SQSBatchResponse
 import com.amazonaws.services.lambda.runtime.events.SQSEvent
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.MessageAttribute
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage
@@ -46,12 +48,24 @@ import java.util.Date
 
 @ExtendWith(JsonApprovalTest::class)
 class AwsLambdaMoshiTest {
+
     @Test
     fun `CloudWatchLogs event`(approver: Approver) {
         approver.assertRoundtrips(CloudWatchLogsEvent().apply {
             awsLogs = CloudWatchLogsEvent.AWSLogs().apply {
                 data = "logsData"
             }
+        })
+    }
+
+    @Test
+    fun `SQSBatchResponse event`(approver: Approver) {
+        approver.assertRoundtrips(SQSBatchResponse().apply {
+            batchItemFailures = listOf(
+                SQSBatchResponse.BatchItemFailure().apply {
+                    itemIdentifier = "itemIdentifier"
+                }
+            )
         })
     }
 
@@ -180,6 +194,20 @@ class AwsLambdaMoshiTest {
     }
 
     @Test
+    fun `EventBridge event`(approver: Approver) {
+        approver.assertRoundtrips(EventBridgeEvent().apply {
+            id = "id"
+            detailType = "detail"
+            source = "source"
+            account = "account"
+            time = DateTime(0, UTC)
+            region = "region"
+            resources = listOf("resources")
+            detail = mapOf("detailName" to "detailValue")
+        })
+    }
+
+    @Test
     fun `SNS event`(approver: Approver) {
         approver.assertRoundtrips(SNSEvent().apply {
             records = listOf(
@@ -267,7 +295,8 @@ class AwsLambdaMoshiTest {
                       ]
                     }
                 """.trimIndent()
-            ).records[0].md5OfMessageAttributes)
+            ).records[0].md5OfMessageAttributes
+        )
     }
 
     @Test

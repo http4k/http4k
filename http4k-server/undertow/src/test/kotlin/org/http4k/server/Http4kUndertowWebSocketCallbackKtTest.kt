@@ -22,6 +22,6 @@ class Http4kUndertowWebSocketCallbackKtTest {
 
         val requiresWebsocketUpgrade = predicate(httpServerExchange)
 
-        assertThat(requiresWebsocketUpgrade,  equalTo(true))
+        assertThat(requiresWebsocketUpgrade, equalTo(true))
     }
 }

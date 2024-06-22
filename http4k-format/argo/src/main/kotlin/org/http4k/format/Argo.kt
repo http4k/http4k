@@ -1,11 +1,11 @@
 package org.http4k.format
 
-import argo.format.CompactJsonFormatter
-import argo.format.PrettyJsonFormatter
-import argo.jdom.JdomParser
+import argo.JsonGenerator
+import argo.JsonGenerator.JsonGeneratorStyle.COMPACT
+import argo.JsonGenerator.JsonGeneratorStyle.PRETTY
+import argo.JsonParser
 import argo.jdom.JsonNode
 import argo.jdom.JsonNodeFactories
-import argo.jdom.JsonNodeFactories.field
 import argo.jdom.JsonNodeFactories.`object`
 import argo.jdom.JsonNodeType.ARRAY
 import argo.jdom.JsonNodeType.FALSE
@@ -14,7 +14,6 @@ import argo.jdom.JsonNodeType.NUMBER
 import argo.jdom.JsonNodeType.OBJECT
 import argo.jdom.JsonNodeType.STRING
 import argo.jdom.JsonNodeType.TRUE
-import argo.jdom.JsonStringNode
 import org.http4k.format.JsonType.Object
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -32,9 +31,9 @@ object Argo : Json<JsonNode> {
             else -> throw IllegalArgumentException("Don't know how to translate $value")
         }
 
-    private val pretty = PrettyJsonFormatter()
-    private val compact = CompactJsonFormatter()
-    private val jdomParser = JdomParser()
+    private val pretty = JsonGenerator().style(PRETTY)
+    private val compact = JsonGenerator().style(COMPACT)
+    private val jdomParser = JsonParser()
 
     override fun String.asJsonObject(): JsonNode = let(jdomParser::parse)
     override fun String?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.string(it) }
@@ -59,8 +58,8 @@ object Argo : Json<JsonNode> {
         ?: JsonNodeFactories.nullNode()
 
     override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = JsonNodeFactories.array(this)
-    override fun JsonNode.asPrettyJsonString(): String = pretty.format(this)
-    override fun JsonNode.asCompactJsonString(): String = compact.format(this)
+    override fun JsonNode.asPrettyJsonString(): String = pretty.generate(this)
+    override fun JsonNode.asCompactJsonString(): String = compact.generate(this)
 
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
         `object`(associate { JsonNodeFactories.string(it.first) to it.second })
@@ -69,7 +68,7 @@ object Argo : Json<JsonNode> {
         if (typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
-    override fun text(value: JsonNode): String = when(value.type) {
+    override fun text(value: JsonNode): String = when (value.type) {
         STRING -> value.text
         NUMBER -> value.getNumberValue().toString()
         ARRAY -> ""

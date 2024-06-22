@@ -1,6 +1,6 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
-description = "http4k incubator module"
+description = "http4k Servirtium module"
 
 dependencies {
     api(project(":http4k-core"))
@@ -12,13 +12,13 @@ dependencies {
 
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-testing-approval"))
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 
 tasks {
-    withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = freeCompilerArgs + listOf("-Xjvm-default=all")
+    withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.add("-Xjvm-default=all")
         }
     }
 }

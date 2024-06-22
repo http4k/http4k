@@ -1,8 +1,6 @@
 package org.http4k.chaos
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.natpryce.hamkrest.and
-import com.natpryce.hamkrest.anything
 import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.chaos.ChaosTriggers.Countdown
 import org.http4k.chaos.ChaosTriggers.Deadline
@@ -12,24 +10,17 @@ import org.http4k.chaos.ChaosTriggers.Once
 import org.http4k.chaos.ChaosTriggers.PercentageBased
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.hamkrest.hasBody
-import org.http4k.hamkrest.hasHeader
-import org.http4k.hamkrest.hasMethod
-import org.http4k.hamkrest.hasQuery
-import org.http4k.hamkrest.hasUri
-import org.http4k.hamkrest.hasUriPath
 import java.time.Clock
 import java.time.Clock.systemUTC
 import java.time.Duration
 import java.time.Instant
-import java.util.Locale.getDefault
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
-typealias Trigger = (req: Request) -> Boolean
+fun interface Trigger : (Request) -> Boolean
 
-operator fun Trigger.not() = object : Function1<Request, Boolean> {
+operator fun Trigger.not() = object : Trigger {
     override fun invoke(req: Request) = !this@not(req)
     override fun toString() = "NOT " + this@not.toString()
 }
@@ -81,9 +72,10 @@ object ChaosTriggers {
          * Get a percentage from the environment.
          * Defaults to CHAOS_PERCENTAGE and a value of 50%
          */
-        fun fromEnvironment(env: (String) -> String? = System::getenv,
-                            defaultPercentage: Int = 50,
-                            name: String = "CHAOS_PERCENTAGE"
+        fun fromEnvironment(
+            env: (String) -> String? = System::getenv,
+            defaultPercentage: Int = 50,
+            name: String = "CHAOS_PERCENTAGE"
         ) = PercentageBased(env(name)?.let(Integer::parseInt) ?: defaultPercentage)
     }
 
@@ -108,25 +100,51 @@ object ChaosTriggers {
         }
     }
 
+    private class RequestMatcher(val description: String, predicate: (Request) -> Boolean) :
+            (Request) -> Boolean by predicate
+
     /**
      * Activates when matching attributes of a single received request are met.
      */
     object MatchRequest {
-        operator fun invoke(method: String? = null,
-                            path: Regex? = null,
-                            queries: Map<String, Regex>? = null,
-                            headers: Map<String, Regex>? = null,
-                            body: Regex? = null): Trigger {
-            val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
-            val queriesMatchers = queries?.map { hasQuery(it.key, it.value) } ?: emptyList()
-            val pathMatchers = path?.let { listOf(hasUri(hasUriPath(it))) } ?: emptyList()
-            val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
-            val methodMatchers = method?.let { listOf(hasMethod(Method.valueOf(it.uppercase(getDefault())))) } ?: emptyList()
+        operator fun invoke(
+            method: String? = null,
+            path: Regex? = null,
+            queries: Map<String, Regex>? = null,
+            headers: Map<String, Regex>? = null,
+            body: Regex? = null
+        ): Trigger {
+            val headerMatchers =
+                headers?.map { (k, v) ->
+                    RequestMatcher("header '$k' matches '$v'") {
+                        it.headerValues(k).any { v.matches(it ?: "") }
+                    }
+                }
+                    ?: emptyList()
+            val queriesMatchers =
+                queries?.map { (k, v) ->
+                    RequestMatcher("query '$k' matches '$v'") {
+                        it.queries(k).any { v.matches(it ?: "") }
+                    }
+                }
+                    ?: emptyList()
+            val pathMatchers =
+                path?.let { p -> listOf(RequestMatcher("path matches '$p'") { it.uri.path.matches(p) }) } ?: emptyList()
+            val bodyMatchers =
+                body?.let { b -> listOf(RequestMatcher("body matches '$b'") { it.bodyString().matches(b) }) }
+                    ?: emptyList()
+            val methodMatchers =
+                method?.let { m -> listOf(RequestMatcher("method == ${m.uppercase()}") { it.method == Method.valueOf(m.uppercase()) }) }
+                    ?: emptyList()
             val all = methodMatchers + pathMatchers + queriesMatchers + headerMatchers + bodyMatchers
-            val matcher = if (all.isEmpty()) anything else all.reduce { acc, next -> acc and next }
+
+            val matcher = if (all.isEmpty()) RequestMatcher("anything") { true } else
+                all.reduce { acc, next ->
+                    RequestMatcher(acc.description + " AND " + next.description) { acc(it) && next(it) }
+                }
 
             return object : Trigger {
-                override fun invoke(req: Request) = matcher.asPredicate()(req)
+                override fun invoke(req: Request) = matcher(req)
                 override fun toString() = matcher.description
             }
         }
@@ -152,7 +170,14 @@ internal fun JsonNode.asTrigger(clock: Clock): Trigger = when (nonNullable<Strin
     "deadline" -> Deadline(nonNullable("endTime"), clock)
     "delay" -> Delay(nonNullable("period"), clock)
     "countdown" -> Countdown(nonNullable("count"))
-    "request" -> MatchRequest(asNullable("method"), asNullable("path"), toRegexMap("queries"), toRegexMap("headers"), asNullable("body"))
+    "request" -> MatchRequest(
+        asNullable("method"),
+        asNullable("path"),
+        toRegexMap("queries"),
+        toRegexMap("headers"),
+        asNullable("body")
+    )
+
     "once" -> Once(this["trigger"]?.asTrigger(clock))
     "percentage" -> PercentageBased(this["percentage"].asInt())
     "always" -> Always()

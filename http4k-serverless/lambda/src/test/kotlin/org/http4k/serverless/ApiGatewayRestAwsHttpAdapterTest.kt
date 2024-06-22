@@ -35,6 +35,52 @@ class ApiGatewayRestAwsHttpAdapterTest {
     }
 
     @Test
+    fun `converts into http4k request with multi header`() {
+        val request = mapOf(
+            "path" to "/path",
+            "body" to "",
+            "headers" to mapOf("a" to "b", "c" to "f"),
+            "multiValueHeaders" to mapOf("c" to listOf("d", "e", "f"), "g" to listOf("h")),
+            "isBase64Encoded" to false,
+            "httpMethod" to "GET"
+        )
+
+        assertThat(
+            ApiGatewayRestAwsHttpAdapter(request, LambdaContextMock()),
+            equalTo(Request(GET, "/path")
+                .header("a", "b")
+                .header("c", "d")
+                .header("c", "e")
+                .header("c", "f")
+                .header("g", "h")
+                .body("")
+            ))
+    }
+
+    @Test
+    fun `converts into http4k request with multi query`() {
+        val request = mapOf(
+            "path" to "/path",
+            "body" to "",
+            "queryStringParameters" to mapOf("a" to "b", "c" to "f"),
+            "multiValueQueryStringParameters" to mapOf("c" to listOf("d", "e", "f"), "g" to listOf("h")),
+            "isBase64Encoded" to false,
+            "httpMethod" to "GET"
+        )
+
+        assertThat(
+            ApiGatewayRestAwsHttpAdapter(request, LambdaContextMock()),
+            equalTo(Request(GET, "/path")
+                .query("c", "d")
+                .query("c", "e")
+                .query("c", "f")
+                .query("g", "h")
+                .query("a", "b")
+                .body("")
+            ))
+    }
+
+    @Test
     fun `converts into http4k request when body is not base 64 encoded`() {
         val request = mapOf(
             "path" to "/path",

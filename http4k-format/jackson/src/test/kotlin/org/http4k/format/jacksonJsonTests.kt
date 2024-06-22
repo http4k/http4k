@@ -5,7 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
+import dev.forkhandles.data.JsonNodeDataContainer
+import dev.forkhandles.values.AbstractValue
+import dev.forkhandles.values.BooleanValueFactory
 import org.http4k.core.Body
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -16,6 +22,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.lens.BiDiMapping
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 
 class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
@@ -25,6 +32,12 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = Jackson.asJsonObject(obj)
         assertThat(Jackson.asA(out, ArbObject::class), equalTo(obj))
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { Jackson.autoBody<ArbObject>().toLens()(Request(GET, "").body("{}")) }
+            .exceptionOrNull()!!.message!!, startsWith("Instantiation of [simple type"))
     }
 
     @Test
@@ -66,7 +79,6 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
             KotlinModule.Builder().build().asConfigurable().customise()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
         ) {}
-
 
     override fun customMarshaller() =
         object : ConfigurableJackson(KotlinModule.Builder().build().asConfigurable().customise()) {}
@@ -146,7 +158,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         val wrapper = mapOf(
             "str" to "val1",
             "num" to BigDecimal("123.1"),
-            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "array" to listOf(BigDecimal("1.1"), "stuff"),
             "map" to mapOf("foo" to "bar"),
             "bool" to true
         )
@@ -161,7 +173,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
             "foo",
             BigDecimal("123.1"),
             mapOf("foo" to "bar"),
-            listOf(BigDecimal("1.1"),BigDecimal("2.1")),
+            listOf(BigDecimal("1.1"), BigDecimal("2.1")),
             true
         )
         val asString = Jackson.asFormatString(wrapper)
@@ -172,11 +184,27 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
     @Test
     fun `custom jackson`() {
         val jackson = Jackson.custom {
-            text(BiDiMapping({StringHolder(it)},{it.value}))
+            text(BiDiMapping({ StringHolder(it) }, { it.value }))
         }
 
         val value = StringHolder("stuff")
         assertThat(jackson.asFormatString(value), equalTo("\"stuff\""))
+    }
+
+    @Test
+    fun `throws on mapped value class when we specifically prohibit it`() {
+        val marshaller = object :
+            ConfigurableJackson(
+                KotlinModule.Builder().build().asConfigurable()
+                    .value(MyValue)
+                    .prohibitUnknownValues()
+                    .value(MyOtherValue)
+                    .done()
+            ) {}
+
+        assertThat(marshaller.asFormatString(MyValue.of("hello")), equalTo(""""hello""""))
+        assertThat(marshaller.asFormatString(MyOtherValue.of("world")), equalTo(""""world""""))
+        assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("hello")) }
     }
 }
 
@@ -184,6 +212,34 @@ class JacksonTest : JsonContract<JsonNode>(Jackson) {
     override val prettyString = """{
   "hello" : "world"
 }"""
+}
+
+class JacksonDataContainerTest {
+
+    class MyValue private constructor(value: Boolean) : AbstractValue<Boolean>(value) {
+        companion object : BooleanValueFactory<MyValue>(::MyValue)
+    }
+
+    class Foo(node: JsonNode) : JsonNodeDataContainer(node) {
+        val foo by required<String>()
+        var bar by required(MyValue)
+    }
+
+    @Test
+    fun `can use custom data container to modify a JsonNode`() {
+        val json = """{"foo":"world","bar":true}"""
+
+        val lens = Body.json(::Foo).toLens()
+
+        val data = lens(Request(GET, "").body(json))
+        assertThat(data.foo, equalTo("world"))
+        assertThat(data.bar, equalTo(MyValue.of(true)))
+        data.bar = MyValue.of(false)
+        assertThat(data.bar, equalTo(MyValue.of(false)))
+
+        val updated = Request(GET, "").with(lens of data)
+        assertThat(updated, hasBody("""{"foo":"world","bar":false}"""))
+    }
 }
 
 class JacksonAutoEventsTest : AutoMarshallingEventsContract(Jackson)

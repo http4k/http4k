@@ -8,6 +8,7 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -28,7 +29,7 @@ class RoutedMessageTest {
         val request = ExtendedRequest(RoutedRequest(Request(GET, "/the-path"), from("/{pathParam}")))
 
         assertThat(request.path("pathParam"), equalTo("the-path"))
-        assertThat(request.query("name","value"), isA<ExtendedRequest>())
+        assertThat(request.query("name", "value"), isA<ExtendedRequest>())
 
         checkMessageFields<RoutedRequest>(request)
     }
@@ -42,7 +43,7 @@ class RoutedMessageTest {
 
         val response = ExtendedResponse(RoutedResponse(Response(OK, "/the-path"), from("/{pathParam}")))
 
-        assertThat(response.header("name","value"), isA<ExtendedResponse>())
+        assertThat(response.header("name", "value"), isA<ExtendedResponse>())
     }
 
     @Test
@@ -53,6 +54,9 @@ class RoutedMessageTest {
         assertThat(request.uri(Uri.of("/changed")), isA<RoutedRequest>())
         assertThat(request.query("foo", "bar"), isA<RoutedRequest>())
         assertThat(request.headers(listOf("foo" to "bar")), isA<RoutedRequest>())
+        assertThat(request.removeQuery("foo"), isA<RoutedRequest>())
+        assertThat(request.removeQueries("foo"), isA<RoutedRequest>())
+        assertThat(request.source(RequestSource("localhost")), isA<RoutedRequest>())
 
         checkMessageFields<RoutedRequest>(request)
     }
@@ -61,13 +65,18 @@ class RoutedMessageTest {
     fun `response manipulations maintain the same type`() {
         val response = RoutedResponse(Response(NOT_FOUND), template)
 
+        assertThat(response.status(OK), isA<RoutedResponse>())
+
         checkMessageFields<RoutedResponse>(response)
     }
 
     private inline fun <reified T : Any> checkMessageFields(request: HttpMessage) {
         assertThat(request.header("foo", "bar"), isA<T>())
+        assertThat(request.headers(listOf("foo" to "bar")), isA<T>())
         assertThat(request.replaceHeader("foo", "bar"), isA<T>())
+        assertThat(request.replaceHeaders(listOf("foo" to "bar")), isA<T>())
         assertThat(request.removeHeader("foo"), isA<T>())
+        assertThat(request.removeHeaders("foot"), isA<T>())
         assertThat(request.body("foo"), isA<T>())
         assertThat(request.body(Body.EMPTY), isA<T>())
         assertThat(request.body("foo".byteInputStream()), isA<T>())

@@ -85,7 +85,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * **1LOC** server backend spin-up for:
         * **Apache v4 & v5** (from httpcore)
         * **Jetty & Jetty Loom** (including SSE and Websocket support)
-        * **Helidon Nima (Loom)**
+        * **Helidon (Loom)**
         * **Ktor CIO & Netty**
         * **Netty** (including Websocket support)
         * **SunHttp & SunHttpLoom** (bundled with `http4k-core`)
@@ -112,20 +112,21 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * **Pluggable** templating system support for:
         * **Freemarker**
         * **Handlebars** 
+        * **JTE**
         * **Pebble**
+        * **Pug4j**
         * **Rocker**
         * **Thymeleaf**
-        * **Jade4j**
     * Caching and **Hot-Reload** template support
 * **Message formats:** 
     * Consistent API provides first class support for marshalling formats to/from HTTP messages for:
         * **[JSON](https://www.http4k.org/guide/reference/json/)** - with support for: 
             * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
-            * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
-            * **Klaxon** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
-            * **KondorJson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
             * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
+            * **KondorJson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
             * **KotlinX Serialization** - official Kotlin JSON API. 
+            * **Klaxon** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
+            * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/reference/json/#auto-marshalling-capabilities) of Data classes**
             * **Argo** - lightweight Java JSON API with zero dependencies.            
         * **[XML](https://www.http4k.org/guide/reference/xml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
@@ -133,8 +134,13 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **[YAML](https://www.http4k.org/guide/reference/yaml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
             * **Moshi** - includes support for **fully automatic marshalling of Data classes**
+        * **[DataFrame](https://www.http4k.org/guide/reference/dataframe/)** - with support for: 
+            * **CSV** 
+            * **JSON**
         * **CSV** - includes support for: 
             * **Jackson** - CSV format for Jackson
+* [Multipart:](https://http4k.org/guide/reference/multipart)
+    * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [Resilience4J:](https://http4k.org/guide/reference/resilience4j) 
     * Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration
 * [Micrometer:](https://http4k.org/guide/reference/micrometer) 
@@ -143,8 +149,10 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Consume and produce CloudEvents using typesafe lenses.
 * [OpenTelemetry:](https://http4k.org/guide/reference/opentelemetry) 
     * Instrument http4k apps with OpenTelemetry tooling.
-* [Multipart:](https://http4k.org/guide/reference/multipart) 
-    * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
+* [htmx:](https://http4k.org/guide/reference/htmx)
+    * Support for powering http4k apps with htmx.
+* [Webhooks:](https://http4k.org/guide/reference/webhooks)
+    * Simply use the [Standard Webhooks](https://www.standardwebhooks.com/) format to send signed and consistent Webhook events.
 * [GraphQL:](https://http4k.org/guide/reference/graphql) 
     * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
 * [AWS:](https://http4k.org/guide/reference/aws) 
@@ -178,10 +186,12 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Record and replay versioned HTTP contracts to/from `Servirtium` Markdown format. Includes Servirtium MiTM server and simple JUnit extensions.
 * [Strikt:](https://http4k.org/guide/reference/strikt) 
     * A set of Strikt matchers for testing [http4k] Request and Response messages.
-* [TracerBullet:](https://http4k.org/guide/reference/tracerbuller)
+* [TracerBullet:](https://http4k.org/guide/reference/tracerbullet)
     * Visually document your applications using the JUnit plugin.
+* [Playwright:](https://http4k.org/guide/reference/playwright)
+    * Simplify in-browser testing with this JUnit extension.
 * [WebDriver:](https://http4k.org/guide/reference/webdriver)
-    * Ultra-lightweight Selenium WebDriver implementation for [http4k] application.
+    * Ultra-lightweight Selenium WebDriver implementation for [http4k] applications.
     
 ## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/howz/readme/example.kt)
 
@@ -191,7 +201,7 @@ To install, add these dependencies to your **Gradle** file:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.2.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.23.0.0"))
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-server-jetty")
     implementation("org.http4k:http4k-client-okhttp")

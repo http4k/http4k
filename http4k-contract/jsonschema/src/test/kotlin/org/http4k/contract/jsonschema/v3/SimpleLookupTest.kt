@@ -33,7 +33,7 @@ class SimpleLookupTest {
     }
 
     @Test
-    fun `throws on no field found`() {
+    fun `recovers and responds with empty FieldMetadata when there are generics in the class`() {
         assertThat("non existent", { SimpleLookup()(KotlinBean(), "non existent") }, throws<NoFieldFound>())
     }
 }

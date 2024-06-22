@@ -9,8 +9,8 @@
         "sourceIPAddress": "sourceIp"
       },
       "responseElements": {
-        "xAmzId2": "xAmzId2",
-        "xAmzRequestId": "xAmzRequestId"
+        "x-amz-id-2": "xAmzId2",
+        "x-amz-request-id": "xAmzRequestId"
       },
       "userIdentity": {
         "principalId": "principalId"

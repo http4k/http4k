@@ -25,10 +25,20 @@ class ApiGatewayV2FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(Ap
  * This is the main entry point for lambda invocations using the V2 payload format.
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
+ *
+ * Use main constructor if you need to read ENV variables to make your HttpHandler and the AWS context
  */
 abstract class ApiGatewayV2LambdaFunction(input: AppLoaderWithContexts) :
     AwsLambdaEventFunction(ApiGatewayV2FnLoader(input)) {
+
+    /**
+     * Use this constructor if you need to read ENV variables to make your HttpHandler
+     */
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+
+    /**
+     * Use this constructor if you just want to convert a standard HttpHandler
+     */
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
 
@@ -36,17 +46,11 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
     private fun Map<String, Any>.toHttp4kRequest(): Request {
         val method = (getNested("requestContext")?.getNested("http")?.get("method") as? String)
             ?: error("method is invalid")
-        val query = getStringMap("queryStringParameters")
-            ?.toList()
-            ?: Uri.of(getString("rawQueryString").orEmpty()).queries()
+        val query = Uri.of("?" + getString("rawQueryString").orEmpty()).queries()
         val headers = toHeaders() +
             (getStringList("cookies")?.map { "Cookie" to it } ?: emptyList())
 
-        return Request(
-            Method.valueOf(method),
-            Uri.of(getString("rawPath").orEmpty())
-                .query(query.toUrlFormEncoded())
-        )
+        return Request(Method.valueOf(method), Uri.of(getString("rawPath").orEmpty()).query(query.toUrlFormEncoded()))
             .headers(headers)
             .body(toBody())
     }

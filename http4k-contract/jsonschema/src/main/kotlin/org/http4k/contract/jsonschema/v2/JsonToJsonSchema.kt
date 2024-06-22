@@ -2,9 +2,9 @@ package org.http4k.contract.jsonschema.v2
 
 import org.http4k.contract.jsonschema.IllegalSchemaException
 import org.http4k.contract.jsonschema.JsonSchema
+import org.http4k.contract.jsonschema.JsonSchemaCreator
 import org.http4k.format.Json
 import org.http4k.format.JsonType
-import org.http4k.contract.jsonschema.JsonSchemaCreator
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
@@ -15,7 +15,7 @@ class JsonToJsonSchema<NODE>(
     private val json: Json<NODE>,
     private val refLocationPrefix: String = "definitions"
 ) : JsonSchemaCreator<NODE, NODE> {
-    override fun toSchema(obj: NODE, overrideDefinitionId: String?, refModelNamePrefix: String?) = JsonSchema(obj, emptySet()).toSchema(overrideDefinitionId, refModelNamePrefix ?: "")
+    override fun toSchema(obj: NODE, overrideDefinitionId: String?, refModelNamePrefix: String?) = JsonSchema(obj, emptySet()).toSchema(overrideDefinitionId, refModelNamePrefix.orEmpty())
 
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null, prefix: String): JsonSchema<NODE> =
         when (json.typeOf(node)) {

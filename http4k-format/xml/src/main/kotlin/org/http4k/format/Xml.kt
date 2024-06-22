@@ -4,7 +4,10 @@ import com.google.gson.JsonElement
 import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -23,6 +26,7 @@ import javax.xml.transform.stream.StreamResult
 import kotlin.reflect.KClass
 
 object Xml : AutoMarshallingXml() {
+    override val defaultContentType = APPLICATION_XML
 
     override fun Any.asXmlString(): String = throw UnsupportedOperationException("")
 
@@ -46,11 +50,30 @@ object Xml : AutoMarshallingXml() {
         it.toString()
     }
 
+    /**
+     * Convenience function to write the object as XML to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.xml(t: T): R = with(Body.auto<T>().toLens() of t)
+
+    /**
+     * Convenience function to read an object as XML from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
+
+    /**
+     * Convenience function to write the object as XML to the message body and set the content type.
+     */
     fun <IN : Any> BiDiLensSpec<IN, String>.xml() = map({ it.asXmlDocument() }, { it.asXmlString() })
 
-    fun Body.Companion.xml(description: String? = null,
-                           contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Document> =
-        httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_XML, contentNegotiation)
+    fun Body.Companion.xml(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None
+    ): BiDiBodyLensSpec<Document> =
+        httpBodyRoot(
+            listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),
+            APPLICATION_XML,
+            contentNegotiation
+        )
             .map(Body::payload) { Body(it) }
             .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlDocument() }, { it.asXmlString() })
 }

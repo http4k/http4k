@@ -1,7 +1,8 @@
 import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.time.Duration
 
 plugins {
@@ -9,14 +10,17 @@ plugins {
     idea
     jacoco
     `java-library`
+    `java-test-fixtures`
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin")
+    id("com.google.devtools.ksp")
+    kotlin("plugin.serialization")
 }
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(20))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -26,7 +30,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
+        classpath(Kotlin.gradlePlugin)
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
         classpath("gradle.plugin.com.github.johnrengelman:shadow:_")
@@ -37,6 +41,7 @@ allprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
     apply(plugin = "org.gradle.jacoco")
+    apply(plugin = "java-test-fixtures")
 
     repositories {
         mavenCentral()
@@ -50,9 +55,9 @@ allprojects {
     }
 
     tasks {
-        withType<KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "1.8"
+        withType<KotlinJvmCompile>().configureEach {
+            compilerOptions {
+                jvmTarget.set(JVM_1_8)
             }
         }
 
@@ -83,6 +88,10 @@ allprojects {
         testImplementation(Testing.junit.jupiter.api)
         testImplementation(Testing.junit.jupiter.engine)
         testImplementation("com.natpryce:hamkrest:_")
+
+        testFixturesImplementation(Testing.junit.jupiter.api)
+        testFixturesImplementation(Testing.junit.jupiter.engine)
+        testFixturesImplementation("com.natpryce:hamkrest:_")
     }
 }
 
@@ -113,15 +122,6 @@ subprojects {
             archiveClassifier.set("test")
             from(project.the<SourceSetContainer>()["test"].output)
         }
-
-        configurations.create("testArtifacts") {
-            extendsFrom(configurations["testApi"])
-        }
-        artifacts {
-            add("testArtifacts", testJar)
-            archives(sourcesJar)
-            archives(javadocJar)
-        }
     }
 
     if (hasAnArtifact(project)) {
@@ -141,6 +141,11 @@ subprojects {
 
         publishing {
             publications {
+                val javaComponent = components["java"] as AdhocComponentWithVariants
+
+                javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+                javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+
                 val archivesBaseName = tasks.jar.get().archiveBaseName.get()
                 create<MavenPublication>("mavenJava") {
                     artifactId = archivesBaseName
@@ -202,7 +207,7 @@ tasks.register<JacocoReport>("jacocoRootReport") {
         html.required.set(true)
         xml.required.set(true)
         csv.required.set(false)
-        xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml"))
+        xml.outputLocation.set(file("${layout.buildDirectory}/reports/jacoco/test/jacocoRootReport.xml"))
     }
 }
 
@@ -211,15 +216,20 @@ dependencies {
         .filter { hasAnArtifact(it) }
         .forEach {
             api(project(it.name))
-            testImplementation(project(path = it.name, configuration = "testArtifacts"))
+            testImplementation(testFixtures(project(it.name)))
         }
 
-    testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
 
-    testImplementation("software.amazon.awssdk:s3:_") {
+    testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
+    testImplementation("se.ansman.kotshi:api:_")
+    kspTest("se.ansman.kotshi:compiler:_")
+
+    testImplementation("software.amazon.awssdk:s3") {
         exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
         exclude(group = "software.amazon.awssdk", module = "apache-client")
     }
+
+    testImplementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:_")
     testImplementation("com.expediagroup:graphql-kotlin-schema-generator:_")
     testImplementation("com.amazonaws:aws-lambda-java-events:_")
 }
@@ -248,10 +258,14 @@ fun Node.childrenCalled(wanted: String) = children()
         (name is QName) && name.localPart == wanted
     }
 
-tasks.named<KotlinCompile>("compileTestKotlin") {
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += listOf("-Xjvm-default=all")
+tasks {
+    named<KotlinJvmCompile>("compileTestKotlin").configure {
+        if (name == "compileTestKotlin") {
+            compilerOptions {
+                jvmTarget.set(JVM_1_8)
+                freeCompilerArgs.add("-Xjvm-default=all")
+            }
+        }
     }
 }
 

@@ -1,8 +1,10 @@
 package org.http4k.tracing
 
 import org.http4k.events.Event
+import org.http4k.events.HttpEvent.Incoming
+import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.events.MetadataEvent
-import org.http4k.filter.TraceId
+import org.http4k.events.plus
 import org.http4k.tracing.CollectEvents.Collect
 import org.http4k.tracing.CollectEvents.Drop
 import org.http4k.tracing.tracer.TreeWalker
@@ -19,17 +21,44 @@ class TracerBullet(private val tracers: List<Tracer>) {
             .flatMap { event -> tracers.flatMap { it(event, Tracer.TreeWalker(tracers)) } }
 }
 
-internal fun List<MetadataEvent>.buildTree(): List<EventNode> {
+internal fun List<MetadataEvent>.buildTree() = groupBy { it.traces()?.traceId }
+    .mapValues { it.value.buildTreeForTrace() }
+    .flatMap { it.value }
+
+private fun List<MetadataEvent>.buildTreeForTrace(): List<EventNode> {
     val eventsByParent = groupBy { it.traces()?.parentSpanId }
 
-    fun createEventNodes(parentService: TraceId?): List<EventNode> =
-        (eventsByParent[parentService] ?: emptyList()).map { EventNode(it, createEventNodes(it.traces()?.spanId)) }
+    fun MetadataEvent.childEventNodes(): List<EventNode> =
+        eventsByParent[traces()?.spanId]
+            ?.map { EventNode(attachIncomingFor(it), it.childEventNodes()) }
+            ?: emptyList()
 
     val rootEvents = filter { event ->
         eventsByParent.none { it.value.any { it.traces()?.spanId == event.traces()?.parentSpanId } }
     }
-    return rootEvents.map { EventNode(it, createEventNodes(it.traces()?.spanId))
-    }
+
+    return rootEvents.map { EventNode(attachIncomingFor(it), it.childEventNodes()) }
+}
+
+private fun List<MetadataEvent>.attachIncomingFor(candidate: MetadataEvent): MetadataEvent {
+    val outgoing = candidate.event
+    return (when (outgoing) {
+        is Outgoing -> {
+            when (val incoming = asReversed()
+                .firstOrNull {
+                    val event = it.event
+                    event is Incoming &&
+                        it.metadata["traces"] == candidate.traces() &&
+                        event.uri.path == event.uri.path
+                }
+            ) {
+                null -> candidate
+                else -> candidate + (X_HTTP4K_INCOMING_EVENT to incoming)
+            }
+        }
+
+        else -> candidate
+    }) as MetadataEvent
 }
 
 private enum class CollectEvents { Collect, Drop }

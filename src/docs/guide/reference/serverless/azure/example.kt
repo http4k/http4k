@@ -7,6 +7,7 @@ import com.microsoft.azure.functions.HttpResponseMessage
 import com.microsoft.azure.functions.annotation.AuthorizationLevel.ANONYMOUS
 import com.microsoft.azure.functions.annotation.FunctionName
 import com.microsoft.azure.functions.annotation.HttpTrigger
+import dev.forkhandles.mock4k.mock
 import org.http4k.client.ApacheClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -22,7 +23,6 @@ import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
 import org.http4k.serverless.AzureFunction
 import org.http4k.serverless.FakeAzureRequest
-import java.lang.reflect.Proxy
 import java.util.Optional
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to ACF
@@ -88,7 +88,7 @@ fun main() {
             FakeAzureRequest(
                 Request(POST, "http://localhost:8000/echo")
                     .body("hello hello hello, i suppose this isn't 140 characters anymore..")
-            ), proxy()
+            ), mock()
         )
         println(response.status)
         println(response.body)
@@ -97,9 +97,3 @@ fun main() {
     runFunctionLocally()
     runFunctionAsAzureWould()
 }
-
-// helper method to stub the Lambda Context
-private inline fun <reified T> proxy(): T = Proxy.newProxyInstance(
-    T::class.java.classLoader,
-    arrayOf(T::class.java)
-) { _, _, _ -> TODO("not implemented") } as T

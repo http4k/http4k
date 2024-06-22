@@ -2,7 +2,6 @@ package org.http4k.events
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.filter.ZipkinTraces
 import org.http4k.filter.ZipkinTracesStorage
 import org.http4k.testing.RecordingEvents
 import org.http4k.util.FixedClock

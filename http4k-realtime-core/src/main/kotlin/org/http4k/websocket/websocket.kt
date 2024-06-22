@@ -18,7 +18,9 @@ interface Websocket {
     fun onMessage(fn: (WsMessage) -> Unit)
 }
 
-data class WsResponse(val consumer: WsConsumer): WsConsumer by consumer
+data class WsResponse(val subprotocol: String? = null, val consumer: WsConsumer) : WsConsumer by consumer {
+    constructor(consumer: WsConsumer) : this(null, consumer)
+}
 
 typealias WsConsumer = (Websocket) -> Unit
 

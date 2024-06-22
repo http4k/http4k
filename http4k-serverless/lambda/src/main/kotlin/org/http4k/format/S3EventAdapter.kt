@@ -75,8 +75,8 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
                             string("sourceIPAddress", sourceIPAddress)
                         }
                         obj("responseElements", responseElements) {
-                            string("xAmzId2", getxAmzId2())
-                            string("xAmzRequestId", getxAmzRequestId())
+                            string("x-amz-id-2", getxAmzId2())
+                            string("x-amz-request-id", getxAmzRequestId())
                         }
                         obj("userIdentity", userIdentity) {
                             string("principalId", principalId)
@@ -177,10 +177,10 @@ private fun JsonReader.requestParameters() =
     }
 
 private fun JsonReader.responseElements() =
-    obj({ it -> ResponseElementsEntity(it["xAmzId2"] as? String, it["xAmzRequestId"] as? String) }) {
+    obj({ it -> ResponseElementsEntity(it["x-amz-id-2"] as? String, it["x-amz-request-id"] as? String) }) {
         when (it) {
-            "xAmzId2" -> nextString()
-            "xAmzRequestId" -> nextString()
+            "x-amz-id-2" -> nextString()
+            "x-amz-request-id" -> nextString()
             else -> error("unknown key")
         }
     }

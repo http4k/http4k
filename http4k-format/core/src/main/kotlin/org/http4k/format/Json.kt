@@ -71,7 +71,11 @@ interface Json<NODE> {
     fun <IN : Any> BiDiLensSpec<IN, String>.json() = jsonLens(this)
 
     fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> =
-        httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
+        httpBodyRoot(
+            listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),
+            APPLICATION_JSON,
+            contentNegotiation
+        )
             .map({ it.payload.asString() }, { Body(it) })
             .map({ parse(it) }, { compact(it) })
 
@@ -81,7 +85,6 @@ interface Json<NODE> {
     ): BiDiBodyLensSpec<NODE> = body(description, contentNegotiation)
 
     fun WsMessage.Companion.json() = WsMessage.string().map({ parse(it) }, { compact(it) })
-
 
     fun textValueOf(node: NODE, name: String): String?
 

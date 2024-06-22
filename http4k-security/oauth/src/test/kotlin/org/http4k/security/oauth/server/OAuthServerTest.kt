@@ -24,7 +24,7 @@ class OAuthServerTest {
         val authenticationServer = customOauthAuthorizationServer()
         val consumerApp = oauthClientApp(authenticationServer)
 
-        val browser = Cookies().then(authenticationServer + consumerApp).debug()
+        val browser = Cookies().then(authenticationServer + consumerApp)
 
         val browserWithRedirection = FollowRedirects().then(browser)
 

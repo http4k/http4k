@@ -2,23 +2,28 @@ package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.Tag
 import org.http4k.contract.jsonschema.JsonSchema
+import org.http4k.contract.jsonschema.JsonSchemaCreator
+import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
-import org.http4k.contract.openapi.v3.BodyContent.*
+import org.http4k.contract.openapi.v3.BodyContent.FormContent
+import org.http4k.contract.openapi.v3.BodyContent.NoSchema
+import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
+import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.format.Json
-import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
-import java.util.*
 
 /**
  * Converts a API to OpenApi3 format JSON, using non-reflective JSON marshalling - this is the limited version
  *
  * If you are using Jackson, you probably want to use ApiRenderer.Auto()!
  */
-class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
-    private val refLocationPrefix = "components/schemas"
-    private val jsonToJsonSchema = JsonToJsonSchema(json, refLocationPrefix)
+class OpenApi3ApiRenderer<NODE : Any>(
+    private val json: Json<NODE>,
+    private val refLocationPrefix: String = "components/schemas",
+    private val jsonToJsonSchema: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json, refLocationPrefix),
+) : ApiRenderer<Api<NODE>, NODE> {
 
     override fun api(api: Api<NODE>): NODE =
         with(api) {
@@ -48,7 +53,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     private fun ApiServer.asJson() = json {
         obj(
             "url" to string(url.toString()),
-            "description" to string(description ?: "")
+            "description" to string(description.orEmpty())
         )
     }
 
@@ -216,7 +221,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     }
 
     private fun ApiInfo.asJson() = json {
-        obj("title" to string(title), "version" to string(version), "description" to string(description ?: ""))
+        obj("title" to string(title), "version" to string(version), "description" to string(description.orEmpty()))
     }
 
     private fun String?.asJson() = this?.let { json.string(it) } ?: json.nullNode()
@@ -241,7 +246,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
     private fun toEnumSchema(
         obj: Enum<*>,
         refModelNamePrefix: String?,
-        overrideDefinitionId: String?
+        overrideDefinitionId: String?,
     ): JsonSchema<NODE> {
         val newDefinition = json.obj(
             "example" to json.string(obj.name),
@@ -249,11 +254,10 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
             "enum" to json.array(obj.javaClass.enumConstants.map { json.string(it.name) })
         )
         val definitionId =
-            (refModelNamePrefix ?: "") + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
+            (refModelNamePrefix.orEmpty()) + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
         return JsonSchema(
-            json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) }, setOf(
-                definitionId to newDefinition
-            )
+            json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) },
+            setOf(definitionId to newDefinition)
         )
     }
 }

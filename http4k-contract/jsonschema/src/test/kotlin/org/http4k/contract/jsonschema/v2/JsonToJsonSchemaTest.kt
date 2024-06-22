@@ -4,7 +4,6 @@ import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
-import org.http4k.contract.jsonschema.v2.JsonToJsonSchema
 import org.http4k.lens.Header
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -56,10 +55,10 @@ class JsonToJsonSchemaTest {
         }, "bob", "prefix")
     }
 
-        private fun Approver.assertApproved(obj: com.fasterxml.jackson.databind.JsonNode, name: String, prefix: String? = null) {
+    private fun Approver.assertApproved(obj: com.fasterxml.jackson.databind.JsonNode, name: String, prefix: String? = null) {
         assertApproved(
             Response(Status.OK)
-            .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(org.http4k.format.Jackson.asFormatString(creator.toSchema(obj, name, prefix))))
+                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
+                .body(org.http4k.format.Jackson.asFormatString(creator.toSchema(obj, name, prefix))))
     }
 }

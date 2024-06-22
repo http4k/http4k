@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import com.squareup.moshi.Moshi.Builder
 import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.lens.BiDiMapping
@@ -144,10 +145,16 @@ bool:true
     @Test
     fun `custom moshi yaml`() {
         val moshi = MoshiYaml.custom {
-            text(BiDiMapping({StringHolder(it)},{it.value}))
+            text(BiDiMapping({ StringHolder(it) }, { it.value }))
         }
 
         val value = StringHolder("stuff")
         assertThat(moshi.asFormatString(value), equalTo("'\"stuff\"'\n"))
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { MoshiYaml.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Required value 'string' missing at \$"))
     }
 }

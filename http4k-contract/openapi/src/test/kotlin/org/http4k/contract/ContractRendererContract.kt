@@ -45,9 +45,13 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
 import org.http4k.lens.WebForm
+import org.http4k.lens.bigDecimal
+import org.http4k.lens.bigInteger
 import org.http4k.lens.boolean
+import org.http4k.lens.double
 import org.http4k.lens.enum
 import org.http4k.lens.int
+import org.http4k.lens.long
 import org.http4k.lens.multipartForm
 import org.http4k.lens.string
 import org.http4k.lens.webForm
@@ -59,6 +63,8 @@ import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.math.BigDecimal
+import java.math.BigInteger
 
 @ExtendWith(JsonApprovalTest::class)
 abstract class ContractRendererContract<NODE : Any>(
@@ -70,8 +76,8 @@ abstract class ContractRendererContract<NODE : Any>(
         val response = rendererToUse.badRequest(
             LensFailure(
                 listOf(
-                    Missing(Meta(true, "location1", StringParam, "name1")),
-                    Invalid(Meta(false, "location2", NumberParam, "name2"))
+                    Missing(Meta(true, "location1", StringParam, "name1", null, emptyMap())),
+                    Invalid(Meta(false, "location2", NumberParam, "name2", null, emptyMap()))
                 )
             )
         )
@@ -98,6 +104,8 @@ abstract class ContractRendererContract<NODE : Any>(
             Body.string(ContentType("custom/v2")).toLens()
         )
 
+        fun schemaOf(schema: Map<String, Any>) = mapOf("schema" to schema)
+
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             tags += Tag("hello", "world")
@@ -114,7 +122,7 @@ abstract class ContractRendererContract<NODE : Any>(
             routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") / Path.enum<Foo>()
                 .of("foo") bindContract POST to { a, _, _, _ -> { Response(OK).body(a) } }
             routes += "/queries" meta {
-                queries += Query.boolean().multi.required("b", "booleanQuery")
+                queries += Query.boolean().multi.required("b", "booleanQuery", schemaOf(mapOf("default" to listOf(true, false))))
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += Query.enum<Foo>().optional("e", "enumQuery")
@@ -127,10 +135,16 @@ abstract class ContractRendererContract<NODE : Any>(
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/headers" meta {
                 headers += Header.boolean().required("b", "booleanHeader")
-                headers += Header.string().optional("s", "stringHeader")
-                headers += Header.int().optional("i", "intHeader")
-                headers += Header.enum<HttpMessage, Foo>().optional("e", "enumHeader")
-                headers += json.jsonLens(Header).optional("j", "jsonHeader")
+                headers += Header.string().optional("s", "stringHeader", schemaOf(mapOf("pattern" to ".*", "nullable" to true)))
+                headers += Header.int().optional("i", "intHeader", schemaOf(mapOf("default" to 42)))
+                headers += Header.double().optional("d", "dHeader", schemaOf(mapOf("default" to 0.0)))
+                headers += Header.bigDecimal().optional("bd", "bigDHeader", schemaOf(mapOf("default" to BigDecimal("4.2"))))
+                headers += Header.bigInteger().optional("bi", "bigIHeader", schemaOf(mapOf("default" to BigInteger("6547262478"))))
+                headers += Header.long().optional("l", "lHeader", schemaOf(mapOf("default" to 8493575243L)))
+                headers += Header.map { listOf("a", "b") }.optional("list", "listHeader", schemaOf(mapOf("default" to listOf("a", "b"))))
+                headers += Header.map { mapOf("a" to "b") }.optional("obj", "objHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
+                headers += Header.enum<HttpMessage, Foo>().optional("e", "enumHeader", schemaOf(mapOf("default" to Foo.bar)))
+                headers += json.jsonLens(Header).optional("j", "jsonHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/body_receiving_string" meta {
                 summary = "body_receiving_string"

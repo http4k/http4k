@@ -10,6 +10,8 @@ import okio.source
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
@@ -26,7 +28,7 @@ import kotlin.reflect.KClass
 
 open class ConfigurableMoshi(
     builder: Moshi.Builder,
-    val defaultContentType: ContentType = APPLICATION_JSON,
+    override val defaultContentType: ContentType = APPLICATION_JSON,
     private val strictness: StrictnessMode = Lenient
 ) : AutoMarshallingJson<MoshiNode>() {
 
@@ -56,7 +58,7 @@ open class ConfigurableMoshi(
     override fun decimal(value: MoshiNode) = (value as MoshiDecimal).value.toBigDecimal()
     override fun integer(value: MoshiNode) = ((value as MoshiInteger).value)
     override fun bool(value: MoshiNode) = (value as MoshiBoolean).value
-    override fun text(value: MoshiNode) = when(value) {
+    override fun text(value: MoshiNode) = when (value) {
         is MoshiString -> value.value
         is MoshiBoolean -> value.value.toString()
         is MoshiInteger -> value.value.toString()
@@ -65,6 +67,7 @@ open class ConfigurableMoshi(
         is MoshiObject -> ""
         MoshiNull -> "null"
     }
+
     override fun elements(value: MoshiNode) = (value as MoshiArray).elements
     override fun fields(node: MoshiNode) = (node as? MoshiObject)
         ?.attributes
@@ -95,6 +98,16 @@ open class ConfigurableMoshi(
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = adapterFor(target).fromJson(
         input.source().buffer()
     )!!
+
+    /**
+     * Convenience function to write the object as JSON to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.json(t: T): R = with(Body.auto<T>().toLens() of t)
+
+    /**
+     * Convenience function to read an object as JSON from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
 
     override fun asJsonObject(input: Any): MoshiNode = MoshiNode.wrap(objectAdapter.toJsonValue(input))
 
@@ -160,8 +173,8 @@ fun Moshi.Builder.asConfigurable(
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
     override fun done() = this@asConfigurable
-        .add(kotlinFactory)
         .add(Unit::class.java, UnitAdapter)
+        .addLast(kotlinFactory)
 }
 
 private object UnitAdapter : JsonAdapter<Unit>() {
@@ -173,3 +186,6 @@ private object UnitAdapter : JsonAdapter<Unit>() {
         value?.let { writer.beginObject().endObject() } ?: writer.nullValue()
     }
 }
+
+inline operator fun <reified T : Any> ConfigurableMoshi.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableMoshi.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

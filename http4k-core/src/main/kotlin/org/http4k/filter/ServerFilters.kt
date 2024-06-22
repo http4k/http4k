@@ -9,6 +9,7 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
@@ -18,12 +19,16 @@ import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
+import org.http4k.filter.ZipkinTraces.Companion.X_B3_PARENTSPANID
+import org.http4k.filter.ZipkinTraces.Companion.X_B3_SPANID
+import org.http4k.filter.ZipkinTraces.Companion.X_B3_TRACEID
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 import org.http4k.lens.RequestContextLens
+import org.http4k.lens.bearerToken
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
@@ -77,6 +82,32 @@ object ServerFilters {
                 )
             }
         }
+    }
+
+    /**
+     * Checks that client supplied values are valid, and either remove or reject
+     */
+    object ValidateRequestTracingHeaders {
+        private val X_B3_FORMAT: (TraceId) -> Boolean = "^[a-fA-F0-9-]+$".toRegex()
+            .let { { part -> part.value.length in 10..32 && it.matches(part.value) } }
+
+        operator fun invoke(rejectStatus: Status? = null, tracePredicate: (TraceId) -> Boolean = X_B3_FORMAT) =
+            Filter { next ->
+                {
+                    val traceParts = listOfNotNull(X_B3_TRACEID(it), X_B3_SPANID(it), X_B3_PARENTSPANID(it))
+                    when {
+                        traceParts.isEmpty() -> next(it)
+                        else ->
+                            when {
+                                traceParts.all(tracePredicate) -> next(it)
+                                else -> when {
+                                    rejectStatus != null -> Response(rejectStatus)
+                                    else -> next(it.removeHeaders("x-b3-"))
+                                }
+                            }
+                    }
+                }
+            }
     }
 
     /**
@@ -169,12 +200,6 @@ object ServerFilters {
                     ?: Response(UNAUTHORIZED)
             }
         }
-
-        private fun Request.bearerToken(): String? = header("Authorization")
-            ?.trim()
-            ?.takeIf { it.startsWith("Bearer") }
-            ?.substringAfter("Bearer")
-            ?.trim()
     }
 
     /**
@@ -213,8 +238,9 @@ object ServerFilters {
      * This is required when using lenses to automatically unmarshall inbound requests.
      * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
      */
-    object CatchLensFailure :
-        Filter by CatchLensFailure({ lensFailure -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; "))) })
+    val CatchLensFailure = CatchLensFailure { lensFailure ->
+        Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
+    }
 
     /**
      * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).

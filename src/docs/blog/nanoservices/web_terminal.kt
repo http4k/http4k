@@ -9,6 +9,7 @@ import org.http4k.websocket.WsMessage
 import java.lang.Runtime.getRuntime
 import java.util.Scanner
 
+@Suppress("DEPRECATION")
 fun `websocket terminal`() =
     { ws: Websocket ->
         ws.onMessage {

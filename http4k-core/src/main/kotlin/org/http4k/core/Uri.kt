@@ -64,7 +64,7 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 
 fun Uri.removeQuery(name: String) = copy(query = query.toParameters().filterNot { it.first == name }.toUrlFormEncoded())
 
-fun Uri.removeQueries(prefix: String) =
+fun Uri.removeQueries(prefix: String= "") =
     copy(query = query.toParameters().filterNot { it.first.startsWith(prefix) }.toUrlFormEncoded())
 
 fun Uri.query(name: String, value: String?): Uri =
@@ -99,8 +99,71 @@ fun String.toPathSegmentDecoded(): String =
     this.replace("+", "%2B").urlDecoded()
 
 fun Uri.extend(uri: Uri): Uri =
-    appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())
+    appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded(),
+        fragment = uri.fragment.takeIf { it.isNotEmpty() } ?: fragment)
 
 fun Uri.appendToPath(pathToAppend: String?): Uri =
     if (pathToAppend.isNullOrBlank()) this
     else copy(path = (path.removeSuffix("/") + "/" + pathToAppend.removePrefix("/")))
+
+fun Uri.relative(relative: String): Uri = if (relative == "") this else this.relative(Uri.of(relative))
+
+// Implementation of relative resolution as per [RFC3986 5.2](https://datatracker.ietf.org/doc/html/rfc3986#section-5.2)
+fun Uri.relative(relative: Uri): Uri {
+    fun String.merge(relativePath: String): String {
+        return when {
+            this == "" -> if (relativePath[0] == '/') relativePath else "/$relativePath"
+            else -> lastIndexOf('/').let { this.slice(0..(it)) } + relativePath
+        }
+    }
+
+    return when {
+        relative.scheme != "" -> relative
+        relative.authority != "" -> Uri(scheme, relative.userInfo, relative.host, relative.port, relative.path, relative.query, relative.fragment)
+        relative.path == "" -> Uri(scheme, userInfo, host, port, path, if (relative.query == "") query else relative.query, relative.fragment)
+        relative.path.startsWith("/") -> Uri(scheme, userInfo, host, port, relative.path.normalizePath(), relative.query, relative.fragment)
+        else -> Uri(scheme, userInfo, host, port, path.merge(relative.path).normalizePath(), relative.query, relative.fragment)
+    }
+}
+
+private fun String.normalizePath(): String {
+    fun String.replacePrefix(original: String, newPrefix: String): String = newPrefix + (removePrefix(original))
+    fun String.removeLastSegment(): String = lastIndexOf('/').let { this.slice(0..<it) }
+    fun String.secondIndexOf(char: Char): Int = indexOf(char, indexOf(char) + 1)
+    fun String.firstSegment() = when {
+        startsWith("/") -> if (secondIndexOf('/') == -1) this else slice(0..<secondIndexOf('/'))
+        else -> if (indexOf('/') == -1) this else slice(0..<indexOf('/'))
+    }
+
+    var input = this
+    var output = ""
+
+    while (input.isNotBlank()) {
+        when {
+            input.startsWith("./") -> input = input.removePrefix("./")
+            input.startsWith("../") -> input = input.removePrefix("../")
+            input.startsWith("/./") -> input = input.replacePrefix("/./", "/")
+            input.startsWith("/../") -> {
+                input = input.replacePrefix("/../", "/")
+                output = output.removeLastSegment()
+            }
+            input.firstSegment() == "/.." -> {
+                input = input.replacePrefix("/..", "/")
+                output = output.removeLastSegment()
+            }
+
+            input.firstSegment() == "/." -> input = input.replacePrefix("/.", "/")
+
+            input == "." -> input = ""
+            input == ".." -> input = ""
+            else -> {
+                val newFirstSegment: String = input.firstSegment()
+
+                input = input.removePrefix(newFirstSegment)
+                output += newFirstSegment
+            }
+        }
+    }
+
+    return output
+}

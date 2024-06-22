@@ -2,8 +2,20 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.ubertob.kondor.json.*
+import com.natpryce.hamkrest.startsWith
+import com.ubertob.kondor.json.JAny
+import com.ubertob.kondor.json.JBigDecimal
+import com.ubertob.kondor.json.JBigInteger
+import com.ubertob.kondor.json.JField
+import com.ubertob.kondor.json.JInt
+import com.ubertob.kondor.json.JMap
+import com.ubertob.kondor.json.JString
+import com.ubertob.kondor.json.JStringRepresentable
+import com.ubertob.kondor.json.array
+import com.ubertob.kondor.json.bool
 import com.ubertob.kondor.json.jsonnode.JsonNodeObject
+import com.ubertob.kondor.json.obj
+import com.ubertob.kondor.json.str
 import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -31,7 +43,6 @@ import org.http4k.lens.StringBiDiMappings.zoneOffset
 import org.http4k.lens.StringBiDiMappings.zonedDateTime
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.util.*
 
 class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     KondorJson {
@@ -65,6 +76,11 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     @Disabled("not supported")
     override fun `roundtrip arbitrary array`() {
         super.`roundtrip arbitrary array`()
+    }
+
+    @Test
+    @Disabled
+    override fun `serialises enum as a key correctly`() {
     }
 
     @Test
@@ -111,6 +127,15 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
+    fun `roundtrip arbitrary object to and from ws body`() {
+        val body = customMarshaller().wsAutoBody(ArbObject::class).toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(body(obj)), equalTo(obj))
+    }
+
+    @Test
     fun `default content type`() {
         val body = customMarshaller().autoBody<ArbObject>().toLens()
 
@@ -129,6 +154,34 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(Request(Method.POST, "/").with(body of obj), hasContentType(ContentType.Text("application/some-custom+json")))
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        val marshaller = KondorJson(ContentType.Text("application/some-custom+json")) {
+            register(JArbObject)
+        }
+
+        assertThat(runCatching { marshaller.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Error reading property <string> of node <[root]"))
+    }
+
+    @Test
+    fun `roundtrip arbitrary object to and from body using converter body lens`() {
+        val body = JArbObject.autoBody().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(Response(Status.OK).with(body of obj)), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip arbitrary object to and from ws body using converter body lens`() {
+        val body = JArbObject.wsAutoBody().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(body(obj)), equalTo(obj))
     }
 }
 

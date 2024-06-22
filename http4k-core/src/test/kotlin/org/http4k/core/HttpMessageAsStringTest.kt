@@ -118,9 +118,10 @@ HTTP/1.1 200
 
     @Test
     fun `parse using other character as line break`() {
-        assertThat(Request.parse("""GET http://www.somewhere.com/path HTTP/1.1,,body""", ","),
-            equalTo(Request(GET, Uri.of("http://www.somewhere.com/path")).body(Body("body"))
-        ))
+        assertThat(
+            Request.parse("""GET http://www.somewhere.com/path HTTP/1.1,,body""", ","),
+            equalTo(Request(GET, Uri.of("http://www.somewhere.com/path")).body(Body("body")))
+        )
     }
 
     private fun assertParsingFailure(action: () -> Any, message: String) {

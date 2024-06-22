@@ -1,10 +1,8 @@
 package org.http4k.testing
 
 import org.http4k.core.Request
-import org.http4k.server.PolyHandler
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.Websocket
-import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse
@@ -26,6 +24,7 @@ class TestWebsocket(response: WsResponse) : PushPullAdaptingWebSocket() {
         }
 
         override fun close(status: WsStatus) {
+            triggerClose(status)
             client.triggerClose(status)
         }
     }

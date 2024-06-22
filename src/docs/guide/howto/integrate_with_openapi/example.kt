@@ -19,7 +19,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.CachingFilters.Response.NoCache
+import org.http4k.filter.CachingFilters.CacheResponse.NoCache
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.ResponseFilters
 import org.http4k.filter.ServerFilters
@@ -45,7 +45,7 @@ fun main() {
         )
     }
 
-    val ageQuery = Query.int().required("age")
+    val ageQuery = Query.int().required("age", "Your age", mapOf("schema" to mapOf("minimum" to 18)))
     fun echo(name: String): HttpHandler = {
         Response(OK).with(
             Body.string(TEXT_PLAIN).toLens() of "hello $name you are ${ageQuery(it)}"

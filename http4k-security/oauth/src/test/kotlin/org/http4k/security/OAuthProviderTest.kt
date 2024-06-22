@@ -45,9 +45,9 @@ class OAuthProviderTest {
         persistence: OAuthPersistence,
         status: Status = OK,
         responseType: ResponseType = ResponseType.Code,
-        nonceFromIdToken:Nonce? = null,
-        resultIdTokenFromAuth:  Result<Unit, OAuthCallbackError.InvalidIdToken> = Success(Unit),
-        resultIdTokenFromAccessToken:  Result<Unit, OAuthCallbackError.InvalidIdToken> = Success(Unit)
+        nonceFromIdToken: Nonce? = null,
+        resultIdTokenFromAuth: Result<Unit, OAuthCallbackError.InvalidIdToken> = Success(Unit),
+        resultIdTokenFromAccessToken: Result<Unit, OAuthCallbackError.InvalidIdToken> = Success(Unit)
     ): OAuthProvider = OAuthProvider(
         providerConfig,
         { Response(status).body("access token goes here").header("request-uri", it.uri.toString()) },
@@ -58,7 +58,7 @@ class OAuthProviderTest {
         { CrossSiteRequestForgeryToken("randomCsrf") },
         { Nonce("randomNonce") },
         responseType,
-        idTokenConsumer = object:IdTokenConsumer{
+        idTokenConsumer = object : IdTokenConsumer {
             override fun nonceFromIdToken(idToken: IdToken) = nonceFromIdToken
             override fun consumeFromAuthorizationResponse(idToken: IdToken) = resultIdTokenFromAuth
             override fun consumeFromAccessTokenResponse(idToken: IdToken) = resultIdTokenFromAccessToken
@@ -138,21 +138,21 @@ class OAuthProviderTest {
     }
 
     @Test
-    fun `api - uses base api uri`(){
+    fun `api - uses base api uri`() {
         val response = oAuth(oAuthPersistence).api(Request(GET, "/some-resource"))
 
         assertThat(response, hasHeader("request-uri", equalTo("http://apiHost/api/some-resource")))
     }
 
     @Test
-    fun `id token - can fail from id_token from callback request`(){
+    fun `id token - can fail from id_token from callback request`() {
         val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAuth = Failure(OAuthCallbackError.InvalidIdToken("some reason")))
 
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }
 
     @Test
-    fun `id token - can fail from id_token from access token response`(){
+    fun `id token - can fail from id_token from access token response`() {
         val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAccessToken = Failure(OAuthCallbackError.InvalidIdToken("some reason")))
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }

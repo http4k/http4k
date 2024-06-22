@@ -15,7 +15,7 @@ fun main() {
     // a standard websocket app
     val server = websockets(
         "/bob" bind
-            { req: Request ->
+            { _: Request ->
                 WsResponse { ws ->
                     ws.send(WsMessage("bob"))
                     ws.onMessage {

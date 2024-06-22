@@ -11,4 +11,5 @@ data class OAuthProviderConfig(
     val credentials: Credentials,
     val apiBase: Uri = authBase,
     val authUri: Uri = authBase.extend(Uri.of(authPath)),
-    val tokenUri: Uri = authBase.extend(Uri.of(tokenPath)))
+    val tokenUri: Uri = authBase.extend(Uri.of(tokenPath))
+)

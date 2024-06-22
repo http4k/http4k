@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.SealedChild"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.SealedChild"
   },
   "definitions": [
     {
@@ -9,7 +9,8 @@
         "properties": {
           "string": {
             "example": "child",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {

@@ -3,6 +3,7 @@ package org.http4k.cloudnative.env
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.lens.secret
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.FileNotFoundException
@@ -59,6 +60,16 @@ class EnvironmentTest {
 
         assertThat(finalEnv["FOO"], equalTo("bob"))
         assertThat(default(finalEnv), equalTo("bill"))
+    }
+
+    @Test
+    fun `defaults secret`() {
+        val secret = EnvironmentKey.secret().required("PASSWORD")
+        val env = Environment.defaults(secret of Secret("hunter2"))
+
+        env[secret].use { password ->
+            assertThat(password, equalTo("hunter2"))
+        }
     }
 
     @Test

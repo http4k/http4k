@@ -4,6 +4,8 @@ import com.squareup.moshi.Moshi
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_YAML
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -23,7 +25,8 @@ import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
 open class ConfigurableMoshiYaml(
-    builder: Moshi.Builder, val defaultContentType: ContentType = APPLICATION_YAML,
+    builder: Moshi.Builder,
+    override val defaultContentType: ContentType = APPLICATION_YAML,
     private val yamlDumperOptions: DumperOptions = defaultDumperOptions,
     private val resolver: Resolver = MinimalResolver,
     strictness: StrictnessMode = Lenient
@@ -40,7 +43,7 @@ open class ConfigurableMoshiYaml(
         val str = json.asFormatString(input)
         val yaml = yaml()
 
-        return when(input) {
+        return when (input) {
             is Iterable<*> -> yaml.dump(json.asA<List<Any>>(str))
             is Array<*> -> yaml.dump(json.asA<Array<Any>>(str))
             else -> try {
@@ -69,6 +72,16 @@ open class ConfigurableMoshiYaml(
         description, contentNegotiation,
         defaultContentType
     ).map({ asA(it) }, ::asFormatString)
+
+    /**
+     * Convenience function to write the object as YAML to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.yaml(t: T): R = with(Body.auto<T>().toLens() of t)
+
+    /**
+     * Convenience function to read an object as JSON from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
 }
 
 val defaultDumperOptions = DumperOptions().apply {

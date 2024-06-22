@@ -2,7 +2,11 @@ package org.http4k.testing
 
 import com.github.dockerjava.api.async.ResultCallback
 import com.github.dockerjava.api.command.BuildImageResultCallback
-import com.github.dockerjava.api.model.*
+import com.github.dockerjava.api.model.ExposedPort
+import com.github.dockerjava.api.model.Frame
+import com.github.dockerjava.api.model.HostConfig
+import com.github.dockerjava.api.model.LogConfig
+import com.github.dockerjava.api.model.Ports
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
@@ -210,17 +214,17 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
         events(DockerEvent.ContainerStopped(containerId.value))
     }
 
-    sealed class DockerEvent : Event {
-        object ServerStartedRequested : DockerEvent()
-        object WorkspacePrepared : DockerEvent()
-        data class RelevantContainersFound(val ids: List<Pair<String, String>>) : DockerEvent()
-        object StartedCreatingContainer : DockerEvent()
-        data class ContainerCreated(val id: String) : DockerEvent()
-        data class ContainerKilled(val id: String) : DockerEvent()
-        data class ServerStopRequested(val id: String) : DockerEvent()
-        data class ContainerStopped(val id: String) : DockerEvent()
-        data class ContainerRemoved(val id: String) : DockerEvent()
-        object ServerReady : DockerEvent()
+    sealed interface DockerEvent : Event {
+        data object ServerStartedRequested : DockerEvent
+        data object WorkspacePrepared : DockerEvent
+        data class RelevantContainersFound(val ids: List<Pair<String, String>>) : DockerEvent
+        data object StartedCreatingContainer : DockerEvent
+        data class ContainerCreated(val id: String) : DockerEvent
+        data class ContainerKilled(val id: String) : DockerEvent
+        data class ServerStopRequested(val id: String) : DockerEvent
+        data class ContainerStopped(val id: String) : DockerEvent
+        data class ContainerRemoved(val id: String) : DockerEvent
+        data object ServerReady : DockerEvent
     }
 }
 

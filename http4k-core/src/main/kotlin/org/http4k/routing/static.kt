@@ -26,7 +26,7 @@ fun static(
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
 ): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
 
-internal data class StaticRoutingHttpHandler(
+data class StaticRoutingHttpHandler(
     private val pathSegments: String,
     private val resourceLoader: ResourceLoader,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
@@ -47,6 +47,8 @@ internal data class StaticRoutingHttpHandler(
     } ?: RouterMatch.Unmatched(description)
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
+
+    override fun toString() = description.friendlyToString()
 }
 
 internal class ResourceLoadingHandler(
@@ -56,21 +58,36 @@ internal class ResourceLoadingHandler(
 ) : HttpHandler {
     private val extMap = MimeTypes(extraFileExtensionToContentTypes)
 
-    override fun invoke(p1: Request): Response = if (p1.uri.path.startsWith(pathSegments)) {
-        val path = convertPath(p1.uri.path)
+    override fun invoke(p1: Request): Response = if (isStartingWithPathSegment(p1) && p1.method == GET) {
+        load(convertPath(p1.uri.path))
+    } else Response(NOT_FOUND)
+
+    private fun load(path: String): Response =
+        loadPath(path)
+            ?: loadPath(pathWithIndex(path))
+            ?: Response(NOT_FOUND)
+
+    private fun loadPath(path: String): Response? =
         resourceLoader.load(path)?.let { url ->
             val lookupType = extMap.forFile(path)
-            if (p1.method == GET && lookupType != OCTET_STREAM) {
+            if (lookupType != OCTET_STREAM) {
                 Response(OK)
                     .with(CONTENT_TYPE of lookupType)
                     .body(Body(url.openStream()))
-            } else Response(NOT_FOUND)
-        } ?: Response(NOT_FOUND)
-    } else Response(NOT_FOUND)
+            } else null
+        }
+
+    private fun pathWithIndex(path: String): String {
+        val newPath = if (path.endsWith("/")) "${path}index.html" else "$path/index.html"
+        return newPath.trimStart('/')
+    }
 
     private fun convertPath(path: String): String {
         val newPath = if (pathSegments == "/" || pathSegments == "") path else path.replaceFirst(pathSegments, "")
         val resolved = if (newPath == "/" || newPath.isBlank()) "/index.html" else newPath
         return resolved.trimStart('/')
     }
+
+    private fun isStartingWithPathSegment(p1: Request) =
+        (p1.uri.path.startsWith(pathSegments) || p1.uri.path.startsWith("/$pathSegments"))
 }

@@ -1,7 +1,7 @@
 package org.http4k.server
 
-import io.helidon.nima.webserver.WebServer
-import io.helidon.nima.webserver.http.HttpRouting.builder
+import io.helidon.webserver.WebServer
+import io.helidon.webserver.http.HttpRouting
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode.Immediate
 
@@ -10,7 +10,7 @@ class Helidon(val port: Int = 8000) : ServerConfig {
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val server = WebServer.builder()
-            .addRouting(builder().any(HelidonHandler(http)))
+            .addRouting(HttpRouting.builder().any(HelidonHandler(http)))
             .port(port)
             .build()
 

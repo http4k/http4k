@@ -12,7 +12,7 @@ import java.util.ArrayDeque
 /**
  * A class that is used for *offline* testing of a routed Sse, without starting up a Server.
  */
-class TestSseClient internal constructor(sseResponse: SseResponse) : SseClient {
+class TestSseClient internal constructor(sseResponse: SseResponse, request: Request) : SseClient {
 
     val status = sseResponse.status
     val headers = sseResponse.headers
@@ -23,7 +23,7 @@ class TestSseClient internal constructor(sseResponse: SseResponse) : SseClient {
         queue.remove()()
     }
 
-    private val socket = object : PushAdaptingSse() {
+    private val socket = object : PushAdaptingSse(request) {
         init {
             sseResponse.consumer(this)
             onClose { queue.add { null } }
@@ -41,5 +41,5 @@ class TestSseClient internal constructor(sseResponse: SseResponse) : SseClient {
     override fun close() = socket.triggerClose()
 }
 
-fun SseHandler.testSseClient(request: Request): TestSseClient = TestSseClient(invoke(request))
+fun SseHandler.testSseClient(request: Request): TestSseClient = TestSseClient(invoke(request), request)
 fun PolyHandler.testSseClient(request: Request): TestSseClient = sse?.testSseClient(request) ?: error("No SSE handler set.")

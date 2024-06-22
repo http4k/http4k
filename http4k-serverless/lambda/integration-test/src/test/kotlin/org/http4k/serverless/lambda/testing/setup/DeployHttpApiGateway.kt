@@ -2,33 +2,27 @@ package org.http4k.serverless.lambda.testing.setup
 
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.JavaHttpClient
-import org.http4k.cloudnative.env.Timeout
+import org.http4k.connect.amazon.apigatewayv2.action.createApi
+import org.http4k.connect.amazon.apigatewayv2.action.createDefaultRoute
+import org.http4k.connect.amazon.apigatewayv2.action.createLambdaIntegration
+import org.http4k.connect.amazon.apigatewayv2.action.createStage
+import org.http4k.connect.amazon.apigatewayv2.action.delete
+import org.http4k.connect.amazon.apigatewayv2.action.listApis
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v1
+import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion.v2
+import org.http4k.connect.amazon.apigatewayv2.model.ApiName
+import org.http4k.connect.amazon.apigatewayv2.model.Stage
+import org.http4k.connect.amazon.lambda.action.list
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV1
+import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.serverless.lambda.testing.client.apiGatewayApiClient
 import org.http4k.serverless.lambda.testing.client.awsLambdaApiClient
 import org.http4k.serverless.lambda.testing.setup.DeployServerAsLambdaForClientContract.functionName
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion.v1
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiIntegrationVersion.v2
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.ApiName
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.Stage
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createApi
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createDefaultRoute
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createLambdaIntegration
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.createStage
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.delete
-import org.http4k.serverless.lambda.testing.setup.aws.apigatewayv2.listApis
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV1
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.LambdaIntegrationType.ApiGatewayV2
-import org.http4k.serverless.lambda.testing.setup.aws.lambda.list
-import org.junit.jupiter.api.fail
-import java.time.Duration
-import java.time.Instant
 
 object DeployHttpApiGateway {
 
@@ -59,7 +53,7 @@ object DeployHttpApiGateway {
 
         apiGateway.createDefaultRoute(api.apiId, integrationId)
 
-        waitUntil(OK) {
+        retryUntil(OK) {
             JavaHttpClient()(Request(GET, api.apiEndpoint.path("/empty"))).also { println(it.status) }
         }
     }
@@ -76,21 +70,3 @@ fun main() {
     ApiIntegrationVersion.values().forEach(DeployHttpApiGateway::deploy)
 }
 
-fun waitUntil(
-    status: Status,
-    timeout: Timeout = Timeout(Duration.ofSeconds(5)),
-    retryEvery: Duration = Duration.ofMillis(500),
-    action: () -> Response
-) {
-    val start = Instant.now()
-    var success: Boolean
-    do {
-        success = action().status == status
-        if (!success) {
-            if (Duration.ofMillis(Instant.now().toEpochMilli() - start.toEpochMilli()) > timeout.value) {
-                fail("Timed out after ${timeout.value}")
-            }
-            Thread.sleep(retryEvery.toMillis())
-        }
-    } while (!success)
-}

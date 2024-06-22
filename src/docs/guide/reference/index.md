@@ -40,6 +40,7 @@ description: Details about the various http4k integration libraries
 
 ### Messaging formats
 <a href="/guide/reference/json"><span class="pill">Argo</span></a>
+<a href="/guide/reference/dataframe"><span class="pill">DataFrame</span></a>
 <a href="/guide/reference/json"><span class="pill">Gson</span></a>
 <a href="/guide/reference/xml"><span class="pill">Gson XML</span></a>
 <a href="/guide/reference/json"><span class="pill">Jackson</span></a>
@@ -54,12 +55,12 @@ description: Details about the various http4k integration libraries
 ### Templating libraries
 <a href="/guide/reference/templating"><span class="pill">Freemarker</span></a>
 <a href="/guide/reference/templating"><span class="pill">Handlebars</span></a>
-<a href="/guide/reference/templating"><span class="pill">Jade4j</span></a>
+<a href="/guide/reference/templating"><span class="pill">Pug4j</span></a>
 <a href="/guide/reference/templating"><span class="pill">Rocker</span></a>
 <a href="/guide/reference/templating"><span class="pill">Pebble</span></a>
 <a href="/guide/reference/templating"><span class="pill">Thymeleaf</span></a>
 
-### Cloud-Native & Observability
+### Cloud-Native/Observability/Misc
 <a href="/guide/reference/aws"><span class="pill">AWS</span></a>
 <a href="/guide/reference/cloud_native"><span class="pill">Cloud Native Configuration</span></a>
 <a href="/guide/reference/cloud_events"><span class="pill">Cloud Events</span></a>
@@ -69,12 +70,15 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/opentelemetry"><span class="pill">OpenTelemetry</span></a>
 <a href="/guide/reference/resilience4j"><span class="pill">Resilience4J</span></a>
 <a href="/guide/reference/failsafe"><span class="pill">FailSafe</span></a>
+<a href="/guide/reference/htmx"><span class="pill">htmx</span></a>
+<a href="/guide/reference/webhooks"><span class="pill">Webhooks</span></a>
 
 ### Testing
 <a href="/guide/reference/approvaltests"><span class="pill">Approval Testing</span></a>
-<a href="/guide/reference/chaos"><span class="pill">Chaos Monkey</span></a>
+<a href="/guide/reference/chaos"><span class="pill">Chaos Testing</span></a>
 <a href="/guide/reference/hamkrest"><span class="pill">Hamkrest</span></a>
 <a href="/guide/reference/kotest"><span class="pill">Kotest</span></a>
+<a href="/guide/reference/playwright"><span class="pill">Playwright</span></a>
 <a href="/guide/reference/strikt"><span class="pill">Strikt</span></a>
 <a href="/guide/reference/servicevirtualisation"><span class="pill">Servirtium</span></a>
 <a href="/guide/reference/webdriver"><span class="pill">WebDriver</span></a>

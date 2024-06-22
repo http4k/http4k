@@ -13,7 +13,7 @@ import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.HttpMessage
 import org.http4k.format.JacksonYaml
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.testing.ApprovalContent.Companion.HttpBodyOnly
+import org.http4k.testing.ApprovalContent.Companion.HttpTextBody
 import org.http4k.testing.TestNamer.Companion.ClassAndMethod
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
@@ -51,7 +51,7 @@ interface BaseApprovalTest : BeforeTestExecutionCallback, ParameterResolver {
 class ApprovalTest : BaseApprovalTest {
     override fun approverFor(context: ExtensionContext): Approver = NamedResourceApprover(
         ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
-        HttpBodyOnly(),
+        HttpTextBody(),
         FileSystemApprovalSource(File("src/test/resources"))
     )
 }
@@ -70,11 +70,13 @@ abstract class ContentTypeAwareApprovalTest(
             assertEquals(contentType, CONTENT_TYPE(httpMessage))
         }
 
-        private val delegate = NamedResourceApprover(
+        private val delegate: Approver = NamedResourceApprover(
             testNamer.nameFor(context.requiredTestClass, context.requiredTestMethod),
-            HttpBodyOnly(::format),
+            HttpTextBody(::format),
             approvalSource
         )
+
+        override fun withNameSuffix(suffix: String): Approver = delegate.withNameSuffix(suffix)
     }
 
     abstract fun format(input: String): String

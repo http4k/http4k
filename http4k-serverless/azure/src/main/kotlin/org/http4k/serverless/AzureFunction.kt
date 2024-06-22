@@ -25,8 +25,10 @@ abstract class AzureFunction(appLoader: AppLoaderWithContexts) {
     private val contexts = RequestContexts("azure")
     private val app = appLoader(System.getenv(), contexts)
 
-    abstract fun handleRequest(req: HttpRequestMessage<Optional<String>>,
-                               ctx: ExecutionContext): HttpResponseMessage
+    abstract fun handleRequest(
+        req: HttpRequestMessage<Optional<String>>,
+        ctx: ExecutionContext
+    ): HttpResponseMessage
 
     protected fun handle(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext) =
         CatchAll()
@@ -36,8 +38,10 @@ abstract class AzureFunction(appLoader: AppLoaderWithContexts) {
             .asAzure(request)
 }
 
-private fun AddAzure(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext,
-                     contexts: RequestContexts) = Filter { next ->
+private fun AddAzure(
+    request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext,
+    contexts: RequestContexts
+) = Filter { next ->
     {
         contexts[it][AZURE_CONTEXT_KEY] = ctx
         contexts[it][AZURE_REQUEST_KEY] = request

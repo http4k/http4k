@@ -27,8 +27,6 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.security.CredentialsProvider
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 
 object ClientFilters {
 
@@ -177,7 +175,18 @@ object ClientFilters {
                 } else it
             }
 
-        private fun Request.toNewLocation(location: String) = ensureValidMethodForRedirect().uri(newLocation(location))
+        private fun Request.toNewLocation(location: String): Request {
+            val newUri = newLocation(location)
+            val redirect = ensureValidMethodForRedirect().uri(newUri)
+
+            return when {
+                header("host") != null && newUri.host.isNotEmpty() ->
+                    redirect.replaceHeader("host",
+                    "${newUri.host}${newUri.port?.let { port -> ":$port" } ?: ""}")
+
+                else -> redirect
+            }
+        }
 
         private fun Response.location() = header("location")?.replace(";\\s*charset=.*$".toRegex(), "").orEmpty()
 
@@ -209,9 +218,14 @@ object ClientFilters {
         operator fun invoke(
             clock: Clock = Clock.systemDefaultZone(),
             storage: CookieStorage = BasicCookieStorage()
+        ) = invoke(clock::instant, storage)
+
+        operator fun invoke(
+            timeSource: () -> Instant,
+            storage: CookieStorage = BasicCookieStorage()
         ): Filter = Filter { next ->
             { request ->
-                val now = clock.instant()
+                val now = timeSource()
                 removeExpired(now, storage)
                 val response = next(request.withLocalCookies(storage))
                 storage.store(response.cookies().map { LocalCookie(it, now) })
@@ -225,8 +239,6 @@ object ClientFilters {
 
         private fun removeExpired(now: Instant, storage: CookieStorage) =
             storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
-
-        private fun Clock.now() = LocalDateTime.ofInstant(instant(), ZoneOffset.UTC)
     }
 
     /**

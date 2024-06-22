@@ -5,7 +5,7 @@ import org.http4k.core.Body
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.websocket.WsMessage
 
-internal val meta = Meta(true, "websocket", ObjectParam, "message")
+internal val meta = Meta(true, "websocket", ObjectParam, "message", null, emptyMap())
 
 /**
  * Represents a extraction of an entity from a target WsMessage.

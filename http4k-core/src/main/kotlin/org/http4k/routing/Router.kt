@@ -41,6 +41,9 @@ interface Router {
 }
 
 data class RouterDescription(val description: String, val children: List<RouterDescription> = listOf()) {
+
+    override fun toString(): String = friendlyToString()
+
     companion object {
         val unavailable = RouterDescription("unavailable")
     }
@@ -49,22 +52,43 @@ data class RouterDescription(val description: String, val children: List<RouterD
 /**
  * The result of a matching operation. May or may not contain a matched HttpHandler.
  */
-sealed class RouterMatch(private val priority: Int, open val description: RouterDescription, open val subMatches: List<RouterMatch>) : Comparable<RouterMatch> {
-    data class MatchingHandler(private val httpHandler: HttpHandler, override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(0, description, subMatches), HttpHandler {
+sealed class RouterMatch(
+    private val priority: Int,
+    open val description: RouterDescription,
+    open val subMatches: List<RouterMatch>
+) : Comparable<RouterMatch> {
+    data class MatchingHandler(
+        private val httpHandler: HttpHandler,
+        override val description: RouterDescription,
+        override val subMatches: List<RouterMatch> = listOf()
+    ) : RouterMatch(0, description, subMatches), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
-        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
+        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch =
+            copy(description = description, subMatches = fromMatches)
     }
 
-    data class MatchedWithoutHandler(override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(1, description, subMatches) {
-        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
+    data class MatchedWithoutHandler(
+        override val description: RouterDescription,
+        override val subMatches: List<RouterMatch> = listOf()
+    ) : RouterMatch(1, description, subMatches) {
+        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch =
+            copy(description = description, subMatches = fromMatches)
     }
 
-    data class MethodNotMatched(override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(2, description, subMatches) {
-        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
+    data class MethodNotMatched(
+        override val description: RouterDescription,
+        override val subMatches: List<RouterMatch> = listOf()
+    ) : RouterMatch(2, description, subMatches) {
+        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch =
+            copy(description = description, subMatches = fromMatches)
     }
 
-    data class Unmatched(override val description: RouterDescription, override val subMatches: List<RouterMatch> = listOf()) : RouterMatch(3, description, subMatches) {
-        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch = copy(description = description, subMatches = fromMatches)
+    data class Unmatched(
+        override val description: RouterDescription,
+        override val subMatches: List<RouterMatch> = listOf()
+    ) : RouterMatch(3, description, subMatches) {
+        override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch =
+            copy(description = description, subMatches = fromMatches)
     }
 
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
@@ -77,6 +101,7 @@ internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
         is MatchingHandler, is MatchedWithoutHandler, is MethodNotMatched -> this
         is Unmatched -> other
     }
+
     is Unmatched -> this
 }
 
@@ -91,9 +116,9 @@ internal data class OrRouter private constructor(private val list: List<Router>)
 
     override fun withFilter(new: Filter) = from(list.map { it.withFilter(new) })
 
-    override val description: RouterDescription
-        get() =
-            RouterDescription("or", list.map { it.description })
+    override val description = RouterDescription("or", list.map { it.description })
+
+    override fun toString() = description.friendlyToString()
 
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else OrRouter(list)
@@ -113,6 +138,8 @@ internal data class AndRouter private constructor(private val list: List<Router>
 
     override val description = RouterDescription("and", list.map { it.description })
 
+    override fun toString() = description.friendlyToString()
+
     companion object {
         fun from(list: List<Router>): Router = if (list.size == 1) list.first() else AndRouter(list)
     }
@@ -131,7 +158,12 @@ internal data class PassthroughRouter(private val handler: HttpHandler) : Router
         else -> PassthroughRouter(new.then(handler))
     }
 
-    override val description = RouterDescription("<http-handler>")
+    override fun toString() = description.friendlyToString()
+
+    override val description = when (handler) {
+        is Router -> handler.description
+        else -> RouterDescription("<http-handler>")
+    }
 }
 
 internal data class Prefix(private val template: String) : Router {
@@ -143,6 +175,8 @@ internal data class Prefix(private val template: String) : Router {
     override fun withBasePath(new: String) = Prefix("$new/${template.trimStart('/')}")
 
     override val description = RouterDescription("prefix == '$template'")
+
+    override fun toString() = description.friendlyToString()
 }
 
 internal data class TemplateRouter(
@@ -152,22 +186,33 @@ internal data class TemplateRouter(
     override fun match(request: Request) = when {
         template.matches(request.uri.path) ->
             MatchingHandler({ RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }, description)
+
         else -> Unmatched(description)
     }
 
     override fun withBasePath(new: String): Router =
-        TemplateRouter(UriTemplate.from("$new/${template}"),
+        TemplateRouter(
+            UriTemplate.from("$new/${template}"),
             when (httpHandler) {
                 is RoutingHttpHandler -> httpHandler.withBasePath(new)
                 else -> httpHandler
-            })
+            }
+        )
 
-    override fun withFilter(new: Filter): Router = copy(httpHandler = when (httpHandler) {
-        is RoutingHttpHandler -> httpHandler.withFilter(new)
-        else -> new.then(httpHandler)
-    })
+    override fun withFilter(new: Filter): Router = copy(
+        httpHandler = when (httpHandler) {
+            is RoutingHttpHandler -> httpHandler.withFilter(new)
+            else -> new.then(httpHandler)
+        }
+    )
 
     override val description = RouterDescription("template == '$template'")
+
+    override fun toString() = description.friendlyToString()
 }
 
 val Fallback = { _: Request -> true }.asRouter("*")
+
+fun RouterDescription.friendlyToString(indent: Int = 0): String = "$description\n" + children.joinToString("") {
+    "\t".repeat(indent + 1) + it.friendlyToString(indent + 1)
+}

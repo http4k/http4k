@@ -13,15 +13,13 @@ interface Event {
     }
 }
 
-fun Events.then(next: Events): Events = { it.also(this).also(next) }
+fun Events.and(next: Events): Events = { it.also(this).also(next) }
 
 /**
  * An EventFilter is used to create pipelines for Event processing.
  */
 fun interface EventFilter : (Events) -> Events {
-    companion object {
-        operator fun invoke(fn: (Events) -> Events) = EventFilter { next -> fn(next) }
-    }
+    companion object
 }
 
 fun EventFilter.then(next: EventFilter): EventFilter = EventFilter { this(next(it)) }

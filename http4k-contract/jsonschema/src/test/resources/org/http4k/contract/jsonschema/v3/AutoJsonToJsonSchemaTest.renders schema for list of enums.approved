@@ -1,13 +1,14 @@
 {
   "node": {
     "items": {
-      "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.Foo"
+      "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
     },
     "example": [
       "value1",
       "value2"
     ],
-    "type": "array"
+    "type": "array",
+    "nullable": false
   },
   "definitions": [
     {
@@ -18,7 +19,8 @@
           "value1",
           "value2"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": false
       }
     }
   ]

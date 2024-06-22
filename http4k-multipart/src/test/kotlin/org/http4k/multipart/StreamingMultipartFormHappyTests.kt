@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets
 class StreamingMultipartFormHappyTests {
 
     @Test
-    fun uploadEmptyContents() {
+    fun `upload empty contents`() {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary).stream())
 
@@ -20,7 +20,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun uploadEmptyFile() {
+    fun `upload empty file`() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "", "doesnt/matter", "".byteInputStream(), emptyList()).stream())
@@ -31,7 +31,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun hasNextIsIdempotent() {
+    fun `has next is idempotent`() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "", "application/octet-stream", "".byteInputStream(), emptyList())
@@ -52,7 +52,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun uploadEmptyField() {
+    fun `upload empty field`() {
         val boundary = "-----3456"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .field("aField", "", emptyList()).stream())
@@ -63,7 +63,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun uploadSmallFile() {
+    fun `upload small file`() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
@@ -74,7 +74,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun uploadFileWithLowercaseContentDisposition() {
+    fun `upload file with lowercase content disposition`() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .part("File contents here".byteInputStream(),
@@ -90,7 +90,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun uploadSmallFileAsAttachment() {
+    fun `upload small file as attachment`() {
         val boundary = "-----4567"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("beforeFile", "before.txt", "application/json", "[]".byteInputStream(), emptyList())
@@ -110,7 +110,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun uploadSmallField() {
+    fun `upload small field`() {
         val boundary = "-----3456"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .field("aField", "Here is the value of the field\n", emptyList()).stream())
@@ -121,7 +121,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun uploadMultipleFilesAndFields() {
+    fun `upload multiple files and fields`() {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary,
             MultipartFormBuilder(boundary)
@@ -142,7 +142,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun uploadFieldsWithMultilineHeaders() {
+    fun `upload fields with multiline headers`() {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary,
             MultipartFormBuilder(boundary)
@@ -165,7 +165,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun partsCanHaveLotsOfHeaders() {
+    fun `parts can have lots of headers`() {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary,
             MultipartFormBuilder(boundary)
@@ -197,7 +197,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun closedPartsCannotBeReadFrom() {
+    fun `closed parts cannot be read from`() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
@@ -220,7 +220,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun readingPartsContentsAsStringClosesStream() {
+    fun `reading parts contents as string closes stream`() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
@@ -239,7 +239,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun gettingNextPartClosesOldPart() {
+    fun `getting next part closes old part`() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
@@ -264,7 +264,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun canLoadComplexRealLifeSafariExample() {
+    fun `can load complex real life safari example`() {
         val parts = StreamingMultipartFormParts.parse(
             "----WebKitFormBoundary6LmirFeqsyCQRtbj".toByteArray(StandardCharsets.UTF_8),
             FileInputStream("examples/safari-example.multipart"),
@@ -280,7 +280,7 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
-    fun canLoadComplexRealLifeChromeExample() {
+    fun `can load complex real life chrome example`() {
         val parts = StreamingMultipartFormParts.parse(
             "----WebKitFormBoundaryft3FGhOMTYoOkCCc".toByteArray(StandardCharsets.UTF_8),
             FileInputStream("examples/chrome-example.multipart"),

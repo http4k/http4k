@@ -16,11 +16,11 @@ import java.nio.ByteBuffer
  * 2. It's _always_ consumed, or `close()` is called appropriately.
  */
 sealed class BodyMode : (InputStream) -> Body {
-    object Memory : BodyMode() {
+    data object Memory : BodyMode() {
         override fun invoke(stream: InputStream): Body = stream.use { Body(ByteBuffer.wrap(it.readBytes())) }
     }
 
-    object Stream : BodyMode() {
+    data object Stream : BodyMode() {
         override fun invoke(stream: InputStream): Body = Body(stream)
     }
 }

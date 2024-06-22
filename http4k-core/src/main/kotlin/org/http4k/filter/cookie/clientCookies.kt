@@ -3,8 +3,6 @@ package org.http4k.filter.cookie
 import org.http4k.core.cookie.Cookie
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.concurrent.ConcurrentHashMap
 
 data class LocalCookie(val cookie: Cookie, private val created: Instant) {

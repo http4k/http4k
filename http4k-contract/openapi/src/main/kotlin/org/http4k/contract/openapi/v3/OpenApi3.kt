@@ -10,6 +10,7 @@ import org.http4k.contract.RouteMeta
 import org.http4k.contract.Tag
 import org.http4k.contract.WebCallback
 import org.http4k.contract.jsonschema.JsonSchema
+import org.http4k.contract.jsonschema.v2.value
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
@@ -17,7 +18,6 @@ import org.http4k.contract.openapi.OpenApiVersion
 import org.http4k.contract.openapi.OpenApiVersion._3_0_0
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.contract.jsonschema.v2.value
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -38,18 +38,18 @@ import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
 import org.http4k.format.JsonType
-import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.lens.MultipartForm
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.EnumParam
-import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.WebForm
-import java.util.*
+import java.math.BigDecimal
+import java.math.BigInteger
+import java.util.Locale
 
 /**
  * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of
@@ -198,40 +198,76 @@ class OpenApi3<NODE : Any>(
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
         .toMap()
 
-    private fun requestParameter(it: Meta) = when (val paramMeta: ParamMeta = it.paramMeta) {
-        ObjectParam -> SchemaParameter(it, "{}".toSchema())
-        FileParam -> PrimitiveParameter(it, json {
-            obj("type" to string(FileParam.value), "format" to string("binary"))
-        })
+    private fun requestParameter(meta: Meta): RequestParameter<NODE> =
+        when (val paramMeta: ParamMeta = meta.paramMeta) {
+            ObjectParam -> SchemaParameter(
+                meta, "{}".toSchema()
+                    .appendFields(meta.schemaFields())
+            )
 
-        is ArrayParam -> PrimitiveParameter(it, json {
-            val itemType = paramMeta.itemType()
-            obj(
-                "type" to string("array"),
-                "items" to when (itemType) {
-                    is EnumParam<*> -> apiRenderer.toSchema(
-                        itemType.clz.java.enumConstants[0],
-                        it.name,
+            is ArrayParam -> PrimitiveParameter(meta, json {
+                val itemType = paramMeta.itemType()
+                obj(
+                    listOf(
+                        "type" to string("array"),
+                        "items" to when (itemType) {
+                            is EnumParam<*> -> apiRenderer.toSchema(
+                                itemType.clz.java.enumConstants[0],
+                                meta.name,
+                                null
+                            ).definitions.first().second
+
+                            else -> obj("type" to string(itemType.value))
+                        }
+                    )
+                        + meta.schemaFields()
+                )
+            })
+
+            is EnumParam<*> -> SchemaParameter(
+                meta,
+                json {
+                    apiRenderer.toSchema(
+                        paramMeta.clz.java.enumConstants[0],
+                        meta.name,
                         null
-                    ).definitions.first().second
-
-                    else -> obj("type" to string(itemType.value))
+                    ).appendFields(
+                        meta.schemaFields()
+                    )
                 }
             )
-        })
 
-        is EnumParam<*> -> SchemaParameter(
-            it, apiRenderer.toSchema(
-                paramMeta.clz.java.enumConstants[0],
-                it.name,
-                null
-            )
+            else -> PrimitiveParameter(meta, json {
+                obj(listOf("type" to string(paramMeta.value)) + meta.schemaFields())
+            })
+        }
+
+    private fun Meta.schemaFields(): List<Pair<String, NODE>> =
+        schemaMetadata()?.map { entry -> entry.key to asNode(entry.value) } ?: emptyList()
+
+    @Suppress("UNCHECKED_CAST")
+    private fun Meta.schemaMetadata() = metadata.let { it["schema"] as? Map<String, Any> }
+
+    private fun JsonSchema<NODE>.appendFields(fields: List<Pair<String, NODE>>): JsonSchema<NODE> =
+        JsonSchema(
+            this@OpenApi3.json { obj(fields(node) + fields) },
+            definitions
         )
 
-        else -> PrimitiveParameter(it, json {
-            obj("type" to string(paramMeta.value))
-        })
-    }
+    private fun asNode(thing: Any?): NODE =
+        this@OpenApi3.json {
+            when (thing) {
+                is Boolean -> boolean(thing)
+                is Int -> number(thing)
+                is Double -> number(thing)
+                is BigDecimal -> number(thing)
+                is BigInteger -> number(thing)
+                is Long -> number(thing)
+                is Iterable<*> -> array(thing.map { asNode(it) })
+                is Map<*, *> -> obj(thing.map { it.key.toString() to asNode(it.value) }.toList())
+                else -> string(thing.toString())
+            }
+        }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
@@ -294,7 +330,7 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()
-        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId, null) }
+        ?.let { apiRenderer.toSchema(it, definitionId, null) }
         ?: JsonSchema(json.obj(), emptySet())
 
     private fun List<Security>.combineFull(): Render<NODE> = {

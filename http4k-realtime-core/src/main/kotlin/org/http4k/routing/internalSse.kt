@@ -13,7 +13,7 @@ sealed class SseRouterMatch(private val priority: Int) : Comparable<SseRouterMat
 
     data class MatchingHandler(private val handler: SseHandler) : SseRouterMatch(0), SseHandler by handler
 
-    object Unmatched : SseRouterMatch(1)
+    data object Unmatched : SseRouterMatch(1)
 
     override fun compareTo(other: SseRouterMatch): Int = priority.compareTo(other.priority)
 }

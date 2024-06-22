@@ -11,9 +11,19 @@ import org.http4k.core.toUrlFormEncoded
 
 /**
  * Function loader for ApiGatewayV1 Lambdas
+ *
+ * Use main constructor if you need to read ENV variables to make your HttpHandler and the AWS context
  */
 class ApiGatewayV1FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(ApiGatewayV1AwsHttpAdapter, input) {
+
+    /**
+     * Use this constructor if you need to read ENV variables to make your HttpHandler
+     */
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+
+    /**
+     * Use this constructor if you just want to convert a standard HttpHandler
+     */
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
 
@@ -21,10 +31,20 @@ class ApiGatewayV1FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(Ap
  * This is the main entry point for lambda invocations using the V1 payload format.
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
+ *
+ * Use main constructor if you need to read ENV variables to make your HttpHandler and the AWS context
  */
 abstract class ApiGatewayV1LambdaFunction(input: AppLoaderWithContexts) :
     AwsLambdaEventFunction(ApiGatewayV1FnLoader(input)) {
+
+    /**
+     * Use this constructor if you need to read ENV variables to make your HttpHandler
+     */
     constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+
+    /**
+     * Use this constructor if you just want to convert a standard HttpHandler
+     */
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
 

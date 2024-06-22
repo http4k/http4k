@@ -138,19 +138,20 @@ val UserCredentialsOAuthSecurity.Companion.renderer
         }
     }
 
-val OpenIdConnectSecurity.Companion.renderer get() = rendererFor<OpenIdConnectSecurity> {
-    object : RenderModes {
-        override fun <NODE> full(): Render<NODE> = {
-            obj(it.name to
-                obj(
-                    listOfNotNull(
-                        "type" to string("openIdConnect"),
-                        "openIdConnectUrl" to string(it.discoveryUrl.toString()),
+val OpenIdConnectSecurity.Companion.renderer
+    get() = rendererFor<OpenIdConnectSecurity> {
+        object : RenderModes {
+            override fun <NODE> full(): Render<NODE> = {
+                obj(it.name to
+                    obj(
+                        listOfNotNull(
+                            "type" to string("openIdConnect"),
+                            "openIdConnectUrl" to string(it.discoveryUrl.toString()),
+                        )
                     )
                 )
-            )
-        }
+            }
 
-        override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+        }
     }
-}

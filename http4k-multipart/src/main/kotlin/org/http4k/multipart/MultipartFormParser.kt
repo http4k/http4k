@@ -55,19 +55,13 @@ internal class MultipartFormParser(
             val count = part.inputStream.read(bytes, length, writeToDiskThreshold - length)
             if (count < 0) {
                 part.inputStream.use {
-                    return InMemory(
-                        part,
-                        storeInMemory(bytes, length), encoding
-                    )
+                    return InMemory(part, storeInMemory(bytes, length), encoding)
                 }
             }
             length += count
             if (length >= writeToDiskThreshold) {
                 part.inputStream.use {
-                    return DiskBacked(
-                        part,
-                        diskLocation.createFile(part.fileName).writeFile(part, bytes, length),
-                    )
+                    return DiskBacked(part, diskLocation.createFile(part.fileName).writeBufferAndThenRestOfStream(part, bytes, length))
                 }
             }
         }
@@ -75,8 +69,9 @@ internal class MultipartFormParser(
 
     private fun storeInMemory(bytes: ByteArray, length: Int) = ByteArray(length).apply { System.arraycopy(bytes, 0, this, 0, length) }
 
-    private fun MultipartFile.writeFile(part: StreamingPart, bytes: ByteArray, length: Int): MultipartFile =
-        this.also { multipartFile ->
+    private fun MultipartFile.writeBufferAndThenRestOfStream(part: StreamingPart, bytes: ByteArray, length: Int): MultipartFile =
+        also { multipartFile ->
+            // copy the existing buffer and then the rest of the stream to the file
             multipartFile.file().apply {
                 FileOutputStream(this).apply {
                     write(bytes, 0, length)

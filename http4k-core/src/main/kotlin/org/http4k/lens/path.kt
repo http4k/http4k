@@ -31,7 +31,7 @@ class BiDiPathLens<FINAL>(
     meta: Meta,
     get: (String) -> FINAL,
     private val set: (FINAL, Request) -> Request
-) : LensInjector<FINAL, Request>, PathLens<FINAL>(meta, get) {
+) : LensInjectorExtractor<Request, FINAL>, PathLens<FINAL>(meta, get) {
     @Suppress("UNCHECKED_CAST")
     override operator fun <R : Request> invoke(value: FINAL, target: R): R = set(value, target) as R
 }
@@ -39,10 +39,13 @@ class BiDiPathLens<FINAL>(
 /**
  * Represents a uni-directional extraction of an entity from a target path segment.
  */
-open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<String, OUT>) {
-    open fun of(name: String, description: String? = null): PathLens<OUT> {
+open class PathLensSpec<out OUT>(
+    protected val paramMeta: ParamMeta,
+    internal val get: LensGet<String, OUT>
+) {
+    open fun of(name: String, description: String? = null, metadata: Map<String, Any> = emptyMap()): PathLens<OUT> {
         val getLens = get(name)
-        val meta = Meta(true, "path", paramMeta, name, description)
+        val meta = Meta(true, "path", paramMeta, name, description, metadata)
         return PathLens(meta) { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) }
     }
 
@@ -75,11 +78,11 @@ open class BiDiPathLensSpec<OUT>(
     /**
      * Create a lens for this Spec
      */
-    override fun of(name: String, description: String?): BiDiPathLens<OUT> {
+    override fun of(name: String, description: String?, metadata: Map<String, Any>): BiDiPathLens<OUT> {
         val getLens = get(name)
         val setLens = set(name)
 
-        val meta = Meta(true, "path", paramMeta, name, description)
+        val meta = Meta(true, "path", paramMeta, name, description, metadata)
         return BiDiPathLens(meta,
             { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
             { it: OUT, target: Request -> setLens(listOf(it), target) })
@@ -92,8 +95,9 @@ object Path : BiDiPathLensSpec<String>(StringParam,
         target.uri(
             target.uri.path(
                 target.uri.path.replaceFirst(
-                    "{$name}",
+                    Regex("""\{$name(:[^}]*)?}"""),
                     values.first().toPathSegmentEncoded()
+                        .replace("\\", "\\\\").replace("$", "\\\$")
                 )
             )
         )
@@ -102,7 +106,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
     fun fixed(name: String): PathLens<String> {
         if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
         val getLens = get(name)
-        val meta = Meta(true, "path", StringParam, name)
+        val meta = Meta(true, "path", StringParam, name, null, emptyMap())
         return object : PathLens<String>(meta,
             { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta), target = it) }) {
             override fun toString(): String = name
@@ -114,6 +118,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 
 fun Path.string() = this
 fun Path.nonEmptyString() = map(StringBiDiMappings.nonEmpty())
+fun Path.nonBlankString() = map(StringBiDiMappings.nonBlank())
 fun Path.int() = mapWithNewMeta(StringBiDiMappings.int(), IntegerParam)
 fun Path.long() = mapWithNewMeta(StringBiDiMappings.long(), IntegerParam)
 fun Path.double() = mapWithNewMeta(StringBiDiMappings.double(), NumberParam)
@@ -141,10 +146,17 @@ inline fun <reified T : Enum<T>> Path.enum(caseSensitive: Boolean = true) = mapW
     if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
     EnumParam(T::class)
 )
-inline fun <reified T : Enum<T>> Path.enum(noinline nextOut: (String) -> T, noinline nextIn: (T) -> String) = mapWithNewMeta(BiDiMapping(nextOut, nextIn), EnumParam(T::class))
+
+inline fun <reified T : Enum<T>> Path.enum(noinline nextOut: (String) -> T, noinline nextIn: (T) -> String) =
+    mapWithNewMeta(BiDiMapping(nextOut, nextIn), EnumParam(T::class))
 
 @PublishedApi
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
 fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) =
     mapWithNewMeta(mapping::invoke, mapping::invoke, paramMeta)
+
+fun main() {
+    val name = "bob"
+    "/first/{$name}/second".replaceFirst(Regex("""\{$name(:[^}]*)?}"""), "!\$&'()*+,;=")
+}

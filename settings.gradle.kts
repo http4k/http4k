@@ -1,18 +1,21 @@
-import org.gradle.internal.impldep.org.bouncycastle.asn1.x500.style.RFC4519Style.name
+@file:Suppress("UnstableApiUsage")
 
 rootProject.name = "http4k"
 
 plugins {
-    id("de.fayard.refreshVersions").version("0.40.2")
+    id("de.fayard.refreshVersions").version("0.60.5")
 }
 
 refreshVersions {
-    enableBuildSrcLibs()
-
     rejectVersionIf {
-        candidate.stabilityLevel.isLessStableThan(current.stabilityLevel)
+        candidate.stabilityLevel.isLessStableThan(current.stabilityLevel) ||
+            setOf("milestone", "-RC").map { it.lowercase() }.any { candidate.value.contains(it) } ||
+            Regex("""\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}.*""").matches(candidate.value) || // graphql nightlies
+            candidate.value.contains("nf-execution") // graphql nightlies
     }
 }
+
+gradle.startParameter.isContinueOnFailure = true
 
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
@@ -23,10 +26,6 @@ fun String.includeModule(name: String) {
 fun String.includeSubmodule(name: String) {
     include(":$this-$name")
     project(":$this-$name").projectDir = File("$this/${name.replace('-', '/')}")
-}
-
-fun includeWithDirectory(projectName: String, name: String) {
-    include("$projectName-$name")
 }
 
 include("http4k-core")
@@ -59,6 +58,7 @@ include("http4k-cloudnative")
 "http4k-format".apply {
     includeModule("core")
     includeModule("argo")
+    includeModule("dataframe")
     includeModule("gson")
     includeModule("jackson")
     includeModule("jackson-xml")
@@ -73,6 +73,7 @@ include("http4k-cloudnative")
 }
 
 include("http4k-graphql")
+include("http4k-htmx")
 include("http4k-incubator")
 include("http4k-jsonrpc")
 include("http4k-metrics-micrometer")
@@ -87,6 +88,7 @@ include("http4k-realtime-core")
     includeModule("apache4")
     includeModule("helidon")
     includeModule("jetty")
+    includeModule("jetty11")
     includeModule("ktorcio")
     includeModule("ktornetty")
     includeModule("netty")
@@ -115,20 +117,21 @@ include("http4k-realtime-core")
     includeModule("tencent:integration-test:test-function")
 }
 
-"http4k-template".apply {
-    includeModule("core")
-    includeModule("freemarker")
-    includeModule("handlebars")
-    includeModule("rocker")
-    includeModule("pebble")
-    includeModule("thymeleaf")
-    includeModule("jade4j")
-}
-
 "http4k-security".apply {
     includeModule("core")
     includeModule("digest")
     includeModule("oauth")
+}
+
+"http4k-template".apply {
+    includeModule("core")
+    includeModule("freemarker")
+    includeModule("handlebars")
+    includeModule("jte")
+    includeModule("rocker")
+    includeModule("pebble")
+    includeModule("thymeleaf")
+    includeModule("pug4j")
 }
 
 "http4k-testing".apply {
@@ -136,8 +139,11 @@ include("http4k-realtime-core")
     includeModule("chaos")
     includeModule("hamkrest")
     includeModule("kotest")
+    includeModule("playwright")
     includeModule("strikt")
     includeModule("servirtium")
     includeModule("tracerbullet")
     includeModule("webdriver")
 }
+
+include("http4k-webhook")

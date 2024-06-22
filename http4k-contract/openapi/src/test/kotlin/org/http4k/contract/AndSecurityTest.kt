@@ -20,14 +20,12 @@ import org.http4k.lens.Query
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicInteger
 
-object FooBar : Security {
+data object FooBar : Security {
     override val filter = Filter.NoOp
-    override fun toString() = "FooBar"
 }
 
-object BarFoo : Security {
+data object BarFoo : Security {
     override val filter = Filter.NoOp
-    override fun toString() = "BarFoo"
 }
 
 class AndSecurityTest {

@@ -64,18 +64,23 @@ open class TracerBulletEvents(
         }
     }
 
+
     override fun <T> record(block: () -> T): T {
-        events(MetadataEvent(StartRendering))
-        return block().also {
-            events(MetadataEvent(StopRendering))
-        }
+        resume()
+        return block().also { pause() }
     }
 
     override fun <T> pause(block: () -> T): T {
+        pause()
+        return block().also { resume() }
+    }
+
+    override fun pause() {
         events(MetadataEvent(StopRendering))
-        return block().also {
-            events(MetadataEvent(StartRendering))
-        }
+    }
+
+    override fun resume() {
+        events(MetadataEvent(StartRendering))
     }
 
     override fun toString() = events.toString()

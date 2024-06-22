@@ -22,6 +22,8 @@ import io.cloudevents.jackson.JsonCloudEventData
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.format.JsonType.Integer
 import org.http4k.format.JsonType.Number
 import org.http4k.lens.BiDiBodyLensSpec
@@ -36,7 +38,7 @@ import kotlin.reflect.KClass
 
 open class ConfigurableJackson(
     val mapper: ObjectMapper,
-    val defaultContentType: ContentType = APPLICATION_JSON
+    override val defaultContentType: ContentType = APPLICATION_JSON
 ) : AutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
@@ -46,6 +48,7 @@ open class ConfigurableJackson(
             INT, LONG, BIG_INTEGER -> Integer
             else -> Number
         }
+
         is ArrayNode -> JsonType.Array
         is ObjectNode -> JsonType.Object
         is NullNode -> JsonType.Null
@@ -88,6 +91,8 @@ open class ConfigurableJackson(
 
     inline fun <reified T : Any> JsonNode.asA(): T = mapper.convertValue(this)
 
+    override fun asInputStream(input: Any): InputStream = mapper.writeValueAsBytes(input).inputStream()
+
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 
     inline fun <reified T : Any> Body.Companion.auto(
@@ -100,9 +105,18 @@ open class ConfigurableJackson(
         description: String? = null,
         contentNegotiation: ContentNegotiation = None,
         contentType: ContentType = defaultContentType
-    )
-        : BiDiBodyLensSpec<T> =
+    ): BiDiBodyLensSpec<T> =
         httpBodyLens(description, contentNegotiation, contentType).map(mapper.read(), mapper.write())
+
+    /**
+     * Convenience function to write the object as JSON to the message body and set the content type.
+     */
+    inline fun <reified T : Any, R : HttpMessage> R.json(t: T): R = with(Body.auto<T>().toLens() of t)
+
+    /**
+     * Convenience function to read an object as JSON from the message body.
+     */
+    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String =
@@ -115,14 +129,14 @@ open class ConfigurableJackson(
         description: String? = null,
         contentNegotiation: ContentNegotiation = None,
         contentType: ContentType = APPLICATION_JSON
-    ) =
-        Body.string(contentType, description, contentNegotiation)
-            .map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
+    ) = Body.string(contentType, description, contentNegotiation)
+        .map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 
     inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =
         WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 
-    fun <T: Any> CloudEventBuilder.withData(t: T) = withData(defaultContentType.value, JsonCloudEventData.wrap(asJsonObject(t)))
+    fun <T : Any> CloudEventBuilder.withData(t: T) =
+        withData(defaultContentType.value, JsonCloudEventData.wrap(asJsonObject(t)))
 }
 
 fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
@@ -138,3 +152,7 @@ inline fun <reified T : Any> ObjectMapper.write(): (T) -> String = {
         }
     }
 }
+
+inline operator fun <reified T : Any> ConfigurableJackson.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJackson.invoke(item: T) =
+    autoBody<T>().toLens().of<R>(item)

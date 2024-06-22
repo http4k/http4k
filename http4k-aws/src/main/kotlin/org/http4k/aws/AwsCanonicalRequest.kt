@@ -25,14 +25,14 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
             return AwsCanonicalRequest(canonical, signedHeaders, payload.hash)
         }
 
-        private fun Request.signedHeaders(): String =
-            headers.map { it.first.lowercase(getDefault()) }.sorted().joinToString(";")
-
+        private val multipleSpaces = Regex("\\s+")
         private fun Request.canonicalHeaders(): String = headers
-            .map { it.first.lowercase(getDefault()) to it.second?.replace("\\s+", " ")?.trim() }
-            .map { it.first + ":" + it.second }
-            .sorted()
-            .joinToString("\n")
+            .map { it.first.lowercase(getDefault()) to (it.second?.replace(multipleSpaces, " ")?.trim().orEmpty()) }
+            .groupBy({ it.first }) { it.second }
+            .mapValues { it.value.joinToString(",") }
+            .toList()
+            .sortedBy { it.first }
+            .joinToString("\n") { it.first + ":" + it.second }
 
         private fun Request.canonicalQueryString(): String =
             uri.query.toParameters()
@@ -40,6 +40,13 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 .sorted()
                 .joinToString("&")
 
-        private fun Uri.normalisedPath() = if (path.isBlank()) "/" else path.split("/").joinToString("/") { it.urlEncoded() }
+        private fun Uri.normalisedPath() = if (path.isBlank()) "/" else path.split("/")
+            .joinToString("/") {
+                it.urlEncoded().replace("+", "%20").replace("*", "%2A").replace("%7E", "~")
+            }
+            .let { if (it.startsWith("/")) it else "/$it" }
     }
 }
+
+internal fun Request.signedHeaders(): String =
+    headers.map { it.first.lowercase(getDefault()) }.toSet().sorted().joinToString(";")

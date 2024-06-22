@@ -50,7 +50,7 @@ class TracingFunctionalTest {
         }
     }
 
-    private fun Service.recordTraces() = { _: Request, trace: ZipkinTraces -> traces.put(this, trace) }
+    private fun Service.recordTraces(): (Request, ZipkinTraces) -> Unit = { _: Request, trace: ZipkinTraces -> traces.put(this, trace) }
     private fun Service.traces() = traces[this] ?: fail("trace not present")
     private fun Service.port() = registry[this] ?: error("could not find server port")
 

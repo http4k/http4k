@@ -16,7 +16,7 @@ If you're running http4k in production and would like to be listed on the site a
 
 **Q. Does http4k support an Async model? I need webscale!**
 
-**A.** Not at the moment. Adding Async support is a decision that we are thinking about carefully so that we don't end up complicating the API. When we do add it, it'll use co-routines model so we also want to ensure that the integrations with the various backends and clients are solid, as well as supporting essential features that currently rely on Threads, such as Zipkin Request Tracing and Resilience4j support. As for the scaling arguments, see the above answer relating to production usage, or checkout the [benchmark results](/performance/) to see how http4k compares to other JVM-based sync and async web libraries.
+**A.** Currently there is no coroutine support in http4k. However, with the advent of project Loom on the JVM, we get a lot of the benefits of async model out of the box without the need to complicate the API with the use of suspend etc. As for scaling arguments, see the above answer relating to production usage, or checkout the [benchmark results](/performance/) to see how http4k compares to other JVM-based sync and async web libraries.
 
 ### API
 **Q. I'm attempting to build HTTP messages using the API, but changes don't affect the object (e.g. calling `request.body("hello")`)?**
@@ -36,7 +36,7 @@ If you're running http4k in production and would like to be listed on the site a
 - `org.http4k.filter.TrafficFilters`
 
 ### Lenses & Auto-Marshalling
-**Q. I am having a problem with the usage of Jackson or GSON for auto marshalling**
+**Q. I am having a problem with the usage of Moshi, Jackson or GSON for auto marshalling**
 
 **A.** Please see the [custom FAQ](/guide/reference/json/) for JSON handling questions.
 
@@ -55,5 +55,13 @@ routes += "/api/document-upload" meta {
     preFlightExtraction = PreFlightExtraction.IgnoreBody
 } bindContract POST to { req -> Response(OK) }
 ```
+
+### Serverless 
+**Q. When using AWS Lambda, I get an "method is invalid" error when testing my lambda.**
+
+**A.** This comes from the fact that there are 2 different payload formats for AWS Lambda HTTP functions. We support both v1 and v2 formats, 
+but recommend V2 is used as the JSON format is superior. To fix the problem, ensure that your Lambda function payload version matches the name 
+of the AWS adapter function class being used (v1 or v2)
+
 
 [http4k]: https://http4k.org

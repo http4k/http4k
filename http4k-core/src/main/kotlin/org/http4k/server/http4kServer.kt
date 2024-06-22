@@ -19,9 +19,9 @@ interface Http4kServer : AutoCloseable {
  * Standard interface for creating a configured WebServer
  */
 interface ServerConfig {
-    sealed class StopMode {
-        object Immediate : StopMode()
-        data class Graceful(val timeout: Duration) : StopMode()
+    sealed interface StopMode {
+        data object Immediate : StopMode
+        data class Graceful(val timeout: Duration) : StopMode
     }
 
     class UnsupportedStopMode(stopMode: StopMode) :

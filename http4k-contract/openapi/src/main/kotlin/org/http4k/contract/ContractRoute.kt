@@ -27,17 +27,19 @@ import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 
-class ContractRoute internal constructor(val method: Method,
-                                         val spec: ContractRouteSpec,
-                                         val meta: RouteMeta,
-                                         internal val toHandler: (ExtractedParts) -> HttpHandler) : HttpHandler {
+class ContractRoute internal constructor(
+    val method: Method,
+    val spec: ContractRouteSpec,
+    val meta: RouteMeta,
+    internal val toHandler: (ExtractedParts) -> HttpHandler
+) : HttpHandler {
     val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatten()
 
     val tags = meta.tags.toSet().sortedBy { it.name }
 
     fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
 
-    internal fun toRouter(contractRoot: PathSegments) = object : Router {
+    fun toRouter(contractRoot: PathSegments) = object : Router {
 
         override fun toString() = description.description
 

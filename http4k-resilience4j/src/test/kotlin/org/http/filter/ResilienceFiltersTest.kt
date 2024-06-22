@@ -9,7 +9,6 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.HALF_OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.of
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType.COUNT_BASED
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig
@@ -24,7 +23,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
 import org.http4k.core.then
-import org.http4k.filter.ResilienceFilters
 import org.http4k.filter.ResilienceFilters.Bulkheading
 import org.http4k.filter.ResilienceFilters.CircuitBreak
 import org.http4k.filter.ResilienceFilters.RateLimit

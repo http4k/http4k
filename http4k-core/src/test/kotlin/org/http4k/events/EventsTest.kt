@@ -18,7 +18,7 @@ class EventsTest {
         val second = RecordingEvents()
         val error = Error("foo")
 
-        first.then(second)(error)
+        first.and(second)(error)
 
         assertThat(first.toList(), equalTo(listOf<Event>(error)))
         assertThat(second.toList(), equalTo(listOf<Event>(error)))

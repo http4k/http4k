@@ -133,7 +133,15 @@ class MultipartFormTest {
         assertThat(intField(populated), equalTo(123))
     }
 
-    private fun multipartFormLens(validator: Validator,
-                                  contentTypeFn: (String) -> ContentType = Companion::MultipartFormWithBoundary
-    ) = Body.multipartForm(validator, stringRequiredField, intRequiredField, requiredFile, defaultBoundary = DEFAULT_BOUNDARY, contentTypeFn = contentTypeFn).toLens()
+    private fun multipartFormLens(
+        validator: Validator,
+        contentTypeFn: (String) -> ContentType = Companion::MultipartFormWithBoundary
+    ) = Body.multipartForm(
+        validator,
+        stringRequiredField,
+        intRequiredField,
+        requiredFile,
+        defaultBoundary = DEFAULT_BOUNDARY,
+        contentTypeFn = contentTypeFn
+    ).toLens()
 }

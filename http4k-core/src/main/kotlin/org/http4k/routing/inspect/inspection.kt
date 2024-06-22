@@ -37,14 +37,13 @@ private data class PrettyNode(val name: String, val textStyle: TextStyle, val gr
         if (children.isEmpty()) {
             name.styled(textStyle, escapeMode)
         } else {
-            val nIndent = (" ".repeat(depth * 2)).let{"\n$it"}
-            val prefix  = if(depth == 0 /*no leading newline*/) "" else nIndent
+            val nIndent = (" ".repeat(depth * 2)).let { "\n$it" }
+            val prefix = if (depth == 0 /*no leading newline*/) "" else nIndent
             prefix +
                 "(".styled(groupStyle, escapeMode) +
                 children.joinToString("$nIndent ${name.styled(groupStyle, escapeMode)} ") { it.prettify(depth + 1, escapeMode) } +
                 ")".styled(groupStyle, escapeMode)
         }
-
 
     private fun andRenderer(depth: Int, escapeMode: EscapeMode): String =
         if (children.isEmpty()) {

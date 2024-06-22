@@ -8,6 +8,6 @@ dependencies {
     }
     api("dev.forkhandles:result4k:_")
     testImplementation(project(":http4k-format-jackson"))
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    testImplementation(testFixtures(project(":http4k-core")))
     testImplementation("commons-codec:commons-codec:_")
 }

@@ -6,11 +6,12 @@ import org.http4k.cloudnative.env.Port
 import org.http4k.cloudnative.env.Secret
 import org.http4k.cloudnative.env.Timeout
 
-fun StringBiDiMappings.host() = nonEmpty().map(::Host, Host::value)
+fun StringBiDiMappings.host() = nonBlank().map(::Host, Host::value)
 fun StringBiDiMappings.port() = int().map(::Port, Port::value)
-fun StringBiDiMappings.authority() = nonEmpty().map({ Authority(it) }, Authority::toString)
+fun StringBiDiMappings.authority() = nonBlank().map({ Authority(it) }, Authority::toString)
+fun StringBiDiMappings.secret() = nonEmpty().map({ Secret(it) }, { secret -> secret.use { it } })
 
-fun <IN : Any> BiDiLensSpec<IN, String>.secret() = nonEmptyString().bytes().map(::Secret)
+fun <IN : Any> BiDiLensSpec<IN, String>.secret() = map(StringBiDiMappings.secret())
 fun <IN : Any> BiDiLensSpec<IN, String>.host() = map(StringBiDiMappings.host())
 fun <IN : Any> BiDiLensSpec<IN, String>.port() = map(StringBiDiMappings.port())
 fun <IN : Any> BiDiLensSpec<IN, String>.authority() = map(StringBiDiMappings.authority())

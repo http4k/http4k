@@ -4,8 +4,6 @@ import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
-import java.nio.ByteBuffer
-import java.security.MessageDigest
 import java.time.Clock
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -13,7 +11,7 @@ import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 
 open class CacheControlHeaderPart(open val name: String, val value: Duration) {
     fun toHeaderValue(): String = if (value.seconds > 0) "$name=${value.seconds}" else ""
-    fun replaceIn(header: String?): String? = header?.let {
+    fun replaceIn(header: String?): String = header?.let {
         header.split(",")
             .map { it.trim() }
             .filterNot { it.startsWith(name) }.plusElement(toHeaderValue())
@@ -38,10 +36,13 @@ data class DefaultCacheTimings(
  */
 object CachingFilters {
 
+    @Deprecated("Renamed to CacheRequest", ReplaceWith("CacheRequest", "org.http4k.filter.CachingFilters"))
+    val Request = CacheRequest
+
     /**
      * These filters operate on Requests (pre-flight)
      */
-    object Request {
+    object CacheRequest {
         fun AddIfModifiedSince(clock: Clock, maxAge: Duration) = Filter { next ->
             {
                 next(it.replaceHeader("If-Modified-Since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
@@ -49,10 +50,13 @@ object CachingFilters {
         }
     }
 
+    @Deprecated("Renamed to CacheResponse", ReplaceWith("CacheResponse", "org.http4k.filter.CachingFilters"))
+    val Response = CacheResponse
+
     /**
      * These filters operate on Responses (post-flight)
      */
-    object Response {
+    object CacheResponse {
 
         private abstract class CacheFilter(private val predicate: (org.http4k.core.Response) -> Boolean) : Filter {
             abstract fun headersFor(response: org.http4k.core.Response): Headers
@@ -71,7 +75,7 @@ object CachingFilters {
          */
         object NoCache {
             operator fun invoke(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
-                override fun headersFor(response: org.http4k.core.Response) = listOf("Cache-Control" to "private, must-revalidate", "Expires" to "0")
+                override fun headersFor(response: org.http4k.core.Response) = listOf("Cache-Control" to "private, must-revalidate")
             }
         }
 
@@ -79,29 +83,20 @@ object CachingFilters {
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
         object MaxAge {
-            operator fun invoke(clock: Clock, maxAge: Duration, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
+            operator fun invoke(maxAge: Duration, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
                 override fun headersFor(response: org.http4k.core.Response) = listOf(
-                    "Cache-Control" to listOf("public", MaxAgeTtl(maxAge).toHeaderValue()).joinToString(", "),
-                    "Expires" to RFC_1123_DATE_TIME.format(now(response).plusSeconds(maxAge.seconds))
+                    "Cache-Control" to listOf("public", MaxAgeTtl(maxAge).toHeaderValue()).joinToString(", ")
                 )
-
-                private fun now(response: org.http4k.core.Response) =
-                    try {
-                        response.header("Date")?.let(RFC_1123_DATE_TIME::parse)?.let(ZonedDateTime::from)
-                            ?: ZonedDateTime.now(clock)
-                    } catch (e: Exception) {
-                        ZonedDateTime.now(clock)
-                    }
             }
         }
 
         /**
-         * Applies the passed cache timings (Cache-Control, Expires, Vary) to responses, but only if they are not there already.
+         * Applies the passed cache timings (Cache-Control, Vary) to responses, but only if they are not there already.
          * Use this for adding default cache settings.
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
         object FallbackCacheControl {
-            operator fun invoke(clock: Clock, defaultCacheTimings: DefaultCacheTimings, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter {
+            operator fun invoke(defaultCacheTimings: DefaultCacheTimings, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter {
 
                 fun addDefaultHeaderIfAbsent(response: org.http4k.core.Response, header: String, defaultProducer: () -> String) =
                     response.replaceHeader(header, response.header(header) ?: defaultProducer())
@@ -112,7 +107,6 @@ object CachingFilters {
                             .filter { it != "" }
                             .joinToString(", ")
                     }
-                        .let { addDefaultHeaderIfAbsent(it, "Expires") { RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(defaultCacheTimings.maxAge.value)) } }
                         .let { addDefaultHeaderIfAbsent(it, "Vary") { "Accept-Encoding" } }
                 return Filter { next ->
                     {

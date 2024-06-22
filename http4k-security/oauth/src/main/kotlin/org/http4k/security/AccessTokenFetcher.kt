@@ -25,7 +25,7 @@ class AccessTokenFetcher(
     private val accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator,
     private val accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
 ) {
-    fun fetch(theCode: String): Result<AccessTokenDetails, CouldNotFetchAccessToken> =
+    fun fetch(authCode: String): Result<AccessTokenDetails, CouldNotFetchAccessToken> =
         api(
             Request(POST, providerConfig.tokenPath)
                 .with(
@@ -34,15 +34,14 @@ class AccessTokenFetcher(
                             grantType of "authorization_code",
                             redirectUri of callbackUri,
                             clientId of providerConfig.credentials.user,
-                            code of theCode
+                            code of authCode
                         )
                 )
-                .authenticate(accessTokenFetcherAuthenticator)
+                .let { request ->
+                    accessTokenFetcherAuthenticator.authenticate(request)
+                }
         ).let {
             if (it.status != OK) Failure(CouldNotFetchAccessToken(it.status, it.bodyString()))
             else Success(it)
-        }.flatMap { msg -> accessTokenExtractor(msg) }
-
-    private fun Request.authenticate(accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator): Request =
-        accessTokenFetcherAuthenticator.authenticate(this)
+        }.flatMap { response -> accessTokenExtractor(response) }
 }

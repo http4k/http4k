@@ -1,0 +1,14 @@
+[
+    {
+        "name": "service_a",
+        "_links": {
+            "url": "https://a"
+        }
+    },
+    {
+        "name": "service_b",
+        "_links": {
+            "url": "https://b"
+        }
+    }
+]

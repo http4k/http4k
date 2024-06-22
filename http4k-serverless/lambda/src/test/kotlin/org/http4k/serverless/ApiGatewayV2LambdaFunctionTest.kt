@@ -19,7 +19,7 @@ class ApiGatewayV2LambdaFunctionTest {
 
         val request = mapOf(
             "rawPath" to "/path",
-            "queryStringParameters" to mapOf("query" to "value"),
+            "rawQueryString" to "query=value",
             "body" to "input body",
             "headers" to mapOf("c" to "d"),
             "requestContext" to mapOf("http" to mapOf("method" to "GET"))

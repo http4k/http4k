@@ -12,7 +12,7 @@ import org.http4k.lens.ParamMeta.ObjectParam
  * Lens to get/set a cloud event into an HttpMessage
  */
 fun Body.Companion.cloudEvent(contentType: ContentType = ContentType.CLOUD_EVENT_JSON) = BiDiBodyLensSpec<CloudEvent>(
-    listOf(Meta(true, "body", ObjectParam, "Cloud Event", "Cloud Event")),
+    listOf(Meta(true, "body", ObjectParam, "Cloud Event", "Cloud Event", emptyMap())),
     contentType,
     LensGet { _, target -> listOf(target.toCloudEventReader().toEvent()) },
     LensSet { _, values, target ->
@@ -27,6 +27,6 @@ object CloudEvent {
         object : LensSpec<CloudEvent, T>(
             "Cloud Event",
             ObjectParam,
-            LensGet { _, target -> target.data?.let { listOf(mapper.map(it)) } ?: emptyList() }
+            LensGet { _, target -> target.data?.let { listOf(mapper.map(it)) }.orEmpty() }
         ) {}.required("data")
 }

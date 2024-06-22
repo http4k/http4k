@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -16,6 +17,7 @@ import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
+import java.net.URI
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
@@ -120,7 +122,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
             Instant.EPOCH,
             UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
             Uri.of("http://uri:8000"),
-            URL("http://url:9000"),
+            URI.create("http://url:9000").toURL(),
             Status.OK
         )
         val out = KotlinxSerialization.asFormatString(obj)
@@ -178,6 +180,10 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     @Test
     @Disabled("kotlinx.serialization does not support serialization auto-fallback to parent class")
     override fun `exception is marshalled`() {
+    }
+
+    @Disabled
+    override fun `serialises enum as a key correctly`() {
     }
 
     @Test
@@ -287,7 +293,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         val wrapper = mapOf(
             "str" to "val1",
             "num" to BigDecimal("123.1"),
-            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "array" to listOf(BigDecimal("1.1"), "stuff"),
             "map" to mapOf("foo" to "bar"),
             "bool" to true
         )
@@ -301,7 +307,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
             "foo",
             BigDecimal("123.1"),
             mapOf("foo" to "bar"),
-            listOf(BigDecimal("1.1"),BigDecimal("2.1")),
+            listOf(BigDecimal("1.1"), BigDecimal("2.1")),
             true
         )
         val asString = KotlinxSerialization.asFormatString(wrapper)
@@ -311,6 +317,12 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
 
     @Disabled
     override fun `roundtrip arbitrary set`() {
+    }
+
+    @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { KotlinxSerialization.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Fields [string, child, numbers, bool]"))
     }
 
     override fun strictMarshaller() = KotlinxSerialization

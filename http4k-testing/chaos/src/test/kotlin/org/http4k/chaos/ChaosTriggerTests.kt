@@ -3,6 +3,7 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.chaos.ChaosTriggers.Countdown
@@ -88,11 +89,11 @@ class DelayTriggerTest : ChaosTriggerContract() {
 }
 
 class MatchRequestTriggerTest : ChaosTriggerContract() {
-    override val asJson = """{"type":"request","method":"get","path":".*bob","queries":{"query":".*query"},"headers":{"header":".*header"},"body":".*body"}"""
+    override val asJson =
+        """{"type":"request","method":"get","path":".*bob","queries":{"query":".*query"},"headers":{"header":".*header"},"body":".*body"}"""
 
-    override val expectedDescription = "has Method that is equal to GET and has Uri that has Path " +
-        "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
-        " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
+    override val expectedDescription =
+        "method == GET AND path matches '.*bob' AND query 'query' matches '.*query' AND header 'header' matches '.*header' AND body matches '.*body'"
 
     private fun assertMatchNoMatch(s: Trigger, match: Request, noMatch: Request) {
         assertThat(s(match), equalTo(true))
@@ -101,37 +102,47 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
 
     @Test
     fun `matches path`() {
-        assertMatchNoMatch(MatchRequest(path = Regex(".*bob")),
+        assertMatchNoMatch(
+            MatchRequest(path = Regex(".*bob")),
             Request(GET, "/abob"),
-            Request(GET, "/bill"))
+            Request(GET, "/bill")
+        )
     }
 
     @Test
     fun `matches header`() {
-        assertMatchNoMatch(MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
+        assertMatchNoMatch(
+            MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
             request.header("header", "abob"),
-            request.header("header", "bill"))
+            request.header("header", "bill")
+        )
     }
 
     @Test
     fun `matches query`() {
-        assertMatchNoMatch(MatchRequest(queries = mapOf("query" to Regex(".*bob"))),
+        assertMatchNoMatch(
+            MatchRequest(queries = mapOf("query" to Regex(".*bob"))),
             request.query("query", "abob"),
-            request.query("query", "bill"))
+            request.query("query", "bill")
+        )
     }
 
     @Test
     fun `matches body`() {
-        assertMatchNoMatch(MatchRequest(body = Regex(".*bob")),
+        assertMatchNoMatch(
+            MatchRequest(body = Regex(".*bob")),
             request.body("abob"),
-            request.body("bill"))
+            request.body("bill")
+        )
     }
 
     @Test
     fun `matches method`() {
-        assertMatchNoMatch(MatchRequest(method = "put"),
+        assertMatchNoMatch(
+            MatchRequest(method = "put"),
             Request(PUT, "/abob"),
-            Request(GET, "/abob"))
+            Request(GET, "/abob")
+        )
     }
 }
 
@@ -143,7 +154,10 @@ class AlwaysTest : ChaosTriggerContract() {
     @Test
     fun `Always applies by default`() {
         val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always()).asFilter().then { Response(OK) }
-        assertThat(http(Request(GET, "/foo")), hasStatus(INTERNAL_SERVER_ERROR).and(hasBody("")).and(hasHeader("x-http4k-chaos", "Status 500")))
+        assertThat(
+            http(Request(GET, "/foo")),
+            hasStatus(INTERNAL_SERVER_ERROR).and(hasBody("")).and(hasHeader("x-http4k-chaos", "Status 500"))
+        )
     }
 }
 
@@ -154,14 +168,20 @@ class PercentageBasedTest : ChaosTriggerContract() {
 
     @Test
     fun `from environment`() {
-        assertThat(PercentageBased.fromEnvironment({ Properties().apply { put("CHAOS_PERCENTAGE", "75") }.getProperty(it) }).toString(), equalTo("PercentageBased (75%)"))
+        assertThat(PercentageBased.fromEnvironment({
+            Properties().apply { put("CHAOS_PERCENTAGE", "75") }.getProperty(it)
+        }).toString(), equalTo("PercentageBased (75%)"))
         assertThat(PercentageBased.fromEnvironment().toString(), equalTo("PercentageBased (50%)"))
     }
 
     @Test
     fun `PercentageBased applied`() {
-        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(100)).asFilter().then { Response(OK) }
-        assertThat(http(Request(GET, "/foo")), hasStatus(INTERNAL_SERVER_ERROR).and(hasBody("")).and(hasHeader("x-http4k-chaos", "Status 500")))
+        val http =
+            ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(100)).asFilter().then { Response(OK) }
+        assertThat(
+            http(Request(GET, "/foo")),
+            hasStatus(INTERNAL_SERVER_ERROR).and(hasBody("")).and(hasHeader("x-http4k-chaos", "Status 500"))
+        )
     }
 }
 
@@ -178,7 +198,8 @@ class OnceTest : ChaosTriggerContract() {
 
     @Test
     fun `Once only fires once with trigger`() {
-        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Once { it.method == GET }).asFilter().then { Response(OK) }
+        val http =
+            ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Once { it.method == GET }).asFilter().then { Response(OK) }
         assertThat(http(Request(POST, "/foo")), hasStatus(OK))
         assertThat(http(Request(GET, "/foo")), hasStatus(INTERNAL_SERVER_ERROR))
         assertThat(http(Request(POST, "/foo")), hasStatus(OK))
@@ -191,32 +212,36 @@ class ChaosPolicyOperationTest {
     @Test
     fun `Until stops a behaviour when triggered`() {
         val stage: Stage = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always()).until { it.method == POST }
-        assertThat(stage.toString(), equalTo("Always ReturnStatus (500) until (org.http4k.core.Request) -> kotlin.Boolean"))
+        assertThat(
+            stage.toString(),
+            startsWith("Always ReturnStatus (500) until")
+        )
 
         val http: HttpHandler = stage.asFilter().then { Response(OK) }
 
-        assertThat(http(Request(GET, "/foo")), hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500")))
+        assertThat(
+            http(Request(GET, "/foo")),
+            hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500"))
+        )
         assertThat(http(Request(POST, "/bar")), hasStatus(OK).and(!hasHeader("x-http4k-chaos")))
         assertThat(http(Request(GET, "/bar")), hasStatus(OK).and(!hasHeader("x-http4k-chaos")))
     }
 }
 
 class ChaosTriggerLogicalOperatorTest {
-    private val isFalse: Trigger = { false }
-    private val isTrue: Trigger = { true }
+    private val isFalse: Trigger = Trigger { false }
+    private val isTrue: Trigger = Trigger { true }
 
     @Test
     fun invert() {
         assertThat((!isFalse)(request), equalTo(true))
         assertThat((!isTrue)(request), equalTo(false))
-        assertThat((!isTrue).toString(), equalTo("NOT (org.http4k.core.Request) -> kotlin.Boolean"))
     }
 
     @Test
     fun and() {
         assertThat((isFalse and isTrue)(request), equalTo(false))
         assertThat((isTrue and isTrue)(request), equalTo(true))
-        assertThat((isTrue and isTrue).toString(), equalTo("(org.http4k.core.Request) -> kotlin.Boolean AND (org.http4k.core.Request) -> kotlin.Boolean"))
     }
 
     @Test
@@ -224,6 +249,12 @@ class ChaosTriggerLogicalOperatorTest {
         assertThat((isFalse or isFalse)(request), equalTo(false))
         assertThat((isFalse or isTrue)(request), equalTo(true))
         assertThat((isTrue or isTrue)(request), equalTo(true))
-        assertThat((isTrue or isTrue).toString(), equalTo("(org.http4k.core.Request) -> kotlin.Boolean OR (org.http4k.core.Request) -> kotlin.Boolean"))
     }
+}
+
+data object Foo : Trigger {
+    override fun invoke(p1: Request): Boolean {
+        TODO("Not yet implemented")
+    }
+
 }

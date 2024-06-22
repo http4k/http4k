@@ -1,12 +1,14 @@
 package org.http4k.client
 
+import org.eclipse.jetty.client.BufferingResponseListener
+import org.eclipse.jetty.client.ByteBufferRequestContent
 import org.eclipse.jetty.client.HttpClient
-import org.eclipse.jetty.client.api.Result
-import org.eclipse.jetty.client.util.BufferingResponseListener
-import org.eclipse.jetty.client.util.InputStreamRequestContent
-import org.eclipse.jetty.client.util.InputStreamResponseListener
+import org.eclipse.jetty.client.InputStreamRequestContent
+import org.eclipse.jetty.client.InputStreamResponseListener
+import org.eclipse.jetty.client.Result
+import org.eclipse.jetty.http.HttpCookieStore
+import org.eclipse.jetty.http.HttpField
 import org.eclipse.jetty.http.HttpFields
-import org.eclipse.jetty.util.HttpCookieStore
 import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.BodyMode
 import org.http4k.core.Headers
@@ -23,17 +25,19 @@ import java.net.UnknownHostException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
-import org.eclipse.jetty.client.api.Request as JettyRequest
-import org.eclipse.jetty.client.api.Response as JettyResponse
+import org.eclipse.jetty.client.Request as JettyRequest
+import org.eclipse.jetty.client.Response as JettyResponse
 
 object JettyClient {
     @JvmStatic
     @JvmOverloads
     @JvmName("create")
-    operator fun invoke(client: HttpClient = defaultJettyHttpClient(),
-                        bodyMode: BodyMode = BodyMode.Memory,
-                        requestModifier: (JettyRequest) -> JettyRequest = { it }): DualSyncAsyncHttpHandler {
-        if(!client.isRunning) client.start()
+    operator fun invoke(
+        client: HttpClient = defaultJettyHttpClient(),
+        bodyMode: BodyMode = BodyMode.Memory,
+        requestModifier: (JettyRequest) -> JettyRequest = { it }
+    ): DualSyncAsyncHttpHandler {
+        if (!client.isRunning) client.start()
 
         return object : DualSyncAsyncHttpHandler {
             override fun close() = client.stop()
@@ -75,6 +79,7 @@ object JettyClient {
                                 fn(response)
                             }
                         })
+
                         BodyMode.Stream -> send(object : InputStreamResponseListener() {
                             override fun onHeaders(response: JettyResponse) {
                                 super.onHeaders(response)
@@ -92,22 +97,37 @@ object JettyClient {
                 }
             }
 
-            private fun HttpClient.newRequest(request: Request) =
+            private fun HttpClient.newRequest(request: Request): org.eclipse.jetty.client.Request =
                 newRequest(request.uri.toString()).method(request.method.name)
-                .headers { fields -> request.headers.toParametersMap().forEach { fields.put(it.key, it.value)}}
-                .body(InputStreamRequestContent(request.body.stream)).let(requestModifier)
+                    .headers { fields -> request.headers.toParametersMap().forEach { fields.put(it.key, it.value) } }
+                    .body(
+                        when (bodyMode) {
+                            BodyMode.Memory -> ByteBufferRequestContent(request.body.payload)
+                            BodyMode.Stream -> InputStreamRequestContent(request.body.stream)
+                        }
+                    )
+                    .let(requestModifier)
+                    .let { jettyRequest ->
+                        request.body.length?.let { len ->
+                            jettyRequest.headers { headers -> headers.add("content-length", len.toString()) }
+                        } ?: jettyRequest
+                    }
+
 
             private fun JettyRequest.timeoutOrMax() = if (timeout <= 0) Long.MAX_VALUE else timeout
 
             private fun JettyResponse.toHttp4kResponse(): Response =
                 Response(Status(status, reason)).headers(headers.toHttp4kHeaders())
 
-            private fun HttpFields.toHttp4kHeaders(): Headers = flatMap { it.values.map { hValue -> it.name to hValue } }
+            private fun HttpFields.toHttp4kHeaders(): Headers =
+                flatMap { it.values.map { hValue -> it.name to hValue } }
 
-            private fun Throwable.asHttp4kResponse(): Response = Response(when (this) {
-                is TimeoutException -> CLIENT_TIMEOUT
-                else -> SERVICE_UNAVAILABLE
-            }.description("Client Error: caused by $localizedMessage"))
+            private fun Throwable.asHttp4kResponse(): Response = Response(
+                when (this) {
+                    is TimeoutException -> CLIENT_TIMEOUT
+                    else -> SERVICE_UNAVAILABLE
+                }.description("Client Error: caused by $localizedMessage")
+            )
         }
     }
 }
@@ -115,6 +135,6 @@ object JettyClient {
 object PreCannedJettyHttpClients {
     fun defaultJettyHttpClient() = HttpClient().apply {
         isFollowRedirects = false
-        cookieStore = HttpCookieStore.Empty()
+        httpCookieStore = HttpCookieStore.Empty()
     }
 }

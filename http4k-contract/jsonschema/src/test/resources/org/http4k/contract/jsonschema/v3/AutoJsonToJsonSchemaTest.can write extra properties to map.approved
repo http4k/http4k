@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/customPrefix/org.http4k.contract.jsonschema.v3.ArbObject3"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject3"
   },
   "definitions": [
     {
@@ -11,13 +11,18 @@
             "example": "stringValue",
             "description": "string description",
             "format": "string format",
-            "type": "string"
+            "type": "string",
+            "a-x-thing": "some special value",
+            "key": "string",
+            "nullable": false
           },
           "num": {
             "example": 1,
             "description": "int description",
             "format": "another format",
-            "type": "integer"
+            "type": "integer",
+            "key": 123,
+            "nullable": false
           }
         },
         "example": {

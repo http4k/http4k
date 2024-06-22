@@ -3,6 +3,7 @@ package org.http4k.format
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import dev.forkhandles.values.AbstractValue
 import org.http4k.events.Event
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
@@ -34,15 +35,17 @@ inline fun <reified K> JsonAdapter<K>.asFactory() = SimpleMoshiAdapterFactory(K:
 inline fun <reified T : JsonAdapter<K>, reified K> Moshi.Builder.addTyped(fn: T): Moshi.Builder =
     add(K::class.java, fn)
 
-
 /**
  * This adapter factory will capture ALL instances of a particular superclass/interface.
  */
-abstract class IsAnInstanceOfAdapter<T : Any>(private val clazz: KClass<T>) : JsonAdapter.Factory {
+abstract class IsAnInstanceOfAdapter<T : Any>(
+    private val clazz: KClass<T>,
+    private val resolveAdapter: Moshi.(KClass<T>) -> JsonAdapter<T> = { adapter(it.java) }
+) : JsonAdapter.Factory {
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
         with(Types.getRawType(type)) {
             when {
-                isA(clazz.java) -> moshi.adapter(clazz.java)
+                isA(clazz.java) -> moshi.resolveAdapter(clazz)
                 else -> null
             }
         }
@@ -54,7 +57,6 @@ abstract class IsAnInstanceOfAdapter<T : Any>(private val clazz: KClass<T>) : Js
 /**
  * These adapters are the edge case adapters for dealing with Moshi
  */
-
 object ThrowableAdapter : IsAnInstanceOfAdapter<Throwable>(Throwable::class)
 
 object MapAdapter : IsAnInstanceOfAdapter<Map<*, *>>(Map::class)
@@ -67,3 +69,13 @@ object EventAdapter : JsonAdapter.Factory {
     override fun create(p0: Type, p1: MutableSet<out Annotation>, p2: Moshi) =
         if (p0.typeName == Event::class.java.typeName) p2.adapter(Any::class.java) else null
 }
+
+object ProhibitUnknownValuesAdapter : JsonAdapter.Factory {
+    override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
+        when {
+            (type as Class<*>).superclass == AbstractValue::class.java -> throw UnmappedValue(type)
+            else -> null
+        }
+}
+
+class UnmappedValue(type: Type) : Exception("unmapped type $type")

@@ -6,17 +6,18 @@ import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
 import org.eclipse.jetty.websocket.api.exceptions.WebSocketException
 import org.http4k.server.Jetty
+import org.http4k.server.ServerConfig
 import org.http4k.websocket.BlockingWebsocketClientContract
 import java.net.UnknownHostException
 
 class JettyWebsocketClientBlockingTest : BlockingWebsocketClientContract(
-    serverConfig = Jetty(0),
+    serverConfig = Jetty(0, ServerConfig.StopMode.Immediate),
     websocketFactory = { uri, headers, timeout ->
         JettyWebsocketClient.blocking(uri, headers, timeout)
     }
 ) {
-    override fun <T: Throwable> connectErrorMatcher(): Matcher<T> = isA<UnknownHostException>()
-    override fun <T: Throwable> connectionClosedErrorMatcher(): Matcher<T> = isA(
+    override fun <T : Throwable> connectErrorMatcher(): Matcher<T> = isA<UnknownHostException>()
+    override fun <T : Throwable> connectionClosedErrorMatcher(): Matcher<T> = isA(
         has(WebSocketException::message, equalTo("Connection to ws://localhost:$port/bob is closed."))
     )
 }

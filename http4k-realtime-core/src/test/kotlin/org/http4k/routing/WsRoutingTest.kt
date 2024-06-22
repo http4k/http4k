@@ -25,7 +25,7 @@ class WsRoutingTest {
             "/path1" bind websockets(
                 "/{name}" bind { req ->
                     request.set(req)
-                    WsResponse { ws ->  }
+                    WsResponse { _ ->  }
                 }
             ))
 

@@ -12,8 +12,11 @@ object DeployAction {
     @JvmStatic
     fun main(args: Array<String>) =
         OpenWhiskCliFlags(args).use {
-            openWhiskClient().updateActionInPackage(namespace, packageName, actionName, "true",
-                ActionPut(namespace, actionName, version, true, ActionExec("java:default",
+            openWhiskClient().updateActionInPackage(
+                namespace, packageName, actionName, "true",
+                ActionPut(
+                    namespace, actionName, version, true, ActionExec(
+                    "java:default",
                     File(jarFile).readBytes().base64Encode(),
                     main = main), listOf(
                     KeyValue("web-export", true),

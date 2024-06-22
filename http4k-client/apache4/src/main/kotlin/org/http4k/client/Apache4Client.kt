@@ -101,7 +101,7 @@ private class Apache4Request(requestBodyMode: BodyMode, private val request: Req
     init {
         uri = URI(request.uri.toString())
         entity = when (requestBodyMode) {
-            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
+            Stream -> InputStreamEntity(request.body.stream, request.body.length ?: request.header("content-length")?.toLong() ?: -1)
             Memory -> ByteArrayEntity(request.body.payload.array())
         }
     }

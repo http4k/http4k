@@ -43,7 +43,8 @@
                     "foo": {
                       "example": 123,
                       "format": "int32",
-                      "type": "integer"
+                      "type": "integer",
+                      "nullable": true
                     },
                     "arb": {
                       "$ref": "#/components/schemas/ArbObject1"
@@ -174,7 +175,8 @@
                       ]
                     }
                   ],
-                  "type": "array"
+                  "type": "array",
+                  "nullable": false
                 }
               }
             }
@@ -396,13 +398,15 @@
             "custom/v1": {
               "schema": {
                 "example": "john",
-                "type": "string"
+                "type": "string",
+                "nullable": false
               }
             },
             "custom/v2": {
               "schema": {
                 "example": "john",
-                "type": "string"
+                "type": "string",
+                "nullable": false
               }
             }
           },
@@ -415,13 +419,15 @@
               "custom/v1": {
                 "schema": {
                   "example": "john",
-                  "type": "string"
+                  "type": "string",
+                  "nullable": false
                 }
               },
               "custom/v2": {
                 "schema": {
                   "example": "john",
-                  "type": "string"
+                  "type": "string",
+                  "nullable": false
                 }
               }
             }
@@ -575,24 +581,27 @@
         "properties": {
           "string": {
             "example": "s",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           },
           "child": {
             "$ref": "#/components/schemas/ArbObject1"
           },
           "numbers": {
             "items": {
-              "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "type": "integer"
             },
             "example": [
               1
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           },
           "bool": {
             "example": true,
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": false
           }
         },
         "example": {
@@ -608,6 +617,7 @@
           ],
           "bool": true
         },
+        "additionalProperties": false,
         "type": "object",
         "required": [
           "bool",
@@ -627,7 +637,8 @@
             "example": [
               "bing"
             ],
-            "type": "array"
+            "type": "array",
+            "nullable": false
           }
         },
         "example": {
@@ -648,7 +659,8 @@
           "bar",
           "bing"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": false
       },
       "ArbObject4": {
         "properties": {
@@ -669,7 +681,8 @@
           "uri": {
             "example": "http://foowang",
             "format": "uri",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           },
           "additional": {
             "additionalProperties": {
@@ -677,7 +690,8 @@
                 "foo": {
                   "example": 123,
                   "format": "int32",
-                  "type": "integer"
+                  "type": "integer",
+                  "nullable": true
                 },
                 "arb": {
                   "$ref": "#/components/schemas/ArbObject1"
@@ -774,7 +788,8 @@
         "properties": {
           "value": {
             "example": "bob",
-            "type": "string"
+            "type": "string",
+            "nullable": false
           }
         },
         "example": {
@@ -806,7 +821,8 @@
           "value": {
             "example": 123,
             "format": "int32",
-            "type": "integer"
+            "type": "integer",
+            "nullable": false
           }
         },
         "example": {

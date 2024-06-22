@@ -5,8 +5,6 @@ import org.http4k.core.Uri
 /**
  * Persists the trace and optionally reports the location
  */
-fun interface TraceRenderPersistence {
-    operator fun invoke(render: TraceRender): Uri?
-
+fun interface TraceRenderPersistence : (TraceRender) -> Uri? {
     companion object
 }

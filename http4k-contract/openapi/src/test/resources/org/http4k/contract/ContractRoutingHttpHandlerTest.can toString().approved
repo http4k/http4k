@@ -1,0 +1,8 @@
+
+GET: /route-contract
+GET: /bad-request
+GET: /bad-request-query-via-meta
+GET: /bad-request-body
+GET: /bad-request-body-via-meta
+GET: /bad-request-body-ignore-body
+GET: /bad-request-body-ignore-all

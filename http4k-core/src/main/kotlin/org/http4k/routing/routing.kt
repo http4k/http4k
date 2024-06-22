@@ -9,7 +9,9 @@ import org.http4k.core.UriTemplate
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler =
     routes(*list.map { "" bind it.first to it.second }.toTypedArray())
 
-fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = RouterBasedHttpHandler(OrRouter.from(list.toList()))
+fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = routes(list.toList())
+
+fun routes(routers: List<RoutingHttpHandler>): RoutingHttpHandler = RouterBasedHttpHandler(OrRouter.from(routers))
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 infix fun String.bind(httpHandler: RoutingHttpHandler): RoutingHttpHandler = httpHandler.withBasePath(this)

@@ -17,7 +17,7 @@ class NamedSourceApproverTest {
     private val testName = "somename" + Random.nextLong()
     private val actualFile = File(baseFile, "$testName.actual")
     private val approvedFile = File(baseFile, "$testName.approved")
-    private val approver = NamedResourceApprover(testName, ApprovalContent.HttpBodyOnly(), FileSystemApprovalSource(baseFile))
+    private val approver = NamedResourceApprover(testName, ApprovalContent.HttpTextBody(), FileSystemApprovalSource(baseFile))
 
     @Test
     fun `when no approval recorded, create actual and throw`() {
@@ -49,5 +49,14 @@ class NamedSourceApproverTest {
         approver.assertApproved(Response(OK).body(body))
         assertThat(actualFile.exists(), equalTo(false))
         assertThat(approvedFile.readText(), equalTo(body))
+    }
+
+    @Test
+    fun `uses file name suffix`() {
+        assertThat({ approver.withNameSuffix("suffix").assertApproved(Response(OK).body(body)) }, throws<ApprovalFailed>())
+        val actualFile = File(baseFile, "${testName}.suffix.actual")
+        assertThat(actualFile.exists(), equalTo(true))
+        assertThat(actualFile.readText(), equalTo(body))
+        assertThat(approvedFile.exists(), equalTo(false))
     }
 }

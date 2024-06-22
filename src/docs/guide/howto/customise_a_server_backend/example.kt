@@ -21,7 +21,7 @@ class SecureJetty(
     private val sslPort: Int,
     private val localKeyStorePath: String,
     private val localKeystorePassword: String,
-    private val locakKeyManagerPassword: String
+    private val localKeyManagerPassword: String
 
 ) : ServerConfig {
     override fun toServer(http: HttpHandler): Http4kServer {
@@ -31,9 +31,9 @@ class SecureJetty(
             }
 
             val sslContextFactory = SslContextFactory.Server().apply {
-                this.keyStorePath = localKeyStorePath
-                setKeyStorePassword(localKeystorePassword)
-                setKeyManagerPassword(locakKeyManagerPassword)
+                keyStorePath = localKeyStorePath
+                keyStorePassword = localKeystorePassword
+                keyManagerPassword = localKeyManagerPassword
             }
 
             connectors = arrayOf(
@@ -64,7 +64,7 @@ fun main() {
                 sslPort = 9000,
                 localKeyStorePath = "keystore.jks",
                 localKeystorePassword = "password",
-                locakKeyManagerPassword = "password"
+                localKeyManagerPassword = "password"
             )
         ).start()
 }

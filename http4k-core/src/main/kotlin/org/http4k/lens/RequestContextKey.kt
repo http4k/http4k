@@ -10,7 +10,7 @@ typealias RequestContextLens<T> = BiDiLens<Request, T>
 
 object RequestContextKey {
     fun <T> required(store: Store<RequestContext>, name: String = UUID.randomUUID().toString()): RequestContextLens<T> {
-        val meta = Meta(true, "context", ObjectParam, name)
+        val meta = Meta(true, "context", ObjectParam, name, null, emptyMap())
         val get: (Request) -> T = { target ->
             store[target].let {
                 val value: T? = it[name]
@@ -22,12 +22,14 @@ object RequestContextKey {
     }
 
     fun <T : Any?> optional(store: Store<RequestContext>, name: String = UUID.randomUUID().toString()) =
-        BiDiLens(Meta(false, "context", ObjectParam, name), { target -> store[target][name] },
+        BiDiLens(
+            Meta(false, "context", ObjectParam, name, null, emptyMap()), { target -> store[target][name] },
             { value: T?, target: Request -> store[target][name] = value; target }
         )
 
     fun <T : Any?> defaulted(store: Store<RequestContext>, default: T, name: String = UUID.randomUUID().toString()) =
-        BiDiLens(Meta(false, "context", ObjectParam, name), { target -> store[target][name] ?: default },
+        BiDiLens(
+            Meta(false, "context", ObjectParam, name, null, emptyMap()), { target -> store[target][name] ?: default },
             { value: T, target: Request -> store[target][name] = value; target }
         )
 }

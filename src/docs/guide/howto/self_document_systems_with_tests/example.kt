@@ -13,6 +13,7 @@ import org.http4k.events.EventFilters.AddZipkinTraces
 import org.http4k.events.Events
 import org.http4k.events.HttpEvent.Incoming
 import org.http4k.events.HttpEvent.Outgoing
+import org.http4k.events.and
 import org.http4k.events.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.ResetRequestTracing
@@ -22,8 +23,8 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.bind
 import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
-import org.http4k.tracing.ActorResolver
 import org.http4k.tracing.Actor
+import org.http4k.tracing.ActorResolver
 import org.http4k.tracing.ActorType
 import org.http4k.tracing.TraceRenderPersistence
 import org.http4k.tracing.junit.TracerBulletEvents
@@ -39,12 +40,12 @@ import java.io.File
 fun TraceEvents(actorName: String) = AddZipkinTraces().then(AddServiceName(actorName))
 
 // standardised client filter stack which adds tracing and records traffic events
-fun ClientStack(events: Events) = ReportHttpTransaction { events(Outgoing(it)) }
-    .then(ClientFilters.RequestTracing())
+fun ClientStack(events: Events) = ClientFilters.RequestTracing()
+    .then(ReportHttpTransaction { events(Outgoing(it)) })
 
 // standardised server filter stack which adds tracing and records traffic events
-fun ServerStack(events: Events) = ReportHttpTransaction { events(Incoming(it)) }
-    .then(RequestTracing())
+fun ServerStack(events: Events) =
+    RequestTracing().then(ReportHttpTransaction { events(Incoming(it)) })
 
 // Our "User" object who will send a request to our system
 class User(rawEvents: Events, rawHttp: HttpHandler) {
@@ -58,7 +59,7 @@ class User(rawEvents: Events, rawHttp: HttpHandler) {
 
 // the first internal app
 fun Internal1(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
-    val events = TraceEvents("internal1").then(rawEvents).then(rawEvents)
+    val events = TraceEvents("internal1").then(rawEvents).and(rawEvents)
     val http = ClientStack(events).then(rawHttp)
 
     return ServerStack(events)
@@ -75,7 +76,7 @@ fun Internal1(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
 
 // the second internal app
 fun Internal2(rawEvents: Events, rawHttp: HttpHandler): HttpHandler {
-    val events = TraceEvents("internal2").then(rawEvents).then(rawEvents)
+    val events = TraceEvents("internal2").then(rawEvents)
     val http = ClientStack(events).then(rawHttp)
 
     return ServerStack(events)

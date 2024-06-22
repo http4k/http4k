@@ -139,6 +139,15 @@ class HeaderTest {
     }
 
     @Test
+    fun `accept header serialises correctly to message`() {
+        val reqWithHeader = Request(GET, "").with(Header.ACCEPT of Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
+
+        assertThat(reqWithHeader.header("Accept"), equalTo("text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))
+        assertThat(reqWithHeader.accept(), equalTo(Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
+        )
+    }
+
+    @Test
     fun `multiple directives are parsed correctly`() {
         assertThat(Header.parseValueAndDirectives("some value"), equalTo("some value" to emptyList()))
         assertThat(Header.parseValueAndDirectives("some value ;"), equalTo("some value" to emptyList()))
@@ -193,9 +202,19 @@ class HeaderTest {
 
     @Test
     fun `basic auth header added correctly to message`() {
-        val request = Request(GET, "")
-            .with(Header.AUTHORIZATION_BASIC of Credentials("admin", "hunter2"))
+        val credentials = Credentials("admin", "hunter2")
+        val request = Request(GET, "").basicAuthentication(credentials)
 
         assertThat(request, hasHeader("Authorization", "Basic YWRtaW46aHVudGVyMg=="))
+        assertThat(request.basicAuthentication(), equalTo(credentials))
+    }
+
+    @Test
+    fun `bearer auth header added correctly to message`() {
+        val token = "foo"
+        val request = Request(GET, ""). bearerAuth(token)
+
+        assertThat(request, hasHeader("Authorization", "Bearer $token"))
+        assertThat(request.bearerToken(), equalTo(token))
     }
 }

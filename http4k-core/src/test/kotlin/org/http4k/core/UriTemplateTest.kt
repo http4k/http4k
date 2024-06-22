@@ -144,7 +144,7 @@ class UriTemplateTest {
     @Test
     @Disabled
     fun greedyQualifiersAreNotReplaced() {
-         val patternWithGreedyQualifier = "[a-z]{3}"
+        val patternWithGreedyQualifier = "[a-z]{3}"
         assertThat(from("/foo/{bar:$patternWithGreedyQualifier}").matches("/foo/abc"), equalTo(true))
     }
 

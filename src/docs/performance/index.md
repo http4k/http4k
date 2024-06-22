@@ -8,12 +8,12 @@ generally performs at a very low overhead compared to the raw server.
 We have entered http4k into the prominent [Tech Empower Framework Benchmarks](https://www.techempower.com/benchmarks/) 
 project, which assesses frameworks over a series of realistic tests. 
 
-For this benchmark, no customisation or performance tuning of the underlying servers was done - the default application 
-HttpHandler was used which is then plugged into each custom backend, as below:
+For this benchmark, no customisation or performance tuning of the underlying servers is done - the default application 
+HttpHandler is used which is then plugged into each custom backend, as below:
 
 ```kotlin
 fun main() {
-    Http4kBenchmarkServer.start(Undertow(9000))
+    Http4kBenchmarkServer(PostgresDatabase()).start(Undertow(9000))
 }
 ```
 
@@ -21,42 +21,42 @@ Command-line JVM options, however, were tuned for the test to take advantage of 
 
 The full implementation of the benchmark can be found [here](https://github.com/TechEmpower/FrameworkBenchmarks/tree/master/frameworks/Kotlin/http4k).
 
-### Results - Round 19
-Overall, http4k did very well in this round of benchmarking, placing 19/104 - especially considering that the [ethos](/guide/concepts/rationale) of the library is one of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
+### Results - Round 22
+Overall, http4k continues to do well in this round of benchmarking, placing 48/159 - especially considering that the [ethos](/guide/concepts/rationale) of the library is one of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
 
-The big surprise was the high performance of the Apache server backend, which consistently outranked Undertow (which is the most fully featured of all the supported backends and our default option). 
+Rankings below are filtered for JVM libraries:
 
-#### Overall ranking (a: [results](https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=composite):
-*Top rank: 9/29
+#### Composite ranking: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=composite&l=xan3h7-cn3):
+*Top rank: 13/41
 
-#### DB query + HTML rendering: [results](https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=fortune&l=fjd30b):
-*Top rank: 9/111 - Apache backend*
-
-Database driver used is PostgreSql backed by a Hikari pool.
-Handlebars templating engine used for rendering.
-
-#### Multiple DB queries: [results](https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=query&l=fjd30b):
-*Top rank: 10/105 - Undertow backend*
+#### DB query + HTML rendering: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=fortune&l=xan3h7-cn3):
+*Top rank: 25/146 - Apache backend*
 
 Database driver used is PostgreSql backed by a Hikari pool.
+Rocker templating engine used for rendering.
 
-#### Single DB query: [results](https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=db&l=fjd30b):
-*Top rank: 22/111 - Apache backend*
+#### Multiple DB queries: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=query&l=xan3h7-cn3):
+*Top rank: 23/145 - Jetty Loom backend*
 
-Database driver used is PostgreSql backed by a Hikari pool.
+Database driver used is Postgres Vertx Client backed by a Hikari pool.
 
-#### Random DB updates: [results](https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=update&l=fjd30b):
-*Top rank: 23/93 - Undertow backend*
+#### Single DB query: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=db&l=xan3h7-cn3):
+*Top rank: 25/151 - Apache backend*
 
 Database driver used is PostgreSql backed by a Hikari pool.
 
-#### JSON Serialization: [results](https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=json&l=fjd30b):
-*Top rank: 35/110 - Apache backend*
+#### Random DB updates: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=update&l=xan3h7-cn3):
+*Top rank: 41/138 - Jetty Loom backend*
 
-The standard Jackson module used for JSON creation and marshalling.
+Database driver used is Postgres Vertx Client backed by a Hikari pool.
 
-#### Plaintext pipelining: [results](https://www.techempower.com/benchmarks/#section=data-r19&hw=ph&test=plaintext&l=fjd30b):
-*Top rank: 55/113 - Apache backend*
+#### JSON Serialization: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=json&l=xan3h7-cn3):
+*Top rank: 59/152 - Netty backend*
+
+The standard Argo JSON module used for JSON creation and marshalling.
+
+#### Plaintext pipelining: [results](https://www.techempower.com/benchmarks/#section=data-r22&hw=ph&test=plaintext&l=xan3h7-cn3):
+*Top rank: 84/153 - Netty backend*
 
 ### Recommendations
 Benchmark your own app's performance trying different engines if performance is critical.  The Tech Empower benchmarks attempt to simulate simple real-world scenarios, but they can behave drastically different than your app.  One other consideration is test time; some engines start up much faster than others.

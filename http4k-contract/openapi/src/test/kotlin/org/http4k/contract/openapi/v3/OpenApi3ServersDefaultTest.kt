@@ -7,7 +7,8 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.format.Argo
 
 class OpenApi3ServersDefaultTest : ContractRendererContract<JsonNode>(
-    Argo, OpenApi3(
+    Argo,
+    OpenApi3(
         ApiInfo("title", "1.2", "module description"),
         Argo,
         listOf(AddSimpleFieldToRootNode)

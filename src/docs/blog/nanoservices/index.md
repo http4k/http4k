@@ -66,7 +66,7 @@ This example contains two apps. The first is a proxy which captures streams of t
 <hr/>
 
 ### 7. Watch your FS for file changes [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/nanoservices/file_watcher.kt)
-Requires: `http4k-core`, `http4k-server-jetty`
+Requires: `http4k-core`, `http4k-server-undertow`
 
 Back to Websockets, we can watch the file system for changes and subscribe to the event feed.
 

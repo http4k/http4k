@@ -339,13 +339,15 @@
             "custom/v1": {
               "schema": {
                 "example": "john",
-                "type": "string"
+                "type": "string",
+                "nullable": false
               }
             },
             "custom/v2": {
               "schema": {
                 "example": "john",
-                "type": "string"
+                "type": "string",
+                "nullable": false
               }
             }
           },
@@ -358,13 +360,15 @@
               "custom/v1": {
                 "schema": {
                   "example": "john",
-                  "type": "string"
+                  "type": "string",
+                  "nullable": false
                 }
               },
               "custom/v2": {
                 "schema": {
                   "example": "john",
-                  "type": "string"
+                  "type": "string",
+                  "nullable": false
                 }
               }
             }
@@ -393,7 +397,8 @@
             "text/plain": {
               "schema": {
                 "example": "hello from the land of receiving plaintext",
-                "type": "string"
+                "type": "string",
+                "nullable": false
               }
             }
           },
@@ -426,7 +431,8 @@
               "text/plain": {
                 "schema": {
                   "example": "hello from the land of sending plaintext",
-                  "type": "string"
+                  "type": "string",
+                  "nullable": false
                 }
               }
             }
@@ -586,7 +592,9 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": ".*",
+              "nullable": true
             },
             "in": "header",
             "name": "s",
@@ -595,7 +603,8 @@
           },
           {
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 42
             },
             "in": "header",
             "name": "i",
@@ -603,12 +612,78 @@
             "description": "intHeader"
           },
           {
+            "schema": {
+              "type": "number",
+              "default": 0
+            },
+            "in": "header",
+            "name": "d",
+            "required": false,
+            "description": "dHeader"
+          },
+          {
+            "schema": {
+              "type": "number",
+              "default": 4.2
+            },
+            "in": "header",
+            "name": "bd",
+            "required": false,
+            "description": "bigDHeader"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "default": 6547262478
+            },
+            "in": "header",
+            "name": "bi",
+            "required": false,
+            "description": "bigIHeader"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "default": 8493575243
+            },
+            "in": "header",
+            "name": "l",
+            "required": false,
+            "description": "lHeader"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "default": [
+                "a",
+                "b"
+              ]
+            },
+            "in": "header",
+            "name": "list",
+            "required": false,
+            "description": "listHeader"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "default": {
+                "a": "b"
+              }
+            },
+            "in": "header",
+            "name": "obj",
+            "required": false,
+            "description": "objHeader"
+          },
+          {
             "in": "header",
             "name": "e",
             "required": false,
             "description": "enumHeader",
             "schema": {
-              "$ref": "#/components/schemas/Foo"
+              "$ref": "#/components/schemas/Foo",
+              "default": "bar"
             }
           },
           {
@@ -617,7 +692,10 @@
             "required": false,
             "description": "jsonHeader",
             "schema": {
-              "$ref": "#/components/schemas/object1955914966"
+              "$ref": "#/components/schemas/object1955914966",
+              "default": {
+                "a": "b"
+              }
             }
           }
         ],
@@ -824,7 +902,11 @@
               "type": "array",
               "items": {
                 "type": "boolean"
-              }
+              },
+              "default": [
+                true,
+                false
+              ]
             },
             "in": "query",
             "name": "b",
@@ -867,7 +949,8 @@
                   "bar",
                   "bing"
                 ],
-                "type": "string"
+                "type": "string",
+                "nullable": false
               }
             },
             "in": "query",
@@ -983,7 +1066,8 @@
           "bar",
           "bing"
         ],
-        "type": "string"
+        "type": "string",
+        "nullable": false
       },
       "object1955914966": {
         "type": "object",

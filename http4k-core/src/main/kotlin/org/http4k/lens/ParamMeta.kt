@@ -6,12 +6,13 @@ sealed class ParamMeta(val description: String) {
     data class ArrayParam(private val itemType: ParamMeta) : ParamMeta("array") {
         fun itemType() = itemType
     }
+
     class EnumParam<T : Enum<T>>(val clz: KClass<T>) : ParamMeta("string")
-    object StringParam : ParamMeta("string")
-    object ObjectParam : ParamMeta("object")
-    object BooleanParam : ParamMeta("boolean")
-    object IntegerParam : ParamMeta("integer")
-    object FileParam : ParamMeta("file")
-    object NumberParam : ParamMeta("number")
-    object NullParam : ParamMeta("null")
+    data object StringParam : ParamMeta("string")
+    data object ObjectParam : ParamMeta("object")
+    data object BooleanParam : ParamMeta("boolean")
+    data object IntegerParam : ParamMeta("integer")
+    data object FileParam : ParamMeta("file")
+    data object NumberParam : ParamMeta("number")
+    data object NullParam : ParamMeta("null")
 }

@@ -29,7 +29,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
 
         val request = mapOf(
             "rawPath" to "/path",
-            "queryStringParameters" to mapOf("query" to "value"),
+            "rawQueryString" to "query=value",
             "body" to "input body",
             "cookies" to listOf(inputCookie.keyValueCookieString(), inputCookie2.keyValueCookieString()),
             "headers" to mapOf("c" to "d"),
@@ -71,7 +71,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
 
         val request = mapOf(
             "rawPath" to "/path",
-            "queryStringParameters" to mapOf("query" to "value"),
+            "rawQueryString" to "query=value",
             "body" to "input body".base64Encode(),
             "headers" to mapOf("c" to "d"),
             "cookies" to listOf(inputCookie.fullCookieString() + "; " + inputCookie2.fullCookieString()),

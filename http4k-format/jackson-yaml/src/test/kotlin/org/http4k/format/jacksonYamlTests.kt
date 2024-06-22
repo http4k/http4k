@@ -3,6 +3,7 @@ package org.http4k.format
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -156,11 +157,17 @@ bool: true
     override val expectedAutoMarshallingZonesAndLocale = "zoneId:\"America/Toronto\"\nzoneOffset:\"-04:00\"\nlocale:\"en-CA\"\n"
 
     @Test
+    override fun `automarshalling failure has expected message`() {
+        assertThat(runCatching { JacksonYaml.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
+            .exceptionOrNull()!!.message!!, startsWith("Instantiation of [simple type"))
+    }
+
+    @Test
     override fun `roundtrip arbitrary map`() {
         val wrapper = mapOf(
             "str" to "val1",
             "num" to BigDecimal("123.1"),
-            "array" to listOf(BigDecimal("1.1"),"stuff"),
+            "array" to listOf(BigDecimal("1.1"), "stuff"),
             "map" to mapOf("foo" to "bar"),
             "bool" to true
         )
@@ -186,7 +193,7 @@ bool: true
     @Test
     fun `custom jackson yaml`() {
         val jackson = JacksonYaml.custom {
-            text(BiDiMapping({StringHolder(it)},{it.value}))
+            text(BiDiMapping({ StringHolder(it) }, { it.value }))
         }
 
         val value = StringHolder("stuff")

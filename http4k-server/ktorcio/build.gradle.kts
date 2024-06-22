@@ -1,15 +1,17 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 description = "Http4k HTTP Server built on top of Ktor CIO engine"
 
 dependencies {
     api(project(":http4k-core"))
-    api("io.ktor:ktor-server-cio:_")
-    testImplementation(project(path = ":http4k-core", configuration = "testArtifacts"))
+    api(Ktor.server.cio)
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 
 tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = freeCompilerArgs + listOf("-opt-in=kotlin.RequiresOptIn")
+    withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
         }
     }
 }
