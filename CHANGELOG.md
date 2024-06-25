@@ -3,9 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.23.1.0 (uncut)
+### v5.24.0.0 
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Allow removal of all queries for a URI. H/T @dhs3000
+- **http4k-format-kondor** : Upgrade to new version of Kondor. H/T @uberto
+- **http4k-testing-strikt** [Break] The upgrade to the latest version drops Java <17 support. If you are still using Java 8, you will need to stick with the previous version of this module.
 
 ### v5.23.0.0
 - **http4k-*** : Upgrade some dependency versions.
