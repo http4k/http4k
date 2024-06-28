@@ -72,7 +72,18 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
                     val currentPath = currentUrl?.let {
                         Uri.of(it).path.let { it.ifEmpty { "/" } }
                     } ?: "/"
-                    currentPath.appendToPath(path)
+                    when {
+                        currentPath.endsWith("/") -> currentPath.appendToPath(path)
+                        else -> {
+                            val pathParts = Paths.get(currentPath).toList()
+                            val newPathParts = Paths.get(path).toList()
+                            val newPath = when {
+                                path.isEmpty() -> pathParts
+                                else -> pathParts.dropLast(1) + newPathParts
+                            }
+                            newPath.joinToString(separator = "/")
+                        }
+                    }
                 }
             }
             newPath.normalizePath()
@@ -96,10 +107,6 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         }
         var normalizedPath = newPathParts.joinToString(separator = "/")
         if (!normalizedPath.startsWith("/")) normalizedPath = "/$normalizedPath"
-        if (normalizedPath != "/" && normalizedPath.endsWith("/"))
-            normalizedPath = normalizedPath.removeRange(
-                IntRange(normalizedPath.lastIndex, normalizedPath.lastIndex)
-            )
         return normalizedPath
     }
 
