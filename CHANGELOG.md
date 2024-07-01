@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v5.24.1.0 (uncut) 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-testing-webdriver** : Fix base path replacement logic for same-dir-path and dot-path URLs. H/T jweidler
+- **http4k-serverless-lambda*** : [Fix] AWS adapter throws on invalid URLs.
+- **http4k-testing-webdriver** : [Fix] Base path replacement logic for same-dir-path and dot-path URLs. H/T jweidler
 
 ### v5.24.0.0 
 - **http4k-*** : Upgrade some dependency versions.

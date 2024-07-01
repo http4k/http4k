@@ -47,10 +47,11 @@ abstract class InvocationLambdaFunction(appLoader: AppLoaderWithContexts) :
 }
 
 object InvocationLambdaAwsHttpAdapter : AwsHttpAdapter<InputStream, InputStream> {
-    override fun invoke(req: InputStream, ctx: Context) =
+    override fun invoke(req: InputStream, ctx: Context) = runCatching {
         Request(POST, "/2015-03-31/functions/${ctx.functionName}/invocations")
             .header("X-Amz-Invocation-Type", "RequestResponse")
             .header("X-Amz-Log-Type", "Tail").body(req)
+    }
 
     override fun invoke(resp: Response) = resp.body.stream
 }

@@ -5,6 +5,8 @@ import com.squareup.moshi.Moshi
 import okio.buffer
 import okio.source
 import org.http4k.core.RequestContexts
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
@@ -20,15 +22,20 @@ abstract class ApiGatewayFnLoader protected constructor(
 
     override operator fun invoke(env: Map<String, String>): FnHandler<InputStream, Context, InputStream> {
         val app = appLoader(env, contexts)
+
         return FnHandler { inputStream, ctx ->
-            val newRequest = adapter(moshi.asA(inputStream), ctx)
-            moshi.asInputStream(
-                adapter(
-                    coreFilter
-                        .then(AddLambdaContextAndRequest(ctx, newRequest, contexts))
-                        .then(app)(newRequest)
+            val response = adapter(moshi.asA(inputStream), ctx)
+                .fold(
+                    {
+                        coreFilter
+                            .then(AddLambdaContextAndRequest(ctx, it, contexts))
+                            .then(app)(it)
+                    },
+                    {
+                        Response(BAD_REQUEST).body(it.localizedMessage)
+                    }
                 )
-            )
+            moshi.asInputStream(adapter(response))
         }
     }
 }
