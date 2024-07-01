@@ -39,12 +39,12 @@ The principles of [http4k] are:
 * **Application as a Function:** Based on the Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed 
 of 2 types of simple function:
     * *HttpHandler:* `(Request) -> Response` - provides a remote call for processing a Request. 
-    * *Filter:* `(HttpHandler) -> HttpHandler` - adds Request/Response pre/post processing. These filters are composed to make stacks of reusable behaviour that can 
+    * *Filter:* `(HttpHandler) -> HttpHandler` - adds Request/Response pre/post-processing. These filters are composed to make stacks of reusable behaviour that can 
     then be applied to an `HttpHandler`.
 * **Immutability:** All entities in the library are immutable unless their function explicitly disallows this.
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as 
 plugging together of services without HTTP container being required.
-* **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has **ZERO** dependencies and weighs in at ~1mb. Add-on modules only have dependencies required for specific implementation.
+* **Dependency-lite:** Apart from the Kotlin StdLib, `http4k-core` module has **ZERO** dependencies and weighs in at ~1mb. Add-on modules only have dependencies required for specific implementation.
 * **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both in-memory and port-based testing of:
     * individual endpoints
     * applications
@@ -91,7 +91,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
         * **SunHttp & SunHttpLoom** (bundled with `http4k-core`)
         * **Undertow** (including SSE and Websocket support)
         * **Java-WebSocket** (Websocket support only)
-    * API design allows for simple customization of underying backend.
+    * API design allows for simple customization of underlying backend.
     * **Native Friendly** Several of the supported backends can be compiled with **GraalVM** and **Quarkus** with zero configuration.
 * [Serverless:](https://http4k.org/guide/reference/serverless)
     * **Function-based support for both HTTP and Event-based applications** via adapters, using the simple and testable `HttpHandler` and `FnHandler` types.
@@ -106,7 +106,7 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
     * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-    * Self-documenting for all routes - eg. Built in support for live **OpenApi v2 and v3** description endpoints including **JSON Schema** model breakdown.
+    * Self-documenting for all routes - e.g. Built in support for live **OpenApi v2 and v3** description endpoints including **JSON Schema** model breakdown.
     * [Redoc and Swagger UI](https://http4k.org/guide/howto/create_a_swagger_ui) for OpenApi descriptions
 * [Templating:](https://http4k.org/guide/reference/templating) 
     * **Pluggable** templating system support for:
