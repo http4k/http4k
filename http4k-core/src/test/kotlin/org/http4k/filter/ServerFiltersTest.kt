@@ -295,9 +295,9 @@ class ServerFiltersTest {
 
             assertThat(
                 response, hasStatus(OK)
-                    .and(hasHeader("access-control-allow-origin", "null"))
-                    .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                    .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+                    .and(!hasHeader("access-control-allow-origin"))
+                    .and(!hasHeader("access-control-allow-headers"))
+                    .and(!hasHeader("access-control-allow-methods"))
                     .and(!hasHeader("access-control-allow-credentials"))
             )
         }
@@ -315,9 +315,9 @@ class ServerFiltersTest {
 
             assertThat(
                 response, hasStatus(OK)
-                    .and(hasHeader("access-control-allow-origin", "null"))
-                    .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                    .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+                    .and(!hasHeader("access-control-allow-origin"))
+                    .and(!hasHeader("access-control-allow-headers"))
+                    .and(!hasHeader("access-control-allow-methods"))
                     .and(!hasHeader("access-control-allow-credentials"))
             )
         }
