@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.24.1.0 (uncut) 
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-webdriver** : Fix base path replacement logic for same-dir-path and dot-path URLs. H/T jweidler
+
 ### v5.24.0.0 
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Allow removal of all queries for a URI. H/T @dhs3000
