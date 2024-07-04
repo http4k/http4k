@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.24.1.0 (uncut) 
+### v5.24.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-lambda*** : [Fix] AWS adapter throws on invalid URLs.
 - **http4k-testing-webdriver** : [Fix] Base path replacement logic for same-dir-path and dot-path URLs. H/T jweidler
