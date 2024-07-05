@@ -32,10 +32,10 @@ sealed interface ApiKeySecurity<out T> : Security {
         operator fun <T, C> invoke(
             param: Lens<Request, T>,
             consumer: LensInjector<C, Request>,
-            retrieveConsumerForKey: (T) -> C?,
+            consumerForKey: (T) -> C?,
             authorizeOptionsRequests: Boolean = true,
             name: String = "api_key"
-        ): ApiKeySecurity<T> = ApiKeySecurityWithConsumer(param, consumer, retrieveConsumerForKey, authorizeOptionsRequests, name)
+        ): ApiKeySecurity<T> = ApiKeySecurityWithConsumer(param, consumer, consumerForKey, authorizeOptionsRequests, name)
     }
 }
 
@@ -50,12 +50,12 @@ private fun <T, R> apiKeySecurityFilter(
         if (!authorizeOptionsRequests && it.method == Method.OPTIONS) {
             next(it)
         } else {
-            val keyValid = try {
+            val result = try {
                 validateAndReturnResult(param(it))
             } catch (e: LensFailure) {
                 failureResult
             }
-            onSuccess(next, it, keyValid) ?: Response(UNAUTHORIZED)
+            onSuccess(next, it, result) ?: Response(UNAUTHORIZED)
         }
     }
 }
@@ -75,12 +75,12 @@ internal class SimpleApiKeySecurity<out T>(
 internal class ApiKeySecurityWithConsumer<out T, in C>(
     override val param: Lens<Request, T>,
     private val consumer: LensInjector<C, Request>,
-    retrieveConsumerForKey: (T) -> C?,
+    consumerForKey: (T) -> C?,
     authorizeOptionsRequests: Boolean = true,
     override val name: String
 ) : ApiKeySecurity<T> {
     override val filter =
-        apiKeySecurityFilter(param, retrieveConsumerForKey, failureResult = null, authorizeOptionsRequests) { next, request, result ->
+        apiKeySecurityFilter(param, consumerForKey, failureResult = null, authorizeOptionsRequests) { next, request, result ->
             if(result != null) next(request.with(consumer of result)) else null
         }
 }
