@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.25.0.0 (uncut)
+### v5.25.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-lambda*** : [Breaking Fix] Incorrect lambda request context variable is passed - we now pass the incoming reqeust object instead of the converted http4k request. If you were using the LAMBDA_REQUEST_KEY, you can just use the request passed into the handler instead.
 
