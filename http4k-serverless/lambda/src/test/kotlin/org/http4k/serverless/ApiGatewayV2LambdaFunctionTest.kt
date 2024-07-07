@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
-import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -28,14 +27,7 @@ class ApiGatewayV2LambdaFunctionTest {
         val lambda = object : ApiGatewayV2LambdaFunction(AppLoaderWithContexts { env, contexts ->
             {
                 assertThat(contexts[it].get<Context>(LAMBDA_CONTEXT_KEY), equalTo(lambdaContext))
-                assertThat(
-                    contexts[it].get<Request>(LAMBDA_REQUEST_KEY), equalTo(
-                        Request(GET, "/path")
-                            .query("query", "value")
-                            .header("c", "d")
-                            .body("input body")
-                    )
-                )
+                assertThat(contexts[it].get<Request>(LAMBDA_REQUEST_KEY), equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
                 Response(OK).header("a", "b").body("hello there")
             }

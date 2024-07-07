@@ -28,7 +28,7 @@ class InvocationFnLoader(private val appLoader: AppLoaderWithContexts) : FnLoade
                 .header("X-Amz-Log-Type", "Tail").body(inputStream)
             CatchAll()
                 .then(InitialiseRequestContext(contexts))
-                .then(AddLambdaContextAndRequest(ctx, request, contexts))
+                .then(AddLambdaContextAndRequest(ctx, inputStream, contexts))
                 .then(app)(request)
                 .body.stream
         }

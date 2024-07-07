@@ -24,11 +24,12 @@ abstract class ApiGatewayFnLoader protected constructor(
         val app = appLoader(env, contexts)
 
         return FnHandler { inputStream, ctx ->
-            val response = adapter(moshi.asA(inputStream), ctx)
+            val request = moshi.asA<Map<String, Any>>(inputStream)
+            val response = adapter(request, ctx)
                 .fold(
                     {
                         coreFilter
-                            .then(AddLambdaContextAndRequest(ctx, it, contexts))
+                            .then(AddLambdaContextAndRequest(ctx, request, contexts))
                             .then(app)(it)
                     },
                     {
