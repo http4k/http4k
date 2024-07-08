@@ -21,13 +21,19 @@ fun Response.noStore() = addCacheability("no-store")
 
 fun Response.immutable() = addCacheability("immutable")
 
+fun Response.maxAge() = getCacheControlDirectiveValue("max-age")
+
 fun Response.maxAge(duration: JavaDuration) = replaceHeader("Cache-Control", MaxAgeTtl(duration).replaceIn(header("Cache-Control")))
 
 fun Response.maxAge(duration: KotlinDuration) = maxAge(duration.toJavaDuration())
 
+fun Response.staleWhileRevalidate() = getCacheControlDirectiveValue("stale-while-revalidate")
+
 fun Response.staleWhileRevalidate(duration: JavaDuration) = replaceHeader("Cache-Control", StaleWhenRevalidateTtl(duration).replaceIn(header("Cache-Control")))
 
 fun Response.staleWhileRevalidate(duration: KotlinDuration) = staleWhileRevalidate(duration.toJavaDuration())
+
+fun Response.staleIfError() = getCacheControlDirectiveValue("stale-if-error")
 
 fun Response.staleIfError(duration: JavaDuration) = replaceHeader("Cache-Control", StaleIfErrorTtl(duration).replaceIn(header("Cache-Control")))
 
@@ -54,3 +60,6 @@ private enum class Cacheability {
 
 private fun String.ensureOnlyOnceIn(currentValue: String?): String =
     currentValue?.split(",")?.map(String::trim)?.toSet()?.plus(this)?.joinToString(", ") ?: this
+
+private fun Response.getCacheControlDirectiveValue(directive: String) =
+    header("Cache-Control")?.let { Regex("$directive=(\\d+)").find(it) }?.groupValues?.lastOrNull()?.toLong()
