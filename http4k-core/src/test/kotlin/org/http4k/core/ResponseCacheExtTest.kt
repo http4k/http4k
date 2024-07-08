@@ -5,6 +5,9 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import java.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class ResponseCacheExtTest {
 
@@ -58,24 +61,45 @@ class ResponseCacheExtTest {
     }
 
     @Test
-    fun `adds max-age to response Cache-Control header`() {
+    fun `adds max-age to response Cache-Control header from Java duration`() {
         val maxAgeResponse = Response(OK).maxAge(Duration.ofMinutes(1))
 
         assertThat(maxAgeResponse.header("Cache-Control"), equalTo("max-age=60"))
     }
 
     @Test
-    fun `adds stale-while-revalidate to response Cache-Control header`() {
+    fun `adds max-age to response Cache-Control header from Kotlin duration`() {
+        val maxAgeResponse = Response(OK).maxAge(2.hours)
+
+        assertThat(maxAgeResponse.header("Cache-Control"), equalTo("max-age=7200"))
+    }
+
+    @Test
+    fun `adds stale-while-revalidate to response Cache-Control header from Java duration`() {
         val maxAgeResponse = Response(OK).staleWhileRevalidate(Duration.ofMinutes(1))
 
         assertThat(maxAgeResponse.header("Cache-Control"), equalTo("stale-while-revalidate=60"))
     }
 
     @Test
-    fun `adds stale-if-error to response Cache-Control header`() {
+    fun `adds stale-while-revalidate to response Cache-Control header from Kotlin Duration`() {
+        val maxAgeResponse = Response(OK).staleWhileRevalidate(3.minutes)
+
+        assertThat(maxAgeResponse.header("Cache-Control"), equalTo("stale-while-revalidate=180"))
+    }
+
+    @Test
+    fun `adds stale-if-error to response Cache-Control header from Java duration`() {
         val maxAgeResponse = Response(OK).staleIfError(Duration.ofMinutes(1))
 
         assertThat(maxAgeResponse.header("Cache-Control"), equalTo("stale-if-error=60"))
+    }
+
+    @Test
+    fun `adds stale-if-error to response Cache-Control header from Kotlin Duration`() {
+        val maxAgeResponse = Response(OK).staleIfError(6.seconds)
+
+        assertThat(maxAgeResponse.header("Cache-Control"), equalTo("stale-if-error=6"))
     }
 
     @Test
