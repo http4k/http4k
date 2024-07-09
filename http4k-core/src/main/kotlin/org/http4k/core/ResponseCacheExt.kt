@@ -62,4 +62,4 @@ private fun String.ensureOnlyOnceIn(currentValue: String?): String =
     currentValue?.split(",")?.map(String::trim)?.toSet()?.plus(this)?.joinToString(", ") ?: this
 
 private fun Response.getCacheControlDirectiveValue(directive: String) =
-    header("Cache-Control")?.let { Regex("$directive=(\\d+)").find(it) }?.groupValues?.lastOrNull()?.toLong()
+    header("Cache-Control")?.let { Regex("$directive=(\\d+)").find(it) }?.groupValues?.lastOrNull()?.toLongOrNull()
