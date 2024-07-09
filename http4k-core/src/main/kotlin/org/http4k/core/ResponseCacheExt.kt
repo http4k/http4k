@@ -3,7 +3,9 @@ package org.http4k.core
 import org.http4k.filter.MaxAgeTtl
 import org.http4k.filter.StaleIfErrorTtl
 import org.http4k.filter.StaleWhenRevalidateTtl
-import java.time.Duration
+import kotlin.time.Duration as KotlinDuration
+import kotlin.time.toJavaDuration
+import java.time.Duration as JavaDuration
 
 fun Response.public() = addCacheability(Cacheability.public)
 
@@ -19,11 +21,23 @@ fun Response.noStore() = addCacheability("no-store")
 
 fun Response.immutable() = addCacheability("immutable")
 
-fun Response.maxAge(duration: Duration) = replaceHeader("Cache-Control", MaxAgeTtl(duration).replaceIn(header("Cache-Control")))
+fun Response.maxAge() = getCacheControlDirectiveValue("max-age")
 
-fun Response.staleWhileRevalidate(duration: Duration) = replaceHeader("Cache-Control", StaleWhenRevalidateTtl(duration).replaceIn(header("Cache-Control")))
+fun Response.maxAge(duration: JavaDuration) = replaceHeader("Cache-Control", MaxAgeTtl(duration).replaceIn(header("Cache-Control")))
 
-fun Response.staleIfError(duration: Duration) = replaceHeader("Cache-Control", StaleIfErrorTtl(duration).replaceIn(header("Cache-Control")))
+fun Response.maxAge(duration: KotlinDuration) = maxAge(duration.toJavaDuration())
+
+fun Response.staleWhileRevalidate() = getCacheControlDirectiveValue("stale-while-revalidate")
+
+fun Response.staleWhileRevalidate(duration: JavaDuration) = replaceHeader("Cache-Control", StaleWhenRevalidateTtl(duration).replaceIn(header("Cache-Control")))
+
+fun Response.staleWhileRevalidate(duration: KotlinDuration) = staleWhileRevalidate(duration.toJavaDuration())
+
+fun Response.staleIfError() = getCacheControlDirectiveValue("stale-if-error")
+
+fun Response.staleIfError(duration: JavaDuration) = replaceHeader("Cache-Control", StaleIfErrorTtl(duration).replaceIn(header("Cache-Control")))
+
+fun Response.staleIfError(duration: KotlinDuration) = staleIfError(duration.toJavaDuration())
 
 private fun Response.addCacheability(value: String): Response =
     replaceHeader("Cache-Control", value.ensureOnlyOnceIn(header("Cache-Control")))
@@ -46,3 +60,6 @@ private enum class Cacheability {
 
 private fun String.ensureOnlyOnceIn(currentValue: String?): String =
     currentValue?.split(",")?.map(String::trim)?.toSet()?.plus(this)?.joinToString(", ") ?: this
+
+private fun Response.getCacheControlDirectiveValue(directive: String) =
+    header("Cache-Control")?.let { Regex("$directive=(\\d+)").find(it) }?.groupValues?.lastOrNull()?.toLongOrNull()
