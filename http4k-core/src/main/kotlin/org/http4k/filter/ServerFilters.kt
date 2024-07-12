@@ -74,13 +74,20 @@ object ServerFilters {
                         Header.required("access-control-allow-headers") of policy.headers.joined(),
                         Header.required("access-control-allow-methods") of policy.methods.map { method -> method.name }
                             .joined(),
-                        { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res },
+                        { res ->
+                            if (policy.credentials) res.header(
+                                "access-control-allow-credentials",
+                                "true"
+                            ) else res
+                        },
                         { res ->
                             res.takeIf { policy.exposedHeaders.isNotEmpty() }
                                 ?.header("access-control-expose-headers", policy.exposedHeaders.joined())
                                 ?: res
                         },
-                        { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res }
+                        { res ->
+                            policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res
+                        }
                     )
                 } ?: response
             }
@@ -116,20 +123,18 @@ object ServerFilters {
     /**
      * Adds Zipkin request tracing headers to the incoming request and outbound response. (traceid, spanid, parentspanid)
      */
-    object RequestTracing {
-        operator fun invoke(
-            startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> },
-            storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL
-        ): Filter = Filter { next ->
-            { req ->
-                storage.ensureCurrentSpan {
-                    val fromRequest = ZipkinTraces(req)
-                    startReportFn(req, fromRequest)
-                    storage.setForCurrentThread(fromRequest)
-                    ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, req)))
-                        .apply { endReportFn(req, this, fromRequest) }
-                }
+    fun RequestTracing(
+        startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
+        endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> },
+        storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL
+    ): Filter = Filter { next ->
+        { req ->
+            storage.ensureCurrentSpan {
+                val fromRequest = ZipkinTraces(req)
+                startReportFn(req, fromRequest)
+                storage.setForCurrentThread(fromRequest)
+                ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, req)))
+                    .apply { endReportFn(req, this, fromRequest) }
             }
         }
     }
@@ -329,12 +334,10 @@ object ServerFilters {
     /**
      * Copy headers from the incoming request to the outbound response.
      */
-    object CopyHeaders {
-        operator fun invoke(vararg headers: String): Filter = Filter { next ->
-            { request ->
-                headers.fold(next(request)) { memo, name ->
-                    request.header(name)?.let { memo.header(name, it) } ?: memo
-                }
+    fun CopyHeaders(vararg headers: String): Filter = Filter { next ->
+        { request ->
+            headers.fold(next(request)) { memo, name ->
+                request.header(name)?.let { memo.header(name, it) } ?: memo
             }
         }
     }
@@ -344,10 +347,8 @@ object ServerFilters {
      * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
-    object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory()): Filter =
-            RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
-    }
+    fun GZip(compressionMode: GzipCompressionMode = Memory()): Filter =
+        RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
 
     /**
      * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list.
@@ -366,15 +367,13 @@ object ServerFilters {
     /**
      * Initialise a RequestContext for each request which passes through the Filter stack,
      */
-    object InitialiseRequestContext {
-        operator fun invoke(contexts: Store<RequestContext>): Filter = Filter { next ->
-            {
-                val context = RequestContext()
-                try {
-                    next(contexts.inject(context, it))
-                } finally {
-                    contexts.remove(context)
-                }
+    fun InitialiseRequestContext(contexts: Store<RequestContext>): Filter = Filter { next ->
+        {
+            val context = RequestContext()
+            try {
+                next(contexts.inject(context, it))
+            } finally {
+                contexts.remove(context)
             }
         }
     }
@@ -382,11 +381,9 @@ object ServerFilters {
     /**
      * Sets the Content Type response header on the Response.
      */
-    object SetContentType {
-        operator fun invoke(contentType: ContentType): Filter = Filter { next ->
-            {
-                next(it).with(CONTENT_TYPE of contentType)
-            }
+    fun SetContentType(contentType: ContentType): Filter = Filter { next ->
+        {
+            next(it).with(CONTENT_TYPE of contentType)
         }
     }
 

@@ -92,11 +92,9 @@ object ClientFilters {
     /**
      * Sets the Content Type request header.
      */
-    object SetContentType {
-        operator fun invoke(contentType: ContentType): Filter = Filter { next ->
-            {
-                next(it.with(CONTENT_TYPE of contentType))
-            }
+    fun SetContentType(contentType: ContentType): Filter = Filter { next ->
+        {
+            next(it.with(CONTENT_TYPE of contentType))
         }
     }
 
@@ -182,7 +180,7 @@ object ClientFilters {
             return when {
                 header("host") != null && newUri.host.isNotEmpty() ->
                     redirect.replaceHeader("host",
-                    "${newUri.host}${newUri.port?.let { port -> ":$port" } ?: ""}")
+                        "${newUri.host}${newUri.port?.let { port -> ":$port" } ?: ""}")
 
                 else -> redirect
             }

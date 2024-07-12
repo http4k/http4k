@@ -17,43 +17,39 @@ object DebuggingFilters {
     /**
      * Print details of the request before it is sent to the next service.
      */
-    object PrintRequest {
-        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter =
-            RequestFilters.Tap { req ->
-                out.println(
-                    listOf(
-                        "***** REQUEST: ${req.method}: ${req.uri} *****",
-                        req.printable(debugStream)
-                    ).joinToString("\n")
-                )
-            }
-    }
+    fun PrintRequest(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter =
+        RequestFilters.Tap { req ->
+            out.println(
+                listOf(
+                    "***** REQUEST: ${req.method}: ${req.uri} *****",
+                    req.printable(debugStream)
+                ).joinToString("\n")
+            )
+        }
 
     /**
      * Print details of the response before it is returned.
      */
-    object PrintResponse {
-        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter =
-            Filter { next ->
-                {
-                    try {
-                        next(it).let { response ->
-                            out.println(
-                                listOf(
-                                    "***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****",
-                                    response.printable(debugStream)
-                                ).joinToString("\n")
-                            )
-                            response
-                        }
-                    } catch (e: Exception) {
-                        out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri} *****")
-                        e.printStackTrace(out)
-                        throw e
+    fun PrintResponse(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter =
+        Filter { next ->
+            {
+                try {
+                    next(it).let { response ->
+                        out.println(
+                            listOf(
+                                "***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****",
+                                response.printable(debugStream)
+                            ).joinToString("\n")
+                        )
+                        response
                     }
+                } catch (e: Exception) {
+                    out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri} *****")
+                    e.printStackTrace(out)
+                    throw e
                 }
             }
-    }
+        }
 
     private fun HttpMessage.printable(debugStream: Boolean) =
         if (debugStream || body is MemoryBody) this else body("<<stream>>")
@@ -61,10 +57,8 @@ object DebuggingFilters {
     /**
      * Print details of a request and it's response.
      */
-    object PrintRequestAndResponse {
-        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream) =
-            PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
-    }
+    fun PrintRequestAndResponse(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream) =
+        PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
 }
 
 fun HttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =

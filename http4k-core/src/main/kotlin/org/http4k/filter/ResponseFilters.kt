@@ -22,13 +22,11 @@ object ResponseFilters {
     /**
      * Intercept the response after it is sent to the next service.
      */
-    object Tap {
-        operator fun invoke(fn: (Response) -> Unit) = Filter { next ->
-            {
-                next(it).let {
-                    fn(it)
-                    it
-                }
+    fun Tap(fn: (Response) -> Unit) = Filter { next ->
+        {
+            next(it).let {
+                fn(it)
+                it
             }
         }
     }
@@ -91,10 +89,9 @@ object ResponseFilters {
 
         override fun invoke(next: HttpHandler): HttpHandler = { request ->
             next(request).let {
-                if (requestAcceptsGzip(request) && isCompressible(it)) {
-                    compressionMode.compress(it.body).apply(it)
-                } else {
-                    it
+                when {
+                    requestAcceptsGzip(request) && isCompressible(it) -> compressionMode.compress(it.body).apply(it)
+                    else -> it
                 }
             }
         }
@@ -112,14 +109,12 @@ object ResponseFilters {
     /**
      * Basic GZipping of Response.
      */
-    object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
-            { request ->
-                next(request).let {
-                    if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
-                        compressionMode.compress(it.body).apply(it)
-                    } else it
-                }
+    fun GZip(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
+        { request ->
+            next(request).let {
+                if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
+                    compressionMode.compress(it.body).apply(it)
+                } else it
             }
         }
     }
@@ -127,14 +122,12 @@ object ResponseFilters {
     /**
      * Basic UnGZipping of Response.
      */
-    object GunZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
-            { request ->
-                next(request.header("accept-encoding", "gzip")).let { response ->
-                    response.header("content-encoding")
-                        ?.let { if (it.contains("gzip")) it else null }
-                        ?.let { response.body(compressionMode.decompress(response.body)) } ?: response
-                }
+    fun GunZip(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
+        { request ->
+            next(request.header("accept-encoding", "gzip")).let { response ->
+                response.header("content-encoding")
+                    ?.let { if (it.contains("gzip")) it else null }
+                    ?.let { response.body(compressionMode.decompress(response.body)) } ?: response
             }
         }
     }
@@ -146,16 +139,16 @@ object ResponseFilters {
         { next(it).run { body(body.payload.base64Encode()) } }
     }
 
-    class EtagSupport : Filter {
-        private val md5 = ThreadLocal.withInitial {
-            MessageDigest.getInstance("MD5")
-        }
+    object EtagSupport {
+        private val md5 = ThreadLocal.withInitial { MessageDigest.getInstance("MD5") }
 
-        override fun invoke(next: HttpHandler): HttpHandler = { request ->
-            next(request).let { response ->
-                if (request.method == Method.GET && response.status == Status.OK) {
-                    checkEtag(request, response)
-                } else response
+        operator fun invoke() = Filter { next ->
+            { request ->
+                next(request).let { response ->
+                    if (request.method == Method.GET && response.status == Status.OK) {
+                        checkEtag(request, response)
+                    } else response
+                }
             }
         }
 
@@ -170,6 +163,7 @@ object ResponseFilters {
                         closeOldResponse(response)
                         Response(Status.NOT_MODIFIED).withSafeHeadersFrom(response).header("etag", etag)
                     }
+
                     upstreamEtag == null -> response.header("etag", etag)
                     else -> response
                 }
@@ -192,11 +186,8 @@ object ResponseFilters {
                 )
             }
 
-        private fun Response.headerIfPresent(name: String, value: String?) = if (value != null) {
-            this.header(name, value)
-        } else {
-            this
-        }
+        private fun Response.headerIfPresent(name: String, value: String?) =
+            if (value != null) header(name, value) else this
 
         private fun generateStrongEtag(content: ByteArray): String = "\"${content.hash().toHex()}\""
 
@@ -204,9 +195,8 @@ object ResponseFilters {
 
         private fun ByteArray.toHex() = joinToString("") { "%02x".format(it) }
 
-        companion object {
-            private val SAFE_HEADERS = listOf("date", "last-modified", "cache-control", "expires", "set-cookie", "vary", "surrogate-key")
-        }
+        private val SAFE_HEADERS =
+            listOf("date", "last-modified", "cache-control", "expires", "set-cookie", "vary", "surrogate-key")
     }
 
     /**
