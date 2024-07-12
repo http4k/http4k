@@ -15,30 +15,36 @@ object RequestFilters {
     /**
      * Intercept the request before it is sent to the next service.
      */
-    fun Tap(fn: (Request) -> Unit) = Filter { next ->
-        {
-            fn(it)
-            next(it)
+    object Tap {
+        operator fun invoke(fn: (Request) -> Unit) = Filter { next ->
+            {
+                fn(it)
+                next(it)
+            }
         }
     }
 
     /**
      * Basic GZipping of Request.
      */
-    fun GZip(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
-        {
-            next(compressionMode.compress(it.body).apply(it))
+    object GZip {
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
+            {
+                next(compressionMode.compress(it.body).apply(it))
+            }
         }
     }
 
     /**
      * Basic UnGZipping of Request.
      */
-    fun GunZip(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
-        { request ->
-            request.header("content-encoding")
-                ?.let { if (it.contains("gzip")) it else null }
-                ?.let { next(request.body(compressionMode.decompress(request.body))) } ?: next(request)
+    object GunZip {
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
+            { request ->
+                request.header("content-encoding")
+                    ?.let { if (it.contains("gzip")) it else null }
+                    ?.let { next(request.body(compressionMode.decompress(request.body))) } ?: next(request)
+            }
         }
     }
 
@@ -59,10 +65,12 @@ object RequestFilters {
      * Sets the host on an outbound request from the Host header of the incoming request. This is useful for implementing proxies.
      * Note the use of the ProxyProtocolMode to set the outbound scheme
      */
-    fun ProxyHost(mode: ProxyProtocolMode = ProxyProtocolMode.Http): Filter = Filter { next ->
-        {
-            it.header("Host")?.let { host -> next(it.uri(mode(it.uri).authority(host))) }
-                ?: Response(BAD_REQUEST.description("Cannot proxy without host header"))
+    object ProxyHost {
+        operator fun invoke(mode: ProxyProtocolMode = ProxyProtocolMode.Http): Filter = Filter { next ->
+            {
+                it.header("Host")?.let { host -> next(it.uri(mode(it.uri).authority(host))) }
+                    ?: Response(BAD_REQUEST.description("Cannot proxy without host header"))
+            }
         }
     }
 
