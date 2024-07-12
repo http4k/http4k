@@ -70,13 +70,13 @@ class UserDbHandler : GraphQLWithContextHandler<String> {
         })
     }
 
-    override fun invoke(payload: GraphQLRequest, context: String) = GraphQLResponse.from(
+    override fun invoke(payload: GraphQLRequest, user: String) = GraphQLResponse.from(
         graphQL.execute(
             Builder()
                 .query(payload.query)
                 .variables(payload.variables.orEmpty())
                 .dataLoaderRegistry(dataLoaderRegistry)
-                .context(context)
+                .graphQLContext(mapOf("user" to user))
         )
     )
 }
