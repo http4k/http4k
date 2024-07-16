@@ -87,7 +87,8 @@ nav:
     - JSON handling: guide/reference/json/index.md
     - Templating: guide/reference/templating/index.md
     - Multipart forms: guide/reference/multipart/index.md
-    - Cloud Native Configuration: guide/reference/cloud_native/index.md
+    - Typesafe Configuration: guide/reference/config/index.md
+    - Cloud Native Extensions: guide/reference/cloud_native/index.md
     - Cloud Events: guide/reference/cloud_events/index.md
     - Micrometer: guide/reference/micrometer/index.md
     - OpenTelemetry: guide/reference/opentelemetry/index.md

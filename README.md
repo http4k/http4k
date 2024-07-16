@@ -172,8 +172,10 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Implement the [Digest Authentication](https://datatracker.ietf.org/doc/html/rfc2617) flow for clients and servers
     * Supports the null and Auth QoPs
     * Supports Proxy Authentication
+* [Typesafe Configuration:](https://http4k.org/guide/reference/config)
+    * Tooling to support operating [http4k] applications with 12-factor typesafe configuration. 
 * [Cloud Native:](https://http4k.org/guide/reference/cloud_native)
-    * Tooling to support operating [http4k] applications in orchestrated cloud environments such as Kubernetes and CloudFoundry. 12-factor configuration, dual-port servers and health checks such as liveness and readiness checking. 
+    * Tooling to support operating [http4k] applications in orchestrated cloud environments such as Kubernetes and CloudFoundry., dual-port servers and health checks such as liveness and readiness checking. 
 * [Approval Testing:](https://http4k.org/guide/reference/approvaltests)
     * JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of [http4k] Request and Response messages.
 * [Chaos:](https://http4k.org/guide/reference/chaos)

@@ -62,7 +62,8 @@ description: Details about the various http4k integration libraries
 
 ### Cloud-Native/Observability/Misc
 <a href="/guide/reference/aws"><span class="pill">AWS</span></a>
-<a href="/guide/reference/cloud_native"><span class="pill">Cloud Native Configuration</span></a>
+<a href="/guide/reference/config"><span class="pill">Typesafe Configuration</span></a>
+<a href="/guide/reference/cloud_native"><span class="pill">Cloud Native extensions</span></a>
 <a href="/guide/reference/cloud_events"><span class="pill">Cloud Events</span></a>
 <a href="/guide/reference/digest"><span class="pill">Digest Auth</span></a>
 <a href="/guide/reference/oauth"><span class="pill">OAuth</span></a>

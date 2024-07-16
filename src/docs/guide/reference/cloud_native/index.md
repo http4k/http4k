@@ -18,12 +18,6 @@ Because http4k does not use reflection or annotation process for application sta
 start up and shutdown very quickly - this is crucial for cloud-based environments where an orchestration framework might move 
 instances around to redistribute load or avoid problematic server/rack/DCs.
 
-#### Configuration
-All application configuration should be injected via environmental variables. http4k provides an `Environment` object, along with 
-typesafe variable binding using the in-built Lenses mechanism. This typesafe API is consistent with the other usages of Lenses 
-throughout http4k, so should have a near-zero learning curve. Also provided are a set of extension methods for retrieving standard 
-environmental config for service ports from Kubernetes.
-
 #### Observability
 Orchestration software such as Kubernetes and CloudFoundry regularly query a set of diagnostic endpoints to monitor the state of an 
 application. This module provides standardised `HttpHandler` implementations to model the following endpoints:
