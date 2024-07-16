@@ -1,10 +1,10 @@
 package org.http4k.lens
 
-import org.http4k.cloudnative.env.Authority
-import org.http4k.cloudnative.env.Host
-import org.http4k.cloudnative.env.Port
-import org.http4k.cloudnative.env.Secret
-import org.http4k.cloudnative.env.Timeout
+import org.http4k.config.Authority
+import org.http4k.config.Host
+import org.http4k.config.Port
+import org.http4k.config.Secret
+import org.http4k.config.Timeout
 
 fun StringBiDiMappings.host() = nonBlank().map(::Host, Host::value)
 fun StringBiDiMappings.port() = int().map(::Port, Port::value)

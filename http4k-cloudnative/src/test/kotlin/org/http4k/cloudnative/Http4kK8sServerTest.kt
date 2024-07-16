@@ -2,9 +2,9 @@ package org.http4k.cloudnative
 
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.client.JavaHttpClient
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey.k8s.HEALTH_PORT
-import org.http4k.cloudnative.env.EnvironmentKey.k8s.SERVICE_PORT
+import org.http4k.config.Environment
+import org.http4k.config.EnvironmentKey.k8s.HEALTH_PORT
+import org.http4k.config.EnvironmentKey.k8s.SERVICE_PORT
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request

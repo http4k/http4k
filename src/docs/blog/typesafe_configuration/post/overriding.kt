@@ -1,6 +1,6 @@
 package blog.typesafe_configuration.post
 
-import org.http4k.cloudnative.env.Environment
+import org.http4k.config.Environment
 import java.io.File
 
 val systemEnv: Environment = Environment.ENV

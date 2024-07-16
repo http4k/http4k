@@ -1,4 +1,4 @@
-package org.http4k.cloudnative.env
+package org.http4k.config
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -68,7 +68,7 @@ class EnvironmentTest {
     @Test
     fun `defaults secret`() {
         val secret = EnvironmentKey.secret().required("PASSWORD")
-        val env = Environment.defaults(secret of org.http4k.cloudnative.env.Secret("hunter2"))
+        val env = Environment.defaults(secret of Secret("hunter2"))
 
         env[secret].use { password ->
             assertThat(password, equalTo("hunter2"))

@@ -1,9 +1,9 @@
 package org.http4k.core
 
-import org.http4k.cloudnative.env.Authority
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.Host
-import org.http4k.cloudnative.env.Port
+import org.http4k.config.Authority
+import org.http4k.config.Environment
+import org.http4k.config.Host
+import org.http4k.config.Port
 
 fun Uri.port(port: Port?) = port(port?.value)
 fun Uri.port() = port?.let(::Port)

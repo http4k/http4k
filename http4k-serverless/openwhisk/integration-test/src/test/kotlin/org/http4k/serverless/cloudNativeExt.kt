@@ -3,8 +3,8 @@ package org.http4k.serverless
 import okhttp3.OkHttpClient
 import org.http4k.client.OkHttp
 import org.http4k.client.PreCannedOkHttpClients.insecureOkHttpClient
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
+import org.http4k.config.Environment
+import org.http4k.config.EnvironmentKey
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.NoOp

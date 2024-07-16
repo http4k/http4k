@@ -1,9 +1,9 @@
 package org.http4k.aws
 
 import org.http4k.client.JavaHttpClient
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
-import org.http4k.cloudnative.env.fromConfigFile
+import org.http4k.config.Environment
+import org.http4k.config.EnvironmentKey
+import org.http4k.config.fromConfigFile
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters

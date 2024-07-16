@@ -3,11 +3,11 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.cloudnative.env.Authority
-import org.http4k.cloudnative.env.Host
-import org.http4k.cloudnative.env.Port
-import org.http4k.cloudnative.env.Secret
-import org.http4k.cloudnative.env.Timeout
+import org.http4k.config.Authority
+import org.http4k.config.Host
+import org.http4k.config.Port
+import org.http4k.config.Secret
+import org.http4k.config.Timeout
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with

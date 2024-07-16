@@ -1,6 +1,6 @@
 package org.http4k.serverless.lambda.testing.setup
 
-import org.http4k.cloudnative.env.Timeout
+import org.http4k.config.Timeout
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.fail

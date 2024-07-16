@@ -1,4 +1,4 @@
-package org.http4k.cloudnative.env
+package org.http4k.config
 
 import java.io.Closeable
 import java.nio.charset.StandardCharsets.UTF_8

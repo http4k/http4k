@@ -1,7 +1,7 @@
 package blog.typesafe_configuration.post
 
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
+import org.http4k.config.Environment
+import org.http4k.config.EnvironmentKey
 import org.http4k.lens.Lens
 import org.http4k.lens.duration
 import org.http4k.lens.int

@@ -1,4 +1,4 @@
-package org.http4k.cloudnative.env
+package org.http4k.config
 
 import org.http4k.format.JacksonYaml
 import java.io.File

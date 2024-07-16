@@ -2,9 +2,9 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.cloudnative.env.Authority
-import org.http4k.cloudnative.env.Host
-import org.http4k.cloudnative.env.Port
+import org.http4k.config.Authority
+import org.http4k.config.Host
+import org.http4k.config.Port
 import org.junit.jupiter.api.Test
 
 class ConfigExtTest {

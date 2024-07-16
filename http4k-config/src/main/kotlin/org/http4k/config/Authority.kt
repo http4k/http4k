@@ -1,4 +1,4 @@
-package org.http4k.cloudnative.env
+package org.http4k.config
 
 data class Authority(val host: Host, val port: Port? = null) {
     override fun toString() = host.value + (port?.let { ":${it.value}" }.orEmpty())

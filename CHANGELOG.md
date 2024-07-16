@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Response caching extensions. H/T @ollieabbey
 - **http4k-config** : [New Module!] Extraction of typesafe configuration module from http4k-cloudnative.
+- **http4k-cloudnative** : [Breaking!] Repackaging of typesafe configuration module classes (org.http4k.cloudnative.env) to http4k-config (org.http4k.config). New imports are required.
 - **http4k-contract** : Adds ApiKeySecurity that identifies a consumer and makes it available for later use. H/T @dhs3000
 
 ### v5.25.0.0
