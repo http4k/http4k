@@ -1,9 +1,8 @@
-description = "Machinery for running Http4k apps in cloud-native environments"
+description = "Machinery for configuring Http4k apps in a typesafe way"
 
 dependencies {
     api(project(":http4k-core"))
-    api(project(":http4k-config"))
-    implementation(project(":http4k-format-core"))
+    implementation(project(":http4k-format-jackson-yaml"))
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-testing-hamkrest"))

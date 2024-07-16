@@ -46,6 +46,7 @@ include("http4k-bom")
 
 include("http4k-cloudevents")
 include("http4k-cloudnative")
+include("http4k-config")
 
 "http4k-contract".apply {
     include(":$this")

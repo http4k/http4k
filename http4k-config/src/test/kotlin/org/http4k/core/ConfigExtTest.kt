@@ -7,7 +7,7 @@ import org.http4k.cloudnative.env.Host
 import org.http4k.cloudnative.env.Port
 import org.junit.jupiter.api.Test
 
-class CloudNativeExtTest {
+class ConfigExtTest {
 
     @Test
     fun `uri extensions`() {

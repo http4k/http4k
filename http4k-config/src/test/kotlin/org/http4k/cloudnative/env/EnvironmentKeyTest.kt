@@ -2,12 +2,6 @@ package org.http4k.cloudnative.env
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.cloudnative.env.Environment.Companion.EMPTY
-import org.http4k.cloudnative.env.Environment.Companion.from
-import org.http4k.cloudnative.env.EnvironmentKey.k8s.HEALTH_PORT
-import org.http4k.cloudnative.env.EnvironmentKey.k8s.SERVICE_PORT
-import org.http4k.cloudnative.env.EnvironmentKey.k8s.serviceUriFor
-import org.http4k.cloudnative.env.EnvironmentKeyTest.Foo.bar
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.LensFailure
@@ -21,7 +15,7 @@ import java.util.Properties
 
 class EnvironmentKeyTest {
 
-    private val env = EMPTY
+    private val env = Environment.EMPTY
 
     @Test
     fun `custom key roundtrip`() {
@@ -48,7 +42,7 @@ class EnvironmentKeyTest {
 
         assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
         assertThat(
-            EnvironmentKey.int().multi.required("SOME_VALUE")(from("SOME_VALUE" to "80  , 81  ")),
+            EnvironmentKey.int().multi.required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
             equalTo(listOf(80, 81))
         )
     }
@@ -77,7 +71,7 @@ class EnvironmentKeyTest {
     fun `value replaced`() {
         val single = EnvironmentKey.int().required("value")
 
-        val original = env.with(HEALTH_PORT of 81)
+        val original = env.with(EnvironmentKey.k8s.HEALTH_PORT of 81)
         assertThat(single(single(2, single(1, original))), equalTo(2))
 
         val multi = EnvironmentKey.int().multi.required("value")
@@ -90,49 +84,49 @@ class EnvironmentKeyTest {
     @Test
     fun `using property method`() {
         val MY_GREAT_ENV_VARIABLE by EnvironmentKey.long().of().required()
-        assertThat(MY_GREAT_ENV_VARIABLE(from("MY_GREAT_ENV_VARIABLE" to "123")), equalTo(123))
+        assertThat(MY_GREAT_ENV_VARIABLE(Environment.from("MY_GREAT_ENV_VARIABLE" to "123")), equalTo(123))
     }
 
     @Test
     fun `can get ports from env`() {
-        val withPorts = env.with(SERVICE_PORT of 80, HEALTH_PORT of 81)
-        assertThat(SERVICE_PORT(withPorts), equalTo(80))
-        assertThat(HEALTH_PORT(withPorts), equalTo(81))
+        val withPorts = env.with(EnvironmentKey.k8s.SERVICE_PORT of 80, EnvironmentKey.k8s.HEALTH_PORT of 81)
+        assertThat(EnvironmentKey.k8s.SERVICE_PORT(withPorts), equalTo(80))
+        assertThat(EnvironmentKey.k8s.HEALTH_PORT(withPorts), equalTo(81))
     }
 
     @Test
     fun `get uri for a service`() {
         assertThat(
-            serviceUriFor("myservice")(
-                from("MYSERVICE_SERVICE_PORT" to "8000")
+            EnvironmentKey.k8s.serviceUriFor("myservice")(
+                Environment.from("MYSERVICE_SERVICE_PORT" to "8000")
             ),
             equalTo(Uri.of("http://myservice:8000/"))
         )
 
         assertThat(
-            serviceUriFor("myservice")(
-                from("MYSERVICE_SERVICE_PORT" to "80")
+            EnvironmentKey.k8s.serviceUriFor("myservice")(
+                Environment.from("MYSERVICE_SERVICE_PORT" to "80")
             ),
             equalTo(Uri.of("http://myservice/"))
         )
 
         assertThat(
-            serviceUriFor("myservice", true)(
-                from("MYSERVICE_SERVICE_PORT" to "80")
+            EnvironmentKey.k8s.serviceUriFor("myservice", true)(
+                Environment.from("MYSERVICE_SERVICE_PORT" to "80")
             ),
             equalTo(Uri.of("https://myservice/"))
         )
 
         assertThat(
-            serviceUriFor("myservice")(
-                from("MYSERVICE_SERVICE_PORT" to "443")
+            EnvironmentKey.k8s.serviceUriFor("myservice")(
+                Environment.from("MYSERVICE_SERVICE_PORT" to "443")
             ),
             equalTo(Uri.of("http://myservice/"))
         )
 
         assertThat(
-            serviceUriFor("myservice", true)(
-                from("MYSERVICE_SERVICE_PORT" to "443")
+            EnvironmentKey.k8s.serviceUriFor("myservice", true)(
+                Environment.from("MYSERVICE_SERVICE_PORT" to "443")
             ),
             equalTo(Uri.of("https://myservice/"))
         )
@@ -140,7 +134,7 @@ class EnvironmentKeyTest {
 
     @Test
     fun `falls back to value when using environment key`() {
-        val finalEnv = EMPTY overrides from("FOO" to "bill")
+        val finalEnv = Environment.EMPTY overrides Environment.from("FOO" to "bill")
 
         val key = EnvironmentKey.required("FOO")
         assertThat(finalEnv[key], equalTo("bill"))
@@ -151,7 +145,7 @@ class EnvironmentKeyTest {
     fun `composite can use a mixture of overridden and non overridden values`() {
         data class Target(val foo: String, val bar: Int, var foobar: Int?)
 
-        val finalEnv = from("bar" to "123") overrides from("FOO" to "bill")
+        val finalEnv = Environment.from("bar" to "123") overrides Environment.from("FOO" to "bill")
 
         val key = EnvironmentKey.composite {
             Target(
@@ -171,7 +165,6 @@ class EnvironmentKeyTest {
     @Test
     fun `enum support`() {
         val key = EnvironmentKey.enum<Foo>().required("foo")
-        assertThat(key(EMPTY.with(key of bar)), equalTo(bar))
-
+        assertThat(key(Environment.EMPTY.with(key of Foo.bar)), equalTo(Foo.bar))
     }
 }

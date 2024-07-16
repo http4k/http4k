@@ -38,7 +38,10 @@ class EnvironmentTest {
 
     @Test
     fun `overriding overrides separator`() {
-        val finalEnv = MapEnvironment.from(listOf("FOO" to "foo;bar").toMap().toProperties(), separator = ";") overrides Environment.from("FOO" to "bob")
+        val finalEnv = MapEnvironment.from(
+            listOf("FOO" to "foo;bar").toMap().toProperties(),
+            separator = ";"
+        ) overrides Environment.from("FOO" to "bob")
 
         assertThat(EnvironmentKey.required("FOO")[finalEnv], equalTo("foo"))
     }
@@ -65,7 +68,7 @@ class EnvironmentTest {
     @Test
     fun `defaults secret`() {
         val secret = EnvironmentKey.secret().required("PASSWORD")
-        val env = Environment.defaults(secret of Secret("hunter2"))
+        val env = Environment.defaults(secret of org.http4k.cloudnative.env.Secret("hunter2"))
 
         env[secret].use { password ->
             assertThat(password, equalTo("hunter2"))
