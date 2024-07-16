@@ -17,12 +17,12 @@ data class HtmxCommand(
 ) {
     fun performOn(element: HtmxJsoupWebElement) {
         // TODO: re-use headers from http4k.http4k-htmx instead of repeating?
-        val headers = listOf(
+        val headers = listOfNotNull(
             "hx-request" to "true",
             element.getAttribute("id")?.let { "hx-trigger" to it },
             element.getAttribute("name")?.let { "hx-trigger-name" to it },
             if (target.hasAttr("id")) "hx-target" to target.attr("id") else null,
-        ).filterNotNull()
+        )
 
         val response = element
             .handler(
