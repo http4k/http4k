@@ -2,12 +2,12 @@ package org.http4k.webdriver
 
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.urlEncoded
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.parser.Parser
-import java.net.URLEncoder
 
 data class HtmxCommand(
     val method: Method,
@@ -114,9 +114,7 @@ data class HtmxCommand(
 
         val all = (inputs + textAreas + selects + buttons)
 
-        return all.joinToString("&") {
-            "${URLEncoder.encode(it.first, "UTF-8")}=${URLEncoder.encode(it.second, "UTF-8")}"
-        }
+        return all.joinToString("&") { "${it.first.urlEncoded()}=${it.second.urlEncoded()}" }
     }
 
     companion object {

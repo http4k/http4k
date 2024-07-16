@@ -25,7 +25,8 @@ fun String.asByteBuffer(): ByteBuffer = toByteArray().asByteBuffer()
 
 fun String.quoted() = "\"${replace("\"", "\\\"")}\""
 
-fun String.unquoted(): String = replaceFirst("^\"".toRegex(), "").replaceFirst("\"$".toRegex(), "").replace("\\\"", "\"")
+fun String.unquoted(): String =
+    replaceFirst("^\"".toRegex(), "").replaceFirst("\"$".toRegex(), "").replace("\\\"", "\"")
 
 fun StringBuilder.appendIfNotBlank(valueToCheck: String, vararg toAppend: String): StringBuilder =
     appendIf({ valueToCheck.isNotBlank() }, *toAppend)
@@ -48,6 +49,6 @@ fun String.base64DecodedByteBuffer() = base64DecodedArray().asByteBuffer()
 
 fun String.base64Encode() = toByteArray().base64Encode()
 
-fun String.urlEncoded(): String = URLEncoder.encode(this, "utf-8")
+fun String.urlEncoded(): String = URLEncoder.encode(this, Charsets.UTF_8)
 
-fun String.urlDecoded(): String = URLDecoder.decode(this, "utf-8")
+fun String.urlDecoded(): String = URLDecoder.decode(this, Charsets.UTF_8)

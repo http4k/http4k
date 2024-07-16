@@ -8,7 +8,7 @@ import org.http4k.core.toUrlFormEncoded
 import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.ParamMeta.StringParam
-import org.http4k.lens.Validator.*
+import org.http4k.lens.Validator.Ignore
 import java.net.URLDecoder.decode
 
 object FormField : BiDiLensSpec<WebForm, String>("formData",
@@ -43,7 +43,7 @@ private fun formParametersFrom(target: String): Map<String, List<String>> = targ
     .split("&")
     .filter { it.contains("=") }
     .map { it.split("=") }
-    .map { decode(it[0], "UTF-8") to if (it.size > 1) decode(it[1], "UTF-8") else "" }
+    .map { decode(it[0], Charsets.UTF_8) to if (it.size > 1) decode(it[1], Charsets.UTF_8) else "" }
     .groupBy { it.first }
     .mapValues { it.value.map { it.second } }
 
