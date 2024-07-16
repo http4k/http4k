@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.25.1.0
+### v5.25.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Response caching extensions. H/T @ollieabbey
 - **http4k-contract** : Adds ApiKeySecurity that identifies a consumer and makes it available for later use. H/T @dhs3000
