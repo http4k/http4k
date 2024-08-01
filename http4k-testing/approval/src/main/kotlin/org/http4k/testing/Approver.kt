@@ -38,7 +38,8 @@ class NamedResourceApprover(
     override fun withNameSuffix(suffix: String) = NamedResourceApprover(
         name = "$name.$suffix",
         approvalContent = approvalContent,
-        approvalSource = approvalSource
+        approvalSource = approvalSource,
+        transformer = transformer,
     )
 
     override fun <T : HttpMessage> assertApproved(httpMessage: T) {

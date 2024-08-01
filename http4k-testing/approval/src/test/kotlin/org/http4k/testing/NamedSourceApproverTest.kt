@@ -59,4 +59,24 @@ class NamedSourceApproverTest {
         assertThat(actualFile.readText(), equalTo(body))
         assertThat(approvedFile.exists(), equalTo(false))
     }
+
+    @Test
+    fun `uses file name suffix with transformer`() {
+        val expected = "transformed content"
+        val approver = NamedResourceApprover(
+            testName,
+            ApprovalContent.HttpTextBody(),
+            FileSystemApprovalSource(baseFile)
+        ) {
+            ApprovalTransformer.StringWithNormalisedLineEndings().invoke(it)
+                .replace(body, expected)
+        }
+        val approvedFile = File(baseFile, "${testName}.suffix.approved")
+            .also { it.writeText(expected) }
+
+        approver.withNameSuffix("suffix").assertApproved(Response(OK).body(body))
+
+        assertThat(actualFile.exists(), equalTo(false))
+        assertThat(approvedFile.readText(), equalTo(expected))
+    }
 }
