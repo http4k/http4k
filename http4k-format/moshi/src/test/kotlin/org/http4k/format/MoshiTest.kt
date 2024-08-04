@@ -78,11 +78,10 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
             )
         )
 
-        val element = with(Moshi) {
-            json.asJsonObject()
-        }
+        val element = with(Moshi) { json.asJsonObject() }
 
         assertThat(element, equalTo(expected))
+        assertThat(Moshi.asA<MoshiObject>(json), equalTo(expected))
     }
 
     @Test
@@ -107,14 +106,14 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
             )
         )
 
-        val json = with(Moshi) {
-            element.asCompactJsonString()
-        }
-
+        val expected =
+            """{"string":"hello","child":{"string":"world","numbers":[1,1.2],"bool":true},"numbers":[],"bool":false}"""
         assertThat(
-            json,
-            equalTo("""{"string":"hello","child":{"string":"world","numbers":[1,1.2],"bool":true},"numbers":[],"bool":false}""")
+            with(Moshi) { element.asCompactJsonString() },
+            equalTo(expected)
         )
+
+        assertThat(Moshi.asFormatString(element), equalTo(expected))
     }
 
     @Test
