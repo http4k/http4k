@@ -32,6 +32,16 @@ class FormTest {
     }
 
     @Test
+    fun `can add multiple form parameters`() {
+        val get = Request(GET, "ignored").form("foo" to "1", "bar" to "2")
+
+        val actual = get.form()
+
+        val form: Form = listOf("foo" to "1", "bar" to "2")
+        assertThat(actual, equalTo(form))
+    }
+
+    @Test
     fun `can handle stream body`() {
         val form: Form = listOf("a" to "b")
 
