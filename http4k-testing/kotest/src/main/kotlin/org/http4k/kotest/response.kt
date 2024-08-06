@@ -17,6 +17,6 @@ infix fun Response.shouldHaveSetCookie(expected: Cookie) = this should haveSetCo
 infix fun Response.shouldNotHaveSetCookie(expected: Cookie) = this shouldNot haveSetCookie(expected)
 fun haveSetCookie(expected: Cookie): Matcher<Response> = haveSetCookie(expected.name, be(expected))
 
-fun Response.shouldHaveSetCookie(name: String, match: Matcher<Cookie>) = this should haveSetCookie(name, match)
-fun Response.shouldNotHaveSetCookie(name: String, match: Matcher<Cookie>) = this shouldNot haveSetCookie(name, match)
-fun haveSetCookie(name: String, expected: Matcher<Cookie>): Matcher<Response> = httpMessageHas("Cookie \"$name\"", { r: Response -> r.cookies().find { name == it.name }!! }, expected)
+fun Response.shouldHaveSetCookie(name: String, match: Matcher<Cookie?>) = this should haveSetCookie(name, match)
+fun Response.shouldNotHaveSetCookie(name: String, match: Matcher<Cookie?>) = this shouldNot haveSetCookie(name, match)
+fun haveSetCookie(name: String, expected: Matcher<Cookie?>): Matcher<Response> = httpMessageHas("Cookie \"$name\"", { r: Response -> r.cookies().find { name == it.name } }, expected)
