@@ -7,9 +7,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PRO
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 import org.http4k.format.asConfigurable
@@ -22,6 +21,7 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
 
     override val json = Jackson
 
+    @Suppress("DEPRECATION")
     @Test
     fun `renders schema for objects with metadata`(approver: Approver) {
         val jackson = object : ConfigurableJackson(
@@ -37,6 +37,7 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
                 .configure(FAIL_ON_IGNORED_PROPERTIES, false)
                 .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
                 .configure(USE_BIG_INTEGER_FOR_INTS, true)
+                .configure(SORT_PROPERTIES_ALPHABETICALLY, true)
         ) {}
 
         approver.assertApproved(
@@ -56,36 +57,16 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
                 .setSerializationInclusion(NON_NULL)
         ) {}
 
-        try {
-            approver.assertApproved(
-                Data4kContainer().apply {
-                    anInt = MyInt.of(123)
-                    anString = "helloworld"
-                },
-                creator = autoJsonToJsonSchema(
-                    jackson, strategy = PrimitivesFieldMetadataRetrievalStrategy
-                        .then(Values4kFieldMetadataRetrievalStrategy)
-                        .then(Data4kFieldMetadataRetrievalStrategy)
-                )
+        approver.assertApproved(
+            Data4kContainer().apply {
+                anInt = MyInt.of(123)
+                anString = "helloworld"
+            },
+            creator = autoJsonToJsonSchema(
+                jackson, strategy = PrimitivesFieldMetadataRetrievalStrategy
+                    .then(Values4kFieldMetadataRetrievalStrategy)
+                    .then(Data4kFieldMetadataRetrievalStrategy)
             )
-        } catch (e: AssertionError) {
-            System.err.println(e.message)
-            throw e
-        }
+        )
     }
 }
-
-private fun standardConfig(
-    configFn: AutoMappingConfiguration<ObjectMapper>.() -> AutoMappingConfiguration<ObjectMapper>
-) = KotlinModule.Builder().build()
-    .asConfigurable()
-    .withStandardMappings()
-    .let(configFn)
-    .done()
-    .deactivateDefaultTyping()
-    .setSerializationInclusion(NON_NULL)
-    .configure(FAIL_ON_NULL_FOR_PRIMITIVES, true)
-    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-    .configure(FAIL_ON_IGNORED_PROPERTIES, false)
-    .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
-
