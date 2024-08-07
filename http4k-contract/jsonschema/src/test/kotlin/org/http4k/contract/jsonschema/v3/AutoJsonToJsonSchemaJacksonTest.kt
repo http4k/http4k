@@ -56,17 +56,21 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
                 .setSerializationInclusion(NON_NULL)
         ) {}
 
-        approver.assertApproved(
-            Data4kContainer().apply {
-                anInt = MyInt.of(123)
-                anString = "helloworld"
-            },
-            creator = autoJsonToJsonSchema(
-                jackson, strategy = PrimitivesFieldMetadataRetrievalStrategy
-                    .then(Values4kFieldMetadataRetrievalStrategy)
-                    .then(Data4kFieldMetadataRetrievalStrategy)
+        try {
+            approver.assertApproved(
+                Data4kContainer().apply {
+                    anInt = MyInt.of(123)
+                    anString = "helloworld"
+                },
+                creator = autoJsonToJsonSchema(
+                    jackson, strategy = PrimitivesFieldMetadataRetrievalStrategy
+                        .then(Values4kFieldMetadataRetrievalStrategy)
+                        .then(Data4kFieldMetadataRetrievalStrategy)
+                )
             )
-        )
+        } catch (e: AssertionError) {
+            System.err.println(e.message)
+            throw e
     }
 }
 
