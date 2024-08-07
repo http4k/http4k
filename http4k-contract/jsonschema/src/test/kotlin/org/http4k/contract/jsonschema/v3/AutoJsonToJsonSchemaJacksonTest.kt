@@ -46,7 +46,7 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
     }
 
     @Test
-    fun `renders schema for a data4k container and metadata`(approver: Approver) {
+    fun `renders schema for a data4k container with metadata`(approver: Approver) {
         val jackson = object : ConfigurableJackson(
             KotlinModule.Builder().build()
                 .asConfigurable()
