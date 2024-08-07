@@ -1,6 +1,8 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.JsonPrimitives"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.JsonPrimitives",
+    "example": null,
+    "format": null
   },
   "definitions": [
     {
@@ -9,11 +11,13 @@
         "properties": {
           "string": {
             "example": "string",
+            "format": null,
             "type": "string",
             "nullable": false
           },
           "boolean": {
             "example": false,
+            "format": null,
             "type": "boolean",
             "nullable": false
           },
@@ -43,11 +47,13 @@
           },
           "bigInt": {
             "example": 92233720368547758079223372036854775807,
+            "format": null,
             "type": "integer",
             "nullable": false
           },
           "bigDecimal": {
             "example": 1.7976931348623157E+308111,
+            "format": null,
             "type": "number",
             "nullable": false
           }
@@ -62,6 +68,7 @@
           "bigInt": 92233720368547758079223372036854775807,
           "bigDecimal": 1.7976931348623157E+308111
         },
+        "format": null,
         "type": "object",
         "required": [
           "bigDecimal",

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.ConfigurableJackson
+import org.http4k.format.Jackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
@@ -19,8 +20,7 @@ import org.junit.jupiter.api.Test
 
 class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>() {
 
-    override val json = object : ConfigurableJackson(standardConfig { this }) {
-    }
+    override val json = Jackson
 
     @Test
     fun `renders schema for objects with metadata`(approver: Approver) {

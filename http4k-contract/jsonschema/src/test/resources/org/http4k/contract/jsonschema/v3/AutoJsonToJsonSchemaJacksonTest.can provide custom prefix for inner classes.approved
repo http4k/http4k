@@ -1,6 +1,8 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses"
+    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses",
+    "example": null,
+    "format": null
   },
   "definitions": [
     {
@@ -8,10 +10,14 @@
       "second": {
         "properties": {
           "inner": {
-            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner"
+            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner",
+            "example": null,
+            "format": null
           },
           "enum": {
-            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum"
+            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum",
+            "example": null,
+            "format": null
           }
         },
         "example": {
@@ -20,6 +26,7 @@
           },
           "enum": "bar"
         },
+        "format": null,
         "type": "object",
         "required": [
           "enum",
@@ -33,6 +40,7 @@
         "properties": {
           "name": {
             "example": "name",
+            "format": null,
             "type": "string",
             "nullable": false
           }
@@ -40,6 +48,7 @@
         "example": {
           "name": "name"
         },
+        "format": null,
         "type": "object",
         "required": [
           "name"
@@ -53,6 +62,7 @@
         "enum": [
           "bar"
         ],
+        "format": null,
         "type": "string",
         "nullable": false
       }

@@ -1,9 +1,11 @@
 {
   "node": {
+    "example": null,
     "additionalProperties": {
       "properties": {
         "key": {
           "example": "value",
+          "format": null,
           "type": "string",
           "nullable": true
         },
@@ -14,10 +16,13 @@
           "nullable": true
         },
         "key3": {
+          "example": null,
           "additionalProperties": {
             "properties": {
               "inner": {
-                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
+                "example": null,
+                "format": null
               }
             },
             "example": {
@@ -25,12 +30,17 @@
                 "uri": "foobar"
               }
             },
-            "type": "object"
+            "format": null,
+            "type": "object",
+            "required": null
           },
+          "format": null,
           "type": "object"
         },
         "key4": {
-          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
+          "example": null,
+          "format": null
         },
         "key5": {
           "items": {
@@ -91,6 +101,7 @@
               "enumVal": "value2"
             }
           ],
+          "format": null,
           "type": "array",
           "nullable": true
         },
@@ -103,11 +114,14 @@
             1,
             2
           ],
+          "format": null,
           "type": "array",
           "nullable": true
         },
         "key7": {
-          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder"
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder",
+          "example": null,
+          "format": null
         }
       },
       "example": {
@@ -224,8 +238,11 @@
           ]
         }
       },
-      "type": "object"
+      "format": null,
+      "type": "object",
+      "required": null
     },
+    "format": null,
     "type": "object"
   },
   "definitions": [
@@ -243,6 +260,7 @@
         "example": {
           "uri": "foobar"
         },
+        "format": null,
         "type": "object",
         "required": [
           "uri"
@@ -254,7 +272,9 @@
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
+            "example": null,
+            "format": null
           },
           "list": {
             "items": {
@@ -268,6 +288,7 @@
                 "uri": "foobar"
               }
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           },
@@ -276,6 +297,7 @@
               "items": {
                 "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
+              "format": null,
               "type": "array"
             },
             "example": [
@@ -288,20 +310,25 @@
                 }
               ]
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           },
           "nullableChild": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
+            "example": null,
+            "format": null
           },
           "stringList": {
             "items": {
+              "format": null,
               "type": "string"
             },
             "example": [
               "hello",
               "goodbye"
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           },
@@ -312,12 +339,15 @@
                   "items": {
                     "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                   },
+                  "format": null,
                   "type": "array"
                 },
                 {
+                  "format": null,
                   "type": "string"
                 },
                 {
+                  "format": null,
                   "type": "boolean"
                 },
                 {
@@ -337,11 +367,14 @@
                 }
               ]
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           },
           "enumVal": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo",
+            "example": null,
+            "format": null
           }
         },
         "example": {
@@ -387,6 +420,7 @@
           ],
           "enumVal": "value2"
         },
+        "format": null,
         "type": "object",
         "required": [
           "anyList",
@@ -405,6 +439,7 @@
           "value1",
           "value2"
         ],
+        "format": null,
         "type": "string",
         "nullable": true
       }
@@ -472,6 +507,7 @@
                 "enumVal": "value2"
               }
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           }
@@ -526,6 +562,7 @@
             }
           ]
         },
+        "format": null,
         "type": "object",
         "required": [
           "value"

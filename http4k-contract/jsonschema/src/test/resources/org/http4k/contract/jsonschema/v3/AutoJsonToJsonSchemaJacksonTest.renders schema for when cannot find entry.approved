@@ -1,6 +1,8 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldAnnotated"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldAnnotated",
+    "example": null,
+    "format": null
   },
   "definitions": [
     {
@@ -9,6 +11,7 @@
         "properties": {
           "OTHERNAME": {
             "example": "foobar",
+            "format": null,
             "type": "string",
             "nullable": false
           }
@@ -16,6 +19,7 @@
         "example": {
           "OTHERNAME": "foobar"
         },
+        "format": null,
         "type": "object",
         "required": [
           "OTHERNAME"

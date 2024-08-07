@@ -48,6 +48,7 @@
         "enumVal": "value2"
       }
     ],
+    "format": null,
     "type": "array",
     "nullable": false
   },
@@ -57,7 +58,9 @@
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
+            "example": null,
+            "format": null
           },
           "list": {
             "items": {
@@ -71,6 +74,7 @@
                 "uri": "foobar"
               }
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           },
@@ -79,6 +83,7 @@
               "items": {
                 "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
+              "format": null,
               "type": "array"
             },
             "example": [
@@ -91,20 +96,25 @@
                 }
               ]
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           },
           "nullableChild": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
+            "example": null,
+            "format": null
           },
           "stringList": {
             "items": {
+              "format": null,
               "type": "string"
             },
             "example": [
               "hello",
               "goodbye"
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           },
@@ -115,12 +125,15 @@
                   "items": {
                     "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
                   },
+                  "format": null,
                   "type": "array"
                 },
                 {
+                  "format": null,
                   "type": "string"
                 },
                 {
+                  "format": null,
                   "type": "boolean"
                 },
                 {
@@ -140,11 +153,14 @@
                 }
               ]
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           },
           "enumVal": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo",
+            "example": null,
+            "format": null
           }
         },
         "example": {
@@ -190,6 +206,7 @@
           ],
           "enumVal": "value2"
         },
+        "format": null,
         "type": "object",
         "required": [
           "anyList",
@@ -214,6 +231,7 @@
         "example": {
           "uri": "foobar"
         },
+        "format": null,
         "type": "object",
         "required": [
           "uri"
@@ -228,6 +246,7 @@
           "value1",
           "value2"
         ],
+        "format": null,
         "type": "string",
         "nullable": true
       }

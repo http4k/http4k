@@ -1,6 +1,8 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject",
+    "example": null,
+    "format": null
   },
   "definitions": [
     {
@@ -17,6 +19,7 @@
                 ]
               }
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           }
@@ -29,6 +32,7 @@
             }
           ]
         },
+        "format": null,
         "type": "object",
         "required": [
           "children"

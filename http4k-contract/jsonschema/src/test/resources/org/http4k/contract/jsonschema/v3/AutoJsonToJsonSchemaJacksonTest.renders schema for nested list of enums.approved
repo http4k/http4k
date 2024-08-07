@@ -1,6 +1,8 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.EnumListHolder"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.EnumListHolder",
+    "example": null,
+    "format": null
   },
   "definitions": [
     {
@@ -15,6 +17,7 @@
               "value1",
               "value2"
             ],
+            "format": null,
             "type": "array",
             "nullable": false
           }
@@ -25,6 +28,7 @@
             "value2"
           ]
         },
+        "format": null,
         "type": "object",
         "required": [
           "value"
@@ -39,6 +43,7 @@
           "value1",
           "value2"
         ],
+        "format": null,
         "type": "string",
         "nullable": false
       }

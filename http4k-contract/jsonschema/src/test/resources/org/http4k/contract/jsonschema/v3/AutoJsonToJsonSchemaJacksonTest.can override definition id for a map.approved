@@ -1,6 +1,8 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/foobar"
+    "$ref": "#/locationPrefix/foobar",
+    "example": null,
+    "format": null
   },
   "definitions": [
     {
@@ -8,10 +10,12 @@
       "second": {
         "properties": {
           "value": {
+            "example": null,
             "additionalProperties": {
               "properties": {
                 "key": {
                   "example": "value",
+                  "format": null,
                   "type": "string",
                   "nullable": true
                 },
@@ -22,10 +26,13 @@
                   "nullable": true
                 },
                 "key3": {
+                  "example": null,
                   "additionalProperties": {
                     "properties": {
                       "inner": {
-                        "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                        "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
+                        "example": null,
+                        "format": null
                       }
                     },
                     "example": {
@@ -33,8 +40,11 @@
                         "uri": "foobar"
                       }
                     },
-                    "type": "object"
+                    "format": null,
+                    "type": "object",
+                    "required": null
                   },
+                  "format": null,
                   "type": "object"
                 }
               },
@@ -47,8 +57,11 @@
                   }
                 }
               },
-              "type": "object"
+              "format": null,
+              "type": "object",
+              "required": null
             },
+            "format": null,
             "type": "object"
           }
         },
@@ -63,6 +76,7 @@
             }
           }
         },
+        "format": null,
         "type": "object",
         "required": [
           "value"
@@ -83,6 +97,7 @@
         "example": {
           "uri": "foobar"
         },
+        "format": null,
         "type": "object",
         "required": [
           "uri"

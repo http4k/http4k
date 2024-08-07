@@ -1,6 +1,8 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceHolder"
+    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceHolder",
+    "example": null,
+    "format": null
   },
   "definitions": [
     {
@@ -8,7 +10,9 @@
       "second": {
         "properties": {
           "i": {
-            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceImpl1"
+            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.InterfaceImpl1",
+            "example": null,
+            "format": null
           }
         },
         "example": {
@@ -16,6 +20,7 @@
             "a": "a"
           }
         },
+        "format": null,
         "type": "object",
         "required": [
           "i"
@@ -28,6 +33,7 @@
         "properties": {
           "a": {
             "example": "a",
+            "format": null,
             "type": "string",
             "nullable": false
           }
@@ -35,6 +41,7 @@
         "example": {
           "a": "a"
         },
+        "format": null,
         "type": "object",
         "required": [
           "a"

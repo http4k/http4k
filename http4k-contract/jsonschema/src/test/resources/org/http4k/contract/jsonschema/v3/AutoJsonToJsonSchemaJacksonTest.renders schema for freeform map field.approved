@@ -1,6 +1,8 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.MapHolder"
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.MapHolder",
+    "example": null,
+    "format": null
   },
   "definitions": [
     {
@@ -8,13 +10,17 @@
       "second": {
         "properties": {
           "value": {
+            "example": null,
             "additionalProperties": {
               "properties": {
               },
               "example": {
               },
-              "type": "object"
+              "format": null,
+              "type": "object",
+              "required": null
             },
+            "format": null,
             "type": "object"
           }
         },
@@ -22,6 +28,7 @@
           "value": {
           }
         },
+        "format": null,
         "type": "object",
         "required": [
           "value"
