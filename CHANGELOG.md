@@ -4,6 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.26.2.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.10
+- **http4k-core** New HTTP status codes. H/T @torfinnberset
 - **http4k-core** Added helper method for dealing with forms. H/T @tim-mortimer
 
 ### v5.26.1.0
