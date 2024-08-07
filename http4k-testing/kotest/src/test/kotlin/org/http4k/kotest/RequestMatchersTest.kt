@@ -1,6 +1,8 @@
 package org.http4k.kotest
 
 import io.kotest.matchers.be
+import io.kotest.matchers.should
+import io.kotest.matchers.shouldNot
 import io.kotest.matchers.string.contain
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -12,6 +14,8 @@ import org.http4k.core.cookie.cookie
 import org.http4k.core.with
 import org.http4k.lens.Query
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 
 class RequestMatchersTest {
 
@@ -104,4 +108,32 @@ class RequestMatchersTest {
     @Test
     fun `cookie value`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")),
         { shouldHaveCookie("name", "bob") }, { shouldHaveCookie("name", "bill") })
+
+    @Test
+    fun `should haveCookie(Cookie), cookie does not exist`() {
+        assertThrows<AssertionError> {
+            Request(GET, "").cookie(Cookie("name", "bob")) should haveCookie(Cookie("planet", "Earth"))
+        }
+    }
+
+    @Test
+    fun `shouldNot haveCookie(Cookie), cookie does not exist`() {
+        assertDoesNotThrow {
+            Request(GET, "").cookie(Cookie("name", "bob")) shouldNot haveCookie(Cookie("planet", "Earth"))
+        }
+    }
+
+    @Test
+    fun `should haveCookie(String), cookie does not exist`() {
+        assertThrows<AssertionError> {
+            Request(GET, "").cookie(Cookie("name", "bob")) should haveCookie("planet", "Earth")
+        }
+    }
+
+    @Test
+    fun `shouldNot haveCookie(String), cookie does not exist`() {
+        assertDoesNotThrow {
+            Request(GET, "").cookie(Cookie("name", "bob")) shouldNot haveCookie("planet", "Earth")
+        }
+    }
 }

@@ -22,12 +22,12 @@ fun haveName(expected: String): Matcher<Cookie> = object : Matcher<Cookie> {
 
 infix fun Cookie.shouldHaveValue(expected: String) = this should haveValue(expected)
 infix fun Cookie.shouldNotHaveValue(expected: String) = this shouldNot haveValue(expected)
-fun haveValue(expected: String): Matcher<Cookie> = haveValue(be<String>(expected))
+fun haveValue(expected: String): Matcher<Cookie?> = haveValue(be<String>(expected))
 
 @JvmName("haveCookieValueNullableString")
-fun haveValue(matcher: Matcher<String?>): Matcher<Cookie> = object : Matcher<Cookie> {
-    override fun test(value: Cookie): MatcherResult {
-        val testResult = matcher.test(value.value)
+fun haveValue(matcher: Matcher<String?>): Matcher<Cookie?> = object : Matcher<Cookie?> {
+    override fun test(value: Cookie?): MatcherResult {
+        val testResult = matcher.test(value?.value)
         return MatcherResult(
             testResult.passed(),
             { "Cookie value mismatch: ${testResult.failureMessage()}" },
@@ -36,7 +36,7 @@ fun haveValue(matcher: Matcher<String?>): Matcher<Cookie> = object : Matcher<Coo
     }
 }
 
-fun haveValue(matcher: Matcher<String>): Matcher<Cookie> = haveValue(neverNullMatcher(matcher::test))
+fun haveValue(matcher: Matcher<String>): Matcher<Cookie?> = haveValue(neverNullMatcher(matcher::test))
 
 infix fun Cookie.shouldHaveDomain(expected: String) = this should haveDomain(expected)
 infix fun Cookie.shouldNotHaveDomain(expected: String) = this shouldNot haveDomain(expected)
