@@ -18,10 +18,11 @@ import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.Validator.Strict
 import org.http4k.multipart.DiskLocation
 import org.http4k.testing.ApprovalTest
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.nio.file.Files
+
+private const val DEFAULT_BOUNDARY = "hello"
 
 @ExtendWith(ApprovalTest::class)
 class MultipartFormTest {
@@ -32,10 +33,8 @@ class MultipartFormTest {
     private val fieldWithHeaders = MultipartFormField.required("fieldWithHeaders")
     private val requiredFile = MultipartFormFile.required("file")
 
-    private val message = javaClass.getResourceAsStream("fullMessage.txt").reader().use { it.readText() }
+    private val message = javaClass.getResourceAsStream("fullMessage.txt")!!.reader().use { it.readText() }
     private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
-
-    private val DEFAULT_BOUNDARY = "hello"
 
     @Test
     fun `multipart form serialized into request`() {
@@ -51,7 +50,7 @@ class MultipartFormTest {
             )
         )
 
-        assertThat(populatedRequest.toMessage().replace("\r\n", "\n"), equalTo(message))
+        assertThat(populatedRequest.toMessage().replace("\r\n", "\n"), equalTo(message.replace("\r\n", "\n")))
     }
 
     @Test
@@ -164,8 +163,7 @@ class MultipartFormTest {
     ).toLens()
 
     @Test
-//    @Disabled("Repro case for https://github.com/http4k/http4k/issues/1142")
-    fun `override disk location`() {
+    fun `backing disk location deleted after close`() {
         val tempDir = Files.createTempDirectory("http4k-override").toFile().apply { deleteOnExit() }
         assertThat(tempDir.listFiles()!!.toList(), isEmpty)
 

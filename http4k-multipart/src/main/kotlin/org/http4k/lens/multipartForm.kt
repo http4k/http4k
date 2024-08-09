@@ -41,6 +41,23 @@ data class MultipartForm(
 
     fun minusField(name: String) = copy(fields = fields - name)
     fun minusFile(name: String) = copy(files = files - name)
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is MultipartForm) return false
+
+        if (fields != other.fields) return false
+        if (files != other.files) return false
+        if (errors != other.errors) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = fields.hashCode()
+        result = 31 * result + files.hashCode()
+        result = 31 * result + errors.hashCode()
+        return result
+    }
 }
 
 val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
