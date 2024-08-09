@@ -19,10 +19,14 @@ import java.util.UUID
 data class MultipartForm(
     val fields: Map<String, List<MultipartFormField>> = emptyMap(),
     val files: Map<String, List<MultipartFormFile>> = emptyMap(),
-    val errors: List<Failure> = emptyList()
+    val errors: List<Failure> = emptyList(),
+    val onClose: List<() -> Unit> = emptyList()
 ) : Closeable {
 
-    override fun close() = files.values.flatten().forEach(MultipartFormFile::close)
+    override fun close() {
+        files.values.flatten().forEach(MultipartFormFile::close)
+        onClose.forEach { it() }
+    }
 
     operator fun plus(kv: Pair<String, String>) =
         copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + MultipartFormField(kv.second)))
@@ -37,6 +41,23 @@ data class MultipartForm(
 
     fun minusField(name: String) = copy(fields = fields - name)
     fun minusFile(name: String) = copy(files = files - name)
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is MultipartForm) return false
+
+        if (fields != other.fields) return false
+        if (files != other.files) return false
+        if (errors != other.errors) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = fields.hashCode()
+        result = 31 * result + files.hashCode()
+        result = 31 * result + errors.hashCode()
+        return result
+    }
 }
 
 val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
@@ -70,7 +91,7 @@ fun Body.Companion.multipartForm(
         .map({ it.copy(errors = validator(it, parts.toList())) }, { it.copy(errors = validator(it, parts.toList())) })
 
 internal fun Body.toMultipartForm(): MultipartForm = (this as MultipartFormBody).let {
-    it.formParts.fold(MultipartForm()) { memo, next ->
+    it.formParts.fold(MultipartForm(onClose = listOf(this::close))) { memo, next ->
         when (next) {
             is MultipartEntity.File -> memo + (next.name to next.file)
             is MultipartEntity.Field -> memo + (next.name to next.value)
