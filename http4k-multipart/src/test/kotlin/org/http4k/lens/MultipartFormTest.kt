@@ -168,7 +168,7 @@ class MultipartFormTest {
         val tempDir = Files.createTempDirectory("http4k-override").toFile().apply { deleteOnExit() }
         assertThat(tempDir.listFiles()!!.toList(), isEmpty)
 
-        val lens = Body.multipartForm(Strict, diskThreshold = 1, diskLocation = DiskLocation.Temp(tempDir)).toLens()
+        val lens = Body.multipartForm(Strict, diskThreshold = 1, getDiskLocation = { DiskLocation.Temp(tempDir) }).toLens()
 
         val request = emptyRequest.with(
             lens of MultipartForm().with(
