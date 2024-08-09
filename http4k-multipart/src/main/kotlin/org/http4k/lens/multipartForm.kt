@@ -11,7 +11,8 @@ import org.http4k.core.MultipartFormBody.Companion.DEFAULT_DISK_THRESHOLD
 import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation.Companion.Strict
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.lens.Validator.*
+import org.http4k.lens.Validator.Ignore
+import org.http4k.multipart.DiskLocation
 import java.io.Closeable
 import java.util.UUID
 
@@ -50,11 +51,12 @@ fun Body.Companion.multipartForm(
     vararg parts: Lens<MultipartForm, *>,
     defaultBoundary: String = MULTIPART_BOUNDARY,
     diskThreshold: Int = DEFAULT_DISK_THRESHOLD,
-    contentTypeFn: (String) -> ContentType = ::MultipartFormWithBoundary
+    contentTypeFn: (String) -> ContentType = ::MultipartFormWithBoundary,
+    diskLocation: DiskLocation = DiskLocation.Temp()
 ): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, MULTIPART_FORM_DATA,
         LensGet { _, target ->
-            listOf(MultipartFormBody.from(target, diskThreshold).apply {
+            listOf(MultipartFormBody.from(target, diskThreshold, diskLocation).apply {
                 Strict(contentTypeFn(boundary), CONTENT_TYPE(target))
             })
         },
