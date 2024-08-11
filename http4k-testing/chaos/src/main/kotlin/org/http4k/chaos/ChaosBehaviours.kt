@@ -191,6 +191,16 @@ object ChaosBehaviours {
     }
 
     /**
+     * Return the provided response.
+     */
+    object ReturnResponse {
+        operator fun invoke(response: Response) = object : Behaviour() {
+            override fun invoke(next: HttpHandler): HttpHandler = { response }
+            override fun toString() = "ReturnResponse ($response)"
+        }
+    }
+
+    /**
      * Does absolutely nothing.
      */
     object None {
