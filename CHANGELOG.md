@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.10
 - **http4k-core** New HTTP status codes. H/T @torfinnberset
 - **http4k-core** Added helper method for dealing with forms. H/T @tim-mortimer
+- **http4k-core** [Fix] Close backing DiskLocation when MultipartForm closed. H/T @oharaandrew314
 - **http4k-testing-kotest** Fix haveSetCookie and haveCookie to work when cookie isn't present. H/T @bagguley
 
 ### v5.26.1.0
