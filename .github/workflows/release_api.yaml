@@ -1,11 +1,11 @@
 on:
   repository_dispatch:
     types: [http4k-release]
-  push:
-    branches:
-      - 'master'
-    paths-ignore:
-      - '**/*.md'
+#  push:
+#    branches:
+#      - 'master'
+#    paths-ignore:
+#      - '**/*.md'
 
 jobs:
   release-api:
