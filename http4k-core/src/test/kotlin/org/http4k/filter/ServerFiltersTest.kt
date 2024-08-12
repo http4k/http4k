@@ -232,8 +232,9 @@ class ServerFiltersTest {
                         )
                     )
                     .and(hasHeader("access-control-allow-credentials", "true"))
-                    .and(hasHeader("access-control-expose-headers").not())
-                    .and(hasHeader("access-control-max-age").not())
+                    .and(!hasHeader("access-control-expose-headers"))
+                    .and(!hasHeader("access-control-max-age"))
+                    .and(!hasHeader("vary"))
             )
         }
 
@@ -279,6 +280,7 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(hasHeader("vary", "Origin"))
             )
         }
 
@@ -299,6 +301,7 @@ class ServerFiltersTest {
                     .and(!hasHeader("access-control-allow-headers"))
                     .and(!hasHeader("access-control-allow-methods"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(!hasHeader("vary"))
             )
         }
 
@@ -319,6 +322,7 @@ class ServerFiltersTest {
                     .and(!hasHeader("access-control-allow-headers"))
                     .and(!hasHeader("access-control-allow-methods"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(!hasHeader("vary"))
             )
         }
 
@@ -339,6 +343,7 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(!hasHeader("vary"))
             )
         }
 
@@ -359,6 +364,7 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(hasHeader("vary", "Origin"))
             )
         }
 
@@ -379,6 +385,7 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(hasHeader("vary", "Origin"))
             )
         }
 
@@ -399,7 +406,50 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(hasHeader("vary", "Origin"))
             )
+        }
+
+        @Test
+        fun `GET - should append 'Origin' to the existing 'Vary' list if present`() {
+            val handler = ServerFilters.Cors(
+                CorsPolicy(
+                    OriginPolicy.Only("foo"),
+                    listOf("rita", "sue", "bob"),
+                    listOf(DELETE, POST)
+                )
+            ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "x, y") }
+            val response = handler(Request(GET, "/").header("Origin", "foo"))
+
+            assertThat(response, hasHeader("vary", "x, y, Origin"))
+        }
+
+        @Test
+        fun `GET - should not append 'Origin' to the existing 'Vary' list if 'Origin' is already present`() {
+            val handler = ServerFilters.Cors(
+                CorsPolicy(
+                    OriginPolicy.Only("foo"),
+                    listOf("rita", "sue", "bob"),
+                    listOf(DELETE, POST)
+                )
+            ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "x, Origin, y") }
+            val response = handler(Request(GET, "/").header("Origin", "foo"))
+
+            assertThat(response, hasHeader("vary", "x, Origin, y"))
+        }
+
+        @Test
+        fun `GET - should not append 'Origin' to the existing 'Vary' list if the wildcard value is present`() {
+            val handler = ServerFilters.Cors(
+                CorsPolicy(
+                    OriginPolicy.Only("foo"),
+                    listOf("rita", "sue", "bob"),
+                    listOf(DELETE, POST)
+                )
+            ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "*") }
+            val response = handler(Request(GET, "/").header("Origin", "foo"))
+
+            assertThat(response, hasHeader("vary", "*"))
         }
     }
 
