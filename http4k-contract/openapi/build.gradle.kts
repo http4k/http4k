@@ -1,3 +1,4 @@
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 description = "http4k typesafe HTTP contracts and OpenApi support"
@@ -22,36 +23,37 @@ dependencies {
     testImplementation(testFixtures(project(":http4k-security-oauth")))
 }
 
-tasks.register<GenerateTask>("generateOpenApi3AutoClient") {
-    generatorName = "kotlin"
-    outputDir = "."
-    validateSpec = false
-    inputSpec =
-        "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved".toString()
-    inputs.file(inputSpec)
-}
-
-tasks.register<GenerateTask>("generateOpenApi3Client") {
-    generatorName = "kotlin"
-    outputDir = "."
-    validateSpec = false
-    inputSpec =
-        "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3Test.renders as expected.approved".toString()
-    inputs.file(inputSpec)
-    mustRunAfter("generateOpenApi3AutoClient")
-}
-
-tasks.register<GenerateTask>("generateOpenApi2Client") {
-    generatorName = "kotlin"
-    outputDir = "."
-    validateSpec = false
-    inputSpec =
-        "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved".toString()
-    inputs.file(inputSpec)
-    mustRunAfter("generateOpenApi3Client")
-}
 
 tasks {
+    register<GenerateTask>("generateOpenApi3AutoClient") {
+        generatorName = "kotlin"
+        outputDir = "."
+        validateSpec = false
+        inputSpec =
+            "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved".toString()
+        inputs.file(inputSpec)
+    }
+
+    register<GenerateTask>("generateOpenApi3Client") {
+        generatorName = "kotlin"
+        outputDir = "."
+        validateSpec = false
+        inputSpec =
+            "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3Test.renders as expected.approved".toString()
+        inputs.file(inputSpec)
+        mustRunAfter("generateOpenApi3AutoClient")
+    }
+
+    register<GenerateTask>("generateOpenApi2Client") {
+        generatorName = "kotlin"
+        outputDir = "."
+        validateSpec = false
+        inputSpec =
+            "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved".toString()
+        inputs.file(inputSpec)
+        mustRunAfter("generateOpenApi3Client")
+    }
+
     named("compileKotlin").get().dependsOn(
         named("generateOpenApi3AutoClient").get(),
         named("generateOpenApi3Client").get(),
@@ -67,4 +69,11 @@ tasks {
         named("generateOpenApi3Client").get(),
         named("generateOpenApi2Client").get()
     )
+
+    named("dokkaHtmlPartial", DokkaTaskPartial::class) {
+        dependsOn(named("generateOpenApi2Client"))
+        dependsOn(named("generateOpenApi3Client"))
+        dependsOn(named("generateOpenApi3AutoClient"))
+    }
+
 }

@@ -16,6 +16,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
     id("com.google.devtools.ksp")
     kotlin("plugin.serialization")
+    id("org.jetbrains.dokka")
 }
 
 kotlin {
@@ -98,6 +99,10 @@ allprojects {
 subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "idea")
+
+    if(hasAnArtifact(project) && !project.name.contains("serverless")) {
+        apply(plugin = "org.jetbrains.dokka")
+    }
 
     val sourcesJar by tasks.creating(Jar::class) {
         archiveClassifier.set("sources")
