@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.27.1.0 (uncut)
+- **http4k-core** : Include Vary header on CORS responses. H/T @ollieabbey
+
 ### v5.27.0.0
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.10
 - **http4k-core** New HTTP status codes. H/T @torfinnberset
