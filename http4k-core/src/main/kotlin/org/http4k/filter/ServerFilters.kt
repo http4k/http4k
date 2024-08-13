@@ -80,7 +80,15 @@ object ServerFilters {
                                 ?.header("access-control-expose-headers", policy.exposedHeaders.joined())
                                 ?: res
                         },
-                        { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res }
+                        { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res },
+                        { res ->
+                            val existingVaryValues = res.header("Vary")?.split(", ")?.toSet() ?: emptySet()
+                            when {
+                                allowedOrigin == "*" -> res
+                                existingVaryValues == setOf("*") -> res
+                                else -> res.replaceHeader("Vary", (existingVaryValues + "Origin").joinToString(", "))
+                            }
+                        }
                     )
                 } ?: response
             }
