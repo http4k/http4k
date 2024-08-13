@@ -3,13 +3,16 @@ package org.http4k.webdriver
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import org.http4k.core.Credentials
 import org.http4k.core.Method.POST
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
+import org.http4k.lens.basicAuthentication
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
@@ -206,5 +209,21 @@ class Http4kWebDriverTest {
 
         driver.navigate().to("http://redirect.com")
         assertThat(driver.pageSource, equalTo("destination.com"))
+    }
+
+    @Test
+    fun `set the basic auth header when the url navigated to contains userinfo`() {
+        var receivedRequest: Request? = null
+        val driver = Http4kWebDriver({ req ->
+            receivedRequest = req
+            Response(OK)
+        })
+
+        val username = "username"
+        val password = "password"
+        driver.navigate().to("http://$username:$password@example.com:808/path")
+
+        assertThat(receivedRequest, present())
+        assertThat(receivedRequest?.basicAuthentication(), equalTo(Credentials(username, password)))
     }
 }
