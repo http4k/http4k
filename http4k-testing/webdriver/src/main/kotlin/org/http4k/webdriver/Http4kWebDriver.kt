@@ -1,5 +1,6 @@
 package org.http4k.webdriver
 
+import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -10,6 +11,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
+import org.http4k.lens.basicAuthentication
 import org.openqa.selenium.Alert
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
@@ -117,11 +119,17 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
 
     private fun LocalCookie.toWebDriver(): StoredCookie = StoredCookie(cookie.toWebDriver(), this)
 
-    override fun get(url: String) {
-        navigateTo(Request(GET, url).body(""))
-    }
+    override fun get(url: String) = get(Uri.of(url))
 
-    fun get(uri: Uri) = get(uri.toString())
+    fun get(uri: Uri) {
+        val basicAuthCredentials = uri.credentials()
+        val request = basicAuthCredentials?.let { Request(GET, uri).body("").basicAuthentication(it) } ?: Request(
+            GET,
+            uri
+        ).body("")
+
+        navigateTo(request)
+    }
 
     override fun getCurrentUrl(): String? = current?.url
 
@@ -236,6 +244,16 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
     }
 
     private data class StoredCookie(val cookie: Cookie, val localCookie: LocalCookie)
+
+    private fun Uri.credentials(): Credentials? {
+        if (userInfo.isBlank()) return null
+
+        val parts = userInfo.split(":")
+        if (parts.size != 2) return null
+
+        val (username, password) = parts
+        return Credentials(username, password)
+    }
 }
 
 /**
