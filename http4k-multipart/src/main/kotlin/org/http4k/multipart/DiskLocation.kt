@@ -21,9 +21,7 @@ interface DiskLocation : Closeable {
                         File.createTempFile(
                             filename ?: (UUID.randomUUID().toString() + "-"),
                             ".tmp", diskDir
-                        ).apply {
-                            deleteOnExit()
-                        }
+                        )
                     )
 
                 override fun close() {
@@ -57,7 +55,7 @@ internal class TempFile(private val file: File) : MultipartFile {
     override fun file() = file
 
     override fun close() {
-        if (!file.delete()) throw FileSystemException("Failed to delete file")
+        if (file.exists() && !file.delete()) throw FileSystemException("Failed to delete file")
     }
 }
 

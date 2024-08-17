@@ -20,8 +20,23 @@ data class MultipartFormField(val value: String, val headers: Headers = emptyLis
     }
 }
 
-data class MultipartFormFile(val filename: String, val contentType: ContentType, val content: InputStream) : Closeable {
-    override fun close() { content.close() }
+data class MultipartFormFile internal constructor(
+    val filename: String,
+    val contentType: ContentType,
+    val content: InputStream,
+    val closeable: Closeable
+) : Closeable {
+
+    constructor(filename: String, contentType: ContentType, content: InputStream) : this(
+        filename,
+        contentType,
+        content,
+        Closeable { })
+
+    override fun close() {
+        closeable.close()
+        content.close()
+    }
 
     private data class Realised(val filename: String, val contentType: ContentType, val content: String)
 
