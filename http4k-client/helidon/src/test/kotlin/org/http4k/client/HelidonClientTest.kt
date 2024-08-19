@@ -37,6 +37,6 @@ class HelidonClientTest : HttpClientContract(
     fun `helidon doesn't add another host header`() {
         val response = client(Request(GET, "http://localhost:$port/headers").header("Host", "localhost:$port"))
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), equalTo("Host,User-Agent,Connection,Content-Length"))
+        assertThat(response.bodyString(), equalTo("Host,User-Agent,Connection,Content-Length,Proxy-Connection"))
     }
 }
