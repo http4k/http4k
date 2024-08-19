@@ -6,7 +6,7 @@ description: Recipes for looking up and populating a user principal from a reque
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.27.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.28.0.0"))
     implementation("org.http4k:http4k-core")
 }
 ```
