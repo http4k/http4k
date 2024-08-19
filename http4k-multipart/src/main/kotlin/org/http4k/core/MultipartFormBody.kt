@@ -144,7 +144,8 @@ data class MultipartFormBody private constructor(
                     MultipartFormFile(
                         it.fileName!!,
                         ContentType(it.contentType!!, TEXT_HTML.directives),
-                        it.newInputStream
+                        it.newInputStream,
+                        it
                     )
                 )
             }
