@@ -24,7 +24,7 @@ jobs:
           path: tmp
           token: ${{ secrets.AUTHOR_TOKEN }}
       - run: cp -R build/dokka/htmlMultiModule/* tmp/
-      - uses: EndBug/add-and-commit@v4
+      - uses: EndBug/add-and-commit@v9
         with:
           cwd: 'tmp'
           message: 'release API docs'
