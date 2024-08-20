@@ -23,6 +23,26 @@ sealed class MultipartEntity : Closeable {
         MultipartEntity(), Closeable by closeable {
 
         override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value, headers)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Field
+
+            if (name != other.name) return false
+            if (value != other.value) return false
+            if (headers != other.headers) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = name.hashCode()
+            result = 31 * result + value.hashCode()
+            result = 31 * result + headers.hashCode()
+            return result
+        }
     }
 
     data class File(override val name: String, val file: MultipartFormFile, val headers: Headers = emptyList()) :
