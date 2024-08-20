@@ -82,7 +82,10 @@ data class MultipartFormBody private constructor(
 
     constructor(boundary: String = UUID.randomUUID().toString()) : this(emptyList(), boundary)
 
-    override fun close() = formParts.forEach(MultipartEntity::close)
+    override fun close() {
+        formParts.forEach(MultipartEntity::close)
+        diskLocation.close()
+    }
 
     fun file(name: String) = files(name).firstOrNull()
     fun files(name: String) =

@@ -1,8 +1,8 @@
 package org.http4k.multipart
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.isEmpty
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.POST
 import org.http4k.core.MultipartFormBody
@@ -41,6 +41,6 @@ class LiveServerTest {
 
         server.stop()
 
-        assertThat(diskDir.listFiles()!!.toList(), isEmpty)
+        assertThat(diskDir.listFiles(), absent())
     }
 }
