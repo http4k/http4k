@@ -1,6 +1,5 @@
 package org.http4k.lens
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
@@ -163,11 +162,11 @@ class MultipartFormTest {
     ).toLens()
 
     @Test
-    fun `backing disk location deleted after close`() {
+    fun `backing disk location emptied after close`() {
         val tempDir = Files.createTempDirectory("http4k-override").toFile().apply { deleteOnExit() }
-        assertThat(tempDir.listFiles()!!.toList(), isEmpty)
+        val lens = Body.multipartForm(Strict, diskThreshold = 1, diskLocation = DiskLocation.Temp(tempDir)).toLens()
 
-        val lens = Body.multipartForm(Strict, diskThreshold = 1, getDiskLocation = { DiskLocation.Temp(tempDir) }).toLens()
+        assertThat(tempDir.listFiles()!!.toList(), isEmpty)
 
         val request = emptyRequest.with(
             lens of MultipartForm().with(
@@ -183,6 +182,6 @@ class MultipartFormTest {
             assertThat(tempDir.listFiles()!!.toList(), hasSize(equalTo(3)))
         }
 
-        assertThat(tempDir.listFiles(), absent())
+        assertThat(tempDir.listFiles()!!.toList(), isEmpty)
     }
 }

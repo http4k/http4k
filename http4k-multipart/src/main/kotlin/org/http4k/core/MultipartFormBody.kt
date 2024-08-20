@@ -19,19 +19,14 @@ sealed class MultipartEntity : Closeable {
     abstract val name: String
     internal abstract fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder
 
-    data class Field(override val name: String, val value: String, val headers: Headers = emptyList()) :
-        MultipartEntity() {
-        override fun close() = Unit
+    data class Field(override val name: String, val value: String, val headers: Headers = emptyList(), val closeable: Closeable = Closeable { }) :
+        MultipartEntity(), Closeable by closeable {
 
         override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value, headers)
     }
 
     data class File(override val name: String, val file: MultipartFormFile, val headers: Headers = emptyList()) :
-        MultipartEntity() {
-
-        override fun close() {
-            file.close()
-        }
+        MultipartEntity(), Closeable by file {
 
         override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder =
             builder.file(name, file.filename, file.contentType.value, file.content, headers)
@@ -67,10 +62,7 @@ data class MultipartFormBody private constructor(
 
     constructor(boundary: String = UUID.randomUUID().toString()) : this(emptyList(), boundary)
 
-    override fun close() {
-        formParts.forEach(MultipartEntity::close)
-        diskLocation.close()
-    }
+    override fun close() = formParts.forEach(MultipartEntity::close)
 
     fun file(name: String) = files(name).firstOrNull()
     fun files(name: String) =
@@ -138,7 +130,7 @@ data class MultipartFormBody private constructor(
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8)
 
             val parts = MultipartFormParser(UTF_8, diskThreshold, diskLocation).formParts(form).map {
-                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList())
+                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList(), it)
                 else MultipartEntity.File(
                     it.fieldName!!,
                     MultipartFormFile(
