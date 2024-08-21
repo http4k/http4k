@@ -32,7 +32,8 @@ fun OAuthProvider.Companion.dropbox(client: HttpHandler, credentials: Credential
         client,
         callbackUri,
         listOf(""),
-        oAuthPersistence)
+        oAuthPersistence
+    )
 
 fun OAuthProvider.Companion.facebook(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("email")): OAuthProvider =
     OAuthProvider(
@@ -50,8 +51,7 @@ fun OAuthProvider.Companion.google(client: HttpHandler, credentials: Credentials
         callbackUri,
         scopes,
         oAuthPersistence,
-        { it.query("nonce", SECURE_CSRF(Request(GET, "")).value) },
-        SECURE_CSRF
+        { it.query("nonce", SECURE_CSRF(Request(GET, "")).value) }
     )
 
 fun OAuthProvider.Companion.soundCloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =

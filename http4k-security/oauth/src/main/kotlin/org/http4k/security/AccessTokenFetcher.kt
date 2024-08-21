@@ -14,6 +14,7 @@ import org.http4k.lens.WebForm
 import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.OAuthWebForms.clientId
 import org.http4k.security.OAuthWebForms.code
+import org.http4k.security.OAuthWebForms.codeVerifier
 import org.http4k.security.OAuthWebForms.grantType
 import org.http4k.security.OAuthWebForms.redirectUri
 import org.http4k.security.OAuthWebForms.requestForm
@@ -25,7 +26,7 @@ class AccessTokenFetcher(
     private val accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator,
     private val accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
 ) {
-    fun fetch(authCode: String): Result<AccessTokenDetails, CouldNotFetchAccessToken> =
+    fun fetch(authCode: String, pkceVerifier: String? = null): Result<AccessTokenDetails, CouldNotFetchAccessToken> =
         api(
             Request(POST, providerConfig.tokenPath)
                 .with(
@@ -34,7 +35,8 @@ class AccessTokenFetcher(
                             grantType of "authorization_code",
                             redirectUri of callbackUri,
                             clientId of providerConfig.credentials.user,
-                            code of authCode
+                            code of authCode,
+                            codeVerifier of pkceVerifier,
                         )
                 )
                 .let { request ->

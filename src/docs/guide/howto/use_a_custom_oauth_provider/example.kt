@@ -18,6 +18,7 @@ import org.http4k.security.Nonce
 import org.http4k.security.OAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.security.PkceChallengeAndVerifier
 import org.http4k.security.openid.IdToken
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -65,10 +66,11 @@ fun main() {
 // One strategy might be to use an enum to map to a set of know uris
 // e.g. shoppingCart -> /cart
 class CustomOAuthPersistence : OAuthPersistence {
-    var nonce: Nonce? = null
-    var csrf: CrossSiteRequestForgeryToken? = null
-    var accessToken: AccessToken? = null
-    var originalUri: Uri? = null
+    private var nonce: Nonce? = null
+    private var csrf: CrossSiteRequestForgeryToken? = null
+    private var accessToken: AccessToken? = null
+    private var originalUri: Uri? = null
+    private var pkce: PkceChallengeAndVerifier? = null
 
     override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
 
@@ -90,6 +92,13 @@ class CustomOAuthPersistence : OAuthPersistence {
     }
 
     override fun retrieveOriginalUri(request: Request): Uri? = originalUri
+
+    override fun assignPkce(redirect: Response, pkce: PkceChallengeAndVerifier): Response {
+        this.pkce = pkce
+        return redirect.header("action", "assignPkce")
+    }
+
+    override fun retrievePkce(request: Request): PkceChallengeAndVerifier? = pkce
 
     override fun retrieveToken(request: Request): AccessToken? = accessToken
 

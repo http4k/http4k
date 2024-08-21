@@ -6,11 +6,11 @@ import org.http4k.core.Uri
 import org.http4k.security.openid.IdToken
 
 class FakeOAuthPersistence : OAuthPersistence {
-
-    var csrf: CrossSiteRequestForgeryToken? = null
-    var nonce: Nonce? = null
-    var accessToken: AccessToken? = null
-    var originalUri: Uri? = null
+    private var csrf: CrossSiteRequestForgeryToken? = null
+    private var nonce: Nonce? = null
+    private var accessToken: AccessToken? = null
+    private var originalUri: Uri? = null
+    private var pkce: PkceChallengeAndVerifier? = null
 
     override fun assignNonce(redirect: Response, nonce: Nonce): Response {
         this.nonce = nonce
@@ -32,6 +32,11 @@ class FakeOAuthPersistence : OAuthPersistence {
         return redirect.header("action", "assignOriginalUri")
     }
 
+    override fun assignPkce(redirect: Response, pkce: PkceChallengeAndVerifier): Response {
+        this.pkce = pkce
+        return redirect.header("action", "assignPkce")
+    }
+
     override fun retrieveNonce(request: Request): Nonce? = nonce
 
     override fun retrieveToken(request: Request): AccessToken? = accessToken
@@ -39,4 +44,6 @@ class FakeOAuthPersistence : OAuthPersistence {
     override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
 
     override fun retrieveOriginalUri(request: Request): Uri? = originalUri
+
+    override fun retrievePkce(request: Request): PkceChallengeAndVerifier? = pkce
 }

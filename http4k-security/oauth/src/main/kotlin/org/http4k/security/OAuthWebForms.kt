@@ -18,6 +18,7 @@ object OAuthWebForms {
     val refreshToken = FormField.map(::RefreshToken, RefreshToken::value).optional("refresh_token")
     val scope = FormField.optional("scope")
     val code = FormField.optional("code")
+    val codeVerifier = FormField.optional("code_verifier")
     val redirectUri = FormField.uri().optional("redirect_uri")
     val accessToken = FormField.optional("access_token")
     val username = FormField.optional("username")
