@@ -30,9 +30,7 @@ class BiDiLensSpecTest {
     data class Container(val s: String?)
 
     private val spec = BiDiLensSpec("location", StringParam,
-        LensGet { _: String, str: String ->
-            if (str.isBlank()) emptyList() else listOf(str)
-        },
+        LensGet { _: String, str: String -> if (str.isBlank()) emptyList() else listOf(str) },
         LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
 
     private val oSpec = BiDiLensSpec("location", StringParam,

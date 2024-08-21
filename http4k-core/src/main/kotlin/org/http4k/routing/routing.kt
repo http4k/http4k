@@ -35,8 +35,8 @@ fun reverseProxy(vararg hostToHandler: Pair<String, HttpHandler>): HttpHandler =
  */
 fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>) = routes(
     *hostToHandler
-        .map { service ->
-            hostHeaderOrUri(service.first) { it.contains(service.first) } bind service.second
+        .map { (host, handler) ->
+            hostHeaderOrUri(host) { it.contains(host) } bind handler
         }.toTypedArray()
 )
 
