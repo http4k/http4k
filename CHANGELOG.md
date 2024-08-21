@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.28.0.1 (uncut)
+### v5.28.1.0
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. H/T @H/T @oharaandrew314
 
 ### v5.28.0.0
