@@ -3,10 +3,13 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.28.0.1 (uncut)
+- **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. H/T @H/T @oharaandrew314
+
 ### v5.28.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Include Vary header on CORS responses. H/T @ollieabbey
-- **http4k-multipart** : [Fix Break] Multipart form files were all calling deleteOnExit() instead of being deleted when the Body is closed. Possible memory leak for long running processes. The fix MAY be a change of OS files-system usage if you are not closing your MultiPart form body. #H/T @oharaandrew314 for the report.
+- **http4k-multipart** : [Fix Break] Multipart form files were all calling deleteOnExit() instead of being deleted when the Body is closed. Possible memory leak for long running processes. The fix MAY be a change of OS files-system usage if you are not closing your MultiPart form body. @H/T @oharaandrew314 for the report.
 
 ### v5.27.0.0
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.10
