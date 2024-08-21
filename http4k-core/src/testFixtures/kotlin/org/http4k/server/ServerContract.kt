@@ -38,7 +38,7 @@ import java.net.URI.create
 
 abstract class ServerContract(
     private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
-    private val requiredMethods: Array<Method> = Method.values()
+    private val requiredMethods: Array<Method> = Method.entries.toTypedArray()
 ) {
     private lateinit var server: Http4kServer
 

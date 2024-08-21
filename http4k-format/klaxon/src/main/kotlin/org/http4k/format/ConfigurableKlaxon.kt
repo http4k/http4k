@@ -21,7 +21,6 @@ open class ConfigurableKlaxon(
     private val klaxon: KKlaxon,
     override val defaultContentType: ContentType = APPLICATION_JSON
 ) : AutoMarshalling() {
-    @Suppress("UNCHECKED_CAST")
     override fun <T : Any> asA(input: String, target: KClass<T>) = asA(input.byteInputStream(), target)
 
     @Suppress("UNCHECKED_CAST")

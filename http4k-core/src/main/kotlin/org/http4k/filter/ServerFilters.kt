@@ -44,7 +44,7 @@ data class CorsPolicy(
 ) {
     companion object {
         val UnsafeGlobalPermissive =
-            CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.values().toList(), true)
+            CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.entries, true)
     }
 }
 
