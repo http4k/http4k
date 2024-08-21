@@ -73,7 +73,6 @@ class BiDiWsMessageLens<FINAL>(
     private val setLens: (FINAL, WsMessage) -> WsMessage
 ) : WsMessageLens<FINAL>(get) {
 
-    @Suppress("UNCHECKED_CAST")
     operator fun invoke(target: FINAL): WsMessage = setLens(target, WsMessage(Body.EMPTY))
 
     fun create(value: FINAL): WsMessage = invoke(value)

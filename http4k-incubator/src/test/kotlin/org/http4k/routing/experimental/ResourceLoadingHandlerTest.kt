@@ -200,7 +200,6 @@ fun <T> allOf(matchers: List<Matcher<T>>): Matcher<T> = matchers.reducedWith(Mat
  */
 fun <T> allOf(vararg matchers: Matcher<T>): Matcher<T> = allOf(matchers.asList())
 
-@Suppress("UNCHECKED_CAST")
 private fun <T> List<Matcher<T>>.reducedWith(op: (Matcher<T>, Matcher<T>) -> Matcher<T>): Matcher<T> = when {
     isEmpty() -> anything
     else -> reduce(op)
