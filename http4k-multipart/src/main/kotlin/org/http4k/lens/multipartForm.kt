@@ -20,12 +20,12 @@ data class MultipartForm(
     val fields: Map<String, List<MultipartFormField>> = emptyMap(),
     val files: Map<String, List<MultipartFormFile>> = emptyMap(),
     val errors: List<Failure> = emptyList(),
-    val onClose: List<() -> Unit> = emptyList()
+    val onClose: List<Closeable> = emptyList()
 ) : Closeable {
 
     override fun close() {
         files.values.flatten().forEach(MultipartFormFile::close)
-        onClose.forEach { it() }
+        onClose.forEach(Closeable::close)
     }
 
     operator fun plus(kv: Pair<String, String>) =
@@ -91,7 +91,7 @@ fun Body.Companion.multipartForm(
         .map({ it.copy(errors = validator(it, parts.toList())) }, { it.copy(errors = validator(it, parts.toList())) })
 
 internal fun Body.toMultipartForm(): MultipartForm = (this as MultipartFormBody).let {
-    it.formParts.fold(MultipartForm(onClose = listOf(this::close))) { memo, next ->
+    it.formParts.fold(MultipartForm(onClose = listOf(this))) { memo, next ->
         when (next) {
             is MultipartEntity.File -> memo + (next.name to next.file)
             is MultipartEntity.Field -> memo + (next.name to next.value)
