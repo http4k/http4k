@@ -54,7 +54,7 @@ private enum class Cacheability {
             val split = currentValue.split(",")
             (listOf(name) + split
                 .map(String::trim)
-                .filterNot { values().map { it.name }.contains(it) }).joinToString(", ")
+                .filterNot { entries.map { it.name }.contains(it) }).joinToString(", ")
         } ?: name
 }
 

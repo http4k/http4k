@@ -8,7 +8,7 @@ import org.junit.jupiter.api.assertThrows
 class ResponseTypeTest {
     @Test
     fun `can resolve from query parameter value`() {
-        ResponseType.values().forEach { responseType ->
+        ResponseType.entries.forEach { responseType ->
             assertThat(ResponseType.fromQueryParameterValue(responseType.queryParameterValue), equalTo(responseType))
         }
     }

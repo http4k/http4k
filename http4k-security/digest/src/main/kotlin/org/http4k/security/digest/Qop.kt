@@ -8,6 +8,6 @@ enum class Qop(val value: String) {
     Auth("auth");
 
     companion object {
-        fun from(value: String) = values().firstOrNull { it.value == value }
+        fun from(value: String) = entries.firstOrNull { it.value == value }
     }
 }
