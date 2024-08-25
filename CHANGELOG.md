@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.29.0.1 (uncut)
+- **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. Should fix memory leak. @H/T @oharaandrew314
+
 ### v5.29.0.0
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.20
 - **http4k-security-oauth** : [Breaking] OAuthProvider support for PKCE. This may break code because of the addition of an extra parameter in the OAuth construction. H/T @dkandalov
@@ -11,7 +14,7 @@ changes with their rationale when appropriate:
 
 ### v5.28.1.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. H/T @H/T @oharaandrew314
+- **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. @H/T @oharaandrew314
 
 ### v5.28.0.0
 - **http4k-*** : Upgrade some dependency versions.
