@@ -14,7 +14,7 @@ interface DiskLocation : Closeable {
     fun createFile(filename: String?): MultipartFile
 
     companion object {
-        fun Temp(diskDir: File = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }) =
+        fun Temp(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
             object : DiskLocation {
                 override fun createFile(filename: String?): MultipartFile =
                     TempFile(
