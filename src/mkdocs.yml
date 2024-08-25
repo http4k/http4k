@@ -1,4 +1,5 @@
 site_name: http4k
+site_name: http4k
 site_url: https://www.http4k.org/
 site_description: The Functional toolkit for Kotlin HTTP applications
 site_author: David Denton (@daviddenton), Ivan Sanchez (@s4nchez)
@@ -95,6 +96,7 @@ nav:
     - Resilience4J: guide/reference/resilience4j/index.md
     - Failsafe: guide/reference/failsafe/index.md
     - AWS: guide/reference/aws/index.md
+    - Azure: guide/reference/azure/index.md
     - OAuth: guide/reference/oauth/index.md
     - Digest: guide/reference/digest/index.md
     - GraphQL: guide/reference/graphql/index.md
