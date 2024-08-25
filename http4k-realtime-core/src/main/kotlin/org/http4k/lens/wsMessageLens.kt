@@ -73,7 +73,7 @@ class BiDiWsMessageLens<FINAL>(
     private val setLens: (FINAL, WsMessage) -> WsMessage
 ) : WsMessageLens<FINAL>(get) {
 
-    operator fun invoke(target: FINAL): WsMessage = setLens(target, WsMessage(Body.EMPTY))
+    operator fun invoke(target: FINAL): WsMessage = setLens(target, WsMessage(Body.EMPTY, WsMessage.Mode.Text))
 
     fun create(value: FINAL): WsMessage = invoke(value)
 }

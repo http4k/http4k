@@ -1,10 +1,12 @@
 package org.http4k.websocket
 
 import org.http4k.core.Body
+import org.http4k.core.MemoryBody
 import org.http4k.core.Request
 import org.http4k.routing.RoutingWsHandler
 import org.http4k.websocket.WsStatus.Companion.NORMAL
 import java.io.InputStream
+import java.nio.ByteBuffer
 
 /**
  * Represents a connected Websocket instance, and can be passed around an application. This is configured
@@ -26,12 +28,16 @@ typealias WsConsumer = (Websocket) -> Unit
 
 typealias WsHandler = (Request) -> WsResponse
 
-data class WsMessage(val body: Body) {
-    constructor(value: String) : this(Body(value))
-    constructor(value: InputStream) : this(Body(value))
+data class WsMessage(val body: Body, val mode: Mode) {
+    constructor(value: String, mode: Mode = Mode.Text) : this(Body(value), mode)
+    constructor(value: ByteBuffer, mode: Mode = Mode.Binary): this(Body(value), mode)
+    constructor(value: ByteArray, mode: Mode = Mode.Binary): this(MemoryBody(value), mode)
+    constructor(value: InputStream, mode: Mode = Mode.Binary) : this(Body(value), mode)
 
     fun body(new: Body): WsMessage = copy(body = new)
     fun bodyString(): String = String(body.payload.array())
+
+    enum class Mode { Text, Binary }
 
     companion object
 }

@@ -7,11 +7,9 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import org.http4k.client.PreCannedOkHttpClients.defaultOkHttpClient
-import org.http4k.core.Body
 import org.http4k.core.Headers
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.Websocket
@@ -93,9 +91,9 @@ private class OkHttpNonBlockingWebsocket(
         .newWebSocket(req.asOkHttp(), Listener())
 
     override fun send(message: WsMessage) {
-        val messageSent = when (message.body) {
-            is StreamBody -> ws.send(message.body.payload.toByteString())
-            else -> ws.send(message.body.toString())
+        val messageSent = when (message.mode) {
+            WsMessage.Mode.Binary -> ws.send(message.body.payload.toByteString())
+            WsMessage.Mode.Text -> ws.send(message.body.toString())
         }
         check(messageSent) {
             "Connection to ${req.uri} is closed."
@@ -128,7 +126,7 @@ private class OkHttpNonBlockingWebsocket(
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            triggerMessage(WsMessage(Body(bytes.toByteArray().inputStream())))
+            triggerMessage(WsMessage(bytes.toByteArray(), WsMessage.Mode.Binary))
         }
     }
 }

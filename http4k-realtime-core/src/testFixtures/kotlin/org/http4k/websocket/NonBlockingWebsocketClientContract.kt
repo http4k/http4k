@@ -4,7 +4,10 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
+import com.natpryce.hamkrest.hasSize
+import org.http4k.base64Encode
 import org.http4k.core.Headers
+import org.http4k.core.MemoryBody
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.server.PolyServerConfig
@@ -43,9 +46,11 @@ abstract class NonBlockingWebsocketClientContract(
 
     @Test
     @Timeout(10, unit = TimeUnit.SECONDS)
-    fun `send and receive in binary mode`() {
+    fun `send and receive in binary mode - MemoryBody`() {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
+
+        val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
 
         websocket(Uri.of("ws://localhost:$port/bin")) { ws ->
             ws.onMessage { message ->
@@ -54,12 +59,41 @@ abstract class NonBlockingWebsocketClientContract(
             ws.onClose {
                 queue.add { null }
             }
-            ws.send(WsMessage("hello".byteInputStream()))
+            ws.send(WsMessage(MemoryBody(content), WsMessage.Mode.Binary))
         }
 
         val messages = received.take(4).toList()
-        assertThat(messages.all { it.body is StreamBody }, equalTo(true))
-        assertThat(messages, equalTo(listOf(WsMessage("hello"))))
+        assertThat(messages, hasSize(equalTo(1)))
+
+        val message = messages.first()
+        assertThat(message.mode, equalTo(WsMessage.Mode.Binary))
+        assertThat(message.body.stream.readBytes().base64Encode(), equalTo(content.base64Encode()))
+    }
+
+    @Test
+    @Timeout(10, unit = TimeUnit.SECONDS)
+    fun `send and receive in binary mode - StreamBody`() {
+        val queue = LinkedBlockingQueue<() -> WsMessage?>()
+        val received = generateSequence { queue.take()() }
+
+        val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
+
+        websocket(Uri.of("ws://localhost:$port/bin")) { ws ->
+            ws.onMessage { message ->
+                queue.add { message }
+            }
+            ws.onClose {
+                queue.add { null }
+            }
+            ws.send(WsMessage(StreamBody(content.inputStream()), WsMessage.Mode.Binary))
+        }
+
+        val messages = received.take(4).toList()
+        assertThat(messages, hasSize(equalTo(1)))
+
+        val message = messages.first()
+        assertThat(message.mode, equalTo(WsMessage.Mode.Binary))
+        assertThat(message.body.stream.readBytes().base64Encode(), equalTo(content.base64Encode()))
     }
 
     @Test

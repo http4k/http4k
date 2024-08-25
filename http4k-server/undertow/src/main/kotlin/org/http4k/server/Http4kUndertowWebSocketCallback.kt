@@ -10,10 +10,8 @@ import io.undertow.websockets.core.WebSockets.sendBinary
 import io.undertow.websockets.core.WebSockets.sendClose
 import io.undertow.websockets.core.WebSockets.sendText
 import io.undertow.websockets.spi.WebSocketHttpExchange
-import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.StreamBody
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
@@ -26,9 +24,10 @@ class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCa
         val upgradeRequest = exchange.asRequest()
 
         val socket = object : PushPullAdaptingWebSocket() {
-            override fun send(message: WsMessage) =
-                if (message.body is StreamBody) sendBinary(message.body.payload, channel, null)
-                else sendText(message.bodyString(), channel, null)
+            override fun send(message: WsMessage) = when(message.mode) {
+                WsMessage.Mode.Binary -> sendBinary(message.body.payload, channel, null)
+                WsMessage.Mode.Text -> sendText(message.bodyString(), channel, null)
+            }
 
             override fun close(status: WsStatus) {
                 sendClose(status.code, status.description, channel, null)
@@ -42,7 +41,7 @@ class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCa
         channel.receiveSetter.set(object : AbstractReceiveListener() {
             override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
                 try {
-                    socket.triggerMessage(WsMessage(Body(message.data)))
+                    socket.triggerMessage(WsMessage(message.data))
                 } catch (e: IOException) {
                     throw e
                 } catch (e: Exception) {
@@ -52,7 +51,7 @@ class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCa
             }
 
             override fun onFullBinaryMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) =
-                message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }
+                message.data.resource.forEach { socket.triggerMessage(WsMessage(it)) }
 
             override fun onError(channel: WebSocketChannel, error: Throwable) = socket.triggerError(error)
         })

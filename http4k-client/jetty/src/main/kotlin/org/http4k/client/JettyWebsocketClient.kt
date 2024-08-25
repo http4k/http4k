@@ -11,7 +11,6 @@ import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.Headers
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.core.toParametersMap
 import org.http4k.websocket.PushPullAdaptingWebSocket
@@ -111,9 +110,9 @@ private class JettyNonBlockingWebsocket(
             throw WebSocketException("Connection to ${req.uri} is closed.")
         }
         try {
-            when (message.body) {
-                is StreamBody -> Completable.with { session.sendBinary(message.body.payload, it) }.get()
-                else -> Completable.with { session.sendText(message.body.toString(), it) }.get()
+            when (message.mode) {
+                WsMessage.Mode.Binary -> Completable.with { session.sendBinary(message.body.payload, it) }.get()
+                WsMessage.Mode.Text -> Completable.with { session.sendText(message.body.toString(), it) }.get()
             }
         } catch (error: Throwable) {
             triggerError(error)
