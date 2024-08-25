@@ -10,12 +10,12 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 
 fun main() {
-    val fakeS3 = DebuggingFilters.PrintRequestAndResponse().then(OkHttp())
+    val http4kClient = DebuggingFilters.PrintRequestAndResponse().then(OkHttp())
 
     val s3 = S3Client.builder()
         .region(EU_WEST_1)
         .credentialsProvider { AwsBasicCredentials.create("accessKey", "secret") }
-        .httpClient(AwsSdkClient(fakeS3))
+        .httpClient(AwsSdkClient(http4kClient))
         .build()
 
     s3.createBucket(CreateBucketRequest.builder().bucket("hello").build())

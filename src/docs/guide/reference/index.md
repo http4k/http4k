@@ -5,8 +5,11 @@ description: Details about the various http4k integration libraries
 
 ### Core functionality
 <a href="/guide/reference/core"><span class="pill">Core</span></a>
-<a href="/guide/reference/contracts"><span class="pill">OpenAPI Contracts</span></a>
 <a href="/guide/reference/multipart"><span class="pill">Multipart Forms</span></a>
+<a href="/guide/reference/config"><span class="pill">Typesafe Configuration</span></a>
+
+### API styles
+<a href="/guide/reference/contracts"><span class="pill">OpenAPI Contracts</span></a>
 <a href="/guide/reference/graphql"><span class="pill">GraphQL</span></a>
 
 ### HTTP Server Backends
@@ -60,18 +63,26 @@ description: Details about the various http4k integration libraries
 <a href="/guide/reference/templating"><span class="pill">Pebble</span></a>
 <a href="/guide/reference/templating"><span class="pill">Thymeleaf</span></a>
 
-### Cloud-Native/Observability/Misc
+### SDK integrations
 <a href="/guide/reference/aws"><span class="pill">AWS</span></a>
-<a href="/guide/reference/config"><span class="pill">Typesafe Configuration</span></a>
-<a href="/guide/reference/cloud_native"><span class="pill">Cloud Native extensions</span></a>
-<a href="/guide/reference/cloud_events"><span class="pill">Cloud Events</span></a>
+<a href="/guide/reference/azure"><span class="pill">Azure</span></a>
+
+### Security 
 <a href="/guide/reference/digest"><span class="pill">Digest Auth</span></a>
 <a href="/guide/reference/oauth"><span class="pill">OAuth</span></a>
+
+### Observability & Metrics
 <a href="/guide/reference/micrometer"><span class="pill">Micrometer</span></a>
 <a href="/guide/reference/opentelemetry"><span class="pill">OpenTelemetry</span></a>
+
+### Web Technologies
+<a href="/guide/reference/htmx"><span class="pill">htmx</span></a>
+
+### Cloud-Native/Misc
+<a href="/guide/reference/cloud_native"><span class="pill">Cloud Native extensions</span></a>
+<a href="/guide/reference/cloud_events"><span class="pill">Cloud Events</span></a>
 <a href="/guide/reference/resilience4j"><span class="pill">Resilience4J</span></a>
 <a href="/guide/reference/failsafe"><span class="pill">FailSafe</span></a>
-<a href="/guide/reference/htmx"><span class="pill">htmx</span></a>
 <a href="/guide/reference/webhooks"><span class="pill">Webhooks</span></a>
 
 ### Testing

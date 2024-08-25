@@ -239,6 +239,8 @@ dependencies {
         exclude(group = "software.amazon.awssdk", module = "apache-client")
     }
 
+    testImplementation("com.azure:azure-search-documents:_")
+
     testImplementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:_")
     testImplementation("com.expediagroup:graphql-kotlin-schema-generator:_")
     testImplementation("com.amazonaws:aws-lambda-java-events:_")

@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.28.2.0
+- **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.20
+- **http4k-*** : [New module] Azure SDK integration - use an http4k client with the official libraries
+
 ### v5.28.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. H/T @H/T @oharaandrew314
