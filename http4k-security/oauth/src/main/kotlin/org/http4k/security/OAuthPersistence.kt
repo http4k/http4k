@@ -49,6 +49,10 @@ interface OAuthPersistence {
      */
     fun retrieveOriginalUri(request: Request): Uri?
 
+    fun assignPkce(redirect: Response, pkce: PkceChallengeAndVerifier): Response
+
+    fun retrievePkce(request: Request): PkceChallengeAndVerifier?
+
     /**
      * Assign the swapped AccessToken (and optional IdToken) returned by the end-service. Opportunity here to modify the
      * response returned to the user when the redirection happens.

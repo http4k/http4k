@@ -20,12 +20,13 @@ class OAuthRedirectionFilter(
     private val scopes: List<String>,
     private val generateCrsf: CsrfGenerator = SECURE_CSRF,
     private val nonceGenerator: NonceGenerator = SECURE_NONCE,
+    private val pkceGenerator: PkceGenerator? = null,
     private val modifyState: (Uri) -> Uri,
     private val oAuthPersistence: OAuthPersistence,
     private val responseType: ResponseType,
     private val redirectionBuilder: RedirectionUriBuilder = defaultUriBuilder,
     private val originalUri: (Request) -> Uri = Request::uri,
-    private val responseMode: ResponseMode? = null
+    private val responseMode: ResponseMode? = null,
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
@@ -34,6 +35,7 @@ class OAuthRedirectionFilter(
             val csrf = generateCrsf(request)
             val state = State(csrf.value)
             val nonce = if (responseType == CodeIdToken) nonceGenerator.invoke() else null
+            val pkce = pkceGenerator?.invoke()
             val authRequest = AuthRequest(
                 ClientId(providerConfig.credentials.user),
                 scopes,
@@ -41,7 +43,8 @@ class OAuthRedirectionFilter(
                 state,
                 responseType,
                 nonce,
-                responseMode
+                responseMode,
+                codeChallenge = pkce?.challenge
             )
             val redirectUri = modifyState(redirectionBuilder(providerConfig.authUri, authRequest, state, nonce))
 
@@ -49,6 +52,7 @@ class OAuthRedirectionFilter(
                 .let { response -> oAuthPersistence.assignCsrf(response, csrf) }
                 .let { response -> oAuthPersistence.assignOriginalUri(response, originalUri(request)) }
                 .let { response -> if (nonce != null) oAuthPersistence.assignNonce(response, nonce) else response }
+                .let { response -> if (pkce != null) oAuthPersistence.assignPkce(response, pkce) else response }
         }
     }
 }
