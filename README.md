@@ -157,9 +157,9 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Integration with GraphQL Java library to route and serve Graph-based apps. Plus conversion of any HttpHandler to be a GraphQL client.
 * [AWS:](https://http4k.org/guide/reference/aws) 
     * Plug a standard `HttpHandler` into the AWS v2 SDKs. This massively simplifies testing and allows for sniffing of the exact traffic going to AWS - brilliant for debugging and building fakes.
+  * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [Azure:](https://http4k.org/guide/reference/azure) 
     * Plug a standard `HttpHandler` into the Azure Java SDKs. 
-    * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [OAuth Security:](https://http4k.org/guide/reference/oauth) 
     * Implement OAuth Authorisation Code Grant flow with a single Interface
     * **Pre-configured** OAuth for following providers:
