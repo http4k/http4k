@@ -40,7 +40,7 @@ class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun ApacheRequest.asHttp4kRequest(context: HttpContext): Request? {
         val connection = context.getAttribute(HTTP_CONNECTION) as HttpInetConnection
         return Method.supportedOrNull(requestLine.method)?.let {
-            Request(it, requestLine.uri)
+            Request(it, requestLine.uri, protocolVersion.toString())
                 .headers(allHeaders.toHttp4kHeaders()).let {
                     when (this) {
                         is HttpEntityEnclosingRequest -> it.body(

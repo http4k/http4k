@@ -30,7 +30,7 @@ class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpH
 
     private fun HttpServerExchange.asRequest() =
         Method.supportedOrNull(requestMethod.toString())?.let {
-            Request(it, Uri.of("$relativePath?$queryString"))
+            Request(it, Uri.of("$relativePath?$queryString"), protocol.toString())
                 .headers(requestHeaders
                     .flatMap { header -> header.map { header.headerName.toString() to it } })
                 .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())

@@ -26,7 +26,7 @@ class Http4kJettyHttpHandler(private val handler: HttpHandler) : Abstract(Invoca
 
 internal fun JettyRequest.asHttp4kRequest(): Request? =
     Method.supportedOrNull(method)?.let {
-        Request(it, Uri.of("${httpURI.pathQuery.orEmpty()}#${httpURI.fragment.orEmpty()}"))
+        Request(it, Uri.of("${httpURI.pathQuery.orEmpty()}#${httpURI.fragment.orEmpty()}"), connectionMetaData.httpVersion.asString())
             .headers(headerParameters())
             .source(RequestSource(JettyRequest.getRemoteAddr(this), JettyRequest.getRemotePort(this), httpURI.scheme))
             .body(Content.Source.asInputStream(this), headers[HttpHeader.CONTENT_LENGTH].safeLong())

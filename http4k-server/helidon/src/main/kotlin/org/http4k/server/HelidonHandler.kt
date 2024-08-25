@@ -19,7 +19,7 @@ fun HelidonHandler(http: HttpHandler) = Handler { req, res ->
 private fun ServerRequest.toHttp4k(): Request? =
     Method.supportedOrNull(prologue().method().text())
         ?.let {
-            Request(it, Uri.of(path().rawPath() + query()), prologue().protocolVersion())
+            Request(it, Uri.of(path().rawPath() + query()), prologue().rawProtocol())
                 .body(content().inputStream(), headers().contentLength().let {
                     if (it.isPresent) it.asLong else null
                 })

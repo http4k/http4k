@@ -30,7 +30,7 @@ fun Response.transferTo(destination: HttpServletResponse) {
 }
 
 fun HttpServletRequest.asHttp4kRequest() = Method.supportedOrNull(method)?.let {
-    Request(it, Uri.of(requestURI + queryString.toQueryString()))
+    Request(it, Uri.of(requestURI + queryString.toQueryString()), protocol)
         .body(inputStream, getHeader("Content-Length").safeLong()).headers(headerParameters())
         .source(RequestSource(remoteAddr, remotePort, scheme))
 }

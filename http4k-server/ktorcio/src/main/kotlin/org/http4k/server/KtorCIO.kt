@@ -13,6 +13,7 @@ import io.ktor.server.plugins.origin
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.header
 import io.ktor.server.request.httpMethod
+import io.ktor.server.request.httpVersion
 import io.ktor.server.request.uri
 import io.ktor.server.response.ApplicationResponse
 import io.ktor.server.response.header
@@ -66,7 +67,7 @@ class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode
 }
 
 fun ApplicationRequest.asHttp4k() = Method.supportedOrNull(httpMethod.value)?.let {
-    Request(it, uri)
+    Request(it, uri, httpVersion)
         .headers(headers.toHttp4kHeaders())
         .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
         .source(RequestSource(origin.remoteHost, scheme = origin.scheme)) // origin.remotePort does not exist for Ktor

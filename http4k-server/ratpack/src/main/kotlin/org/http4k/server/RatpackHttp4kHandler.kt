@@ -19,7 +19,7 @@ class RatpackHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
 
     private fun Context.toHttp4kRequest(data: TypedData) = Method.supportedOrNull(request.method.name)
         ?.let {
-            Request(it, request.rawUri)
+            Request(it, request.rawUri, request.protocol)
                 .let {
                     request.headers.names.fold(it) { acc, nextHeaderName ->
                         request.headers.getAll(nextHeaderName)
