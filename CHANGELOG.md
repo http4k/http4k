@@ -5,9 +5,9 @@ changes with their rationale when appropriate:
 
 ### v5.29.0.0
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.20
-- **http4k-server-*** : [Fix #1163] Request.version is always HTTP/1.1 for server requests, even when using HTTP/2.0
+- **http4k-security-oauth** : [Breaking] OAuthProvider support for PKCE. This may break code because of the addition of an extra parameter in the OAuth construction. H/T @dkandalov
 - **http4k-*** : [New module] Azure SDK integration - use an http4k client with the official libraries
-- **http4k-security-oauth** : [Breaking] OAuthProvider support for PKCE. This may break code because of the addition of an extra parameter in the OAuth construction. H/T @dkandalov 
+- **http4k-server-*** : [Fix #1163] Request.version is always HTTP/1.1 for server requests, even when using HTTP/2.0
 
 ### v5.28.1.0
 - **http4k-*** : Upgrade some dependency versions.
