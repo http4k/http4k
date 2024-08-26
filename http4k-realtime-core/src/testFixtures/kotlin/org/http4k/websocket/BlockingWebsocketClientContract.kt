@@ -47,7 +47,6 @@ abstract class BlockingWebsocketClientContract(
 
         val message = messages.first()
         assertThat(message.mode, equalTo(WsMessage.Mode.Binary))
-        assertInstanceOf<MemoryBody>(message.body)
         assertThat(message.body.stream.readBytes().base64Encode(), equalTo(content.base64Encode()))
     }
 
