@@ -3,12 +3,16 @@ package org.http4k.websocket
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.throws
+import org.http4k.base64Encode
 import org.http4k.core.Headers
+import org.http4k.core.MemoryBody
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.server.PolyServerConfig
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
 import java.time.Duration
 
 abstract class BlockingWebsocketClientContract(
@@ -31,16 +35,36 @@ abstract class BlockingWebsocketClientContract(
     }
 
     @Test
-    fun `send and receive in binary mode`() {
+    fun `send and receive in binary mode - memoryBody`() {
         val ws = websocket(Uri.of("ws://localhost:$port/bin"))
-        ws.send(WsMessage("hello".byteInputStream()))
+
+        val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
+
+        ws.send(WsMessage(MemoryBody(content), WsMessage.Mode.Binary))
 
         val messages = ws.received().take(4).toList()
+        assertThat(messages, hasSize(equalTo(1)))
 
-        assertThat(messages.all { it.body is StreamBody }, equalTo(true))
-        assertThat(messages, equalTo(listOf(WsMessage("hello"))))
+        val message = messages.first()
+        assertThat(message.mode, equalTo(WsMessage.Mode.Binary))
+        assertThat(message.body.stream.readBytes().base64Encode(), equalTo(content.base64Encode()))
     }
 
+    @Test
+    fun `send and receive in binary mode - StreamBody`() {
+        val ws = websocket(Uri.of("ws://localhost:$port/bin"))
+
+        val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
+
+        ws.send(WsMessage(StreamBody(content.inputStream()), WsMessage.Mode.Binary))
+
+        val messages = ws.received().take(4).toList()
+        assertThat(messages, hasSize(equalTo(1)))
+
+        val message = messages.first()
+        assertThat(message.mode, equalTo(WsMessage.Mode.Binary))
+        assertThat(message.body.stream.readBytes().base64Encode(), equalTo(content.base64Encode()))
+    }
 
     @Test
     fun `exception is thrown on connection error`() {

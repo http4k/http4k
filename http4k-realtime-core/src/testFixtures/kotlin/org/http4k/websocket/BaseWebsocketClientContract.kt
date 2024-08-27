@@ -24,7 +24,7 @@ abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerC
                 WsResponse { ws ->
                     ws.onMessage {
                         val content = it.body.stream.readBytes()
-                        ws.send(WsMessage(content.inputStream()))
+                        ws.send(WsMessage(content))
                         ws.close(WsStatus.NORMAL)
                     }
                 }

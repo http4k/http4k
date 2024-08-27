@@ -5,7 +5,6 @@ import org.http4k.core.MemoryBody
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
-import org.http4k.core.StreamBody
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.ServerConfig
@@ -88,9 +87,9 @@ private fun createServer(
 
         val wsAdapter = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
-                when (message.body) {
-                    is StreamBody -> conn.send(message.body.payload)
-                    else -> conn.send(message.bodyString())  // furthering the generalization that a MemoryBody is ALWAYS to use text mode
+                when (message.mode) {
+                    WsMessage.Mode.Binary -> conn.send(message.body.payload)
+                    WsMessage.Mode.Text -> conn.send(message.bodyString())
                 }
             }
 
@@ -110,7 +109,7 @@ private fun createServer(
     override fun onMessage(conn: WebSocket, message: ByteBuffer) {
         conn.adapter()?.let { ws ->
             try {
-                ws.triggerMessage(WsMessage(MemoryBody(message)))
+                ws.triggerMessage(WsMessage(message, WsMessage.Mode.Binary))
             } catch (e: Throwable) {
                 ws.triggerError(e)
             }

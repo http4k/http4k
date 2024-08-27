@@ -11,8 +11,6 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
 import io.netty.handler.codec.http.websocketx.WebSocketFrame
-import org.http4k.core.Body
-import org.http4k.core.StreamBody
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
@@ -26,14 +24,13 @@ class Http4kWsChannelHandler(private val wSocket: WsConsumer) : SimpleChannelInb
     override fun handlerAdded(ctx: ChannelHandlerContext) {
         websocket = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
-                when (message.body) {
-                    is StreamBody -> ctx.writeAndFlush(BinaryWebSocketFrame(message.body.stream.use {
+                when (message.mode) {
+                    WsMessage.Mode.Text -> ctx.writeAndFlush(TextWebSocketFrame(message.bodyString()))
+                    WsMessage.Mode.Binary -> ctx.writeAndFlush(BinaryWebSocketFrame(message.body.stream.use {
                         Unpooled.wrappedBuffer(
                             it.readBytes()
                         )
                     }))
-
-                    else -> ctx.writeAndFlush(TextWebSocketFrame(message.bodyString()))
                 }
             }
 
@@ -58,8 +55,8 @@ class Http4kWsChannelHandler(private val wSocket: WsConsumer) : SimpleChannelInb
 
     override fun channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) {
         when (msg) {
-            is TextWebSocketFrame -> websocket?.triggerMessage(WsMessage(Body(msg.text())))
-            is BinaryWebSocketFrame -> websocket?.triggerMessage(WsMessage(Body(ByteBufInputStream(msg.content()))))
+            is TextWebSocketFrame -> websocket?.triggerMessage(WsMessage(msg.text()))
+            is BinaryWebSocketFrame -> websocket?.triggerMessage(WsMessage(ByteBufInputStream(msg.content()), WsMessage.Mode.Binary))
             is CloseWebSocketFrame -> {
                 msg.retain()
                 ctx.writeAndFlush(msg).addListeners(ChannelFutureListener {

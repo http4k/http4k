@@ -13,7 +13,7 @@ class WsMessageTest {
     fun `calls through to create correct body`() {
         val memoryBody = MemoryBody("body")
         assertThat(WsMessage("body").body, equalTo(memoryBody as Body))
-        assertThat(WsMessage(memoryBody).body, equalTo(memoryBody as Body))
+        assertThat(WsMessage(memoryBody, WsMessage.Mode.Binary).body, equalTo(memoryBody as Body))
         assertThat(WsMessage("hello".byteInputStream()).body, equalTo(StreamBody("hello".byteInputStream(), 5) as Body))
     }
 }

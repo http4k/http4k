@@ -1,11 +1,9 @@
 package org.http4k.server
 
-import org.eclipse.jetty.util.BufferUtil
 import org.eclipse.jetty.websocket.api.Callback
 import org.eclipse.jetty.websocket.api.Session
 import org.eclipse.jetty.websocket.api.exceptions.WebSocketException
 import org.http4k.core.Request
-import org.http4k.core.StreamBody
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
@@ -25,9 +23,9 @@ class Http4kJettyServerWebSocketEndpoint(
                     throw WebSocketException("Connection to ${request.uri} is closed.")
                 }
                 try {
-                    when (message.body) {
-                        is StreamBody -> Callback.Completable.with { session.sendBinary(message.body.payload, it) }.get()
-                        else -> Callback.Completable.with { session.sendText(message.body.toString(), it) }.get()
+                    when (message.mode) {
+                        WsMessage.Mode.Binary -> Callback.Completable.with { session.sendBinary(message.body.payload, it) }.get()
+                        WsMessage.Mode.Text -> Callback.Completable.with { session.sendText(message.body.toString(), it) }.get()
                     }
                 } catch (error: Throwable) {
                     triggerError(error)
@@ -65,7 +63,7 @@ class Http4kJettyServerWebSocketEndpoint(
     override fun onWebSocketBinary(payload: ByteBuffer, callback: Callback) {
         super.onWebSocketBinary(payload, callback)
         try {
-            websocket?.triggerMessage(WsMessage(BufferUtil.toArray(payload).inputStream()))
+            websocket?.triggerMessage(WsMessage(payload))
             callback.succeed()
         } catch (e: Throwable) {
             websocket?.triggerError(e)

@@ -4,12 +4,15 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
+import org.http4k.base64Encode
 import org.http4k.client.WebsocketClient
 import org.http4k.core.HttpHandler
+import org.http4k.core.MemoryBody
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.string
@@ -51,7 +54,7 @@ abstract class WebsocketServerContract(
                     WsResponse { ws ->
                         val name = req.path("name")!!
                         ws.send(WsMessage(name))
-                        ws.onMessage { ws.send(WsMessage("goodbye $name".byteInputStream())) }
+                        ws.onMessage { ws.send(WsMessage("goodbye $name")) }
                         ws.onClose { println("$name is closing") }
                     }
                 }
@@ -74,6 +77,14 @@ abstract class WebsocketServerContract(
                 WsResponse { ws ->
                     ws.onMessage { ws.send(it) }
                 }
+            },
+            "/bin" bind { _ ->
+                WsResponse { ws ->
+                    ws.onMessage { message ->
+                        val content = message.body.stream.readBytes()
+                        ws.send(WsMessage(content))
+                    }
+                }
             })
 
         server = PolyHandler(routes.takeIf { httpSupported }, ws).asServer(serverConfig(0)).start()
@@ -91,14 +102,45 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `can send and receive messages from socket`() {
+    fun `can send and receive text messages from socket`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/hello/bob"))
-
         client.send(WsMessage("hello"))
-        assertThat(
-            client.received().take(2).toList(),
-            equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
-        )
+
+        val messages = client.received().take(2).toList()
+
+        messages.first().also { message ->
+            assertThat(message.mode, equalTo(WsMessage.Mode.Text))
+            assertThat(message.bodyString(), equalTo("bob"))
+        }
+
+        messages.last().also { message ->
+            assertThat(message.mode, equalTo(WsMessage.Mode.Text))
+            assertThat(message.bodyString(), equalTo("goodbye bob"))
+        }
+    }
+
+    @Test
+    fun `can send and receive binary messages from socket - MemoryBody`() {
+        val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
+
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bin"))
+        client.send(WsMessage(MemoryBody(content), WsMessage.Mode.Binary))
+
+        val (message) = client.received().take(1).toList()
+        assertThat(message.mode, equalTo(WsMessage.Mode.Binary))
+        assertThat(message.body.stream.readBytes().base64Encode(), equalTo(content.base64Encode()))
+    }
+
+    @Test
+    fun `can send and receive binary messages from socket - StreamBody`() {
+        val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
+
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bin"))
+        client.send(WsMessage(StreamBody(content.inputStream()), WsMessage.Mode.Binary))
+
+        val (message) = client.received().take(1).toList()
+        assertThat(message.mode, equalTo(WsMessage.Mode.Binary))
+        assertThat(message.body.stream.readBytes().base64Encode(), equalTo(content.base64Encode()))
     }
 
     @Test
