@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.30.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. Should fix memory leak. @H/T @oharaandrew314
 - **http4k-*** : [Breaking] Make WsMessage mode explicit, and fix many binary frame errors. The` WSMessage` object signature will need to be migrated to the new form as we have had to make some adjustments to handle binary modes, but should be quite easy.  @H/T @oharaandrew314
 
