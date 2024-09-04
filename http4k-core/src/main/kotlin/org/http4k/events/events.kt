@@ -1,6 +1,13 @@
 package org.http4k.events
 
+/**
+ * Event stream - reports http4k Events
+ */
 typealias Events = (Event) -> Unit
+
+object StdOutEvents : Events by System.out::println
+
+object StdErrEvents : Events by System.err::println
 
 /**
  * Represents a meaningful "happening" in an app.
