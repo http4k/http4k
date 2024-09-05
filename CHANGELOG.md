@@ -6,7 +6,26 @@ changes with their rationale when appropriate:
 ### v5.30.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. Should fix memory leak. @H/T @oharaandrew314
-- **http4k-*** : [Breaking] Make WsMessage mode explicit, and fix many binary frame errors. The` WSMessage` object signature will need to be migrated to the new form as we have had to make some adjustments to handle binary modes, but should be quite easy.  @H/T @oharaandrew314
+- **http4k-server-jetty11** : [Fix] Received binary Websocket frames will no longer have their content coerced to text. @H/T @oharaandrew314
+- **http4k-*** : [Breaking] Make `WsMessage` mode explicit.
+
+#### Migration Guide
+
+Previously, a `WsMessage` was sent in either `TEXT` or `BINARY` mode based on whether the `Body` was a `MemoryBody` or `StreamBody`, respectively.
+Now, the `WsMessage` has several helper constructors that set a reasonable default based on the content.
+You can also set it explicitly.
+For Example:
+
+```kotlin
+val textMessage = WsMessage("hi") // inferred based on content
+val binaryMessage = WsMessage(imageBytes) // inferred based on content
+
+val textMessage2 = WsMessage("bye", WsMessage.Mode.Text) // set explicitly
+val binaryMessage2 = WsMessage(imageBytes, WsMessage.Mode.Binary) // set explicitly
+
+val binaryAsText = WsMessage(imageBytes, WsMessage.Mode.Text) // this doesn't make much sense, but totally possible
+val binaryAsText2 = WsMessage("later".encodeToByteArray(), WsMesage.Mode.Text) // override Binary message to Text
+```
 
 ### v5.29.0.0
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.20
