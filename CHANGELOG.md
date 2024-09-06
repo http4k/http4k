@@ -7,7 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. Should fix memory leak. @H/T @oharaandrew314
 - **http4k-server-jetty11** : [Fix] Received binary Websocket frames will no longer have their content coerced to text. @H/T @oharaandrew314
-- **http4k-*** : [Breaking] Make `WsMessage` mode explicit.
+- **http4k-*** : [Breaking] Make `WsMessage` mode explicit. @H/T @oharaandrew314
 
 #### Migration Guide
 
