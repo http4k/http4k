@@ -34,7 +34,7 @@ data class WsMessage(val body: Body, val mode: Mode) {
     constructor(value: ByteArray, mode: Mode = Mode.Binary): this(MemoryBody(value), mode)
     constructor(value: InputStream, mode: Mode = Mode.Binary) : this(Body(value), mode)
 
-    fun body(new: Body): WsMessage = copy(body = new)
+    fun body(new: Body, newMode: Mode = mode): WsMessage = copy(body = new, mode = newMode)
     fun bodyString(): String = String(body.payload.array())
 
     enum class Mode { Text, Binary }

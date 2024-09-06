@@ -6,7 +6,37 @@ changes with their rationale when appropriate:
 ### v5.30.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. Should fix memory leak. @H/T @oharaandrew314
-- **http4k-*** : [Breaking] Make WsMessage mode explicit, and fix many binary frame errors. The` WSMessage` object signature will need to be migrated to the new form as we have had to make some adjustments to handle binary modes, but should be quite easy.  @H/T @oharaandrew314
+- **http4k-server-jetty11** : [Fix] Received binary Websocket frames will no longer have their content coerced to text. @H/T @oharaandrew314
+- **http4k-*** : [Breaking] Make `WsMessage` mode explicit. @H/T @oharaandrew314
+
+#### Migration Guide
+
+Previously, a `WsMessage` was sent in either `TEXT` or `BINARY` mode based on whether the `Body` was a `MemoryBody` or `StreamBody`, respectively.
+N
+
+:warning: **Warning:** If you were using the primary constructor of `WsMessage`, you will need to explicitly provide a `WsMessage.Mode` to resolve the new compiler errors.
+
+```kotlin
+val textMessage = WsMessage(MemoryBody("hi"), WsMessage.Mode.Text)
+val binaryMessage = WsMessage(StreamBody(imageStream), WsMessage.Mode.Binary)
+```
+
+:bulb: **Note:** If you were using the secondary `WsMessage` constructors, no changes are necessary.
+
+```kotlin
+val textMessage = WsMessage("hi") // Text like before
+val binaryMessage = WsMessage(imageStream) // Binary like before
+```
+
+:bulb: **Note:** You now have full control over how content is sent.
+
+```kotlin
+// have a very long string?  Stream it!
+val lotsOfText = WsMessage(StreamBody(imageStream), WsMessage.Mode.Text)
+
+// have your binary buffered already?  Send it as is!
+val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
+```
 
 ### v5.29.0.0
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.20
