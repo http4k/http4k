@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.30.0.0 (uncut)
+### v5.30.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. Should fix memory leak. @H/T @oharaandrew314
 - **http4k-server-jetty11** : [Fix] Received binary Websocket frames will no longer have their content coerced to text. @H/T @oharaandrew314
@@ -12,7 +12,6 @@ changes with their rationale when appropriate:
 #### Migration Guide
 
 Previously, a `WsMessage` was sent in either `TEXT` or `BINARY` mode based on whether the `Body` was a `MemoryBody` or `StreamBody`, respectively.
-N
 
 :warning: **Warning:** If you were using the primary constructor of `WsMessage`, you will need to explicitly provide a `WsMessage.Mode` to resolve the new compiler errors.
 
