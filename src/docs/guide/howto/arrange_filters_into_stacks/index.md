@@ -38,7 +38,7 @@ The client-side is similar, but simpler:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.29.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.30.0.0"))
     implementation("org.http4k:http4k-core")
 }
 ```
