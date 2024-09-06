@@ -29,6 +29,7 @@ val binaryMessage = WsMessage(imageStream) // Binary like before
 ```
 
 :bulk: **Note:** You now have full control over how content is sent.
+
 ```kotlin
 // have a very long string?  Stream it!
 val lotsOfText = WsMessage(StreamBody(imageStream), WsMessage.Mode.Text)
