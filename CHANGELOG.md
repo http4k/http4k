@@ -12,19 +12,29 @@ changes with their rationale when appropriate:
 #### Migration Guide
 
 Previously, a `WsMessage` was sent in either `TEXT` or `BINARY` mode based on whether the `Body` was a `MemoryBody` or `StreamBody`, respectively.
-Now, the `WsMessage` has several helper constructors that set a reasonable default based on the content.
-You can also set it explicitly.
-For Example:
+N
+
+:warning: **Warning:** If you were using the primary constructor of `WsMessage`, you will need to explicitly provide a `WsMessage.Mode` to resolve the new compiler errors.
 
 ```kotlin
-val textMessage = WsMessage("hi") // inferred based on content
-val binaryMessage = WsMessage(imageBytes) // inferred based on content
+val textMessage = WsMessage(MemoryBody("hi"), WsMessage.Mode.Text)
+val binaryMessage = WsMessage(StreamBody(imageStream), WsMessage.Mode.Binary)
+```
 
-val textMessage2 = WsMessage("bye", WsMessage.Mode.Text) // set explicitly
-val binaryMessage2 = WsMessage(imageBytes, WsMessage.Mode.Binary) // set explicitly
+:bulb: **Note:** If you were using the secondary `WsMessage` constructors, no changes are necessary.
 
-val binaryAsText = WsMessage(imageBytes, WsMessage.Mode.Text) // this doesn't make much sense, but totally possible
-val binaryAsText2 = WsMessage("later".encodeToByteArray(), WsMesage.Mode.Text) // override Binary message to Text
+```kotlin
+val textMessage = WsMessage("hi") // Text like before
+val binaryMessage = WsMessage(imageStream) // Binary like before
+```
+
+:bulk: **Note:** You now have full control over how content is sent.
+```kotlin
+// have a very long string?  Stream it!
+val lotsOfText = WsMessage(StreamBody(imageStream), WsMessage.Mode.Text)
+
+// have your binary buffered already?  Send it as is!
+val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 ```
 
 ### v5.29.0.0
