@@ -11,7 +11,7 @@ import java.net.UnknownHostException
 class OkHttpWebsocketClientBlockingTest : BlockingWebsocketClientContract(
     serverConfig = Undertow(0),
     websocketFactory = { uri, headers, timeout ->
-        OkHttpWebsocketClient(timeout).blocking(uri, headers)
+        OkHttpWebsocketClient.blocking(uri, headers, timeout)
     }
 ) {
     override fun <T : Throwable> connectErrorMatcher(): Matcher<T> = isA<UnknownHostException>()

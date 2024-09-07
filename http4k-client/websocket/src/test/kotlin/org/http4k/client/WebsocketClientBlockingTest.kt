@@ -15,7 +15,7 @@ import java.time.Duration
 class WebsocketClientBlockingTest : BlockingWebsocketClientContract(
     serverConfig = Jetty(0),
     websocketFactory = { uri, headers, timeout ->
-        WebsocketClient(timeout).blocking(uri, headers)
+        WebsocketClient.blocking(uri, headers, timeout)
     },
     connectionErrorTimeout = Duration.ofMillis(10)
 ) {
