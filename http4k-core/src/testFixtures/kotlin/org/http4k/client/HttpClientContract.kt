@@ -38,6 +38,8 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.util.Locale.getDefault
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 abstract class HttpClientContract(
     serverConfig: (Int) -> ServerConfig,
@@ -148,10 +150,11 @@ abstract class HttpClientContract(
         assertThat(response.status, equalTo(OK))
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     @Test
     open fun `download binary data`() {
         val response = client(Request(GET, "http://localhost:$port/image"))
-        assertThat(response.bodyString(), equalTo(String(testImageBytes())))
+        assertThat(Base64.encode(response.body.payload.array()), equalTo(Base64.encode(testImageBytes())))
     }
 
     @Test

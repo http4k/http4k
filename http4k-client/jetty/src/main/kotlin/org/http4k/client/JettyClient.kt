@@ -9,7 +9,9 @@ import org.eclipse.jetty.client.Result
 import org.eclipse.jetty.http.HttpCookieStore
 import org.eclipse.jetty.http.HttpField
 import org.eclipse.jetty.http.HttpFields
+import org.http4k.asByteBuffer
 import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
+import org.http4k.core.Body
 import org.http4k.core.BodyMode
 import org.http4k.core.Headers
 import org.http4k.core.Request
@@ -49,7 +51,7 @@ object JettyClient {
             private fun HttpClient.send(request: Request): Response = with(newRequest(request)) {
                 try {
                     when (bodyMode) {
-                        BodyMode.Memory -> send().let { it.toHttp4kResponse().body(it.contentAsString) }
+                        BodyMode.Memory -> send().let { it.toHttp4kResponse().body(Body(it.content.asByteBuffer())) }
                         BodyMode.Stream -> InputStreamResponseListener().run {
                             send(this)
                             get(timeoutOrMax(), MILLISECONDS).toHttp4kResponse().body(inputStream)
