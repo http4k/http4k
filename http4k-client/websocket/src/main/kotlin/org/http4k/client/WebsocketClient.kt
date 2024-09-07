@@ -16,7 +16,6 @@ import org.java_websocket.drafts.Draft
 import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.exceptions.WebsocketNotConnectedException
 import java.time.Duration
-import java.time.Duration.ZERO
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
@@ -24,14 +23,14 @@ import java.util.concurrent.atomic.AtomicReference
 object WebsocketClient {
 
     operator fun invoke(
-        timeout: Duration = ZERO,
+        timeout: Duration = Duration.ofSeconds(5),
         autoReconnection: Boolean = false,
         draft: Draft = Draft_6455(),
     ) = object: WebsocketFactory {
 
         override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer): Websocket {
             val socket = AtomicReference<PushPullAdaptingWebSocket>()
-            val client = nonBlockingClient(uri, headers, timeout, draft, socket, onConnect)
+            val client = nonBlockingClient(uri, headers, timeout, onConnect, draft, socket)
             socket.set(AdaptingWebSocket(client, autoReconnection).apply { onError(onError) })
             client.connect()
 
@@ -40,8 +39,7 @@ object WebsocketClient {
 
         override fun blocking(uri: Uri, headers: Headers): WsClient {
             val queue = LinkedBlockingQueue<() -> WsMessage?>()
-            val client = BlockingQueueClient(uri, headers, timeout, draft, queue)
-            .apply {
+            val client = BlockingQueueClient(uri, headers, timeout, draft, queue).apply {
                 if (!connectBlocking(timeout.toMillis(), MILLISECONDS)) {
                     throw WebsocketNotConnectedException()
                 }
@@ -54,7 +52,7 @@ object WebsocketClient {
     fun nonBlocking(
         uri: Uri,
         headers: Headers = emptyList(),
-        timeout: Duration = ZERO,
+        timeout: Duration = Duration.ofSeconds(5),
         onError: (Throwable) -> Unit = {},
         draft: Draft = Draft_6455(),
         onConnect: WsConsumer = {}
@@ -63,7 +61,7 @@ object WebsocketClient {
     fun blocking(
         uri: Uri,
         headers: Headers = emptyList(),
-        timeout: Duration = ZERO,
+        timeout: Duration = Duration.ofSeconds(5),
         autoReconnection: Boolean = false,
         draft: Draft = Draft_6455(),
     ) = WebsocketClient(timeout, autoReconnection, draft).blocking(uri, headers)

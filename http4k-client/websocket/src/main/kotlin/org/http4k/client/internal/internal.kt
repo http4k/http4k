@@ -62,9 +62,9 @@ internal fun nonBlockingClient(
     uri: Uri,
     headers: Headers,
     timeout: Duration,
+    onConnect: WsConsumer,
     draft: Draft,
     socket: AtomicReference<PushPullAdaptingWebSocket>,
-    onConnect: WsConsumer
 ) = object: WebSocketClient(URI.create(uri.toString()), draft, headers.combineToMap(), timeout.toMillis().toInt()) {
     override fun onOpen(handshakedata: ServerHandshake?) = onConnect(socket.get())
 
