@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.30.0.0 (uncut)
+### v5.30.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-client-jetty** : [Fix] encoding of binary content in Jetty client. H/T @kwydler
 - **http4k-client-*** : All websocket implementations implement a unified `WebsocketFactory`. @H/T @oharaandrew314
