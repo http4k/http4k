@@ -12,7 +12,6 @@ import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.server.PolyServerConfig
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertInstanceOf
 import java.time.Duration
 
 abstract class BlockingWebsocketClientContract(

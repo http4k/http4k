@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v5.30.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-client-jetty** : Fix encoding of binary content in Jetty client. H/T @kwydler
+- **http4k-client-jetty** : [Fix] encoding of binary content in Jetty client. H/T @kwydler
+- **http4k-client-*** : All websocket implementations implement a unified `WebsocketFactory`. @H/T @oharaandrew314
 
 ### v5.30.0.0
 - **http4k-*** : Upgrade some dependency versions.

@@ -12,7 +12,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.websocket.PushPullAdaptingWebSocket
-import org.http4k.websocket.Websocket
+import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
@@ -25,21 +25,32 @@ import java.util.concurrent.LinkedBlockingQueue
 
 object OkHttpWebsocketClient {
 
-    fun blocking(
-        uri: Uri,
-        headers: Headers = emptyList(),
-        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
+    operator fun invoke(
+        timeout: Duration =  Duration.of(5, ChronoUnit.SECONDS),
         client: OkHttpClient = defaultOkHttpClient()
-    ): WsClient = OkHttpBlockingWebsocket(uri, headers, timeout, client).awaitConnected()
+    ) = object: WebsocketFactory {
+        override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer) =
+            OkHttpNonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
 
+        override fun blocking(uri: Uri, headers: Headers) =
+            OkHttpBlockingWebsocket(uri, headers, timeout, client).awaitConnected()
+    }
+
+    // backwards compatibility
     fun nonBlocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ZERO,
         client: OkHttpClient = defaultOkHttpClient(),
-        onError: (Throwable) -> Unit = {},
-        onConnect: WsConsumer = {}
-    ): Websocket = OkHttpNonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
+        onError: (Throwable) -> Unit,
+        onConnect: WsConsumer
+    ) = OkHttpWebsocketClient(timeout, client).nonBlocking(uri, headers, onError, onConnect)
+
+    fun blocking(
+        uri: Uri,
+        headers: Headers = emptyList(),
+        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS)
+    ) = OkHttpWebsocketClient(timeout).blocking(uri, headers)
 }
 
 private class OkHttpBlockingWebsocket(
