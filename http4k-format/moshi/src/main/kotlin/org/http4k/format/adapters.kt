@@ -75,7 +75,7 @@ object EventAdapter : JsonAdapter.Factory {
 object ProhibitUnknownValuesAdapter : JsonAdapter.Factory {
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
         when {
-            (type as Class<*>).superclass == AbstractValue::class.java -> throw UnmappedValue(type)
+            (type as? Class<*>)?.superclass == AbstractValue::class.java -> throw UnmappedValue(type)
             else -> null
         }
 }
