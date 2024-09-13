@@ -2,7 +2,6 @@ package org.http4k.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.routing.path
 import org.http4k.routing.websockets
 import org.http4k.routing.ws.bind
 import org.http4k.websocket.WsMessage
@@ -17,11 +16,12 @@ import java.util.concurrent.TimeUnit
 class TestWebsocketFactoryTest {
 
     private val wsHandler = websockets(
-        "/hello/{name}" bind { req ->
-            val name = req.path("name")!!
+        "/echo" bind {
             WsResponse { ws ->
-                ws.send(WsMessage(name))
-                ws.close()
+                ws.onMessage {
+                    ws.send(it)
+                    ws.close()
+                }
             }
         }
     )
@@ -30,9 +30,11 @@ class TestWebsocketFactoryTest {
 
     @Test
     fun `blocking client`() {
+        val ws = factory.blocking("/echo")
+        ws.send(WsMessage("hello"))
         assertThat(
-            factory.blocking("hello/jim").received().toList(),
-            equalTo(listOf(WsMessage("jim")))
+            ws.received().toList(),
+            equalTo(listOf(WsMessage("hello")))
         )
     }
 
@@ -40,11 +42,12 @@ class TestWebsocketFactoryTest {
     @Timeout(2, unit = TimeUnit.SECONDS)
     fun `non-blocking client`() {
         val latch = CountDownLatch(1)
-        val ws = factory.nonBlocking("hello/jim")
+        val ws = factory.nonBlocking("/echo")
         ws.onMessage {
-            assertThat(it, equalTo(WsMessage("jim")))
+            assertThat(it, equalTo(WsMessage("hello")))
             latch.countDown()
         }
+        ws.send(WsMessage("hello"))
 
         latch.await()
     }
