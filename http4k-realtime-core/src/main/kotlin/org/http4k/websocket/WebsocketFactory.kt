@@ -18,3 +18,9 @@ interface WebsocketFactory {
      */
     fun blocking(uri: Uri, headers: Headers = emptyList()): WsClient
 }
+
+fun WebsocketFactory.nonBlocking(uri: String, headers: Headers = emptyList(), onError: (Throwable) -> Unit = {}, onConnect: WsConsumer = {}) =
+    nonBlocking(Uri.of(uri), headers, onError, onConnect)
+
+fun WebsocketFactory.blocking(uri: String, headers: Headers = emptyList()) =
+    blocking(Uri.of(uri), headers)
