@@ -12,32 +12,26 @@ jobs:
     name: Check New Versions
     runs-on: "ubuntu-latest"
     steps:
-      - id: step-0
-        name: check-out
+      - name: check-out
         uses: actions/checkout@v4.1.7
         with:
           ref: master
-      - id: step-1
-        name: setup-java
+      - name: setup-java
         uses: actions/setup-java@v4.3.0
         with:
           distribution: temurin
           java-version: 21
           cache: gradle
-      - id: step-2
-        name: create-branch
+      - name: create-branch
         uses: peterjgrainger/action-create-branch@v3.0.0
         with:
           branch: dependency-update
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - id: step-3
-        name: gradle refreshVersions
-        uses: gradle/actions/setup-gradle@v4.1.0
-        with:
-          arguments: refreshVersions
-      - id: step-4
-        name: Commit
+      - uses: gradle/actions/setup-gradle@v4.1.0
+      - name: Run Gradle
+        run: ./gradlew refreshVersions
+      - name: Commit
         uses: EndBug/add-and-commit@v9
         with:
           author_name: GitHub Actions
@@ -45,8 +39,7 @@ jobs:
           message: Refresh versions.properties
           new_branch: dependency-update
           push: --force --set-upstream origin dependency-update
-      - id: step-5
-        name: Pull Request
+      - name: Pull Request
         uses: repo-sync/pull-request@v2
         with:
           source_branch: dependency-update
