@@ -49,6 +49,8 @@ jobs:
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          check_annotations: true
+          update_check: true
       - name: Release (if required)
         run: |
           git config user.name github-actions
