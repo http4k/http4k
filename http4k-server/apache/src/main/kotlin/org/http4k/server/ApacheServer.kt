@@ -2,6 +2,8 @@ package org.http4k.server
 
 import org.apache.hc.core5.http.impl.bootstrap.HttpServer
 import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap
+import org.apache.hc.core5.http.impl.routing.RequestRouter
+import org.apache.hc.core5.http.io.HttpRequestHandler
 import org.apache.hc.core5.http.io.SocketConfig
 import org.apache.hc.core5.io.CloseMode.IMMEDIATE
 import org.apache.hc.core5.util.TimeValue
@@ -35,6 +37,11 @@ class ApacheServer(
                         .build()
                 )
                 .register("*", Http4kRequestHandler(http))
+                .setRequestRouter(
+                    RequestRouter.builder<HttpRequestHandler>()
+                    .addRoute(RequestRouter.LOCAL_AUTHORITY, "*", Http4kRequestHandler(http))
+                    .resolveAuthority(RequestRouter.LOCAL_AUTHORITY_RESOLVER)
+                    .build());
 
             if (canonicalHostname != null)
                 bootstrap.setCanonicalHostName(canonicalHostname)
