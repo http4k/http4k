@@ -36,7 +36,6 @@ class ApacheServer(
                         .setBacklogSize(1000)
                         .build()
                 )
-                .register("*", Http4kRequestHandler(http))
                 .setRequestRouter(
                     RequestRouter.builder<HttpRequestHandler>()
                     .addRoute(RequestRouter.LOCAL_AUTHORITY, "*", Http4kRequestHandler(http))
