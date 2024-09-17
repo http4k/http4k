@@ -47,6 +47,7 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun `renders schema for a data4k container with metadata`(approver: Approver) {
         val jackson = object : ConfigurableJackson(
             KotlinModule.Builder().build()
@@ -55,6 +56,7 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
                 .value(MyInt)
                 .done()
                 .setSerializationInclusion(NON_NULL)
+                .configure(SORT_PROPERTIES_ALPHABETICALLY, true)
         ) {}
 
         approver.assertApproved(
