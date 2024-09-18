@@ -2,8 +2,11 @@ package org.http4k.server
 
 import org.apache.hc.core5.http.impl.bootstrap.HttpServer
 import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap
+import org.apache.hc.core5.http.impl.routing.RequestRouter
+import org.apache.hc.core5.http.io.HttpRequestHandler
 import org.apache.hc.core5.http.io.SocketConfig
 import org.apache.hc.core5.io.CloseMode.IMMEDIATE
+import org.apache.hc.core5.net.URIAuthority
 import org.apache.hc.core5.util.TimeValue
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode
@@ -18,12 +21,16 @@ class ApacheServer(
 ) : ServerConfig {
 
     constructor(port: Int = 8000) : this(port, null, null)
-    constructor(port: Int = 8000, address: InetAddress? = null, canonicalHostname: String? = null) : this(port, address, canonicalHostname, StopMode.Immediate)
+
+    constructor(port: Int = 8000, address: InetAddress? = null, canonicalHostname: String? = null) :
+        this(port, address, canonicalHostname, StopMode.Immediate)
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer
 
         init {
+            val fallbackAuthority: URIAuthority = URIAuthority.create("fallback")
+
             val bootstrap = ServerBootstrap.bootstrap()
                 .setListenerPort(port)
                 .setSocketConfig(
@@ -34,7 +41,11 @@ class ApacheServer(
                         .setBacklogSize(1000)
                         .build()
                 )
-                .register("*", Http4kRequestHandler(http))
+                .setRequestRouter(
+                    RequestRouter.builder<HttpRequestHandler>()
+                        .addRoute(fallbackAuthority, "*", Http4kRequestHandler(http))
+                        .resolveAuthority { _: String, _: URIAuthority -> fallbackAuthority }
+                        .build());
 
             if (canonicalHostname != null)
                 bootstrap.setCanonicalHostName(canonicalHostname)
