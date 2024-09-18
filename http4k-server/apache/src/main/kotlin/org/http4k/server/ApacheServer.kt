@@ -78,8 +78,4 @@ class ApacheServer(
 
         override fun port(): Int = if (port != 0) port else server.localPort
     }
-
-    companion object{
-
-    }
 }
