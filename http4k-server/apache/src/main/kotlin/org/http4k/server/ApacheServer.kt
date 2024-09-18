@@ -21,12 +21,9 @@ class ApacheServer(
 ) : ServerConfig {
 
     constructor(port: Int = 8000) : this(port, null, null)
-    constructor(port: Int = 8000, address: InetAddress? = null, canonicalHostname: String? = null) : this(
-        port,
-        address,
-        canonicalHostname,
-        StopMode.Immediate
-    )
+
+    constructor(port: Int = 8000, address: InetAddress? = null, canonicalHostname: String? = null) :
+        this(port, address, canonicalHostname, StopMode.Immediate)
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val server: HttpServer
