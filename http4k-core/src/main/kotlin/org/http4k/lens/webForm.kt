@@ -29,8 +29,8 @@ data class WebForm(val fields: Map<String, List<String>> = emptyMap(), val error
  */
 fun <R : HttpMessage> R.webForm(t: WebForm): R = with(Body.webForm(Ignore).toLens() of t)
 
-fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
-    httpBodyRoot(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, StrictNoDirective)
+fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm, *>, contentNegotiation: ContentNegotiation = StrictNoDirective): BiDiBodyLensSpec<WebForm> =
+    httpBodyRoot(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, contentNegotiation)
         .map({ it.payload.asString() }, { Body(it) })
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },

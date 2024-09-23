@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.31.1.0
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v5.31.0.0
 - **http4k-server-apache** : [Possible Break] Upgrade httpcore to 5.3, which introduces stricter authority validation. This may break projects with custom version of ApacheServer.
 
