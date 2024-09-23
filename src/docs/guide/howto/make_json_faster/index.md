@@ -25,7 +25,7 @@ plugins {
 }
 
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.31.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.31.1.0"))
     implementation("org.http4k:http4k-format-kotlinx-serialization")
 }
 ```
@@ -46,7 +46,7 @@ However, it will bring the smallest performance benefit out of these options.
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.31.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.31.1.0"))
     implementation("org.http4k:http4k-format-moshi") {
         exclude("org.jetbrains.kotlin", "kotlin-reflect") // Exclude kotlin-reflect
     }
