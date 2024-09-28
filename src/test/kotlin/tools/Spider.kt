@@ -27,14 +27,14 @@ fun main() {
         val nowVisited = visited.plus(actualUrl)
 
         val sublinks = driver.findElements(By.tagName("a"))
-            ?.map { it.getAttribute("href") }
-            ?.filter {
+            .mapNotNull { it.getAttribute("href") }
+            .filter {
                 it != "." &&
                     !it.startsWith("#") &&
                     !it.startsWith("http") &&
                     !nowVisited.contains(it)
             }
-            ?.map { spider(it, nowVisited) }.orEmpty()
+            .map { spider(it, nowVisited) }
 
         Ok(actualUrl, sublinks)
     } catch (e: Exception) {

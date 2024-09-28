@@ -25,7 +25,8 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset.UTC
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import org.http4k.core.cookie.Cookie as HCookie
 
 typealias Navigate = (Request) -> Unit
@@ -138,9 +139,9 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
     val status: Status?
         get() = current?.status
 
-    override fun findElements(by: By): List<WebElement>? = current?.findElements(by)
+    override fun findElements(by: By): List<WebElement> = current?.findElements(by) ?: throw NoSuchElementException()
 
-    override fun findElement(by: By): WebElement? = current?.findElements(by)?.firstOrNull()
+    override fun findElement(by: By): WebElement = current?.findElements(by)?.first() ?: throw NoSuchElementException()
 
     override fun getPageSource(): String? = current?.contents
 
@@ -154,14 +155,14 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
 
     override fun getWindowHandles(): Set<String> = current?.let { setOf(it.handle.toString()) } ?: emptySet()
 
-    override fun getWindowHandle(): String? = windowHandles.firstOrNull()
+    override fun getWindowHandle(): String = windowHandles.first()
 
     override fun switchTo(): WebDriver.TargetLocator = object : WebDriver.TargetLocator {
         override fun frame(index: Int): WebDriver = throw FeatureNotImplementedYet
 
-        override fun frame(nameOrId: String?): WebDriver = throw FeatureNotImplementedYet
+        override fun frame(nameOrId: String): WebDriver = throw FeatureNotImplementedYet
 
-        override fun frame(frameElement: WebElement?): WebDriver = throw FeatureNotImplementedYet
+        override fun frame(frameElement: WebElement): WebDriver = throw FeatureNotImplementedYet
 
         override fun parentFrame(): WebDriver = throw FeatureNotImplementedYet
 
@@ -170,10 +171,10 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         override fun activeElement(): WebElement = activeElement ?: current?.firstElement()
         ?: throw NoSuchElementException("no page loaded!")
 
-        override fun window(nameOrHandle: String?): WebDriver =
+        override fun window(nameOrHandle: String): WebDriver =
             if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle$nameOrHandle") else this@Http4kWebDriver
 
-        override fun newWindow(typeHint: WindowType?) = throw FeatureNotImplementedYet
+        override fun newWindow(typeHint: WindowType) = throw FeatureNotImplementedYet
 
         override fun defaultContent(): WebDriver = this@Http4kWebDriver
     }
@@ -210,7 +211,7 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
 
         override fun getCookies() = siteCookies.values.map { it.cookie }.toSet()
 
-        override fun deleteCookieNamed(name: String?) {
+        override fun deleteCookieNamed(name: String) {
             siteCookies.remove(name)
         }
 

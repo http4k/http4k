@@ -10,7 +10,7 @@ import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 
-data class Api<NODE> private constructor(
+data class Api<NODE> internal constructor(
     val info: ApiInfo,
     val tags: List<Tag>,
     val servers: List<ApiServer>,
