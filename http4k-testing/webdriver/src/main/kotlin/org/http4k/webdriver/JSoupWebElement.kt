@@ -63,18 +63,20 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 runCatching { Method.valueOf(form.element.attr("method").uppercase(getDefault())) }.getOrDefault(POST)
 
             val inputs = associatedFormElements(form, "input")
+                .asSequence()
                 .filter { it.getAttribute("name") != "" }
                 .filterNot { it.isAFileInput() }
                 .filterNot { it.isAnInactiveSubmitInput() }
                 .filterNot(::isUncheckedInput)
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+                .toList()
 
             val fileInputs = associatedFormElements(form, "input")
                 .filter { it.getAttribute("name") != "" }
                 .filter { it.isAFileInput() }
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
 
-            val textareas = associatedFormElements(form, "textarea")
+            val textAreas = associatedFormElements(form, "textarea")
                 .filter { it.getAttribute("name") != "" }
                 .map { it.getAttribute("name") to listOf(it.text) }
 
@@ -90,8 +92,9 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 .filter { it.getAttribute("name") != "" && it == this }
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
 
-            val ordinaryInputs = inputs + textareas + selects + buttons
-            val addFormModifier = createForm(enctype, ordinaryInputs, fileInputs)
+            val ordinaryInputs = inputs + textAreas + selects + buttons
+            val addFormModifier = createForm(enctype, ordinaryInputs.toNotNullMap(),
+                fileInputs.toNotNullMap())
 
             val actionString = form.element.attr("action") ?: ""
             val formActionUri = Uri.of(actionString)
@@ -103,6 +106,12 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             else navigate(Request(method, formUri.query(postRequest.bodyString())).body(""))
         }
     }
+
+    private fun List<Pair<String?, List<String?>>>.toNotNullMap() =
+        toMap()
+            .filterKeys { it != null }
+            .mapKeys { it.key!! }
+            .mapValues { it.value.filterNotNull() }
 
     private fun WebElement.isAFileInput() = getAttribute("type") == "file"
     private fun WebElement.isSubmitInput() = getAttribute("type") == "submit"
@@ -116,11 +125,11 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
 
     private fun isUncheckedInput(input: WebElement): Boolean =
-        (listOf("checkbox", "radio").contains(input.getAttribute("type"))) && input.getAttribute("checked") == null
+        (listOf("checkbox", "radio").contains(input.getAttribute("type") ?: null)) && input.getAttribute("checked") == null
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
 
-    override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = throw FeatureNotImplementedYet
+    override fun <X : Any> getScreenshotAs(target: OutputType<X>): X = throw FeatureNotImplementedYet
 
     override fun click() {
         when {
@@ -188,11 +197,11 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun getRect(): Rectangle = throw FeatureNotImplementedYet
 
-    override fun getCssValue(propertyName: String?): String = throw FeatureNotImplementedYet
+    override fun getCssValue(propertyName: String): String = throw FeatureNotImplementedYet
 
     override fun hashCode(): Int = element.hashCode()
 
-    override fun findElement(by: By): WebElement? =
+    override fun findElement(by: By): WebElement =
         JSoupElementFinder(navigate, getURL, element).findElement(by)
 
     override fun findElements(by: By) =
@@ -202,7 +211,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     private fun associatedForm(): JSoupWebElement? {
         val formId = getAttribute("form")
-        return if (formId?.isNotBlank() == true)  {
+        return if (formId?.isNotBlank() == true) {
             element.root().getElementById(formId)?.let { JSoupWebElement(navigate, getURL, it) }
         } else {
             current("form")
@@ -217,7 +226,8 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         val root = JSoupWebElement(navigate, getURL, form.element.root())
         val formId: String? = form.getAttribute("id")?.ifBlank { null }
 
-        return form.findElements(By.tagName(tagName)) + (formId?.let { root.findElements(By.cssSelector("$tagName[form=$formId]")) } ?: emptyList())
+        return form.findElements(By.tagName(tagName)) + (formId?.let { root.findElements(By.cssSelector("$tagName[form=$formId]")) }
+            ?: emptyList())
     }
 
     companion object {
@@ -268,8 +278,8 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
 private fun createForm(
     enctype: String,
-    fileFields: List<Pair<String, List<String>>>,
-    otherFields: List<Pair<String, List<String>>>
+    fileFields: Map<String, List<String>>,
+    otherFields: Map<String, List<String>>
 ): (Request) -> Request {
     return when (enctype) {
         ContentType.MULTIPART_FORM_DATA.value -> createFormMultipart(fileFields, otherFields)
@@ -278,14 +288,14 @@ private fun createForm(
 }
 
 private fun createFormMultipart(
-    otherFields: List<Pair<String, List<String>>>,
-    fileFields: List<Pair<String, List<String>>>
+    otherFields: Map<String, List<String>>,
+    fileFields: Map<String, List<String>>
 ): (Request) -> Request {
-    val fields = otherFields
+    val fields = otherFields.toList()
         .groupBy { it.first }
         .mapValues { (_, values) -> values.flatMap { it.second.map { MultipartFormField(it) } } }
 
-    val files = fileFields
+    val files = fileFields.toList()
         .groupBy { it.first }
         .mapValues { (_, values) ->
             values.flatMap {
@@ -318,10 +328,10 @@ private fun createFormMultipart(
 }
 
 private fun createFormUrlEncoded(
-    fields: List<Pair<String, List<String>>>,
+    fields: Map<String, List<String>>,
 ): (Request) -> Request {
     val form = WebForm(
-        fields
+        fields.toList()
             .groupBy { it.first }
             .mapValues { it.value.map { it.second }.flatten() }
     )

@@ -2,6 +2,7 @@ package org.http4k.core
 
 import java.util.regex.Pattern
 
+@ExposedCopyVisibility
 data class UriTemplate private constructor(private val template: String) {
     private val templateRegex = template.replace(URI_TEMPLATE_FORMAT,
         { notMatched -> Pattern.quote(notMatched) },

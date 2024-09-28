@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.32.1.0
+- **http4k-core** : Fix ordering of params on `Body.webForm()`
+- **http4k-*** : Tightened up nullable types and data class constructor visibility on various APIs
+
 ### v5.32.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-client-apache*** : [Unlikely break]: Removed `insecureApacheHttpClient()` due to deprecated API.

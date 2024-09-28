@@ -25,12 +25,18 @@ data class WebForm(val fields: Map<String, List<String>> = emptyMap(), val error
 }
 
 /**
- * Convenience function to write the Webform to the message body and set the content type.
+ * Convenience function to write the WebForm to the message body and set the content type.
  */
 fun <R : HttpMessage> R.webForm(t: WebForm): R = with(Body.webForm(Ignore).toLens() of t)
 
-@JvmOverloads
-fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm, *>, contentNegotiation: ContentNegotiation = StrictNoDirective): BiDiBodyLensSpec<WebForm> =
+fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
+    webForm(validator, StrictNoDirective, *formFields)
+
+fun Body.Companion.webForm(
+    validator: Validator,
+    contentNegotiation: ContentNegotiation,
+    vararg formFields: Lens<WebForm, *>
+): BiDiBodyLensSpec<WebForm> =
     httpBodyRoot(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, contentNegotiation)
         .map({ it.payload.asString() }, { Body(it) })
         .map(

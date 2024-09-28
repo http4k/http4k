@@ -72,6 +72,7 @@ fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
  * Represents a Multi-part that is backed by a stream, which should be closed after handling the content. The gotchas
  * which apply to StreamBody also apply here..
  **/
+@ExposedCopyVisibility
 data class MultipartFormBody private constructor(
     internal val formParts: List<MultipartEntity>,
     val boundary: String = UUID.randomUUID().toString(),

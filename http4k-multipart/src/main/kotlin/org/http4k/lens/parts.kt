@@ -10,6 +10,7 @@ import java.io.InputStream
 import kotlin.Int.Companion.MAX_VALUE
 import kotlin.random.Random.Default.nextInt
 
+@ExposedCopyVisibility
 data class MultipartFormField internal constructor(
     val value: String,
     val headers: Headers = emptyList(),
@@ -27,6 +28,7 @@ data class MultipartFormField internal constructor(
     }
 }
 
+@ExposedCopyVisibility
 data class MultipartFormFile internal constructor(
     val filename: String,
     val contentType: ContentType,

@@ -17,12 +17,13 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
             .findElements(by)
             .map { toHtmx(it) }
 
-    override fun findElement(by: By): WebElement? =
+    override fun findElement(by: By): WebElement =
         delegate
             .findElement(by)
             ?.let { toHtmx(it) }
+            ?: throw NoSuchElementException("No such element: $by")
 
-    override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = delegate.getScreenshotAs(target)
+    override fun <X : Any> getScreenshotAs(target: OutputType<X>): X = delegate.getScreenshotAs(target)
 
     override fun click() {
         delegate.click()
