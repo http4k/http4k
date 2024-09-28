@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.32.0.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-client-apache*** : [Unlikely break]: Removed `insecureApacheHttpClient()` due to deprecated API.
 - **http4k-webdriver*** : [Unlikely break]: New Nullable types on WebDriver API led to tightening up our implementations.
 
 ### v5.31.1.0
