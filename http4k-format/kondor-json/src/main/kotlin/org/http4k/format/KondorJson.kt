@@ -10,9 +10,6 @@ import com.ubertob.kondor.json.jsonnode.JsonNodeNull
 import com.ubertob.kondor.json.jsonnode.JsonNodeNumber
 import com.ubertob.kondor.json.jsonnode.JsonNodeObject
 import com.ubertob.kondor.json.jsonnode.JsonNodeString
-import com.ubertob.kondor.json.jsonnode.NodePath
-import com.ubertob.kondor.json.jsonnode.NodePathRoot
-import com.ubertob.kondor.json.jsonnode.NodePathSegment
 import com.ubertob.kondor.json.jsonnode.parseJsonNode
 import com.ubertob.kondor.json.render
 import org.http4k.core.Body
@@ -178,7 +175,7 @@ class KondorJson(
     private fun <T, JN : JsonNode> InputStream.fromJson(converter: JsonConverter<T, JN>): T =
         converter.fromJson(this).orThrow()
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST", "DEPRECATION")
     private fun <T, JN : JsonNode> JsonNode.fromJsonNode(converter: JsonConverter<T, JN>): T =
         converter.fromJsonNode(this as JN).orThrow()
 
