@@ -29,6 +29,7 @@ import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
+import org.http4k.filter.GzipCompressionMode.Mixed
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
@@ -608,6 +609,44 @@ class ServerFiltersTest {
                         .body(Body("hello").gzipped().body)
                 ),
                 hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body)))
+            )
+        }
+
+        @Test
+        fun `gzip stream request in mixed should return gzip stream body`() {
+            val handler = ServerFilters.GZip(Mixed()).then {
+                assertThat(it, hasBody(equalTo<String>("hello")))
+                Response(OK).body(Body("world".byteInputStream()))
+            }
+
+            assertThat(
+                handler(
+                    Request(GET, "/")
+                        .header("accept-encoding", "gzip")
+                        .header("content-encoding", "gzip")
+                        .body(Body("hello").gzipped().body)
+                ),
+                hasHeader("content-encoding", "gzip")
+                    .and(hasBody(equalTo<Body>(Body("world").gzippedStream().body)))
+            )
+        }
+
+        @Test
+        fun `gzip memory request in mixed should return gzip memory body`() {
+            val handler = ServerFilters.GZip(Mixed()).then {
+                assertThat(it, hasBody(equalTo<String>("hello")))
+                Response(OK).body(Body("world"))
+            }
+
+            assertThat(
+                handler(
+                    Request(GET, "/")
+                        .header("accept-encoding", "gzip")
+                        .header("content-encoding", "gzip")
+                        .body(Body("hello").gzipped().body)
+                ),
+                hasHeader("content-encoding", "gzip")
+                    .and(hasBody(equalTo<Body>(Body("world").gzipped().body)))
             )
         }
 
