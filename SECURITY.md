@@ -6,9 +6,9 @@ http4k is released on a regular basis, generally as soon as fixes are available.
 to APIs will not need to be mixed in with security patches.
 
 | Version       | Supported          |
-| ------------- | ------------------ |
-| 4.x           | :white_check_mark: |
-| 3.x and below | :x:                |
+|---------------| ------------------ |
+| 5.x           | :white_check_mark: |
+| 4.x and below | :x:                |
 
 ## Reporting a Vulnerability
 
