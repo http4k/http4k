@@ -2,7 +2,8 @@
 
 ## Reporting a Vulnerability
 
-Please reach out to: `security@http4k.org` if you find a vulnerability with http4k code. Typically you can expect a response the same working day. 
+If you discover any potential security vulnerabilities in the http4k ecosystem, please report them through GitHub's
+private vulnerability reporting feature.
 
 For vulnerabilities in third party dependencies, we monitor these separately and update as soon as a fix is released by the maintainers.
 Our normal policy is to fix-forward.
