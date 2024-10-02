@@ -7,8 +7,10 @@ jobs:
     strategy:
       matrix:
         repo:
+          - 'http4k/www'
           - 'http4k/toolbox'
           - 'http4k/examples'
+          - 'http4k/http4k-by-example'
           - 'http4k/http4k-by-example'
           - 'http4k/http4k-connect'
           - 'http4k/http4k-connect-examples'
