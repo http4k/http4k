@@ -64,22 +64,31 @@ abstract class ContentTypeAwareApprovalTest(
     private val testNamer: TestNamer = ClassAndMethod,
     private val approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
 ) : BaseApprovalTest {
-    override fun approverFor(context: ExtensionContext) = object : Approver {
-        override fun <T : HttpMessage> assertApproved(httpMessage: T) {
-            delegate.assertApproved(httpMessage)
-            assertEquals(contentType, CONTENT_TYPE(httpMessage))
-        }
-
-        private val delegate: Approver = NamedResourceApprover(
+    override fun approverFor(context: ExtensionContext) = checkingContentType(
+        NamedResourceApprover(
             testNamer.nameFor(context.requiredTestClass, context.requiredTestMethod),
             HttpTextBody(::format),
             approvalSource
-        )
-
-        override fun withNameSuffix(suffix: String): Approver = delegate.withNameSuffix(suffix)
-    }
+        ),
+        contentType
+    )
 
     abstract fun format(input: String): String
+}
+
+fun checkingContentType(approver: Approver, contentType: ContentType): Approver = object : Approver {
+    override fun <T : HttpMessage> assertApproved(httpMessage: T) {
+        println("checking approved")
+        approver.assertApproved(httpMessage)
+        println("checking content type")
+        println(contentType)
+        println(CONTENT_TYPE(httpMessage))
+        println(httpMessage)
+        assertEquals(contentType, CONTENT_TYPE(httpMessage))
+    }
+
+    override fun withNameSuffix(suffix: String) =
+        checkingContentType(approver.withNameSuffix(suffix), contentType)
 }
 
 /**

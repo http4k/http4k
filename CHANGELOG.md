@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.32.1.1
+- **http4k-testing-approval** : Fix `withNameSuffix` which wasn't checking the content type when you overrode the name suffix.§
+
 ### v5.32.1.0
 - **http4k-core** : Fix ordering of params on `Body.webForm()`
 - **http4k-*** : Tightened up nullable types and data class constructor visibility on various APIs
