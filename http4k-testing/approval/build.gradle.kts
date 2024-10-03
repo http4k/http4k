@@ -3,6 +3,7 @@ description = "Http4k support for Approval Testing"
 dependencies {
     api(project(":http4k-core"))
     api("com.github.javadev:underscore:_")
+    api("org.jsoup:jsoup:_")
 
     implementation(Testing.junit.jupiter.api)
     implementation("com.natpryce:hamkrest:_")
