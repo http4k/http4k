@@ -138,6 +138,7 @@ include("http4k-realtime-core")
 
 "http4k-testing".apply {
     includeModule("approval")
+    includeModule("approval-jsoup")
     includeModule("chaos")
     includeModule("hamkrest")
     includeModule("kotest")
