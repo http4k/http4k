@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":http4k-format-jackson-yaml"))
     implementation(project(":http4k-cloudevents"))
 
+    testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-testing-hamkrest"))
 }

@@ -19,13 +19,11 @@ interface ApprovalContent {
 
         fun HttpTextBody(formatter: (String) -> String = { it }) = object : ApprovalContent {
             override fun invoke(input: InputStream) = input
-
             override fun invoke(input: HttpMessage) = formatter(input.bodyString()).byteInputStream()
         }
 
         fun HttpBinaryBody() = object : ApprovalContent {
             override fun invoke(input: InputStream): InputStream = input
-
             override fun invoke(input: HttpMessage): InputStream = invoke(input.body.stream)
         }
 

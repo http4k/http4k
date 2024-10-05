@@ -13,6 +13,7 @@ import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.HttpMessage
 import org.http4k.format.JacksonYaml
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.testing.ApprovalContent.Companion.HttpBinaryBody
 import org.http4k.testing.ApprovalContent.Companion.HttpTextBody
 import org.http4k.testing.TestNamer.Companion.ClassAndMethod
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -161,4 +162,17 @@ class YamlApprovalTest(
     } catch (e: Exception) {
         throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input, e)
     }
+}
+
+/**
+ * Approval JUnit5 extension configured to compare binary messages
+ */
+open class BinaryApprovalTest(private val contentType: ContentType = ContentType.OCTET_STREAM) : BaseApprovalTest {
+    override fun approverFor(context: ExtensionContext): Approver = checkingContentType(
+        NamedResourceApprover(
+            ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
+            HttpBinaryBody(),
+            FileSystemApprovalSource(File("src/test/resources"))
+        ), contentType
+    )
 }
