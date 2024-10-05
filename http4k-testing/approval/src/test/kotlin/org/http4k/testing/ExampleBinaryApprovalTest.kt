@@ -14,10 +14,13 @@ import org.http4k.junit.TestResources
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 
 @ExtendWith(TestResources::class)
-@ExtendWith(BinaryApprovalTest::class)
 class ExampleBinaryApprovalTest {
+
+    @RegisterExtension
+    val approvalTest = BinaryApprovalTest(OCTET_STREAM)
 
     @Test
     fun `check response content`(approver: Approver, loader: ResourceLoader) {

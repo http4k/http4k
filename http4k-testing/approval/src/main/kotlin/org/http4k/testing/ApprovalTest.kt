@@ -167,12 +167,13 @@ class YamlApprovalTest(
 /**
  * Approval JUnit5 extension configured to compare binary messages
  */
-open class BinaryApprovalTest(private val contentType: ContentType = ContentType.OCTET_STREAM) : BaseApprovalTest {
-    override fun approverFor(context: ExtensionContext): Approver = checkingContentType(
-        NamedResourceApprover(
+open class BinaryApprovalTest(private val contentType: ContentType? = null) : BaseApprovalTest {
+    override fun approverFor(context: ExtensionContext): Approver {
+        val approver = NamedResourceApprover(
             ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
             HttpBinaryBody(),
             FileSystemApprovalSource(File("src/test/resources"))
-        ), contentType
-    )
+        )
+        return contentType?.let { checkingContentType(approver, it) } ?: approver
+    }
 }

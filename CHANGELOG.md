@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.32.3.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-testing-approval** : Fix `withNameSuffix` which wasn't checking the content type when you overrode the name suffix.§
+- **http4k-testing-approval** Support for binary comparisons using BinaryApprovalTest. @H/T @oharaandrew314
 
 ### v5.32.2.0
 - **http4k-*** : Upgrade some dependency versions.
