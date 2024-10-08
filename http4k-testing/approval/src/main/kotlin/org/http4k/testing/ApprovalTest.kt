@@ -79,12 +79,7 @@ abstract class ContentTypeAwareApprovalTest(
 
 fun checkingContentType(approver: Approver, contentType: ContentType): Approver = object : Approver {
     override fun <T : HttpMessage> assertApproved(httpMessage: T) {
-        println("checking approved")
         approver.assertApproved(httpMessage)
-        println("checking content type")
-        println(contentType)
-        println(CONTENT_TYPE(httpMessage))
-        println(httpMessage)
         assertEquals(contentType, CONTENT_TYPE(httpMessage))
     }
 
