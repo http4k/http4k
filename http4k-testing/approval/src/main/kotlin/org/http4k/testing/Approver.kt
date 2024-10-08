@@ -11,6 +11,7 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.opentest4j.AssertionFailedError
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -54,25 +55,26 @@ class NamedResourceApprover(
                 null -> when {
                     actualBytes.isNotEmpty() -> {
                         actual.output().write(actualBytes)
-                        throw ApprovalFailed("No approved content found", actual, approved)
+                        assertNull(actualBytes.toString(Charsets.UTF_8)) {
+                            "No approved content found. To approve output:\nmv '$actual' '$approved'"
+                        }
                     }
 
                     else -> {}
                 }
 
                 else -> try {
-                    assertEquals(transformer(approvalContent(this)), transformer(ByteArrayInputStream(actualBytes)))
+                    assertEquals(transformer(approvalContent(this)), transformer(ByteArrayInputStream(actualBytes))) {
+                        "Mismatch. To approve output:\nmv '$actual' '$approved'"
+                    }
                 } catch (e: AssertionError) {
                     ByteArrayInputStream(actualBytes).copyTo(actual.output())
-                    throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)
+                    throw e
                 }
             }
         }
     }
 }
-
-class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResource) :
-    RuntimeException("$prefix. To approve output:\nmv '$actual' '$expected'")
 
 fun Approver.assertApproved(response: Response, expectedStatus: Status) =
     assertApproved(response.apply { assertEquals(expectedStatus, response.status) })
