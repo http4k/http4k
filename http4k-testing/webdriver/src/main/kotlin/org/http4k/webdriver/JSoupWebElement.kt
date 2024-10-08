@@ -108,7 +108,8 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     }
 
     private fun List<Pair<String?, List<String?>>>.toNotNullMap() =
-        toMap()
+        groupBy({ it.first }, { it.second })
+            .mapValues { (_, value: List<List<String?>>) -> value.flatten() }
             .filterKeys { it != null }
             .mapKeys { it.key!! }
             .mapValues { it.value.filterNotNull() }

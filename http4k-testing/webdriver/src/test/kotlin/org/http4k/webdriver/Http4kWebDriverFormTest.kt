@@ -55,6 +55,16 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
+    fun `POSTing a form with multiple values associated with a single name`() {
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("other_checkbox1"))!!.click()
+        driver.findElement(By.id("button"))!!.submit()
+        driver.assertOnPage("https://example.com/form")
+        assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&checkbox1=other_checkbox1_value&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(driver, showsWeUsedTheMethod("POST"))
+    }
+
+    @Test
     fun `POST form`() {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("button"))!!.submit()
