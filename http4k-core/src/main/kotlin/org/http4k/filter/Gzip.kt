@@ -3,6 +3,7 @@ package org.http4k.filter
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.StreamBody
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -16,6 +17,18 @@ import java.util.zip.Deflater.DEFAULT_COMPRESSION
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
+/**
+ * GzipCompressionMode represents a choice between working lazily with streams when gzipping or eagerly storing the body contents in memory.
+ *
+ * This choice comes with the following trade-offs:
+ *
+ * `Memory` does not require any special treatment. However, you need to be confident that the sum of all "in-flight"
+ * body bytes does not exceed your JVM heap. Otherwise, you'll run into `OutOfMemoryException's.
+ *
+ * `Streaming`, on the other hand, allows you to handle payloads of any size.
+ *
+ * `Mixed` will use either of the approaches based on the body type given.
+ */
 sealed class GzipCompressionMode(
     internal val compress: (Body) -> CompressionResult,
     internal val decompress: (Body) -> Body
@@ -25,6 +38,12 @@ sealed class GzipCompressionMode(
 
     class Streaming(compressionLevel: Int = DEFAULT_COMPRESSION) :
         GzipCompressionMode({ it.gzippedStream(compressionLevel) }, Body::gunzippedStream)
+
+    class Mixed(compressionLevel: Int = DEFAULT_COMPRESSION) :
+        GzipCompressionMode({ body ->
+            if (body is StreamBody) body.gzippedStream(compressionLevel)
+            else body.gzipped(compressionLevel)
+        }, Body::gunzippedStream)
 }
 
 data class CompressionResult(
