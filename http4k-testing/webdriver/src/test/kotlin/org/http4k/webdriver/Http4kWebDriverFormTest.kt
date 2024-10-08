@@ -10,6 +10,7 @@ import org.http4k.core.MultipartFormBody
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.core.body.Form
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
@@ -202,6 +203,40 @@ class Http4kWebDriverFormTest {
         val expectedFormBody = "text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"
 
         assertThat(driver, showsWeSentTheBody(expectedFormBody))
+    }
+
+    @Test
+    fun `POST form - disabled controls`() {
+        val driver = driverFor("disabled-controls.html", POST)
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("button"))!!.click()
+        driver.assertOnPage("https://example.com/form")
+        val expectedFormBody = "only-thing-submitted=only-thing-submitted"
+
+        assertThat(driver, showsWeSentTheBody(expectedFormBody))
+    }
+
+    @Test
+    fun `POST form - unable to submit using a disabled button`() {
+        val driver = driverFor("disabled-controls.html", POST, action = "/should-not-navigate-to-here")
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("disabled-button"))!!.click()
+
+        driver.assertNotOnPage("https://example.com/should-not-navigate-to-here")
+        driver.assertOnPage("https://example.com/bob")
+    }
+
+    @Test
+    fun `POST form - unable to submit using a disabled submit input`() {
+        val driver = driverFor("disabled-controls.html", POST, action = "/should-not-navigate-to-here")
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("disabled-submit-input"))!!.click()
+
+        driver.assertNotOnPage("https://example.com/should-not-navigate-to-here")
+        driver.assertOnPage("https://example.com/bob")
     }
 
     @Test

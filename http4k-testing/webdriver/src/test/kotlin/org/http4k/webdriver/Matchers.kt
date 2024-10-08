@@ -21,6 +21,10 @@ internal fun WebDriver.assertOnPage(expected: String) {
     assertThat(findElement(By.tagName("h1"))!!.text, equalTo(expected))
 }
 
+internal fun WebDriver.assertNotOnPage(expected: String) {
+    assertThat(findElement(By.tagName("h1"))!!.text, !equalTo(expected))
+}
+
 internal fun Http4kWebDriver.assertCurrentUrl(expectedUrl: String) {
     assertThat(this, hasCurrentUrl(expectedUrl))
 }
