@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.32.4.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-approval** Better diffing of failures in the IDE. @H/T @frednordin
+- **http4k-core** Gzip mixed compression mode H/T @IlyaNerd
+- 
 ### v5.32.3.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** Support for binary comparisons using BinaryApprovalTest. @H/T @oharaandrew314
