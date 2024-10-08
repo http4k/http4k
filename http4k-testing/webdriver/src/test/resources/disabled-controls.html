@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page title</title>
+</head>
+<body>
+<div>
+  <h1>THEURL</h1>
+  <h2>THETIME</h2>
+  <ul>
+    <li class="aClass" id="firstId">the first text</li>
+    <li id="secondId">the second text</li>
+  </ul>
+  <themethod>THEMETHOD</themethod>
+  <thebody>THEBODY</thebody>
+  <span>this is a span</span>
+  <disabled disabled>this is a disabled item</disabled>
+  <a href="/link">this is a link</a>
+  <form ACTION method="FORMMETHOD">
+    <input disabled name="text1" type="text" value="textValue"/>
+    <textarea disabled name="textarea1">textarea</textarea>
+    <input disabled name="checkbox1" type="checkbox" value="checkbox" checked/>
+    <input disabled id="other_checkbox1" name="checkbox1" type="checkbox" value="other_checkbox1_value"/>
+    <input disabled type="radio" value="radio" checked="checked"/>
+    <select disabled ="select1">
+      <option value="option1" selected="selected"></option>
+      <option value="option2" selected="selected"></option>
+    </select>
+    <button id="button" value="only-thing-submitted" name="only-thing-submitted"/>
+    <button id="disabled-button" value="cannot-click-on-me" name="cannot-click-on-me" disabled />
+    <button id="resetbutton" type="reset"/>
+
+    <input id="disabled-submit-input" type="submit" disabled />
+    <input id="only-send-when-activated" type="submit" value="only-send-when-activated" name="only-send-when-activated" />
+  </form>
+  <a id="noPath" href=""></a>
+  <a id="sameDirPath" href="bob"></a>
+  <a id="backForwardPath" href="../bob/link"></a>
+  <a id="backPath" href=".."></a>
+  <a id="dotPath" href="./bob/link"></a>
+  <a id="dotBackPath" href="./../bob/link"></a>
+  <a id="rootBackPath" href="/../bob/link"></a>
+</div>
+
+</body>
+</html>

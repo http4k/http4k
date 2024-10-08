@@ -3,12 +3,14 @@ package org.http4k.webdriver
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.MultipartFormBody
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.core.body.Form
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
@@ -18,16 +20,18 @@ import java.nio.file.Files
 import kotlin.io.path.createTempFile
 
 class Http4kWebDriverFormTest {
-    private val driver = Http4kWebDriver({ req ->
-        val body = File("src/test/resources/test.html").readText()
+    private val driver = driverFor("test.html", POST)
+
+    private fun driverFor(fileName: String, method: Method = POST, action: String = "/form"): Http4kWebDriver = Http4kWebDriver({ req ->
+        val body = File("src/test/resources/$fileName").readText()
         Response(Status.OK).body(
             body
-                .replace("FORMMETHOD", POST.name)
+                .replace("FORMMETHOD", method.name)
                 .replace("THEMETHOD", req.method.name)
                 .replace("THEBODY", req.bodyString())
                 .replace("THEURL", req.uri.toString())
                 .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action=\"/form\"")
+                .replace("ACTION", "action=\"$action\"")
         )
     })
 
@@ -137,18 +141,7 @@ class Http4kWebDriverFormTest {
 
     @Test
     fun `POST form with action set to fragment with no leading slash replaces last part of current base path`() {
-        val driver = Http4kWebDriver({ req ->
-            val body = File("src/test/resources/test.html").readText()
-            Response(Status.OK).body(
-                body
-                    .replace("FORMMETHOD", POST.name)
-                    .replace("THEMETHOD", req.method.name)
-                    .replace("THEBODY", req.bodyString())
-                    .replace("THEURL", req.uri.toString())
-                    .replace("THETIME", System.currentTimeMillis().toString())
-                    .replace("ACTION", "action=\"fragmentWithNoLeadingSlash\"")
-            )
-        })
+        val driver = driverFor("test.html", action = "fragmentWithNoLeadingSlash")
 
         driver.get("http://example.com/bob/was/here/today")
         driver.findElement(By.id("button"))!!.submit()
@@ -158,18 +151,7 @@ class Http4kWebDriverFormTest {
 
     @Test
     fun `GET form`() {
-        val driver = Http4kWebDriver({ req ->
-            val body = File("src/test/resources/test.html").readText()
-            Response(Status.OK).body(
-                body
-                    .replace("FORMMETHOD", GET.name)
-                    .replace("THEMETHOD", req.method.name)
-                    .replace("THEBODY", req.bodyString())
-                    .replace("THEURL", req.uri.toString())
-                    .replace("THETIME", System.currentTimeMillis().toString())
-                    .replace("ACTION", "action=\"/form\"")
-            )
-        })
+        val driver = driverFor("test.html", method = GET)
 
         driver.get("/bob")
         driver.findElement(By.id("button"))!!.submit()
@@ -213,14 +195,7 @@ class Http4kWebDriverFormTest {
 
     @Test
     fun `POST form - form elements associated with the form by the 'form' attribute are still sent`() {
-        val driver = Http4kWebDriver({ req ->
-            val body = File("src/test/resources/form_element_association.html").readText()
-
-            Response(Status.OK).body(
-                body.replace("THEBODY", req.bodyString())
-                    .replace("THEURL", req.uri.toString())
-            )
-        })
+        val driver = driverFor("form_element_association.html")
 
         driver.get("https://example.com/bob")
         driver.findElement(By.id("button"))!!.click()
@@ -228,6 +203,40 @@ class Http4kWebDriverFormTest {
         val expectedFormBody = "text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"
 
         assertThat(driver, showsWeSentTheBody(expectedFormBody))
+    }
+
+    @Test
+    fun `POST form - disabled controls`() {
+        val driver = driverFor("disabled-controls.html", POST)
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("button"))!!.click()
+        driver.assertOnPage("https://example.com/form")
+        val expectedFormBody = "only-thing-submitted=only-thing-submitted"
+
+        assertThat(driver, showsWeSentTheBody(expectedFormBody))
+    }
+
+    @Test
+    fun `POST form - unable to submit using a disabled button`() {
+        val driver = driverFor("disabled-controls.html", POST, action = "/should-not-navigate-to-here")
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("disabled-button"))!!.click()
+
+        driver.assertNotOnPage("https://example.com/should-not-navigate-to-here")
+        driver.assertOnPage("https://example.com/bob")
+    }
+
+    @Test
+    fun `POST form - unable to submit using a disabled submit input`() {
+        val driver = driverFor("disabled-controls.html", POST, action = "/should-not-navigate-to-here")
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.id("disabled-submit-input"))!!.click()
+
+        driver.assertNotOnPage("https://example.com/should-not-navigate-to-here")
+        driver.assertOnPage("https://example.com/bob")
     }
 
     @Test
@@ -270,6 +279,8 @@ class Http4kWebDriverFormTest {
 
         assertThat(driver, hasElement(By.tagName("theotherformfields"), hasText(equalTo(expectedOtherFields))))
     }
+
+
 }
 
 private fun showsWeSentTheBody(body: String) = hasElement(By.tagName("thebody"), hasText(equalTo(body)))

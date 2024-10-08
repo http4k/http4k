@@ -65,6 +65,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val inputs = associatedFormElements(form, "input")
                 .asSequence()
                 .filter { it.getAttribute("name") != "" }
+                .filter { it.isNotDisabled() }
                 .filterNot { it.isAFileInput() }
                 .filterNot { it.isAnInactiveSubmitInput() }
                 .filterNot(::isUncheckedInput)
@@ -73,14 +74,17 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
             val fileInputs = associatedFormElements(form, "input")
                 .filter { it.getAttribute("name") != "" }
+                .filter { it.isNotDisabled() }
                 .filter { it.isAFileInput() }
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
 
             val textAreas = associatedFormElements(form, "textarea")
+                .filter { it.isNotDisabled() }
                 .filter { it.getAttribute("name") != "" }
                 .map { it.getAttribute("name") to listOf(it.text) }
 
             val selects = associatedFormElements(form, "select")
+                .filter { it.isNotDisabled() }
                 .filter { it.getAttribute("name") != "" }
                 .map {
                     it.getAttribute("name") to it.findElements(By.tagName("option"))
@@ -148,6 +152,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             }
 
             isA("input") -> {
+                if (isDisabled()) return
                 val t = element.attr("type")
                 if (t == "" || t.lowercase(getDefault()) == "submit")
                     submit()
@@ -166,6 +171,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             }
 
             isA("button") -> {
+                if (isDisabled()) return
                 val t = element.attr("type")
                 if (t == "" || t.lowercase(getDefault()) == "submit")
                     submit()
@@ -276,6 +282,9 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         )
     }
 }
+
+private fun WebElement.isNotDisabled(): Boolean = this.getAttribute("disabled") == null
+private fun WebElement.isDisabled() = !isNotDisabled()
 
 private fun createForm(
     enctype: String,
