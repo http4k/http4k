@@ -5,7 +5,7 @@ description: Feature overview of the DataFrame http4k-format module, allowing fo
 
 ```kotlin
 dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.32.3.0"))
+    implementation(platform("org.http4k:http4k-bom:5.32.4.0"))
     implementation("org.http4k:http4k-format-dataframe")
 }
 ```
