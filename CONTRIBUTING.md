@@ -31,51 +31,6 @@ Testing with default settings is required when push changes. Note that we curren
 ./gradlew check
 ```
 
-## Credits
+## Appreciation
 
-### Contributors
-
-Thank you to all the people who have already contributed to http4k!
-<a href="https://github.com/http4k/http4k/graphs/contributors"><img src="https://opencollective.com/http4k/contributors.svg?width=890" /></a>
-
-### Backers
-
-Thank you to all our backers! [[Become a backer](https://opencollective.com/http4k#backer)]
-
-<a href="https://opencollective.com/http4k#backers" target="_blank"><img src="https://opencollective.com/http4k/backers.svg?width=890"></a>
-
-### Sponsors
-
-Thank you to all our sponsors! (please ask your company to also support this open source project by becoming a sponsor, either on [GitHub Sponsors](https://github.com/sponsors/http4k) or directly with [OpenCollective](https://opencollective.com/http4k#sponsor))
-
-<a href="https://opencollective.com/http4k/sponsor/0/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/2/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/3/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/4/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/5/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/6/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/7/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/8/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/http4k/sponsor/9/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/9/avatar.svg"></a>
-
-### Vendor support
-Many thanks to all of the software vendors who supply tools to help us deliver http4k to it's community:
-
-#### Kotlin IDE
-<img src="https://www.http4k.org/img/intellij-100.png" alt="intellij"/></a>
-
-[Jetbrains](https://www.jetbrains.com) kindly supplies the project with an Open Source License for the amazing IntelliJ IDE.
-
-#### Pairing tools
-<img src="https://www.http4k.org/img/tuple.png" alt="tuple"/></a>
-
-[Tuple](https://tuple.app/) supplies the http4k team with their amazing Pair-Programming tool Tuple allowing us to collaborate to build the library. Pairing is ace - everyone should do it!
-
-#### JVM Profiling tools
-<img src="https://www.yourkit.com/images/yklogo.png" alt="yourkit"/>
-
-YourKit supports open source projects with innovative and intelligent tools
-for monitoring and profiling Java and .NET applications.
-YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
-<a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>,
-and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
+We love our community! See [the http4k site](https://http4k.org/community/) for details!
