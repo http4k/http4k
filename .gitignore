@@ -3,7 +3,6 @@
 .gradle
 .kotlin
 .http4k
-.venv
 build/
 .DS_Store
 classes/
@@ -13,6 +12,4 @@ store/
 intellij-settings/
 **/*.actual
 **/generated/**
-/RenderingTest - render successful trace - Sequence.puml
 jte-classes
-/dependencies.txt

@@ -1,6 +1,6 @@
 # Supported Versions
 
-Tjos [rpkect] is released on a regular basis, generally as soon as fixes are available. We recommend keeping up-to-date in order that any changes 
+This [project] is released on a regular basis, generally as soon as fixes are available. We recommend keeping up-to-date in order that any changes 
 to APIs will not need to be mixed in with security patches.
 
 | Version       | Supported          |
