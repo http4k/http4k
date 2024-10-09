@@ -39,6 +39,10 @@ running Server, Serverless platform, or compiled to GraalVM and run as a super-l
 
 You can read about the rationale and ethos of http4k [here](https://http4k.org/rationale)
 
+## Sounds cool! Where can I find out more?
+
+You can find out all about the project on the [http4k] site.
+
 ## Quickstart
 
 Bored with reading already and just want to get coding? Read the [quickstart](https://www.http4k.org/quickstart/) or take a look at
@@ -47,8 +51,7 @@ showcases a variety of [http4k] use-cases and features.
 
 ## Module feature overview
 
-If you're needed it to build an HTTP application, there's an excellent chance that http4k has a module for it. Check out the reference guide sections for
-details on the over 65 different built in integrations.
+If you're needed it to build an HTTP application, there's an excellent chance that http4k has a module for it. Check out the reference guide sections for details on the over 65 different built in integrations.
 
 ## Acknowledgments
 
