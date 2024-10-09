@@ -196,105 +196,11 @@ Alternatively, read the [quickstart](https://www.http4k.org/quickstart/) or take
     * Simplify in-browser testing with this JUnit extension.
 * [WebDriver:](https://http4k.org/guide/reference/webdriver)
     * Ultra-lightweight Selenium WebDriver implementation for [http4k] applications.
-    
-## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/howz/readme/example.kt)
-
-This quick example is designed to convey the simplicity & features of [http4k] . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point and demonstrates how to serve and consume HTTP services with dynamic routing.
-
-To install, add these dependencies to your **Gradle** file:
-
-```kotlin
-dependencies {
-    implementation(platform("org.http4k:http4k-bom:5.32.4.0"))
-    implementation("org.http4k:http4k-core")
-    implementation("org.http4k:http4k-server-jetty")
-    implementation("org.http4k:http4k-client-okhttp")
-}
-```
-
-```kotlin
-package guide.howto.readme
-
-import org.http4k.client.OkHttp
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
-import org.http4k.filter.CachingFilters
-import org.http4k.routing.bind
-import org.http4k.routing.path
-import org.http4k.routing.routes
-import org.http4k.server.Jetty
-import org.http4k.server.asServer
-
-fun main() {
-    // we can bind HttpHandlers (which are just functions from  Request -> Response) to paths/methods to create a Route,
-    // then combine many Routes together to make another HttpHandler
-    val app: HttpHandler = routes(
-        "/ping" bind GET to { _: Request -> Response(OK).body("pong!") },
-        "/greet/{name}" bind GET to { req: Request ->
-            val name: String? = req.path("name")
-            Response(OK).body("hello ${name ?: "anon!"}")
-        }
-    )
-
-    // call the handler in-memory without spinning up a server
-    val inMemoryResponse: Response = app(Request(GET, "/greet/Bob"))
-    println(inMemoryResponse)
-
-// Produces:
-//    HTTP/1.1 200 OK
-//
-//
-//    hello Bob
-
-    // this is a Filter - it performs pre/post processing on a request or response
-    val timingFilter = Filter {
-        next: HttpHandler ->
-        {
-            request: Request ->
-            val start = System.currentTimeMillis()
-            val response = next(request)
-            val latency = System.currentTimeMillis() - start
-            println("Request to ${request.uri} took ${latency}ms")
-            response
-        }
-    }
-
-    // we can "stack" filters to create reusable units, and then apply them to an HttpHandler
-    val compositeFilter = CachingFilters.Response.NoCache().then(timingFilter)
-    val filteredApp: HttpHandler = compositeFilter.then(app)
-
-    // only 1 LOC to mount an app and start it in a container
-    filteredApp.asServer(Jetty(9000)).start()
-
-    // HTTP clients are also HttpHandlers!
-    val client: HttpHandler = OkHttp()
-
-    val networkResponse: Response = client(Request(GET, "http://localhost:9000/greet/Bob"))
-    println(networkResponse)
-
-// Produces:
-//    Request to /api/greet/Bob took 1ms
-//    HTTP/1.1 200
-//    cache-control: private, must-revalidate
-//    content-length: 9
-//    date: Thu, 08 Jun 2017 13:01:13 GMT
-//    expires: 0
-//    server: Jetty(9.3.16.v20170120)
-//
-//    hello Bob
-}
-```
 
 ## Acknowledgments
 
 * [Dan Bodart](https://twitter.com/DanielBodart)'s [utterlyidle](https://github.com/bodar/utterlyidle)
 * [Ivan Moore](https://twitter.com/ivanrmoore) for pairing on "BarelyMagical", a 50-line wrapper around utterlyidle to allow "Server as a Function"
-
 
 <span class="github">
 
