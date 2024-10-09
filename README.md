@@ -54,14 +54,6 @@ details on the over 65 different built in integrations.
 
 * Dan Bodart](https://twitter.com/DanielBodart)'s **utterlyidle**
 * Ivan Moore for pairing on the original hackday project - Barely Magical.
-
-<span class="github">
-
-## Contributors
-
-This project exists thanks to all the people who [contribute](https://www.http4k.org/contributing/).
-<a href="https://github.com/http4k/http4k/graphs/contributors"><img src="https://opencollective.com/http4k/contributors.svg?width=890" /></a>
-
-</span>
+* You can see the amazing people and companies who have helped us to make http4k [here](https://http4k.org/contributing).
 
 [http4k]: https://http4k.org 
