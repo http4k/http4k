@@ -1693,9 +1693,9 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 
 ### v4.0.0.0
 
-- New versioning scheme! See [announcement](https://www.http4k.org/blog/http4k_v4/) for details.
+- New versioning scheme! See [announcement](https://www.http4k.org/news/http4k_v4/) for details.
 - **http4k-*** : Remove all previous deprecations from all modules. To upgrade cleanly, follow the simple instructions
-  in the [announcement](https://www.http4k.org/blog/http4k_v4/#upgrading_library_api_changes)
+  in the [announcement](https://www.http4k.org/news/http4k_v4/#upgrading_library_api_changes)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-webdriver** : [Breaking] Upgrade of APIs to match new v4 Selenium APIs. It is quite safe to continue
   to use previous versions of the `http4k-testing-webdriver` JAR if you are unable to upgrade immediately. The API is
