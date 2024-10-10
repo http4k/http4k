@@ -37,12 +37,12 @@ running Server, Serverless platform, or compiled to GraalVM and run as a super-l
 You can read about the rationale and ethos of http4k [here](https://http4k.org/rationale)
 
 <div class="github">
-## Sounds cool! Where can I find out more?
+<h2>Sounds cool! Where can I find out more?</h2>
 
 You can find out all about the project on the [http4k] site.
 </div>
 
-### Installation
+## Installation
 ```kotlin
 dependencies {
     // install the platform...
