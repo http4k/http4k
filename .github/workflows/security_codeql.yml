@@ -26,6 +26,7 @@ on:
 
 jobs:
   analyze:
+    if: github.repository == 'http4k/http4k'
     name: Analyze
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}

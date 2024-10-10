@@ -8,6 +8,7 @@ env:
 jobs:
   ReleaseMC:
     runs-on: ubuntu-latest
+    if: github.repository == 'http4k/http4k'
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.0

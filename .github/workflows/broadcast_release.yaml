@@ -9,6 +9,7 @@ on:
       - '**/*.md'
 jobs:
   check-new-version:
+    if: github.repository == 'http4k/http4k'
     runs-on: ubuntu-latest
     outputs:
       requires-broadcast: ${{ steps.check-version.outputs.requires-broadcast }}

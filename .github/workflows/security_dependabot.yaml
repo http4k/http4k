@@ -10,6 +10,7 @@ jobs:
   build:
     name: Dependencies
     runs-on: ubuntu-latest
+    if: github.repository == 'http4k/http4k'
     permissions:
       contents: write
     steps:
