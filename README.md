@@ -51,7 +51,28 @@ showcases a variety of [http4k] use-cases and features.
 
 ## Module feature overview
 
-If you're needed it to build an HTTP application, there's an excellent chance that http4k has a module for it. Check out the reference guide sections for details on the over 65 different built in integrations.
+If you're needed it to build an HTTP application, there's an excellent chance that http4k has a module for it. Check out the reference guide sections for details on the over 65 different built in integrations. 
+
+- http4k applications can run seamlessly in all these different runtimes:
+    - Server: 8 server integrations including Jetty, Helidon, Undertow and Ktor 
+    - Servlets: Plug into any HTTP Servlet container
+    - Serverless: Support for 6 platforms including AWS Lambda, GCP, Alibaba and Azure
+    - Custom Lambda runtime: For running performance sensitive AWS Lambdas without the overhead of the AWS runtime
+    - Native: http4k apps can compile to GraalVM with no changes or configuration
+    - In-memory: Running apps in a JVM for lightning fast tests
+    - Realtime: WebSockets and Server Sent Events (SSE)
+- Document your APIs with industry leading OpenAPI support
+- Support for lots of protocol formats including JSONRpc, Graphql
+- Pluggable wire format integrations for: JSON, YAML, CSV, XML, DataFrame
+- Clients are available for these technologies:
+  - HTTP: 6 clients including Apache, Jetty and OkHttp
+  - WebSocket & SSE: For realtime connectivity
+- Observability: Measure http4l with integrations including OpenTelemetry and Micrometer
+- Metrics: Protect your app with Resilience4k and Failsafe 
+- Security: Seamless OAuth and Digest integrations
+- HTML Templating: 7 serverside rendering engines including Handlebars, Pug4J and Rocker
+- Testing styles: Support for innovative testing techniques such as TracerBullet, Approval and Chaos testing
+- Testing Integrations: Battle harden your apps with integrations for WebDriver, Playwright, KoTest and others
 
 ## Acknowledgments
 
