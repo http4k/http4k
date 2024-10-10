@@ -29,7 +29,7 @@
 services in a functional and consistent way. [http4k] applications are *just* Kotlin functions. For example, here's a simple echo server:
 
 ```kotlin
- val app: HttpHandler = { request: Request -> Response(OK).body(request.body) }
+val app: HttpHandler = { request: Request -> Response(OK).body(request.body) }
 val server = app.asServer(SunHttp(8000)).start()
 ```
 
