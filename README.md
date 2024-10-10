@@ -51,7 +51,7 @@ showcases a variety of [http4k] use-cases and features.
 
 ## Module feature overview
 
-If you're needed it to build an HTTP application, there's an excellent chance that http4k has a module for it. Check out the reference guide sections for details on the over 65 different built in integrations. 
+If you're needed it to build an HTTP application, there's an excellent chance that http4k has a module for it. Check out the reference guide sections for details on the over 65 different built in integrations. Here's a selection:
 
 - **Seamless app running in all these runtimes**:
     - **Server**: 8 server integrations including Jetty, Helidon, Undertow and Ktor 
