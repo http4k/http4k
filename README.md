@@ -40,6 +40,17 @@ You can read about the rationale and ethos of http4k [here](https://http4k.org/r
 
 You can find out all about the project on the [http4k] site.
 
+### Installation
+```kotlin
+dependencies {
+    // install the platform...
+    implementation(platform("org.http4k:http4k-bom:5.32.4.0"))
+
+    // ...then choose any moduless but at least the core
+    implementation("org.http4k:http4k-core")
+}
+```
+
 ## Quickstart
 
 Bored with reading already and just want to get coding? Read the [quickstart](https://www.http4k.org/quickstart/) or take a look at
