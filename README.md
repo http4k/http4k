@@ -78,6 +78,6 @@ If you're needed it to build an HTTP application, there's an excellent chance th
 
 * [Dan Bodart](https://twitter.com/DanielBodart)'s **utterlyidle**
 * Ivan Moore for pairing on the original hackday project - Barely Magical.
-* You can see the amazing people and companies who have helped us to make http4k [here](https://http4k.org/contributing).
+* You can see the amazing people and companies who have helped us to make http4k [here](https://http4k.org/community).
 
 [http4k]: https://http4k.org 
