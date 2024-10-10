@@ -61,8 +61,8 @@ If you're needed it to build an HTTP application, there's an excellent chance th
     - **Native**: http4k apps can compile to GraalVM with no changes or configuration
     - **In-memory**: Running apps in a JVM for lightning fast tests
     - **Realtime**: WebSockets and Server Sent Events (SSE)
-- Document your APIs with industry leading OpenAPI support
-- Support for lots of protocol formats including JSONRpc, Graphql
+- **OpenAPI**: Document your APIs with industry leading support
+- **Protocol formats:** Support for lots of protocol formats including JSONRpc, Graphql
 - **Pluggable wire format integrations for**: JSON, YAML, CSV, XML, DataFrame
 - **Clients are available for these technologies**:
   - **HTTP**: 6 clients including Apache, Jetty and OkHttp
