@@ -10,6 +10,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
@@ -37,6 +38,14 @@ open class ConfigurableJacksonXml(
      * Convenience function to read an object as XML from the message body.
      */
     inline fun <reified T: Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
+
+    inline fun <reified T: Any> asBiDiMapping() =
+        BiDiMapping<String, T>({ it.asA<T>() }, { it.asXmlString() })
+
+    inline fun <reified T : Any> Body.Companion.auto(
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None
+    ) = autoBody<T>(description, contentNegotiation)
 
     inline fun <reified T : Any> autoBody(
         description: String? = null,

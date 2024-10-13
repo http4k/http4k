@@ -206,6 +206,14 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         assertThat(marshaller.asFormatString(MyOtherValue.of("world")), equalTo(""""world""""))
         assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("hello")) }
     }
+
+    @Test
+    fun `roundtrip arbitrary object to and from JSON string with BiDi lens`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        val lens = Jackson.asBiDiMapping<ArbObject>()
+        val out = lens(obj)
+        assertThat(lens(out), equalTo(obj))
+    }
 }
 
 class JacksonTest : JsonContract<JsonNode>(Jackson) {

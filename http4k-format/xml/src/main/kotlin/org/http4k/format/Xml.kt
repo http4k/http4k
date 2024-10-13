@@ -4,12 +4,12 @@ import com.google.gson.JsonElement
 import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
-import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
@@ -65,6 +65,9 @@ object Xml : AutoMarshallingXml() {
      */
     fun <IN : Any> BiDiLensSpec<IN, String>.xml() = map({ it.asXmlDocument() }, { it.asXmlString() })
 
+    fun asBiDiMapping() =
+        BiDiMapping<String, Document>({ it.asXmlDocument() }, { it.asXmlString() })
+
     fun Body.Companion.xml(
         description: String? = null,
         contentNegotiation: ContentNegotiation = ContentNegotiation.None
@@ -75,5 +78,6 @@ object Xml : AutoMarshallingXml() {
             contentNegotiation
         )
             .map(Body::payload) { Body(it) }
-            .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlDocument() }, { it.asXmlString() })
+            .map(ByteBuffer::asString, String::asByteBuffer)
+            .map({ it.asXmlDocument() }, { it.asXmlString() })
 }

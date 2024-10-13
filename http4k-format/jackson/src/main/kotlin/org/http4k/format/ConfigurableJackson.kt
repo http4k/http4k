@@ -27,6 +27,7 @@ import org.http4k.core.with
 import org.http4k.format.JsonType.Integer
 import org.http4k.format.JsonType.Number
 import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
@@ -94,6 +95,8 @@ open class ConfigurableJackson(
     override fun asInputStream(input: Any): InputStream = mapper.writeValueAsBytes(input).inputStream()
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
+
+    inline fun <reified T: Any> asBiDiMapping() = BiDiMapping<String, T>(mapper.read<T>(), mapper.write<T>())
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,

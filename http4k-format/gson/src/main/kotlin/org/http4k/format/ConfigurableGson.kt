@@ -121,6 +121,9 @@ open class ConfigurableGson(
     inline fun <reified T : Any> WsMessage.Companion.auto() =
         WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
+    inline fun <reified T: Any> asBiDiMapping() =
+        BiDiMapping<String, T>(mapper.read<T>()) { mapper.toJson(it) }
+
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
         contentNegotiation: ContentNegotiation = None,

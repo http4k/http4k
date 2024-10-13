@@ -17,6 +17,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
@@ -139,6 +140,14 @@ class KondorJson(
     ) =
         converterFor(target).autoBody(description, contentNegotiation, contentType, compactJsonStyle)
 
+    inline fun <reified T: Any> asBiDiMapping(renderStyle: JsonStyle = JsonStyle.compactWithNulls) =
+        converterFor(T::class).let { converter ->
+            BiDiMapping<String, T>(
+                { converter.fromJson(it).orThrow() },
+                { converter.toJsonNode(it).render(renderStyle) }
+            )
+        }
+
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
@@ -180,7 +189,7 @@ class KondorJson(
         converter.fromJsonNode(this as JN).orThrow()
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T : Any> converterFor(target: KClass<T>): JsonConverter<T, *> =
+    fun <T : Any> converterFor(target: KClass<T>): JsonConverter<T, *> =
         requireNotNull(converters[target.java]) {
             "JsonConverter for '$target' has not been registered"
         } as JsonConverter<T, *>

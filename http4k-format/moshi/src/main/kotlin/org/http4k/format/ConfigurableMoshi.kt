@@ -114,6 +114,9 @@ open class ConfigurableMoshi(
     override fun <T : Any> asA(j: MoshiNode, target: KClass<T>): T = adapterFor(target)
         .fromJsonValue(j.unwrap())!!
 
+    inline fun <reified T: Any> asBiDiMapping() =
+        BiDiMapping<String, T>({ asA(it, T::class) }, { asFormatString(it) })
+
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
         contentNegotiation: ContentNegotiation = None,

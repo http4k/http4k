@@ -157,4 +157,10 @@ bool:true
         assertThat(runCatching { MoshiYaml.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
             .exceptionOrNull()!!.message!!, startsWith("Required value 'string' missing at \$"))
     }
+
+    @Test
+    fun `roundtrip list of arbitrary objects to and with BiDi lens`() {
+        val lens = MoshiYaml.asBiDiMapping<ArbObject>()
+        assertThat(lens(lens(obj)), equalTo(obj))
+    }
 }

@@ -200,6 +200,15 @@ bool: true
         assertThat(jackson.asFormatString(value), equalTo("\"stuff\"\n"))
     }
 
+    @Test
+    fun `roundtrip list of arbitrary objects to and from with BiDi lens`() {
+        val lens = JacksonYaml.asBiDiMapping<ArbObject>()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(lens(listOf(obj)), equalTo(listOf(obj)))
+    }
+
     override fun strictMarshaller() =
         object : ConfigurableJacksonYaml(KotlinModule.Builder().build().asConfigurable().customise()) {}
 

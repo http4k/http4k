@@ -65,4 +65,10 @@ class XmlTest {
         assertThat(out.asXmlString(), equalTo(xmlString))
         assertThat(lens(out, Request(GET, "/")), equalTo(original))
     }
+
+    @Test
+    fun `roundtrip xml to and from with BiDi lens`() {
+        val lens = Xml.asBiDiMapping()
+        assertThat(lens(lens(xml)), equalTo(xml))
+    }
 }

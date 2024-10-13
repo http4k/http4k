@@ -9,6 +9,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.string
@@ -31,6 +32,9 @@ open class ConfigurableKlaxon(
         }
 
     override fun asFormatString(input: Any) = klaxon.toJsonString(input)
+
+    inline fun <reified T: Any> asBiDiMapping() =
+        BiDiMapping<String, T>({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,

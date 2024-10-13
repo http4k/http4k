@@ -8,6 +8,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
@@ -54,6 +55,9 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
      * Convenience function to read an object as CSV from the message body.
      */
     inline fun <reified T: Any> HttpMessage.csv(): List<T> = Body.auto<T>().toLens()(this)
+
+    inline fun <reified T: Any> asBiDiMapping(schema: CsvSchema = defaultSchema<T>()) =
+        BiDiMapping<String, List<T>>(readerFor(T::class, schema), writerFor(T::class, schema))
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
