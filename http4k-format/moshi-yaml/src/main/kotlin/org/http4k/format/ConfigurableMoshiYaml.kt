@@ -8,6 +8,7 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.format.StrictnessMode.Lenient
 import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
@@ -59,6 +60,9 @@ open class ConfigurableMoshiYaml(
     )
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map({ }, ::asFormatString)
+
+    inline fun <reified T: Any> asBiDiMapping() =
+        BiDiMapping<String, T>({ asA(it) }, ::asFormatString)
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
