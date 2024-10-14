@@ -13,11 +13,18 @@ import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.junit.jupiter.api.Test
 import java.time.Duration.ZERO
+import java.time.Instant
 
 class HttpEventTest {
-
-    private val tx = HttpTransaction(Request(GET, ""), Response(OK), ZERO, mapOf())
-
+    private val startTime = Instant.ofEpochSecond(17)
+    private val tx = HttpTransaction(
+        request = Request(GET, ""),
+        response = Response(OK),
+        start = startTime,
+        duration = ZERO,
+        labels = mapOf()
+    )
+    
     @Test
     fun `outgoing equals`() {
         assertThat(Outgoing(tx), equalTo(Outgoing(tx)))
@@ -25,19 +32,33 @@ class HttpEventTest {
 
     @Test
     fun `outgoing uses template if available`() {
-        assertThat(Outgoing(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf())).xUriTemplate, equalTo("bob"))
-        assertThat(Outgoing(HttpTransaction(Request(GET, "/bob"),
-            RoutedResponse(Response(OK), UriTemplate.from("bar")), ZERO, mapOf())).xUriTemplate, equalTo("bar"))
+        assertThat(Outgoing(HttpTransaction(
+            request = Request(GET, "/bob"),
+            response = Response(OK),
+            start = startTime,
+            duration = ZERO,
+            labels = mapOf()
+        )).xUriTemplate, equalTo("bob"))
+        assertThat(Outgoing(HttpTransaction(
+            request = Request(GET, "/bob"),
+            response = RoutedResponse(Response(OK), UriTemplate.from("bar")),
+            start = startTime,
+            duration = ZERO,
+            labels = mapOf()
+        )).xUriTemplate, equalTo("bar"))
     }
 
     @Test
     fun `incoming uses template if available`() {
-        assertThat(HttpEvent.Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf())).xUriTemplate, equalTo("bob"))
+        assertThat(HttpEvent.Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf(),startTime)).xUriTemplate, equalTo("bob"))
         assertThat(
             HttpEvent.Incoming(
                 HttpTransaction(
-                    RoutedRequest(Request(GET, "/bob"), UriTemplate.from("bar")),
-                    Response(OK), ZERO, mapOf()
+                    request = RoutedRequest(Request(GET, "/bob"), UriTemplate.from("bar")),
+                    response = Response(OK),
+                    start = startTime,
+                    duration = ZERO,
+                    labels = mapOf()
                 )
             ).xUriTemplate, equalTo("bar"))
     }
@@ -46,5 +67,4 @@ class HttpEventTest {
     fun `incoming equals`() {
         assertThat(HttpEvent.Incoming(tx), equalTo(HttpEvent.Incoming(tx)))
     }
-
 }

@@ -40,8 +40,11 @@ import java.time.Clock
 import java.time.Clock.fixed
 import java.time.Duration.ZERO
 import java.time.Duration.ofSeconds
+import java.time.Instant
 import java.time.Instant.EPOCH
 import java.time.ZoneId.systemDefault
+
+private val instant = EPOCH
 
 class ResponseFiltersTest {
 
@@ -289,23 +292,29 @@ class ResponseFiltersTest {
     @Test
     fun `reporting http transaction for unknown route`() {
         var transaction: HttpTransaction? = null
-
-        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) { transaction = it }
-
+        
+        val startTime = Instant.ofEpochSecond(1)
+        val filter = ReportHttpTransaction(fixed(startTime, systemDefault())) { transaction = it }
         val handler = filter.then { Response(OK) }
-
         val request = Request(GET, "")
 
         handler(request)
 
-        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), ZERO, emptyMap())))
+        assertThat(transaction, equalTo(HttpTransaction(
+            request = request,
+            response = Response(OK),
+            start = startTime,
+            duration = ZERO,
+            labels = emptyMap()
+        )))
     }
 
     @Test
     fun `reporting http transaction for known route`() {
         var transaction: HttpTransaction? = null
-
-        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) {
+        
+        val startTime = Instant.ofEpochSecond(14)
+        val filter = ReportHttpTransaction(fixed(startTime, systemDefault())) {
             transaction = it
         }
 
@@ -317,8 +326,13 @@ class ResponseFiltersTest {
 
         handler(request)
 
-        assertThat(transaction, equalTo(HttpTransaction(request,
-            Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}"))))
+        assertThat(transaction, equalTo(HttpTransaction(
+            request = request,
+            response = Response(OK),
+            start = startTime,
+            duration = ZERO,
+            labels = mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}")
+        )))
     }
 
     @Test

@@ -13,10 +13,11 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-class Java8HttpClientTest : HttpClientContract(::ApacheServer, Java8HttpClient(),
-    ApacheClient(HttpClients.custom()
-        .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(100, MILLISECONDS).build()).build()
-        , responseBodyMode = BodyMode.Stream)),
+class Java8HttpClientTest : HttpClientContract(
+    serverConfig = ::ApacheServer,
+    client = Java8HttpClient(),
+    timeoutClient = Java8HttpClient(readTimeout = Duration.ofMillis(100))
+),
     HttpClientWithMemoryModeContract {
 
     @Test

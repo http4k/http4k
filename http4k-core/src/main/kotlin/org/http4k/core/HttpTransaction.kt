@@ -3,6 +3,7 @@ package org.http4k.core
 import org.http4k.routing.RequestWithRoute
 import org.http4k.routing.ResponseWithRoute
 import java.time.Duration
+import java.time.Instant
 
 data class HttpTransaction(
     val request: Request,
@@ -12,7 +13,8 @@ data class HttpTransaction(
         response is ResponseWithRoute -> mapOf(ROUTING_GROUP_LABEL to response.xUriTemplate.toString())
         request is RequestWithRoute -> mapOf(ROUTING_GROUP_LABEL to request.xUriTemplate.toString())
         else -> emptyMap()
-    }
+    },
+    val start: Instant
 ) {
     fun label(name: String, value: String) = copy(labels = labels + (name to value))
     fun label(name: String) = labels[name]

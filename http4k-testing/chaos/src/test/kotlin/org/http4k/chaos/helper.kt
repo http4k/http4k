@@ -11,10 +11,16 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.format.Jackson.asJsonObject
 import java.time.Duration
+import java.time.Instant
 
 internal fun assertBehaviour(json: String, description: String, matcher: Matcher<Response>) {
     val behaviour = json.createBehaviourWith(description)
-    val tx = HttpTransaction(Request(GET, ""), Response(OK).body("hello"), Duration.ZERO)
+    val tx = HttpTransaction(
+        request = Request(GET, ""),
+        response = Response(OK).body("hello"),
+        start = Instant.ofEpochSecond(1),
+        duration = Duration.ZERO
+    )
     assertThat(behaviour.then { tx.response }(tx.request), matcher)
 }
 
