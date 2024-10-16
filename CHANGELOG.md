@@ -3,9 +3,120 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.23.1.0 (uncut)
+### v5.32.4.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-approval** Better diffing of failures in the IDE. @H/T @frednordin
+- **http4k-core** Gzip mixed compression mode H/T @IlyaNerd
+- 
+### v5.32.3.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-approval** Support for binary comparisons using BinaryApprovalTest. @H/T @oharaandrew314
+
+### v5.32.2.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-approval** : Fix `withNameSuffix` which wasn't checking the content type when you overrode the name suffix.§
+
+### v5.32.1.0
+- **http4k-core** : Fix ordering of params on `Body.webForm()`
+- **http4k-*** : Tightened up nullable types and data class constructor visibility on various APIs
+
+### v5.32.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-client-apache*** : [Unlikely break]: Removed `insecureApacheHttpClient()` due to deprecated API.
+- **http4k-webdriver*** : [Unlikely break]: New Nullable types on WebDriver API led to tightening up our implementations.
+
+### v5.31.1.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v5.31.0.0
+- **http4k-server-apache** : [Possible Break] Upgrade httpcore to 5.3, which introduces stricter authority validation. This may break projects with custom version of ApacheServer.
+
+### v5.30.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-client-jetty** : [Fix] encoding of binary content in Jetty client. H/T @kwydler
+- **http4k-client-*** : All websocket implementations implement a unified `WebsocketFactory`. @H/T @oharaandrew314
+
+### v5.30.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. Should fix memory leak. @H/T @oharaandrew314
+- **http4k-server-jetty11** : [Fix] Received binary Websocket frames will no longer have their content coerced to text. @H/T @oharaandrew314
+- **http4k-*** : [Breaking] Make `WsMessage` mode explicit. @H/T @oharaandrew314
+
+#### Migration Guide
+
+Previously, a `WsMessage` was sent in either `TEXT` or `BINARY` mode based on whether the `Body` was a `MemoryBody` or `StreamBody`, respectively.
+
+:warning: **Warning:** If you were using the primary constructor of `WsMessage`, you will need to explicitly provide a `WsMessage.Mode` to resolve the new compiler errors.
+
+```kotlin
+val textMessage = WsMessage(MemoryBody("hi"), WsMessage.Mode.Text)
+val binaryMessage = WsMessage(StreamBody(imageStream), WsMessage.Mode.Binary)
+```
+
+:bulb: **Note:** If you were using the secondary `WsMessage` constructors, no changes are necessary.
+
+```kotlin
+val textMessage = WsMessage("hi") // Text like before
+val binaryMessage = WsMessage(imageStream) // Binary like before
+```
+
+:bulb: **Note:** You now have full control over how content is sent.
+
+```kotlin
+// have a very long string?  Stream it!
+val lotsOfText = WsMessage(StreamBody(imageStream), WsMessage.Mode.Text)
+
+// have your binary buffered already?  Send it as is!
+val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
+```
+
+### v5.29.0.0
+- **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.20
+- **http4k-security-oauth** : [Breaking] OAuthProvider support for PKCE. This may break code because of the addition of an extra parameter in the OAuth construction. H/T @dkandalov
+- **http4k-*** : [New module] Azure SDK integration - use an http4k client with the official libraries
+- **http4k-server-*** : [Fix #1163] Request.version is always HTTP/1.1 for server requests, even when using HTTP/2.0
+
+### v5.28.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. @H/T @oharaandrew314
+
+### v5.28.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Include Vary header on CORS responses. H/T @ollieabbey
+- **http4k-multipart** : [Fix Break] Multipart form files were all calling deleteOnExit() instead of being deleted when the Body is closed. Possible memory leak for long running processes. The fix MAY be a change of OS files-system usage if you are not closing your MultiPart form body. @H/T @oharaandrew314 for the report.
+
+### v5.27.0.0
+- **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.10
+- **http4k-core** New HTTP status codes. H/T @torfinnberset
+- **http4k-core** Added helper method for dealing with forms. H/T @tim-mortimer
+- **http4k-core** [Fix] Close backing DiskLocation when MultipartForm closed. H/T @oharaandrew314
+- **http4k-testing-kotest** Fix haveSetCookie and haveCookie to work when cookie isn't present. H/T @bagguley
+
+### v5.26.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** : Fix transformer is lost when adding name suffix to Approver H/T @ilya.aliaksandrovich
+
+### v5.26.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-core** : Response caching extensions. H/T @ollieabbey
+- **http4k-config** : [New Module!] Extraction of typesafe configuration module from http4k-cloudnative.
+- **http4k-cloudnative** : [Breaking!] Repackaging of typesafe configuration module classes (org.http4k.cloudnative.env) to http4k-config (org.http4k.config). New imports are required.
+- **http4k-contract** : Adds ApiKeySecurity that identifies a consumer and makes it available for later use. H/T @dhs3000
+
+### v5.25.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-serverless-lambda*** : [Breaking Fix] Incorrect lambda request context variable is passed - we now pass the incoming reqeust object instead of the converted http4k request. If you were using the LAMBDA_REQUEST_KEY, you can just use the request passed into the handler instead.
+
+### v5.24.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-serverless-lambda*** : [Fix] AWS adapter throws on invalid URLs.
+- **http4k-testing-webdriver** : [Fix] Base path replacement logic for same-dir-path and dot-path URLs. H/T jweidler
+
+### v5.24.0.0 
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Allow removal of all queries for a URI. H/T @dhs3000
+- **http4k-format-kondor** : Upgrade to new version of Kondor. H/T @uberto
+- **http4k-testing-strikt** [Break] The upgrade to the latest version drops Java <17 support. If you are still using Java 8, you will need to stick with the previous version of this module.
 
 ### v5.23.0.0
 - **http4k-*** : Upgrade some dependency versions.
@@ -1582,9 +1693,9 @@ changes with their rationale when appropriate:
 
 ### v4.0.0.0
 
-- New versioning scheme! See [announcement](https://www.http4k.org/blog/http4k_v4/) for details.
+- New versioning scheme! See [announcement](https://www.http4k.org/news/http4k_v4/) for details.
 - **http4k-*** : Remove all previous deprecations from all modules. To upgrade cleanly, follow the simple instructions
-  in the [announcement](https://www.http4k.org/blog/http4k_v4/#upgrading_library_api_changes)
+  in the [announcement](https://www.http4k.org/news/http4k_v4/#upgrading_library_api_changes)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-webdriver** : [Breaking] Upgrade of APIs to match new v4 Selenium APIs. It is quite safe to continue
   to use previous versions of the `http4k-testing-webdriver` JAR if you are unable to upgrade immediately. The API is

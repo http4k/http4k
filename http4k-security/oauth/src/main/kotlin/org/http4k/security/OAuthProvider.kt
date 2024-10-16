@@ -25,16 +25,15 @@ class OAuthProvider(
     private val modifyAuthState: (Uri) -> Uri = { it },
     private val generateCrsf: CsrfGenerator = SECURE_CSRF,
     private val nonceGenerator: NonceGenerator = SECURE_NONCE,
+    private val pkceGenerator: PkceGenerator? = null,
     private val responseType: ResponseType = Code,
     idTokenConsumer: IdTokenConsumer = NoOp,
-    accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(
-        providerConfig
-    ),
+    accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(providerConfig),
     private val jwtRedirectionUriBuilder: (RequestJwts) -> RedirectionUriBuilder = ::uriBuilderWithRequestJwt,
     redirectionUrlBuilder: RedirectionUriBuilder = defaultUriBuilder,
     accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
     private val responseMode: ResponseMode? = null,
-    originalUri: (Request) -> Uri = Request::uri,
+    originalUri: (Request) -> Uri = Request::uri
 ) {
 
     // pre-configured API client for this provider
@@ -47,12 +46,13 @@ class OAuthProvider(
         scopes,
         generateCrsf,
         nonceGenerator,
+        pkceGenerator,
         modifyAuthState,
         oAuthPersistence,
         responseType,
         redirectionUrlBuilder,
-        responseMode = responseMode,
-        originalUri = originalUri
+        originalUri = originalUri,
+        responseMode = responseMode
     )
 
     // protect endpoint and provide custom request JWT creation mechanism
@@ -63,6 +63,7 @@ class OAuthProvider(
             scopes,
             generateCrsf,
             nonceGenerator,
+            pkceGenerator,
             modifyAuthState,
             oAuthPersistence,
             responseType,

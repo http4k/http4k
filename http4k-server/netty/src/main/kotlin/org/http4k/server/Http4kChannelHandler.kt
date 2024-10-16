@@ -74,7 +74,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 
     private fun FullHttpRequest.asRequest(address: InetSocketAddress?) = Method.supportedOrNull(method().name())
         ?.let {
-            val baseRequest = Request(it, Uri.of(uri()))
+            val baseRequest = Request(it, Uri.of(uri()), protocolVersion().text())
                 .headers(headers().map { it.key to it.value })
                 .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
             address?.let { baseRequest.source(RequestSource(it.address.hostAddress, it.port)) } ?: baseRequest

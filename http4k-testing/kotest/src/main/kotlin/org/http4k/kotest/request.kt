@@ -96,6 +96,6 @@ fun Request.shouldHaveCookie(name: String, expected: String) = this should haveC
 fun Request.shouldNotHaveCookie(name: String, expected: String) = this shouldNot haveCookie(name, expected)
 fun haveCookie(name: String, expected: String): Matcher<Request> = haveCookie(name, haveValue(expected))
 
-fun Request.shouldHaveCookie(name: String, match: Matcher<Cookie>) = this should haveCookie(name, match)
-fun Request.shouldNotHaveCookie(name: String, match: Matcher<Cookie>) = this shouldNot haveCookie(name, match)
-fun haveCookie(name: String, match: Matcher<Cookie>): Matcher<Request> = httpMessageHas("Cookie \"$name\"", { r: Request -> r.cookie(name)!! }, match)
+fun Request.shouldHaveCookie(name: String, match: Matcher<Cookie?>) = this should haveCookie(name, match)
+fun Request.shouldNotHaveCookie(name: String, match: Matcher<Cookie?>) = this shouldNot haveCookie(name, match)
+fun haveCookie(name: String, match: Matcher<Cookie?>): Matcher<Request> = httpMessageHas("Cookie \"$name\"", { r: Request -> r.cookie(name) }, match)

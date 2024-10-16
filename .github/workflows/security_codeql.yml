@@ -26,6 +26,7 @@ on:
 
 jobs:
   analyze:
+    if: github.repository == 'http4k/http4k'
     name: Analyze
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
@@ -45,9 +46,9 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4.2.0
     
-    - uses: actions/setup-java@v4.0.0
+    - uses: actions/setup-java@v4.4.0
       with:
         distribution: temurin
         java-version: 21

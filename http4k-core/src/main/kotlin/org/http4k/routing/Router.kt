@@ -105,7 +105,7 @@ internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
     is Unmatched -> this
 }
 
-internal data class OrRouter private constructor(private val list: List<Router>) : Router {
+internal class OrRouter private constructor(private val list: List<Router>) : Router {
     override fun match(request: Request): RouterMatch {
         val matches = list.map { next -> next.match(request) }
         val result = matches.minOrNull() ?: Unmatched(description)
@@ -125,7 +125,7 @@ internal data class OrRouter private constructor(private val list: List<Router>)
     }
 }
 
-internal data class AndRouter private constructor(private val list: List<Router>) : Router {
+internal class AndRouter internal constructor(private val list: List<Router>) : Router {
     override fun match(request: Request): RouterMatch {
         val matches = list.map { it.match(request) }
         val result = matches.reduce(RouterMatch::and)

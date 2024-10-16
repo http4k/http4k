@@ -29,6 +29,7 @@ import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
+import org.http4k.filter.GzipCompressionMode.Mixed
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
@@ -232,8 +233,9 @@ class ServerFiltersTest {
                         )
                     )
                     .and(hasHeader("access-control-allow-credentials", "true"))
-                    .and(hasHeader("access-control-expose-headers").not())
-                    .and(hasHeader("access-control-max-age").not())
+                    .and(!hasHeader("access-control-expose-headers"))
+                    .and(!hasHeader("access-control-max-age"))
+                    .and(!hasHeader("vary"))
             )
         }
 
@@ -279,6 +281,7 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(hasHeader("vary", "Origin"))
             )
         }
 
@@ -295,10 +298,11 @@ class ServerFiltersTest {
 
             assertThat(
                 response, hasStatus(OK)
-                    .and(hasHeader("access-control-allow-origin", "null"))
-                    .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                    .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+                    .and(!hasHeader("access-control-allow-origin"))
+                    .and(!hasHeader("access-control-allow-headers"))
+                    .and(!hasHeader("access-control-allow-methods"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(!hasHeader("vary"))
             )
         }
 
@@ -315,10 +319,11 @@ class ServerFiltersTest {
 
             assertThat(
                 response, hasStatus(OK)
-                    .and(hasHeader("access-control-allow-origin", "null"))
-                    .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                    .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+                    .and(!hasHeader("access-control-allow-origin"))
+                    .and(!hasHeader("access-control-allow-headers"))
+                    .and(!hasHeader("access-control-allow-methods"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(!hasHeader("vary"))
             )
         }
 
@@ -339,6 +344,7 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(!hasHeader("vary"))
             )
         }
 
@@ -359,6 +365,7 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(hasHeader("vary", "Origin"))
             )
         }
 
@@ -379,6 +386,7 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(hasHeader("vary", "Origin"))
             )
         }
 
@@ -399,7 +407,50 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
                     .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
                     .and(!hasHeader("access-control-allow-credentials"))
+                    .and(hasHeader("vary", "Origin"))
             )
+        }
+
+        @Test
+        fun `GET - should append 'Origin' to the existing 'Vary' list if present`() {
+            val handler = ServerFilters.Cors(
+                CorsPolicy(
+                    OriginPolicy.Only("foo"),
+                    listOf("rita", "sue", "bob"),
+                    listOf(DELETE, POST)
+                )
+            ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "x, y") }
+            val response = handler(Request(GET, "/").header("Origin", "foo"))
+
+            assertThat(response, hasHeader("vary", "x, y, Origin"))
+        }
+
+        @Test
+        fun `GET - should not append 'Origin' to the existing 'Vary' list if 'Origin' is already present`() {
+            val handler = ServerFilters.Cors(
+                CorsPolicy(
+                    OriginPolicy.Only("foo"),
+                    listOf("rita", "sue", "bob"),
+                    listOf(DELETE, POST)
+                )
+            ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "x, Origin, y") }
+            val response = handler(Request(GET, "/").header("Origin", "foo"))
+
+            assertThat(response, hasHeader("vary", "x, Origin, y"))
+        }
+
+        @Test
+        fun `GET - should not append 'Origin' to the existing 'Vary' list if the wildcard value is present`() {
+            val handler = ServerFilters.Cors(
+                CorsPolicy(
+                    OriginPolicy.Only("foo"),
+                    listOf("rita", "sue", "bob"),
+                    listOf(DELETE, POST)
+                )
+            ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "*") }
+            val response = handler(Request(GET, "/").header("Origin", "foo"))
+
+            assertThat(response, hasHeader("vary", "*"))
         }
     }
 
@@ -558,6 +609,44 @@ class ServerFiltersTest {
                         .body(Body("hello").gzipped().body)
                 ),
                 hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body)))
+            )
+        }
+
+        @Test
+        fun `gzip stream request in mixed should return gzip stream body`() {
+            val handler = ServerFilters.GZip(Mixed()).then {
+                assertThat(it, hasBody(equalTo<String>("hello")))
+                Response(OK).body(Body("world".byteInputStream()))
+            }
+
+            assertThat(
+                handler(
+                    Request(GET, "/")
+                        .header("accept-encoding", "gzip")
+                        .header("content-encoding", "gzip")
+                        .body(Body("hello").gzipped().body)
+                ),
+                hasHeader("content-encoding", "gzip")
+                    .and(hasBody(equalTo<Body>(Body("world").gzippedStream().body)))
+            )
+        }
+
+        @Test
+        fun `gzip memory request in mixed should return gzip memory body`() {
+            val handler = ServerFilters.GZip(Mixed()).then {
+                assertThat(it, hasBody(equalTo<String>("hello")))
+                Response(OK).body(Body("world"))
+            }
+
+            assertThat(
+                handler(
+                    Request(GET, "/")
+                        .header("accept-encoding", "gzip")
+                        .header("content-encoding", "gzip")
+                        .body(Body("hello").gzipped().body)
+                ),
+                hasHeader("content-encoding", "gzip")
+                    .and(hasBody(equalTo<Body>(Body("world").gzipped().body)))
             )
         }
 

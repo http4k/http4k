@@ -23,6 +23,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.hamkrest.hasStatusDescription
+import org.http4k.security.OAuthCallbackError.InvalidIdToken
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
@@ -32,11 +33,11 @@ import org.junit.jupiter.api.Test
 
 class OAuthProviderTest {
     private val providerConfig = OAuthProviderConfig(
-        Uri.of("http://authHost/base"),
-        "/auth",
-        "/token",
-        Credentials("user", "password"),
-        Uri.of("http://apiHost/api/")
+        authBase = Uri.of("http://authHost/base"),
+        authPath = "/auth",
+        tokenPath = "/token",
+        credentials = Credentials("user", "password"),
+        apiBase = Uri.of("http://apiHost/api/")
     )
 
     private val oAuthPersistence = FakeOAuthPersistence()
@@ -46,23 +47,24 @@ class OAuthProviderTest {
         status: Status = OK,
         responseType: ResponseType = ResponseType.Code,
         nonceFromIdToken: Nonce? = null,
-        resultIdTokenFromAuth: Result<Unit, OAuthCallbackError.InvalidIdToken> = Success(Unit),
-        resultIdTokenFromAccessToken: Result<Unit, OAuthCallbackError.InvalidIdToken> = Success(Unit)
+        resultIdTokenFromAuth: Result<Unit, InvalidIdToken> = Success(Unit),
+        resultIdTokenFromAccessToken: Result<Unit, InvalidIdToken> = Success(Unit)
     ): OAuthProvider = OAuthProvider(
-        providerConfig,
-        { Response(status).body("access token goes here").header("request-uri", it.uri.toString()) },
-        Uri.of("http://callbackHost/callback"),
-        listOf("scope1", "scope2"),
-        persistence,
-        { it.query("response_mode", "form_post") },
-        { CrossSiteRequestForgeryToken("randomCsrf") },
-        { Nonce("randomNonce") },
-        responseType,
+        providerConfig = providerConfig,
+        client = { Response(status).body("access token goes here").header("request-uri", it.uri.toString()) },
+        callbackUri = Uri.of("http://callbackHost/callback"),
+        scopes = listOf("scope1", "scope2"),
+        oAuthPersistence = persistence,
+        modifyAuthState = { it.query("response_mode", "form_post") },
+        generateCrsf = { CrossSiteRequestForgeryToken("randomCsrf") },
+        nonceGenerator = { Nonce("randomNonce") },
+        pkceGenerator = { PkceChallengeAndVerifier("pkceChallenge", "pkceVerifier") },
+        responseType = responseType,
         idTokenConsumer = object : IdTokenConsumer {
             override fun nonceFromIdToken(idToken: IdToken) = nonceFromIdToken
             override fun consumeFromAuthorizationResponse(idToken: IdToken) = resultIdTokenFromAuth
             override fun consumeFromAccessTokenResponse(idToken: IdToken) = resultIdTokenFromAccessToken
-        }
+        },
     )
 
     @Test
@@ -73,20 +75,27 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - when no accessToken value present, request is redirected to expected location`() {
-        val expectedHeader = """http://authHost/base/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&response_mode=form_post"""
+        val expectedHeader = "http://authHost/base/auth?" +
+            "client_id=user&response_type=code&scope=scope1+scope2&" +
+            "redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&" +
+            "code_challenge=pkceChallenge&code_challenge_method=S256&response_mode=form_post"
+
         assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
     @Test
     fun `filter - accepts custom request JWT container`() {
-        val expectedHeader = """http://authHost/base/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&request=myCustomJwt&response_mode=form_post"""
+        val expectedHeader = "http://authHost/base/auth?" +
+            "client_id=user&response_type=code&scope=scope1+scope2&" +
+            "redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&" +
+            "code_challenge=pkceChallenge&code_challenge_method=S256&request=myCustomJwt&response_mode=form_post"
 
         val jwts = RequestJwts { _, _, _ -> RequestJwtContainer("myCustomJwt") }
         assertThat(oAuth(oAuthPersistence).authFilter(jwts).then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
     @Test
-    fun `filter - request redirecttion may use other response_type`() {
+    fun `filter - request redirection may use other response_type`() {
         assertThat(oAuth(oAuthPersistence, OK, CodeIdToken)
             .authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", ".*response_type=code\\+id_token.*".toRegex())))
     }
@@ -113,8 +122,7 @@ class OAuthProviderTest {
     }
 
     @Test
-    fun `callback - when valid inputs passed, defaults value stored in oauth persistance`() {
-
+    fun `callback - when valid inputs passed, defaults value stored in oauth persistence`() {
         oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
         oAuthPersistence.assignOriginalUri(Response(OK), Uri.of("/defaulted"))
 
@@ -126,8 +134,7 @@ class OAuthProviderTest {
     }
 
     @Test
-    fun `callback - when valid inputs passed, defaults to root if no uri is stored in oauth persistance`() {
-
+    fun `callback - when valid inputs passed, defaults to root if no uri is stored in oauth persistence`() {
         oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
 
         val validRedirectToRoot = Response(TEMPORARY_REDIRECT)
@@ -146,14 +153,14 @@ class OAuthProviderTest {
 
     @Test
     fun `id token - can fail from id_token from callback request`() {
-        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAuth = Failure(OAuthCallbackError.InvalidIdToken("some reason")))
+        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAuth = Failure(InvalidIdToken("some reason")))
 
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }
 
     @Test
     fun `id token - can fail from id_token from access token response`() {
-        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAccessToken = Failure(OAuthCallbackError.InvalidIdToken("some reason")))
+        val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAccessToken = Failure(InvalidIdToken("some reason")))
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }
 }

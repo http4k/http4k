@@ -13,10 +13,17 @@ import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.NoOp
 import org.http4k.core.Uri
+import org.http4k.lens.Header
 import org.http4k.lens.Query
+import org.http4k.lens.string
 
 class ApiKeySecurityRendererTest : SecurityRendererContract {
     override val security = ApiKeySecurity(Query.required("the_api_key"), { true })
+    override val renderer = OpenApi3SecurityRenderer
+}
+
+class ApiKeySecurityWithConsumerRendererTest : SecurityRendererContract {
+    override val security = ApiKeySecurity(Query.required("the_api_key"), Header.string().required("consumer-name"), { "" })
     override val renderer = OpenApi3SecurityRenderer
 }
 

@@ -12,9 +12,9 @@ class HtmxHttp4kWebDriver(private val driver: Http4kWebDriver) : WebDriver {
             else -> throw RuntimeException("could not convert $element to HtmxJsoupWebElement")
         }
 
-    override fun findElements(by: By): List<WebElement>? = driver.findElements(by)?.map { toHtmx(it) }
+    override fun findElements(by: By): List<WebElement> = driver.findElements(by).map { toHtmx(it) }
 
-    override fun findElement(by: By): WebElement? = driver.findElement(by)?.let { toHtmx(it) }
+    override fun findElement(by: By): WebElement = toHtmx(driver.findElement(by))
 
     override fun get(url: String) = driver.get(url)
 
@@ -30,7 +30,7 @@ class HtmxHttp4kWebDriver(private val driver: Http4kWebDriver) : WebDriver {
 
     override fun getWindowHandles(): Set<String> = driver.getWindowHandles()
 
-    override fun getWindowHandle(): String? = driver.getWindowHandle()
+    override fun getWindowHandle(): String = driver.getWindowHandle()
 
     override fun switchTo(): WebDriver.TargetLocator = driver.switchTo()
 

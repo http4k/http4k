@@ -24,6 +24,8 @@ class InsecureCookieBasedOAuthPersistence(
     private val csrfName = "${cookieNamePrefix}Csrf"
     private val nonceName = "${cookieNamePrefix}Nonce"
     private val originalUriName = "${cookieNamePrefix}OriginalUri"
+    private val pkceChallengeCookieName = "${cookieNamePrefix}PkceChallenge"
+    private val pkceVerifierCookieName = "${cookieNamePrefix}PkceVerifier"
     private val accessTokenCookieName = "${cookieNamePrefix}AccessToken"
 
     override fun retrieveCsrf(request: Request) =
@@ -37,6 +39,13 @@ class InsecureCookieBasedOAuthPersistence(
 
     override fun retrieveOriginalUri(request: Request): Uri? =
         request.cookie(originalUriName)?.value?.let { Uri.of(it) }
+
+    override fun retrievePkce(request: Request): PkceChallengeAndVerifier? {
+        return PkceChallengeAndVerifier(
+            challenge = request.cookie(pkceChallengeCookieName)?.value ?: return null,
+            verifier = request.cookie(pkceVerifierCookieName)?.value ?: return null
+        )
+    }
 
     override fun assignCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken) =
         redirect.cookie(expiring(csrfName, csrf.value))
@@ -52,6 +61,10 @@ class InsecureCookieBasedOAuthPersistence(
 
     override fun assignOriginalUri(redirect: Response, originalUri: Uri): Response =
         redirect.cookie(expiring(originalUriName, originalUri.toString()))
+
+    override fun assignPkce(redirect: Response, pkce: PkceChallengeAndVerifier): Response =
+        redirect.cookie(expiring(pkceChallengeCookieName, pkce.challenge))
+            .cookie(expiring(pkceVerifierCookieName, pkce.verifier))
 
     override fun authFailureResponse(reason: OAuthCallbackError) =
         Response(FORBIDDEN)

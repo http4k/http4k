@@ -1,7 +1,7 @@
 package org.http4k.serverless.openwhisk
 
 import org.http4k.client.ApacheClient
-import org.http4k.cloudnative.env.Authority
+import org.http4k.config.Authority
 import org.http4k.core.Body
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler

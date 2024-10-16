@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.matches
+import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import org.http4k.chaos.ChaosBehaviours.KillProcess
 import org.http4k.chaos.ChaosBehaviours.Latency
@@ -16,6 +17,7 @@ import org.http4k.chaos.ChaosBehaviours.Variable
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -116,6 +118,25 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
         assertBehaviour("""{"type":"status","status":404}""",
             description,
             hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
+    }
+}
+
+class ReturnResponseTest : ChaosBehaviourContract() {
+    private val description = """ReturnResponse (HTTP/1.1 500 Internal Server Error"""
+
+    @Test
+    fun `should return response `() {
+        val expected = Response(INTERNAL_SERVER_ERROR)
+        val returnResponse = ChaosBehaviours.ReturnResponse(expected)
+        assertThat(returnResponse.toString(), startsWith(description))
+
+        val injectedResponse = returnResponse.then { response }(request)
+        assertEquals(expected, injectedResponse)
+    }
+
+    @Test
+    @Disabled("not supported remotely")
+    override fun `deserialises from JSON`() {
     }
 }
 

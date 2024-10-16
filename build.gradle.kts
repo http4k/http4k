@@ -1,6 +1,9 @@
 import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.time.Duration
@@ -16,6 +19,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
     id("com.google.devtools.ksp")
     kotlin("plugin.serialization")
+    id("org.jetbrains.dokka")
 }
 
 kotlin {
@@ -34,6 +38,7 @@ buildscript {
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
         classpath("gradle.plugin.com.github.johnrengelman:shadow:_")
+        classpath("org.jetbrains.dokka:dokka-base:_")
     }
 }
 
@@ -51,7 +56,7 @@ allprojects {
     group = "org.http4k"
 
     jacoco {
-        toolVersion = "0.8.9"
+        toolVersion = "0.8.12"
     }
 
     tasks {
@@ -99,6 +104,7 @@ subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "idea")
 
+
     val sourcesJar by tasks.creating(Jar::class) {
         archiveClassifier.set("sources")
         from(project.the<SourceSetContainer>()["main"].allSource)
@@ -125,6 +131,10 @@ subprojects {
     }
 
     if (hasAnArtifact(project)) {
+        if (!project.name.contains("serverless")) {
+            apply(plugin = "org.jetbrains.dokka")
+        }
+
         val enableSigning = project.findProperty("sign") == "true"
 
         apply(plugin = "maven-publish") // required to upload to sonatype
@@ -229,6 +239,8 @@ dependencies {
         exclude(group = "software.amazon.awssdk", module = "apache-client")
     }
 
+    testImplementation("com.azure:azure-search-documents:_")
+
     testImplementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:_")
     testImplementation("com.expediagroup:graphql-kotlin-schema-generator:_")
     testImplementation("com.amazonaws:aws-lambda-java-events:_")
@@ -282,5 +294,15 @@ nexusPublishing {
     transitionCheckOptions {
         maxRetries.set(150)
         delayBetween.set(Duration.ofSeconds(5))
+    }
+}
+
+tasks.withType<DokkaMultiModuleTask>().configureEach {
+    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+        moduleVersion.set(version.toString())
+        customAssets = listOf(file("src/docs/img/favicon-mono.png"))
+        footerMessage = "(c) 2024 http4k"
+        homepageLink = "https://http4k.org"
+        customStyleSheets = listOf(file("src/docs/css/dokka.css"))
     }
 }

@@ -1,0 +1,30 @@
+{
+  "node": {
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.SealedChild",
+    "example": null,
+    "format": null
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.SealedChild",
+      "second": {
+        "properties": {
+          "string": {
+            "example": "child",
+            "format": null,
+            "type": "string",
+            "nullable": false
+          }
+        },
+        "example": {
+          "string": "child"
+        },
+        "format": null,
+        "type": "object",
+        "required": [
+          "string"
+        ]
+      }
+    }
+  ]
+}

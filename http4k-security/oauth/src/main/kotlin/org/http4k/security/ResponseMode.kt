@@ -7,7 +7,7 @@ enum class ResponseMode(val queryParameterValue: String) {
 
     companion object {
         fun fromQueryParameterValue(value: String): ResponseMode =
-            values().find { it.queryParameterValue == value }
+            entries.find { it.queryParameterValue == value }
                 ?: throw IllegalArgumentException("Invalid response mode: $value")
     }
 }

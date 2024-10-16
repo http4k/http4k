@@ -14,7 +14,7 @@ class InvocationLambdaAwsHttpAdapterTest {
     fun `converts into http4k request`() {
         val request = "helloworld"
         assertThat(
-            InvocationLambdaAwsHttpAdapter(request.byteInputStream(), LambdaContextMock()),
+            InvocationLambdaAwsHttpAdapter(request.byteInputStream(), LambdaContextMock()).getOrThrow(),
             equalTo(Request(POST, "/2015-03-31/functions/LambdaContextMock/invocations")
                 .header("X-Amz-Invocation-Type", "RequestResponse")
                 .header("X-Amz-Log-Type", "Tail")

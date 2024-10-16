@@ -2,12 +2,12 @@ package org.http4k.webdriver
 
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.urlEncoded
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.parser.Parser
-import java.net.URLEncoder
 
 data class HtmxCommand(
     val method: Method,
@@ -17,12 +17,12 @@ data class HtmxCommand(
 ) {
     fun performOn(element: HtmxJsoupWebElement) {
         // TODO: re-use headers from http4k.http4k-htmx instead of repeating?
-        val headers = listOf(
+        val headers = listOfNotNull(
             "hx-request" to "true",
             element.getAttribute("id")?.let { "hx-trigger" to it },
             element.getAttribute("name")?.let { "hx-trigger-name" to it },
             if (target.hasAttr("id")) "hx-target" to target.attr("id") else null,
-        ).filterNotNull()
+        )
 
         val response = element
             .handler(
@@ -114,9 +114,7 @@ data class HtmxCommand(
 
         val all = (inputs + textAreas + selects + buttons)
 
-        return all.joinToString("&") {
-            "${URLEncoder.encode(it.first, "UTF-8")}=${URLEncoder.encode(it.second, "UTF-8")}"
-        }
+        return all.joinToString("&") { "${it.first.urlEncoded()}=${it.second.urlEncoded()}" }
     }
 
     companion object {

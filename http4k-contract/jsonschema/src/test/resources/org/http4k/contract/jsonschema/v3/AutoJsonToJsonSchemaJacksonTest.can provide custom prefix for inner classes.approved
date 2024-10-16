@@ -1,0 +1,71 @@
+{
+  "node": {
+    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses",
+    "example": null,
+    "format": null
+  },
+  "definitions": [
+    {
+      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses",
+      "second": {
+        "properties": {
+          "inner": {
+            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner",
+            "example": null,
+            "format": null
+          },
+          "enum": {
+            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum",
+            "example": null,
+            "format": null
+          }
+        },
+        "example": {
+          "inner": {
+            "name": "name"
+          },
+          "enum": "bar"
+        },
+        "format": null,
+        "type": "object",
+        "required": [
+          "enum",
+          "inner"
+        ]
+      }
+    },
+    {
+      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner",
+      "second": {
+        "properties": {
+          "name": {
+            "example": "name",
+            "format": null,
+            "type": "string",
+            "nullable": false
+          }
+        },
+        "example": {
+          "name": "name"
+        },
+        "format": null,
+        "type": "object",
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum",
+      "second": {
+        "example": "bar",
+        "enum": [
+          "bar"
+        ],
+        "format": null,
+        "type": "string",
+        "nullable": false
+      }
+    }
+  ]
+}

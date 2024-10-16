@@ -14,19 +14,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.2.0
         with:
           # required by release-tag.sh to correctly identify files changed in the last commit
           fetch-depth: 2
           # required by release-tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
-      - uses: actions/setup-java@v4.0.0
+      - uses: actions/setup-java@v4.4.0
         with:
           distribution: temurin
           java-version: 21
           cache: gradle
       - name: Cache Gradle packages
-        uses: actions/cache@v4.0.0
+        uses: actions/cache@v4.0.2
         with:
           path: |
             ~/.gradle/caches
@@ -35,7 +35,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build
-        timeout-minutes: 15
+        timeout-minutes: 25
         run: ./build-ci.sh
       - name: Cleanup Gradle Cache
           # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
@@ -44,11 +44,13 @@ jobs:
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -f ~/.gradle/caches/modules-2/gc.properties
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v4.1.0
+        uses: mikepenz/action-junit-report@v4.3.1
         if: always()
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          check_annotations: true
+          update_check: true
       - name: Release (if required)
         run: |
           git config user.name github-actions

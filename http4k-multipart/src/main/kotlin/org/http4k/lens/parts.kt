@@ -10,7 +10,15 @@ import java.io.InputStream
 import kotlin.Int.Companion.MAX_VALUE
 import kotlin.random.Random.Default.nextInt
 
-data class MultipartFormField(val value: String, val headers: Headers = emptyList()) {
+@ExposedCopyVisibility
+data class MultipartFormField internal constructor(
+    val value: String,
+    val headers: Headers = emptyList(),
+    val closeable: Closeable
+): Closeable by closeable {
+
+    constructor(value: String, headers: Headers = emptyList()): this(value, headers, {})
+
     companion object : BiDiLensSpec<MultipartForm, MultipartFormField>("form",
         StringParam,
         LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
@@ -20,8 +28,24 @@ data class MultipartFormField(val value: String, val headers: Headers = emptyLis
     }
 }
 
-data class MultipartFormFile(val filename: String, val contentType: ContentType, val content: InputStream) : Closeable {
-    override fun close() { content.close() }
+@ExposedCopyVisibility
+data class MultipartFormFile internal constructor(
+    val filename: String,
+    val contentType: ContentType,
+    val content: InputStream,
+    val closeable: Closeable
+) : Closeable {
+
+    constructor(filename: String, contentType: ContentType, content: InputStream) : this(
+        filename,
+        contentType,
+        content,
+        Closeable { })
+
+    override fun close() {
+        content.close()
+        closeable.close()
+    }
 
     private data class Realised(val filename: String, val contentType: ContentType, val content: String)
 

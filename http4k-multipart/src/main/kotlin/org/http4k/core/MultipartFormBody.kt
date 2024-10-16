@@ -19,19 +19,34 @@ sealed class MultipartEntity : Closeable {
     abstract val name: String
     internal abstract fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder
 
-    data class Field(override val name: String, val value: String, val headers: Headers = emptyList()) :
-        MultipartEntity() {
-        override fun close() = Unit
+    data class Field(override val name: String, val value: String, val headers: Headers = emptyList(), val closeable: Closeable = Closeable { }) :
+        MultipartEntity(), Closeable by closeable {
 
         override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value, headers)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Field
+
+            if (name != other.name) return false
+            if (value != other.value) return false
+            if (headers != other.headers) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = name.hashCode()
+            result = 31 * result + value.hashCode()
+            result = 31 * result + headers.hashCode()
+            return result
+        }
     }
 
     data class File(override val name: String, val file: MultipartFormFile, val headers: Headers = emptyList()) :
-        MultipartEntity() {
-
-        override fun close() {
-            file.close()
-        }
+        MultipartEntity(), Closeable by file {
 
         override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder =
             builder.file(name, file.filename, file.contentType.value, file.content, headers)
@@ -57,6 +72,7 @@ fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
  * Represents a Multi-part that is backed by a stream, which should be closed after handling the content. The gotchas
  * which apply to StreamBody also apply here..
  **/
+@ExposedCopyVisibility
 data class MultipartFormBody private constructor(
     internal val formParts: List<MultipartEntity>,
     val boundary: String = UUID.randomUUID().toString(),
@@ -138,13 +154,14 @@ data class MultipartFormBody private constructor(
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8)
 
             val parts = MultipartFormParser(UTF_8, diskThreshold, diskLocation).formParts(form).map {
-                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList())
+                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList(), it)
                 else MultipartEntity.File(
                     it.fieldName!!,
                     MultipartFormFile(
                         it.fileName!!,
                         ContentType(it.contentType!!, TEXT_HTML.directives),
-                        it.newInputStream
+                        it.newInputStream,
+                        it
                     )
                 )
             }

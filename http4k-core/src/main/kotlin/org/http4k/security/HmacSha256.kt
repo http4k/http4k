@@ -13,6 +13,6 @@ object HmacSha256 {
 
     fun hmacSHA256(key: ByteArray, data: String): ByteArray = Mac.getInstance("HmacSHA256").run {
         init(SecretKeySpec(key, "HmacSHA256"))
-        doFinal(data.toByteArray(charset("UTF8")))
+        doFinal(data.toByteArray(Charsets.UTF_8))
     }
 }

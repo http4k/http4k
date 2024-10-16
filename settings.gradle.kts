@@ -30,6 +30,7 @@ fun String.includeSubmodule(name: String) {
 
 include("http4k-core")
 include("http4k-aws")
+include("http4k-azure")
 include("http4k-bom")
 
 "http4k-client".apply {
@@ -46,6 +47,7 @@ include("http4k-bom")
 
 include("http4k-cloudevents")
 include("http4k-cloudnative")
+include("http4k-config")
 
 "http4k-contract".apply {
     include(":$this")

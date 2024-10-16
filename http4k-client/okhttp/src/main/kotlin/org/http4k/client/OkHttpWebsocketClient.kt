@@ -7,14 +7,12 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import org.http4k.client.PreCannedOkHttpClients.defaultOkHttpClient
-import org.http4k.core.Body
 import org.http4k.core.Headers
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.websocket.PushPullAdaptingWebSocket
-import org.http4k.websocket.Websocket
+import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
@@ -27,21 +25,32 @@ import java.util.concurrent.LinkedBlockingQueue
 
 object OkHttpWebsocketClient {
 
-    fun blocking(
-        uri: Uri,
-        headers: Headers = emptyList(),
-        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
+    operator fun invoke(
+        timeout: Duration =  Duration.of(5, ChronoUnit.SECONDS),
         client: OkHttpClient = defaultOkHttpClient()
-    ): WsClient = OkHttpBlockingWebsocket(uri, headers, timeout, client).awaitConnected()
+    ) = object: WebsocketFactory {
+        override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer) =
+            OkHttpNonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
 
+        override fun blocking(uri: Uri, headers: Headers) =
+            OkHttpBlockingWebsocket(uri, headers, timeout, client).awaitConnected()
+    }
+
+    // backwards compatibility
     fun nonBlocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ZERO,
         client: OkHttpClient = defaultOkHttpClient(),
-        onError: (Throwable) -> Unit = {},
-        onConnect: WsConsumer = {}
-    ): Websocket = OkHttpNonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
+        onError: (Throwable) -> Unit,
+        onConnect: WsConsumer
+    ) = OkHttpWebsocketClient(timeout, client).nonBlocking(uri, headers, onError, onConnect)
+
+    fun blocking(
+        uri: Uri,
+        headers: Headers = emptyList(),
+        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS)
+    ) = OkHttpWebsocketClient(timeout).blocking(uri, headers)
 }
 
 private class OkHttpBlockingWebsocket(
@@ -93,9 +102,9 @@ private class OkHttpNonBlockingWebsocket(
         .newWebSocket(req.asOkHttp(), Listener())
 
     override fun send(message: WsMessage) {
-        val messageSent = when (message.body) {
-            is StreamBody -> ws.send(message.body.payload.toByteString())
-            else -> ws.send(message.body.toString())
+        val messageSent = when (message.mode) {
+            WsMessage.Mode.Binary -> ws.send(message.body.payload.toByteString())
+            WsMessage.Mode.Text -> ws.send(message.body.toString())
         }
         check(messageSent) {
             "Connection to ${req.uri} is closed."
@@ -128,7 +137,7 @@ private class OkHttpNonBlockingWebsocket(
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            triggerMessage(WsMessage(Body(bytes.toByteArray().inputStream())))
+            triggerMessage(WsMessage(bytes.toByteArray(), WsMessage.Mode.Binary))
         }
     }
 }

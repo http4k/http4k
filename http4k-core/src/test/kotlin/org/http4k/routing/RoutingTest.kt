@@ -95,7 +95,7 @@ class RoutingTest {
             "/a/{route}" bind { _: Request -> Response(OK).body("matched") }
         )
 
-        Method.values().forEach {
+        Method.entries.forEach {
             assertThat(routes(Request(it, "/a/something")).bodyString(), equalTo("matched"))
         }
     }

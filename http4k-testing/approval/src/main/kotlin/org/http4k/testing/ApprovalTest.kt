@@ -13,6 +13,7 @@ import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.HttpMessage
 import org.http4k.format.JacksonYaml
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.testing.ApprovalContent.Companion.HttpBinaryBody
 import org.http4k.testing.ApprovalContent.Companion.HttpTextBody
 import org.http4k.testing.TestNamer.Companion.ClassAndMethod
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -64,22 +65,26 @@ abstract class ContentTypeAwareApprovalTest(
     private val testNamer: TestNamer = ClassAndMethod,
     private val approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
 ) : BaseApprovalTest {
-    override fun approverFor(context: ExtensionContext) = object : Approver {
-        override fun <T : HttpMessage> assertApproved(httpMessage: T) {
-            delegate.assertApproved(httpMessage)
-            assertEquals(contentType, CONTENT_TYPE(httpMessage))
-        }
-
-        private val delegate: Approver = NamedResourceApprover(
+    override fun approverFor(context: ExtensionContext) = checkingContentType(
+        NamedResourceApprover(
             testNamer.nameFor(context.requiredTestClass, context.requiredTestMethod),
             HttpTextBody(::format),
             approvalSource
-        )
-
-        override fun withNameSuffix(suffix: String): Approver = delegate.withNameSuffix(suffix)
-    }
+        ),
+        contentType
+    )
 
     abstract fun format(input: String): String
+}
+
+fun checkingContentType(approver: Approver, contentType: ContentType): Approver = object : Approver {
+    override fun <T : HttpMessage> assertApproved(httpMessage: T) {
+        approver.assertApproved(httpMessage)
+        assertEquals(contentType, CONTENT_TYPE(httpMessage))
+    }
+
+    override fun withNameSuffix(suffix: String) =
+        checkingContentType(approver.withNameSuffix(suffix), contentType)
 }
 
 /**
@@ -151,5 +156,19 @@ class YamlApprovalTest(
         input
     } catch (e: Exception) {
         throw AssertionFailedError("Invalid YAML generated", "<valid YAML>", input, e)
+    }
+}
+
+/**
+ * Approval JUnit5 extension configured to compare binary messages
+ */
+open class BinaryApprovalTest(private val contentType: ContentType? = null) : BaseApprovalTest {
+    override fun approverFor(context: ExtensionContext): Approver {
+        val approver = NamedResourceApprover(
+            ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
+            HttpBinaryBody(),
+            FileSystemApprovalSource(File("src/test/resources"))
+        )
+        return contentType?.let { checkingContentType(approver, it) } ?: approver
     }
 }

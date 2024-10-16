@@ -22,7 +22,7 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
                 Thread.currentThread()
                     .getContextClassLoader().getResourceAsStream("$name.${getExtension()}")
                     ?: throw NoSuchFileException(name),
-                "UTF-8"
+                Charsets.UTF_8
             )
 
             override fun getBase() = "."

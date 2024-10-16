@@ -67,6 +67,6 @@ object DeployHttpApiGateway {
 }
 
 fun main() {
-    ApiIntegrationVersion.values().forEach(DeployHttpApiGateway::deploy)
+    ApiIntegrationVersion.entries.forEach(DeployHttpApiGateway::deploy)
 }
 

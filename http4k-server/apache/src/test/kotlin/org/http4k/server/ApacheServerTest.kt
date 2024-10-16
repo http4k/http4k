@@ -7,7 +7,7 @@ import org.http4k.core.Method
 
 class ApacheServerTest : ServerContract({ port -> ApacheServer(port, canonicalHostname = "localhost") },
     ApacheClient(),
-    Method.values().filter { it != Method.PURGE }.toTypedArray()) {
+    Method.entries.filter { it != Method.PURGE }.toTypedArray()) {
 
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 }

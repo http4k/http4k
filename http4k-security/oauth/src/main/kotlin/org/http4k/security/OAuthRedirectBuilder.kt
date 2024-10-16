@@ -15,6 +15,11 @@ val defaultUriBuilder: RedirectionUriBuilder = { uri: Uri, authRequest: AuthRequ
         .query("state", state.value)
         .addQueryIfNotNull("nonce", nonce?.value)
         .addQueryIfNotNull("response_mode", authRequest.responseMode?.queryParameterValue)
+        .let {
+            if (authRequest.codeChallenge == null) it
+            else it.query("code_challenge", authRequest.codeChallenge)
+                .query("code_challenge_method", "S256")
+        }
 }
 
 private fun Uri.addQueryIfNotNull(name: String, value: String?) = when {
@@ -22,7 +27,7 @@ private fun Uri.addQueryIfNotNull(name: String, value: String?) = when {
     else -> this
 }
 
-fun uriBuilderWithRequestJwt(requestJwts: RequestJwts) =
+fun uriBuilderWithRequestJwt(requestJwts: RequestJwts): RedirectionUriBuilder =
     { uri: Uri, authRequest: AuthRequest, state: State, nonce: Nonce? ->
         defaultUriBuilder(uri, authRequest, state, nonce)
             .query("request", requestJwts.create(authRequest, state, nonce).value)

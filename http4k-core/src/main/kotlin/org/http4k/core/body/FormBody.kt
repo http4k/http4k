@@ -23,4 +23,6 @@ fun Form.toBody(): Body = Body(toUrlFormEncoded())
 
 fun Request.form(): Form = bodyString().toParameters()
 
-fun Request.form(name: String, value: String): Request = body(form().plus(name to value).toBody())
+fun Request.form(name: String, value: String?): Request = body(form().plus(name to value).toBody())
+
+fun Request.form(vararg formData: Pair<String, String?>): Request = body(form().plus(formData).toBody())

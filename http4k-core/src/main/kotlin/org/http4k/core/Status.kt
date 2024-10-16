@@ -49,9 +49,15 @@ class Status internal constructor(val code: Int, val description: String, privat
         @JvmField val REQUESTED_RANGE_NOT_SATISFIABLE = Status(416, "Requested Range Not Satisfiable")
         @JvmField val EXPECTATION_FAILED = Status(417, "Expectation Failed")
         @JvmField val I_M_A_TEAPOT = Status(418, "I'm a teapot") //RFC2324
+        @JvmField val MISDIRECTED_REQUEST = Status(421, "Misdirected Request")
         @JvmField val UNPROCESSABLE_ENTITY = Status(422, "Unprocessable Entity")
+        @JvmField val LOCKED = Status(423, "Locked")
+        @JvmField val FAILED_DEPENDENCY = Status(424, "Failed Dependency")
+        @JvmField val TOO_EARLY = Status(425, "Too Early")
         @JvmField val UPGRADE_REQUIRED = Status(426, "Upgrade Required")
+        @JvmField val PRECONDITION_REQUIRED = Status(428, "Precondition Required")
         @JvmField val TOO_MANY_REQUESTS = Status(429, "Too many requests")
+        @JvmField val REQUEST_HEADER_FIELDS_TOO_LARGE = Status(431, "Request Header Fields Too Large")
         @JvmField val UNAVAILABLE_FOR_LEGAL_REASONS = Status(451, "Unavailable For Legal Reasons")
 
         private val SERVER_ERROR = 500..599
@@ -104,9 +110,15 @@ class Status internal constructor(val code: Int, val description: String, privat
                 REQUESTED_RANGE_NOT_SATISFIABLE,
                 EXPECTATION_FAILED,
                 I_M_A_TEAPOT,
+                MISDIRECTED_REQUEST,
                 UNPROCESSABLE_ENTITY,
+                LOCKED,
+                FAILED_DEPENDENCY,
+                TOO_EARLY,
                 UPGRADE_REQUIRED,
+                PRECONDITION_REQUIRED,
                 TOO_MANY_REQUESTS,
+                REQUEST_HEADER_FIELDS_TOO_LARGE,
                 UNAVAILABLE_FOR_LEGAL_REASONS,
                 INTERNAL_SERVER_ERROR,
                 NOT_IMPLEMENTED,

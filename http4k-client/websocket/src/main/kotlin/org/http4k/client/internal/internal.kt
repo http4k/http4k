@@ -1,8 +1,6 @@
 package org.http4k.client.internal
 
-import org.http4k.core.Body
 import org.http4k.core.Headers
-import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsClient
@@ -18,17 +16,25 @@ import java.time.Duration
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicReference
 
-class AdaptingWebSocket(private val client: WebSocketClient) : PushPullAdaptingWebSocket() {
-    override fun send(message: WsMessage) =
-        when (message.body) {
-            is StreamBody -> client.send(message.body.payload)
-            else -> client.send(message.bodyString())
+internal class AdaptingWebSocket(
+    private val client: WebSocketClient,
+    private val autoReconnection: Boolean
+) : PushPullAdaptingWebSocket() {
+    override fun send(message: WsMessage) {
+        if (autoReconnection && (client.isClosing || client.isClosed)) {
+            client.closeBlocking() // ensure it's closed
+            client.reconnectBlocking()
         }
+        when (message.mode) {
+            WsMessage.Mode.Binary -> client.send(message.body.payload)
+            WsMessage.Mode.Text -> client.send(message.bodyString())
+        }
+    }
 
     override fun close(status: WsStatus) = client.close(status.code, status.description)
 }
 
-class BlockingQueueClient(
+internal class BlockingQueueClient(
     uri: Uri,
     headers: Headers,
     timeout: Duration,
@@ -46,39 +52,36 @@ class BlockingQueueClient(
     }
 
     override fun onMessage(bytes: ByteBuffer) {
-        queue += { WsMessage(Body(bytes.array().inputStream())) }
+        queue += { WsMessage(bytes) }
     }
 
     override fun onError(e: Exception): Unit = throw e
 }
 
-class NonBlockingClient(
+internal fun nonBlockingClient(
     uri: Uri,
     headers: Headers,
     timeout: Duration,
-    private val onConnect: WsConsumer,
+    onConnect: WsConsumer,
     draft: Draft,
-    private val socket: AtomicReference<PushPullAdaptingWebSocket>
-) : WebSocketClient(URI.create(uri.toString()), draft, headers.combineToMap(), timeout.toMillis().toInt()) {
-    override fun onOpen(handshakedata: ServerHandshake?) {
-        onConnect(socket.get())
-    }
+    socket: AtomicReference<PushPullAdaptingWebSocket>,
+) = object: WebSocketClient(URI.create(uri.toString()), draft, headers.combineToMap(), timeout.toMillis().toInt()) {
+    override fun onOpen(handshakedata: ServerHandshake?) = onConnect(socket.get())
 
     override fun onClose(code: Int, reason: String, remote: Boolean) = socket.get().triggerClose(WsStatus(code, reason))
 
     override fun onMessage(message: String) = socket.get().triggerMessage(WsMessage(message))
 
-    override fun onMessage(bytes: ByteBuffer) =
-        socket.get().triggerMessage(WsMessage(Body(bytes.array().inputStream())))
+    override fun onMessage(bytes: ByteBuffer) = socket.get().triggerMessage(WsMessage(bytes))
 
     override fun onError(e: Exception) = socket.get().triggerError(e)
 }
 
-class BlockingWsClient(
-    private val queue: LinkedBlockingQueue<() -> WsMessage?>,
-    private val client: BlockingQueueClient,
-    private val autoReconnection: Boolean
-) : WsClient {
+internal fun blockingWsClient(
+    queue: LinkedBlockingQueue<() -> WsMessage?>,
+    client: BlockingQueueClient,
+    autoReconnection: Boolean
+) = object:  WsClient {
     override fun received() = generateSequence { queue.take()() }
 
     override fun close(status: WsStatus) = client.close(status.code, status.description)
@@ -89,9 +92,9 @@ class BlockingWsClient(
             client.reconnectBlocking()
         }
 
-        return when (message.body) {
-            is StreamBody -> client.send(message.body.payload)
-            else -> client.send(message.bodyString())
+        return when (message.mode) {
+            WsMessage.Mode.Binary -> client.send(message.body.payload)
+            WsMessage.Mode.Text -> client.send(message.bodyString())
         }
     }
 }

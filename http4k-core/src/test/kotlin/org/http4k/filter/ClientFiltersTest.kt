@@ -9,6 +9,7 @@ import org.http4k.core.Body
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.ContentType.Companion.TEXT_XML
 import org.http4k.core.Credentials
+import org.http4k.core.MemoryBody
 import org.http4k.core.MemoryRequest
 import org.http4k.core.MemoryResponse
 import org.http4k.core.Method.GET
@@ -21,12 +22,14 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.MOVED_PERMANENTLY
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
+import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.parse
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
+import org.http4k.filter.GzipCompressionMode.Mixed
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
@@ -372,6 +375,38 @@ class ClientFiltersTest {
             }
 
             assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
+        }
+
+        @Test
+        fun `gzip stream request in mixed should return gzip stream body`() {
+            val handler = ClientFilters.GZip(Mixed()).then {
+                assertThat(
+                    it,
+                    hasHeader(
+                        "content-encoding",
+                        "gzip"
+                    ).and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body)))
+                )
+                Response(OK).header("content-encoding", "gzip").body(Body("world").gzippedStream().body)
+            }
+
+            assertThat(handler(Request(GET, "/").body("hello".byteInputStream())), hasStatus(OK))
+        }
+
+        @Test
+        fun `gzip memory request in mixed should return gzip memory body`() {
+            val handler = ClientFilters.GZip(Mixed()).then {
+                assertThat(
+                    it,
+                    hasHeader(
+                        "content-encoding",
+                        "gzip"
+                    ).and(hasBody(equalTo<Body>(Body("hello").gzipped().body)))
+                )
+                Response(OK).header("content-encoding", "gzip").body(Body("world").gzipped().body)
+            }
+
+            assertThat(handler(Request(GET, "/").body("hello")), hasStatus(OK))
         }
 
         @Test

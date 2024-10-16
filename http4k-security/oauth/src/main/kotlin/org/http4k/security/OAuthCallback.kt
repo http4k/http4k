@@ -29,7 +29,8 @@ class OAuthCallback(
         .flatMap { parameters -> validateCsrf(parameters, request, oAuthPersistence.retrieveCsrf(request)) }
         .flatMap { parameters -> validateNonce(parameters, oAuthPersistence.retrieveNonce(request)) }
         .flatMap { parameters -> consumeIdToken(parameters) }
-        .flatMap { parameters -> accessTokenFetcher.fetch(parameters.code.value) }
+        .map { parameters -> parameters to oAuthPersistence.retrievePkce(request) }
+        .flatMap { (parameters, pkce) -> accessTokenFetcher.fetch(parameters.code.value, pkce?.verifier) }
         .flatMap { tokenDetails -> consumeIdToken(tokenDetails) }
         .map { tokenDetails ->
             oAuthPersistence.assignToken(
@@ -38,18 +39,22 @@ class OAuthCallback(
                 tokenDetails.accessToken,
                 tokenDetails.idToken
             )
-        }.mapFailure { oAuthPersistence.authFailureResponse(it) }.get()
+        }
+        .mapFailure { oAuthPersistence.authFailureResponse(it) }
+        .get()
 
-    private fun Request.callbackParameters() = authorizationCode().map {
-        CallbackParameters(
-            code = it,
-            state = queryOrFragmentParameter("state")?.let(::CrossSiteRequestForgeryToken),
-            idToken = queryOrFragmentParameter("id_token")?.let(::IdToken)
-        )
-    }
+    private fun Request.callbackParameters() =
+        authorizationCode().map {
+            CallbackParameters(
+                code = it,
+                state = queryOrFragmentParameter("state")?.let(::CrossSiteRequestForgeryToken),
+                idToken = queryOrFragmentParameter("id_token")?.let(::IdToken)
+            )
+        }
 
-    private fun Request.authorizationCode() = queryOrFragmentParameter("code")?.let(::AuthorizationCode)
-        ?.let(::Success) ?: Failure(AuthorizationCodeMissing(uri))
+    private fun Request.authorizationCode() =
+        queryOrFragmentParameter("code")?.let(::AuthorizationCode)?.let(::Success)
+            ?: Failure(AuthorizationCodeMissing(uri))
 
     private fun validateCsrf(
         parameters: CallbackParameters,
@@ -76,8 +81,8 @@ class OAuthCallback(
         tokenDetails.idToken?.let(idTokenConsumer::consumeFromAccessTokenResponse)?.map { tokenDetails }
             ?: Success(tokenDetails)
 
-    private fun redirectionResponse(request: Request) = Response(TEMPORARY_REDIRECT)
-        .header("Location", oAuthPersistence.retrieveOriginalUri(request)?.toString() ?: "/")
+    private fun redirectionResponse(request: Request) =
+        Response(TEMPORARY_REDIRECT).header("Location", oAuthPersistence.retrieveOriginalUri(request)?.toString() ?: "/")
 
     private fun Request.queryOrFragmentParameter(name: String) = query(name) ?: fragmentParameter(name)
 

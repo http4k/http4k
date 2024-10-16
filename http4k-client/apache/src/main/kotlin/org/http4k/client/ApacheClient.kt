@@ -11,19 +11,12 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
 import org.apache.hc.client5.http.config.RequestConfig
 import org.apache.hc.client5.http.cookie.StandardCookieSpec.IGNORE
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory.INSTANCE
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
 import org.apache.hc.core5.http.ClassicHttpResponse
 import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.HttpResponse
-import org.apache.hc.core5.http.config.RegistryBuilder
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity
 import org.apache.hc.core5.http.io.entity.InputStreamEntity
-import org.apache.hc.core5.ssl.SSLContextBuilder
 import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
@@ -60,6 +53,7 @@ object ApacheClient {
                 Memory -> client.execute(request.toApacheRequest(requestBodyMode)) {
                     it.toHttp4kResponse(responseBodyMode)
                 }
+
                 Stream -> client.executeOpen(null, request.toApacheRequest(requestBodyMode), null)
                     .toHttp4kResponse(responseBodyMode)
             }
@@ -88,7 +82,8 @@ object ApacheClient {
             DELETE -> HttpDelete(uri)
             else -> ApacheRequest(requestBodyMode, request)
         }
-        request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
+        request.headers.filter { !it.first.equals("content-length", true) }
+            .map { apacheRequest.addHeader(it.first, it.second) }
         return apacheRequest
     }
 
@@ -96,15 +91,22 @@ object ApacheClient {
 
     private fun Array<Header>.toTarget(): Headers = map { it.name to it.value }
 
-    private fun ClassicHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(toTargetStatus()).headers(headers.toTarget())) {
-        entity?.let { body(responseBodyMode(it.content)) } ?: this
-    }
+    private fun ClassicHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) =
+        with(Response(toTargetStatus()).headers(headers.toTarget())) {
+            entity?.let { body(responseBodyMode(it.content)) } ?: this
+        }
 }
 
-private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpUriRequestBase(request.method.toString(), URI(request.uri.toString())) {
+private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) :
+    HttpUriRequestBase(request.method.toString(), URI(request.uri.toString())) {
     init {
         entity = when (requestBodyMode) {
-            Stream -> InputStreamEntity(request.body.stream, request.body.length ?: request.header("content-length")?.toLong() ?: -1, null)
+            Stream -> InputStreamEntity(
+                request.body.stream,
+                request.body.length ?: request.header("content-length")?.toLong() ?: -1,
+                null
+            )
+
             Memory -> ByteArrayEntity(request.body.payload.array(), null)
         }
     }
@@ -113,30 +115,14 @@ private class ApacheRequest(requestBodyMode: BodyMode, private val request: Requ
 }
 
 object PreCannedApacheHttpClients {
-
     /**
      * Standard non-redirecting, no Cookies HTTP client
      */
     fun defaultApacheHttpClient(): CloseableHttpClient = HttpClients.custom()
-        .setDefaultRequestConfig(RequestConfig.custom()
-            .setRedirectsEnabled(false)
-            .setCookieSpec(IGNORE)
-            .build()).build()
-
-    /**
-     * Do not use this in production! This is useful for testing locally and debugging HTTPS traffic
-     */
-    fun insecureApacheHttpClient(): CloseableHttpClient = SSLContextBuilder()
-        .loadTrustMaterial(null) { _, _ -> true }
-        .build().run {
-            HttpClientBuilder.create()
-                .setConnectionManager(
-                    PoolingHttpClientConnectionManager(
-                        RegistryBuilder.create<ConnectionSocketFactory>()
-                            .register("http", INSTANCE)
-                            .register("https", SSLConnectionSocketFactory(this) { _, _ -> true })
-                            .build()
-                    ))
+        .setDefaultRequestConfig(
+            RequestConfig.custom()
+                .setRedirectsEnabled(false)
+                .setCookieSpec(IGNORE)
                 .build()
-        }
+        ).build()
 }

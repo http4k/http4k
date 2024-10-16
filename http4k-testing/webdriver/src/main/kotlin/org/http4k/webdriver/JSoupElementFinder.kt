@@ -13,7 +13,7 @@ class JSoupElementFinder(
     internal fun findElementsByCssQuery(query: String) =
         element.select(query).map { JSoupWebElement(navigate, getURL, it) }
 
-    override fun findElement(by: By): WebElement? = when (by) {
+    override fun findElement(by: By): WebElement = when (by) {
         is By.ById -> cssSelector("#${by.remoteParameters.value()}").findElement(this)
         is By.ByClassName -> cssSelector(".${by.remoteParameters.value()}").findElement(this)
         is By.ByTagName -> cssSelector(by.remoteParameters.value().toString()).findElement(this)

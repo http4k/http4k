@@ -45,7 +45,6 @@ object RequestObjectExtractor {
                 }
             }
 
-    @Suppress("UNCHECKED_CAST")
     private fun toClaims(claims: Any?) = when (claims) {
         is Map<*, *> -> Claims(
             asClaims(claims.map("userinfo")),

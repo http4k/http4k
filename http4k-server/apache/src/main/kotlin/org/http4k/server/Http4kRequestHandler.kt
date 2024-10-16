@@ -37,9 +37,9 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
         (request.asHttp4kRequest(context)?.let(safeHandler) ?: Response(NOT_IMPLEMENTED)).into(response)
 
     private fun HttpRequest.asHttp4kRequest(context: HttpContext): Request? {
-        val connection = context.getAttribute(HttpCoreContext.CONNECTION_ENDPOINT) as EndpointDetails
+        val connection = (context as HttpCoreContext).endpointDetails
         return Method.supportedOrNull(method)?.let {
-            Request(it, uri.httpUri())
+            Request(it, uri.httpUri(), version.toString())
                 .headers(headers.toHttp4kHeaders()).let {
                     when (this) {
                         is HttpEntityContainer -> entity?.let { httpEntity ->

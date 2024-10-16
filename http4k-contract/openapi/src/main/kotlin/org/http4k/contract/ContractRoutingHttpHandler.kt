@@ -54,10 +54,10 @@ data class ContractRoutingHttpHandler(
         routes.map { it.toRouter(PathSegments("$it$descriptionPath")).description }
     )
 
-    private val notFound = preSecurityFilter.then(
-        security?.filter
-            ?: Filter.NoOp
-    ).then(postSecurityFilter).then { renderer.notFound() }
+    private val notFound = preSecurityFilter
+        .then(security?.filter ?: Filter.NoOp)
+        .then(postSecurityFilter)
+        .then { renderer.notFound() }
 
     private val handler: HttpHandler = {
         when (val matchResult = match(it)) {
@@ -73,8 +73,7 @@ data class ContractRoutingHttpHandler(
     private val descriptionRoute =
         ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
             .let {
-                val extra =
-                    listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { _ -> Response(OK) } else null)
+                val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { _ -> Response(OK) } else null)
                 it bindContract GET to { _ ->
                     renderer.description(
                         contractRoot,

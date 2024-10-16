@@ -31,6 +31,6 @@ class ClientValidationFilter(
         }
 
     companion object {
-        val validResponseTypes = ResponseType.values().map { it.queryParameterValue }
+        val validResponseTypes = ResponseType.entries.map { it.queryParameterValue }
     }
 }

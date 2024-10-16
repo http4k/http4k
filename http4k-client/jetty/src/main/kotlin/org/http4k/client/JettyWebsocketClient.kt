@@ -11,11 +11,11 @@ import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.Headers
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.core.toParametersMap
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.Websocket
+import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
@@ -31,29 +31,37 @@ import java.util.concurrent.TimeUnit
 
 object JettyWebsocketClient {
 
-    fun blocking(
-        uri: Uri,
-        headers: Headers = emptyList(),
-        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
+    operator fun invoke(
+        timeout: Duration =  Duration.of(5, ChronoUnit.SECONDS),
         wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient())
-    ): WsClient {
-        if (!wsClient.isRunning) wsClient.start()
+    ) = object: WebsocketFactory {
+        override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer): Websocket {
+            if (!wsClient.isRunning) wsClient.start()
 
-        return JettyBlockingWebsocket(uri, headers, timeout, wsClient).awaitConnected()
+            return JettyNonBlockingWebsocket(uri, headers, timeout, wsClient, onError, onConnect)
+        }
+
+        override fun blocking(uri: Uri, headers: Headers): WsClient {
+            if (!wsClient.isRunning) wsClient.start()
+
+            return JettyBlockingWebsocket(uri, headers, timeout, wsClient).awaitConnected()
+        }
     }
 
+    // backwards compatibility
     fun nonBlocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ZERO,
-        wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient()),
-        onError: (Throwable) -> Unit = {},
-        onConnect: WsConsumer = {}
-    ): Websocket {
-        if (!wsClient.isRunning) wsClient.start()
+        wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient()
+        ), onError: (Throwable) -> Unit = {}, onConnect: WsConsumer = {}) =
+        JettyWebsocketClient(timeout, wsClient).nonBlocking(uri, headers, onError, onConnect)
 
-        return JettyNonBlockingWebsocket(uri, headers, timeout, wsClient, onError, onConnect)
-    }
+    fun blocking(
+        uri: Uri,
+        headers: Headers = emptyList(),
+        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS)
+    ) = JettyWebsocketClient(timeout = timeout).blocking(uri, headers)
 }
 
 private class JettyBlockingWebsocket(
@@ -111,9 +119,9 @@ private class JettyNonBlockingWebsocket(
             throw WebSocketException("Connection to ${req.uri} is closed.")
         }
         try {
-            when (message.body) {
-                is StreamBody -> Completable.with { session.sendBinary(message.body.payload, it) }.get()
-                else -> Completable.with { session.sendText(message.body.toString(), it) }.get()
+            when (message.mode) {
+                WsMessage.Mode.Binary -> Completable.with { session.sendBinary(message.body.payload, it) }.get()
+                WsMessage.Mode.Text -> Completable.with { session.sendText(message.body.toString(), it) }.get()
             }
         } catch (error: Throwable) {
             triggerError(error)

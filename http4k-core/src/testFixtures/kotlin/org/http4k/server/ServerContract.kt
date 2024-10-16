@@ -38,7 +38,7 @@ import java.net.URI.create
 
 abstract class ServerContract(
     private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
-    private val requiredMethods: Array<Method> = Method.values()
+    private val requiredMethods: Array<Method> = Method.entries.toTypedArray()
 ) {
     private lateinit var server: Http4kServer
 
@@ -71,6 +71,7 @@ abstract class ServerContract(
                 }
             },
             "/uri" bind GET to { Response(OK).body(it.uri.toString()) },
+            "/version" bind GET to { Response(OK).body(it.version) },
             "/multiple-headers" bind GET to { Response(OK).header("foo", "value1").header("foo", "value2") },
             "/boom" bind GET to { throw IllegalArgumentException("BOOM!") },
             "/request-source" bind GET to { request ->
@@ -108,6 +109,12 @@ abstract class ServerContract(
     fun `null header`() {
         val response = client(Request(GET, "$baseUrl/null-header-value"))
         assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
+    fun `http version`() {
+        val response = client(Request(GET, "$baseUrl/version"))
+        assertThat(response.bodyString(), equalTo("HTTP/1.1"))
     }
 
     @Test
@@ -272,7 +279,10 @@ abstract class ServerContract(
 
     @Test
     open fun `illegal url doesn't expose stacktrace`() {
-        assertThat(client(Request(GET, "$baseUrl/v1/foo//bar")).bodyString().lowercase(), !containsSubstring("exception"))
+        assertThat(
+            client(Request(GET, "$baseUrl/v1/foo//bar")).bodyString().lowercase(),
+            !containsSubstring("exception")
+        )
     }
 
     open fun clientAddress() = anyOf(

@@ -1,7 +1,10 @@
 package org.http4k.lens
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
+import com.natpryce.hamkrest.isEmpty
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -13,9 +16,13 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.Validator.Strict
+import org.http4k.multipart.DiskLocation
 import org.http4k.testing.ApprovalTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.nio.file.Files
+
+private const val DEFAULT_BOUNDARY = "hello"
 
 @ExtendWith(ApprovalTest::class)
 class MultipartFormTest {
@@ -26,10 +33,8 @@ class MultipartFormTest {
     private val fieldWithHeaders = MultipartFormField.required("fieldWithHeaders")
     private val requiredFile = MultipartFormFile.required("file")
 
-    private val message = javaClass.getResourceAsStream("fullMessage.txt").reader().use { it.readText() }
+    private val message = javaClass.getResourceAsStream("fullMessage.txt")!!.reader().use { it.readText() }
     private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
-
-    private val DEFAULT_BOUNDARY = "hello"
 
     @Test
     fun `multipart form serialized into request`() {
@@ -38,13 +43,14 @@ class MultipartFormTest {
                 stringRequiredField of "world",
                 intRequiredField of 123,
                 requiredFile of validFile(),
-                fieldWithHeaders of MultipartFormField("someValue",
+                fieldWithHeaders of MultipartFormField(
+                    "someValue",
                     listOf("MyHeader" to "myHeaderValue")
                 )
             )
         )
 
-        assertThat(populatedRequest.toMessage().replace("\r\n", "\n"), equalTo(message))
+        assertThat(populatedRequest.toMessage().replace("\r\n", "\n"), equalTo(message.replace("\r\n", "\n")))
     }
 
     @Test
@@ -54,7 +60,8 @@ class MultipartFormTest {
                 stringRequiredField of "world",
                 intRequiredField of 123,
                 requiredFile of validFile()
-            )).replaceHeader("Content-Type", "unknown; boundary=hello")
+            )
+        ).replaceHeader("Content-Type", "unknown; boundary=hello")
 
         assertThat({
             multipartFormLens(Strict)(request)
@@ -72,9 +79,12 @@ class MultipartFormTest {
         )
 
         val expected = MultipartForm(
-            mapOf("hello" to listOf(MultipartFormField("world")),
-                "another" to listOf(MultipartFormField("123"))),
-            mapOf("file" to listOf(validFile())))
+            mapOf(
+                "hello" to listOf(MultipartFormField("world")),
+                "another" to listOf(MultipartFormField("123"))
+            ),
+            mapOf("file" to listOf(validFile()))
+        )
         assertThat(multipartFormLens(Strict)(request), equalTo(expected))
     }
 
@@ -89,10 +99,15 @@ class MultipartFormTest {
         )
 
         val requiredString = MultipartFormField.string().required("hello")
-        assertThat(multipartFormLens(Feedback)(request), equalTo(MultipartForm(
-            mapOf("another" to listOf(MultipartFormField("123"))),
-            mapOf("file" to listOf(validFile())),
-            listOf(Missing(requiredString.meta)))))
+        assertThat(
+            multipartFormLens(Feedback)(request), equalTo(
+                MultipartForm(
+                    mapOf("another" to listOf(MultipartFormField("123"))),
+                    mapOf("file" to listOf(validFile())),
+                    listOf(Missing(requiredString.meta))
+                )
+            )
+        )
     }
 
     @Test
@@ -126,8 +141,10 @@ class MultipartFormTest {
         val intField = MultipartFormField.string().int().required("another")
 
         val populated = MultipartForm()
-            .with(stringField of "world",
-                intField of 123)
+            .with(
+                stringField of "world",
+                intField of 123
+            )
 
         assertThat(stringField(populated), equalTo("world"))
         assertThat(intField(populated), equalTo(123))
@@ -144,4 +161,26 @@ class MultipartFormTest {
         defaultBoundary = DEFAULT_BOUNDARY,
         contentTypeFn = contentTypeFn
     ).toLens()
+
+    @Test
+    fun `backing disk location deleted after close`() {
+        val tempDir = Files.createTempDirectory("http4k-override").toFile().apply { deleteOnExit() }
+        val lens = Body.multipartForm(Strict, diskThreshold = 1, getDiskLocation = { DiskLocation.Temp(tempDir) }).toLens()
+
+        val request = emptyRequest.with(
+            lens of MultipartForm().with(
+                stringRequiredField of "world",
+                intRequiredField of 123,
+                requiredFile of validFile()
+            )
+        )
+
+        assertThat(tempDir.listFiles()!!.toList(), isEmpty)
+
+        lens(request).use {
+            assertThat(tempDir.listFiles()!!.toList(), hasSize(equalTo(3)))
+        }
+
+        assertThat(tempDir.listFiles(), absent())
+    }
 }

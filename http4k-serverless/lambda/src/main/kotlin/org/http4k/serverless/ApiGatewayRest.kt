@@ -48,7 +48,7 @@ object ApiGatewayRestAwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<Strin
             .headers((toMultiHeaders() + toHeaders()).distinct())
             .body(toBody())
 
-    override fun invoke(req: Map<String, Any>, ctx: Context): Request = req.toHttp4kRequest()
+    override fun invoke(req: Map<String, Any>, ctx: Context) = runCatching { req.toHttp4kRequest() }
 
     override fun invoke(resp: Response) = mapOf(
         "statusCode" to resp.status.code,

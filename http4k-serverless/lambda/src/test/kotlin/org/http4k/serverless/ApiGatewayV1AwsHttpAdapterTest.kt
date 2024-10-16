@@ -26,7 +26,7 @@ class ApiGatewayV1AwsHttpAdapterTest {
         )
 
         assertThat(
-            ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()),
+            ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()).getOrThrow(),
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")
@@ -46,7 +46,7 @@ class ApiGatewayV1AwsHttpAdapterTest {
         )
 
         assertThat(
-            ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()),
+            ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()).getOrThrow(),
             equalTo(Request(GET, "/path")
                 .query("query", "value")
                 .header("c", "d")
@@ -66,7 +66,7 @@ class ApiGatewayV1AwsHttpAdapterTest {
         )
 
         assertThat(
-            ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()),
+            ApiGatewayV1AwsHttpAdapter(request, LambdaContextMock()).getOrThrow(),
             equalTo(Request(POST, "/path")
                 .body(Body(ByteBuffer.wrap(imageBytes)))
             ))

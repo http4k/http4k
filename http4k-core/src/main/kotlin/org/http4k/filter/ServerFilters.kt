@@ -44,7 +44,7 @@ data class CorsPolicy(
 ) {
     companion object {
         val UnsafeGlobalPermissive =
-            CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.values().toList(), true)
+            CorsPolicy(OriginPolicy.AllowAll(), listOf("content-type"), Method.entries, true)
     }
 }
 
@@ -61,25 +61,36 @@ object ServerFilters {
                 val response = if (it.method == OPTIONS) Response(OK) else next(it)
 
                 val origin = it.header("Origin")
+
                 val allowedOrigin = when {
                     policy.originPolicy is AllowAllOriginPolicy -> "*"
                     origin != null && policy.originPolicy(origin) -> origin
-                    else -> "null"
+                    else -> null
                 }
 
-                response.with(
-                    Header.required("access-control-allow-origin") of allowedOrigin,
-                    Header.required("access-control-allow-headers") of policy.headers.joined(),
-                    Header.required("access-control-allow-methods") of policy.methods.map { method -> method.name }
-                        .joined(),
-                    { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res },
-                    { res ->
-                        res.takeIf { policy.exposedHeaders.isNotEmpty() }
-                            ?.header("access-control-expose-headers", policy.exposedHeaders.joined())
-                            ?: res
-                    },
-                    { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res }
-                )
+                allowedOrigin?.let {
+                    response.with(
+                        Header.required("access-control-allow-origin") of allowedOrigin,
+                        Header.required("access-control-allow-headers") of policy.headers.joined(),
+                        Header.required("access-control-allow-methods") of policy.methods.map { method -> method.name }
+                            .joined(),
+                        { res -> if (policy.credentials) res.header("access-control-allow-credentials", "true") else res },
+                        { res ->
+                            res.takeIf { policy.exposedHeaders.isNotEmpty() }
+                                ?.header("access-control-expose-headers", policy.exposedHeaders.joined())
+                                ?: res
+                        },
+                        { res -> policy.maxAge?.let { maxAge -> res.header("access-control-max-age", "$maxAge") } ?: res },
+                        { res ->
+                            val existingVaryValues = res.header("Vary")?.split(", ")?.toSet() ?: emptySet()
+                            when {
+                                allowedOrigin == "*" -> res
+                                existingVaryValues == setOf("*") -> res
+                                else -> res.replaceHeader("Vary", (existingVaryValues + "Origin").joinToString(", "))
+                            }
+                        }
+                    )
+                } ?: response
             }
         }
     }

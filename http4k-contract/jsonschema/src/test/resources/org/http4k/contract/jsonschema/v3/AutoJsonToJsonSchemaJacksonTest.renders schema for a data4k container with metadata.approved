@@ -1,0 +1,37 @@
+{
+  "node": {
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Data4kContainer"
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.Data4kContainer",
+      "second": {
+        "properties": {
+          "anInt": {
+            "example": 123,
+            "format": "int32",
+            "default": 123,
+            "type": "integer",
+            "nullable": false
+          },
+          "anString": {
+            "example": "helloworld",
+            "exclusiveMinimum": true,
+            "maxLength": 12,
+            "type": "string",
+            "nullable": false
+          }
+        },
+        "example": {
+          "anInt": 123,
+          "anString": "helloworld"
+        },
+        "type": "object",
+        "required": [
+          "anInt",
+          "anString"
+        ]
+      }
+    }
+  ]
+}

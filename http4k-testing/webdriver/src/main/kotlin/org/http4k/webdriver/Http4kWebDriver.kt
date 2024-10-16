@@ -1,5 +1,6 @@
 package org.http4k.webdriver
 
+import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -10,6 +11,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
+import org.http4k.lens.basicAuthentication
 import org.openqa.selenium.Alert
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
@@ -23,7 +25,8 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset.UTC
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import org.http4k.core.cookie.Cookie as HCookie
 
 typealias Navigate = (Request) -> Unit
@@ -72,7 +75,18 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
                     val currentPath = currentUrl?.let {
                         Uri.of(it).path.let { it.ifEmpty { "/" } }
                     } ?: "/"
-                    currentPath.appendToPath(path)
+                    when {
+                        currentPath.endsWith("/") -> currentPath.appendToPath(path)
+                        else -> {
+                            val pathParts = Paths.get(currentPath).toList()
+                            val newPathParts = Paths.get(path).toList()
+                            val newPath = when {
+                                path.isEmpty() -> pathParts
+                                else -> pathParts.dropLast(1) + newPathParts
+                            }
+                            newPath.joinToString(separator = "/")
+                        }
+                    }
                 }
             }
             newPath.normalizePath()
@@ -96,10 +110,6 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         }
         var normalizedPath = newPathParts.joinToString(separator = "/")
         if (!normalizedPath.startsWith("/")) normalizedPath = "/$normalizedPath"
-        if (normalizedPath != "/" && normalizedPath.endsWith("/"))
-            normalizedPath = normalizedPath.removeRange(
-                IntRange(normalizedPath.lastIndex, normalizedPath.lastIndex)
-            )
         return normalizedPath
     }
 
@@ -110,11 +120,17 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
 
     private fun LocalCookie.toWebDriver(): StoredCookie = StoredCookie(cookie.toWebDriver(), this)
 
-    override fun get(url: String) {
-        navigateTo(Request(GET, url).body(""))
-    }
+    override fun get(url: String) = get(Uri.of(url))
 
-    fun get(uri: Uri) = get(uri.toString())
+    fun get(uri: Uri) {
+        val basicAuthCredentials = uri.credentials()
+        val request = basicAuthCredentials?.let { Request(GET, uri).body("").basicAuthentication(it) } ?: Request(
+            GET,
+            uri
+        ).body("")
+
+        navigateTo(request)
+    }
 
     override fun getCurrentUrl(): String? = current?.url
 
@@ -123,9 +139,9 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
     val status: Status?
         get() = current?.status
 
-    override fun findElements(by: By): List<WebElement>? = current?.findElements(by)
+    override fun findElements(by: By): List<WebElement> = current?.findElements(by) ?: throw NoSuchElementException()
 
-    override fun findElement(by: By): WebElement? = current?.findElements(by)?.firstOrNull()
+    override fun findElement(by: By): WebElement = current?.findElements(by)?.first() ?: throw NoSuchElementException()
 
     override fun getPageSource(): String? = current?.contents
 
@@ -139,14 +155,14 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
 
     override fun getWindowHandles(): Set<String> = current?.let { setOf(it.handle.toString()) } ?: emptySet()
 
-    override fun getWindowHandle(): String? = windowHandles.firstOrNull()
+    override fun getWindowHandle(): String = windowHandles.first()
 
     override fun switchTo(): WebDriver.TargetLocator = object : WebDriver.TargetLocator {
         override fun frame(index: Int): WebDriver = throw FeatureNotImplementedYet
 
-        override fun frame(nameOrId: String?): WebDriver = throw FeatureNotImplementedYet
+        override fun frame(nameOrId: String): WebDriver = throw FeatureNotImplementedYet
 
-        override fun frame(frameElement: WebElement?): WebDriver = throw FeatureNotImplementedYet
+        override fun frame(frameElement: WebElement): WebDriver = throw FeatureNotImplementedYet
 
         override fun parentFrame(): WebDriver = throw FeatureNotImplementedYet
 
@@ -155,10 +171,10 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         override fun activeElement(): WebElement = activeElement ?: current?.firstElement()
         ?: throw NoSuchElementException("no page loaded!")
 
-        override fun window(nameOrHandle: String?): WebDriver =
+        override fun window(nameOrHandle: String): WebDriver =
             if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle$nameOrHandle") else this@Http4kWebDriver
 
-        override fun newWindow(typeHint: WindowType?) = throw FeatureNotImplementedYet
+        override fun newWindow(typeHint: WindowType) = throw FeatureNotImplementedYet
 
         override fun defaultContent(): WebDriver = this@Http4kWebDriver
     }
@@ -195,7 +211,7 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
 
         override fun getCookies() = siteCookies.values.map { it.cookie }.toSet()
 
-        override fun deleteCookieNamed(name: String?) {
+        override fun deleteCookieNamed(name: String) {
             siteCookies.remove(name)
         }
 
@@ -229,6 +245,16 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
     }
 
     private data class StoredCookie(val cookie: Cookie, val localCookie: LocalCookie)
+
+    private fun Uri.credentials(): Credentials? {
+        if (userInfo.isBlank()) return null
+
+        val parts = userInfo.split(":")
+        if (parts.size != 2) return null
+
+        val (username, password) = parts
+        return Credentials(username, password)
+    }
 }
 
 /**

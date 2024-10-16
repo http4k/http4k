@@ -1,0 +1,35 @@
+{
+  "node": {
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Nulls",
+    "example": null,
+    "format": null
+  },
+  "definitions": [
+    {
+      "first": "org.http4k.contract.jsonschema.v3.Nulls",
+      "second": {
+        "properties": {
+          "f1": {
+            "example": "foo",
+            "format": null,
+            "type": "string",
+            "nullable": true
+          },
+          "f2": {
+            "example": "bar",
+            "format": null,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "example": {
+          "f1": "foo",
+          "f2": "bar"
+        },
+        "format": null,
+        "type": "object",
+        "required": null
+      }
+    }
+  ]
+}
