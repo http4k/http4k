@@ -206,7 +206,7 @@ bool: true
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
-        assertThat(lens(listOf(obj)), equalTo(listOf(obj)))
+        assertThat(lens(lens(listOf(obj))), equalTo(listOf(obj)))
     }
 
     override fun strictMarshaller() =

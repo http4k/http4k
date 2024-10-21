@@ -126,7 +126,7 @@ PT1S,1970-01-01T00:00:00Z,2000-01-01,2000-01-01T01:01:01,01:01:01,2000-01-01T01:
         )
 
         assertThat(
-            lens(objects),
+            lens(lens(objects)),
             equalTo(objects)
         )
     }

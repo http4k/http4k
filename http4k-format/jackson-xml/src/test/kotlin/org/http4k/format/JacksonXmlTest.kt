@@ -87,6 +87,6 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
     fun `can roundtrip an with BiDi lens`() {
         val lens = JacksonXml.asBiDiMapping<UriContainer>()
         val item = UriContainer(Uri.of("foo.bar"))
-        assertThat(lens(item), equalTo(item))
+        assertThat(lens(lens(item)), equalTo(item))
     }
 }
