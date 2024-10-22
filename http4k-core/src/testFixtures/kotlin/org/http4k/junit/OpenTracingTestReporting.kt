@@ -11,12 +11,15 @@ import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
 import org.junit.platform.engine.TestExecutionResult
 import org.junit.platform.launcher.TestExecutionListener
 import org.junit.platform.launcher.TestIdentifier
+import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit.SECONDS
 
 
 class OpenTracingTestReporting : TestExecutionListener {
 
     private val openTelemetry: OpenTelemetrySdk?
+    private val stats = Stats()
 
     init {
         val honeycombApiKey = System.getenv("HONEYCOMB_API_KEY")
@@ -53,31 +56,37 @@ class OpenTracingTestReporting : TestExecutionListener {
         }
     }
 
+    override fun executionStarted(testIdentifier: TestIdentifier) = stats.start(testIdentifier)
+
     override fun executionFinished(testIdentifier: TestIdentifier, testExecutionResult: TestExecutionResult) {
         if (openTelemetry == null || !testIdentifier.isTest) return
 
-        val tracer: Tracer = openTelemetry.getTracer("http4")
-        val identifier = parseTestIdentifier(testIdentifier.uniqueId)
+        stats.end(testIdentifier)
 
-        val span = tracer.spanBuilder(identifier.spanName()).startSpan()
+        val tracer: Tracer = openTelemetry.getTracer("http4")
+        val betterIdentifier = parseTestIdentifier(testIdentifier.uniqueId)
+
+        val span = tracer.spanBuilder(betterIdentifier.spanName()).startSpan()
 
         try {
             span.makeCurrent().use { _ ->
                 span.setAttribute("status", testExecutionResult.status.toString())
                 span.setAttribute("junit_id", testIdentifier.uniqueId)
+                span.setAttribute("duration", stats.duration(testIdentifier)?.toString() ?: "")
 
-                when (identifier) {
+                when (betterIdentifier) {
                     is BetterTestIdentifier.TestId -> {
                         span.setAttribute("identified", true)
-                        span.setAttribute("package", identifier.packageName)
-                        span.setAttribute("class", identifier.className)
-                        span.setAttribute("method", identifier.methodName)
+                        span.setAttribute("package", betterIdentifier.packageName)
+                        span.setAttribute("class", betterIdentifier.className)
+                        span.setAttribute("method", betterIdentifier.methodName)
                     }
 
                     is BetterTestIdentifier.Unknown -> {
                         span.setAttribute("identified", false)
                     }
                 }
+
                 testExecutionResult.throwable.ifPresent {
                     span.recordException(it)
                 }
@@ -111,4 +120,24 @@ sealed class BetterTestIdentifier {
 
     data class Unknown(val identifier: String) : BetterTestIdentifier()
     data class TestId(val packageName: String, val className: String, val methodName: String) : BetterTestIdentifier()
+}
+
+private class Stats {
+    private val starts = ConcurrentHashMap<TestIdentifier, Instant>()
+    private val ends = ConcurrentHashMap<TestIdentifier, Instant>()
+
+    fun start(testId: TestIdentifier) {
+        starts[testId] = Instant.now()
+    }
+
+    fun end(testId: TestIdentifier) {
+        ends[testId] = Instant.now()
+    }
+
+    fun duration(testId: TestIdentifier) =
+        starts[testId]?.let { start ->
+            ends[testId]?.let { end ->
+                end.toEpochMilli() - start.toEpochMilli()
+            }
+        }
 }
