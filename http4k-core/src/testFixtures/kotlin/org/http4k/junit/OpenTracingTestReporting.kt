@@ -30,7 +30,7 @@ class OpenTracingTestReporting : TestExecutionListener {
             val resource = Resource.getDefault()
                 .merge(Resource.create(Attributes.of(AttributeKey.stringKey("service.name"), "test-main")))
 
-            val dataset = System.getenv("HONEYCOMB_DATASET") ?: "local"
+            val dataset = System.getenv("HONEYCOMB_DATASET") ?: "test-main"
 
             val spanExporter = OtlpHttpSpanExporter.builder()
                 .setEndpoint("https://api.honeycomb.io/v1/traces")
