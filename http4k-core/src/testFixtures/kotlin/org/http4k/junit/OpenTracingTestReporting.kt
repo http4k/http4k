@@ -72,7 +72,7 @@ class OpenTracingTestReporting : TestExecutionListener {
             span.makeCurrent().use { _ ->
                 span.setAttribute("status", testExecutionResult.status.toString())
                 span.setAttribute("junit_id", testIdentifier.uniqueId)
-                span.setAttribute("duration", stats.duration(testIdentifier)?.toString() ?: "")
+                span.setAttribute("duration_ms", stats.duration(testIdentifier) ?: -1)
 
                 when (betterIdentifier) {
                     is BetterTestIdentifier.TestId -> {
