@@ -101,11 +101,11 @@ class OpenTracingTestReporting : TestExecutionListener {
 }
 
 fun parseTestIdentifier(identifier: String): BetterTestIdentifier {
-    val regex = Regex("""\[class:(.+?)\]/\[method|test-template:(.+?)\]""")
+    val regex = Regex("""\[class:(.+?)\]\/\[(method|template):(.+?)\]""")
     val matchResult = regex.find(identifier)
     return matchResult?.let {
         val classFullyClassifiedName = it.groupValues[1]
-        val methodName = it.groupValues[2].substringBeforeLast('(')
+        val methodName = it.groupValues[3].substringBeforeLast('(')
         val packageName = classFullyClassifiedName.substringBeforeLast('.')
         val className = classFullyClassifiedName.substringAfterLast('.')
         BetterTestIdentifier.TestId(packageName, className, methodName)
