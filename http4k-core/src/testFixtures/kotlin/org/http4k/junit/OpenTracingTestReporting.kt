@@ -64,6 +64,8 @@ class OpenTracingTestReporting : TestExecutionListener {
         try {
             span.makeCurrent().use { _ ->
                 span.setAttribute("status", testExecutionResult.status.toString())
+                span.setAttribute("junit_id", testIdentifier.uniqueId)
+
                 when (identifier) {
                     is BetterTestIdentifier.TestId -> {
                         span.setAttribute("identified", true)
