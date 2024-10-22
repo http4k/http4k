@@ -11,11 +11,12 @@ dependencies {
     testImplementation(Testing.junit.jupiter.params)
 
     testFixturesImplementation("org.junit.platform:junit-platform-launcher:_")
-    testFixturesImplementation("io.opentelemetry:opentelemetry-sdk:_")
-    testFixturesImplementation("io.opentelemetry:opentelemetry-context:_")
-    testFixturesImplementation("io.opentelemetry:opentelemetry-exporter-otlp-http-trace:_")
-    testFixturesImplementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:_")
-    testFixturesImplementation("io.opentelemetry:opentelemetry-extension-trace-propagators:_")
+    testFixturesImplementation(platform("io.opentelemetry:opentelemetry-bom:_"))
+    testFixturesImplementation("io.opentelemetry:opentelemetry-sdk")
+    testFixturesImplementation("io.opentelemetry:opentelemetry-context")
+    testFixturesImplementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    testFixturesImplementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure")
+    testFixturesImplementation("io.opentelemetry:opentelemetry-extension-trace-propagators")
 
     testFixturesImplementation("javax.servlet:javax.servlet-api:_")
     testFixturesImplementation("jakarta.servlet:jakarta.servlet-api:_")
