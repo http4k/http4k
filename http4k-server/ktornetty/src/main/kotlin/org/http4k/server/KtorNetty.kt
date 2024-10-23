@@ -32,7 +32,6 @@ import org.http4k.server.ServerConfig.StopMode.Immediate
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import io.ktor.http.Headers as KHeaders
 
-@Suppress("EXPERIMENTAL_API_USAGE")
 class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMode) : ServerConfig {
     constructor(port: Int = 8000) : this(port, Immediate)
 
