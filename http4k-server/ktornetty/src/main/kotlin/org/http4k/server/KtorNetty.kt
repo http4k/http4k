@@ -6,7 +6,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.stop
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.ApplicationRequest
@@ -33,7 +32,6 @@ import org.http4k.server.ServerConfig.StopMode.Immediate
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import io.ktor.http.Headers as KHeaders
 
-@Suppress("EXPERIMENTAL_API_USAGE")
 class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMode) : ServerConfig {
     constructor(port: Int = 8000) : this(port, Immediate)
 
@@ -59,7 +57,7 @@ class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMo
             }
         }
 
-        override fun port() = engine.environment.connectors[0].port
+        override fun port() = engine.engineConfig.connectors[0].port
     }
 }
 
