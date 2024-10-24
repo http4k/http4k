@@ -115,4 +115,19 @@ PT1S,1970-01-01T00:00:00Z,2000-01-01,2000-01-01T01:01:01,01:01:01,2000-01-01T01:
             equalTo(csv)
         )
     }
+
+    @Test
+    fun `roundtrip list of arbitrary objects to and from with BiDi lens`() {
+        val lens = JacksonCsv.asBiDiMapping<CsvArbObject>()
+
+        val objects = listOf(
+            CsvArbObject("hello", emptyList(), false),
+            CsvArbObject("goodbye", listOf(1, 2, 3), true)
+        )
+
+        assertThat(
+            lens(lens(objects)),
+            equalTo(objects)
+        )
+    }
 }

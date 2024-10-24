@@ -197,6 +197,12 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
         assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("unknown")).also { println(it) } }
     }
 
+    @Test
+    fun `roundtrip list of arbitrary objects to and with BiDi lens`() {
+        val lens = Moshi.asBiDiMapping<ArbObject>()
+        assertThat(lens(lens(obj)), equalTo(obj))
+    }
+
     override fun strictMarshaller() =
         object : ConfigurableMoshi(Builder().asConfigurable().customise(), strictness = FailOnUnknown) {}
 
