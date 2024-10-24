@@ -168,17 +168,15 @@ class ResilienceFiltersTest {
 
     @Test
     fun `TimeLimit filter can use a different future supplier if supplied`() {
-        val executorService = Executors.newSingleThreadExecutor()
-        val mainThreadId = Thread.currentThread().threadId()
-
-        val timeoutService = ResilienceFilters.TimeLimit(
-            TimeLimiter.of(Duration.ofMillis(100)),
-            futureSupplier = { executorService.submit(it) }
-        ).then {
-            assertThat(Thread.currentThread().threadId(), !equalTo(mainThreadId))
-            Thread.sleep(50)
-            Response(OK)
+        val executorService = Executors.newSingleThreadExecutor {
+            Thread(it, "My thread")
         }
+
+        val timeoutService = ResilienceFilters.TimeLimit(futureSupplier = { executorService.submit(it) })
+            .then {
+                assertThat(Thread.currentThread().name, equalTo("My thread"))
+                Response(OK)
+            }
 
         assertThat(timeoutService(Request(GET, "/")).status, equalTo(OK))
     }
