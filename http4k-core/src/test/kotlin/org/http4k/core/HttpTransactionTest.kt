@@ -10,18 +10,30 @@ import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.junit.jupiter.api.Test
 import java.time.Duration.ZERO
+import java.time.Instant
 
 class HttpTransactionTest {
-
+    private val startTime = Instant.ofEpochSecond(93)
+    
     @Test
     fun `cannot get the routing group from a standard Response`() {
-        assertThat(HttpTransaction(Request(GET, Uri.of("/")), Response(OK), ZERO).routingGroup, equalTo("UNMAPPED"))
+        assertThat(HttpTransaction(
+            request = Request(GET, Uri.of("/")),
+            response = Response(OK),
+            start = startTime,
+            duration = ZERO
+        ).routingGroup, equalTo("UNMAPPED"))
     }
 
     @Test
     fun `can get the routing group from a RoutedResponse`() {
         val response = RoutedResponse(Response(OK), UriTemplate.from("hello"))
-        assertThat(HttpTransaction(Request(GET, Uri.of("/")), response, ZERO).routingGroup, equalTo("hello"))
+        assertThat(HttpTransaction(
+            request = Request(GET, Uri.of("/")),
+            response = response,
+            start = startTime,
+            duration = ZERO
+        ).routingGroup, equalTo("hello"))
     }
 
     @Test
@@ -31,9 +43,19 @@ class HttpTransactionTest {
         class ExtendedResponse(val delegate: RoutedResponse) : ResponseWithRoute by delegate
 
         val request = ExtendedRequest(RoutedRequest(Request(GET, "/the-path"), UriTemplate.from("request")))
-        assertThat(HttpTransaction(request, Response(OK), ZERO).labels, equalTo(mapOf("routingGroup" to "request")))
+        assertThat(HttpTransaction(
+            request = request,
+            response = Response(OK),
+            start = startTime,
+            duration = ZERO
+        ).labels, equalTo(mapOf("routingGroup" to "request")))
 
         val response = ExtendedResponse(RoutedResponse(Response(OK, "/the-path"), UriTemplate.from("response")))
-        assertThat(HttpTransaction(request, response, ZERO).labels, equalTo(mapOf("routingGroup" to "response")))
+        assertThat(HttpTransaction(
+            request = request,
+            response = response,
+            start = startTime,
+            duration = ZERO
+        ).labels, equalTo(mapOf("routingGroup" to "response")))
     }
 }
