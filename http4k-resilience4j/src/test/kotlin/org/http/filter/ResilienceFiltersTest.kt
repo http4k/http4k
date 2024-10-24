@@ -14,15 +14,18 @@ import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.RetryConfig
+import io.github.resilience4j.timelimiter.TimeLimiter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_GATEWAY
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
 import org.http4k.core.then
+import org.http4k.filter.ResilienceFilters
 import org.http4k.filter.ResilienceFilters.Bulkheading
 import org.http4k.filter.ResilienceFilters.CircuitBreak
 import org.http4k.filter.ResilienceFilters.RateLimit
@@ -32,6 +35,7 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.ArrayDeque
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import kotlin.concurrent.thread
 
 class ResilienceFiltersTest {
@@ -138,5 +142,42 @@ class ResilienceFiltersTest {
 
         latch.await()
         assertThat(bulkheading(Request(GET, "/second")).status, equalTo(TOO_MANY_REQUESTS))
+    }
+
+    @Test
+    fun `TimeLimit filter returns error response if time limit is exceeded`() {
+        val timeoutService = ResilienceFilters.TimeLimit(TimeLimiter.of(Duration.ofMillis(50)))
+            .then {
+                Thread.sleep(100)
+                Response(OK)
+            }
+
+        assertThat(timeoutService(Request(GET, "/")).status, equalTo(CLIENT_TIMEOUT))
+    }
+
+    @Test
+    fun `TimeLimit filter returns success if time limit is not exceeded`() {
+        val timeoutService = ResilienceFilters.TimeLimit(TimeLimiter.of(Duration.ofMillis(100)))
+            .then {
+                Thread.sleep(50)
+                Response(OK)
+            }
+
+        assertThat(timeoutService(Request(GET, "/")).status, equalTo(OK))
+    }
+
+    @Test
+    fun `TimeLimit filter can use a different future supplier if supplied`() {
+        val executorService = Executors.newSingleThreadExecutor {
+            Thread(it, "My thread")
+        }
+
+        val timeoutService = ResilienceFilters.TimeLimit(futureSupplier = { executorService.submit(it) })
+            .then {
+                assertThat(Thread.currentThread().name, equalTo("My thread"))
+                Response(OK)
+            }
+
+        assertThat(timeoutService(Request(GET, "/")).status, equalTo(OK))
     }
 }
