@@ -15,6 +15,7 @@ import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
 
@@ -119,11 +120,12 @@ object ResilienceFilters {
         operator fun invoke(
             timeLimiter: TimeLimiter = TimeLimiter.ofDefaults("TimeLimit"),
             onError: () -> Response = { Response(CLIENT_TIMEOUT.description("Time limit exceeded")) },
+            futureSupplier: (() -> Response) -> Future<Response> = { CompletableFuture.supplyAsync(it) }
         ) = Filter { next ->
             {
                 try {
                     timeLimiter.executeFutureSupplier {
-                        CompletableFuture.supplyAsync {
+                        futureSupplier {
                             next(it)
                         }
                     }

@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.ArrayDeque
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import kotlin.concurrent.thread
 
 class ResilienceFiltersTest {
@@ -161,6 +162,23 @@ class ResilienceFiltersTest {
                 Thread.sleep(50)
                 Response(OK)
             }
+
+        assertThat(timeoutService(Request(GET, "/")).status, equalTo(OK))
+    }
+
+    @Test
+    fun `TimeLimit filter can use a different future supplier if supplied`() {
+        val executorService = Executors.newSingleThreadExecutor()
+        val mainThreadId = Thread.currentThread().threadId()
+
+        val timeoutService = ResilienceFilters.TimeLimit(
+            TimeLimiter.of(Duration.ofMillis(100)),
+            futureSupplier = { executorService.submit(it) }
+        ).then {
+            assertThat(Thread.currentThread().threadId(), !equalTo(mainThreadId))
+            Thread.sleep(50)
+            Response(OK)
+        }
 
         assertThat(timeoutService(Request(GET, "/")).status, equalTo(OK))
     }
