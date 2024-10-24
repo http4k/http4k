@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.32.5.0
+### v5.33.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 2.0.21
+- **http4k-core** : [Unlikely break] Adding start time to HTTP Transaction. Should be a simple fix if you are already creating your own for some reason. :) H/T @npryce
 - **http4k-resilience4j** : Add resilience4j timeout filter. H/T @ollieabbey
 
 ### v5.32.4.0
