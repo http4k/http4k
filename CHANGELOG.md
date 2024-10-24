@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.32.5.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 2.0.21
+- **http4k-resilience4j** : Add resilience4j timeout filter. H/T @ollieabbey
+
 ### v5.32.4.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** Better diffing of failures in the IDE. @H/T @frednordin
