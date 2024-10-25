@@ -1,6 +1,5 @@
 name: Publish LTS Artifacts
 on:
-  push:
   repository_dispatch:
     types: [http4k-lts-release]
 env:
