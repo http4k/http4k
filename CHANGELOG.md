@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.33.0.1 (uncut)
+### v5.33.0.1
 - **http4k-multipart*** : [Fix #1188] MultiPartFormBody reads body into memory even when stream is available
 
 ### v5.33.0.0
