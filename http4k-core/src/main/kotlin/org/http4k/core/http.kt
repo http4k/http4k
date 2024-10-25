@@ -48,6 +48,15 @@ interface Body : Closeable {
 }
 
 /**
+ * This function works around input streams which report that there is nothing to read when they
+ * have never been accessed.
+ *
+ * See https://github.com/http4k/http4k/issues/1188
+ */
+fun Body.hasContentToRead() = stream.read(ByteArray(0)) > -1
+
+
+/**
  * Represents a body that is backed by an in-memory ByteBuffer. Closing this has no effect.
  **/
 data class MemoryBody(override val payload: ByteBuffer) : Body {

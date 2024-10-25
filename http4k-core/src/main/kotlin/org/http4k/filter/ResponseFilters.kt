@@ -14,7 +14,6 @@ import org.http4k.filter.GzipCompressionMode.Memory
 import java.security.MessageDigest
 import java.time.Clock
 import java.time.Duration
-import java.time.Duration.between
 import java.time.Instant
 
 object ResponseFilters {
@@ -50,10 +49,15 @@ object ResponseFilters {
             transactionLabeler: HttpTransactionLabeler = { it },
             recordFn: (HttpTransaction) -> Unit
         ): Filter = Filter { next ->
-            {
+            { request ->
                 timeSource().let { start ->
-                    next(it).apply {
-                        recordFn(transactionLabeler(HttpTransaction(it, this, between(start, timeSource()))))
+                    next(request).apply {
+                        recordFn(transactionLabeler(HttpTransaction(
+                            request = request,
+                            response = this,
+                            start = start,
+                            duration = Duration.between(start, timeSource())
+                        )))
                     }
                 }
             }

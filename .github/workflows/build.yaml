@@ -37,6 +37,9 @@ jobs:
       - name: Build
         timeout-minutes: 25
         run: ./build-ci.sh
+        env:
+          HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
+          HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
       - name: Cleanup Gradle Cache
           # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
         # Restoring these files from a GitHub Actions cache might cause problems for future builds.

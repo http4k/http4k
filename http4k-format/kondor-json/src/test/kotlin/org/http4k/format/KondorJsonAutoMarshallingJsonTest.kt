@@ -183,6 +183,16 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
 
         assertThat(body(body(obj)), equalTo(obj))
     }
+
+    @Test
+    fun `roundtrip arbitrary object to and from with BiDi lens`() {
+        val lens = KondorJson() { register(JArbObject) }
+            .asBiDiMapping<ArbObject>()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(lens(lens(obj)), equalTo(obj))
+    }
 }
 
 private object JInOnly : JStringRepresentable<InOnly>() {

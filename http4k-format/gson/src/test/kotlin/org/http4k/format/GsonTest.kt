@@ -84,6 +84,13 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     override fun `serialises enum as a key correctly`() {
     }
 
+    @Test
+    fun ` roundtrip arbitrary object to and from with BiDi lens`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        val lens = Gson.asBiDiMapping<ArbObject>()
+        assertThat(lens(lens(obj)), equalTo(obj))
+    }
+
     override fun strictMarshaller() = throw UnsupportedOperationException()
 
     override fun customMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}

@@ -3,7 +3,6 @@ package org.http4k.server
 import org.apache.hc.core5.http.ClassicHttpRequest
 import org.apache.hc.core5.http.ClassicHttpResponse
 import org.apache.hc.core5.http.ContentType
-import org.apache.hc.core5.http.EndpointDetails
 import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.HttpEntityContainer
 import org.apache.hc.core5.http.HttpRequest
@@ -20,6 +19,7 @@ import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
+import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
@@ -71,7 +71,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
         response.reasonPhrase = status.description
         headers.filter { !headersThatApacheInterceptorSets.contains(it.first) }
             .forEach { (key, value) -> response.addHeader(key, value) }
-        if (response is HttpEntityContainer) {
+        if (response is HttpEntityContainer && status != NO_CONTENT) {
             val contentType = org.http4k.lens.Header.CONTENT_TYPE(this@into)
                 ?.let { ContentType.parse(it.toHeaderValue()) }
                 ?: ContentType.WILDCARD

@@ -8,11 +8,16 @@ import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RequestNotPermitted
 import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.Retry.ofDefaults
+import io.github.resilience4j.timelimiter.TimeLimiter
 import org.http4k.core.Filter
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeoutException
 
 object ResilienceFilters {
 
@@ -36,7 +41,7 @@ object ResilienceFilters {
                         if (isError(this)) cb.onError(0, MILLISECONDS, CircuitError)
                         else cb.onSuccess(cb.currentTimestamp - start, cb.timestampUnit)
                     }
-                } catch (e: CallNotPermittedException) {
+                } catch (_: CallNotPermittedException) {
                     onError()
                 }
             }
@@ -81,7 +86,7 @@ object ResilienceFilters {
             {
                 try {
                     rateLimit.executeCallable { next(it) }
-                } catch (e: RequestNotPermitted) {
+                } catch (_: RequestNotPermitted) {
                     onError()
                 }
             }
@@ -100,7 +105,31 @@ object ResilienceFilters {
             {
                 try {
                     bulkhead.executeCallable { next(it) }
-                } catch (e: BulkheadFullException) {
+                } catch (_: BulkheadFullException) {
+                    onError()
+                }
+            }
+        }
+    }
+
+    /**
+     * Provide simple timeout functionality.
+     * By default, reject with HTTP 504 after 1 second.
+     */
+    object TimeLimit {
+        operator fun invoke(
+            timeLimiter: TimeLimiter = TimeLimiter.ofDefaults("TimeLimit"),
+            onError: () -> Response = { Response(CLIENT_TIMEOUT.description("Time limit exceeded")) },
+            futureSupplier: (() -> Response) -> Future<Response> = { CompletableFuture.supplyAsync(it) }
+        ) = Filter { next ->
+            {
+                try {
+                    timeLimiter.executeFutureSupplier {
+                        futureSupplier {
+                            next(it)
+                        }
+                    }
+                } catch (_: TimeoutException) {
                     onError()
                 }
             }

@@ -3,6 +3,16 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.33.0.1
+- **http4k-multipart*** : [Fix #1188] MultiPartFormBody reads body into memory even when stream is available
+
+### v5.33.0.0
+- **http4k-*** : Upgrade some dependency versions, including Kotlin to 2.0.21
+- **http4k-core** : [Unlikely break] Adding start time to HTTP Transaction. Should be a simple fix if you are already creating your own for some reason. :) H/T @npryce
+- **http4k-resilience4j** : Add resilience4j timeout filter. H/T @ollieabbey
+- **http4k-format-*** : Adding ability to create BiDiMapping lens. H/T @potfur
+- **http4k-server-apache** - [Fix] Apache httpcomponents server throws when returning 204.
+
 ### v5.32.4.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** Better diffing of failures in the IDE. @H/T @frednordin

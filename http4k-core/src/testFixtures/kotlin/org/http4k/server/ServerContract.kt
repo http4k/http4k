@@ -21,6 +21,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.StreamBody
 import org.http4k.core.with
@@ -85,6 +86,9 @@ abstract class ServerContract(
             },
             "/null-header-value" bind GET to {
                 Response(OK).header("header", null)
+            },
+            "/no-content" bind GET to {
+                Response(NO_CONTENT)
             }
         )
 
@@ -283,6 +287,11 @@ abstract class ServerContract(
             client(Request(GET, "$baseUrl/v1/foo//bar")).bodyString().lowercase(),
             !containsSubstring("exception")
         )
+    }
+
+    @Test
+    open fun `return 204 no content`() {
+        assertThat(client(Request(GET, "$baseUrl/no-content")).status, equalTo(NO_CONTENT))
     }
 
     open fun clientAddress() = anyOf(

@@ -6,7 +6,7 @@ on:
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:
-  ReleaseMC:
+  Release:
     runs-on: ubuntu-latest
     if: github.repository == 'http4k/http4k'
     steps:
@@ -23,10 +23,12 @@ jobs:
           cache: gradle
       - name: Upload to Sonatype
         run: |
-          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository \
+          ./gradlew publish publishToSonatype closeAndReleaseSonatypeStagingRepository \
           -Psign=true \
           -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
           -PsigningKey="${{ secrets.SIGNING_KEY }}" \
           -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}" \
+          -PltsUsername="${{ secrets.LTS_USERNAME }}" \
+          -PltsPassword="${{ secrets.LTS_PASSWORD }}" \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"

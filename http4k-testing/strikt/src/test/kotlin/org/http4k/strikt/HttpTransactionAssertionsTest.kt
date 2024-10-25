@@ -9,12 +9,18 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.time.Duration
+import java.time.Instant
 
 class HttpTransactionAssertionsTest {
 
     @Test
     fun assertions() {
-        val tx = HttpTransaction(Request(Method.GET, ""), Response(OK), Duration.ZERO)
+        val tx = HttpTransaction(
+            request = Request(Method.GET, ""),
+            response = Response(OK),
+            start = Instant.ofEpochSecond(24),
+            duration = Duration.ZERO
+        )
 
         expectThat(tx) {
             request.isEqualTo(tx.request)
