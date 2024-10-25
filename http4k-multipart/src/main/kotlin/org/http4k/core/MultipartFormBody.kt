@@ -149,8 +149,9 @@ data class MultipartFormBody private constructor(
             diskLocation: DiskLocation = DiskLocation.Temp()
         ): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directives?.firstOrNull { it.first == "boundary" }?.second ?: ""
+
             val inputStream =
-                httpMessage.body.run { if (stream.available() > 0) stream else ByteArrayInputStream(payload.array()) }
+                httpMessage.body.run { if (hasContentToRead()) stream else ByteArrayInputStream(payload.array()) }
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8)
 
             val parts = MultipartFormParser(UTF_8, diskThreshold, diskLocation).formParts(form).map {

@@ -2,8 +2,10 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
 import java.nio.ByteBuffer
 
 class BodyTest {
@@ -14,14 +16,18 @@ class BodyTest {
 
     @Test
     fun `body bytebuffer`() {
-        assertThat(Response(OK).body(Body(ByteBuffer.wrap("abc".toByteArray()))).bodyString(),
-            equalTo("abc"))
+        assertThat(
+            Response(OK).body(Body(ByteBuffer.wrap("abc".toByteArray()))).bodyString(),
+            equalTo("abc")
+        )
     }
 
     @Test
     fun `body stream`() {
-        assertThat(String(Response(OK).body(Body("abc".byteInputStream())).body.stream.readBytes()),
-            equalTo("abc"))
+        assertThat(
+            String(Response(OK).body(Body("abc".byteInputStream())).body.stream.readBytes()),
+            equalTo("abc")
+        )
     }
 
     @Test
@@ -101,5 +107,55 @@ class BodyTest {
         val body = Body(ByteBuffer.wrap(bytes, 2, 4))
 
         assertThat("body to string", body.toString(), equalTo("cdef"))
+    }
+
+    @Test
+    fun `hasContentToRead returns false when empty`() {
+
+        fun String.inputStreamWhichReportsZeroWhenNotRead() = object : ByteArrayInputStream(encodeToByteArray()) {
+            var availableWhichIsZeroWhenNotEverRead = 0
+            override fun read(b: ByteArray): Int {
+                availableWhichIsZeroWhenNotEverRead = (length - b.size).coerceAtLeast(0)
+                return super.read(b)
+            }
+
+            override fun available() = availableWhichIsZeroWhenNotEverRead
+        }
+
+        Request(GET, "").body("123".byteInputStream()).apply {
+            assertThat(body.stream.available(), equalTo(3))
+            assertThat(body.hasContentToRead(), equalTo(true))
+            assertThat(body.stream.read(ByteArray(2)), equalTo(2))
+            assertThat(body.stream.available(), equalTo(1))
+            assertThat(body.hasContentToRead(), equalTo(true))
+            assertThat(body.stream.read(ByteArray(1)), equalTo(1))
+            assertThat(body.hasContentToRead(), equalTo(false))
+        }
+
+        Request(GET, "").body("123".inputStreamWhichReportsZeroWhenNotRead()).apply {
+            assertThat(body.stream.available(), equalTo(0))
+            assertThat(body.hasContentToRead(), equalTo(true))
+            assertThat(body.stream.read(ByteArray(2)), equalTo(2))
+            assertThat(body.stream.available(), equalTo(1))
+            assertThat(body.hasContentToRead(), equalTo(true))
+            assertThat(body.stream.read(ByteArray(1)), equalTo(1))
+            assertThat(body.hasContentToRead(), equalTo(false))
+        }
+
+        Request(GET, "").body("".byteInputStream()).apply {
+            assertThat(body.stream.available(), equalTo(0))
+            assertThat(body.hasContentToRead(), equalTo(false))
+            assertThat(body.stream.read(ByteArray(2)), equalTo(-1))
+            assertThat(body.stream.available(), equalTo(0))
+            assertThat(body.hasContentToRead(), equalTo(false))
+        }
+
+        Request(GET, "").body("".inputStreamWhichReportsZeroWhenNotRead()).apply {
+            assertThat(body.stream.available(), equalTo(0))
+            assertThat(body.hasContentToRead(), equalTo(false))
+            assertThat(body.stream.read(ByteArray(2)), equalTo(-1))
+            assertThat(body.stream.available(), equalTo(0))
+            assertThat(body.hasContentToRead(), equalTo(false))
+        }
     }
 }
