@@ -6,6 +6,7 @@ import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import java.net.URI
 import java.time.Duration
 
 plugins {
@@ -33,6 +34,7 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
     }
+
     dependencies {
         classpath(Kotlin.gradlePlugin)
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
@@ -150,6 +152,20 @@ subprojects {
         }
 
         publishing {
+            repositories {
+                maven {
+                    url = URI("s3://http4k-lts/maven2")
+
+                    val ltsUsername: String? by project
+                    val ltsPassword: String? by project
+
+                    credentials(AwsCredentials::class.java) {
+                        accessKey = ltsUsername
+                        secretKey = ltsPassword
+                    }
+                }
+            }
+
             publications {
                 val javaComponent = components["java"] as AdhocComponentWithVariants
 
@@ -280,6 +296,7 @@ tasks {
         }
     }
 }
+
 
 val nexusUsername: String? by project
 val nexusPassword: String? by project

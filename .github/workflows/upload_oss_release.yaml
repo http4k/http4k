@@ -1,4 +1,4 @@
-name: Publish Artifacts
+name: Publish OSS Artifacts
 on:
   push:
     tags:
