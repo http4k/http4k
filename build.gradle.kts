@@ -323,7 +323,3 @@ tasks.withType<DokkaMultiModuleTask>().configureEach {
         customStyleSheets = listOf(file("src/docs/css/dokka.css"))
     }
 }
-
-tasks.named("initializeSonatypeStagingRepository").configure {
-    enabled = nexusUsername != null
-}
