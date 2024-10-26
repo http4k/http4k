@@ -154,7 +154,7 @@ subprojects {
         publishing {
             repositories {
                 maven {
-                    url = URI("s3://http4k-lts/maven2")
+                    url = URI("s3://http4k-maven/maven2")
 
                     val ltsUsername: String? by project
                     val ltsPassword: String? by project
