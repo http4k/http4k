@@ -9,6 +9,7 @@ jobs:
         repo:
           - 'http4k/www'
           - 'http4k/toolbox'
+          - 'http4k/lts-examples'
           - 'http4k/examples'
           - 'http4k/http4k-by-example'
           - 'http4k/http4k-connect'
