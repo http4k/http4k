@@ -18,7 +18,6 @@ plugins {
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin")
-    id("com.google.devtools.ksp")
     kotlin("plugin.serialization")
     id("org.jetbrains.dokka")
 }
