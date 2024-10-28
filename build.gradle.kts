@@ -244,22 +244,6 @@ dependencies {
             api(project(it.name))
             testImplementation(testFixtures(project(it.name)))
         }
-
-
-    testImplementation("dev.zacsweers.moshix:moshi-metadata-reflect:_")
-    testImplementation("se.ansman.kotshi:api:_")
-    kspTest("se.ansman.kotshi:compiler:_")
-
-    testImplementation("software.amazon.awssdk:s3") {
-        exclude(group = "software.amazon.awssdk", module = "netty-nio-client")
-        exclude(group = "software.amazon.awssdk", module = "apache-client")
-    }
-
-    testImplementation("com.azure:azure-search-documents:_")
-
-    testImplementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:_")
-    testImplementation("com.expediagroup:graphql-kotlin-schema-generator:_")
-    testImplementation("com.amazonaws:aws-lambda-java-events:_")
 }
 
 fun hasAnArtifact(it: Project) = !it.name.contains("test-function") && !it.name.contains("integration-test")
