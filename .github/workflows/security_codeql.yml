@@ -22,7 +22,7 @@ on:
     paths-ignore:
       - '**/*.md'
   schedule:
-    - cron: '30 23 * * 3'
+    - cron: '0 12 * * 3' # ever
 
 jobs:
   analyze:
