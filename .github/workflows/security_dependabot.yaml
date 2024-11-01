@@ -5,7 +5,8 @@ on:
       - 'master'
     paths-ignore:
       - '**/*.md'
-
+  schedule:
+    - cron: '0 12 * * 3' # ever
 jobs:
   build:
     name: Dependencies
