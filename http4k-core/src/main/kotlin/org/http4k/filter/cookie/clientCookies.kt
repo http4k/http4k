@@ -5,7 +5,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
-data class LocalCookie(val cookie: Cookie, private val created: Instant) {
+data class LocalCookie(val cookie: Cookie, val created: Instant) {
     fun isExpired(now: Instant) =
         (cookie.maxAge
             ?.let { maxAge -> Duration.between(created, now).seconds >= maxAge }

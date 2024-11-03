@@ -3,6 +3,8 @@ package org.http4k.filter.cookie
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.cookie.Cookie
+import org.http4k.format.Jackson
+import org.http4k.format.Jackson.asA
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDateTime
@@ -11,7 +13,7 @@ import java.time.LocalDateTime.MIN
 import java.time.ZoneOffset.UTC
 
 class LocalCookieTest {
-    val cookie = Cookie("foo", "bar")
+    private val cookie = Cookie("foo", "bar")
 
     @Test
     fun `cookie without time attributes does not expire`() {
@@ -43,5 +45,11 @@ class LocalCookieTest {
 
         assertThat(localCookie.isExpired(created.plusSeconds(5)), equalTo(false))
         assertThat(localCookie.isExpired(created.plusSeconds(6)), equalTo(true))
+    }
+
+    @Test
+    fun `can be serialised`(){
+        val aCookie = LocalCookie(cookie, LocalDateTime.of(2017, 3, 11, 12, 15, 2).toInstant(UTC))
+        assertThat(Jackson.asA<LocalCookie>(Jackson.asFormatString(aCookie)), equalTo(aCookie))
     }
 }
