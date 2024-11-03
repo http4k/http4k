@@ -9,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.HEAD
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
@@ -174,34 +175,31 @@ object ClientFilters {
                 if (it.isRedirection()) {
                     if (attempt == 10) throw IllegalStateException("Too many redirection")
                     it.assureBodyIsConsumed()
-                    if (it.status == SEE_OTHER) {
-                        makeRequest(
-                            next,
-                            request.body(EMPTY).toNewLocation(it.location()),
-                            attempt + 1,
-                            it.resolveInitialUriTemplate(responseUriTemplate, attempt)
-                        )
-                    } else {
-                        makeRequest(
-                            next,
-                            request.toNewLocation(it.location()),
-                            attempt + 1,
-                            it.resolveInitialUriTemplate(responseUriTemplate, attempt)
-                        )
-                    }
+                    makeRequest(
+                        next,
+                        request.bodyForStatus(it.status).toNewLocation(it.location()),
+                        attempt + 1,
+                        it.resolveInitialUriTemplate(responseUriTemplate, attempt)
+                    )
                 } else it.withUriTemplate(responseUriTemplate)
+            }
+
+        private fun Request.bodyForStatus(status: Status): Request =
+            when (status) {
+                SEE_OTHER -> body(EMPTY)
+                else -> this
             }
 
         private fun Response.resolveInitialUriTemplate(previousValue: UriTemplate?, attempt: Int): UriTemplate? =
             when {
                 attempt > 1 -> previousValue
-                else -> when(this) {
+                else -> when (this) {
                     is RoutedResponse -> this.xUriTemplate
                     else -> null
                 }
             }
 
-        private fun Response.withUriTemplate(uriTemplate: UriTemplate?) = when(uriTemplate) {
+        private fun Response.withUriTemplate(uriTemplate: UriTemplate?) = when (uriTemplate) {
             null -> this
             else -> RoutedResponse(this, uriTemplate)
         }
@@ -213,7 +211,7 @@ object ClientFilters {
             return when {
                 header("host") != null && newUri.host.isNotEmpty() ->
                     redirect.replaceHeader("host",
-                    "${newUri.host}${newUri.port?.let { port -> ":$port" } ?: ""}")
+                        "${newUri.host}${newUri.port?.let { port -> ":$port" } ?: ""}")
 
                 else -> redirect
             }
