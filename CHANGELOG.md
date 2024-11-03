@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.33.2.0 (uncut)
+- **http4k-core* : Fix tracking of uri templates during in-memory request redirection
+- **http4k-core* : Make LocalCookie serialisable
+
 ### v5.33.1.0
 - **http4k-*** : Upgrade some dependency versions.
 
