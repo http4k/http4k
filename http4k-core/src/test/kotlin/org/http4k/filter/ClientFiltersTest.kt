@@ -9,7 +9,6 @@ import org.http4k.core.Body
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.ContentType.Companion.TEXT_XML
 import org.http4k.core.Credentials
-import org.http4k.core.MemoryBody
 import org.http4k.core.MemoryRequest
 import org.http4k.core.MemoryResponse
 import org.http4k.core.Method.GET
@@ -22,7 +21,6 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.MOVED_PERMANENTLY
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
-import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.parse
@@ -82,6 +80,21 @@ class ClientFiltersTest {
             defaultClient(Request(GET, "http://myhost/redirect")),
             equalTo(Response(FOUND).header("location", "/ok"))
         )
+    }
+
+    @Test
+    fun `redirects preserve initial uri template from response`() {
+        val server = routes(
+            "r1" bind GET to { Response(FOUND).header("location", "/r2") },
+            "r2" bind GET to { Response(FOUND).header("location", "/r3") },
+            "r3" bind GET to { Response(OK) }
+        )
+
+        val redirectingClient = ClientFilters.FollowRedirects().then(server)
+
+        val response = redirectingClient(Request(GET, "/r1")) as RoutedResponse
+
+        assertThat(response.xUriTemplate, equalTo(UriTemplate.from("r1")))
     }
 
     @Test
