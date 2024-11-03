@@ -12,6 +12,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
+import org.http4k.core.UriTemplate
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.extend
@@ -23,6 +24,7 @@ import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.StringBiDiMappings
+import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.security.CredentialsProvider
 import java.time.Clock
@@ -162,18 +164,47 @@ object ClientFilters {
     }
 
     class FollowRedirects : Filter {
-        private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response =
+        private fun makeRequest(
+            next: HttpHandler,
+            request: Request,
+            attempt: Int = 1,
+            responseUriTemplate: UriTemplate? = null
+        ): Response =
             next(request).let {
                 if (it.isRedirection()) {
                     if (attempt == 10) throw IllegalStateException("Too many redirection")
                     it.assureBodyIsConsumed()
                     if (it.status == SEE_OTHER) {
-                        makeRequest(next, request.body(EMPTY).toNewLocation(it.location()), attempt + 1)
+                        makeRequest(
+                            next,
+                            request.body(EMPTY).toNewLocation(it.location()),
+                            attempt + 1,
+                            it.resolveInitialUriTemplate(responseUriTemplate, attempt)
+                        )
                     } else {
-                        makeRequest(next, request.toNewLocation(it.location()), attempt + 1)
+                        makeRequest(
+                            next,
+                            request.toNewLocation(it.location()),
+                            attempt + 1,
+                            it.resolveInitialUriTemplate(responseUriTemplate, attempt)
+                        )
                     }
-                } else it
+                } else it.withUriTemplate(responseUriTemplate)
             }
+
+        private fun Response.resolveInitialUriTemplate(previousValue: UriTemplate?, attempt: Int): UriTemplate? =
+            when {
+                attempt > 1 -> previousValue
+                else -> when(this) {
+                    is RoutedResponse -> this.xUriTemplate
+                    else -> null
+                }
+            }
+
+        private fun Response.withUriTemplate(uriTemplate: UriTemplate?) = when(uriTemplate) {
+            null -> this
+            else -> RoutedResponse(this, uriTemplate)
+        }
 
         private fun Request.toNewLocation(location: String): Request {
             val newUri = newLocation(location)
