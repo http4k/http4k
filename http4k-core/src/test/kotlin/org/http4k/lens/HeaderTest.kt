@@ -157,11 +157,11 @@ class HeaderTest {
             )
         )
 
-        val reqWithHeader = Request(GET, "").acceptContent(accept)
+        val reqWithHeader = Request(GET, "").accept(accept)
 
         assertThat(reqWithHeader.header("Accept"),
             equalTo("text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))
-        assertThat(reqWithHeader.acceptContent(), equalTo(accept))
+        assertThat(reqWithHeader.accept(), equalTo(accept))
     }
 
     @Test
@@ -175,7 +175,7 @@ class HeaderTest {
         )
 
         assertThat(
-            Request(GET, "").acceptContent(accept).header("Accept"),
+            Request(GET, "").accept(accept).header("Accept"),
             equalTo("text/html;q=0.8, text/html;q=0.2, text/plain")
         )
 
@@ -183,7 +183,7 @@ class HeaderTest {
 
         assertThat(
             Request(GET, "")
-                .header("Accept", "text/html;level=1;q=0.8, text/html;charset=utf-8;q=0.2, text/plain").acceptContent(),
+                .header("Accept", "text/html;level=1;q=0.8, text/html;charset=utf-8;q=0.2, text/plain").accept(),
             equalTo(expected)
         )
     }

@@ -99,11 +99,7 @@ fun Response.location(uri: Uri) = with(LOCATION of uri)
 
 fun Request.accept(): Accept? = ACCEPT(this)
 
-fun Request.acceptContent(): Accept? = ACCEPT(this)
-
 fun Request.accept(accept: Accept) = with(ACCEPT of accept)
-
-fun Request.acceptContent(accept: Accept) = with(ACCEPT of accept)
 
 fun Request.basicAuthentication() = AUTHORIZATION_BASIC(this)
 
