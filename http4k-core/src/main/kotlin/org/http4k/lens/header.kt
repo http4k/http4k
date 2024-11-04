@@ -1,10 +1,13 @@
 package org.http4k.lens
 
 import org.http4k.core.Accept
+import org.http4k.core.AcceptContent
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.HttpMessage
+import org.http4k.core.Parameter
 import org.http4k.core.Parameters
+import org.http4k.core.QualifiedContent
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -19,6 +22,7 @@ import org.http4k.lens.ParamMeta.StringParam
 import java.util.Locale.getDefault
 
 typealias HeaderLens<T> = Lens<HttpMessage, T>
+
 
 object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
     LensGet { name, target -> target.headerValues(name).map { it ?: "" } },
@@ -49,6 +53,17 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
                 ?.map { it.first + (it.second?.let { "=$it" } ?: "") }?.joinToString(";", prefix = ";")
                 .orEmpty()
     }
+
+    val ACCEPT_CONTENT = map(::parseAcceptContentHeader).optional("Accept")
+
+    private fun parseAcceptContentHeader(it: String): AcceptContent =
+        it.split(",")
+            .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
+            .map { it.split(";").let { parts -> parts.first().trim() to parts.findQValue() } }
+            .map { QualifiedContent(ContentType(it.first), it.second) }
+            .let(::AcceptContent)
+
+    private fun List<String>.findQValue(): Double = find { it.startsWith("q=") }?.substring(2)?.toDoubleOrNull() ?: 1.0
 
     val LINK = map(
         {
