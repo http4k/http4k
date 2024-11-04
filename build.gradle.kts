@@ -138,14 +138,8 @@ subprojects {
         apply(plugin = "com.github.jk1.dependency-license-report")
 
         licenseReport {
-            val groupsWeKnowArePermissivelyLicensed = listOf<String>(
-//                "com.squareup.okio",              // apache2
-//                "io.ktor",                        // apache2
-                "io.netty",                       // apache2
-//                "io.kotest",                      // apache2
-//                "org.jetbrains.kotlin",           // apache2
-//                "org.jetbrains.kotlinx",          // apache2
-//                "org.reactivestreams"             // MIT-0
+            val groupsWeKnowArePermissivelyLicensed = listOf(
+                "io.netty",                       // apache2: https://github.com/netty/netty/blob/4.1/LICENSE.txt
             )
 
             val implementationDependenciesWhichWeDoNotDistribute =

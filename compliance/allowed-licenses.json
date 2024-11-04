@@ -63,7 +63,12 @@
         {
             "moduleLicense": "CC0-1.0",
             "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "Creative Commons Legal Code",
+            "moduleName": "org.reactivestreams:reactive-streams",
+            "comment": "Mistake in tooling: Reactive Streams is licensed under the MIT No Attribution License",
+            "url": "https://github.com/reactive-streams/reactive-streams-jvm/blob/master/LICENSE"
         }
-
     ]
 }
