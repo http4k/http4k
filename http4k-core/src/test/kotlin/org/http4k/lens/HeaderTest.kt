@@ -10,6 +10,8 @@ import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.QualifiedContent
 import org.http4k.core.Credentials
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -130,21 +132,77 @@ class HeaderTest {
     }
 
     @Test
-    fun `accept header deserialises correctly from message`() {
+    fun `accept content header deserialises correctly from message`() {
         val accept = Header.ACCEPT(Request(GET, "").header("Accept", "text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))!!
 
-        assertThat(accept, equalTo(Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8"))))
+        assertThat(accept, equalTo(Accept(listOf(
+            QualifiedContent(TEXT_HTML.withNoDirectives()),
+            QualifiedContent(APPLICATION_PDF.withNoDirectives()),
+            QualifiedContent(APPLICATION_XML.withNoDirectives(), 0.9),
+            QualifiedContent(ContentType("image/webp")),
+            QualifiedContent(ContentType("*/*"), 0.8)
+        ))))
+
         assertThat(accept.accepts(TEXT_HTML), equalTo(true))
         assertThat(accept.accepts(MULTIPART_FORM_DATA), equalTo(false))
     }
 
     @Test
-    fun `accept header serialises correctly to message`() {
-        val reqWithHeader = Request(GET, "").with(Header.ACCEPT of Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
-
-        assertThat(reqWithHeader.header("Accept"), equalTo("text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))
-        assertThat(reqWithHeader.accept(), equalTo(Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
+    fun `accept content header serialises correctly from message`() {
+        val accept = Accept(listOf(
+                QualifiedContent(TEXT_HTML.withNoDirectives()),
+                QualifiedContent(APPLICATION_PDF.withNoDirectives()),
+                QualifiedContent(APPLICATION_XML.withNoDirectives(), 0.9),
+                QualifiedContent(ContentType("image/webp")),
+                QualifiedContent(ContentType("*/*"), 0.8)
+            )
         )
+
+        val reqWithHeader = Request(GET, "").accept(accept)
+
+        assertThat(reqWithHeader.header("Accept"),
+            equalTo("text/html, application/pdf, application/xml; q=0.9, image/webp, */*; q=0.8"))
+        assertThat(reqWithHeader.accept(), equalTo(accept))
+    }
+
+    @Test
+    fun `accept content header ignores charset directive`() {
+        val accept = Accept(
+            listOf(
+                QualifiedContent(ContentType("text/*", listOf("charset" to "utf-8")), 0.3),
+                QualifiedContent(ContentType("text/plain"), 0.7),
+                QualifiedContent(ContentType("text/plain", listOf("format" to "flowed"))),
+                QualifiedContent(ContentType("text/plain", listOf("format" to "fixed")), 0.4),
+                QualifiedContent(ContentType("*/*"), 0.5),
+            )
+        )
+
+        assertThat(
+            Request(GET, "").accept(accept).header("Accept"),
+            equalTo("text/*; q=0.3, text/plain; q=0.7, text/plain; format=flowed, text/plain; format=fixed; q=0.4, */*; q=0.5")
+        )
+
+        val expected = accept.copy(accept.contentTypes.map { it.copy(content = it.content.withoutCharset()) })
+
+        assertThat(
+            Request(GET, "")
+                .header("Accept", "text/*;charset=utf-8;q=0.3, text/plain; q=0.7, text/plain;format=flowed;charset=utf-8, text/plain;format=fixed;q=0.4, */*;q=0.5").accept(),
+            equalTo(expected)
+        )
+    }
+
+    @Test
+    fun `checking accepted content-type ignores directives`(){
+        val accept = Accept(
+            listOf(
+                QualifiedContent(ContentType("text/html", listOf("charset" to "utf-8", "format" to "fixed")), 0.3),
+                QualifiedContent(ContentType("text/plain", listOf("charset" to "utf-8")), 0.2),
+            )
+        )
+
+        assertThat(accept.accepts(TEXT_PLAIN), equalTo(true))
+        assertThat(accept.accepts(TEXT_HTML), equalTo(true))
+        assertThat(accept.accepts(TEXT_HTML.copy(directives = listOf("format" to "fixed"))), equalTo(true))
     }
 
     @Test

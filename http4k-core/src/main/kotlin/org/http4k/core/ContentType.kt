@@ -8,6 +8,8 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
 
     fun withNoDirectives() = copy(directives = emptyList())
 
+    fun withoutCharset() = copy(directives = directives.filter { it.first.lowercase(getDefault()) != "charset" })
+
     fun toHeaderValue() = (
         listOf(value) +
             directives

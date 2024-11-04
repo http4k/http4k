@@ -5,10 +5,12 @@ import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.HttpMessage
 import org.http4k.core.Parameters
+import org.http4k.core.QualifiedContent
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.findSingle
 import org.http4k.core.with
 import org.http4k.lens.Header.ACCEPT
 import org.http4k.lens.Header.AUTHORIZATION_BASIC
@@ -19,6 +21,7 @@ import org.http4k.lens.ParamMeta.StringParam
 import java.util.Locale.getDefault
 
 typealias HeaderLens<T> = Lens<HttpMessage, T>
+
 
 object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
     LensGet { name, target -> target.headerValues(name).map { it ?: "" } },
@@ -37,18 +40,26 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
 
     val LOCATION = map(::of, Uri::toString).required("location")
 
-    val ACCEPT = map(::parseAcceptHeaders, ::injectAcceptHeaders).optional("Accept")
+    val ACCEPT = map(::parseAcceptContentHeader, ::injectAcceptContentHeaders).optional("Accept")
 
-    private fun parseAcceptHeaders(it: String): Accept = parseValueAndDirectives(it).let {
-        Accept(it.first.split(",").map { it.trim() }.map(::ContentType), it.second)
+    private fun parseAcceptContentHeader(value: String): Accept =
+        value.split(",")
+            .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
+            .map { rawContentType ->
+                parseValueAndDirectives(rawContentType)
+                    .let { it.toAcceptContentType() to it.second.findQValue()}
+            }
+            .map { QualifiedContent(it.first, it.second) }
+            .let(::Accept)
+
+    private fun injectAcceptContentHeaders(accept: Accept): String = accept.contentTypes.joinToString(", ") {
+        it.content.withoutCharset().toHeaderValue() + it.priority
+            .takeIf { priority -> priority < 1.0 }
+            ?.let { priority -> "; q=$priority" }
+            .orEmpty()
     }
 
-    private fun injectAcceptHeaders(accept: Accept): String = accept.let {
-        it.contentTypes.joinToString(", ") { it.withNoDirectives().toHeaderValue() } +
-            it.directives.takeIf { it.isNotEmpty() }
-                ?.map { it.first + (it.second?.let { "=$it" } ?: "") }?.joinToString(";", prefix = ";")
-                .orEmpty()
-    }
+    private fun Parameters.findQValue(): Double = findSingle("q")?.toDoubleOrNull() ?: 1.0
 
     val LINK = map(
         {
@@ -76,6 +87,10 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
             }
         }
 }
+
+private fun Pair<String, Parameters>.toAcceptContentType() =
+    ContentType(first, second.filter { it.first.lowercase(getDefault()) != "q" }).withoutCharset()
+
 
 inline fun <reified T : Enum<T>> Header.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
     if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
