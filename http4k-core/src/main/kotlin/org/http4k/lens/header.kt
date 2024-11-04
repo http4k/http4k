@@ -14,6 +14,7 @@ import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.with
 import org.http4k.lens.Header.ACCEPT
+import org.http4k.lens.Header.ACCEPT_CONTENT
 import org.http4k.lens.Header.AUTHORIZATION_BASIC
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Header.LOCATION
@@ -54,7 +55,7 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
                 .orEmpty()
     }
 
-    val ACCEPT_CONTENT = map(::parseAcceptContentHeader).optional("Accept")
+    val ACCEPT_CONTENT = map(::parseAcceptContentHeader, ::injectAcceptContentHeaders).optional("Accept")
 
     private fun parseAcceptContentHeader(it: String): AcceptContent =
         it.split(",")
@@ -62,6 +63,13 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
             .map { it.split(";").let { parts -> parts.first().trim() to parts.findQValue() } }
             .map { QualifiedContent(ContentType(it.first), it.second) }
             .let(::AcceptContent)
+
+    private fun injectAcceptContentHeaders(accept: AcceptContent): String = accept.types.joinToString(", ") {
+        it.content.toHeaderValue() + it.priority
+            .takeIf { priority -> priority < 1.0 }
+            ?.let { priority -> ";q=$priority" }
+            .orEmpty()
+    }
 
     private fun List<String>.findQValue(): Double = find { it.startsWith("q=") }?.substring(2)?.toDoubleOrNull() ?: 1.0
 
@@ -107,7 +115,11 @@ fun Response.location(uri: Uri) = with(LOCATION of uri)
 
 fun Request.accept(): Accept? = ACCEPT(this)
 
+fun Request.acceptContent(): AcceptContent? = ACCEPT_CONTENT(this)
+
 fun Request.accept(accept: Accept) = with(ACCEPT of accept)
+
+fun Request.acceptContent(accept: AcceptContent) = with(ACCEPT_CONTENT of accept)
 
 fun Request.basicAuthentication() = AUTHORIZATION_BASIC(this)
 

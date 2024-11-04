@@ -157,6 +157,24 @@ class HeaderTest {
     }
 
     @Test
+    fun `accept content header serialises correctly from message`() {
+        val accept = AcceptContent(listOf(
+                QualifiedContent(TEXT_HTML.withNoDirectives()),
+                QualifiedContent(APPLICATION_PDF.withNoDirectives()),
+                QualifiedContent(APPLICATION_XML.withNoDirectives(), 0.9),
+                QualifiedContent(ContentType("image/webp")),
+                QualifiedContent(ContentType("*/*"), 0.8)
+            )
+        )
+
+        val reqWithHeader = Request(GET, "").acceptContent(accept)
+
+        assertThat(reqWithHeader.header("Accept"),
+            equalTo("text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))
+        assertThat(reqWithHeader.acceptContent(), equalTo(accept))
+    }
+
+    @Test
     fun `accept header serialises correctly to message`() {
         val reqWithHeader = Request(GET, "").with(Header.ACCEPT of Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
 
