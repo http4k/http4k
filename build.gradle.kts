@@ -23,7 +23,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
     kotlin("plugin.serialization")
     id("org.jetbrains.dokka")
-    id("com.github.jk1.dependency-license-report") version "2.0"
+    id("com.github.jk1.dependency-license-report")
 }
 
 kotlin {
@@ -134,19 +134,25 @@ subprojects {
         }
     }
 
-    if(hasAnArtifact(project)) {
+    if (hasAnArtifact(project)) {
         apply(plugin = "com.github.jk1.dependency-license-report")
 
         licenseReport {
-            val groupsWeKnowArePermissivelyLicensed = arrayOf(
-                "com.squareup.okio",              // apache2
-                "io.ktor",                        // apache2
+            val groupsWeKnowArePermissivelyLicensed = listOf<String>(
+//                "com.squareup.okio",              // apache2
+//                "io.ktor",                        // apache2
                 "io.netty",                       // apache2
-                "io.kotest",                      // apache2
-                "org.jetbrains.kotlin",           // apache2
-                "org.jetbrains.kotlinx",          // apache2
-                "org.reactivestreams"             // MIT-0
+//                "io.kotest",                      // apache2
+//                "org.jetbrains.kotlin",           // apache2
+//                "org.jetbrains.kotlinx",          // apache2
+//                "org.reactivestreams"             // MIT-0
             )
+
+            val implementationDependenciesWhichWeDoNotDistribute =
+                project.configurations.getAt("implementation").dependencies.map { it.group }
+
+            excludeGroups = (implementationDependenciesWhichWeDoNotDistribute + groupsWeKnowArePermissivelyLicensed)
+                .toTypedArray()
 
             configurations = arrayOf("compileClasspath")
             filters = arrayOf(
@@ -156,10 +162,9 @@ subprojects {
                 )
             )
             renderers = arrayOf(JsonReportRenderer(), InventoryHtmlReportRenderer())
-            excludeGroups = groupsWeKnowArePermissivelyLicensed
             allowedLicensesFile = "${project.rootProject.projectDir}/compliance/allowed-licenses.json"
             excludeBoms = true
-            excludeOwnGroup = false
+            excludeOwnGroup = true
         }
 
         if (!project.name.contains("serverless")) {
