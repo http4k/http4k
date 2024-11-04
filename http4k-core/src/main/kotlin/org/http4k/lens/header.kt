@@ -55,7 +55,7 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
     private fun injectAcceptContentHeaders(accept: Accept): String = accept.contentTypes.joinToString(", ") {
         it.content.withoutCharset().toHeaderValue() + it.priority
             .takeIf { priority -> priority < 1.0 }
-            ?.let { priority -> ";q=$priority" }
+            ?.let { priority -> "; q=$priority" }
             .orEmpty()
     }
 
