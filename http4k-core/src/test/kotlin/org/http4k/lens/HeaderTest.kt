@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Accept
-import org.http4k.core.AcceptContent
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
@@ -132,19 +131,10 @@ class HeaderTest {
     }
 
     @Test
-    fun `accept header deserialises correctly from message`() {
+    fun `accept content header deserialises correctly from message`() {
         val accept = Header.ACCEPT(Request(GET, "").header("Accept", "text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))!!
 
-        assertThat(accept, equalTo(Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8"))))
-        assertThat(accept.accepts(TEXT_HTML), equalTo(true))
-        assertThat(accept.accepts(MULTIPART_FORM_DATA), equalTo(false))
-    }
-
-    @Test
-    fun `accept content header deserialises correctly from message`() {
-        val accept = Header.ACCEPT_CONTENT(Request(GET, "").header("Accept", "text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))!!
-
-        assertThat(accept, equalTo(AcceptContent(listOf(
+        assertThat(accept, equalTo(Accept(listOf(
             QualifiedContent(TEXT_HTML.withNoDirectives()),
             QualifiedContent(APPLICATION_PDF.withNoDirectives()),
             QualifiedContent(APPLICATION_XML.withNoDirectives(), 0.9),
@@ -158,7 +148,7 @@ class HeaderTest {
 
     @Test
     fun `accept content header serialises correctly from message`() {
-        val accept = AcceptContent(listOf(
+        val accept = Accept(listOf(
                 QualifiedContent(TEXT_HTML.withNoDirectives()),
                 QualifiedContent(APPLICATION_PDF.withNoDirectives()),
                 QualifiedContent(APPLICATION_XML.withNoDirectives(), 0.9),
@@ -176,7 +166,7 @@ class HeaderTest {
 
     @Test
     fun `accept content header ignores directives`() {
-        val accept = AcceptContent(
+        val accept = Accept(
             listOf(
                 QualifiedContent(ContentType("text/html", listOf("level" to "1")), 0.8),
                 QualifiedContent(ContentType("text/html", listOf("charset" to "utf-8")), 0.2),
@@ -189,21 +179,12 @@ class HeaderTest {
             equalTo("text/html;q=0.8, text/html;q=0.2, text/plain")
         )
 
-        val expected = accept.copy(accept.types.map { it.copy(content = it.content.withNoDirectives()) })
+        val expected = accept.copy(accept.contentTypes.map { it.copy(content = it.content.withNoDirectives()) })
 
         assertThat(
             Request(GET, "")
                 .header("Accept", "text/html;level=1;q=0.8, text/html;charset=utf-8;q=0.2, text/plain").acceptContent(),
             equalTo(expected)
-        )
-    }
-
-    @Test
-    fun `accept header serialises correctly to message`() {
-        val reqWithHeader = Request(GET, "").with(Header.ACCEPT of Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
-
-        assertThat(reqWithHeader.header("Accept"), equalTo("text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))
-        assertThat(reqWithHeader.accept(), equalTo(Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
         )
     }
 

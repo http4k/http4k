@@ -1,11 +1,9 @@
 package org.http4k.lens
 
 import org.http4k.core.Accept
-import org.http4k.core.AcceptContent
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.HttpMessage
-import org.http4k.core.Parameter
 import org.http4k.core.Parameters
 import org.http4k.core.QualifiedContent
 import org.http4k.core.Request
@@ -14,7 +12,6 @@ import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.with
 import org.http4k.lens.Header.ACCEPT
-import org.http4k.lens.Header.ACCEPT_CONTENT
 import org.http4k.lens.Header.AUTHORIZATION_BASIC
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Header.LOCATION
@@ -42,29 +39,16 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
 
     val LOCATION = map(::of, Uri::toString).required("location")
 
-    val ACCEPT = map(::parseAcceptHeaders, ::injectAcceptHeaders).optional("Accept")
+    val ACCEPT = map(::parseAcceptContentHeader, ::injectAcceptContentHeaders).optional("Accept")
 
-    private fun parseAcceptHeaders(it: String): Accept = parseValueAndDirectives(it).let {
-        Accept(it.first.split(",").map { it.trim() }.map(::ContentType), it.second)
-    }
-
-    private fun injectAcceptHeaders(accept: Accept): String = accept.let {
-        it.contentTypes.joinToString(", ") { it.withNoDirectives().toHeaderValue() } +
-            it.directives.takeIf { it.isNotEmpty() }
-                ?.map { it.first + (it.second?.let { "=$it" } ?: "") }?.joinToString(";", prefix = ";")
-                .orEmpty()
-    }
-
-    val ACCEPT_CONTENT = map(::parseAcceptContentHeader, ::injectAcceptContentHeaders).optional("Accept")
-
-    private fun parseAcceptContentHeader(it: String): AcceptContent =
+    private fun parseAcceptContentHeader(it: String): Accept =
         it.split(",")
             .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
             .map { it.split(";").let { parts -> parts.first().trim() to parts.findQValue() } }
             .map { QualifiedContent(ContentType(it.first), it.second) }
-            .let(::AcceptContent)
+            .let(::Accept)
 
-    private fun injectAcceptContentHeaders(accept: AcceptContent): String = accept.types.joinToString(", ") {
+    private fun injectAcceptContentHeaders(accept: Accept): String = accept.contentTypes.joinToString(", ") {
         it.content.withNoDirectives().toHeaderValue() + it.priority
             .takeIf { priority -> priority < 1.0 }
             ?.let { priority -> ";q=$priority" }
@@ -115,11 +99,11 @@ fun Response.location(uri: Uri) = with(LOCATION of uri)
 
 fun Request.accept(): Accept? = ACCEPT(this)
 
-fun Request.acceptContent(): AcceptContent? = ACCEPT_CONTENT(this)
+fun Request.acceptContent(): Accept? = ACCEPT(this)
 
 fun Request.accept(accept: Accept) = with(ACCEPT of accept)
 
-fun Request.acceptContent(accept: AcceptContent) = with(ACCEPT_CONTENT of accept)
+fun Request.acceptContent(accept: Accept) = with(ACCEPT of accept)
 
 fun Request.basicAuthentication() = AUTHORIZATION_BASIC(this)
 
