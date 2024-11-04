@@ -69,6 +69,17 @@
             "moduleName": "org.reactivestreams:reactive-streams",
             "comment": "Mistake in tooling: Reactive Streams is licensed under the MIT No Attribution License",
             "url": "https://github.com/reactive-streams/reactive-streams-jvm/blob/master/LICENSE"
+        },
+        {
+            "moduleLicense": "Common Development and Distribution License 1.0",
+            "moduleName": "javax.servlet:javax.servlet-api",
+            "comment": "Not distributed as pulled in as provided dependency"
+        },
+        {
+            "moduleLicense": "PUBLIC DOMAIN",
+            "moduleName": "org.latencyutils:LatencyUtils",
+            "comment": "BSD 2-Clause License",
+            "url": "https://github.com/LatencyUtils/LatencyUtils/blob/master/LICENSE"
         }
     ]
 }
