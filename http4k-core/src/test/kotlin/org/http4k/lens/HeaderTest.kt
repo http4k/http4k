@@ -175,6 +175,30 @@ class HeaderTest {
     }
 
     @Test
+    fun `accept content header ignores directives`() {
+        val accept = AcceptContent(
+            listOf(
+                QualifiedContent(ContentType("text/html", listOf("level" to "1")), 0.8),
+                QualifiedContent(ContentType("text/html", listOf("charset" to "utf-8")), 0.2),
+                QualifiedContent(ContentType("text/plain")),
+            )
+        )
+
+        assertThat(
+            Request(GET, "").acceptContent(accept).header("Accept"),
+            equalTo("text/html;q=0.8, text/html;q=0.2, text/plain")
+        )
+
+        val expected = accept.copy(accept.types.map { it.copy(content = it.content.withNoDirectives()) })
+
+        assertThat(
+            Request(GET, "")
+                .header("Accept", "text/html;level=1;q=0.8, text/html;charset=utf-8;q=0.2, text/plain").acceptContent(),
+            equalTo(expected)
+        )
+    }
+
+    @Test
     fun `accept header serialises correctly to message`() {
         val reqWithHeader = Request(GET, "").with(Header.ACCEPT of Accept(listOf(TEXT_HTML.withNoDirectives(), APPLICATION_PDF.withNoDirectives(), APPLICATION_XML.withNoDirectives()), listOf("q" to "0.9, image/webp, */*", "q" to "0.8")))
 
