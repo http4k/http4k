@@ -10,6 +10,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.QualifiedContent
 import org.http4k.core.Credentials
 import org.http4k.core.Method
@@ -165,27 +166,43 @@ class HeaderTest {
     }
 
     @Test
-    fun `accept content header ignores directives`() {
+    fun `accept content header ignores charset directive`() {
         val accept = Accept(
             listOf(
-                QualifiedContent(ContentType("text/html", listOf("level" to "1")), 0.8),
-                QualifiedContent(ContentType("text/html", listOf("charset" to "utf-8")), 0.2),
-                QualifiedContent(ContentType("text/plain")),
+                QualifiedContent(ContentType("text/*", listOf("charset" to "utf-8")), 0.3),
+                QualifiedContent(ContentType("text/plain"), 0.7),
+                QualifiedContent(ContentType("text/plain", listOf("format" to "flowed"))),
+                QualifiedContent(ContentType("text/plain", listOf("format" to "fixed")), 0.4),
+                QualifiedContent(ContentType("*/*"), 0.5),
             )
         )
 
         assertThat(
             Request(GET, "").accept(accept).header("Accept"),
-            equalTo("text/html;q=0.8, text/html;q=0.2, text/plain")
+            equalTo("text/*;q=0.3, text/plain;q=0.7, text/plain; format=flowed, text/plain; format=fixed;q=0.4, */*;q=0.5")
         )
 
-        val expected = accept.copy(accept.contentTypes.map { it.copy(content = it.content.withNoDirectives()) })
+        val expected = accept.copy(accept.contentTypes.map { it.copy(content = it.content.withoutCharset()) })
 
         assertThat(
             Request(GET, "")
-                .header("Accept", "text/html;level=1;q=0.8, text/html;charset=utf-8;q=0.2, text/plain").accept(),
+                .header("Accept", "text/*;charset=utf-8;q=0.3, text/plain;q=0.7, text/plain;format=flowed;charset=utf-8, text/plain;format=fixed;q=0.4, */*;q=0.5").accept(),
             equalTo(expected)
         )
+    }
+
+    @Test
+    fun `checking accepted content-type ignores directives`(){
+        val accept = Accept(
+            listOf(
+                QualifiedContent(ContentType("text/html", listOf("charset" to "utf-8", "format" to "fixed")), 0.3),
+                QualifiedContent(ContentType("text/plain", listOf("charset" to "utf-8")), 0.2),
+            )
+        )
+
+        assertThat(accept.accepts(TEXT_PLAIN), equalTo(true))
+        assertThat(accept.accepts(TEXT_HTML), equalTo(true))
+        assertThat(accept.accepts(TEXT_HTML.copy(directives = listOf("format" to "fixed"))), equalTo(true))
     }
 
     @Test

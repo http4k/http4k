@@ -10,6 +10,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.findSingle
 import org.http4k.core.with
 import org.http4k.lens.Header.ACCEPT
 import org.http4k.lens.Header.AUTHORIZATION_BASIC
@@ -41,21 +42,24 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
 
     val ACCEPT = map(::parseAcceptContentHeader, ::injectAcceptContentHeaders).optional("Accept")
 
-    private fun parseAcceptContentHeader(it: String): Accept =
-        it.split(",")
+    private fun parseAcceptContentHeader(value: String): Accept =
+        value.split(",")
             .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
-            .map { it.split(";").let { parts -> parts.first().trim() to parts.findQValue() } }
-            .map { QualifiedContent(ContentType(it.first), it.second) }
+            .map { rawContentType ->
+                parseValueAndDirectives(rawContentType)
+                    .let { it.toAcceptContentType() to it.second.findQValue()}
+            }
+            .map { QualifiedContent(it.first, it.second) }
             .let(::Accept)
 
     private fun injectAcceptContentHeaders(accept: Accept): String = accept.contentTypes.joinToString(", ") {
-        it.content.withNoDirectives().toHeaderValue() + it.priority
+        it.content.withoutCharset().toHeaderValue() + it.priority
             .takeIf { priority -> priority < 1.0 }
             ?.let { priority -> ";q=$priority" }
             .orEmpty()
     }
 
-    private fun List<String>.findQValue(): Double = find { it.startsWith("q=") }?.substring(2)?.toDoubleOrNull() ?: 1.0
+    private fun Parameters.findQValue(): Double = findSingle("q")?.toDoubleOrNull() ?: 1.0
 
     val LINK = map(
         {
@@ -83,6 +87,10 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
             }
         }
 }
+
+private fun Pair<String, Parameters>.toAcceptContentType() =
+    ContentType(first, second.filter { it.first.lowercase(getDefault()) != "q" }).withoutCharset()
+
 
 inline fun <reified T : Enum<T>> Header.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
     if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),

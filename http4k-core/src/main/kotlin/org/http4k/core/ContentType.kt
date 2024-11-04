@@ -8,6 +8,8 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
 
     fun withNoDirectives() = copy(directives = emptyList())
 
+    fun withoutCharset() = copy(directives = directives.filter { it.first.lowercase(getDefault()) != "charset" })
+
     fun toHeaderValue() = (
         listOf(value) +
             directives
@@ -15,6 +17,8 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         ).joinToString("; ")
 
     fun equalsIgnoringDirectives(that: ContentType): Boolean = withNoDirectives() == that.withNoDirectives()
+
+    fun equalsIgnoringCharset(that: ContentType): Boolean = withoutCharset() == that.withoutCharset()
 
     companion object {
         fun Text(value: String, charset: Charset? = UTF_8) = ContentType(value, listOfNotNull(charset?.let {
