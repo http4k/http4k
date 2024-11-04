@@ -23,7 +23,6 @@ dependencies {
     testImplementation(testFixtures(project(":http4k-security-oauth")))
 }
 
-
 tasks {
     register<GenerateTask>("generateOpenApi3AutoClient") {
         generatorName = "kotlin"
@@ -52,6 +51,12 @@ tasks {
             "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved".toString()
         inputs.file(inputSpec)
         mustRunAfter("generateOpenApi3Client")
+    }
+
+    named("checkLicense") {
+        dependsOn("generateOpenApi2Client")
+        dependsOn("generateOpenApi3Client")
+        dependsOn("generateOpenApi3AutoClient")
     }
 
     named("compileKotlin").get().dependsOn(

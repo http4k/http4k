@@ -1,3 +1,6 @@
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
+import com.github.jk1.license.render.JsonReportRenderer
 import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
@@ -20,6 +23,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
     kotlin("plugin.serialization")
     id("org.jetbrains.dokka")
+    id("com.github.jk1.dependency-license-report") version "2.0"
 }
 
 kotlin {
@@ -105,7 +109,6 @@ subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "idea")
 
-
     val sourcesJar by tasks.creating(Jar::class) {
         archiveClassifier.set("sources")
         from(project.the<SourceSetContainer>()["main"].allSource)
@@ -131,7 +134,34 @@ subprojects {
         }
     }
 
-    if (hasAnArtifact(project)) {
+    if(hasAnArtifact(project)) {
+        apply(plugin = "com.github.jk1.dependency-license-report")
+
+        licenseReport {
+            val groupsWeKnowArePermissivelyLicensed = arrayOf(
+                "com.squareup.okio",              // apache2
+                "io.ktor",                        // apache2
+                "io.netty",                       // apache2
+                "io.kotest",                      // apache2
+                "org.jetbrains.kotlin",           // apache2
+                "org.jetbrains.kotlinx",          // apache2
+                "org.reactivestreams"             // MIT-0
+            )
+
+            configurations = arrayOf("compileClasspath")
+            filters = arrayOf(
+                LicenseBundleNormalizer(
+                    "${project.rootProject.projectDir}/compliance/license-normalizer-bundle.json",
+                    true
+                )
+            )
+            renderers = arrayOf(JsonReportRenderer(), InventoryHtmlReportRenderer())
+            excludeGroups = groupsWeKnowArePermissivelyLicensed
+            allowedLicensesFile = "${project.rootProject.projectDir}/compliance/allowed-licenses.json"
+            excludeBoms = true
+            excludeOwnGroup = false
+        }
+
         if (!project.name.contains("serverless")) {
             apply(plugin = "org.jetbrains.dokka")
         }
@@ -214,6 +244,7 @@ subprojects {
             kotlin.srcDir("$projectDir/src/examples/kotlin")
         }
     }
+
 }
 
 tasks.register<JacocoReport>("jacocoRootReport") {
@@ -262,6 +293,11 @@ tasks.register("listProjects") {
     }
 }
 
+tasks.named("checkLicense") {
+    onlyIf {
+        project != rootProject
+    }
+}
 fun Node.childrenCalled(wanted: String) = children()
     .filterIsInstance<Node>()
     .filter {
@@ -279,7 +315,6 @@ tasks {
         }
     }
 }
-
 
 val nexusUsername: String? by project
 val nexusPassword: String? by project
