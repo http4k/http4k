@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.33.2.0 (uncut)
+### v5.34.0.0 (uncut)
+- **http4k-core* : [Unlikely break] Fix parsing of accept header. It may break direct usages of `Accept` class
 - **http4k-core* : Fix tracking of uri templates during in-memory request redirection
 - **http4k-core* : Make LocalCookie serialisable
 
