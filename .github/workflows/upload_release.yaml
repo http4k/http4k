@@ -32,6 +32,6 @@ jobs:
           -PltsPassword="${{ secrets.LTS_PASSWORD }}" \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
-      - run: ./notify-lts-slack.sh ${{ github.event.client_payload.version }}
+      - run: ./notify-lts-slack.sh ${{ steps.tagName.outputs.tag }}
         env:
           LTS_SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}
