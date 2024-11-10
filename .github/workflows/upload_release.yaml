@@ -28,8 +28,8 @@ jobs:
           -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
           -PsigningKey="${{ secrets.SIGNING_KEY }}" \
           -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}" \
-          -PltsUsername="${{ secrets.LTS_USERNAME }}" \
-          -PltsPassword="${{ secrets.LTS_PASSWORD }}" \
+          -PltsPublishingUser="${{ secrets.LTS_PUBLISHING_USER }}" \
+          -PltsPublishingPassword="${{ secrets.LTS_PUBLISHING_PASSWORD }}" \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
       - run: ./notify-lts-slack.sh ${{ steps.tagName.outputs.tag }}
