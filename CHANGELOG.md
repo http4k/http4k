@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-core* : [Unlikely break] Fix parsing of accept header. It may break direct usages of `Accept` class
 - **http4k-core* : Fix tracking of uri templates during in-memory request redirection
 - **http4k-core* : Make LocalCookie serialisable
+- **http4k-testing-tracerbullet* : Render other types of participant in PlantUML diagrams
 
 ### v5.33.1.0
 - **http4k-*** : Upgrade some dependency versions.
