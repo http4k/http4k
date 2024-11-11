@@ -1,7 +1,7 @@
 @startuml
 title foobar
-participant "user 1"
-participant "user 2"
+actor "user 1"
+actor "user 2"
 participant "events"
 participant "system.b"
 participant "system-c"
