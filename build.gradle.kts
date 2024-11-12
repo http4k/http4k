@@ -4,7 +4,6 @@ import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-import java.net.URI
 import java.time.Duration
 
 plugins {
@@ -13,8 +12,6 @@ plugins {
     id("org.jetbrains.dokka")
 
     id("org.http4k.conventions")
-    id("org.http4k.license-check")
-    id("org.http4k.publishing")
 }
 
 kotlin {
@@ -107,9 +104,9 @@ subprojects {
             apply(plugin = "org.jetbrains.dokka")
         }
 
-        apply(plugin = "org.http4k.license-check")
-        apply(plugin = "org.http4k.publishing")
-        apply(plugin = "maven-publish") // required to upload to sonatype
+//        apply(plugin = "org.http4k.license-check")
+//        apply(plugin = "org.http4k.publishing")
+//        apply(plugin = "maven-publish") // required to upload to sonatype
     }
 
     sourceSets {
@@ -163,12 +160,6 @@ tasks.register("listProjects") {
         subprojects
             .filter { hasAnArtifact(it) }
             .forEach { System.err.println(it.name) }
-    }
-}
-
-tasks.named("checkLicense") {
-    onlyIf {
-        project != rootProject
     }
 }
 
