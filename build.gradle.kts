@@ -14,7 +14,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
     id("org.jetbrains.dokka")
 
-    id("http4k-conventions")
+    id("org.http4k.conventions")
     id("org.http4k.license-check")
     id("org.http4k.publishing")
 }
@@ -101,7 +101,7 @@ allprojects {
 subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "idea")
-    apply(plugin = "http4k-conventions")
+    apply(plugin = "org.http4k.conventions")
 
     if (hasAnArtifact(project)) {
 
