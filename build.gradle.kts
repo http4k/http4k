@@ -13,12 +13,12 @@ import java.net.URI
 import java.time.Duration
 
 plugins {
-    kotlin("jvm")
     kotlin("plugin.serialization")
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin")
     id("org.jetbrains.dokka")
+
     id("http4k-conventions")
     id("license-check")
 }
