@@ -25,7 +25,7 @@ val testJar by tasks.creating(Jar::class) {
 
 tasks.named<Jar>("jar") {
     manifest {
-        val asd = rootProject.name.replace('-', '_')
-        attributes(mapOf("${asd}_version" to archiveVersion))
+        val projectName = rootProject.name.replace('-', '_')
+        attributes(mapOf("${projectName}_version" to archiveVersion))
     }
 }
