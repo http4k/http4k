@@ -15,7 +15,7 @@ plugins {
     id("org.jetbrains.dokka")
 
     id("http4k-conventions")
-    id("license-check")
+    id("org.http4k.license-check")
     id("org.http4k.publishing")
 }
 
@@ -109,8 +109,8 @@ subprojects {
             apply(plugin = "org.jetbrains.dokka")
         }
 
-        apply(plugin = "license-check")
-        apply(plugin = "publishing")
+        apply(plugin = "org.http4k.license-check")
+        apply(plugin = "org.http4k.publishing")
         apply(plugin = "maven-publish") // required to upload to sonatype
 
         publishing {
