@@ -7,10 +7,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.time.Duration
 
 plugins {
-    `maven-publish`
     id("io.github.gradle-nexus.publish-plugin")
     id("org.jetbrains.dokka")
-
     id("org.http4k.conventions")
 }
 
