@@ -1,6 +1,3 @@
-import com.github.jk1.license.filter.LicenseBundleNormalizer
-import com.github.jk1.license.render.InventoryHtmlReportRenderer
-import com.github.jk1.license.render.JsonReportRenderer
 import groovy.namespace.QName
 import groovy.util.Node
 import org.gradle.api.JavaVersion.VERSION_1_8
@@ -104,6 +101,7 @@ allprojects {
 subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "idea")
+    apply(plugin = "http4k-conventions")
 
     if (hasAnArtifact(project)) {
 
@@ -113,33 +111,7 @@ subprojects {
 
         apply(plugin = "license-check")
         apply(plugin = "publishing")
-
         apply(plugin = "maven-publish") // required to upload to sonatype
-
-        val sourcesJar by tasks.creating(Jar::class) {
-            archiveClassifier.set("sources")
-            from(project.the<SourceSetContainer>()["main"].allSource)
-            dependsOn(tasks.named("classes"))
-        }
-
-        val javadocJar by tasks.creating(Jar::class) {
-            archiveClassifier.set("javadoc")
-            from(tasks.named<Javadoc>("javadoc").get().destinationDir)
-            dependsOn(tasks.named("javadoc"))
-        }
-
-        tasks {
-            named<Jar>("jar") {
-                manifest {
-                    attributes(mapOf("http4k_version" to archiveVersion))
-                }
-            }
-
-            val testJar by creating(Jar::class) {
-                archiveClassifier.set("test")
-                from(project.the<SourceSetContainer>()["test"].output)
-            }
-        }
 
         publishing {
             repositories {
@@ -194,8 +166,8 @@ subprojects {
                             .flatMap { it.childrenCalled("scope") }
                             .forEach { if (it.text() == "runtime") it.setValue("provided") }
                     }
-                    artifact(sourcesJar)
-                    artifact(javadocJar)
+                    artifact(tasks.named("sourcesJar"))
+                    artifact(tasks.named("javadocJar"))
                 }
             }
         }
