@@ -99,14 +99,9 @@ subprojects {
     apply(plugin = "org.http4k.conventions")
 
     if (hasAnArtifact(project)) {
-
         if (!project.name.contains("serverless")) {
             apply(plugin = "org.jetbrains.dokka")
         }
-
-//        apply(plugin = "org.http4k.license-check")
-//        apply(plugin = "org.http4k.publishing")
-//        apply(plugin = "maven-publish") // required to upload to sonatype
     }
 
     sourceSets {
