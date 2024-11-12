@@ -105,31 +105,6 @@ subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "idea")
 
-    val sourcesJar by tasks.creating(Jar::class) {
-        archiveClassifier.set("sources")
-        from(project.the<SourceSetContainer>()["main"].allSource)
-        dependsOn(tasks.named("classes"))
-    }
-
-    val javadocJar by tasks.creating(Jar::class) {
-        archiveClassifier.set("javadoc")
-        from(tasks.named<Javadoc>("javadoc").get().destinationDir)
-        dependsOn(tasks.named("javadoc"))
-    }
-
-    tasks {
-        named<Jar>("jar") {
-            manifest {
-                attributes(mapOf("http4k_version" to archiveVersion))
-            }
-        }
-
-        val testJar by creating(Jar::class) {
-            archiveClassifier.set("test")
-            from(project.the<SourceSetContainer>()["test"].output)
-        }
-    }
-
     if (hasAnArtifact(project)) {
 
         if (!project.name.contains("serverless")) {
@@ -138,11 +113,38 @@ subprojects {
 
         apply(plugin = "license-check")
         apply(plugin = "publishing")
+
         apply(plugin = "maven-publish") // required to upload to sonatype
+
+        val sourcesJar by tasks.creating(Jar::class) {
+            archiveClassifier.set("sources")
+            from(project.the<SourceSetContainer>()["main"].allSource)
+            dependsOn(tasks.named("classes"))
+        }
+
+        val javadocJar by tasks.creating(Jar::class) {
+            archiveClassifier.set("javadoc")
+            from(tasks.named<Javadoc>("javadoc").get().destinationDir)
+            dependsOn(tasks.named("javadoc"))
+        }
+
+        tasks {
+            named<Jar>("jar") {
+                manifest {
+                    attributes(mapOf("http4k_version" to archiveVersion))
+                }
+            }
+
+            val testJar by creating(Jar::class) {
+                archiveClassifier.set("test")
+                from(project.the<SourceSetContainer>()["test"].output)
+            }
+        }
 
         publishing {
             repositories {
                 maven {
+                    name = "http4k"
                     url = URI("s3://http4k-maven")
 
                     val ltsPublishingUser: String? by project
