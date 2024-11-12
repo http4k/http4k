@@ -29,3 +29,9 @@ licenseReport {
     excludeBoms = true
     excludeOwnGroup = true
 }
+
+tasks.named("checkLicense") {
+    onlyIf {
+        project != rootProject
+    }
+}

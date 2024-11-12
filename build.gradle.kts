@@ -14,12 +14,12 @@ import java.time.Duration
 
 plugins {
     `maven-publish`
-    signing
     id("io.github.gradle-nexus.publish-plugin")
     id("org.jetbrains.dokka")
 
     id("http4k-conventions")
     id("license-check")
+    id("publishing")
 }
 
 kotlin {
@@ -137,20 +137,8 @@ subprojects {
         }
 
         apply(plugin = "license-check")
-
-        val enableSigning = project.findProperty("sign") == "true"
-
+        apply(plugin = "publishing")
         apply(plugin = "maven-publish") // required to upload to sonatype
-
-        if (enableSigning) { // when added it expects signing keys to be configured
-            apply(plugin = "signing")
-            signing {
-                val signingKey: String? by project
-                val signingPassword: String? by project
-                useInMemoryPgpKeys(signingKey, signingPassword)
-                sign(publishing.publications)
-            }
-        }
 
         publishing {
             repositories {
