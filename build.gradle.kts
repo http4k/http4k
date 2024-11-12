@@ -14,14 +14,10 @@ import java.time.Duration
 
 plugins {
     kotlin("jvm")
-    idea
-    jacoco
-    `java-library`
-    `java-test-fixtures`
+    kotlin("plugin.serialization")
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin")
-    kotlin("plugin.serialization")
     id("org.jetbrains.dokka")
     id("http4k-conventions")
     id("license-check")
