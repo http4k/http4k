@@ -1,5 +1,10 @@
 description = "Http4k Standard webhooks support"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api("dev.forkhandles:values4k:_")

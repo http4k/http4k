@@ -1,5 +1,10 @@
 description = "Ultra-lightweight Selenium WebDriver implementation for http4k apps"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api("org.seleniumhq.selenium:selenium-api:_")

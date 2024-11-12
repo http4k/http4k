@@ -1,5 +1,10 @@
 description = "Http4k Bill Of Materials (BOM)"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     constraints {
         rootProject.subprojects

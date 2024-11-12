@@ -1,5 +1,10 @@
 description = "http4k support for the CloudEvents format"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-core"))

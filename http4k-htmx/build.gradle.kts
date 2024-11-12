@@ -1,5 +1,10 @@
 description = "Http4k htmx support utilities"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api("org.webjars.npm:htmx.org:_")

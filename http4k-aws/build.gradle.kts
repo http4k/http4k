@@ -1,5 +1,10 @@
 description = "Http4k AWS integration and request signing"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     implementation("software.amazon.awssdk:http-client-spi:_")

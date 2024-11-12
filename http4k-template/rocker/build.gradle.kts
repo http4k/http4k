@@ -2,6 +2,8 @@ description = "Http4k Rocker templating support"
 
 plugins {
     id("nu.studer.rocker")
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
 }
 
 apply(plugin = "java")

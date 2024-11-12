@@ -1,5 +1,10 @@
 description = "Http4k Serverless support for AWS Lambda"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-serverless-lambda"))
     testImplementation(testFixtures(project(":http4k-core")))

@@ -1,5 +1,10 @@
 description = "Http4k HTTP Server built on top of Undertow"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))

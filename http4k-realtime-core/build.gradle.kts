@@ -1,5 +1,10 @@
 description = "Http4k WebSocket core"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     testFixturesImplementation(testFixtures(project(":http4k-core")))

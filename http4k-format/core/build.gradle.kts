@@ -1,5 +1,10 @@
 description = "Http4k Format supporting code"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))

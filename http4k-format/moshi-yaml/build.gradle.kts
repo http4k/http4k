@@ -1,5 +1,10 @@
 description = "Http4k YAML support using Moshi and SnakeYaml as an underlying engine"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-realtime-core"))
     api(project(":http4k-format-moshi"))

@@ -1,5 +1,10 @@
 description = "Http4k WS(S) Server implemented by TooTallNate/Java-WebSocket"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))

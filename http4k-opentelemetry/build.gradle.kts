@@ -1,5 +1,10 @@
 description = "Http4k OpenTelemetry support"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api(platform("io.opentelemetry:opentelemetry-bom:_"))

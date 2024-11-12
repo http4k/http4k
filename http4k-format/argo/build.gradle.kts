@@ -1,5 +1,10 @@
 description = "Http4k Argo JSON support"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-format-core"))
     api("net.sourceforge.argo:argo:_")

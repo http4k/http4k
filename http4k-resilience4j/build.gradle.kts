@@ -1,5 +1,10 @@
 description = "Http4k Resilience4j support"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api("io.github.resilience4j:resilience4j-bulkhead:_")

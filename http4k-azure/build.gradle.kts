@@ -1,5 +1,10 @@
 description = "Http4k Azure integration tooling"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     api("com.azure:azure-core:_")

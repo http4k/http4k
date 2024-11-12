@@ -1,5 +1,10 @@
 description = "Http4k Handlebars templating support"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-template-core"))
     api("com.github.jknack:handlebars:_")

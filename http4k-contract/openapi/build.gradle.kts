@@ -3,6 +3,11 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 description = "http4k typesafe HTTP contracts and OpenApi support"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 apply(plugin = "org.openapi.generator")
 
 dependencies {

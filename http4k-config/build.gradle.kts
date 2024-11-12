@@ -1,5 +1,10 @@
 description = "Machinery for configuring Http4k apps in a typesafe way"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     implementation(project(":http4k-format-jackson-yaml"))

@@ -1,8 +1,10 @@
+description = "Http4k KotlinX DataFrame support"
+
 plugins {
     id("org.jetbrains.kotlinx.dataframe")
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
 }
-
-description = "Http4k KotlinX DataFrame support"
 
 dependencies {
     api(project(":http4k-format-core"))

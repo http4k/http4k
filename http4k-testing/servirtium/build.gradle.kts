@@ -2,6 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 description = "http4k Servirtium module"
 
+plugins {
+    id("org.http4k.license-check")
+    id("org.http4k.publishing")
+}
+
 dependencies {
     api(project(":http4k-core"))
     implementation(Testing.junit.jupiter.api)
