@@ -13,7 +13,6 @@ import java.net.URI
 import java.time.Duration
 
 plugins {
-    kotlin("plugin.serialization")
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin")
