@@ -23,7 +23,8 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
     kotlin("plugin.serialization")
     id("org.jetbrains.dokka")
-    id("com.github.jk1.dependency-license-report")
+    id("http4k-conventions")
+    id("license-check")
 }
 
 kotlin {
@@ -135,35 +136,12 @@ subprojects {
     }
 
     if (hasAnArtifact(project)) {
-        apply(plugin = "com.github.jk1.dependency-license-report")
-
-        licenseReport {
-            val groupsWeKnowArePermissivelyLicensed = listOf(
-                "io.netty",                       // apache2: https://github.com/netty/netty/blob/4.1/LICENSE.txt
-            )
-
-            val implementationDependenciesWhichWeDoNotDistribute =
-                project.configurations.getAt("implementation").dependencies.map { it.group }
-
-            excludeGroups = (implementationDependenciesWhichWeDoNotDistribute + groupsWeKnowArePermissivelyLicensed)
-                .toTypedArray()
-
-            configurations = arrayOf("compileClasspath")
-            filters = arrayOf(
-                LicenseBundleNormalizer(
-                    "${project.rootProject.projectDir}/compliance/license-normalizer-bundle.json",
-                    true
-                )
-            )
-            renderers = arrayOf(JsonReportRenderer(), InventoryHtmlReportRenderer())
-            allowedLicensesFile = "${project.rootProject.projectDir}/compliance/allowed-licenses.json"
-            excludeBoms = true
-            excludeOwnGroup = true
-        }
 
         if (!project.name.contains("serverless")) {
             apply(plugin = "org.jetbrains.dokka")
         }
+
+        apply(plugin = "license-check")
 
         val enableSigning = project.findProperty("sign") == "true"
 

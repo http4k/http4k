@@ -2,6 +2,10 @@
 
 rootProject.name = "http4k"
 
+pluginManagement {
+    includeBuild("gradle/scripts")
+}
+
 plugins {
     id("de.fayard.refreshVersions").version("0.60.5")
 }
