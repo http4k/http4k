@@ -16,7 +16,7 @@ plugins {
 
     id("http4k-conventions")
     id("license-check")
-    id("publishing")
+    id("org.http4k.publishing")
 }
 
 kotlin {
