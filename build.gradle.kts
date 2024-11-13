@@ -10,7 +10,6 @@ buildscript {
     }
 
     dependencies {
-        classpath(Kotlin.gradlePlugin)
         classpath("org.openapitools:openapi-generator-gradle-plugin:_")
         classpath("org.jetbrains.kotlin:kotlin-serialization:_")
     }
