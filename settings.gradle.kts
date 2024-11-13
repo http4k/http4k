@@ -109,7 +109,7 @@ include("http4k-realtime-core")
     includeModule("alibaba")
     includeModule("alibaba:integration-test:test-function")
     includeModule("azure")
-    includeModule("azure:integration-test:test-function")
+//    includeModule("azure:integration-test:test-function") // <-- removed due to bug with jackson in build phase
     includeModule("gcf")
     includeModule("gcf:integration-test:test-function")
     includeModule("lambda")

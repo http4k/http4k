@@ -7,9 +7,19 @@ plugins {
     id("org.http4k.license-check")
     id("org.http4k.publishing")
     id("org.http4k.api-docs")
+    id("org.openapi.generator") version "7.8.0"
 }
 
-apply(plugin = "org.openapi.generator")
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        classpath("org.openapitools:openapi-generator-gradle-plugin:_")
+    }
+}
 
 dependencies {
     api(project(":http4k-core"))

@@ -3,17 +3,6 @@ plugins {
     id("org.http4k.conventions")
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-
-    dependencies {
-        classpath("org.openapitools:openapi-generator-gradle-plugin:_")
-    }
-}
-
 allprojects {
     apply(plugin = "org.http4k.conventions")
     apply(plugin = "org.http4k.code-coverage")
