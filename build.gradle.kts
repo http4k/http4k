@@ -1,4 +1,3 @@
-
 plugins {
     id("org.http4k.nexus-config")
     id("org.http4k.conventions")
@@ -40,31 +39,5 @@ allprojects {
         testFixturesImplementation(Testing.junit.jupiter.api)
         testFixturesImplementation(Testing.junit.jupiter.engine)
         testFixturesImplementation("com.natpryce:hamkrest:_")
-    }
-}
-
-dependencies {
-    subprojects
-        .filter { hasAnArtifact(it) }
-        .forEach {
-            api(project(it.name))
-            testImplementation(testFixtures(project(it.name)))
-        }
-}
-
-fun hasAnArtifact(it: Project) = !it.name.contains("test-function") && !it.name.contains("integration-test")
-
-sourceSets {
-    test {
-        kotlin.srcDir("$projectDir/src/docs")
-        resources.srcDir("$projectDir/src/docs")
-    }
-}
-
-tasks.register("listProjects") {
-    doLast {
-        subprojects
-            .filter { hasAnArtifact(it) }
-            .forEach { System.err.println(it.name) }
     }
 }
