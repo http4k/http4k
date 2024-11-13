@@ -9,6 +9,7 @@ plugins {
     id("org.http4k.nexus-config")
     id("org.jetbrains.dokka")
     id("org.http4k.conventions")
+    id("org.http4k.code-coverage")
 }
 
 kotlin {
@@ -35,8 +36,8 @@ buildscript {
 allprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
-    apply(plugin = "org.gradle.jacoco")
     apply(plugin = "java-test-fixtures")
+    apply(plugin = "org.http4k.code-coverage")
 
     repositories {
         mavenCentral()
@@ -44,10 +45,6 @@ allprojects {
 
     version = project.properties["releaseVersion"] ?: "LOCAL"
     group = "org.http4k"
-
-    jacoco {
-        toolVersion = "0.8.12"
-    }
 
     tasks {
         withType<KotlinJvmCompile>().configureEach {
@@ -64,14 +61,6 @@ allprojects {
         withType<Test> {
             useJUnitPlatform()
             jvmArgs = listOf("--enable-preview")
-        }
-
-        named<JacocoReport>("jacocoTestReport") {
-            reports {
-                html.required.set(true)
-                xml.required.set(true)
-                csv.required.set(false)
-            }
         }
 
         withType<GenerateModuleMetadata> {
@@ -107,26 +96,6 @@ subprojects {
         }
     }
 
-}
-
-tasks.register<JacocoReport>("jacocoRootReport") {
-    dependsOn(subprojects.map { it.tasks.named<Test>("test").get() })
-
-    sourceDirectories.from(subprojects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
-    classDirectories.from(subprojects.map { it.the<SourceSetContainer>()["main"].output })
-    executionData.from(subprojects
-        .filter { it.name != "http4k-bom" && hasAnArtifact(it) }
-        .map {
-            it.tasks.named<JacocoReport>("jacocoTestReport").get().executionData
-        }
-    )
-
-    reports {
-        html.required.set(true)
-        xml.required.set(true)
-        csv.required.set(false)
-        xml.outputLocation.set(file("${layout.buildDirectory}/reports/jacoco/test/jacocoRootReport.xml"))
-    }
 }
 
 dependencies {
