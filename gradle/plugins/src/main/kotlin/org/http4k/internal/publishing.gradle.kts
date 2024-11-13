@@ -11,7 +11,7 @@ plugins {
     `maven-publish`
 }
 
-val metadata = rootProject.extensions.getByType<MetaDataExtension>()
+val metadata = rootProject.extensions.getByType<ProjectMetadata.Extension>()
 
 val enableSigning = project.findProperty("sign") == "true"
 
