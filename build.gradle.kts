@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.time.Duration
 
 plugins {
-    id("io.github.gradle-nexus.publish-plugin")
+    id("org.http4k.nexus-config")
     id("org.jetbrains.dokka")
     id("org.http4k.conventions")
 }
@@ -164,22 +164,6 @@ tasks {
                 freeCompilerArgs.add("-Xjvm-default=all")
             }
         }
-    }
-}
-
-val nexusUsername: String? by project
-val nexusPassword: String? by project
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            username.set(nexusUsername)
-            password.set(nexusPassword)
-        }
-    }
-    transitionCheckOptions {
-        maxRetries.set(150)
-        delayBetween.set(Duration.ofSeconds(5))
     }
 }
 
