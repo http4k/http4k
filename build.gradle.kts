@@ -75,14 +75,6 @@ subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "idea")
     apply(plugin = "org.http4k.api-docs")
-
-
-    sourceSets {
-        test {
-            kotlin.srcDir("$projectDir/src/examples/kotlin")
-        }
-    }
-
 }
 
 dependencies {
@@ -110,15 +102,3 @@ tasks.register("listProjects") {
             .forEach { System.err.println(it.name) }
     }
 }
-
-tasks {
-    named<KotlinJvmCompile>("compileTestKotlin").configure {
-        if (name == "compileTestKotlin") {
-            compilerOptions {
-                jvmTarget.set(JVM_1_8)
-                freeCompilerArgs.add("-Xjvm-default=all")
-            }
-        }
-    }
-}
-

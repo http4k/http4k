@@ -1,3 +1,7 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import org.gradle.api.JavaVersion.VERSION_1_8
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+
 plugins {
     kotlin("jvm")
     idea
@@ -22,9 +26,26 @@ val testJar by tasks.creating(Jar::class) {
     from(project.the<SourceSetContainer>()["test"].output)
 }
 
-tasks.named<Jar>("jar") {
-    manifest {
-        val projectName = rootProject.name.replace('-', '_')
-        attributes(mapOf("${projectName}_version" to archiveVersion))
+sourceSets {
+    test {
+        kotlin.srcDir("$projectDir/src/examples/kotlin")
+    }
+}
+
+tasks {
+    named<Jar>("jar") {
+        manifest {
+            val projectName = rootProject.name.replace('-', '_')
+            attributes(mapOf("${projectName}_version" to archiveVersion))
+        }
+    }
+
+    named<KotlinJvmCompile>("compileTestKotlin").configure {
+        if (name == "compileTestKotlin") {
+            compilerOptions {
+                jvmTarget.set(JVM_1_8)
+                freeCompilerArgs.add("-Xjvm-default=all")
+            }
+        }
     }
 }
