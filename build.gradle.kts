@@ -5,7 +5,4 @@ plugins {
 allprojects {
     apply(plugin = "org.http4k.conventions")
 
-    repositories {
-        mavenCentral()
-    }
 }

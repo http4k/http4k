@@ -12,6 +12,10 @@ plugins {
 version = project.properties["releaseVersion"] ?: "LOCAL"
 group = "org.http4k"
 
+repositories {
+    mavenCentral()
+}
+
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
