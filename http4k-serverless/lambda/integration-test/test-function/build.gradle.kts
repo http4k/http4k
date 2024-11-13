@@ -1,5 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+plugins {
+    id("org.http4k.conventions")
+}
+
 configurations {
     named<Configuration>("runtimeClasspath") {
         isTransitive = true

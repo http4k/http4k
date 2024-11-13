@@ -1,6 +1,7 @@
 description = "Testing against a functions deployed to SCF"
 
 plugins {
+    id("org.http4k.conventions")
     id("com.github.johnrengelman.shadow")
 }
 

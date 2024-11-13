@@ -1,3 +1,7 @@
+plugins {
+    id("org.http4k.conventions")
+}
+
 dependencies {
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-template-handlebars"))

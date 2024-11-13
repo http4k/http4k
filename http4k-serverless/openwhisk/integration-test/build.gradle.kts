@@ -1,6 +1,7 @@
 description = "Functions to be used for testing of Apache OpenWhisk"
 
 plugins {
+    id("org.http4k.conventions")
     id("com.github.johnrengelman.shadow")
 }
 

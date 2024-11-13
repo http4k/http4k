@@ -2,6 +2,7 @@ description = "Testing against a functions deployed to ACF"
 
 plugins {
     id("com.github.johnrengelman.shadow")
+    id("org.http4k.conventions")
 }
 
 dependencies {

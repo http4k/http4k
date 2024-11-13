@@ -1,6 +1,7 @@
 import com.microsoft.azure.gradle.configuration.GradleRuntimeConfig
 
 plugins {
+    id("org.http4k.conventions")
     id("com.microsoft.azure.azurefunctions")
 }
 

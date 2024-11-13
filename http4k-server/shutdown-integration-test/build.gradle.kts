@@ -1,6 +1,7 @@
 description = "Integration tests for all servers"
 
 plugins {
+    id("org.http4k.conventions")
     application
 }
 

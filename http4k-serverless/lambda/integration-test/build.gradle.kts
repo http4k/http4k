@@ -1,3 +1,7 @@
+plugins {
+    id("org.http4k.conventions")
+}
+
 dependencies {
     testImplementation(testFixtures(project(":http4k-aws")))
     testImplementation(testFixtures(project(":http4k-serverless-lambda")))
