@@ -12,6 +12,12 @@ plugins {
 version = project.properties["releaseVersion"] ?: "LOCAL"
 group = "org.http4k"
 
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 val sourcesJar by tasks.creating(Jar::class) {
     archiveClassifier.set("sources")
     from(project.the<SourceSetContainer>()["main"].allSource)

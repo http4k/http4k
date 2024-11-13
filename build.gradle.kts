@@ -3,12 +3,6 @@ plugins {
     id("org.http4k.conventions")
 }
 
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
-}
-
 buildscript {
     repositories {
         mavenCentral()
