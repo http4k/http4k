@@ -1,6 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-rootProject.name = "gradle-plugins"
-
 plugins {
     id("de.fayard.refreshVersions").version("0.60.5")
 }
