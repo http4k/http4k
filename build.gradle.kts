@@ -1,6 +1,3 @@
-import org.gradle.api.JavaVersion.VERSION_1_8
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("org.http4k.nexus-config")
@@ -33,31 +30,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-    }
-
-    version = project.properties["releaseVersion"] ?: "LOCAL"
-    group = "org.http4k"
-
-    tasks {
-        withType<KotlinJvmCompile>().configureEach {
-            compilerOptions {
-                jvmTarget.set(JVM_1_8)
-            }
-        }
-
-        java {
-            sourceCompatibility = VERSION_1_8
-            targetCompatibility = VERSION_1_8
-        }
-
-        withType<Test> {
-            useJUnitPlatform()
-            jvmArgs = listOf("--enable-preview")
-        }
-
-        withType<GenerateModuleMetadata> {
-            enabled = false
-        }
     }
 
     dependencies {

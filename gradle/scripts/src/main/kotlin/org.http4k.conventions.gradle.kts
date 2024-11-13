@@ -9,6 +9,9 @@ plugins {
     `java-test-fixtures`
 }
 
+version = project.properties["releaseVersion"] ?: "LOCAL"
+group = "org.http4k"
+
 val sourcesJar by tasks.creating(Jar::class) {
     archiveClassifier.set("sources")
     from(project.the<SourceSetContainer>()["main"].allSource)
@@ -38,6 +41,26 @@ tasks {
             val projectName = rootProject.name.replace('-', '_')
             attributes(mapOf("${projectName}_version" to archiveVersion))
         }
+    }
+
+    withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(JVM_1_8)
+        }
+    }
+
+    java {
+        sourceCompatibility = VERSION_1_8
+        targetCompatibility = VERSION_1_8
+    }
+
+    withType<Test> {
+        useJUnitPlatform()
+        jvmArgs = listOf("--enable-preview")
+    }
+
+    withType<GenerateModuleMetadata> {
+        enabled = false
     }
 
     named<KotlinJvmCompile>("compileTestKotlin").configure {
