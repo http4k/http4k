@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 description = "Http4k Kotlinx Serialization JSON support"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 

@@ -1,7 +1,7 @@
 description = "Http4k HTTP Client built on top of async apache httpclient"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

@@ -1,7 +1,7 @@
 description = "Ultra-lightweight Selenium WebDriver implementation for http4k apps"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

@@ -1,7 +1,7 @@
 description = "Http4k Serverless support for AWS Lambda"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

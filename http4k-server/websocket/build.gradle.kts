@@ -1,7 +1,7 @@
 description = "Http4k WS(S) Server implemented by TooTallNate/Java-WebSocket"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

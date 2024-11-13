@@ -1,7 +1,7 @@
 description = "Http4k Security Core support"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

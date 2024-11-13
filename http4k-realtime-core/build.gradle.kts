@@ -1,7 +1,7 @@
 description = "Http4k WebSocket core"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

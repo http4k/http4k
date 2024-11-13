@@ -1,7 +1,7 @@
 description = "http4k support for the CloudEvents format"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

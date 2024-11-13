@@ -1,7 +1,7 @@
 description = "HTTP Client built on top of jetty"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

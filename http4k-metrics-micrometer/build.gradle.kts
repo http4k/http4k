@@ -1,7 +1,7 @@
 description = "Http4k metrics support, integrating with micrometer.io"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

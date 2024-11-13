@@ -1,7 +1,7 @@
 description = "Http4k CSV support using Jackson as an underlying engine"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

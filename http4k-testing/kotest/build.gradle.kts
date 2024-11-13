@@ -1,7 +1,7 @@
 description = "A set of kotest matchers for common http4k types"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

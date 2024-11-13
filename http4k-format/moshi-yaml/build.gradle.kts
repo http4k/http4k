@@ -1,7 +1,7 @@
 description = "Http4k YAML support using Moshi and SnakeYaml as an underlying engine"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

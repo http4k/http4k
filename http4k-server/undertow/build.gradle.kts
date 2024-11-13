@@ -1,7 +1,7 @@
 description = "Http4k HTTP Server built on top of Undertow"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {

@@ -1,7 +1,7 @@
 description = "Machinery for configuring Http4k apps in a typesafe way"
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.apache-module")
 }
 
 dependencies {
