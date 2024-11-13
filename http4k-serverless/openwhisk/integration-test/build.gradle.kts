@@ -1,7 +1,7 @@
 description = "Functions to be used for testing of Apache OpenWhisk"
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.github.johnrengelman.shadow")
 }
 
 dependencies {

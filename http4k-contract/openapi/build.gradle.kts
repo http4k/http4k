@@ -8,7 +8,7 @@ plugins {
     id("org.http4k.publishing")
     id("org.http4k.api-docs")
     id("org.http4k.code-coverage")
-    id("org.openapi.generator") version "7.8.0"
+    id("org.openapi.generator")
 }
 
 buildscript {

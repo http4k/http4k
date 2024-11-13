@@ -1,7 +1,7 @@
 description = "Testing against a functions deployed to SCF"
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.github.johnrengelman.shadow")
 }
 
 dependencies {
