@@ -1,6 +1,5 @@
 plugins {
     id("org.http4k.nexus-config")
-    id("org.http4k.conventions")
 }
 
 allprojects {
