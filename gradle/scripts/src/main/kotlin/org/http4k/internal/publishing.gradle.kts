@@ -11,6 +11,8 @@ plugins {
     `maven-publish`
 }
 
+val metadata = rootProject.extensions.getByType<MetaDataExtension>()
+
 val enableSigning = project.findProperty("sign") == "true"
 
 if (enableSigning) { // when added it expects signing keys to be configured
@@ -52,16 +54,17 @@ publishing {
                 asNode().appendNode("name", archivesBaseName)
                 asNode().appendNode("description", description)
                 asNode().appendNode("url", "https://http4k.org")
-                asNode().appendNode("developers")
-                    .appendNode("developer").appendNode("name", "Ivan Sanchez").parent()
-                    .appendNode("email", "ivan@http4k.org")
-                    .parent().parent()
-                    .appendNode("developer").appendNode("name", "David Denton").parent()
-                    .appendNode("email", "david@http4k.org")
+                asNode().appendNode("developers").apply {
+                    metadata.developers
+                        .forEach { (name, email) ->
+                            appendNode("developer").appendNode("name", name).parent()
+                                .appendNode("email", email)
+                        }
+                }
                 asNode().appendNode("scm")
-                    .appendNode("url", "https://github.com/http4k/http4k").parent()
-                    .appendNode("connection", "scm:git:git@github.com:http4k/http4k.git").parent()
-                    .appendNode("developerConnection", "scm:git:git@github.com:http4k/http4k.git")
+                    .appendNode("url", "https://github.com/http4k/${rootProject.name}").parent()
+                    .appendNode("connection", "scm:git:git@github.com:http4k/${rootProject.name}.git").parent()
+                    .appendNode("developerConnection", "scm:git:git@github.com:http4k/${rootProject.name}.git")
                 asNode().appendNode("licenses").appendNode("license")
                     .appendNode("name", "Apache License, Version 2.0").parent()
                     .appendNode("url", "http://www.apache.org/licenses/LICENSE-2.0.html")
