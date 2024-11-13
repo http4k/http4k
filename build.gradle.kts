@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-    id("org.http4k.conventions")
     id("org.http4k.nexus-config")
+    id("org.http4k.conventions")
 }
 
 kotlin {
@@ -28,9 +28,7 @@ buildscript {
 }
 
 allprojects {
-    apply(plugin = "java")
-    apply(plugin = "kotlin")
-    apply(plugin = "java-test-fixtures")
+    apply(plugin = "org.http4k.conventions")
     apply(plugin = "org.http4k.code-coverage")
 
     repositories {
