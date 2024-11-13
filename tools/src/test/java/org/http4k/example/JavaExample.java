@@ -1,9 +1,11 @@
 package org.http4k.example;
 
-import okhttp3.OkHttpClient;
-import org.http4k.client.DualSyncAsyncHttpHandler;
-import org.http4k.client.OkHttp;
-import org.http4k.core.*;
+import kotlin.jvm.functions.Function1;
+import org.http4k.client.Java8HttpClient;
+import org.http4k.core.Filter;
+import org.http4k.core.Request;
+import org.http4k.core.Response;
+import org.http4k.core.Status;
 import org.http4k.routing.RoutingHttpHandler;
 import org.http4k.server.Http4kServer;
 import org.http4k.server.SunHttp;
@@ -27,7 +29,7 @@ public class JavaExample {
 
         http4kServer.start();
 
-        DualSyncAsyncHttpHandler client = OkHttp.create(new OkHttpClient.Builder().build(), BodyMode.Memory.INSTANCE);
+        Function1<Request, Response> client = Java8HttpClient.create();
 
         System.out.println(client.invoke(Request.create(POST, "http://localhost:8000/path").body("1234567890")));
 
