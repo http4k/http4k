@@ -6,6 +6,7 @@ plugins {
     id("org.http4k.license-check")
     id("org.http4k.publishing")
     id("org.http4k.api-docs")
+    id("org.http4k.code-coverage")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.0-RC"
 }
 
