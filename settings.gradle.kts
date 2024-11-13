@@ -3,7 +3,7 @@
 rootProject.name = "http4k"
 
 pluginManagement {
-    includeBuild("gradle/scripts")
+    includeBuild("gradle/plugins")
 }
 
 plugins {

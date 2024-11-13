@@ -1,6 +1,6 @@
 plugins {
-    id("org.http4k.nexus")
     id("org.http4k.metadata")
+    id("org.http4k.nexus")
 }
 
 http4kMetadata {

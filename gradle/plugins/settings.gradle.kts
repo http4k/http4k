@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import java.io.File
-
 plugins {
     id("de.fayard.refreshVersions").version("0.60.5")
 }

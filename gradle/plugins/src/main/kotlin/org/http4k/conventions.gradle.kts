@@ -1,8 +1,8 @@
 package org.http4k
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     kotlin("jvm")

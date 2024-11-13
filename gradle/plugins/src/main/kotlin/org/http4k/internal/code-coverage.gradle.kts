@@ -1,9 +1,5 @@
 package org.http4k.internal
 
-import org.gradle.kotlin.dsl.jacoco
-import org.gradle.kotlin.dsl.named
-import org.gradle.testing.jacoco.tasks.JacocoReport
-
 plugins {
     jacoco
 }
