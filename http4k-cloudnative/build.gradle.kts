@@ -3,6 +3,7 @@ description = "Machinery for running Http4k apps in cloud-native environments"
 plugins {
     id("org.http4k.license-check")
     id("org.http4k.publishing")
+    id("org.http4k.api-docs")
 }
 
 dependencies {

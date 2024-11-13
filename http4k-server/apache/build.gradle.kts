@@ -3,6 +3,7 @@ description = "Http4k HTTP Server built on top of Apache httpcore"
 plugins {
     id("org.http4k.license-check")
     id("org.http4k.publishing")
+    id("org.http4k.api-docs")
 }
 
 dependencies {

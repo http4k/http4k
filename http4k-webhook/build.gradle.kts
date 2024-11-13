@@ -3,6 +3,7 @@ description = "Http4k Standard webhooks support"
 plugins {
     id("org.http4k.license-check")
     id("org.http4k.publishing")
+    id("org.http4k.api-docs")
 }
 
 dependencies {

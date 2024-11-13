@@ -3,6 +3,7 @@ description = "Machinery for configuring Http4k apps in a typesafe way"
 plugins {
     id("org.http4k.license-check")
     id("org.http4k.publishing")
+    id("org.http4k.api-docs")
 }
 
 dependencies {

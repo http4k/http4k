@@ -5,6 +5,7 @@ description = "Http4k Kotlinx Serialization JSON support"
 plugins {
     id("org.http4k.license-check")
     id("org.http4k.publishing")
+    id("org.http4k.api-docs")
 }
 
 apply(plugin = "kotlinx-serialization")

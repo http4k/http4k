@@ -71,12 +71,6 @@ allprojects {
     }
 }
 
-subprojects {
-    apply(plugin = "kotlin")
-    apply(plugin = "idea")
-    apply(plugin = "org.http4k.api-docs")
-}
-
 dependencies {
     subprojects
         .filter { hasAnArtifact(it) }

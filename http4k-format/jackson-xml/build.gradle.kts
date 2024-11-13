@@ -3,6 +3,7 @@ description = "Http4k XML support using Jackson as an underlying engine"
 plugins {
     id("org.http4k.license-check")
     id("org.http4k.publishing")
+    id("org.http4k.api-docs")
 }
 
 dependencies {
