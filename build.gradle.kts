@@ -10,14 +10,4 @@ allprojects {
     repositories {
         mavenCentral()
     }
-
-    dependencies {
-        testImplementation(Testing.junit.jupiter.api)
-        testImplementation(Testing.junit.jupiter.engine)
-        testImplementation("com.natpryce:hamkrest:_")
-
-        testFixturesImplementation(Testing.junit.jupiter.api)
-        testFixturesImplementation(Testing.junit.jupiter.engine)
-        testFixturesImplementation("com.natpryce:hamkrest:_")
-    }
 }

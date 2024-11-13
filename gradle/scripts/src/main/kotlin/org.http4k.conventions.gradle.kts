@@ -78,3 +78,13 @@ tasks {
         }
     }
 }
+
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter-api:_")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:_")
+    testImplementation("com.natpryce:hamkrest:_")
+
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:_")
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:_")
+    testFixturesImplementation("com.natpryce:hamkrest:_")
+}
