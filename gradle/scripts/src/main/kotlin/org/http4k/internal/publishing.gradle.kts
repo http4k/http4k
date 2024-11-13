@@ -1,3 +1,5 @@
+package org.http4k.internal
+
 import groovy.namespace.QName
 import groovy.util.Node
 import java.net.URI
