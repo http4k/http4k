@@ -8,6 +8,9 @@ kotlin {
     }
 }
 
+group = "org.http4k"
+version = "0.0.0.0"
+
 repositories {
     gradlePluginPortal()
     mavenCentral()
