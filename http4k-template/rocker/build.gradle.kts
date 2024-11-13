@@ -2,7 +2,7 @@ description = "Http4k Rocker templating support"
 
 plugins {
     id("nu.studer.rocker")
-    id("org.http4k.apache-module")
+    id("org.http4k.module")
 }
 
 apply(plugin = "java")

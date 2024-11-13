@@ -1,10 +1,14 @@
+import org.http4k.internal.ModuleLicense.Apache2
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 description = "Http4k HTTP Server built on top of Ktor CIO engine"
 
+val license by project.extra { Apache2 }
+
 plugins {
-    id("org.http4k.apache-module")
+    id("org.http4k.module")
 }
+
 
 dependencies {
     api(project(":http4k-core"))

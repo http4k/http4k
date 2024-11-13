@@ -2,7 +2,7 @@ description = "Http4k KotlinX DataFrame support"
 
 plugins {
     id("org.jetbrains.kotlinx.dataframe")
-    id("org.http4k.apache-module")
+    id("org.http4k.module")
 }
 
 dependencies {

@@ -65,9 +65,12 @@ publishing {
                     .appendNode("url", "https://github.com/http4k/${rootProject.name}").parent()
                     .appendNode("connection", "scm:git:git@github.com:http4k/${rootProject.name}.git").parent()
                     .appendNode("developerConnection", "scm:git:git@github.com:http4k/${rootProject.name}.git")
+
+                val license: ModuleLicense by project.extra
+
                 asNode().appendNode("licenses").appendNode("license")
-                    .appendNode("name", "Apache License, Version 2.0").parent()
-                    .appendNode("url", "http://www.apache.org/licenses/LICENSE-2.0.html")
+                    .appendNode("name", license.commonName).parent()
+                    .appendNode("url", license.url)
             }
             from(components["java"])
 

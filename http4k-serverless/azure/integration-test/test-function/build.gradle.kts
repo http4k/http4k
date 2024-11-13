@@ -5,6 +5,8 @@ plugins {
     id("com.microsoft.azure.azurefunctions")
 }
 
+import org.http4k.internal.License.Apache2
+
 description = "Testing against a functions deployed to Azure Functions"
 
 apply(plugin = "com.microsoft.azure.azurefunctions")

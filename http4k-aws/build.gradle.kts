@@ -1,8 +1,13 @@
+import org.http4k.internal.ModuleLicense.Apache2
+
 description = "Http4k AWS integration and request signing"
 
+val license by project.extra { Apache2 }
+
 plugins {
-    id("org.http4k.apache-module")
+    id("org.http4k.module")
 }
+
 
 dependencies {
     api(project(":http4k-core"))
@@ -15,4 +20,3 @@ dependencies {
     testFixturesImplementation(project(":http4k-cloudnative"))
     testFixturesImplementation(project(":http4k-client-okhttp"))
 }
-

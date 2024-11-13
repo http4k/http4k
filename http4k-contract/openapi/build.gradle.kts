@@ -4,7 +4,7 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 description = "http4k typesafe HTTP contracts and OpenApi support"
 
 plugins {
-    id("org.http4k.apache-module")
+    id("org.http4k.module")
     id("org.openapi.generator")
 }
 
