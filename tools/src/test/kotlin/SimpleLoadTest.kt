@@ -1,13 +1,10 @@
-import org.http4k.client.ApacheClient
+import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.server.ApacheServer
-import org.http4k.server.Netty
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
-import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicLong
@@ -24,7 +21,7 @@ fun testWith(threads: Int, reps: Int, fn: (Int) -> ServerConfig, port: Int): Res
     val server = { _: Request -> Response(OK).body(System.nanoTime().toString()) }.asServer(config).start()
     Thread.sleep(1000)
 
-    val client = ApacheClient()
+    val client = JavaHttpClient()
     val latch = CountDownLatch(threads)
     val start = System.currentTimeMillis()
     val errors = AtomicLong(0)
@@ -49,7 +46,7 @@ fun main() {
     val threads = 250
     val reps = 400
 
-    listOf<(Int) -> ServerConfig>(::ApacheServer, ::Undertow, ::SunHttp, ::Netty)
+    listOf<(Int) -> ServerConfig>(::SunHttp)
         .map { testWith(threads, reps, it, 8000) }
         .sortedBy { it.time }
         .forEach(::println)
