@@ -13,6 +13,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 group = rootProject.group
