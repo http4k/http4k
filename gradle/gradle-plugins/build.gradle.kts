@@ -25,7 +25,14 @@ publishing {
             url = file("${rootProject.projectDir}/../../../http4k-connect/gradle/repo").toURI()
         }
     }
+    repositories {
+        maven {
+            name = "localHttp4kReleaseRepo"
+            url = file("${rootProject.projectDir}/../../../http4k-release/gradle/repo").toURI()
+        }
+    }
 }
+
 dependencies {
     api(Kotlin.gradlePlugin)
     api(gradleApi())
