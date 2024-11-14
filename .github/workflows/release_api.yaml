@@ -13,7 +13,7 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: gradle
-      - run: ./gradlew -i dokkaHtmlMultiModule -PreleaseVersion="${{ github.event.client_payload.version }}" \
+      - run: ./gradlew -i dokkaHtmlMultiModule -PreleaseVersion="${{ github.event.client_payload.version }}" -Porg.gradle.parallel=false
       - uses: actions/checkout@v4.2.2
         with:
           repository: http4k/api
