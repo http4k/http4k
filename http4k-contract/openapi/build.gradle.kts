@@ -1,7 +1,10 @@
+import org.http4k.internal.ModuleLicense.Apache2
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 description = "http4k typesafe HTTP contracts and OpenApi support"
+
+val license by project.extra { Apache2 }
 
 plugins {
     id("org.http4k.module")

@@ -15,6 +15,9 @@ repositories {
     mavenCentral()
 }
 
+group = rootProject.group
+version = rootProject.version
+
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
