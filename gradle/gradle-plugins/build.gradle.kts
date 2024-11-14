@@ -18,6 +18,14 @@ repositories {
     mavenCentral()
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "localHttp4kConnectRepo"
+            url = file("${rootProject.projectDir}/../../../http4k-connect/gradle/repo").toURI()
+        }
+    }
+}
 dependencies {
     api(Kotlin.gradlePlugin)
     api(gradleApi())
