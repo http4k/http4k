@@ -6,6 +6,8 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
 }
 
+version = project.properties["releaseVersion"] ?: "LOCAL"
+
 val nexusUsername: String? by project
 val nexusPassword: String? by project
 

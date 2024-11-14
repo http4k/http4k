@@ -11,9 +11,6 @@ plugins {
     `java-test-fixtures`
 }
 
-version = project.properties["releaseVersion"] ?: "LOCAL"
-group = "org.http4k"
-
 repositories {
     mavenCentral()
 }
