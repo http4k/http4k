@@ -8,7 +8,6 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     constraints {
         rootProject.subprojects

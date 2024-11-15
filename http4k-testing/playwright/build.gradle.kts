@@ -8,11 +8,10 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(project(":http4k-core"))
     api("com.microsoft.playwright:playwright:_")
-    implementation(Testing.junit.jupiter.api)
+    implementation("org.junit.jupiter:junit-jupiter-api:_")
 
     testImplementation(testFixtures(project(":http4k-core")))
 

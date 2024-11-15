@@ -8,7 +8,6 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(Kotlin.stdlib)
 
@@ -17,7 +16,7 @@ dependencies {
     implementation("dev.forkhandles:result4k:_")
     implementation("dev.forkhandles:values4k:_")
 
-    testImplementation(Testing.junit.jupiter.params)
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
 
     testFixturesImplementation("org.junit.platform:junit-platform-launcher:_")
     testFixturesImplementation(platform("io.opentelemetry:opentelemetry-bom:_"))

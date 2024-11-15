@@ -9,10 +9,9 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(project(":http4k-core"))
-    implementation(Testing.junit.jupiter.api)
+    implementation("org.junit.jupiter:junit-jupiter-api:_")
     api(project(":http4k-cloudnative"))
     api(project(":http4k-format-moshi"))
     api(project(":http4k-client-apache"))

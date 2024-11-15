@@ -8,13 +8,12 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-moshi"))
     api(Square.moshi.adapters)
     implementation(project(mapOf("path" to ":http4k-testing-webdriver")))
-    compileOnly(Testing.junit.jupiter.api)
+    compileOnly("org.junit.jupiter:junit-jupiter-api:_")
 
     testImplementation(project(":http4k-client-apache"))
 

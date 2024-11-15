@@ -8,7 +8,6 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(project(":http4k-core"))
     api("io.helidon.webserver:helidon-webserver:_")

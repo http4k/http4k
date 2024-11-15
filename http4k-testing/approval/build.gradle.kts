@@ -8,13 +8,12 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(project(":http4k-core"))
     api("com.github.javadev:underscore:_")
     api("org.jsoup:jsoup:_")
 
-    implementation(Testing.junit.jupiter.api)
+    implementation("org.junit.jupiter:junit-jupiter-api:_")
     implementation("com.natpryce:hamkrest:_")
     implementation(project(":http4k-format-jackson-yaml"))
     implementation(project(":http4k-cloudevents"))

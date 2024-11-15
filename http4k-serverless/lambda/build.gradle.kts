@@ -8,7 +8,6 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(project(":http4k-serverless-core"))
     api("com.amazonaws:aws-lambda-java-core:_")

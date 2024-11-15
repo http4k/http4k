@@ -15,7 +15,7 @@ dependencies {
     api(project(":http4k-connect-storage-core"))
 
     compileOnly(platform("org.junit:junit-bom:_"))
-    compileOnly("org.junit.jupiter:junit-jupiter-api")
+    compileOnly("org.junit.jupiter:junit-jupiter-api:_")
     compileOnly(project(":http4k-testing-approval"))
     compileOnly(project(":http4k-testing-hamkrest"))
 

@@ -8,7 +8,6 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(project(":http4k-template-core"))
     api("org.thymeleaf:thymeleaf:_")

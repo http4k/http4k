@@ -8,7 +8,6 @@ plugins {
     id("org.http4k.module")
 }
 
-
 dependencies {
     api(project(":http4k-serverless-lambda"))
     testImplementation(testFixtures(project(":http4k-core")))
