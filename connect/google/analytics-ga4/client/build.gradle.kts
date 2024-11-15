@@ -3,6 +3,7 @@ import org.http4k.internal.ModuleLicense.Apache2
 val license by project.extra { Apache2 }
 
 plugins {
+    id("org.http4k.project-metadata")
     id("org.http4k.module")
     id("org.http4k.connect.module")
     id("org.http4k.connect.client")
@@ -16,4 +17,12 @@ dependencies {
     api("se.ansman.kotshi:api:_")
 
     implementation(project(":http4k-format-core"))
+}
+
+metadata {
+    developers = mapOf(
+        "David Denton" to "david@http4k.org",
+        "Ivan Sanchez" to "ivan@http4k.org",
+        "Albert Latacz" to "albert@http4k.org"
+    )
 }

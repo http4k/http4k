@@ -11,7 +11,9 @@ plugins {
     `maven-publish`
 }
 
-val metadata = rootProject.extensions.getByType<ProjectMetadata.Extension>()
+val metadata = kotlin.runCatching {
+    (project.extensions.getByName("metadata") as? ProjectMetadata.Extension)
+}.getOrNull() ?: rootProject.extensions.getByType<ProjectMetadata.Extension>()
 
 val enableSigning = project.findProperty("sign") == "true"
 
