@@ -24,18 +24,18 @@ gradle.startParameter.isContinueOnFailure = true
 fun String.includeModule(name: String) {
     val projectName = "$this-$name"
     include(":$projectName")
-    project(":$projectName").projectDir = File("$this/${name.replace(':', '/')}")
+    project(":$projectName").projectDir = File("core/$this/${name.replace(':', '/')}")
 }
 
 fun String.includeSubmodule(name: String) {
     include(":$this-$name")
-    project(":$this-$name").projectDir = File("$this/${name.replace('-', '/')}")
+    project(":$this-$name").projectDir = File("core/$this/${name.replace('-', '/')}")
 }
 
-include("http4k-core")
-include("http4k-aws")
-include("http4k-azure")
-include("http4k-bom")
+includeWithName("http4k-core", prefix = "core")
+includeWithName("http4k-aws", prefix = "core")
+includeWithName("http4k-azure", prefix = "core")
+includeWithName("http4k-bom", prefix = "core")
 
 "http4k-client".apply {
     includeModule("apache")
@@ -49,13 +49,13 @@ include("http4k-bom")
     includeModule("websocket")
 }
 
-include("http4k-cloudevents")
-include("http4k-cloudnative")
-include("http4k-config")
+includeWithName("http4k-cloudevents", prefix = "core")
+includeWithName("http4k-cloudnative", prefix = "core")
+includeWithName("http4k-config", prefix = "core")
 
 "http4k-contract".apply {
     include(":$this")
-    project(":$this").projectDir = File("$this/openapi")
+    project(":$this").projectDir = File("core/$this/openapi")
     includeSubmodule("jsonschema")
     includeSubmodule("ui-swagger")
     includeSubmodule("ui-redoc")
@@ -78,16 +78,16 @@ include("http4k-config")
     includeModule("jackson-csv")
 }
 
-include("http4k-graphql")
-include("http4k-htmx")
-include("http4k-incubator")
-include("http4k-jsonrpc")
-include("http4k-metrics-micrometer")
-include("http4k-multipart")
-include("http4k-failsafe")
-include("http4k-resilience4j")
-include("http4k-opentelemetry")
-include("http4k-realtime-core")
+includeWithName("http4k-graphql", prefix = "core")
+includeWithName("http4k-htmx", prefix = "core")
+includeWithName("http4k-incubator", prefix = "core")
+includeWithName("http4k-jsonrpc", prefix = "core")
+includeWithName("http4k-metrics-micrometer", prefix = "core")
+includeWithName("http4k-multipart", prefix = "core")
+includeWithName("http4k-failsafe", prefix = "core")
+includeWithName("http4k-resilience4j", prefix = "core")
+includeWithName("http4k-opentelemetry", prefix = "core")
+includeWithName("http4k-realtime-core", prefix = "core")
 
 "http4k-server".apply {
     includeModule("apache")
@@ -152,9 +152,9 @@ include("http4k-realtime-core")
     includeModule("webdriver")
 }
 
-include("http4k-webhook")
+includeWithName("http4k-webhook", prefix = "core")
 
-include("tools")
+includeWithName("tools", prefix = "core")
 
 //connect
 includeWithName("http4k-connect:tools", "http4k-connect:tools")
@@ -235,9 +235,9 @@ fun includeCommon(projectName: String, file: String) {
     includeWithName("http4k-connect-$projectName", file)
 }
 
-fun includeWithName(projectName: String, file: String) {
+fun includeWithName(projectName: String, file: String = projectName, prefix: String = "connect") {
     include(":$projectName")
-    project(":$projectName").projectDir = File("connect/$file")
+    project(":$projectName").projectDir = File("$prefix/$file")
 }
 
 fun includeStorage(name: String) {
