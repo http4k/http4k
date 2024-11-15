@@ -10,10 +10,10 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-google-analytics-core"))
-    api( ":http4k-format-moshi") {
+    api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
     implementation("se.ansman.kotshi:api:_")
 
-    implementation( ":http4k-format-core")
+    implementation(project(":http4k-format-core"))
 }

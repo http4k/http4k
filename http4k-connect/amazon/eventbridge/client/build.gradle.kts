@@ -10,10 +10,10 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-amazon-core"))
-    api( ":http4k-format-moshi") {
+    api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
-    compileOnly( ":http4k-serverless-lambda")
+    compileOnly(project(":http4k-serverless-lambda"))
     compileOnly("joda-time:joda-time:_")
 
     implementation("se.ansman.kotshi:api:_")

@@ -9,14 +9,14 @@ plugins {
 }
 
 dependencies {
-    api( ":http4k-aws")
+    api(project(":http4k-aws"))
 
-    api( ":http4k-format-moshi") {
+    api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
 
     implementation("se.ansman.kotshi:api:_")
-    implementation( ":http4k-format-core")
+    implementation(project(":http4k-format-core"))
 
-    testFixturesApi( ":http4k-testing-chaos")
+    testFixturesApi(project(":http4k-testing-chaos"))
 }

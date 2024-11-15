@@ -10,11 +10,11 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-amazon-core"))
-    api( ":http4k-format-moshi") {
+    api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
 
-    api( ":http4k-security-oauth") {
+    api(project(":http4k-security-oauth")) {
         exclude("org.http4k", "http4k-format-moshi")
     }
 

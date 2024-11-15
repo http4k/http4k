@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    implementation( ":http4k-template-pebble")
+    implementation(project(":http4k-template-pebble"))
     testFixturesApi("software.amazon.awssdk:s3:_")
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

@@ -9,12 +9,12 @@ plugins {
 }
 
 dependencies {
-    api( ":http4k-cloudnative")
-    api( ":http4k-format-moshi") {
+    api(project(":http4k-cloudnative"))
+    api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
     implementation("se.ansman.kotshi:api:_")
 
-    testApi( ":http4k-format-moshi")
+    testApi(project(":http4k-format-moshi"))
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
 }

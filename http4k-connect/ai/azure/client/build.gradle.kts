@@ -13,7 +13,7 @@ dependencies {
 
     implementation("se.ansman.kotshi:api:_")
 
-    testApi( ":http4k-cloudnative")
-    testApi( ":http4k-format-moshi")
+    testApi(project(":http4k-cloudnative"))
+    testApi(project(":http4k-format-moshi"))
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
 }

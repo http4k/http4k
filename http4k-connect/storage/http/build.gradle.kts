@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api( ":http4k-contract")
-    api( ":http4k-format-jackson")
+    api(project(":http4k-contract"))
+    api(project(":http4k-format-jackson"))
     api("org.webjars:swagger-ui:_")
 }

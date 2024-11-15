@@ -9,6 +9,6 @@ plugins {
 }
 
 dependencies {
-    api( ":http4k-format-moshi")
+    api(project(":http4k-format-moshi"))
     api("io.lettuce:lettuce-core:_")
 }

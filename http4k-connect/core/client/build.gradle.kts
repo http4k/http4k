@@ -9,6 +9,6 @@ plugins {
 
 dependencies {
     api("dev.forkhandles:values4k")
-    compileOnly( ":http4k-format-moshi")
-    testCompileOnly( ":http4k-format-moshi")
+    compileOnly(project(":http4k-format-moshi"))
+    testCompileOnly(project(":http4k-format-moshi"))
 }
