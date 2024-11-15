@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<SendEmailResponse xmlns="http://ses.amazonaws.com/doc/2010-12-01/">
+    <SendEmailResult>
+        <MessageId>{{model.messageId}}</MessageId>
+    </SendEmailResult>
+    <ResponseMetadata>
+        <RequestId>b2a9b9f6-a790-41c1-bffb-cd21ee9ce3f5</RequestId>
+    </ResponseMetadata>
+</SendEmailResponse>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<SendMessageResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+    <SendMessageResult>
+        <MD5OfMessageBody>{{model.md5OfMessageBody}}</MD5OfMessageBody>
+        <MD5OfMessageAttributes>{{model.md5OfMessageAttributes}}</MD5OfMessageAttributes>
+        <MessageId>{{model.messageId}}</MessageId>
+    </SendMessageResult>
+    <ResponseMetadata>
+        <RequestId>11111111-1111-1111-1111-111111111111</RequestId>
+    </ResponseMetadata>
+</SendMessageResponse>

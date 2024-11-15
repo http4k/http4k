@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<GetQueueAttributesResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+    <GetQueueAttributesResult>
+        {% for attribute in model.attributes %}
+        <Attribute>
+            <Name>{{attribute.first}}</Name>
+            <Value>{{attribute.second}}</Value>
+        </Attribute>
+        {% endfor %}
+    </GetQueueAttributesResult>
+    <ResponseMetadata>
+        <RequestId>11111111-1111-1111-1111-111111111111</RequestId>
+    </ResponseMetadata>
+</GetQueueAttributesResponse>

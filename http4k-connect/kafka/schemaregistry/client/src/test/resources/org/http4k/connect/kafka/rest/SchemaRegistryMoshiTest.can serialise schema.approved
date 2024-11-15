@@ -1,0 +1,1 @@
+"{\"type\":\"record\",\"name\":\"RandomKey\",\"namespace\":\"http4k\",\"doc\":\"Random key\",\"fields\":[{\"name\":\"uuid\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}}]}"

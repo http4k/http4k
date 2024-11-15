@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invalidation>
+    <CreateTime>{{model.time}}</CreateTime>
+    <Id>11111111-1111-1111-1111-111111111111</Id>
+    {{model.batch}}
+    <Status>Completed</Status>
+</Invalidation>

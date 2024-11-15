@@ -1,0 +1,36 @@
+{
+  "doc": "Random event",
+  "fields": [
+    {
+      "name": "localDate",
+      "type": {
+        "logicalType": "date",
+        "type": "int"
+      }
+    },
+      {
+      "name": "localTime",
+      "type": {
+        "logicalType": "time-millis",
+        "type": "int"
+      }
+    },
+      {
+      "name": "instant",
+      "type": {
+        "logicalType": "timestamp-millis",
+        "type": "long"
+      }
+    },
+      {
+      "name": "localDateTime",
+      "type": {
+        "logicalType": "local-timestamp-millis",
+        "type": "long"
+      }
+    }
+  ],
+  "name": "RandomEvent",
+  "namespace": "http4k",
+  "type": "record"
+}
