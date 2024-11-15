@@ -1,0 +1,11 @@
+:root {
+    --dokka-logo-image-url: url('/images/favicon-mono.png');
+}
+
+.navigation {
+    background-color: rgba(96, 192, 255, 0.9);
+}
+
+.library-name--link::before {
+    background-position: left;
+}

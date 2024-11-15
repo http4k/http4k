@@ -14,6 +14,9 @@ tasks.withType<AbstractDokkaTask>().configureEach {
         moduleVersion.set(version.toString())
         footerMessage = "(c) ${Year.now().value} http4k"
         homepageLink = "https://http4k.org"
-        customStyleSheets = listOf(file("${rootProject.projectDir}/src/docs/css/dokka.css"))
+        customAssets = listOf(
+            file("${rootProject.projectDir}/gradle/gradle-plugins/src/main/resources/logo-icon.svg"),
+        )
+        customStyleSheets = listOf(file("${rootProject.projectDir}/gradle/gradle-plugins/src/main/resources/dokka.css"))
     }
 }
