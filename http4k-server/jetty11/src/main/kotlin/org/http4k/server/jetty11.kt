@@ -23,7 +23,7 @@ class Jetty11(private val port: Int, override val stopMode: StopMode, private va
     init {
         when (stopMode) {
             is Graceful -> server.apply { stopTimeout = stopMode.timeout.toMillis() }
-            is Immediate -> throw UnsupportedStopMode(stopMode)
+            is Immediate -> server.apply { stopAtShutdown = true }
         }
     }
 

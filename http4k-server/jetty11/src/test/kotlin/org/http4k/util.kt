@@ -3,4 +3,4 @@ package org.http4k
 import org.http4k.server.ServerConfig
 import java.time.Duration
 
-val testingStopMode = ServerConfig.StopMode.Graceful(Duration.ofSeconds(4))
+val testingStopMode = ServerConfig.StopMode.Immediate
