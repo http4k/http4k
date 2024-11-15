@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Error>
+  <Code>{{model.code}}</Code>
+  <Message>{{model.message}}</Message>
+  <Resource>{{model.resource}}</Resource>
+  <RequestId>11111111-1111-1111-1111-111111111111</RequestId>
+</Error>

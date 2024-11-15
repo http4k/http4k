@@ -40,4 +40,5 @@ dependencies {
     api("com.github.jk1:gradle-license-report:_")
     api("org.jetbrains.dokka:dokka-base:_")
     api("org.jetbrains.dokka:dokka-gradle-plugin:_")
+    api("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:_")
 }

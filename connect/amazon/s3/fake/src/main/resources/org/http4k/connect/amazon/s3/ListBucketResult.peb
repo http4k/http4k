@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.comdoc/2006-03-01/">
+    <Name>{{model.bucketName}}</Name>
+    <Prefix/>
+    <KeyCount>{{model.keyCount}}</KeyCount>
+    <MaxKeys>{{model.maxKeys}}</MaxKeys>
+    <IsTruncated>false</IsTruncated>
+    {% for key in model.keys %}
+    <Contents>
+        <Key>{{key.key}}</Key>
+        <LastModified>{{key.modified}}</LastModified>
+        <ETag>0000000000000000000000000000</ETag>
+        <Size>{{key.size}}</Size>
+        <StorageClass>STANDARD</StorageClass>
+    </Contents>
+    {% endfor %}
+</ListBucketResult>
