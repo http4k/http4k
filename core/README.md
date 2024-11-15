@@ -2,9 +2,7 @@
 
 <hr/>
 
-<picture>
   <img src="https://http4k.org/images/logo-http4k.png" alt="http4k logo">
-</picture>
 
 <hr/>
 
@@ -31,6 +29,7 @@ You can find out all about the project on the [http4k] site.
 </div>
 
 ## Installation
+
 ```kotlin
 dependencies {
     // install the platform...
