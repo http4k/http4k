@@ -1,9 +1,5 @@
 <hr/>
-
-<picture>
-  <img src="https://http4k.org/images/logo-http4k.png" alt="http4k logo">
-</picture>
-
+<img src="https://http4k.org/images/logo-http4k.png" alt="http4k logo">
 <hr/>
 
 <a href="https://github.com/http4k/http4k/actions/workflows/build.yaml"><img alt="build" src="https://github.com/http4k/http4k/actions/workflows/build.yaml/badge.svg"></a>

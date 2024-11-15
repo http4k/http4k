@@ -1,9 +1,6 @@
 <div class="github">
-
 <hr/>
-
-  <img src="https://http4k.org/images/logo-http4k.png" alt="http4k logo">
-
+<img src="https://http4k.org/images/logo-http4k.png" alt="http4k logo">
 <hr/>
 
 </div>
