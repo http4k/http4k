@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
-import re
-import glob
-import shutil
-import requests
 import os
+import requests
+import shutil
 
 
 def pull_content(uri):
@@ -50,6 +48,6 @@ if __name__ == "__main__":
     shutil.rmtree(working_dir, ignore_errors=True)
     os.makedirs(working_dir, exist_ok=True)
 
-    copy_and_rename_readme_to_index(".", "src/docs/guide/reference")
+    copy_and_rename_readme_to_index("../connect/tools", "src/docs/guide/reference")
 
     shutil.copytree(project_root + '/src/docs', working_dir + '/docs')
