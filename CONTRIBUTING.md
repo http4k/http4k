@@ -31,6 +31,9 @@ Testing with default settings is required when push changes. Note that we curren
 ./gradlew check
 ```
 
-## Appreciation
+<h2 class="github">
 
+## Appreciation
 We love our community! See [the http4k site](https://http4k.org/community/) for details!
+
+</h2>
