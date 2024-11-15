@@ -12,7 +12,6 @@ jobs:
           - 'http4k/lts-examples'
           - 'http4k/examples'
           - 'http4k/http4k-by-example'
-          - 'http4k/http4k-connect'
           - 'http4k/http4k-connect-examples'
           - 'http4k/http4k-contract-todo-backend'
           - 'http4k/http4k-bin'
