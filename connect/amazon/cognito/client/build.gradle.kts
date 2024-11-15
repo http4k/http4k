@@ -18,7 +18,7 @@ dependencies {
         exclude("org.http4k", "http4k-format-moshi")
     }
 
-    implementation("se.ansman.kotshi:api:_")
+    api("se.ansman.kotshi:api:_")
     testFixturesApi("org.bitbucket.b_c:jose4j:_")
 
     testFixturesApi(testFixtures(project(":http4k-connect-core")))

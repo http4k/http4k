@@ -13,7 +13,7 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
-    implementation("se.ansman.kotshi:api:_")
+    api("se.ansman.kotshi:api:_")
 
     testFixturesApi("org.jetbrains.kotlin", "kotlin-reflect")
     testFixturesApi(project(":http4k-serverless-lambda"))

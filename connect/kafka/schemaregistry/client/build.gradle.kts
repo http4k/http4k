@@ -18,7 +18,7 @@ dependencies {
 
     implementation("org.apache.avro:avro:_")
 
-    implementation("se.ansman.kotshi:api:_")
+    api("se.ansman.kotshi:api:_")
 
     testFixturesApi("org.jetbrains.kotlin:kotlin-reflect")
 

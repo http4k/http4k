@@ -13,7 +13,7 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
-    implementation("se.ansman.kotshi:api:_")
+    api("se.ansman.kotshi:api:_")
 
     implementation(project(":http4k-format-core"))
 }

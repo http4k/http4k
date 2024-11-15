@@ -9,5 +9,5 @@ plugins {
 }
 
 dependencies {
-    implementation("se.ansman.kotshi:api:_")
+    api("se.ansman.kotshi:api:_")
 }

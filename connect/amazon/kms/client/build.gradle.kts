@@ -13,7 +13,7 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
-    implementation("se.ansman.kotshi:api:_")
+    api("se.ansman.kotshi:api:_")
 
     testFixturesApi("org.bouncycastle:bcprov-jdk18on:_")
     testFixturesApi(testFixtures(project(":http4k-connect-core")))

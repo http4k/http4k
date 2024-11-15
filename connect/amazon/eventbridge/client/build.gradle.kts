@@ -16,7 +16,7 @@ dependencies {
     compileOnly(project(":http4k-serverless-lambda"))
     compileOnly("joda-time:joda-time:_")
 
-    implementation("se.ansman.kotshi:api:_")
+    api("se.ansman.kotshi:api:_")
 
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
