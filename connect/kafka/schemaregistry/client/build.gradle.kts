@@ -1,5 +1,6 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.http4k.internal.ModuleLicense.Apache2
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val license by project.extra { Apache2 }
 
@@ -28,6 +29,12 @@ dependencies {
 
 tasks {
     withType<KotlinCompile>().configureEach {
+        dependsOn("generateAvroJava")
         dependsOn("generateTestFixturesAvroJava")
     }
+
+    named("dokkaHtmlPartial", DokkaTaskPartial::class) {
+        dependsOn(named("generateAvroJava"))
+    }
 }
+
