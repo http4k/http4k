@@ -16,8 +16,6 @@
 <a href="https://opencollective.com/http4k"><img alt="back us!" src="https://opencollective.com/http4k/backers/badge.svg"></a>
 <a href="https://opencollective.com/http4k"><img alt="sponsor us!" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
 
-<hr/>
-
 [http4k] is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP
 services in a functional and consistent way. [http4k] applications are *just* Kotlin functions. For example, here's a simple echo server:
 
