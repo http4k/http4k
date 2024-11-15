@@ -13,9 +13,9 @@ dependencies {
     api("com.github.javadev:underscore:_")
     api("org.jsoup:jsoup:_")
 
-    implementation("org.junit.jupiter:junit-jupiter-api:_")
+    api("org.junit.jupiter:junit-jupiter-api:_")
     implementation("com.natpryce:hamkrest:_")
-    implementation(project(":http4k-format-jackson-yaml"))
+    api(project(":http4k-format-jackson-yaml"))
     implementation(project(":http4k-cloudevents"))
 
     testImplementation(testFixtures(project(":http4k-core")))

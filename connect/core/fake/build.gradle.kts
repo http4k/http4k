@@ -11,5 +11,5 @@ dependencies {
     api(project(":http4k-connect-core"))
     api(project(":http4k-connect-storage-core"))
     api(project(":http4k-testing-chaos"))
-    implementation(project(":http4k-format-moshi"))
+    api(project(":http4k-format-moshi"))
 }

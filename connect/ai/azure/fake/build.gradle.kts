@@ -12,5 +12,5 @@ dependencies {
     api(project(":http4k-connect-ai-azure"))
     api(project(":http4k-template-pebble"))
     api(project(":http4k-contract-ui-swagger"))
-    implementation("de.sven-jacobs:loremipsum:_")
+    api("de.sven-jacobs:loremipsum:_")
 }

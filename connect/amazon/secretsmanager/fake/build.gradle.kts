@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":http4k-format-moshi"))
+    api(project(":http4k-format-moshi"))
 
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

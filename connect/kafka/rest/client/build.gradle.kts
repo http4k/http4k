@@ -16,7 +16,7 @@ dependencies {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
 
-    implementation("org.apache.avro:avro:_")
+    api("org.apache.avro:avro:_")
     api("se.ansman.kotshi:api:_")
 
     testFixturesApi("org.jetbrains.kotlin:kotlin-reflect")

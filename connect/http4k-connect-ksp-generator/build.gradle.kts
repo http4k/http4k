@@ -11,11 +11,11 @@ plugins {
 dependencies {
     api(project(":http4k-connect-core"))
 
-    implementation(project(":http4k-format-moshi"))
-    implementation("com.squareup:kotlinpoet:_")
-    implementation("com.squareup:kotlinpoet-metadata:_")
-    implementation("com.squareup:kotlinpoet-ksp:_")
-    implementation("com.google.devtools.ksp:symbol-processing-api:_")
+    api(project(":http4k-format-moshi"))
+    api("com.squareup:kotlinpoet:_")
+    api("com.squareup:kotlinpoet-metadata:_")
+    api("com.squareup:kotlinpoet-ksp:_")
+    api("com.google.devtools.ksp:symbol-processing-api:_")
 
     ksp("se.ansman.kotshi:compiler:_")
 

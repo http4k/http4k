@@ -9,5 +9,5 @@ plugins {
 }
 
 dependencies {
-    implementation("de.sven-jacobs:loremipsum:_")
+    api("de.sven-jacobs:loremipsum:_")
 }
