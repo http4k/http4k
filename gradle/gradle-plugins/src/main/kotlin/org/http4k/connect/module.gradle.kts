@@ -15,12 +15,12 @@ repositories {
 
 dependencies {
     api(platform("dev.forkhandles:forkhandles-bom:_"))
-    api("org.http4k:http4k-core:${rootProject.properties["http4k_version"]}")
+    api(project(":http4k-core"))
     api("dev.forkhandles:result4k")
 
     testFixturesApi(platform("org.junit:junit-bom:_"))
-    testFixturesApi("org.http4k:http4k-testing-hamkrest:${rootProject.properties["http4k_version"]}")
-    testFixturesApi("org.http4k:http4k-testing-approval:${rootProject.properties["http4k_version"]}")
+    testFixturesApi(project(":http4k-testing-hamkrest"))
+    testFixturesApi(project(":http4k-testing-approval"))
 
     testFixturesApi("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
