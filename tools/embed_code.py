@@ -42,12 +42,12 @@ def copy_and_rename_readme_to_index(src_dir, docs_dir):
 
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    project_root = script_dir + '/../'
+    project_root = script_dir + '/../connect'
     working_dir = script_dir + '/../build/docs-website'
 
     shutil.rmtree(working_dir, ignore_errors=True)
     os.makedirs(working_dir, exist_ok=True)
 
-    copy_and_rename_readme_to_index("../connect/tools", "src/docs/guide/reference")
+    copy_and_rename_readme_to_index("../tools", "src/docs/guide/reference")
 
     shutil.copytree(project_root + '/src/docs', working_dir + '/docs')
