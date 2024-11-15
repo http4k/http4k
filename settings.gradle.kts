@@ -161,7 +161,7 @@ includeWithName("http4k-connect:tools", "http4k-connect:tools")
 
 includeWithName("http4k-connect-ksp-generator", "http4k-connect-ksp-generator")
 
-//includeWithName("http4k-connect-bom", "bom")
+includeWithName("http4k-connect-bom", "bom")
 includeSystem("core")
 includeStorage("core")
 includeStorage("jdbc")
