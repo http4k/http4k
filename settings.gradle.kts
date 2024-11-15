@@ -237,7 +237,7 @@ fun includeCommon(projectName: String, file: String) {
 
 fun includeWithName(projectName: String, file: String) {
     include(":$projectName")
-    project(":$projectName").projectDir = File("http4k-connect/$file")
+    project(":$projectName").projectDir = File("connect/$file")
 }
 
 fun includeStorage(name: String) {
