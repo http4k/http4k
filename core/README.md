@@ -3,7 +3,7 @@
 <hr/>
 
 <picture>
-  <img src="../logo.png" alt="http4k logo">
+  <img src="https://http4k.org/images/logo-http4k.png" alt="http4k logo">
 </picture>
 
 <hr/>
