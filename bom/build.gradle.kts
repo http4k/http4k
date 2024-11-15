@@ -19,5 +19,5 @@ dependencies {
 }
 
 fun hasAnArtifact(it: Project) =
-    !it.name.contains("test-function") && !it.name.contains("integration-test")
+    !it.name.contains("test-function") && !it.name.contains("integration-test") && !it.name.contains("tools")
 
