@@ -155,9 +155,10 @@ includeWithName("http4k-realtime-core", prefix = "core")
 
 includeWithName("http4k-webhook", prefix = "core")
 
-includeWithName("tools")
+includeWithName("tools", prefix = "core")
 
 //connect
+includeWithName("http4k-connect:tools", "http4k-connect:tools")
 
 includeWithName("http4k-connect-ksp-generator", "http4k-connect-ksp-generator")
 
