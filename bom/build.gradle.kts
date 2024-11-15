@@ -14,6 +14,7 @@ dependencies {
             .filter { it.name != project.name }
             .filter { hasAnArtifact(it) }
             .sortedBy { it.name }
+            .also { System.err.println("Selected: ${it.size} subprojects") }
             .forEach { api(it) }
     }
 }

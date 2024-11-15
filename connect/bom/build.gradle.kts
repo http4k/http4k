@@ -13,6 +13,7 @@ dependencies {
     constraints {
         rootProject.subprojects
             .filter { it.name != project.name }
+            .filter { it.name.startsWith("http4k-connect") }
             .sortedBy { "$it.name" }
             .forEach { api(it) }
     }

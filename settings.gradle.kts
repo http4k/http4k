@@ -32,10 +32,11 @@ fun String.includeSubmodule(name: String) {
     project(":$this-$name").projectDir = File("core/$this/${name.replace('-', '/')}")
 }
 
+includeWithName("http4k-bom", "bom", prefix = ".")
+
 includeWithName("http4k-core", prefix = "core")
 includeWithName("http4k-aws", prefix = "core")
 includeWithName("http4k-azure", prefix = "core")
-includeWithName("http4k-bom", prefix = "core")
 
 "http4k-client".apply {
     includeModule("apache")
