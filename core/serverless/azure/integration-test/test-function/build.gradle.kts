@@ -5,6 +5,7 @@ plugins {
     id("com.microsoft.azure.azurefunctions")
 }
 
+
 description = "Testing against a functions deployed to Azure Functions"
 
 apply(plugin = "com.microsoft.azure.azurefunctions")
@@ -21,11 +22,9 @@ azurefunctions {
     appName = "http4k-test-function" // this global to Azure and needs to be changed if you"re using your own account
     pricingTier = "Consumption"
     region = "westus"
-    runtime = object : GradleRuntimeConfig() {
-        init {
-            os("windows")
-            javaVersion("8")
-        }
-    }
+    setRuntime(closureOf<GradleRuntimeConfig> {
+        os("windows")
+        javaVersion("8")
+    })
     localDebug = "transport=dt_socket,server=y,suspend=n,address=5005"
 }
