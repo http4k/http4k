@@ -36,7 +36,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Build
         timeout-minutes: 25
-        run: ./build-ci.sh
+        run: bin/build-ci.sh
         env:
           HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
           HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
