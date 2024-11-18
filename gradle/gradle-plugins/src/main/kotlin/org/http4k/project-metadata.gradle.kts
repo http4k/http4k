@@ -16,3 +16,14 @@ group = "org.http4k"
 
 apply<ProjectMetadata>()
 
+if(rootProject.tasks.findByName("listProjects") == null) {
+    rootProject.tasks.register("listProjects") {
+        doLast {
+            allprojects
+                .filter { it.tasks.findByName("publishToSonatype") != null }
+                .map { it.name }
+                .forEach(System.err::println)
+        }
+    }
+}
+
