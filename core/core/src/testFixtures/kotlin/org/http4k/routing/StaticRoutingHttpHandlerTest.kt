@@ -19,6 +19,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
+import org.http4k.filter.debug
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -218,7 +219,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
     @Test
     fun `Directory ResourceLoader can serve a directory with an index file`() {
-        val handler = "/svc" bind static(ResourceLoader.Directory("../http4k-core/src/test/resources"))
+        val handler = "/svc" bind static(ResourceLoader.Directory("../core/src/test/resources"))
         val request = Request(GET, of("/svc/org"))
         val criteria =
             hasStatus(OK) and hasBody("hello from the io index.html") and hasHeader("Content-type", TEXT_HTML.value)
