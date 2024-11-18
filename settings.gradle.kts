@@ -21,24 +21,25 @@ refreshVersions {
 
 gradle.startParameter.isContinueOnFailure = true
 
+fun includeWithName(projectName: String, file: String = projectName, prefix: String = "connect") {
+    val projectName = ":http4k-$projectName"
+    include(projectName)
+    project(projectName).projectDir = File("$prefix/$file")
+}
+
 fun String.includeModule(name: String) {
-    val projectName = "$this-$name"
+    val projectName = "http4k-$this-$name"
     include(":$projectName")
     project(":$projectName").projectDir = File("core/$this/${name.replace(':', '/')}")
 }
 
-fun String.includeSubmodule(name: String) {
-    include(":$this-$name")
-    project(":$this-$name").projectDir = File("core/$this/${name.replace('-', '/')}")
-}
+includeWithName("bom", "bom", prefix = ".")
 
-includeWithName("http4k-bom", "bom", prefix = ".")
+includeWithName("core", prefix = "core")
+includeWithName("aws", prefix = "core")
+includeWithName("azure", prefix = "core")
 
-includeWithName("http4k-core", prefix = "core")
-includeWithName("http4k-aws", prefix = "core")
-includeWithName("http4k-azure", prefix = "core")
-
-"http4k-client".apply {
+"client".apply {
     includeModule("apache")
     includeModule("apache4")
     includeModule("apache-async")
@@ -50,19 +51,20 @@ includeWithName("http4k-azure", prefix = "core")
     includeModule("websocket")
 }
 
-includeWithName("http4k-cloudevents", prefix = "core")
-includeWithName("http4k-cloudnative", prefix = "core")
-includeWithName("http4k-config", prefix = "core")
+includeWithName("cloudevents", prefix = "core")
+includeWithName("cloudnative", prefix = "core")
+includeWithName("config", prefix = "core")
 
-"http4k-contract".apply {
-    include(":$this")
-    project(":$this").projectDir = File("core/$this/openapi")
-    includeSubmodule("jsonschema")
-    includeSubmodule("ui-swagger")
-    includeSubmodule("ui-redoc")
+"contract".apply {
+    val projectName = ":http4k-$this"
+    include(projectName)
+    project(projectName).projectDir = File("core/$this/openapi")
+    includeModule("jsonschema")
+    includeModule("ui-swagger")
+    includeModule("ui-redoc")
 }
 
-"http4k-format".apply {
+"format".apply {
     includeModule("core")
     includeModule("argo")
     includeModule("dataframe")
@@ -79,18 +81,18 @@ includeWithName("http4k-config", prefix = "core")
     includeModule("jackson-csv")
 }
 
-includeWithName("http4k-graphql", prefix = "core")
-includeWithName("http4k-htmx", prefix = "core")
-includeWithName("http4k-incubator", prefix = "core")
-includeWithName("http4k-jsonrpc", prefix = "core")
-includeWithName("http4k-metrics-micrometer", prefix = "core")
-includeWithName("http4k-multipart", prefix = "core")
-includeWithName("http4k-failsafe", prefix = "core")
-includeWithName("http4k-resilience4j", prefix = "core")
-includeWithName("http4k-opentelemetry", prefix = "core")
-includeWithName("http4k-realtime-core", prefix = "core")
+includeWithName("graphql", prefix = "core")
+includeWithName("htmx", prefix = "core")
+includeWithName("incubator", prefix = "core")
+includeWithName("jsonrpc", prefix = "core")
+includeWithName("metrics-micrometer", prefix = "core")
+includeWithName("multipart", prefix = "core")
+includeWithName("failsafe", prefix = "core")
+includeWithName("resilience4j", prefix = "core")
+includeWithName("opentelemetry", prefix = "core")
+includeWithName("realtime-core", prefix = "core")
 
-"http4k-server".apply {
+"server".apply {
     includeModule("apache")
     includeModule("apache4")
     includeModule("helidon")
@@ -105,7 +107,7 @@ includeWithName("http4k-realtime-core", prefix = "core")
     includeModule("websocket")
 }
 
-"http4k-serverless".apply {
+"serverless".apply {
     includeModule("core")
     includeModule("alibaba")
     includeModule("alibaba:integration-test:test-function")
@@ -124,13 +126,13 @@ includeWithName("http4k-realtime-core", prefix = "core")
     includeModule("tencent:integration-test:test-function")
 }
 
-"http4k-security".apply {
+"security".apply {
     includeModule("core")
     includeModule("digest")
     includeModule("oauth")
 }
 
-"http4k-template".apply {
+"template".apply {
     includeModule("core")
     includeModule("freemarker")
     includeModule("handlebars")
@@ -141,7 +143,7 @@ includeWithName("http4k-realtime-core", prefix = "core")
     includeModule("pug4j")
 }
 
-"http4k-testing".apply {
+"testing".apply {
     includeModule("approval")
     includeModule("chaos")
     includeModule("hamkrest")
@@ -153,15 +155,15 @@ includeWithName("http4k-realtime-core", prefix = "core")
     includeModule("webdriver")
 }
 
-includeWithName("http4k-webhook", prefix = "core")
+includeWithName("webhook", prefix = "core")
 
 includeWithName("tools")
 
 //connect
 
-includeWithName("http4k-connect-ksp-generator", "http4k-connect-ksp-generator")
+includeWithName("connect-ksp-generator", "ksp-generator")
 
-includeWithName("http4k-connect-bom", "bom")
+includeWithName("connect-bom", "bom")
 includeSystem("core")
 includeStorage("core")
 includeStorage("jdbc")
@@ -217,7 +219,7 @@ includeVendorSystem("google", "analytics-ua")
 includeVendorSystem("google", "analytics-ga4")
 
 fun includeSystem(system: String, vararg extraModules: String) {
-    val projectName = "http4k-connect-$system"
+    val projectName = "connect-$system"
     includeWithName(projectName, "$system/client")
     includeWithName("$projectName-fake", "$system/fake")
     extraModules.forEach {
@@ -226,20 +228,15 @@ fun includeSystem(system: String, vararg extraModules: String) {
 }
 
 fun includeVendorSystem(owner: String, system: String) {
-    val projectName = "http4k-connect-$owner-$system"
+    val projectName = "connect-$owner-$system"
     includeWithName(projectName, "$owner/$system/client")
     includeWithName("$projectName-fake", "$owner/$system/fake")
 }
 
 fun includeCommon(projectName: String, file: String) {
-    includeWithName("http4k-connect-$projectName", file)
-}
-
-fun includeWithName(projectName: String, file: String = projectName, prefix: String = "connect") {
-    include(":$projectName")
-    project(":$projectName").projectDir = File("$prefix/$file")
+    includeWithName("connect-$projectName", file)
 }
 
 fun includeStorage(name: String) {
-    includeWithName("http4k-connect-storage-$name", "storage/$name")
+    includeWithName("connect-storage-$name", "storage/$name")
 }
