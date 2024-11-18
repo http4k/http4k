@@ -17,8 +17,6 @@ import io.ktor.server.response.ApplicationResponse
 import io.ktor.server.response.header
 import io.ktor.server.response.respondOutputStream
 import io.ktor.utils.io.jvm.javaio.toInputStream
-import kotlinx.coroutines.Dispatchers.Default
-import kotlinx.coroutines.withContext
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -28,7 +26,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.server.ServerConfig.StopMode.Immediate
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -45,9 +43,7 @@ class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode
         private val engine = embeddedServer(CIO, port) {
             install(createApplicationPlugin(name = "http4k") {
                 onCall {
-                    withContext(Default) {
-                        it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(NOT_IMPLEMENTED))
-                    }
+                    it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(NOT_IMPLEMENTED))
                 }
             })
         }
@@ -57,7 +53,7 @@ class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode
         }
 
         override fun stop() = apply {
-            engine.stop(0, 2, SECONDS)
+            engine.stop(0, 0, MILLISECONDS)
         }
 
         override fun port() = engine.engineConfig.connectors.first().port
