@@ -1,8 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.gradle.internal.impldep.bsh.commands.dir
-
-
 rootProject.name = "http4k"
 
 pluginManagement {
@@ -16,7 +13,7 @@ plugins {
 refreshVersions {
     rejectVersionIf {
         candidate.stabilityLevel.isLessStableThan(current.stabilityLevel) ||
-            setOf("milestone", "-RC").map { it.lowercase() }.any { candidate.value.contains(it) } ||
+            setOf("milestone", "-rc", "-beta").map { it.lowercase() }.any { candidate.value.lowercase().contains(it) } ||
             Regex("""\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}.*""").matches(candidate.value) || // graphql nightlies
             candidate.value.contains("nf-execution") // graphql nightlies
     }
