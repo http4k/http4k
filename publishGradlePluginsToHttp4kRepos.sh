@@ -1,3 +1,0 @@
-#!/bin/bash
-./gradlew :gradle-plugins:publishPluginMavenPublicationToLocalHttp4kConnectRepoRepository
-./gradlew :gradle-plugins:publishPluginMavenPublicationToLocalHttp4kReleaseRepoRepository
