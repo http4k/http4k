@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
-      - run: ./build-release-note.sh ${{ github.event.client_payload.version }} > NOTE.md
+      - run: bin/build_release_note.sh ${{ github.event.client_payload.version }} > NOTE.md
       - uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
