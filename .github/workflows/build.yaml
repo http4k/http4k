@@ -16,9 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.2
         with:
-          # required by release-tag.sh to correctly identify files changed in the last commit
+          # required by release_tag.sh to correctly identify files changed in the last commit
           fetch-depth: 2
-          # required by release-tag.sh to allow pushing with another credentials so other workflows are triggered
+          # required by release_tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
       - uses: actions/setup-java@v4.5.0
         with:
@@ -59,7 +59,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git remote set-url origin https://x-access-token:${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}@github.com/${GITHUB_REPOSITORY}.git
-          ./release-tag.sh
+          bin/release_tag.sh
         if: github.ref == 'refs/heads/master'
         env:
           GH_TOKEN: ${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}
