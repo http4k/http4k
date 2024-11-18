@@ -56,9 +56,7 @@ includeWithName("cloudnative", prefix = "core")
 includeWithName("config", prefix = "core")
 
 "contract".apply {
-    val projectName = ":http4k-$this"
-    include(projectName)
-    project(projectName).projectDir = File("core/$this/openapi")
+    includeWithName(this, prefix = "core")
     includeModule("jsonschema")
     includeModule("ui-swagger")
     includeModule("ui-redoc")
