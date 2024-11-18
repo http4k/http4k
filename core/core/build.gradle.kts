@@ -5,12 +5,11 @@ description = "Dependency-lite Server as a Function in pure Kotlin"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {
     api(Kotlin.stdlib)
-
     implementation("javax.servlet:javax.servlet-api:_")
     implementation("jakarta.servlet:jakarta.servlet-api:_")
     implementation("dev.forkhandles:result4k:_")

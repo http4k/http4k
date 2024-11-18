@@ -28,9 +28,10 @@ rootDir.walkTopDown()
     .filterNot { dir -> dir == rootDir || exclusions.any { dir.absolutePath.contains(it) } }
     .forEach {
         val moduleName = it.relativeTo(rootDir).path
-            .removePrefix("core/") // remove core modules as they have no prefix
+            .removePrefix("core/") // remove core ecosystem modules as they have no prefix to add
+            .removePrefix("enterprise/") // remove enterprise ecosystem modules as they have no prefix to add
             .replace('/', '-')
-            .removeSuffix("-client") // replace http4k-connect clients with no suffix
+            .removeSuffix("-client") // replace http4k-connect client module names as they have no suffixx
 
         include(":http4k-$moduleName")
         project(":http4k-$moduleName").projectDir = File(it.absoluteFile.path)

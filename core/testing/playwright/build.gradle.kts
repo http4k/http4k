@@ -5,7 +5,7 @@ description = "http4k extensions for testing with Playwright"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {

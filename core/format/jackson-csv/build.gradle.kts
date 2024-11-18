@@ -5,7 +5,7 @@ description = "Http4k CSV support using Jackson as an underlying engine"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {

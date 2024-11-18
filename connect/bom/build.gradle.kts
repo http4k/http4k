@@ -5,7 +5,7 @@ description = "Http4k Connect Bill Of Materials (BOM)"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
     id("org.http4k.connect.module")
 }
 
@@ -14,7 +14,7 @@ dependencies {
         rootProject.subprojects
             .filter { it.name != project.name }
             .filter { it.name.startsWith("http4k-connect") }
-            .sortedBy { "$it.name" }
+            .sortedBy { it.name }
             .forEach { api(it) }
     }
 }

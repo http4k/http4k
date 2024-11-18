@@ -5,7 +5,7 @@ description = "Add a locally hosted Redoc UI to your server"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {

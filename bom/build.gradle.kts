@@ -5,19 +5,23 @@ description = "Http4k Bill Of Materials (BOM)"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {
     constraints {
         rootProject.subprojects
             .filter { it.name != project.name }
-            .filter { hasAnArtifact(it) }
+            .filter { shouldBePublished(it) }
             .sortedBy { it.name }
             .forEach { api(it) }
     }
 }
 
-fun hasAnArtifact(it: Project) =
-    !it.name.contains("test-function") && !it.name.contains("integration-test") && !it.name.contains("tools")
-
+fun shouldBePublished(p: Project) = setOf(
+    "enterprise", // TODO - remove this to publish
+    "example",
+    "test-function",
+    "integration-test",
+    "tools"
+).none { p.name.contains(it) }

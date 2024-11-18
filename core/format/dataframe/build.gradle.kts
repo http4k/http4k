@@ -6,7 +6,7 @@ val license by project.extra { Apache2 }
 
 plugins {
     id("org.jetbrains.kotlinx.dataframe")
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {

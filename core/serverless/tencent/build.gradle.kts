@@ -5,7 +5,7 @@ description = "Http4k Serverless support for Tencent Serverless Cloud Functions"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {

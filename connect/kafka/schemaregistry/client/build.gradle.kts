@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
     id("org.http4k.connect.module")
     id("org.http4k.connect.client")
     id("com.github.davidmc24.gradle.plugin.avro")

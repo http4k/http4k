@@ -2,6 +2,7 @@ package org.http4k.format
 
 import org.http4k.core.Accept
 import org.http4k.core.HttpMessage
+import org.http4k.core.QualifiedContent
 import org.http4k.core.Request
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
@@ -21,7 +22,7 @@ class AutoContentNegotiator<T>(
 
     override fun invoke(target: HttpMessage): T = Header
         .CONTENT_TYPE(target)
-        ?.let { contentType -> Accept(listOf(contentType), emptyList()) }
+        ?.let { contentType -> Accept(listOf(QualifiedContent(contentType))) }
         .let { accept -> invoke(accept) }
         .invoke(target)
 

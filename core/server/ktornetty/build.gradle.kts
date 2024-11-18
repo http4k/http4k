@@ -6,7 +6,7 @@ description = "Http4k HTTP Server built on top of Ktor Netty engine"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {

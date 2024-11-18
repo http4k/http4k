@@ -5,7 +5,7 @@ description = "Http4k WS(S) Server implemented by TooTallNate/Java-WebSocket"
 val license by project.extra { Apache2 }
 
 plugins {
-    id("org.http4k.module")
+    id("org.http4k.community")
 }
 
 dependencies {
