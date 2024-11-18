@@ -5,7 +5,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-BASE_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+BASE_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd)"
 
 LOCAL_VERSION=$(jq -r .http4k.version $BASE_DIR/version.json)
 
