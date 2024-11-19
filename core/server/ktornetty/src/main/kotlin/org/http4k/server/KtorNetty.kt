@@ -6,7 +6,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.stop
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.ApplicationRequest
@@ -18,8 +17,6 @@ import io.ktor.server.response.ApplicationResponse
 import io.ktor.server.response.header
 import io.ktor.server.response.respondOutputStream
 import io.ktor.utils.io.jvm.javaio.toInputStream
-import kotlinx.coroutines.Dispatchers.Default
-import kotlinx.coroutines.withContext
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -30,6 +27,8 @@ import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.StopMode.Immediate
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import io.ktor.http.Headers as KHeaders
 
@@ -41,9 +40,7 @@ class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMo
         private val engine = embeddedServer(Netty, port) {
             install(createApplicationPlugin(name = "http4k") {
                 onCall {
-                    withContext(Default) {
-                        it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(NOT_IMPLEMENTED))
-                    }
+                    it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(NOT_IMPLEMENTED))
                 }
             })
         }
@@ -59,7 +56,7 @@ class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMo
             }
         }
 
-        override fun port() = engine.environment.connectors[0].port
+        override fun port() = engine.engineConfig.connectors.first().port
     }
 }
 
@@ -77,8 +74,18 @@ suspend fun ApplicationResponse.fromHttp4K(response: Response) {
         .forEach { header(it.first, it.second ?: "") }
     call.respondOutputStream(
         CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
-    ) {
-        response.body.stream.copyTo(this)
+    ) { response.body.stream.copyFlushingTo(this) }
+}
+
+private fun InputStream.copyFlushingTo(outputStream: OutputStream) {
+    var bytesCopied: Long = 0
+    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+    var bytes = read(buffer)
+    while (bytes >= 0) {
+        outputStream.write(buffer, 0, bytes)
+        outputStream.flush() // flush each buffer to ensure data is written immediately
+        bytesCopied += bytes
+        bytes = read(buffer)
     }
 }
 
