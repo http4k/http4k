@@ -44,6 +44,7 @@ val testJar by tasks.creating(Jar::class) {
 sourceSets {
     test {
         kotlin.srcDir("$projectDir/src/examples/kotlin")
+        kotlin.srcDir("$projectDir/src/tools/kotlin")
     }
 }
 

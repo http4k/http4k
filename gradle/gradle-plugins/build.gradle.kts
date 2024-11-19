@@ -21,8 +21,8 @@ repositories {
 publishing {
     repositories {
         maven {
-            name = "localHttp4kConnectRepo"
-            url = file("${rootProject.projectDir}/../../../http4k-connect/gradle/repo").toURI()
+            name = "localHttp4kEnterpriseRepo"
+            url = file("${rootProject.projectDir}/../../../http4k-enterprise/gradle/repo").toURI()
         }
     }
     repositories {
