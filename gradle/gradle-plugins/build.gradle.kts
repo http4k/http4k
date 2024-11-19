@@ -25,12 +25,6 @@ publishing {
             url = file("${rootProject.projectDir}/../../../http4k-enterprise/gradle/repo").toURI()
         }
     }
-    repositories {
-        maven {
-            name = "localHttp4kReleaseRepo"
-            url = file("${rootProject.projectDir}/../../../http4k-release/gradle/repo").toURI()
-        }
-    }
 }
 
 dependencies {
