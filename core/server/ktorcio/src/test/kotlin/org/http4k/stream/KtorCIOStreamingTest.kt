@@ -11,10 +11,6 @@ import java.util.Random
 class KtorCIOStreamingTest : StreamingContract(
     StreamingTestConfiguration(multiplier = 4)
 ) {
-    @BeforeEach
-    fun sleepForABitBecauseStartupIsCrushinglySlow() {
-        Thread.sleep(0)
-    }
 
     override fun serverConfig() = KtorCIO(Random().nextInt(1000) + 10000)
 
