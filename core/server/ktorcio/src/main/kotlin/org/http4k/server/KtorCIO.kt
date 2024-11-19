@@ -6,9 +6,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
-import io.ktor.server.cio.CIOApplicationEngine
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.stop
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.header
@@ -44,7 +42,7 @@ class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode
     }
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
-        private val engine: CIOApplicationEngine = embeddedServer(CIO, port) {
+        private val engine = embeddedServer(CIO, port) {
             install(createApplicationPlugin(name = "http4k") {
                 onCall {
                     withContext(Default) {
@@ -62,7 +60,7 @@ class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode
             engine.stop(0, 2, SECONDS)
         }
 
-        override fun port() = engine.environment.connectors[0].port
+        override fun port() = engine.engineConfig.connectors.first().port
     }
 }
 
