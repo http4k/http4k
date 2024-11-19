@@ -26,6 +26,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.server.ServerConfig.StopMode.Immediate
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import io.ktor.http.Headers as KHeaders
 
@@ -74,8 +76,18 @@ suspend fun ApplicationResponse.fromHttp4K(response: Response) {
         .forEach { header(it.first, it.second ?: "") }
     call.respondOutputStream(
         CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
-    ) {
-        response.body.stream.copyTo(this)
+    ) { response.body.stream.copyFlushingTo(this) }
+}
+
+private fun InputStream.copyFlushingTo(outputStream: OutputStream) {
+    var bytesCopied: Long = 0
+    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+    var bytes = read(buffer)
+    while (bytes >= 0) {
+        outputStream.write(buffer, 0, bytes)
+        outputStream.flush() // flush each buffer to ensure data is written immediately
+        bytesCopied += bytes
+        bytes = read(buffer)
     }
 }
 

@@ -13,7 +13,7 @@ class KtorCIOStreamingTest : StreamingContract(
 ) {
     @BeforeEach
     fun sleepForABitBecauseStartupIsCrushinglySlow() {
-        Thread.sleep(1000)
+        Thread.sleep(0)
     }
 
     override fun serverConfig() = KtorCIO(Random().nextInt(1000) + 10000)
