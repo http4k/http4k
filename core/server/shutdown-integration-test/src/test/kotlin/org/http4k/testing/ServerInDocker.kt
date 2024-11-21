@@ -30,7 +30,7 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
     private val basePath by lazy {
         val workingDir = File(".").absolutePath
         val projectDir = workingDir.removeSuffix(workingDir.substringAfter("/http4k/"))
-        val modulePath = "/http4k-server/shutdown-integration-test"
+        val modulePath = "/core/server/shutdown-integration-test"
         Uri.of("$projectDir$modulePath")
     }
     private val dockerWorkspace = basePath.extend(Uri.of("build/docker"))
@@ -143,7 +143,7 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
         val imageId = dockerClient.buildImageCmd(dockerWorkspace("Dockerfile"))
             .withTags(setOf("http4k-server-shutdown-integration-test"))
             .exec(BuildImageResultCallback())
-            .awaitImageId(10, SECONDS)
+            .awaitImageId(30, SECONDS)
 
         events(DockerEvent.WorkspacePrepared)
         return imageId
@@ -237,3 +237,7 @@ class PrintEventsInIntelliJ : Events {
 }
 
 data class ContainerId(val value: String)
+
+fun main() {
+    ServerInDocker()
+}
