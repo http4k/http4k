@@ -6,6 +6,7 @@ import org.http4k.connect.amazon.apprunner.model.NextToken
 import org.http4k.connect.amazon.apprunner.model.ServiceId
 import org.http4k.connect.amazon.apprunner.model.ServiceName
 import org.http4k.format.AwsCoreJsonAdapterFactory
+import org.http4k.format.AwsMoshiBuilder
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -16,14 +17,7 @@ import org.http4k.format.withStandardMappings
 import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 object AppRunnerMoshi : ConfigurableMoshi(
-    Moshi.Builder()
-        .add(AppRunnerJsonAdapterFactory)
-        .add(AwsCoreJsonAdapterFactory())
-        .add(ListAdapter)
-        .add(MapAdapter)
-        .asConfigurable()
-        .withStandardMappings()
-        .withAwsCoreMappings()
+    AwsMoshiBuilder(AppRunnerJsonAdapterFactory)
         .value(NextToken)
         .value(ServiceId)
         .value(ServiceName)

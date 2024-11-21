@@ -8,6 +8,7 @@ import org.http4k.connect.amazon.cloudwatchlogs.model.LogIndex
 import org.http4k.connect.amazon.cloudwatchlogs.model.LogStreamName
 import org.http4k.connect.amazon.cloudwatchlogs.model.NextToken
 import org.http4k.format.AwsCoreJsonAdapterFactory
+import org.http4k.format.AwsMoshiBuilder
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -18,14 +19,7 @@ import org.http4k.format.withStandardMappings
 import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 object CloudWatchLogsMoshi : ConfigurableMoshi(
-    Moshi.Builder()
-        .add(CloudWatchLogsJsonAdapterFactory)
-        .add(AwsCoreJsonAdapterFactory())
-        .add(ListAdapter)
-        .add(MapAdapter)
-        .asConfigurable()
-        .withStandardMappings()
-        .withAwsCoreMappings()
+    AwsMoshiBuilder(CloudWatchLogsJsonAdapterFactory)
         .value(EventId)
         .value(NextToken)
         .value(LogGroupName)

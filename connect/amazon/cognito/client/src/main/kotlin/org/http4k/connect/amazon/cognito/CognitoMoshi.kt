@@ -26,6 +26,7 @@ import org.http4k.connect.amazon.cognito.model.UserPoolId
 import org.http4k.connect.amazon.core.model.Password
 import org.http4k.connect.amazon.core.model.Username
 import org.http4k.format.AwsCoreJsonAdapterFactory
+import org.http4k.format.AwsMoshiBuilder
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -36,14 +37,7 @@ import org.http4k.format.withStandardMappings
 import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 object CognitoMoshi : ConfigurableMoshi(
-    Moshi.Builder()
-        .add(CognitoJsonAdapterFactory)
-        .add(AwsCoreJsonAdapterFactory())
-        .add(ListAdapter)
-        .add(MapAdapter)
-        .asConfigurable()
-        .withStandardMappings()
-        .withAwsCoreMappings()
+    AwsMoshiBuilder(CognitoJsonAdapterFactory)
         .value(AccessToken)
         .value(AttributeName)
         .value(ClientId)
