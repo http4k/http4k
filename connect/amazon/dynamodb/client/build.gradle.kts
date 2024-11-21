@@ -10,11 +10,6 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-amazon-core"))
-    api(project(":http4k-format-moshi")) {
-        exclude("org.jetbrains.kotlin", "kotlin-reflect")
-    }
-    api("se.ansman.kotshi:api:_")
-
     testFixturesApi("org.jetbrains.kotlin", "kotlin-reflect")
     testFixturesApi(project(":http4k-serverless-lambda"))
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
