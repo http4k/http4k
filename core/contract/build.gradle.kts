@@ -28,7 +28,7 @@ dependencies {
 
     implementation("dev.forkhandles:values4k:_")
     implementation(project(":http4k-security-oauth"))
-    api(project(":http4k-format-jackson"))
+    implementation(project(":http4k-format-jackson"))
     implementation(project(":http4k-multipart"))
 
     testImplementation("dev.forkhandles:values4k:_")
