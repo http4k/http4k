@@ -4,7 +4,7 @@ import org.http4k.sse.SseMessage
 
 sealed class DatastarEvent(val name: String, val data: List<String>, open val id: String?) {
 
-    fun toEvent(): SseMessage = SseMessage.Event(name, data.joinToString("\n"), id)
+    fun toSseEvent() = SseMessage.Event(name, data.joinToString("\n"), id)
 
     /**
      * The datastar-merge-fragments event is used to merge HTML fragments into the DOM. The fragments
@@ -72,7 +72,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
     data class RemoveFragments(
         val selector: Selector,
         override val id: String? = null,
-    ) : DatastarEvent("datastar-merge-signals", listOf("selector $selector"), id)
+    ) : DatastarEvent("datastar-remove-fragments", listOf("selector $selector"), id)
 
     /**
      * The datastar-remove-signals event is used to remove signals that match the provided paths

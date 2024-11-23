@@ -10,7 +10,7 @@ class DatastarEventTest {
     @Test
     fun `merge fragment to event`() {
         assertThat(
-            DatastarEvent.MergeFragments(Fragment.of("foo"), Fragment.of("bar")).toEvent(),
+            DatastarEvent.MergeFragments(Fragment.of("foo"), Fragment.of("bar")).toSseEvent(),
             equalTo(
                 SseMessage.Event(
                     "datastar-merge-fragments",
@@ -24,7 +24,7 @@ class DatastarEventTest {
     @Test
     fun `merge signals to event`() {
         assertThat(
-            DatastarEvent.MergeSignals(Signal.of("foo"), Signal.of("bar")).toEvent(),
+            DatastarEvent.MergeSignals(Signal.of("foo"), Signal.of("bar")).toSseEvent(),
             equalTo(
                 SseMessage.Event(
                     "datastar-merge-signals",
@@ -38,7 +38,7 @@ class DatastarEventTest {
     @Test
     fun `execute script to event`() {
         assertThat(
-            DatastarEvent.ExecuteScript(Script.of("foo"), true, listOf("foo" to "bar", "foo2" to "bar2")).toEvent(),
+            DatastarEvent.ExecuteScript(Script.of("foo"), true, listOf("foo" to "bar", "foo2" to "bar2")).toSseEvent(),
             equalTo(
                 SseMessage.Event(
                     "datastar-execute-script",
@@ -52,7 +52,7 @@ class DatastarEventTest {
     @Test
     fun `remove fragments to event`() {
         assertThat(
-            DatastarEvent.RemoveFragments(Selector.of("#foo")).toEvent(),
+            DatastarEvent.RemoveFragments(Selector.of("#foo")).toSseEvent(),
             equalTo(
                 SseMessage.Event(
                     "datastar-remove-fragments",
@@ -66,7 +66,7 @@ class DatastarEventTest {
     @Test
     fun `remove signals to event`() {
         assertThat(
-            DatastarEvent.RemoveSignals(Path.of("foo"), Path.of("bar")).toEvent(),
+            DatastarEvent.RemoveSignals(Path.of("foo"), Path.of("bar")).toSseEvent(),
             equalTo(
                 SseMessage.Event(
                     "datastar-remove-signals",
