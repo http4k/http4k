@@ -15,7 +15,7 @@ import java.io.PrintStream
 class SseDebuggingExtensionTests {
 
     @Test
-    fun `SSE - debug request`() {
+    fun `debug request`() {
         val os = ByteArrayOutputStream()
         val req = Request(GET, "").body("anything".byteInputStream())
 
@@ -29,11 +29,12 @@ class SseDebuggingExtensionTests {
         socket.testSseClient(req)
 
         val actual = String(os.toByteArray())
+        assertThat(actual, containsSubstring("***** SSE REQUEST: GET:  *****"))
         assertThat(actual, containsSubstring("<<stream>>"))
     }
 
     @Test
-    fun `SSE - debug response`() {
+    fun `debug response`() {
         val os = ByteArrayOutputStream()
         val req = Request(GET, "").body("anything".byteInputStream())
 
@@ -48,7 +49,8 @@ class SseDebuggingExtensionTests {
         socket.testSseClient(req)
 
         val actual = String(os.toByteArray())
-        assertThat(actual, containsSubstring("***** Sent: Data: hello"))
-        assertThat(actual, containsSubstring("***** CONNECTION CLOSED *****"))
+        assertThat(actual, containsSubstring("***** SSE RESPONSE 200 to GET:  *****"))
+        assertThat(actual, containsSubstring("***** SSE SEND GET:  -> Data: hello"))
+        assertThat(actual, containsSubstring("***** SSE CLOSED on GET:  *****"))
     }
 }
