@@ -3,6 +3,7 @@ package org.http4k.filter
 
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
+import org.http4k.routing.RoutingWsHandler
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
@@ -30,6 +31,9 @@ fun DebuggingFilters.PrintWsRequestAndResponse(out: PrintStream = System.out, de
     PrintWsRequest(out, debugStream).then(PrintWsResponse(out))
 
 fun WsHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
+    DebuggingFilters.PrintWsRequestAndResponse(out, debugStream).then(this)
+
+fun RoutingWsHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
     DebuggingFilters.PrintWsRequestAndResponse(out, debugStream).then(this)
 
 fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream: Boolean = false) =

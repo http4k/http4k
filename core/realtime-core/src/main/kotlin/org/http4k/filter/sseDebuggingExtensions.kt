@@ -3,6 +3,7 @@ package org.http4k.filter
 
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
+import org.http4k.routing.RoutingSseHandler
 import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
@@ -30,6 +31,9 @@ fun DebuggingFilters.PrintSseRequestAndResponse(out: PrintStream = System.out, d
     PrintSseRequest(out, debugStream).then(PrintSseResponse(out))
 
 fun SseHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
+    DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
+
+fun RoutingSseHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
     DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
 
 fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
