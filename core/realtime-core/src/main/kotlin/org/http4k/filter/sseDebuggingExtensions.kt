@@ -18,7 +18,7 @@ fun DebuggingFilters.PrintSseRequest(out: PrintStream = System.out, debugStream:
         { req ->
             out.println(
                 listOf(
-                    "***** SSE REQUEST: ${req.method}: ${req.uri} *****",
+                    "***** REQUEST: ${req.method}: ${req.uri} *****",
                     req.printable(debugStream)
                 ).joinToString("\n")
             )
@@ -40,9 +40,9 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                     out.println(
                         (
                             listOf(
-                                "***** SSE RESPONSE ${response.status.code} to ${req.method}: ${req.uri} *****"
+                                "***** RESPONSE ${response.status.code} to ${req.method}: ${req.uri} *****"
                             ) +
-                                response.headers.map { "${it.first}: ${it.second}" }
+                                response.headers.map { "AAAA${it.first}: ${it.second}" }
                             )
                             .joinToString("\n")
                     )
@@ -52,7 +52,7 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                             override fun send(message: SseMessage) {
                                 sse.send(message)
                                 out.println(
-                                    "***** SSE SEND ${req.method}: ${req.uri} -> " + when (message) {
+                                    "***** Sent: " + when (message) {
                                         is Data -> "Data: ${message.data}"
                                         is Event -> "Event: ${message.event} ${message.data} ${message.id ?: ""}"
                                         is Retry -> "Retry: ${message.backoff}"
@@ -62,13 +62,13 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
 
                             override fun close() {
                                 sse.close()
-                                out.println("***** SSE CLOSED on ${req.method}: ${req.uri} *****")
+                                out.println("***** CONNECTION CLOSED *****")
                             }
                         })
                     })
                 }
             } catch (e: Exception) {
-                out.println("***** SSE RESPONSE FAILED to ${req.method}: ${req.uri} *****")
+                out.println("***** RESPONSE FAILED to ${req.method}: ${req.uri} *****")
                 e.printStackTrace(out)
                 throw e
             }
