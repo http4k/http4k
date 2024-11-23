@@ -35,7 +35,16 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
             fragments + nullable + other
         },
         id
-    )
+    ) {
+        constructor(
+            vararg fragment: Fragment,
+            selector: Selector? = null,
+            mergeMode: MergeMode = MergeMode.morph,
+            useViewTransition: Boolean = false,
+            settleDuration: SettleDuration? = SettleDuration.DEFAULT,
+            id: String? = null,
+        ) : this(fragment.toList(), selector, mergeMode, useViewTransition, settleDuration, id)
+    }
 
     /**
      * The datastar-merge-signals event is used to update the store with new values. The onlyIfMissing
@@ -47,8 +56,14 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
         val onlyIfMissing: Boolean? = false,
         override val id: String? = null,
     ) : DatastarEvent("datastar-merge-signals", run {
-        signals.map { "signals it" } + listOfNotNull(onlyIfMissing?.let { "onlyIfMissing $it" })
-    }, id)
+        signals.map { "signals $it" } + listOfNotNull(onlyIfMissing?.let { "onlyIfMissing $it" })
+    }, id) {
+        constructor(
+            vararg signal: Signal,
+            onlyIfMissing: Boolean? = false,
+            id: String? = null,
+        ) : this(signal.toList(), onlyIfMissing, id)
+    }
 
     /**
      * The datastar-remove-fragments event is used to remove HTML fragments that match the provided
@@ -66,7 +81,12 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
     data class RemoveSignals(
         val paths: List<Path>,
         override val id: String? = null,
-    ) : DatastarEvent("datastar-remove-signals", paths.map { "paths $it" }, id)
+    ) : DatastarEvent("datastar-remove-signals", paths.map { "paths $it" }, id) {
+        constructor(
+            vararg path: Path,
+            id: String? = null,
+        ) : this(path.toList(), id)
+    }
 
     /**
      * The datastar-execute-script event is used to execute JavaScript in the browser.
@@ -79,7 +99,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
         val autoRemove: Boolean = true,
         val attributes: List<Pair<String, String>> = emptyList(),
         override val id: String? = null,
-    ) : DatastarEvent("datastar-merge-signals", run {
+    ) : DatastarEvent("datastar-execute-script", run {
         listOf("script $script", "autoRemove $autoRemove") + attributes.map { "attributes ${it.first} ${it.second}" }
     }, id)
 }
