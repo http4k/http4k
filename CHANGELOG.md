@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.35.4.0 (uncut)
+### v5.35.4.0
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HeliconSseTest for details. 
 - **http4k-realtime-core*** : Added Debugging for Websocket and SSE connections.
 - **http4k-realtime-core*** : Can now route SSE based on the method as well as the path.
 
