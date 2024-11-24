@@ -12,7 +12,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseHandler
@@ -29,7 +29,7 @@ fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
                 else -> http?.let { res.from(it(http4kReq)) }
             }
         }
-        ?: res.from(Response(NOT_FOUND))
+        ?: res.from(Response(NOT_IMPLEMENTED))
 }
 
 private fun SseHandler.handle(http4kRequest: Request, res: ServerResponse) {
