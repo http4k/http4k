@@ -12,6 +12,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.sse.PushAdaptingSse
@@ -25,8 +26,13 @@ fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
     req.toHttp4k()
         ?.let { http4kReq ->
             when {
-                sse != null && http4kReq.isEventStream() -> sse.handle(http4kReq, res)
-                else -> http?.let { res.from(it(http4kReq)) }
+                sse != null && http4kReq.isEventStream() -> {
+                    sse.handle(http4kReq, res)
+                }
+
+                else -> {
+                    res.from(http?.let { it(http4kReq) } ?: Response(NOT_FOUND))
+                }
             }
         }
         ?: res.from(Response(NOT_IMPLEMENTED))
@@ -49,7 +55,8 @@ private fun SseHandler.handle(http4kRequest: Request, res: ServerResponse) {
                 when (message) {
                     is Retry -> builder().reconnectDelay(message.backoff).build()
                     is Data -> builder().data(message.sanitizeForMultipleRecords()).build()
-                    is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:")).id(message.id).build()
+                    is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:")).id(message.id)
+                        .build()
                 }
             )
         }
