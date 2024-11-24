@@ -5,5 +5,15 @@ import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.sse.SseServerContract
 import org.junit.jupiter.api.Disabled
 
-@Disabled("cannot do this in helidon yet")
-class HelidonSseTest : SseServerContract({ Helidon(it, Immediate) }, JavaHttpClient(), newThreadForClose = false)
+class HelidonSseTest : SseServerContract({ Helidon(it, Immediate) }, JavaHttpClient(), newThreadForClose = false) {
+
+    @Disabled("not available in Helidon")
+    override fun `can handle multiple pieces of data in an event`() {
+        super.`can handle multiple pieces of data in an event`()
+    }
+
+    @Disabled("not available in Helidon")
+    override fun `can modify status`() {
+        super.`can modify status`()
+    }
+}
