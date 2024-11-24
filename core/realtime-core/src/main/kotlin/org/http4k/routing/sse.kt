@@ -1,5 +1,6 @@
 package org.http4k.routing
 
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseFilter
@@ -20,3 +21,7 @@ interface RoutingSseHandler : SseHandler, SseRouter {
 fun sse(sse: SseConsumer): SseHandler = { SseResponse(sse) }
 
 fun sse(vararg list: SseRouter): RoutingSseHandler = RouterSseHandler(list.toList())
+
+fun sse(vararg methods: Pair<Method, SseHandler>): SseHandler = {
+    methods.toMap()[it.method]?.invoke(it) ?: SseResponse { it.close() }
+}

@@ -8,11 +8,8 @@ import org.http4k.base64Encode
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
-import org.http4k.core.Method.PATCH
 import org.http4k.core.Method.POST
-import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
@@ -51,8 +48,12 @@ abstract class SseServerContract(
     )
 
     private val sse = sse(
-        "/modify" bind { SseResponse(ACCEPTED) { it.close() } },
-        "/method" bind { SseResponse(OK, listOf("method" to it.method.name)) { it.close() } },
+        "/modify" bind { SseResponse(ACCEPTED) { it.closeInABit() } },
+        "/routeMethod" bind sse(
+            POST to { SseResponse(OK, listOf("METHOD" to it.method.name)) { it.closeInABit() } },
+            GET to { SseResponse(OK, listOf("METHOD" to it.method.name)) { it.closeInABit() } }
+        ),
+        "/method" bind { SseResponse(OK, listOf("method" to it.method.name)) { it.closeInABit() } },
         "/hello" bind sse(
             "/{name}" bind { req: Request ->
                 when {
@@ -61,19 +62,23 @@ abstract class SseServerContract(
                         sse.send(Event("event1", "hello $name", "123"))
                         sse.send(Event("event2", "again $name\nHi!", "456"))
                         sse.send(Data("goodbye $name".byteInputStream()))
-                        if (newThreadForClose) {
-                            thread {
-                                Thread.sleep(100)
-                                sse.close()
-                            }
-                        } else sse.close()
+                        sse.closeInABit()
                     }
 
-                    else -> SseResponse { it.close() }
+                    else -> SseResponse { it.closeInABit() }
                 }
             },
         )
     )
+
+    private fun Sse.closeInABit() {
+        if (newThreadForClose) {
+            thread {
+                Thread.sleep(100)
+                close()
+            }
+        } else close()
+    }
 
     @BeforeEach
     fun before() {
@@ -107,13 +112,13 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `supports methods`() {
-        setOf(GET, PUT, DELETE, PATCH, POST).forEach {
+    fun `can route to method`() {
+        setOf(GET, POST).forEach {
             val response = JavaHttpClient()(
-                Request(it, "http://localhost:${server.port()}/method")
+                Request(it, "http://localhost:${server.port()}/routeMethod")
                     .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
             )
-            assertThat(response.header("method"), equalTo(it.name))
+            assertThat(response.header("METHOD"), equalTo(it.name))
         }
     }
 
@@ -136,6 +141,15 @@ abstract class SseServerContract(
 
     @Test
     open fun `can modify status`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${server.port()}/modify")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.status, equalTo(ACCEPTED))
+    }
+
+    @Test
+    open fun `can route by method`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/modify")
                 .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
