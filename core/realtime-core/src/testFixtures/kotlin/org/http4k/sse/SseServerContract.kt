@@ -158,7 +158,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can handle newlines`() {
+    open fun `can handle newlines`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/newline")
                 .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
@@ -245,7 +245,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `when no http handler messages without the event stream header don't blow up`() {
+    open fun `when no http handler messages without the event stream header don't blow up`() {
         PolyHandler(sse = sse).asServer(serverConfig(0)).start().use {
             assertThat(
                 client(Request(GET, "http://localhost:${it.port()}/hello/bob")),
