@@ -10,6 +10,8 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.server.ServerConfig.StopMode
+import org.http4k.server.ServerConfig.StopMode.Graceful
+import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
@@ -17,18 +19,17 @@ import java.net.InetSocketAddress
 class Undertow(
     val port: Int = 8000,
     val enableHttp2: Boolean,
-    override val stopMode: StopMode = StopMode.Immediate
+    override val stopMode: StopMode = Immediate
 ) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, false)
-    constructor(port: Int = 8000, enableHttp2: Boolean) : this(port, enableHttp2, StopMode.Immediate)
+    constructor(port: Int = 8000, enableHttp2: Boolean) : this(port, enableHttp2, Immediate)
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
         val httpHandler =
             (http ?: { Response(BAD_REQUEST) }).let(::Http4kUndertowHttpHandler).let(::BlockingHandler).let { handler ->
-                if (stopMode is StopMode.Graceful) {
-                    GracefulShutdownHandler(handler)
-                } else {
-                    handler
+                when (stopMode) {
+                    is Graceful -> GracefulShutdownHandler(handler)
+                    else -> handler
                 }
             }
         val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
@@ -53,7 +54,7 @@ class Undertow(
             override fun stop() = apply {
                 (httpHandler as? GracefulShutdownHandler)?.apply {
                     shutdown()
-                    awaitShutdown((stopMode as StopMode.Graceful).timeout.toMillis())
+                    awaitShutdown((stopMode as Graceful).timeout.toMillis())
                 }
                 server.stop()
             }

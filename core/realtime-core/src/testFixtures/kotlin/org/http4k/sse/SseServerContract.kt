@@ -1,13 +1,18 @@
 package org.http4k.sse
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.or
 import org.http4k.base64Encode
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.PATCH
+import org.http4k.core.Method.POST
+import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
@@ -33,31 +38,41 @@ import org.junit.jupiter.api.Test
 import kotlin.concurrent.thread
 import org.http4k.routing.bind as hbind
 
-abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerConfig, private val client: HttpHandler) {
+abstract class SseServerContract(
+    private val serverConfig: (Int) -> PolyServerConfig,
+    private val client: HttpHandler,
+    private val newThreadForClose: Boolean = true
+) {
+
     private lateinit var server: Http4kServer
 
     private val http = routes(
         "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) }
     )
 
-    private val sse = sse("/hello" bind sse(
-        "/{name}" bind { req: Request ->
-            when {
-                req.query("reject") == null -> SseResponse(ACCEPTED, listOf("foo" to "bar")) { sse ->
-                    val name = req.path("name")!!
-                    sse.send(Event("event1", "hello $name", "123"))
-                    sse.send(Event("event2", "again $name\nHi!", "456"))
-                    sse.send(Data("goodbye $name".byteInputStream()))
-                    thread {
-                        Thread.sleep(100)
-                        sse.close()
+    private val sse = sse(
+        "/modify" bind { SseResponse(ACCEPTED) { it.close() } },
+        "/method" bind { SseResponse(OK, listOf("method" to it.method.name)) { it.close() } },
+        "/hello" bind sse(
+            "/{name}" bind { req: Request ->
+                when {
+                    req.query("reject") == null -> SseResponse(OK, listOf("foo" to "bar")) { sse ->
+                        val name = req.path("name")!!
+                        sse.send(Event("event1", "hello $name", "123"))
+                        sse.send(Event("event2", "again $name\nHi!", "456"))
+                        sse.send(Data("goodbye $name".byteInputStream()))
+                        if (newThreadForClose) {
+                            thread {
+                                Thread.sleep(100)
+                                sse.close()
+                            }
+                        } else sse.close()
                     }
-                }
 
-                else -> SseResponse { it.close() }
-            }
-        }
-    )
+                    else -> SseResponse { it.close() }
+                }
+            },
+        )
     )
 
     @BeforeEach
@@ -92,13 +107,40 @@ abstract class SseServerContract(private val serverConfig: (Int) -> PolyServerCo
     }
 
     @Test
-    fun `can set response headers and status`() {
+    fun `supports methods`() {
+        setOf(GET, PUT, DELETE, PATCH, POST).forEach {
+            val response = JavaHttpClient()(
+                Request(it, "http://localhost:${server.port()}/method")
+                    .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+            )
+            assertThat(response.header("method"), equalTo(it.name))
+        }
+    }
+
+    @Test
+    fun `can handle multiple pieces of data in an event`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/hello/leia")
                 .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
         )
-        assertThat(response.status, equalTo(ACCEPTED))
         assertThat(response.header("foo"), equalTo("bar"))
+        assertThat(response.bodyString(), containsSubstring("""id:123"""))
+        assertThat(response.bodyString(), containsSubstring("""data:hello leia"""))
+        assertThat(response.bodyString(), containsSubstring("""id:456"""))
+        assertThat(response.bodyString(), containsSubstring("""event:event2"""))
+        assertThat(response.bodyString(), containsSubstring("""data:again leia"""))
+        assertThat(response.bodyString(), containsSubstring("""data:Hi!"""))
+        assertThat(response.bodyString(), containsSubstring("""data:Z29vZGJ5ZSBsZWlh"""))
+        assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
+    open fun `can modify status`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${server.port()}/modify")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.status, equalTo(ACCEPTED))
     }
 
     @Test

@@ -65,9 +65,12 @@ class JettyEventStreamHandler(
 
     companion object {
         private fun JettyRequest.isEventStream() =
-            method == "GET" && headers.contains(HttpHeader.ACCEPT, TEXT_EVENT_STREAM.value)
+            headers.contains(HttpHeader.ACCEPT, TEXT_EVENT_STREAM.value)
 
-        private fun JettyResponse.writeEventStreamResponse(newStatus: Status, additionalHeaders: Headers): Callback.Completable {
+        private fun JettyResponse.writeEventStreamResponse(
+            newStatus: Status,
+            additionalHeaders: Headers
+        ): Callback.Completable {
             status = newStatus.code
             headers.add(HttpHeader.CONTENT_TYPE, TEXT_EVENT_STREAM.toHeaderValue())
             // By adding this header, and not closing the connection,

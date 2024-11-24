@@ -22,8 +22,8 @@ class Jetty(private val port: Int, override val stopMode: StopMode, private val 
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
         server.handler = Handler.Sequence(listOfNotNull(
-            ws?.let { ws.toJettyWsHandler(server) },
             sse?.let { sse.toJettySseHandler() },
+            ws?.let { ws.toJettyWsHandler(server) },
             http?.let { http.toJettyHandler(stopMode is Graceful) }
         ))
 
