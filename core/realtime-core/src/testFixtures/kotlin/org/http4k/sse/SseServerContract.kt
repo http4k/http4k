@@ -120,7 +120,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `supports methods`() {
+    open fun `supports methods`() {
         setOf(GET, PUT, DELETE, PATCH, POST).forEach {
             val response = JavaHttpClient()(
                 Request(it, "http://localhost:${server.port()}/method")
