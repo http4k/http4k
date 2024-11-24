@@ -13,7 +13,7 @@ import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.SseResponse
 import org.http4k.routing.bind as hbind
 
-class SseServerContract222() {
+class SseServer {
 
     var server: Http4kServer
 
@@ -44,5 +44,5 @@ class SseServerContract222() {
 }
 
 fun main() {
-    SseServerContract222()
+    SseServer()
 }
