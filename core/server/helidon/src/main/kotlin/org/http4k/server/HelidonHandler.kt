@@ -41,18 +41,20 @@ private fun SseHandler.handle(http4kRequest: Request, res: ServerResponse) {
 
     val sseSink = res.sink(TYPE)
 
-//    res.status(create(response.status.code, response.status.description))
+    res.status(create(http4kResponse.status.code, http4kResponse.status.description))
 
     http4kResponse.consumer(object : PushAdaptingSse(http4kRequest) {
         override fun send(message: SseMessage) {
             sseSink.emit(
                 when (message) {
                     is Retry -> builder().reconnectDelay(message.backoff).build()
-                    is Data -> builder().data(message.data).build()
-                    is Event -> builder().name(message.event).data(message.data).id(message.id).build()
+                    is Data -> builder().data(message.sanitizeForMultipleRecords()).build()
+                    is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:")).id(message.id).build()
                 }
             )
         }
+
+        private fun Data.sanitizeForMultipleRecords() = data.replace("\n", "\ndata:")
 
         override fun close() {
             sseSink.close()

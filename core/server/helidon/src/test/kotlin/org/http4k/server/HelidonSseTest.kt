@@ -8,11 +8,6 @@ import org.junit.jupiter.api.Disabled
 class HelidonSseTest : SseServerContract({ Helidon(it, Immediate) }, JavaHttpClient(), newThreadForClose = false) {
 
     @Disabled("not available in Helidon")
-    override fun `can handle newlines`() {
-        super.`can handle newlines`()
-    }
-
-    @Disabled("not available in Helidon")
     override fun `when no http handler messages without the event stream header don't blow up`() {
         super.`when no http handler messages without the event stream header don't blow up`()
     }
