@@ -63,7 +63,7 @@ abstract class SseServerContract(
                     req.query("reject") == null -> SseResponse(OK, listOf("foo" to "bar")) { sse ->
                         val name = req.path("name")!!
                         sse.send(Event("event1", "hello $name", "123"))
-                        sse.send(Event("event2", "again $name\nHi!", "456"))
+                        sse.send(Event("event2", "again $name", "456"))
                         sse.send(Data("goodbye $name".byteInputStream()))
                         sse.closeInABit()
                     }
@@ -71,8 +71,13 @@ abstract class SseServerContract(
                     else -> SseResponse { it.closeInABit() }
                 }
             },
-        )
-    )
+        ),
+        "/newline" bind {
+            SseResponse(OK) { sse ->
+                sse.send(Event("event", "hello\nworld!", "456"))
+                sse.closeInABit()
+            }
+        })
 
     private fun Sse.closeInABit() {
         if (newThreadForClose) {
@@ -107,7 +112,7 @@ abstract class SseServerContract(
             equalTo(
                 listOf(
                     Event("event1", "hello bob", "123"),
-                    Event("event2", "again bob\nHi!", "456"),
+                    Event("event2", "again bob", "456"),
                     Data("goodbye bob".base64Encode())
                 )
             )
@@ -137,7 +142,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can handle multiple pieces of data in an event`() {
+    fun `can handle multiple messages`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/hello/leia")
                 .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
@@ -148,8 +153,19 @@ abstract class SseServerContract(
         assertThat(response.bodyString(), containsSubstring("""id:456"""))
         assertThat(response.bodyString(), containsSubstring("""event:event2"""))
         assertThat(response.bodyString(), containsSubstring("""data:again leia"""))
-        assertThat(response.bodyString(), containsSubstring("""data:Hi!"""))
         assertThat(response.bodyString(), containsSubstring("""data:Z29vZGJ5ZSBsZWlh"""))
+        assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
+    fun `can handle newlines`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${server.port()}/newline")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.bodyString(), containsSubstring("""id:456"""))
+        assertThat(response.bodyString(), containsSubstring("""data:hello"""))
+        assertThat(response.bodyString(), containsSubstring("""data:world"""))
         assertThat(response.status, equalTo(OK))
     }
 
@@ -195,7 +211,7 @@ abstract class SseServerContract(
             equalTo(
                 listOf(
                     Event("event1", "hello leia", "123"),
-                    Event("event2", "again leia\nHi!", "456"),
+                    Event("event2", "again leia", "456"),
                     Data("goodbye leia".base64Encode())
                 )
             )
@@ -207,7 +223,7 @@ abstract class SseServerContract(
             equalTo(
                 listOf(
                     Event("event1", "hello luke", "123"),
-                    Event("event2", "again luke\nHi!", "456"),
+                    Event("event2", "again luke", "456"),
                     Data("goodbye luke".base64Encode())
                 )
             )
@@ -218,7 +234,7 @@ abstract class SseServerContract(
             equalTo(
                 listOf(
                     Event("event1", "hello anakin", "123"),
-                    Event("event2", "again anakin\nHi!", "456"),
+                    Event("event2", "again anakin", "456"),
                     Data("goodbye anakin".base64Encode())
                 )
             )
