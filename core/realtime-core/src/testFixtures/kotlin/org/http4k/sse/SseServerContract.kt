@@ -163,12 +163,15 @@ abstract class SseServerContract(
     }
 
     @Test
-    open fun `can route by method`() {
-        val response = JavaHttpClient()(
-            Request(GET, "http://localhost:${server.port()}/modify")
-                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
-        )
-        assertThat(response.status, equalTo(ACCEPTED))
+    fun `can route by method`() {
+        setOf(GET, POST).forEach {
+            val response = JavaHttpClient()(
+                Request(it, "http://localhost:${server.port()}/routeMethod")
+                    .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+            )
+            assertThat(response.status, equalTo(OK))
+            assertThat(response.header("METHOD"), equalTo(it.name))
+        }
     }
 
     @Test

@@ -4,7 +4,9 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.35.4.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-realtime-core*** : Added Debugging for Websocket and SSE connections.
+- **http4k-realtime-core*** : Can now route SSE based on the method as well as the path.
 
 ### v5.35.3.0
 - **http4k-*** : Upgrade some dependency versions.
