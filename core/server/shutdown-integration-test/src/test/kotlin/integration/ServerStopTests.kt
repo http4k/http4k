@@ -1,7 +1,6 @@
 package integration
 
 import org.http4k.client.OkHttp
-import org.http4k.server.ClientForServerTesting
 import org.http4k.testing.ServerBackend.Apache
 import org.http4k.testing.ServerBackend.Apache4
 import org.http4k.testing.ServerBackend.Helidon
