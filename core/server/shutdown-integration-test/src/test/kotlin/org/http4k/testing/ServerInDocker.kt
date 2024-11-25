@@ -211,6 +211,7 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
     fun stop(containerId: ContainerId) {
         events(DockerEvent.ServerStopRequested(containerId.value))
         dockerClient.stopContainerCmd(containerId.value).exec()
+        waitForEvent(containerId, TestServerEvent.ServerStopRequested())
         events(DockerEvent.ContainerStopped(containerId.value))
     }
 
