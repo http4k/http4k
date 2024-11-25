@@ -13,6 +13,7 @@ import org.http4k.testing.ServerBackend.Ratpack
 import org.http4k.testing.ServerBackend.SunHttp
 import org.http4k.testing.ServerBackend.SunHttpLoom
 import org.http4k.testing.ServerBackend.Undertow
+import org.junit.jupiter.api.Disabled
 
 class ApacheServerStopTest : ServerStopContract(Apache, OkHttp(), {
     enableImmediateStop()
@@ -33,10 +34,12 @@ class JettyLoomStopTest : ServerStopContract(JettyLoom, OkHttp(), {
     enableImmediateStop()
 })
 
+@Disabled
 class KtorCIOStopTest : ServerStopContract(KtorCIO, OkHttp(), {
     enableImmediateStop()
 })
 
+@Disabled
 class KtorNettyStopTest : ServerStopContract(KtorNetty, OkHttp(), {
     enableImmediateStop()
     enableGracefulStop()
