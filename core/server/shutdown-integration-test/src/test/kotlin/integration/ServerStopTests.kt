@@ -25,6 +25,7 @@ class Apache4ServerStopTest : ServerStopContract(Apache4, OkHttp(), {
 
 class JettyStopTest : ServerStopContract(Jetty, OkHttp(), {
     enableGracefulStop()
+    enableImmediateStop()
 })
 
 class JettyLoomStopTest : ServerStopContract(JettyLoom, OkHttp(), {
