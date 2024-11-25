@@ -10,8 +10,8 @@ changes with their rationale when appropriate:
 
 ### v5.35.4.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HeliconSseTest for details. 
-- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HeliconSseTest for details. 
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HelidonSseTest for details. 
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HelidonSseTest for details. 
 
 ### v5.35.4.0
 - **http4k-*** : Upgrade some dependency versions.
