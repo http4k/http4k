@@ -1,22 +1,24 @@
 package org.http4k.server
 
-import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
-import org.apache.hc.client5.http.impl.classic.HttpClients.createDefault
-import org.apache.hc.core5.http.ClassicHttpResponse
-import org.http4k.client.ApacheClient
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
+import org.apache.http.impl.client.HttpClients
+import org.http4k.client.Apache4Client
 import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.HttpHandler
 import org.http4k.core.Status
+import java.net.URI
 import java.net.URI.create
 
 object ClientForServerTesting {
     fun makeRequestWithInvalidMethod(baseUrl: String): Status =
-        createDefault().use { client ->
-            client.execute(HttpUriRequestBase("FOOBAR", create(baseUrl)), ClassicHttpResponse::getCode)
-                ?.let(Status::fromCode)!!
+        HttpClients.createDefault().use { client ->
+            client.execute(object: HttpEntityEnclosingRequestBase(){
+                override fun getMethod(): String = "UNKNWON"
+                override fun getURI(): URI = create(baseUrl)
+            }).statusLine.statusCode.let(Status::fromCode)!!
         }
 
     operator fun invoke(requestBodyMode: BodyMode = Memory, responseBodyMode: BodyMode = Memory): HttpHandler =
-        ApacheClient(requestBodyMode = requestBodyMode, responseBodyMode = responseBodyMode)
+        Apache4Client(requestBodyMode = requestBodyMode, responseBodyMode = responseBodyMode)
 }
