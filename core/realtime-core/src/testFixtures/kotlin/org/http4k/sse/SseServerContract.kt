@@ -49,12 +49,28 @@ abstract class SseServerContract(
     )
 
     private val sse = sse(
-        "/modify" bind { SseResponse(ACCEPTED) { it.closeInABit() } },
+        "/modify" bind {
+            SseResponse(ACCEPTED) {
+                it.close()
+            }
+        },
         "/routeMethod" bind sse(
-            POST to { SseResponse(OK, listOf("METHOD" to it.method.name)) { it.closeInABit() } },
-            GET to { SseResponse(OK, listOf("METHOD" to it.method.name)) { it.closeInABit() } }
+            POST to {
+                SseResponse(OK, listOf("METHOD" to it.method.name)) {
+                    it.close()
+                }
+            },
+            GET to {
+                SseResponse(OK, listOf("METHOD" to it.method.name)) {
+                    it.close()
+                }
+            }
         ),
-        "/method" bind { SseResponse(OK, listOf("method" to it.method.name)) { it.closeInABit() } },
+        "/method" bind {
+            SseResponse(OK, listOf("method" to it.method.name)) {
+                it.close()
+            }
+        },
         "/hello" bind sse(
             "/{name}" bind { req: Request ->
                 when {
@@ -63,23 +79,21 @@ abstract class SseServerContract(
                         sse.send(Event("event1", "hello $name", "123"))
                         sse.send(Event("event2", "again $name", "456"))
                         sse.send(Data("goodbye $name".byteInputStream()))
-                        sse.closeInABit()
+                        sse.close()
                     }
 
-                    else -> SseResponse { it.closeInABit() }
+                    else -> SseResponse {
+                        it.close()
+                    }
                 }
             },
         ),
         "/newline" bind {
             SseResponse(OK) { sse ->
                 sse.send(Event("event", "hello\nworld!", "456"))
-                sse.closeInABit()
+                sse.close()
             }
         })
-
-    private fun Sse.closeInABit() {
-        close()
-    }
 
     @BeforeEach
     fun before() {
