@@ -3,9 +3,13 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.35.6.0 (uncut)
+- **http4k-server-netty*** : Throw exception if configured with `Immediate` stop mode as it's not supported.
+
 ### v5.35.5.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-server-helidon*** : Fixes to SSE support
+- **http4k-server-helidon*** : Throw exception if configured with `Graceful` stop mode as it's not supported.
 - **http4k-server-undertow*** : Fixes to SSE support
 
 ### v5.35.4.0
