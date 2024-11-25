@@ -29,6 +29,7 @@ class JettyStopTest : ServerStopContract(Jetty, OkHttp(), {
 
 class JettyLoomStopTest : ServerStopContract(JettyLoom, OkHttp(), {
     enableGracefulStop()
+    enableImmediateStop()
 })
 
 class KtorCIOStopTest : ServerStopContract(KtorCIO, OkHttp(), {
