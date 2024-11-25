@@ -25,6 +25,7 @@ dependencies {
     api(project(":http4k-format-jackson"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-realtime-core")))
+    testImplementation(project(":http4k-client-okhttp"))
     testImplementation("com.github.docker-java:docker-java-core:_")
     testImplementation("com.github.docker-java:docker-java-transport-httpclient5:_")
 }
