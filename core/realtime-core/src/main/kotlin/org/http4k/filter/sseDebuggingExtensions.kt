@@ -8,9 +8,6 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
-import org.http4k.sse.SseMessage.Data
-import org.http4k.sse.SseMessage.Event
-import org.http4k.sse.SseMessage.Retry
 import org.http4k.sse.then
 import java.io.PrintStream
 
@@ -55,13 +52,8 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                         response.consumer(object : Sse by sse {
                             override fun send(message: SseMessage) {
                                 sse.send(message)
-                                out.println(
-                                    "***** SSE SEND ${req.method}: ${req.uri} -> " + when (message) {
-                                        is Data -> "Data: ${message.data}"
-                                        is Event -> "Event: ${message.event} ${message.data} ${message.id ?: ""}"
-                                        is Retry -> "Retry: ${message.backoff}"
-                                    }
-                                )
+                                out.println("""***** SSE SEND ${req.method}: ${req.uri} -> ${message::class.simpleName}}""")
+                                out.println(message.toMessage())
                             }
 
                             override fun close() {
