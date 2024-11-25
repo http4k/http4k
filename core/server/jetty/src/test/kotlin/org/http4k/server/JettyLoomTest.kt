@@ -2,13 +2,12 @@ package org.http4k.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.client.ApacheClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class JettyLoomTest : ServerContract({ JettyLoom(it, ServerConfig.StopMode.Immediate) }, ApacheClient()) {
+class JettyLoomTest : ServerContract({ JettyLoom(it, ServerConfig.StopMode.Immediate) }, ClientForServerTesting()) {
     override fun requestScheme() = equalTo("http")
 
     @Test

@@ -2,16 +2,12 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.apache.hc.client5.http.config.RequestConfig
-import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.http4k.core.BodyMode
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.server.ApacheServer
 import org.junit.jupiter.api.Test
 import java.time.Duration
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class Java8HttpClientTest : HttpClientContract(
     serverConfig = ::ApacheServer,
