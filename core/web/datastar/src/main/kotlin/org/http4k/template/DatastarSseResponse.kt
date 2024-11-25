@@ -41,7 +41,7 @@ interface DatastarSseResponse {
         override fun invoke(renderer: TemplateRenderer) = SseResponse(status, headers) {
             it.send(
                 DatastarEvent.MergeFragments(
-                    views.map { Fragment.of(renderer(it)) },
+                    views.map { Fragment.of(renderer(it).stripNewLines()) },
                     mergeMode,
                     selector,
                     useViewTransition,
@@ -51,6 +51,8 @@ interface DatastarSseResponse {
             )
             if (close) it.close()
         }
+
+        private fun String.stripNewLines() = replace("\n", "")
     }
 
     data class Error(override val status: Status, override val headers: Headers = emptyList()) : DatastarSseResponse {
