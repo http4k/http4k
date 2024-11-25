@@ -55,8 +55,9 @@ private fun SseHandler.handle(http4kRequest: Request, res: ServerResponse) {
                 when (message) {
                     is Retry -> builder().reconnectDelay(message.backoff).build()
                     is Data -> builder().data(message.sanitizeForMultipleRecords()).build()
-                    is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:")).id(message.id)
-                        .build()
+                    is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:")).let {
+                        if (message.id == null) it else it.id(message.id)
+                    }.build()
                 }
             )
         }

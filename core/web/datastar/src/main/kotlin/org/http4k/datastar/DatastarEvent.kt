@@ -26,7 +26,6 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
     ) : DatastarEvent(
         "datastar-merge-fragments",
         run {
-            val fragments = fragments.map { "fragments $it" }
             val nullable = listOfNotNull(
                 selector?.value?.let { "selector $it" },
                 settleDuration?.let { "settleDuration ${it.value.toMillis()}" }
@@ -35,7 +34,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
                 "mergeMode $mergeMode",
                 "useViewTransition $useViewTransition"
             )
-            fragments + nullable + other
+            fragments.map { "fragments $it" } + nullable + other
         },
         id
     ) {
@@ -115,3 +114,4 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
         listOf("script $script", "autoRemove $autoRemove") + attributes.map { "attributes ${it.first} ${it.second}" }
     }, id)
 }
+

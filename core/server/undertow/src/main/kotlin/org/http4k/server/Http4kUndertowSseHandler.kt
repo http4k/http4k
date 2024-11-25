@@ -16,7 +16,7 @@ import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
 import java.io.IOException
 
-class Http4kSetHeadersHandler(private val sse: SseHandler) : HttpHandler {
+class Http4kUndertowSseHandler(private val sse: SseHandler) : HttpHandler {
 
     override fun handleRequest(exchange: HttpServerExchange) {
         val asRequest = exchange.asRequest()
@@ -38,7 +38,7 @@ class Http4kSetHeadersHandler(private val sse: SseHandler) : HttpHandler {
                         is SseMessage.Event -> connection.send(message.data, message.event, message.id, NoOp)
                     }
 
-                override fun close() = connection.close()
+                override fun close() = connection.shutdown()
             }
 
             consumer(socket)

@@ -34,7 +34,7 @@ class Undertow(
             }
         val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
 
-        val sseCallback = sse?.let { Http4kSetHeadersHandler(sse) }
+        val sseCallback = sse?.let { Http4kUndertowSseHandler(sse) }
 
         val handlerWithWs = predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
 
