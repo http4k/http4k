@@ -19,7 +19,6 @@ dependencies {
 }
 
 fun shouldBePublished(p: Project) = setOf(
-    "datastar", // TODO - remove this to publish
     "enterprise", // TODO - remove this to publish
     "example",
     "test-function",
