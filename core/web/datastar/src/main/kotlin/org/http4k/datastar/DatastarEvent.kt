@@ -1,5 +1,8 @@
 package org.http4k.datastar
 
+import org.http4k.datastar.Fragment.Companion.of
+import org.http4k.datastar.MergeMode.morph
+import org.http4k.datastar.SettleDuration.Companion.DEFAULT
 import org.http4k.sse.SseMessage
 
 sealed class DatastarEvent(val name: String, val data: List<String>, open val id: String?) {
@@ -15,10 +18,10 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
      */
     data class MergeFragments(
         val fragments: List<Fragment>,
+        val mergeMode: MergeMode = morph,
         val selector: Selector? = null,
-        val mergeMode: MergeMode = MergeMode.morph,
         val useViewTransition: Boolean = false,
-        val settleDuration: SettleDuration? = SettleDuration.DEFAULT,
+        val settleDuration: SettleDuration? = DEFAULT,
         override val id: String? = null,
     ) : DatastarEvent(
         "datastar-merge-fragments",
@@ -38,12 +41,21 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
     ) {
         constructor(
             vararg fragment: Fragment,
+            mergeMode: MergeMode = morph,
             selector: Selector? = null,
-            mergeMode: MergeMode = MergeMode.morph,
             useViewTransition: Boolean = false,
-            settleDuration: SettleDuration? = SettleDuration.DEFAULT,
+            settleDuration: SettleDuration? = DEFAULT,
             id: String? = null,
-        ) : this(fragment.toList(), selector, mergeMode, useViewTransition, settleDuration, id)
+        ) : this(fragment.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
+
+        constructor(
+            vararg fragment: String,
+            mergeMode: MergeMode = morph,
+            selector: Selector? = null,
+            useViewTransition: Boolean = false,
+            settleDuration: SettleDuration? = DEFAULT,
+            id: String? = null,
+        ) : this(fragment.map { of(it) }.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
     }
 
     /**
