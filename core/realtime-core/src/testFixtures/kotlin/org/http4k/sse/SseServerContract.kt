@@ -35,13 +35,11 @@ import org.http4k.sse.SseMessage.Event
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.concurrent.thread
 import org.http4k.routing.bind as hbind
 
 abstract class SseServerContract(
     private val serverConfig: (Int) -> PolyServerConfig,
-    private val client: HttpHandler,
-    private val newThreadForClose: Boolean = true
+    private val client: HttpHandler
 ) {
 
     private lateinit var server: Http4kServer
@@ -80,12 +78,7 @@ abstract class SseServerContract(
         })
 
     private fun Sse.closeInABit() {
-        if (newThreadForClose) {
-            thread {
-                Thread.sleep(100)
-                close()
-            }
-        } else close()
+        close()
     }
 
     @BeforeEach
