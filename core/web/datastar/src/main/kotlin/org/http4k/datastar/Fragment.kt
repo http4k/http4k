@@ -3,6 +3,9 @@ package org.http4k.datastar
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 
-class Fragment private constructor(value: String) : StringValue(value) {
+/**
+ * Represents a Fragment which contains no surrounidng whitespace.
+ */
+class Fragment private constructor(value: String) : StringValue(value.trim()) {
     companion object : NonBlankStringValueFactory<Fragment>(::Fragment)
 }

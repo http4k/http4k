@@ -11,7 +11,6 @@ import org.http4k.datastar.Selector
 import org.http4k.datastar.SettleDuration
 import org.http4k.datastar.SettleDuration.Companion.DEFAULT
 import org.http4k.sse.SseResponse
-import kotlin.concurrent.thread
 
 /**
  * Custom SseHandler for Datastar when used with TemplateRenderers
@@ -50,10 +49,7 @@ interface DatastarSseResponse {
                     id
                 ).toSseEvent()
             )
-            if(close) thread {
-                Thread.sleep(100)
-                it.close()
-            }
+            if (close) it.close()
         }
     }
 
