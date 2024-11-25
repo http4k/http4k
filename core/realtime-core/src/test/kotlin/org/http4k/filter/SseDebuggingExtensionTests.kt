@@ -50,7 +50,8 @@ class SseDebuggingExtensionTests {
 
         val actual = String(os.toByteArray())
         assertThat(actual, containsSubstring("***** SSE RESPONSE 200 to GET:  *****"))
-        assertThat(actual, containsSubstring("***** SSE SEND GET:  -> Data: hello"))
+        assertThat(actual, containsSubstring("***** SSE SEND GET:  -> Data"))
+        assertThat(actual, containsSubstring("data: hello"))
         assertThat(actual, containsSubstring("***** SSE CLOSED on GET:  *****"))
     }
 }
