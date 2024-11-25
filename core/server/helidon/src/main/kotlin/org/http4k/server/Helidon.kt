@@ -11,6 +11,12 @@ import org.http4k.websocket.WsHandler
 class Helidon(val port: Int = 8000, override val stopMode: StopMode) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, Immediate)
 
+    init {
+        if (stopMode != Immediate) {
+            throw ServerConfig.UnsupportedStopMode(stopMode)
+        }
+    }
+
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?) =
         object : Http4kServer {
 

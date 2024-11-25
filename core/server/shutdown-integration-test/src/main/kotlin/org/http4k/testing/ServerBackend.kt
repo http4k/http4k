@@ -40,7 +40,7 @@ enum class ServerBackend : (ServerConfig.StopMode) -> ServerConfig {
         override fun invoke(mode: ServerConfig.StopMode) = Ratpack(port = 8000, stopMode = mode)
     },
     Helidon {
-        override fun invoke(mode: ServerConfig.StopMode) = Helidon(port = 8000)
+        override fun invoke(mode: ServerConfig.StopMode) = Helidon(port = 8000, stopMode = mode)
     },
     SunHttp {
         override fun invoke(mode: ServerConfig.StopMode) = SunHttp(port = 8000, stopMode = mode)
