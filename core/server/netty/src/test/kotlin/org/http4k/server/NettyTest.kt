@@ -11,7 +11,9 @@ import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.junit.jupiter.api.Test
 import java.time.Duration.ofMillis
 
-class NettyTest : ServerContract({ Netty(it, Graceful(ofMillis(1))) }, ClientForServerTesting()) {
+val defaultStopMode = Graceful(ofMillis(1))
+
+class NettyTest : ServerContract({ Netty(it, defaultStopMode) }, ClientForServerTesting()) {
 
     @Test
     fun `sets keep-alive for non-streaming response`() {
