@@ -99,7 +99,7 @@ data: useViewTransition false
             ).accept(ContentType.TEXT_EVENT_STREAM)
         )
 
-        val actual = response.bodyString()
+        val actual = response.bodyString().replace("\r", "")
         val expected = """event:datastar-merge-signals
 data:signals oh signal1
 data:onlyIfMissing false
