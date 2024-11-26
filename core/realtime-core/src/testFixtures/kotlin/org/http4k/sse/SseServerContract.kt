@@ -74,6 +74,11 @@ abstract class SseServerContract(
                 it.close()
             }
         },
+        "/body" bind {
+            SseResponse(OK, listOf("body" to it.bodyString())) {
+                it.close()
+            }
+        },
         "/hello" bind sse(
             "/{name}" bind { req: Request ->
                 when {
@@ -140,6 +145,16 @@ abstract class SseServerContract(
             )
             assertThat(response.header("method"), equalTo(it.name))
         }
+    }
+
+    @Test
+    fun `supports bodies`() {
+        val response = JavaHttpClient()(
+            Request(POST, "http://localhost:${server.port()}/body")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                .body("hello")
+        )
+        assertThat(response.header("body"), equalTo("hello"))
     }
 
     @Test

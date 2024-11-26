@@ -31,7 +31,7 @@ sealed interface SseMessage {
     data class Data(val data: String) : SseMessage {
         constructor(data: ByteArray) : this(data.base64Encode())
         constructor(data: InputStream) : this(data.readAllBytes())
-        override fun toMessage() = "data: $data"
+        override fun toMessage() = "data: $data\n\n"
     }
 
     data class Event(val event: String, val data: String, val id: String? = null) : SseMessage {
@@ -45,11 +45,11 @@ sealed interface SseMessage {
 
         override fun toMessage() = (listOf("event: $event") + data.split("\n")
             .map { "data: $it" } + listOfNotNull(id?.let { "id: $it" }))
-            .joinToString("\n")
+            .joinToString("\n") + "\n\n"
     }
 
     data class Retry(val backoff: Duration) : SseMessage {
-        override fun toMessage() = "retry: ${backoff.toMillis()}"
+        override fun toMessage() = "retry: ${backoff.toMillis()}\n\n"
     }
 
     companion object {

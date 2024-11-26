@@ -122,11 +122,11 @@ internal class JettyEventStreamEmitter(
             id?.also {
                 write(ID_FIELD)
                 write(it.toByteArray())
-                write(CRLF)
+                write(DELIMITER)
             }
             write(EVENT_FIELD)
             write(event.toByteArray())
-            write(CRLF)
+            write(DELIMITER)
             sendData(data)
         }
     }
@@ -136,9 +136,9 @@ internal class JettyEventStreamEmitter(
             data.lines().forEach { line ->
                 write(DATA_FIELD)
                 write(line.toByteArray())
-                write(CRLF)
+                write(DELIMITER)
             }
-            write(CRLF)
+            write(DELIMITER)
             flush()
         }
     }
@@ -147,8 +147,8 @@ internal class JettyEventStreamEmitter(
         safeOutput {
             write(RETRY_FIELD)
             write(duration.toMillis().toString().toByteArray())
-            write(CRLF)
-            write(CRLF)
+            write(DELIMITER)
+            write(DELIMITER)
             flush()
         }
     }
@@ -203,7 +203,7 @@ internal class JettyEventStreamEmitter(
     }
 
     companion object {
-        private val CRLF = "\r\n".toByteArray()
+        private val DELIMITER = "\n".toByteArray()
         private val ID_FIELD = "id:".toByteArray()
         private val EVENT_FIELD = "event:".toByteArray()
         private val DATA_FIELD = "data:".toByteArray()

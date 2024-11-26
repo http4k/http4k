@@ -15,7 +15,7 @@ class SseMessageTest {
 
     @Test
     fun `converts data toMessage`() {
-        assertRoundtrip(SseMessage.Data("body"), "data: body")
+        assertRoundtrip(SseMessage.Data("body"), "data: body\n\n")
     }
 
     @Test
@@ -24,15 +24,16 @@ class SseMessageTest {
             SseMessage.Event("event", "data1\ndata2", "id"), """event: event
 data: data1
 data: data2
-id: id"""
+id: id
+
+"""
         )
     }
 
     @Test
     fun `converts retry toMessage`() {
-        assertRoundtrip(SseMessage.Retry(Duration.ofMillis(1000)), "retry: 1000")
+        assertRoundtrip(SseMessage.Retry(Duration.ofMillis(1000)), "retry: 1000\n\n")
     }
-
 
     private fun assertRoundtrip(message: SseMessage, string: String) {
         assertThat(message.toMessage(), equalTo(string))

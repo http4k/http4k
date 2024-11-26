@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class FragmentTest {
 
     @Test
-    fun `trims whitespace on construction`() {
-        assertThat(Fragment.of("  hello  ").value, equalTo("hello"))
+    fun `trims whitespace and newlines on construction`() {
+        assertThat(Fragment.of("  hello  \n goodbye   ").value, equalTo("hello   goodbye"))
     }
 }

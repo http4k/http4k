@@ -36,7 +36,7 @@ class Undertow(
 
         val handlerWithWs = predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
 
-        val handlerWithSse = sse?.let { Http4kUndertowSseFallbackHandler(sse, handlerWithWs) }
+        val handlerWithSse = sse?.let { Http4kUndertowSseFallbackHandler(sse, handlerWithWs).let(::BlockingHandler) }
 
         return object : Http4kServer {
             val server = Undertow.builder()

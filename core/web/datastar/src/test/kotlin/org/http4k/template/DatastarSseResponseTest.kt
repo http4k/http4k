@@ -29,6 +29,8 @@ class DatastarSseResponseTest {
 data: fragments <foo>bar</foo><bar>foo</bar>
 data: settleDuration 300
 data: mergeMode morph
-data: useViewTransition false"""))
+data: useViewTransition false
+
+"""))
     }
 }
