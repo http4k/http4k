@@ -24,7 +24,7 @@ class Jetty11EventStreamHandler(
         if (!baseRequest.isHandled && request.isEventStream()) {
             val connectRequest = request.asHttp4kRequest()
             if (connectRequest != null) {
-                val (status, headers, consumer) = sse(connectRequest)
+                val (status, headers, handled, consumer) = sse(connectRequest)
                 response.writeEventStreamResponse(status, headers)
 
                 val async = request.startAsyncWithNoTimeout()

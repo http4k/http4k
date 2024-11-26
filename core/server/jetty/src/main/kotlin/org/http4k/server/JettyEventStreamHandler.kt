@@ -31,7 +31,7 @@ class JettyEventStreamHandler(
         if (request.isEventStream()) {
             val connectRequest = request.asHttp4kRequest()
             if (connectRequest != null) {
-                val (status, headers, consumer) = sse(connectRequest)
+                val (status, headers, handled, consumer) = sse(connectRequest)
                 response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
                     if (flushFailure == null) {
                         val output = Content.Sink.asOutputStream(response)
