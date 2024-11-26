@@ -7,7 +7,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.datastar.DatastarEvent
@@ -37,12 +36,11 @@ abstract class DatastarServerContract(
     private lateinit var server: Http4kServer
 
     private val sse = sse(
-        "/signal" bind {
-            SseResponse(ACCEPTED) {
-                it.send(MergeSignals(Signal.of("oh signal")).toSseEvent())
-                it.close()
-            }
-        }
+        "/signal" bind sse(GET to sse {
+            it.send(MergeSignals(Signal.of("oh signal1")).toSseEvent())
+            it.send(MergeSignals(Signal.of("oh signal2")).toSseEvent())
+            it.close()
+        })
     ).debug()
 
     @BeforeEach
@@ -64,9 +62,13 @@ abstract class DatastarServerContract(
     fun `can receive messages from sse`() {
         val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/signal"))
 
+        val toList = client.received().toList()
         assertThat(
-            client.received().toList().first(),
-            equalTo(Event("datastar-merge-signals", "signals oh signal\nonlyIfMissing false"))
+            toList,
+            equalTo(listOf(
+                Event("datastar-merge-signals", "signals oh signal1\nonlyIfMissing false"),
+                Event("datastar-merge-signals", "signals oh signal2\nonlyIfMissing false")
+            ))
         )
     }
 
@@ -99,7 +101,11 @@ data: useViewTransition false
 
         val actual = response.bodyString()
         val expected = """event:datastar-merge-signals
-data:signals oh signal
+data:signals oh signal1
+data:onlyIfMissing false
+
+event:datastar-merge-signals
+data:signals oh signal2
 data:onlyIfMissing false
 
 """
