@@ -44,6 +44,7 @@ abstract class ServerStopContract(
     private val defaultGracefulStopMode = Graceful(ofSeconds(10))
     private val timeoutTolerance = ofMillis(1000)
     private val supportedStopModes: Set<StopMode>
+    private val dockerHost = System.getenv("DOCKER_HOST") ?: "127.0.0.1"
 
     init {
         supportedStopModes = ConfigureServerStopContract()
@@ -62,7 +63,7 @@ abstract class ServerStopContract(
     }
 
     // localhost doesn't work on GitHub Actions
-    private val Http4kServer.baseUrl: String get() = "http://127.0.0.1:${port()}"
+    private val Http4kServer.baseUrl: String get() = "http://${dockerHost}:${port()}"
 
     private fun Http4kServer.waitUntilHealthy(): Http4kServer {
         val startTime = System.currentTimeMillis()

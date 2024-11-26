@@ -40,3 +40,5 @@ jobs:
       - name: Build
         timeout-minutes: 25
         run: bin/run_shutdown_tests.sh
+        env:
+          DOCKER_HOST: docker
