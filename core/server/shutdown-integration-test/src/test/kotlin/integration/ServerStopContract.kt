@@ -61,7 +61,8 @@ abstract class ServerStopContract(
         }
     }
 
-    private val Http4kServer.baseUrl: String get() = "http://localhost:${port()}"
+    // localhost doesn't work on GitHub Actions
+    private val Http4kServer.baseUrl: String get() = "http://127.0.0.1:${port()}"
 
     private fun Http4kServer.waitUntilHealthy(): Http4kServer {
         val startTime = System.currentTimeMillis()
