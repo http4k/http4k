@@ -202,7 +202,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `should propagate close on server stop`() {
+    open fun `should propagate close on server stop`() {
         val latch = CountDownLatch(1)
         var closeStatus: WsStatus? = null
 
