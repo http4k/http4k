@@ -21,13 +21,18 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.SseMessage.Retry
+import org.http4k.sse.SseResponse
 
 fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
     req.toHttp4k()
         ?.let { http4kReq ->
             when {
                 sse != null && http4kReq.isEventStream() -> {
-                    sse.handle(http4kReq, res)
+                    val http4kResponse = sse(http4kReq)
+                    when {
+                        http4kResponse.handled -> http4kResponse.writeInto(http4kReq, res)
+                        else -> res.from(http?.let { it(http4kReq) } ?: Response(NOT_FOUND))
+                    }
                 }
 
                 else -> {
@@ -38,18 +43,17 @@ fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
         ?: res.from(Response(NOT_IMPLEMENTED))
 }
 
-private fun SseHandler.handle(http4kRequest: Request, res: ServerResponse) {
-    val http4kResponse = this(http4kRequest)
+private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
 
-    http4kResponse.headers.groupBy { it.first }.forEach {
+    headers.groupBy { it.first }.forEach {
         res.header(it.key, *it.value.map { it.second ?: "" }.toTypedArray<String>())
     }
 
     val sseSink = res.sink(TYPE)
 
-    res.status(create(http4kResponse.status.code, http4kResponse.status.description))
+    res.status(create(status.code, status.description))
 
-    http4kResponse.consumer(object : PushAdaptingSse(http4kRequest) {
+    this.consumer(object : PushAdaptingSse(http4kRequest) {
         override fun send(message: SseMessage) {
             sseSink.emit(
                 when (message) {
