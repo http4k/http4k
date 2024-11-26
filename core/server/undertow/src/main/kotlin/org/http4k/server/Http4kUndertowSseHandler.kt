@@ -11,6 +11,7 @@ import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.SseMessage.Retry
 import java.io.IOException
+import java.nio.channels.ClosedChannelException
 
 fun Http4kUndertowSseHandler(request: Request, consumer: SseConsumer) =
     ServerSentEventHandler { connection, _ ->
@@ -18,9 +19,9 @@ fun Http4kUndertowSseHandler(request: Request, consumer: SseConsumer) =
 
             override fun send(message: SseMessage) =
                 when (message) {
-                    is Retry -> connection.sendRetry(message.backoff.toMillis())
-                    is Data -> connection.send(message.data)
-                    is Event -> connection.send(message.data, message.event, message.id, NoOp)
+                    is Retry -> connection.sendRetry(message.backoff.toMillis(), CloseOnFailure)
+                    is Data -> connection.send(message.data, CloseOnFailure)
+                    is Event -> connection.send(message.data, message.event, message.id, CloseOnFailure)
                 }
 
             override fun close() = connection.shutdown()
@@ -31,7 +32,7 @@ fun Http4kUndertowSseHandler(request: Request, consumer: SseConsumer) =
         consumer(socket)
     }
 
-private object NoOp : EventCallback {
+private object CloseOnFailure : EventCallback {
     override fun done(
         connection: ServerSentEventConnection?,
         data: String?,
@@ -41,12 +42,13 @@ private object NoOp : EventCallback {
     }
 
     override fun failed(
-        connection: ServerSentEventConnection?,
+        connection: ServerSentEventConnection,
         data: String?,
         event: String?,
         id: String?,
         e: IOException?
     ) {
-        e?.printStackTrace()
+        if (e !is ClosedChannelException) e?.printStackTrace()
+        connection.close()
     }
 }
