@@ -44,7 +44,7 @@ abstract class ServerStopContract(
     private val defaultGracefulStopMode = Graceful(ofSeconds(10))
     private val timeoutTolerance = ofMillis(1000)
     private val supportedStopModes: Set<StopMode>
-    private val dockerHost = System.getenv("DOCKER_HOST") ?: "127.0.0.1"
+    private val dockerHost = System.getenv("SERVER_HOST") ?: "127.0.0.1"
 
     init {
         supportedStopModes = ConfigureServerStopContract()
