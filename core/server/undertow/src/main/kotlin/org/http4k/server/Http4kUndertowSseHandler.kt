@@ -26,9 +26,9 @@ fun Http4kUndertowSseHandler(request: Request, consumer: SseConsumer) =
             override fun close() = connection.shutdown()
         }
 
-        consumer(socket)
-
         connection.addCloseTask { socket.triggerClose() }
+
+        consumer(socket)
     }
 
 private object NoOp : EventCallback {
