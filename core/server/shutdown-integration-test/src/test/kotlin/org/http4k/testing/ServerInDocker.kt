@@ -17,16 +17,16 @@ import org.http4k.core.extend
 import org.http4k.events.Event
 import org.http4k.events.Events
 import org.http4k.server.ServerConfig
-import org.http4k.util.inIntelliJOnly
 import org.junit.jupiter.api.fail
 import java.io.File
+import java.net.URI
 import java.nio.file.Files
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 
-class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
+class ServerInDocker(private val events: Events = PrintEventsIfDebugFlagOn()) {
     private val basePath by lazy {
         val workingDir = File(".").absolutePath
         val projectDir = workingDir.removeSuffix(workingDir.substringAfter("/http4k/"))
@@ -39,7 +39,7 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
 
     private val config = DefaultDockerClientConfig.createDefaultConfigBuilder().build()
     private val http: DockerHttpClient = ApacheDockerHttpClient.Builder()
-        .dockerHost(config.dockerHost)
+        .dockerHost(URI.create("unix:///var/run/docker.sock"))
         .sslConfig(config.sslConfig)
         .maxConnections(100)
         .connectionTimeout(Duration.ofSeconds(30))
@@ -229,11 +229,12 @@ class ServerInDocker(private val events: Events = PrintEventsInIntelliJ()) {
     }
 }
 
-class PrintEventsInIntelliJ : Events {
+class PrintEventsIfDebugFlagOn : Events {
     data class DebugEvent(val timestamp: Instant, val event: Event)
+    private val debug = System.getenv("DEBUG") == "true"
 
     override fun invoke(event: Event) {
-        inIntelliJOnly { println(DebugEvent(Instant.now(), event)) }
+        if(debug) { println(DebugEvent(Instant.now(), event)) }
     }
 }
 
