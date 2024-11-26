@@ -44,7 +44,7 @@ internal class TemplateRoutingSseHandler(
 
     override operator fun invoke(request: Request): SseResponse = when (val matched = match(request)) {
         is MatchingHandler -> matched(RoutedRequest(request, template))
-        is Unmatched -> SseResponse { it.close() }
+        is Unmatched -> SseResponse(handled = false) { it.close() }
     }
 
     override fun withBasePath(new: String) = TemplateRoutingSseHandler(UriTemplate.from("$new/$template"), handler)

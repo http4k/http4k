@@ -18,8 +18,8 @@ interface Sse {
 
 typealias SseConsumer = (Sse) -> Unit
 
-data class SseResponse(val status: Status = OK, val headers: Headers = emptyList(), val consumer: SseConsumer) {
-    constructor(consumer: SseConsumer) : this(OK, emptyList(), consumer)
+data class SseResponse(val status: Status = OK, val headers: Headers = emptyList(), val handled: Boolean = true, val consumer: SseConsumer) {
+    constructor(consumer: SseConsumer) : this(OK, emptyList(), true, consumer)
 }
 
 typealias SseHandler = (Request) -> SseResponse
