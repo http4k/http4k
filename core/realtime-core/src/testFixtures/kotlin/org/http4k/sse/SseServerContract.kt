@@ -44,6 +44,7 @@ abstract class SseServerContract(
 ) {
 
     private lateinit var server: Http4kServer
+    private lateinit var serverOnlySse: Http4kServer
 
     private val http = routes(
         "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) },
@@ -100,11 +101,13 @@ abstract class SseServerContract(
     @BeforeEach
     fun before() {
         server = PolyHandler(http, sse = sse).asServer(serverConfig(0)).start()
+        serverOnlySse = PolyHandler(null, sse = sse).asServer(serverConfig(0)).start()
     }
 
     @AfterEach
     fun after() {
         server.stop()
+        serverOnlySse.stop()
     }
 
     @Test
@@ -158,6 +161,24 @@ abstract class SseServerContract(
         )
         assertThat(response.status, equalTo(I_M_A_TEAPOT))
         assertThat(response.bodyString(), equalTo("fallback"))
+    }
+
+    @Test
+    fun `returns 404 when route is not found in SSE or HTTP`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${server.port()}/notfound")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.status, equalTo(NOT_FOUND))
+    }
+
+    @Test
+    fun `returns 404 when route is not found in SSE`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${serverOnlySse.port()}/notfound")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.status, equalTo(NOT_FOUND))
     }
 
     @Test

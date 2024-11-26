@@ -8,7 +8,7 @@ import io.undertow.server.handlers.BlockingHandler
 import io.undertow.server.handlers.GracefulShutdownHandler
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.StopMode.Immediate
@@ -26,7 +26,7 @@ class Undertow(
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
         val httpHandler =
-            (http ?: { Response(BAD_REQUEST) }).let(::Http4kUndertowHttpHandler).let(::BlockingHandler).let { handler ->
+            (http ?: { Response(NOT_FOUND) }).let(::Http4kUndertowHttpHandler).let(::BlockingHandler).let { handler ->
                 when (stopMode) {
                     is Graceful -> GracefulShutdownHandler(handler)
                     else -> handler

@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.36.0.0 (uncut)
 - **http4k-server-helidon*** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
-- **http4k-realtime-core*** : [Possible Break] SSE responses now contain a "handled" flag, so we can now fallback from SSE to HTTP if the route is unbound in SSE.
+- **http4k-realtime-core*** : [Possible Break] SSE responses now contain a "handled" flag, so we can now fallback from SSE to HTTP if the route is unbound in SSE. SSE now also returns a 404 if the route is unbound.
 - **http4k-server-undertow*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
 - **http4k-server-jetty*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
 - **http4k-server-jetty11*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
