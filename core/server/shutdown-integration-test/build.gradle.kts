@@ -37,6 +37,8 @@ tasks.test {
 }
 
 tasks.register<Test>("integrationTests") {
+    dependsOn("distZip")
+
     description = "Runs docker-based server shutdown tests."
     group = "verification"
 
