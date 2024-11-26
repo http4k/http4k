@@ -1,0 +1,42 @@
+name: Server Shutdown Tests
+on:
+  push:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '**/*.md'
+jobs:
+  run_tests:
+    name: Run Shutdown Tests
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --shm-size=2g
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+    container:
+      image: ubuntu:latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-java@v4.5.0
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - name: Cache Gradle packages
+        uses: actions/cache@v4.1.2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Install Docker
+        run: |
+          apt-get update
+          apt-get install -y docker.io
+      - name: Build
+        timeout-minutes: 25
+        run: bin/run_shutdown_tests.sh
