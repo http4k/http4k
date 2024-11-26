@@ -77,3 +77,4 @@ fun Filter.inIntelliJOnly() = when {
     getRuntimeMXBean().inputArguments.find { it.contains("idea", true) } != null -> this
     else -> Filter.NoOp
 }
+

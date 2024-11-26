@@ -50,9 +50,8 @@ class Jetty11EventStreamHandler(
     }
 
     companion object {
-
         private fun HttpServletRequest.isEventStream() =
-            getHeaders("Accept").toList().any { it.contains(TEXT_EVENT_STREAM.value) }
+            getHeaders("Accept").toList().any { it.contains(TEXT_EVENT_STREAM.value, true) }
 
         private fun HttpServletResponse.writeEventStreamResponse(newStatus: Status, headers: Headers) {
             status = newStatus.code

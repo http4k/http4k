@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import org.http4k.core.RequestContext
 import org.http4k.core.Store
+import org.http4k.server.PolyHandler
 import org.http4k.sse.SseFilter
 import org.http4k.websocket.WsFilter
 
@@ -32,3 +33,9 @@ fun ServerFilters.SetWsSubProtocol(subprotocol: String) = WsFilter { next ->
         next(it).copy(subprotocol = subprotocol)
     }
 }
+
+fun PolyHandler.debug() = PolyHandler(
+    http = http?.debug(),
+    ws = ws?.debug(),
+    sse = sse?.debug()
+)

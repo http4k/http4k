@@ -75,7 +75,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
 }
 
 private fun Request.isEventStream() =
-    headerValues("Accept").any { it?.contains(TEXT_EVENT_STREAM.value) == true }
+    headerValues("Accept").any { it?.contains(TEXT_EVENT_STREAM.value, true) == true }
 
 private fun ServerRequest.toHttp4k(): Request? =
     Method.supportedOrNull(prologue().method().text())
