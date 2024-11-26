@@ -8,6 +8,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Uri
+import org.http4k.core.safeLong
 import org.http4k.core.toParametersMap
 import org.http4k.sse.SseHandler
 
@@ -41,6 +42,7 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
                 .headers(requestHeaders
                     .flatMap { header -> header.map { header.headerName.toString() to it } })
                 .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
+                .body(startBlocking().inputStream, requestHeaders.getFirst("Content-Length").safeLong())
         }
 }
 
