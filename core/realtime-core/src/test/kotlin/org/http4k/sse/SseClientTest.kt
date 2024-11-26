@@ -41,7 +41,7 @@ class SseClientTest {
 
         val client = { req: Request ->
             assertThat(req, equalTo(Request(GET, "/")))
-            SseResponse(OK, listOf("foo" to "bar"), consumer)
+            SseResponse(OK, listOf("foo" to "bar"), consumer = consumer)
         }.testSseClient(Request(GET, "/"))
 
         assertThat(client.status, equalTo(OK))

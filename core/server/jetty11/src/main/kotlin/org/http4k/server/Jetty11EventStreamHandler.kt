@@ -16,30 +16,33 @@ class Jetty11EventStreamHandler(
     private val sse: SseHandler,
     private val heartBeatDuration: Duration = Duration.ofSeconds(15)
 ) : HandlerWrapper() {
-
     override fun handle(
         target: String, baseRequest: JettyRequest,
         request: HttpServletRequest, response: HttpServletResponse
     ) {
         if (!baseRequest.isHandled && request.isEventStream()) {
             val connectRequest = request.asHttp4kRequest()
-            if (connectRequest != null) {
-                val (status, headers, handled, consumer) = sse(connectRequest)
-                response.writeEventStreamResponse(status, headers)
+            when {
+                connectRequest != null -> {
+                    val (status, headers, handled, consumer) = sse(connectRequest)
+                    if (handled) {
+                        response.writeEventStreamResponse(status, headers)
 
-                val async = request.startAsyncWithNoTimeout()
-                val output = async.response.outputStream
-                val scheduler = baseRequest.httpChannel.connector.scheduler
-                val server = baseRequest.httpChannel.connector.server
+                        val async = request.startAsyncWithNoTimeout()
+                        val output = async.response.outputStream
+                        val scheduler = baseRequest.httpChannel.connector.scheduler
+                        val server = baseRequest.httpChannel.connector.server
 
-                val emitter =
-                    Jetty11EventStreamEmitter(connectRequest, output, heartBeatDuration, scheduler, onClose = {
-                        async.complete()
-                        server.removeEventListener(it)
-                    }).also(server::addEventListener)
-                consumer(emitter)
+                        val emitter =
+                            Jetty11EventStreamEmitter(connectRequest, output, heartBeatDuration, scheduler, onClose = {
+                                async.complete()
+                                server.removeEventListener(it)
+                            }).also(server::addEventListener)
+                        consumer(emitter)
+                    }
 
-                baseRequest.isHandled = true
+                    baseRequest.isHandled = handled
+                }
             }
         }
 

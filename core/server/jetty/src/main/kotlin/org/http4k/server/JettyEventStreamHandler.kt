@@ -27,41 +27,52 @@ class JettyEventStreamHandler(
     private val heartBeatDuration: Duration = Duration.ofSeconds(15)
 ) : Abstract.NonBlocking() {
 
-    override fun handle(request: JettyRequest, response: JettyResponse, callback: Callback): Boolean {
-        if (request.isEventStream()) {
-            val connectRequest = request.asHttp4kRequest()
-            if (connectRequest != null) {
-                val (status, headers, handled, consumer) = sse(connectRequest)
-                response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
-                    if (flushFailure == null) {
-                        val output = Content.Sink.asOutputStream(response)
-                        val scheduler = request.connectionMetaData.connector.scheduler
-                        val server = request.connectionMetaData.connector.server
+    override fun handle(request: JettyRequest, response: JettyResponse, callback: Callback) =
+        when {
+            request.isEventStream() -> {
+                val connectRequest = request.asHttp4kRequest()
+                when {
+                    connectRequest != null -> {
+                        val (status, headers, handled, consumer) = sse(connectRequest)
 
-                        consumer(
-                            JettyEventStreamEmitter(connectRequest, output, heartBeatDuration, scheduler,
-                                onClose = { emitter, emitterFailure ->
-                                    if (emitterFailure == null) {
-                                        callback.succeeded()
+                        when {
+                            handled -> {
+                                response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
+                                    if (flushFailure == null) {
+                                        val output = Content.Sink.asOutputStream(response)
+                                        val scheduler = request.connectionMetaData.connector.scheduler
+                                        val server = request.connectionMetaData.connector.server
+
+                                        consumer(
+                                            JettyEventStreamEmitter(connectRequest,
+                                                output,
+                                                heartBeatDuration,
+                                                scheduler,
+                                                onClose = { emitter, emitterFailure ->
+                                                    if (emitterFailure == null) {
+                                                        callback.succeeded()
+                                                    } else {
+                                                        callback.failed(emitterFailure)
+                                                    }
+                                                    server.removeEventListener(emitter)
+                                                }
+                                            ).also(server::addEventListener)
+                                        )
                                     } else {
-                                        callback.failed(emitterFailure)
+                                        callback.failed(flushFailure)
                                     }
-                                    server.removeEventListener(emitter)
                                 }
-                            ).also(server::addEventListener)
-                        )
-                    } else {
-                        callback.failed(flushFailure)
+                            }
+                        }
+                        handled
                     }
+
+                    else -> false
                 }
-
-                return true
             }
+            // Not a valid event stream request - return false and let next handler process the request
+            else -> false
         }
-
-        // Not a valid event stream request - return false and let next handler process the request
-        return false
-    }
 
     companion object {
         private fun JettyRequest.isEventStream() =
