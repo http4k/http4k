@@ -109,6 +109,8 @@ fun Request.accept(): Accept? = ACCEPT(this)
 
 fun Request.accept(accept: Accept) = with(ACCEPT of accept)
 
+fun Request.accept(contentType: ContentType) = with(ACCEPT of Accept(listOf(QualifiedContent(contentType))))
+
 fun Request.basicAuthentication() = AUTHORIZATION_BASIC(this)
 
 fun Request.basicAuthentication(credentials: Credentials) = with(AUTHORIZATION_BASIC of credentials)
