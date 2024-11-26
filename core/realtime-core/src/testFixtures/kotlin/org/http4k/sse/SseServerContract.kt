@@ -17,6 +17,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
@@ -43,9 +44,11 @@ abstract class SseServerContract(
 ) {
 
     private lateinit var server: Http4kServer
+    private lateinit var serverOnlySse: Http4kServer
 
     private val http = routes(
-        "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) }
+        "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) },
+        "/fallback" hbind GET to { Response(I_M_A_TEAPOT).body("fallback") },
     )
 
     private val sse = sse(
@@ -98,11 +101,13 @@ abstract class SseServerContract(
     @BeforeEach
     fun before() {
         server = PolyHandler(http, sse = sse).asServer(serverConfig(0)).start()
+        serverOnlySse = PolyHandler(null, sse = sse).asServer(serverConfig(0)).start()
     }
 
     @AfterEach
     fun after() {
         server.stop()
+        serverOnlySse.stop()
     }
 
     @Test
@@ -146,6 +151,34 @@ abstract class SseServerContract(
             )
             assertThat(response.header("METHOD"), equalTo(it.name))
         }
+    }
+
+    @Test
+    fun `can fallback to HTTP when SSE doesn't find anything`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${server.port()}/fallback")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.status, equalTo(I_M_A_TEAPOT))
+        assertThat(response.bodyString(), equalTo("fallback"))
+    }
+
+    @Test
+    fun `returns 404 when route is not found in SSE or HTTP`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${server.port()}/notfound")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.status, equalTo(NOT_FOUND))
+    }
+
+    @Test
+    fun `returns 404 when route is not found in SSE`() {
+        val response = JavaHttpClient()(
+            Request(GET, "http://localhost:${serverOnlySse.port()}/notfound")
+                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+        )
+        assertThat(response.status, equalTo(NOT_FOUND))
     }
 
     @Test

@@ -1,6 +1,7 @@
 package org.http4k.routing
 
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.routing.SseRouterMatch.MatchingHandler
 import org.http4k.routing.SseRouterMatch.Unmatched
@@ -23,7 +24,7 @@ internal class RouterSseHandler(private val list: List<SseRouter>) : RoutingSseH
 
     override operator fun invoke(request: Request): SseResponse = when (val match = match(request)) {
         is MatchingHandler -> match(request)
-        is Unmatched -> SseResponse { it.close() }
+        is Unmatched -> SseResponse(NOT_FOUND, handled = false) { it.close() }
     }
 
     override fun withBasePath(new: String): RoutingSseHandler =
@@ -44,7 +45,7 @@ internal class TemplateRoutingSseHandler(
 
     override operator fun invoke(request: Request): SseResponse = when (val matched = match(request)) {
         is MatchingHandler -> matched(RoutedRequest(request, template))
-        is Unmatched -> SseResponse { it.close() }
+        is Unmatched -> SseResponse(NOT_FOUND, handled = false) { it.close() }
     }
 
     override fun withBasePath(new: String) = TemplateRoutingSseHandler(UriTemplate.from("$new/$template"), handler)
