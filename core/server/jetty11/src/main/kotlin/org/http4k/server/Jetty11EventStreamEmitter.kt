@@ -36,11 +36,11 @@ class Jetty11EventStreamEmitter(
         id?.also {
             output.write(ID_FIELD)
             output.write(it.toByteArray())
-            output.write(CRLF)
+            output.write(DELIMITER)
         }
         output.write(EVENT_FIELD)
         output.write(event.toByteArray())
-        output.write(CRLF)
+        output.write(DELIMITER)
         sendData(data)
     }
 
@@ -48,17 +48,17 @@ class Jetty11EventStreamEmitter(
         data.lines().forEach { line ->
             output.write(DATA_FIELD)
             output.write(line.toByteArray())
-            output.write(CRLF)
+            output.write(DELIMITER)
         }
-        output.write(CRLF)
+        output.write(DELIMITER)
         output.flush()
     }
 
     private fun sendRetry(duration: Duration) = lock.lock().use {
         output.write(RETRY_FIELD)
         output.write(duration.toMillis().toString().toByteArray())
-        output.write(CRLF)
-        output.write(CRLF)
+        output.write(DELIMITER)
+        output.write(DELIMITER)
         output.flush()
     }
 
@@ -102,7 +102,7 @@ class Jetty11EventStreamEmitter(
     }
 
     companion object {
-        private val CRLF = "\r\n".toByteArray()
+        private val DELIMITER = "\n".toByteArray()
         private val ID_FIELD = "id:".toByteArray()
         private val EVENT_FIELD = "event:".toByteArray()
         private val DATA_FIELD = "data:".toByteArray()

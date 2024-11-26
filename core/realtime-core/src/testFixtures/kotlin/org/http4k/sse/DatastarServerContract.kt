@@ -65,10 +65,12 @@ abstract class DatastarServerContract(
         val toList = client.received().toList()
         assertThat(
             toList,
-            equalTo(listOf(
-                Event("datastar-merge-signals", "signals oh signal1\nonlyIfMissing false"),
-                Event("datastar-merge-signals", "signals oh signal2\nonlyIfMissing false")
-            ))
+            equalTo(
+                listOf(
+                    Event("datastar-merge-signals", "signals oh signal1\nonlyIfMissing false"),
+                    Event("datastar-merge-signals", "signals oh signal2\nonlyIfMissing false")
+                )
+            )
         )
     }
 
@@ -99,7 +101,7 @@ data: useViewTransition false
             ).accept(ContentType.TEXT_EVENT_STREAM)
         )
 
-        val actual = response.bodyString().replace("\r", "")
+        val actual = response.bodyString()
         val expected = """event:datastar-merge-signals
 data:signals oh signal1
 data:onlyIfMissing false
