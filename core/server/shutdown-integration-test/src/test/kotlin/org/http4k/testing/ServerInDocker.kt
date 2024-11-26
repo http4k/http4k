@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 class ServerInDocker(private val events: Events = PrintEventsIfDebugFlagOn()) {
     private val basePath by lazy {
         val workingDir = File(".").absolutePath
-        val projectDir = workingDir.removeSuffix(workingDir.substringAfter("/http4k/"))
+        val projectDir = workingDir.removeSuffix(workingDir.substringAfterLast("/http4k/"))
         val modulePath = "/core/server/shutdown-integration-test"
         Uri.of("$projectDir$modulePath")
     }
