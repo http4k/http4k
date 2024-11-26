@@ -14,7 +14,7 @@ import org.http4k.websocket.WsMessage.Mode.Binary
 import org.http4k.websocket.WsMessage.Mode.Text
 import org.http4k.websocket.WsStatus
 
-class HelidonWsHandler(private val ws: WsHandler) : WsListener {
+class HelidonWebSockerListener(private val ws: WsHandler) : WsListener {
 
     private val sessions = mutableMapOf<WsSession, PushPullAdaptingWebSocket>()
 

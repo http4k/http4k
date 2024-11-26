@@ -23,7 +23,7 @@ class Helidon(val port: Int = 8000, override val stopMode: StopMode) : PolyServe
                 .addRouting(
                     WsRouting
                         .builder()
-                        .endpoint("*", HelidonWsHandler(ws!!))
+                        .endpoint("*", HelidonWebSockerListener(ws!!))
                 )
                 .port(port)
                 .build()
