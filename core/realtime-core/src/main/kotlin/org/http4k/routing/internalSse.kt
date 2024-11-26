@@ -23,7 +23,7 @@ internal class RouterSseHandler(private val list: List<SseRouter>) : RoutingSseH
 
     override operator fun invoke(request: Request): SseResponse = when (val match = match(request)) {
         is MatchingHandler -> match(request)
-        is Unmatched -> SseResponse { it.close() }
+        is Unmatched -> SseResponse(handled = false) { it.close() }
     }
 
     override fun withBasePath(new: String): RoutingSseHandler =

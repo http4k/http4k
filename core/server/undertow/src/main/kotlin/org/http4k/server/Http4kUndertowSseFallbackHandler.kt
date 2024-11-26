@@ -19,7 +19,7 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
         when {
             exchange.hasEventStreamContentType() -> {
                 val (status, headers, handled, consumer) = sse(request)
-                println(listOf(status, headers, handled, consumer))
+
                 if (handled) {
                     exchange.setStatusCode(status.code)
                     headers.toParametersMap().forEach { (name, values) ->
