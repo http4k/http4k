@@ -28,6 +28,7 @@ class HelidonWebSockerListener(private val ws: WsHandler) : WsListener {
 
     override fun onClose(session: WsSession, status: Int, reason: String) {
         wsFor(session).triggerClose(WsStatus(status, reason))
+        sessions.remove(session)
     }
 
     override fun onError(session: WsSession, t: Throwable) {
