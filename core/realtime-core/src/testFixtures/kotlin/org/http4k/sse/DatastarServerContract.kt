@@ -97,14 +97,16 @@ data: useViewTransition false
             ).accept(ContentType.TEXT_EVENT_STREAM)
         )
 
-        assertThat(
-            response.bodyString(),
-            equalTo(
-                """event:datastar-merge-signals
+        val actual = response.bodyString()
+        val expected = """event:datastar-merge-signals
 data:signals oh signal
 data:onlyIfMissing false
 
 """
+        assertThat(
+            actual,
+            equalTo(
+                expected
             )
         )
     }
