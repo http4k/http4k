@@ -34,20 +34,16 @@ class Undertow(
             }
         val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
 
-        val sseCallback = sse?.let { Http4kUndertowSseHandler(sse) }
-
         val handlerWithWs = predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
 
-        val handlerWithSse = sseCallback
-            ?.let { predicate(hasEventStreamContentType(), sseCallback, handlerWithWs) }
-            ?: handlerWithWs
+        val handlerWithSse = sse?.let { Http4kUndertowSseFallbackHandler(sse, handlerWithWs) }
 
         return object : Http4kServer {
             val server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, enableHttp2)
                 .setWorkerThreads(32 * Runtime.getRuntime().availableProcessors())
-                .setHandler(handlerWithSse).build()
+                .setHandler(handlerWithSse ?: handlerWithWs).build()
 
             override fun start() = apply { server.start() }
 
