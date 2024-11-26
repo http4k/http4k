@@ -4,7 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.36.1.0 (uncut)
-- **http4k-server-*** : Fixes to SSE support.
+- **http4k-server-helidon** : Add WebSocket support.
+- **http4k-server-*** : Fixes to SSE support for various servers.
 
 ### v5.36.0.0
 - **http4k-*** : Upgrade some dependency versions.
