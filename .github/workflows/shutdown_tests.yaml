@@ -30,3 +30,7 @@ jobs:
         run: bin/run_shutdown_tests.sh
         env:
           SERVER_HOST: localhost
+          HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
+          HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
+
+
