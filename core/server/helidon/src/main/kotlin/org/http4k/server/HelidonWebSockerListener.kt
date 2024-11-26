@@ -42,7 +42,8 @@ class HelidonWebSockerListener(private val ws: WsHandler) : WsListener {
     private fun wsFor(session: WsSession): PushPullAdaptingWebSocket {
         return sessions.getOrPut(session) {
             val uriPath = uriPath.get(prologue.get(session) as HttpPrologue) as UriPath
-            val upgradeRequest = org.http4k.core.Request(GET, uriPath.rawPath())
+            val query = rawQuery.get(prologue.get(session) as HttpPrologue)
+            val upgradeRequest = org.http4k.core.Request(GET, uriPath.rawPath() + "?" + query)
             object : PushPullAdaptingWebSocket() {
                 override fun send(message: WsMessage) {
                     when (message.mode) {
@@ -62,6 +63,9 @@ class HelidonWebSockerListener(private val ws: WsHandler) : WsListener {
         it.isAccessible = true
     }
     private val uriPath = HttpPrologue::class.java.getDeclaredField("uriPath").also {
+        it.isAccessible = true
+    }
+    private val rawQuery = HttpPrologue::class.java.getDeclaredField("rawQuery").also {
         it.isAccessible = true
     }
 }
