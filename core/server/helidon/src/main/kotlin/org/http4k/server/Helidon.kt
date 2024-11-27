@@ -20,11 +20,7 @@ class Helidon(val port: Int = 8000, override val stopMode: StopMode) : PolyServe
         object : Http4kServer {
             private val server = WebServer.builder()
                 .addRouting(HttpRouting.builder().any(HelidonHandler(http, sse)))
-                .addRouting(
-                    WsRouting
-                        .builder()
-                        .endpoint("*", HelidonWebSockerListener(ws!!))
-                )
+                .apply { ws?.let { addRouting(WsRouting.builder().endpoint("*", HelidonWebSockerListener(it))) } }
                 .port(port)
                 .build()
 
