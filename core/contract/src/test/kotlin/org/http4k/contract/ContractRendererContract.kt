@@ -12,6 +12,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -47,6 +48,7 @@ import org.http4k.lens.Validator.Strict
 import org.http4k.lens.WebForm
 import org.http4k.lens.bigDecimal
 import org.http4k.lens.bigInteger
+import org.http4k.lens.binary
 import org.http4k.lens.boolean
 import org.http4k.lens.double
 import org.http4k.lens.enum
@@ -244,6 +246,12 @@ abstract class ContractRendererContract<NODE : Any>(
                 val json = MultipartFormField.json(json).required("jsonField")
                 receiving(Body.multipartForm(Strict, field, pic, json).toLens())
             } bindContract PUT to { _ -> Response(OK) }
+            routes += "/pdf-file" meta {
+                returning(OK, Body.binary(APPLICATION_PDF).toLens() to "fake pdf".toByteArray().inputStream())
+            } bindContract GET to { _ -> Response(OK) }
+            routes += "/png-file" meta {
+                returning(OK, Body.binary(ContentType("image/png")).toLens() to "fake png".toByteArray().inputStream())
+            } bindContract GET to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
             } bindContract POST to { _ -> Response(OK) }

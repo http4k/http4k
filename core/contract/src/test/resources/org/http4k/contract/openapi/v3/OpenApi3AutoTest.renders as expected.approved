@@ -870,6 +870,68 @@
         "deprecated": false
       }
     },
+    "/basepath/pdf-file": {
+      "get": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "getBasepathPdf_file",
+        "deprecated": false
+      }
+    },
+    "/basepath/png-file": {
+      "get": {
+        "summary": "<unknown>",
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "getBasepathPng_file",
+        "deprecated": false
+      }
+    },
     "/basepath/produces_and_consumes": {
       "get": {
         "summary": "<unknown>",

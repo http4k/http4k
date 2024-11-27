@@ -47,6 +47,7 @@ import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.WebForm
+import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Locale
@@ -189,10 +190,10 @@ class OpenApi3<NODE : Any>(
         }.toMap()
 
     private fun List<HttpMessageMeta<Response>>.collectSchemas() = groupBy { CONTENT_TYPE(it.message) }
-        .mapValues {
-            when (it.value.size) {
-                1 -> it.value.first().toSchemaContent()
-                else -> OneOfSchemaContent<NODE>(it.value.map { it.toSchemaContent() })
+        .mapValues { (_, metas) ->
+            when (metas.size) {
+                1 -> metas.first().toSchemaContent()
+                else -> OneOfSchemaContent<NODE>(metas.map { meta -> meta.toSchemaContent() })
             }
         }
         .mapNotNull { i -> i.key?.let { it.value to i.value } }
@@ -315,18 +316,28 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): BodyContent {
-        fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
-            when (example) {
-                is Array<*>, is Iterable<*> -> !json.fields(schema.node).toMap().containsKey("\$ref")
-                else -> apiRenderer.toSchema(object {}, refModelNamePrefix = schemaPrefix) != schema
+        fun exampleSchemaIsValid(schema: JsonSchema<NODE>) = when (example) {
+            is Array<*>, is Iterable<*> -> !json.fields(schema.node).toMap().containsKey("\$ref")
+            else -> apiRenderer.toSchema(object {}, refModelNamePrefix = schemaPrefix) != schema
+        }
+
+        return when (example) {
+            is InputStream -> NoSchema(
+                schema = json {
+                    obj(
+                        "type" to string(StringParam.value),
+                        "format" to string("binary")
+                    )
+                }
+            )
+            else -> {
+                val schema = example
+                    ?.let { apiRenderer.toSchema(it, definitionId, schemaPrefix) }
+                    ?.takeIf(::exampleSchemaIsValid)
+                    ?: message.bodyString().toSchema(definitionId)
+                SchemaContent(schema, message.bodyString().safeParse())
             }
-
-        val jsonSchema = example
-            ?.let { apiRenderer.toSchema(it, definitionId, schemaPrefix) }
-            ?.takeIf(::exampleSchemaIsValid)
-            ?: message.bodyString().toSchema(definitionId)
-
-        return SchemaContent(jsonSchema, message.bodyString().safeParse())
+        }
     }
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()
