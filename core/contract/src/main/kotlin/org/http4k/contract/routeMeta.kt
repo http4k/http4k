@@ -92,7 +92,8 @@ class RouteMetaDsl internal constructor() {
      */
     @JvmName("returningStatus")
     fun <T> returning(
-        status: Status, body: Pair<BiDiBodyLens<T>, T>,
+        status: Status,
+        body: Pair<BiDiBodyLens<T>, T>,
         description: String? = null,
         definitionId: String? = null,
         schemaPrefix: String? = null

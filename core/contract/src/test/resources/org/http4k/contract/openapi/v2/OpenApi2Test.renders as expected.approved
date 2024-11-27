@@ -857,6 +857,64 @@
         ]
       }
     },
+    "/basepath/pdf-file": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "getBasepathPdf_file",
+        "produces": [
+          "application/pdf"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/png-file": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "getBasepathPng_file",
+        "produces": [
+          "image/png"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/produces_and_consumes": {
       "get": {
         "tags": [
