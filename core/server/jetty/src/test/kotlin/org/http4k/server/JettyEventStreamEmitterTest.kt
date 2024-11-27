@@ -36,7 +36,7 @@ class JettyEventStreamEmitterTest {
 
         emitter.send(SseMessage.Retry(Duration.ofMillis(3)))
 
-        assertThat(output.toString(), equalTo("retry:3\r\n\r\n"))
+        assertThat(output.toString(), equalTo("retry:3\n\n"))
         assertThat(output.flushCalls, equalTo(1))
     }
 
@@ -47,7 +47,7 @@ class JettyEventStreamEmitterTest {
 
         emitter.send(SseMessage.Data("some data"))
 
-        assertThat(output.toString(), equalTo("data:some data\r\n\r\n"))
+        assertThat(output.toString(), equalTo("data:some data\n\n"))
         assertThat(output.flushCalls, equalTo(1))
     }
 
@@ -58,7 +58,7 @@ class JettyEventStreamEmitterTest {
 
         emitter.send(SseMessage.Data("some data\nwith another line"))
 
-        assertThat(output.toString(), equalTo("data:some data\r\ndata:with another line\r\n\r\n"))
+        assertThat(output.toString(), equalTo("data:some data\ndata:with another line\n\n"))
         assertThat(output.flushCalls, equalTo(1))
     }
 
@@ -69,7 +69,7 @@ class JettyEventStreamEmitterTest {
 
         emitter.send(SseMessage.Event("event name", "some data", "an id"))
 
-        assertThat(output.toString(), equalTo("id:an id\r\nevent:event name\r\ndata:some data\r\n\r\n"))
+        assertThat(output.toString(), equalTo("id:an id\nevent:event name\ndata:some data\n\n"))
         assertThat(output.flushCalls, equalTo(1))
     }
 
@@ -80,7 +80,7 @@ class JettyEventStreamEmitterTest {
 
         emitter.send(SseMessage.Event("event name", "some data", id = null))
 
-        assertThat(output.toString(), equalTo("event:event name\r\ndata:some data\r\n\r\n"))
+        assertThat(output.toString(), equalTo("event:event name\ndata:some data\n\n"))
         assertThat(output.flushCalls, equalTo(1))
     }
 
@@ -91,7 +91,7 @@ class JettyEventStreamEmitterTest {
 
         emitter.send(SseMessage.Event("event name", "some data\nwith another line", id = null))
 
-        assertThat(output.toString(), equalTo("event:event name\r\ndata:some data\r\ndata:with another line\r\n\r\n"))
+        assertThat(output.toString(), equalTo("event:event name\ndata:some data\ndata:with another line\n\n"))
         assertThat(output.flushCalls, equalTo(1))
     }
 
