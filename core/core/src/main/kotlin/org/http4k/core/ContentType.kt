@@ -18,6 +18,8 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
 
     fun equalsIgnoringDirectives(that: ContentType): Boolean = withNoDirectives() == that.withNoDirectives()
 
+    fun structure() = Regex("\\+(\\w*)$").find(value)?.groups?.get(1)?.value
+
     companion object {
         fun Text(value: String, charset: Charset? = UTF_8) = ContentType(value, listOfNotNull(charset?.let {
             "charset" to charset.name().lowercase(getDefault())
