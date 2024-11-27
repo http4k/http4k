@@ -29,4 +29,20 @@ class ContentTypeTest {
         assertThat(contentType3.toHeaderValue(), equalTo("bar; bob; bob2=jim"))
         assertThat(contentType3.toHeaderValue(), equalTo("bar; bob; bob2=jim"))
     }
+
+    @Test
+    fun `structure returns null when there is no +suffix`() {
+        assertThat(ContentType("foo").structure(), equalTo(null))
+        assertThat(ContentType("foo/bar").structure(), equalTo(null))
+        assertThat(ContentType("foo/bar.baz").structure(), equalTo(null))
+        assertThat(ContentType("foo/bar.baz", listOf("x" to "y")).structure(), equalTo(null))
+    }
+
+    @Test
+    fun `structure returns the structure suffix when there is a +suffix`() {
+        assertThat(ContentType("foo+json").structure(), equalTo("json"))
+        assertThat(ContentType("foo/bar+xml").structure(), equalTo("xml"))
+        assertThat(ContentType("foo/bar.baz+zip").structure(), equalTo("zip"))
+        assertThat(ContentType("foo/bar.baz+json", listOf("x" to "y")).structure(), equalTo("json"))
+    }
 }
