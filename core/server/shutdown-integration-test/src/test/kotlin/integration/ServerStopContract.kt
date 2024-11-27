@@ -196,7 +196,7 @@ abstract class ServerStopContract(
                 countDownInflightRequestsStarted.countDown()
                 try {
                     responses.add(client(Request(POST, "$baseUrl/slow-echo").body("Hello")).also { it.bodyString() })
-                } catch (e: IOException) {
+                } catch (e: Exception) {
                     responses.add(Response(Status.CONNECTION_REFUSED.toClientStatus(e)))
                 }
             }

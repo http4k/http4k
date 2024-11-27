@@ -1,6 +1,6 @@
 package integration
 
-import org.http4k.client.OkHttp
+import org.http4k.client.JettyClient
 import org.http4k.testing.ServerBackend.Apache
 import org.http4k.testing.ServerBackend.Apache4
 import org.http4k.testing.ServerBackend.Helidon
@@ -15,59 +15,59 @@ import org.http4k.testing.ServerBackend.SunHttpLoom
 import org.http4k.testing.ServerBackend.Undertow
 import org.junit.jupiter.api.Disabled
 
-class ApacheServerStopTest : ServerStopContract(Apache, OkHttp(), {
+class ApacheServerStopTest : ServerStopContract(Apache, JettyClient(), {
     enableImmediateStop()
     enableGracefulStop()
 })
 
-class Apache4ServerStopTest : ServerStopContract(Apache4, OkHttp(), {
+class Apache4ServerStopTest : ServerStopContract(Apache4, JettyClient(), {
     enableImmediateStop()
 })
 
-class JettyStopTest : ServerStopContract(Jetty, OkHttp(), {
+class JettyStopTest : ServerStopContract(Jetty, JettyClient(), {
     enableGracefulStop()
     enableImmediateStop()
 })
 
-class JettyLoomStopTest : ServerStopContract(JettyLoom, OkHttp(), {
+class JettyLoomStopTest : ServerStopContract(JettyLoom, JettyClient(), {
     enableGracefulStop()
     enableImmediateStop()
 })
 
 @Disabled
-class KtorCIOStopTest : ServerStopContract(KtorCIO, OkHttp(), {
+class KtorCIOStopTest : ServerStopContract(KtorCIO, JettyClient(), {
     enableImmediateStop()
 })
 
 @Disabled
-class KtorNettyStopTest : ServerStopContract(KtorNetty, OkHttp(), {
+class KtorNettyStopTest : ServerStopContract(KtorNetty, JettyClient(), {
     enableImmediateStop()
     enableGracefulStop()
 })
 
-class NettyStopTest : ServerStopContract(Netty, OkHttp(), {
+class NettyStopTest : ServerStopContract(Netty, JettyClient(), {
     enableGracefulStop()
 })
 
-class RatpackStopTest : ServerStopContract(Ratpack, OkHttp(), {
+class RatpackStopTest : ServerStopContract(Ratpack, JettyClient(), {
     enableImmediateStop()
 })
 
-class HelidonStopTest : ServerStopContract(Helidon, OkHttp(), {
+class HelidonStopTest : ServerStopContract(Helidon, JettyClient(), {
     enableImmediateStop()
 })
 
-class SunHttpStopTest : ServerStopContract(SunHttp, OkHttp(), {
-    enableImmediateStop()
-    enableGracefulStop()
-})
-
-class SunHttpLoomStopTest : ServerStopContract(SunHttpLoom, OkHttp(), {
+class SunHttpStopTest : ServerStopContract(SunHttp, JettyClient(), {
     enableImmediateStop()
     enableGracefulStop()
 })
 
-class UndertowStopTest : ServerStopContract(Undertow, OkHttp(), {
+class SunHttpLoomStopTest : ServerStopContract(SunHttpLoom, JettyClient(), {
+    enableImmediateStop()
+    enableGracefulStop()
+})
+
+class UndertowStopTest : ServerStopContract(Undertow, JettyClient(), {
     enableImmediateStop()
     enableGracefulStop()
 })
