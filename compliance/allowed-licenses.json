@@ -1,0 +1,85 @@
+{
+    "allowedLicenses": [
+        {
+            "moduleLicense": "Apache License, Version 2.0",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "MIT License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "MIT No Attribution License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "BSD License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "BSD 0-Clause License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "BSD 2-Clause License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "The 2-Clause BSD License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "BSD 3-Clause License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "ISC License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "Python Software Foundation License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "Unlicense",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "W3C License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "zlib License",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "Public Domain",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "Universal Permissive License 1.0",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "CC0-1.0",
+            "moduleName": ".*"
+        },
+        {
+            "moduleLicense": "Creative Commons Legal Code",
+            "moduleName": "org.reactivestreams:reactive-streams",
+            "comment": "Mistake in tooling: Reactive Streams is licensed under the MIT No Attribution License",
+            "url": "https://github.com/reactive-streams/reactive-streams-jvm/blob/master/LICENSE"
+        },
+        {
+            "moduleLicense": "Common Development and Distribution License 1.0",
+            "moduleName": "javax.servlet:javax.servlet-api",
+            "comment": "Not distributed as pulled in as provided dependency"
+        },
+        {
+            "moduleLicense": "PUBLIC DOMAIN",
+            "moduleName": "org.latencyutils:LatencyUtils",
+            "comment": "BSD 2-Clause License",
+            "url": "https://github.com/LatencyUtils/LatencyUtils/blob/master/LICENSE"
+        }
+    ]
+}

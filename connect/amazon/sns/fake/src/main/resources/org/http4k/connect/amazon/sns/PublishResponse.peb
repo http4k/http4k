@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<PublishResponse xmlns="https://sns.amazonaws.com/doc/2010-03-31/">
+    <PublishResult>
+        <MessageId>{{model.messageId}}</MessageId>
+    </PublishResult>
+    <ResponseMetadata>
+        <RequestId>11111111-1111-1111-1111-111111111111</RequestId>
+    </ResponseMetadata>
+</PublishResponse>

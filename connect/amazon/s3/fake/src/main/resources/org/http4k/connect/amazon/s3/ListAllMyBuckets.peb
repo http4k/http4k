@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListAllMyBucketsResult xmlns="http://s3.amazonaws.comdoc/2006-03-01/">
+    <Owner>
+        <ID>25f3c384e613858c3d5bc830d0208aa3c7d2b62161c5fab525f8437ef2425e6a</ID>
+        <DisplayName>fakes3</DisplayName>
+    </Owner>
+    <Buckets>
+        {% for bucket in model.buckets %}
+        <Bucket>
+            <Name>{{bucket}}</Name>
+            <CreationDate>1976-08-31T01:23:45.678Z</CreationDate>
+        </Bucket>
+        {% endfor %}
+    </Buckets>
+</ListAllMyBucketsResult>

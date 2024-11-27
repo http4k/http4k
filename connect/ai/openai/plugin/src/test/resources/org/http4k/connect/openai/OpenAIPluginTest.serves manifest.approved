@@ -1,0 +1,19 @@
+{
+  "name_for_human": "addressbook",
+  "description_for_human": "my great plugin",
+  "name_for_model": "addressbook",
+  "description_for_model": "my great plugin",
+  "api": {
+    "url": "http://localhost:9000/openapi.json",
+    "is_user_authenticated": true,
+    "type": "openapi"
+  },
+  "auth": {
+    "type": "user_http",
+    "authorization_type": "basic"
+  },
+  "contact_email": "foo@bar",
+  "logo_url": "http://localhost:9000/logo.png",
+  "legal_info_url": "http://localhost:9000/legal",
+  "schema_version": "v1"
+}

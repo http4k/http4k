@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<SendMessageBatchResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+    <SendMessageBatchResult>
+        {% for entry in model.Successful %}
+        <SendMessageBatchResultEntry>
+            <Id>{{entry.Id}}</Id>
+            <MessageId>{{entry.MessageId}}</MessageId>
+            <MD5OfMessageBody>{{entry.MD5OfMessageBody}}</MD5OfMessageBody>
+            {% if entry.MD5OfMessageAttributes != null %}
+            <MD5OfMessageAttributes>{{entry.MD5OfMessageAttributes}}</MD5OfMessageAttributes>
+            {% endif %}
+        </SendMessageBatchResultEntry>
+        {% endfor %}
+    </SendMessageBatchResult>
+    <ResponseMetadata>
+        <RequestId>11111111-1111-1111-1111-111111111111</RequestId>
+    </ResponseMetadata>
+</SendMessageBatchResponse>

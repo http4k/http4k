@@ -1,0 +1,55 @@
+{
+  "info": {
+    "title": "addressbook",
+    "version": "1.0",
+    "description": "addressbook"
+  },
+  "tags": [
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:9000"
+    }
+  ],
+  "paths": {
+    "/{foo}/{bar}": {
+      "get": {
+        "summary": "A great api endpoint",
+        "tags": [
+          ""
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "foo",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "bar",
+            "required": true
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+        ],
+        "operationId": "get_foo__bar",
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+    },
+    "securitySchemes": {
+    }
+  },
+  "openapi": "3.0.0"
+}

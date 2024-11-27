@@ -1,0 +1,8 @@
+<b>Welcome to Fake OpenAI. Select a plugin</b>
+<ul>
+    {% for plugin in model.plugins %}
+    <li><a href="/{{plugin}}">{{plugin}}</a></li>
+    {% endfor %}
+</ul>
+
+The plugins use different auth models. The credentials for the user plugin are "sherlock/watson"

@@ -3,6 +3,66 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.36.1.0 (uncut)
+- **http4k-server-helidon** : Add WebSocket support.
+- **http4k-server-*** : Fixes to SSE support for various servers.
+
+### v5.36.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-realtime-core*** : [Possible Break] SSE responses now contain a "handled" flag, so we can now fallback from SSE to HTTP if the route is unbound in SSE. SSE now also returns a 404 if the route is unbound.
+- **http4k-server-helidon*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-helidon*** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
+- **http4k-server-jetty*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-jetty11*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-netty*** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
+- **http4k-server-undertow*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+
+### v5.35.5.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-helidon*** : Fixes to SSE support
+- **http4k-server-helidon*** : Throw exception if configured with `Graceful` stop mode as it's not supported.
+- **http4k-server-undertow*** : Fixes to SSE support
+
+### v5.35.4.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HelidonSseTest for details. 
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HelidonSseTest for details. 
+
+### v5.35.4.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HeliconSseTest for details. 
+- **http4k-realtime-core*** : Added Debugging for Websocket and SSE connections.
+- **http4k-realtime-core*** : Can now route SSE based on the method as well as the path.
+
+### v5.35.3.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-gcp** : [New module!] SDK support for GCP services.
+
+### v5.35.2.0
+- **http4k-server-ktorcio** : Upgrade to Ktor 3
+- **http4k-server-ktornetty** : Upgrade to Ktor 3
+- **http4k-*** : Upgrade some dependency versions.
+
+### v5.35.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-*** - [Fix again!] Missing dependencies in various modules
+- **http4k-connect*** - [Fix again!] Missing dependencies in various modules
+
+### v5.35.0.0
+- **http4k-bom** : Now includes all http4k-connect modules.  
+
+### v5.34.1.0
+- **http4k-*** : Upgrade some dependency versions.
+
+### v5.34.0.0
+- **http4k-core** : [Unlikely break] Fix parsing of accept header. It may break direct usages of `Accept` class
+- **http4k-core** : Fix tracking of uri templates during in-memory request redirection
+- **http4k-core** : Make LocalCookie serialisable
+- **http4k-testing-tracerbullet** : Render other types of participant in PlantUML diagrams
+
+### v5.33.1.0
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v5.33.0.1
 - **http4k-multipart*** : [Fix #1188] MultiPartFormBody reads body into memory even when stream is available
 

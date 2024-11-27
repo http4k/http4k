@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ReceiveMessageResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+    <ReceiveMessageResult>
+        {% for message in model.Messages %}
+        <Message>
+            <MessageId>{{message.messageId}}</MessageId>
+            <ReceiptHandle>{{message.receiptHandle}}</ReceiptHandle>
+            <MD5OfBody>{{message.md5OfBody}}</MD5OfBody>
+            <MD5OfMessageAttributes>{{md5OfMessageAttributes}}</MD5OfMessageAttributes>
+            <Body>{{message.body}}</Body>
+            {% for attr in message.attribute %}
+                <MessageAttribute>
+                    <Name>{{attr.name}}</Name>
+                    <Value>
+                        <DataType>{{attr.dataType}}</DataType>
+                        <StringValue>{{attr.value}}</StringValue>
+                        <BinaryValue>{{attr.value}}</BinaryValue>
+                    </Value>
+                </MessageAttribute>
+            {% endfor %}
+        </Message>
+        {% endfor %}
+    </ReceiveMessageResult>
+    <ResponseMetadata>
+        <RequestId>11111111-1111-1111-1111-111111111111</RequestId>
+    </ResponseMetadata>
+</ReceiveMessageResponse>

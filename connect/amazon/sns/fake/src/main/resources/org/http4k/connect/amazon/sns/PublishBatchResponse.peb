@@ -1,0 +1,23 @@
+<PublishBatchResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <PublishBatchResult>
+    <Failed/>
+    <Successful>
+        {% for result in model.results %}
+        <member>
+            {% if result.MessageId != null %}
+                <MessageId>{{result.MessageId}}</MessageId>
+            {% endif %}
+            {% if result.Id != null %}
+                <Id>{{result.Id}}</Id>
+            {% endif %}
+            {% if result.SequenceNumber != null %}
+                <SequenceNumber>{{result.SequenceNumber}}</SequenceNumber>
+            {% endif %}
+        </member>
+        {% endfor %}
+    </Successful>
+  </PublishBatchResult>
+  <ResponseMetadata>
+    <RequestId>11111111-1111-1111-1111-111111111111</RequestId>
+  </ResponseMetadata>
+</PublishBatchResponse>

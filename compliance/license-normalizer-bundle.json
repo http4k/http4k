@@ -1,0 +1,166 @@
+{
+    "bundles": [
+        {
+            "bundleName": "apache2",
+            "licenseName": "Apache License, Version 2.0",
+            "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0"
+        },
+        {
+            "bundleName": "bsd2",
+            "licenseName": "BSD 2-Clause License",
+            "licenseUrl": "https://opensource.org/licenses/BSD-2-Clause"
+        },
+        {
+            "bundleName": "bsd3",
+            "licenseName": "BSD 3-Clause License",
+            "licenseUrl": "https://opensource.org/licenses/BSD-3-Clause"
+        },
+        {
+            "bundleName": "bsd0",
+            "licenseName": "BSD 0-Clause License",
+            "licenseUrl": "https://opensource.org/licenses/0BSD"
+        },
+        {
+            "bundleName": "mit0",
+            "licenseName": "MIT No Attribution License",
+            "licenseUrl": "https://opensource.org/licenses/MIT-0"
+        },
+        {
+            "bundleName": "cddl1",
+            "licenseName": "Common Development and Distribution License 1.0",
+            "licenseUrl": "https://opensource.org/licenses/CDDL-1.0"
+        },
+        {
+            "bundleName": "epl2",
+            "licenseName": "Eclipse Public License 2.0",
+            "licenseUrl": "https://opensource.org/licenses/EPL-2.0"
+        },
+        {
+            "bundleName": "gpl2ce",
+            "licenseName": "GNU General Public License, Version 2 with Classpath Exception",
+            "licenseUrl": "https://www.gnu.org/software/classpath/license.html"
+        },
+        {
+            "bundleName": "lgpl21",
+            "licenseName": "GNU Lesser General Public License 2.1",
+            "licenseUrl": "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html"
+        },
+        {
+            "bundleName": "mpl20",
+            "licenseName": "Mozilla Public License 2.0",
+            "licenseUrl": "https://opensource.org/licenses/MPL-2.0"
+        },
+        {
+            "bundleName": "publicdomain",
+            "licenseName": "Public Domain",
+            "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        {
+            "bundleName": "upl1",
+            "licenseName": "Universal Permissive License 1.0",
+            "licenseUrl": "https://opensource.org/licenses/UPL"
+        }
+    ],
+    "transformationRules": [
+        {
+            "bundleName": "apache2",
+            "licenseNamePattern": ".*The Apache Software License, Version 2.0.*"
+        },
+        {
+            "bundleName": "apache2",
+            "licenseNamePattern": "Apache 2"
+        },
+        {
+            "bundleName": "apache2",
+            "licenseNamePattern": "Apache-2.0"
+        },
+        {
+            "bundleName": "apache2",
+            "licenseNamePattern": "Apache License V2.0"
+        },
+        {
+            "bundleName": "bsd2",
+            "licenseNamePattern": "BSD 2-Clause"
+        },
+        {
+            "bundleName": "bsd2",
+            "licenseNamePattern": "The 2\\-Clause BSD License"
+        },
+        {
+            "bundleName": "bsd3",
+            "licenseNamePattern": "BSD 3-Clause"
+        },
+        {
+            "bundleName": "bsd0",
+            "licenseNamePattern": "0BSD"
+        },
+        {
+            "bundleName": "bsd0",
+            "licenseNamePattern": "BSD Zero Clause"
+        },
+        {
+            "bundleName": "mit0",
+            "licenseNamePattern": "MIT-0"
+        },
+        {
+            "bundleName": "mit0",
+            "licenseNamePattern": "MIT No Attribution License"
+        },
+        {
+            "bundleName": "cddl1",
+            "licenseNamePattern": "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE.*Version 1\\.0.*"
+        },
+        {
+            "bundleName": "cddl1",
+            "licenseNamePattern": "CDDL.*v1\\.0"
+        },
+        {
+            "bundleName": "epl2",
+            "licenseNamePattern": "/*Eclipse Public License.*"
+        },
+        {
+            "bundleName": "epl2",
+            "licenseNamePattern": "EPL-2\\.0"
+        },
+        {
+            "bundleName": "gpl2ce",
+            "licenseNamePattern": "GNU GENERAL PUBLIC LICENSE, Version 2 + Classpath Exception"
+        },
+        {
+            "bundleName": "gpl2ce",
+            "licenseNamePattern": "GNU General Public License, Version 2 with Classpath Exception"
+        },
+        {
+            "bundleName": "gpl2ce",
+            "licenseNamePattern": "GPL v2 with the Classpath exception"
+        },
+        {
+            "bundleName": "lgpl21",
+            "licenseNamePattern": "GNU LESSER GENERAL PUBLIC LICENSE 2\\.1"
+        },
+        {
+            "bundleName": "lgpl21",
+            "licenseNamePattern": "LGPL-2\\.1"
+        },
+        {
+            "bundleName": "mpl20",
+            "licenseNamePattern": "Mozilla Public License.*2\\.0"
+        },
+        {
+            "bundleName": "mpl20",
+            "licenseNamePattern": "MPL-2\\.0"
+        },
+        {
+            "bundleName": "publicdomain",
+            "licenseNamePattern": "PUBLIC DOMAIN"
+        },
+        {
+            "bundleName": "upl1",
+            "licenseNamePattern": "Universal Permissive License.*"
+        },
+        {
+            "bundleName": "upl1",
+            "licenseNamePattern": "UPL-1\\.0"
+        }
+    ]
+}

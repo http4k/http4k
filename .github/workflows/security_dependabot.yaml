@@ -5,7 +5,8 @@ on:
       - 'master'
     paths-ignore:
       - '**/*.md'
-
+  schedule:
+    - cron: '0 12 * * 3' # ever
 jobs:
   build:
     name: Dependencies
@@ -15,9 +16,9 @@ jobs:
       contents: write
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
 
-      - uses: actions/setup-java@v4.4.0
+      - uses: actions/setup-java@v4.5.0
         with:
           distribution: temurin
           java-version: 21

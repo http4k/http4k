@@ -9,13 +9,10 @@ jobs:
         repo:
           - 'http4k/www'
           - 'http4k/toolbox'
+          - 'http4k/lts-examples'
           - 'http4k/examples'
           - 'http4k/http4k-by-example'
-          - 'http4k/http4k-connect'
-          - 'http4k/http4k-connect-examples'
-          - 'http4k/http4k-contract-todo-backend'
           - 'http4k/http4k-bin'
-          - 'http4k/http4k-todo-backend'
 
     runs-on: ubuntu-latest
     steps:

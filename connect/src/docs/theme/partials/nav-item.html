@@ -1,0 +1,43 @@
+{% if level == 1 %}
+    {% if nav_item.children %}
+        <li class="nav-item dropdown {%if nav_item.active %}active show{% endif %}">
+            <a class="nav-link dropdown-toggle {%if nav_item.active %}active{% endif %}"
+               data-toggle="dropdown"
+               href="#"
+               role="button"
+               aria-haspopup="true"
+               aria-expanded="{%if nav_item.active %}true{% else %}false{% endif %}">{{ nav_item.title }}</a>
+            <div class="dropdown-menu {%if nav_item.active %}show{% endif %}">
+            {% for nav_item in nav_item.children %}
+            {% set level = level + 1 %}
+            {% include "partials/nav-item.html" %}
+            {% endfor %}
+            </div>
+        </li>
+    {% else %}
+        <li class="nav-item">
+            <a class="nav-link {%if nav_item == page %}active{% endif %}"
+               href="{{ nav_item.url | url }}"
+               title="{{ nav_item.title | striptags }}">{{ nav_item.title }}</a>
+        </li>
+    {% endif %}
+{% else %}
+    {% if nav_item.children %}
+        <a class="dropdown-item nav-link dropdown-toggle  {%if nav_item.active %}active{% endif %}"
+            data-toggle="dropdown"
+            href="#"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="{%if nav_item.active %}true{% else %}false{% endif %}"> {{ nav_item.title }}</a>
+        <div class="dropdown-menu {%if nav_item.active %}show{% endif %}">
+            {% for nav_item in nav_item.children %}
+            {% set level = level + 1 %}
+            {% include "partials/nav-item.html" %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <a class="dropdown-item {%if nav_item.active %}active{% endif %}"
+           href="{{ nav_item.url | url }}"
+           title="{{ nav_item.title | striptags }}">{{ nav_item.title }}</a>
+    {% endif %}
+{% endif %}
