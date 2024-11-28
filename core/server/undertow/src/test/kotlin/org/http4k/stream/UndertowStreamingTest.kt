@@ -9,5 +9,5 @@ class UndertowStreamingTest : StreamingContract() {
     override fun serverConfig() = Undertow(0)
 
     override fun createClient() =
-        ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+        ClientForServerTesting(bodyMode = Stream)
 }

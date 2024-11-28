@@ -12,5 +12,5 @@ class Jetty11StreamingTest : StreamingContract() {
     override fun serverConfig(): ServerConfig = Jetty11(0, testingStopMode)
 
     override fun createClient(): HttpHandler =
-        ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+        ClientForServerTesting(bodyMode = Stream)
 }

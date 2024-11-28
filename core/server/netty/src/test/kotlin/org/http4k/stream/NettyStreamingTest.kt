@@ -11,7 +11,7 @@ class NettyStreamingTest : StreamingContract() {
     override fun serverConfig() = Netty(0, defaultStopMode)
 
     override fun createClient() =
-        ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+        ClientForServerTesting(bodyMode = Stream)
 
     @Test
     override fun `can stream request`() {

@@ -9,5 +9,5 @@ class HelidonStreamingTest : StreamingContract() {
     override fun serverConfig() = Helidon(0)
 
     override fun createClient() =
-        ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+        ClientForServerTesting(bodyMode = Stream)
 }

@@ -12,5 +12,5 @@ class KtorNettyStreamingTest : StreamingContract(
 ) {
     override fun serverConfig() = KtorNetty(Random().nextInt(1000) + 10000)
 
-    override fun createClient() = ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+    override fun createClient() = ClientForServerTesting(bodyMode = Stream)
 }

@@ -7,5 +7,5 @@ import org.http4k.server.SunHttpLoom
 class SunHttpLoomStreamingTest : StreamingContract() {
     override fun serverConfig() = SunHttpLoom(0)
 
-    override fun createClient() = ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+    override fun createClient() = ClientForServerTesting(bodyMode = Stream)
 }

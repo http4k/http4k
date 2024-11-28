@@ -10,5 +10,5 @@ class JettyLoomStreamingTest : StreamingContract() {
     override fun serverConfig() = JettyLoom(0, ServerConfig.StopMode.Immediate)
 
     override fun createClient() =
-        ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+        ClientForServerTesting(bodyMode = Stream)
 }

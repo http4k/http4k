@@ -11,5 +11,5 @@ class ApacheServerStreamingTest : StreamingContract() {
     override fun serverConfig(): ServerConfig = ApacheServer(0, canonicalHostname = "localhost")
 
     override fun createClient(): HttpHandler =
-        ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+        ClientForServerTesting(bodyMode = Stream)
 }

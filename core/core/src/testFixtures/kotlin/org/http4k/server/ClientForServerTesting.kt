@@ -19,6 +19,6 @@ object ClientForServerTesting {
             }).statusLine.statusCode.let(Status::fromCode)!!
         }
 
-    operator fun invoke(requestBodyMode: BodyMode = Memory, responseBodyMode: BodyMode = Memory): HttpHandler =
-        Apache4Client(requestBodyMode = requestBodyMode, responseBodyMode = responseBodyMode)
+    operator fun invoke(bodyMode: BodyMode = Memory): HttpHandler =
+        Apache4Client(requestBodyMode = bodyMode, responseBodyMode = bodyMode)
 }

@@ -11,5 +11,5 @@ class Apache4ServerStreamingTest : StreamingContract() {
     override fun serverConfig(): ServerConfig = Apache4Server(0)
 
     override fun createClient(): HttpHandler =
-        ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+        ClientForServerTesting(bodyMode = Stream)
 }

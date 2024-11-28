@@ -13,5 +13,5 @@ class KtorCIOStreamingTest : StreamingContract(
 
     override fun serverConfig() = KtorCIO(Random().nextInt(1000) + 10000)
 
-    override fun createClient() = ClientForServerTesting(requestBodyMode = Stream, responseBodyMode = Stream)
+    override fun createClient() = ClientForServerTesting(bodyMode = Stream)
 }
