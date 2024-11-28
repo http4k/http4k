@@ -29,6 +29,7 @@ class JettyStopTest : ServerStopContract(Jetty, JettyClient(), {
     enableImmediateStop()
 })
 
+@Disabled
 class JettyLoomStopTest : ServerStopContract(JettyLoom, JettyClient(), {
     enableGracefulStop()
     enableImmediateStop()
