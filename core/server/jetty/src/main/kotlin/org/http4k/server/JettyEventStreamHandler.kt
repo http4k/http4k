@@ -111,10 +111,12 @@ internal class JettyEventStreamEmitter(
         scheduleHeartBeat()
     }
 
-    override fun send(message: SseMessage) = when (message) {
-        is SseMessage.Event -> sendEvent(message.event, message.data, message.id)
-        is SseMessage.Data -> sendData(message.data)
-        is SseMessage.Retry -> sendRetry(message.backoff)
+    override fun send(message: SseMessage) = apply {
+        when (message) {
+            is SseMessage.Event -> sendEvent(message.event, message.data, message.id)
+            is SseMessage.Data -> sendData(message.data)
+            is SseMessage.Retry -> sendRetry(message.backoff)
+        }
     }
 
     private fun sendEvent(event: String, data: String, id: String?) = lock.lock().use {

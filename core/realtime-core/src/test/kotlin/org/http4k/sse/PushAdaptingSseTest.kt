@@ -13,7 +13,7 @@ class PushAdaptingSseTest {
         val received = mutableListOf<SseMessage>()
         var closed = AtomicBoolean(false)
 
-        override fun send(message: SseMessage) {
+        override fun send(message: SseMessage) = apply {
             received += message
         }
 

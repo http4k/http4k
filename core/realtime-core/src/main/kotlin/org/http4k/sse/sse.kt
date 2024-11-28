@@ -11,9 +11,9 @@ import java.time.Duration
 
 interface Sse {
     val connectRequest: Request
-    fun send(message: SseMessage)
+    fun send(message: SseMessage): Sse
     fun close()
-    fun onClose(fn: () -> Unit)
+    fun onClose(fn: () -> Unit): Sse
 }
 
 typealias SseConsumer = (Sse) -> Unit

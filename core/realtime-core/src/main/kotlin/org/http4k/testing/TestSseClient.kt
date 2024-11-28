@@ -29,7 +29,7 @@ class TestSseClient internal constructor(sseResponse: SseResponse, request: Requ
             onClose { queue.add { null } }
         }
 
-        override fun send(message: SseMessage) {
+        override fun send(message: SseMessage) = apply {
             queue.add { message }
         }
 
@@ -38,8 +38,11 @@ class TestSseClient internal constructor(sseResponse: SseResponse, request: Requ
         }
     }
 
-    override fun close() = socket.triggerClose()
+    override fun close() {
+        socket.triggerClose()
+    }
 }
 
 fun SseHandler.testSseClient(request: Request): TestSseClient = TestSseClient(invoke(request), request)
-fun PolyHandler.testSseClient(request: Request): TestSseClient = sse?.testSseClient(request) ?: error("No SSE handler set.")
+fun PolyHandler.testSseClient(request: Request): TestSseClient =
+    sse?.testSseClient(request) ?: error("No SSE handler set.")

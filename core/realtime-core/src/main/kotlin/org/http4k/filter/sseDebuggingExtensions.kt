@@ -50,7 +50,7 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
 
                     response.copy(consumer = { sse ->
                         response.consumer(object : Sse by sse {
-                            override fun send(message: SseMessage) {
+                            override fun send(message: SseMessage) = apply {
                                 sse.send(message)
                                 out.println("""***** SSE SEND ${req.method}: ${req.uri} -> ${message::class.simpleName}}""")
                                 out.println(message.toMessage())

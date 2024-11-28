@@ -54,7 +54,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
     res.status(create(status.code, status.description))
 
     this.consumer(object : PushAdaptingSse(http4kRequest) {
-        override fun send(message: SseMessage) {
+        override fun send(message: SseMessage) = apply {
             sseSink.emit(
                 when (message) {
                     is Retry -> builder().reconnectDelay(message.backoff).build()

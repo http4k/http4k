@@ -6,9 +6,9 @@ abstract class PushAdaptingSse(override val connectRequest: Request) : Sse {
 
     private val closeHandlers: MutableList<() -> Unit> = mutableListOf()
 
-    fun triggerClose() = closeHandlers.forEach { it() }
+    fun triggerClose() = apply { closeHandlers.forEach { it() } }
 
-    override fun onClose(fn: () -> Unit) {
+    override fun onClose(fn: () -> Unit) = apply {
         closeHandlers.add(fn)
     }
 }

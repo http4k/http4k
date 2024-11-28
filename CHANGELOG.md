@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.36.1.0 (uncut)
+### v5.37.0.0 (uncut)
+- **http4k-server-*** : [Possible Break] The return type to sse.send() is now `Sse` instead of `Unit`
 - **http4k-server-helidon** : Add WebSocket support.
 - **http4k-server-*** : Fixes to SSE support for various servers.
 

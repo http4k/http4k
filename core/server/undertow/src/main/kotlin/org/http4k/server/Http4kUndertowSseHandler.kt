@@ -17,12 +17,13 @@ fun Http4kUndertowSseHandler(request: Request, consumer: SseConsumer) =
     ServerSentEventHandler { connection, _ ->
         val socket = object : PushAdaptingSse(request) {
 
-            override fun send(message: SseMessage) =
+            override fun send(message: SseMessage) = apply {
                 when (message) {
                     is Retry -> connection.sendRetry(message.backoff.toMillis(), CloseOnFailure)
                     is Data -> connection.send(message.data, CloseOnFailure)
                     is Event -> connection.send(message.data, message.event, message.id, CloseOnFailure)
                 }
+            }
 
             override fun close() = connection.shutdown()
         }
