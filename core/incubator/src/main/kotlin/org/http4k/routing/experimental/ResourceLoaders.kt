@@ -6,7 +6,7 @@ import org.http4k.core.MimeTypes
 import org.http4k.core.Request
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatch
-import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.Unmatched
 import java.net.URL
 import java.time.Instant
@@ -54,7 +54,7 @@ interface ResourceLoading : Router {
     fun match(path: String): HttpHandler?
 
     override fun match(request: Request): RouterMatch = when (val matchResult = match(request.uri.path)) {
-        is HttpHandler -> MatchingHandler(matchResult, description)
+        is HttpHandler -> MatchedHandler(matchResult, description)
         else -> Unmatched(description)
     }
 }

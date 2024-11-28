@@ -13,8 +13,8 @@ import org.http4k.core.then
 import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.RoutingHttpHandler
@@ -39,7 +39,7 @@ internal data class StaticRoutingHttpHandler(
 
     override fun match(request: Request): RouterMatch = handlerNoFilter(request).let {
         if (it.status != NOT_FOUND)
-            MatchingHandler(filter.then { _: Request -> it }, description)
+            MatchedHandler(filter.then { _: Request -> it }, description)
         else
             Unmatched(description)
     }
@@ -57,7 +57,7 @@ internal class ResourceLoadingHandler(
     override fun invoke(request: Request): Response =
         if (request.method == GET && request.uri.path.startsWith(pathSegments))
             when (val matchResult = resourceLoader.match(request.uri(of(convertPath(request.uri.path))))) {
-                is MatchingHandler -> matchResult(request)
+                is MatchedHandler -> matchResult.handler(request)
                 is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
                 is Unmatched -> Response(NOT_FOUND)
                 is MatchedWithoutHandler -> Response(NOT_FOUND)

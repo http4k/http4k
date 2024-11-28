@@ -7,7 +7,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.then
-import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 
 internal data class RouterBasedHttpHandler(
@@ -17,7 +17,7 @@ internal data class RouterBasedHttpHandler(
 ) : RoutingHttpHandler, Router by router {
 
     override fun invoke(request: Request): Response = when (val matchResult = match(request)) {
-        is MatchingHandler -> matchResult
+        is MatchedHandler -> matchResult.handler
         is MethodNotMatched -> methodNotAllowedHandler
         else -> notFoundHandler
     }(request)

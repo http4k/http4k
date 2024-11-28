@@ -15,7 +15,7 @@ import org.http4k.format.Jackson.prettify
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -139,6 +139,6 @@ abstract class RoutingHttpHandlerContract {
 }
 
 fun RoutingHttpHandler.matchAndInvoke(request: Request) = when (val matchResult = match(request)) {
-    is MatchingHandler -> matchResult(request)
+    is MatchedHandler -> matchResult.handler(request)
     else -> null
 }

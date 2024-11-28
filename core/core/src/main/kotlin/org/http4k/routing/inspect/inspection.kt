@@ -2,8 +2,8 @@ package org.http4k.routing.inspect
 
 import org.http4k.routing.RouterDescription
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.inspect.EscapeMode.Ansi
@@ -56,6 +56,6 @@ private data class PrettyNode(val name: String, val textStyle: TextStyle, val gr
 }
 
 private fun RouterMatch.resolveStyle(): TextStyle = when (this) {
-    is MatchingHandler, is MatchedWithoutHandler -> TextStyle(ForegroundColour.Green)
+    is MatchedHandler, is MatchedWithoutHandler -> TextStyle(ForegroundColour.Green)
     is MethodNotMatched, is Unmatched -> TextStyle(ForegroundColour.Red, variation = Variation.Strikethrough)
 }

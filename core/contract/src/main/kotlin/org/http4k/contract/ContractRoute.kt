@@ -22,8 +22,8 @@ import org.http4k.lens.PathLens
 import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 
@@ -51,7 +51,7 @@ class ContractRoute internal constructor(
                     request.without(spec.pathFn(contractRoot))
                         .extract(spec.pathLenses.toList())
                         ?.let {
-                            MatchingHandler(
+                            MatchedHandler(
                                 if (request.method == OPTIONS) {
                                     { Response(OK) }
                                 } else toHandler(it), description)
@@ -71,11 +71,11 @@ class ContractRoute internal constructor(
      */
     override fun invoke(request: Request): Response {
         return when (val matchResult = toRouter(Root).match(request)) {
-            is MatchingHandler -> {
+            is MatchedHandler -> {
                 (meta.security?.filter ?: Filter.NoOp)
                     .then(ServerFilters.CatchLensFailure { _ -> Response(BAD_REQUEST) })
                     .then(PreFlightExtractionFilter(meta, Companion.All))
-                    .then(matchResult)(request)
+                    .then(matchResult.handler)(request)
             }
             is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
             is Unmatched -> Response(NOT_FOUND)

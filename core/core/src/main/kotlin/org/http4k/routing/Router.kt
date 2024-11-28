@@ -3,11 +3,10 @@ package org.http4k.routing
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 
@@ -57,12 +56,11 @@ sealed class RouterMatch(
     open val description: RouterDescription,
     open val subMatches: List<RouterMatch>
 ) : Comparable<RouterMatch> {
-    data class MatchingHandler(
-        private val httpHandler: HttpHandler,
+    data class MatchedHandler(
+        val handler: HttpHandler,
         override val description: RouterDescription,
         override val subMatches: List<RouterMatch> = listOf()
-    ) : RouterMatch(0, description, subMatches), HttpHandler {
-        override fun invoke(request: Request): Response = httpHandler(request)
+    ) : RouterMatch(0, description, subMatches) {
         override fun aggregatedBy(description: RouterDescription, fromMatches: List<RouterMatch>): RouterMatch =
             copy(description = description, subMatches = fromMatches)
     }
@@ -97,8 +95,8 @@ sealed class RouterMatch(
 
 internal fun RouterMatch.and(other: RouterMatch): RouterMatch = when (this) {
     is MatchedWithoutHandler -> other
-    is MethodNotMatched, is MatchingHandler -> when (other) {
-        is MatchingHandler, is MatchedWithoutHandler, is MethodNotMatched -> this
+    is MethodNotMatched, is MatchedHandler -> when (other) {
+        is MatchedHandler, is MatchedWithoutHandler, is MethodNotMatched -> this
         is Unmatched -> other
     }
 
@@ -146,7 +144,7 @@ internal class AndRouter internal constructor(private val list: List<Router>) : 
 }
 
 internal data class PassthroughRouter(private val handler: HttpHandler) : Router {
-    override fun match(request: Request): RouterMatch = MatchingHandler(handler, description)
+    override fun match(request: Request): RouterMatch = MatchedHandler(handler, description)
 
     override fun withBasePath(new: String) = when (handler) {
         is RoutingHttpHandler -> handler.withBasePath(new)
@@ -185,7 +183,7 @@ internal data class TemplateRouter(
 ) : Router {
     override fun match(request: Request) = when {
         template.matches(request.uri.path) ->
-            MatchingHandler({ RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }, description)
+            MatchedHandler({ RoutedResponse(httpHandler(RoutedRequest(it, template)), template) }, description)
 
         else -> Unmatched(description)
     }

@@ -18,8 +18,8 @@ import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RouterDescription
 import org.http4k.routing.RouterMatch
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.RoutingHttpHandler
@@ -61,7 +61,7 @@ data class ContractRoutingHttpHandler(
 
     private val handler: HttpHandler = {
         when (val matchResult = match(it)) {
-            is MatchingHandler -> matchResult(it)
+            is MatchedHandler -> matchResult.handler(it)
             is MethodNotMatched -> notFound(it)
             is Unmatched -> notFound(it)
             is MatchedWithoutHandler -> notFound(it)
@@ -106,9 +106,9 @@ data class ContractRoutingHttpHandler(
         return if (request.isIn(contractRoot)) {
             routers.fold(unmatched) { memo, (routeFilter, router) ->
                 when (memo) {
-                    is MatchingHandler -> memo
+                    is MatchedHandler -> memo
                     else -> when (val matchResult = router.match(request)) {
-                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult), description)
+                        is MatchedHandler -> MatchedHandler(routeFilter.then(matchResult.handler), description)
                         else -> minOf(memo, matchResult)
                     }
                 }

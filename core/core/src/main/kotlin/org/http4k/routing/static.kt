@@ -43,7 +43,7 @@ data class StaticRoutingHttpHandler(
     private val handlerWithFilter = filter.then(handlerNoFilter)
 
     override fun match(request: Request): RouterMatch = handlerNoFilter(request).let {
-        if (it.status != NOT_FOUND) RouterMatch.MatchingHandler(filter.then { _: Request -> it }, description) else null
+        if (it.status != NOT_FOUND) RouterMatch.MatchedHandler(filter.then { _: Request -> it }, description) else null
     } ?: RouterMatch.Unmatched(description)
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)

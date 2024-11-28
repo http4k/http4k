@@ -186,7 +186,7 @@ private class IndeterminateLengthResource : Resource {
 
 private class InMemoryResourceLoader(val resources: Map<String, Resource>) : Router {
     override fun match(request: Request): RouterMatch = resources[request.uri.path]?.let {
-        RouterMatch.MatchingHandler(it, description)
+        RouterMatch.MatchedHandler(it, description)
     } ?: RouterMatch.Unmatched(description)
 }
 

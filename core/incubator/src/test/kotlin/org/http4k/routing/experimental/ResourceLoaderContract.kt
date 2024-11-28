@@ -15,7 +15,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.Router
 import org.http4k.routing.RouterMatch
-import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Test
 
@@ -66,7 +66,7 @@ abstract class ResourceLoaderContract(private val loader: Router) {
     }
 
     private fun RouterMatch.matchOrExplode(): HttpHandler = when (this) {
-        is MatchingHandler -> this
+        is MatchedHandler -> handler
         else -> error("Unmatched, got $this")
     }
 }

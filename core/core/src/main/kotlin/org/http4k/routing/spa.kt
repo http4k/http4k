@@ -7,7 +7,7 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 
 /**
@@ -30,22 +30,22 @@ internal data class SinglePageAppRoutingHandler(
 
     override fun invoke(request: Request): Response {
         val matchOnStatic = when (val matchResult = staticHandler.match(request)) {
-            is MatchingHandler -> matchResult(request)
+            is MatchedHandler -> matchResult.handler(request)
             else -> null
         }
 
         val matchOnIndex = when (val matchResult = staticHandler.match(Request(GET, pathSegments))) {
-            is MatchingHandler -> matchResult
+            is MatchedHandler -> matchResult
             else -> null
         }
 
-        val fallbackHandler = matchOnIndex ?: { Response(NOT_FOUND) }
+        val fallbackHandler = matchOnIndex?.handler ?: { Response(NOT_FOUND) }
         return matchOnStatic ?: fallbackHandler(Request(GET, pathSegments))
     }
 
     override fun match(request: Request) = when (request.method) {
         OPTIONS -> MethodNotMatched(RouterDescription("template == '$pathSegments'"))
-        else -> MatchingHandler(this, description)
+        else -> MatchedHandler(this, description)
     }
 
     override fun withFilter(new: Filter) =

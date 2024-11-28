@@ -12,8 +12,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.matches
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Test
@@ -130,6 +130,6 @@ class RouterMatchingTest {
         val router = GET.bind { Response(OK) }.and(header("foo", "bar"))
 
         assertThat(router.match(Request(GET, "")), isA<Unmatched>())
-        assertThat(router.match(Request(GET, "").header("foo", "bar")), isA<MatchingHandler>())
+        assertThat(router.match(Request(GET, "").header("foo", "bar")), isA<MatchedHandler>())
     }
 }

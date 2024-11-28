@@ -26,7 +26,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.RouterMatch
-import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MatchedHandler
 import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Test
 
@@ -84,7 +84,7 @@ class ContractRouteTest {
         val route = "/" bindContract GET to handler
         "/" bindContract GET to { -> handler }
         val router = route.toRouter(Root)
-        assertThat(router.match(Request(GET, "/")), equalTo(MatchingHandler(handler, router.description) as RouterMatch))
+        assertThat(router.match(Request(GET, "/")), equalTo(MatchedHandler(handler, router.description) as RouterMatch))
         assertThat(router.match(Request(POST, "/")), equalTo(Unmatched(router.description) as RouterMatch))
         assertThat(router.match(Request(GET, "/bob")), equalTo(Unmatched(router.description) as RouterMatch))
     }
@@ -306,7 +306,7 @@ class ContractRouteTest {
     }
 
     private fun RouterMatch.matchOrNull(): HttpHandler? = when (this) {
-        is MatchingHandler -> this
+        is MatchedHandler -> handler
         else -> null
     }
 }
