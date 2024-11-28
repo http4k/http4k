@@ -2,6 +2,8 @@ package org.http4k.routing
 
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.routing.sse.RouterSseHandler
+import org.http4k.routing.sse.SseRouterMatch
 import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler

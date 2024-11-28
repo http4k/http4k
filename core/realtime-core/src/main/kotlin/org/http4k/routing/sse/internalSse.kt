@@ -1,10 +1,14 @@
-package org.http4k.routing
+package org.http4k.routing.sse
 
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
-import org.http4k.routing.SseRouterMatch.MatchingHandler
-import org.http4k.routing.SseRouterMatch.Unmatched
+import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RoutingSseHandler
+import org.http4k.routing.SseRouter
+import org.http4k.routing.sse
+import org.http4k.routing.sse.SseRouterMatch.MatchingHandler
+import org.http4k.routing.sse.SseRouterMatch.Unmatched
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseResponse
