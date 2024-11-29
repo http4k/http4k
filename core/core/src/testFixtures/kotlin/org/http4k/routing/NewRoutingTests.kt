@@ -33,6 +33,7 @@ class NewRoutingTests {
     }
 }
 
+// public API
 private fun newRoutes(routes: Pair<String, HttpHandler>): HttpHandler = RoutedHttpHandler(
     TemplatedHttpHandler(UriTemplate.from(routes.first), routes.second)
 )
@@ -41,7 +42,13 @@ private fun newRoutes(routes: Triple<String, Method, HttpHandler>): HttpHandler 
     TemplatedHttpHandler(UriTemplate.from(routes.first), routes.third, Specific(routes.second))
 )
 
+infix fun String.newBind(pair: Method): Pair<String, Method> = Pair(this, pair)
 
+infix fun Pair<String, Method>.to(handler: HttpHandler): Triple<String, Method, HttpHandler> =
+    Triple(this.first, this.second, handler)
+
+
+// internals
 class RoutedHttpHandler(private val templatedHandler: TemplatedHttpHandler) : HttpHandler {
     override fun invoke(request: Request) = templatedHandler.match(request).toHandler()(request)
 }
@@ -82,8 +89,3 @@ fun RoutingMatchResult.toHandler() = when (this) {
     is RoutingMatchResult.MethodNotMatched -> routeMethodNotAllowedHandler
     is RoutingMatchResult.NotFound -> routeNotFoundHandler
 }
-
-infix fun String.newBind(pair: Method): Pair<String, Method> = Pair(this, pair)
-
-infix fun Pair<String, Method>.to(handler: HttpHandler): Triple<String, Method, HttpHandler> =
-    Triple(this.first, this.second, handler)
