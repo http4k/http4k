@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 class NewRoutingTests {
 
     private val aValidHandler = { request: Request ->
-        val body =
+        val body: String =
             when (request) {
                 is RoutedRequest -> request.xUriTemplate.toString()
                 else -> request.uri.path
@@ -64,29 +64,42 @@ class NewRoutingTests {
         assertThat(app(Request(GET, "/bar")).status, equalTo(OK))
         assertThat(app(Request(GET, "/baz")).status, equalTo(NOT_FOUND))
     }
+
+    @Test
+    fun `nested routes`() {
+        val app: HttpHandler = newRoutes(
+            "/foo" newBind newRoutes(
+                "/bar" newBind GET to aValidHandler
+            )
+        )
+    }
+
 }
 
 // public API
-private fun newRoutes(vararg routes: Pair<String, HttpHandler>): HttpHandler = RoutedHttpHandler(
+private fun newRoutes(routedHttpHandler: RoutedHttpHandler): RoutedHttpHandler = routedHttpHandler
+
+private fun newRoutes(vararg routes: Pair<String, HttpHandler>): RoutedHttpHandler = RoutedHttpHandler(
     routes.map { (template, handler) ->
         TemplatedHttpHandler(UriTemplate.from(template), handler)
     }
 )
 
-private fun newRoutes(vararg routes: Triple<String, Method, HttpHandler>): HttpHandler = RoutedHttpHandler(
+private fun newRoutes(vararg routes: Triple<String, Method, HttpHandler>): RoutedHttpHandler = RoutedHttpHandler(
     routes.map { (template, method, handler) ->
         TemplatedHttpHandler(UriTemplate.from(template), handler, Specific(method))
     }
 )
+
+private infix fun String.newBind(newRoutes: RoutedHttpHandler): RoutedHttpHandler = newRoutes.withBasePath(this)
 
 infix fun String.newBind(pair: Method): Pair<String, Method> = Pair(this, pair)
 
 infix fun Pair<String, Method>.to(handler: HttpHandler): Triple<String, Method, HttpHandler> =
     Triple(this.first, this.second, handler)
 
-
 // internals
-class RoutedHttpHandler(private val templates: List<TemplatedHttpHandler>) : HttpHandler {
+data class RoutedHttpHandler(val templates: List<TemplatedHttpHandler>) : HttpHandler {
     override fun invoke(request: Request) = templates
         .map { it.match(request) }
         .sortedBy(RoutingMatchResult::priority)
@@ -94,10 +107,14 @@ class RoutedHttpHandler(private val templates: List<TemplatedHttpHandler>) : Htt
         .toHandler()(request)
 }
 
-class TemplatedHttpHandler(
-    private val uriTemplate: UriTemplate,
-    private val handler: HttpHandler,
-    private val method: MethodConstraint = Any
+private fun RoutedHttpHandler.withBasePath(prefix: String): RoutedHttpHandler {
+    return copy(templates = templates.map { it.withBasePath(prefix) })
+}
+
+data class TemplatedHttpHandler(
+    val uriTemplate: UriTemplate,
+    val handler: HttpHandler,
+    val method: MethodConstraint = Any
 ) {
     fun match(request: Request): RoutingMatchResult =
         if (uriTemplate.matches(request.uri.path)) {
@@ -107,6 +124,11 @@ class TemplatedHttpHandler(
                 RoutingMatchResult.Matched(AddUriTemplate(uriTemplate).then(handler))
         } else
             RoutingMatchResult.NotFound
+}
+
+
+private fun TemplatedHttpHandler.withBasePath(prefix: String): TemplatedHttpHandler {
+    return copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
 }
 
 sealed class MethodConstraint {
