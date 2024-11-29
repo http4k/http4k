@@ -1,4 +1,4 @@
-package org.http4k.routing
+package org.http4k.routing.experimental
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -15,8 +15,11 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
-import org.http4k.routing.MethodConstraint.Any
-import org.http4k.routing.MethodConstraint.Specific
+import org.http4k.routing.RoutedRequest
+import org.http4k.routing.experimental.MethodConstraint.Any
+import org.http4k.routing.experimental.MethodConstraint.Specific
+import org.http4k.routing.routeMethodNotAllowedHandler
+import org.http4k.routing.routeNotFoundHandler
 import org.junit.jupiter.api.Test
 
 class NewRoutingTests {
@@ -132,21 +135,18 @@ class NewRoutingTests {
 private fun newRoutes(vararg routed: RoutedHttpHandler): RoutedHttpHandler =
     RoutedHttpHandler(routed.flatMap { it.templates })
 
-inline fun <reified T : kotlin.Any> newRoutes(vararg routes: Pair<T, HttpHandler>): RoutedHttpHandler =
-    RoutedHttpHandler(routes.map { (first, second) ->
-        when (first) {
-            is Method -> TemplatedHttpHandler(UriTemplate.from(""), second, Specific(first))
-            is String -> TemplatedHttpHandler(UriTemplate.from(first), second)
-            else -> throw IllegalArgumentException("Only Method and String are supported")
-        }
-    })
-
 private infix fun String.newBind(newRoutes: RoutedHttpHandler): RoutedHttpHandler = newRoutes.withBasePath(this)
 
-infix fun String.newBind(method: Method): Pair<String, Method> = Pair(this, method)
+infix fun String.newBind(method: Method): PathMethod = PathMethod(this, method)
 
-infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(first), handler, Specific(second))))
+infix fun PathMethod.to(handler: HttpHandler): RoutedHttpHandler =
+    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(path), handler, Specific(method))))
+
+infix fun String.to(httpHandler: HttpHandler): RoutedHttpHandler =
+    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(this), httpHandler)))
+
+infix fun Method.to(httpHandler: HttpHandler): RoutedHttpHandler =
+    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(""), httpHandler, Specific(this))))
 
 // internals
 data class RoutedHttpHandler(val templates: List<TemplatedHttpHandler>) : HttpHandler {
@@ -208,3 +208,5 @@ fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
         next(RoutedRequest(it, uriTemplate))
     }
 }
+
+data class PathMethod( val path: String, val method: Method)
