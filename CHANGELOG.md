@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.37.0.0 (uncut)
+### v5.37.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract-*** :  Ability to model binary downloads in OpenAPI format. H/T @hektorKS
 - **http4k-server-*** : [Possible Break] The return type to sse.send() is now `Sse` instead of `Unit`
