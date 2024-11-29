@@ -173,10 +173,9 @@ private infix fun String.newBind(newRoutes: RoutedHttpHandler): RoutedHttpHandle
 private infix fun String.newBind(handler: HttpHandler): RoutedHttpHandler =
     RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(this), handler)))
 
-infix fun String.newBind(method: Method): Pair<String, Method> = Pair(this, method)
+infix fun String.newBind(method: Method) = NewPathMethod(this, method)
 
 infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler = NewPathMethod(first, second) to handler
-
 
 infix fun Method.to(httpHandler: HttpHandler): RoutedHttpHandler =
     RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(""), httpHandler, asPredicate())))
@@ -193,8 +192,12 @@ fun newReverseProxy(vararg hostToHandler: Pair<String, HttpHandler>): HttpHandle
  */
 fun newReverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): RoutedHttpHandler =
     RoutedHttpHandler(
-        hostToHandler.map { (host, handler) ->
-            TemplatedHttpHandler(UriTemplate.from(""), handler, hostHeaderOrUriHost(host))
+        hostToHandler.flatMap { (host, handler) ->
+            when(handler){
+                is RoutedHttpHandler ->
+                    handler.templates.map { it.copy(predicate = it.predicate.and(hostHeaderOrUriHost(host))) }
+                else -> listOf(TemplatedHttpHandler(UriTemplate.from(""), handler, hostHeaderOrUriHost(host)))
+            }
         }
     )
 
@@ -220,6 +223,10 @@ data class TemplatedHttpHandler(
     val handler: HttpHandler,
     val predicate: Predicate = Any
 ) {
+    init {
+        require(handler !is RoutedHttpHandler)
+    }
+
     fun match(request: Request): RoutingMatchResult =
         if (uriTemplate.matches(request.uri.path)) {
             if (!predicate(request))
@@ -238,6 +245,7 @@ interface Predicate {
         operator fun invoke(description: String = "", predicate: (Request) -> Boolean) = object : Predicate {
             override val description: String = description
             override fun invoke(request: Request): Boolean = predicate(request)
+            override fun toString(): String = description
         }
     }
 }
@@ -248,9 +256,9 @@ private fun TemplatedHttpHandler.withBasePath(prefix: String): TemplatedHttpHand
 
 val Any: Predicate = Predicate("any") { true }
 fun Method.asPredicate(): Predicate = Predicate("method == $this") { it.method == this }
-fun Predicate.and(other: Predicate): Predicate = Predicate("($this and $other)") { this(it) && other(it) }
-fun Predicate.or(other: Predicate): Predicate = Predicate("($this or $other)") { this(it) || other(it) }
-fun Predicate.not(): Predicate = Predicate("not $this") { !this(it) }
+fun Predicate.and(other: Predicate): Predicate = Predicate("($this AND $other)") { this(it) && other(it) }
+fun Predicate.or(other: Predicate): Predicate = Predicate("($this OR $other)") { this(it) || other(it) }
+fun Predicate.not(): Predicate = Predicate("NOT $this") { !this(it) }
 
 private fun hostHeaderOrUriHost(host: String): Predicate =
     Predicate("host header or uri host = $host") { req: Request ->
