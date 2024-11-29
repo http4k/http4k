@@ -52,15 +52,31 @@ class NewRoutingTests {
         val app: HttpHandler = newRoutes("/foo/{name}" to aValidHandler)
         assertThat(app(Request(GET, "/foo/bar")).bodyString(), equalTo("foo/{name}"))
     }
+
+    @Test
+    fun `multiple routes`() {
+        val app: HttpHandler = newRoutes(
+            "/foo" newBind GET to aValidHandler,
+            "/bar" newBind GET to aValidHandler,
+        )
+
+        assertThat(app(Request(GET, "/foo")).status, equalTo(OK))
+        assertThat(app(Request(GET, "/bar")).status, equalTo(OK))
+        assertThat(app(Request(GET, "/baz")).status, equalTo(NOT_FOUND))
+    }
 }
 
 // public API
-private fun newRoutes(routes: Pair<String, HttpHandler>): HttpHandler = RoutedHttpHandler(
-    TemplatedHttpHandler(UriTemplate.from(routes.first), routes.second)
+private fun newRoutes(vararg routes: Pair<String, HttpHandler>): HttpHandler = RoutedHttpHandler(
+    routes.map { (template, handler) ->
+        TemplatedHttpHandler(UriTemplate.from(template), handler)
+    }
 )
 
-private fun newRoutes(routes: Triple<String, Method, HttpHandler>): HttpHandler = RoutedHttpHandler(
-    TemplatedHttpHandler(UriTemplate.from(routes.first), routes.third, Specific(routes.second))
+private fun newRoutes(vararg routes: Triple<String, Method, HttpHandler>): HttpHandler = RoutedHttpHandler(
+    routes.map { (template, method, handler) ->
+        TemplatedHttpHandler(UriTemplate.from(template), handler, Specific(method))
+    }
 )
 
 infix fun String.newBind(pair: Method): Pair<String, Method> = Pair(this, pair)
@@ -70,8 +86,12 @@ infix fun Pair<String, Method>.to(handler: HttpHandler): Triple<String, Method, 
 
 
 // internals
-class RoutedHttpHandler(private val templatedHandler: TemplatedHttpHandler) : HttpHandler {
-    override fun invoke(request: Request) = templatedHandler.match(request).toHandler()(request)
+class RoutedHttpHandler(private val templates: List<TemplatedHttpHandler>) : HttpHandler {
+    override fun invoke(request: Request) = templates
+        .map { it.match(request) }
+        .sortedBy(RoutingMatchResult::priority)
+        .first()
+        .toHandler()(request)
 }
 
 class TemplatedHttpHandler(
@@ -99,10 +119,10 @@ fun MethodConstraint.matches(request: Request): Boolean = when (this) {
     is Specific -> request.method == method
 }
 
-sealed class RoutingMatchResult {
-    data class Matched(val handler: HttpHandler) : RoutingMatchResult()
-    data object MethodNotMatched : RoutingMatchResult()
-    data object NotFound : RoutingMatchResult()
+sealed class RoutingMatchResult(val priority: Int) {
+    data class Matched(val handler: HttpHandler) : RoutingMatchResult(0)
+    data object MethodNotMatched : RoutingMatchResult(1)
+    data object NotFound : RoutingMatchResult(2)
 }
 
 fun RoutingMatchResult.toHandler() = when (this) {
