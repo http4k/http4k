@@ -139,29 +139,29 @@ class NewRoutingTests {
             hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody("")
         )
     }
-//
-//    @Test
-//    open fun `stacked filter application - applies when not found`() {
-//        val filtered = filterAppending("foo").then(routes(handler))
-//        val request = Request(GET, "/not-found").header("host", "host")
-//
-//        assertThat(filtered.matchAndInvoke(request), absent())
-//        assertThat(
-//            filtered(request),
-//            hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody)
-//        )
-//    }
-//
-//    @Test
-//    open fun `with filter - applies in correct order`() {
-//        val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
-//        val request = Request(GET, "/not-found").header("host", "host")
-//
-//        assertThat(filtered.matchAndInvoke(request), absent())
-//        assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foobar"))
-//    }
 
-    fun filterAppending(value: String) = Filter { next ->
+    @Test
+    fun `stacked filter application - applies when not found`() {
+        val handler = "/foo" newBind GET to newRoutes("/bar" newBind { Response(OK) })
+        val filtered = filterAppending("foo").then(newRoutes(handler))
+        val request = Request(GET, "/not-found").header("host", "host")
+
+        assertThat(
+            filtered(request),
+            hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody("")
+        )
+    }
+
+    @Test
+    fun `with filter - applies in correct order`() {
+        val handler = "/foo" newBind GET to newRoutes("/bar" newBind { Response(OK) })
+        val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
+        val request = Request(GET, "/not-found").header("host", "host")
+
+        assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foobar"))
+    }
+
+    private fun filterAppending(value: String) = Filter { next ->
         {
             val response = next(it)
             response.replaceHeader("res-header", response.header("res-header").orEmpty() + value)
@@ -373,6 +373,7 @@ data class NewPathMethod(val path: String, val method: Method) {
         when (handler) {
             is RoutedHttpHandler ->
                 handler.withPredicate(method.asPredicate()).withBasePath(path)
+
             else -> RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(path), handler, method.asPredicate())))
         }
 }
