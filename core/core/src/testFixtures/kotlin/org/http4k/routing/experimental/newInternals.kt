@@ -11,7 +11,8 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
-import org.http4k.routing.experimental.PredicateResult.*
+import org.http4k.routing.experimental.PredicateResult.Matched
+import org.http4k.routing.experimental.PredicateResult.NotMatched
 
 data class RoutedHttpHandler(
     val routes: List<TemplatedHttpRoute>,
@@ -22,14 +23,14 @@ data class RoutedHttpHandler(
         .sortedBy(HttpMatchResult::priority)
         .first().handler)(request)
 
-    fun withBasePath(prefix: String): RoutedHttpHandler = copy(routes = routes.map { it.withBasePath(prefix) })
+    fun withBasePath(prefix: String) = copy(routes = routes.map { it.withBasePath(prefix) })
 
-    fun withFilter(filter: Filter): RoutedHttpHandler = copy(filter = filter.then(this.filter))
+    fun withFilter(filter: Filter) = copy(filter = filter.then(this.filter))
 
-    fun withPredicate(predicate: Predicate): RoutedHttpHandler =
+    fun withPredicate(predicate: Predicate) =
         copy(routes = routes.map { it.withPredicate(predicate) })
 
-    override fun toString(): String = routes.sortedBy(TemplatedHttpRoute::toString).joinToString("\n")
+    override fun toString() = routes.sortedBy(TemplatedHttpRoute::toString).joinToString("\n")
 }
 
 data class TemplatedHttpRoute(
@@ -50,11 +51,11 @@ data class TemplatedHttpRoute(
         else -> HttpMatchResult(2) { _: Request -> Response(NOT_FOUND) }
     }
 
-    fun withBasePath(prefix: String): TemplatedHttpRoute = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
+    fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
 
-    fun withPredicate(other: Predicate): TemplatedHttpRoute = copy(predicate = predicate.and(other))
+    fun withPredicate(other: Predicate) = copy(predicate = predicate.and(other))
 
-    override fun toString(): String = "template=$uriTemplate AND ${predicate.description}"
+    override fun toString() = "template=$uriTemplate AND ${predicate.description}"
 
     private fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
         {

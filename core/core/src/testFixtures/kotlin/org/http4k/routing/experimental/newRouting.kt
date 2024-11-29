@@ -6,16 +6,16 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.UriTemplate
 
- fun newRoutes(vararg list: Pair<Method, HttpHandler>): RoutedHttpHandler =
-    newRoutes(*list.map { "" newBind  it.first to it.second }.toTypedArray())
+fun newRoutes(vararg list: Pair<Method, HttpHandler>) =
+    newRoutes(*list.map { "" newBind it.first to it.second }.toTypedArray())
 
- fun newRoutes(vararg list: RoutedHttpHandler): RoutedHttpHandler = newRoutes(list.toList())
+fun newRoutes(vararg list: RoutedHttpHandler) = newRoutes(list.toList())
 
- fun newRoutes(routers: List<RoutedHttpHandler>):RoutedHttpHandler = RoutedHttpHandler(routers.flatMap { it.routes })
+fun newRoutes(routers: List<RoutedHttpHandler>) = RoutedHttpHandler(routers.flatMap { it.routes })
 
- infix fun String.newBind(method: Method) = HttpPathMethod(this, method)
- infix fun String.newBind(httpHandler: RoutedHttpHandler): RoutedHttpHandler = httpHandler.withBasePath(this)
- infix fun String.newBind(action: HttpHandler): RoutedHttpHandler =
+infix fun String.newBind(method: Method) = HttpPathMethod(this, method)
+infix fun String.newBind(httpHandler: RoutedHttpHandler) = httpHandler.withBasePath(this)
+infix fun String.newBind(action: HttpHandler) =
     RoutedHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(this), action)))
 
 /**
@@ -34,14 +34,16 @@ fun newReverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): Rou
             when (handler) {
                 is RoutedHttpHandler ->
                     handler.routes.map { it.withPredicate(hostHeaderOrUriHost(host)) }
+
                 else -> listOf(TemplatedHttpRoute(UriTemplate.from(""), handler, hostHeaderOrUriHost(host)))
             }
         }
     )
 
-private fun hostHeaderOrUriHost(host: String): Predicate =
+private fun hostHeaderOrUriHost(host: String) =
     Predicate("host header or uri host = $host") { req: Request ->
         (req.headerValues("host").firstOrNull() ?: req.uri.authority).contains(host)
     }
 
-fun Method.asPredicate(): Predicate = Predicate("method == $this", notMatchedStatus = METHOD_NOT_ALLOWED) { it.method == this }
+fun Method.asPredicate() =
+    Predicate("method == $this", notMatchedStatus = METHOD_NOT_ALLOWED) { it.method == this }
