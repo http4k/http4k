@@ -125,7 +125,7 @@ class NewRoutingTests {
     }
 
     @Test
-    fun `reverse proxy`(){
+    fun `reverse proxy`() {
 
     }
 
@@ -198,16 +198,27 @@ data class TemplatedHttpHandler(
             RoutingMatchResult.NotFound
 }
 
-typealias Predicate = (Request) -> Boolean
+interface Predicate {
+    val description: String
+    operator fun invoke(request: Request): Boolean
 
-
+    companion object {
+        operator fun invoke(description: String = "", predicate: (Request) -> Boolean) = object : Predicate {
+            override val description: String = description
+            override fun invoke(request: Request): Boolean = predicate(request)
+        }
+    }
+}
 
 private fun TemplatedHttpHandler.withBasePath(prefix: String): TemplatedHttpHandler {
     return copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
 }
 
-val Any:Predicate = {true}
-fun Method.asPredicate():Predicate = { it.method == this }
+val Any: Predicate = Predicate("any") { true }
+fun Method.asPredicate(): Predicate = Predicate("method == $this") { it.method == this }
+fun Predicate.and(other: Predicate): Predicate = Predicate("($this and $other)") { this(it) && other(it) }
+fun Predicate.or(other: Predicate): Predicate = Predicate("($this or $other)") { this(it) || other(it) }
+fun Predicate.not(): Predicate = Predicate("not $this") { !this(it) }
 
 sealed class RoutingMatchResult(val priority: Int) {
     data class Matched(val handler: HttpHandler) : RoutingMatchResult(0)
