@@ -359,7 +359,7 @@ fun Predicate.not(): Predicate = Predicate("NOT $this") { !this(it) }
 
 private fun hostHeaderOrUriHost(host: String): Predicate =
     Predicate("host header or uri host = $host") { req: Request ->
-        (req.headerValues("host").firstOrNull() ?: req.uri.authority).let { it.contains(host) }
+        (req.headerValues("host").firstOrNull() ?: req.uri.authority).contains(host)
     }
 
 sealed class RoutingMatchResult(val priority: Int) {
