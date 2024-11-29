@@ -34,15 +34,12 @@ fun reverseProxy(vararg hostToHandler: Pair<String, HttpHandler>): HttpHandler =
  * Simple Reverse Proxy. Exposes routing.
  */
 fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>) = routes(
-    *hostToHandler
-        .map { (host, handler) ->
-            hostHeaderOrUri(host) { it.contains(host) } bind handler
-        }.toTypedArray()
+    *hostToHandler.map { (host, handler) -> hostHeaderOrUri(host) bind handler }.toTypedArray()
 )
 
-private fun hostHeaderOrUri(host: String, fn: (String) -> Boolean) =
+private fun hostHeaderOrUri(host: String) =
     { req: Request ->
-        (req.headerValues("host").firstOrNull() ?: req.uri.authority).let(fn)
+        (req.headerValues("host").firstOrNull() ?: req.uri.authority).let({ it.contains(host) })
     }.asRouter("Host or URI: '$host'")
 
 /**
@@ -59,7 +56,8 @@ fun query(name: String, value: String) = query(name) { it == value }
 /**
  * Ensure all queries are present
  */
-fun queries(vararg names: String) = { req: Request -> names.all { req.query(it) != null } }.asRouter("Queries ${names.toList()}")
+fun queries(vararg names: String) =
+    { req: Request -> names.all { req.query(it) != null } }.asRouter("Queries ${names.toList()}")
 
 /**
  * Apply routing predicate to a header
@@ -75,7 +73,8 @@ fun header(name: String, value: String) = header(name) { it == value }
 /**
  * Ensure all headers are present
  */
-fun headers(vararg names: String) = { req: Request -> names.all { req.header(it) != null } }.asRouter("Headers ${names.toList()}")
+fun headers(vararg names: String) =
+    { req: Request -> names.all { req.header(it) != null } }.asRouter("Headers ${names.toList()}")
 
 /**
  * Ensure body matches predicate
