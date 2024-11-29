@@ -16,6 +16,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RoutedResponse
 import org.http4k.routing.experimental.MethodConstraint.Any
 import org.http4k.routing.experimental.MethodConstraint.Specific
 import org.http4k.routing.routeMethodNotAllowedHandler
@@ -223,6 +224,6 @@ fun RoutingMatchResult.toHandler() = when (this) {
 
 fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
     {
-        next(RoutedRequest(it, uriTemplate))
+        RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
     }
 }
