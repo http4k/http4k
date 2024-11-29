@@ -90,11 +90,11 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
      * from the store.
      */
     data class RemoveSignals(
-        val paths: List<Path>,
+        val paths: List<SignalPath>,
         override val id: String? = null,
     ) : DatastarEvent("datastar-remove-signals", paths.map { "paths $it" }, id) {
         constructor(
-            vararg path: Path,
+            vararg path: SignalPath,
             id: String? = null,
         ) : this(path.toList(), id)
     }

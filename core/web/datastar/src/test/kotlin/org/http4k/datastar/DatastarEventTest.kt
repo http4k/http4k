@@ -66,7 +66,7 @@ class DatastarEventTest {
     @Test
     fun `remove signals to event`() {
         assertThat(
-            DatastarEvent.RemoveSignals(Path.of("foo"), Path.of("bar")).toSseEvent(),
+            DatastarEvent.RemoveSignals(SignalPath.of("foo"), SignalPath.of("bar")).toSseEvent(),
             equalTo(
                 SseMessage.Event(
                     "datastar-remove-signals",

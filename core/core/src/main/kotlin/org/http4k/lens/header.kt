@@ -2,6 +2,7 @@ package org.http4k.lens
 
 import org.http4k.core.Accept
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Credentials
 import org.http4k.core.HttpMessage
 import org.http4k.core.Parameters
@@ -121,3 +122,5 @@ fun Request.bearerToken(): String? = header("Authorization")
     ?.trim()
     ?.takeIf { it.startsWith("Bearer ", true) }
     ?.substringAfter("earer ")
+
+fun Response.html(body: String) = contentType(TEXT_HTML).body(body)

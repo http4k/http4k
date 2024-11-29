@@ -6,6 +6,7 @@ import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Response
 import org.http4k.core.with
 import org.http4k.datastar.DatastarEvent
+import org.http4k.datastar.DatastarEvent.MergeFragments
 import org.http4k.datastar.Fragment
 import org.http4k.datastar.MergeMode
 import org.http4k.datastar.MergeMode.morph
@@ -28,40 +29,41 @@ val Query.DATASTAR_DATA get() = Query.map(String::urlDecoded, String::urlEncoded
 /**
  * Put datastar event into response as a datastar-merge-fragments event
  */
-fun Response.datastar(
+fun Response.datastarFragments(
     vararg fragments: String,
     mergeMode: MergeMode = morph,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
     id: String? = null,
-): Response = datastar(fragments.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
+): Response = datastarFragments(fragments.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
 
 /**
  * Put datastar event into response as a datastar-merge-fragments event
  */
-@JvmName("datastarStrings")
-fun Response.datastar(
+@JvmName("datastarFragmentsStrings")
+fun Response.datastarFragments(
     fragments: List<String>,
     mergeMode: MergeMode = morph,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
     id: String? = null,
-): Response = datastar(fragments.map { Fragment.of(it) }, mergeMode, selector, useViewTransition, settleDuration, id)
+): Response =
+    datastarFragments(fragments.map { Fragment.of(it) }, mergeMode, selector, useViewTransition, settleDuration, id)
 
 /**
  * Put datastar event into response as a datastar-merge-fragments event
  */
-fun Response.datastar(
+fun Response.datastarFragments(
     vararg fragments: Fragment,
     mergeMode: MergeMode = morph,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
     id: String? = null,
-): Response = datastar(
-    DatastarEvent.MergeFragments(
+): Response = datastarFragments(
+    MergeFragments(
         fragments.toList(),
         mergeMode,
         selector,
@@ -75,15 +77,15 @@ fun Response.datastar(
  * Put datastar event into response as a datastar-merge-fragments event
  */
 @JvmName("datastarFragments")
-fun Response.datastar(
+fun Response.datastarFragments(
     fragments: List<Fragment>,
     mergeMode: MergeMode = morph,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
     id: String? = null,
-): Response = datastar(
-    DatastarEvent.MergeFragments(
+): Response = datastarFragments(
+    MergeFragments(
         fragments.toList(),
         mergeMode,
         selector,
@@ -94,14 +96,19 @@ fun Response.datastar(
 )
 
 /**
- * Inject a datastar event into a response
+ * Inject a Datastar Event into a response
  */
-fun Response.datastar(event: DatastarEvent) = with(Body.datastar().toLens() of event)
+fun Response.datastarFragments(event: DatastarEvent) = with(Body.datastarFragments().toLens() of event)
+
+/**
+ * Inject a Datastar MergeFragments event into a Response as a Datastar event
+ */
+fun Response.html(event: MergeFragments) = html(event.fragments.joinToString("\n"))
 
 /**
  * Injects a datastar event into a response
  */
-fun Body.Companion.datastar() = string(TEXT_EVENT_STREAM)
+fun Body.Companion.datastarFragments() = string(TEXT_EVENT_STREAM)
     .map<DatastarEvent>(
         { error("cannot parse event stream") },
         { it.toSseEvent().toMessage() }

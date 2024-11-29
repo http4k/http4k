@@ -6,6 +6,6 @@ import dev.forkhandles.values.StringValue
 /**
  * Represents a path to a value in a data store.
  */
-class Path private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<Path>(::Path)
+class SignalPath private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<SignalPath>(::SignalPath)
 }

@@ -10,6 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.lens.Header
+import org.http4k.lens.contentType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.opentest4j.AssertionFailedError
@@ -78,6 +79,9 @@ class NamedResourceApprover(
 
 fun Approver.assertApproved(response: Response, expectedStatus: Status) =
     assertApproved(response.apply { assertEquals(expectedStatus, response.status) })
+
+fun Approver.assertApproved(response: Response, expectedContentType: ContentType) =
+    assertApproved(response.apply { assertEquals(expectedContentType, response.contentType()) })
 
 fun Approver.assertApproved(content: String, contentType: ContentType? = null) =
     assertApproved(Response(Status.OK).body(content).with(Header.CONTENT_TYPE of contentType))

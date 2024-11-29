@@ -14,7 +14,7 @@ import org.http4k.datastar.DatastarEvent.MergeSignals
 import org.http4k.datastar.Signal
 import org.http4k.filter.debug
 import org.http4k.lens.accept
-import org.http4k.lens.datastar
+import org.http4k.lens.datastarFragments
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
@@ -47,7 +47,7 @@ abstract class DatastarServerContract(
     fun before() {
         server = PolyHandler(
             http = routes("/noStream" hbind {
-                Response(OK).datastar(DatastarEvent.MergeFragments("hello"))
+                Response(OK).datastarFragments(DatastarEvent.MergeFragments("hello"))
             }),
             sse = sse
         ).asServer(serverConfig(0)).start()
