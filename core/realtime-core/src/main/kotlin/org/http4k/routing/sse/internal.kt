@@ -56,3 +56,5 @@ internal class TemplateRoutingSseHandler(
 
     override fun withFilter(new: SseFilter) = TemplateRoutingSseHandler(template, new.then(handler))
 }
+
+internal data class SseMatchResult(val priority: Int, val handler: SseHandler)
