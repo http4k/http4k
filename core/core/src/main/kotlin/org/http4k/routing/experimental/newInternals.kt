@@ -64,7 +64,7 @@ data class TemplatedHttpRoute(
     }
 }
 
-internal data class HttpMatchResult(val priority: Int, val handler: HttpHandler)
+data class HttpMatchResult(val priority: Int, val handler: HttpHandler)
 
 data class HttpPathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) = when (handler) {
