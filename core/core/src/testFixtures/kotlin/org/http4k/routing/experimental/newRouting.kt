@@ -13,10 +13,10 @@ import org.http4k.core.UriTemplate
 
  fun newRoutes(routers: List<RoutedHttpHandler>):RoutedHttpHandler = RoutedHttpHandler(routers.flatMap { it.routes })
 
- infix fun String.newBind(method: Method) = NewPathMethod(this, method)
+ infix fun String.newBind(method: Method) = HttpPathMethod(this, method)
  infix fun String.newBind(httpHandler: RoutedHttpHandler): RoutedHttpHandler = httpHandler.withBasePath(this)
  infix fun String.newBind(action: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(this), action)))
+    RoutedHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(this), action)))
 
 /**
  * Simple Reverse Proxy which will split and direct traffic to the appropriate
@@ -34,7 +34,7 @@ fun newReverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): Rou
             when (handler) {
                 is RoutedHttpHandler ->
                     handler.routes.map { it.withPredicate(hostHeaderOrUriHost(host)) }
-                else -> listOf(TemplatedRoute(UriTemplate.from(""), handler, hostHeaderOrUriHost(host)))
+                else -> listOf(TemplatedHttpRoute(UriTemplate.from(""), handler, hostHeaderOrUriHost(host)))
             }
         }
     )
