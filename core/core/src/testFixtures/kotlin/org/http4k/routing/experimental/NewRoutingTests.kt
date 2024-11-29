@@ -10,6 +10,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -22,6 +23,7 @@ import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
 import org.http4k.routing.routeMethodNotAllowedHandler
 import org.http4k.routing.routeNotFoundHandler
+import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
 class NewRoutingTests {
@@ -160,6 +162,22 @@ class NewRoutingTests {
 
     @Test
     fun `nice descriptions`() {
+         val routes = newRoutes(
+            "/a" newBind GET to { Response(OK).body("matched a") },
+            "/b/c" newBind newRoutes(
+                "/d" newBind GET to { Response(OK).body("matched b/c/d") },
+                "/e" newBind newRoutes(
+                    "/f" newBind GET to { Response(OK).body("matched b/c/e/f") },
+                    "/g" newBind newRoutes(
+                        GET to { _: Request -> Response(OK).body("matched b/c/e/g/GET") },
+                        POST to { _: Request -> Response(OK).body("matched b/c/e/g/POST") }
+                    )
+                ),
+                "/" newBind GET to { Response(OK).body("matched b/c") }
+            )
+        )
+
+
 
     }
 }
@@ -209,6 +227,8 @@ data class RoutedHttpHandler(val templates: List<TemplatedHttpHandler>) : HttpHa
         .sortedBy(RoutingMatchResult::priority)
         .first()
         .toHandler()(request)
+
+    override fun toString(): String = templates.sortedBy(TemplatedHttpHandler::toString).joinToString("\n")
 }
 
 private fun RoutedHttpHandler.withBasePath(prefix: String): RoutedHttpHandler {
@@ -235,6 +255,8 @@ data class TemplatedHttpHandler(
                 RoutingMatchResult.Matched(AddUriTemplate(uriTemplate).then(handler))
         } else
             RoutingMatchResult.NotFound
+
+    override fun toString(): String = "template=$uriTemplate AND ${predicate.description}"
 }
 
 interface Predicate {
