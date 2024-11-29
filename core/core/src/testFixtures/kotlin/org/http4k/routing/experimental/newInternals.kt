@@ -3,31 +3,28 @@ package org.http4k.routing.experimental
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.NoOp
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
-import org.http4k.routing.routeMethodNotAllowedHandler
-import org.http4k.routing.routeNotFoundHandler
 
 data class RoutedHttpHandler(
     val routes: List<TemplatedRoute>,
-    private val routeNotFound: HttpHandler = routeNotFoundHandler,
-    private val routeMethodNotAllowed: HttpHandler = routeMethodNotAllowedHandler
+    private val filter: Filter = Filter.NoOp
 ) : HttpHandler {
-    override fun invoke(request: Request) = routes
+    override fun invoke(request: Request) = filter.then(routes
         .map { it.match(request) }
         .sortedBy(RoutingMatchResult::priority)
-        .first()
-        .toHandler()(request)
+        .first().handler)(request)
 
     fun withBasePath(prefix: String): RoutedHttpHandler = copy(routes = routes.map { it.withBasePath(prefix) })
 
     fun withFilter(filter: Filter): RoutedHttpHandler = copy(
-        routes = routes.map { it.withFilter(filter) },
-        routeNotFound = filter.then(routeNotFound),
-        routeMethodNotAllowed = filter.then(routeMethodNotAllowed)
+        filter = filter.then(this.filter)
     )
 
     fun withPredicate(predicate: Predicate): RoutedHttpHandler =
@@ -35,12 +32,6 @@ data class RoutedHttpHandler(
 
     override fun toString(): String = routes.sortedBy(TemplatedRoute::toString).joinToString("\n")
 
-    private fun RoutingMatchResult.toHandler() =
-        when (this) {
-            is RoutingMatchResult.Matched -> handler
-            is RoutingMatchResult.MethodNotMatched -> routeMethodNotAllowed
-            is RoutingMatchResult.NotFound -> routeNotFound
-        }
 }
 
 data class TemplatedRoute(
@@ -54,16 +45,14 @@ data class TemplatedRoute(
 
     internal fun match(request: Request): RoutingMatchResult =
         if (uriTemplate.matches(request.uri.path)) {
-            if (!predicate(request))
-                RoutingMatchResult.MethodNotMatched
-            else
-                RoutingMatchResult.Matched(AddUriTemplate(uriTemplate).then(handler))
+            when(val result = predicate(request)) {
+                is PredicateResult.Matched -> RoutingMatchResult(0, AddUriTemplate(uriTemplate).then(handler))
+                is PredicateResult.NotMatched -> RoutingMatchResult(1) { _: Request -> Response(result.status) }
+            }
         } else
-            RoutingMatchResult.NotFound
+            RoutingMatchResult(2) { _: Request -> Response(Status.NOT_FOUND) }
 
     fun withBasePath(prefix: String): TemplatedRoute = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
-
-    fun withFilter(filter: Filter): TemplatedRoute = copy(handler = filter.then(handler))
 
     fun withPredicate(other: Predicate): TemplatedRoute = copy(predicate = predicate.and(other))
 
@@ -76,11 +65,8 @@ data class TemplatedRoute(
     }
 }
 
-internal sealed class RoutingMatchResult(val priority: Int) {
-    data class Matched(val handler: HttpHandler) : RoutingMatchResult(0)
-    data object MethodNotMatched : RoutingMatchResult(1)
-    data object NotFound : RoutingMatchResult(2)
-}
+
+data class RoutingMatchResult(val priority: Int, val handler: HttpHandler)
 
 data class NewPathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) =
