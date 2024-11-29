@@ -3,6 +3,8 @@ package org.http4k.routing.experimental
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.UriTemplate
 
  fun newRoutes(vararg list: Pair<Method, HttpHandler>): RoutedHttpHandler =
@@ -43,4 +45,4 @@ private fun hostHeaderOrUriHost(host: String): Predicate =
         (req.headerValues("host").firstOrNull() ?: req.uri.authority).contains(host)
     }
 
-fun Method.asPredicate(): Predicate = Predicate("method == $this") { it.method == this }
+fun Method.asPredicate(): Predicate = Predicate("method == $this", notMatchedStatus = METHOD_NOT_ALLOWED) { it.method == this }
