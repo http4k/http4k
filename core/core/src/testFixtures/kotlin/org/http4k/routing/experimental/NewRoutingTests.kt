@@ -3,7 +3,6 @@ package org.http4k.routing.experimental
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.present
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -22,7 +21,6 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
-import org.http4k.routing.matchAndInvoke
 import org.http4k.routing.routeMethodNotAllowedHandler
 import org.http4k.routing.routeNotFoundHandler
 import org.junit.jupiter.api.Test
@@ -131,17 +129,17 @@ class NewRoutingTests {
         assertThat(filtered(request), criteria)
     }
 
-//    @Test
-//    open fun `with filter - applies when not found`() {
-//        val filtered = handler.withFilter(filterAppending("foo"))
-//        val request = Request(GET, "/not-found").header("host", "host")
-//
-//        assertThat(filtered.matchAndInvoke(request), absent())
-//        assertThat(
-//            filtered(request),
-//            hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody)
-//        )
-//    }
+    @Test
+    fun `with filter - applies when not found`() {
+        val handler = "/foo" newBind GET to newRoutes("/bar" newBind { Response(OK) })
+        val filtered = handler.withFilter(filterAppending("foo"))
+        val request = Request(GET, "/not-found").header("host", "host")
+
+        assertThat(
+            filtered(request),
+            hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody("")
+        )
+    }
 //
 //    @Test
 //    open fun `stacked filter application - applies when not found`() {
@@ -269,12 +267,21 @@ fun newReverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): Rou
 
 
 // internals
-data class RoutedHttpHandler(val routes: List<TemplatedRoute>) : HttpHandler {
+data class RoutedHttpHandler(
+    val routes: List<TemplatedRoute>,
+    val routeNotFound: HttpHandler = routeNotFoundHandler,
+    val routeMethodNotAllowed: HttpHandler = routeMethodNotAllowedHandler
+) : HttpHandler {
+    init {
+        require(routeNotFound !is RoutedHttpHandler)
+        require(routeMethodNotAllowed !is RoutedHttpHandler)
+    }
+
     override fun invoke(request: Request) = routes
         .map { it.match(request) }
         .sortedBy(RoutingMatchResult::priority)
         .first()
-        .toHandler()(request)
+        .toHandler(routeNotFound, routeMethodNotAllowed)(request)
 
     override fun toString(): String = routes.sortedBy(TemplatedRoute::toString).joinToString("\n")
 }
@@ -283,10 +290,11 @@ private fun RoutedHttpHandler.withBasePath(prefix: String): RoutedHttpHandler {
     return copy(routes = routes.map { it.withBasePath(prefix) })
 }
 
-private fun RoutedHttpHandler.withFilter(filter: Filter): RoutedHttpHandler {
-    return copy(routes = routes.map { it.withFilter(filter) })
-}
-
+private fun RoutedHttpHandler.withFilter(filter: Filter) = copy(
+    routes = routes.map { it.withFilter(filter) },
+    routeNotFound = filter.then(routeNotFound),
+    routeMethodNotAllowed = filter.then(routeMethodNotAllowed)
+)
 
 typealias Handler<R> = (Request) -> R
 typealias Filter2<R> = (Handler<R>) -> Handler<R>
@@ -351,11 +359,12 @@ sealed class RoutingMatchResult(val priority: Int) {
     data object NotFound : RoutingMatchResult(2)
 }
 
-fun RoutingMatchResult.toHandler() = when (this) {
-    is RoutingMatchResult.Matched -> handler
-    is RoutingMatchResult.MethodNotMatched -> routeMethodNotAllowedHandler
-    is RoutingMatchResult.NotFound -> routeNotFoundHandler
-}
+fun RoutingMatchResult.toHandler(routeNotFoundHandler: HttpHandler, routeMethodNotAllowed: HttpHandler) =
+    when (this) {
+        is RoutingMatchResult.Matched -> handler
+        is RoutingMatchResult.MethodNotMatched -> routeMethodNotAllowed
+        is RoutingMatchResult.NotFound -> routeNotFoundHandler
+    }
 
 fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
     {
@@ -367,7 +376,10 @@ data class NewPathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) =
         when (handler) {
             is RoutedHttpHandler ->
-                RoutedHttpHandler(handler.routes.map { it.copy(predicate = it.predicate.and(method.asPredicate())).withBasePath(path) })
+                RoutedHttpHandler(handler.routes.map {
+                    it.copy(predicate = it.predicate.and(method.asPredicate())).withBasePath(path)
+                })
+
             else -> RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(path), handler, method.asPredicate())))
         }
 
