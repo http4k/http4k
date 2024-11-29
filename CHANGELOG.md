@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.37.0.1
+### v5.37.1.0
+- **http4k-web-datastar** : [New module!] A real-time hypermedia framework for building web applications with SSE.
 - **http4k-format-jackson** : Fixed issue with Jackson pulling in a dependency that it didn't need.
 
 ### v5.37.0.0
