@@ -129,16 +129,16 @@ class NewRoutingTests {
 
     @Test
     fun `reverse proxy`() {
-//        val otherHandler = newReverseProxyRouting(
-//            "host1" to newRoutes("/foo" bind GET to { Response(OK).body("host1" + it.header("host")) }),
-//            "host2" to newRoutes("/foo" bind GET to { Response(OK).body("host2" + it.header("host")) })
-//        )
-//
-//        assertThat(otherHandler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
-//        assertThat(otherHandler(requestWithHost("host1", "http://host2/foo")), hasBody("host1host1"))
-//        assertThat(otherHandler(requestWithHost("host2", "/foo")), hasBody("host2host2"))
-//        assertThat(otherHandler(Request(GET, "http://host2/foo")), hasBody("host2null"))
-//        assertThat(otherHandler(Request(GET, "")), hasStatus(NOT_FOUND))
+        val otherHandler = newReverseProxyRouting(
+            "host1" to newRoutes("/foo" newBind  GET to { Response(OK).body("host1" + it.header("host")) }),
+            "host2" to newRoutes("/foo" newBind  GET to { Response(OK).body("host2" + it.header("host")) })
+        )
+
+        assertThat(otherHandler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
+        assertThat(otherHandler(requestWithHost("host1", "http://host2/foo")), hasBody("host1host1"))
+        assertThat(otherHandler(requestWithHost("host2", "/foo")), hasBody("host2host2"))
+        assertThat(otherHandler(Request(GET, "http://host2/foo")), hasBody("host2null"))
+        assertThat(otherHandler(Request(GET, "")), hasStatus(NOT_FOUND))
     }
 
     private fun requestWithHost(host: String, path: String) = Request(GET, path).header("host", host)
@@ -177,8 +177,6 @@ infix fun String.newBind(method: Method): Pair<String, Method> = Pair(this, meth
 
 infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler = NewPathMethod(first, second) to handler
 
-
-infix fun String.to(httpHandler: RoutedHttpHandler): RoutedHttpHandler = httpHandler.withBasePath(this)
 
 infix fun Method.to(httpHandler: HttpHandler): RoutedHttpHandler =
     RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(""), httpHandler, asPredicate())))
