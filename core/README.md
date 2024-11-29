@@ -30,7 +30,7 @@ You can find out all about the project on the [http4k] site.
 ```kotlin
 dependencies {
     // install the platform...
-    implementation(platform("org.http4k:http4k-bom:5.36.0.0"))
+    implementation(platform("org.http4k:http4k-bom:5.37.0.0"))
 
     // ...then choose any moduless but at least the core
     implementation("org.http4k:http4k-core")
