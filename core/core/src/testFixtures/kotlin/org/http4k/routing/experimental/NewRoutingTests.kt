@@ -290,6 +290,9 @@ data class RoutedHttpHandler(
         routeMethodNotAllowed = filter.then(routeMethodNotAllowed)
     )
 
+    fun withPredicate(predicate: Predicate): RoutedHttpHandler =
+        copy(routes = routes.map { it.withPredicate(predicate) })
+
     override fun toString(): String = routes.sortedBy(TemplatedRoute::toString).joinToString("\n")
 
     private fun RoutingMatchResult.toHandler() =
@@ -301,7 +304,7 @@ data class RoutedHttpHandler(
 }
 
 data class TemplatedRoute(
-    val uriTemplate: UriTemplate,
+    private val uriTemplate: UriTemplate,
     private val handler: HttpHandler,
     val predicate: Predicate = Any
 ) {
@@ -318,13 +321,11 @@ data class TemplatedRoute(
         } else
             RoutingMatchResult.NotFound
 
-     fun withBasePath(prefix: String): TemplatedRoute {
-        return copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
-    }
+    fun withBasePath(prefix: String): TemplatedRoute = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
 
-     fun withFilter(filter: Filter): TemplatedRoute {
-        return copy(handler = filter.then(handler))
-    }
+    fun withFilter(filter: Filter): TemplatedRoute = copy(handler = filter.then(handler))
+
+    fun withPredicate(other: Predicate): TemplatedRoute = copy(predicate = predicate.and(other))
 
     override fun toString(): String = "template=$uriTemplate AND ${predicate.description}"
 
@@ -333,6 +334,7 @@ data class TemplatedRoute(
             RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
         }
     }
+
 
 }
 
@@ -360,7 +362,6 @@ private fun hostHeaderOrUriHost(host: String): Predicate =
         (req.headerValues("host").firstOrNull() ?: req.uri.authority).let { it.contains(host) }
     }
 
-
 sealed class RoutingMatchResult(val priority: Int) {
     data class Matched(val handler: HttpHandler) : RoutingMatchResult(0)
     data object MethodNotMatched : RoutingMatchResult(1)
@@ -371,10 +372,7 @@ data class NewPathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) =
         when (handler) {
             is RoutedHttpHandler ->
-                RoutedHttpHandler(handler.routes.map {
-                    it.copy(predicate = it.predicate.and(method.asPredicate())).withBasePath(path)
-                })
-
+                handler.withPredicate(method.asPredicate()).withBasePath(path)
             else -> RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(path), handler, method.asPredicate())))
         }
 }
