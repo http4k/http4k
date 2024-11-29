@@ -875,6 +875,7 @@
           "200": {
             "description": "OK",
             "schema": {
+              "type": "file"
             }
           }
         },
@@ -904,6 +905,7 @@
           "200": {
             "description": "OK",
             "schema": {
+              "type": "file"
             }
           }
         },
