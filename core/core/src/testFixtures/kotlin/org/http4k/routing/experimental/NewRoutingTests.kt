@@ -15,8 +15,11 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
+import org.http4k.routing.bind
 import org.http4k.routing.routeMethodNotAllowedHandler
 import org.http4k.routing.routeNotFoundHandler
 import org.junit.jupiter.api.Test
@@ -34,7 +37,7 @@ class NewRoutingTests {
 
     @Test
     fun `routes a template`() {
-        val app: HttpHandler = newRoutes("/foo" to aValidHandler)
+        val app: HttpHandler = newRoutes("/foo" newBind  aValidHandler)
 
         assertThat(app(Request(GET, "/bar")).status, equalTo(NOT_FOUND))
         assertThat(app(Request(GET, "/foo")).status, equalTo(OK))
@@ -52,7 +55,7 @@ class NewRoutingTests {
 
     @Test
     fun `includes routing info in request`() {
-        val app: HttpHandler = newRoutes("/foo/{name}" to aValidHandler)
+        val app: HttpHandler = newRoutes("/foo/{name}" newBind aValidHandler)
         assertThat(app(Request(GET, "/foo/bar")).bodyString(), equalTo("foo/{name}"))
     }
 
@@ -126,8 +129,19 @@ class NewRoutingTests {
 
     @Test
     fun `reverse proxy`() {
-
+//        val otherHandler = newReverseProxyRouting(
+//            "host1" to newRoutes("/foo" bind GET to { Response(OK).body("host1" + it.header("host")) }),
+//            "host2" to newRoutes("/foo" bind GET to { Response(OK).body("host2" + it.header("host")) })
+//        )
+//
+//        assertThat(otherHandler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
+//        assertThat(otherHandler(requestWithHost("host1", "http://host2/foo")), hasBody("host1host1"))
+//        assertThat(otherHandler(requestWithHost("host2", "/foo")), hasBody("host2host2"))
+//        assertThat(otherHandler(Request(GET, "http://host2/foo")), hasBody("host2null"))
+//        assertThat(otherHandler(Request(GET, "")), hasStatus(NOT_FOUND))
     }
+
+    private fun requestWithHost(host: String, path: String) = Request(GET, path).header("host", host)
 
     @Test
     fun `single page apps`() {
@@ -156,16 +170,36 @@ private fun newRoutes(vararg routed: RoutedHttpHandler): RoutedHttpHandler =
 
 private infix fun String.newBind(newRoutes: RoutedHttpHandler): RoutedHttpHandler = newRoutes.withBasePath(this)
 
+private infix fun String.newBind(handler: HttpHandler): RoutedHttpHandler =
+    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(this), handler)))
+
 infix fun String.newBind(method: Method): Pair<String, Method> = Pair(this, method)
 
-infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(first), handler, second.asPredicate())))
+infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler = NewPathMethod(first, second) to handler
 
-infix fun String.to(httpHandler: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(this), httpHandler)))
+
+infix fun String.to(httpHandler: RoutedHttpHandler): RoutedHttpHandler = httpHandler.withBasePath(this)
 
 infix fun Method.to(httpHandler: HttpHandler): RoutedHttpHandler =
     RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(""), httpHandler, asPredicate())))
+
+/**
+ * Simple Reverse Proxy which will split and direct traffic to the appropriate
+ * HttpHandler based on the content of the Host header
+ */
+fun newReverseProxy(vararg hostToHandler: Pair<String, HttpHandler>): HttpHandler =
+    newReverseProxyRouting(*hostToHandler)
+
+/**
+ * Simple Reverse Proxy. Exposes routing.
+ */
+fun newReverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): RoutedHttpHandler =
+    RoutedHttpHandler(
+        hostToHandler.map { (host, handler) ->
+            TemplatedHttpHandler(UriTemplate.from(""), handler, hostHeaderOrUriHost(host))
+        }
+    )
+
 
 // internals
 data class RoutedHttpHandler(val templates: List<TemplatedHttpHandler>) : HttpHandler {
@@ -220,6 +254,12 @@ fun Predicate.and(other: Predicate): Predicate = Predicate("($this and $other)")
 fun Predicate.or(other: Predicate): Predicate = Predicate("($this or $other)") { this(it) || other(it) }
 fun Predicate.not(): Predicate = Predicate("not $this") { !this(it) }
 
+private fun hostHeaderOrUriHost(host: String): Predicate =
+    Predicate("host header or uri host = $host") { req: Request ->
+        (req.headerValues("host").firstOrNull() ?: req.uri.authority).let { it.contains(host) }
+    }
+
+
 sealed class RoutingMatchResult(val priority: Int) {
     data class Matched(val handler: HttpHandler) : RoutingMatchResult(0)
     data object MethodNotMatched : RoutingMatchResult(1)
@@ -236,4 +276,9 @@ fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
     {
         RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
     }
+}
+
+data class NewPathMethod( val path: String, val method: Method) {
+    infix fun to(handler: HttpHandler) =
+        RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(path),handler,method.asPredicate())))
 }
