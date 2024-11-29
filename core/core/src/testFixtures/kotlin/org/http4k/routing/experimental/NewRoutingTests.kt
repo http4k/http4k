@@ -220,27 +220,23 @@ class NewRoutingTests {
                 "/" newBind GET to { Response(OK).body("matched b/c") }
             )
         )
-
-
     }
 }
 
 
 // public API
-private fun newRoutes(vararg routed: RoutedHttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(routed.flatMap { it.routes })
+private fun newRoutes(vararg list: Pair<Method, HttpHandler>): RoutedHttpHandler =
+    newRoutes(*list.map { "" newBind  it.first to it.second }.toTypedArray())
 
-private infix fun String.newBind(newRoutes: RoutedHttpHandler): RoutedHttpHandler = newRoutes.withBasePath(this)
+private fun newRoutes(vararg list: RoutedHttpHandler): RoutedHttpHandler = newRoutes(list.toList())
 
-private infix fun String.newBind(handler: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(this), handler)))
+private fun newRoutes(routers: List<RoutedHttpHandler>):RoutedHttpHandler = RoutedHttpHandler(routers.flatMap { it.routes })
 
-infix fun String.newBind(method: Method) = NewPathMethod(this, method)
+private infix fun String.newBind(method: Method) = NewPathMethod(this, method)
+private infix fun String.newBind(httpHandler: RoutedHttpHandler): RoutedHttpHandler = httpHandler.withBasePath(this)
+private infix fun String.newBind(action: HttpHandler): RoutedHttpHandler =
+    RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(this), action)))
 
-infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler = NewPathMethod(first, second) to handler
-
-infix fun Method.to(httpHandler: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(""), httpHandler, asPredicate())))
 
 /**
  * Simple Reverse Proxy which will split and direct traffic to the appropriate
