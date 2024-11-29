@@ -257,7 +257,7 @@ fun newReverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): Rou
         hostToHandler.flatMap { (host, handler) ->
             when (handler) {
                 is RoutedHttpHandler ->
-                    handler.routes.map { it.copy(predicate = it.predicate.and(hostHeaderOrUriHost(host))) }
+                    handler.routes.map { it.withPredicate(hostHeaderOrUriHost(host)) }
 
                 else -> listOf(TemplatedRoute(UriTemplate.from(""), handler, hostHeaderOrUriHost(host)))
             }
@@ -306,7 +306,7 @@ data class RoutedHttpHandler(
 data class TemplatedRoute(
     private val uriTemplate: UriTemplate,
     private val handler: HttpHandler,
-    val predicate: Predicate = Any
+    private val predicate: Predicate = Any
 ) {
     init {
         require(handler !is RoutedHttpHandler)
