@@ -1,9 +1,6 @@
 package org.http4k.connect
 
 import com.google.devtools.ksp.gradle.KspTask
-import gradle.kotlin.dsl.accessors._0e3dbbf81313c38faa652e7693f66ab5.api
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.project
 
 plugins {
     id("org.http4k.connect.module")

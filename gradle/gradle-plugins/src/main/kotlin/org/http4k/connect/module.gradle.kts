@@ -1,11 +1,22 @@
 package org.http4k.connect
 
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.api
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.kotlin
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.main
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.sourceSets
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.test
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.testFixtures
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.testFixturesApi
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.testImplementation
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.`java-test-fixtures`
-import org.gradle.kotlin.dsl.kotlin
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.project
+import org.gradle.kotlin.dsl.repositories
 
 plugins {
-    kotlin("jvm")
+    id("org.http4k.internal.module")
     `java-test-fixtures`
 }
 
