@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
@@ -14,15 +13,11 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RoutedRequest
-import org.http4k.routing.RoutedResponse
-import org.http4k.routing.routeMethodNotAllowedHandler
-import org.http4k.routing.routeNotFoundHandler
 import org.junit.jupiter.api.Test
 
 class NewRoutingTests {
@@ -221,153 +216,4 @@ class NewRoutingTests {
             )
         )
     }
-}
-
-
-// public API
-private fun newRoutes(vararg list: Pair<Method, HttpHandler>): RoutedHttpHandler =
-    newRoutes(*list.map { "" newBind  it.first to it.second }.toTypedArray())
-
-private fun newRoutes(vararg list: RoutedHttpHandler): RoutedHttpHandler = newRoutes(list.toList())
-
-private fun newRoutes(routers: List<RoutedHttpHandler>):RoutedHttpHandler = RoutedHttpHandler(routers.flatMap { it.routes })
-
-private infix fun String.newBind(method: Method) = NewPathMethod(this, method)
-private infix fun String.newBind(httpHandler: RoutedHttpHandler): RoutedHttpHandler = httpHandler.withBasePath(this)
-private infix fun String.newBind(action: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(this), action)))
-
-
-/**
- * Simple Reverse Proxy which will split and direct traffic to the appropriate
- * HttpHandler based on the content of the Host header
- */
-fun newReverseProxy(vararg hostToHandler: Pair<String, HttpHandler>): HttpHandler =
-    newReverseProxyRouting(*hostToHandler)
-
-/**
- * Simple Reverse Proxy. Exposes routing.
- */
-fun newReverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): RoutedHttpHandler =
-    RoutedHttpHandler(
-        hostToHandler.flatMap { (host, handler) ->
-            when (handler) {
-                is RoutedHttpHandler ->
-                    handler.routes.map { it.withPredicate(hostHeaderOrUriHost(host)) }
-
-                else -> listOf(TemplatedRoute(UriTemplate.from(""), handler, hostHeaderOrUriHost(host)))
-            }
-        }
-    )
-
-
-// internals
-data class RoutedHttpHandler(
-    val routes: List<TemplatedRoute>,
-    private val routeNotFound: HttpHandler = routeNotFoundHandler,
-    private val routeMethodNotAllowed: HttpHandler = routeMethodNotAllowedHandler
-) : HttpHandler {
-    init {
-        require(routeNotFound !is RoutedHttpHandler)
-        require(routeMethodNotAllowed !is RoutedHttpHandler)
-    }
-
-    override fun invoke(request: Request) = routes
-        .map { it.match(request) }
-        .sortedBy(RoutingMatchResult::priority)
-        .first()
-        .toHandler()(request)
-
-    fun withBasePath(prefix: String): RoutedHttpHandler = copy(routes = routes.map { it.withBasePath(prefix) })
-
-    fun withFilter(filter: Filter): RoutedHttpHandler = copy(
-        routes = routes.map { it.withFilter(filter) },
-        routeNotFound = filter.then(routeNotFound),
-        routeMethodNotAllowed = filter.then(routeMethodNotAllowed)
-    )
-
-    fun withPredicate(predicate: Predicate): RoutedHttpHandler =
-        copy(routes = routes.map { it.withPredicate(predicate) })
-
-    override fun toString(): String = routes.sortedBy(TemplatedRoute::toString).joinToString("\n")
-
-    private fun RoutingMatchResult.toHandler() =
-        when (this) {
-            is RoutingMatchResult.Matched -> handler
-            is RoutingMatchResult.MethodNotMatched -> routeMethodNotAllowed
-            is RoutingMatchResult.NotFound -> routeNotFound
-        }
-}
-
-data class TemplatedRoute(
-    private val uriTemplate: UriTemplate,
-    private val handler: HttpHandler,
-    private val predicate: Predicate = Any
-) {
-    init {
-        require(handler !is RoutedHttpHandler)
-    }
-
-    fun match(request: Request): RoutingMatchResult =
-        if (uriTemplate.matches(request.uri.path)) {
-            if (!predicate(request))
-                RoutingMatchResult.MethodNotMatched
-            else
-                RoutingMatchResult.Matched(AddUriTemplate(uriTemplate).then(handler))
-        } else
-            RoutingMatchResult.NotFound
-
-    fun withBasePath(prefix: String): TemplatedRoute = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
-
-    fun withFilter(filter: Filter): TemplatedRoute = copy(handler = filter.then(handler))
-
-    fun withPredicate(other: Predicate): TemplatedRoute = copy(predicate = predicate.and(other))
-
-    override fun toString(): String = "template=$uriTemplate AND ${predicate.description}"
-
-    private fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
-        {
-            RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
-        }
-    }
-}
-
-interface Predicate {
-    val description: String
-    operator fun invoke(request: Request): Boolean
-
-    companion object {
-        operator fun invoke(description: String = "", predicate: (Request) -> Boolean) = object : Predicate {
-            override val description: String = description
-            override fun invoke(request: Request): Boolean = predicate(request)
-            override fun toString(): String = description
-        }
-    }
-}
-
-val Any: Predicate = Predicate("any") { true }
-fun Method.asPredicate(): Predicate = Predicate("method == $this") { it.method == this }
-fun Predicate.and(other: Predicate): Predicate = Predicate("($this AND $other)") { this(it) && other(it) }
-fun Predicate.or(other: Predicate): Predicate = Predicate("($this OR $other)") { this(it) || other(it) }
-fun Predicate.not(): Predicate = Predicate("NOT $this") { !this(it) }
-
-private fun hostHeaderOrUriHost(host: String): Predicate =
-    Predicate("host header or uri host = $host") { req: Request ->
-        (req.headerValues("host").firstOrNull() ?: req.uri.authority).contains(host)
-    }
-
-sealed class RoutingMatchResult(val priority: Int) {
-    data class Matched(val handler: HttpHandler) : RoutingMatchResult(0)
-    data object MethodNotMatched : RoutingMatchResult(1)
-    data object NotFound : RoutingMatchResult(2)
-}
-
-data class NewPathMethod(val path: String, val method: Method) {
-    infix fun to(handler: HttpHandler) =
-        when (handler) {
-            is RoutedHttpHandler ->
-                handler.withPredicate(method.asPredicate()).withBasePath(path)
-
-            else -> RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(path), handler, method.asPredicate())))
-        }
 }
