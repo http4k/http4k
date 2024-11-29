@@ -334,8 +334,6 @@ data class TemplatedRoute(
             RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
         }
     }
-
-
 }
 
 interface Predicate {
