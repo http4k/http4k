@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.37.0.1
+- **http4k-format-jackson** : Fixed issue with Jackson pulling in a dependency that it didn't need.
+
 ### v5.37.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract-*** :  Ability to model binary downloads in OpenAPI format. H/T @hektorKS

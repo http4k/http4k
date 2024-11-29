@@ -4,7 +4,6 @@ import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Request
-import org.http4k.datastar.Signal
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
@@ -29,12 +28,9 @@ abstract class AutoMarshallingJson<NODE : Any> : AutoMarshalling(), Json<NODE> {
     @JvmName("nodeAsA")
     fun <T : Any> NODE.asA(target: KClass<T>): T = asA(this, target)
 
-
     /**
      * Datastar convenience functions
      */
-
-    fun Signal.Companion.of(signal: Any) = Signal.of(asFormatString(signal))
 
     inline fun <reified T : Any> Sse.datastarModel() =
         Query.urlEncoded().auto<T>().defaulted("datastar", { asA<T>(it.bodyString()) })(connectRequest)
