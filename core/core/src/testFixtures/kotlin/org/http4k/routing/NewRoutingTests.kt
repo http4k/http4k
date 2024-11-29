@@ -72,6 +72,10 @@ class NewRoutingTests {
                 "/bar" newBind GET to aValidHandler
             )
         )
+
+        assertThat(app(Request(GET, "/foo")).status, equalTo(NOT_FOUND))
+        assertThat(app(Request(GET, "/bar")).status, equalTo(NOT_FOUND))
+        assertThat(app(Request(GET, "/foo/bar")).status, equalTo(OK))
     }
 
 }
