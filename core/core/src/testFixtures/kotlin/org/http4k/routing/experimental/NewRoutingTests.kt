@@ -17,8 +17,6 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
-import org.http4k.routing.experimental.MethodConstraint.Any
-import org.http4k.routing.experimental.MethodConstraint.Specific
 import org.http4k.routing.routeMethodNotAllowedHandler
 import org.http4k.routing.routeNotFoundHandler
 import org.junit.jupiter.api.Test
@@ -161,13 +159,13 @@ private infix fun String.newBind(newRoutes: RoutedHttpHandler): RoutedHttpHandle
 infix fun String.newBind(method: Method): Pair<String, Method> = Pair(this, method)
 
 infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(first), handler, Specific(second))))
+    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(first), handler, second.asPredicate())))
 
 infix fun String.to(httpHandler: HttpHandler): RoutedHttpHandler =
     RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(this), httpHandler)))
 
 infix fun Method.to(httpHandler: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(""), httpHandler, Specific(this))))
+    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(""), httpHandler, asPredicate())))
 
 // internals
 data class RoutedHttpHandler(val templates: List<TemplatedHttpHandler>) : HttpHandler {
@@ -188,11 +186,11 @@ typealias Filter2<R> = (Handler<R>) -> Handler<R>
 data class TemplatedHttpHandler(
     val uriTemplate: UriTemplate,
     val handler: HttpHandler,
-    val method: MethodConstraint = Any
+    val predicate: Predicate = Any
 ) {
     fun match(request: Request): RoutingMatchResult =
         if (uriTemplate.matches(request.uri.path)) {
-            if (!method.matches(request))
+            if (!predicate(request))
                 RoutingMatchResult.MethodNotMatched
             else
                 RoutingMatchResult.Matched(AddUriTemplate(uriTemplate).then(handler))
@@ -200,20 +198,16 @@ data class TemplatedHttpHandler(
             RoutingMatchResult.NotFound
 }
 
+typealias Predicate = (Request) -> Boolean
+
+
 
 private fun TemplatedHttpHandler.withBasePath(prefix: String): TemplatedHttpHandler {
     return copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
 }
 
-sealed class MethodConstraint {
-    data object Any : MethodConstraint()
-    data class Specific(val method: Method) : MethodConstraint()
-}
-
-fun MethodConstraint.matches(request: Request): Boolean = when (this) {
-    is Any -> true
-    is Specific -> request.method == method
-}
+val Any:Predicate = {true}
+fun Method.asPredicate():Predicate = { it.method == this }
 
 sealed class RoutingMatchResult(val priority: Int) {
     data class Matched(val handler: HttpHandler) : RoutingMatchResult(0)
