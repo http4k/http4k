@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -12,13 +13,21 @@ import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
+import org.http4k.core.then
 import org.http4k.routing.MethodConstraint.Any
 import org.http4k.routing.MethodConstraint.Specific
 import org.junit.jupiter.api.Test
 
 class NewRoutingTests {
 
-    private val aValidHandler = { _: Request -> Response(OK) }
+    private val aValidHandler = { request: Request ->
+        val body =
+            when (request) {
+                is RoutedRequest -> request.xUriTemplate.toString()
+                else -> request.uri.path
+            }
+        Response(OK).body(body)
+    }
 
     @Test
     fun `routes a template`() {
@@ -36,6 +45,12 @@ class NewRoutingTests {
         assertThat(app(Request(GET, "/bar")).status, equalTo(NOT_FOUND))
         assertThat(app(Request(GET, "/foo")).status, equalTo(OK))
         assertThat(app(Request(PUT, "/foo")).status, equalTo(METHOD_NOT_ALLOWED))
+    }
+
+    @Test
+    fun `includes routing info in request`() {
+        val app: HttpHandler = newRoutes("/foo/{name}" to aValidHandler)
+        assertThat(app(Request(GET, "/foo/bar")).bodyString(), equalTo("foo/{name}"))
     }
 }
 
@@ -69,7 +84,7 @@ class TemplatedHttpHandler(
             if (!method.matches(request))
                 RoutingMatchResult.MethodNotMatched
             else
-                RoutingMatchResult.Matched(handler)
+                RoutingMatchResult.Matched(AddUriTemplate(uriTemplate).then(handler))
         } else
             RoutingMatchResult.NotFound
 }
@@ -94,4 +109,10 @@ fun RoutingMatchResult.toHandler() = when (this) {
     is RoutingMatchResult.Matched -> handler
     is RoutingMatchResult.MethodNotMatched -> routeMethodNotAllowedHandler
     is RoutingMatchResult.NotFound -> routeNotFoundHandler
+}
+
+fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
+    {
+        next(RoutedRequest(it, uriTemplate))
+    }
 }
