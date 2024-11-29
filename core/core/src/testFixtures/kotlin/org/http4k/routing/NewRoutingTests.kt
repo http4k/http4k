@@ -75,7 +75,7 @@ class TemplatedHttpHandler(
 }
 
 sealed class MethodConstraint {
-    object Any : MethodConstraint()
+    data object Any : MethodConstraint()
     data class Specific(val method: Method) : MethodConstraint()
 }
 
@@ -86,8 +86,8 @@ fun MethodConstraint.matches(request: Request): Boolean = when (this) {
 
 sealed class RoutingMatchResult {
     data class Matched(val handler: HttpHandler) : RoutingMatchResult()
-    object MethodNotMatched : RoutingMatchResult()
-    object NotFound : RoutingMatchResult()
+    data object MethodNotMatched : RoutingMatchResult()
+    data object NotFound : RoutingMatchResult()
 }
 
 fun RoutingMatchResult.toHandler() = when (this) {
