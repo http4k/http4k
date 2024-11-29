@@ -4,9 +4,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.routing.MethodConstraint.Any
 import org.http4k.routing.MethodConstraint.Specific
@@ -14,22 +18,24 @@ import org.junit.jupiter.api.Test
 
 class NewRoutingTests {
 
+    private val aValidHandler = { _: Request -> Response(OK) }
+
     @Test
     fun `routes a template`() {
-        val app: HttpHandler = newRoutes("/foo" to { req: Request -> Response(Status.OK) })
+        val app: HttpHandler = newRoutes("/foo" to aValidHandler)
 
-        assertThat(app(Request(Method.GET, "/bar")).status, equalTo(Status.NOT_FOUND))
-        assertThat(app(Request(Method.GET, "/foo")).status, equalTo(Status.OK))
-        assertThat(app(Request(Method.PUT, "/foo")).status, equalTo(Status.OK))
+        assertThat(app(Request(GET, "/bar")).status, equalTo(NOT_FOUND))
+        assertThat(app(Request(GET, "/foo")).status, equalTo(OK))
+        assertThat(app(Request(PUT, "/foo")).status, equalTo(OK))
     }
 
     @Test
     fun `routes a template with method`() {
-        val app: HttpHandler = newRoutes("/foo" newBind Method.GET to { req: Request -> Response(Status.OK) })
+        val app: HttpHandler = newRoutes("/foo" newBind GET to aValidHandler)
 
-        assertThat(app(Request(Method.GET, "/bar")).status, equalTo(Status.NOT_FOUND))
-        assertThat(app(Request(Method.GET, "/foo")).status, equalTo(Status.OK))
-        assertThat(app(Request(Method.PUT, "/foo")).status, equalTo(Status.METHOD_NOT_ALLOWED))
+        assertThat(app(Request(GET, "/bar")).status, equalTo(NOT_FOUND))
+        assertThat(app(Request(GET, "/foo")).status, equalTo(OK))
+        assertThat(app(Request(PUT, "/foo")).status, equalTo(METHOD_NOT_ALLOWED))
     }
 }
 
