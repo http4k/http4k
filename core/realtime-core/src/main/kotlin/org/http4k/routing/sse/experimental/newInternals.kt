@@ -10,7 +10,6 @@ import org.http4k.routing.experimental.Predicate
 import org.http4k.routing.experimental.PredicateResult
 import org.http4k.routing.experimental.and
 import org.http4k.routing.experimental.asPredicate
-import org.http4k.routing.sse.SseMatchResult
 import org.http4k.sse.NoOp
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
@@ -74,3 +73,5 @@ data class TemplatedSseRoute(
         }
     }
 }
+
+internal data class SseMatchResult(val priority: Int, val handler: SseHandler)
