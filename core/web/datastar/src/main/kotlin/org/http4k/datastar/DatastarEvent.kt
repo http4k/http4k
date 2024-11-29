@@ -3,11 +3,12 @@ package org.http4k.datastar
 import org.http4k.datastar.Fragment.Companion.of
 import org.http4k.datastar.MergeMode.morph
 import org.http4k.datastar.SettleDuration.Companion.DEFAULT
-import org.http4k.sse.SseMessage
+import org.http4k.sse.SseMessage.Event
+import java.time.Duration
 
 sealed class DatastarEvent(val name: String, val data: List<String>, open val id: String?) {
 
-    fun toSseEvent() = SseMessage.Event(name, data.joinToString("\n"), id)
+    fun toSseEvent() = Event(name, data.joinToString("\n"), id)
 
     /**
      * The datastar-merge-fragments event is used to merge HTML fragments into the DOM. The fragments
@@ -113,5 +114,61 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
     ) : DatastarEvent("datastar-execute-script", run {
         listOf("script $script", "autoRemove $autoRemove") + attributes.map { "attributes ${it.first} ${it.second}" }
     }, id)
+
+    companion object {
+        /**
+         * Parse an event from an SSE Event.
+         */
+        fun from(event: Event) = with(event.data.split("\n")) {
+            when (event.event) {
+                "datastar-merge-fragments" -> {
+                    MergeFragments(
+                        data("fragments", Fragment.Companion::of),
+                        data("mergeMode", MergeMode::valueOf).first(),
+                        data("selector", Selector.Companion::of).firstOrNull(),
+                        data("useViewTransition", String::toBoolean).firstOrNull() ?: false,
+                        data("settleDuration", { SettleDuration.of(Duration.ofMillis(it.toLong())) }).firstOrNull(),
+                        event.id
+                    )
+                }
+
+                "datastar-merge-signals" -> {
+                    MergeSignals(
+                        data("signals", Signal.Companion::of),
+                        data("onlyIfMissing", String::toBoolean).firstOrNull(),
+                        event.id
+                    )
+                }
+
+                "datastar-remove-fragments" -> {
+                    RemoveFragments(
+                        data("selector", Selector.Companion::of).first(),
+                        event.id
+                    )
+                }
+
+                "datastar-remove-signals" -> {
+                    RemoveSignals(
+                        data("paths", SignalPath.Companion::of),
+                        event.id
+                    )
+                }
+
+                "datastar-execute-script" -> {
+                    ExecuteScript(
+                        data("script", Script.Companion::of).first(),
+                        data("autoRemove", String::toBoolean).firstOrNull() ?: true,
+                        data("attributes", { it: String -> it.split(" ").let { i -> i[0] to i[1] } }),
+                        event.id
+                    )
+                }
+
+                else -> error("unknown event ${event.event}")
+            }
+        }
+
+        private fun <T> List<String>.data(name: String, fn: (String) -> T): List<T> =
+            filter { it.startsWith(name) }.map { it.removePrefix(name).trim() }.map(fn)
+    }
 }
 

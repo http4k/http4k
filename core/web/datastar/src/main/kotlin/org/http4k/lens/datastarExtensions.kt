@@ -23,8 +23,8 @@ val Header.DATASTAR_REQUEST get() = Header.boolean().defaulted("DATASTAR_REQUEST
 val Header.DATASTAR_CONTENT_TYPE
     get() = Header.map(::ContentType, ContentType::toHeaderValue).required("CONTENT_TYPE")
 
-// Used for Datastae data when a request is a GET
-val Query.DATASTAR_DATA get() = Query.map(String::urlDecoded, String::urlEncoded).required("datastar")
+// Used for Datastae model data when a request is a GET
+val Query.DATASTAR_MODEL get() = Query.map(String::urlDecoded, String::urlEncoded).optional("datastar")
 
 /**
  * Put datastar event into response as a datastar-merge-fragments event
@@ -98,7 +98,7 @@ fun Response.datastarFragments(
 /**
  * Inject a Datastar Event into a response
  */
-fun Response.datastarFragments(event: DatastarEvent) = with(Body.datastarFragments().toLens() of event)
+fun Response.datastarFragments(event: MergeFragments) = with(Body.datastarFragments().toLens() of event)
 
 /**
  * Inject a Datastar MergeFragments event into a Response as a Datastar event
