@@ -137,10 +137,10 @@ private fun newRoutes(vararg routed: RoutedHttpHandler): RoutedHttpHandler =
 
 private infix fun String.newBind(newRoutes: RoutedHttpHandler): RoutedHttpHandler = newRoutes.withBasePath(this)
 
-infix fun String.newBind(method: Method): PathMethod = PathMethod(this, method)
+infix fun String.newBind(method: Method): Pair<String, Method> = Pair(this, method)
 
-infix fun PathMethod.to(handler: HttpHandler): RoutedHttpHandler =
-    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(path), handler, Specific(method))))
+infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler =
+    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(first), handler, Specific(second))))
 
 infix fun String.to(httpHandler: HttpHandler): RoutedHttpHandler =
     RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(this), httpHandler)))
@@ -208,5 +208,3 @@ fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
         next(RoutedRequest(it, uriTemplate))
     }
 }
-
-data class PathMethod( val path: String, val method: Method)
