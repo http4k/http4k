@@ -6,6 +6,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -78,29 +79,74 @@ class NewRoutingTests {
         assertThat(app(Request(GET, "/foo/bar")).status, equalTo(OK))
     }
 
+    @Test
+    fun `mix and match`() {
+        val routes = newRoutes(
+            "/a" newBind GET to { Response(OK).body("matched a") },
+            "/b/c" newBind newRoutes(
+                "/d" newBind GET to { Response(OK).body("matched b/c/d") },
+                "/e" newBind newRoutes(
+                    "/f" newBind GET to { Response(OK).body("matched b/c/e/f") },
+                    "/g" newBind newRoutes(
+                        GET to { _: Request -> Response(OK).body("matched b/c/e/g/GET") },
+                        POST to { _: Request -> Response(OK).body("matched b/c/e/g/POST") }
+                    )
+                ),
+                "/" newBind GET to { Response(OK).body("matched b/c") }
+            )
+        )
+
+        assertThat(routes(Request(GET, "/a")).bodyString(), equalTo("matched a"))
+        assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))
+        assertThat(routes(Request(GET, "/b/c")).bodyString(), equalTo("matched b/c"))
+        assertThat(routes(Request(GET, "/b/c/e/f")).bodyString(), equalTo("matched b/c/e/f"))
+        assertThat(routes(Request(GET, "/b/c/e/g")).bodyString(), equalTo("matched b/c/e/g/GET"))
+        assertThat(routes(Request(POST, "/b/c/e/g")).bodyString(), equalTo("matched b/c/e/g/POST"))
+        assertThat(routes(Request(GET, "/b/c/e/h")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b/e")).status, equalTo(NOT_FOUND))
+
+    }
+
+    @Test
+    fun `other request predicates`() {
+    }
+
+    @Test
+    fun `filter application`() {
+
+    }
+
+    @Test
+    fun `binding to static resources`() {
+
+    }
+
+    @Test
+    fun `binding to sse handlers`() {
+
+    }
 }
 
 // public API
-private fun newRoutes(routedHttpHandler: RoutedHttpHandler): RoutedHttpHandler = routedHttpHandler
+private fun newRoutes(vararg routed: RoutedHttpHandler): RoutedHttpHandler =
+    RoutedHttpHandler(routed.flatMap { it.templates })
 
-private fun newRoutes(vararg routes: Pair<String, HttpHandler>): RoutedHttpHandler = RoutedHttpHandler(
-    routes.map { (template, handler) ->
-        TemplatedHttpHandler(UriTemplate.from(template), handler)
-    }
-)
-
-private fun newRoutes(vararg routes: Triple<String, Method, HttpHandler>): RoutedHttpHandler = RoutedHttpHandler(
-    routes.map { (template, method, handler) ->
-        TemplatedHttpHandler(UriTemplate.from(template), handler, Specific(method))
-    }
-)
+inline fun <reified T : kotlin.Any> newRoutes(vararg routes: Pair<T, HttpHandler>): RoutedHttpHandler =
+    RoutedHttpHandler(routes.map { (first, second) ->
+        when (first) {
+            is Method -> TemplatedHttpHandler(UriTemplate.from(""), second, Specific(first))
+            is String -> TemplatedHttpHandler(UriTemplate.from(first), second)
+            else -> throw IllegalArgumentException("Only Method and String are supported")
+        }
+    })
 
 private infix fun String.newBind(newRoutes: RoutedHttpHandler): RoutedHttpHandler = newRoutes.withBasePath(this)
 
-infix fun String.newBind(pair: Method): Pair<String, Method> = Pair(this, pair)
+infix fun String.newBind(method: Method): Pair<String, Method> = Pair(this, method)
 
-infix fun Pair<String, Method>.to(handler: HttpHandler): Triple<String, Method, HttpHandler> =
-    Triple(this.first, this.second, handler)
+infix fun Pair<String, Method>.to(handler: HttpHandler): RoutedHttpHandler =
+    RoutedHttpHandler(listOf(TemplatedHttpHandler(UriTemplate.from(first), handler, Specific(second))))
 
 // internals
 data class RoutedHttpHandler(val templates: List<TemplatedHttpHandler>) : HttpHandler {
