@@ -118,7 +118,6 @@ class NewRoutingTests {
     fun `other request predicates`() {
     }
 
-
     @Test
     fun `with filter - applies to matching handler`() {
         val handler = "/foo" newBind GET to newRoutes("/bar" newBind { Response(OK) })
@@ -269,8 +268,8 @@ fun newReverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): Rou
 // internals
 data class RoutedHttpHandler(
     val routes: List<TemplatedRoute>,
-    val routeNotFound: HttpHandler = routeNotFoundHandler,
-    val routeMethodNotAllowed: HttpHandler = routeMethodNotAllowedHandler
+    private val routeNotFound: HttpHandler = routeNotFoundHandler,
+    private val routeMethodNotAllowed: HttpHandler = routeMethodNotAllowedHandler
 ) : HttpHandler {
     init {
         require(routeNotFound !is RoutedHttpHandler)
@@ -281,27 +280,29 @@ data class RoutedHttpHandler(
         .map { it.match(request) }
         .sortedBy(RoutingMatchResult::priority)
         .first()
-        .toHandler(routeNotFound, routeMethodNotAllowed)(request)
+        .toHandler()(request)
+
+    fun withBasePath(prefix: String): RoutedHttpHandler = copy(routes = routes.map { it.withBasePath(prefix) })
+
+    fun withFilter(filter: Filter): RoutedHttpHandler = copy(
+        routes = routes.map { it.withFilter(filter) },
+        routeNotFound = filter.then(routeNotFound),
+        routeMethodNotAllowed = filter.then(routeMethodNotAllowed)
+    )
 
     override fun toString(): String = routes.sortedBy(TemplatedRoute::toString).joinToString("\n")
+
+    private fun RoutingMatchResult.toHandler() =
+        when (this) {
+            is RoutingMatchResult.Matched -> handler
+            is RoutingMatchResult.MethodNotMatched -> routeMethodNotAllowed
+            is RoutingMatchResult.NotFound -> routeNotFound
+        }
 }
-
-private fun RoutedHttpHandler.withBasePath(prefix: String): RoutedHttpHandler {
-    return copy(routes = routes.map { it.withBasePath(prefix) })
-}
-
-private fun RoutedHttpHandler.withFilter(filter: Filter) = copy(
-    routes = routes.map { it.withFilter(filter) },
-    routeNotFound = filter.then(routeNotFound),
-    routeMethodNotAllowed = filter.then(routeMethodNotAllowed)
-)
-
-typealias Handler<R> = (Request) -> R
-typealias Filter2<R> = (Handler<R>) -> Handler<R>
 
 data class TemplatedRoute(
     val uriTemplate: UriTemplate,
-    val handler: HttpHandler,
+    private val handler: HttpHandler,
     val predicate: Predicate = Any
 ) {
     init {
@@ -317,7 +318,22 @@ data class TemplatedRoute(
         } else
             RoutingMatchResult.NotFound
 
+     fun withBasePath(prefix: String): TemplatedRoute {
+        return copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
+    }
+
+     fun withFilter(filter: Filter): TemplatedRoute {
+        return copy(handler = filter.then(handler))
+    }
+
     override fun toString(): String = "template=$uriTemplate AND ${predicate.description}"
+
+    private fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
+        {
+            RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
+        }
+    }
+
 }
 
 interface Predicate {
@@ -331,14 +347,6 @@ interface Predicate {
             override fun toString(): String = description
         }
     }
-}
-
-private fun TemplatedRoute.withBasePath(prefix: String): TemplatedRoute {
-    return copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
-}
-
-private fun TemplatedRoute.withFilter(filter: Filter): TemplatedRoute {
-    return copy(handler = filter.then(handler))
 }
 
 val Any: Predicate = Predicate("any") { true }
@@ -359,19 +367,6 @@ sealed class RoutingMatchResult(val priority: Int) {
     data object NotFound : RoutingMatchResult(2)
 }
 
-fun RoutingMatchResult.toHandler(routeNotFoundHandler: HttpHandler, routeMethodNotAllowed: HttpHandler) =
-    when (this) {
-        is RoutingMatchResult.Matched -> handler
-        is RoutingMatchResult.MethodNotMatched -> routeMethodNotAllowed
-        is RoutingMatchResult.NotFound -> routeNotFoundHandler
-    }
-
-fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
-    {
-        RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
-    }
-}
-
 data class NewPathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) =
         when (handler) {
@@ -382,5 +377,4 @@ data class NewPathMethod(val path: String, val method: Method) {
 
             else -> RoutedHttpHandler(listOf(TemplatedRoute(UriTemplate.from(path), handler, method.asPredicate())))
         }
-
 }
