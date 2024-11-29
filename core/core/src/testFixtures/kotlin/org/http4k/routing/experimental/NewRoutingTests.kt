@@ -126,7 +126,22 @@ class NewRoutingTests {
     }
 
     @Test
+    fun `single page apps`() {
+
+    }
+
+    @Test
+    fun `works in contracts`() {
+
+    }
+
+    @Test
     fun `binding to sse handlers`() {
+
+    }
+
+    @Test
+    fun `nice descriptions`() {
 
     }
 }
@@ -160,6 +175,9 @@ data class RoutedHttpHandler(val templates: List<TemplatedHttpHandler>) : HttpHa
 private fun RoutedHttpHandler.withBasePath(prefix: String): RoutedHttpHandler {
     return copy(templates = templates.map { it.withBasePath(prefix) })
 }
+
+typealias Handler<R> = (Request) -> R
+typealias Filter2<R> = (Handler<R>) -> Handler<R>
 
 data class TemplatedHttpHandler(
     val uriTemplate: UriTemplate,
