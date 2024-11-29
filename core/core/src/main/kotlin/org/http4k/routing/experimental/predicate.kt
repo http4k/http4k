@@ -2,7 +2,8 @@ package org.http4k.routing.experimental
 
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.routing.experimental.PredicateResult.*
+import org.http4k.routing.experimental.PredicateResult.Matched
+import org.http4k.routing.experimental.PredicateResult.NotMatched
 
 interface Predicate {
     val description: String
