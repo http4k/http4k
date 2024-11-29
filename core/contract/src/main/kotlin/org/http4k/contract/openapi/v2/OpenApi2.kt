@@ -30,8 +30,10 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
+import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
+import java.io.InputStream
 import java.util.Locale.getDefault
 
 /**
@@ -173,38 +175,52 @@ open class OpenApi2<out NODE>(
 
             FieldAndDefinitions(
                 route.method.toString().lowercase(getDefault()) to obj(fields),
-                ((route.meta.requests.flatMap { it.asSchema().definitions }) + responseDefinitions).toSet()
+                ((route.meta.requests.flatMap {
+                    it.asSchema()?.definitions ?: emptyList()
+                }) + responseDefinitions).toSet()
             )
         }
     }
 
-    private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
-        schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId, null)
-    } catch (e: Exception) {
-        JsonSchema(json.obj(), emptySet())
+    private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE>? = when (example) {
+        is InputStream -> null
+        else -> try {
+            schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId, null)
+        } catch (e: Exception) {
+            JsonSchema(json.obj(), emptySet())
+        }
     }
+
 
     private fun List<HttpMessageMeta<Response>>.render() = json {
         val all = this@render.takeIf { it.isNotEmpty() } ?: listOf(
             ResponseMeta(OK.description, Response(OK))
         )
 
-        val collected: Map<Status, Pair<String, JsonSchema<NODE>>> = all.groupBy { it.message.status }
+        val collected: Map<Status, Pair<String, JsonSchema<NODE>?>> = all.groupBy { it.message.status }
             .mapValues { (_, responses) ->
                 responses.first().run { description to asSchema() }
             }
         collected.entries.fold(FieldsAndDefinitions<NODE>()) { memo, entry ->
-            val (status, descriptionSchema) = entry
-            val (description, schema) = descriptionSchema
+            val (status, descriptionToSchema) = entry
+            val (description, schema) = descriptionToSchema
 
             memo + FieldAndDefinitions(
-                status.code.toString() to obj(
+                field = status.code.toString() to obj(
                     listOf("description" to string(description)) +
-                        if (schema.node == nullNode()) emptyList() else listOf("schema" to schema.node)
+                        if (schema == null) listOf("schema" to notJsonSchema(FileParam))
+                        else if (schema.node == nullNode()) emptyList()
+                        else listOf("schema" to schema.node)
                 ),
-                schema.definitions
+                definitions = schema?.definitions ?: emptySet()
             )
         }
+    }
+
+    private fun notJsonSchema(fileParam: FileParam) = json {
+        obj(
+            "type" to string(fileParam.value),
+        )
     }
 
     private fun ContractRoute.tagNames() = tags.map(Tag::name).map(json::string)
