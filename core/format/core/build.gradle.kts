@@ -12,7 +12,6 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
     implementation("dev.forkhandles:values4k:_")
-    implementation(project(":http4k-web-datastar"))
 
     testImplementation("dev.forkhandles:values4k:_")
     testImplementation(project(":http4k-core"))
