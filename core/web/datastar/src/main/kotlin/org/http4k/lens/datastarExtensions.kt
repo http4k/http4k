@@ -17,11 +17,11 @@ import org.http4k.urlDecoded
 import org.http4k.urlEncoded
 
 // Present on all Datastar requests
-val Header.DATASTAR_REQUEST get() = Header.boolean().defaulted("DATASTAR_REQUEST", false)
+val Header.DATASTAR_REQUEST get() = Header.boolean().defaulted("datastar_request", false)
 
 // Special content type used for datastar events
 val Header.DATASTAR_CONTENT_TYPE
-    get() = Header.map(::ContentType, ContentType::toHeaderValue).required("CONTENT_TYPE")
+    get() = Header.map(::ContentType, ContentType::toHeaderValue).required("content_type")
 
 // Used for Datastae model data when a request is a GET
 val Query.DATASTAR_MODEL get() = Query.map(String::urlDecoded, String::urlEncoded).optional("datastar")
