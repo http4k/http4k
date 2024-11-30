@@ -7,7 +7,6 @@ changes with their rationale when appropriate:
 - **http4k-format-8** : [Fix 1225] Issue with Datastar module being required on the classpath. Causes NoClassDefFoundError.
 
 ### v5.37.1.0
-- **http4k-web-datastar** : [New module!] A real-time hypermedia framework for building web applications with SSE.
 - **http4k-format-jackson** : Fixed issue with Jackson pulling in a dependency that it didn't need.
 
 ### v5.37.0.0
