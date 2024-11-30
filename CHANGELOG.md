@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.37.1.1
-- **http4k-format-8** : [Fix 1225] Issue with Datastar module being required on the classpath. Causes NoClassDefFoundError.
+- **http4k-format-*** : [Fix 1225] Issue with Datastar module being required on the classpath. Causes NoClassDefFoundError.
 
 ### v5.37.1.0
 - **http4k-format-jackson** : Fixed issue with Jackson pulling in a dependency that it didn't need.
