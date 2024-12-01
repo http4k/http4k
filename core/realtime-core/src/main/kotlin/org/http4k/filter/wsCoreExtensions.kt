@@ -67,8 +67,8 @@ fun DebuggingFilters.PrintWsRequest(out: PrintStream = System.out, debugStream: 
 fun DebuggingFilters.PrintWsRequestAndResponse(out: PrintStream = System.out, debugStream: Boolean = false) =
     PrintWsRequest(out, debugStream).then(PrintWsResponse(out))
 
-fun WsHandler.debug(out: PrintStream = java.lang.System.out, debugStream: Boolean = false) =
-    org.http4k.filter.DebuggingFilters.PrintWsRequestAndResponse(out, debugStream).then(this)
+fun WsHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
+    DebuggingFilters.PrintWsRequestAndResponse(out, debugStream).then(this)
 
 fun RoutingWsHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
     DebuggingFilters.PrintWsRequestAndResponse(out, debugStream).then(this)
@@ -82,7 +82,6 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
 
                     response.copy(consumer = { ws ->
                         response.consumer(object : Websocket by ws {
-
                             override fun send(message: WsMessage) {
                                 ws.send(message)
                                 out.println(
@@ -113,4 +112,3 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
 
 private fun HttpMessage.printable(debugStream: Boolean) =
     if (debugStream || body is MemoryBody) this else body("<<stream>>")
-

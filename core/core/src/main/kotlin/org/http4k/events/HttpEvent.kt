@@ -31,6 +31,8 @@ sealed class HttpEvent(
         )
 
         override fun toString() = "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+
+        companion object
     }
 
     class Outgoing(

@@ -3,6 +3,7 @@ package org.http4k.filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
 import org.http4k.core.RequestContext
+import org.http4k.core.SseTransaction
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Store
 import org.http4k.routing.RoutingSseHandler
@@ -13,6 +14,9 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import java.io.PrintStream
+import java.time.Clock
+import java.time.Duration
+import java.time.Instant
 
 fun ServerFilters.CatchAllSse(
     onError: (Throwable) -> SseResponse = ::originalSseBehaviour,
@@ -59,8 +63,8 @@ fun DebuggingFilters.PrintSseRequest(out: PrintStream = System.out, debugStream:
 fun DebuggingFilters.PrintSseRequestAndResponse(out: PrintStream = System.out, debugStream: Boolean = false) =
     PrintSseRequest(out, debugStream).then(PrintSseResponse(out))
 
-fun SseHandler.debug(out: PrintStream = java.lang.System.out, debugStream: Boolean = false) =
-    org.http4k.filter.DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
+fun SseHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
+    DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
 
 fun RoutingSseHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
     DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
@@ -105,3 +109,44 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
 
 private fun HttpMessage.printable(debugStream: Boolean) =
     if (debugStream || body is MemoryBody) this else body("<<stream>>")
+
+/**
+ * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeler to
+ * create custom labels.
+ * This is useful for logging metrics. Note that the passed function blocks the response from completing.
+ */
+fun ResponseFilters.ReportSseTransaction(
+    clock: Clock = Clock.systemUTC(),
+    transactionLabeler: SseTransactionLabeler = { it },
+    recordFn: (SseTransaction) -> Unit
+): SseFilter = ReportSseTransaction(clock::instant, transactionLabeler, recordFn)
+
+/**
+ * General reporting SseFilter for an ReportSseTransaction. Pass an optional SseTransactionLabeler to
+ * create custom labels.
+ * This is useful for logging metrics. Note that the passed function blocks the response from completing.
+ */
+fun ResponseFilters.ReportSseTransaction(
+    timeSource: () -> Instant,
+    transactionLabeler: SseTransactionLabeler = { it },
+    recordFn: (SseTransaction) -> Unit
+) = SseFilter { next ->
+    { request ->
+        timeSource().let { start ->
+            next(request).apply {
+                recordFn(
+                    transactionLabeler.invoke(
+                        SseTransaction(
+                            request = request,
+                            response = this,
+                            start = start,
+                            duration = Duration.between(start, timeSource())
+                        )
+                    )
+                )
+            }
+        }
+    }
+}
+
+typealias SseTransactionLabeler = (SseTransaction) -> SseTransaction

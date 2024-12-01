@@ -21,7 +21,7 @@ class RoutedMessageTest {
 
     @Test
     fun `routed request can be extended`() {
-        class ExtendedRequest(val delegate: RoutedRequest) : RequestWithRoute by delegate {
+        class ExtendedRequest(val delegate: RoutedRequest) : Request by delegate, RoutedMessage by delegate {
             override fun query(name: String, value: String?): ExtendedRequest =
                 ExtendedRequest(delegate.query(name, value) as RoutedRequest)
         }
@@ -36,7 +36,7 @@ class RoutedMessageTest {
 
     @Test
     fun `routed response can be extended`() {
-        class ExtendedResponse(val delegate: RoutedResponse) : ResponseWithRoute by delegate {
+        class ExtendedResponse(val delegate: RoutedResponse) : Response by delegate, RoutedMessage by delegate {
             override fun header(name: String, value: String?): ExtendedResponse =
                 ExtendedResponse(delegate.header(name, value) as RoutedResponse)
         }

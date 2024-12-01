@@ -15,12 +15,15 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import org.http4k.testing.testSseClient
+import org.http4k.util.TickingClock
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.then
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.time.Duration.ofSeconds
 import java.util.concurrent.atomic.AtomicReference
 
 class SseCoreExtensionsTest {
@@ -130,4 +133,22 @@ class SseCoreExtensionsTest {
         assertThat(response.status, equalTo(I_M_A_TEAPOT))
         assertThat(error.get(), equalTo(e))
     }
+
+    @Test
+    fun `reporting latency for request`() {
+        var called = false
+        val request = Request(GET, "")
+        val response = SseResponse { _ -> }
+
+        val tickingClock = TickingClock()
+        ResponseFilters.ReportSseTransaction(tickingClock) { (req, resp, duration) ->
+            called = true
+            assertThat(req, equalTo(request))
+            assertThat(resp, equalTo(response))
+            assertThat(duration, equalTo(ofSeconds(1)))
+        }.then { response }(request)
+
+        assertTrue(called)
+    }
+
 }

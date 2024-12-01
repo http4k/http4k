@@ -4,6 +4,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Response
 import java.time.Clock
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -19,7 +20,8 @@ open class CacheControlHeaderPart(open val name: String, val value: Duration) {
     } ?: toHeaderValue()
 }
 
-data class StaleWhenRevalidateTtl(private val valueD: Duration) : CacheControlHeaderPart("stale-while-revalidate", valueD)
+data class StaleWhenRevalidateTtl(private val valueD: Duration) :
+    CacheControlHeaderPart("stale-while-revalidate", valueD)
 
 data class StaleIfErrorTtl(private val valueD: Duration) : CacheControlHeaderPart("stale-if-error", valueD)
 
@@ -45,7 +47,12 @@ object CachingFilters {
     object CacheRequest {
         fun AddIfModifiedSince(clock: Clock, maxAge: Duration) = Filter { next ->
             {
-                next(it.replaceHeader("If-Modified-Since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
+                next(
+                    it.replaceHeader(
+                        "If-Modified-Since",
+                        RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))
+                    )
+                )
             }
         }
     }
@@ -58,8 +65,8 @@ object CachingFilters {
      */
     object CacheResponse {
 
-        private abstract class CacheFilter(private val predicate: (org.http4k.core.Response) -> Boolean) : Filter {
-            abstract fun headersFor(response: org.http4k.core.Response): Headers
+        private abstract class CacheFilter(private val predicate: (Response) -> Boolean) : Filter {
+            abstract fun headersFor(response: Response): Headers
 
             override fun invoke(next: HttpHandler): HttpHandler =
                 {
@@ -74,20 +81,22 @@ object CachingFilters {
          * For example you could combine this with a MaxAge for everything >= 400
          */
         object NoCache {
-            operator fun invoke(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
-                override fun headersFor(response: org.http4k.core.Response) = listOf("Cache-Control" to "private, must-revalidate")
-            }
+            operator fun invoke(predicate: (Response) -> Boolean = { it.status.code < 400 }): Filter =
+                object : CacheFilter(predicate) {
+                    override fun headersFor(response: Response) = listOf("Cache-Control" to "private, must-revalidate")
+                }
         }
 
         /**
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
         object MaxAge {
-            operator fun invoke(maxAge: Duration, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
-                override fun headersFor(response: org.http4k.core.Response) = listOf(
-                    "Cache-Control" to listOf("public", MaxAgeTtl(maxAge).toHeaderValue()).joinToString(", ")
-                )
-            }
+            operator fun invoke(maxAge: Duration, predicate: (Response) -> Boolean = { it.status.code < 400 }): Filter =
+                object : CacheFilter(predicate) {
+                    override fun headersFor(response: Response) = listOf(
+                        "Cache-Control" to listOf("public", MaxAgeTtl(maxAge).toHeaderValue()).joinToString(", ")
+                    )
+                }
         }
 
         /**
@@ -96,14 +105,22 @@ object CachingFilters {
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
         object FallbackCacheControl {
-            operator fun invoke(defaultCacheTimings: DefaultCacheTimings, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter {
+            operator fun invoke(
+                defaultCacheTimings: DefaultCacheTimings,
+                predicate: (Response) -> Boolean = { it.status.code < 400 }
+            ): Filter {
 
-                fun addDefaultHeaderIfAbsent(response: org.http4k.core.Response, header: String, defaultProducer: () -> String) =
+                fun addDefaultHeaderIfAbsent(response: Response, header: String, defaultProducer: () -> String) =
                     response.replaceHeader(header, response.header(header) ?: defaultProducer())
 
-                fun addDefaultCacheHeadersIfAbsent(response: org.http4k.core.Response) =
+                fun addDefaultCacheHeadersIfAbsent(response: Response) =
                     addDefaultHeaderIfAbsent(response, "Cache-Control") {
-                        listOf("public", defaultCacheTimings.maxAge.toHeaderValue(), defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(), defaultCacheTimings.staleIfErrorTtl.toHeaderValue())
+                        listOf(
+                            "public",
+                            defaultCacheTimings.maxAge.toHeaderValue(),
+                            defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(),
+                            defaultCacheTimings.staleIfErrorTtl.toHeaderValue()
+                        )
                             .filter { it != "" }
                             .joinToString(", ")
                     }

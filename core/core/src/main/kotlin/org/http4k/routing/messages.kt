@@ -11,15 +11,19 @@ import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import java.io.InputStream
 
-interface RequestWithRoute : Request {
+interface RoutedMessage {
     val xUriTemplate: UriTemplate
 }
 
-interface ResponseWithRoute : Response {
-    val xUriTemplate: UriTemplate
-}
+@Deprecated("Use RoutedMessage", ReplaceWith("RoutedMessage"))
+interface RequestWithRoute : Request, RoutedMessage
 
-data class RoutedRequest(private val delegate: Request, override val xUriTemplate: UriTemplate) : Request by delegate, RequestWithRoute {
+@Deprecated("Use RoutedMessage", ReplaceWith("RoutedMessage"))
+interface ResponseWithRoute : Response, RoutedMessage
+
+@Suppress("DEPRECATION")
+data class RoutedRequest(private val delegate: Request, override val xUriTemplate: UriTemplate) : Request by delegate,
+    RequestWithRoute,  RoutedMessage {
     override fun equals(other: Any?): Boolean = delegate == other
 
     override fun hashCode(): Int = delegate.hashCode()
@@ -38,11 +42,13 @@ data class RoutedRequest(private val delegate: Request, override val xUriTemplat
 
     override fun source(source: RequestSource): Request = RoutedRequest(delegate.source(source), xUriTemplate)
 
-    override fun header(name: String, value: String?): Request = RoutedRequest(delegate.header(name, value), xUriTemplate)
+    override fun header(name: String, value: String?): Request =
+        RoutedRequest(delegate.header(name, value), xUriTemplate)
 
     override fun headers(headers: Headers): Request = RoutedRequest(delegate.headers(headers), xUriTemplate)
 
-    override fun replaceHeader(name: String, value: String?): Request = RoutedRequest(delegate.replaceHeader(name, value), xUriTemplate)
+    override fun replaceHeader(name: String, value: String?): Request =
+        RoutedRequest(delegate.replaceHeader(name, value), xUriTemplate)
 
     override fun replaceHeaders(source: Headers): Request = RoutedRequest(delegate.replaceHeaders(source), xUriTemplate)
 
@@ -54,23 +60,28 @@ data class RoutedRequest(private val delegate: Request, override val xUriTemplat
 
     override fun body(body: String): Request = RoutedRequest(delegate.body(body), xUriTemplate)
 
-    override fun body(body: InputStream, length: Long?): Request = RoutedRequest(delegate.body(body, length), xUriTemplate)
+    override fun body(body: InputStream, length: Long?): Request =
+        RoutedRequest(delegate.body(body, length), xUriTemplate)
 }
 
-class RoutedResponse(private val delegate: Response, override val xUriTemplate: UriTemplate) : Response by delegate, ResponseWithRoute {
+class RoutedResponse(private val delegate: Response, override val xUriTemplate: UriTemplate) : Response by delegate,
+    RoutedMessage {
     override fun equals(other: Any?): Boolean = delegate == other
 
     override fun hashCode(): Int = delegate.hashCode()
 
     override fun toString(): String = delegate.toString()
 
-    override fun header(name: String, value: String?): Response = RoutedResponse(delegate.header(name, value), xUriTemplate)
+    override fun header(name: String, value: String?): Response =
+        RoutedResponse(delegate.header(name, value), xUriTemplate)
 
     override fun headers(headers: Headers): Response = RoutedResponse(delegate.headers(headers), xUriTemplate)
 
-    override fun replaceHeader(name: String, value: String?): Response = RoutedResponse(delegate.replaceHeader(name, value), xUriTemplate)
+    override fun replaceHeader(name: String, value: String?): Response =
+        RoutedResponse(delegate.replaceHeader(name, value), xUriTemplate)
 
-    override fun replaceHeaders(source: Headers): Response = RoutedResponse(delegate.replaceHeaders(source), xUriTemplate)
+    override fun replaceHeaders(source: Headers): Response =
+        RoutedResponse(delegate.replaceHeaders(source), xUriTemplate)
 
     override fun removeHeader(name: String): Response = RoutedResponse(delegate.removeHeader(name), xUriTemplate)
 
@@ -80,7 +91,8 @@ class RoutedResponse(private val delegate: Response, override val xUriTemplate: 
 
     override fun body(body: String): Response = RoutedResponse(delegate.body(body), xUriTemplate)
 
-    override fun body(body: InputStream, length: Long?): Response = RoutedResponse(delegate.body(body, length), xUriTemplate)
+    override fun body(body: InputStream, length: Long?): Response =
+        RoutedResponse(delegate.body(body, length), xUriTemplate)
 
     override fun status(new: Status): Response = RoutedResponse(delegate.status(new), xUriTemplate)
 }

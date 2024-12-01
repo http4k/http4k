@@ -23,7 +23,7 @@ internal class PredicateRouter(private val predicate: (Request) -> Boolean, rawD
 }
 
 fun Request.path(name: String): String? = when (this) {
-    is RequestWithRoute -> xUriTemplate.extract(uri.path)[name]
+    is RoutedMessage -> xUriTemplate.extract(uri.path)[name]
     else -> throw IllegalStateException("Request was not routed, so no uri-template present")
 }
 

@@ -23,7 +23,7 @@ abstract class TypedHttpMessage {
         Required(spec)
 
     protected fun <IN : HttpMessage, OUT : Any> optional(spec: BiDiLensBuilder<IN, OUT>) =
-        Optional(spec,)
+        Optional(spec)
 
     protected fun <IN : HttpMessage, OUT : Any> defaulted(
         spec: BiDiLensBuilder<IN, OUT>,
@@ -35,6 +35,7 @@ abstract class TypedHttpMessage {
         Body<IN, OUT>(spec, example)
 }
 
+@Suppress("DEPRECATION")
 abstract class TypedRequest(request: Request) : TypedHttpMessage(), RequestWithRoute by httpMessage(
     when {
         request is RequestWithRoute -> request
@@ -43,9 +44,7 @@ abstract class TypedRequest(request: Request) : TypedHttpMessage(), RequestWithR
 ) {
     protected constructor(method: Method, uri: Uri) : this(Request(method, uri))
 
-    protected fun <OUT : Any> required(spec: PathLensSpec<OUT>) = Path(spec)
-
-    override fun toString() = super.toMessage()
+    protected fun <OUT : Any> required(spec: PathLensSpec<OUT>): Path<OUT> = Path(spec)
 }
 
 abstract class TypedResponse(response: Response) : TypedHttpMessage(), Response by httpMessage(response) {
@@ -54,7 +53,7 @@ abstract class TypedResponse(response: Response) : TypedHttpMessage(), Response 
     override fun toString() = super.toMessage()
 }
 
-private inline fun <reified IN : HttpMessage> httpMessage(initial: IN): IN = Proxy.newProxyInstance(
+private inline fun <reified IN> httpMessage(initial: IN): IN = Proxy.newProxyInstance(
     IN::class.java.classLoader,
     arrayOf(IN::class.java), object : InvocationHandler {
         private val ref = AtomicReference(initial)

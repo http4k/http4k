@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.38.0.0 (uncut)
+- **http4k-core** : [Unlikely break] Split of RequestWithRoute into Request and RoutedMessage 
+- **http4k-realtime-core-*** : Further rework on Sse and Ws to add functionalities missing (which are present in HTTP)
+
 ### v5.37.1.1
 - **http4k-format-*** : [Fix 1225] Issue with Datastar module being required on the classpath. Causes NoClassDefFoundError.
 
