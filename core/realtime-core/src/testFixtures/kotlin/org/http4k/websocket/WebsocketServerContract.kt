@@ -1,6 +1,7 @@
 package org.http4k.websocket
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
@@ -28,6 +29,8 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import org.http4k.routing.bind as hbind
@@ -43,12 +46,24 @@ abstract class WebsocketServerContract(
 
     private val lens = WsMessage.string().map(String::toInt).toLens()
 
+    private val err = ByteArrayOutputStream()
+    private val sysErr = System.err
+
+    init {
+        System.setErr(PrintStream(err))
+    }
+
     @BeforeEach
     fun before() {
         val routes = routes(
             "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) }
         )
         val ws = websockets(
+            "/noclose" bind {
+                WsResponse { ws ->
+                    ws.send(WsMessage("event"))
+                }
+            },
             "/hello" bind websockets(
                 "/{name}" bind { req: Request ->
                     WsResponse { ws ->
@@ -93,12 +108,27 @@ abstract class WebsocketServerContract(
     @AfterEach
     fun after() {
         server.stop()
+        sysErr.print(err.toByteArray())
+        System.setErr(sysErr)
     }
 
     @Test
     fun `can do standard http traffic`() {
         if (!httpSupported) return
         assertThat(client(Request(GET, "http://localhost:$port/hello/bob")), hasBody("bob"))
+    }
+
+    @Test
+    fun `does not error when we do not call close`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${port}/noclose"))
+        assertThat(
+            client.received().take(1).toList(),
+            equalTo(listOf(WsMessage("event")))
+        )
+        val syserr = String(err.toByteArray()).lowercase()
+        assertThat(syserr, !containsSubstring("exception"))
+        assertThat(syserr, !containsSubstring("error"))
+        assertThat(syserr, !containsSubstring("warning"))
     }
 
     @Test

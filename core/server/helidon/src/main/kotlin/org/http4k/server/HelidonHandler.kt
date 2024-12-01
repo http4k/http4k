@@ -22,6 +22,7 @@ import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.SseMessage.Retry
 import org.http4k.sse.SseResponse
+import java.util.concurrent.CountDownLatch
 
 fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
     val httpToUse = http ?: { Response(NOT_FOUND) }
@@ -52,7 +53,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
 
     res.status(create(status.code, status.description))
 
-    consumer(object : PushAdaptingSse(http4kRequest) {
+    val sse = object : PushAdaptingSse(http4kRequest) {
         override fun send(message: SseMessage) = apply {
             sseSink.emit(
                 when (message) {
@@ -69,7 +70,13 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
         override fun close() {
             sseSink.close()
         }
-    })
+    }
+    val latch = CountDownLatch(1)
+
+    sse.onClose(latch::countDown)
+
+    consumer(sse)
+    latch.await()
 }
 
 private fun Request.isEventStream() =

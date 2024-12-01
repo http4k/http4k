@@ -18,7 +18,12 @@ interface Sse {
 
 typealias SseConsumer = (Sse) -> Unit
 
-data class SseResponse(val status: Status = OK, val headers: Headers = emptyList(), val handled: Boolean = true, val consumer: SseConsumer) {
+data class SseResponse(
+    val status: Status = OK,
+    val headers: Headers = emptyList(),
+    val handled: Boolean = true,
+    val consumer: SseConsumer
+) {
     constructor(consumer: SseConsumer) : this(OK, emptyList(), true, consumer)
 }
 
@@ -31,6 +36,7 @@ sealed interface SseMessage {
     data class Data(val data: String) : SseMessage {
         constructor(data: ByteArray) : this(data.base64Encode())
         constructor(data: InputStream) : this(data.readAllBytes())
+
         override fun toMessage() = "data: $data\n\n"
     }
 
@@ -62,7 +68,13 @@ sealed interface SseMessage {
                     parts.filter { it.startsWith("data: ") }.joinToString("\n") { it.removePrefix("data: ") },
                     parts.find { it.startsWith("id: ") }?.removePrefix("id: ")
                 )
-                parts.first().startsWith("retry: ") -> Retry(Duration.ofMillis(parts.first().removePrefix("retry: ").toLong()))
+
+                parts.first().startsWith("retry: ") -> Retry(
+                    Duration.ofMillis(
+                        parts.first().removePrefix("retry: ").toLong()
+                    )
+                )
+
                 else -> throw IllegalArgumentException("Unrecognised message format: $message")
             }
         }

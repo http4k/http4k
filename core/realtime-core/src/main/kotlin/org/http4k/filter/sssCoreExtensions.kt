@@ -1,15 +1,47 @@
 package org.http4k.filter
 
-
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
+import org.http4k.core.RequestContext
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Store
 import org.http4k.routing.RoutingSseHandler
 import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
+import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import java.io.PrintStream
+
+fun ServerFilters.CatchAllSse(
+    onError: (Throwable) -> SseResponse = ::originalSseBehaviour,
+) = SseFilter { next ->
+    {
+        try {
+            next(it)
+        } catch (e: Throwable) {
+            onError(e)
+        }
+    }
+}
+
+private fun originalSseBehaviour(e: Throwable): SseResponse {
+    if (e !is Exception) throw e
+    e.printStackTrace()
+    return SseResponse(INTERNAL_SERVER_ERROR) { it.close() }
+}
+
+fun ServerFilters.InitialiseSseRequestContext(contexts: Store<RequestContext>) = SseFilter { next ->
+    {
+        val context = RequestContext()
+        try {
+            next(contexts(context, it))
+        } finally {
+            contexts.remove(context)
+        }
+    }
+}
 
 fun DebuggingFilters.PrintSseRequest(out: PrintStream = System.out, debugStream: Boolean = false) =
     SseFilter { next ->
@@ -27,8 +59,8 @@ fun DebuggingFilters.PrintSseRequest(out: PrintStream = System.out, debugStream:
 fun DebuggingFilters.PrintSseRequestAndResponse(out: PrintStream = System.out, debugStream: Boolean = false) =
     PrintSseRequest(out, debugStream).then(PrintSseResponse(out))
 
-fun SseHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
-    DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
+fun SseHandler.debug(out: PrintStream = java.lang.System.out, debugStream: Boolean = false) =
+    org.http4k.filter.DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
 
 fun RoutingSseHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
     DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
@@ -73,4 +105,3 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
 
 private fun HttpMessage.printable(debugStream: Boolean) =
     if (debugStream || body is MemoryBody) this else body("<<stream>>")
-
