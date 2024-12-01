@@ -24,6 +24,7 @@ import org.http4k.sse.SseMessage.Retry
 import org.http4k.sse.SseResponse
 
 fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
+    val httpToUse = http ?: { Response(NOT_FOUND) }
     req.toHttp4k()
         ?.let { http4kReq ->
             when {
@@ -31,13 +32,11 @@ fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
                     val http4kResponse = sse(http4kReq)
                     when {
                         http4kResponse.handled -> http4kResponse.writeInto(http4kReq, res)
-                        else -> res.from(http?.let { it(http4kReq) } ?: Response(NOT_FOUND))
+                        else -> res.from(httpToUse(http4kReq))
                     }
                 }
 
-                else -> {
-                    res.from(http?.let { it(http4kReq) } ?: Response(NOT_FOUND))
-                }
+                else -> res.from(httpToUse(http4kReq))
             }
         }
         ?: res.from(Response(NOT_IMPLEMENTED))

@@ -36,12 +36,21 @@ import org.http4k.sse.SseMessage.Event
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import org.http4k.routing.bind as hbind
+
 
 abstract class SseServerContract(
     private val serverConfig: (Int) -> PolyServerConfig,
     private val client: HttpHandler
 ) {
+    private val err = ByteArrayOutputStream()
+    private val sysErr = System.err
+
+    init {
+        System.setErr(PrintStream(err))
+    }
 
     private lateinit var server: Http4kServer
     private lateinit var serverOnlySse: Http4kServer
@@ -52,6 +61,11 @@ abstract class SseServerContract(
     )
 
     private val sse = sse(
+        "/noclose" bind {
+            SseResponse(OK) { sse ->
+                sse.send(Event("event", "hello\nworld!", "456"))
+            }
+        },
         "/modify" bind {
             SseResponse(ACCEPTED) {
                 it.close()
@@ -101,7 +115,8 @@ abstract class SseServerContract(
                 sse.send(Event("event", "hello\nworld!", "456"))
                 sse.close()
             }
-        })
+        }
+    )
 
     @BeforeEach
     fun before() {
@@ -113,11 +128,26 @@ abstract class SseServerContract(
     fun after() {
         server.stop()
         serverOnlySse.stop()
+        sysErr.print(err.toByteArray())
+        System.setErr(sysErr)
     }
 
     @Test
     fun `can do standard http traffic`() {
         assertThat(client(Request(GET, "http://localhost:${server.port()}/hello/bob")), hasBody("bob"))
+    }
+
+    @Test
+    fun `does not error when we do not call close`() {
+        val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/noclose"))
+        assertThat(
+            client.received().take(1).toList(),
+            equalTo(listOf(Event("event", "hello\nworld!", "456")))
+        )
+        val syserr = String(err.toByteArray()).lowercase()
+        assertThat(syserr, !containsSubstring("exception"))
+        assertThat(syserr, !containsSubstring("error"))
+        assertThat(syserr, !containsSubstring("warning"))
     }
 
     @Test
