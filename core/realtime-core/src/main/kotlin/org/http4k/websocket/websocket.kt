@@ -12,12 +12,13 @@ import java.nio.ByteBuffer
  * Represents a connected Websocket instance, and can be passed around an application. This is configured
  * to react to events on the WS event stream by attaching listeners.
  */
-interface Websocket {
+interface Websocket : AutoCloseable {
     fun send(message: WsMessage)
-    fun close(status: WsStatus = NORMAL)
+    fun close(status: WsStatus)
     fun onError(fn: (Throwable) -> Unit)
     fun onClose(fn: (WsStatus) -> Unit)
     fun onMessage(fn: (WsMessage) -> Unit)
+    override fun close() = close(NORMAL)
 }
 
 data class WsResponse(val subprotocol: String? = null, val consumer: WsConsumer) : WsConsumer by consumer {
@@ -30,8 +31,8 @@ typealias WsHandler = (Request) -> WsResponse
 
 data class WsMessage(val body: Body, val mode: Mode) {
     constructor(value: String, mode: Mode = Mode.Text) : this(Body(value), mode)
-    constructor(value: ByteBuffer, mode: Mode = Mode.Binary): this(Body(value), mode)
-    constructor(value: ByteArray, mode: Mode = Mode.Binary): this(MemoryBody(value), mode)
+    constructor(value: ByteBuffer, mode: Mode = Mode.Binary) : this(Body(value), mode)
+    constructor(value: ByteArray, mode: Mode = Mode.Binary) : this(MemoryBody(value), mode)
     constructor(value: InputStream, mode: Mode = Mode.Binary) : this(Body(value), mode)
 
     fun body(new: Body, newMode: Mode = mode): WsMessage = copy(body = new, mode = newMode)

@@ -9,10 +9,10 @@ import org.http4k.routing.RoutingSseHandler
 import java.io.InputStream
 import java.time.Duration
 
-interface Sse {
+interface Sse : AutoCloseable {
     val connectRequest: Request
     fun send(message: SseMessage): Sse
-    fun close()
+    override fun close()
     fun onClose(fn: () -> Unit): Sse
 }
 
