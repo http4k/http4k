@@ -26,17 +26,17 @@ import org.http4k.sse.SseResponse
 fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
     val httpToUse = http ?: { Response(NOT_FOUND) }
     req.toHttp4k()
-        ?.let { http4kReq ->
+        ?.let {
             when {
-                sse != null && http4kReq.isEventStream() -> {
-                    val http4kResponse = sse(http4kReq)
+                sse != null && it.isEventStream() -> {
+                    val http4kResponse = sse(it)
                     when {
-                        http4kResponse.handled -> http4kResponse.writeInto(http4kReq, res)
-                        else -> res.from(httpToUse(http4kReq))
+                        http4kResponse.handled -> http4kResponse.writeInto(it, res)
+                        else -> res.from(httpToUse(it))
                     }
                 }
 
-                else -> res.from(httpToUse(http4kReq))
+                else -> res.from(httpToUse(it))
             }
         }
         ?: res.from(Response(NOT_IMPLEMENTED))
