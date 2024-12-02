@@ -27,7 +27,7 @@ data class RoutingSseHandler(
 
     fun withBasePath(prefix: String) = copy(routes = routes.map { it.withBasePath(prefix) })
 
-    fun withFilter(filter: SseFilter) = copy(filter = filter.then(filter))
+    fun withFilter(new: SseFilter) = copy(filter = new.then(filter))
 
     fun withPredicate(predicate: Predicate) =
         copy(routes = routes.map { it.withPredicate(predicate) })
