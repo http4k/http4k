@@ -86,6 +86,11 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val optionsResponse = hasStatus(OK).and(hasBody(""))
 
         assertThat(
+            app(Request(GET, "/index").header("Origin", "foo")),
+            isHomePage("public")
+        )
+
+        assertThat(
             app(Request(OPTIONS, "/api/ken").header("Origin", "foo")),
             optionsResponse
         )
@@ -93,11 +98,6 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         assertThat(
             app(Request(GET, "/api/ken").header("Origin", "foo")),
             hasStatus(OK).and(hasBody("ken"))
-        )
-
-        assertThat(
-            app(Request(GET, "/index").header("Origin", "foo")),
-            isHomePage("public")
         )
 
         assertThat(
