@@ -1,8 +1,8 @@
 package org.http4k.contract
 
+import org.http4k.contract.security.NoSecurity.filter
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.NoOp
 import org.http4k.core.Request
@@ -39,9 +39,13 @@ data class ContractRouteMatcher(
     private val includeDescriptionRoute: Boolean = false,
     private val webhooks: Map<String, List<WebCallback>> = emptyMap(),
     private val predicate: Predicate = Fallback,
-    private val filter: Filter = Filter.NoOp
 ) : RouteMatcher {
     private val contractRoot = PathSegments(rootAsString)
+
+    private val notFound = preSecurityFilter
+        .then(security?.filter ?: Filter.NoOp)
+        .then(postSecurityFilter)
+        .then { renderer.notFound() }
 
     override fun match(request: Request): HttpMatchResult {
         val m = internalMatch(request)
@@ -50,10 +54,9 @@ data class ContractRouteMatcher(
             filter.then(
                 when (m) {
                     is MatchingHandler -> m
-                    is MatchedWithoutHandler -> { _: Request -> Response(Status.NOT_FOUND) }
-                    is MethodNotMatched -> { _: Request -> Response(Status.METHOD_NOT_ALLOWED) }
-
-                    is Unmatched -> { _: Request -> Response(Status.NOT_FOUND) }
+                    is MatchedWithoutHandler -> notFound
+                    is MethodNotMatched -> notFound
+                    is Unmatched -> notFound
                 })
         )
     }
@@ -78,25 +81,11 @@ data class ContractRouteMatcher(
 
     override fun withPredicate(other: Predicate): RouteMatcher = copy(predicate = predicate.and(other))
 
-    override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
+    override fun withFilter(new: Filter): RouteMatcher = copy(preSecurityFilter = new.then(preSecurityFilter))
 
     val description = RouterDescription(rootAsString,
         routes.map { it.toRouter(PathSegments("$it$descriptionPath")).description }
     )
-
-    private val notFound = preSecurityFilter
-        .then(security?.filter ?: Filter.NoOp)
-        .then(postSecurityFilter)
-        .then { renderer.notFound() }
-
-    private val handler: HttpHandler = {
-        when (val matchResult = internalMatch(it)) {
-            is MatchingHandler -> matchResult(it)
-            is MethodNotMatched -> notFound(it)
-            is Unmatched -> notFound(it)
-            is MatchedWithoutHandler -> notFound(it)
-        }
-    }
 
     private val descriptionRoute =
         ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
