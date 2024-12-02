@@ -1,14 +1,9 @@
 package org.http4k.routing
 
 import org.http4k.core.ContentType
-import org.http4k.core.Filter
 import org.http4k.core.Method.GET
-import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.routing.RouterMatch.MatchingHandler
-import org.http4k.routing.RouterMatch.MethodNotMatched
+import org.http4k.core.Status
 
 /**
  * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
@@ -18,44 +13,33 @@ fun singlePageApp(
     resourceLoader: ResourceLoader = ResourceLoader.Classpath("/public"),
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
 ): RoutingHttpHandler =
-    SinglePageAppRoutingHandler(
-        "",
-        StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
+    RoutingHttpHandler(
+        listOf(
+            SinglePageAppRouteMatcher(
+                "",
+                NewStaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
+            )
+        )
     )
 
-internal data class SinglePageAppRoutingHandler(
+internal data class SinglePageAppRouteMatcher(
     private val pathSegments: String,
-    private val staticHandler: StaticRoutingHttpHandler
-) : RoutingHttpHandler {
+    private val staticMatcher: NewStaticRouteMatcher
+) : RouteMatcher {
 
-    override fun invoke(request: Request): Response {
-        val matchOnStatic = when (val matchResult = staticHandler.match(request)) {
-            is MatchingHandler -> matchResult(request)
-            else -> null
+    override fun match(request: Request): HttpMatchResult {
+        val staticMatch = staticMatcher.match(request)
+        return when (staticMatch.handler(request).status) {
+            Status.NOT_FOUND -> staticMatcher.match(Request(GET, pathSegments))
+            else -> staticMatch
         }
-
-        val matchOnIndex = when (val matchResult = staticHandler.match(Request(GET, pathSegments))) {
-            is MatchingHandler -> matchResult
-            else -> null
-        }
-
-        val fallbackHandler = matchOnIndex ?: { Response(NOT_FOUND) }
-        return matchOnStatic ?: fallbackHandler(Request(GET, pathSegments))
     }
-
-    override fun match(request: Request) = when (request.method) {
-        OPTIONS -> MethodNotMatched(RouterDescription("template == '$pathSegments'"))
-        else -> MatchingHandler(this, description)
-    }
-
-    override fun withFilter(new: Filter) =
-        copy(staticHandler = staticHandler.withFilter(new) as StaticRoutingHttpHandler)
 
     override fun withBasePath(new: String) =
-        SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
+        SinglePageAppRouteMatcher(new + pathSegments, staticMatcher.withBasePath(new) as NewStaticRouteMatcher)
 
-    override val description = RouterDescription("SPA at $pathSegments", listOf(staticHandler.description))
+    override fun withPredicate(other: Predicate): RouteMatcher = this
 
-    override fun toString() = description.friendlyToString()
+    override fun toString() = "SPA at $pathSegments"
 
 }

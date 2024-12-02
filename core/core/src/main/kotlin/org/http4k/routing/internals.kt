@@ -1,4 +1,4 @@
-package org.http4k.routing.experimental
+package org.http4k.routing
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -9,10 +9,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
-import org.http4k.routing.RoutedRequest
-import org.http4k.routing.RoutedResponse
-import org.http4k.routing.experimental.PredicateResult.Matched
-import org.http4k.routing.experimental.PredicateResult.NotMatched
+import org.http4k.routing.PredicateResult.Matched
+import org.http4k.routing.PredicateResult.NotMatched
 
 /**
  * Composite HttpHandler which can potentially service many different URL patterns. Should
@@ -22,8 +20,8 @@ import org.http4k.routing.experimental.PredicateResult.NotMatched
  * implementations that already exist. The interface is public only because we have not found a way to hide it from
  * the API user in an API-consistent manner.
  */
-data class RoutedHttpHandler(
-    val routes: List<NewRouteMatcher>,
+data class RoutingHttpHandler(
+    val routes: List<RouteMatcher>,
     val filter: Filter = Filter.NoOp
 ) : HttpHandler {
     override fun invoke(request: Request) = filter.then(routes
@@ -38,22 +36,22 @@ data class RoutedHttpHandler(
     fun withPredicate(predicate: Predicate) =
         copy(routes = routes.map { it.withPredicate(predicate) })
 
-    override fun toString() = routes.sortedBy(NewRouteMatcher::toString).joinToString("\n")
+    override fun toString() = routes.sortedBy(RouteMatcher::toString).joinToString("\n")
 }
 
-interface NewRouteMatcher {
+interface RouteMatcher {
     fun match(request: Request): HttpMatchResult
-    fun withBasePath(prefix: String): NewRouteMatcher
-    fun withPredicate(other: Predicate): NewRouteMatcher
+    fun withBasePath(prefix: String): RouteMatcher
+    fun withPredicate(other: Predicate): RouteMatcher
 }
 
 data class TemplatedHttpRoute(
     private val uriTemplate: UriTemplate,
     private val handler: HttpHandler,
     private val predicate: Predicate = Any
-) : NewRouteMatcher {
+) : RouteMatcher {
     init {
-        require(handler !is RoutedHttpHandler)
+        require(handler !is RoutingHttpHandler)
     }
 
     override fun match(request: Request) = when {
@@ -82,7 +80,7 @@ data class HttpMatchResult(val priority: Int, val handler: HttpHandler)
 
 data class HttpPathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) = when (handler) {
-        is RoutedHttpHandler -> handler.withPredicate(method.asPredicate()).withBasePath(path)
-        else -> RoutedHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(path), handler, method.asPredicate())))
+        is RoutingHttpHandler -> handler.withPredicate(method.asPredicate()).withBasePath(path)
+        else -> RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(path), handler, method.asPredicate())))
     }
 }

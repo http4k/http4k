@@ -3,9 +3,9 @@ package org.http4k.core
 import org.http4k.lens.HX_REQUEST
 import org.http4k.lens.Header
 import org.http4k.lens.isHtmx
-import org.http4k.routing.asRouter
+import org.http4k.routing.Predicate
 
-val Request.Companion.isHtmx get() = Request::isHtmx.asRouter()
+val Request.Companion.isHtmx get() = Predicate("isHtmx") { it.isHtmx() }
 
 fun Request.isHtmx() = Header.HX_REQUEST(this)
 

@@ -1,4 +1,4 @@
-package org.http4k.routing.experimental
+package org.http4k.routing
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
@@ -17,7 +17,6 @@ import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.RoutedRequest
 import org.junit.jupiter.api.Test
 
 class NewRoutingTests {
@@ -33,7 +32,7 @@ class NewRoutingTests {
 
     @Test
     fun `routes a template`() {
-        val app: HttpHandler = newRoutes("/foo" newBind aValidHandler)
+        val app: HttpHandler = routes("/foo" bind aValidHandler)
 
         assertThat(app(Request(GET, "/bar")).status, equalTo(NOT_FOUND))
         assertThat(app(Request(GET, "/foo")).status, equalTo(OK))
@@ -42,7 +41,7 @@ class NewRoutingTests {
 
     @Test
     fun `routes a template with method`() {
-        val app: HttpHandler = newRoutes("/foo" newBind GET to aValidHandler)
+        val app: HttpHandler = routes("/foo" bind GET to aValidHandler)
 
         assertThat(app(Request(GET, "/bar")).status, equalTo(NOT_FOUND))
         assertThat(app(Request(GET, "/foo")).status, equalTo(OK))
@@ -51,15 +50,15 @@ class NewRoutingTests {
 
     @Test
     fun `includes routing info in request`() {
-        val app: HttpHandler = newRoutes("/foo/{name}" newBind aValidHandler)
+        val app: HttpHandler = routes("/foo/{name}" bind aValidHandler)
         assertThat(app(Request(GET, "/foo/bar")).bodyString(), equalTo("foo/{name}"))
     }
 
     @Test
     fun `multiple routes`() {
-        val app: HttpHandler = newRoutes(
-            "/foo" newBind GET to aValidHandler,
-            "/bar" newBind GET to aValidHandler,
+        val app: HttpHandler = routes(
+            "/foo" bind GET to aValidHandler,
+            "/bar" bind GET to aValidHandler,
         )
 
         assertThat(app(Request(GET, "/foo")).status, equalTo(OK))
@@ -69,9 +68,9 @@ class NewRoutingTests {
 
     @Test
     fun `nested routes`() {
-        val app: HttpHandler = newRoutes(
-            "/foo" newBind newRoutes(
-                "/bar" newBind GET to aValidHandler
+        val app: HttpHandler = routes(
+            "/foo" bind routes(
+                "/bar" bind GET to aValidHandler
             )
         )
 
@@ -82,18 +81,18 @@ class NewRoutingTests {
 
     @Test
     fun `mix and match`() {
-        val routes = newRoutes(
-            "/a" newBind GET to { Response(OK).body("matched a") },
-            "/b/c" newBind newRoutes(
-                "/d" newBind GET to { Response(OK).body("matched b/c/d") },
-                "/e" newBind newRoutes(
-                    "/f" newBind GET to { Response(OK).body("matched b/c/e/f") },
-                    "/g" newBind newRoutes(
+        val routes = routes(
+            "/a" bind GET to { Response(OK).body("matched a") },
+            "/b/c" bind routes(
+                "/d" bind GET to { Response(OK).body("matched b/c/d") },
+                "/e" bind routes(
+                    "/f" bind GET to { Response(OK).body("matched b/c/e/f") },
+                    "/g" bind routes(
                         GET to { _: Request -> Response(OK).body("matched b/c/e/g/GET") },
                         POST to { _: Request -> Response(OK).body("matched b/c/e/g/POST") }
                     )
                 ),
-                "/" newBind GET to { Response(OK).body("matched b/c") }
+                "/" bind GET to { Response(OK).body("matched b/c") }
             )
         )
 
@@ -115,7 +114,7 @@ class NewRoutingTests {
 
     @Test
     fun `with filter - applies to matching handler`() {
-        val handler = "/foo" newBind GET to newRoutes("/bar" newBind { Response(OK) })
+        val handler = "/foo" bind GET to routes("/bar" bind { Response(OK) })
         val filtered = handler.withFilter(filterAppending("bar"))
         val criteria = hasStatus(OK) and hasHeader("res-header", "bar")
         val request = Request(GET, "/foo/bar").header("host", "host")
@@ -125,7 +124,7 @@ class NewRoutingTests {
 
     @Test
     fun `with filter - applies when not found`() {
-        val handler = "/foo" newBind GET to newRoutes("/bar" newBind { Response(OK) })
+        val handler = "/foo" bind GET to routes("/bar" bind { Response(OK) })
         val filtered = handler.withFilter(filterAppending("foo"))
         val request = Request(GET, "/not-found").header("host", "host")
 
@@ -137,8 +136,8 @@ class NewRoutingTests {
 
     @Test
     fun `stacked filter application - applies when not found`() {
-        val handler = "/foo" newBind GET to newRoutes("/bar" newBind { Response(OK) })
-        val filtered = filterAppending("foo").then(newRoutes(handler))
+        val handler = "/foo" bind GET to routes("/bar" bind { Response(OK) })
+        val filtered = filterAppending("foo").then(routes(handler))
         val request = Request(GET, "/not-found").header("host", "host")
 
         assertThat(
@@ -149,7 +148,7 @@ class NewRoutingTests {
 
     @Test
     fun `with filter - applies in correct order`() {
-        val handler = "/foo" newBind GET to newRoutes("/bar" newBind { Response(OK) })
+        val handler = "/foo" bind GET to routes("/bar" bind { Response(OK) })
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
         val request = Request(GET, "/not-found").header("host", "host")
 
@@ -170,9 +169,9 @@ class NewRoutingTests {
 
     @Test
     fun `reverse proxy`() {
-        val otherHandler = newReverseProxyRouting(
-            "host1" to newRoutes("/foo" newBind GET to { Response(OK).body("host1" + it.header("host")) }),
-            "host2" to newRoutes("/foo" newBind GET to { Response(OK).body("host2" + it.header("host")) })
+        val otherHandler = reverseProxyRouting(
+            "host1" to routes("/foo" bind GET to { Response(OK).body("host1" + it.header("host")) }),
+            "host2" to routes("/foo" bind GET to { Response(OK).body("host2" + it.header("host")) })
         )
 
         assertThat(otherHandler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
@@ -201,18 +200,18 @@ class NewRoutingTests {
 
     @Test
     fun `nice descriptions`() {
-        val routes = newRoutes(
-            "/a" newBind GET to { Response(OK).body("matched a") },
-            "/b/c" newBind newRoutes(
-                "/d" newBind GET to { Response(OK).body("matched b/c/d") },
-                "/e" newBind newRoutes(
-                    "/f" newBind GET to { Response(OK).body("matched b/c/e/f") },
-                    "/g" newBind newRoutes(
+        val routes = routes(
+            "/a" bind GET to { Response(OK).body("matched a") },
+            "/b/c" bind routes(
+                "/d" bind GET to { Response(OK).body("matched b/c/d") },
+                "/e" bind routes(
+                    "/f" bind GET to { Response(OK).body("matched b/c/e/f") },
+                    "/g" bind routes(
                         GET to { _: Request -> Response(OK).body("matched b/c/e/g/GET") },
                         POST to { _: Request -> Response(OK).body("matched b/c/e/g/POST") }
                     )
                 ),
-                "/" newBind GET to { Response(OK).body("matched b/c") }
+                "/" bind GET to { Response(OK).body("matched b/c") }
             )
         )
     }

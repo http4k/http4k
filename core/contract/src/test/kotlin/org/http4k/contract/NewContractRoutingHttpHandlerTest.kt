@@ -37,8 +37,8 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.routing.RoutedResponse
-import org.http4k.routing.experimental.newBind
-import org.http4k.routing.experimental.newRoutes
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
 class NewContractRoutingHttpHandlerTest {
@@ -72,18 +72,18 @@ class NewContractRoutingHttpHandlerTest {
     private val handler =
         ServerFilters.CatchAll()
             .then(
-                newContract {
+                contract {
                     renderer = SimpleJson(Jackson)
                     routes += contractRoutes.toList()
                 }
             )
 
     @Test
-    fun `can newBind under a route match`() {
+    fun `can bind under a route match`() {
         val app =
-            newRoutes(
-                "/hello" newBind newRoutes("/there" newBind
-                    newContract {
+            routes(
+                "/hello" bind routes("/there" bind
+                    contract {
                         renderer = SimpleJson(Jackson)
                         routes += validPath bindContract GET to { _ -> Response(OK) }
                     }
@@ -95,7 +95,7 @@ class NewContractRoutingHttpHandlerTest {
     @Test
     fun `by default the description lives at the route`() {
         Request(GET, "/root")
-        val response = ("/root" newBind newContract {
+        val response = ("/root" bind contract {
             renderer = SimpleJson(Jackson)
             security = ApiKeySecurity(Query.required("goo"), { false })
         }).invoke(Request(GET, "/root"))
@@ -109,7 +109,7 @@ class NewContractRoutingHttpHandlerTest {
             { next(it.with(header of "true")) }
         }
 
-        val root = "/root" newBind newContract {
+        val root = "/root" bind contract {
             descriptionPath = "/docs"
             routes += "/" bindContract GET to { it -> Response(OK).with(header of header(it)) }
         }
@@ -123,8 +123,8 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `traffic goes to the path specified`() {
-        val root = newRoutes(
-            "/root/bar" newBind newContract {
+        val root = routes(
+            "/root/bar" bind contract {
                 routes += "/foo/bar" / Path.of("world") bindContract GET to { { Response(OK) } }
             })
         val response = root(Request(GET, "/root/bar/foo/bar/hello")) as RoutedResponse
@@ -135,8 +135,8 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `OPTIONS traffic goes to the path specified but is intercepted by the default response if the route does NOT response to OPTIONS`() {
-        val root = newRoutes(
-            "/root/bar" newBind newContract {
+        val root = routes(
+            "/root/bar" bind contract {
                 routes += "/foo/bar" bindContract GET to { _ -> Response(NOT_IMPLEMENTED) }
             }
         )
@@ -147,8 +147,8 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `OPTIONS traffic ignores missing body`() {
-        val root = newRoutes(
-            "/root/bar" newBind newContract {
+        val root = routes(
+            "/root/bar" bind contract {
                 routes += "/foo/bar" meta {
                     receiving(requiredBody)
                 } bindContract POST to { _ -> Response(NOT_IMPLEMENTED) }
@@ -162,7 +162,7 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `stacked filter application - applies when not found`() {
-        val filtered = filterAppending("foo").then(newRoutes(handler))
+        val filtered = filterAppending("foo").then(routes(handler))
         val request = Request(GET, "/not-found").header("host", "host")
 
         assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo"))
@@ -170,8 +170,8 @@ class NewContractRoutingHttpHandlerTest {
 
 //    @Test
 //    fun `OPTIONS traffic goes to the path and handler specified if the route responds to OPTIONS`() {
-//        val root = newRoutes(
-//            "/root/bar" newBind newContract {
+//        val root = routes(
+//            "/root/bar" bind newContract {
 //                routes += "/foo/bar" bindContract OPTIONS to { _ -> Response(NOT_IMPLEMENTED) }
 //            }
 //        )
@@ -182,8 +182,8 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `OPTIONS traffic responds with 404 if route does not exist`() {
-        val root = newRoutes(
-            "/root/bar" newBind newContract {
+        val root = routes(
+            "/root/bar" bind contract {
             }
         )
         val response = root(Request(OPTIONS, "/root/bar/foo/bar2"))
@@ -193,8 +193,8 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `identifies called route using identity header on request`() {
-        val root = newRoutes(
-            "/root" newBind newContract {
+        val root = routes(
+            "/root" bind contract {
                 routes += Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK) } }
             }
         )
@@ -206,7 +206,7 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `applies security and responds with a 401 to unauthorized requests`() {
-        val root = "/root" newBind newContract {
+        val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { _ -> Response(OK) }
         }
@@ -217,7 +217,7 @@ class NewContractRoutingHttpHandlerTest {
     @Test
     fun `security from endpoint overrides global security`() {
         val credentials = Credentials("bill", "password")
-        val root = "/root" newBind newContract {
+        val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "valid" })
             routes += "/bob" meta {
             } bindContract GET to { _ -> Response(OK) }
@@ -244,7 +244,7 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `pre-security filter is applied before security`() {
-        val root = "/root" newBind newContract {
+        val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { _ -> Response(OK) }
         }.withFilter { next ->
@@ -258,7 +258,7 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `post-security filter is applied after security`() {
-        val root = "/root" newBind newContract {
+        val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { it -> Response(OK).body(it.body) }
             postSecurityFilter = Filter { next ->
@@ -273,7 +273,7 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `applies security and responds with a 200 to authorized requests`() {
-        val root = "/root" newBind newContract {
+        val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { _ -> Response(OK) }
         }
@@ -284,7 +284,7 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `can change path to description route`() {
-        val response = ("/root/foo" newBind newContract {
+        val response = ("/root/foo" bind contract {
             renderer = SimpleJson(OpenAPIJackson)
             descriptionPath = "/docs/swagger.json"
         }).invoke(Request(GET, "/root/foo/docs/swagger.json"))
@@ -293,7 +293,7 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `applies description security to description route and responds with 401 to unauthorized access`() {
-        val handler = "/root" newBind newContract {
+        val handler = "/root" bind contract {
             descriptionPath = "/docs/swagger.json"
             descriptionSecurity = ApiKeySecurity(Query.required("key"), { false })
         }
@@ -303,7 +303,7 @@ class NewContractRoutingHttpHandlerTest {
 
     @Test
     fun `applies description security and responds with a 200 to authorized requests`() {
-        val handler = "/root" newBind newContract {
+        val handler = "/root" bind contract {
             renderer = SimpleJson(Jackson)
             descriptionSecurity = ApiKeySecurity(Query.required("key"), { it == "valid" })
         }
@@ -320,7 +320,7 @@ class NewContractRoutingHttpHandlerTest {
                 next(it.header("foo", "bar"))
             }
         }
-        val contract = newContract {
+        val contract = contract {
             routes += "/test" bindContract GET to
                 { it -> Response(OK).body(it.headerValues("foo").toString()) }
         }
@@ -379,7 +379,7 @@ class NewContractRoutingHttpHandlerTest {
     @Test
     fun `matches requests without root slash`() {
         val route = "foo" / Path.of("id") bindContract GET to { value -> { Response(OK).body(value) } }
-        val http = newContract { routes += listOf(route) }
+        val http = contract { routes += listOf(route) }
 
         assertThat(http(Request(GET, "/foo/fooBar")), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK
         assertThat(http(Request(GET, "foo/fooBar")), hasStatus(OK) and hasBody("fooBar")) // --> 200 OK

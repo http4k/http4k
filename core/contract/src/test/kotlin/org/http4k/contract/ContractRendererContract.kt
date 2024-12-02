@@ -57,7 +57,7 @@ import org.http4k.lens.long
 import org.http4k.lens.multipartForm
 import org.http4k.lens.string
 import org.http4k.lens.webForm
-import org.http4k.routing.experimental.newBind
+import org.http4k.routing.bind
 import org.http4k.security.FakeOAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.gitHub
@@ -108,7 +108,7 @@ abstract class ContractRendererContract<NODE : Any>(
 
         fun schemaOf(schema: Map<String, Any>) = mapOf("schema" to schema)
 
-        val router = "/basepath" newBind newContract {
+        val router = "/basepath" bind contract {
             renderer = rendererToUse
             tags += Tag("hello", "world")
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
@@ -124,7 +124,11 @@ abstract class ContractRendererContract<NODE : Any>(
             routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") / Path.enum<Foo>()
                 .of("foo") bindContract POST to { a, _, _, _ -> { Response(OK).body(a) } }
             routes += "/queries" meta {
-                queries += Query.boolean().multi.required("b", "booleanQuery", schemaOf(mapOf("default" to listOf(true, false))))
+                queries += Query.boolean().multi.required(
+                    "b",
+                    "booleanQuery",
+                    schemaOf(mapOf("default" to listOf(true, false)))
+                )
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += Query.enum<Foo>().optional("e", "enumQuery")
@@ -137,16 +141,23 @@ abstract class ContractRendererContract<NODE : Any>(
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/headers" meta {
                 headers += Header.boolean().required("b", "booleanHeader")
-                headers += Header.string().optional("s", "stringHeader", schemaOf(mapOf("pattern" to ".*", "nullable" to true)))
+                headers += Header.string()
+                    .optional("s", "stringHeader", schemaOf(mapOf("pattern" to ".*", "nullable" to true)))
                 headers += Header.int().optional("i", "intHeader", schemaOf(mapOf("default" to 42)))
                 headers += Header.double().optional("d", "dHeader", schemaOf(mapOf("default" to 0.0)))
-                headers += Header.bigDecimal().optional("bd", "bigDHeader", schemaOf(mapOf("default" to BigDecimal("4.2"))))
-                headers += Header.bigInteger().optional("bi", "bigIHeader", schemaOf(mapOf("default" to BigInteger("6547262478"))))
+                headers += Header.bigDecimal()
+                    .optional("bd", "bigDHeader", schemaOf(mapOf("default" to BigDecimal("4.2"))))
+                headers += Header.bigInteger()
+                    .optional("bi", "bigIHeader", schemaOf(mapOf("default" to BigInteger("6547262478"))))
                 headers += Header.long().optional("l", "lHeader", schemaOf(mapOf("default" to 8493575243L)))
-                headers += Header.map { listOf("a", "b") }.optional("list", "listHeader", schemaOf(mapOf("default" to listOf("a", "b"))))
-                headers += Header.map { mapOf("a" to "b") }.optional("obj", "objHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
-                headers += Header.enum<HttpMessage, Foo>().optional("e", "enumHeader", schemaOf(mapOf("default" to Foo.bar)))
-                headers += json.jsonLens(Header).optional("j", "jsonHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
+                headers += Header.map { listOf("a", "b") }
+                    .optional("list", "listHeader", schemaOf(mapOf("default" to listOf("a", "b"))))
+                headers += Header.map { mapOf("a" to "b") }
+                    .optional("obj", "objHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
+                headers += Header.enum<HttpMessage, Foo>()
+                    .optional("e", "enumHeader", schemaOf(mapOf("default" to Foo.bar)))
+                headers += json.jsonLens(Header)
+                    .optional("j", "jsonHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/body_receiving_string" meta {
                 summary = "body_receiving_string"
@@ -281,7 +292,7 @@ abstract class ContractRendererContract<NODE : Any>(
 
     @Test
     fun `when enabled renders description including its own path`(approver: Approver) {
-        val router = "/" newBind newContract {
+        val router = "/" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
             routes += "/" bindContract GET to { _ -> Response(OK) }
@@ -294,7 +305,7 @@ abstract class ContractRendererContract<NODE : Any>(
 
     @Test
     fun `duplicate schema models are not rendered`(approver: Approver) {
-        val router = "/" newBind newContract {
+        val router = "/" bind contract {
             renderer = rendererToUse
             routes += Path.enum<Foo>()
                 .of("enum") bindContract POST to { _ -> { _: Request -> Response(OK) } }

@@ -13,20 +13,21 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.body.form
 import org.http4k.core.body.formAsMap
 import org.http4k.core.with
-import org.http4k.routing.asRouter
+import org.http4k.routing.Predicate
 import org.http4k.routing.bind
 import org.http4k.template.PebbleTemplates
 import org.http4k.template.viewModel
 import java.util.UUID
 
 fun createTopic(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, region: Region) =
-    { r: Request -> r.form("Action") == "CreateTopic" }
-        .asRouter() bind { req: Request ->
+    Predicate("", Status.NOT_FOUND, { r: Request -> r.form("Action") == "CreateTopic" }
+    ) bind { req: Request ->
         val topicName = TopicName.of(req.form("Name")!!)
         if (topics.keySet(topicName.value).isEmpty()) topics[topicName.value] = listOf()
 
@@ -38,8 +39,8 @@ fun createTopic(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, regio
     }
 
 fun deleteTopic(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, region: Region) =
-    { r: Request -> r.form("Action") == "DeleteTopic" }
-        .asRouter() bind { req: Request ->
+    Predicate("", Status.NOT_FOUND, { r: Request -> r.form("Action") == "DeleteTopic" }
+    ) bind { req: Request ->
         val topicName = ARN.parse(req.form("TopicArn")!!).resourceId(TopicName::of)
 
         when {
@@ -54,8 +55,8 @@ fun deleteTopic(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, regio
     }
 
 fun listTopics(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, region: Region) =
-    { r: Request -> r.form("Action") == "ListTopics" }
-        .asRouter() bind {
+    Predicate("", Status.NOT_FOUND, { r: Request -> r.form("Action") == "ListTopics" }
+    ) bind {
         Response(OK).with(
             viewModelLens of ListTopicsResponse(
                 topics.keySet("").map { ARN.of(SNS.awsService, region, awsAccount, it) })
@@ -63,8 +64,8 @@ fun listTopics(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, region
     }
 
 fun publish(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, region: Region) =
-    { r: Request -> r.form("Action") == "Publish" }
-        .asRouter() bind { req: Request ->
+    Predicate("", Status.NOT_FOUND, { r: Request -> r.form("Action") == "Publish" }
+    ) bind { req: Request ->
 
         val topicName = ARN.parse(req.form("TopicArn")!!).resourceId(TopicName::of)
 
@@ -84,8 +85,8 @@ fun publish(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, region: R
     }
 
 fun publishBatch(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, region: Region) =
-    { r: Request -> r.form("Action") == "PublishBatch" }
-        .asRouter() bind fn@{ req: Request ->
+    Predicate("", Status.NOT_FOUND, { r: Request -> r.form("Action") == "PublishBatch" }
+    ) bind fn@{ req: Request ->
 
         val topicName = ARN.parse(req.form("TopicArn")!!).resourceId(TopicName::of)
         if (topics.keySet(topicName.value)
@@ -126,7 +127,7 @@ private fun attributesFrom(req: Request, prefix: String = ""): List<MessageAttri
         .filter { it.key.endsWith(".Name") }
         .map {
             it.value.first()!!.removePrefix("[").removeSuffix("]") to
-                it.key.removePrefix("${prefix}MessageAttributes.entry.").removeSuffix(".Name")
+                    it.key.removePrefix("${prefix}MessageAttributes.entry.").removeSuffix(".Name")
         }
 
     val cleanedValues = req.formAsMap().mapKeys {

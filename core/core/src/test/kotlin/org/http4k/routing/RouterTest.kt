@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.Router.Companion.orElse
@@ -15,7 +16,7 @@ class RouterTest {
 
     @Test
     fun `orElse router catches everything`() {
-        val asRouter = { _: Request -> false }.asRouter()
+        val asRouter = Predicate("", Status.NOT_FOUND, { _: Request -> false })
         val app = routes(
             asRouter bind { _: Request -> Response(NOT_ACCEPTABLE) },
             orElse bind { _: Request -> Response(OK) }

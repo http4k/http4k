@@ -1,9 +1,9 @@
-package org.http4k.routing.experimental
+package org.http4k.routing
 
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.routing.experimental.PredicateResult.Matched
-import org.http4k.routing.experimental.PredicateResult.NotMatched
+import org.http4k.routing.PredicateResult.Matched
+import org.http4k.routing.PredicateResult.NotMatched
 
 interface Predicate {
     val description: String
@@ -25,6 +25,7 @@ sealed class PredicateResult{
 }
 
 val Any: Predicate = Predicate("any") { true }
+val Fallback: Predicate = Predicate("any") { true }
 fun Predicate.and(other: Predicate): Predicate = Predicate("($this AND $other)") { this(it) is Matched && other(it) is Matched }
 fun Predicate.or(other: Predicate): Predicate = Predicate("($this OR $other)") { this(it) is Matched || other(it) is Matched }
 fun Predicate.not(): Predicate = Predicate("NOT $this") { this(it) !is Matched  }

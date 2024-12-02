@@ -1,7 +1,6 @@
 package org.http4k.core
 
 import org.http4k.routing.RoutingHttpHandler
-import org.http4k.routing.experimental.RoutedHttpHandler
 
 typealias HttpHandler = (request: Request) -> Response
 
@@ -16,5 +15,3 @@ fun Filter.then(next: Filter): Filter = Filter { this(next(it)) }
 fun Filter.then(next: HttpHandler): HttpHandler = this(next)
 
 fun Filter.then(next: RoutingHttpHandler): RoutingHttpHandler = next.withFilter(this)
-
-fun Filter.then(next: RoutedHttpHandler): RoutedHttpHandler = next.withFilter(this)

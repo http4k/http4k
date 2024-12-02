@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -40,7 +39,6 @@ import org.http4k.lens.int
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RoutingHttpHandlerContract
 import org.http4k.routing.bind
-import org.http4k.routing.matchAndInvoke
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
@@ -168,7 +166,6 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val filtered = filterAppending("foo").then(routes(handler))
         val request = Request(GET, "/not-found").header("host", "host")
 
-        assertThat(filtered.matchAndInvoke(request), absent())
         assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo"))
     }
 
