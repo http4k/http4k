@@ -10,6 +10,7 @@ import org.http4k.routing.PredicateResult.NotMatched
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.and
 import org.http4k.routing.asPredicate
+import org.http4k.routing.ws.TemplatedWsRoute.Companion.notMachResult
 import org.http4k.websocket.NoOp
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
@@ -21,10 +22,11 @@ data class RoutingWsHandler(
     val routes: List<TemplatedWsRoute>,
     private val filter: WsFilter = WsFilter.NoOp
 ) : WsHandler {
-    override fun invoke(request: Request) = filter.then(routes
+    override fun invoke(request: Request) = filter.then((routes
         .map { it.match(request) }
         .sortedBy(WsMatchResult::priority)
-        .first().handler)(request)
+        .firstOrNull() ?: notMachResult)
+        .handler)(request)
 
     fun withBasePath(prefix: String) = copy(routes = routes.map { it.withBasePath(prefix) })
 
@@ -55,10 +57,10 @@ data class TemplatedWsRoute(
     internal fun match(request: Request) = when {
         uriTemplate.matches(request.uri.path) -> when (val result = predicate(request)) {
             is Matched -> WsMatchResult(0, AddUriTemplate(uriTemplate).then(handler))
-            is NotMatched -> WsMatchResult(1) { _: Request -> WsResponse { it.close(REFUSE) } }
+            is NotMatched -> notMachResult
         }
 
-        else -> WsMatchResult(2) { _: Request -> WsResponse() { it.close(REFUSE) } }
+        else -> notMachResult
     }
 
     fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
@@ -71,6 +73,10 @@ data class TemplatedWsRoute(
         {
             next(RoutedRequest(it, uriTemplate))
         }
+    }
+
+    companion object{
+        internal val notMachResult = WsMatchResult(1) { _: Request -> WsResponse { it.close(REFUSE) } }
     }
 }
 
