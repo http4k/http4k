@@ -51,9 +51,9 @@ fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): Routin
     )
 
 private fun hostHeaderOrUriHost(host: String) =
-    Predicate("host header or uri host = $host") { req: Request ->
+    { req: Request ->
         (req.headerValues("host").firstOrNull() ?: req.uri.authority).contains(host)
-    }
+    }.asPredicate("host header or uri host = $host")
 
 fun Method.asPredicate() =
     Predicate("method == $this", notMatchedStatus = METHOD_NOT_ALLOWED) { it.method == this }
@@ -64,7 +64,7 @@ fun Method.and(predicate: Predicate) = asPredicate().and(predicate)
  * Apply routing predicate to a query
  */
 fun query(name: String, fn: (String) -> Boolean) =
-    Predicate("Query $name matching $fn") { req: Request -> req.queries(name).filterNotNull().any(fn) }
+    { req: Request -> req.queries(name).filterNotNull().any(fn) }.asPredicate("Query $name matching $fn")
 
 /**
  * Apply routing predicate to a query
@@ -75,15 +75,13 @@ fun query(name: String, value: String) = query(name) { it == value }
  * Ensure all queries are present
  */
 fun queries(vararg names: String) =
-    Predicate("Queries ${names.toList()}") { req: Request -> names.all { req.query(it) != null } }
+    { req: Request -> names.all { req.query(it) != null } }.asPredicate("Queries ${names.toList()}")
 
 /**
  * Apply routing predicate to a header
  */
 fun header(name: String, fn: (String) -> Boolean) =
-    Predicate("Header $name matching $fn") { req: Request ->
-        req.headerValues(name).filterNotNull().any(fn)
-    }
+    { req: Request -> req.headerValues(name).filterNotNull().any(fn) }.asPredicate("Header $name matching $fn")
 
 /**
  * Apply routing predicate to a header
@@ -94,15 +92,15 @@ fun header(name: String, value: String) = header(name) { it == value }
  * Ensure all headers are present
  */
 fun headers(vararg names: String) =
-    Predicate("Headers ${names.toList()}") { req: Request -> names.all { req.header(it) != null } }
+    { req: Request -> names.all { req.header(it) != null } }.asPredicate("Headers ${names.toList()}")
 
 /**
  * Ensure body matches predicate
  */
-fun body(fn: (Body) -> Boolean) = Predicate("Body matching $fn") { fn(it.body) }
+fun body(fn: (Body) -> Boolean) = { it: Request -> fn(it.body) }.asPredicate("Body matching $fn")
 
 /**
  * Ensure body string matches predicate
  */
 @JvmName("bodyMatches")
-fun body(fn: (String) -> Boolean) = Predicate("Body matching $fn") { req: Request -> fn(req.bodyString()) }
+fun body(fn: (String) -> Boolean) = { req: Request -> fn(req.bodyString()) }.asPredicate("Body matching $fn")
