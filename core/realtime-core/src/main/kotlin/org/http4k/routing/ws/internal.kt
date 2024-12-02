@@ -3,7 +3,7 @@ package org.http4k.routing.ws
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
-import org.http4k.routing.Any
+import org.http4k.routing.All
 import org.http4k.routing.Predicate
 import org.http4k.routing.PredicateResult.Matched
 import org.http4k.routing.PredicateResult.NotMatched
@@ -48,7 +48,7 @@ data class WsPathMethod(val path: String, val method: Method) {
 data class TemplatedWsRoute(
     private val uriTemplate: UriTemplate,
     private val handler: WsHandler,
-    private val predicate: Predicate = Any
+    private val predicate: Predicate = All
 ) {
     init {
         require(handler !is RoutingWsHandler)
