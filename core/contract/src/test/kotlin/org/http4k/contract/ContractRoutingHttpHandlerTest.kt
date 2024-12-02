@@ -253,9 +253,10 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { it -> Response(OK).body(it.body) }
-        }.withPostSecurityFilter { next ->
-            {
-                next(it.body("body"))
+            postSecurityFilter = Filter { next ->
+                {
+                    next(it.body("body"))
+                }
             }
         }
 
