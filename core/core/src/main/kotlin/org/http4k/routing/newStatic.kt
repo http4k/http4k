@@ -35,23 +35,20 @@ fun newStatic(
 data class NewStaticRouteMatcher(
     private val pathSegments: String,
     private val resourceLoader: ResourceLoader,
-    private val extraFileExtensionToContentTypes: Map<String, ContentType>,
-    private val filter: Filter = Filter.NoOp): NewRouteMatcher {
+    private val extraFileExtensionToContentTypes: Map<String, ContentType>): NewRouteMatcher {
 
     private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
     override fun match(request: Request): HttpMatchResult = handlerNoFilter(request).let {
         when {
-            it.status != NOT_FOUND -> HttpMatchResult(0,filter.then { _: Request -> it })
-            else -> HttpMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+            it.status != NOT_FOUND -> HttpMatchResult(0) { _: Request -> it }
+            else -> HttpMatchResult(2) { _: Request -> Response(NOT_FOUND) }
         }
     }
 
     override fun withBasePath(prefix: String): NewRouteMatcher = copy(pathSegments = prefix + pathSegments)
 
     override fun withPredicate(other: Predicate): NewRouteMatcher = this
-    override fun withFilter(new: Filter): NewRouteMatcher = copy(filter = new.then(filter))
-
 }
 
 data class NewStaticRoutingHttpHandler(
