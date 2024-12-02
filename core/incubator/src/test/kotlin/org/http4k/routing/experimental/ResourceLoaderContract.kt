@@ -2,19 +2,19 @@ package org.http4k.routing.experimental
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.or
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri.Companion.of
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.HttpMatchResult
 import org.http4k.routing.RouteMatcher
-import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Test
 
 abstract class ResourceLoaderContract(private val loader: RouteMatcher) {
@@ -54,7 +54,7 @@ abstract class ResourceLoaderContract(private val loader: RouteMatcher) {
     protected fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
         val request = Request(GET, of(path))
         if (expected == null)
-            assertThat(loader.match(request), isA<Unmatched>())
+            assertThat(loader.match(request).handler(request), hasStatus(NOT_FOUND))
         else {
             val response = loader.match(request).handler(request)
             assertThat(response, hasBody(expected))
