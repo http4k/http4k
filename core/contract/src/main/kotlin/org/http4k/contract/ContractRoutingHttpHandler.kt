@@ -40,8 +40,6 @@ data class ContractRoutingHttpHandler(
 ) : RoutingHttpHandler {
     private val contractRoot = PathSegments(rootAsString)
 
-    fun withPostSecurityFilter(new: Filter) = copy(postSecurityFilter = postSecurityFilter.then(new))
-
     /**
      * NOTE: By default, filters for Contracts are applied *before* the Security filter. Use withPostSecurityFilter()
      * to achieve population of filters after security.
