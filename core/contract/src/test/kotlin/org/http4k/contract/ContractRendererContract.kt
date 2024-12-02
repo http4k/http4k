@@ -57,7 +57,7 @@ import org.http4k.lens.long
 import org.http4k.lens.multipartForm
 import org.http4k.lens.string
 import org.http4k.lens.webForm
-import org.http4k.routing.bind
+import org.http4k.routing.experimental.newBind
 import org.http4k.security.FakeOAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.gitHub
@@ -108,7 +108,7 @@ abstract class ContractRendererContract<NODE : Any>(
 
         fun schemaOf(schema: Map<String, Any>) = mapOf("schema" to schema)
 
-        val router = "/basepath" bind contract {
+        val router = "/basepath" newBind newContract {
             renderer = rendererToUse
             tags += Tag("hello", "world")
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
@@ -281,7 +281,7 @@ abstract class ContractRendererContract<NODE : Any>(
 
     @Test
     fun `when enabled renders description including its own path`(approver: Approver) {
-        val router = "/" bind contract {
+        val router = "/" newBind newContract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
             routes += "/" bindContract GET to { _ -> Response(OK) }
@@ -294,7 +294,7 @@ abstract class ContractRendererContract<NODE : Any>(
 
     @Test
     fun `duplicate schema models are not rendered`(approver: Approver) {
-        val router = "/" bind contract {
+        val router = "/" newBind newContract {
             renderer = rendererToUse
             routes += Path.enum<Foo>()
                 .of("enum") bindContract POST to { _ -> { _: Request -> Response(OK) } }

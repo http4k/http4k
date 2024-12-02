@@ -8,15 +8,16 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Path
-import org.http4k.routing.routes
+import org.http4k.routing.experimental.newBind
+import org.http4k.routing.experimental.newRoutes
 import org.junit.jupiter.api.Test
 
 class Issue536Test {
 
     @Test
     fun `path parameters are decoded correctly`() {
-        val app = routes(
-            "/" bind contract {
+        val app = newRoutes(
+            "/" newBind newContract {
                 routes += Path.of("name") bindContract GET to { name ->
                     assertThat(name, equalTo("Günter"))
                     ({ Response(OK) })
