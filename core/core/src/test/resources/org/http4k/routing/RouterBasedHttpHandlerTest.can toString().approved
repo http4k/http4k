@@ -1,7 +1,1 @@
-and
-	method == GET
-	and
-		and
-			prefix == '/route-contract'
-			Headers [host]
-		template == 'route-contract'
+template=route-contract AND all

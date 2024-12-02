@@ -12,7 +12,7 @@ interface Predicate {
 
     companion object {
 
-        operator fun invoke(description: String = "", notMatchedStatus: Status = Status.NOT_FOUND, predicate: (Request) -> Boolean) = object : Predicate {
+        operator fun invoke(description: String = "", notMatchedStatus: Status = NOT_FOUND, predicate: (Request) -> Boolean) = object : Predicate {
             override val description: String = description
             override fun invoke(request: Request): PredicateResult = if(predicate(request)) Matched else NotMatched(notMatchedStatus)
             override fun toString(): String = description
@@ -22,11 +22,11 @@ interface Predicate {
 
 sealed class PredicateResult{
     data object Matched: PredicateResult()
-    data class NotMatched(val status:Status = Status.NOT_FOUND): PredicateResult()
+    data class NotMatched(val status:Status = NOT_FOUND): PredicateResult()
 }
 
-val Any: Predicate = Predicate("any") { true }
-val Fallback: Predicate = Predicate("any") { true }
+val All: Predicate = Predicate("all") { true }
+val Fallback: Predicate = All
 val orElse = Fallback
 fun Predicate.and(other: Predicate): Predicate = Predicate("($this AND $other)") { this(it) is Matched && other(it) is Matched }
 fun Predicate.or(other: Predicate): Predicate = Predicate("($this OR $other)") { this(it) is Matched || other(it) is Matched }

@@ -48,7 +48,7 @@ interface RouteMatcher {
 data class TemplatedHttpRoute(
     private val uriTemplate: UriTemplate,
     private val handler: HttpHandler,
-    private val predicate: Predicate = Any
+    private val predicate: Predicate = All
 ) : RouteMatcher {
     init {
         require(handler !is RoutingHttpHandler)

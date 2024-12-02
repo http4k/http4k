@@ -4,7 +4,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.UriTemplate
-import org.http4k.routing.Any
+import org.http4k.routing.All
 import org.http4k.routing.Predicate
 import org.http4k.routing.PredicateResult
 import org.http4k.routing.RoutedRequest
@@ -46,7 +46,7 @@ data class SsePathMethod(val path: String, val method: Method) {
 data class TemplatedSseRoute(
     private val uriTemplate: UriTemplate,
     private val handler: SseHandler,
-    private val predicate: Predicate = Any
+    private val predicate: Predicate = All
 ) {
     init {
         require(handler !is RoutingSseHandler)
