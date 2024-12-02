@@ -18,8 +18,10 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
-    override val handler = singlePageApp(ResourceLoader.Classpath())
+class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
+    override val handler = validPath bind singlePageApp(
+        ResourceLoader.Classpath()
+    )
 
     @Test
     override fun `with filter - applies in correct order`() {
