@@ -1,3 +1,4 @@
+import jdk.tools.jlink.resources.plugins
 import org.http4k.internal.ModuleLicense.Apache2
 
 description = "http4k incubator module"

@@ -3,7 +3,7 @@ package org.http4k.websocket
 import org.http4k.core.Body
 import org.http4k.core.MemoryBody
 import org.http4k.core.Request
-import org.http4k.routing.RoutingWsHandler
+import org.http4k.routing.ws.RoutingWsHandler
 import org.http4k.websocket.WsStatus.Companion.NORMAL
 import java.io.InputStream
 import java.nio.ByteBuffer
