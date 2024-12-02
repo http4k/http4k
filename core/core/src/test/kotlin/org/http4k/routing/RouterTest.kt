@@ -8,7 +8,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.Status.Companion.OK
-import org.http4k.routing.Router.Companion.orElse
 import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.junit.jupiter.api.Test
 

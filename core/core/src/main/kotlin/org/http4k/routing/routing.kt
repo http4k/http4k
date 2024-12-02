@@ -25,7 +25,9 @@ infix fun Predicate.bind(handler: HttpHandler): RoutingHttpHandler =
 infix fun Predicate.bind(handler: RoutingHttpHandler): RoutingHttpHandler = // TODO this will fail
     RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(""), handler, this)))
 
-fun Method.bind(handler: HttpHandler) = asPredicate().bind(handler)
+fun Method.bind(handler: HttpHandler): RoutingHttpHandler = asPredicate().bind(handler)
+
+fun RoutingHttpHandler.and(predicate: Predicate) = withPredicate(predicate)
 
 /**
  * Simple Reverse Proxy which will split and direct traffic to the appropriate
