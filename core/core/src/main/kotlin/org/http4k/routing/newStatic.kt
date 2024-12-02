@@ -26,9 +26,9 @@ data class NewStaticRouteMatcher(
     private val resourceLoader: ResourceLoader,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>): NewRouteMatcher {
 
-    private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
+    private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun match(request: Request): HttpMatchResult = handlerNoFilter(request).let {
+    override fun match(request: Request): HttpMatchResult = handler(request).let {
         when {
             it.status != NOT_FOUND -> HttpMatchResult(0) { _: Request -> it }
             else -> HttpMatchResult(2) { _: Request -> Response(NOT_FOUND) }
