@@ -22,8 +22,7 @@ infix fun String.bind(action: HttpHandler) =
 infix fun Predicate.bind(handler: HttpHandler): RoutingHttpHandler =
     RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(""), handler, this)))
 
-infix fun Predicate.bind(handler: RoutingHttpHandler): RoutingHttpHandler = // TODO this will fail
-    RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(""), handler, this)))
+infix fun Predicate.bind(handler: RoutingHttpHandler): RoutingHttpHandler = handler.withPredicate(this)
 
 fun Method.bind(handler: HttpHandler): RoutingHttpHandler = asPredicate().bind(handler)
 

@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.routing.PredicateResult.Matched
 import org.http4k.routing.PredicateResult.NotMatched
 
@@ -30,3 +31,6 @@ val orElse = Fallback
 fun Predicate.and(other: Predicate): Predicate = Predicate("($this AND $other)") { this(it) is Matched && other(it) is Matched }
 fun Predicate.or(other: Predicate): Predicate = Predicate("($this OR $other)") { this(it) is Matched || other(it) is Matched }
 fun Predicate.not(): Predicate = Predicate("NOT $this") { this(it) !is Matched  }
+
+fun ((Request) -> Boolean).asPredicate(name: String = "") = Predicate(name, NOT_FOUND, this)
+
