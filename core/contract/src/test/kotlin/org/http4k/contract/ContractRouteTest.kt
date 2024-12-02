@@ -91,10 +91,10 @@ class ContractRouteTest {
         val router = route.toRouter(Root)
         assertThat(
             router.match(Request(GET, "/")),
-            equalTo(MatchingHandler(handler, router.description) as RouterMatch)
+            equalTo(MatchingHandler(handler) as RouterMatch)
         )
-        assertThat(router.match(Request(POST, "/")), equalTo(Unmatched(router.description) as RouterMatch))
-        assertThat(router.match(Request(GET, "/bob")), equalTo(Unmatched(router.description) as RouterMatch))
+        assertThat(router.match(Request(POST, "/")), equalTo(Unmatched as RouterMatch))
+        assertThat(router.match(Request(GET, "/bob")), equalTo(Unmatched as RouterMatch))
     }
 
     @Test
@@ -334,11 +334,11 @@ class ContractRouteTest {
         val routerOnNoPrefix = route.toRouter(Root)
         assertThat(
             routerOnNoPrefix.match(Request(GET, "")),
-            equalTo(Unmatched(routerOnNoPrefix.description) as RouterMatch)
+            equalTo(Unmatched as RouterMatch)
         )
         assertThat(
             routerOnNoPrefix.match(Request(POST, valid)),
-            equalTo(Unmatched(routerOnNoPrefix.description) as RouterMatch)
+            equalTo(Unmatched as RouterMatch)
         )
         assertThat(
             routerOnNoPrefix.match(Request(GET, valid)).matchOrNull()?.invoke(Request(GET, valid))?.bodyString(),
@@ -348,11 +348,11 @@ class ContractRouteTest {
         val routerOnPrefix = route.toRouter(Root / "somePrefix")
         assertThat(
             routerOnPrefix.match(Request(GET, "/somePrefix")),
-            equalTo(Unmatched(routerOnPrefix.description) as RouterMatch)
+            equalTo(Unmatched as RouterMatch)
         )
         assertThat(
             routerOnPrefix.match(Request(POST, "/somePrefix/$valid")),
-            equalTo(Unmatched(routerOnPrefix.description) as RouterMatch)
+            equalTo(Unmatched as RouterMatch)
         )
         assertThat(
             routerOnPrefix.match(Request(GET, "/somePrefix/$valid")).matchOrNull()?.invoke(Request(GET, valid))

@@ -54,12 +54,12 @@ class ContractRoute internal constructor(
                             MatchingHandler(
                                 if (request.method == OPTIONS) {
                                     { Response(OK) }
-                                } else toHandler(it), description)
-                        } ?: Unmatched(description)
+                                } else toHandler(it))
+                        } ?: Unmatched
                 } catch (e: LensFailure) {
-                    Unmatched(description)
+                    Unmatched
                 }
-            } else Unmatched(description)
+            } else Unmatched
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)

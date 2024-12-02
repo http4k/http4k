@@ -14,31 +14,18 @@ interface Router {
 
 sealed class RouterMatch(
     val priority: Int,
-    open val description: RouterDescription,
-    open val subMatches: List<RouterMatch>
 ) : Comparable<RouterMatch> {
     data class MatchingHandler(
         private val httpHandler: HttpHandler,
-        override val description: RouterDescription,
-        override val subMatches: List<RouterMatch> = listOf()
-    ) : RouterMatch(0, description, subMatches), HttpHandler {
+    ) : RouterMatch(0), HttpHandler {
         override fun invoke(request: Request): Response = httpHandler(request)
     }
 
-    data class MatchedWithoutHandler(
-        override val description: RouterDescription,
-        override val subMatches: List<RouterMatch> = listOf()
-    ) : RouterMatch(1, description, subMatches)
+    data object MatchedWithoutHandler : RouterMatch(1)
 
-    data class MethodNotMatched(
-        override val description: RouterDescription,
-        override val subMatches: List<RouterMatch> = listOf()
-    ) : RouterMatch(2, description, subMatches)
+    data object MethodNotMatched : RouterMatch(2)
 
-    data class Unmatched(
-        override val description: RouterDescription,
-        override val subMatches: List<RouterMatch> = listOf()
-    ) : RouterMatch(3, description, subMatches)
+    data object Unmatched : RouterMatch(3)
 
     override fun compareTo(other: RouterMatch): Int = priority.compareTo(other.priority)
 }

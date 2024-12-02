@@ -62,14 +62,14 @@ data class ContractRouteMatcher(
     }
 
     private fun internalMatch(request: Request): RouterMatch {
-        val unmatched: RouterMatch = Unmatched(description)
+        val unmatched: RouterMatch = Unmatched
 
         return if (request.isIn(contractRoot)) {
             routers.fold(unmatched) { memo, (routeFilter, router) ->
                 when (memo) {
                     is MatchingHandler -> memo
                     else -> when (val matchResult = router.match(request)) {
-                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult), description)
+                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult))
                         else -> minOf(memo, matchResult)
                     }
                 }
